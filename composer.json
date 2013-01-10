@@ -34,7 +34,7 @@
             "src/Pheanstalk"
         ],
     	"files": [
-    		"src/helpers.php"
+            "src/helpers.php"
     	],
         "psr-0": {
             "Illuminate": "src/"
