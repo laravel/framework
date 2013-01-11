@@ -21,7 +21,7 @@
             "Illuminate\\Queue": ""
         },
         "classmap": [
-            "Pheanstalk"
+            "Illuminate/Queue/Pheanstalk"
         ]
     },
     "target-dir": "Illuminate/Queue",
