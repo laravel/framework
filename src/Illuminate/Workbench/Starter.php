@@ -13,7 +13,7 @@ class Starter {
 	{
 		$finder = $finder ?: new \Symfony\Component\Finder\Finder;
 
-		$files = $files ?: new \Illuminate\Filesystem;
+		$files = $files ?: new \Illuminate\Filesystem\Filesystem;
 
 		// We will use the finder to locate all "autoload.php" files in the workbench
 		// directory, then we will include them each so that they are able to load
