@@ -3,7 +3,7 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 
-class KeyGeneratorServiceProvider {
+class KeyGeneratorServiceProvider extends ServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
