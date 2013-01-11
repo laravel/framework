@@ -107,7 +107,7 @@ class Dispatcher extends SymfonyDispatcher {
 
 		return function(SymfonyEvent $event) use ($listener, $container)
 		{
-			// If the listener has a colon, we will assume it is being used to delimit
+			// If the listener has an @ sign, we will assume it is being used to delimit
 			// the class name from the handle method name. This allows for handlers
 			// to run multiple handler methods in a single class for convenience.
 			$segments = explode('@', $listener);
