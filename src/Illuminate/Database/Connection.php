@@ -642,6 +642,16 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Get the table prefix for the connection.
+	 *
+	 * @return string
+	 */
+	public function getTablePrefix()
+	{
+		return $this->tablePrefix;
+	}
+
+	/**
 	 * Set the table prefix and return the grammar.
 	 *
 	 * @param  Illuminate\Database\Grammar  $grammar

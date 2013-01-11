@@ -42,6 +42,8 @@ class Builder {
 	{
 		$sql = $this->grammar->compileTableExists();
 
+		$table = $this->connection->getTablePrefix().$table;
+
 		return count($this->connection->select($sql, array($table))) > 0;
 	}
 
