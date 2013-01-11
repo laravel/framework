@@ -9,12 +9,12 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/cache": "dev-master",
-        "illuminate/cookie": "dev-master",
-        "illuminate/database": "dev-master",
-        "illuminate/encryption": "dev-master",
-        "illuminate/filesystem": "dev-master",
-        "illuminate/support": "dev-master",
+        "illuminate/cache": "4.0.x",
+        "illuminate/cookie": "4.0.x",
+        "illuminate/database": "4.0.x",
+        "illuminate/encryption": "4.0.x",
+        "illuminate/filesystem": "4.0.x",
+        "illuminate/support": "4.0.x",
         "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {

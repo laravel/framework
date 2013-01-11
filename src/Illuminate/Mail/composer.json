@@ -8,10 +8,10 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/container": "dev-master",
-        "illuminate/log": "dev-master",
-        "illuminate/support": "dev-master",
-        "illuminate/view": "dev-master",
+        "illuminate/container": "4.0.x",
+        "illuminate/log": "4.0.x",
+        "illuminate/support": "4.0.x",
+        "illuminate/view": "4.0.x",
         "swiftmailer/swiftmailer": "4.3.*"
     },
     "require-dev": {

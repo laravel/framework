@@ -8,12 +8,12 @@
         }
     ],
     "require": {
-        "illuminate/filesystem": "dev-master",
-        "illuminate/support": "dev-master",
+        "illuminate/filesystem": "4.0.x",
+        "illuminate/support": "4.0.x",
         "symfony/finder": "2.2.*"
     },
     "require-dev": {
-        "illuminate/console": "dev-master",
+        "illuminate/console": "4.0.x",
         "mockery/mockery": "0.7.2"
     },
     "autoload": {

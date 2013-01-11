@@ -9,8 +9,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/container": "dev-master",
-        "illuminate/support": "dev-master",
+        "illuminate/container": "4.0.x",
+        "illuminate/support": "4.0.x",
         "symfony/event-dispatcher": "2.2.*"
     },
     "require-dev": {

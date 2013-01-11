@@ -9,17 +9,17 @@
         }
     ],
     "require": {
-        "illuminate/container": "dev-master",
-        "illuminate/http": "dev-master",
-        "illuminate/session": "dev-master",
-        "illuminate/support": "dev-master",
+        "illuminate/container": "4.0.x",
+        "illuminate/http": "4.0.x",
+        "illuminate/session": "4.0.x",
+        "illuminate/support": "4.0.x",
         "symfony/http-foundation": "2.2.*",
         "symfony/http-kernel": "2.2.*",
         "symfony/routing": "2.2.*"
     },
     "require-dev": {
-        "illuminate/console": "dev-master",
-        "illuminate/filesystem": "dev-master",
+        "illuminate/console": "4.0.x",
+        "illuminate/filesystem": "4.0.x",
         "mockery/mockery": "0.7.2"
     },
     "autoload": {

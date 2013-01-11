@@ -8,8 +8,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/filesystem": "dev-master",
-        "illuminate/support": "dev-master",
+        "illuminate/filesystem": "4.0.x",
+        "illuminate/support": "4.0.x",
         "symfony/translation": "2.2.*"
     },
     "require-dev": {

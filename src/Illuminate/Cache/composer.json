@@ -8,11 +8,11 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/database": "dev-master",
-        "illuminate/encryption": "dev-master",
-        "illuminate/filesystem": "dev-master",
-        "illuminate/redis": "dev-master",
-        "illuminate/support": "dev-master"
+        "illuminate/database": "4.0.x",
+        "illuminate/encryption": "4.0.x",
+        "illuminate/filesystem": "4.0.x",
+        "illuminate/redis": "4.0.x",
+        "illuminate/support": "4.0.x"
     },
     "autoload": {
         "psr-0": {"Illuminate\\Cache": ""}
