@@ -22,7 +22,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
 
 	public function testContainerResolutionOfEventHandlers()
 	{
-		$d = new Dispatcher($container = m::mock('Illuminate\Container'));
+		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
 		$handler->shouldReceive('onFooEvent')->once()->with(m::type('Illuminate\Events\Event'));
 		$d->listen('foo', 'FooHandler@onFooEvent');
@@ -32,7 +32,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
 
 	public function testContainerResolutionOfEventHandlersWithDefaultMethods()
 	{
-		$d = new Dispatcher($container = m::mock('Illuminate\Container'));
+		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
 		$handler->shouldReceive('handle')->once()->with(m::type('Illuminate\Events\Event'));
 		$d->listen('foo', 'FooHandler');

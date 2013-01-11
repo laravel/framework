@@ -97,7 +97,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testNullIsReturnedForUserIfNoUserFound()
 	{
 		$mock = $this->getGuard();
-		$mock->setCookieJar($cookies = m::mock('Illuminate\CookieJar'));
+		$mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
 		$cookies->shouldReceive('get')->once()->andReturn(null);
 		$mock->getSession()->shouldReceive('get')->once()->andReturn(null);
 		$this->assertNull($mock->user());
@@ -119,7 +119,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName', 'getRecallerName'), array($provider, $session, $request));
-		$mock->setCookieJar($cookies = m::mock('Illuminate\CookieJar'));
+		$mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
@@ -147,7 +147,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testLoginMethodQueuesCookieWhenRemembering()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$cookie = m::mock('Illuminate\CookieJar');
+		$cookie = m::mock('Illuminate\Cookie\CookieJar');
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->setCookieJar($cookie);
 		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo')->andReturn(new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo'));
@@ -169,7 +169,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => 'recaller'));
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
-		$cookie = m::mock('Illuminate\CookieJar');
+		$cookie = m::mock('Illuminate\Cookie\CookieJar');
 		$guard->setCookieJar($cookie);
 		$cookie->shouldReceive('get')->once()->with($guard->getRecallerName())->andReturn('recaller');
 		$guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
@@ -192,14 +192,14 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 			m::mock('Illuminate\Session\Store'),
 			m::mock('Illuminate\Auth\UserProviderInterface'),
 			Symfony\Component\HttpFoundation\Request::create('/', 'GET'),
-			m::mock('Illuminate\CookieJar'),
+			m::mock('Illuminate\Cookie\CookieJar'),
 		);
 	}
 
 
 	protected function getCookieJar()
 	{
-		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Encrypter'), array('domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false));
+		return new Illuminate\Cookie\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Encryption\Encrypter'), array('domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false));
 	}
 
 }

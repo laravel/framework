@@ -42,7 +42,7 @@ class BeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 	protected function getJob()
 	{
 		return new Illuminate\Queue\Jobs\BeanstalkdJob(
-			m::mock('Illuminate\Container'),
+			m::mock('Illuminate\Container\Container'),
 			m::mock('Pheanstalk'),
 			m::mock('Pheanstalk_Job')
 		);

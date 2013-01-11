@@ -90,7 +90,7 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getLoader()
 	{
-		return new Illuminate\Config\FileLoader(m::mock('Illuminate\Filesystem'), __DIR__);
+		return new Illuminate\Config\FileLoader(m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 	}
 
 }

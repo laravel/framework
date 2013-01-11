@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Illuminate\CookieJar;
-use Illuminate\Encrypter;
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends PHPUnit_Framework_TestCase {

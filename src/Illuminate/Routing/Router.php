@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Container;
 use Illuminate\Http\Response;
+use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;

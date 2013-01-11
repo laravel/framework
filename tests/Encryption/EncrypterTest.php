@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Encrypter;
+use Illuminate\Encryption\Encrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase {
 
@@ -14,7 +14,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @expectedException Illuminate\DecryptException
+	 * @expectedException Illuminate\Encryption\DecryptException
 	 */
 	public function testExceptionThrownWhenPayloadIsInvalid()
 	{
@@ -26,7 +26,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @expectedException Illuminate\DecryptException
+	 * @expectedException Illuminate\Encryption\DecryptException
 	 */
 	public function testExceptionThrownWhenValueIsInvalid()
 	{

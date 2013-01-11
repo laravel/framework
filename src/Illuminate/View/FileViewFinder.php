@@ -1,6 +1,6 @@
 <?php namespace Illuminate\View;
 
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class FileViewFinder implements ViewFinderInterface {
 

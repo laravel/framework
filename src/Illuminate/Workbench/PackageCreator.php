@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Workbench;
 
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class PackageCreator {
 

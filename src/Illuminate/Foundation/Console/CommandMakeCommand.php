@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Filesystem;
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 

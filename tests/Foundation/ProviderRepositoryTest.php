@@ -12,7 +12,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
 	{
-		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem'), array(__DIR__)));
+		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
 		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$app = m::mock('Illuminate\Foundation\Application[register,setDeferredServices,runningInConsole]');
@@ -28,7 +28,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testServicesAreNeverLazyLoadedWhenRunningInConsole()
 	{
-		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem'), array(__DIR__)));
+		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
 		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$app = m::mock('Illuminate\Foundation\Application[register,setDeferredServices,runningInConsole]');
@@ -75,7 +75,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testShouldRecompileReturnsCorrectValue()
 	{
-		$repo = new Illuminate\Foundation\ProviderRepository(new Illuminate\Filesystem, __DIR__);
+		$repo = new Illuminate\Foundation\ProviderRepository(new Illuminate\Filesystem\Filesystem, __DIR__);
 		$this->assertTrue($repo->shouldRecompile(null, array()));
 		$this->assertTrue($repo->shouldRecompile(array('providers' => array('foo')), array('foo', 'bar')));
 		$this->assertFalse($repo->shouldRecompile(array('providers' => array('foo')), array('foo')));
@@ -84,7 +84,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoadManifestReturnsParsedJSON()
 	{
-		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem'), __DIR__);
+		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/services.json')->andReturn(true);
 		$files->shouldReceive('get')->once()->with(__DIR__.'/services.json')->andReturn(json_encode($array = array('users' => array('dayle' => true))));
 		$app = new Illuminate\Foundation\Application;
@@ -95,7 +95,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testWriteManifestStoresToProperLocation()
 	{
-		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem'), __DIR__);
+		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('put')->once()->with(__DIR__.'/services.json', json_encode(array('foo')));
 		$app = new Illuminate\Foundation\Application;
 

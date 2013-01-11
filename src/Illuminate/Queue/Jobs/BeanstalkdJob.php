@@ -2,7 +2,7 @@
 
 use Pheanstalk;
 use Pheanstalk_Job;
-use Illuminate\Container;
+use Illuminate\Container\Container;
 
 class BeanstalkdJob extends Job {
 

@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Console;
 
-use Illuminate\Container;
+use Illuminate\Container\Container;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 

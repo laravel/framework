@@ -39,7 +39,7 @@ class BeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
 	public function testPopProperlyPopsJobOffOfBeanstalkd()
 	{
 		$queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk'), 'default');
-		$queue->setContainer(m::mock('Illuminate\Container'));
+		$queue->setContainer(m::mock('Illuminate\Container\Container'));
 		$pheanstalk = $queue->getPheanstalk();
 		$pheanstalk->shouldReceive('watchOnly')->once()->with('default')->andReturn($pheanstalk);
 		$job = m::mock('Pheanstalk_Job');

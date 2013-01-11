@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Cache;
 
-use Illuminate\Encrypter;
 use Illuminate\Database\Connection;
+use Illuminate\Encryption\Encrypter;
 
 class DatabaseStore extends Store {
 

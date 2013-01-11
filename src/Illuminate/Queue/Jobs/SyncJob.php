@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Container;
+use Illuminate\Container\Container;
 
 class SyncJob extends Job {
 

@@ -52,7 +52,7 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase {
 
 	protected function getCreator()
 	{
-		$files = m::mock('Illuminate\Filesystem');
+		$files = m::mock('Illuminate\Filesystem\Filesystem');
 
 		return $this->getMock('Illuminate\Database\Migrations\MigrationCreator', array('getDatePrefix'), array($files));
 	}

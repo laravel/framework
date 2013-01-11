@@ -1,7 +1,7 @@
 <?php
 
 use Mockery as m;
-use Illuminate\CookieJar;
+use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieStore;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,7 +15,7 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testRetrieveSessionProperlyRetrievesCookie()
 	{
-		$store = new CookieStore($cookies = m::mock('Illuminate\CookieJar'));
+		$store = new CookieStore($cookies = m::mock('Illuminate\Cookie\CookieJar'));
 		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn(1);
 		$cookies->shouldReceive('get')->once()->with('illuminate_payload')->andReturn(serialize($expect = array('id' => '1', 'data' => array('foo' => 'bar'), 'last_activity' => '9999999999')));
 		$store->start($cookies);
@@ -25,7 +25,7 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreateSessionStoresCookiePayload()
 	{
-		$store = new Illuminate\Session\CookieStore($cookie = m::mock('Illuminate\CookieJar'));
+		$store = new Illuminate\Session\CookieStore($cookie = m::mock('Illuminate\Cookie\CookieJar'));
 		$session = array('id' => '1', 'data' => array(':old:' => array(), ':new:' => array()));
 		$cookie->shouldReceive('make')->once()
 			->with('illuminate_payload', serialize($session))
@@ -66,7 +66,7 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 
 	protected function getCookieJar()
 	{
-		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Encrypter'), array('path' => '/', 'domain' => 'foo.com', 'secure' => true, 'httpOnly' => true));
+		return new Illuminate\Cookie\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Encryption\Encrypter'), array('path' => '/', 'domain' => 'foo.com', 'secure' => true, 'httpOnly' => true));
 	}
 
 }

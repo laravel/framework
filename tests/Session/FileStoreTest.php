@@ -14,7 +14,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testRetrieveSessionReturnsFileWhenItExists()
 	{
-		$files = m::mock('Illuminate\Filesystem');
+		$files = m::mock('Illuminate\Filesystem\Filesystem');
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/foo')->andReturn(true);
 		$files->shouldReceive('get')->once()->with(__DIR__.'/foo')->andReturn(serialize('hello'));
 		$store = new Illuminate\Session\FileStore($files, __DIR__);
@@ -25,7 +25,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testRetrieveSessionReturnsNullWhenItDoesntExist()
 	{
-		$files = m::mock('Illuminate\Filesystem');
+		$files = m::mock('Illuminate\Filesystem\Filesystem');
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/foo')->andReturn(false);
 		$store = new Illuminate\Session\FileStore($files, __DIR__);
 
@@ -35,7 +35,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreateSessionStoresSessionInProperPath()
 	{
-		$files = m::mock('Illuminate\Filesystem');
+		$files = m::mock('Illuminate\Filesystem\Filesystem');
 		$files->shouldReceive('put')->once()->with(__DIR__.'/foo', serialize(array('foo')));
 		$store = new Illuminate\Session\FileStore($files, __DIR__);
 		$store->createSession('foo', array('foo'), new Response);
@@ -44,7 +44,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testUpdateSessionStoresSessionInProperPath()
 	{
-		$files = m::mock('Illuminate\Filesystem');
+		$files = m::mock('Illuminate\Filesystem\Filesystem');
 		$files->shouldReceive('put')->once()->with(__DIR__.'/foo', serialize(array('foo')));
 		$store = new Illuminate\Session\FileStore($files, __DIR__);
 		$store->updateSession('foo', array('foo'), new Response);
@@ -53,7 +53,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testSweepCleansDirectory()
 	{
-		$mock = m::mock('Illuminate\Filesystem');
+		$mock = m::mock('Illuminate\Filesystem\Filesystem');
 
 		$store = new Illuminate\Session\FileStore($mock, __DIR__);
 

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database;
 
-use Illuminate\Filesystem;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Filesystem\Filesystem;
 
 class Seeder {
 

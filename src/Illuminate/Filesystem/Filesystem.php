@@ -1,4 +1,4 @@
-<?php namespace Illuminate;
+<?php namespace Illuminate\Filesystem;
 
 use FilesystemIterator;
 

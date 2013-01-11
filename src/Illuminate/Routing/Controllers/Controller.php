@@ -2,8 +2,8 @@
 
 use Closure;
 use ReflectionClass;
-use Illuminate\Container;
 use Illuminate\Routing\Router;
+use Illuminate\Container\Container;
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

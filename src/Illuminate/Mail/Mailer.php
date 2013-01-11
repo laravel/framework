@@ -3,9 +3,9 @@
 use Closure;
 use Swift_Mailer;
 use Swift_Message;
-use Illuminate\Container;
 use Illuminate\Log\Writer;
 use Illuminate\View\Environment;
+use Illuminate\Container\Container;
 
 class Mailer {
 

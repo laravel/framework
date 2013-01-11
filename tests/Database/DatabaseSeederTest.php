@@ -13,7 +13,7 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 
 	public function testTablesAreSeededFromSeedFiles()
 	{
-		$seeder = new Seeder($files = m::mock('Illuminate\Filesystem'), $events = m::mock('Illuminate\Events\Dispatcher'));
+		$seeder = new Seeder($files = m::mock('Illuminate\Filesystem\Filesystem'), $events = m::mock('Illuminate\Events\Dispatcher'));
 		$files->shouldReceive('glob')->once()->with('path/*.php')->andReturn(array('path/b.php', 'path/a.php'));
 		$files->shouldReceive('getRequire')->once()->with('path/a.php')->andReturn(array('table' => 'a_table', array('name' => 'Taylor')));
 		$files->shouldReceive('getRequire')->once()->with('path/b.php')->andReturn(array(array('name' => 'Dayle')));

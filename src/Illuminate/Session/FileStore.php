@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Session;
 
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 
 class FileStore extends Store implements Sweeper {

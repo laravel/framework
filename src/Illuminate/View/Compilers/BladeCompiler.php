@@ -1,7 +1,7 @@
 <?php namespace Illuminate\View\Compilers;
 
 use Closure;
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class BladeCompiler extends Compiler implements CompilerInterface {
 

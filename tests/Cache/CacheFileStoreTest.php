@@ -79,7 +79,7 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 
 	protected function mockFilesystem()
 	{
-		return $this->getMock('Illuminate\Filesystem');
+		return $this->getMock('Illuminate\Filesystem\Filesystem');
 	}
 
 }

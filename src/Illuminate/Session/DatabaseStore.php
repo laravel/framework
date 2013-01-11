@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Session;
 
-use Illuminate\Encrypter;
 use Illuminate\Database\Connection;
+use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Response;
 
 class DatabaseStore extends Store implements Sweeper {

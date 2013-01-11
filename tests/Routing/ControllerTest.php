@@ -14,7 +14,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 	public function testBasicMethodExecution()
 	{
 		$controller = new BasicControllerStub;
-		$container = new Illuminate\Container;
+		$container = new Illuminate\Container\Container;
 		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
 		$container['filter.parser']->shouldReceive('parse')->andReturn(array());
 		$router = m::mock('Illuminate\Routing\Router');
@@ -30,7 +30,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 	public function testLayoutsCanBeReturned()
 	{
 		$controller = new LayoutControllerStub;
-		$container = new Illuminate\Container;
+		$container = new Illuminate\Container\Container;
 		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
 		$container['filter.parser']->shouldReceive('parse')->andReturn(array());
 		$router = m::mock('Illuminate\Routing\Router');
@@ -46,7 +46,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 	public function testBeforeFiltersAreCalledAndHaltRequestLifecycle()
 	{
 		$controller = new BasicControllerStub;
-		$container = new Illuminate\Container;
+		$container = new Illuminate\Container\Container;
 		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
 		$container['filter.parser']->shouldReceive('parse')->twice()->andReturn(array('foo-filter', 'foo-filter-2'), array());
 		$router = m::mock('Illuminate\Routing\Router');
@@ -65,7 +65,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 		$controller = new BasicControllerStub;
 		$callback = function() { return 'filtered!'; };
 		$controller->beforeFilter($callback);
-		$container = new Illuminate\Container;
+		$container = new Illuminate\Container\Container;
 		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
 		$container['filter.parser']->shouldReceive('parse')->twice()->andReturn(array($filterName = spl_object_hash($callback)), array());
 		$router = m::mock('Illuminate\Routing\Router');
@@ -82,7 +82,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 	{
 		unset($_SERVER['__controller.after']);
 		$controller = new BasicControllerStub;
-		$container = new Illuminate\Container;
+		$container = new Illuminate\Container\Container;
 		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
 		$container['filter.parser']->shouldReceive('parse')->twice()->andReturn(array('foo-filter'), array());
 		$router = m::mock('Illuminate\Routing\Router');
@@ -108,7 +108,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 		$controller = new BasicControllerStub;
 		$callback = function() { $_SERVER['__controller.after'] = true; };
 		$controller->afterFilter($callback);
-		$container = new Illuminate\Container;
+		$container = new Illuminate\Container\Container;
 		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
 		$container['filter.parser']->shouldReceive('parse')->twice()->andReturn(array($hash = spl_object_hash($callback)), array());
 		$router = m::mock('Illuminate\Routing\Router');

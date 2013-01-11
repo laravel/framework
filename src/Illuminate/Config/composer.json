@@ -1,0 +1,24 @@
+{
+    "name": "illuminate/config",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/filesystem": "1.2.*",
+        "illuminate/support": "1.2.*"
+    },
+    "autoload": {
+        "psr-0": {"Illuminate\\Config": ""}
+    },
+    "target-dir": "Illuminate/Config",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.2-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}

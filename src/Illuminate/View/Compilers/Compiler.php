@@ -1,6 +1,6 @@
 <?php namespace Illuminate\View\Compilers;
 
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 abstract class Compiler {
 

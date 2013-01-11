@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Routing\Generators;
 
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class ControllerGenerator {
 

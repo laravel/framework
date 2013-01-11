@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Migrations;
 
 use Closure;
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class MigrationCreator {
 

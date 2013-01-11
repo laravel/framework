@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Container;
+use Illuminate\Container\Container;
 
 class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 

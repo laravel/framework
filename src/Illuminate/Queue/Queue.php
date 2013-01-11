@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Queue;
 
-use Illuminate\Container;
+use Illuminate\Container\Container;
 
 abstract class Queue {
 

@@ -79,7 +79,7 @@ class MailerTest extends PHPUnit_Framework_TestCase {
 		$message = m::mock('StdClass');
 		$mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
 		$view = m::mock('StdClass');
-		$container = new Illuminate\Container;
+		$container = new Illuminate\Container\Container;
 		$mailer->setContainer($container);
 		$mockMailer = m::mock('StdClass');
 		$container['FooMailer'] = $container->share(function() use ($mockMailer)

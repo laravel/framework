@@ -74,7 +74,7 @@ class DatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	protected function getStore()
 	{
-		return new DatabaseStore(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Encrypter'), 'table');
+		return new DatabaseStore(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Encryption\Encrypter'), 'table');
 	}
 
 }

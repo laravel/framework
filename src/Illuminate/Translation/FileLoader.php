@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Translation;
 
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class FileLoader implements LoaderInterface {
 

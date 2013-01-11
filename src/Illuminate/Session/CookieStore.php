@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Session;
 
-use Illuminate\CookieJar;
+use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Response;
 
 class CookieStore extends Store {

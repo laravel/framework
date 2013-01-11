@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Cache; use Illuminate\Filesystem;
+<?php namespace Illuminate\Cache; use Illuminate\Filesystem\Filesystem;
 
 class FileStore extends Store {
 

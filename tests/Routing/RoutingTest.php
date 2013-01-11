@@ -98,7 +98,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	public function testControllersAreCalledFromControllerRoutes()
 	{
 		$router = new Router;
-		$container = m::mock('Illuminate\Container');
+		$container = m::mock('Illuminate\Container\Container');
 		$controller = m::mock('stdClass');
 		$controller->shouldReceive('callAction')->once()->with($container, $router, 'index', array('taylor'))->andReturn('foo');
 		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
@@ -113,7 +113,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	public function testControllerMethodBackReferencesCanBeUsed()
 	{
 		$router = new Router;
-		$container = m::mock('Illuminate\Container');
+		$container = m::mock('Illuminate\Container\Container');
 		$controller = m::mock('stdClass');
 		$controller->shouldReceive('callAction')->once()->with($container, $router, 'getBar', array('1', 'taylor'))->andReturn('foo');
 		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
@@ -128,7 +128,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	public function testControllerMethodBackReferencesUseGetMethodOnHeadRequest()
 	{
 		$router = new Router;
-		$container = m::mock('Illuminate\Container');
+		$container = m::mock('Illuminate\Container\Container');
 		$controller = m::mock('stdClass');
 		$controller->shouldReceive('callAction')->once()->with($container, $router, 'getBar', array('1', 'taylor'))->andReturn('foo');
 		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
@@ -144,7 +144,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	public function testControllerMethodBackReferencesCanPointToIndex()
 	{
 		$router = new Router;
-		$container = m::mock('Illuminate\Container');
+		$container = m::mock('Illuminate\Container\Container');
 		$controller = m::mock('stdClass');
 		$controller->shouldReceive('callAction')->once()->with($container, $router, 'postIndex', array())->andReturn('foo');
 		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
@@ -159,7 +159,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	public function testControllersAreCalledFromControllerRoutesWithUsesStatement()
 	{
 		$router = new Router;
-		$container = m::mock('Illuminate\Container');
+		$container = m::mock('Illuminate\Container\Container');
 		$controller = m::mock('stdClass');
 		$controller->shouldReceive('callAction')->once()->with($container, $router, 'index', array('taylor'))->andReturn('foo');
 		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
@@ -213,7 +213,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->before(function() { return 'foo'; });
 		$this->assertEquals('foo', $router->dispatch(Request::create('/bar', 'GET'))->getContent());
 
-		$router = new Router($container = m::mock('Illuminate\Container'));
+		$router = new Router($container = m::mock('Illuminate\Container\Container'));
 		$filter = m::mock('stdClass');
 		$filter->shouldReceive('filter')->once()->with(m::type('Symfony\Component\HttpFoundation\Request'))->andReturn('foo');
 		$container->shouldReceive('make')->once()->with('FooFilter')->andReturn($filter);
@@ -398,7 +398,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testStringFilterAreResolvedOutOfTheContainer()
 	{
-		$router = new Router($container = m::mock('Illuminate\Container'));
+		$router = new Router($container = m::mock('Illuminate\Container\Container'));
 		$router->addFilter('foo', 'FooFilter');
 		$container->shouldReceive('make')->once()->with('FooFilter')->andReturn('bar');
 
@@ -408,7 +408,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testCurrentRouteNameCanBeChecked()
 	{
-		$router = new Router(new Illuminate\Container);
+		$router = new Router(new Illuminate\Container\Container);
 		$route = $router->get('foo', array('as' => 'foo.route', function() {}));
 		$route2 = $router->get('bar', array('as' => 'bar.route', function() {}));
 		$router->setCurrentRoute($route);
@@ -420,7 +420,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testCurrentRouteActionCanBeChecked()
 	{
-		$router = new Router(new Illuminate\Container);
+		$router = new Router(new Illuminate\Container\Container);
 		$route = $router->get('foo', array('uses' => 'foo.route@action'));
 		$route2 = $router->get('bar', array('uses' => 'bar.route@action'));
 		$router->setCurrentRoute($route);

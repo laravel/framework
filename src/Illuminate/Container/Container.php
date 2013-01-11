@@ -1,4 +1,4 @@
-<?php namespace Illuminate; use Closure, ArrayAccess;
+<?php namespace Illuminate\Container; use Closure, ArrayAccess;
 
 class BindingResolutionException extends \Exception {}
 

@@ -1,7 +1,7 @@
-<?php namespace Illuminate;
+<?php namespace Illuminate\Cookie;
 
 use Closure;
-use Illuminate\Encrypter;
+use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

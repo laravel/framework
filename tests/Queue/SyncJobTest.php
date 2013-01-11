@@ -12,7 +12,7 @@ class SyncJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testFireResolvesAndFiresJobClass()
 	{
-		$container = m::mock('Illuminate\Container');
+		$container = m::mock('Illuminate\Container\Container');
 		$job = new Illuminate\Queue\Jobs\SyncJob($container, 'Foo', 'data');
 		$handler = m::mock('StdClass');
 		$container->shouldReceive('make')->once()->with('Foo')->andReturn($handler);

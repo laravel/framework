@@ -1,7 +1,7 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\FileLoader;
 
 class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
@@ -14,7 +14,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoadMethodWithoutNamespacesProperlyCallsLoader()
 	{
-		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem'), __DIR__);
+		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/en/foo.php')->andReturn(true);
 		$files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/foo.php')->andReturn(array('messages'));
 
@@ -24,7 +24,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testArraysAreCollapsedIntoDotNotation()
 	{
-		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem'), __DIR__);
+		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/en/foo.php')->andReturn(true);
 		$files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/foo.php')->andReturn(array('messages' => array('foo' => 'bar')));
 
@@ -34,7 +34,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoadMethodWithNamespacesProperlyCallsLoader()
 	{
-		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem'), __DIR__);
+		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with('bar/en/foo.php')->andReturn(true);
 		$files->shouldReceive('getRequire')->once()->with('bar/en/foo.php')->andReturn(array('messages'));
 		$loader->addNamespace('namespace', 'bar');
@@ -45,7 +45,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testEmptyArraysReturnedWhenFilesDontExist()
 	{
-		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem'), __DIR__);
+		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/en/foo.php')->andReturn(false);
 		$files->shouldReceive('getRequire')->never();
 
@@ -55,7 +55,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testEmptyArraysReturnedWhenFilesDontExistForNamespacedItems()
 	{
-		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem'), __DIR__);
+		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('getRequire')->never();
 
 		$this->assertEquals(array(), $loader->load('en', 'foo', 'bar'));

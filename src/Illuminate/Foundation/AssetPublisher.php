@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation;
 
-use Illuminate\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class AssetPublisher {
 
