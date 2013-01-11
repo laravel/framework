@@ -8,8 +8,8 @@
         }
     ],
     "require": {
-        "illuminate/session": "1.2.*",
-        "illuminate/support": "1.2.*",
+        "illuminate/session": "dev-master",
+        "illuminate/support": "dev-master",
         "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {

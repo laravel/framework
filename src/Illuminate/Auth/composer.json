@@ -8,11 +8,11 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/cookie": "1.2.*",
-        "illuminate/encryption": "1.2.*",
-        "illuminate/hashing": "1.2.*",
-        "illuminate/session": "1.2.*",
-        "illuminate/support": "1.2.*",
+        "illuminate/cookie": "dev-master",
+        "illuminate/encryption": "dev-master",
+        "illuminate/hashing": "dev-master",
+        "illuminate/session": "dev-master",
+        "illuminate/support": "dev-master",
         "symfony/http-foundation": "2.2.*"
     },
     "autoload": {

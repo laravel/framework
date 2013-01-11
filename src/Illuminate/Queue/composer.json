@@ -8,9 +8,9 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/console": "1.2.*",
-        "illuminate/container": "1.2.*",
-        "illuminate/support": "1.2.*"
+        "illuminate/console": "dev-master",
+        "illuminate/container": "dev-master",
+        "illuminate/support": "dev-master"
     },
     "require-dev": {
         "iron-io/iron_mq": "1.2.*",

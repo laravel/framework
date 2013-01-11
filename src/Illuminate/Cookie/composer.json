@@ -9,8 +9,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/encryption": "1.2.*",
-        "illuminate/support": "1.2.*",
+        "illuminate/encryption": "dev-master",
+        "illuminate/support": "dev-master",
         "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {
