@@ -25,7 +25,7 @@
     "target-dir": "Illuminate/Mail",
     "extra": {
         "branch-alias": {
-            "dev-master": "1.2-dev"
+            "dev-master": "4.0-dev"
         }
     },
     "minimum-stability": "dev"
