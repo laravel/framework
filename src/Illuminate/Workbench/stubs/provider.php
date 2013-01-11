@@ -12,13 +12,23 @@ class {{name}}ServiceProvider extends ServiceProvider {
 	protected $defer = false;
 
 	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		$this->package('{{lower_vendor}}/{{lower_name}}');
+	}
+
+	/**
 	 * Register the {{full_package}} service provider.
 	 *
 	 * @return void
 	 */
 	public function register()
 	{
-		$this->package('{{lower_vendor}}/{{lower_name}}');
+		//
 	}
 
 	/**
