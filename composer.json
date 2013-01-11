@@ -26,12 +26,40 @@
         "symfony/routing": "2.2.*",
         "symfony/translation": "2.2.*"
     },
+    "replace": {
+        "illuminate/auth": "self.version",
+        "illuminate/cache": "self.version",
+        "illuminate/config": "self.version",
+        "illuminate/console": "self.version",
+        "illuminate/container": "self.version",
+        "illuminate/cookie": "self.version",
+        "illuminate/database": "self.version",
+        "illuminate/encryption": "self.version",
+        "illuminate/events": "self.version",
+        "illuminate/exception": "self.version",
+        "illuminate/filesystem": "self.version",
+        "illuminate/foundation": "self.version",
+        "illuminate/hashing": "self.version",
+        "illuminate/http": "self.version",
+        "illuminate/log": "self.version",
+        "illuminate/mail": "self.version",
+        "illuminate/pagination": "self.version",
+        "illuminate/queue": "self.version",
+        "illuminate/redis": "self.version",
+        "illuminate/routing": "self.version",
+        "illuminate/session": "self.version",
+        "illuminate/support": "self.version",
+        "illuminate/translation": "self.version",
+        "illuminate/validation": "self.version",
+        "illuminate/view": "self.version",
+        "illuminate/workbench": "self.version"
+    },
     "require-dev": {
         "mockery/mockery": "0.7.2"
     },
     "autoload": {
         "classmap": [
-            "src/Pheanstalk"
+            "src/Illuminate/Queue/Pheanstalk"
         ],
     	"files": [
             "src/Illuminate/Support/helpers.php"

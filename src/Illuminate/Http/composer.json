@@ -1,0 +1,30 @@
+{
+    "name": "illuminate/http",
+    "keywords": ["laravel"],
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/session": "1.2.*",
+        "illuminate/support": "1.2.*",
+        "symfony/http-foundation": "2.2.*"
+    },
+    "require-dev": {
+        "mockery/mockery": "0.7.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "Illuminate\\Http": ""
+        }
+    },
+    "target-dir": "Illuminate/Http",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.2-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}
