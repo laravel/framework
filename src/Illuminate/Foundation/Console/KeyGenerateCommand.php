@@ -27,6 +27,8 @@ class KeyGenerateCommand extends Command {
 	 */
 	public function __construct(Filesystem $files)
 	{
+		parent::__construct();
+
 		$this->files = $files;
 	}
 
