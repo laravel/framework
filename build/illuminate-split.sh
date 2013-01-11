@@ -10,7 +10,6 @@ git subsplit publish src/Illuminate/Encryption:git@github.com:illuminate/encrypt
 git subsplit publish src/Illuminate/Events:git@github.com:illuminate/events.git
 git subsplit publish src/Illuminate/Exception:git@github.com:illuminate/exception.git
 git subsplit publish src/Illuminate/Filesystem:git@github.com:illuminate/filesystem.git
-git subsplit publish src/Illuminate/Foundation:git@github.com:illuminate/foundation.git
 git subsplit publish src/Illuminate/Hashing:git@github.com:illuminate/hashing.git
 git subsplit publish src/Illuminate/Http:git@github.com:illuminate/http.git
 git subsplit publish src/Illuminate/Log:git@github.com:illuminate/log.git
