@@ -69,7 +69,7 @@ class WorkbenchMakeCommand extends Command {
 		// generated for the package. This will allow the devs to start migrating.
 		if ($this->input->getOption('composer'))
 		{
-			$this->comment('Installing depenencies for workbench...');
+			$this->comment('Installing dependencies for workbench...');
 
 			$this->callComposerUpdate($workbench);
 		}
