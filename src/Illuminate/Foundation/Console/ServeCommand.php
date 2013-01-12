@@ -28,11 +28,17 @@ class ServeCommand extends Command {
 	{
 		chdir($this->laravel['path.base']);
 
+		$host = 'localhost';
+		if ($this->input->getOption('any-host') === true)
+		{
+			$host = '0.0.0.0';
+		}
+
 		$port = $this->input->getOption('port');
 
-		$this->info("Laravel development server started on port {$port}...");
+		$this->info("Laravel development server started on {$host}:{$port}...");
 
-		passthru("php -S localhost:{$port} -t public server.php");
+		passthru("php -S {$host}:{$port} -t public server.php");
 	}
 
 	/**
@@ -43,6 +49,7 @@ class ServeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('any-host', null, InputOption::VALUE_NONE, 'Binds server to 0.0.0.0 for open access'),
 			array('port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000),
 		);
 	}
