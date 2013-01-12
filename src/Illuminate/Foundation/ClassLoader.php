@@ -19,6 +19,13 @@ class ClassLoader {
 	protected $directories = array();
 
 	/**
+	 * Indicates if a ClassLoader has been registered.
+	 *
+	 * @var bool
+	 */
+	protected static $registered = false;
+
+	/**
 	 * Create a new class loader instance.
 	 *
 	 * @param  array  $directories
@@ -67,13 +74,18 @@ class ClassLoader {
 	}
 
 	/**
-	 * Register the class loader on the auto-loader stack.
+	 * Register the given class loader on the auto-loader stack.
 	 *
 	 * @return void
 	 */
-	public function register()
+	public static function register(ClassLoader $loader)
 	{
-		spl_autoload_register(array($this, 'load'));
+		if ( ! static::$registered)
+		{
+			spl_autoload_register(array($loader, 'load'));
+
+			static::$registered = true;
+		}
 	}
 
 	/**
