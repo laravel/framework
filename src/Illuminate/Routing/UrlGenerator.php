@@ -172,16 +172,14 @@ class UrlGenerator {
 	{
 		$keys = $route->getVariableKeys();
 
+		// If the number of keys is less than the number of parameters on a route
+		// we'll fill out the parameter arrays with empty bindings on the rest
+		// of the spots until they are equal so we can run an array combine.
 		if (count($parameters) < count($keys))
 		{
-			// If the number of keys is less than the number of parameters on a route
-			// we'll fill out the parameter arrays with empty bindings on the rest
-			// of the spots until they are equal so we can run an array combine.
-			$paramCount = count($parameters);
+			$difference = count($keys) - count($parameters);
 
-			$difference = count($keys) - $paramCount;
-
-			$parameters += array_fill($paramCount, $difference, null);
+			$parameters += array_fill(count($parameters), $difference, null);
 		}
 
 		return array_combine($keys, $parameters);
