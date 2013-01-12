@@ -22,7 +22,7 @@ class {{name}}ServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Register the {{full_package}} service provider.
+	 * Register the service provider.
 	 *
 	 * @return void
 	 */

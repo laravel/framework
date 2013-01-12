@@ -12,7 +12,7 @@ class {{name}}ServiceProvider extends ServiceProvider {
 	protected $defer = false;
 
 	/**
-	 * Register the {{full_package}} service provider.
+	 * Register the service provider.
 	 *
 	 * @return void
 	 */
