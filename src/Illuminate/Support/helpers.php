@@ -303,6 +303,17 @@ function ends_with($haystack, $needle)
 }
 
 /**
+ * Get the first element of an array. Useful for method chaining.
+ *
+ * @param  array  $array
+ * @return mixed
+ */
+function head($array)
+{
+	return reset($array);
+}
+
+/**
  * Generate a path for the application.
  *
  * @param  string  $path

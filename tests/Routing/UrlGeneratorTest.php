@@ -56,6 +56,18 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRouteParametersCanBeShortCircuted()
+	{
+		$gen = $this->getGenerator();
+		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.baz', array('name' => 'taylor', 'age' => 25), true);
+		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
+		$gen->setGenerator($symfonyGen);
+
+		$gen->route('foo.baz', array('taylor', 25));	
+	}
+
+
 	public function testRoutesToControllerAreGenerated()
 	{
 		$gen = $this->getGenerator();
@@ -78,6 +90,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 
 		$router->get('foo/bar/{name}', array('as' => 'foo.bar', function() {}));
+		$router->get('foo/bar/{name}/baz/{age}', array('as' => 'foo.baz', function() {}));
 		$router->get('/boom/baz/{name}', array('uses' => 'FooController@fooAction'));
 
 		return new UrlGenerator($router->getRoutes(), Request::create('/'), 'assets.com');

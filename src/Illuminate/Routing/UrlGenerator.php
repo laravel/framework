@@ -140,7 +140,25 @@ class UrlGenerator {
 	 */
 	public function route($name, $parameters = array(), $absolute = true)
 	{
+		$route = $this->routes->get($name);
+
+		if (isset($route) and $this->quickParameters($parameters))
+		{
+			$parameters = array_combine($route->getVariableKeys(), $parameters);
+		}
+
 		return $this->generator->generate($name, $parameters, $absolute);
+	}
+
+	/**
+	 * Determine if we're short circuting the parameter list.
+	 *
+	 * @param  array  $parameters
+	 * @return bool
+	 */
+	protected function quickParameters(array $parameters)
+	{
+		return count($parameters) > 0 and is_numeric(head(array_keys($parameters)));
 	}
 
 	/**
