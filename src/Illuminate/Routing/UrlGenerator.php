@@ -182,7 +182,6 @@ class UrlGenerator {
 			$difference = count($keys) - $paramCount;
 
 			$parameters += array_fill($paramCount, $difference, null);
-			//var_dump($parameters);
 		}
 
 		return array_combine($keys, $parameters);
