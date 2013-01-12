@@ -56,6 +56,18 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRouteUrlGenerationWithOptional()
+	{
+		$gen = $this->getGenerator();
+		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.boom', array(), true);
+		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
+		$gen->setGenerator($symfonyGen);
+
+		$gen->route('foo.boom', array());
+	}
+
+
 	public function testRouteParametersCanBeShortCircuted()
 	{
 		$gen = $this->getGenerator();
@@ -65,6 +77,18 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$gen->setGenerator($symfonyGen);
 
 		$gen->route('foo.baz', array('taylor', 25));	
+	}
+
+
+	public function testRouteParametersCanBeShortCircutedWithOptionals()
+	{
+		$gen = $this->getGenerator();
+		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.breeze', array('boom' => 'bar', 'breeze' => null), true);
+		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
+		$gen->setGenerator($symfonyGen);
+
+		$gen->route('foo.breeze', array('bar'));	
 	}
 
 
@@ -91,6 +115,8 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$router->get('foo/bar/{name}', array('as' => 'foo.bar', function() {}));
 		$router->get('foo/bar/{name}/baz/{age}', array('as' => 'foo.baz', function() {}));
+		$router->get('foo/{boom?}', array('as' => 'foo.boom', function() {}));
+		$router->get('foo/{boom?}/{breeze?}', array('as' => 'foo.breeze', function() {}));
 		$router->get('/boom/baz/{name}', array('uses' => 'FooController@fooAction'));
 
 		return new UrlGenerator($router->getRoutes(), Request::create('/'), 'assets.com');
