@@ -142,9 +142,9 @@ class UrlGenerator {
 	{
 		$route = $this->routes->get($name);
 
-		if (isset($route) and $this->quickParameters($parameters))
+		if (isset($route) and $this->usingQuickParameters($parameters))
 		{
-			$parameters = array_combine($route->getVariableKeys(), $parameters);
+			$parameters = $this->buildParameterList($route, $parameters);
 		}
 
 		return $this->generator->generate($name, $parameters, $absolute);
@@ -156,9 +156,36 @@ class UrlGenerator {
 	 * @param  array  $parameters
 	 * @return bool
 	 */
-	protected function quickParameters(array $parameters)
+	protected function usingQuickParameters(array $parameters)
 	{
 		return count($parameters) > 0 and is_numeric(head(array_keys($parameters)));
+	}
+
+	/**
+	 * Build the parameter list for short circuit parameters.
+	 *
+	 * @param  Illuminate\Routing\Route  $route
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function buildParameterList($route, array $parameters)
+	{
+		$keys = $route->getVariableKeys();
+
+		if (count($parameters) < count($keys))
+		{
+			// If the number of keys is less than the number of parameters on a route
+			// we'll fill out the parameter arrays with empty bindings on the rest
+			// of the spots until they are equal so we can run an array combine.
+			$paramCount = count($parameters);
+
+			$difference = count($keys) - $paramCount;
+
+			$parameters += array_fill($paramCount, $difference, null);
+			//var_dump($parameters);
+		}
+
+		return array_combine($keys, $parameters);
 	}
 
 	/**

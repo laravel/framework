@@ -92,6 +92,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+
 	public function testRoutesToControllerAreGenerated()
 	{
 		$gen = $this->getGenerator();
