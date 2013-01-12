@@ -48,7 +48,7 @@ class ConfigPublishCommand extends Command {
 	 */
 	public function fire()
 	{
-		$package = $this->input->getArgument('package');
+		$package = $this->getPackage();
 
 		if ( ! is_null($path = $this->getPath()))
 		{
@@ -63,6 +63,25 @@ class ConfigPublishCommand extends Command {
 	}
 
 	/**
+	 * Get the name of the package being published.
+	 *
+	 * @return string
+	 */
+	protected function getPackage()
+	{
+		if ( ! is_null($package = $this->input->getArgument('package')))
+		{
+			return $package;
+		}
+		elseif ( ! is_null($bench = $this->input->getOption('bench')))
+		{
+			return $bench;
+		}
+
+		throw new \Exception("Package or bench must be specified.");
+	}
+
+	/**
 	 * Get the specified path to the files.
 	 *
 	 * @return string
@@ -71,9 +90,22 @@ class ConfigPublishCommand extends Command {
 	{
 		$path = $this->input->getOption('path');
 
+		// First we will check for an explicitly specified path from the user. If one
+		// exists we will use that as the path to the config files. This allows the free
+		// storage of config files wherever is best for this developer's web projects.
 		if ( ! is_null($path))
 		{
 			return $this->laravel['path.base'].'/'.$path;
+		}
+
+		// If a "bench" option was specified, we will publish from a workbench as the
+		// source location. This is mainly just a short-cut for having to manually
+		// specify the full workbench path using the --path command line option.
+		$bench = $this->input->getOption('bench');
+
+		if ( ! is_null($bench))
+		{
+			return $this->laravel['path.base']."/workbench/{$bench}/src/config";
 		}
 	}
 
@@ -85,7 +117,7 @@ class ConfigPublishCommand extends Command {
 	protected function getArguments()
 	{
 		return array(
-			array('package', InputArgument::REQUIRED, 'The name of package being published.'),
+			array('package', InputArgument::OPTIONAL, 'The name of package being published.'),
 		);
 	}
 
@@ -97,6 +129,8 @@ class ConfigPublishCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to publish.', null),
+
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the configuration files.', null),
 		);
 	}
