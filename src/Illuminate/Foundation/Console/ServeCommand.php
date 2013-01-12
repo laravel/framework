@@ -28,11 +28,13 @@ class ServeCommand extends Command {
 	{
 		chdir($this->laravel['path.base']);
 
+		$host = $this->input->getOption('host');
+
 		$port = $this->input->getOption('port');
 
-		$this->info("Laravel development server started on port {$port}...");
+		$this->info("Laravel development server started on {$host}:{$port}...");
 
-		passthru("php -S localhost:{$port} -t public server.php");
+		passthru("php -S {$host}:{$port} -t public server.php");
 	}
 
 	/**
@@ -43,6 +45,8 @@ class ServeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', 'localhost'),
+
 			array('port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000),
 		);
 	}
