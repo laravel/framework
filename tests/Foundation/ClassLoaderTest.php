@@ -15,9 +15,9 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testProperFilesAreCheckedByLoader()
 	{
 		$loader = new ClassLoader(array(__DIR__, __DIR__.'/Models'), $files = m::mock('Illuminate\Filesystem\Filesystem'));
-		$files->shouldReceive('exists')->once()->with(__DIR__.'/User/Model.php')->andReturn(false);
-		$files->shouldReceive('exists')->once()->with(__DIR__.'/Models/User/Model.php')->andReturn(true);
-		$files->shouldReceive('requireOnce')->once()->with(__DIR__.'/Models/User/Model.php');
+		$files->shouldReceive('exists')->once()->with(__DIR__.'/User'.DIRECTORY_SEPARATOR.'Model.php')->andReturn(false);
+		$files->shouldReceive('exists')->once()->with(__DIR__.'/Models/User'.DIRECTORY_SEPARATOR.'Model.php')->andReturn(true);
+		$files->shouldReceive('requireOnce')->once()->with(__DIR__.'/Models/User'.DIRECTORY_SEPARATOR.'Model.php');
 
 		$this->assertTrue($loader->load('\\User\\Model'));
 	}
