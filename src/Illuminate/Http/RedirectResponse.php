@@ -35,6 +35,21 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	}
 
 	/**
+	 * Flash a message with specified type
+	 *
+	 * @param  string  $message
+	 * @param  string  $type
+	 * @return Illuminate\Http\RedirectResponse
+	 */
+	public function withMessage($message, $type = 'success')
+	{
+		$this->session->flash('message', $message);
+		$this->session->flash('message_type', $type);
+
+		return $this;
+	}
+	
+	/**
 	 * Add a cookie to the response.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Cookie  $cookie
