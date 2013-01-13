@@ -517,7 +517,7 @@ class Router {
 	{
 		if (isset($action['as'])) return $action['as'];
 
-		return $method.' '.$pattern.' '.microtime(true);
+		return $method.' '.$pattern;
 	}
 
 	/**
