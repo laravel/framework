@@ -43,7 +43,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path)
 	{
-		$contents = $this->compileString($this->files->get($path));
+		$contents = trim($this->compileString($this->files->get($path)));
 
 		if ( ! is_null($this->cachePath))
 		{
