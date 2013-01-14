@@ -122,7 +122,7 @@ class MessageBag implements Countable, MessageProviderInterface {
 	 * @param  string  $format
 	 * @return array
 	 */
-	protected function transform($messages, $format, $messages_key = null)
+	protected function transform($messages, $format, $messagesKey = null)
 	{
 		$messages = (array) $messages;
 
@@ -132,7 +132,7 @@ class MessageBag implements Countable, MessageProviderInterface {
 		// the messages to be easily formatted to each developer's desires.
 		foreach ($messages as $key => &$message)
 		{
-			$message = str_replace(array(':message',':key'), array($message,$messages_key), $format);
+			$message = str_replace(array(':message', ':key'), array($message, $messagesKey), $format);
 		}
 
 		return $messages;
