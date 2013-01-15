@@ -203,6 +203,15 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExecuteMethod()
+	{
+		$connection = $this->getMockConnection(array('execute'));
+		$connection->expects($this->once())->method('execute')->with($this->equalTo('foo'))->will($this->returnValue(true));
+		$results = $connection->execute('foo');
+		$this->assertTrue($results);
+	}
+
+
 	protected function getMockConnection($methods = array(), $pdo = null)
 	{
 		$pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
