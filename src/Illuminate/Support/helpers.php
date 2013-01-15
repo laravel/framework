@@ -16,18 +16,22 @@ if ( ! function_exists('app'))
  */
 function action($name, $parameters = array(), $absolute = true)
 {
-	$app = app();
-
-	return $app['url']->action($name, $parameters, $absolute);
+	return app('url')->action($name, $parameters, $absolute);
 }
 
 /**
  * Get the root Facade application instance.
  *
- * @return Illuminate\Foundation\Application
+ * @param  string  $make
+ * @return mixed
  */
-function app()
+function app($make = null)
 {
+	if ($make !== null)
+	{
+		return app()->make($make);
+	}
+
 	return Illuminate\Support\Facades\Facade::getFacadeApplication();
 }
 
@@ -38,7 +42,7 @@ function app()
  */
 function app_path()
 {
-	return app()->make('path');
+	return app('path');
 }
 
 /**
