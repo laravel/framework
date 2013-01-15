@@ -46,6 +46,16 @@ function app_path()
 }
 
 /**
+ * Get the current controller and method.
+ *
+ * @return  mixed
+ */
+function current_action()
+{
+	return app('router')->getCurrentRoute()->getOption('_uses');
+}
+
+/**
  * Divide an array into two arrays. One with keys and the other with values.
  *
  * @param  array  $array
