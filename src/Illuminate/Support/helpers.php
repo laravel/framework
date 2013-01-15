@@ -23,7 +23,7 @@ function action($name, $parameters = array(), $absolute = true)
  * Get the root Facade application instance.
  *
  * @param  string  $make
- * @return mixed|Illuminate\Foundation\Application
+ * @return mixed
  */
 function app($make = null)
 {
