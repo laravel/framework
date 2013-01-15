@@ -135,7 +135,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	{
 		$schema = $this->getConnection()->getSchemaBuilder();
 
-		return $schema->hasTable($this->table);
+		$prefix = $this->getConnection()->getTablePrefix();
+
+		return $schema->hasTable($prefix.$this->table);
 	}
 
 	/**
