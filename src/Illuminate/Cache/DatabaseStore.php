@@ -8,7 +8,7 @@ class DatabaseStore extends Store {
 	/**
 	 * The database connection instance.
 	 *
-	 * @var Illuminate\Database\Connection
+	 * @var \Illuminate\Database\Connection
 	 */
 	protected $connection;
 
@@ -36,8 +36,8 @@ class DatabaseStore extends Store {
 	/**
 	 * Create a new database store.
 	 *
-	 * @param  Illuminate\Database\Connection  $connection
-	 * @param  Illuminate\Encrypter  $encrypter
+	 * @param  \Illuminate\Database\Connection  $connection
+	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
 	 * @param  string  $table
 	 * @param  string  $prefix
 	 * @return void
@@ -151,7 +151,7 @@ class DatabaseStore extends Store {
 	/**
 	 * Get a query builder for the cache table.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function table()
 	{
@@ -161,7 +161,7 @@ class DatabaseStore extends Store {
 	/**
 	 * Get the underlying database connection.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function getConnection()
 	{
@@ -171,7 +171,7 @@ class DatabaseStore extends Store {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return Illuminate\Encrypter
+	 * @return \Illuminate\Encryption\Encrypter
 	 */
 	public function getEncrypter()
 	{

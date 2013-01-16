@@ -7,7 +7,7 @@ class RedisStore extends Store {
 	/**
 	 * The Redis database connection.
 	 *
-	 * @var Illuminate\Redis\Database
+	 * @var \Illuminate\Redis\Database
 	 */
 	protected $redis;
 
@@ -21,7 +21,7 @@ class RedisStore extends Store {
 	/**
 	 * Create a new APC store.
 	 *
-	 * @param  Illuminate\Redis\Database  $redis
+	 * @param  \Illuminate\Redis\Database  $redis
 	 * @param  string                     $prefix
 	 * @return void
 	 */
@@ -96,7 +96,7 @@ class RedisStore extends Store {
 	/**
 	 * Get the Redis database instance.
 	 *
-	 * @return Illuminate\Redis\Database
+	 * @return \Illuminate\Redis\Database
 	 */
 	public function getRedis()
 	{

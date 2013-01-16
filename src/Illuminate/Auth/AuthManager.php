@@ -27,7 +27,7 @@ class AuthManager extends Manager {
 	/**
 	 * Create an instance of the database driver.
 	 *
-	 * @return Illuminate\Auth\Guard
+	 * @return \Illuminate\Auth\Guard
 	 */
 	protected function createDatabaseDriver()
 	{
@@ -39,7 +39,7 @@ class AuthManager extends Manager {
 	/**
 	 * Create an instance of the database user provider.
 	 *
-	 * @return Illuminate\Auth\DatabaseUserProvider
+	 * @return \Illuminate\Auth\DatabaseUserProvider
 	 */
 	protected function createDatabaseProvider()
 	{
@@ -56,7 +56,7 @@ class AuthManager extends Manager {
 	/**
 	 * Create an instance of the Eloquent driver.
 	 *
-	 * @return Illuminate\Auth\Guard
+	 * @return \Illuminate\Auth\Guard
 	 */
 	public function createEloquentDriver()
 	{
@@ -68,7 +68,7 @@ class AuthManager extends Manager {
 	/**
 	 * Create an instance of the Eloquent user provider.
 	 *
-	 * @return Illuminate\Auth\EloquentUserProvider
+	 * @return \Illuminate\Auth\EloquentUserProvider
 	 */
 	protected function createEloquentProvider()
 	{

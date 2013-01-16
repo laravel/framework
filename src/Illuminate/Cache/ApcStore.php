@@ -5,7 +5,7 @@ class ApcStore extends Store {
 	/**
 	 * The APC wrapper instance.
 	 *
-	 * @var Illuminate\Cache\ApcWrapper
+	 * @var \Illuminate\Cache\ApcWrapper
 	 */
 	protected $apc;
 
@@ -19,7 +19,7 @@ class ApcStore extends Store {
 	/**
 	 * Create a new APC store.
 	 *
-	 * @param  Illuminate\Cache\ApcWrapper  $apc
+	 * @param  \Illuminate\Cache\ApcWrapper  $apc
 	 * @param  string                       $prefix
 	 * @return void
 	 */
