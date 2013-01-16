@@ -41,7 +41,7 @@ class HelpersTest extends PHPUnit_Framework_TestCase {
 		$router->dispatch($request);
 
 		$app = m::mock('Illuminate\Foundation\Application');
-		$app->shouldReceive('make')->with('router')->andReturn($router);
+		$app->shouldReceive('make')->once()->with('router')->andReturn($router);
 		
 		Illuminate\Support\Facades\Facade::setFacadeApplication($app);
 		
