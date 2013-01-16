@@ -16,23 +16,23 @@ class HelpersTest extends PHPUnit_Framework_TestCase {
 
 		$app = m::mock('Illuminate\Foundation\Application');
 		$app->shouldReceive('make')->once()->with('router')->andReturn($router);
-		
+
 		Illuminate\Support\Facades\Facade::setFacadeApplication($app);
-		
+
 		$this->assertNull(current_action());
 	}
 
 	public function testCurrentActionOnController()
 	{
 		$router = new Illuminate\Routing\Router;
-		
+
 		$container = m::mock('Illuminate\Container\Container');		
-		
+
 		$controller = m::mock('stdClass');
 		$controller->shouldReceive('callAction')->once()->with($container, $router, 'getIndex', array());
-		
+
 		$container->shouldReceive('make')->once()->with('Controllers\Home')->andReturn($controller);
-		
+
 		$router->setContainer($container);
 		$router->get('/', 'Controllers\Home@getIndex');
 
@@ -42,9 +42,9 @@ class HelpersTest extends PHPUnit_Framework_TestCase {
 
 		$app = m::mock('Illuminate\Foundation\Application');
 		$app->shouldReceive('make')->once()->with('router')->andReturn($router);
-		
+
 		Illuminate\Support\Facades\Facade::setFacadeApplication($app);
-		
+
 		$this->assertEquals('Controllers\Home@getIndex', current_action());
 	}
 
