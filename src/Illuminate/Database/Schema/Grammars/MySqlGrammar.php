@@ -17,7 +17,7 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment');
+	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After');
 
 	/**
 	 * Compile the query to determine if a table exists.
@@ -410,5 +410,20 @@ class MySqlGrammar extends Grammar {
 			return ' auto_increment primary key';
 		}
 	}
+	
+	/**
+	 * Get the SQL for an after column modifier.
+	 *
+	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  Illuminate\Support\Fluent  $column
+	 * @return string|null
+	 */
+	protected function modifyAfter(Blueprint $blueprint, Fluent $column)
+	{
+		if ( ! is_null($column->after))
+		{
+			return ' after '.$this->wrap($column->after);
+		}
+	}	
 
 }
