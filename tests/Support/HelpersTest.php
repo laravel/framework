@@ -1,6 +1,25 @@
 <?php
 
+use Mockery as m;
+use Symfony\Component\HttpFoundation\Request;
+
 class HelpersTest extends PHPUnit_Framework_TestCase {
+
+	public function testCurrentAction()
+	{
+		$route = m::mock('Illuminate\Routing\Route');
+		$route->shouldReceive('getOption')->andReturn(null);
+
+		$router = m::mock('Illuminate\Routing\Router');
+		$router->shouldReceive('getCurrentRoute')->andReturn($route);
+
+		$app = m::mock('Illuminate\Foundation\Application');
+		$app->shouldReceive('make')->once()->with('router')->andReturn($router);
+		
+		Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+		
+		$this->assertNull(current_action());
+	}
 
 	public function testArrayDot()
 	{
