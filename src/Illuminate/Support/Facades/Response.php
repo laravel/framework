@@ -8,7 +8,7 @@ class Response {
 	 * @param  string  $content
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public static function make($content = '', $status = 200, array $headers = array())
 	{
@@ -21,7 +21,7 @@ class Response {
 	 * @param  string  $content
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\JsonResponse
+	 * @return \Symfony\Component\HttpFoundation\JsonResponse
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
@@ -31,10 +31,10 @@ class Response {
 	/**
 	 * Return a new streamed response from the application.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @param  int      $status
 	 * @param  array    $headers
-	 * @return Symfony\Component\HttpFoundation\StreamedResponse
+	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
 	public static function stream($callback, $status = 200, array $headers = array())
 	{
@@ -44,10 +44,10 @@ class Response {
 	/**
 	 * Create a new file download response.
 	 *
-	 * @param  SplFileInfo|string  $file
+	 * @param  \SplFileInfo|string  $file
 	 * @param  int  $status
 	 * @param  array  $headers
-	 * @return Symfony\Component\HttpFoundation\BinaryFileResponse
+	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
 	public static function download($file, $status = 200, $headers = array())
 	{

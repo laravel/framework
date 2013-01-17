@@ -10,29 +10,29 @@ class UrlGenerator {
 	/**
 	 * The route collection.
 	 *
-	 * @var Symfony\Component\Routing\RouteCollection
+	 * @var \Symfony\Component\Routing\RouteCollection
 	 */
 	protected $routes;
 
 	/**
 	 * The request instance.
 	 *
-	 * @var Symfony\Component\HttpFoundation\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $request;
 
 	/**
 	 * The Symfony routing URL generator.
 	 *
-	 * @var Symfony\Component\Routing\Generator\UrlGenerator
+	 * @var \Symfony\Component\Routing\Generator\UrlGenerator
 	 */
 	protected $generator;
 
 	/**
 	 * Create a new URL Generator instance.
 	 *
-	 * @param  Symfony\Component\Routing\RouteCollection  $routes
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\Routing\RouteCollection  $routes
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
 	 * @return void
 	 */
 	public function __construct(RouteCollection $routes, Request $request)
@@ -164,7 +164,7 @@ class UrlGenerator {
 	/**
 	 * Build the parameter list for short circuit parameters.
 	 *
-	 * @param  Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  array  $parameters
 	 * @return array
 	 */
@@ -245,7 +245,7 @@ class UrlGenerator {
 	/**
 	 * Get the request instance.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -255,7 +255,7 @@ class UrlGenerator {
 	/**
 	 * Set the current request instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function setRequest(Request $request)
@@ -272,7 +272,7 @@ class UrlGenerator {
 	/**
 	 * Get the Symfony URL generator instance.
 	 *
-	 * @return Symfony\Component\Routing\Generator\UrlGenerator
+	 * @return \Symfony\Component\Routing\Generator\UrlGenerator
 	 */
 	public function getGenerator()
 	{
@@ -282,7 +282,7 @@ class UrlGenerator {
 	/**
 	 * Get the Symfony URL generator instance.
 	 *
-	 * @param  Symfony\Component\Routing\Generator\UrlGenerator  $generator
+	 * @param  \Symfony\Component\Routing\Generator\UrlGenerator  $generator
 	 * @return void
 	 */
 	public function setGenerator(SymfonyGenerator $generator)

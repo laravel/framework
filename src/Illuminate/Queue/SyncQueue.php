@@ -33,7 +33,7 @@ class SyncQueue extends Queue implements QueueInterface {
 	 * Pop the next job off of the queue.
 	 *
 	 * @param  string  $queue
-	 * @return Illuminate\Queue\Jobs\Job|null
+	 * @return \Illuminate\Queue\Jobs\Job|null
 	 */
 	public function pop($queue = null) {}
 
@@ -42,7 +42,7 @@ class SyncQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  string  $job
 	 * @param  string  $data
-	 * @return Illuminate\Queue\Jobs\SyncJob
+	 * @return \Illuminate\Queue\Jobs\SyncJob
 	 */
 	protected function resolveJob($job, $data)
 	{

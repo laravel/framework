@@ -8,14 +8,14 @@ class Factory {
 	/**
 	 * The Translator implementation.
 	 *
-	 * @var Symfony\Component\Translator\TranslatorInterface
+	 * @var \Symfony\Component\Translator\TranslatorInterface
 	 */
 	protected $translator;
 
 	/**
 	 * The Presence Verifier implementation.
 	 *
-	 * @var Illuminate\Validation\PresenceVerifierInterface
+	 * @var \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	protected $presenceVerifier;
 
@@ -36,7 +36,7 @@ class Factory {
 	/**
 	 * Create a new Validator factory instance.
 	 *
-	 * @param  Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @return void
 	 */
 	public function __construct(TranslatorInterface $translator)
@@ -50,7 +50,7 @@ class Factory {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
-	 * @return Illuminate\Validation\Validator
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function make(array $data, array $rules, array $messages = array())
 	{
@@ -72,7 +72,7 @@ class Factory {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
-	 * @return Illuminate\Validation\Validator
+	 * @return \Illuminate\Validation\Validator
 	 */
 	protected function resolve($data, $rules, $messages)
 	{
@@ -112,7 +112,7 @@ class Factory {
 	/**
 	 * Get the Translator implementation.
 	 *
-	 * @return Symfony\Component\Translation\TranslatorInterface
+	 * @return \Symfony\Component\Translation\TranslatorInterface
 	 */
 	public function getTranslator()
 	{
@@ -122,7 +122,7 @@ class Factory {
 	/**
 	 * Get the Presence Verifier implementation.
 	 *
-	 * @return Illuminate\Validation\PresenceVerifierInterface
+	 * @return \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	public function getPresenceVerifier()
 	{
@@ -132,7 +132,7 @@ class Factory {
 	/**
 	 * Set the Presence Verifier implementation.
 	 *
-	 * @param  Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+	 * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
 	 * @return void
 	 */
 	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)

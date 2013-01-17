@@ -57,7 +57,7 @@ class Fluent {
 	 *
 	 * @param  string  $method
 	 * @param  array   $parameters
-	 * @return Illuminate\Support\Fluent
+	 * @return \Illuminate\Support\Fluent
 	 */
 	public function __call($method, $parameters)
 	{

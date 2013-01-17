@@ -7,14 +7,14 @@ class Listener {
 	/**
 	 * THe queue manager instance.
 	 *
-	 * @var Illuminate\Queue\QueueManager
+	 * @var \Illuminate\Queue\QueueManager
 	 */
 	protected $manager;
 
 	/**
 	 * Create a new queue listener.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	public function __construct(QueueManager $manager)
@@ -64,7 +64,7 @@ class Listener {
 	/**
 	 * Process a given job from the queue.
 	 *
-	 * @param  Illuminate\Queue\Jobs\Job  $job
+	 * @param  \Illuminate\Queue\Jobs\Job  $job
 	 * @param  int  $delay
 	 * @return void
 	 */
@@ -126,7 +126,7 @@ class Listener {
 	/**
 	 * Get the queue manager instance.
 	 *
-	 * @return Illuminate\Queue\QueueManager
+	 * @return \Illuminate\Queue\QueueManager
 	 */
 	public function getManager()
 	{
@@ -136,7 +136,7 @@ class Listener {
 	/**
 	 * Set the queue manager instance.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	public function setManager(QueueManager $manager)

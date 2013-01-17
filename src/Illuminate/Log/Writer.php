@@ -9,7 +9,7 @@ class Writer {
 	/**
 	 * The Monolog logger instance.
 	 *
-	 * @var Monolog\Logger
+	 * @var \Monolog\Logger
 	 */
 	protected $monolog;
 
@@ -32,7 +32,7 @@ class Writer {
 	/**
 	 * Create a new log writer instance.
 	 *
-	 * @param  Monolog\Logger  $monolog
+	 * @param  \Monolog\Logger  $monolog
 	 * @return void
 	 */
 	public function __construct(MonologLogger $monolog)
@@ -111,7 +111,7 @@ class Writer {
 	/**
 	 * Get the underlying Monolog instance.
 	 *
-	 * @return Monolog\Logger
+	 * @return \Monolog\Logger
 	 */
 	public function getMonolog()
 	{

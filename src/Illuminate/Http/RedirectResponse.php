@@ -9,14 +9,14 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * The request instance.
 	 *
-	 * @var Illuminate\Http\Request
+	 * @var \Illuminate\Http\Request
 	 */
 	protected $request;
 
 	/**
 	 * The session store implementation.
 	 *
-	 * @var Illuminate\Session\Store
+	 * @var \Illuminate\Session\Store
 	 */
 	protected $session;
 
@@ -25,7 +25,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return Illuminate\Http\RedirectResponse
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function with($key, $value)
 	{
@@ -37,8 +37,8 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Add a cookie to the response.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return Illuminate\Http\Response
+	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
+	 * @return \Illuminate\Http\Response
 	 */
 	public function withCookie(Cookie $cookie)
 	{
@@ -87,7 +87,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Flash a container of errors to the session.
 	 *
-	 * @param  Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
+	 * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
 	 * @return void
 	 */
 	public function withErrors($provider)
@@ -107,7 +107,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Get the request instance.
 	 *
-	 * @return  Illuminate\Http\Request
+	 * @return  \Illuminate\Http\Request
 	 */
 	public function getRequest()
 	{
@@ -117,7 +117,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Set the request instance.
 	 *
-	 * @param  Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
 	public function setRequest(Request $request)
@@ -128,7 +128,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Get the session store implementation.
 	 *
-	 * @return Illuminate\Session\Store
+	 * @return \Illuminate\Session\Store
 	 */
 	public function getSession()
 	{
@@ -138,7 +138,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Set the session store implementation.
 	 *
-	 * @param  Illuminate\Session\Store  $store
+	 * @param  \Illuminate\Session\Store  $store
 	 * @return void
 	 */
 	public function setSession(SessionStore $session)

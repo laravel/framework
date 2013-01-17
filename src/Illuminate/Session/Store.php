@@ -62,7 +62,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	abstract public function createSession($id, array $session, Response $response);
@@ -72,7 +72,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	abstract public function updateSession($id, array $session, Response $response);
@@ -80,7 +80,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	/**
 	 * Load the session for the request.
 	 *
-	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  \Illuminate\Cookie\CookieJar  $cookies
 	 * @return void
 	 */
 	public function start(CookieJar $cookies)
@@ -358,8 +358,8 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	/**
 	 * Finish the session handling for the request.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\CookieJar  $cookie
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Illuminate\Cookie\CookieJar  $cookie
 	 * @param  int  $lifetime
 	 * @return void
 	 */
@@ -435,8 +435,8 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * Write the session cookie to the response.
 	 *
 	 * @param  string  $id
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\Jar  $cookie
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Illuminate\Cookie\CookieJar  $cookie
 	 * @param  int  $lifetime
 	 * @return void
 	 */
