@@ -68,6 +68,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($class->inner->impl instanceof ContainerImplementationStub);
 	}
 
+	public function testNestedDependencyResolutionWithDefaultValue()
+	{
+		$container = new Container;
+		$container->bind('IContainerContractSub', 'ContainerImplementationStub');
+		$class = $container->make('ContainerNestedDependentWithDefaultValueStub');
+		$this->assertTrue($class->inner instanceof ContainerDependentStub);
+		$this->assertTrue($class->inner->impl instanceof ContainerImplementationStub);
+		$this->assertNull($class->innerArray);
+		$this->assertEqual($class->innerString, 'string');
+	}
 
 	public function testContainerIsPassedToResolvers()
 	{
@@ -205,5 +215,17 @@ class ContainerNestedDependentStub {
 	public function __construct(ContainerDependentStub $inner)
 	{
 		$this->inner = $inner;
+	}
+}
+
+class ContainerNestedDependentWithDefaultValueStub {
+	public $inner;
+	public $innerArray;
+	public $innerString;
+	public function __construct(ContainerDependentStub $inner, array $innerArray = null, $innerString = 'string')
+	{
+		$this->inner = $inner;
+		$this->innerArray = $innerArray;
+		$this->innerString = 'string';
 	}
 }
