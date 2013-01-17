@@ -47,6 +47,16 @@ class SessionManager extends Manager {
 	}
 
 	/**
+	 * Create an instance of the Wincache session driver.
+	 *
+	 * @return Illuminate\Session\CacheDrivenStore
+	 */
+	protected function createWincacheDriver()
+	{
+		return $this->createCacheBased('wincache');
+	}
+
+	/**
 	 * Create an instance of the Redis session driver.
 	 *
 	 * @return Illuminate\Session\CacheDrivenStore

@@ -51,6 +51,16 @@ class CacheManager extends Manager {
 	}
 
 	/**
+	 * Create an instance of the WinCache cache driver.
+	 *
+	 * @return Illuminate\Cache\WinCacheStore
+	 */
+	protected function createWincacheDriver()
+	{
+		return new WinCacheStore($this->app['config']['cache.prefix']);
+	}
+
+	/**
 	 * Create an instance of the Redis cache driver.
 	 *
 	 * @return Illuminate\Cache\RedisStore
