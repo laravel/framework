@@ -9,22 +9,22 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * The exception handler instance.
 	 *
-	 * @var Illuminate\Exception\Handler
+	 * @var \Illuminate\Exception\Handler
 	 */
 	protected $exceptionHandler;
 
 	/**
 	 * The Laravel application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $laravel;
 
 	/**
 	 * Start a new Console application.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
-	 * @return Illuminate\Console\Application
+	 * @param  \Illuminate\Foundation\Application  $app
+	 * @return \Illuminate\Console\Application
 	 */
 	public static function start($app)
 	{
@@ -44,8 +44,8 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Add a command to the console.
 	 *
-	 * @param  Symfony\Component\Console\Command\Command  $command
-	 * @return Symfony\Component\Console\Command\Command
+	 * @param  \Symfony\Component\Console\Command\Command  $command
+	 * @return \Symfony\Component\Console\Command\Command
 	 */
 	public function add(SymfonyCommand $command)
 	{
@@ -60,8 +60,8 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Add the command to the parent instance.
 	 *
-	 * @param  Symfony\Component\Console\Command  $command
-	 * @return Symfony\Component\Console\Command
+	 * @param  \Symfony\Component\Console\Command  $command
+	 * @return \Symfony\Component\Console\Command
 	 */
 	protected function addToParent($command)
 	{
@@ -98,7 +98,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Get the default input definitions for the applications.
 	 *
-	 * @return Symfony\Component\Console\Input\InputDefinition
+	 * @return \Symfony\Component\Console\Input\InputDefinition
 	 */
 	protected function getDefaultInputDefinition()
 	{
@@ -112,7 +112,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Get the global environment option for the definition.
 	 *
-	 * @return Symfony\Component\Console\Input\InputOption
+	 * @return \Symfony\Component\Console\Input\InputOption
 	 */
 	protected function getEnvironmentOption()
 	{
@@ -124,8 +124,8 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Render the given exception.
 	 *
-	 * @param  Exception  $e
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Exception  $e
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return void
 	 */
 	public function renderException($e, $output)
@@ -144,7 +144,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Set the exception handler instance.
 	 *
-	 * @param  Illuminate\Exception\Handler  $handler
+	 * @param  \Illuminate\Exception\Handler  $handler
 	 * @return void
 	 */
 	public function setExceptionHandler($handler)
@@ -155,7 +155,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $laravel
+	 * @param  \Illuminate\Foundation\Application  $laravel
 	 * @return void
 	 */
 	public function setLaravel($laravel)

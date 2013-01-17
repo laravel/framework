@@ -24,7 +24,7 @@ class MigrateCommand extends BaseCommand {
 	/**
 	 * The migrator instance.
 	 *
-	 * @var Illuminate\Database\Migrations\Migrator
+	 * @var \Illuminate\Database\Migrations\Migrator
 	 */
 	protected $migrator;
 
@@ -36,7 +36,7 @@ class MigrateCommand extends BaseCommand {
 	/**
 	 * Create a new migration command instance.
 	 *
-	 * @param  Illuminate\Database\Migrations\Migrator  $migrator
+	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
 	 * @param  string  $packagePath
 	 * @return void
 	 */

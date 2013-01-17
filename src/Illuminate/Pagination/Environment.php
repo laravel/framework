@@ -9,21 +9,21 @@ class Environment {
 	/**
 	 * The request instance.
 	 *
-	 * @var Symfony\Component\HttpFoundation\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $request;
 
 	/**
 	 * The view environment instance.
 	 *
-	 * @var Illuminate\View\Environment
+	 * @var \Illuminate\View\Environment
 	 */
 	protected $view;
 
 	/**
 	 * The translator implementation.
 	 *
-	 * @var Symfony\Component\Translation\TranslatorInterface
+	 * @var \Symfony\Component\Translation\TranslatorInterface
 	 */
 	protected $trans;
 
@@ -51,9 +51,9 @@ class Environment {
 	/**
 	 * Create a new pagination environment.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @param  Illuminate\View\Environment  $view
-	 * @param  Illuminate\Translation\TranslatorInterface  $trans
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Illuminate\View\Environment  $view
+	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @return void
 	 */
 	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans)
@@ -80,7 +80,7 @@ class Environment {
 	 * @param  array  $items
 	 * @param  int    $perPage
 	 * @param  int    $total
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function make(array $items, $total, $perPage)
 	{
@@ -92,8 +92,8 @@ class Environment {
 	/**
 	 * Get the pagination view.
 	 *
-	 * @param  Illuminate\Pagination\Paginator  $paginator
-	 * @return Illuminate\View\View
+	 * @param  \Illuminate\Pagination\Paginator  $paginator
+	 * @return \Illuminate\View\View
 	 */
 	public function getPaginationView(Paginator $paginator)
 	{
@@ -178,7 +178,7 @@ class Environment {
 	/**
 	 * Get the active request instance.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -188,7 +188,7 @@ class Environment {
 	/**
 	 * Set the active request instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function setRequest(Request $request)
@@ -199,7 +199,7 @@ class Environment {
 	/**
 	 * Get the current view driver.
 	 *
-	 * @return Illuminate\View\Environment
+	 * @return \Illuminate\View\Environment
 	 */
 	public function getViewDriver()
 	{
@@ -209,7 +209,7 @@ class Environment {
 	/**
 	 * Set the current view driver.
 	 *
-	 * @param  Illuminate\View\Environment  $view
+	 * @param  \Illuminate\View\Environment  $view
 	 * @return void
 	 */
 	public function setViewDriver(ViewEnvironment $view)
@@ -220,7 +220,7 @@ class Environment {
 	/**
 	 * Get the translator instance.
 	 *
-	 * @return Symfony\Component\Translation\TranslatorInterface
+	 * @return \Symfony\Component\Translation\TranslatorInterface
 	 */
 	public function getTranslator()
 	{

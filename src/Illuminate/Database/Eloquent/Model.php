@@ -117,7 +117,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected static $resolver;
 
@@ -136,7 +136,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Fill the model with an array of attributes.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function fill(array $attributes)
 	{
@@ -159,7 +159,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 *
 	 * @param  array  $attributes
 	 * @param  bool   $exists
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function newInstance($attributes = array(), $exists = false)
 	{
@@ -177,7 +177,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Create a new model instance that is existing.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function newExisting($attributes = array())
 	{
@@ -188,7 +188,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Save a new model and return the instance.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public static function create(array $attributes)
 	{
@@ -203,7 +203,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Begin querying the model on a given connection.
 	 *
 	 * @param  string  $connection
-	 * @return Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public static function on($connection)
 	{
@@ -221,7 +221,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Get all of the models from the database.
 	 *
 	 * @param  array  $columns
-	 * @return Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public static function all($columns = array('*'))
 	{
@@ -235,7 +235,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return Illuminate\Database\Eloquent\Model|Collection
+	 * @return \Illuminate\Database\Eloquent\Model|Collection
 	 */
 	public static function find($id, $columns = array('*'))
 	{
@@ -253,7 +253,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Being querying a model with eager loading.
 	 *
 	 * @param  array  $relations
-	 * @return Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public static function with($relations)
 	{
@@ -269,7 +269,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
-	 * @return Illuminate\Database\Eloquent\Relation\HasOne
+	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
 	 */
 	public function hasOne($related, $foreignKey = null)
 	{
@@ -286,7 +286,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * @param  string  $related
 	 * @param  string  $name
 	 * @param  string  $foreignKey
-	 * @return Illuminate\Database\Eloquent\Relation\MorphOne
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphOne
 	 */
 	public function morphOne($related, $name)
 	{
@@ -300,7 +300,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
-	 * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
 	public function belongsTo($related, $foreignKey = null)
 	{
@@ -328,7 +328,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Define an polymorphic, inverse one-to-one or many relationship.
 	 *
 	 * @param  string  $name
-	 * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
 	public function morphTo($name = null)
 	{
@@ -350,7 +350,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
-	 * @return Illuminate\Database\Eloquent\Relations\HasMany
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
 	 */
 	public function hasMany($related, $foreignKey = null)
 	{
@@ -367,7 +367,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * @param  string  $related
 	 * @param  string  $name
 	 * @param  string  $foreignKey
-	 * @return Illuminate\Database\Eloquent\Relation\MorphMany
+	 * @return \Illuminate\Database\Eloquent\Relation\MorphMany
 	 */
 	public function morphMany($related, $name)
 	{
@@ -383,7 +383,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
-	 * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null)
 	{
@@ -555,7 +555,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	/**
 	 * Get a new query builder instance for the connection.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function newBaseQueryBuilder()
 	{
@@ -570,7 +570,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Create a new Eloquent Collection instance.
 	 *
 	 * @param  array  $models
-	 * @return Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function newCollection(array $models = array())
 	{
@@ -694,7 +694,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Set the fillable attributes for the model.
 	 *
 	 * @param  array  $fillable
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function fillable(array $fillable)
 	{
@@ -707,7 +707,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Set the guarded attributes for the model.
 	 *
 	 * @param  array  $guarded
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function guard(array $guarded)
 	{
@@ -1055,7 +1055,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	/**
 	 * Get the database connection for the model.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function getConnection()
 	{
@@ -1087,7 +1087,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * Resolve a connection instance by name.
 	 *
 	 * @param  string  $connection
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public static function resolveConnection($connection)
 	{
@@ -1097,7 +1097,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	/**
 	 * Get the connection resolver instance.
 	 *
-	 * @return Illuminate\Database\ConnectionResolverInterface
+	 * @return \Illuminate\Database\ConnectionResolverInterface
 	 */
 	public static function getConnectionResolver()
 	{
@@ -1107,7 +1107,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	/**
 	 * Set the connection resolver instance.
 	 *
-	 * @param  Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
 	 * @return void
 	 */
 	public static function setConnectionResolver(Resolver $resolver)

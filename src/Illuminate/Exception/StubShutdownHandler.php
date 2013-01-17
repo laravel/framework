@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Exception;
 
+use Exception;
 use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 
 class StubShutdownHandler extends ExceptionHandler {
@@ -7,7 +8,7 @@ class StubShutdownHandler extends ExceptionHandler {
 	/**
 	 * The application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 

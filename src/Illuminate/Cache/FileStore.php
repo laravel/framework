@@ -5,7 +5,7 @@ class FileStore extends Store {
 	/**
 	 * The Illuminate Filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -19,7 +19,7 @@ class FileStore extends Store {
 	/**
 	 * Create a new file cache store instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string                 $directory
 	 * @return void
 	 */
@@ -137,7 +137,7 @@ class FileStore extends Store {
 	/**
 	 * Get the Filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{

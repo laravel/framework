@@ -38,8 +38,8 @@ class BelongsToMany extends Relation {
 	/**
 	 * Create a new has many relationship instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder  $query
-	 * @param  Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
@@ -68,7 +68,7 @@ class BelongsToMany extends Relation {
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns
-	 * @return Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function get($columns = array('*'))
 	{
@@ -111,7 +111,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Get the pivot attributes from a model.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $model
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
 	 * @return array
 	 */
 	protected function cleanPivotAttributes(Model $model)
@@ -147,7 +147,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the select clause for the relation query.
 	 *
-	 * @return Illuminate\Database\Eloquent\Relation\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function getSelectColumns()
 	{
@@ -181,7 +181,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the join clause for the relation query.
 	 *
-	 * @return Illuminate\Database\Eloquent\Relation\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function setJoin()
 	{
@@ -200,7 +200,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the where clause for the relation query.
 	 *
-	 * @return Illuminate\Database\Eloquent\Relation\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function setWhere()
 	{
@@ -243,7 +243,7 @@ class BelongsToMany extends Relation {
 	 * Match the eagerly loaded results to their parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -270,7 +270,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Build model dictionary keyed by the relation's foreign key.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @return array
 	 */
 	protected function buildDictionary(Collection $results)
@@ -293,9 +293,9 @@ class BelongsToMany extends Relation {
 	/**
 	 * Save a new model and attach it to the parent model.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $model
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
 	 * @param  array  $joining
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function save(Model $model, array $joining = array())
 	{
@@ -311,7 +311,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array  $attributes
 	 * @param  array  $joining
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function create(array $attributes, array $joining = array())
 	{
@@ -486,7 +486,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Create a new query builder for the pivot table.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function newPivotQuery()
 	{
@@ -498,7 +498,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Get a new plain query builder for the pivot table.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function newPivotStatement()
 	{
@@ -510,7 +510,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array  $attributes
 	 * @param  bool   $exists
-	 * @return Illuminate\Database\Eloquent\Relation\Pivot
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
 	 */
 	public function newPivot(array $attributes = array(), $exists = false)
 	{
@@ -527,7 +527,7 @@ class BelongsToMany extends Relation {
 	 * Create a new existing pivot model instance.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Relations\Pivot
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
 	 */
 	public function newExistingPivot(array $attributes = array())
 	{
@@ -538,7 +538,7 @@ class BelongsToMany extends Relation {
 	 * Set the columns on the pivot table to retrieve.
 	 *
 	 * @param  array  $columns
-	 * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	public function withPivot($columns)
 	{
@@ -550,7 +550,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Specify that the pivot table has creation and update timestamps.
 	 *
-	 * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	public function withTimestamps()
 	{

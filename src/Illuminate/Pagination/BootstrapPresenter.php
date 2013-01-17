@@ -5,7 +5,7 @@ class BootstrapPresenter {
 	/**
 	 * The paginator instance being rendered.
 	 *
-	 * @var Illuminate\Pagination\Paginator
+	 * @var \Illuminate\Pagination\Paginator
 	 */
 	protected $paginator;
 
@@ -26,7 +26,7 @@ class BootstrapPresenter {
 	/**
 	 * Create a new Bootstrap presenter instance.
 	 *
-	 * @param  Illuminate\Pagination\Paginator  $paginator
+	 * @param  \Illuminate\Pagination\Paginator  $paginator
 	 * @return void
 	 */
 	public function __construct(Paginator $paginator)

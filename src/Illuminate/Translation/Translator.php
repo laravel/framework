@@ -9,14 +9,14 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * The loader implementation.
 	 *
-	 * @var Illuminate\Translation\LoaderInterface
+	 * @var \Illuminate\Translation\LoaderInterface
 	 */
 	protected $loader;
 
 	/**
 	 * The Symfony translator instance.
 	 *
-	 * @var Symfony\Translation\Translator
+	 * @var \Symfony\Translation\Translator
 	 */
 	protected $trans;
 
@@ -48,7 +48,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 *
 	 * @param  string  $default
 	 * @param  string  $fallback
-	 * @return Symfony\Component\Translation\Translator
+	 * @return \Symfony\Component\Translation\Translator
 	 */
 	protected function createSymfonyTranslator($default, $fallback)
 	{
@@ -258,7 +258,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get the base Symfony translator instance.
 	 *
-	 * @return Symfony\Translation\Translator
+	 * @return \Symfony\Translation\Translator
 	 */
 	public function getSymfonyTranslator()
 	{
@@ -268,7 +268,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get the base Symfony translator instance.
 	 *
-	 * @param  Symfony\Translation\Translator  $trans
+	 * @param  \Symfony\Translation\Translator  $trans
 	 * @return void
 	 */
 	public function setSymfonyTranslator(SymfonyTranslator $trans)

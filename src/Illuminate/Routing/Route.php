@@ -10,7 +10,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	/**
 	 * The router instance.
 	 *
-	 * @var  Illuminate\Routing\Router
+	 * @var  \Illuminate\Routing\Router
 	 */
 	protected $router;
 
@@ -24,7 +24,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	/**
 	 * Execute the route and return the response.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return mixed
 	 */	
 	public function run(Request $request)
@@ -67,7 +67,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	/**
 	 * Call all of the before filters on the route.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
 	 * @return mixed
 	 */
 	protected function callBeforeFilters(Request $request)
@@ -90,7 +90,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	/**
 	 * Get all of the before filters to run on the route.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return array
 	 */
 	protected function getAllBeforeFilters(Request $request)
@@ -104,7 +104,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	 * Call a given filter with the parameters.
 	 *
 	 * @param  string  $name
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
@@ -248,7 +248,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	 *
 	 * @param  string  $name
 	 * @param  string  $expression
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function where($name, $expression)
 	{
@@ -262,7 +262,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function defaults($key, $value)
 	{
@@ -275,7 +275,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	 * Set the before filters on the route.
 	 *
 	 * @param  dynamic
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function before()
 	{
@@ -292,7 +292,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	 * Set the after filters on the route.
 	 *
 	 * @param  dynamic
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function after()
 	{
@@ -361,7 +361,7 @@ class Route extends BaseRoute implements ArrayAccess {
 	/**
 	 * Set the Router instance on the route.
 	 *
-	 * @param  Illuminate\Routing\Router  $router
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @return void
 	 */
 	public function setRouter(Router $router)

@@ -11,21 +11,21 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * The Translator implementation.
 	 *
-	 * @var Symfony\Component\Translation\TranslatorInterface
+	 * @var \Symfony\Component\Translation\TranslatorInterface
 	 */
 	protected $translator;
 
 	/**
 	 * The Presence Verifier implementation.
 	 *
-	 * @var Illuminate\Validation\PresenceVerifierInterface
+	 * @var \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	protected $presenceVerifier;
 
 	/**
 	 * The message bag instance.
 	 *
-	 * @var Illuminate\Support\MessageBag
+	 * @var \Illuminate\Support\MessageBag
 	 */
 	protected $messages;
 
@@ -1311,7 +1311,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the files under validation.
 	 *
 	 * @param  array  $files
-	 * @return Illuminate\Validation\Validator
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setFiles(array $files)
 	{
@@ -1323,7 +1323,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the Presence Verifier implementation.
 	 *
-	 * @return Illuminate\Validation\PresenceVerifierInterface
+	 * @return \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	public function getPresenceVerifier()
 	{
@@ -1338,7 +1338,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the Presence Verifier implementation.
 	 *
-	 * @param  Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+	 * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
 	 * @return void
 	 */
 	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
@@ -1349,7 +1349,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the Translator implementation.
 	 *
-	 * @return Symfony\Component\Translation\TranslatorInterface
+	 * @return \Symfony\Component\Translation\TranslatorInterface
 	 */
 	public function getTranslator()
 	{
@@ -1359,7 +1359,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the Translator implementation.
 	 *
-	 * @param Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @return void
 	 */
 	public function setTranslator(TranslatorInterface $translator)
@@ -1370,7 +1370,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the message container for the validator.
 	 *
-	 * @return Illuminate\Support\MessageBag
+	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function messages()
 	{
@@ -1380,7 +1380,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * An alternative more semantic shortcut to the message container.
 	 *
-	 * @return Illuminate\Support\MessageBag
+	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function errors()
 	{
@@ -1390,7 +1390,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the messages for the instance.
 	 *
-	 * @return ILluminate\Support\MessageBag
+	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function getMessageBag()
 	{

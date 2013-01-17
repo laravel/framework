@@ -7,14 +7,14 @@ class CacheDrivenStore extends Store {
 	/**
 	 * The cache store instance.
 	 *
-	 * @var Illuminate\Cache\Store
+	 * @var \Illuminate\Cache\Store
 	 */
 	protected $cache;
 
 	/**
 	 * Create a new Memcache session instance.
 	 *
-	 * @param  Illuminate\Cache\Store  $cache
+	 * @param  \Illuminate\Cache\Store  $cache
 	 * @return void
 	 */
 	public function __construct(\Illuminate\Cache\Store $cache)
@@ -38,7 +38,7 @@ class CacheDrivenStore extends Store {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	public function createSession($id, array $session, Response $response)
@@ -51,7 +51,7 @@ class CacheDrivenStore extends Store {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	public function updateSession($id, array $session, Response $response)

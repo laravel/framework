@@ -26,21 +26,21 @@ class SeedCommand extends Command {
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var  Illuminate\Database\ConnectionResolverInterface
+	 * @var  \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected $resolver;
 
 	/**
 	 * The database seeder instance.
 	 *
-	 * @var Illuminate\Database\Seeder
+	 * @var \Illuminate\Database\Seeder
 	 */
 	protected $seeder;
 
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -54,9 +54,9 @@ class SeedCommand extends Command {
 	/**
 	 * Create a new database seed command instance.
 	 *
-	 * @param  Illuminate\Database\ConnectionResolverInterface  $resolver
-	 * @param  Illuminate\Database\Seeder  $seeder
-	 * @param  Illuminate\Events\Dispatcher  $events
+	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Database\Seeder  $seeder
+	 * @param  \Illuminate\Events\Dispatcher  $events
 	 * @param  string  $path
 	 * @return void
 	 */

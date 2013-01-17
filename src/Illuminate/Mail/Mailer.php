@@ -12,7 +12,7 @@ class Mailer {
 	/**
 	 * The view environment instance.
 	 *
-	 * @var Illuminate\View\Environment
+	 * @var \Illuminate\View\Environment
 	 */
 	protected $views;
 
@@ -33,14 +33,14 @@ class Mailer {
 	/**
 	 * The log writer instance.
 	 *
-	 * @var Illuminate\Log\Writer
+	 * @var \Illuminate\Log\Writer
 	 */
 	protected $logger;
 
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
@@ -54,7 +54,7 @@ class Mailer {
 	/**
 	 * Create a new Mailer instance.
 	 *
-	 * @param  Illuminate\View\Environment  $views
+	 * @param  \Illuminate\View\Environment  $views
 	 * @param  Swift_Mailer  $swift
 	 * @return void
 	 */
@@ -142,7 +142,7 @@ class Mailer {
 	 * Call the provided message builder.
 	 *
 	 * @param  Closure|string  $callback
-	 * @param  Illuminate\Mail\Message  $message
+	 * @param  \Illuminate\Mail\Message  $message
 	 * @return void
 	 */
 	protected function callMessageBuilder($callback, $message)
@@ -162,7 +162,7 @@ class Mailer {
 	/**
 	 * Create a new message instance.
 	 *
-	 * @return Illuminate\Mail\Message
+	 * @return \Illuminate\Mail\Message
 	 */
 	protected function createMessage()
 	{
@@ -184,7 +184,7 @@ class Mailer {
 	 *
 	 * @param  string  $view
 	 * @param  array   $data
-	 * @return Illuminate\View\View
+	 * @return \Illuminate\View\View
 	 */
 	protected function getView($view, $data)
 	{
@@ -205,7 +205,7 @@ class Mailer {
 	/**
 	 * Get the view environment instance.
 	 *
-	 * @return Illuminate\View\Environment
+	 * @return \Illuminate\View\Environment
 	 */
 	public function getViewEnvironment()
 	{
@@ -236,7 +236,7 @@ class Mailer {
 	/**
 	 * Set the log writer instance.
 	 *
-	 * @param  Illuminate\Log\Writer  $logger
+	 * @param  \Illuminate\Log\Writer  $logger
 	 * @return void
 	 */
 	public function setLogger(Writer $logger)
@@ -247,7 +247,7 @@ class Mailer {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

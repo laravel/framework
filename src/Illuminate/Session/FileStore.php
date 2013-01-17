@@ -8,7 +8,7 @@ class FileStore extends Store implements Sweeper {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -22,7 +22,7 @@ class FileStore extends Store implements Sweeper {
 	/**
 	 * Create a new file session store instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $path
 	 */
 	public function __construct(Filesystem $files, $path)
@@ -50,7 +50,7 @@ class FileStore extends Store implements Sweeper {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	public function createSession($id, array $session, Response $response)
@@ -63,7 +63,7 @@ class FileStore extends Store implements Sweeper {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	public function updateSession($id, array $session, Response $response)

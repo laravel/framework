@@ -9,8 +9,8 @@ abstract class Grammar extends BaseGrammar {
 	/**
 	 * Compile a foreign key command.
 	 *
-	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  Illuminate\Support\Fluent  $command
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
 	public function compileForeign(Blueprint $blueprint, Fluent $command)
@@ -49,7 +49,7 @@ abstract class Grammar extends BaseGrammar {
 	/**
 	 * Compile the blueprint's column definitions.
 	 *
-	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @return array
 	 */
 	protected function getColumns(Blueprint $blueprint)
@@ -73,8 +73,8 @@ abstract class Grammar extends BaseGrammar {
 	 * Add the column modifiers to the definition.
 	 *
 	 * @param  string  $sql
-	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  Illuminate\Support\Fluent  $column
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
 	protected function addModifiers($sql, Blueprint $blueprint, Fluent $column)
@@ -90,8 +90,8 @@ abstract class Grammar extends BaseGrammar {
 	/**
 	 * Get the primary key command if it exists on the blueprint.
 	 *
-	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @return Illuminate\Support\Fluent|null
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @return \Illuminate\Support\Fluent|null
 	 */
 	protected function getCommandByName(Blueprint $blueprint, $name)
 	{
@@ -106,7 +106,7 @@ abstract class Grammar extends BaseGrammar {
 	/**
 	 * Get all of the commands with a given name.
 	 *
-	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  string  $name
 	 * @return array
 	 */
@@ -121,7 +121,7 @@ abstract class Grammar extends BaseGrammar {
 	/**
 	 * Get the SQL for the column data type.
 	 *
-	 * @param  Illuminate\Support\Fluent  $column
+	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
 	protected function getType(Fluent $column)

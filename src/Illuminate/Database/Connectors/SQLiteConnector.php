@@ -6,7 +6,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface {
 	 * Establish a database connection.
 	 *
 	 * @param  array  $options
-	 * @return PDO
+	 * @return \PDO
 	 */
 	public function connect(array $config)
 	{

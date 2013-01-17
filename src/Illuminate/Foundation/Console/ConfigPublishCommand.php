@@ -24,14 +24,14 @@ class ConfigPublishCommand extends Command {
 	/**
 	 * The asset publisher instance.
 	 *
-	 * @var Illuminate\Foundation\AssetPublisher
+	 * @var \Illuminate\Foundation\AssetPublisher
 	 */
 	protected $config;
 
 	/**
 	 * Create a new configuration publish command instance.
 	 *
-	 * @param  Illuminate\Foundation\ConfigPublisher  $config
+	 * @param  \Illuminate\Foundation\ConfigPublisher  $config
 	 * @return void
 	 */
 	public function __construct(ConfigPublisher $config)

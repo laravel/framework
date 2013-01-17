@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Exception;
 
 use Closure;
+use Exception;
 use ReflectionFunction;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -16,7 +17,7 @@ class Handler {
 	/**
 	 * Handle a console exception.
 	 *
-	 * @param  Exception  $exception
+	 * @param  \Exception  $exception
 	 * @return void
 	 */
 	public function handleConsole($exception)

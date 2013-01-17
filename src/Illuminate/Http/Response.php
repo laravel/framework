@@ -16,8 +16,8 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	/**
 	 * Add a cookie to the response.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return Illuminate\Http\Response
+	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
+	 * @return \Illuminate\Http\Response
 	 */
 	public function withCookie(Cookie $cookie)
 	{

@@ -8,7 +8,7 @@ class CookieStore extends Store {
 	/**
 	 * The Illuminate cookie creator.
 	 *
-	 * @var Illuminate\CookieJar
+	 * @var \Illuminate\Cookie\CookieJar
 	 */
 	protected $cookies;
 
@@ -22,7 +22,7 @@ class CookieStore extends Store {
 	/**
 	 * Create a new Cookie based session store.
 	 *
-	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  \Illuminate\Cookie\CookieJar  $cookies
 	 * @return void
 	 */
 	public function __construct(CookieJar $cookies)
@@ -46,7 +46,7 @@ class CookieStore extends Store {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	public function createSession($id, array $session, Response $response)
@@ -61,7 +61,7 @@ class CookieStore extends Store {
 	 *
 	 * @param  string  $id
 	 * @param  array   $session
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	public function updateSession($id, array $session, Response $response)
@@ -83,7 +83,7 @@ class CookieStore extends Store {
 	/**
 	 * Get the cookie jar instance.
 	 *
-	 * @return Illuminate\CookieJar
+	 * @return \Illuminate\Cookie\CookieJar
 	 */
 	public function getCookieJar()
 	{

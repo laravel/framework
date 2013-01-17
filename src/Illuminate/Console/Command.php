@@ -9,21 +9,21 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * The Laravel application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $laravel;
 
 	/**
 	 * The input interface implementation.
 	 *
-	 * @var Symfony\Component\Console\Input\InputInterface
+	 * @var \Symfony\Component\Console\Input\InputInterface
 	 */
 	protected $input;
 
 	/**
 	 * The output interface implementation.
 	 *
-	 * @var Symfony\Component\Console\Output\OutputInterface
+	 * @var \Symfony\Component\Console\Output\OutputInterface
 	 */
 	protected $output;
 
@@ -82,8 +82,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Run the conosle command.
 	 *
-	 * @param  Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return mixed
 	 */
 	public function run(InputInterface $input, OutputInterface $output)
@@ -98,8 +98,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Execute the console command.
 	 *
-	 * @param  Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return mixed
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -255,7 +255,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Get the output implementation.
 	 *
-	 * @return Symfony\Component\Console\Output\OutputInterface
+	 * @return \Symfony\Component\Console\Output\OutputInterface
 	 */
 	public function getOutput()
 	{
@@ -265,7 +265,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @return Illuminate\Foundation\Application
+	 * @return \Illuminate\Foundation\Application
 	 */
 	public function getLaravel()
 	{
@@ -275,7 +275,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $laravel
+	 * @param  \Illuminate\Foundation\Application  $laravel
 	 * @return void
 	 */
 	public function setLaravel($laravel)

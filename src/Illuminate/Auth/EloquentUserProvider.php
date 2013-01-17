@@ -7,7 +7,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	/**
 	 * The hasher implementation.
 	 *
-	 * @var Illuminate\Hashing\HasherInterface
+	 * @var \Illuminate\Hashing\HasherInterface
 	 */
 	protected $hasher;
 
@@ -21,7 +21,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	/**
 	 * Create a new database user provider.
 	 *
-	 * @param  Illuminate\Hashing\HasherInterface  $hasher
+	 * @param  \Illuminate\Hashing\HasherInterface  $hasher
 	 * @param  string  $model
 	 * @return void
 	 */
@@ -35,7 +35,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 * Retrieve a user by their unique identifier.
 	 *
 	 * @param  mixed  $identifier
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function retrieveByID($identifier)
 	{
@@ -46,7 +46,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function retrieveByCredentials(array $credentials)
 	{
@@ -66,7 +66,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	/**
 	 * Validate a user against the given credentials.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @param  array  $credentials
 	 * @return bool
 	 */
@@ -80,7 +80,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	/**
 	 * Create a new instance of the model.
 	 *
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function createModel()
 	{

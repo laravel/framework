@@ -6,7 +6,7 @@ class Route extends Facade {
 	 * Register a new filter with the application.
 	 *
 	 * @param  string   $name
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public static function filter($name, $callback)

@@ -12,21 +12,21 @@ class Migrator {
 	/**
 	 * The migration repository implementation.
 	 *
-	 * @var Illuminate\Database\Migrations\MigrationRepositoryInterface
+	 * @var \Illuminate\Database\Migrations\MigrationRepositoryInterface
 	 */
 	protected $repository;
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected $resolver;
 
@@ -47,9 +47,9 @@ class Migrator {
 	/**
 	 * Create a new migrator instance.
 	 *
-	 * @param  Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
-	 * @param  Illuminate\Database\ConnectionResolverInterface  $resolver
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
+	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(MigrationRepositoryInterface $repository,
@@ -180,7 +180,7 @@ class Migrator {
 	/**
 	 * Run "down" a migration instance.
 	 *
-	 * @param  StdClass  $migration
+	 * @param  \StdClass  $migration
 	 * @param  bool  $pretend
 	 * @return void
 	 */
@@ -314,7 +314,7 @@ class Migrator {
 	/**
 	 * Resolve the database connection instance.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function resolveConnection()
 	{
@@ -342,7 +342,7 @@ class Migrator {
 	/**
 	 * Get the migration repository instance.
 	 *
-	 * @return Illuminate\Database\Migrations\MigrationRepositoryInterface
+	 * @return \Illuminate\Database\Migrations\MigrationRepositoryInterface
 	 */
 	public function getRepository()
 	{
@@ -362,7 +362,7 @@ class Migrator {
 	/**
 	 * Get the file system instance.
 	 *
-	 * @return Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{

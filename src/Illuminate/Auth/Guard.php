@@ -18,21 +18,21 @@ class Guard {
 	/**
 	 * The user provider implementation.
 	 *
-	 * @var Illuminate\Auth\UserProviderInterface
+	 * @var \Illuminate\Auth\UserProviderInterface
 	 */
 	protected $provider;
 
 	/**
 	 * The session store used by the guard.
 	 *
-	 * @var Illuminate\Session\Store
+	 * @var \Illuminate\Session\Store
 	 */
 	protected $session;
 
 	/**
 	 * The Illuminate cookie creator service.
 	 *
-	 * @var Illuminate\CookieJar
+	 * @var \Illuminate\Cookie\CookieJar
 	 */
 	protected $cookie;
 
@@ -46,15 +46,15 @@ class Guard {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
 
 	/**
 	 * Create a new authentication guard.
 	 *
-	 * @param  Illuminate\Auth\UserProviderInterface  $provider
-	 * @param  Illuminate\Session\Store  $session
+	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
+	 * @param  \Illuminate\Session\Store  $session
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
@@ -87,7 +87,7 @@ class Guard {
 	/**
 	 * Get the currently authenticated user.
 	 *
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function user()
 	{
@@ -153,7 +153,7 @@ class Guard {
 	/**
 	 * Log a user into the application.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @param  bool  $remember
 	 * @return void
 	 */
@@ -186,7 +186,7 @@ class Guard {
 	 * Create a remember me cookie for a given ID.
 	 *
 	 * @param  mixed  $id
-	 * @return Symfony\Component\HttpFoundation\Cookie
+	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
 	protected function createRecaller($id)
 	{
@@ -227,7 +227,7 @@ class Guard {
 	/**
 	 * Get the cookie creator instance used by the guard.
 	 *
-	 * @return Illuminate\CookieJar
+	 * @return \Illuminate\CookieJar
 	 */
 	public function getCookieJar()
 	{
@@ -242,7 +242,7 @@ class Guard {
 	/**
 	 * Set the cookie creator instance used by the guard.
 	 *
-	 * @param  Illuminate\CookieJar  $cookie
+	 * @param  \Illuminate\CookieJar  $cookie
 	 * @return void
 	 */
 	public function setCookieJar(CookieJar $cookie)
@@ -253,7 +253,7 @@ class Guard {
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Events\Dispatcher
 	 */
 	public function getDispatcher()
 	{
@@ -263,7 +263,7 @@ class Guard {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  Illuminate\Events\Dispatcher
+	 * @param \Illuminate\Events\Dispatcher $events
 	 */
 	public function setDispatcher(Dispatcher $events)
 	{
@@ -273,7 +273,7 @@ class Guard {
 	/**
 	 * Get the session store used by the guard.
 	 *
-	 * @return Illuminate\Session\Store
+	 * @return \Illuminate\Session\Store
 	 */
 	public function getSession()
 	{
@@ -293,7 +293,7 @@ class Guard {
 	/**
 	 * Get the user provider used by the guard.
 	 *
-	 * @return Illuminate\Auth\UserProviderInterface
+	 * @return \Illuminate\Auth\UserProviderInterface
 	 */
 	public function getProvider()
 	{
@@ -303,7 +303,7 @@ class Guard {
 	/**
 	 * Return the currently cached user of the application.
 	 *
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function getUser()
 	{
@@ -313,7 +313,7 @@ class Guard {
 	/**
 	 * Set the current user of the application.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @return void
 	 */
 	public function setUser(UserInterface $user)

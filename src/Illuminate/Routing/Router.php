@@ -19,7 +19,7 @@ class Router {
 	/**
 	 * The route collection instance.
 	 *
-	 * @var Symfony\Component\Routing\RouteCollection
+	 * @var \Symfony\Component\Routing\RouteCollection
 	 */
 	protected $routes;
 
@@ -54,21 +54,21 @@ class Router {
 	/**
 	 * The inversion of control container instance.
 	 *
-	 * @var Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
 	/**
 	 * The current request being dispatched.
 	 *
-	 * @var Symfony\Component\HttpFoundation\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $currentRequest;
 
 	/**
 	 * The current route being executed.
 	 *
-	 * @var Illuminate\Routing\Route
+	 * @var \Illuminate\Routing\Route
 	 */
 	protected $currentRoute;
 
@@ -82,7 +82,7 @@ class Router {
 	/**
 	 * Create a new router instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function __construct(Container $container = null)
@@ -97,7 +97,7 @@ class Router {
 	 *
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function get($pattern, $action)
 	{
@@ -109,7 +109,7 @@ class Router {
 	 *
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function post($pattern, $action)
 	{
@@ -121,7 +121,7 @@ class Router {
 	 *
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function put($pattern, $action)
 	{
@@ -133,7 +133,7 @@ class Router {
 	 *
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function patch($pattern, $action)
 	{
@@ -145,7 +145,7 @@ class Router {
 	 *
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function delete($pattern, $action)
 	{
@@ -158,7 +158,7 @@ class Router {
 	 * @param  string  $method
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function match($method, $pattern, $action)
 	{
@@ -170,7 +170,7 @@ class Router {
 	 *
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function any($pattern, $action)
 	{
@@ -196,7 +196,7 @@ class Router {
 	 *
 	 * @param  string  $controller
 	 * @param  string  $uri
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function controller($controller, $uri)
 	{
@@ -352,7 +352,7 @@ class Router {
 	 * @param  string  $method
 	 * @param  string  $pattern
 	 * @param  mixed   $action
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function createRoute($method, $pattern, $action)
 	{
@@ -413,7 +413,7 @@ class Router {
 	/**
 	 * Set the attributes and requirements on the route.
 	 *
-	 * @param  Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  array  $action
 	 * @param  array  $optional
 	 * @return void
@@ -579,7 +579,7 @@ class Router {
 	/**
 	 * Replace any route back-references in a route.
 	 *
-	 * @param  Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  string  $original
 	 * @return void
 	 */
@@ -633,8 +633,8 @@ class Router {
 	/**
 	 * Get the response for a given request.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
@@ -665,8 +665,8 @@ class Router {
 	/**
 	 * Match the given request to a route object.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Illuminate\Routing\Route
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function findRoute(Request $request)
 	{
@@ -826,7 +826,7 @@ class Router {
 	/**
 	 * Find the patterned filters matching a request.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return array
 	 */
 	public function findPatternFilters(Request $request)
@@ -850,8 +850,8 @@ class Router {
 	/**
 	 * Call the "after" global filters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	protected function callAfterFilter(Request $request, SymfonyResponse $response)
@@ -864,8 +864,8 @@ class Router {
 	/**
 	 * Call the "finish" global filter.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	public function callFinishFilter(Request $request, SymfonyResponse $response)
@@ -876,7 +876,7 @@ class Router {
 	/**
 	 * Call a given global filter with the parameters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $name
 	 * @param  array   $parameters
 	 * @return mixed
@@ -905,8 +905,8 @@ class Router {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
 	{
@@ -918,7 +918,7 @@ class Router {
 	/**
 	 * Convert routing exception to HttpKernel version.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return void
 	 */
 	protected function handleRoutingException(\Exception $e)
@@ -996,7 +996,7 @@ class Router {
 	/**
 	 * Get the current request being dispatched.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -1006,7 +1006,7 @@ class Router {
 	/**
 	 * Get the current route being executed.
 	 *
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function getCurrentRoute()
 	{
@@ -1016,7 +1016,7 @@ class Router {
 	/**
 	 * Set the current route on the router.
 	 *
-	 * @param  Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return void
 	 */
 	public function setCurrentRoute(Route $route)
@@ -1027,8 +1027,8 @@ class Router {
 	/**
 	 * Create a new URL matcher instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\Routing\Matcher\UrlMatcher
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\Routing\Matcher\UrlMatcher
 	 */
 	protected function getUrlMatcher(Request $request)
 	{
@@ -1042,7 +1042,7 @@ class Router {
 	/**
 	 * Retrieve the entire route collection.
 	 * 
-	 * @return Symfony\Component\Routing\RouteCollection
+	 * @return \Symfony\Component\Routing\RouteCollection
 	 */
 	public function getRoutes()
 	{
@@ -1052,7 +1052,7 @@ class Router {
 	/**
 	 * Set the container instance on the router.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)
