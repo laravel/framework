@@ -163,6 +163,18 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testLoginUsingIdStoresInSessionAndLogsInWithUser()
+	{
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$guard = $this->getMock('Illuminate\Auth\Guard', array('login', 'user'), array($provider, $session, $request));
+		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 10);
+		$guard->expects($this->once())->method('user')->will($this->returnValue($user = m::mock('Illuminate\Auth\UserInterface')));
+		$guard->expects($this->once())->method('login')->with($this->equalTo($user), $this->equalTo(false))->will($this->returnValue($user));
+
+		$this->assertEquals($user, $guard->loginUsingId(10));
+	}
+
+
 	public function testUserUsesRememberCookieIfItExists()
 	{
 		$guard = $this->getGuard();
