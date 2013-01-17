@@ -226,6 +226,6 @@ class ContainerNestedDependentWithDefaultValueStub {
 	{
 		$this->inner = $inner;
 		$this->innerArray = $innerArray;
-		$this->innerString = 'string';
+		$this->innerString = $innerString;
 	}
 }
