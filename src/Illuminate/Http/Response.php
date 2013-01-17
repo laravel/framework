@@ -53,6 +53,13 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 		{
 			$content = $content->render();
 		}
+		
+		// If this content is an array then we will render as human-readable and 
+		// apply pre-formatting. 
+		elseif (is_array($content))
+		{
+			$content = '<pre>'.print_r($content, true).'</pre>';
+		}
 
 		return parent::setContent($content);
 	}
