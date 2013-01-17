@@ -41,7 +41,10 @@ class KeyGenerateCommand extends Command {
 	{
 		$contents = $this->files->get($path = $this->laravel['path'].'/config/app.php');
 
-		$contents = str_replace('YourSecretKey!!!', $key = $this->getRandomKey(), $contents, $count);
+		$content = explode("'key' => '", $contents);
+		$content = explode("',", $content[1]);
+
+		$contents = str_replace($content[0], $key = $this->getRandomKey(), $contents, $count);
 
 		if ($count == 0)
 		{
