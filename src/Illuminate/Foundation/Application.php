@@ -221,7 +221,7 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Register a service provider with the application.
 	 *
-	 * @param  Illuminate\Support\ServiceProvider  $provider
+	 * @param  \Illuminate\Support\ServiceProvider  $provider
 	 * @param  array  $options
 	 * @return void
 	 */
@@ -356,8 +356,8 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Handle the given request and get the response.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
@@ -376,10 +376,10 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @implements HttpKernelInterface::handle
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
@@ -406,8 +406,8 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Prepare the request by injecting any services.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
-	 * @return Illuminate\Foundation\Request
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Request
 	 */
 	public function prepareRequest(Request $request)
 	{
@@ -423,8 +423,8 @@ class Application extends Container implements HttpKernelInterface {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepareResponse($value, Request $request)
 	{

@@ -8,14 +8,14 @@ class Seeder {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -29,8 +29,8 @@ class Seeder {
 	/**
 	 * Create a new database seeder instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
-	 * @param  Illuminate\Events\Dispatcher  $events
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, Dispatcher $events = null)
@@ -42,7 +42,7 @@ class Seeder {
 	/**
 	 * Seed the given connection from the given path.
 	 *
-	 * @param  Illuminate\Database\Connection  $connection
+	 * @param  \Illuminate\Database\Connection  $connection
 	 * @param  string  $path
 	 * @return int
 	 */

@@ -54,7 +54,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Add an item to the collection.
 	 *
 	 * @param  mixed  $item
-	 * @return Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function add($item)
 	{

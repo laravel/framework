@@ -12,7 +12,7 @@ class ConnectionFactory {
 	 * Establish a PDO connection based on the configuration.
 	 *
 	 * @param  array  $config
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function make(array $config)
 	{
@@ -30,7 +30,7 @@ class ConnectionFactory {
 	 * Create a connector instance based on the configuration.
 	 *
 	 * @param  array  $config
-	 * @return Illuminate\Database\Connectors\ConnectorInterface
+	 * @return \Illuminate\Database\Connectors\ConnectorInterface
 	 */
 	public function createConnector(array $config)
 	{
@@ -64,7 +64,7 @@ class ConnectionFactory {
 	 * @param  PDO     $connection
 	 * @param  string  $database
 	 * @param  string  $tablePrefix
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	protected function createConnection($driver, PDO $connection, $database, $tablePrefix = '')
 	{

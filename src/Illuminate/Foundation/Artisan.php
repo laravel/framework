@@ -10,21 +10,21 @@ class Artisan {
 	/**
 	 * The application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 
 	/**
 	 * The Artisan console instance.
 	 *
-	 * @var  Illuminate\Console\Application
+	 * @var  \Illuminate\Console\Application
 	 */
 	protected $artisan;
 
 	/**
 	 * Create a new Artisan command runner instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct(Application $app)
@@ -37,7 +37,7 @@ class Artisan {
 	 *
 	 * @param  string  $command
 	 * @param  array   $parameters
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return void
 	 */
 	public function call($command, array $parameters = array(), OutputInterface $output = null)
@@ -59,7 +59,7 @@ class Artisan {
 	/**
 	 * Get the Artisan console instance.
 	 *
-	 * @return Illuminate\Console\Application
+	 * @return \Illuminate\Console\Application
 	 */
 	protected function getArtisan()
 	{

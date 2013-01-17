@@ -8,14 +8,14 @@ class DatabaseManager implements ConnectionResolverInterface {
 	/**
 	 * The application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 
 	/**
 	 * The database connection factory instance.
 	 *
-	 * @var Illuminate\Database\Connectors\ConnectionFactory
+	 * @var \Illuminate\Database\Connectors\ConnectionFactory
 	 */
 	protected $factory;
 
@@ -29,8 +29,8 @@ class DatabaseManager implements ConnectionResolverInterface {
 	/**
 	 * Create a new database manager instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
-	 * @param  Illuminate\Database\Connectors\ConnectionFactory  $factory
+	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
 	 * @return void
 	 */
 	public function __construct($app, ConnectionFactory $factory)
@@ -43,7 +43,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 * Get a database connection instance.
 	 *
 	 * @param  string  $name
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function connection($name = null)
 	{
@@ -65,8 +65,8 @@ class DatabaseManager implements ConnectionResolverInterface {
 	/**
 	 * Prepare the database connection instance.
 	 *
-	 * @param  Illuminate\Database\Connection  $connection
-	 * @return Illuminate\Database\Connection
+	 * @param  \Illuminate\Database\Connection  $connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	protected function prepare(Connection $connection)
 	{

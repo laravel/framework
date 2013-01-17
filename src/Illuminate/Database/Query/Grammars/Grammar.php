@@ -70,7 +70,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile an aggregated select clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $aggregate
 	 * @return string
 	 */
@@ -92,7 +92,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "select *" portion of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $columns
 	 * @return string
 	 */
@@ -111,7 +111,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "from" portion of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  string  $table
 	 * @return string
 	 */
@@ -123,7 +123,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "join" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $joins
 	 * @return string
 	 */
@@ -181,7 +181,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "where" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return string
 	 */
 	protected function compileWheres(Builder $query)
@@ -214,7 +214,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a nested where clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -228,7 +228,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a where condition with a sub-select.
 	 *
-	 * @param  Illuminate\Database\Query\Builder $query
+	 * @param  \Illuminate\Database\Query\Builder $query
 	 * @param  array   $where
 	 * @return string
 	 */
@@ -242,7 +242,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a basic where clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -256,7 +256,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a "between" where clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -268,7 +268,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a where exists clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -280,7 +280,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a where exists clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -292,7 +292,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a "where in" clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -306,7 +306,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a "where not in" clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -320,7 +320,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a where in sub-select clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -334,7 +334,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a where not in sub-select clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -348,7 +348,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a "where null" clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -360,7 +360,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a "where not null" clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -372,7 +372,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a raw where clause.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
 	 * @return string
 	 */
@@ -384,7 +384,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "group by" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $groups
 	 * @return string
 	 */
@@ -396,7 +396,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "having" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $havings
 	 * @return string
 	 */
@@ -418,7 +418,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "order by" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $orders
 	 * @return string
 	 */
@@ -436,7 +436,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "limit" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  int  $limit
 	 * @return string
 	 */
@@ -448,7 +448,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the "offset" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  int  $offset
 	 * @return string
 	 */
@@ -460,7 +460,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile an insert statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $values
 	 * @return string
 	 */
@@ -493,7 +493,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile an insert and get ID statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array   $values
 	 * @param  string  $sequence
 	 * @return string
@@ -506,7 +506,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile an update statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $values
 	 * @return string
 	 */
@@ -537,7 +537,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a delete statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $values
 	 * @return string
 	 */

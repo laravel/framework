@@ -10,14 +10,14 @@ class Dispatcher extends SymfonyDispatcher {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
 	/**
 	 * Create a new event dispatcher instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function __construct(Container $container = null)
@@ -43,7 +43,7 @@ class Dispatcher extends SymfonyDispatcher {
 	 *
 	 * @param  string  $eventName
 	 * @param  mixed   $payload
-	 * @return Symfony\Component\EventDispatcher\Event
+	 * @return \Symfony\Component\EventDispatcher\Event
 	 */
 	public function fire($eventName, $payload = array())
 	{
@@ -58,7 +58,7 @@ class Dispatcher extends SymfonyDispatcher {
 	/**
 	 * Register an event subscriber class.
 	 *
-	 * @param  Symfony\Component\EventDispatcher\EventSubscriberInterface  $subscriber
+	 * @param  \Symfony\Component\EventDispatcher\EventSubscriberInterface  $subscriber
 	 * @return void
 	 */
 	public function subscribe(EventSubscriberInterface $subscriber)
@@ -69,7 +69,7 @@ class Dispatcher extends SymfonyDispatcher {
 	/**
 	 * Remove an event subscriber.
 	 *
-	 * @param  Symfony\Component\EventDispatcher\EventSubscriberInterface  $subscriber
+	 * @param  \Symfony\Component\EventDispatcher\EventSubscriberInterface  $subscriber
 	 * @return void
 	 */
 	public function unsubscribe(EventSubscriberInterface $subscriber)
@@ -99,7 +99,7 @@ class Dispatcher extends SymfonyDispatcher {
 	 * Create a class based listener using the IoC container.
 	 *
 	 * @param  mixed    $listener
-	 * @return Closure
+	 * @return \Closure
 	 */
 	public function createClassListener($listener)
 	{

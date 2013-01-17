@@ -7,7 +7,7 @@ class ClassLoader {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -29,7 +29,7 @@ class ClassLoader {
 	 * Create a new class loader instance.
 	 *
 	 * @param  array  $directories
-	 * @param  Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(array $directories, Filesystem $files = null)

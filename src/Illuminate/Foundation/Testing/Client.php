@@ -10,8 +10,8 @@ class Client extends BaseClient {
 	/**
 	 * Convert a BrowserKit request into a Illuminate request.
 	 *
-	 * @param  Symfony\Component\BrowserKit\Request  $request
-	 * @return Illuminate\Http\Request
+	 * @param  \Symfony\Component\BrowserKit\Request  $request
+	 * @return \Illuminate\Http\Request
 	 */
 	protected function filterRequest(DomRequest $request)
 	{

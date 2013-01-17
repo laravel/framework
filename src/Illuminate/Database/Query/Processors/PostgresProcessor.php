@@ -7,7 +7,7 @@ class PostgresProcessor extends Processor {
 	/**
 	 * Process an "insert get ID" query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  string  $sql
 	 * @param  array   $values
 	 * @param  string  $sequence
