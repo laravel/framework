@@ -89,7 +89,7 @@ class MessageBag implements Countable, MessageProviderInterface {
 		// methods is to return back an array of messages in the first place.
 		if (array_key_exists($key, $this->messages))
 		{
-			return $this->transform($this->messages[$key], $format);
+			return $this->transform($this->messages[$key], $format, $key);
 		}
 
 		return array();
@@ -107,9 +107,9 @@ class MessageBag implements Countable, MessageProviderInterface {
 
 		$all = array();
 
-		foreach ($this->messages as $messages)
+		foreach ($this->messages as $key => $messages)
 		{
-			$all = array_merge($all, $this->transform($messages, $format));
+			$all = array_merge($all, $this->transform($messages, $format, $key));
 		}
 
 		return $all;
@@ -122,16 +122,17 @@ class MessageBag implements Countable, MessageProviderInterface {
 	 * @param  string  $format
 	 * @return array
 	 */
-	protected function transform($messages, $format)
+	protected function transform($messages, $format, $messagesKey = null)
 	{
 		$messages = (array) $messages;
 
 		// We will simply spin through the given messages and transform each one
-		// replacing the :message place holder with the real message allowing
+		// replacing the :message place holder with the real message 
+		// and  replacing the :key place holder with the message array key 
 		// the messages to be easily formatted to each developer's desires.
 		foreach ($messages as $key => &$message)
 		{
-			$message = str_replace(':message', $message, $format);
+			$message = str_replace(array(':message', ':key'), array($message, $messagesKey), $format);
 		}
 
 		return $messages;
