@@ -43,6 +43,14 @@ class MailServiceProvider extends ServiceProvider {
 				$mailer->alwaysFrom($from['address'], $from['name']);
 			}
 
+            // If a "pretend" value is set, we will set it on the mailer.  This allows
+            // developers to enable/disable sending through configuration
+            if (isset($app['config']['mail.pretend']))
+            {
+                $pretend = (bool) $app['config']['mail.pretend'];
+                $mailer->pretend($pretend);
+            }
+
 			return $mailer;
 		});
 	}
