@@ -5,6 +5,7 @@ use Illuminate\Http\Response;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
+use Illuminate\Routing\Controllers\Inspector;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
@@ -200,13 +201,14 @@ class Router {
 	 */
 	public function controller($controller, $uri)
 	{
-		$inspector = $this->inspector ?: new Controllers\Inspector;
+		$routable = $this->getInspector()->getRoutable($controller);
 
-		$routable = $inspector->getRoutable($controller);
-
+		// When a controller is routed using this method, we use Reflection to parse
+		// out all of the routable methods for the controller, then register each
+		// route explicitly for the developers, so reverse routing is possible.
 		foreach ($routable as $method => $data)
 		{
-			$uri = $data['uri'].'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
+			$uri = $uri.'/'.$data['uri'].'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
 
 			$this->{$data['verb']}($uri, $controller.'@'.$method);
 		}
@@ -1001,6 +1003,16 @@ class Router {
 	}
 
 	/**
+	 * Retrieve the entire route collection.
+	 * 
+	 * @return Symfony\Component\Routing\RouteCollection
+	 */
+	public function getRoutes()
+	{
+		return $this->routes;
+	}
+
+	/**
 	 * Get the current request being dispatched.
 	 *
 	 * @return Symfony\Component\HttpFoundation\Request
@@ -1047,19 +1059,40 @@ class Router {
 	}
 
 	/**
-	 * Retrieve the entire route collection.
-	 * 
-	 * @return Symfony\Component\Routing\RouteCollection
+	 * Get the controller inspector instance.
+	 *
+	 * @return Illuminate\Routing\Controllers\Inspector
 	 */
-	public function getRoutes()
+	public function getInspector()
 	{
-		return $this->routes;
+		return $this->inspector ?: new Controllers\Inspector;
+	}
+
+	/**
+	 * Set the controller inspector instance.
+	 *
+	 * @param  Illuminate\Routing\Controllers\Inspector  $inspector
+	 * @return void
+	 */
+	public function setInspector(Inspector $inspector)
+	{
+		$this->inspector = $inspector;
+	}
+
+	/**
+	 * Get the container used by the router.
+	 *
+	 * @return Illuminate\Container\Container
+	 */
+	public function getContainer()
+	{
+		return $this->container;
 	}
 
 	/**
 	 * Set the container instance on the router.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)
