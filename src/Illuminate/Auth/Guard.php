@@ -183,6 +183,20 @@ class Guard {
 	}
 
 	/**
+	 * Log the given user ID into the application.
+	 *
+	 * @param  mixed  $id
+	 * @param  bool   $remember
+	 * @return Illuminate\Auth\UserInterface
+	 */
+	public function loginUsingId($id, $remember = false)
+	{
+		$this->session->put($this->getName(), $id);
+
+		return $this->login($this->user(), $remember);
+	}
+
+	/**
 	 * Create a remember me cookie for a given ID.
 	 *
 	 * @param  mixed  $id

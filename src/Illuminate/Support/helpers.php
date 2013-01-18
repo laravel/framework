@@ -390,12 +390,17 @@ function snake_case($value, $delimiter = '_')
  * Determine if a string starts with a given needle.
  *
  * @param  string  $haystack
- * @param  string  $needle
+ * @param  string|array  $needle
  * @return bool
  */
-function starts_with($haystack, $needle)
+function starts_with($haystack, $needles)
 {
-	return strpos($haystack, $needle) === 0;
+	foreach ((array) $needles as $needle)
+	{
+		if (strpos($haystack, $needle) === 0) return true;
+	}
+
+	return false;
 }
 
 /**
@@ -449,6 +454,29 @@ function str_is($pattern, $value)
 	}
 
 	return (bool) preg_match('#^'.$pattern.'#', $value);
+}
+
+/**
+ * Get the plural form of an English word.
+ *
+ * @param  string  $value
+ * @param  int  $count
+ * @return string
+ */
+function str_plural($value, $count = 2)
+{
+	return Illuminate\Support\Pluralizer::plural($value, $count);
+}
+
+/**
+ * Get the singular form of an English word.
+ *
+ * @param  string  $value
+ * @return string
+ */
+function str_singular($value)
+{
+	return Illuminate\Support\Pluralizer::singular($value);
 }
 
 /**
