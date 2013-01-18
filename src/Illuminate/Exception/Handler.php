@@ -107,7 +107,7 @@ class Handler {
 	 */
 	public function error(Closure $callback)
 	{
-		array_unshift($this->handlers, $callback);
+		$this->handlers[] = $callback;
 	}
 
 }

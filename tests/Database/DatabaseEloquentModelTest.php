@@ -411,13 +411,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testModelsAssumeTheirName()
-	{
-		$model = new EloquentModelWithoutTableStub;
-		$this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
-	}
-
-
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -500,5 +493,3 @@ class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
 		return $mock;
 	}
 }
-
-class EloquentModelWithoutTableStub extends Illuminate\Database\Eloquent\Model {}
