@@ -16,9 +16,10 @@ class Inspector {
 	 * Get the routable methods for a controller.
 	 *
 	 * @param  string  $controller
+	 * @param  string  $prefix
 	 * @return array
 	 */
-	public function getRoutable($controller)
+	public function getRoutable($controller, $prefix)
 	{
 		$routable = array();
 
@@ -31,7 +32,19 @@ class Inspector {
 		{
 			if ($this->isRoutable($method, $controller))
 			{
-				$routable[$method->name] = $this->getMethodData($method);
+				$data = $this->getMethodData($method, $prefix);
+
+				$routable[$method->name][] = $data;
+
+				// If the routable method is an index method, we will create a special index
+				// route which is simply the prefix and the verb and does not contain any
+				// the wildcard place-holders that each "typical" routes would contain.
+				if ($data['plain'] == $prefix.'/index')
+				{
+					$index = $this->getIndexData($data, $prefix);
+
+					$routable[$method->name][] = $index;
+				}
 			}
 		}
 
@@ -58,11 +71,13 @@ class Inspector {
 	 * @param  ReflectionMethod  $method
 	 * @return array
 	 */
-	public function getMethodData(ReflectionMethod $method)
+	public function getMethodData(ReflectionMethod $method, $prefix)
 	{
-		$name = $method->name;
+		$verb = $this->getVerb($name = $method->name);
 
-		return array('verb' => $this->getVerb($name), 'uri' => $this->getUri($name));
+		$uri = $this->addUriWildcards($plain = $this->getPlainUri($name, $prefix));
+
+		return compact('verb', 'plain', 'uri');
 	}
 
 	/**
@@ -80,11 +95,35 @@ class Inspector {
 	 * Determine the URI from the given method name.
 	 *
 	 * @param  string  $name
+	 * @param  string  $prefix
 	 * @return string
 	 */
-	public function getUri($name)
+	public function getPlainUri($name, $prefix)
 	{
-		return implode('-', array_slice(explode('_', snake_case($name)), 1));
+		return $prefix.'/'.implode('-', array_slice(explode('_', snake_case($name)), 1));
+	}
+
+	/**
+	 * Add wildcards to the given URI.
+	 *
+	 * @param  string  $uri
+	 * @return string
+	 */
+	public function addUriWildcards($uri)
+	{
+		return $uri.'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
+	}
+
+	/**
+	 * Get the routable data for an index method.
+	 *
+	 * @param  array   $data
+	 * @param  string  $prefix
+	 * @return array
+	 */
+	protected function getIndexData($data, $prefix)
+	{
+		return array('verb' => $data['verb'], 'plain' => $prefix, 'uri' => $prefix);
 	}
 
 }

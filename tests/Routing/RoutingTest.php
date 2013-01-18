@@ -110,52 +110,6 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testControllerMethodBackReferencesCanBeUsed()
-	{
-		$router = new Router;
-		$container = m::mock('Illuminate\Container\Container');
-		$controller = m::mock('stdClass');
-		$controller->shouldReceive('callAction')->once()->with($container, $router, 'getBar', array('1', 'taylor'))->andReturn('foo');
-		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
-		$router->setContainer($container);
-		$request = Request::create('/foo/bar/1/taylor', 'GET');
-		$router->get('/foo/{name}/{id}/{person}', 'home@{name}');
-
-		$this->assertEquals('foo', $router->dispatch($request)->getContent());
-	}
-
-
-	public function testControllerMethodBackReferencesUseGetMethodOnHeadRequest()
-	{
-		$router = new Router;
-		$container = m::mock('Illuminate\Container\Container');
-		$controller = m::mock('stdClass');
-		$controller->shouldReceive('callAction')->once()->with($container, $router, 'getBar', array('1', 'taylor'))->andReturn('foo');
-		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
-		$router->setContainer($container);
-		$request = Request::create('/foo/bar/1/taylor', 'HEAD');
-		$router->get('/foo/{name}/{id}/{person}', 'home@{name}');
-
-		// HEAD requests won't return content
-		$this->assertEquals('', $router->dispatch($request)->getOriginalContent());
-	}
-
-
-	public function testControllerMethodBackReferencesCanPointToIndex()
-	{
-		$router = new Router;
-		$container = m::mock('Illuminate\Container\Container');
-		$controller = m::mock('stdClass');
-		$controller->shouldReceive('callAction')->once()->with($container, $router, 'postIndex', array())->andReturn('foo');
-		$container->shouldReceive('make')->once()->with('home')->andReturn($controller);
-		$router->setContainer($container);
-		$request = Request::create('/foo', 'POST');
-		$router->post('/foo/{method?}', 'home@{method}');
-
-		$this->assertEquals('foo', $router->dispatch($request)->getContent());
-	}
-
-
 	public function testControllersAreCalledFromControllerRoutesWithUsesStatement()
 	{
 		$router = new Router;
@@ -434,10 +388,12 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = $this->getMock('Illuminate\Routing\Router', array('get'), array(new Illuminate\Container\Container));
 		$router->setInspector($inspector = m::mock('Illuminate\Routing\Controllers\Inspector'));
-		$inspector->shouldReceive('getRoutable')->once()->with('FooController')->andReturn(array(
-			'getFoo' => array('verb' => 'get', 'uri' => 'foo'),
+		$inspector->shouldReceive('getRoutable')->once()->with('FooController', 'prefix')->andReturn(array(
+			'getFoo' => array(
+				array('verb' => 'get', 'uri' => 'foo'),
+			)
 		));
-		$router->expects($this->once())->method('get')->with($this->equalTo('prefix/foo/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}'), $this->equalTo('FooController@getFoo'));
+		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo('FooController@getFoo'));
 
 		$router->controller('FooController', 'prefix');
 	}
