@@ -390,12 +390,17 @@ function snake_case($value, $delimiter = '_')
  * Determine if a string starts with a given needle.
  *
  * @param  string  $haystack
- * @param  string  $needle
+ * @param  string|array  $needle
  * @return bool
  */
-function starts_with($haystack, $needle)
+function starts_with($haystack, $needles)
 {
-	return strpos($haystack, $needle) === 0;
+	foreach ((array) $needles as $needle)
+	{
+		if (strpos($haystack, $needle) === 0) return true;
+	}
+
+	return false;
 }
 
 /**

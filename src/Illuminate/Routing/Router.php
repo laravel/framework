@@ -200,9 +200,16 @@ class Router {
 	 */
 	public function controller($controller, $uri)
 	{
-		$uri = $uri.'/{method?}/{v1?}/{v2?}/{v3?}/{v4?}';
+		$inspector = $this->inspector ?: new Controllers\Inspector;
 
-		return $this->any($uri, $controller.'@{method}');
+		$routable = $inspector->getRoutable($controller);
+
+		foreach ($routable as $method => $data)
+		{
+			$uri = $data['uri'].'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
+
+			$this->{$data['verb']}($uri, $controller.'@'.$method);
+		}
 	}
 
 	/**
