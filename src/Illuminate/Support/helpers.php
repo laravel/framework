@@ -452,6 +452,29 @@ function str_is($pattern, $value)
 }
 
 /**
+ * Get the plural form of an English word.
+ *
+ * @param  string  $value
+ * @param  int  $count
+ * @return string
+ */
+function str_plural($value, $count = 2)
+{
+	return Illuminate\Support\Pluralizer::plural($value, $count);
+}
+
+/**
+ * Get the singular form of an English word.
+ *
+ * @param  string  $value
+ * @return string
+ */
+function str_singular($value)
+{
+	return Illuminate\Support\Pluralizer::singular($value);
+}
+
+/**
  * Translate the given message.
  *
  * @param  string  $id
