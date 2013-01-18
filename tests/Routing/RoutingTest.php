@@ -429,4 +429,17 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($router->currentRouteUses('bar.route@action'));
 	}
 
+
+	public function testControllerMethodProperlyRegistersRoutes()
+	{
+		$router = $this->getMock('Illuminate\Routing\Router', array('get'), array(new Illuminate\Container\Container));
+		$router->setInspector($inspector = m::mock('Illuminate\Routing\Controllers\Inspector'));
+		$inspector->shouldReceive('getRoutable')->once()->with('FooController')->andReturn(array(
+			'getFoo' => array('verb' => 'get', 'uri' => 'foo'),
+		));
+		$router->expects($this->once())->method('get')->with($this->equalTo('prefix/foo/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}'), $this->equalTo('FooController@getFoo'));
+
+		$router->controller('FooController', 'prefix');
+	}
+
 }
