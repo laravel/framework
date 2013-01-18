@@ -60,6 +60,13 @@ class Router {
 	protected $container;
 
 	/**
+	 * The controller inspector instance.
+	 *
+	 * @var Illuminate\Routing\Controllers\Inspector
+	 */
+	protected $inspector;
+
+	/**
 	 * The current request being dispatched.
 	 *
 	 * @var Symfony\Component\HttpFoundation\Request
