@@ -523,4 +523,15 @@ function value($value)
 	return $value instanceof Closure ? $value() : $value;
 }
 
+/**
+ * Return the given object. Useful for chaining.
+ *
+ * @param  mixed  $object
+ * @return mixed
+ */
+function with($object)
+{
+	return $object;
+}
+
 }

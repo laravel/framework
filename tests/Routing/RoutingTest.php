@@ -69,7 +69,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/foo/taylor', 'GET');
 
 		$this->assertEquals('bar', $router->dispatch($request)->getContent());
-		$this->assertEquals('taylor', $router->getCurrentRoute()->getVariable('name'));
+		$this->assertEquals('taylor', $router->getCurrentRoute()->getParameter('name'));
 	}
 
 
@@ -398,4 +398,30 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->controller('FooController', 'prefix');
 	}
 
+
+	public function testRouteParameterBinding()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->bind('user', function($value) { return $value.'-bar'; });
+		$router->get('user/{user}', function($user) { return $user; });
+		$request = Request::create('/user/foo', 'GET');
+		$this->assertEquals('foo-bar', $router->dispatch($request)->getContent());
+
+		$router = new Router(new Illuminate\Container\Container);
+		$router->model('user', 'RoutingModelBindingStub');
+		$router->get('user/{user}', function($user) { return $user; });
+		$request = Request::create('/user/foo', 'GET');
+		$this->assertEquals('foo', $router->dispatch($request)->getContent());
+
+		$router = new Router(new Illuminate\Container\Container);
+		$router->model('user', 'RoutingModelBindingStub');
+		$router->get('user/{user?}', function($user = 'default') { return $user; });
+		$request = Request::create('/user', 'GET');
+		$this->assertEquals('default', $router->dispatch($request)->getContent());
+	}
+
+}
+
+class RoutingModelBindingStub {
+	public function find($value) { return $value; }
 }

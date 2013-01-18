@@ -1,11 +1,10 @@
 <?php namespace Illuminate\Routing;
 
-use ArrayAccess;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route as BaseRoute;
 
-class Route extends BaseRoute implements ArrayAccess {
+class Route extends BaseRoute {
 
 	/**
 	 * The router instance.
@@ -22,6 +21,13 @@ class Route extends BaseRoute implements ArrayAccess {
 	protected $parameters;
 
 	/**
+	 * The pared parameter array.
+	 *
+	 * @var array
+	 */
+	protected $parsedParameters;
+
+	/**
 	 * Execute the route and return the response.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
@@ -29,6 +35,8 @@ class Route extends BaseRoute implements ArrayAccess {
 	 */	
 	public function run(Request $request)
 	{
+		$this->parsedParameters = null;
+
 		$response = $this->callBeforeFilters($request);
 
 		// We will only call the router callable if no "before" middlewares returned
@@ -59,9 +67,9 @@ class Route extends BaseRoute implements ArrayAccess {
 	 */
 	protected function callCallable()
 	{
-		$variables = array_values($this->getVariablesWithoutDefaults());
+		$variables = array_values($this->getParametersWithoutDefaults());
 
-		return call_user_func_array($this->parameters['_call'], $variables);
+		return call_user_func_array($this->getOption('_call'), $variables);
 	}
 
 	/**
@@ -105,25 +113,25 @@ class Route extends BaseRoute implements ArrayAccess {
 	 *
 	 * @param  string  $name
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @param  array   $parameters
+	 * @param  array   $params
 	 * @return mixed
 	 */
-	public function callFilter($name, Request $request, array $parameters = array())
+	public function callFilter($name, Request $request, array $params = array())
 	{
 		if ( ! $this->router->filtersEnabled()) return;
 
 		$merge = array($this->router->getCurrentRoute(), $request);
 
-		$parameters = array_merge($merge, $parameters);
+		$params = array_merge($merge, $params);
 
 		// Next we will parse the filter name to extract out any parameters and adding
 		// any parameters specified in a filter name to the end of the lists of our
 		// parameters, since the ones at the beginning are typically very static.
-		list($name, $parameters) = $this->parseFilter($name, $parameters);
+		list($name, $params) = $this->parseFilter($name, $params);
 
 		if ( ! is_null($callable = $this->router->getFilter($name)))
 		{
-			return call_user_func_array($callable, $parameters);
+			return call_user_func_array($callable, $params);
 		}
 	}
 
@@ -145,11 +153,11 @@ class Route extends BaseRoute implements ArrayAccess {
 
 			$name = $segments[0];
 
-			$arguments = explode(',', $segments[1]);
-
 			// We will merge the arguments specified in the filter name into the list
 			// of existing parameters. We'll send them at the end since any values
 			// at the front are usually static such as request, response, route.
+			$arguments = explode(',', $segments[1]);
+
 			$parameters = array_merge($parameters, $arguments);
 		}
 
@@ -157,66 +165,89 @@ class Route extends BaseRoute implements ArrayAccess {
 	}
 
 	/**
-	 * Get a variable by name from the route.
+	 * Get a parameter by name from the route.
 	 *
 	 * @param  string  $name
 	 * @param  mixed   $default
 	 * @return string
 	 */
-	public function getVariable($name, $default = null)
+	public function getParameter($name, $default = null)
 	{
-		return array_get($this->parameters, $name, $default);
+		return array_get($this->getParameters(), $name, $default);
 	}
 
 	/**
-	 * Set the value of a variable.
-	 *
-	 * @param  string  $name
-	 * @param  mixed   $value
-	 * @return void
-	 */
-	public function setVariable($name, $value)
-	{
-		$this->parameters[$name] = $value;
-	}
-
-	/**
-	 * Get the variables to the callback.
+	 * Get the parameters to the callback.
 	 *
 	 * @return array
 	 */
-	public function getVariables()
+	public function getParameters()
 	{
+		// If we have already parsed the parameters, we will just return the listing
+		// the we already parsed, as some of these may have been resolved through
+		// a binder that uses a database repository and should'nt be run again.
+		if (isset($this->parsedParameters))
+		{
+			return $this->parsedParameters;
+		}
+
 		$variables = $this->compile()->getVariables();
 
+		// To get the parameter array, we need to spin the names of the variables on
+		// the compiled route and match them to the parameters that we got when a
+		// route is matched by the router, as routes instances don't have them.
 		$parameters = array();
 
 		foreach ($variables as $variable)
 		{
-			$parameters[$variable] = $this->parameters[$variable];
+			$parameters[$variable] = $this->resolveParameter($variable);
 		}
 
-		return $parameters;
+		return $this->parsedParameters = $parameters;
 	}
 
 	/**
-	 * Get the route variables without missing defaults.
+	 * Resolve a parameter value for the route.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	protected function resolveParameter($key)
+	{
+		$value = $this->parameters[$key];
+
+		// If the parameter has a binder, we will call the binder to resolve the real
+		// value for the parameters. The binders could make a database call to get
+		// a User object for example or may transform the input in some fashion.
+		if ($this->router->hasBinder($key))
+		{
+			return $this->router->performBinding($key, $value, $this);
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Get the route parameters without missing defaults.
 	 *
 	 * @return array
 	 */
-	public function getVariablesWithoutDefaults()
+	public function getParametersWithoutDefaults()
 	{
-		$variables = $this->getVariables();
+		$parameters = $this->getParameters();
 
-		foreach ($variables as $key => $value)
+		foreach ($parameters as $key => $value)
 		{
+			// When calling functions using call_user_func_array, we don't want to write
+			// over any existing default parameters, so we will remove every optional
+			// parameter from the list that did not get a specified value on route.
 			if ($this->isMissingDefault($key, $value))
 			{
-				unset($variables[$key]);
+				unset($parameters[$key]);
 			}
 		}
 
-		return $variables;
+		return $parameters;
 	}
 
 	/**
@@ -228,9 +259,18 @@ class Route extends BaseRoute implements ArrayAccess {
 	 */
 	protected function isMissingDefault($key, $value)
 	{
-		$defaults = $this->getDefaults();
+		return $this->isOptional($key) and is_null($value);
+	}
 
-		return array_key_exists($key, $defaults) and is_null($value);
+	/**
+	 * Determine if a given key is optional.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function isOptional($key)
+	{
+		return array_key_exists($key, $this->getDefaults());
 	}
 
 	/**
@@ -238,9 +278,9 @@ class Route extends BaseRoute implements ArrayAccess {
 	 *
 	 * @return array
 	 */
-	public function getVariableKeys()
+	public function getParameterKeys()
 	{
-		return array_keys($this->getVariables());
+		return array_keys($this->getParameters());
 	}
 
 	/**
@@ -362,56 +402,13 @@ class Route extends BaseRoute implements ArrayAccess {
 	 * Set the Router instance on the route.
 	 *
 	 * @param  Illuminate\Routing\Router  $router
-	 * @return void
+	 * @return Illuminate\Routing\Route
 	 */
 	public function setRouter(Router $router)
 	{
 		$this->router = $router;
-	}
 
-	/**
-	 * Check if a given variable exists.
-	 *
-	 * @param  string  $key
-	 * @return bool
-	 */
-	public function offsetExists($key)
-	{
-		return ! is_null($this->getVariable($key));
-	}
-
-	/**
-	 * Get a variable by key.
-	 *
-	 * @param  string  $key
-	 * @return string
-	 */
-	public function offsetGet($key)
-	{
-		return $this->getVariable($key);
-	}
-
-	/**
-	 * Set the given variable value.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
-	public function offsetSet($key, $value)
-	{
-		$this->setVariable($key, $value);
-	}
-
-	/**
-	 * Set the given variable to null.
-	 *
-	 * @param  string  $key
-	 * @return void
-	 */
-	public function offsetUnset($key)
-	{
-		$this->setVariable($key, null);
+		return $this;
 	}
 
 }

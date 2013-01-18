@@ -165,24 +165,24 @@ class UrlGenerator {
 	 * Build the parameter list for short circuit parameters.
 	 *
 	 * @param  Illuminate\Routing\Route  $route
-	 * @param  array  $parameters
+	 * @param  array  $params
 	 * @return array
 	 */
-	protected function buildParameterList($route, array $parameters)
+	protected function buildParameterList($route, array $params)
 	{
-		$keys = $route->getVariableKeys();
+		$keys = $route->getParameterKeys();
 
 		// If the number of keys is less than the number of parameters on a route
 		// we'll fill out the parameter arrays with empty bindings on the rest
 		// of the spots until they are equal so we can run an array combine.
-		if (count($parameters) < count($keys))
+		if (count($params) < count($keys))
 		{
-			$difference = count($keys) - count($parameters);
+			$difference = count($keys) - count($params);
 
-			$parameters += array_fill(count($parameters), $difference, null);
+			$params += array_fill(count($params), $difference, null);
 		}
 
-		return array_combine($keys, $parameters);
+		return array_combine($keys, $params);
 	}
 
 	/**

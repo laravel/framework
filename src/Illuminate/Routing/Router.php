@@ -67,6 +67,13 @@ class Router {
 	protected $inspector;
 
 	/**
+	 * The registered route binders.
+	 *
+	 * @var array
+	 */
+	protected $binders = array();
+
+	/**
 	 * The current request being dispatched.
 	 *
 	 * @var Symfony\Component\HttpFoundation\Request
@@ -383,14 +390,16 @@ class Router {
 
 		$name = $this->getName($method, $pattern, $action);
 
+		list($pattern, $optional) = $this->getOptional($pattern);
+
 		// We will create the routes, setting the Closure callbacks on the instance
 		// so we can easily access it later. If there are other parameters on a
 		// routes we'll also set those requirements as well such as defaults.
-		$callback = $this->getCallback($action);
+		$route = with(new Route($pattern))->setOptions(array(
 
-		list($pattern, $optional) = $this->getOptional($pattern);
+			'_call' => $this->getCallback($action),
 
-		$route = new Route($pattern, array('_call' => $callback));
+		))->setRouter($this);
 
 		$route->setRequirement('_method', $method);
 
@@ -585,7 +594,7 @@ class Router {
 			// We will extract the passed in parameters off of the route object so we will
 			// pass them off to the controller method as arguments. We will not get the
 			// defaults so that the controllers will be able to use its own defaults.
-			$args = array_values($route->getVariablesWithoutDefaults());
+			$args = array_values($route->getParametersWithoutDefaults());
 
 			$instance = $ioc->make($controller);
 
@@ -657,8 +666,6 @@ class Router {
 		// route collection and set the matching parameters on the instance so
 		// we will easily access them later if the route action is executed.
 		$route->setParameters($parameters);
-
-		$route->setRouter($this);
 
 		return $route;
 	}
@@ -862,6 +869,66 @@ class Router {
 				if ( ! is_null($response)) return $response;
 			}
 		}
+	}
+
+	/**
+	 * Register a model binder for a wildcard.
+	 *
+	 * @param  string  $key
+	 * @param  string  $class
+	 * @return void
+	 */
+	public function model($key, $class)
+	{
+		return $this->bind($key, function($value) use ($class)
+		{
+			if (is_null($value)) return null;
+
+			// For model binders, we will attempt to retrieve the model using the find
+			// method on the model instance. If we cannot retrieve the models we'll
+			// throw a not found exception otherwise we will return the instance.
+			if ( ! is_null($model = with(new $class)->find($value)))
+			{
+				return $model;
+			}
+
+			throw new NotFoundHttpException;
+		});
+	}
+
+	/**
+	 * Register a custom parameter binder.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $binder
+	 */
+	public function bind($key, $binder)
+	{
+		$this->binders[$key] = $binder;
+	}
+
+	/**
+	 * Determine if a given key has a registered binder.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function hasBinder($key)
+	{
+		return isset($this->binders[$key]);
+	}
+
+	/**
+	 * Call a binder for a given wildcard.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @param  Illuminate\Routing\Route  $route
+	 * @return mixed
+	 */
+	public function performBinding($key, $value, $route)
+	{
+		return call_user_func($this->binders[$key], $value, $route);
 	}
 
 	/**
