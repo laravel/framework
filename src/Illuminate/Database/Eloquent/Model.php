@@ -584,7 +584,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function getTable()
 	{
-		return $this->table;
+		return $this->table ?: snake_case(str_plural(get_class($this)));
 	}
 
 	/**
