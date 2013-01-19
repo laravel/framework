@@ -92,6 +92,20 @@ class MakeControllerCommand extends Command {
 		{
 			return $this->laravel['path.base'].'/'.$this->input->getOption('path');
 		}
+		
+		//option to set path to a workbench
+		$bench = $this->input->getOption('bench');
+		if ( ! is_null($bench))
+		{
+			$path = $this->laravel['path.base'] . "/workbench/{$bench}/src/controllers";
+
+			if(!is_dir($path))
+			{
+				mkdir($path);
+			}
+
+			return $path;
+		}
 
 		return $this->path;
 	}
