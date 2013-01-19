@@ -66,6 +66,15 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMultilingualRouteUrlGeneration()
+	{
+		$gen = $this->getMultilingualGenerator();
+		$gen->setRequest(Request::create('http://foobar.com/en', 'GET'));
+
+		$this->assertEquals('http://foobar.com/en/foo/bar/taylor', $gen->route('foo.bar', array('name' => 'taylor')));
+	}
+
+
 	public function testRouteUrlGenerationWithOptional()
 	{
 		$gen = $this->getGenerator();
@@ -102,7 +111,6 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-
 	public function testRoutesToControllerAreGenerated()
 	{
 		$gen = $this->getGenerator();
@@ -112,6 +120,14 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMultilingualRoutesToControllerAreGenerated()
+	{
+		$gen = $this->getMultilingualGenerator();
+		$gen->setRequest(Request::create('http://foobar.com/en', 'GET'));
+		$this->assertEquals('http://foobar.com/en/boom/baz/taylor', $gen->action('FooController@fooAction', array('name' => 'taylor')));
+	}
+	
+	
 	public function testWellFormedUrlIsReturnedUnchanged()
 	{
 		$gen = $this->getGenerator();
