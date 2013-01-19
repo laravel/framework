@@ -57,7 +57,7 @@ class RoutingServiceProvider extends ServiceProvider {
 
 			$locale = $app['config']['app.locale'];
 
- 			$languages = $app['config']['app.languages'];
+			$languages = $app['config']['app.languages'];
             
 			return new UrlGenerator($routes, $app['request'], $locale, $languages);
 		});
