@@ -23,6 +23,16 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('something', array('dayle', 'rees')));
 	}
 
+	public function testBasicMultilingualUrlGeneration()
+	{
+		$gen = $this->getMultilingualGenerator();
+		$gen->setRequest(Request::create('http://foobar.com/en/foo/bar', 'GET'));
+
+		$this->assertEquals('http://foobar.com/en/something', $gen->to('something'));
+		$this->assertEquals('https://foobar.com/en/something', $gen->secure('something'));
+		$this->assertEquals('http://foobar.com/en/something/dayle/rees', $gen->to('something', array('dayle', 'rees')));
+	}
+
 
 	public function testUrlGenerationUsesCurrentProtocol()
 	{
@@ -120,7 +130,19 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$router->get('foo/{boom?}/{breeze?}', array('as' => 'foo.breeze', function() {}));
 		$router->get('/boom/baz/{name}', array('uses' => 'FooController@fooAction'));
 
-		return new UrlGenerator($router->getRoutes(), Request::create('/'), 'assets.com');
+		return new UrlGenerator($router->getRoutes(), Request::create('/'), 'en', array());
 	}
 
+	protected function getMultilingualGenerator()
+	{
+		$router = new Router;
+
+		$router->get('foo/bar/{name}', array('as' => 'foo.bar', function() {}));
+		$router->get('foo/bar/{name}/baz/{age}', array('as' => 'foo.baz', function() {}));
+		$router->get('foo/{boom?}', array('as' => 'foo.boom', function() {}));
+		$router->get('foo/{boom?}/{breeze?}', array('as' => 'foo.breeze', function() {}));
+		$router->get('/boom/baz/{name}', array('uses' => 'FooController@fooAction'));
+
+		return new UrlGenerator($router->getRoutes(), Request::create('/'), 'en', array('en', 'gr'));
+	}
 }

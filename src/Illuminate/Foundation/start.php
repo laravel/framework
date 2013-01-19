@@ -168,6 +168,30 @@ Request::enableHttpMethodParameterOverride();
 
 /*
 |--------------------------------------------------------------------------
+| Set The Locale Based On The Route
+|--------------------------------------------------------------------------
+|
+| If the URI starts with one of the supported languages, we will set
+| the default lagnauge to match that URI segment and shorten the
+| URI we'll pass to the router to not include the lang segment.
+|
+*/
+
+$uri = $app['request']->server->get('REQUEST_URI');
+
+foreach($app['config']->get('app.languages') as $language)
+{
+    if(preg_match("#^{$language}(?:$|/)#i", $uri))
+    {
+        $app['config']->set('app.locale', $language);
+        $uri = '/'.substr($uri, strlen($language)+1);
+        $app['request']->server->set('REQUEST_URI', $uri);
+        break;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Register The Core Service Providers
 |--------------------------------------------------------------------------
 |

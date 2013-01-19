@@ -55,7 +55,11 @@ class RoutingServiceProvider extends ServiceProvider {
 			// and all the registered routes will be available to the generator.
 			$routes = $app['router']->getRoutes();
 
-			return new UrlGenerator($routes, $app['request']);
+			$locale = $app['config']['app.locale'];
+
+ 			$languages = $app['config']['app.languages'];
+            
+			return new UrlGenerator($routes, $app['request'], $locale, $languages);
 		});
 	}
 
