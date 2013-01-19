@@ -163,6 +163,8 @@ class MakeControllerCommand extends Command {
 			array('except', null, InputOption::VALUE_OPTIONAL, 'The methods that should be excluded'),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'Where to place the controller'),
+			
+			array('bench', null, InputOption::VALUE_OPTIONAL, 'Place the controller in a workbench'),
 		);
 	}
 
