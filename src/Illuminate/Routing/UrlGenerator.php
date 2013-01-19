@@ -29,18 +29,18 @@ class UrlGenerator {
 	protected $generator;
 
 	/**
-     * The locale for the current request
-     * 
-     * @var String
-     */
-    protected $locale;
+	 * The locale for the current request
+	 * 
+	 * @var String
+	 */
+	protected $locale;
     
-    /**
-     * The available application languages
-     * 
-     * @var Array
-     */
-    protected $languages;
+	/**
+	 * The available application languages
+	 * 
+	 * @var Array
+	 */
+	protected $languages;
 
 	/**
 	 * Create a new URL Generator instance.
