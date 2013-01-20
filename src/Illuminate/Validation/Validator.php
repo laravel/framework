@@ -1406,7 +1406,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function __call($method, $parameters)
 	{
-		$rule = substr($method, 8);
+		$rule = snake_case(substr($method, 8));
 
 		if (isset($this->extensions[$rule]))
 		{
