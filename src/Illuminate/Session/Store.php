@@ -159,7 +159,10 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	{
 		if ( ! is_array($session)) return true;
 
-		return (time() - $session['last_activity']) > ($this->lifetime * 60);
+		return ( $this->lifetime === 0 
+		         ? false 
+		         : (time() - $session['last_activity']) > ($this->lifetime * 60) 
+		);
 	}
 
 	/**
