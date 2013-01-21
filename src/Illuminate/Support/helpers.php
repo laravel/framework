@@ -379,11 +379,12 @@ function secure_path($path, array $parameters = array())
  */
 function snake_case($value, $delimiter = '_')
 {
-	return trim(preg_replace_callback('/[A-Z]/', function($match) use ($delimiter)
-	{
-		return $delimiter.strtolower($match[0]);
+	$value = preg_replace('/([A-Z\d]+)([A-Z][a-z])/', '\1'.$delimiter.'\2', $value);
+	$value = preg_replace('/([a-z\d])([A-Z])/', '\1'.$delimiter.'\2', $value);
+	$value = str_replace(array(' ', '_'), $delimiter, $value);
+	$value = strtolower($value);
 
-	}, $value), $delimiter);
+	return $value;
 }
 
 /**
