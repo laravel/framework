@@ -44,7 +44,7 @@ class BootstrapPresenter {
 	public function render()
 	{
 		// The hard-coded thirteen represents the minimum number of pages we need to
-		// ba able to create a sliding page window. If we have less than that, we
+		// be able to create a sliding page window. If we have less than that, we
 		// will just render a simple range of page links insteadof the sliding.
 		if ($this->lastPage < 13)
 		{
