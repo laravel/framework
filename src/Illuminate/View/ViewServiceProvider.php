@@ -140,7 +140,7 @@ class ViewServiceProvider extends ServiceProvider {
 	{
 		list($me, $app) = array($this, $this->app);
 
-		$app->booting(function() use ($me, $app)
+		$app->before(function() use ($me, $app)
 		{
 			// If the current session has an "errors" variable bound to it, we will share
 			// its value with all view instances so the views can easily access errors
