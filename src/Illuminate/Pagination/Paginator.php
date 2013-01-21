@@ -36,6 +36,20 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	protected $perPage;
 
 	/**
+	 * Get the paginator alignment.
+	 *
+	 * @return string
+	 */
+	protected $alignment;
+
+	/**
+	 * Get the paginator size.
+	 *
+	 * @return string
+	 */
+	protected $size;
+
+	/**
 	 * Get the current page for the request.
 	 *
 	 * @var int
@@ -60,17 +74,21 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 * Create a new Paginator instance.
 	 *
 	 * @param  Illuminate\Pagination\Environment  $env
-	 * @param  array  $items
-	 * @param  int    $total
-	 * @param  int    $perPage
+	 * @param  array   $items
+	 * @param  int     $total
+	 * @param  int     $perPage
+	 * @param  string  $alignment
+	 * @param  string  $size
 	 * @return void
 	 */
-	public function __construct(Environment $env, array $items, $total, $perPage)
+	public function __construct(Environment $env, array $items, $total, $perPage, $alignment = 'left', $size = 'normal')
 	{
 		$this->env = $env;
 		$this->total = $total;
 		$this->items = $items;
 		$this->perPage = $perPage;
+		$this->alignment = $alignment;
+		$this->size = $size;
 	}
 
 	/**
@@ -122,10 +140,15 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Get the pagination links view.
 	 *
+	 * @param  string  $alignment
+	 * @param  string  $size
 	 * @return Illuminate\View\View
 	 */
-	public function links()
+	public function links($alignment = 'left', $size = 'normal')
 	{
+		$this->setAlignment($alignment);
+		$this->setSize($size);
+
 		return $this->env->getPaginationView($this);
 	}
 
@@ -205,6 +228,26 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Get the paginator alignment.
+	 *
+	 * @return string
+	 */
+	public function getAlignment()
+	{
+		return $this->alignment;
+	}
+
+	/**
+	 * Get the paginator size.
+	 *
+	 * @return string
+	 */
+	public function getSize()
+	{
+		return $this->size;
+	}
+
+	/**
 	 * Get an iterator for the items.
 	 *
 	 * @return ArrayIterator
@@ -212,6 +255,28 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getIterator()
 	{
 		return new ArrayIterator($this->items);
+	}
+
+	/**
+	 * Set the paginator alignment.
+	 *
+	 * @param  string  $alignment
+	 * @return void
+	 */
+	protected function setAlignment($alignment)
+	{
+		$this->alignment = $alignment;
+	}
+
+	/**
+	 * Set the paginator size.
+	 *
+	 * @param  string  $size
+	 * @return void
+	 */
+	protected function setSize($size)
+	{
+		$this->size = $size;
 	}
 
 	/**
