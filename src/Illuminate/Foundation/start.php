@@ -179,9 +179,11 @@ Request::enableHttpMethodParameterOverride();
 
 $manifestPath = $config['manifest'];
 
-$services = new ProviderRepository(new Filesystem, $manifestPath);
+$app->singleton('ProviderRepository', function() use ($manifestPath) {
+    return new ProviderRepository(new Filesystem, $manifestPath);
+});
 
-$services->load($app, $config['providers']);
+$app->make('ProviderRepository')->load($app, $config['providers']);
 
 /*
 |--------------------------------------------------------------------------
