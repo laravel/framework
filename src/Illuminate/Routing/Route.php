@@ -21,7 +21,7 @@ class Route extends BaseRoute {
 	protected $parameters;
 
 	/**
-	 * The pared parameter array.
+	 * The parsed parameter array.
 	 *
 	 * @var array
 	 */
