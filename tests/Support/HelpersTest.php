@@ -48,6 +48,18 @@ class HelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Controllers\Home@getIndex', current_action());
 	}
 
+	public function testCurrentActionOnNoCurrentRoute()
+	{
+		$router = new Illuminate\Routing\Router;
+
+		$app = m::mock('Illuminate\Foundation\Application');
+		$app->shouldReceive('make')->once()->with('router')->andReturn($router);
+
+		Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+
+		$this->assertNull(current_action());
+	}
+
 	public function testArrayDot()
 	{
 		$array = array_dot(array('name' => 'taylor', 'languages' => array('php' => true)));

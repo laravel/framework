@@ -52,7 +52,9 @@ function app_path()
  */
 function current_action()
 {
-	return app('router')->getCurrentRoute()->getOption('_uses');
+	$currentRoute = app('router')->getCurrentRoute();
+
+	return ($currentRoute === null) ? null : $currentRoute->getOption('_uses');
 }
 
 /**
