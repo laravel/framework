@@ -232,7 +232,7 @@ class BootstrapPresenter {
 	}
 
 	/**
-	 * Get the pagination view classes.
+	 * Get the pagination view Bootstrap classes.
 	 *
 	 * @return string
 	 */
@@ -243,35 +243,30 @@ class BootstrapPresenter {
 		// Get the current paginator alignment.
 		$alignment = $this->paginator->getAlignment();
 
-		// Add the alignment class.
-		$classes .= $this->addBootstrapClass(
-			$alignment,
-			array('centered', 'right')
-		);
+		// Set the valid Bootstrap alignment classes.
+		$validAlignmentValues = array('centered', 'right');
+
+		// If the alignment value is valid, add it as a Bootstrap class.
+		// If it's invalid, the Bootstrap default is set by not adding a class.
+		if (in_array($alignment, $validAlignmentValues))
+		{
+			$classes .= " pagination-{$alignment}";
+		}
 
 		// Get the current paginator size.
 		$size = $this->paginator->getSize();
 
-		// Add the size class.
-		$classes .= $this->addBootstrapClass(
-			$size,
-			array('large', 'small', 'mini')
-		);
+		// Set the valid Bootstrap size classes.
+		$validSizeValues = array('large', 'small', 'mini');
+
+		// If the size value is valid, add it as a Bootstrap class.
+		// If it's invalid, the Bootstrap default is set by not adding a class.
+		if (in_array($size, $validSizeValues))
+		{
+			$classes .= " pagination-{$size}";
+		}
 
 		return $classes;
-	}
-
-	/**
-	 * Validate and optionally add a Bootstrap class.
-	 *
-	 * @param  string  $class
-	 * @param  array   $validClasses
-	 * @return string
-	 */
-	protected function addBootstrapClass($class, array $validClasses)
-	{
-		// If the class is valid, add the Bootstrap class.
-		return in_array($class, $validClasses) ? " pagination-{$class}" : '';
 	}
 
 	/**
