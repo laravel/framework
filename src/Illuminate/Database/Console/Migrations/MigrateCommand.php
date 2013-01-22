@@ -73,6 +73,13 @@ class MigrateCommand extends BaseCommand {
 		{
 			$this->output->writeln($note);
 		}
+
+		if ($this->input->getOption('seed'))
+		{
+			$options = array('--database' => $this->input->getOption('database'));
+
+			$this->call('db:seed', $options);
+		}
 	}
 
 	/**
@@ -109,6 +116,8 @@ class MigrateCommand extends BaseCommand {
 			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
+
+			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be run.'),
 		);
 	}
 
