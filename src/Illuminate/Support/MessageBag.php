@@ -1,9 +1,11 @@
 <?php namespace Illuminate\Support;
 
 use Countable;
+use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\MessageProviderInterface;
 
-class MessageBag implements Countable, MessageProviderInterface {
+class MessageBag implements ArrayableInterface, Countable, JsonableInterface, MessageProviderInterface {
 
 	/**
 	 * All of the registered messages.
@@ -16,7 +18,7 @@ class MessageBag implements Countable, MessageProviderInterface {
 	 * Default format for message output.
 	 *
 	 * @var string
-	 */	
+	 */
 	protected $format = '<span class="help-inline">:message</span>';
 
 	/**
@@ -196,6 +198,37 @@ class MessageBag implements Countable, MessageProviderInterface {
 	public function count()
 	{
 		return count($this->messages);
+	}
+
+	/**
+	 * Get the instance as an array.
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return $this->getMessages();
+	}
+
+	/**
+	 * Convert the object to its JSON representation.
+	 *
+	 * @param  int  $options
+	 * @return string
+	 */
+	public function toJson($options = 0)
+	{
+		return json_encode($this->toArray(), $options);
+	}
+
+	/**
+	 * Convert the message bag to its string representation.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->toJson();
 	}
 
 }
