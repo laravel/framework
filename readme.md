@@ -14,3 +14,4 @@
 - `DB::table('foo')->truncate()` now available on all supported databases.
 - Fixed Twitter Bootstrap compatibility in Paginator.
 - Allow multiple views to be passed to `View::composer`.
+- Added `Request::segment` method.
