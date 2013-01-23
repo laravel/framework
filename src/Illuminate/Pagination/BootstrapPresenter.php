@@ -44,7 +44,7 @@ class BootstrapPresenter {
 	public function render()
 	{
 		// The hard-coded thirteen represents the minimum number of pages we need to
-		// ba able to create a sliding page window. If we have less than that, we
+		// be able to create a sliding page window. If we have less than that, we
 		// will just render a simple range of page links insteadof the sliding.
 		if ($this->lastPage < 13)
 		{
@@ -70,12 +70,12 @@ class BootstrapPresenter {
 
 		for ($page = $start; $page <= $end; $page++)
 		{
-			// If the current page is equal to the page we're iterating on, we will create a
-			// disabled link for that page. Otherwise, we can create a typical active one
-			// for the link. These views use the "Twitter Bootstrap" styles by default.
+			// If the current page is equal to the page we're iterating on, we will give it
+			// an active link for that page. Otherwise, we'll create a typical link. These 
+			// views use the "Twitter Bootstrap" styles by default.
 			if ($this->currentPage == $page)
 			{
-				$pages[] = '<li class="disabled"><a href="#">'.$page.'</a></li>';
+				$pages[] = '<li class="active"><a href="#">'.$page.'</a></li>';
 			}
 			else
 			{
@@ -172,7 +172,7 @@ class BootstrapPresenter {
 	{
 		// If the current page is less than or equal to one, it means we can't go any
 		// further back in the pages, so we will render a disabled previous button
-		// when that is the case. Otherwise, we will give it an active "status".
+		// when that is the case.
 		if ($this->currentPage <= 1)
 		{
 			return '<li class="disabled"><a href="#">'.$text.'</a></li>';
@@ -181,7 +181,7 @@ class BootstrapPresenter {
 		{
 			$url = $this->paginator->getUrl($this->currentPage - 1);
 
-			return '<li class="active"><a href="'.$url.'">'.$text.'</a></li>';
+			return '<li><a href="'.$url.'">'.$text.'</a></li>';
 		}
 	}
 
@@ -204,7 +204,7 @@ class BootstrapPresenter {
 		{
 			$url = $this->paginator->getUrl($this->currentPage + 1);
 
-			return '<li class="active"><a href="'.$url.'">'.$text.'</a></li>';
+			return '<li><a href="'.$url.'">'.$text.'</a></li>';
 		}
 	}
 
@@ -228,7 +228,7 @@ class BootstrapPresenter {
 	{
 		$url = $this->paginator->getUrl($page);
 
-		return '<li class="active"><a href="'.$url.'">'.$page.'</a></li>';
+		return '<li><a href="'.$url.'">'.$page.'</a></li>';
 	}
 
 	/**
