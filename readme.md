@@ -10,3 +10,4 @@
 - Fixed bug with Redis data retrieval that caused server to hang.
 - Implemented `ArrayableInterface` and `JsonableInterface` on `MessageBag`.
 - Fixed bug where `hasFile` returned `true` when `file` returned `null`.
+- Changed default PDO case constant to `CASE_NATURAL`.
