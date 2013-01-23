@@ -561,7 +561,9 @@ class Router {
 	{
 		if (isset($action['as'])) return $action['as'];
 
-		return $method.' '.$pattern;
+		$domain = isset($action['domain']) ? $action['domain'].' ' : '';
+
+		return "{$domain}{$method} {$pattern}";
 	}
 
 	/**
