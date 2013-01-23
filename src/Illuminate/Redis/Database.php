@@ -164,7 +164,7 @@ class Database {
 		// If the response size is listed as a negative one it means that there is
 		// no data for the given keys, and we should return "null" according to
 		// the Redis protocol documentation for every client Redis libraries.
-		if ($response == '$-1')
+		if (trim($response) == '$-1')
 		{
 			return null;
 		}
