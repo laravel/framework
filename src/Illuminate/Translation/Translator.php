@@ -88,6 +88,8 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		list($namespace, $group, $item) = $this->parseKey($key);
 
+		$parameters = $this->formatParameters($parameters);
+
 		// Once we call the "load" method, we will receive back the "domain" for the
 		// namespace and group. The "domain" is used by the Symfony translator to
 		// logically separate related groups of messages, and should be unique.
@@ -111,6 +113,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		list($namespace, $group, $item) = $this->parseKey($key);
 
+		$parameters = $this->formatParameters($parameters);
+
+		// Once we call the "load" method, we will receive back the "domain" for the
+		// namespace and group. The "domain" is used by the Symfony translator to
+		// logically separate related groups of messages, and should be unique.
 		$domain = $this->load($group, $namespace, $locale);
 
 		$line = $this->trans->transChoice($item, $number, $parameters, $domain, $locale);
@@ -157,13 +164,13 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function load($group, $namespace, $locale)
 	{
-		// The domain is used to store the messages in the Symfony translator object
-		// and functions as a sort of logical separator of message types so we'll
-		// use the namespace and group as the "domain", which should be unique.
 		$domain = $namespace.'::'.$group;
 
 		$locale = $locale ?: $this->getLocale();
 
+		// The domain is used to store the messages in the Symfony translator object
+		// and functions as a sort of logical separator of message types so we'll
+		// use the namespace and group as the "domain", which should be unique.
 		if ($this->loaded($group, $namespace, $locale))
 		{
 			return $domain;
@@ -194,6 +201,24 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 		$this->trans->addResource('array', $lines, $locale, $domain);
 
 		$this->trans->refreshCatalogue($locale);
+	}
+
+	/**
+	 * Format the parameter array.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function formatParameters($parameters)
+	{
+		foreach ($parameters as $key => $value)
+		{
+			$parameters[':'.$key] = $value;
+
+			unset($parameters[$key]);
+		}
+
+		return $parameters;
 	}
 
 	/**
