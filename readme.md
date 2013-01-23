@@ -7,3 +7,5 @@
 - Improved `Route::controller` so that `URL::action` may be used with RESTful controllers.
 - Added model binding to routing engine via `Route::model` and `Route::bind`.
 - Added `missingMethod` to base Controller, can be used to handle catch-all routes into the controller.
+- Fixed bug with Redis data retrieval that caused server to hang.
+- Implemented `ArrayableInterface` and `JsonableInterface` on `MessageBag`.
