@@ -512,7 +512,7 @@ class Router {
 
 		if (isset($action['domain']))
 		{
-			$route->setHostname($action['domain']);
+			$route->setHost($action['domain']);
 		}
 
 		// Finally we will go through and set all of the default variables to null
