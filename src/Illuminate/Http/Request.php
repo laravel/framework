@@ -217,7 +217,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function hasFile($key)
 	{
-		return $this->files->has($key);
+		return $this->files->has($key) and ! is_null($this->file($key));
 	}
 
 	/**

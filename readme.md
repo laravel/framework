@@ -9,3 +9,4 @@
 - Added `missingMethod` to base Controller, can be used to handle catch-all routes into the controller.
 - Fixed bug with Redis data retrieval that caused server to hang.
 - Implemented `ArrayableInterface` and `JsonableInterface` on `MessageBag`.
+- Fixed bug where `hasFile` returned `true` when `file` returned `null`.
