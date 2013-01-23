@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\MessageBag;
+use Mockery as m;
 
 class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 
@@ -81,5 +82,36 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('bar'), $container->get('foo', ':message'));
 		$this->assertEquals(array('bar', 'baz'), $container->all(':message'));
 	}
+
+
+	public function testMessageBagReturnsCorrectArray()
+	{
+		$container = new MessageBag;
+		$container->setFormat(':message');
+		$container->add('foo', 'bar');
+		$container->add('boom', 'baz');
+
+		$this->assertEquals(array('foo' => array('bar'), 'boom' => array('baz')), $container->toArray());
+	}
+
+
+	public function testMessageBagReturnsExpectedJson()
+	{
+		$container = new MessageBag;
+		$container->setFormat(':message');
+		$container->add('foo', 'bar');
+		$container->add('boom', 'baz');
+
+		$this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
+	}
+
+
+	public function testCastingAsStringReturnsBagAsJson()
+	{
+		$container = m::mock('Illuminate\Support\MessageBag[toJson]');
+		$container->shouldReceive('toJson')->once()->andReturn('foo');
+		$this->assertEquals('foo', (string) $container);
+	}
+
 
 }
