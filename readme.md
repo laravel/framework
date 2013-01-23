@@ -6,3 +6,4 @@
 - Inflector migrated to L4. Eloquent models now assume their table names if one is not specified. New helpers `str_plural` and `str_singular`.
 - Improved `Route::controller` so that `URL::action` may be used with RESTful controllers.
 - Added model binding to routing engine via `Route::model` and `Route::bind`.
+- Added `missingMethod` to base Controller, can be used to handle catch-all routes into the controller.
