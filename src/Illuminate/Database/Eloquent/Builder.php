@@ -398,7 +398,7 @@ class Builder {
 	}
 
 	/**
-	 * Set the relationships being eagerly laoded.
+	 * Set the relationships being eagerly loaded.
 	 *
 	 * @param  array  $eagerLoad
 	 * @return void
