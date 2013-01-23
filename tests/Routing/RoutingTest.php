@@ -17,17 +17,13 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 		$router->get('/', function() { return 'root'; });
 		$router->get('/foo', function() { return 'bar'; });
-		$router->get('/foo//', function() { return 'foo'; });
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 
-		$request = Request::create('/foo//', 'GET');
-		$this->assertEquals('foo', $router->dispatch($request)->getContent());
+		$request = Request::create('/foo/', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 
 		$request = Request::create('http://foo.com', 'GET');
-		$this->assertEquals('root', $router->dispatch($request)->getContent());
-
-		$request = Request::create('http://foo.com///', 'GET');
 		$this->assertEquals('root', $router->dispatch($request)->getContent());
 
 		$router = new Router;

@@ -667,7 +667,7 @@ class Router {
 		// that's used by the Illuminate foundation framework for responses.
 		try
 		{
-			$path = '/'.ltrim($request->getPathInfo(), '/');
+			$path = $this->formatRequestPath($request);
 
 			$parameters = $this->getUrlMatcher($request)->match($path);
 		}
@@ -688,6 +688,24 @@ class Router {
 		$route->setParameters($parameters);
 
 		return $route;
+	}
+
+	/**
+	 * Format the request path info for routing.
+	 *
+	 * @param  Illuminate\Http\Request  $request
+	 * @return string
+	 */
+	protected function formatRequestPath($request)
+	{
+		$path = $request->getPathInfo();
+
+		if (strlen($path) > 1 and ends_with($path, '/'))
+		{
+			return '/'.ltrim(substr($path, 0, -1), '/');
+		}
+
+		return '/'.ltrim($path, '/');
 	}
 
 	/**
