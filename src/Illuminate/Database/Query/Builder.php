@@ -560,8 +560,6 @@ class Builder {
 		$this->mergeBindings($query);
 
 		return $this;
-
-		return $this;
 	}
 
 	/**
