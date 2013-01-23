@@ -33,6 +33,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'Shows',
 		'SectionStart',
 		'SectionStop',
+		'MultilineEchos',
 	);
 
 	/**
@@ -146,6 +147,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
+		return preg_replace('/\{\{\s*(.+?)\s*\}\}/s', '<?php echo $1; ?>', $value);
+	}
+
+	/**
+	 * Compile Blade multiline echos into valid PHP.
+	 * 
+	 * @param  string $value
+	 * @return string
+	 */
+	protected function compileMultilineEchos($value){
 		return preg_replace('/\{\{\s*(.+?)\s*\}\}/s', '<?php echo $1; ?>', $value);
 	}
 
