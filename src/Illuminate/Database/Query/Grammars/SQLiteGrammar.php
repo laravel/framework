@@ -66,4 +66,21 @@ class SQLiteGrammar extends Grammar {
 		return "insert into $table ($names) select ".implode(' union select ', $columns);
 	}
 
+	/**
+	 * Compile a truncate table statement into SQL.
+	 *
+	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @return array
+	 */
+	public function compileTruncate(Builder $query)
+	{
+		$table = $this->wrapTable($query->from);
+
+		$sql = array('delete from sqlite_sequence where name = ?' => array($table));
+
+		$sql['delete from '.$table] = array();
+
+		return $sql;
+	}
+
 }

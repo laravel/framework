@@ -512,6 +512,22 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTruncateMethod()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', array());
+		$builder->from('users')->truncate();
+
+		$sqlite = new Illuminate\Database\Query\Grammars\SQLiteGrammar;
+		$builder = $this->getBuilder();
+		$builder->from('users');
+		$this->assertEquals(array(
+			'delete from sqlite_sequence where name = ?' => array('"users"'),
+			'delete from "users"' => array(),
+		), $sqlite->compileTruncate($builder));
+	}
+
+
 	public function testPostgresInsertGetId()
 	{
 		$builder = $this->getPostgresBuilder();

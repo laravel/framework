@@ -158,6 +158,17 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Compile a truncate table statement into SQL.
+	 *
+	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @return array
+	 */
+	public function compileTruncate(Builder $query)
+	{
+		return array('truncate table '.$this->wrapTable($query->from) => array());
+	}
+
+	/**
 	 * Get the format for database stored dates.
 	 *
 	 * @return string

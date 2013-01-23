@@ -1096,6 +1096,19 @@ class Builder {
 	}
 
 	/**
+	 * Run a truncate statement on the table.
+	 *
+	 * @return void
+	 */
+	public function truncate()
+	{
+		foreach ($this->grammar->compileTruncate($this) as $sql => $bindings)
+		{
+			$this->connection->statement($sql, $bindings);
+		}
+	}
+
+	/**
 	 * Get a new instance of the query builder.
 	 *
 	 * @return Illuminate\Database\Query\Builder
