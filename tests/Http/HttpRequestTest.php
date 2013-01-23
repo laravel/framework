@@ -21,6 +21,17 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSegmentMethod()
+	{
+		$request = Request::create('', 'GET');
+		$this->assertEquals('default', $request->segment(1, 'default'));
+
+		$request = Request::create('foo/bar', 'GET');
+		$this->assertEquals('foo', $request->segment(1, 'default'));
+		$this->assertEquals('bar', $request->segment(2, 'default'));
+	}
+
+
 	public function testUrlMethod()
 	{
 		$request = Request::create('http://foo.com/foo/bar?name=taylor', 'GET');

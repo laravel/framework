@@ -64,6 +64,22 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	}
 
 	/**
+	 * Get a segment from the URI (1 based index).
+	 *
+	 * @param  string  $index
+	 * @param  mixed   $default
+	 * @return string
+	 */
+	public function segment($index, $default = null)
+	{
+		$segments = explode('/', trim($this->getPathInfo(), '/'));
+
+		$segments = array_filter($segments, function($v) { return $v != ''; });
+
+		return array_get($segments, $index - 1, $default);
+	}
+
+	/**
 	 * Determine if the current request URI matches a pattern.
 	 *
 	 * @param  string  $pattern

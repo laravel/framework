@@ -43,7 +43,7 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 		{
 			$this->headers->set('Content-Type', 'application/json');
 
-			$content = $content->toJson(JSON_NUMERIC_CHECK);
+			$content = $content->toJson();
 		}
 
 		// If this content implements the "RenderableInterface", then we will call the
