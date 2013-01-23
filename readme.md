@@ -12,3 +12,4 @@
 - Fixed bug where `hasFile` returned `true` when `file` returned `null`.
 - Changed default PDO case constant to `CASE_NATURAL`.
 - `DB::table('foo')->truncate()` now available on all supported databases.
+- Fixed Twitter Bootstrap compatibility in Paginator.
