@@ -125,16 +125,6 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-	 */
-	public function testExceptionThrownWhenControllerMethodsDontExist()
-	{
-		$controller = new Illuminate\Routing\Controllers\Controller;
-		$controller->doSomething();
-	}
-
-
 	public function testOptionalParameters()
 	{
 		$router = new Router;
@@ -386,7 +376,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testControllerMethodProperlyRegistersRoutes()
 	{
-		$router = $this->getMock('Illuminate\Routing\Router', array('get'), array(new Illuminate\Container\Container));
+		$router = $this->getMock('Illuminate\Routing\Router', array('get', 'any'), array(new Illuminate\Container\Container));
 		$router->setInspector($inspector = m::mock('Illuminate\Routing\Controllers\Inspector'));
 		$inspector->shouldReceive('getRoutable')->once()->with('FooController', 'prefix')->andReturn(array(
 			'getFoo' => array(
@@ -394,6 +384,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 			)
 		));
 		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo('FooController@getFoo'));
+		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
+		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
 
 		$router->controller('FooController', 'prefix');
 	}

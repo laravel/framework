@@ -105,6 +105,8 @@ class Router {
 		$this->container = $container;
 
 		$this->routes = new RouteCollection;
+
+		$this->bind('_missing', function($v) { return explode('/', $v); });
 	}
 
 	/**
@@ -227,6 +229,22 @@ class Router {
 				$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
 			}
 		}
+
+		$this->addFallthroughRoute($controller, $uri);
+	}
+
+	/**
+	 * Add a fallthrough route for a controller.
+	 *
+	 * @param  string  $controller
+	 * @param  string  $uri
+	 * @return void
+	 */
+	protected function addFallthroughRoute($controller, $uri)
+	{
+		$missing = $this->any($uri.'/{_missing}', $controller.'@missingMethod');
+
+		$missing->where('_missing', '(.*)');
 	}
 
 	/**

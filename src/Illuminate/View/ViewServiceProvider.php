@@ -21,6 +21,9 @@ class ViewServiceProvider extends ServiceProvider {
 
 		$this->registerViewFinder();
 
+		// Once the other components have been registered we're ready to include the
+		// view environment and session binder. The session binder will bind onto
+		// the "before" application event and add errors into shared view data.
 		$this->registerEnvironment();
 
 		$this->registerSessionBinder();
@@ -138,9 +141,9 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSessionBinder()
 	{
-		list($me, $app) = array($this, $this->app);
+		list($app, $me) = array($this->app, $this);
 
-		$app->before(function() use ($me, $app)
+		$app->before(function() use ($app, $me)
 		{
 			// If the current session has an "errors" variable bound to it, we will share
 			// its value with all view instances so the views can easily access errors
