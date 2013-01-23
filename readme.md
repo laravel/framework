@@ -15,3 +15,4 @@
 - Fixed Twitter Bootstrap compatibility in Paginator.
 - Allow multiple views to be passed to `View::composer`.
 - Added `Request::segment` method.
+- No need to prefix Translator methods with colons anymore.
