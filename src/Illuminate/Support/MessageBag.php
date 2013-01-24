@@ -216,6 +216,16 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	}
 
 	/**
+	 * Determine if the message bag has any messages.
+	 *
+	 * @return bool
+	 */
+	public function any()
+	{
+		return $this->count() > 1;
+	}
+
+	/**
 	 * Get the number of messages in the container.
 	 *
 	 * @return int
