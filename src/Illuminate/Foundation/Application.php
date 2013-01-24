@@ -130,7 +130,7 @@ class Application extends Container implements HttpKernelInterface {
 
 		if ($this->runningInConsole())
 		{
-			return $this->detectConsoleEnvironment($arguments);
+			return $this->detectConsoleEnvironment($base, $environments, $arguments);
 		}
 
 		return $this->detectWebEnvironment($base, $environments);
@@ -176,22 +176,27 @@ class Application extends Container implements HttpKernelInterface {
 	 * @param  array   $arguments
 	 * @return string
 	 */
-	protected function detectConsoleEnvironment(array $arguments)
+	protected function detectConsoleEnvironment($base, array $environments, array $arguments)
 	{
+		// For the console environmnet, we'll just look for an argument that starts
+		// with "--env" then assume that it is setting the environment for every
+		// operation being performed, and we'll use that environment's config.
 		foreach ($arguments as $key => $value)
 		{
-			// For the console environmnet, we'll just look for an argument that starts
-			// with "--env" then assume that it is setting the environment for every
-			// operation being performed, and we'll use that environment's config.
 			if (starts_with($value, '--env='))
 			{
-				$segments = array_slice(explode('=', $value), 1);
-
-				return $this['env'] = $segments[0];
+				return $this['env'] = head(array_slice(explode('=', $value), 1));
 			}
 		}
 
-		return $this['env'] = 'production';
+		// If the environment couldn't be determined via the --env switch on these
+		// console arguments, we will try to detect it via this "web" method as
+		// we may be able to use the machine name to discern the environment.
+		return $this['env'] = $this->detectWebEnvironment(
+
+			$base, $environments
+
+		);
 	}
 
 	/**
