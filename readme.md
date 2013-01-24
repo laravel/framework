@@ -16,3 +16,4 @@
 - Allow multiple views to be passed to `View::composer`.
 - Added `Request::segment` method.
 - No need to prefix Translator methods with colons anymore.
+- Allow inline error messages for an entire rule on the Validator.
