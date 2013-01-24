@@ -56,9 +56,10 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$t = new Translator($loader = $this->getLoader(), 'en', 'sp');
 		$loader->shouldReceive('load')->once()->with('en', 'foo', 'bar')->andReturn(array('messages' => array('foo' => 'bar')));
+		$loader->shouldReceive('load')->once()->with('sp', 'foo', 'bar')->andReturn(array());
 		$t->setSymfonyTranslator($base = m::mock('Illuminate\Translation\SymfonyTranslator'));
 		$base->shouldReceive('addResource')->once()->with('array', array('messages.foo' => 'bar'), 'en', 'bar::foo');
-		$base->shouldReceive('refreshCatalogue')->once()->with('en');
+		$base->shouldReceive('addResource')->once()->with('array', array(), 'sp', 'bar::foo');
 		$base->shouldReceive('getLocale')->andReturn('en');
 		$domain = $t->load('foo', 'bar', null);
 
@@ -72,11 +73,11 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	public function testKeyIsReturnedThroughTransMethodsWhenItemsDontExist()
 	{
 		$t = new Translator($loader = $this->getLoader(), 'en', 'sp');
-		$loader->shouldReceive('load')->once()->andReturn(array());
+		$loader->shouldReceive('load')->twice()->andReturn(array());
 		$t->setSymfonyTranslator($base = m::mock('Illuminate\Translation\SymfonyTranslator'));
 		$base->shouldReceive('getLocale')->andReturn('en');
-		$base->shouldReceive('addResource');
-		$base->shouldReceive('refreshCatalogue')->once()->with('en');
+		$base->shouldReceive('addResource')->once()->with('array', array(), 'en', '::foo');
+		$base->shouldReceive('addResource')->once()->with('array', array(), 'sp', '::foo');
 		$base->shouldReceive('trans')->once()->with('bar', array(), '::foo', null)->andReturn('bar');
 
 		$this->assertEquals('foo.bar', $t->trans('foo.bar'));
