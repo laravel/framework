@@ -21,3 +21,4 @@
 - Fix fallback locale handling in Translator.
 - Added constructor arguments and `merge` method to `MessageBag`.
 - IoC container will now resolve default parameters if no binding is available.
+- Fix auto environment detection on Artisan.
