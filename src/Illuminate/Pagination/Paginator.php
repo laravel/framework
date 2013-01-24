@@ -144,10 +144,19 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 * @param  string  $size
 	 * @return Illuminate\View\View
 	 */
-	public function links($alignment = 'left', $size = 'normal')
+	public function links($alignment = NULL, $size = NULL)
 	{
-		$this->setAlignment($alignment);
-		$this->setSize($size);
+		// If the alignment parameter is passed along,
+		// overwrite the current alignment.
+		if (!is_null($alignment)) {
+			$this->setAlignment($alignment);
+		}
+
+		// If the size parameter is passed along,
+		// overwrite the current size.
+		if (!is_null($alignment)) {
+			$this->setSize($size);
+		}
 
 		return $this->env->getPaginationView($this);
 	}
