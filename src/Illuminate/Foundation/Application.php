@@ -394,7 +394,7 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	protected function boot()
+	public function boot()
 	{
 		foreach ($this->serviceProviders as $provider)
 		{
