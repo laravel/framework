@@ -422,13 +422,15 @@ class Builder {
 	 * Set a model instance for the model being queried.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Model  $model
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Builder
 	 */
 	public function setModel(Model $model)
 	{
 		$this->model = $model;
 
 		$this->query->from($model->getTable());
+
+		return $this;
 	}
 
 	/**

@@ -101,11 +101,18 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	protected $guarded = array();
 
 	/**
-	 * The date fields for the model.
+	 * The date fields for the model.clear
 	 *
 	 * @var array
 	 */
 	protected $dates = array();
+
+	/**
+	 * The relations to eager load on every query.
+	 *
+	 * @var array
+	 */
+	protected $with = array();
 
 	/**
 	 * Indicates if the model exists.
@@ -547,7 +554,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		// Once we have the query builders, we will set the model instances so the
 		// builder can easily access any information it may need from the model
 		// while it is constructing and executing various queries against it.
-		$builder->setModel($this);
+		$builder->setModel($this)->with($this->with);
 
 		return $builder;
 	}
