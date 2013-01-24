@@ -384,6 +384,8 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
+		$this['request'] = $request;
+
 		return $this->dispatch($request);
 	}
 

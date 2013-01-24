@@ -14,7 +14,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * The HttpKernel client instance.
 	 *
-	 * @var Illuminate\Foundation\Testing\CLient
+	 * @var Illuminate\Foundation\Testing\Client
 	 */
 	protected $client;
 
