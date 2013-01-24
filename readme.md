@@ -20,3 +20,4 @@
 - Can now automatically auto-load a relation for every query by setting the `with` attribute on models.
 - Fix fallback locale handling in Translator.
 - Added constructor arguments and `merge` method to `MessageBag`.
+- IoC container will now resolve default parameters if no binding is available.
