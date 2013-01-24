@@ -89,6 +89,9 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $container->first('foo', ':message'));
 		$this->assertEquals(array('bar'), $container->get('foo', ':message'));
 		$this->assertEquals(array('bar', 'baz'), $container->all(':message'));
+
+		$container->setFormat(':key :message');
+		$this->assertEquals('foo bar', $container->first('foo'));
 	}
 
 

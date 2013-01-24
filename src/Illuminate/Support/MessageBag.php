@@ -116,7 +116,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 		// methods is to return back an array of messages in the first place.
 		if (array_key_exists($key, $this->messages))
 		{
-			return $this->transform($this->messages[$key], $format);
+			return $this->transform($this->messages[$key], $format, $key);
 		}
 
 		return array();
@@ -134,9 +134,9 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 
 		$all = array();
 
-		foreach ($this->messages as $messages)
+		foreach ($this->messages as $key => $messages)
 		{
-			$all = array_merge($all, $this->transform($messages, $format));
+			$all = array_merge($all, $this->transform($messages, $format, $key));
 		}
 
 		return $all;
@@ -147,9 +147,10 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 *
 	 * @param  array   $messages
 	 * @param  string  $format
+	 * @param  string  $messageKey
 	 * @return array
 	 */
-	protected function transform($messages, $format)
+	protected function transform($messages, $format, $messageKey)
 	{
 		$messages = (array) $messages;
 
@@ -158,7 +159,9 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 		// the messages to be easily formatted to each developer's desires.
 		foreach ($messages as $key => &$message)
 		{
-			$message = str_replace(':message', $message, $format);
+			$replace = array(':message', ':key');
+
+			$message = str_replace($replace, array($message, $messageKey), $format);
 		}
 
 		return $messages;
