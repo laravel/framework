@@ -10,7 +10,7 @@ class Inspector {
 	 *
 	 * @var array
 	 */
-	protected $verbs = array('get', 'post', 'put', 'delete', 'head', 'options');
+	protected $verbs = array('any', 'get', 'post', 'put', 'delete', 'head', 'options');
 
 	/**
 	 * Get the routable methods for a controller.
@@ -81,6 +81,18 @@ class Inspector {
 	}
 
 	/**
+	 * Get the routable data for an index method.
+	 *
+	 * @param  array   $data
+	 * @param  string  $prefix
+	 * @return array
+	 */
+	protected function getIndexData($data, $prefix)
+	{
+		return array('verb' => $data['verb'], 'plain' => $prefix, 'uri' => $prefix);
+	}
+
+	/**
 	 * Extract the verb from a controller action.
 	 *
 	 * @param  string  $name
@@ -112,18 +124,6 @@ class Inspector {
 	public function addUriWildcards($uri)
 	{
 		return $uri.'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
-	}
-
-	/**
-	 * Get the routable data for an index method.
-	 *
-	 * @param  array   $data
-	 * @param  string  $prefix
-	 * @return array
-	 */
-	protected function getIndexData($data, $prefix)
-	{
-		return array('verb' => $data['verb'], 'plain' => $prefix, 'uri' => $prefix);
 	}
 
 }
