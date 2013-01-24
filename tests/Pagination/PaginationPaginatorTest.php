@@ -103,17 +103,46 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPaginatorClasses()
+	public function testPaginatorClassesForSliderView()
 	{
-		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
-		$viewName = $env->getViewName();
+		$env = m::mock('Illuminate\Pagination\Environment');
+		$env->setViewName('pagination::slider');
+		$p = new Paginator($env, array('foo', 'bar', 'baz'), 3, 2, 'centered', 'small');
+		$output = $p->links();
 
-		// Test for slider view.
-		if ($viewName === 'pagination::slider') {
-			$output = $p->links('centered', 'small');
+		$this->assertEquals('...<div class="pagination pagination-centered pagination-small">...', $output);
+	}
 
-			$this->assertEquals('...<div class="pagination pagination-centered pagination-small">...', $output);
-		}
+
+	public function testPaginatorClassesForSliderViewWithLinksFunction()
+	{
+		$env = m::mock('Illuminate\Pagination\Environment');
+		$env->setViewName('pagination::slider');
+		$p = new Paginator($env, array('foo', 'bar', 'baz'), 3, 2);
+		$output = $p->links('centered', 'small');
+
+		$this->assertEquals('...<div class="pagination pagination-centered pagination-small">...', $output);
+	}
+
+	public function testPaginatorClassesForSliderView()
+	{
+		$env = m::mock('Illuminate\Pagination\Environment');
+		$env->setViewName('pagination::slider');
+		$p = new Paginator($env, array('foo', 'bar', 'baz'), 3, 2, 'centered', 'small');
+		$output = $p->links()->render();
+
+		$this->assertStringStartsWith('<div class="pagination pagination-centered pagination-small">', $output);
+	}
+
+
+	public function testPaginatorClassesForSliderViewWithLinksFunction()
+	{
+		$env = m::mock('Illuminate\Pagination\Environment');
+		$env->setViewName('pagination::slider');
+		$p = new Paginator($env, array('foo', 'bar', 'baz'), 3, 2);
+		$output = $p->links('centered', 'small')->render();
+
+		$this->assertStringStartsWith('<div class="pagination pagination-centered pagination-small">', $output);
 	}
 
 }
