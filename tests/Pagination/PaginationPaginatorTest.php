@@ -101,28 +101,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('ArrayIterator', $p->getIterator());
 		$this->assertEquals(array('foo', 'bar', 'baz'), $p->getIterator()->getArrayCopy());
 	}
-
-
-	public function testPaginatorClassesForSliderView()
-	{
-		$env = m::mock('Illuminate\Pagination\Environment');
-		$env->setViewName('pagination::slider');
-		$p = new Paginator($env, array('foo', 'bar', 'baz'), 3, 2, 'centered', 'small');
-		$output = $p->links();
-
-		$this->assertEquals('...<div class="pagination pagination-centered pagination-small">...', $output);
-	}
-
-
-	public function testPaginatorClassesForSliderViewWithLinksFunction()
-	{
-		$env = m::mock('Illuminate\Pagination\Environment');
-		$env->setViewName('pagination::slider');
-		$p = new Paginator($env, array('foo', 'bar', 'baz'), 3, 2);
-		$output = $p->links('centered', 'small');
-
-		$this->assertEquals('...<div class="pagination pagination-centered pagination-small">...', $output);
-	}
+	
 
 	public function testPaginatorClassesForSliderView()
 	{
