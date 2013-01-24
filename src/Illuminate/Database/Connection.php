@@ -300,6 +300,24 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Execute an unprepared SQL statement and return the boolean result.
+	 *
+	 * @param  string  $query
+	 * @return bool
+	 */
+	public function execute($query)
+	{
+		return $this->run($query, array(), function($me, $query, $bindings)
+		{
+			// Since this is an unprepared statement, $bindings was kept in closure list
+			// of parameters just for compatibility with run()'s callback call.
+			if ($me->pretending()) return true;
+
+			return $me->getPdo()->exec($query);
+		});
+	}
+
+	/**
 	 * Run an SQL statement and get the number of rows affected.
 	 *
 	 * @param  string  $query
