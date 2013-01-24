@@ -26,3 +26,4 @@
 - Added `Config::hasGroup` method.
 - Added `DB::unprepared` method for running raw, unprepared queries against PDO.
 - Allow `:key` place-holder in MessageBag messages.
+- Added `Auth::validate` method for validating credentials without logging in.
