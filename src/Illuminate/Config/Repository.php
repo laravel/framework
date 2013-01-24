@@ -68,6 +68,19 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	}
 
 	/**
+	 * Determine if a configuration group exists.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function hasGroup($key)
+	{
+		list($namespace, $group, $item) = $this->parseKey($key);
+
+		return $this->loader->exists($group, $namespace);
+	}
+
+	/**
 	 * Get the specified configuration value.
 	 *
 	 * @param  string  $key

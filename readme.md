@@ -23,3 +23,4 @@
 - IoC container will now resolve default parameters if no binding is available.
 - Fix auto environment detection on Artisan.
 - Fix BrowserKit request processing.
+- Added `Config::hasGroup` method.
