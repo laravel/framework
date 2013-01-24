@@ -24,3 +24,4 @@
 - Fix auto environment detection on Artisan.
 - Fix BrowserKit request processing.
 - Added `Config::hasGroup` method.
+- Added `DB::unprepared` method for running raw, unprepared queries against PDO.
