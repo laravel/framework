@@ -18,3 +18,4 @@
 - No need to prefix Translator methods with colons anymore.
 - Allow inline error messages for an entire rule on the Validator.
 - Can now automatically auto-load a relation for every query by setting the `with` attribute on models.
+- Fix fallback locale handling in Translator.
