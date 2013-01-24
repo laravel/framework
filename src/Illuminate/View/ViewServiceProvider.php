@@ -21,7 +21,12 @@ class ViewServiceProvider extends ServiceProvider {
 
 		$this->registerViewFinder();
 
+		// Once the other components have been registered we're ready to include the
+		// view environment and session binder. The session binder will bind onto
+		// the "before" application event and add errors into shared view data.
 		$this->registerEnvironment();
+
+		$this->registerSessionBinder();
 	}
 
 	/**
@@ -116,10 +121,30 @@ class ViewServiceProvider extends ServiceProvider {
 
 			$finder = $app['view.finder'];
 
-			$events = $app['events'];
+			$env = new Environment($resolver, $finder, $app['events']);
 
-			$environment = new Environment($resolver, $finder, $events);
+			// We will also set the container instance on this view environment since the
+			// view composers may be classes registered in the container, which allows
+			// for great testable, flexible composers for the application developer.
+			$env->setContainer($app);
 
+			$env->share('app', $app);
+
+			return $env;
+		});
+	}
+
+	/**
+	 * Register the session binder for the view environment.
+	 *
+	 * @return void
+	 */
+	protected function registerSessionBinder()
+	{
+		list($app, $me) = array($this->app, $this);
+
+		$app->before(function() use ($app, $me)
+		{
 			// If the current session has an "errors" variable bound to it, we will share
 			// its value with all view instances so the views can easily access errors
 			// without having to bind. An empty bag is set when there aren't errors.
@@ -127,7 +152,7 @@ class ViewServiceProvider extends ServiceProvider {
 			{
 				$errors = $app['session']->get('errors');
 
-				$environment->share('errors', $errors);
+				$app['view']->share('errors', $errors);
 			}
 
 			// Putting the errors in the view for every view allows the developer to just
@@ -135,17 +160,8 @@ class ViewServiceProvider extends ServiceProvider {
 			// they don't have to continually run checks for the presence of errors.
 			else
 			{
-				$environment->share('errors', new MessageBag);
+				$app['view']->share('errors', new MessageBag);
 			}
-
-			// We will also set the container instance on this view environment since the
-			// view composers may be classes registered in the container, which allows
-			// for great testable, flexible composers for the application developer.
-			$environment->setContainer($app);
-
-			$environment->share('app', $app);
-
-			return $environment;
 		});
 	}
 

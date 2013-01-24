@@ -196,11 +196,30 @@ class Environment {
 	/**
 	 * Register a view composer event.
 	 *
+	 * @param  array|string  $views
+	 * @param  Closure|string  $callback
+	 * @return Closure
+	 */
+	public function composer($views, $callback)
+	{
+		$composers = array();
+
+		foreach ((array) $views as $view)
+		{
+			$composers[] = $this->addComposer($view, $callback);
+		}
+
+		return $composers;
+	}
+
+	/**
+	 * Add a composer for a given view.
+	 *
 	 * @param  string  $view
 	 * @param  Closure|string  $callback
 	 * @return Closure
 	 */
-	public function composer($view, $callback)
+	protected function addComposer($view, $callback)
 	{
 		if ($callback instanceof Closure)
 		{
@@ -211,7 +230,7 @@ class Environment {
 		elseif (is_string($callback))
 		{
 			return $this->addClassComposer($view, $callback);
-		}
+		}		
 	}
 
 	/**

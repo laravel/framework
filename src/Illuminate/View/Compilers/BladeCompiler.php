@@ -43,7 +43,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path)
 	{
-		$contents = trim($this->compileString($this->files->get($path)));
+		$contents = $this->compileString($this->files->get($path));
 
 		if ( ! is_null($this->cachePath))
 		{
@@ -146,7 +146,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		return preg_replace('/\{\{\s*(.+?)\s*\}\}/', '<?php echo $1; ?>', $value);
+		return preg_replace('/\{\{\s*(.+?)\s*\}\}/s', '<?php echo $1; ?>', $value);
 	}
 
 	/**

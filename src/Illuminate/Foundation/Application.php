@@ -29,6 +29,13 @@ class Application extends Container implements HttpKernelInterface {
 	protected $booted = false;
 
 	/**
+	 * Get the booting callbacks.
+	 *
+	 * @var array
+	 */
+	protected $bootingCallbacks = array();
+
+	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
@@ -123,7 +130,7 @@ class Application extends Container implements HttpKernelInterface {
 
 		if ($this->runningInConsole())
 		{
-			return $this->detectConsoleEnvironment($arguments);
+			return $this->detectConsoleEnvironment($base, $environments, $arguments);
 		}
 
 		return $this->detectWebEnvironment($base, $environments);
@@ -169,22 +176,27 @@ class Application extends Container implements HttpKernelInterface {
 	 * @param  array   $arguments
 	 * @return string
 	 */
-	protected function detectConsoleEnvironment(array $arguments)
+	protected function detectConsoleEnvironment($base, array $environments, array $arguments)
 	{
+		// For the console environmnet, we'll just look for an argument that starts
+		// with "--env" then assume that it is setting the environment for every
+		// operation being performed, and we'll use that environment's config.
 		foreach ($arguments as $key => $value)
 		{
-			// For the console environmnet, we'll just look for an argument that starts
-			// with "--env" then assume that it is setting the environment for every
-			// operation being performed, and we'll use that environment's config.
 			if (starts_with($value, '--env='))
 			{
-				$segments = array_slice(explode('=', $value), 1);
-
-				return $this['env'] = $segments[0];
+				return $this['env'] = head(array_slice(explode('=', $value), 1));
 			}
 		}
 
-		return $this['env'] = 'production';
+		// If the environment couldn't be determined via the --env switch on these
+		// console arguments, we will try to detect it via this "web" method as
+		// we may be able to use the machine name to discern the environment.
+		return $this['env'] = $this->detectWebEnvironment(
+
+			$base, $environments
+
+		);
 	}
 
 	/**
@@ -285,17 +297,6 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
-	 * Register a new boot event listener.
-	 *
-	 * @param  mixed  $callback
-	 * @return void
-	 */
-	public function booting($callback)
-	{
-		$this['events']->listen('application.boot', $callback);
-	}
-
-	/**
 	 * Register a "before" application filter.
 	 *
 	 * @param  Closure|string  $callback
@@ -383,6 +384,8 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
+		$this['request'] = $request;
+
 		return $this->dispatch($request);
 	}
 
@@ -391,16 +394,40 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	protected function boot()
+	public function boot()
 	{
 		foreach ($this->serviceProviders as $provider)
 		{
 			$provider->boot($this);
 		}
 
-		$this['events']->fire('application.boot');
+		$this->fireBootingCallbacks();
 
 		$this->booted = true;
+	}
+
+	/**
+	 * Register a new boot listener.
+	 *
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function booting($callback)
+	{
+		$this->bootingCallbacks[] = $callback;
+	}
+
+	/**
+	 * Call the booting callbacks for the application.
+	 *
+	 * @return void
+	 */
+	protected function fireBootingCallbacks()
+	{
+		foreach ($this->bootingCallbacks as $callback)
+		{
+			call_user_func($callback, $this);
+		}
 	}
 
 	/**
@@ -458,7 +485,14 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{
-		throw new HttpException($code, $message, null, $headers);
+		if ($code == 404)
+		{
+			throw new NotFoundHttpException($message);
+		}
+		else
+		{
+			throw new HttpException($code, $message, null, $headers);
+		}
 	}
 
 	/**

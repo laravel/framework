@@ -69,6 +69,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('require it please!', $v->messages()->first('name'));
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('name' => ''), array('name' => 'Required'), array('required' => 'require it please!'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('require it please!', $v->messages()->first('name'));
 	}
 
 
@@ -593,8 +599,8 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$trans = $this->getRealTranslator();
 		$trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
-		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'Foo'));
-		$v->addExtension('Foo', function() { return false; });
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
+		$v->addExtension('foo', function() { return false; });
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('foo!', $v->messages()->first('name'));

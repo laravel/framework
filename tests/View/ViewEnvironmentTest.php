@@ -77,6 +77,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
 		$callback = $env->composer('foo', function() { return 'bar'; });
+		$callback = $callback[0];
 
 		$this->assertEquals('bar', $callback());
 	}
@@ -90,6 +91,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
 		$composer->shouldReceive('compose')->once()->with('view')->andReturn('composed');
 		$callback = $env->composer('foo', 'FooComposer');
+		$callback = $callback[0];
 
 		$this->assertEquals('composed', $callback('view'));
 	}

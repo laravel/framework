@@ -17,17 +17,13 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 		$router->get('/', function() { return 'root'; });
 		$router->get('/foo', function() { return 'bar'; });
-		$router->get('/foo//', function() { return 'foo'; });
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 
-		$request = Request::create('/foo//', 'GET');
-		$this->assertEquals('foo', $router->dispatch($request)->getContent());
+		$request = Request::create('/foo/', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 
 		$request = Request::create('http://foo.com', 'GET');
-		$this->assertEquals('root', $router->dispatch($request)->getContent());
-
-		$request = Request::create('http://foo.com///', 'GET');
 		$this->assertEquals('root', $router->dispatch($request)->getContent());
 
 		$router = new Router;
@@ -122,16 +118,6 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->get('/foo/{name}', array('uses' => 'home@index'));
 
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
-	}
-
-
-	/**
-	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-	 */
-	public function testExceptionThrownWhenControllerMethodsDontExist()
-	{
-		$controller = new Illuminate\Routing\Controllers\Controller;
-		$controller->doSomething();
 	}
 
 
@@ -386,7 +372,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testControllerMethodProperlyRegistersRoutes()
 	{
-		$router = $this->getMock('Illuminate\Routing\Router', array('get'), array(new Illuminate\Container\Container));
+		$router = $this->getMock('Illuminate\Routing\Router', array('get', 'any'), array(new Illuminate\Container\Container));
 		$router->setInspector($inspector = m::mock('Illuminate\Routing\Controllers\Inspector'));
 		$inspector->shouldReceive('getRoutable')->once()->with('FooController', 'prefix')->andReturn(array(
 			'getFoo' => array(
@@ -394,6 +380,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 			)
 		));
 		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo('FooController@getFoo'));
+		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
+		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
 
 		$router->controller('FooController', 'prefix');
 	}
@@ -418,6 +406,20 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->get('user/{user?}', function($user = 'default') { return $user; });
 		$request = Request::create('/user', 'GET');
 		$this->assertEquals('default', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testRoutesArentOverriddenBySubDomain()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->get('/', array('domain' => 'foo.com', function() { return 'main'; }));
+		$router->get('/', array('domain' => 'bar.com', function() { return 'sub'; }));
+
+		$request = Request::create('http://foo.com', 'GET');
+		$this->assertEquals('main', $router->dispatch($request)->getContent());
+
+		$request = Request::create('http://bar.com', 'GET');
+		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
 
 }

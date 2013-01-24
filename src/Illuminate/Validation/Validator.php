@@ -853,14 +853,14 @@ class Validator implements MessageProviderInterface {
 	{
 		$lowerRule = strtolower(snake_case($rule));
 
-		$inlineKey = "{$attribute}.{$lowerRule}";
+		$inlineMessage = $this->getInlineMessage($attribute, $lowerRule);
 
 		// First we will retrieve the custom message for the validation rule if one
 		// exists. If a custom validation message is being used we'll return the
 		// custom message, otherwise we'll keep searching for a valid message.
-		if (isset($this->customMessages[$inlineKey]))
+		if ( ! is_null($inlineMessage))
 		{
-			return $this->customMessages[$inlineKey];
+			return $inlineMessage;
 		}
 
 		$customKey = "validation.custom.{$attribute}.{$lowerRule}";
@@ -891,6 +891,29 @@ class Validator implements MessageProviderInterface {
 			$key = "validation.{$lowerRule}";
 
 			return $this->translator->trans($key);
+		}
+	}
+
+	/**
+	 * Get the inline message for a rule if it exists.
+	 *
+	 * @param  string  $attribute
+	 * @param  string  $lowerRule
+	 * @return string
+	 */
+	protected function getInlineMessage($attribute, $lowerRule)
+	{
+		$keys = array($lowerRule, "{$attribute}.{$lowerRule}");
+
+		// First we will check for a custom message for an attribute specific rule
+		// message for the fields, then we will check for a general custom line
+		// that is not attribute specific. If we find either we'll return it.
+		foreach ($keys as $key)
+		{
+			if (isset($this->customMessages[$key]))
+			{
+				return $this->customMessages[$key];
+			}
 		}
 	}
 

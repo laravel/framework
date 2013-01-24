@@ -150,7 +150,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	}
 
 	/**
-	 * Determine if the given session is expired.
+	 * Determine if the given session is invalid.
 	 *
 	 * @param  array  $session
 	 * @return bool
@@ -158,6 +158,19 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	protected function isInvalid($session)
 	{
 		if ( ! is_array($session)) return true;
+
+		return $this->isExpired($session);
+	}
+
+	/**
+	 * Determine if the given session is expired.
+	 *
+	 * @param  array  $session
+	 * @return bool
+	 */
+	protected function isExpired($session)
+	{
+		if ($this->lifetime == 0) return false;
 
 		return (time() - $session['last_activity']) > ($this->lifetime * 60);
 	}

@@ -324,6 +324,22 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Run a raw, unprepared query against the PDO connection.
+	 *
+	 * @param  string  $query
+	 * @return bool
+	 */
+	public function unprepared($query)
+	{
+		return $this->run($query, array(), function($me, $query, $bindings)
+		{
+			if ($me->pretending()) return true;
+
+			return (bool) $me->getPdo()->exec($query);
+		});
+	}
+
+	/**
 	 * Prepare the query bindings for execution.
 	 *
 	 * @param  array  $bindings

@@ -44,7 +44,7 @@ class BootstrapPresenter {
 	public function render()
 	{
 		// The hard-coded thirteen represents the minimum number of pages we need to
-		// ba able to create a sliding page window. If we have less than that, we
+		// be able to create a sliding page window. If we have less than that, we
 		// will just render a simple range of page links insteadof the sliding.
 		if ($this->lastPage < 13)
 		{
@@ -75,7 +75,7 @@ class BootstrapPresenter {
 			// for the link. These views use the "Twitter Bootstrap" styles by default.
 			if ($this->currentPage == $page)
 			{
-				$pages[] = '<li class="disabled"><a href="#">'.$page.'</a></li>';
+				$pages[] = '<li class="active"><a href="#">'.$page.'</a></li>';
 			}
 			else
 			{
@@ -181,7 +181,7 @@ class BootstrapPresenter {
 		{
 			$url = $this->paginator->getUrl($this->currentPage - 1);
 
-			return '<li class="active"><a href="'.$url.'">'.$text.'</a></li>';
+			return '<li><a href="'.$url.'">'.$text.'</a></li>';
 		}
 	}
 
@@ -204,7 +204,7 @@ class BootstrapPresenter {
 		{
 			$url = $this->paginator->getUrl($this->currentPage + 1);
 
-			return '<li class="active"><a href="'.$url.'">'.$text.'</a></li>';
+			return '<li><a href="'.$url.'">'.$text.'</a></li>';
 		}
 	}
 
@@ -228,7 +228,7 @@ class BootstrapPresenter {
 	{
 		$url = $this->paginator->getUrl($page);
 
-		return '<li class="active"><a href="'.$url.'">'.$page.'</a></li>';
+		return '<li><a href="'.$url.'">'.$page.'</a></li>';
 	}
 
 	/**

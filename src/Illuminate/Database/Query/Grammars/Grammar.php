@@ -551,6 +551,17 @@ class Grammar extends BaseGrammar {
 	}
 
 	/**
+	 * Compile a truncate table statement into SQL.
+	 *
+	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @return array
+	 */
+	public function compileTruncate(Builder $query)
+	{
+		return array('truncate '.$this->wrapTable($query->from) => array());
+	}
+
+	/**
 	 * Concatenate an array of segments, removing empties.
 	 *
 	 * @param  array   $segments

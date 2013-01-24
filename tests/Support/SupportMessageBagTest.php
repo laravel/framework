@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\MessageBag;
+use Mockery as m;
 
 class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 
@@ -24,6 +25,14 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$messages = $container->getMessages();
 		$this->assertEquals(array('bar', 'baz'), $messages['foo']);
 		$this->assertEquals(array('bust'), $messages['boom']);
+	}
+
+
+	public function testMessagesMayBeMerged()
+	{
+		$container = new MessageBag(array('username' => array('foo')));
+		$container->merge(array('username' => array('bar')));
+		$this->assertEquals(array('username' => array('foo', 'bar')), $container->getMessages());
 	}
 
 
@@ -80,6 +89,40 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $container->first('foo', ':message'));
 		$this->assertEquals(array('bar'), $container->get('foo', ':message'));
 		$this->assertEquals(array('bar', 'baz'), $container->all(':message'));
+
+		$container->setFormat(':key :message');
+		$this->assertEquals('foo bar', $container->first('foo'));
 	}
+
+
+	public function testMessageBagReturnsCorrectArray()
+	{
+		$container = new MessageBag;
+		$container->setFormat(':message');
+		$container->add('foo', 'bar');
+		$container->add('boom', 'baz');
+
+		$this->assertEquals(array('foo' => array('bar'), 'boom' => array('baz')), $container->toArray());
+	}
+
+
+	public function testMessageBagReturnsExpectedJson()
+	{
+		$container = new MessageBag;
+		$container->setFormat(':message');
+		$container->add('foo', 'bar');
+		$container->add('boom', 'baz');
+
+		$this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
+	}
+
+
+	public function testCastingAsStringReturnsBagAsJson()
+	{
+		$container = m::mock('Illuminate\Support\MessageBag[toJson]');
+		$container->shouldReceive('toJson')->once()->andReturn('foo');
+		$this->assertEquals('foo', (string) $container);
+	}
+
 
 }
