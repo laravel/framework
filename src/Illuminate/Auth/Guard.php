@@ -124,6 +124,24 @@ class Guard {
 	}
 
 	/**
+	 * Log a user into the application without sessions or cookies.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	public function stateless(array $credentials = array())
+	{
+		if ($this->validate($credentials))
+		{
+			$this->setUser($this->provider->retrieveByCredentials($credentials));
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Validate a user's credentials.
 	 *
 	 * @param  array  $credentials

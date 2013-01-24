@@ -27,3 +27,4 @@
 - Added `DB::unprepared` method for running raw, unprepared queries against PDO.
 - Allow `:key` place-holder in MessageBag messages.
 - Added `Auth::validate` method for validating credentials without logging in.
+- Added `Auth::stateless` method for logging in for a single request without sessions or cookies.
