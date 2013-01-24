@@ -232,6 +232,44 @@ class BootstrapPresenter {
 	}
 
 	/**
+	 * Get the pagination view Bootstrap classes.
+	 *
+	 * @return string
+	 */
+	public function getClasses()
+	{
+		$classes = '';
+
+		// Get the current paginator alignment.
+		$alignment = $this->paginator->getAlignment();
+
+		// Set the valid Bootstrap alignment classes.
+		$validAlignmentValues = array('centered', 'right');
+
+		// If the alignment value is valid, add it as a Bootstrap class.
+		// If it's invalid, the Bootstrap default is set by not adding a class.
+		if (in_array($alignment, $validAlignmentValues))
+		{
+			$classes .= " pagination-{$alignment}";
+		}
+
+		// Get the current paginator size.
+		$size = $this->paginator->getSize();
+
+		// Set the valid Bootstrap size classes.
+		$validSizeValues = array('large', 'small', 'mini');
+
+		// If the size value is valid, add it as a Bootstrap class.
+		// If it's invalid, the Bootstrap default is set by not adding a class.
+		if (in_array($size, $validSizeValues))
+		{
+			$classes .= " pagination-{$size}";
+		}
+
+		return $classes;
+	}
+
+	/**
 	 * Set the value of the current page.
 	 *
 	 * @param  int   $page

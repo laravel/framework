@@ -3,7 +3,7 @@
 ?>
 
 <?php if ($paginator->getLastPage() > 1): ?>
-	<div class="pagination">
+	<div class="pagination<?php $presenter->getClasses(); ?>">
 		<ul>
 			<?php echo $presenter->render(); ?>
 		</ul>
