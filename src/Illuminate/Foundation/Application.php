@@ -485,7 +485,14 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{
-		throw new HttpException($code, $message, null, $headers);
+		if ($code == 404)
+		{
+			throw new NotFoundHttpException($message);
+		}
+		else
+		{
+			throw new HttpException($code, $message, null, $headers);
+		}
 	}
 
 	/**
