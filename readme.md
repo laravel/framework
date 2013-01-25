@@ -30,3 +30,4 @@
 - Added `Auth::stateless` method for logging in for a single request without sessions or cookies.
 - Added `DB::extend` method for adding custom connection resolvers.
 - Added `each` and `filter` methods to Eloquent collections.
+- Swapped method order on `Route::controller` to make it more consistent with other similar methods.

@@ -211,11 +211,11 @@ class Router {
 	/**
 	 * Route a controller to a URI with wildcard routing.
 	 *
-	 * @param  string  $controller
 	 * @param  string  $uri
+	 * @param  string  $controller
 	 * @return Illuminate\Routing\Route
 	 */
-	public function controller($controller, $uri)
+	public function controller($uri, $controller)
 	{
 		$routable = $this->getInspector()->getRoutable($controller, $uri);
 

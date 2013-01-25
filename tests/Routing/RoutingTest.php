@@ -383,7 +383,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
 		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
 
-		$router->controller('FooController', 'prefix');
+		$router->controller('prefix', 'FooController');
 	}
 
 
