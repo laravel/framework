@@ -10,7 +10,10 @@ class Inspector {
 	 *
 	 * @var array
 	 */
-	protected $verbs = array('any', 'get', 'post', 'put', 'delete', 'head', 'options');
+	protected $verbs = array(
+		'any', 'get', 'post', 'put', 
+		'delete', 'head', 'options'
+	);
 
 	/**
 	 * Get the routable methods for a controller.
@@ -41,9 +44,7 @@ class Inspector {
 				// the wildcard place-holders that each "typical" routes would contain.
 				if ($data['plain'] == $prefix.'/index')
 				{
-					$index = $this->getIndexData($data, $prefix);
-
-					$routable[$method->name][] = $index;
+					$routable[$method->name][] = $this->getIndexData($data, $prefix);
 				}
 			}
 		}
