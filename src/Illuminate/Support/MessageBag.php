@@ -225,7 +225,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 */
 	public function any()
 	{
-		return $this->count() > 1;
+		return $this->count() > 0;
 	}
 
 	/**
