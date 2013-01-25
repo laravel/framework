@@ -421,6 +421,25 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('http://bar.com', 'GET');
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
+	
+	public function testRoutesArentOverriddenBySubDomainWithGroups()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->group(array('domain' => 'foo.com'), function() use ($router)
+		{
+			$router->get('/', function() { return 'main'; });
+		});
+		$router->group(array('domain' => 'bar.com'), function() use ($router)
+		{
+			$router->get('/', function() { return 'sub'; });
+		});
+		
+		$request = Request::create('http://foo.com', 'GET');
+		$this->assertEquals('main', $router->dispatch($request)->getContent());
+
+		$request = Request::create('http://bar.com', 'GET');
+		$this->assertEquals('sub', $router->dispatch($request)->getContent());
+	}
 
 }
 
