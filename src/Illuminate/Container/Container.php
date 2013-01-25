@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Container; use Closure, ArrayAccess, ReflectionParameter;
 
-class BindingResolutionException extends \Exception {}
-
 class Container implements ArrayAccess {
 
 	/**

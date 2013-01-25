@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ruleset name="Laravel Standard">
+
+ <description>Laraval Coding Standard</description>
+
+ <exclude-pattern>tests/*</exclude-pattern>
+ <exclude-pattern>vendor/*</exclude-pattern>
+ <exclude-pattern>stubs/*</exclude-pattern>
+ <exclude-pattern>Pheanstalk/*</exclude-pattern>
+ <exclude-pattern>Support/helpers.php</exclude-pattern>
+
+ <rule ref="PSR1"/>
+
+ <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+  <exclude-pattern>Foundation/start.php</exclude-pattern>
+ </rule>
+
+</ruleset>
