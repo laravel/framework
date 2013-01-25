@@ -55,15 +55,20 @@ class UrlGenerator {
 		if ($this->isValidUrl($path)) return $path;
 
 		$scheme = $this->getScheme($secure);
-
-		// Once we have the scheme we will compile the "tail" by collapsing the values
-		// into a single string delimited by slashes. This just makes it convenient
-		// for passing the array of parameters to this URL as a list of segments.
-		$tail = trim(implode('/', (array) $parameters), '/');
-
+		
 		$root = $this->getRootUrl($scheme);
-
-		return $root.rtrim('/'.$path.'/'.$tail, '/');
+		
+		if($parameters != 1)
+		{
+			// Once we have the scheme we will compile the "tail" by collapsing the values
+			// into a single string delimited by slashes. This just makes it convenient
+			// for passing the array of parameters to this URL as a list of segments.
+			$tail = trim(implode('/', (array) $parameters), '/');
+		
+			return $root.rtrim('/'.$path.'/'.$tail, '/');
+		}
+		else
+			return $root.rtrim('/'.$path, '/');
 	}
 
 	/**
