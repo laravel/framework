@@ -582,6 +582,22 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());	
 	}
 
+	public function testValidateDateAndFormat()
+	{
+		date_default_timezone_set('UTC');
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => '2000-01-01'), array('x' => 'date'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => 'Not a date'), array('x' => 'date'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('x' => '2000-01-01'), array('x' => 'date_format:Y-m-d'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => '01/01/2001'), array('x' => 'date_format:Y-m-d'));
+		$this->assertTrue($v->fails());
+	}
 
 	public function testBeforeAndAfter()
 	{
