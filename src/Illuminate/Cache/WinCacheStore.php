@@ -46,7 +46,7 @@ class WinCacheStore extends Store {
 	 */
 	protected function storeItem($key, $value, $minutes)
 	{
-		wincache_ucache_add($this->prefix.$key, value, $minutes * 60);
+		wincache_ucache_add($this->prefix.$key, $value, $minutes * 60);
 	}
 
 	/**
