@@ -27,6 +27,13 @@ class DatabaseManager implements ConnectionResolverInterface {
 	protected $connections = array();
 
 	/**
+	 * The custom connection resolvers.
+	 *
+	 * @var array
+	 */
+	protected $extensions = array();
+
+	/**
 	 * Create a new database manager instance.
 	 *
 	 * @param  Illuminate\Foundation\Application  $app
@@ -54,12 +61,30 @@ class DatabaseManager implements ConnectionResolverInterface {
 		// set the "fetch mode" for PDO which determines the query return types.
 		if ( ! isset($this->connections[$name]))
 		{
-			$connection = $this->factory->make($this->getConfig($name));
+			$connection = $this->makeConnection($name);
 
 			$this->connections[$name] = $this->prepare($connection);
 		}
 
 		return $this->connections[$name];
+	}
+
+	/**
+	 * Make the database connection instance.
+	 *
+	 * @param  string  $name
+	 * @return Illuminate\Database\Connection
+	 */
+	protected function makeConnection($name)
+	{
+		$config = $this->getConfig($name);
+
+		if (isset($this->extensions[$name]))
+		{
+			return call_user_func($this->extensions[$name], $config);
+		}
+
+		return $this->factory->make($this->getConfig($name));
 	}
 
 	/**
@@ -129,6 +154,18 @@ class DatabaseManager implements ConnectionResolverInterface {
 	public function setDefaultConnection($name)
 	{
 		$this->app['config']['database.default'] = $name;
+	}
+
+	/**
+	 * Register an extension connection resolver.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $resolver
+	 * @return void
+	 */
+	public function extend($name, $resolver)
+	{
+		$this->extensions[$name] = $resolver;
 	}
 
 	/**
