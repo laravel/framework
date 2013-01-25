@@ -202,7 +202,7 @@ class Router {
 	 */
 	public function controllers(array $controllers)
 	{
-		foreach ($controllers as $name => $uri)
+		foreach ($controllers as $uri => $name)
 		{
 			$this->controller($uri, $name);
 		}
