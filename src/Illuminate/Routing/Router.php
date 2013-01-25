@@ -204,7 +204,7 @@ class Router {
 	{
 		foreach ($controllers as $name => $uri)
 		{
-			$this->controller($name, $uri);
+			$this->controller($uri, $name);
 		}
 	}
 
