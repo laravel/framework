@@ -817,6 +817,33 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Validate that an attribute is a valid date.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateDate($attribute, $value)
+	{
+		return strtotime($value) !== false;
+	}
+
+	/**
+	 * Validate that an attribute matches a date format.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function validateDateFormat($attribute, $value, $parameters)
+	{
+		$parsed = date_parse_from_format($parameters[0], $value);
+
+		return $parsed['error_count'] === 0;
+	}
+
+	/**
 	 * Validate the date is before a given date.
 	 *
 	 * @param  string  $attribute
@@ -1175,6 +1202,20 @@ class Validator implements MessageProviderInterface {
 	protected function replaceDifferent($message, $attribute, $rule, $parameters)
 	{
 		return str_replace(':other', $parameters[0], $message);
+	}
+
+	/**
+	 * Replace all place-holders for the date_format rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceDateFormat($message, $attribute, $rule, $parameters)
+	{
+		return str_replace(':format', $parameters[0], $message);
 	}
 
 	/**
