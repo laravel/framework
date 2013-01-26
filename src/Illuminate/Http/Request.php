@@ -416,7 +416,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 * @param  mixed   $default
 	 * @return string
 	 */
-	public static function ip($default = '0.0.0.0')
+	public function ip($default = '0.0.0.0')
 	{
 		$clientIp = $this->getClientIp();
 		return $clientIp === NULL ? $default : $clientIp;
