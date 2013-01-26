@@ -259,9 +259,11 @@ class Router {
 	{
 		$defaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
 
+		$base = $this->getBaseResource($resource);
+
 		foreach ($this->getResourceMethods($defaults, $options) as $method)
 		{
-			$this->{'addResource'.ucfirst($method)}($resource, $controller);
+			$this->{'addResource'.ucfirst($method)}($resource, $base, $controller);
 		}
 	}
 
@@ -289,87 +291,189 @@ class Router {
 	/**
 	 * Add the index method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $r
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceIndex($resource, $controller)
+	protected function addResourceIndex($r, $base, $controller)
 	{
-		return $this->get($resource, $controller.'@index');
+		$action = $this->getResourceAction($r, $controller, 'index');
+
+		return $this->get($this->getResourceUri($r), $action);
 	}
 
 	/**
 	 * Add the create method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $r
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceCreate($resource, $controller)
+	protected function addResourceCreate($r, $base, $controller)
 	{
-		return $this->get($resource.'/create', $controller.'@create');
+		$action = $this->getResourceAction($r, $controller, 'create');
+
+		return $this->get($this->getResourceUri($r).'/create', $action);
 	}
 
 	/**
 	 * Add the store method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $r
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceStore($resource, $controller)
+	protected function addResourceStore($r, $base, $controller)
 	{
-		return $this->post($resource, $controller.'@store');
+		$action = $this->getResourceAction($r, $controller, 'store');
+
+		return $this->post($this->getResourceUri($r), $action);
 	}
 
 	/**
 	 * Add the show method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $r
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceShow($resource, $controller)
+	protected function addResourceShow($r, $base, $controller)
 	{
-		return $this->get($resource.'/{id}', $controller.'@show');
+		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+
+		return $this->get($uri, $this->getResourceAction($r, $controller, 'show'));
 	}
 
 	/**
 	 * Add the edit method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $r
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceEdit($resource, $controller)
+	protected function addResourceEdit($r, $base, $controller)
 	{
-		return $this->get($resource.'/{id}/edit', $controller.'@edit');
+		$uri = $this->getResourceUri($r).'/{'.$base.'}/edit';
+
+		return $this->get($uri, $this->getResourceAction($r, $controller, 'edit'));
 	}
 
 	/**
 	 * Add the update method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $r
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceUpdate($resource, $controller)
+	protected function addResourceUpdate($r, $base, $controller)
 	{
-		$this->put($resource.'/{id}', $controller.'@update');
+		$this->addPutResourceUpdate($r, $base, $controller);
 
-		return $this->patch($resource.'/{id}', $controller.'@update');
+		return $this->addPatchResourceUpdate($r, $base, $controller);
+	}
+
+	/**
+	 * Add the update method for a resourceful route.
+	 *
+	 * @param  string  $r
+	 * @param  string  $base
+	 * @param  string  $controller
+	 * @return void
+	 */
+	protected function addPutResourceUpdate($r, $base, $controller)
+	{
+		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+
+		return $this->put($uri, $this->getResourceAction($r, $controller, 'update'));
+	}
+
+	/**
+	 * Add the update method for a resourceful route.
+	 *
+	 * @param  string  $r
+	 * @param  string  $base
+	 * @param  string  $controller
+	 * @return void
+	 */
+	protected function addPatchResourceUpdate($r, $base, $controller)
+	{
+		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+
+		$this->patch($uri, $controller.'@update');
 	}
 
 	/**
 	 * Add the destroy method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $r
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceDestroy($resource, $controller)
+	protected function addResourceDestroy($r, $base, $controller)
 	{
-		return $this->delete($resource.'/{id}', $controller.'@destroy');
+		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+
+		return $this->delete($uri, $this->getResourceAction($r, $controller, 'destroy'));
+	}
+
+	/**
+	 * Get the base resource URI for a given resource.
+	 *
+	 * @param  string  $resource
+	 * @return string
+	 */
+	public function getResourceUri($resource)
+	{
+		if ( ! str_contains($resource, '.')) return $resource;
+
+		// To create the nested resource URI, we will simply explode the segments and
+		// create a base URI for each of them, then join all of them back together
+		// with slashes. This should create the properly nested resource routes.
+		$nested = implode('/', array_map(function($segment)
+		{
+			return $segment.'/{'.$segment.'}';
+
+		}, $segments = explode('.', $resource)));
+
+		// Once we have built the base URI, we'll remove the wildcard holder for this
+		// base resource name so that the individual route adders can suffix these
+		// paths however they need to, as some do not have any wildcards at all.
+		$last = $segments[count($segments) - 1];
+
+		return str_replace('/{'.$last.'}', '', $nested);
+	}
+
+	/**
+	 * Get the action array for a resource route.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $controller
+	 * @param  string  $method
+	 * @return array
+	 */
+	protected function getResourceAction($resource, $controller, $method)
+	{
+		return array('as' => $resource.'.'.$method, 'uses' => $controller.'@'.$method);
+	}
+
+	/**
+	 * Get the base resource from a resource name.
+	 *
+	 * @param  string  $resource
+	 * @return string
+	 */
+	protected function getBaseResource($resource)
+	{
+		$segments = explode('.', $resource);
+
+		return $segments[count($segments) - 1];
 	}
 
 	/**

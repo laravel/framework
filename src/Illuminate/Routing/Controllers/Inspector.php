@@ -37,14 +37,22 @@ class Inspector {
 			{
 				$data = $this->getMethodData($method, $prefix);
 
-				$routable[$method->name][] = $data;
-
 				// If the routable method is an index method, we will create a special index
 				// route which is simply the prefix and the verb and does not contain any
 				// the wildcard place-holders that each "typical" routes would contain.
 				if ($data['plain'] == $prefix.'/index')
 				{
 					$routable[$method->name][] = $this->getIndexData($data, $prefix);
+
+					$routable[$method->name][] = $data;
+				}
+
+				// If the routable method is not a special index method, we will just add in
+				// the data to the returned results straight away. We do not need to make
+				// any special routes for this scenario but only just add these routes.
+				else
+				{
+					$routable[$method->name][] = $data;
 				}
 			}
 		}

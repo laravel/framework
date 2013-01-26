@@ -91,6 +91,47 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResourceRouteNaming()
+	{
+		$router = new Router;
+		$router->resource('foo', 'FooController');
+
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.index'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.show'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.create'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.store'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.edit'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.update'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.destroy'));
+
+		$router = new Router;
+		$router->resource('foo.bar', 'FooController');
+
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.index'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.show'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.create'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.store'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.edit'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.update'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.destroy'));
+	}
+
+
+	public function testResourceRouteUriGeneration()
+	{
+		$router = new Router;
+		$router->resource('foo.bar', 'FooController');
+
+		$this->assertEquals('/foo/{foo}/bar', $router->getRoutes()->get('foo.bar.index')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.show')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/create', $router->getRoutes()->get('foo.bar.create')->getPath());
+		$this->assertEquals('/foo/{foo}/bar', $router->getRoutes()->get('foo.bar.store')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}/edit', $router->getRoutes()->get('foo.bar.edit')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.update')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.destroy')->getPath());
+	}
+
+
 	public function testControllersAreCalledFromControllerRoutes()
 	{
 		$router = new Router;
