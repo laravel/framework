@@ -410,4 +410,16 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		$this->sessionStore = $session;
 	}
 
+	/**
+	 * Get the requestor's IP address.
+	 *
+	 * @param  mixed   $default
+	 * @return string
+	 */
+	public function ip($default = '0.0.0.0')
+	{
+		$clientIp = $this->getClientIp();
+		return $clientIp === NULL ? $default : $clientIp;
+	}
+
 }
