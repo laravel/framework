@@ -31,3 +31,6 @@
 - Added `DB::extend` method for adding custom connection resolvers.
 - Added `each` and `filter` methods to Eloquent collections.
 - Swapped method order on `Route::controller` to make it more consistent with other similar methods.
+- Added route names to resource routes.
+- Added support for nested resources.
+- Changed resource route parameter names to match resource name, allowing for use with `Route::model`.
