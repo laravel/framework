@@ -411,4 +411,16 @@ class Route extends BaseRoute {
 		return $this;
 	}
 
+    /**
+     * Change the name for this route.
+     *
+     * @param string $name New Name
+     * @return Illuminate\Routing\Route
+     */
+    public function named($name)
+    {
+        $this->router->rename($this, $name);
+
+        return $this;
+    }
 }

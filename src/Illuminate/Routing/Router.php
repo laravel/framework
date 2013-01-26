@@ -1263,4 +1263,21 @@ class Router {
 		$this->container = $container;
 	}
 
+    /**
+     * Change the name of a route
+     *
+     * @param $route
+     * @param $name
+     * @return void
+     */
+    public function rename($route, $name)
+    {
+        foreach($this->routes->getIterator() as $n => $r) {
+            if ($r === $route) {
+                $this->routes->remove($n);
+                $this->routes->add($name, $r);
+                return;
+            }
+        }
+    }
 }
