@@ -74,8 +74,6 @@ class PasswordBroker {
 	 */
 	public function remind(array $credentials, $route, Closure $callback = null)
 	{
-		$uri = $this->getUri();
-
 		// First we will check to see if we found a user at the given crednetials and
 		// if we did not we will redirect back to this current URI with a piece of
 		// "flash" data in the session to indicate to the developers the errors.
@@ -83,7 +81,7 @@ class PasswordBroker {
 
 		if (is_null($user))
 		{
-			return $this->redirect->to($uri)->with('error', true);
+			return $this->makeErrorRedirect();
 		}
 
 		// Once we have the reminder token, we are ready to send a message out to the
@@ -93,7 +91,7 @@ class PasswordBroker {
 
 		$this->sendReminder($user, $token, $route, $callback);
 
-		return $this->redirect->to($uri);
+		return $this->redirect->to($this->getUri());
 	}
 
 	/**
@@ -144,6 +142,9 @@ class PasswordBroker {
 	 */
 	public function reset(array $credentials, Closure $callback = null)
 	{
+		// If the responses from the validate method is not a user instance, we will
+		// assume that it is a redirect and simply return it from this method and
+		// the user is properly redirected having an error message on the post.
 		$user = $this->validateReset($credentials);
 
 		if ( ! $user instanceof RemindableInterface)
@@ -151,7 +152,9 @@ class PasswordBroker {
 			return $user;
 		}
 
-		// Let the callback update and save the user, then return a redirect...
+		// When we call the callback, we will pass the user and the password for the
+		// current request. Then, the callback is responsible for the updating of
+		// the users object itself so we do not have to be concerned with that.
 		$response = call_user_func($callback, $user, $password);
 
 		$this->reminders->delete($this->getToken());
@@ -169,20 +172,42 @@ class PasswordBroker {
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
-			return $this->makeResetErrorRedirect();
+			return $this->makeErrorRedirect();
 		}
 		
 		if ( ! $this->validNewPasswords())
 		{
-			return $this->makeResetErrorRedirect();
+			return $this->makeErrorRedirect();
 		}
 
 		if ( ! $this->reminders->exists($user, $this->getToken()))
 		{
-			return $this->makeResetErrorRedirect();
+			return $this->makeErrorRedirect();
 		}
 
 		return $user;
+	}
+
+	/**
+	 * Determine if the passwords match for the request.
+	 *
+	 * @return bool
+	 */
+	protected function validNewPasswords()
+	{
+		$password = $this->getPassword();
+
+		return $password and $password == $this->getConfirmedPassword();
+	}
+
+	/**
+	 * Make an error redirect response.
+	 *
+	 * @return Illuminate\Http\RedirectResponse
+	 */
+	protected function makeErrorRedirect()
+	{
+		return $this->redirect->to($this->getUri())->with('error', true);
 	}
 
 	/**
@@ -204,13 +229,23 @@ class PasswordBroker {
 	}
 
 	/**
+	 * Get the current request object.
+	 *
+	 * @return Illuminate\Http\Request
+	 */
+	protected function getRequest()
+	{
+		return $this->redirect->getUrlGenerator()->getRequest();
+	}
+
+	/**
 	 * Get the request URI for the current request.
 	 *
 	 * @return string
 	 */
 	protected function getUri()
 	{
-		return $this->redirect->getUrlGenerator()->getRequest()->path();
+		return $this->getRequest()->path();
 	}
 
 	/**
@@ -220,7 +255,27 @@ class PasswordBroker {
 	 */
 	protected function getIp()
 	{
-		return $this->redirect->getUrlGenerator()->getRequest()->getClientIp();
+		return $this->getRequest()->getClientIp();
+	}
+
+	/**
+	 * Get the password for the current request.
+	 *
+	 * @return string
+	 */
+	protected function getPassword()
+	{
+		return $this->getRequest()->input('password');
+	}
+
+	/**
+	 * Get the confirmed password.
+	 *
+	 * @return string
+	 */
+	protected function getConfirmedPassword()
+	{
+		return $this->getRequest()->input('password_confirmation');
 	}
 
 }
