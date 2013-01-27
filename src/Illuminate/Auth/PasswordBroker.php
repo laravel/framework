@@ -68,11 +68,10 @@ class PasswordBroker {
 	 * Send a password reminder to a user.
 	 *
 	 * @param  array    $credentials
-	 * @param  string   $route
 	 * @param  Closure  $callback
 	 * @return Illuminate\Http\RedirectResponse
 	 */
-	public function remind(array $credentials, $route = 'auth.remind', Closure $callback = null)
+	public function remind(array $credentials, Closure $callback = null)
 	{
 		// First we will check to see if we found a user at the given crednetials and
 		// if we did not we will redirect back to this current URI with a piece of
@@ -89,9 +88,9 @@ class PasswordBroker {
 		// the current URI having nothing set in the session to indicate errors.
 		$token = $this->reminders->create($user);
 
-		$this->sendReminder($user, $token, $route, $callback);
+		$this->sendReminder($user, $token, $callback);
 
-		return $this->redirect->to($this->getUri());
+		return $this->redirect->refresh();
 	}
 
 	/**
@@ -99,37 +98,22 @@ class PasswordBroker {
 	 *
 	 * @param  Illuminate\Auth\RemindableInterface  $user
 	 * @param  string   $token
-	 * @param  string   $route
 	 * @param  Closure  $callback
 	 * @return void
 	 */
-	protected function sendReminder(RemindableInterface $user, $token, $route, Closure $callback)
+	public function sendReminder(RemindableInterface $user, $token, Closure $callback)
 	{
-		$url = $this->getReminderUrl($token, $route);
-
 		// We will use the reminder view that was given to the broker to display the
-		// password reminder e-mail. We will pass a "$url" variable into the view
+		// password reminder e-mail. We'll pass a "token" variable into the views
 		// so that it may be displayed for an user to click for password reset.
 		$view = $this->reminderView;
 
-		return $this->mailer->send($view, compact('url'), function($m) use ($user, $callback)
+		return $this->mailer->send($view, compact('token'), function($m) use ($user, $callback)
 		{
 			$m->to($user->getContactEmail());
 
 			call_user_func($callback, $m, $user);
 		});
-	}
-
-	/**
-	 * Get the full URL to the password reminder action.
-	 *
-	 * @param  string  $token
-	 * @param  string  $route
-	 * @return string
-	 */
-	protected function getReminderUrl($token, $route)
-	{
-		return $this->redirect->getUrlGenerator()->route($route, compact('token'));
 	}
 
 	/**
@@ -209,7 +193,7 @@ class PasswordBroker {
 	 */
 	protected function makeErrorRedirect()
 	{
-		return $this->redirect->to($this->getUri())->with('error', true);
+		return $this->redirect->refresh()->with('error', true);
 	}
 
 	/**
@@ -238,26 +222,6 @@ class PasswordBroker {
 	protected function getRequest()
 	{
 		return $this->redirect->getUrlGenerator()->getRequest();
-	}
-
-	/**
-	 * Get the request URI for the current request.
-	 *
-	 * @return string
-	 */
-	protected function getUri()
-	{
-		return $this->getRequest()->path();
-	}
-
-	/**
-	 * Get the IP address of the current requestor.
-	 *
-	 * @return string
-	 */
-	protected function getIp()
-	{
-		return $this->getRequest()->getClientIp();
 	}
 
 	/**

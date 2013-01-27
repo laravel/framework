@@ -45,6 +45,18 @@ class Redirector {
 	}
 
 	/**
+	 * Create a new redirect response to the current URI.
+	 *
+	 * @param  int    $status
+	 * @param  array  $headers
+	 * @return Illuminate\Http\RedirectResponse
+	 */
+	public function refresh($status = 302, $headers = array())
+	{
+		return $this->to($this->generator->getRequest()->path(), $status, $headers);
+	}
+
+	/**
 	 * Create a new redirect response to the given path.
 	 *
 	 * @param  string  $path
