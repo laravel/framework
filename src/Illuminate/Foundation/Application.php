@@ -119,7 +119,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * @param  array|string  $environments
 	 * @return string
 	 */
-	public function detectEnvironment($environments)
+	public function detectEnvironment($environments, $default = 'production')
 	{
 		$base = $this['request']->getHost();
 
@@ -133,7 +133,9 @@ class Application extends Container implements HttpKernelInterface {
 			return $this->detectConsoleEnvironment($base, $environments, $arguments);
 		}
 
-		return $this->detectWebEnvironment($base, $environments);
+		$environment = $this->detectWebEnvironment($base, $environments);
+
+        return $this['env'] = $environment ? $environment : $default;
 	}
 
 	/**
@@ -166,8 +168,6 @@ class Application extends Container implements HttpKernelInterface {
 				}
 			}
 		}
-
-		return $this['env'] = 'production';
 	}
 
 	/**
