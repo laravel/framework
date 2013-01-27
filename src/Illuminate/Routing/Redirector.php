@@ -128,6 +128,16 @@ class Redirector {
 	}
 
 	/**
+	 * Get the URL generator instance.
+	 *
+	 * @return  Illuminate\Routing\UrlGenerator
+	 */
+	public function getUrlGenerator()
+	{
+		return $this->generator;
+	}
+
+	/**
 	 * Set the active session store.
 	 *
 	 * @param  Illuminate\Session\Store  $session
