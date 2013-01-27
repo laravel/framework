@@ -57,6 +57,13 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	protected $query = array();
 
 	/**
+	 * Base url for pagination links. 
+	 *
+	 * @var array
+	 */
+	protected $baseUrl;
+
+	/**
 	 * Create a new Paginator instance.
 	 *
 	 * @param  Illuminate\Pagination\Environment  $env
@@ -65,12 +72,22 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 * @param  int    $perPage
 	 * @return void
 	 */
-	public function __construct(Environment $env, array $items, $total, $perPage)
+	public function __construct(Environment $env, array $items, $total, $perPage, $baseUrl = null)
 	{
 		$this->env = $env;
 		$this->total = $total;
 		$this->items = $items;
 		$this->perPage = $perPage;
+
+		// Use a user-specified base url for pagination links if one it passed.
+		if ($baseUrl)
+		{
+			$this->baseUrl = $baseUrl;
+		}
+		else
+		{
+			$this->baseUrl = $this->env->getCurrentUrl();
+		}
 	}
 
 	/**
@@ -137,7 +154,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	public function getUrl($page)
 	{
-		$url = $this->env->getCurrentUrl().'?page='.$page;
+		$url = $this->baseUrl.'?page='.$page;
 
 		// If we have any extra query string key / value pairs that need to be added
 		// onto the URL, we will put them in query string form and then attach it
@@ -148,6 +165,17 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 		}
 
 		return $url;
+	}
+
+	/**
+	 * Set the base url for pagination links.
+	 *
+	 * @param  string  $baseUrl
+	 * @return void
+	 */
+	public function setBaseUrl($baseUrl)
+	{
+		$this->baseUrl = $baseUrl;
 	}
 
 	/**
