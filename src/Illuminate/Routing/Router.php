@@ -1272,6 +1272,17 @@ class Router {
      */
     public function rename($route, $name)
     {
+        $iter = $this->routes->getIterator();
+
+        // Try the most recently added route first
+        $iter->seek($iter->count() - 1);
+        if ($iter->current() === $route) {
+            $this->routes->remove($iter->key());
+            $this->routes->add($name, $route);
+            return;
+        }
+
+        // Do a linear scan through the routes array
         foreach($this->routes->getIterator() as $n => $r) {
             if ($r === $route) {
                 $this->routes->remove($n);
