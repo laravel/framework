@@ -2,7 +2,7 @@
 
 use Closure;
 use Illuminate\Mail\Mailer;
-use Illuminate\Http\Redirector;
+use Illuminate\Routing\Redirector;
 
 class PasswordBroker {
 
@@ -23,7 +23,7 @@ class PasswordBroker {
 	/**
 	 * The redirector instance.
 	 *
-	 * @var Illuminate\Http\Redirector
+	 * @var Illuminate\Routing\Redirector
 	 */
 	protected $redirector;
 
@@ -46,7 +46,7 @@ class PasswordBroker {
 	 *
 	 * @param  Illuminate\Auth\ReminderRepositoryInterface  $reminders
 	 * @param  Illuminate\Auth\UserProviderInterface  $users
-	 * @param  Illuminate\Http\Redirector  $redirector
+	 * @param  Illuminate\Routing\Redirector  $redirector
 	 * @param  Illuminate\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
 	 * @return void
@@ -72,7 +72,7 @@ class PasswordBroker {
 	 * @param  Closure  $callback
 	 * @return Illuminate\Http\RedirectResponse
 	 */
-	public function remind(array $credentials, $route, Closure $callback = null)
+	public function remind(array $credentials, $route = 'auth.remind', Closure $callback = null)
 	{
 		// First we will check to see if we found a user at the given crednetials and
 		// if we did not we will redirect back to this current URI with a piece of
@@ -152,10 +152,12 @@ class PasswordBroker {
 			return $user;
 		}
 
+		$pass = $this->getPassword();
+
 		// When we call the callback, we will pass the user and the password for the
 		// current request. Then, the callback is responsible for the updating of
 		// the users object itself so we do not have to be concerned with that.
-		$response = call_user_func($callback, $user, $password);
+		$response = call_user_func($callback, $user, $pass);
 
 		$this->reminders->delete($this->getToken());
 
@@ -216,13 +218,13 @@ class PasswordBroker {
 	 * @param  array  $credentials
 	 * @return Illuminate\Auth\RemindableInterface
 	 */
-	protected function getUser(array $credentials)
+	public function getUser(array $credentials)
 	{
 		$user = $this->users->retrieveByCredentials($credentials);
 
 		if ($user and ! $user instanceof RemindableInterface)
 		{
-			throw new \Exception("User must implement Contactable interface.");
+			throw new \UnexpectedValueException("User must implement Contactable interface.");
 		}
 
 		return $user;

@@ -16,6 +16,9 @@
         "illuminate/support": "4.0.x",
         "symfony/http-foundation": "2.2.*"
     },
+    "require-dev": {
+        "illuminate/routing": "4.0.x"
+    },
     "autoload": {
         "psr-0": {"Illuminate\\Auth": ""}
     },
