@@ -2,8 +2,6 @@
 
 use FilesystemIterator;
 
-class FileNotFoundException extends \Exception {}
-
 class Filesystem {
 
 	/**

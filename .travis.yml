@@ -4,8 +4,12 @@ php:
   - 5.3
   - 5.4
 
+before_install:
+  - pear install --alldeps pear/PHP_CodeSniffer
+  - phpenv rehash
+
 before_script:
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install --dev
 
-script: phpunit
+script: phpcs --standard=csruleset.xml ./ && phpunit
