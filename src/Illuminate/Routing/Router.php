@@ -509,6 +509,18 @@ class Router {
 		{
 			$action = $this->parseAction($action);
 		}
+		
+		$groupCount = count($this->groupStack);
+
+		// If there are attributes being grouped across routes we will merge those
+		// attributes into the action array so that they will get shared across
+		// the routes. The route can override the attribute by specifying it.
+		if ($groupCount > 0)
+		{
+			$index = $groupCount - 1;
+
+			$action = array_merge($this->groupStack[$index], $action);
+		}
 
 		$name = $this->getName($method, $pattern, $action);
 
@@ -568,18 +580,6 @@ class Router {
 	 */
 	protected function setAttributes(Route $route, $action, $optional)
 	{
-		$groupCount = count($this->groupStack);
-
-		// If there are attributes being grouped across routes we will merge those
-		// attributes into the action array so that they will get shared across
-		// the routes. The route can override the attribute by specifying it.
-		if ($groupCount > 0)
-		{
-			$index = $groupCount - 1;
-
-			$action = array_merge($this->groupStack[$index], $action);
-		}
-
 		// First we will set the requirement for the HTTP schemes. Some routes may
 		// only respond to requests using the HTTPS scheme, while others might
 		// respond to all, regardless of the scheme, so we'll set that here.
