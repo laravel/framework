@@ -473,6 +473,21 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
 
+    public function testWeirdRouteNaming()
+    {
+        $router = new Router(new Illuminate\Container\Container);
+        $route = $router->get('foo', function() {});
+        $route2 = $router->get('bar', function() {})->named('bar.route');
+
+        // Try changing a route's name after another route has been created
+        $route->named('foo.route');
+
+        $router->setCurrentRoute($route);
+
+        $this->assertTrue($router->currentRouteNamed('foo.route'));
+        $this->assertFalse($router->currentRouteNamed('bar.route'));
+    }
+
 }
 
 class RoutingModelBindingStub {

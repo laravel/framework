@@ -1283,7 +1283,8 @@ class Router {
         }
 
         // Do a linear scan through the routes array
-        foreach($this->routes->getIterator() as $n => $r) {
+        $iter->rewind();
+        foreach($iter as $n => $r) {
             if ($r === $route) {
                 $this->routes->remove($n);
                 $this->routes->add($name, $r);
