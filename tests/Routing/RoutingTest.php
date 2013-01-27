@@ -398,6 +398,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($router->currentRouteNamed('bar.route'));
 	}
 
+    public function testCurrentRouteNameCanBeChecked2()
+    {
+        $router = new Router(new Illuminate\Container\Container);
+        $route = $router->get('foo', function() {})->named('foo.route');
+        $route2 = $router->get('bar', function() {})->named('bar.route');
+        $router->setCurrentRoute($route);
+
+        $this->assertTrue($router->currentRouteNamed('foo.route'));
+        $this->assertFalse($router->currentRouteNamed('bar.route'));
+    }
 
 	public function testCurrentRouteActionCanBeChecked()
 	{
@@ -462,6 +472,21 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('http://bar.com', 'GET');
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
+
+    public function testWeirdRouteNaming()
+    {
+        $router = new Router(new Illuminate\Container\Container);
+        $route = $router->get('foo', function() {});
+        $route2 = $router->get('bar', function() {})->named('bar.route');
+
+        // Try changing a route's name after another route has been created
+        $route->named('foo.route');
+
+        $router->setCurrentRoute($route);
+
+        $this->assertTrue($router->currentRouteNamed('foo.route'));
+        $this->assertFalse($router->currentRouteNamed('bar.route'));
+    }
 
 }
 
