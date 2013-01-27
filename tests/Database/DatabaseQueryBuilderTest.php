@@ -522,7 +522,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->from('users');
 		$this->assertEquals(array(
-			'delete from sqlite_sequence where name = ?' => array('"users"'),
+			'delete from sqlite_sequence where name = ?' => array('users'),
 			'delete from "users"' => array(),
 		), $sqlite->compileTruncate($builder));
 	}

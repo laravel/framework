@@ -74,11 +74,9 @@ class SQLiteGrammar extends Grammar {
 	 */
 	public function compileTruncate(Builder $query)
 	{
-		$table = $this->wrapTable($query->from);
+		$sql = array('delete from sqlite_sequence where name = ?' => array($query->from));
 
-		$sql = array('delete from sqlite_sequence where name = ?' => array($table));
-
-		$sql['delete from '.$table] = array();
+		$sql['delete from '.$this->wrapTable($query->from)] = array();
 
 		return $sql;
 	}
