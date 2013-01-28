@@ -85,7 +85,7 @@ class ConfigPublisher {
 	 */
 	protected function getSource($package, $name, $packagePath)
 	{
-		$source = $packagePath."/{$package}/src/config";
+		$source = $packagePath."/{$package}/config";
 
 		if ( ! $this->files->isDirectory($source))
 		{
