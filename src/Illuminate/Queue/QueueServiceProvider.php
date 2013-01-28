@@ -76,6 +76,8 @@ class QueueServiceProvider extends ServiceProvider {
 		{
 			return new ListenCommand($app['queue.listener']);
 		});
+
+		$this->commands('command.queue.listen');
 	}
 
 	/**
