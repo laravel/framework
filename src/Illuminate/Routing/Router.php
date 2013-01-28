@@ -291,119 +291,119 @@ class Router {
 	/**
 	 * Add the index method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceIndex($r, $base, $controller)
+	protected function addResourceIndex($name, $base, $controller)
 	{
-		$action = $this->getResourceAction($r, $controller, 'index');
+		$action = $this->getResourceAction($name, $controller, 'index');
 
-		return $this->get($this->getResourceUri($r), $action);
+		return $this->get($this->getResourceUri($name), $action);
 	}
 
 	/**
 	 * Add the create method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceCreate($r, $base, $controller)
+	protected function addResourceCreate($name, $base, $controller)
 	{
-		$action = $this->getResourceAction($r, $controller, 'create');
+		$action = $this->getResourceAction($name, $controller, 'create');
 
-		return $this->get($this->getResourceUri($r).'/create', $action);
+		return $this->get($this->getResourceUri($name).'/create', $action);
 	}
 
 	/**
 	 * Add the store method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceStore($r, $base, $controller)
+	protected function addResourceStore($name, $base, $controller)
 	{
-		$action = $this->getResourceAction($r, $controller, 'store');
+		$action = $this->getResourceAction($name, $controller, 'store');
 
-		return $this->post($this->getResourceUri($r), $action);
+		return $this->post($this->getResourceUri($name), $action);
 	}
 
 	/**
 	 * Add the show method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceShow($r, $base, $controller)
+	protected function addResourceShow($name, $base, $controller)
 	{
-		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
-		return $this->get($uri, $this->getResourceAction($r, $controller, 'show'));
+		return $this->get($uri, $this->getResourceAction($name, $controller, 'show'));
 	}
 
 	/**
 	 * Add the edit method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceEdit($r, $base, $controller)
+	protected function addResourceEdit($name, $base, $controller)
 	{
-		$uri = $this->getResourceUri($r).'/{'.$base.'}/edit';
+		$uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
 
-		return $this->get($uri, $this->getResourceAction($r, $controller, 'edit'));
+		return $this->get($uri, $this->getResourceAction($name, $controller, 'edit'));
 	}
 
 	/**
 	 * Add the update method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceUpdate($r, $base, $controller)
+	protected function addResourceUpdate($name, $base, $controller)
 	{
-		$this->addPutResourceUpdate($r, $base, $controller);
+		$this->addPutResourceUpdate($name, $base, $controller);
 
-		return $this->addPatchResourceUpdate($r, $base, $controller);
+		return $this->addPatchResourceUpdate($name, $base, $controller);
 	}
 
 	/**
 	 * Add the update method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addPutResourceUpdate($r, $base, $controller)
+	protected function addPutResourceUpdate($name, $base, $controller)
 	{
-		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
-		return $this->put($uri, $this->getResourceAction($r, $controller, 'update'));
+		return $this->put($uri, $this->getResourceAction($name, $controller, 'update'));
 	}
 
 	/**
 	 * Add the update method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addPatchResourceUpdate($r, $base, $controller)
+	protected function addPatchResourceUpdate($name, $base, $controller)
 	{
-		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
 		$this->patch($uri, $controller.'@update');
 	}
@@ -411,16 +411,16 @@ class Router {
 	/**
 	 * Add the destroy method for a resourceful route.
 	 *
-	 * @param  string  $r
+	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceDestroy($r, $base, $controller)
+	protected function addResourceDestroy($name, $base, $controller)
 	{
-		$uri = $this->getResourceUri($r).'/{'.$base.'}';
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
-		return $this->delete($uri, $this->getResourceAction($r, $controller, 'destroy'));
+		return $this->delete($uri, $this->getResourceAction($name, $controller, 'destroy'));
 	}
 
 	/**
