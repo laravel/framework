@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -22,6 +23,8 @@ class QueueServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		$this->registerManager();
+
+		$this->registerWorker();
 
 		$this->registerListener();
 	}
@@ -49,17 +52,49 @@ class QueueServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the queue worker.
+	 *
+	 * @return void
+	 */
+	protected function registerWorker()
+	{
+		$this->registerWorkCommand();
+
+		$this->app['queue.worker'] = $this->app->share(function($app)
+		{
+			return new Worker($app['queue']);
+		});
+	}
+
+	/**
+	 * Register the queue worker console command.
+	 *
+	 * @return void
+	 */
+	protected function registerWorkCommand()
+	{
+		$app = $this->app;
+
+		$app['command.queue.work'] = $app->share(function($app)
+		{
+			return new WorkCommand($app['queue.worker']);
+		});
+
+		$this->commands('command.queue.work');
+	}
+
+	/**
 	 * Register the queue listener.
 	 *
 	 * @return void
 	 */
 	protected function registerListener()
 	{
-		$this->registerListenerCommand();
+		$this->registerListenCommand();
 
 		$this->app['queue.listener'] = $this->app->share(function($app)
 		{
-			return new Listener($app['queue']);
+			return new Listener($app['path.base']);
 		});
 	}
 
@@ -68,7 +103,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerListenerCommand()
+	protected function registerListenCommand()
 	{
 		$app = $this->app;
 
@@ -129,7 +164,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('queue', 'queue.listener', 'command.queue.listen');
+		return array('queue', 'queue.worker', 'queue.listener', 'command.queue.work', 'command.queue.listen');
 	}
 
 }

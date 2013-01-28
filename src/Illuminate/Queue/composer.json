@@ -10,7 +10,8 @@
         "php": ">=5.3.0",
         "illuminate/console": "4.0.x",
         "illuminate/container": "4.0.x",
-        "illuminate/support": "4.0.x"
+        "illuminate/support": "4.0.x",
+        "symfony/process": "2.2.*"
     },
     "require-dev": {
         "iron-io/iron_mq": "1.2.*",
