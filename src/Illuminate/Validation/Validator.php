@@ -1319,6 +1319,22 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Register an array of custom implicit validator extensions.
+	 *
+	 * @param  array  $extensions
+	 * @return void
+	 */
+	public function addImplicitExtensions(array $extensions)
+	{
+		$this->addExtensions($extensions);
+
+		foreach ($extensions as $rule => $extension)
+		{
+			$this->implicitRules[] = camel_case($rule);
+		}
+	}
+
+	/**
 	 * Register a custom validator extension.
 	 *
 	 * @param  string   $rule
@@ -1328,6 +1344,20 @@ class Validator implements MessageProviderInterface {
 	public function addExtension($rule, Closure $extension)
 	{
 		$this->extensions[$rule] = $extension;
+	}
+
+	/**
+	 * Register a custom implicit validator extension.
+	 *
+	 * @param  string   $rule
+	 * @param  Closure  $extension
+	 * @return void
+	 */
+	public function addImplicitExtension($rule, Closure $extension)
+	{
+		$this->addExtension($rule, $extension);
+
+		$this->implicitRules[] = camel_case($rule);
 	}
 
 	/**
