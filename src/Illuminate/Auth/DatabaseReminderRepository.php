@@ -56,7 +56,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 
 		$payload = array('email' => $email, 'token' => $token, 'created_at' => new DateTime);
 
-		$this->getTable()->insert($payload);
+		return $this->getTable()->insert($payload);
 	}
 
 	/**
@@ -72,7 +72,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 
 		$reminder = $this->getTable()->where('email', $email)->where('token', $token)->first();
 
-		return $reminder and $this->notExpired($reminder);
+		return $reminder and ! $this->reminderExpired($reminder);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 * @param  StdClass  $reminder
 	 * @return bool
 	 */
-	protected function notExpired($reminder)
+	protected function reminderExpired($reminder)
 	{
 		$createdPlusHour = strtotime($reminder->created_at) + 216000;
 
@@ -115,7 +115,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 * @param  Illuminate\Auth\RemindableInterface  $user
 	 * @return string
 	 */
-	protected function createNewToken(RemindableInterface $user)
+	public function createNewToken(RemindableInterface $user)
 	{
 		$email = $user->getReminderEmail();
 
@@ -132,6 +132,16 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	protected function getTable()
 	{
 		return $this->connection->table($this->table);
+	}
+
+	/**
+	 * Get the database connection instance.
+	 *
+	 * @return Illuminate\Database\Connection
+	 */
+	public function getConnection()
+	{
+		return $this->connection;
 	}
 
 }
