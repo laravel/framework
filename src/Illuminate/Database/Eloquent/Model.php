@@ -507,6 +507,15 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	}
 
 	/**
+	 * Updates the current model's timestamps
+	 */
+	public function touch()
+	{
+		$this->updateTimestamps();
+		$this->save();
+	}
+
+	/**
 	 * Set the keys for a save update query.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Builder
