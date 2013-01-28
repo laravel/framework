@@ -173,30 +173,27 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Set the application environment from command-line arguments.
 	 *
+	 * @param  string  $base
+	 * @param  mixed   $environments
 	 * @param  array   $arguments
 	 * @return string
 	 */
-	protected function detectConsoleEnvironment($base, array $environments, array $arguments)
+	protected function detectConsoleEnvironment($base, $environments, array $arguments)
 	{
-		// For the console environmnet, we'll just look for an argument that starts
-		// with "--env" then assume that it is setting the environment for every
-		// operation being performed, and we'll use that environment's config.
 		foreach ($arguments as $key => $value)
 		{
+			// For the console environmnet, we'll just look for an argument that starts
+			// with "--env" then assume that it is setting the environment for every
+			// operation being performed, and we'll use that environment's config.
 			if (starts_with($value, '--env='))
 			{
-				return $this['env'] = head(array_slice(explode('=', $value), 1));
+				$segments = array_slice(explode('=', $value), 1);
+
+				return $this['env'] = head($segments);
 			}
 		}
 
-		// If the environment couldn't be determined via the --env switch on these
-		// console arguments, we will try to detect it via this "web" method as
-		// we may be able to use the machine name to discern the environment.
-		return $this['env'] = $this->detectWebEnvironment(
-
-			$base, $environments
-
-		);
+		return $this->detectWebEnvironment($base, $environments);
 	}
 
 	/**
