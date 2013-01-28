@@ -110,7 +110,7 @@ class PasswordBroker {
 
 		return $this->mailer->send($view, compact('token'), function($m) use ($user, $callback)
 		{
-			$m->to($user->getContactEmail());
+			$m->to($user->getReminderEmail());
 
 			call_user_func($callback, $m, $user);
 		});
@@ -124,7 +124,7 @@ class PasswordBroker {
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */
-	public function reset(array $credentials, Closure $callback = null)
+	public function reset(array $credentials, Closure $callback)
 	{
 		// If the responses from the validate method is not a user instance, we will
 		// assume that it is a redirect and simply return it from this method and
@@ -160,7 +160,7 @@ class PasswordBroker {
 		{
 			return $this->makeErrorRedirect();
 		}
-		
+
 		if ( ! $this->validNewPasswords())
 		{
 			return $this->makeErrorRedirect();
@@ -222,6 +222,16 @@ class PasswordBroker {
 	protected function getRequest()
 	{
 		return $this->redirect->getUrlGenerator()->getRequest();
+	}
+
+	/**
+	 * Get the reset token for the current request.
+	 *
+	 * @return string
+	 */
+	protected function getToken()
+	{
+		return $this->getRequest()->input('token');
 	}
 
 	/**

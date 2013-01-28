@@ -58,6 +58,101 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMailerIsCalledWithProperViewTokenAndCallback()
+	{
+		unset($_SERVER['__auth.reminder']);
+		$broker = $this->getBroker($mocks = $this->getMocks());
+		$callback = function($message, $user) { $_SERVER['__auth.reminder'] = true; };
+		$mocks['mailer']->shouldReceive('send')->once()->with('reminderView', array('token' => 'token'), m::type('Closure'))->andReturnUsing(function($view, $data, $callback)
+		{
+			return $callback;
+		});
+		$user = m::mock('Illuminate\Auth\RemindableInterface');
+		$user->shouldReceive('getReminderEmail')->once()->andReturn('email');
+		$message = m::mock('StdClass');
+		$message->shouldReceive('to')->once()->with('email');
+		$result = $broker->sendReminder($user, 'token', $callback);
+		call_user_func($result, $message);
+
+		$this->assertTrue($_SERVER['__auth.reminder']);
+	}
+
+
+	public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid()
+	{
+		$broker = $this->getBroker($mocks = $this->getMocks());
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn(null);
+		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
+		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
+
+		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
+	}
+
+
+	public function testRedirectReturnedByRemindWhenPasswordsDontMatch()
+	{
+		$broker = $this->getBroker($mocks = $this->getMocks());
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$request->shouldReceive('input')->once()->with('password')->andReturn('foo');
+		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn('bar');
+		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
+		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
+
+		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
+	}
+
+
+	public function testRedirectReturnedByRemindWhenPasswordNotSet()
+	{
+		$broker = $this->getBroker($mocks = $this->getMocks());
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$request->shouldReceive('input')->once()->with('password')->andReturn(null);
+		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
+		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
+
+		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
+	}
+
+
+	public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
+	{
+		$broker = $this->getMock('Illuminate\Auth\PasswordBroker', array('validNewPasswords'), array_values($mocks = $this->getMocks()));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$broker->expects($this->once())->method('validNewPasswords')->will($this->returnValue(true));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$request->shouldReceive('input')->once()->with('token')->andReturn('token');
+		$mocks['reminders']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
+		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
+		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
+
+		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
+	}
+
+
+	public function testResetRemovesRecordOnReminderTableAndCallsCallback()
+	{
+		unset($_SERVER['__auth.reminder']);
+		$broker = $this->getMock('Illuminate\Auth\PasswordBroker', array('validateReset', 'getPassword', 'getToken'), array_values($mocks = $this->getMocks()));
+		$broker->expects($this->once())->method('validateReset')->will($this->returnValue($user = m::mock('Illuminate\Auth\RemindableInterface')));
+		$broker->expects($this->once())->method('getPassword')->will($this->returnValue('password'));
+		$broker->expects($this->once())->method('getToken')->will($this->returnValue('token'));
+		$mocks['reminders']->shouldReceive('delete')->once()->with('token');
+		$callback = function($user, $password)
+		{
+			$_SERVER['__auth.reminder'] = compact('user', 'password');
+			return 'foo';
+		};
+
+		$this->assertEquals('foo', $broker->reset(array('creds'), $callback));
+		$this->assertEquals(array('user' => $user, 'password' => 'password'), $_SERVER['__auth.reminder']);
+	}
+
+
 	protected function getBroker($mocks)
 	{
 		return new PasswordBroker($mocks['reminders'], $mocks['users'], $mocks['redirect'], $mocks['mailer'], $mocks['view']);		
