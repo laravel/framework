@@ -518,6 +518,18 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	}
 
 	/**
+	 * Update the model's updat timestamp.
+	 *
+	 * @return bool
+	 */
+	public function touch()
+	{
+		$this->updateTimestamps();
+
+		return $this->save();
+	}
+
+	/**
 	 * Update the creation and update timestamps.
 	 *
 	 * @return void
