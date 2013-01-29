@@ -780,7 +780,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * @param  int  $options
 	 * @return string
 	 */
-	public function toJson($options = 0)
+	public function toJson($options = JSON_NUMERIC_CHECK)
 	{
 		return json_encode($this->toArray(), $options);
 	}
