@@ -557,19 +557,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->take(10);
-		$this->assertEquals('select top 10 * from "users"', $builder->toSql());
+		$this->assertEquals('select top 10 * from [users]', $builder->toSql());
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->skip(10);
-		$this->assertEquals('select * from (select *, row_number() over (order by (select 0)) as row_num from "users") as temp_table where row_num >= 11', $builder->toSql());
+		$this->assertEquals('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num >= 11', $builder->toSql());
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->skip(10)->take(10);
-		$this->assertEquals('select * from (select *, row_number() over (order by (select 0)) as row_num from "users") as temp_table where row_num between 11 and 20', $builder->toSql());
+		$this->assertEquals('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20', $builder->toSql());
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->skip(10)->take(10)->orderBy('email', 'desc');
-		$this->assertEquals('select * from (select *, row_number() over (order by "email" desc) as row_num from "users") as temp_table where row_num between 11 and 20', $builder->toSql());
+		$this->assertEquals('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20', $builder->toSql());
 	}
 
 

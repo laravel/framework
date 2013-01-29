@@ -5,6 +5,13 @@ use Illuminate\Database\Query\Builder;
 class SqlServerGrammar extends Grammar {
 
 	/**
+	 * The keyword identifier wrapper format.
+	 *
+	 * @var string
+	 */
+	protected $wrapper = '[%s]';
+
+	/**
 	 * Compile a select query into SQL.
 	 *
 	 * @param  Illuminate\Database\Query\Builder
