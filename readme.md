@@ -41,3 +41,4 @@
 - Added `isEmpty` method to the `Paginator`.
 - Added ability to specify `prefix` on a route group.
 - Added `setBaseUrl` method to pagination environment.
+- Eloquent Model and Collections objects now include JSON_NUMERIC_CHECK by default on `toJson` method.
