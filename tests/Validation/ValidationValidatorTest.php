@@ -623,6 +623,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCustomImplicitValidators()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array(), array('implicit_rule' => 'foo'));
+		$v->addImplicitExtension('implicit_rule', function() { return true; });
+		$this->assertTrue($v->passes());
+	}
+
+
 	protected function getTranslator()
 	{
 		return m::mock('Symfony\Component\Translation\TranslatorInterface');

@@ -27,6 +27,13 @@ class Factory {
 	protected $extensions = array();
 
 	/**
+	 * All of the custom implicit validator extensions.
+	 *
+	 * @var array
+	 */
+	protected $implicitExtensions = array();
+
+	/**
 	 * The Validator resolver instance.
 	 *
 	 * @var Closure
@@ -63,6 +70,8 @@ class Factory {
 
 		$validator->addExtensions($this->extensions);
 
+		$validator->addImplicitExtensions($this->implicitExtensions);
+
 		return $validator;
 	}
 
@@ -96,6 +105,18 @@ class Factory {
 	public function extend($rule, Closure $extension)
 	{
 		$this->extensions[$rule] = $extension;
+	}
+
+	/**
+	 * Register a custom implicit validator extension.
+	 *
+	 * @param  string  $rule
+	 * @param  Closure $extension
+	 * @return void
+	 */
+	public function extendImplicit($rule, Closure $extension)
+	{
+		$this->implicitExtensions[$rule] = $extension;
 	}
 
 	/**
