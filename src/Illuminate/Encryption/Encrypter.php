@@ -137,11 +137,12 @@ class Encrypter {
 		return $payload;
 	}
 
-	/**
+         /**
 	 * Create a MAC for the given value.
 	 *
-	 * @parma  
-	 */
+         * @param $value
+         * @return string
+         */
 	protected function hash($value)
 	{
 		return hash_hmac('sha256', $value, $this->key);
