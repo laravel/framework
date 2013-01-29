@@ -37,3 +37,6 @@
 - Added `extendImplicit` method to `Validator`.
 - Added `Password::remind` and `Password::reset` methods.
 - Added unified queue API component, with drivers for `sync` and `beanstalkd` (Amazon SQS to come).
+- Ported `Model->touch` method from L3 Eloquent.
+- Added `isEmpty` method to the `Paginator`.
+- Added ability to specify `prefix` on a route group.

@@ -522,9 +522,17 @@ class Router {
 			$action = array_merge($this->groupStack[$index], $action);
 		}
 
-		$name = $this->getName($method, $pattern, $action);
-
+		// Next we will parse the pattern and add any specified prefix to the it so
+		// a common URI prefix may be specified for a group of routes easily and
+		// without having to specify them all for every route that is defined.
 		list($pattern, $optional) = $this->getOptional($pattern);
+
+		if (isset($action['prefix']))
+		{
+			$pattern = trim($action['prefix'], '/').'/'.ltrim($pattern, '/');
+
+			$pattern = trim($pattern, '/');
+		}
 
 		// We will create the routes, setting the Closure callbacks on the instance
 		// so we can easily access it later. If there are other parameters on a
@@ -541,6 +549,8 @@ class Router {
 		// which contains all the other routes and is used to match on incoming
 		// URL and their appropriate route destination and on URL generation.
 		$this->setAttributes($route, $action, $optional);
+
+		$name = $this->getName($method, $pattern, $action);
 
 		$this->routes->add($name, $route);
 

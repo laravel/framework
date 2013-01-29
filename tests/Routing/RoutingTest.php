@@ -33,6 +33,19 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPrefixRouting()
+	{
+		$router = new Router;
+		$router->get('/', array('prefix' => 'blog', function() { return 'root'; }));
+		$router->get('/foo', array('prefix' => 'blog', function() { return 'bar'; }));
+
+		$request = Request::create('/blog', 'GET');
+		$this->assertEquals('root', $router->dispatch($request)->getContent());
+		$request = Request::create('/blog/foo', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
+	}
+
+
 	/**
 	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
