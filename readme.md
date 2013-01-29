@@ -40,3 +40,4 @@
 - Ported `Model->touch` method from L3 Eloquent.
 - Added `isEmpty` method to the `Paginator`.
 - Added ability to specify `prefix` on a route group.
+- Added `setBaseUrl` method to pagination environment.

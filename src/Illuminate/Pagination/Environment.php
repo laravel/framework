@@ -49,6 +49,13 @@ class Environment {
 	protected $locale;
 
 	/**
+	 * The base URL in use by the paginator.
+	 *
+	 * @var string
+	 */
+	protected $baseUrl;
+
+	/**
 	 * Create a new pagination environment.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
@@ -130,7 +137,18 @@ class Environment {
 	 */
 	public function getCurrentUrl()
 	{
-		return $this->request->url();
+		return $this->baseUrl ?: $this->request->url();
+	}
+
+	/**
+	 * Set the base URL in use by the paginator.
+	 *
+	 * @param  string  $baseUrl
+	 * @return void
+	 */
+	public function setBaseUrl($baseUrl)
+	{
+		$this->baseUrl = $baseUrl;
 	}
 
 	/**
