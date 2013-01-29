@@ -70,7 +70,7 @@ class Builder {
 	 */
 	public function first($columns = array('*'))
 	{
-		return $this->get($columns)->first();
+		return $this->take(1)->get($columns)->first();
 	}
 
 	/**
