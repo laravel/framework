@@ -47,7 +47,7 @@ class ConfigPublisher {
 	 */
 	public function publish($package, $source)
 	{
-		$destination = $this->publishPath."/packages/{$package}";		
+		$destination = $this->publishPath."/packages/{$package}";
 
 		$this->makeDestination($destination);
 
@@ -85,7 +85,7 @@ class ConfigPublisher {
 	 */
 	protected function getSource($package, $name, $packagePath)
 	{
-		$source = $packagePath."/{$package}/src/config";
+		$source = $packagePath."/{$package}/config";
 
 		if ( ! $this->files->isDirectory($source))
 		{
