@@ -111,6 +111,22 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
 		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
 		$request->shouldReceive('input')->once()->with('password')->andReturn(null);
+		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn(null);
+		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
+		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
+
+		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
+	}
+
+
+	public function testRedirectReturnedByRemindWhenPasswordsLessThanSixCharacters()
+	{
+		$broker = $this->getBroker($mocks = $this->getMocks());
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$request->shouldReceive('input')->once()->with('password')->andReturn('abc');
+		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn('abc');
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
 		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
 

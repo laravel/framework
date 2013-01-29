@@ -136,11 +136,13 @@ class PasswordBroker {
 			return $user;
 		}
 
-		$response = call_user_func($callback, $user, $this->getPassword());
+		$pass = $this->getPassword();
 
 		// Once we have called this callback, we will remove this token row from the
 		// table and return the response from this callback so the user gets sent
 		// to the destination given by the developers from the callback return.
+		$response = call_user_func($callback, $user, $pass);
+
 		$this->reminders->delete($this->getToken());
 
 		return $response;
@@ -181,7 +183,9 @@ class PasswordBroker {
 	{
 		$password = $this->getPassword();
 
-		return $password and $password == $this->getConfirmedPassword();
+		$confirm = $this->getConfirmedPassword();
+
+		return $password and strlen($password) >= 6 and $password == $confirm;
 	}
 
 	/**
