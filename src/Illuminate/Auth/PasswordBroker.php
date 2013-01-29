@@ -136,13 +136,11 @@ class PasswordBroker {
 			return $user;
 		}
 
-		$pass = $this->getPassword();
+		$response = call_user_func($callback, $user, $this->getPassword());
 
-		// When we call the callback, we will pass the user and the password for the
-		// current request. Then, the callback is responsible for the updating of
-		// the users object itself so we do not have to be concerned with that.
-		$response = call_user_func($callback, $user, $pass);
-
+		// Once we have called this callback, we will remove this token row from the
+		// table and return the response from this callback so the user gets sent
+		// to the destination given by the developers from the callback return.
 		$this->reminders->delete($this->getToken());
 
 		return $response;
