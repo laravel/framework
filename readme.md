@@ -34,3 +34,6 @@
 - Added route names to resource routes.
 - Added support for nested resources.
 - Changed resource route parameter names to match resource name, allowing for use with `Route::model`.
+- Added `extendImplicit` method to `Validator`.
+- Added `Password::remind` and `Password::reset` methods.
+- Added unified queue API component, with drivers for `sync` and `beanstalkd` (Amazon SQS to come).

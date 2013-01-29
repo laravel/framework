@@ -63,6 +63,9 @@ class Factory {
 	{
 		$validator = $this->resolve($data, $rules, $messages);
 
+		// The presence verifier is responsible for checking the unique and exists data
+		// for the validator. It is behind an interface so that multiple versions of
+		// it may be written besides database. We'll inject it into the validator.
 		if ( ! is_null($this->presenceVerifier))
 		{
 			$validator->setPresenceVerifier($this->presenceVerifier);
@@ -70,7 +73,12 @@ class Factory {
 
 		$validator->addExtensions($this->extensions);
 
-		$validator->addImplicitExtensions($this->implicitExtensions);
+		// Next, we will add the implicit extensions, which are similar to the required
+		// and accepted rule in that they are run even if the attributes is not in a
+		// array of data that is given to a validator instances via instantiation.
+		$implicit = $this->implicitExtensions;
+
+		$validator->addImplicitExtensions($implicit);
 
 		return $validator;
 	}
