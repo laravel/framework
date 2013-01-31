@@ -101,7 +101,7 @@ class PasswordBroker {
 	 * @param  Closure  $callback
 	 * @return void
 	 */
-	public function sendReminder(RemindableInterface $user, $token, Closure $callback)
+	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null)
 	{
 		// We will use the reminder view that was given to the broker to display the
 		// password reminder e-mail. We'll pass a "token" variable into the views
@@ -112,7 +112,7 @@ class PasswordBroker {
 		{
 			$m->to($user->getReminderEmail());
 
-			call_user_func($callback, $m, $user);
+			if ( ! is_null($callback)) call_user_func($callback, $m, $user);
 		});
 	}
 
