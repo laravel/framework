@@ -78,6 +78,26 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
+	
+	/**
+	 * Call a named route and return the Response.
+	 *
+	 * @param  string  $method
+	 * @param  string  $name
+	 * @param  array   $routeParameters
+	 * @param  array   $parameters
+	 * @param  array   $files
+	 * @param  array   $server
+	 * @param  string  $content
+	 * @param  bool    $changeHistory
+	 * @return Illuminate\Http\Response
+	 */
+	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
+	{
+		$uri = $this->app['url']->route($name, $routeParameters, false);
+
+		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
+	}
 
 	/**
 	 * Set the currently logged in user for the application.
