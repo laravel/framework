@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Auth;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Auth\DatababaseReminderRepository as DbRepository;
+use Illuminate\Auth\DatabaseReminderRepository as DbRepository;
 
 class ReminderServiceProvider extends ServiceProvider {
 
