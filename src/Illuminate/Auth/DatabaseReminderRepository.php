@@ -54,9 +54,21 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 		// the database so that we can verify the token within the actual reset.
 		$token = $this->createNewToken($user);
 
-		$payload = array('email' => $email, 'token' => $token, 'created_at' => new DateTime);
+		$this->getTable()->insert($this->getPayload($email, $token));
 
-		return $this->getTable()->insert($payload);
+		return $token;
+	}
+
+	/**
+	 * Build the record payload for the table.
+	 *
+	 * @param  string  $email
+	 * @param  string  $token
+	 * @return array
+	 */
+	protected function getPayload($email, $token)
+	{
+		return array('email' => $email, 'token' => $token, 'created_at' => new DateTime);
 	}
 
 	/**

@@ -14,15 +14,13 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 	{
 		$repo = $this->getRepo();
 		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
-		$query->shouldReceive('insert')->andReturnUsing(function($payload) { return $payload; });
+		$query->shouldReceive('insert')->once();
 		$user = m::mock('Illuminate\Auth\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
 
 		$results = $repo->create($user);
 
-		$this->assertEquals('email', $results['email']);
-		$this->assertTrue(is_string($results['token']));
-		$this->assertInstanceOf('DateTime', $results['created_at']);
+		$this->assertTrue(is_string($results) and strlen($results) > 1);
 	}
 
 
