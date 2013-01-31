@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Http;
 
 use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\Facades\Route as Route;
 
 class Request extends \Symfony\Component\HttpFoundation\Request {
 
@@ -96,6 +97,17 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * Determine if the current request URI is a named route.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function isRoute($name)
+	{
+		return Route::currentRouteNamed($name);
 	}
 
 	/**
