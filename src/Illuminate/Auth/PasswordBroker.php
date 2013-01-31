@@ -80,7 +80,7 @@ class PasswordBroker {
 
 		if (is_null($user))
 		{
-			return $this->makeErrorRedirect();
+			return $this->makeErrorRedirect('user');
 		}
 
 		// Once we have the reminder token, we are ready to send a message out to the
@@ -158,17 +158,17 @@ class PasswordBroker {
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
-			return $this->makeErrorRedirect();
+			return $this->makeErrorRedirect('user');
 		}
 
 		if ( ! $this->validNewPasswords())
 		{
-			return $this->makeErrorRedirect();
+			return $this->makeErrorRedirect('password');
 		}
 
 		if ( ! $this->reminders->exists($user, $this->getToken()))
 		{
-			return $this->makeErrorRedirect();
+			return $this->makeErrorRedirect('token');
 		}
 
 		return $user;
@@ -191,11 +191,12 @@ class PasswordBroker {
 	/**
 	 * Make an error redirect response.
 	 *
+	 * @param  string  $reason
 	 * @return Illuminate\Http\RedirectResponse
 	 */
-	protected function makeErrorRedirect()
+	protected function makeErrorRedirect($reason = '')
 	{
-		return $this->redirect->refresh()->with('error', true);
+		return $this->redirect->refresh()->with('error', true)->with('reason', $reason);
 	}
 
 	/**
