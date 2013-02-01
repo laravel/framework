@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Auth;
+<?php namespace Illuminate\Auth\Reminders;
 
 use DateTime;
 use Illuminate\Database\Connection;

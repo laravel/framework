@@ -1,7 +1,7 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Auth\PasswordBroker;
+use Illuminate\Auth\Reminders\PasswordBroker;
 
 class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 
@@ -14,7 +14,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	public function testIfUserIsNotFoundErrorRedirectIsReturned()
 	{
 		$mocks = $this->getMocks();
-		$broker = $this->getMock('Illuminate\Auth\PasswordBroker', array('getUser', 'makeErrorRedirect'), array_values($mocks));
+		$broker = $this->getMock('Illuminate\Auth\Reminders\PasswordBroker', array('getUser', 'makeErrorRedirect'), array_values($mocks));
 		$broker->expects($this->once())->method('getUser')->will($this->returnValue(null));
 		$broker->expects($this->once())->method('makeErrorRedirect')->will($this->returnValue('foo'));
 
@@ -37,7 +37,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	public function testUserIsRetrievedByCredentials()
 	{
 		$broker = $this->getBroker($mocks = $this->getMocks());
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('foo'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('foo'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 
 		$this->assertEquals($user, $broker->getUser(array('foo')));
 	}
@@ -47,8 +47,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	{
 		unset($_SERVER['__reminder.test']);
 		$mocks = $this->getMocks();
-		$broker = $this->getMock('Illuminate\Auth\PasswordBroker', array('sendReminder', 'getUri'), array_values($mocks));
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('foo'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));		
+		$broker = $this->getMock('Illuminate\Auth\Reminders\PasswordBroker', array('sendReminder', 'getUri'), array_values($mocks));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('foo'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));		
 		$mocks['reminders']->shouldReceive('create')->once()->with($user)->andReturn('token');
 		$callback = function() {};
 		$broker->expects($this->once())->method('sendReminder')->with($this->equalTo($user), $this->equalTo('token'), $this->equalTo($callback));
@@ -67,7 +67,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		{
 			return $callback;
 		});
-		$user = m::mock('Illuminate\Auth\RemindableInterface');
+		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->once()->andReturn('email');
 		$message = m::mock('StdClass');
 		$message->shouldReceive('to')->once()->with('email');
@@ -93,7 +93,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	public function testRedirectReturnedByRemindWhenPasswordsDontMatch()
 	{
 		$broker = $this->getBroker($mocks = $this->getMocks());
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
 		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
 		$request->shouldReceive('input')->once()->with('password')->andReturn('foo');
@@ -109,7 +109,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	public function testRedirectReturnedByRemindWhenPasswordNotSet()
 	{
 		$broker = $this->getBroker($mocks = $this->getMocks());
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
 		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
 		$request->shouldReceive('input')->once()->with('password')->andReturn(null);
@@ -125,7 +125,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	public function testRedirectReturnedByRemindWhenPasswordsLessThanSixCharacters()
 	{
 		$broker = $this->getBroker($mocks = $this->getMocks());
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
 		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
 		$request->shouldReceive('input')->once()->with('password')->andReturn('abc');
@@ -140,8 +140,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 
 	public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
 	{
-		$broker = $this->getMock('Illuminate\Auth\PasswordBroker', array('validNewPasswords'), array_values($mocks = $this->getMocks()));
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\RemindableInterface'));
+		$broker = $this->getMock('Illuminate\Auth\Reminders\PasswordBroker', array('validNewPasswords'), array_values($mocks = $this->getMocks()));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 		$broker->expects($this->once())->method('validNewPasswords')->will($this->returnValue(true));
 		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
 		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
@@ -158,8 +158,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	public function testResetRemovesRecordOnReminderTableAndCallsCallback()
 	{
 		unset($_SERVER['__auth.reminder']);
-		$broker = $this->getMock('Illuminate\Auth\PasswordBroker', array('validateReset', 'getPassword', 'getToken'), array_values($mocks = $this->getMocks()));
-		$broker->expects($this->once())->method('validateReset')->will($this->returnValue($user = m::mock('Illuminate\Auth\RemindableInterface')));
+		$broker = $this->getMock('Illuminate\Auth\Reminders\PasswordBroker', array('validateReset', 'getPassword', 'getToken'), array_values($mocks = $this->getMocks()));
+		$broker->expects($this->once())->method('validateReset')->will($this->returnValue($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface')));
 		$broker->expects($this->once())->method('getPassword')->will($this->returnValue('password'));
 		$broker->expects($this->once())->method('getToken')->will($this->returnValue('token'));
 		$mocks['reminders']->shouldReceive('delete')->once()->with('token');
@@ -183,7 +183,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	protected function getMocks()
 	{
 		$mocks = array(
-			'reminders' => m::mock('Illuminate\Auth\ReminderRepositoryInterface'),
+			'reminders' => m::mock('Illuminate\Auth\Reminders\ReminderRepositoryInterface'),
 			'users'     => m::mock('Illuminate\Auth\UserProviderInterface'),
 			'redirect'  => m::mock('Illuminate\Routing\Redirector'),
 			'mailer'    => m::mock('Illuminate\Mail\Mailer'),

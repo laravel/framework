@@ -1,15 +1,16 @@
-<?php namespace Illuminate\Auth;
+<?php namespace Illuminate\Auth\Reminders;
 
 use Closure;
 use Illuminate\Mail\Mailer;
 use Illuminate\Routing\Redirector;
+use Illuminate\Auth\UserProviderInterface;
 
 class PasswordBroker {
 
 	/**
 	 * The password reminder repository.
 	 *
-	 * @var Illuminate\Auth\ReminderRepositoryInterface  $reminders
+	 * @var Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
 	 */
 	protected $reminders;
 

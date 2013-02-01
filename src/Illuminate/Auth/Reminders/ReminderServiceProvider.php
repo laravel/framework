@@ -1,7 +1,8 @@
-<?php namespace Illuminate\Auth;
+<?php namespace Illuminate\Auth\Reminders;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Auth\DatabaseReminderRepository as DbRepository;
+use Illuminate\Auth\Console\MakeRemindersCommand;
+use Illuminate\Auth\Reminders\DatabaseReminderRepository as DbRepository;
 
 class ReminderServiceProvider extends ServiceProvider {
 
@@ -62,7 +63,9 @@ class ReminderServiceProvider extends ServiceProvider {
 	 */
 	protected function registerReminderRepository()
 	{
-		$this->app['auth.reminder.repository'] = $this->app->share(function($app)
+		$app = $this->app;
+
+		$app['auth.reminder.repository'] = $app->share(function($app)
 		{
 			$connection = $app['db']->connection();
 
@@ -88,7 +91,7 @@ class ReminderServiceProvider extends ServiceProvider {
 
 		$app['command.auth.reminders'] = $app->share(function($app)
 		{
-			return new Console\MakeRemindersCommand($app['files']);
+			return new MakeRemindersCommand($app['files']);
 		});
 
 		$this->commands('command.auth.reminders');
