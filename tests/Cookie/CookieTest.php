@@ -40,7 +40,8 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$value = $cookie->getEncrypter()->encrypt('bar');
 		$cookie->getRequest()->cookies->set('foo', $value);
 		$this->assertEquals('bar', $cookie->get('foo'));
-
+        $this->assertEquals('zee', $cookie->get('someOtherFoo', 'zee'));
+        
 		$cookie = $this->getCreator();
 		$value = $cookie->getEncrypter()->encrypt('bar');
 		$value .= '111';
