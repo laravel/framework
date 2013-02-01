@@ -417,7 +417,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	*/
 	public function hasSessionStore()
 	{
-		return isset( $this->sessionStore );
+		return isset($this->sessionStore);
 	}
 
 }
