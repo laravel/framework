@@ -36,6 +36,7 @@
 - Changed resource route parameter names to match resource name, allowing for use with `Route::model`.
 - Added `extendImplicit` method to `Validator`.
 - Added `Password::remind` and `Password::reset` methods.
+- Implemented `RemindableInterface` on the default `User` model.
 - Added unified queue API component, with drivers for `sync` and `beanstalkd` (Amazon SQS to come).
 - Ported `Model->touch` method from L3 Eloquent.
 - Added `isEmpty` method to the `Paginator`.
