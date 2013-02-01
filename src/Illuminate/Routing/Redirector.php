@@ -65,7 +65,7 @@ class Redirector {
 	 * @param  bool    $secure
 	 * @return Illuminate\Http\RedirectResponse
 	 */
-	public function to($path, $status = 302, $headers = array(), $secure = false)
+	public function to($path, $status = 302, $headers = array(), $secure = null)
 	{
 		$path = $this->generator->to($path, array(), $secure);
 
