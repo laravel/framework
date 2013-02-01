@@ -17,6 +17,7 @@
         "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {
+        "illuminate/console": "4.0.x",
         "illuminate/routing": "4.0.x"
     },
     "autoload": {
