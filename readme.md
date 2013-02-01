@@ -26,7 +26,7 @@
 - Added `Config::hasGroup` method.
 - Added `DB::unprepared` method for running raw, unprepared queries against PDO.
 - Allow `:key` place-holder in MessageBag messages.
-- Added `Auth::validate` method for validating credentials without logging in.
+- Added `Auth::validate` method for validating credentials without logging in.fatal
 - Added `Auth::stateless` method for logging in for a single request without sessions or cookies.
 - Added `DB::extend` method for adding custom connection resolvers.
 - Added `each` and `filter` methods to Eloquent collections.
@@ -45,3 +45,4 @@
 - Eloquent Model and Collections objects now include JSON_NUMERIC_CHECK by default on `toJson` method.
 - Eloquent mutators are now prefixed with `give` and `take` instead of `get` and `set`. This is to avoid conflicts with other get and set methods on the model, and in your own code.
 - Added `auth:reminders` Artisan command for generating a migration for the password reminders table.
+- Added `App::fatal` method for registering an error listener for PHP fatal errors.

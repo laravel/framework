@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -501,6 +502,20 @@ class Application extends Container implements HttpKernelInterface {
 	public function error(Closure $callback)
 	{
 		$this['exception']->error($callback);
+	}
+
+	/**
+	 * Register an error handler for fatal errors.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function fatal(Closure $callback)
+	{
+		$this->error(function(FatalErrorException $e) use ($callback)
+		{
+			return call_user_func($callback, $e);
+		});
 	}
 
 	/**
