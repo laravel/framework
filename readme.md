@@ -44,3 +44,4 @@
 - Added `setBaseUrl` method to pagination environment.
 - Eloquent Model and Collections objects now include JSON_NUMERIC_CHECK by default on `toJson` method.
 - Eloquent mutators are now prefixed with `give` and `take` instead of `get` and `set`. This is to avoid conflicts with other get and set methods on the model, and in your own code.
+- Added `auth:reminders` Artisan command for generating a migration for the password reminders table.
