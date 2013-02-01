@@ -22,6 +22,8 @@ class ReminderServiceProvider extends ServiceProvider {
 		$this->registerPasswordBroker();
 
 		$this->registerReminderRepository();
+
+		$this->registerCommands();
 	}
 
 	/**
@@ -76,13 +78,30 @@ class ReminderServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the auth related console commands.
+	 *
+	 * @return void
+	 */
+	protected function registerCommands()
+	{
+		$app = $this->app;
+
+		$app['command.auth.reminders'] = $app->share(function($app)
+		{
+			return new Console\MakeRemindersCommand($app['files']);
+		});
+
+		$this->commands('command.auth.reminders');
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
 	 */
 	public function provides()
 	{
-		return array('auth.reminder', 'auth.reminder.repository');
+		return array('auth.reminder', 'auth.reminder.repository', 'command.auth.reminders');
 	}
 
 }
