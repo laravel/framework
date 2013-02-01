@@ -410,4 +410,14 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		$this->sessionStore = $session;
 	}
 
+	/**
+	* Determine if the current request has a valid session store.
+	*
+	* @return bool
+	*/
+	public function hasSessionStore()
+	{
+		return isset( $this->sessionStore );
+	}
+
 }
