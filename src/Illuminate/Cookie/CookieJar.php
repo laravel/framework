@@ -66,7 +66,7 @@ class CookieJar {
 	{
 		$value = $this->request->cookies->get($key);
 
-		if ( ! is_null($key))
+		if ( ! is_null($value))
 		{
 			return $this->decrypt($value);
 		}
