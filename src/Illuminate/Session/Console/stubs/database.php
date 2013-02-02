@@ -11,7 +11,7 @@ class CreateSessionTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::table('sessions', function($t)
+		Schema::create('sessions', function($t)
 		{
 			$t->string('id')->unique();
 			$t->text('payload');
