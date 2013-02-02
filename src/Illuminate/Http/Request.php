@@ -39,7 +39,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	public function url()
 	{
 		return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
-	}	
+	}
 
 	/**
 	 * Get the full URL for the request.
@@ -94,13 +94,13 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	/**
 	 * Determine if the request is the result of an AJAX call.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function ajax()
@@ -283,7 +283,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
-		$this->sessionStore->flashInput($flash);
+		$this->getSessionStore()->flashInput($flash);
 	}
 
 	/**
@@ -315,7 +315,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function flush()
 	{
-		$this->sessionStore->flashInput(array());
+		$this->getSessionStore()->flashInput(array());
 	}
 
 	/**
@@ -408,6 +408,16 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	public function setSessionStore(SessionStore $session)
 	{
 		$this->sessionStore = $session;
+	}
+
+	/**
+	* Determine if the current request has a valid session store.
+	*
+	* @return bool
+	*/
+	public function hasSessionStore()
+	{
+		return isset($this->sessionStore);
 	}
 
 }
