@@ -47,3 +47,4 @@
 - Added `auth:reminders` Artisan command for generating a migration for the password reminders table.
 - Added `App::fatal` method for registering an error listener for PHP fatal errors.
 - Added `session:table` Artisan command for generating a migration for the session database table.
+- Fix bug when using `first` method on a `belongsToMany` relationship.
