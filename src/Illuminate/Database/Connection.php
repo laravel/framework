@@ -437,13 +437,40 @@ class Connection implements ConnectionInterface {
 		// To execute the statement, we'll simply call the callback, which will actually
 		// run the SQL against the PDO connection. Then we can calculate the time it
 		// took to execute and log the query SQL, bindings and time in our memory.
-		$result = $callback($this, $query, $bindings);
+		try
+		{
+			$result = $callback($this, $query, $bindings);
+		}
+		catch (\Exception $e)
+		{
+			$this->handleQueryException($e, $query, $bindings);
+		}
 
+		// Once we have run the query we will calculate the time that it took to run and
+		// then log the query, bindings, and execution time so we will report them on
+		// the event that the developer needs them. We'll log time in milliseconds.
 		$time = number_format((microtime(true) - $start) * 1000, 2);
 
 		$this->logQuery($query, $bindings, $time);
 
 		return $result;
+	}
+
+	/**
+	 * Handle an exception that occurred during a query.
+	 *
+	 * @param  Exception  $e
+	 * @param  string     $query
+	 * @param  array      $bindings
+	 * @return void
+	 */
+	protected function handleQueryException(\Exception $e, $query, $bindings)
+	{
+		$bindings = var_export($bindings, true);
+
+		$message = $e->getMessage()." (SQL: {$query}) (Bindings: {$bindings})";
+
+		throw new \Exception($message, 0);	
 	}
 
 	/**
