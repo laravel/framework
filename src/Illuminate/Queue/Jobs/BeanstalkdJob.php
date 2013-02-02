@@ -85,6 +85,18 @@ class BeanstalkdJob extends Job {
 	}
 
 	/**
+	 * Get the number of times the job has been attempted.
+	 *
+	 * @return int
+	 */
+	public function attempts()
+	{
+		$stats = $this->pheanstalk->statsJob($this->job);
+
+		return (int) $stats->reserves;
+	}
+
+	/**
 	 * Get the IoC container instance.
 	 *
 	 * @return Illuminate\Container

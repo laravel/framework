@@ -32,6 +32,13 @@ abstract class Job {
 	abstract public function release($delay = 0);
 
 	/**
+	 * Get the number of times the job has been attempted.
+	 *
+	 * @return int
+	 */
+	abstract public function attempts();
+
+	/**
 	 * Determine if job should be auto-deleted.
 	 *
 	 * @return bool
