@@ -283,7 +283,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
-		$this->sessionStore->flashInput($flash);
+		$this->getSessionStore()->flashInput($flash);
 	}
 
 	/**
@@ -315,7 +315,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function flush()
 	{
-		$this->sessionStore->flashInput(array());
+		$this->getSessionStore()->flashInput(array());
 	}
 
 	/**
