@@ -597,6 +597,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDynamicWhereIsNotGreedy()
+	{
+		$method     = 'whereIosVersionAndAndroidVersionOrOrientation';
+		$parameters = array('6.1', '4.2', 'Vertical');
+		$builder    = m::mock('Illuminate\Database\Query\Builder[where]');
+
+		$builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturn($builder);
+		$builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);
+		$builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturn($builder);
+
+		$builder->dynamicWhere($method, $parameters);
+	}
+
+
 	public function testCallTriggersDynamicWhere()
 	{
 		$builder = $this->getBuilder();

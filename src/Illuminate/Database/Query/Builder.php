@@ -625,7 +625,7 @@ class Builder {
 
 		$flags = PREG_SPLIT_DELIM_CAPTURE;
 
-		$segments = preg_split('/(And|Or)/i', $finder, -1, $flags);
+		$segments = preg_split('/(And|Or)(?=[A-Z])/', $finder, -1, $flags);
 
 		// The connector variable will determine which connector will be used
 		// for the condition. We'll change it as we come across new boolean
