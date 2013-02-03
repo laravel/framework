@@ -62,6 +62,20 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 
 		return $pattern == '' ? '/' : $pattern;
 	}
+	
+	/**
+	 * Get the URI segments
+	 *
+	 * @return array
+	 */
+	public function segments()
+	{
+		$segments = explode('/', trim($this->getPathInfo(), '/'));
+
+		$segments = array_filter($segments, function($v) { return $v != ''; });
+		
+		return $segments;
+	}
 
 	/**
 	 * Get a segment from the URI (1 based index).
@@ -72,11 +86,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function segment($index, $default = null)
 	{
-		$segments = explode('/', trim($this->getPathInfo(), '/'));
-
-		$segments = array_filter($segments, function($v) { return $v != ''; });
-
-		return array_get($segments, $index - 1, $default);
+		return array_get($this->segments(), $index - 1, $default);
 	}
 
 	/**
