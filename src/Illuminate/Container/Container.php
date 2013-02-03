@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Container; use Closure, ArrayAccess;
+<?php namespace Illuminate\Container; use Closure, ArrayAccess, ReflectionParameter;
 
 class BindingResolutionException extends \Exception {}
 
@@ -322,15 +322,35 @@ class Container implements ArrayAccess {
 			// we'll just bomb out with an error since we have no-where to go.
 			if (is_null($dependency))
 			{
-				$message = "Unresolvable dependency resolving [$parameter].";
-
-				throw new BindingResolutionException($message);
+				$dependencies[] = $this->resolveNonClass($parameter);
 			}
-
-			$dependencies[] = $this->make($dependency->name);
+			else
+			{
+				$dependencies[] = $this->make($dependency->name);
+			}
 		}
 
 		return (array) $dependencies;
+	}
+
+	/**
+	 * Resolve a non-class hinted dependency.
+	 *
+	 * @param  ReflectionParameter  $parameter
+	 * @return mixed
+	 */
+	protected function resolveNonClass(ReflectionParameter $parameter)
+	{
+		if ($parameter->isDefaultValueAvailable())
+		{
+			return $parameter->getDefaultValue();
+		}
+		else
+		{
+			$message = "Unresolvable dependency resolving [$parameter].";
+
+			throw new BindingResolutionException($message);
+		}
 	}
 
 	/**

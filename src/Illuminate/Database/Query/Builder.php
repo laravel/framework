@@ -560,8 +560,6 @@ class Builder {
 		$this->mergeBindings($query);
 
 		return $this;
-
-		return $this;
 	}
 
 	/**
@@ -1141,6 +1139,19 @@ class Builder {
 		$sql = $this->grammar->compileDelete($this);
 
 		return $this->connection->delete($sql, $this->bindings);
+	}
+
+	/**
+	 * Run a truncate statement on the table.
+	 *
+	 * @return void
+	 */
+	public function truncate()
+	{
+		foreach ($this->grammar->compileTruncate($this) as $sql => $bindings)
+		{
+			$this->connection->statement($sql, $bindings);
+		}
 	}
 
 	/**

@@ -184,6 +184,15 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(1, 2, 3), $container->make('foo', array(1, 2, 3)));
 	}
 
+
+	public function testResolutionOfDefaultParameters()
+	{
+		$container = new Container;
+		$instance = $container->make('ContainerDefaultValueStub');
+		$this->assertInstanceOf('ContainerConcreteStub', $instance->stub);
+		$this->assertEquals('taylor', $instance->default);
+	}
+
 }
 
 class ContainerConcreteStub {}
@@ -205,5 +214,14 @@ class ContainerNestedDependentStub {
 	public function __construct(ContainerDependentStub $inner)
 	{
 		$this->inner = $inner;
+	}
+}
+
+class ContainerDefaultValueStub {
+	public $stub; public $default;
+	public function __construct(ContainerConcreteStub $stub, $default = 'taylor')
+	{
+		$this->stub = $stub;
+		$this->default = $default;
 	}
 }

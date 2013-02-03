@@ -35,9 +35,9 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 		$t = $this->getMock('Illuminate\Translation\Translator', array('load', 'trans'), array($this->getLoader(), 'en', 'sp'));
 		$t->expects($this->once())->method('load')->with($this->equalTo('bar'), $this->equalTo('foo'), $this->equalTo('en'))->will($this->returnValue('foo::bar'));
 		$t->setSymfonyTranslator($base = m::mock('Illuminate\Translation\SymfonyTranslator'));
-		$base->shouldReceive('trans')->once()->with('baz', array('foo'), 'foo::bar', 'en')->andReturn('breeze');
+		$base->shouldReceive('trans')->once()->with('baz', array(':foo' => 'bar'), 'foo::bar', 'en')->andReturn('breeze');
 
-		$this->assertEquals('breeze', $t->get('foo::bar.baz', array('foo'), 'en'));
+		$this->assertEquals('breeze', $t->get('foo::bar.baz', array('foo' => 'bar'), 'en'));
 	}
 
 
@@ -46,9 +46,9 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 		$t = $this->getMock('Illuminate\Translation\Translator', array('load', 'transChoice'), array($this->getLoader(), 'en', 'sp'));
 		$t->expects($this->once())->method('load')->with($this->equalTo('bar'), $this->equalTo('foo'), $this->equalTo('en'))->will($this->returnValue('foo::bar'));
 		$t->setSymfonyTranslator($base = m::mock('Illuminate\Translation\SymfonyTranslator'));
-		$base->shouldReceive('transChoice')->once()->with('baz', 10, array('foo'), 'foo::bar', 'en')->andReturn('breeze');
+		$base->shouldReceive('transChoice')->once()->with('baz', 10, array(':foo' => 'bar'), 'foo::bar', 'en')->andReturn('breeze');
 
-		$this->assertEquals('breeze', $t->choice('foo::bar.baz', 10, array('foo'), 'en'));
+		$this->assertEquals('breeze', $t->choice('foo::bar.baz', 10, array('foo' => 'bar'), 'en'));
 	}
 
 
@@ -56,9 +56,10 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$t = new Translator($loader = $this->getLoader(), 'en', 'sp');
 		$loader->shouldReceive('load')->once()->with('en', 'foo', 'bar')->andReturn(array('messages' => array('foo' => 'bar')));
+		$loader->shouldReceive('load')->once()->with('sp', 'foo', 'bar')->andReturn(array());
 		$t->setSymfonyTranslator($base = m::mock('Illuminate\Translation\SymfonyTranslator'));
 		$base->shouldReceive('addResource')->once()->with('array', array('messages.foo' => 'bar'), 'en', 'bar::foo');
-		$base->shouldReceive('refreshCatalogue')->once()->with('en');
+		$base->shouldReceive('addResource')->once()->with('array', array(), 'sp', 'bar::foo');
 		$base->shouldReceive('getLocale')->andReturn('en');
 		$domain = $t->load('foo', 'bar', null);
 
@@ -72,11 +73,11 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	public function testKeyIsReturnedThroughTransMethodsWhenItemsDontExist()
 	{
 		$t = new Translator($loader = $this->getLoader(), 'en', 'sp');
-		$loader->shouldReceive('load')->once()->andReturn(array());
+		$loader->shouldReceive('load')->twice()->andReturn(array());
 		$t->setSymfonyTranslator($base = m::mock('Illuminate\Translation\SymfonyTranslator'));
 		$base->shouldReceive('getLocale')->andReturn('en');
-		$base->shouldReceive('addResource');
-		$base->shouldReceive('refreshCatalogue')->once()->with('en');
+		$base->shouldReceive('addResource')->once()->with('array', array(), 'en', '::foo');
+		$base->shouldReceive('addResource')->once()->with('array', array(), 'sp', '::foo');
 		$base->shouldReceive('trans')->once()->with('bar', array(), '::foo', null)->andReturn('bar');
 
 		$this->assertEquals('foo.bar', $t->trans('foo.bar'));

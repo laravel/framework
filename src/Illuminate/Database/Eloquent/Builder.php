@@ -70,7 +70,7 @@ class Builder {
 	 */
 	public function first($columns = array('*'))
 	{
-		return $this->get($columns)->first();
+		return $this->take(1)->get($columns)->first();
 	}
 
 	/**
@@ -398,7 +398,7 @@ class Builder {
 	}
 
 	/**
-	 * Set the relationships being eagerly laoded.
+	 * Set the relationships being eagerly loaded.
 	 *
 	 * @param  array  $eagerLoad
 	 * @return void
@@ -422,13 +422,15 @@ class Builder {
 	 * Set a model instance for the model being queried.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Model  $model
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Builder
 	 */
 	public function setModel(Model $model)
 	{
 		$this->model = $model;
 
 		$this->query->from($model->getTable());
+
+		return $this;
 	}
 
 	/**

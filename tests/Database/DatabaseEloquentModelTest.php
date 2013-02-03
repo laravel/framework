@@ -174,7 +174,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor'))->andReturn(1);
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor'), 'id')->andReturn(1);
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
 
@@ -430,19 +430,19 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
-	public function getListItems($value)
+	public function giveListItems($value)
 	{
 		return json_decode($value, true);
 	}
-	public function setListItems($value)
+	public function takeListItems($value)
 	{
 		$this->attributes['list_items'] = json_encode($value);
 	}
-	public function getPassword()
+	public function givePassword()
 	{
 		return '******';
 	}
-	public function setPassword($value)
+	public function takePassword($value)
 	{
 		$this->attributes['password_hash'] = md5($value);
 	}

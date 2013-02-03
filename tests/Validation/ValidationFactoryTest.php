@@ -22,9 +22,10 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
 
 		$presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
 		$factory->extend('foo', function() {});
+		$factory->extendImplicit('implicit', function() {});
 		$factory->setPresenceVerifier($presence);
 		$validator = $factory->make(array(), array());
-		$this->assertEquals(array('foo' => function() {}), $validator->getExtensions());
+		$this->assertEquals(array('foo' => function() {}, 'implicit' => function() {}), $validator->getExtensions());
 		$this->assertEquals($presence, $validator->getPresenceVerifier());
 	}
 

@@ -17,23 +17,32 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 		$router->get('/', function() { return 'root'; });
 		$router->get('/foo', function() { return 'bar'; });
-		$router->get('/foo//', function() { return 'foo'; });
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 
-		$request = Request::create('/foo//', 'GET');
-		$this->assertEquals('foo', $router->dispatch($request)->getContent());
+		$request = Request::create('/foo/', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 
 		$request = Request::create('http://foo.com', 'GET');
-		$this->assertEquals('root', $router->dispatch($request)->getContent());
-
-		$request = Request::create('http://foo.com///', 'GET');
 		$this->assertEquals('root', $router->dispatch($request)->getContent());
 
 		$router = new Router;
 		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; });
 		$request = Request::create('/foo/taylor/25', 'GET');
 		$this->assertEquals('taylor25', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testPrefixRouting()
+	{
+		$router = new Router;
+		$router->get('/', array('prefix' => 'blog', function() { return 'root'; }));
+		$router->get('/foo', array('prefix' => 'blog', function() { return 'bar'; }));
+
+		$request = Request::create('/blog', 'GET');
+		$this->assertEquals('root', $router->dispatch($request)->getContent());
+		$request = Request::create('/blog/foo', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 	}
 
 
@@ -95,6 +104,47 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResourceRouteNaming()
+	{
+		$router = new Router;
+		$router->resource('foo', 'FooController');
+
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.index'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.show'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.create'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.store'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.edit'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.update'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.destroy'));
+
+		$router = new Router;
+		$router->resource('foo.bar', 'FooController');
+
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.index'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.show'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.create'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.store'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.edit'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.update'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.destroy'));
+	}
+
+
+	public function testResourceRouteUriGeneration()
+	{
+		$router = new Router;
+		$router->resource('foo.bar', 'FooController');
+
+		$this->assertEquals('/foo/{foo}/bar', $router->getRoutes()->get('foo.bar.index')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.show')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/create', $router->getRoutes()->get('foo.bar.create')->getPath());
+		$this->assertEquals('/foo/{foo}/bar', $router->getRoutes()->get('foo.bar.store')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}/edit', $router->getRoutes()->get('foo.bar.edit')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.update')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.destroy')->getPath());
+	}
+
+
 	public function testControllersAreCalledFromControllerRoutes()
 	{
 		$router = new Router;
@@ -122,16 +172,6 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->get('/foo/{name}', array('uses' => 'home@index'));
 
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
-	}
-
-
-	/**
-	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-	 */
-	public function testExceptionThrownWhenControllerMethodsDontExist()
-	{
-		$controller = new Illuminate\Routing\Controllers\Controller;
-		$controller->doSomething();
 	}
 
 
@@ -386,7 +426,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testControllerMethodProperlyRegistersRoutes()
 	{
-		$router = $this->getMock('Illuminate\Routing\Router', array('get'), array(new Illuminate\Container\Container));
+		$router = $this->getMock('Illuminate\Routing\Router', array('get', 'any'), array(new Illuminate\Container\Container));
 		$router->setInspector($inspector = m::mock('Illuminate\Routing\Controllers\Inspector'));
 		$inspector->shouldReceive('getRoutable')->once()->with('FooController', 'prefix')->andReturn(array(
 			'getFoo' => array(
@@ -394,8 +434,10 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 			)
 		));
 		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo('FooController@getFoo'));
+		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
+		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
 
-		$router->controller('FooController', 'prefix');
+		$router->controller('prefix', 'FooController');
 	}
 
 
@@ -418,6 +460,39 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->get('user/{user?}', function($user = 'default') { return $user; });
 		$request = Request::create('/user', 'GET');
 		$this->assertEquals('default', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testRoutesArentOverriddenBySubDomain()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->get('/', array('domain' => 'foo.com', function() { return 'main'; }));
+		$router->get('/', array('domain' => 'bar.com', function() { return 'sub'; }));
+
+		$request = Request::create('http://foo.com', 'GET');
+		$this->assertEquals('main', $router->dispatch($request)->getContent());
+
+		$request = Request::create('http://bar.com', 'GET');
+		$this->assertEquals('sub', $router->dispatch($request)->getContent());
+	}
+	
+	public function testRoutesArentOverriddenBySubDomainWithGroups()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->group(array('domain' => 'foo.com'), function() use ($router)
+		{
+			$router->get('/', function() { return 'main'; });
+		});
+		$router->group(array('domain' => 'bar.com'), function() use ($router)
+		{
+			$router->get('/', function() { return 'sub'; });
+		});
+		
+		$request = Request::create('http://foo.com', 'GET');
+		$this->assertEquals('main', $router->dispatch($request)->getContent());
+
+		$request = Request::create('http://bar.com', 'GET');
+		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
 
 }

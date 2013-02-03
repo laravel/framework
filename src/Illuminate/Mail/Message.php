@@ -33,7 +33,7 @@ class Message {
 	 */
 	public function from($address, $name = null)
 	{
-		$this->swift->addFrom($address, $name);
+		$this->swift->setFrom($address, $name);
 
 		return $this;
 	}

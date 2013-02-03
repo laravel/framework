@@ -18,6 +18,7 @@
         "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {
+        "illuminate/console": "4.0.x",
         "mockery/mockery": ">=0.7.2"
     },
     "autoload": {

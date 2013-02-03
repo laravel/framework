@@ -817,6 +817,33 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Validate that an attribute is a valid date.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateDate($attribute, $value)
+	{
+		return strtotime($value) !== false;
+	}
+
+	/**
+	 * Validate that an attribute matches a date format.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function validateDateFormat($attribute, $value, $parameters)
+	{
+		$parsed = date_parse_from_format($parameters[0], $value);
+
+		return $parsed['error_count'] === 0;
+	}
+
+	/**
 	 * Validate the date is before a given date.
 	 *
 	 * @param  string  $attribute
@@ -853,14 +880,14 @@ class Validator implements MessageProviderInterface {
 	{
 		$lowerRule = strtolower(snake_case($rule));
 
-		$inlineKey = "{$attribute}.{$lowerRule}";
+		$inlineMessage = $this->getInlineMessage($attribute, $lowerRule);
 
 		// First we will retrieve the custom message for the validation rule if one
 		// exists. If a custom validation message is being used we'll return the
 		// custom message, otherwise we'll keep searching for a valid message.
-		if (isset($this->customMessages[$inlineKey]))
+		if ( ! is_null($inlineMessage))
 		{
-			return $this->customMessages[$inlineKey];
+			return $inlineMessage;
 		}
 
 		$customKey = "validation.custom.{$attribute}.{$lowerRule}";
@@ -891,6 +918,29 @@ class Validator implements MessageProviderInterface {
 			$key = "validation.{$lowerRule}";
 
 			return $this->translator->trans($key);
+		}
+	}
+
+	/**
+	 * Get the inline message for a rule if it exists.
+	 *
+	 * @param  string  $attribute
+	 * @param  string  $lowerRule
+	 * @return string
+	 */
+	protected function getInlineMessage($attribute, $lowerRule)
+	{
+		$keys = array($lowerRule, "{$attribute}.{$lowerRule}");
+
+		// First we will check for a custom message for an attribute specific rule
+		// message for the fields, then we will check for a general custom line
+		// that is not attribute specific. If we find either we'll return it.
+		foreach ($keys as $key)
+		{
+			if (isset($this->customMessages[$key]))
+			{
+				return $this->customMessages[$key];
+			}
 		}
 	}
 
@@ -1155,6 +1205,20 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Replace all place-holders for the date_format rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceDateFormat($message, $attribute, $rule, $parameters)
+	{
+		return str_replace(':format', $parameters[0], $message);
+	}
+
+	/**
 	 * Replace all place-holders for the before rule.
 	 *
 	 * @param  string  $message
@@ -1255,6 +1319,22 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Register an array of custom implicit validator extensions.
+	 *
+	 * @param  array  $extensions
+	 * @return void
+	 */
+	public function addImplicitExtensions(array $extensions)
+	{
+		$this->addExtensions($extensions);
+
+		foreach ($extensions as $rule => $extension)
+		{
+			$this->implicitRules[] = camel_case($rule);
+		}
+	}
+
+	/**
 	 * Register a custom validator extension.
 	 *
 	 * @param  string   $rule
@@ -1264,6 +1344,20 @@ class Validator implements MessageProviderInterface {
 	public function addExtension($rule, Closure $extension)
 	{
 		$this->extensions[$rule] = $extension;
+	}
+
+	/**
+	 * Register a custom implicit validator extension.
+	 *
+	 * @param  string   $rule
+	 * @param  Closure  $extension
+	 * @return void
+	 */
+	public function addImplicitExtension($rule, Closure $extension)
+	{
+		$this->addExtension($rule, $extension);
+
+		$this->implicitRules[] = camel_case($rule);
 	}
 
 	/**

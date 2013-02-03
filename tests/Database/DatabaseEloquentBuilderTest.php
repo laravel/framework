@@ -29,9 +29,10 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFirstMethod()
 	{
-		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get'), $this->getMocks());
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get', 'take'), $this->getMocks());
 		$collection = m::mock('stdClass');
 		$collection->shouldReceive('first')->once()->andReturn('bar');
+		$builder->expects($this->once())->method('take')->with($this->equalTo(1))->will($this->returnValue($builder));
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue($collection));
 
 		$result = $builder->first();

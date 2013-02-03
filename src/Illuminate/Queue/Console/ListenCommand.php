@@ -63,14 +63,30 @@ class ListenCommand extends Command {
 	}
 
 	/**
+	 * Listen to the given queue connection.
+	 *
+	 * @param  string  $connection
+	 * @param  string  $queue
+	 * @param  int     $delay
+	 * @param  int     $memory
+	 * @return void
+	 */
+	public function listen($connection, $queue, $delay, $memory)
+	{
+
+	}
+
+	/**
 	 * Get the console command arguments.
 	 *
 	 * @return array
 	 */
 	protected function getArguments()
 	{
+		$default = $this->laravel['config']['queue.default'];
+
 		return array(
-			array('connection', InputArgument::OPTIONAL, 'The name of connection', null),
+			array('connection', InputArgument::OPTIONAL, 'The name of connection', $default),
 		);
 	}
 
@@ -82,7 +98,7 @@ class ListenCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'),
+			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', 'default'),
 
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
 

@@ -73,4 +73,14 @@ class SyncJob extends Job {
 		//
 	}
 
+	/**
+	 * Get the number of times the job has been attempted.
+	 *
+	 * @return int
+	 */
+	public function attempts()
+	{
+		return 1;
+	}
+
 }

@@ -37,7 +37,7 @@ class MigrationCreator {
 	 * @param  string  $path
 	 * @param  string  $table
 	 * @param  bool    $create
-	 * @return void
+	 * @return string
 	 */
 	public function create($name, $path, $table = null, $create = false)
 	{
@@ -51,6 +51,8 @@ class MigrationCreator {
 		$this->files->put($path, $this->populateStub($name, $stub, $table));
 
 		$this->firePostCreateHooks();
+
+		return $path;
 	}
 
 	/**

@@ -3,6 +3,7 @@
 use Illuminate\Support\NamespacedItemResolver;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator as SymfonyTranslator;
 
 class Translator extends NamespacedItemResolver implements TranslatorInterface {
 
@@ -19,6 +20,13 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 * @var Symfony\Translation\Translator
 	 */
 	protected $trans;
+
+	/**
+	 * The fallback locale for the translator.
+	 *
+	 * @var string
+	 */
+	protected $fallback;
 
 	/**
 	 * The array of loaded translation groups.
@@ -39,6 +47,8 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	public function __construct(LoaderInterface $loader, $default, $fallback)
 	{
 		$this->loader = $loader;
+
+		$this->fallback = $fallback;
 
 		$this->trans = $this->createSymfonyTranslator($default, $fallback);
 	}
@@ -88,6 +98,8 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		list($namespace, $group, $item) = $this->parseKey($key);
 
+		$parameters = $this->formatParameters($parameters);
+
 		// Once we call the "load" method, we will receive back the "domain" for the
 		// namespace and group. The "domain" is used by the Symfony translator to
 		// logically separate related groups of messages, and should be unique.
@@ -111,6 +123,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		list($namespace, $group, $item) = $this->parseKey($key);
 
+		$parameters = $this->formatParameters($parameters);
+
+		// Once we call the "load" method, we will receive back the "domain" for the
+		// namespace and group. The "domain" is used by the Symfony translator to
+		// logically separate related groups of messages, and should be unique.
 		$domain = $this->load($group, $namespace, $locale);
 
 		$line = $this->trans->transChoice($item, $number, $parameters, $domain, $locale);
@@ -157,28 +174,42 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function load($group, $namespace, $locale)
 	{
-		// The domain is used to store the messages in the Symfony translator object
-		// and functions as a sort of logical separator of message types so we'll
-		// use the namespace and group as the "domain", which should be unique.
 		$domain = $namespace.'::'.$group;
 
-		$locale = $locale ?: $this->getLocale();
-
-		if ($this->loaded($group, $namespace, $locale))
+		foreach ($this->getLocales($locale) as $locale)
 		{
-			return $domain;
+			// The domain is used to store the messages in the Symfony translator object
+			// and functions as a sort of logical separator of message types so we'll
+			// use the namespace and group as the "domain", which should be unique.
+			if ($this->loaded($group, $namespace, $locale))
+			{
+				return $domain;
+			}
+
+			$lines = $this->loader->load($locale, $group, $namespace);
+
+			// We're finally ready to load the array of messages from the loader and add
+			// them to the Symfony translator. We will also convert this array to dot
+			// format so that deeply nested items will be accessed by a translator.
+			$this->addResource(array_dot($lines), $locale, $domain);
+
+			$this->setLoaded($group, $namespace, $locale);
 		}
 
-		$lines = $this->loader->load($locale, $group, $namespace);
-
-		// We're finally ready to load the array of messages from the loader and add
-		// them to the Symfony translator. We will also convert this array to dot
-		// format so that deeply nested items will be accessed by a translator.
-		$this->addResource(array_dot($lines), $locale, $domain);
-
-		$this->setLoaded($group, $namespace, $locale);
-
 		return $domain;
+	}
+
+	/**
+	 * Get the locales to be loaded.
+	 *
+	 * @param  string  $locale
+	 * @return array
+	 */
+	protected function getLocales($locale)
+	{
+		$locale = $locale ?: $this->getLocale();
+
+		return array_unique(array($locale, $this->fallback));
 	}
 
 	/**
@@ -192,8 +223,24 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	protected function addResource(array $lines, $locale, $domain)
 	{
 		$this->trans->addResource('array', $lines, $locale, $domain);
+	}
 
-		$this->trans->refreshCatalogue($locale);
+	/**
+	 * Format the parameter array.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function formatParameters($parameters)
+	{
+		foreach ($parameters as $key => $value)
+		{
+			$parameters[':'.$key] = $value;
+
+			unset($parameters[$key]);
+		}
+
+		return $parameters;
 	}
 
 	/**

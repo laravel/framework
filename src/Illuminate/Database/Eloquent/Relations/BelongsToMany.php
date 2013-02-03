@@ -65,6 +65,19 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Execute the query and get the first result.
+	 *
+	 * @param  array   $columns
+	 * @return mixed
+	 */
+	public function first($columns = array('*'))
+	{
+		$results = $this->take(1)->get($columns);
+
+		return count($results) > 0 ? $results->first() : null;
+	}
+
+	/**
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns

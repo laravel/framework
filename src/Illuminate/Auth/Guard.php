@@ -124,13 +124,43 @@ class Guard {
 	}
 
 	/**
+	 * Log a user into the application without sessions or cookies.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	public function stateless(array $credentials = array())
+	{
+		if ($this->validate($credentials))
+		{
+			$this->setUser($this->provider->retrieveByCredentials($credentials));
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Validate a user's credentials.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	public function validate(array $credentials = array())
+	{
+		return $this->attempt($credentials, false, false);
+	}
+
+	/**
 	 * Attempt to authenticate a user using the given credentials.
 	 *
 	 * @param  array  $credentials
 	 * @param  bool   $remember
+	 * @param  bool   $login
 	 * @return bool
 	 */
-	public function attempt(array $credentials = array(), $remember = false)
+	public function attempt(array $credentials = array(), $remember = false, $login = true)
 	{
 		$user = $this->provider->retrieveByCredentials($credentials);
 
@@ -141,7 +171,7 @@ class Guard {
 		{
 			if ($this->provider->validateCredentials($user, $credentials))
 			{
-				$this->login($user, $remember);
+				if ($login) $this->login($user, $remember);
 
 				return true;
 			}

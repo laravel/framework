@@ -59,7 +59,7 @@ class SessionServiceProvider extends ServiceProvider {
 		// the session "payloads", as well as writing them after each request.
 		if ( ! is_null($config['driver']))
 		{
-			$app->booting(function() use ($app)
+			$app->booting(function($app)
 			{
 				$app['session']->start($app['cookie']);
 			});

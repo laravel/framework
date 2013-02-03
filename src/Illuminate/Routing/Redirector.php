@@ -45,6 +45,18 @@ class Redirector {
 	}
 
 	/**
+	 * Create a new redirect response to the current URI.
+	 *
+	 * @param  int    $status
+	 * @param  array  $headers
+	 * @return Illuminate\Http\RedirectResponse
+	 */
+	public function refresh($status = 302, $headers = array())
+	{
+		return $this->to($this->generator->getRequest()->path(), $status, $headers);
+	}
+
+	/**
 	 * Create a new redirect response to the given path.
 	 *
 	 * @param  string  $path
@@ -53,9 +65,9 @@ class Redirector {
 	 * @param  bool    $secure
 	 * @return Illuminate\Http\RedirectResponse
 	 */
-	public function to($path, $status = 302, $headers = array(), $secure = false)
+	public function to($path, $status = 302, $headers = array(), $secure = null)
 	{
-		$path = $this->generator->to($path, $secure);
+		$path = $this->generator->to($path, array(), $secure);
 
 		return $this->createRedirect($path, $status, $headers);
 	}
@@ -125,6 +137,16 @@ class Redirector {
 		$redirect->setRequest($this->generator->getRequest());
 
 		return $redirect;
+	}
+
+	/**
+	 * Get the URL generator instance.
+	 *
+	 * @return  Illuminate\Routing\UrlGenerator
+	 */
+	public function getUrlGenerator()
+	{
+		return $this->generator;
 	}
 
 	/**

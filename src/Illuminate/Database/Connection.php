@@ -324,6 +324,22 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Run a raw, unprepared query against the PDO connection.
+	 *
+	 * @param  string  $query
+	 * @return bool
+	 */
+	public function unprepared($query)
+	{
+		return $this->run($query, array(), function($me, $query, $bindings)
+		{
+			if ($me->pretending()) return true;
+
+			return (bool) $me->getPdo()->exec($query);
+		});
+	}
+
+	/**
 	 * Prepare the query bindings for execution.
 	 *
 	 * @param  array  $bindings
@@ -421,13 +437,40 @@ class Connection implements ConnectionInterface {
 		// To execute the statement, we'll simply call the callback, which will actually
 		// run the SQL against the PDO connection. Then we can calculate the time it
 		// took to execute and log the query SQL, bindings and time in our memory.
-		$result = $callback($this, $query, $bindings);
+		try
+		{
+			$result = $callback($this, $query, $bindings);
+		}
+		catch (\Exception $e)
+		{
+			$this->handleQueryException($e, $query, $bindings);
+		}
 
+		// Once we have run the query we will calculate the time that it took to run and
+		// then log the query, bindings, and execution time so we will report them on
+		// the event that the developer needs them. We'll log time in milliseconds.
 		$time = number_format((microtime(true) - $start) * 1000, 2);
 
 		$this->logQuery($query, $bindings, $time);
 
 		return $result;
+	}
+
+	/**
+	 * Handle an exception that occurred during a query.
+	 *
+	 * @param  Exception  $e
+	 * @param  string     $query
+	 * @param  array      $bindings
+	 * @return void
+	 */
+	protected function handleQueryException(\Exception $e, $query, $bindings)
+	{
+		$bindings = var_export($bindings, true);
+
+		$message = $e->getMessage()." (SQL: {$query}) (Bindings: {$bindings})";
+
+		throw new \Exception($message, 0);	
 	}
 
 	/**

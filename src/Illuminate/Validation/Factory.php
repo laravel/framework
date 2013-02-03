@@ -27,6 +27,13 @@ class Factory {
 	protected $extensions = array();
 
 	/**
+	 * All of the custom implicit validator extensions.
+	 *
+	 * @var array
+	 */
+	protected $implicitExtensions = array();
+
+	/**
 	 * The Validator resolver instance.
 	 *
 	 * @var Closure
@@ -56,12 +63,22 @@ class Factory {
 	{
 		$validator = $this->resolve($data, $rules, $messages);
 
+		// The presence verifier is responsible for checking the unique and exists data
+		// for the validator. It is behind an interface so that multiple versions of
+		// it may be written besides database. We'll inject it into the validator.
 		if ( ! is_null($this->presenceVerifier))
 		{
 			$validator->setPresenceVerifier($this->presenceVerifier);
 		}
 
 		$validator->addExtensions($this->extensions);
+
+		// Next, we will add the implicit extensions, which are similar to the required
+		// and accepted rule in that they are run even if the attributes is not in a
+		// array of data that is given to a validator instances via instantiation.
+		$implicit = $this->implicitExtensions;
+
+		$validator->addImplicitExtensions($implicit);
 
 		return $validator;
 	}
@@ -96,6 +113,18 @@ class Factory {
 	public function extend($rule, Closure $extension)
 	{
 		$this->extensions[$rule] = $extension;
+	}
+
+	/**
+	 * Register a custom implicit validator extension.
+	 *
+	 * @param  string  $rule
+	 * @param  Closure $extension
+	 * @return void
+	 */
+	public function extendImplicit($rule, Closure $extension)
+	{
+		$this->implicitExtensions[$rule] = $extension;
 	}
 
 	/**

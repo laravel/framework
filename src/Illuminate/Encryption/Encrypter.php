@@ -140,7 +140,8 @@ class Encrypter {
 	/**
 	 * Create a MAC for the given value.
 	 *
-	 * @parma  
+	 * @param  string  $value
+	 * @return string  
 	 */
 	protected function hash($value)
 	{

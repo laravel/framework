@@ -101,11 +101,18 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	protected $guarded = array();
 
 	/**
-	 * The date fields for the model.
+	 * The date fields for the model.clear
 	 *
 	 * @var array
 	 */
 	protected $dates = array();
+
+	/**
+	 * The relations to eager load on every query.
+	 *
+	 * @var array
+	 */
+	protected $with = array();
 
 	/**
 	 * Indicates if the model exists.
@@ -488,7 +495,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		{
 			if ($this->incrementing)
 			{
-				$this->$keyName = $query->insertGetId($this->attributes);
+				$this->$keyName = $query->insertGetId($this->attributes, $keyName);
 			}
 			else
 			{
@@ -508,6 +515,18 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	protected function setKeysForSaveQuery($query)
 	{
 		$query->where($this->getKeyName(), '=', $this->getKey());
+	}
+
+	/**
+	 * Update the model's updat timestamp.
+	 *
+	 * @return bool
+	 */
+	public function touch()
+	{
+		$this->updateTimestamps();
+
+		return $this->save();
 	}
 
 	/**
@@ -547,7 +566,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		// Once we have the query builders, we will set the model instances so the
 		// builder can easily access any information it may need from the model
 		// while it is constructing and executing various queries against it.
-		$builder->setModel($this);
+		$builder->setModel($this)->with($this->with);
 
 		return $builder;
 	}
@@ -761,7 +780,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * @param  int  $options
 	 * @return string
 	 */
-	public function toJson($options = 0)
+	public function toJson($options = JSON_NUMERIC_CHECK)
 	{
 		return json_encode($this->toArray(), $options);
 	}
@@ -861,7 +880,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		// retrieval from the model to a form that is more useful for usage.
 		if ($this->hasGetMutator($key))
 		{
-			return $this->{'get'.camel_case($key)}($value);
+			return $this->{'give'.camel_case($key)}($value);
 		}
 
 		// If the attribute is listed as a date, we will convert it to a DateTime
@@ -897,7 +916,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function hasGetMutator($key)
 	{
-		return method_exists($this, 'get'.camel_case($key));
+		return method_exists($this, 'give'.camel_case($key));
 	}
 
 	/**
@@ -914,7 +933,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		// the model, such as "json_encoding" an listing of data for storage.
 		if ($this->hasSetMutator($key))
 		{
-			$method = 'set'.camel_case($key);
+			$method = 'take'.camel_case($key);
 
 			return $this->{$method}($value);
 		}
@@ -941,7 +960,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function hasSetMutator($key)
 	{
-		return method_exists($this, 'set'.camel_case($key));
+		return method_exists($this, 'take'.camel_case($key));
 	}
 
 	/**

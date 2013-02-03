@@ -105,6 +105,8 @@ class Router {
 		$this->container = $container;
 
 		$this->routes = new RouteCollection;
+
+		$this->bind('_missing', function($v) { return explode('/', $v); });
 	}
 
 	/**
@@ -200,20 +202,20 @@ class Router {
 	 */
 	public function controllers(array $controllers)
 	{
-		foreach ($controllers as $name => $uri)
+		foreach ($controllers as $uri => $name)
 		{
-			$this->controller($name, $uri);
+			$this->controller($uri, $name);
 		}
 	}
 
 	/**
 	 * Route a controller to a URI with wildcard routing.
 	 *
-	 * @param  string  $controller
 	 * @param  string  $uri
+	 * @param  string  $controller
 	 * @return Illuminate\Routing\Route
 	 */
-	public function controller($controller, $uri)
+	public function controller($uri, $controller)
 	{
 		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
@@ -227,6 +229,22 @@ class Router {
 				$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
 			}
 		}
+
+		$this->addFallthroughRoute($controller, $uri);
+	}
+
+	/**
+	 * Add a fallthrough route for a controller.
+	 *
+	 * @param  string  $controller
+	 * @param  string  $uri
+	 * @return void
+	 */
+	protected function addFallthroughRoute($controller, $uri)
+	{
+		$missing = $this->any($uri.'/{_missing}', $controller.'@missingMethod');
+
+		$missing->where('_missing', '(.*)');
 	}
 
 	/**
@@ -241,9 +259,11 @@ class Router {
 	{
 		$defaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
 
+		$base = $this->getBaseResource($resource);
+
 		foreach ($this->getResourceMethods($defaults, $options) as $method)
 		{
-			$this->{'addResource'.ucfirst($method)}($resource, $controller);
+			$this->{'addResource'.ucfirst($method)}($resource, $base, $controller);
 		}
 	}
 
@@ -271,87 +291,189 @@ class Router {
 	/**
 	 * Add the index method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $name
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceIndex($resource, $controller)
+	protected function addResourceIndex($name, $base, $controller)
 	{
-		return $this->get($resource, $controller.'@index');
+		$action = $this->getResourceAction($name, $controller, 'index');
+
+		return $this->get($this->getResourceUri($name), $action);
 	}
 
 	/**
 	 * Add the create method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $name
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceCreate($resource, $controller)
+	protected function addResourceCreate($name, $base, $controller)
 	{
-		return $this->get($resource.'/create', $controller.'@create');
+		$action = $this->getResourceAction($name, $controller, 'create');
+
+		return $this->get($this->getResourceUri($name).'/create', $action);
 	}
 
 	/**
 	 * Add the store method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $name
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceStore($resource, $controller)
+	protected function addResourceStore($name, $base, $controller)
 	{
-		return $this->post($resource, $controller.'@store');
+		$action = $this->getResourceAction($name, $controller, 'store');
+
+		return $this->post($this->getResourceUri($name), $action);
 	}
 
 	/**
 	 * Add the show method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $name
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceShow($resource, $controller)
+	protected function addResourceShow($name, $base, $controller)
 	{
-		return $this->get($resource.'/{id}', $controller.'@show');
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
+		return $this->get($uri, $this->getResourceAction($name, $controller, 'show'));
 	}
 
 	/**
 	 * Add the edit method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $name
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceEdit($resource, $controller)
+	protected function addResourceEdit($name, $base, $controller)
 	{
-		return $this->get($resource.'/{id}/edit', $controller.'@edit');
+		$uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
+
+		return $this->get($uri, $this->getResourceAction($name, $controller, 'edit'));
 	}
 
 	/**
 	 * Add the update method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $name
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceUpdate($resource, $controller)
+	protected function addResourceUpdate($name, $base, $controller)
 	{
-		$this->put($resource.'/{id}', $controller.'@update');
+		$this->addPutResourceUpdate($name, $base, $controller);
 
-		return $this->patch($resource.'/{id}', $controller.'@update');
+		return $this->addPatchResourceUpdate($name, $base, $controller);
+	}
+
+	/**
+	 * Add the update method for a resourceful route.
+	 *
+	 * @param  string  $name
+	 * @param  string  $base
+	 * @param  string  $controller
+	 * @return void
+	 */
+	protected function addPutResourceUpdate($name, $base, $controller)
+	{
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
+		return $this->put($uri, $this->getResourceAction($name, $controller, 'update'));
+	}
+
+	/**
+	 * Add the update method for a resourceful route.
+	 *
+	 * @param  string  $name
+	 * @param  string  $base
+	 * @param  string  $controller
+	 * @return void
+	 */
+	protected function addPatchResourceUpdate($name, $base, $controller)
+	{
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
+		$this->patch($uri, $controller.'@update');
 	}
 
 	/**
 	 * Add the destroy method for a resourceful route.
 	 *
-	 * @param  string  $resource
+	 * @param  string  $name
+	 * @param  string  $base
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceDestroy($resource, $controller)
+	protected function addResourceDestroy($name, $base, $controller)
 	{
-		return $this->delete($resource.'/{id}', $controller.'@destroy');
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
+		return $this->delete($uri, $this->getResourceAction($name, $controller, 'destroy'));
+	}
+
+	/**
+	 * Get the base resource URI for a given resource.
+	 *
+	 * @param  string  $resource
+	 * @return string
+	 */
+	public function getResourceUri($resource)
+	{
+		if ( ! str_contains($resource, '.')) return $resource;
+
+		// To create the nested resource URI, we will simply explode the segments and
+		// create a base URI for each of them, then join all of them back together
+		// with slashes. This should create the properly nested resource routes.
+		$nested = implode('/', array_map(function($segment)
+		{
+			return $segment.'/{'.$segment.'}';
+
+		}, $segments = explode('.', $resource)));
+
+		// Once we have built the base URI, we'll remove the wildcard holder for this
+		// base resource name so that the individual route adders can suffix these
+		// paths however they need to, as some do not have any wildcards at all.
+		$last = $segments[count($segments) - 1];
+
+		return str_replace('/{'.$last.'}', '', $nested);
+	}
+
+	/**
+	 * Get the action array for a resource route.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $controller
+	 * @param  string  $method
+	 * @return array
+	 */
+	protected function getResourceAction($resource, $controller, $method)
+	{
+		return array('as' => $resource.'.'.$method, 'uses' => $controller.'@'.$method);
+	}
+
+	/**
+	 * Get the base resource from a resource name.
+	 *
+	 * @param  string  $resource
+	 * @return string
+	 */
+	protected function getBaseResource($resource)
+	{
+		$segments = explode('.', $resource);
+
+		return $segments[count($segments) - 1];
 	}
 
 	/**
@@ -387,10 +509,30 @@ class Router {
 		{
 			$action = $this->parseAction($action);
 		}
+		
+		$groupCount = count($this->groupStack);
 
-		$name = $this->getName($method, $pattern, $action);
+		// If there are attributes being grouped across routes we will merge those
+		// attributes into the action array so that they will get shared across
+		// the routes. The route can override the attribute by specifying it.
+		if ($groupCount > 0)
+		{
+			$index = $groupCount - 1;
 
+			$action = array_merge($this->groupStack[$index], $action);
+		}
+
+		// Next we will parse the pattern and add any specified prefix to the it so
+		// a common URI prefix may be specified for a group of routes easily and
+		// without having to specify them all for every route that is defined.
 		list($pattern, $optional) = $this->getOptional($pattern);
+
+		if (isset($action['prefix']))
+		{
+			$pattern = trim($action['prefix'], '/').'/'.ltrim($pattern, '/');
+
+			$pattern = trim($pattern, '/');
+		}
 
 		// We will create the routes, setting the Closure callbacks on the instance
 		// so we can easily access it later. If there are other parameters on a
@@ -407,6 +549,8 @@ class Router {
 		// which contains all the other routes and is used to match on incoming
 		// URL and their appropriate route destination and on URL generation.
 		$this->setAttributes($route, $action, $optional);
+
+		$name = $this->getName($method, $pattern, $action);
 
 		$this->routes->add($name, $route);
 
@@ -446,18 +590,6 @@ class Router {
 	 */
 	protected function setAttributes(Route $route, $action, $optional)
 	{
-		$groupCount = count($this->groupStack);
-
-		// If there are attributes being grouped across routes we will merge those
-		// attributes into the action array so that they will get shared across
-		// the routes. The route can override the attribute by specifying it.
-		if ($groupCount > 0)
-		{
-			$index = $groupCount - 1;
-
-			$action = array_merge($this->groupStack[$index], $action);
-		}
-
 		// First we will set the requirement for the HTTP schemes. Some routes may
 		// only respond to requests using the HTTPS scheme, while others might
 		// respond to all, regardless of the scheme, so we'll set that here.
@@ -543,7 +675,9 @@ class Router {
 	{
 		if (isset($action['as'])) return $action['as'];
 
-		return $method.' '.$pattern;
+		$domain = isset($action['domain']) ? $action['domain'].' ' : '';
+
+		return "{$domain}{$method} {$pattern}";
 	}
 
 	/**
@@ -647,7 +781,7 @@ class Router {
 		// that's used by the Illuminate foundation framework for responses.
 		try
 		{
-			$path = '/'.ltrim($request->getPathInfo(), '/');
+			$path = $this->formatRequestPath($request);
 
 			$parameters = $this->getUrlMatcher($request)->match($path);
 		}
@@ -668,6 +802,24 @@ class Router {
 		$route->setParameters($parameters);
 
 		return $route;
+	}
+
+	/**
+	 * Format the request path info for routing.
+	 *
+	 * @param  Illuminate\Http\Request  $request
+	 * @return string
+	 */
+	protected function formatRequestPath($request)
+	{
+		$path = $request->getPathInfo();
+
+		if (strlen($path) > 1 and ends_with($path, '/'))
+		{
+			return '/'.ltrim(substr($path, 0, -1), '/');
+		}
+
+		return '/'.ltrim($path, '/');
 	}
 
 	/**

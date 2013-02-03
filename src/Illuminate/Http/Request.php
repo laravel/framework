@@ -64,6 +64,34 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	}
 
 	/**
+	 * Get a segment from the URI (1 based index).
+	 *
+	 * @param  string  $index
+	 * @param  mixed   $default
+	 * @return string
+	 */
+	public function segment($index, $default = null)
+	{
+		$segments = explode('/', trim($this->getPathInfo(), '/'));
+
+		$segments = array_filter($segments, function($v) { return $v != ''; });
+
+		return array_get($segments, $index - 1, $default);
+	}
+
+	/**
+	 * Get all of the segments for the request path.
+	 *
+	 * @return array
+	 */
+	public function segments()
+	{
+		$path = $this->path();
+
+		return $path == '/' ? array() : explode('/', $path);
+	}
+
+	/**
 	 * Determine if the current request URI matches a pattern.
 	 *
 	 * @param  string  $pattern
@@ -217,7 +245,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function hasFile($key)
 	{
-		return $this->files->has($key);
+		return $this->files->has($key) and ! is_null($this->file($key));
 	}
 
 	/**
@@ -267,7 +295,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
-		$this->sessionStore->flashInput($flash);
+		$this->getSessionStore()->flashInput($flash);
 	}
 
 	/**
@@ -299,7 +327,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function flush()
 	{
-		$this->sessionStore->flashInput(array());
+		$this->getSessionStore()->flashInput(array());
 	}
 
 	/**
@@ -392,6 +420,16 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	public function setSessionStore(SessionStore $session)
 	{
 		$this->sessionStore = $session;
+	}
+
+	/**
+	 * Determine if the session store has been set.
+	 *
+	 * @return bool
+	 */
+	public function hasSessionStore()
+	{
+		return isset($this->sessionStore);
 	}
 
 }

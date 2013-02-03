@@ -10,7 +10,10 @@ class Inspector {
 	 *
 	 * @var array
 	 */
-	protected $verbs = array('get', 'post', 'put', 'delete', 'head', 'options');
+	protected $verbs = array(
+		'any', 'get', 'post', 'put', 
+		'delete', 'head', 'options'
+	);
 
 	/**
 	 * Get the routable methods for a controller.
@@ -34,16 +37,22 @@ class Inspector {
 			{
 				$data = $this->getMethodData($method, $prefix);
 
-				$routable[$method->name][] = $data;
-
 				// If the routable method is an index method, we will create a special index
 				// route which is simply the prefix and the verb and does not contain any
 				// the wildcard place-holders that each "typical" routes would contain.
 				if ($data['plain'] == $prefix.'/index')
 				{
-					$index = $this->getIndexData($data, $prefix);
+					$routable[$method->name][] = $this->getIndexData($data, $prefix);
 
-					$routable[$method->name][] = $index;
+					$routable[$method->name][] = $data;
+				}
+
+				// If the routable method is not a special index method, we will just add in
+				// the data to the returned results straight away. We do not need to make
+				// any special routes for this scenario but only just add these routes.
+				else
+				{
+					$routable[$method->name][] = $data;
 				}
 			}
 		}
@@ -81,6 +90,18 @@ class Inspector {
 	}
 
 	/**
+	 * Get the routable data for an index method.
+	 *
+	 * @param  array   $data
+	 * @param  string  $prefix
+	 * @return array
+	 */
+	protected function getIndexData($data, $prefix)
+	{
+		return array('verb' => $data['verb'], 'plain' => $prefix, 'uri' => $prefix);
+	}
+
+	/**
 	 * Extract the verb from a controller action.
 	 *
 	 * @param  string  $name
@@ -112,18 +133,6 @@ class Inspector {
 	public function addUriWildcards($uri)
 	{
 		return $uri.'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
-	}
-
-	/**
-	 * Get the routable data for an index method.
-	 *
-	 * @param  array   $data
-	 * @param  string  $prefix
-	 * @return array
-	 */
-	protected function getIndexData($data, $prefix)
-	{
-		return array('verb' => $data['verb'], 'plain' => $prefix, 'uri' => $prefix);
 	}
 
 }
