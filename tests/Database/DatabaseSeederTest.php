@@ -20,7 +20,7 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 		$connection = m::mock('Illuminate\Database\Connection');
 		$table = m::mock('Illuminate\Database\Query\Builder');
 		$connection->shouldReceive('table')->with('a_table')->andReturn($table);
-		$table->shouldReceive('truncate')->twice();
+		$table->shouldReceive('delete')->twice();
 		$table->shouldReceive('insert')->once()->with(array(array('name' => 'Taylor')));
 		$connection->shouldReceive('table')->with('b')->andReturn($table);
 		$table->shouldReceive('insert')->once()->with(array(array('name' => 'Dayle')));

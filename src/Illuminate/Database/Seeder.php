@@ -59,7 +59,7 @@ class Seeder {
 			// the databases via a connection and fire an event noting the seeding.
 			$table = $this->getTable($records, $file);
 
-			$connection->table($table)->truncate();
+			$connection->table($table)->delete();
 
 			$connection->table($table)->insert($records);
 
