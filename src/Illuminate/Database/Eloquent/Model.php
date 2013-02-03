@@ -495,7 +495,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		{
 			if ($this->incrementing)
 			{
-				$this->$keyName = $query->insertGetId($this->attributes);
+				$this->$keyName = $query->insertGetId($this->attributes, $keyName);
 			}
 			else
 			{
