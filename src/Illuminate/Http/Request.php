@@ -80,6 +80,18 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	}
 
 	/**
+	 * Get all of the segments for the request path.
+	 *
+	 * @return array
+	 */
+	public function segments()
+	{
+		$path = $this->path();
+
+		return $path == '/' ? array() : explode('/', $path);
+	}
+
+	/**
 	 * Determine if the current request URI matches a pattern.
 	 *
 	 * @param  string  $pattern
