@@ -26,6 +26,13 @@ class Route extends BaseRoute {
 	 * @var array
 	 */
 	protected $parsedParameters;
+	
+	/**
+	 * The compiled route
+	 *
+	 * @var Symfony\Component\Routing\CompiledRoute
+	 */
+	protected $compiledRoute;
 
 	/**
 	 * Execute the route and return the response.
@@ -163,6 +170,21 @@ class Route extends BaseRoute {
 
 		return array($name, $parameters);
 	}
+	
+	/**
+	 * Get the compiled route
+	 *
+	 * @return Symfony\Component\Routing\CompiledRoute
+	 */
+	protected function getCompiledRoute()
+	{
+		if(isset($this->compiledRoute))
+		{
+			return $this->compiledRoute;
+		}
+		
+		return $this->compiledRoute = $this->compile();
+	}
 
 	/**
 	 * Get a parameter by name from the route.
@@ -191,7 +213,7 @@ class Route extends BaseRoute {
 			return $this->parsedParameters;
 		}
 
-		$variables = $this->compile()->getVariables();
+		$variables = $this->getCompiledRoute()->getVariables();
 
 		// To get the parameter array, we need to spin the names of the variables on
 		// the compiled route and match them to the parameters that we got when a
@@ -280,7 +302,7 @@ class Route extends BaseRoute {
 	 */
 	public function getParameterKeys()
 	{
-		return array_keys($this->getParameters());
+		return $this->getCompiledRoute()->getVariables();
 	}
 
 	/**
