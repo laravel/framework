@@ -74,6 +74,13 @@ class Router {
 	protected $binders = array();
 
 	/**
+	 * The registered segmented keys.
+	 *
+	 * @var array
+	 */
+	protected $segmented = array();
+
+	/**
 	 * The current request being dispatched.
 	 *
 	 * @var Symfony\Component\HttpFoundation\Request
@@ -522,7 +529,11 @@ class Router {
 			$action = array_merge($this->groupStack[$index], $action);
 		}
 
-		// Next we will parse the pattern and add any specified prefix to the it so
+		// We will first replace all parameters that represent multiple segments by
+		// expanding them to get the fully qualified pattern containing all parameters.
+		list($pattern, $segmented) = $this->parseSegmentedVariables($pattern);
+
+		// Next we will parse the pattern and add any specified prefix to it so
 		// a common URI prefix may be specified for a group of routes easily and
 		// without having to specify them all for every route that is defined.
 		list($pattern, $optional) = $this->getOptional($pattern);
@@ -544,6 +555,8 @@ class Router {
 		))->setRouter($this);
 
 		$route->setRequirement('_method', $method);
+
+		$route->setSegmented($segmented);
 
 		// Once we have created the route, we will add them to our route collection
 		// which contains all the other routes and is used to match on incoming
@@ -636,6 +649,34 @@ class Router {
 		{
 			$route->setDefault($key, null);
 		}
+	}
+
+	/**
+	 * Parse the pattern by replacing al defined segmented parameters with
+	 * their substituted named segments.
+	 *
+	 * @param  string  $pattern
+	 * @return array
+	 */
+	protected function parseSegmentedVariables($pattern)
+	{
+		$segmented = array();
+
+		foreach ($this->segmented as $variable => $segments)
+		{
+			$search = '{'.$variable.'}';
+
+			if (str_contains($pattern, $search))
+			{
+				$replace = '{'.implode('}/{', $segments).'}';
+
+				$pattern = str_replace($search, $replace, $pattern);
+
+				$segmented[$variable] = $segments;
+			}
+		}
+
+		return array($pattern, $segmented);
 	}
 
 	/**
@@ -1081,6 +1122,18 @@ class Router {
 	public function performBinding($key, $value, $route)
 	{
 		return call_user_func($this->binders[$key], $value, $route);
+	}
+
+	/**
+	 * Register a key which will be substituted as multiple segments.
+	 *
+	 * @param  string  $key
+	 * @param  array   $segments
+	 * @return void
+	 */
+	public function segments($key, array $segments)
+	{
+		$this->segmented[$key] = $segments;
 	}
 
 	/**
