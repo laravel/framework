@@ -67,6 +67,13 @@ class Router {
 	protected $inspector;
 
 	/**
+	 * The global parameter patterns.
+	 *
+	 * @var array
+	 */
+	protected $patterns = array();
+
+	/**
 	 * The registered route binders.
 	 *
 	 * @var array
@@ -542,6 +549,8 @@ class Router {
 			'_call' => $this->getCallback($action),
 
 		))->setRouter($this);
+
+		$route->addRequirements($this->patterns);
 
 		$route->setRequirement('_method', $method);
 
@@ -1021,6 +1030,18 @@ class Router {
 				if ( ! is_null($response)) return $response;
 			}
 		}
+	}
+
+	/**
+	 * Set a global where pattern on all routes
+	 *
+	 * @param  string  $key
+	 * @param  string  $pattern
+	 * @return void
+	 */
+	public function pattern($key, $pattern)
+	{
+		$this->patterns[$key] = $pattern;
 	}
 
 	/**
