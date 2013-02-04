@@ -215,17 +215,17 @@ abstract class Store implements TokenProvider, ArrayAccess {
 			// Session flash data is only persisted for the next request into the app
 			// which makes it convenient for temporary status messages or various
 			// other strings. We'll check all of this flash data for the items.
-			if (isset($data[':new:'][$key]))
+			if ($value = array_get($data, ":new:.$key"))
 			{
-				return $data[':new:'][$key];
+				return $value;
 			}
 
 			// The "old" flash data are the data flashed during the previous request
 			// while the "new" data is the data flashed during the course of this
 			// current request. Usually developers will be retrieving the olds.
-			elseif (isset($data[':old:'][$key]))
+			if ($value = array_get($data, ":old:.$key"))
 			{
-				return $data[':old:'][$key];
+				return $value;
 			}
 
 			return $default instanceof Closure ? $default() : $default;
