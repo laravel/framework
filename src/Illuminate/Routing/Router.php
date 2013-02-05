@@ -529,9 +529,9 @@ class Router {
 
 		if (isset($action['prefix']))
 		{
-			$pattern = trim($action['prefix'], '/').'/'.ltrim($pattern, '/');
+			$prefix = $action['prefix'];
 
-			$pattern = trim($pattern, '/');
+			$pattern = $this->addPrefix($pattern, $prefix);
 		}
 
 		// We will create the routes, setting the Closure callbacks on the instance
@@ -578,6 +578,20 @@ class Router {
 		}
 
 		throw new \InvalidArgumentException("Unroutable action.");
+	}
+
+	/**
+	 * Add the given prefix to the given URI pattern.
+	 *
+	 * @param  string  $pattern
+	 * @param  string  $prefix
+	 * @return string
+	 */
+	protected function addPrefix($pattern, $prefix)
+	{
+		$pattern = trim($prefix, '/').'/'.ltrim($pattern, '/');
+
+		return trim($pattern, '/');
 	}
 
 	/**
