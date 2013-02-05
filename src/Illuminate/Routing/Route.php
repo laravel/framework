@@ -28,6 +28,13 @@ class Route extends BaseRoute {
 	protected $parsedParameters;
 
 	/**
+	 * The registered segmented keys.
+	 *
+	 * @var array
+	 */
+	protected $segmented = array();
+
+	/**
 	 * Execute the route and return the response.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
@@ -193,6 +200,10 @@ class Route extends BaseRoute {
 
 		$variables = $this->compile()->getVariables();
 
+		// We will now reduce the amount of variables to the amount of input parameters
+		// so that segmented parameters will be joined together into one array.
+		$variables = $this->reduceSegmentedVariables($variables);
+
 		// To get the parameter array, we need to spin the names of the variables on
 		// the compiled route and match them to the parameters that we got when a
 		// route is matched by the router, as routes instances don't have them.
@@ -204,6 +215,42 @@ class Route extends BaseRoute {
 		}
 
 		return $this->parsedParameters = $parameters;
+	}
+
+	/**
+	 * Reduce all segmented variables back to one input parameter.
+	 *
+	 * @param  array   $variables
+	 * @return array
+	 */
+	protected function reduceSegmentedVariables($variables)
+	{
+		foreach ($this->segmented as $variable => $segments)
+		{
+			// To replace the segmented variables with their original key, we need
+			// the position of the first variable so we can replace all variables
+			// from that position with just the one variable.
+			$offset = array_search(head($segments), $variables);
+
+			array_splice($variables, $offset, count($segments), $variable);
+
+			// It is also necessary to actually provide the segmented parameter so we
+			// will create it by combining all segments for the substitude parameter.
+			$this->combineParameters($segments, $variable);
+		}
+
+		return $variables;
+	}
+
+	/**
+	 * Create the input parameter for reduced segments.
+	 *
+	 * @param  array   $keys
+	 * @return void
+	 */
+	protected function combineParameters($keys, $substitute)
+	{
+		$this->parameters[$substitute] = array_only($this->parameters, $keys);
 	}
 
 	/**
@@ -396,6 +443,17 @@ class Route extends BaseRoute {
 	public function setParameters($parameters)
 	{
 		$this->parameters = $parameters;
+	}
+
+	/**
+	 * Set the segmented parameters on the route.
+	 *
+	 * @param  array  $segmented
+	 * @return void
+	 */
+	public function setSegmented($segmented)
+	{
+		$this->segmented = $segmented;
 	}
 
 	/**

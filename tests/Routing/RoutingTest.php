@@ -521,6 +521,70 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
 
+	public function testSegmentedParametersAreSubstituted()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->segments('user', array('firstname', 'lastname'));
+		$router->get('users/{user}', function($user) { return $user['firstname'].$user['lastname']; } );
+		$router->get('users/{user}/{age}', function($user, $age) { return $user['firstname'].$user['lastname'].$age; } );
+
+		$request = Request::create('/users/taylor/otwell', 'GET');
+		$this->assertEquals('taylorotwell', $router->dispatch($request)->getContent());
+
+		$request = Request::create('/users/taylor/otwell/25', 'GET');
+		$this->assertEquals('taylorotwell25', $router->dispatch($request)->getContent());
+	}
+
+	public function testSegmentedParametersCreatePattern()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->segments('user', array('firstname', 'lastname'));
+		$r1 = $router->get('users/{user}', function($user) { return $user['firstname'].$user['lastname']; } );
+		$r2 = $router->get('users/{user}/{age}', function($user, $age) { return $user['firstname'].$user['lastname'].$age; } );
+
+		$this->assertEquals('/users/{firstname}/{lastname}', $r1->getPattern());
+		$this->assertEquals('/users/{firstname}/{lastname}/{age}', $r2->getPattern());
+	}
+
+	public function testSegmentedParametersCanBeBound()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->segments('user', array('firstname', 'lastname'));
+		$router->bind('user', function($value) { return (object)$value; });
+		$router->get('users/{user}', function(stdClass $user) { return $user->firstname.$user->lastname; } );
+
+		$request = Request::create('/users/taylor/otwell', 'GET');
+		$this->assertEquals('taylorotwell', $router->dispatch($request)->getContent());
+	}
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testSegmentedParametersShouldBeFullySpecified()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->segments('user', array('firstname', 'lastname'));
+		$router->bind('user', function($value) { return (object)$value; });
+		$router->get('users/{user}', function(stdClass $user) { return $user->firstname.$user->lastname; } );
+
+		$request = Request::create('/users/taylor', 'GET');
+		$this->assertEquals('taylor', $router->dispatch($request)->getContent());
+	}
+
+	public function testSegmentedParametersAreProperlySubstituted()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->segments('user', array('firstname', 'lastname'));
+		$router->get('users/{user}', function($user) { return $user['firstname'].$user['lastname']; } );
+		$router->get('about/{firstname}/{lastname}', function($firstname, $lastname) { return $firstname.$lastname; } );
+
+		$request = Request::create('/users/taylor/otwell', 'GET');
+		$this->assertEquals('taylorotwell', $router->dispatch($request)->getContent());
+
+		$request = Request::create('/about/taylor/otwell', 'GET');
+		$this->assertEquals('taylorotwell', $router->dispatch($request)->getContent());
+	}
+
 }
 
 class RoutingModelBindingStub {
