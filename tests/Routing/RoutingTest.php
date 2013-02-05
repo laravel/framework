@@ -350,12 +350,28 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
 	public function testWhereMethodForcesRegularExpressionMatch()
 	{
 		$router = new Router;
 		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; })->where('age', '[0-9]+');
-		$request = Request::create('/foo/taylor/25', 'GET');
-		$this->assertEquals('taylor25', $router->dispatch($request)->getContent());
+		$request = Request::create('/foo/taylor/abc', 'GET');
+		$this->assertEquals('taylorabc', $router->dispatch($request)->getContent());
+	}
+
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testGlobalParameterPatternsAreApplied()
+	{
+		$router = new Router;
+		$router->pattern('age', '[0-9]+');
+		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; });
+		$request = Request::create('/foo/taylor/abc', 'GET');
+		$this->assertEquals('taylorabc', $router->dispatch($request)->getContent());
 	}
 
 
