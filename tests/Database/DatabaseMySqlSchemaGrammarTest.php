@@ -20,7 +20,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('create table `users` (`id` int not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
+		$this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
 
 		$blueprint = new Blueprint('users');
 		$blueprint->increments('id');
@@ -28,7 +28,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table `users` add `id` int not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
+		$this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
 	}
 
 
@@ -43,7 +43,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($grammar);
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('create table `prefix_users` (`id` int not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
+		$this->assertEquals('create table `prefix_users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
 	}
 
 
@@ -204,7 +204,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table `users` add `id` int not null auto_increment primary key', $statements[0]);
+		$this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key', $statements[0]);
 	}
 
 

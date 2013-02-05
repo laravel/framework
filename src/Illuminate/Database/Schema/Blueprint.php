@@ -317,7 +317,7 @@ class Blueprint {
 	 */
 	public function increments($column)
 	{
-		return $this->integer($column, true);
+		return $this->unsignedInteger($column, true);
 	}
 
 	/**
@@ -347,11 +347,26 @@ class Blueprint {
 	 * Create a new integer column on the table.
 	 *
 	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
 	 * @return Illuminate\Support\Fluent
 	 */
-	public function integer($column, $autoIncrement = false)
+	public function integer($column, $autoIncrement = false, $unsigned = false)
 	{
-		return $this->addColumn('integer', $column, compact('autoIncrement'));
+		return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
+	}
+
+	/**
+	 * Create a new unsigned integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
+	 * @return Illuminate\Support\Fluent
+	 */
+	public function unsignedInteger($column, $autoIncrement = false)
+	{
+		return $this->integer($column, $autoIncrement, true);
 	}
 
 	/**

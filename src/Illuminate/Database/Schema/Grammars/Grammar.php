@@ -81,7 +81,10 @@ abstract class Grammar extends BaseGrammar {
 	{
 		foreach ($this->modifiers as $modifier)
 		{
-			$sql .= $this->{"modify{$modifier}"}($blueprint, $column);
+			if (method_exists($this, $method = "modify{$modifier}"))
+			{
+				$sql .= $this->{$method}($blueprint, $column);
+			}
 		}
 
 		return $sql;
