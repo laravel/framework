@@ -280,7 +280,7 @@ class Route extends BaseRoute {
 	 */
 	public function getParameterKeys()
 	{
-		return array_keys($this->getParameters());
+		return $this->compile()->getVariables();
 	}
 
 	/**
