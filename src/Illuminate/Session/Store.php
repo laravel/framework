@@ -177,7 +177,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 
 	/**
 	 * Get the full array of session data, including flash data.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function all()
@@ -210,28 +210,26 @@ abstract class Store implements TokenProvider, ArrayAccess {
 		// First we will check for the value in the general session data and if it
 		// is not present in that array we'll check the session flash datas to
 		// get the data from there. If netiher is there we give the default.
-		if (isset($data[$key]))
+		return array_get($data, $key, function() use ($data, $key, $default)
 		{
-			return $data[$key];
-		}
+			// Session flash data is only persisted for the next request into the app
+			// which makes it convenient for temporary status messages or various
+			// other strings. We'll check all of this flash data for the items.
+			if ($value = array_get($data, ":new:.$key"))
+			{
+				return $value;
+			}
 
-		// Session flash data is only persisted for the next request into the app
-		// which makes it convenient for temporary status messages or various
-		// other strings. We'll check all of this flash data for the items.
-		elseif (isset($data[':new:'][$key]))
-		{
-			return $data[':new:'][$key];
-		}
+			// The "old" flash data are the data flashed during the previous request
+			// while the "new" data is the data flashed during the course of this
+			// current request. Usually developers will be retrieving the olds.
+			if ($value = array_get($data, ":old:.$key"))
+			{
+				return $value;
+			}
 
-		// The "old" flash data are the data flashed during the previous request
-		// while the "new" data is the data flashed during the course of this
-		// current request. Usually developers will be retrieving the olds.
-		elseif (isset($data[':old:'][$key]))
-		{
-			return $data[':old:'][$key];
-		}
-
-		return $default instanceof Closure ? $default() : $default;
+			return $default instanceof Closure ? $default() : $default;
+		});
 	}
 
 	/**
@@ -252,14 +250,8 @@ abstract class Store implements TokenProvider, ArrayAccess {
 		{
 			return $input;
 		}
-		elseif (array_key_exists($key, $input))
-		{
-			return $input[$key];
-		}
-		else
-		{
-			return $default instanceof Closure ? $default() : $default;
-		}
+
+		return array_get($input, $key, $default);
 	}
 
 	/**
@@ -281,7 +273,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function put($key, $value)
 	{
-		$this->session['data'][$key] = $value;
+		array_set($this->session['data'], $key, $value);
 	}
 
 	/**
@@ -343,7 +335,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function forget($key)
 	{
-		unset($this->session['data'][$key]);
+		array_forget($this->session['data'], $key);
 	}
 
 	/**

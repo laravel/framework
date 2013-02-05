@@ -181,7 +181,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$store->setExists(false);
 		$response = new Response;
 		$cookie = $this->getCookieJarMock();
-		$store->finish($response, $cookie, 0);	
+		$store->finish($response, $cookie, 0);
 	}
 
 
@@ -233,6 +233,26 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $store->getOldInput());
 		$this->assertEquals('bar', $store->getOldInput('adslkasd', 'bar'));
 		$this->assertEquals('bar', $store->getOldInput('adlkasdf', function() { return 'bar'; }));
+	}
+
+
+	public function testComplexArrayPayloadManipulation()
+	{
+		$store = $this->storeMock('isInvalid');
+		$cookies = m::mock('Illuminate\Cookie\CookieJar');
+		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn('foo');
+		$store->start($cookies);
+
+		$store->put('foo.bar', 'baz');
+		$this->assertEquals('baz', $store->get('foo.bar'));
+		$this->assertEquals(array('bar' => 'baz'), $store->get('foo'));
+		$store->put('foo.bat', 'qux');
+		$this->assertCount(2, $store->get('foo'));
+		$this->assertEquals(array('bar' => 'baz', 'bat' => 'qux'), $store->get('foo'));
+		$this->assertTrue($store->has('foo.bat'));
+		$store->forget('foo.bat');
+		$this->assertEquals(array('bar' => 'baz'), $store->get('foo'));
+		$this->assertFalse($store->has('foo.bat'));
 	}
 
 
