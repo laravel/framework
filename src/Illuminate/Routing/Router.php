@@ -548,9 +548,7 @@ class Router {
 
 			'_call' => $this->getCallback($action),
 
-		))->setRouter($this);
-
-		$route->addRequirements($this->patterns);
+		))->setRouter($this)->addRequirements($this->patterns);
 
 		$route->setRequirement('_method', $method);
 

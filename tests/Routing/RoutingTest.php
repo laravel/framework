@@ -375,6 +375,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGlobalParameterPatternsDontInterfereWithRoutesTheyDontApplyTo()
+	{
+		$router = new Router;
+		$router->pattern('age', '[0-9]+');
+		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; });
+		$request = Request::create('/foo/taylor/123', 'GET');
+		$this->assertEquals('taylor123', $router->dispatch($request)->getContent());
+	}
+
+
 	public function testBeforeFiltersCanBeSetOnRoute()
 	{
 		$route = new Route('/foo');
