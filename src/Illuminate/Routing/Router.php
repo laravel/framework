@@ -774,16 +774,22 @@ class Router {
 
 		if ( ! is_null($response))
 		{
-			return $this->prepare($response, $request);
+			$response = $this->prepare($response, $request);
 		}
-
-		$this->currentRoute = $route = $this->findRoute($request);
 
 		// Once we have the route, we can just run it to get the responses, which will
 		// always be instances of the Response class. Once we have the responses we
 		// will execute the global "after" middlewares to finish off the request.
-		$response = $route->run($request);
+		else
+		{
+			$this->currentRoute = $route = $this->findRoute($request);
 
+			$response = $route->run($request);
+		}
+
+		// Finally after the route has been run we can call the after and close global
+		// filters for the request, giving a chance for any final processing to get
+		// done before the response gets returned back to the user's web browser.
 		$this->callAfterFilter($request, $response);
 
 		return $response;
