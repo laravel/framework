@@ -205,31 +205,47 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function get($key, $default = null)
 	{
-		$data = $this->session['data'];
+		$me = $this;
 
 		// First we will check for the value in the general session data and if it
 		// is not present in that array we'll check the session flash datas to
 		// get the data from there. If netiher is there we give the default.
-		return array_get($data, $key, function() use ($data, $key, $default)
+		$data = $this->session['data'];
+
+		return array_get($data, $key, function() use ($me, $key, $default)
 		{
-			// Session flash data is only persisted for the next request into the app
-			// which makes it convenient for temporary status messages or various
-			// other strings. We'll check all of this flash data for the items.
-			if ($value = array_get($data, ":new:.$key"))
-			{
-				return $value;
-			}
-
-			// The "old" flash data are the data flashed during the previous request
-			// while the "new" data is the data flashed during the course of this
-			// current request. Usually developers will be retrieving the olds.
-			if ($value = array_get($data, ":old:.$key"))
-			{
-				return $value;
-			}
-
-			return $default instanceof Closure ? $default() : $default;
+			return $me->getFlash($key, $default);
 		});
+	}
+
+	/**
+	 * Get the request item from the flash data.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	public function getFlash($key, $default = null)
+	{
+		$data = $this->session['data'];
+
+		// Session flash data is only persisted for the next request into the app
+		// which makes it convenient for temporary status messages or various
+		// other strings. We'll check all of this flash data for the items.
+		if ($value = array_get($data, ":new:.$key"))
+		{
+			return $value;
+		}
+
+		// The "old" flash data are the data flashed during the previous request
+		// while the "new" data is the data flashed during the course of this
+		// current request. Usually developers will be retrieving the olds.
+		if ($value = array_get($data, ":old:.$key"))
+		{
+			return $value;
+		}
+
+		return value($default);
 	}
 
 	/**
@@ -246,10 +262,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 		// Input that is flashed to the session can be easily retrieved by the
 		// developer, making repopulating old forms and the like much more
 		// convenient, since the request's previous input is available.
-		if (is_null($key))
-		{
-			return $input;
-		}
+		if (is_null($key)) return $input;
 
 		return array_get($input, $key, $default);
 	}
