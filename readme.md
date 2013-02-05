@@ -51,3 +51,4 @@
 - Added SQL and bindings array to database query exceptions.
 - Allow manipulation of session using "dot" notation.
 - Route regular expression constraints may now be defined globally via `Route::pattern`.
+- Auto-increment fields are now unsigned if the databsae system supports it.
