@@ -49,3 +49,4 @@
 - Added `session:table` Artisan command for generating a migration for the session database table.
 - Fix bug when using `first` method on a `belongsToMany` relationship.
 - Added SQL and bindings array to database query exceptions.
+- Allow manipulation of session using "dot" notation.
