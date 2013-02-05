@@ -1217,6 +1217,26 @@ class Router {
 	}
 
 	/**
+	 * Get the filters defined on the router.
+	 *
+	 * @return array
+	 */
+	public function getFilters()
+	{
+		return $this->filters;
+	}
+
+	/**
+	 * Get the global filters defined on the router.
+	 *
+	 * @return array
+	 */
+	public function getGlobalFilters()
+	{
+		return $this->globalFilters;
+	}
+
+	/**
 	 * Create a new URL matcher instance.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
