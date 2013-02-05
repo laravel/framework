@@ -25,12 +25,12 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/path', $c->getPath());
 
 		$c2 = $cookie->forever('color', 'blue');
-		$value = $cookie->getEncrypter()->decrypt($c->getValue());
+		$value = $cookie->getEncrypter()->decrypt($c2->getValue());
 		$this->assertEquals('blue', $value);
-		$this->assertFalse($c->isHttpOnly());
-		$this->assertTrue($c->isSecure());
-		$this->assertEquals('/domain', $c->getDomain());
-		$this->assertEquals('/path', $c->getPath());
+		$this->assertFalse($c2->isHttpOnly());
+		$this->assertTrue($c2->isSecure());
+		$this->assertEquals('/domain', $c2->getDomain());
+		$this->assertEquals('/path', $c2->getPath());
 	}
 
 
