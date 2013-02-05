@@ -317,7 +317,7 @@ class Blueprint {
 	 */
 	public function increments($column)
 	{
-		return $this->integer($column, true);
+		return $this->integer($column, true, true);
 	}
 
 	/**
@@ -349,9 +349,9 @@ class Blueprint {
 	 * @param  string  $column
 	 * @return Illuminate\Support\Fluent
 	 */
-	public function integer($column, $autoIncrement = false)
+	public function integer($column, $autoIncrement = false, $unsigned = false)
 	{
-		return $this->addColumn('integer', $column, compact('autoIncrement'));
+		return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
 	}
 
 	/**
