@@ -67,21 +67,6 @@ error_reporting(-1);
 
 /*
 |--------------------------------------------------------------------------
-| Load The Illuminate Facades
-|--------------------------------------------------------------------------
-|
-| The facades provide a terser static interface over the various parts
-| of the application, allowing their methods to be accessed through
-| a mixtures of magic methods and facade derivatives. It's slick.
-|
-*/
-
-Facade::clearResolvedInstances();
-
-Facade::setFacadeApplication($app);
-
-/*
-|--------------------------------------------------------------------------
 | Register The Configuration Loader
 |--------------------------------------------------------------------------
 |
