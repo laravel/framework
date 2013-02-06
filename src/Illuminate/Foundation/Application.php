@@ -25,7 +25,7 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Singleton instance
 	 */
-	private static $Current;
+	protected static $Current = null;
 
 	/**
 	 * Facade function, get singleton of Application
