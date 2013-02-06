@@ -56,7 +56,7 @@ class Route extends Facade {
 	 * @return Illuminate\Routing\Router
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['router'];
+		return \Illuminate\Foundation\Application::Current()['router'];
 	}
 
 }

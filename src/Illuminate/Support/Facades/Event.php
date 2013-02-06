@@ -5,10 +5,10 @@ class Event extends Facade {
 	/**
 	 * Get the registered component 'events'.
 	 *
-	 * @return Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Events\Dispatcher
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['events'];
+		return \Illuminate\Foundation\Application::Current()['events'];
 	}
 
 }

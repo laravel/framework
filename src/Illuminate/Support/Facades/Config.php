@@ -5,10 +5,10 @@ class Config extends Facade {
 	/**
 	 * Get the registered component 'config'.
 	 *
-	 * @return Illuminate\Config\
+	 * @return \Illuminate\Config\
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['config'];
+		return \Illuminate\Foundation\Application::Current()['config'];
 	}
 
 }

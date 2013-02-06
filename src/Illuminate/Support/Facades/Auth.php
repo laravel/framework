@@ -5,10 +5,10 @@ class Auth extends Facade {
 	/**
 	 * Get the registered component 'auth'.
 	 *
-	 * @return Illuminate\Auth\
+	 * @return \Illuminate\Auth\AuthManager
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['auth'];
+		return \Illuminate\Foundation\Application::Current()['auth'];
 	}
 
 }

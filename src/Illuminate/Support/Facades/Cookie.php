@@ -5,10 +5,10 @@ class Cookie extends Facade {
 	/**
 	 * Get the registered component 'cookie'.
 	 *
-	 * @return Illuminate\Cookie\CookieJar
+	 * @return \Illuminate\Cookie\CookieJar
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['cookie'];
+		return \Illuminate\Foundation\Application::Current()['cookie'];
 	}
 
 }

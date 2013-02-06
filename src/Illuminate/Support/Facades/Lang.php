@@ -3,12 +3,12 @@
 class Lang extends Facade {
 
 	/**
-	 * Get the registered component 'hash'.
+	 * Get the registered component 'translator'.
 	 *
-	 * @return Illuminate\Hashing\HasherInterface
+	 * @return \Illuminate\Translation\Translator
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['translator'];
+		return \Illuminate\Foundation\Application::Current()['translator'];
 	}
 
 }

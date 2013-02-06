@@ -5,10 +5,10 @@ class Log extends Facade {
 	/**
 	 * Get the registered component 'log'.
 	 *
-	 * @return Illuminate\Log\Writer
+	 * @return \Illuminate\Log\Writer
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['log'];
+		return \Illuminate\Foundation\Application::Current()['log'];
 	}
 
 }

@@ -22,7 +22,7 @@ class Input extends Facade {
 	 * @return Illuminate\Http\Request
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['request'];
+		return \Illuminate\Foundation\Application::Current()['request'];
 	}
 
 }

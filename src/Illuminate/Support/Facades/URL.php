@@ -8,7 +8,7 @@ class URL extends Facade {
 	 * @return Illuminate\Routing\UrlGenerator
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['url'];
+		return \Illuminate\Foundation\Application::Current()['url'];
 	}
 
 }

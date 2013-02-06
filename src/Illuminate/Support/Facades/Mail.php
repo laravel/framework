@@ -5,10 +5,10 @@ class Mail extends Facade {
 	/**
 	 * Get the registered component 'mailer'.
 	 *
-	 * @return Illuminate\Mail\Mailer
+	 * @return \Illuminate\Mail\Mailer
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['mailer'];
+		return \Illuminate\Foundation\Application::Current()['mailer'];
 	}
 
 }

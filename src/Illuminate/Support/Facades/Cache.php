@@ -5,10 +5,10 @@ class Cache extends Facade {
 	/**
 	 * Get the registered component 'cache'.
 	 *
-	 * @return Illuminate\Cache\CacheManager
+	 * @return \Illuminate\Cache\CacheManager
 	 */
 	public static function Current() {
-		return Illuminate\Foundation\Application::Current()['cache'];
+		return \Illuminate\Foundation\Application::Current()['cache'];
 	}
 
 }
