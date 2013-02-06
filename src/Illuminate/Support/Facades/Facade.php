@@ -6,7 +6,7 @@ abstract class Facade {
 	 * Facade function for a Singleton, or registered component
 	 */
 	public static function getCurrent() {
-		throw new \RuntimeException("Facade does not implement Current method.");
+		throw new \RuntimeException("Facade does not implement static getCurrent method.");
 	}
 	
 	/**

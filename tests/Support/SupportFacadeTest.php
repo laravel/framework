@@ -17,9 +17,9 @@ class FacadeStub extends Illuminate\Support\Facades\Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor()
+	protected static function getCurrent()
 	{
-		return 'foo';
+		return new ApplicationStub;
 	}
 
 }
