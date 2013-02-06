@@ -9,8 +9,8 @@ class View extends Facade
 	 *
 	 * @return Illuminate\View\Environment
 	 */
-	public static function Current() {
-		return Application::Current()['view'];
+	public static function getCurrent() {
+		return Application::getCurrent()['view'];
 	}
 
 }

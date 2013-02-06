@@ -7,8 +7,8 @@ class Artisan extends Facade {
 	 *
 	 * @return \Illuminate\Console\Application
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['artisan'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['artisan'];
 	}
 	
 }

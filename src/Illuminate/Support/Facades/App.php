@@ -7,8 +7,8 @@ class App extends Facade {
 	 *
 	 * @return \Illuminate\Foundation\Application
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current();
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent();
 	}
 
 }

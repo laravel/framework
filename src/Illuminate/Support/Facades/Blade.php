@@ -7,8 +7,8 @@ class Blade extends Facade {
 	 *
 	 * @return \Illuminate\View\Compilers\BladeCompiler
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['view']->getEngineResolver()->resolve('blade')->getCompiler();
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['view']->getEngineResolver()->resolve('blade')->getCompiler();
 	}
 
 }

@@ -13,7 +13,7 @@ class Input extends Facade {
 	 */
 	public static function get($key = null, $default = null)
 	{
-		return static::Current()->input($key, $default);
+		return static::getCurrent()->input($key, $default);
 	}
 
 	/**
@@ -21,8 +21,8 @@ class Input extends Facade {
 	 *
 	 * @return Illuminate\Http\Request
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['request'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['request'];
 	}
 
 }

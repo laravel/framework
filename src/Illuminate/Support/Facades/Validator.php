@@ -7,8 +7,8 @@ class Validator extends Facade {
 	 *
 	 * @return Illuminate\Validation\Factory
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['validator'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['validator'];
 	}
 
 }

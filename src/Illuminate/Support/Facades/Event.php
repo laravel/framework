@@ -7,8 +7,8 @@ class Event extends Facade {
 	 *
 	 * @return \Illuminate\Events\Dispatcher
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['events'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['events'];
 	}
 
 }

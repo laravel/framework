@@ -12,7 +12,7 @@ class Schema extends Facade {
 	 */
 	public static function connection($name)
 	{
-		return Application::Current()['db']->connection($name)->getSchemaBuilder();
+		return Application::getCurrent()['db']->connection($name)->getSchemaBuilder();
 	}
 
 	/**
@@ -20,8 +20,8 @@ class Schema extends Facade {
 	 *
 	 * @return Illuminate\Database\Schema\Builder
 	 */
-	public static function Current() {
-		return Application::Current()['db']->connection()->getSchemaBuilder();;
+	public static function getCurrent() {
+		return Application::getCurrent()['db']->connection()->getSchemaBuilder();;
 	}
 
 }

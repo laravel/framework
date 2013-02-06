@@ -7,8 +7,8 @@ class File extends Facade {
 	 *
 	 * @return \Illuminate\Filesystem\Filesystem
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['files'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['files'];
 	}
 
 }

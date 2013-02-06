@@ -7,8 +7,8 @@ class Lang extends Facade {
 	 *
 	 * @return \Illuminate\Translation\Translator
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['translator'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['translator'];
 	}
 
 }

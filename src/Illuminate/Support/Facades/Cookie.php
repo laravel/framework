@@ -7,8 +7,8 @@ class Cookie extends Facade {
 	 *
 	 * @return \Illuminate\Cookie\CookieJar
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['cookie'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['cookie'];
 	}
 
 }

@@ -7,8 +7,8 @@ class DB extends Facade {
 	 *
 	 * @return \Illuminate\db\
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['db'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['db'];
 	}
 
 }

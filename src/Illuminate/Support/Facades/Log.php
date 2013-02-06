@@ -7,8 +7,8 @@ class Log extends Facade {
 	 *
 	 * @return \Illuminate\Log\Writer
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['log'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['log'];
 	}
 
 }

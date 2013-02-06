@@ -7,8 +7,8 @@ class Mail extends Facade {
 	 *
 	 * @return \Illuminate\Mail\Mailer
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['mailer'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['mailer'];
 	}
 
 }

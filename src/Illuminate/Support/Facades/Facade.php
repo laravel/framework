@@ -5,7 +5,7 @@ abstract class Facade {
 	/**
 	 * Facade function for a Singleton, or registered component
 	 */
-	public static function Current() {
+	public static function getCurrent() {
 		throw new \RuntimeException("Facade does not implement Current method.");
 	}
 	
@@ -18,7 +18,7 @@ abstract class Facade {
 	 */
 	public static function __callStatic($method, $args)
 	{
-		return call_user_func_array(array(static::Current(), $method), $args);
+		return call_user_func_array(array(static::getCurrent(), $method), $args);
 	}
 
 }

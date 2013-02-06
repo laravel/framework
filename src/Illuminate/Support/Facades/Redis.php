@@ -7,8 +7,8 @@ class Redis extends Facade {
 	 *
 	 * @return \Illuminate\Redis\RedisManager
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['redis'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['redis'];
 	}
 
 }

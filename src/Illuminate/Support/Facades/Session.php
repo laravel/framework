@@ -7,8 +7,8 @@ class Session extends Facade {
 	 *
 	 * @return Illuminate\Session\SessionManager
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['session'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['session'];
 	}
 
 }

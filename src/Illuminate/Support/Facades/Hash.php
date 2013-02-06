@@ -7,8 +7,8 @@ class Hash extends Facade {
 	 *
 	 * @return \Illuminate\Hashing\HasherInterface
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['hash'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['hash'];
 	}
 
 }

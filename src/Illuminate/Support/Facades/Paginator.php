@@ -7,8 +7,8 @@ class Paginator extends Facade {
 	 *
 	 * @return \Illuminate\Pagination\Environment
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['paginator'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['paginator'];
 	}
 
 }

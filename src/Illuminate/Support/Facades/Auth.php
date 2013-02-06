@@ -7,8 +7,8 @@ class Auth extends Facade {
 	 *
 	 * @return \Illuminate\Auth\AuthManager
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['auth'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['auth'];
 	}
 
 }

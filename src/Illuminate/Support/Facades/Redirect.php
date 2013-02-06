@@ -7,8 +7,8 @@ class Redirect extends Facade {
 	 *
 	 * @return \Illuminate\Routing\Redirector
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['redirect'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['redirect'];
 	}
 
 }

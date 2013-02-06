@@ -7,8 +7,8 @@ class Cache extends Facade {
 	 *
 	 * @return \Illuminate\Cache\CacheManager
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['cache'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['cache'];
 	}
 
 }

@@ -7,8 +7,8 @@ class Queue extends Facade {
 	 *
 	 * @return \Illuminate\Queue\QueueManager
 	 */
-	public static function Current() {
-		return \Illuminate\Foundation\Application::Current()['queue'];
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['queue'];
 	}
 
 }

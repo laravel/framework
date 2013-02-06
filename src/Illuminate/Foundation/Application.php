@@ -25,24 +25,24 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Singleton instance
 	 */
-	private static $Current = null;
-  
+	private static $Current;
+
 	/**
-	 * Facade function: Get instance of Application
-         * Set instance of Application, returns old instance
-	 *
-	 * @param Application  $newCurrent = null
-	 * @return Application
+	 * Facade function, get singleton of Application
 	 */
-	public static function Current($newCurrent = null) {
+	public static function getCurrent() {    
+		return static::$Current;
+	}
+
+	public static function setCurrent($newCurrent) {
 		$current = static::$Current;
-    
+		
 		if ($newCurrent !== null) {
 			// Force this to be only in testing environment?
 			static::$Current = $newCurrent;
 		}
-
-		return $current;  // return only current or the old current
+		
+		return $current;
 	}
 
 	/**
@@ -88,7 +88,7 @@ class Application extends Container implements HttpKernelInterface {
 	public function __construct()
 	{
 		// Auto push master Application
-		if (static::$Current == null) static::$Current = $this;
+		if (static::getCurrent() == null) static::setCurrent($this);
 
 		$this['request'] = Request::createFromGlobals();
 
