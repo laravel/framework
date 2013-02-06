@@ -3,10 +3,12 @@
 class DB extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'db'.
 	 *
-	 * @return string
+	 * @return Illuminate\db\
 	 */
-	protected static function getFacadeAccessor() { return 'db'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['db'];
+	}
 
 }

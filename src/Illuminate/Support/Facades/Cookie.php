@@ -3,10 +3,12 @@
 class Cookie extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'cookie'.
 	 *
-	 * @return string
+	 * @return Illuminate\Cookie\CookieJar
 	 */
-	protected static function getFacadeAccessor() { return 'cookie'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['cookie'];
+	}
 
 }

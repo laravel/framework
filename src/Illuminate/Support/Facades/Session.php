@@ -3,10 +3,12 @@
 class Session extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'session'.
 	 *
-	 * @return string
+	 * @return Illuminate\Session\SessionManager
 	 */
-	protected static function getFacadeAccessor() { return 'session'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['session'];
+	}
 
 }

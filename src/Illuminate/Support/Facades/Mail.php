@@ -3,10 +3,12 @@
 class Mail extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'mailer'.
 	 *
-	 * @return string
+	 * @return Illuminate\Mail\Mailer
 	 */
-	protected static function getFacadeAccessor() { return 'mailer'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['mailer'];
+	}
 
 }

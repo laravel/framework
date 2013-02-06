@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Foundation\Application;
+
 class Route extends Facade {
 
 	/**
@@ -11,7 +13,7 @@ class Route extends Facade {
 	 */
 	public static function filter($name, $callback)
 	{
-		return static::$app['router']->addFilter($name, $callback);
+		return static::addFilter($name, $callback);
 	}
 
 	/**
@@ -23,7 +25,7 @@ class Route extends Facade {
 	 */
 	public static function when($pattern, $name)
 	{
-		return static::$app['router']->matchFilter($pattern, $name);
+		return static::matchFilter($pattern, $name);
 	}
 
 	/**
@@ -34,7 +36,7 @@ class Route extends Facade {
 	 */
 	public static function is($name)
 	{
-		return static::$app['router']->currentRouteNamed($name);
+		return static::currentRouteNamed($name);
 	}
 
 	/**
@@ -45,14 +47,16 @@ class Route extends Facade {
 	 */
 	public static function uses($action)
 	{
-		return static::$app['router']->currentRouteUses($action);
+		return static::currentRouteUses($action);
 	}
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'router'.
 	 *
-	 * @return string
+	 * @return Illuminate\Routing\Router
 	 */
-	protected static function getFacadeAccessor() { return 'router'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['router'];
+	}
 
 }

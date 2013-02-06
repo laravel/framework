@@ -3,10 +3,12 @@
 class Redis extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'redis'.
 	 *
-	 * @return string
+	 * @return Illuminate\Redis\RedisManager
 	 */
-	protected static function getFacadeAccessor() { return 'redis'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['redis'];
+	}
 
 }

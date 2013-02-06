@@ -3,10 +3,12 @@
 class File extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'files'.
 	 *
-	 * @return string
+	 * @return Illuminate\Filesystem\Filesystem
 	 */
-	protected static function getFacadeAccessor() { return 'files'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['files'];
+	}
 
 }

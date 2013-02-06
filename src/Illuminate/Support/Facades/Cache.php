@@ -3,10 +3,12 @@
 class Cache extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'cache'.
 	 *
-	 * @return string
+	 * @return Illuminate\Cache\CacheManager
 	 */
-	protected static function getFacadeAccessor() { return 'cache'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['cache'];
+	}
 
 }

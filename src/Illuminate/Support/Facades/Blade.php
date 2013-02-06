@@ -3,13 +3,12 @@
 class Blade extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Resolve a BladeCompiler from the registered component 'view'.
 	 *
-	 * @return string
+	 * @return Illuminate\View\Compilers\BladeCompiler
 	 */
-	protected static function getFacadeAccessor()
-	{
-		return static::$app['view']->getEngineResolver()->resolve('blade')->getCompiler();
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['view']->getEngineResolver()->resolve('blade')->getCompiler();
 	}
 
 }

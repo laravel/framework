@@ -3,10 +3,12 @@
 class Paginator extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'paginator'.
 	 *
-	 * @return string
+	 * @return Illuminate\Pagination\Environment
 	 */
-	protected static function getFacadeAccessor() { return 'paginator'; }
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['paginator'];
+	}
 
 }

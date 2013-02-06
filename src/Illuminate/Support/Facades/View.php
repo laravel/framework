@@ -1,12 +1,16 @@
 <?php namespace Illuminate\Support\Facades;
 
-class View extends Facade {
+use Illuminate\Foundation\Application;
+
+class View extends Facade 
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'view'.
 	 *
-	 * @return string
+	 * @return Illuminate\View\Environment
 	 */
-	protected static function getFacadeAccessor() { return 'view'; }
+	public static function Current() {
+		return Application::Current()['view'];
+	}
 
 }

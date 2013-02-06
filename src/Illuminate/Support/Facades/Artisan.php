@@ -3,10 +3,12 @@
 class Artisan extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'artisan'.
 	 *
-	 * @return string
+	 * @return Illuminate\Console\Application
 	 */
-	protected static function getFacadeAccessor() { return 'artisan'; }
-
+	public static function Current() {
+		return Illuminate\Foundation\Application::Current()['artisan'];
+	}
+	
 }
