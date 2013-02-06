@@ -104,4 +104,21 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo'), $result);
 	}
 
+
+	public function testDeferredServicesAreSetOnAppBeforeEagerServices()
+	{
+		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
+		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
+		$app = m::mock('Illuminate\Foundation\Application[register,setDeferredServices,runningInConsole]');
+		$provider = m::mock('Illuminate\Support\ServiceProvider');
+		$repo->shouldReceive('createProvider')->once()->with($app, 'foo')->andReturn($provider);
+		$app->shouldReceive('runningInConsole')->andReturn(false);
+
+		$app->shouldReceive('setDeferredServices')->ordered()->once()->with(array('deferred'));
+		$app->shouldReceive('register')->once()->ordered()->with($provider);
+
+		$repo->load($app, array());
+	}
+
 }
