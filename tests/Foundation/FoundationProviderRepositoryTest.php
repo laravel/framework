@@ -116,7 +116,7 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$app->shouldReceive('runningInConsole')->andReturn(false);
 
 		$app->shouldReceive('setDeferredServices')->ordered()->once()->with(array('deferred'));
-		$app->shouldReceive('register')->once()->ordered()->with($provider);
+		$app->shouldReceive('register')->ordered()->once()->with($provider);
 
 		$repo->load($app, array());
 	}
