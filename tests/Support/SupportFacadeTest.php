@@ -13,11 +13,11 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 class FacadeStub extends Illuminate\Support\Facades\Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component.
 	 *
 	 * @return string
 	 */
-	public static function getCurrent()
+	public static function getCurrent()  // facaded Singleton
 	{
 		return ApplicationStub::getCurrent();
 	}
@@ -26,7 +26,7 @@ class FacadeStub extends Illuminate\Support\Facades\Facade {
 
 class ApplicationStub {
 
-	protected $Current;
+	protected static $Current;  // real Singleton
 
 	public static function getCurrent()
 	{
@@ -34,7 +34,7 @@ class ApplicationStub {
 	}
 
 	public function __construct() {
-		$Current = $this;
+		static::$Current = $this;
 	}
 
 	public function bar()
