@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
+class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
