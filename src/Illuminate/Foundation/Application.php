@@ -87,6 +87,9 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function __construct()
 	{
+		// Auto push master Application
+		if (static::$Current == null) static::$Current = $this;
+
 		$this['request'] = Request::createFromGlobals();
 
 		// The exception handler class takes care of determining which of the bound
