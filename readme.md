@@ -26,7 +26,7 @@
 - Added `Config::hasGroup` method.
 - Added `DB::unprepared` method for running raw, unprepared queries against PDO.
 - Allow `:key` place-holder in MessageBag messages.
-- Added `Auth::validate` method for validating credentials without logging in.fatal
+- Added `Auth::validate` method for validating credentials without logging in.
 - Added `Auth::stateless` method for logging in for a single request without sessions or cookies.
 - Added `DB::extend` method for adding custom connection resolvers.
 - Added `each` and `filter` methods to Eloquent collections.
@@ -51,4 +51,4 @@
 - Added SQL and bindings array to database query exceptions.
 - Allow manipulation of session using "dot" notation.
 - Route regular expression constraints may now be defined globally via `Route::pattern`.
-- Auto-increment fields are now unsigned if the databsae system supports it.
+- Auto-increment fields are now unsigned if the database system supports it.
