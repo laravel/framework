@@ -4,7 +4,7 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 
 	public function testFacadeCallsUnderlyingApplication()
 	{
-		FacadeStub::setFacadeApplication(array('foo' => new ApplicationStub));
+		new ApplicationStub;
 		$this->assertEquals('baz', FacadeStub::bar());
 	}
 
@@ -19,12 +19,23 @@ class FacadeStub extends Illuminate\Support\Facades\Facade {
 	 */
 	public static function getCurrent()
 	{
-		return new ApplicationStub;
+		return ApplicationStub::getCurrent();
 	}
 
 }
 
 class ApplicationStub {
+
+	protected $Current;
+
+	public static function getCurrent()
+	{
+		return static::$Current;
+	}
+
+	public function __construct() {
+		$Current = $this;
+	}
 
 	public function bar()
 	{
