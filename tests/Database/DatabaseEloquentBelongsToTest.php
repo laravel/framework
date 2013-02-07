@@ -27,7 +27,8 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	public function testEagerConstraintsAreProperlyAdded()
 	{
 		$relation = $this->getRelation();
-		$relation->getQuery()->shouldReceive('whereIn')->once()->with('id', array('foreign.value', 'foreign.value.two'));
+		$relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
+		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.id', array('foreign.value', 'foreign.value.two'));
 		$models = array(new EloquentBelongsToModelStub, new EloquentBelongsToModelStub, new AnotherEloquentBelongsToModelStub);
 		$relation->addEagerConstraints($models);
 	}

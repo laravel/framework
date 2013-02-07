@@ -66,6 +66,8 @@ class BelongsTo extends Relation {
 		// our eagerly loading query so it returns the proper models from execution.
 		$key = $this->related->getKeyName();
 
+		$key = $this->related->getTable().'.'.$key;
+
 		$this->query->whereIn($key, $this->getEagerModelKeys($models));
 	}
 
