@@ -430,19 +430,19 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
-	public function giveListItems($value)
+	public function getListItemsAttribute($value)
 	{
 		return json_decode($value, true);
 	}
-	public function takeListItems($value)
+	public function setListItemsAttribute($value)
 	{
 		$this->attributes['list_items'] = json_encode($value);
 	}
-	public function givePassword()
+	public function getPasswordAttribute()
 	{
 		return '******';
 	}
-	public function takePassword($value)
+	public function setPasswordAttribute($value)
 	{
 		$this->attributes['password_hash'] = md5($value);
 	}

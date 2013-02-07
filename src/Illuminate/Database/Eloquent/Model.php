@@ -880,7 +880,9 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		// retrieval from the model to a form that is more useful for usage.
 		if ($this->hasGetMutator($key))
 		{
-			return $this->{'give'.camel_case($key)}($value);
+			$accessor = 'get'.camel_case($key).'Attribute';
+
+			return $this->{$accessor}($value);
 		}
 
 		// If the attribute is listed as a date, we will convert it to a DateTime
@@ -916,7 +918,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function hasGetMutator($key)
 	{
-		return method_exists($this, 'give'.camel_case($key));
+		return method_exists($this, 'get'.camel_case($key).'Attribute');
 	}
 
 	/**
@@ -933,7 +935,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		// the model, such as "json_encoding" an listing of data for storage.
 		if ($this->hasSetMutator($key))
 		{
-			$method = 'take'.camel_case($key);
+			$method = 'set'.camel_case($key).'Attribute';
 
 			return $this->{$method}($value);
 		}
@@ -960,7 +962,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function hasSetMutator($key)
 	{
-		return method_exists($this, 'take'.camel_case($key));
+		return method_exists($this, 'set'.camel_case($key).'Attribute');
 	}
 
 	/**
