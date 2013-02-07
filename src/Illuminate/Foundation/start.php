@@ -91,9 +91,9 @@ Facade::setFacadeApplication($app);
 |
 */
 
-$app->bindIf('config.loader', function($app) use ($appPath)
+$app->bindIf('config.loader', function($app)
 {
-	return new FileLoader(new Filesystem, $appPath.'/config');
+	return new FileLoader(new Filesystem, $app['path'].'/config');
 
 }, true);
 
@@ -207,7 +207,7 @@ $app->boot();
 |
 */
 
-$path = $appPath.'/start/global.php';
+$path = $app['path'].'/start/global.php';
 
 if (file_exists($path)) require $path;
 
@@ -222,7 +222,7 @@ if (file_exists($path)) require $path;
 |
 */
 
-$path = $appPath."/start/{$env}.php";
+$path = $app['path']."/start/{$env}.php";
 
 if (file_exists($path)) require $path;
 
@@ -237,4 +237,4 @@ if (file_exists($path)) require $path;
 |
 */
 
-require $appPath.'/routes.php';
+require $app['path'].'/routes.php';

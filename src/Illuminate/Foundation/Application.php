@@ -77,6 +77,21 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Bind the installation paths to the application.
+	 *
+	 * @param  array  $paths
+	 * @return void
+	 */
+	public function bindInstallPaths(array $paths)
+	{
+		$this->instance('path', $paths['app']);
+
+		$this->instance('path.base', $paths['base']);
+
+		$this->instance('path.public', $paths['public']);
+	}
+
+	/**
 	 * Get the application bootstrap file.
 	 *
 	 * @return string
