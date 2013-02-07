@@ -48,7 +48,7 @@ class ProviderRepository {
 		// provides. This is used to know which services are "deferred" loaders.
 		if ($this->shouldRecompile($manifest, $providers))
 		{
-			$manifest = $this->compileManifest($app, $providers);	
+			$manifest = $this->compileManifest($app, $providers);
 		}
 
 		// If the application is running in the console, we will not lazy load any of
@@ -59,6 +59,8 @@ class ProviderRepository {
 			$manifest['eager'] = $manifest['providers'];
 		}
 
+		$app->setDeferredServices($manifest['deferred']);
+
 		// We will go ahead and register all of the eagerly loaded providers with the
 		// application so their services can be registered with the application as
 		// a provided service. Then we will set the deferred service list on it.
@@ -66,8 +68,6 @@ class ProviderRepository {
 		{
 			$app->register($this->createProvider($app, $provider));
 		}
-
-		$app->setDeferredServices($manifest['deferred']);
 	}
 
 	/**
