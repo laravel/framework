@@ -60,7 +60,7 @@ class SeedCommand extends Command {
 	 *
 	 * @return DatabaseSeeder
 	 */
-	protected function getSeeeder()
+	protected function getSeeder()
 	{
 		return $this->laravel->make($this->input->getOption('class'));
 	}
