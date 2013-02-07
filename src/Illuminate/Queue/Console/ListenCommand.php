@@ -48,8 +48,6 @@ class ListenCommand extends Command {
 	 */
 	public function fire()
 	{
-		$queue = $this->input->getOption('queue');
-
 		$delay = $this->input->getOption('delay');
 
 		// The memory limit is the amount of memory we will allow the script to occupy
@@ -59,21 +57,19 @@ class ListenCommand extends Command {
 
 		$connection = $this->input->getArgument('connection');
 
-		$this->listener->listen($connection, $queue, $delay, $memory);
+		$this->listener->listen($connection, $this->getQueue(), $delay, $memory);
 	}
 
 	/**
-	 * Listen to the given queue connection.
+	 * Get the name of the queue connection to listen on.
 	 *
-	 * @param  string  $connection
-	 * @param  string  $queue
-	 * @param  int     $delay
-	 * @param  int     $memory
-	 * @return void
+	 * @return string
 	 */
-	public function listen($connection, $queue, $delay, $memory)
+	protected function getQueue()
 	{
+		$queue = $this->input->getOption('queue');
 
+		return $queue ?: $this->laravel['config']['queue.default'];
 	}
 
 	/**
@@ -83,10 +79,8 @@ class ListenCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		$default = $this->laravel['config']['queue.default'];
-
 		return array(
-			array('connection', InputArgument::OPTIONAL, 'The name of connection', $default),
+			array('connection', InputArgument::OPTIONAL, 'The name of connection'),
 		);
 	}
 

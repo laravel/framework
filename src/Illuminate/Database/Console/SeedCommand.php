@@ -48,7 +48,7 @@ class SeedCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->resolver->setDefaultConnection($this->input->getOption('database'));
+		$this->resolver->setDefaultConnection($this->getDatabase());
 
 		$this->getSeeder()->run();
 
@@ -66,18 +66,28 @@ class SeedCommand extends Command {
 	}
 
 	/**
+	 * Get the name of the database connection to use.
+	 *
+	 * @return string
+	 */
+	protected function getDatabase()
+	{
+		$database = $this->input->getOption('database');
+
+		return $database ?: $this->laravel['config']['database.default'];
+	}
+
+	/**
 	 * Get the console command options.
 	 *
 	 * @return array
 	 */
 	protected function getOptions()
 	{
-		$default = $this->laravel['config']['database.default'];
-
 		return array(
 			array('class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'),
 
-			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed', $default),
+			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'),
 		);
 	}
 
