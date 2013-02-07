@@ -695,6 +695,17 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Set the table prefix in use by the connection.
+	 *
+	 * @param  string  $prefix
+	 * @return void
+	 */
+	public function setTablePrefix($prefix)
+	{
+		$this->tablePrefix = $prefix;
+	}
+
+	/**
 	 * Set the table prefix and return the grammar.
 	 *
 	 * @param  Illuminate\Database\Grammar  $grammar
