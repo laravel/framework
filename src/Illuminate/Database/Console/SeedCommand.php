@@ -72,10 +72,12 @@ class SeedCommand extends Command {
 	 */
 	protected function getOptions()
 	{
+		$default = $this->laravel['config']['database.default'];
+
 		return array(
 			array('class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'),
 
-			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'),
+			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed', $default),
 		);
 	}
 
