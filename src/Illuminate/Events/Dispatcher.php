@@ -1,11 +1,8 @@
 <?php namespace Illuminate\Events;
 
 use Illuminate\Container\Container;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyDispatcher;
 
-class Dispatcher extends SymfonyDispatcher {
+class Dispatcher {
 
 	/**
 	 * The IoC container instance.
@@ -35,7 +32,61 @@ class Dispatcher extends SymfonyDispatcher {
 	 */
 	public function listen($event, $listener, $priority = 0)
 	{
-		return $this->addListener($event, $listener, $priority);
+		$this->listeners[$event][$priority][] = $this->makeListener($listener);
+
+		unset($this->sorted[$event]);
+	}
+
+	/**
+	 * Determine if a given event has listeners.
+	 *
+	 * @param  string  $eventName
+	 * @return bool
+	 */
+	public function hasListeners($eventName)
+	{
+		return isset($this->listeners[$eventName]);
+	}
+
+	/**
+	 * Register an event subscriber with the dispatcher.
+	 *
+	 * @param  string  $subscriber
+	 * @return void
+	 */
+	public function subscribe($subscriber)
+	{
+		$subscriber = $this->resolveSubscriber($subscriber);
+
+		$subscriber->subscribe($this);
+	}
+
+	/**
+	 * Resolve the subscriber instance.
+	 *
+	 * @param  mixed  $subscriber
+	 * @return mixed
+	 */
+	protected function resolveSubscriber($subscriber)
+	{
+		if (is_string($subscriber))
+		{
+			return $this->container->make($subscriber);
+		}
+
+		return $subscriber;
+	}
+
+	/**
+	 * Fire an event until the first non-null response is returned.
+	 *
+	 * @param  string  $eventName
+	 * @param  array   $payload
+	 * @return mixed
+	 */
+	public function until($eventName, $payload = array())
+	{
+		return $this->fire($eventName, $payload, true);
 	}
 
 	/**
@@ -43,56 +94,89 @@ class Dispatcher extends SymfonyDispatcher {
 	 *
 	 * @param  string  $eventName
 	 * @param  mixed   $payload
-	 * @return Symfony\Component\EventDispatcher\Event
+	 * @return void
 	 */
-	public function fire($eventName, $payload = array())
+	public function fire($eventName, $payload = array(), $halt = false)
 	{
-		if ( ! $payload instanceof SymfonyEvent)
+		$responses = array();
+
+		foreach ($this->getListeners($eventName) as $listener)
 		{
-			$payload = new Event($payload);
+			$response = call_user_func_array($listener, $payload);
+
+			// If a response is returned from the listener and event halting is enabled
+			// we will just return this response, and not call the rest of the event
+			// listeners. Otherwise we will add the response on the response list.
+			if ( ! is_null($response) and $halt)
+			{
+				return $response;
+			}
+
+			// If a boolean false is returned from a listener, we will stop propogating
+			// the event to any further listeners down in the chain, else we keep on
+			// looping through the listeners and firing every one in our sequence.
+			if ($response === false)
+			{
+				break;
+			}
+
+			$responses[] = $response;
 		}
 
-		return parent::dispatch($eventName, $payload);
+		return $halt ? null : $responses;
 	}
 
 	/**
-	 * Register an event subscriber class.
+	 * Get all of the listeners for a given event name.
 	 *
-	 * @param  Symfony\Component\EventDispatcher\EventSubscriberInterface  $subscriber
-	 * @return void
+	 * @param  string  $eventName
+	 * @return array
 	 */
-	public function subscribe(EventSubscriberInterface $subscriber)
+	public function getListeners($eventName)
 	{
-		return parent::addSubscriber($subscriber);
+		if ( ! isset($this->sorted[$eventName]))
+		{
+			$this->sortListeners($eventName);
+		}
+
+		return $this->sorted[$eventName];
 	}
 
 	/**
-	 * Remove an event subscriber.
+	 * Sort the listeners for a given event by priority.
 	 *
-	 * @param  Symfony\Component\EventDispatcher\EventSubscriberInterface  $subscriber
-	 * @return void
+	 * @param  string  $eventName
+	 * @return array
 	 */
-	public function unsubscribe(EventSubscriberInterface $subscriber)
+	protected function sortListeners($eventName)
 	{
-		return parent::removeSubscriber($subscriber);
+		$this->sorted[$eventName] = array();
+
+		// If listeners exist for the given event, we will sort them by the priority
+		// so that we can call them in the correct order. We will cache off these
+		// sorted event listeners so we do not have to re-sort on every events.
+		if (isset($this->listeners[$eventName]))
+		{
+			krsort($this->listeners[$eventName]);
+
+			$this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
+		}
 	}
 
 	/**
 	 * Register an event listener with the dispatcher.
 	 *
-	 * @param  string  $event
 	 * @param  mixed   $listener
-	 * @param  int     $priority
 	 * @return void
 	 */
-	public function addListener($eventName, $listener, $priority = 0)
+	public function makeListener($listener)
 	{
 		if (is_string($listener))
 		{
 			$listener = $this->createClassListener($listener);
 		}
 
-		return parent::addListener($eventName, $listener, $priority);
+		return $listener;
 	}
 
 	/**
@@ -105,7 +189,7 @@ class Dispatcher extends SymfonyDispatcher {
 	{
 		$container = $this->container;
 
-		return function(SymfonyEvent $event) use ($listener, $container)
+		return function() use ($listener, $container)
 		{
 			// If the listener has an @ sign, we will assume it is being used to delimit
 			// the class name from the handle method name. This allows for handlers
@@ -114,7 +198,14 @@ class Dispatcher extends SymfonyDispatcher {
 
 			$method = count($segments) == 2 ? $segments[1] : 'handle';
 
-			$container->make($segments[0])->$method($event);
+			$callable = array($container->make($segments[0]), $method);
+
+			// We will make a callable of the listener instance and a method that should
+			// be called on that instance, then we will pass in the arguments that we
+			// received in this method into this listener class instance's methods.
+			$data = func_get_args();
+
+			return call_user_func_array($callable, $data);
 		};
 	}
 

@@ -162,9 +162,9 @@ abstract class ServiceProvider {
 		// give us the Artisan console instance which we will give commands to.
 		$events = $this->app['events'];
 
-		$events->listen('artisan.start', function($e) use ($commands)
+		$events->listen('artisan.start', function($artisan) use ($commands)
 		{
-			$e->artisan->resolveCommands($commands);
+			$artisan->resolveCommands($commands);
 		});
 	}
 

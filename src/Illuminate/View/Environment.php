@@ -270,7 +270,7 @@ class Environment {
 	 */
 	public function callComposer(View $view)
 	{
-		$this->events->fire('composing: '.$view->getName(), compact('view'));
+		$this->events->fire('composing: '.$view->getName(), array($view));
 	}
 
 	/**

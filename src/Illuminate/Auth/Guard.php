@@ -206,7 +206,7 @@ class Guard {
 		// based on the login and logout events fired from the guard instances.
 		if (isset($this->events))
 		{
-			$this->events->fire('auth.login', compact('user', 'remember'));
+			$this->events->fire('auth.login', array($user, $remember));
 		}
 
 		$this->user = $user;
@@ -248,7 +248,7 @@ class Guard {
 
 		if (isset($this->events))
 		{
-			$this->events->fire('auth.logout', array('user' => $this->user));
+			$this->events->fire('auth.logout', array($this->user));
 		}
 
 		$this->user = null;

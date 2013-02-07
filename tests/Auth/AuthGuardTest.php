@@ -57,7 +57,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $request));
 		$mock->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$events->shouldReceive('fire')->once()->with('auth.login', array('user' => $user, 'remember' => false));
+		$events->shouldReceive('fire')->once()->with('auth.login', array($user, false));
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
 		$mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
@@ -139,7 +139,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$mock->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->setUser($user);
-		$events->shouldReceive('fire')->once()->with('auth.logout', array('user' => $user));
+		$events->shouldReceive('fire')->once()->with('auth.logout', array($user));
 		$mock->logout();
 	}
 

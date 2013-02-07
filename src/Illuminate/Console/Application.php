@@ -35,7 +35,7 @@ class Application extends \Symfony\Component\Console\Application {
 		// register their commands on this application before it gets started.
 		if (isset($app['events']))
 		{
-			$app['events']->fire('artisan.start', compact('artisan'));
+			$app['events']->fire('artisan.start', array($artisan));
 		}
 
 		return $artisan;

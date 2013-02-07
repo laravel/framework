@@ -958,6 +958,17 @@ class Builder {
 	}
 
 	/**
+	 * Retrieve the average of the values of a given column.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function avg($column)
+	{
+		return $this->aggregate(__FUNCTION__, array($column));	
+	}
+
+	/**
 	 * Execute an aggregate function on the database.
 	 *
 	 * @param  string  $function
