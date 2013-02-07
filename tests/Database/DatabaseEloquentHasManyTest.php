@@ -49,7 +49,8 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	public function testEagerConstraintsAreProperlyAdded()
 	{
 		$relation = $this->getRelation();
-		$relation->getQuery()->shouldReceive('whereIn')->once()->with('foreign_key', array(1, 2));
+		$relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
+		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', array(1, 2));
 		$model1 = new EloquentHasManyModelStub;
 		$model1->id = 1;
 		$model2 = new EloquentHasManyModelStub;
