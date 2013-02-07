@@ -1,8 +1,6 @@
 <?php namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Database\Seeder;
-use Illuminate\Events\Dispatcher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -31,45 +29,16 @@ class SeedCommand extends Command {
 	protected $resolver;
 
 	/**
-	 * The database seeder instance.
-	 *
-	 * @var Illuminate\Database\Seeder
-	 */
-	protected $seeder;
-
-	/**
-	 * The event dispatcher instance.
-	 *
-	 * @var Illuminate\Events\Dispatcher
-	 */
-	protected $events;
-
-	/**
-	 * The path to the seed files.
-	 *
-	 * @var string
-	 */
-	protected $path;
-
-	/**
 	 * Create a new database seed command instance.
 	 *
 	 * @param  Illuminate\Database\ConnectionResolverInterface  $resolver
-	 * @param  Illuminate\Database\Seeder  $seeder
-	 * @param  Illuminate\Events\Dispatcher  $events
-	 * @param  string  $path
 	 * @return void
 	 */
-	public function __construct(Resolver $resolver, Seeder $seeder, Dispatcher $events, $path)
+	public function __construct(Resolver $resolver)
 	{
 		parent::__construct();
 
-		$this->path = $path;
-		$this->seeder = $seeder;
-		$this->events = $events;
 		$this->resolver = $resolver;
-
-		$this->registerSeedEventListener();
 	}
 
 	/**
@@ -79,28 +48,21 @@ class SeedCommand extends Command {
 	 */
 	public function fire()
 	{
-		$name = $this->input->getOption('database');
+		$this->resolver->setDefaultConnection($this->input->getOption('database'));
 
-		$total = $this->seeder->seed($this->resolver->connection($name), $this->path);
+		$this->getSeeder()->run();
 
-		if ($total == 0) $this->info('Nothing to seed.');
+		$this->info('Database seeded!');
 	}
 
 	/**
-	 * Register the seeding event listener.
+	 * Get a seeder instance from the container.
 	 *
-	 * @return void
+	 * @return DatabaseSeeder
 	 */
-	protected function registerSeedEventListener()
+	protected function getSeeeder()
 	{
-		$me = $this;
-
-		$this->events->listen('illuminate.seeding', function($e) use ($me)
-		{
-			$message = "<info>Seeded table:</info> {$e->table} ({$e->count} records)";
-
-			$me->getOutput()->writeln($message);
-		});
+		return $this->laravel->make($this->input->getOption('class'));
 	}
 
 	/**
@@ -111,6 +73,8 @@ class SeedCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'),
+
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'),
 		);
 	}

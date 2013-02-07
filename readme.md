@@ -52,3 +52,4 @@
 - Allow manipulation of session using "dot" notation.
 - Route regular expression constraints may now be defined globally via `Route::pattern`.
 - Auto-increment fields are now unsigned if the database system supports it.
+- Changed how database seeding works to give more freedom and allow use of Eloquent, etc.
