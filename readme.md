@@ -43,7 +43,7 @@
 - Added ability to specify `prefix` on a route group.
 - Added `setBaseUrl` method to pagination environment.
 - Eloquent Model and Collections objects now include JSON_NUMERIC_CHECK by default on `toJson` method.
-- Eloquent mutators are now prefixed with `give` and `take` instead of `get` and `set`. This is to avoid conflicts with other get and set methods on the model, and in your own code.
+- Eloquent mutators are now prefixed with `getFooAttribute` and `setFooAttribute` instead of `getFoo` and `setFoo`. This is to avoid conflicts with other get and set methods on the model, and in your own code.
 - Added `auth:reminders` Artisan command for generating a migration for the password reminders table.
 - Added `App::fatal` method for registering an error listener for PHP fatal errors.
 - Added `session:table` Artisan command for generating a migration for the session database table.
