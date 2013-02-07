@@ -360,11 +360,6 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function dispatch(Request $request)
 	{
-		// Before we handle the requests we need to make sure the application has been
-		// booted up. The boot process will call the "boot" method on each service
-		// provider giving them all a chance to register any application events.
-		if ( ! $this->booted) $this->boot();
-
 		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
@@ -394,9 +389,14 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function boot()
 	{
+		if ($this->booted) return;
+
+		// To boot the application we will simply spin through each service provider
+		// and call the boot method, which will give them a chance to override on
+		// something that was registered by another provider when it registers.
 		foreach ($this->serviceProviders as $provider)
 		{
-			$provider->boot($this);
+			$provider->boot();
 		}
 
 		$this->fireBootingCallbacks();
