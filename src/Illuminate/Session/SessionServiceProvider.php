@@ -75,7 +75,7 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		$app->booting(function($app)
 		{
-			$app['session']->start($app['cookie']);
+			$app['session']->start($app['cookie'], $app['config']['session.cookie']);
 		});
 	}
 

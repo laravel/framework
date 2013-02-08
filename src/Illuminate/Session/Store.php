@@ -83,9 +83,9 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * @param  Illuminate\CookieJar  $cookies
 	 * @return void
 	 */
-	public function start(CookieJar $cookies)
+	public function start(CookieJar $cookies, $name)
 	{
-		$id = $cookies->get($this->getCookieName());
+		$id = $cookies->get($name);
 
 		// If the session ID was available via the request cookies we'll just retrieve
 		// the session payload from the driver and check the given session to make
@@ -523,16 +523,6 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	public function setExists($value)
 	{
 		$this->exists = $value;
-	}
-
-	/**
-	 * Get the session cookie name.
-	 *
-	 * @return string
-	 */
-	public function getCookieName()
-	{
-		return $this->getCookieOption('name');
 	}
 
 	/**
