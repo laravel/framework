@@ -81,6 +81,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * Load the session for the request.
 	 *
 	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  string  $name
 	 * @return void
 	 */
 	public function start(CookieJar $cookies, $name)
@@ -377,7 +378,6 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * Finish the session handling for the request.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\CookieJar  $cookie
 	 * @param  int  $lifetime
 	 * @return void
 	 */
