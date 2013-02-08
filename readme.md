@@ -1,5 +1,9 @@
 # Laravel 4 Beta Change Log
 
+## Beta 4
+
+...
+
 ## Beta 3
 
 - Fixed a few things in the ArrayStore session driver.
