@@ -514,7 +514,7 @@ class EloquentModelScopedStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('where')->once()->with(array('foo', 'bar'))->andReturn($mock);
+		$mock->shouldReceive('where')->once()->with('foo', 'bar')->andReturn($mock);
 		$mock->shouldReceive('get')->once()->andReturn('baz');
 		return $mock;
 	}
