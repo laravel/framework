@@ -26,7 +26,7 @@ class ArrayStore extends CacheDrivenStore {
 	 * @param  int  $lifetime
 	 * @return void
 	 */
-	public function finish(Response $response, CookieJar $cookie, $lifetime)
+	public function finish(Response $response, $lifetime)
 	{
 		// No storage on array sessions...
 	}
