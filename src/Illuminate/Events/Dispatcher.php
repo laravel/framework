@@ -100,6 +100,8 @@ class Dispatcher {
 	{
 		$responses = array();
 
+		if ( ! is_array($payload)) $payload = array($payload);
+
 		foreach ($this->getListeners($eventName) as $listener)
 		{
 			$response = call_user_func_array($listener, $payload);
