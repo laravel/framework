@@ -183,14 +183,14 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($relation->detach(array(1, 2, 3)));
 	}
 
-
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
 	public function testDetachMethodExpectsArray()
 	{
 		$relation = $this->getRelation();
 		$notAnArray = 'foobar';
-		$this->expectError(new PatternExpectation("/must be an array/i"));
-
-		$this->assertTrue($relation->detach($notAnArray));
+		$relation->detach($notAnArray);
 	}
 
 
