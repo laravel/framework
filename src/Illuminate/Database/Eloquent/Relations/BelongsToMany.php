@@ -464,10 +464,10 @@ class BelongsToMany extends Relation {
 	/**
 	 * Detach models from the relationship.
 	 *
-	 * @param  int|array  $ids
+	 * @param  array  $ids
 	 * @return int
 	 */
-	public function detach($ids = array())
+	public function detach(array $ids = array())
 	{
 		if ($ids instanceof Model) $ids = (array) $ids->getKey();
 

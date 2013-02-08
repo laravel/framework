@@ -183,19 +183,14 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($relation->detach(array(1, 2, 3)));
 	}
 
-
-	public function testDetachMethodClearsAllPivotRecordsWhenNoIDsAreGiven()
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testDetachMethodExpectsArray()
 	{
 		$relation = $this->getRelation();
-		$query = m::mock('stdClass');
-		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
-		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-		$query->shouldReceive('whereIn')->never();
-		$query->shouldReceive('delete')->once()->andReturn(true);
-		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
-		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-
-		$this->assertTrue($relation->detach());
+		$notAnArray = 'foobar';
+		$relation->detach($notAnArray);
 	}
 
 
