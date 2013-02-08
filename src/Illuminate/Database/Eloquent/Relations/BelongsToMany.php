@@ -464,30 +464,26 @@ class BelongsToMany extends Relation {
 	/**
 	 * Detach models from the relationship.
 	 *
-	 * @param  int|array  $ids
+	 * @param  array  $ids
 	 * @return int
 	 */
-	public function detach($ids = array())
+	public function detach(array $ids = array())
 	{
 		if ($ids instanceof Model) $ids = (array) $ids->getKey();
 
+		$query = $this->newPivotQuery();
+
+		// If associated IDs were passed to the method we will only delete those
+		// associations, otherwise all of the association ties will be broken.
 		// We'll return the numbers of affected rows when we do the deletes.
-		// If no associated IDs were passed to the method we will just return 0,
-		// since no associated models will be detatched.
 		$ids = (array) $ids;
 
 		if (count($ids) > 0)
 		{
-			$query = $this->newPivotQuery();
-
 			$query->whereIn($this->otherKey, $ids);
+		}
 
-			return $query->delete();
-		}
-		else
-		{
-			return 0;
-		}
+		return $query->delete();
 	}
 
 	/**
