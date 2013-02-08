@@ -120,6 +120,13 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 * @var bool
 	 */
 	public $exists = false;
+	
+	/**
+	 * A query builder object used for assembling queries through scopes.
+	 * 
+	 * @var \Illuminate\Database\Eloquent\Builder
+	 */
+	protected $scopedQuery;
 
 	/**
 	 * The connection resolver instance.
@@ -569,6 +576,23 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		$builder->setModel($this)->with($this->with);
 
 		return $builder;
+	}
+	
+	/**
+	 * Return the current scoped query builder object.
+	 * 
+	 * This method creates the scoped query object if it doesn't exist.'
+	 * 
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopedQuery()
+	{
+		if ( ! isset($this->scopedQuery))
+		{
+			$this->scopedQuery = $this->newQuery();
+		}
+		
+		return $this->scopedQuery;
 	}
 
 	/**
@@ -1190,7 +1214,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function __call($method, $parameters)
 	{
-		$query = $this->newQuery();
+		$query = $this->scopedQuery();
 
 		return call_user_func_array(array($query, $method), $parameters);
 	}
