@@ -295,6 +295,17 @@ function csrf_token()
 }
 
 /**
+ * Escape HTML entities in a string.
+ *
+ * @param  string  $value
+ * @return string
+ */
+function e($value)
+{
+	return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+}
+
+/**
  * Determine if a given string ends with a given needle.
  *
  * @param string $haystack
