@@ -77,6 +77,19 @@ class Mailer {
 	}
 
 	/**
+	 * Send a new message when only a plain part.
+	 *
+	 * @param  string  $view
+	 * @param  array   $data
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function plain($view, array $data, $callback)
+	{
+		return $this->send(array('text' => $view), $data, $callback);
+	}
+
+	/**
 	 * Send a new message using a view.
 	 *
 	 * @param  string|array    $view
@@ -86,7 +99,10 @@ class Mailer {
 	 */
 	public function send($view, array $data, $callback)
 	{
-		if (is_array($view)) list($view, $plain) = $view;
+		// First we need to parse the view, which could either be a string or an array
+		// containing both an HTML and plain text versions of the view which should
+		// be used when sending an e-mail. We will extract both of them out here.
+		list($view, $plain) = $this->parseView($view);
 
 		$data['message'] = $message = $this->createMessage();
 
@@ -95,16 +111,64 @@ class Mailer {
 		// Once we have retrieved the view content for the e-mail we will set the body
 		// of this message using the HTML type, which will provide a simple wrapper
 		// to creating view based emails that are able to receive arrays of data.
-		$content = $this->getView($view, $data);
+		$this->addContent($message, $view, $plain, $data);
 
-		$message->setBody($content, 'text/html');
+		$message = $message->getSwiftMessage();
+
+		return $this->sendSwiftMessage($message);
+	}
+
+	/**
+	 * Add the content to a given message.
+	 *
+	 * @param  Illuminate\Mail\Message  $message
+	 * @param  string  $view
+	 * @param  string  $plain
+	 * @param  array   $data
+	 * @return void
+	 */
+	protected function addContent($message, $view, $plain, $data)
+	{
+		if (isset($view))
+		{
+			$message->setBody($this->getView($view, $data), 'text/html');
+		}
 
 		if (isset($plain))
 		{
 			$message->addPart($this->getView($plain, $data), 'text/plain');
 		}
+	}
 
-		return $this->sendSwiftMessage($message->getSwiftMessage());
+	/**
+	 * Parse the given view name or array.
+	 *
+	 * @param  string|array  $view
+	 * @return array
+	 */
+	protected function parseView($view)
+	{
+		if (is_string($view)) return array($view, null);
+
+		// If the given view is an array with numeric keys, we will just assume that
+		// both a "pretty" and "plain" view were provided, so we will return this
+		// array as is, since must should contain both views with numeric keys.
+		if (is_array($view) and isset($view[0]))
+		{
+			return $view;
+		}
+
+		// If the view is an array, but doesn't contain numeric keys, we will assume
+		// the the views are being explicitly specified and will extract them via
+		// named keys instead, allowing the developers to use one or the other.
+		elseif (is_array($view))
+		{
+			return array(
+				array_get($view, 'html'), array_get($view, 'text')
+			);
+		}
+		
+		throw new \InvalidArgumentException("Invalid view.");
 	}
 
 	/**
