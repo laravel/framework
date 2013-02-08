@@ -83,9 +83,9 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * @param  Illuminate\CookieJar  $cookies
 	 * @return void
 	 */
-	public function start(CookieJar $cookies)
+	public function start(CookieJar $cookies, $name)
 	{
-		$id = $cookies->get($this->getCookieName());
+		$id = $cookies->get($name);
 
 		// If the session ID was available via the request cookies we'll just retrieve
 		// the session payload from the driver and check the given session to make
@@ -381,7 +381,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * @param  int  $lifetime
 	 * @return void
 	 */
-	public function finish(Response $response, CookieJar $cookie, $lifetime)
+	public function finish(Response $response, $lifetime)
 	{
 		$time = $this->getCurrentTime();
 
@@ -413,8 +413,6 @@ abstract class Store implements TokenProvider, ArrayAccess {
 		{
 			$this->sweep($time - ($this->lifetime * 60));
 		}
-
-		$this->writeCookie($id, $response, $cookie, $lifetime);
 	}
 
 	/**
@@ -452,17 +450,14 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	/**
 	 * Write the session cookie to the response.
 	 *
-	 * @param  string  $id
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\Jar  $cookie
+	 * @param  Illuminate\Cookie\CookieJar  $cookie
+	 * @param  string  $name
 	 * @param  int  $lifetime
 	 * @return void
 	 */
-	protected function writeCookie($id, $response, $cookie, $lifetime)
+	public function getCookie(CookieJar $cookie, $name, $lifetime)
 	{
-		$name = $this->getCookieName();
-
-		$response->headers->setCookie($cookie->make($name, $id, $lifetime));
+		return $cookie->make($name, $this->getSessionId(), $lifetime);
 	}
 
 	/**
@@ -528,16 +523,6 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	public function setExists($value)
 	{
 		$this->exists = $value;
-	}
-
-	/**
-	 * Get the session cookie name.
-	 *
-	 * @return string
-	 */
-	public function getCookieName()
-	{
-		return $this->getCookieOption('name');
 	}
 
 	/**

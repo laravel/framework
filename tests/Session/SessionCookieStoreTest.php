@@ -16,9 +16,9 @@ class SessionCookieStoreTest extends PHPUnit_Framework_TestCase {
 	public function testRetrieveSessionProperlyRetrievesCookie()
 	{
 		$store = new CookieStore($cookies = m::mock('Illuminate\Cookie\CookieJar'));
-		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn(1);
+		$cookies->shouldReceive('get')->once()->with('name')->andReturn(1);
 		$cookies->shouldReceive('get')->once()->with('illuminate_payload')->andReturn(serialize($expect = array('id' => '1', 'data' => array('foo' => 'bar'), 'last_activity' => '9999999999')));
-		$store->start($cookies);
+		$store->start($cookies, 'name');
 		$this->assertEquals($expect, $store->getSession());
 	}
 
