@@ -59,16 +59,45 @@ class SessionServiceProvider extends ServiceProvider {
 		// the session "payloads", as well as writing them after each request.
 		if ( ! is_null($config['driver']))
 		{
-			$app->booting(function($app)
-			{
-				$app['session']->start($app['cookie']);
-			});
+			$this->registerBootingEvent($app);
 
-			$app->close(function($request, $response) use ($app, $config)
-			{
-				$app['session']->finish($response, $app['cookie'], $config['lifetime']);
-			});
+			$this->registerCloseEvent($app, $config);
 		}
+	}
+
+	/**
+	 * Register the session booting event.
+	 *
+	 * @param  Illuminate\Foundation\Application  $app
+	 * @return void
+	 */
+	protected function registerBootingEvent($app)
+	{
+		$app->booting(function($app)
+		{
+			$app['session']->start($app['cookie']);
+		});
+	}
+
+	/**
+	 * Register the session close event.
+	 *
+	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  array $config
+	 * @return void
+	 */
+	protected function registerCloseEvent($app, $config)
+	{
+		$app->close(function($request, $response) use ($app, $config)
+		{
+			$session = $app['session'];
+
+			$session->finish($response, $config['lifetime']);
+
+			$cookie = $session->getCookie($app['cookie'], $config['cookie'], $config['lifetime']);
+
+			$response->headers->setCookie($cookie);
+		});
 	}
 
 }
