@@ -59,3 +59,4 @@
 - Allow method specification on class based Route filters.
 - Added new configuration option for specifying session cookie name.
 - Escape Blade echos by default. Made `{{{ foo }}}` echo for raw output with no escaping.
+- Allow the sending of e-mails with only plain text parts.
