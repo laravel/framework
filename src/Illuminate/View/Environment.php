@@ -247,19 +247,45 @@ class Environment {
 		// When registering a class based view "composer", we will simply resolve the
 		// classes from the application IoC container then call the compose method
 		// on the instance. This allows for convenient, testable view composers.
-		$container = $this->container;
+		$callback = $this->buildClassComposerCallback($class);
 
-		$callback = function($event) use ($class, $container)
-		{
-			return $container->make($class)->compose($event);
-		};
-
-		// Once we've created a function to handle each class callback we'll register
-		// it with an event dispatcher so that it will be called when the composer
-		// event is fired for the view, and the composers will be resolved then.
 		$this->events->listen($name, $callback);
 
 		return $callback;
+	}
+
+	/**
+	 * Build a class based container callback Closure.
+	 *
+	 * @param  string   $class
+	 * @return Closure
+	 */
+	protected function buildClassComposerCallback($class)
+	{
+		$container = $this->container;
+
+		list($class, $method) = $this->parseClassComposer($class);
+
+		// Once we have the class and method name, we can build the Closure to resolve
+		// the instance out of the IoC container and call the method on it with the
+		// given arguments that are passed to the Closure as the composer's data.
+		return function() use ($class, $method, $container)
+		{
+			$callable = array($container->make($class), $method);
+
+			return call_user_func_array($callable, func_get_args());
+		};
+	}
+
+	/**
+	 * Parse a class based composer name.
+	 *
+	 * @param  string  $class
+	 * @return array
+	 */
+	protected function parseClassComposer($class)
+	{
+		return str_contains($class, '@') ? explode('@', $class) : array($class, 'compose');
 	}
 
 	/**

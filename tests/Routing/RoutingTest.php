@@ -426,6 +426,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testStringFilterAreResolvedOutOfTheContainerWithCustomMethods()
+	{
+		$router = new Router($container = m::mock('Illuminate\Container\Container'));
+		$router->addFilter('foo', 'FooFilter@something');
+		$container->shouldReceive('make')->once()->with('FooFilter')->andReturn('bar');
+
+		$this->assertEquals(array('bar', 'something'), $router->getFilter('foo'));
+	}
+
+
 	public function testCurrentRouteNameCanBeChecked()
 	{
 		$router = new Router(new Illuminate\Container\Container);

@@ -950,11 +950,29 @@ class Router {
 			// to test a Closure. So, we will resolve the class out of the container.
 			if (is_string($filter))
 			{
-				return array($this->container->make($filter), 'filter');
+				return $this->getClassBasedFilter($filter);
 			}
 
 			return $filter;
 		}
+	}
+
+	/**
+	 * Get a callable array for a class based filter.
+	 *
+	 * @param  string  $filter
+	 * @return array
+	 */
+	protected function getClassBasedFilter($filter)
+	{
+		if (str_contains($filter, '@'))
+		{
+			list($class, $method) = explode('@', $filter);
+
+			return array($this->container->make($class), $method);
+		}
+
+		return array($this->container->make($filter), 'filter');
 	}
 
 	/**

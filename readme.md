@@ -55,3 +55,5 @@
 - Changed how database seeding works to give more freedom and allow use of Eloquent, etc.
 - Change event dispatcher to use more L3 style conventions instead of passing event objects. Added `until` method.
 - Fix bug with Eloquent eager loads with joins.
+- Allow method specification on class based View composers.
+- Allow method specification on class based Route filters.

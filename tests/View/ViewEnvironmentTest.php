@@ -97,6 +97,20 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testClassCallbacksWithMethods()
+	{
+		$env = $this->getEnvironment();
+		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$env->setContainer($container = m::mock('Illuminate\Container\Container'));
+		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
+		$composer->shouldReceive('doComposer')->once()->with('view')->andReturn('composed');
+		$callback = $env->composer('foo', 'FooComposer@doComposer');
+		$callback = $callback[0];
+
+		$this->assertEquals('composed', $callback('view'));
+	}
+
+
 	public function testCallComposerCallsProperEvent()
 	{
 		$env = $this->getEnvironment();
