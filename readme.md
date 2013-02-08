@@ -1,5 +1,10 @@
 # Laravel 4 Beta Change Log
 
+## Beta 3
+
+- Fixed a few things in the ArrayStore session driver.
+- Improve reasons in Password Broker.
+
 ## Beta 2
 
 - Migrated to ircmaxell's [password-compat](http://github.com/ircmaxell/password_compat) library for PHP 5.5 forward compatibility on hashes. No backward compatibility breaks.

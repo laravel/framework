@@ -197,6 +197,8 @@ class PasswordBroker {
 	 */
 	protected function makeErrorRedirect($reason = '')
 	{
+		if ($reason != '') $reason = 'reminders.'.$reason;
+
 		return $this->redirect->refresh()->with('error', true)->with('reason', $reason);
 	}
 
