@@ -10,9 +10,10 @@ class ArrayStore extends CacheDrivenStore {
 	 * Load the session for the request.
 	 *
 	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  string  $name
 	 * @return void
 	 */
-	public function start(CookieJar $cookies)
+	public function start(CookieJar $cookies, $name)
 	{
 		$this->session = $this->createFreshSession();
 	}

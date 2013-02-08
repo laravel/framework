@@ -81,6 +81,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * Load the session for the request.
 	 *
 	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  string  $name
 	 * @return void
 	 */
 	public function start(CookieJar $cookies, $name)
