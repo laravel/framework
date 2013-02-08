@@ -57,3 +57,4 @@
 - Fix bug with Eloquent eager loads with joins.
 - Allow method specification on class based View composers.
 - Allow method specification on class based Route filters.
+- Added new configuration option for specifying session cookie name.
