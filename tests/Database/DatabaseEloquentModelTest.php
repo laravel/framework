@@ -243,6 +243,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $model->getKey());
 		$this->assertEquals('id', $model->getKeyName());
 	}
+	
+	
+	public function testScopedQuery()
+	{
+		$model = new EloquentModelScopedStub();
+		$result = $model->scope()->get();
+		
+		$this->assertEquals('baz', $result);
+	}
 
 
 	public function testConnectionManagement()
@@ -498,6 +507,21 @@ class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('with')->once()->with(array('foo', 'bar'))->andReturn('foo');
 		return $mock;
+	}
+}
+
+class EloquentModelScopedStub extends Illuminate\Database\Eloquent\Model {
+	public function newQuery()
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('where')->once()->with(array('foo', 'bar'))->andReturn($mock);
+		$mock->shouldReceive('get')->once()->andReturn('baz');
+		return $mock;
+	}
+	public function scope()
+	{
+		$this->scopedQuery()->where('foo', 'bar');
+		return $this;
 	}
 }
 
