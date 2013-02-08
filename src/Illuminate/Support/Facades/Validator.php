@@ -3,10 +3,12 @@
 class Validator extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'validator'.
 	 *
-	 * @return string
+	 * @return Illuminate\Validation\Factory
 	 */
-	protected static function getFacadeAccessor() { return 'validator'; }
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['validator'];
+	}
 
 }

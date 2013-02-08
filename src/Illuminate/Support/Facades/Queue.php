@@ -3,10 +3,12 @@
 class Queue extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'queue'.
 	 *
-	 * @return string
+	 * @return \Illuminate\Queue\QueueManager
 	 */
-	protected static function getFacadeAccessor() { return 'queue'; }
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['queue'];
+	}
 
 }

@@ -3,10 +3,12 @@
 class Lang extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'translator'.
 	 *
-	 * @return string
+	 * @return \Illuminate\Translation\Translator
 	 */
-	protected static function getFacadeAccessor() { return 'translator'; }
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['translator'];
+	}
 
 }

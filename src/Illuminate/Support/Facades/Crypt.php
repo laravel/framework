@@ -3,10 +3,12 @@
 class Crypt extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'encrypter'.
 	 *
-	 * @return string
+	 * @return \Illuminate\Encryption\
 	 */
-	protected static function getFacadeAccessor() { return 'encrypter'; }
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['encrypter'];
+	}
 
 }

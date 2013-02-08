@@ -32,7 +32,7 @@ function app($make = null)
 		return app()->make($make);
 	}
 
-	return Illuminate\Support\Facades\Facade::getFacadeApplication();
+	return \Illuminate\Foundation\Application::getCurrent();
 }
 
 /**

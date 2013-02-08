@@ -3,10 +3,12 @@
 class App extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the Application.
 	 *
-	 * @return string
+	 * @return \Illuminate\Foundation\Application
 	 */
-	protected static function getFacadeAccessor() { return static::$app; }
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent();
+	}
 
 }

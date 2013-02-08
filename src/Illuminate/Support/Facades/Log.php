@@ -3,10 +3,12 @@
 class Log extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'log'.
 	 *
-	 * @return string
+	 * @return \Illuminate\Log\Writer
 	 */
-	protected static function getFacadeAccessor() { return 'log'; }
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['log'];
+	}
 
 }

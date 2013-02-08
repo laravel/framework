@@ -3,10 +3,12 @@
 class URL extends Facade {
 
 	/**
-	 * Get the registered name of the component.
+	 * Get the registered component 'url'.
 	 *
-	 * @return string
+	 * @return Illuminate\Routing\UrlGenerator
 	 */
-	protected static function getFacadeAccessor() { return 'url'; }
+	public static function getCurrent() {
+		return \Illuminate\Foundation\Application::getCurrent()['url'];
+	}
 
 }

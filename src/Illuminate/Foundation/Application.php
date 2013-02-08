@@ -23,6 +23,29 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class Application extends Container implements HttpKernelInterface {
 
 	/**
+	 * Singleton instance
+	 */
+	protected static $Current = null;
+
+	/**
+	 * Facade function, get singleton of Application
+	 */
+	public static function getCurrent() {    
+		return static::$Current;
+	}
+
+	public static function setCurrent($newCurrent) {
+		$current = static::$Current;
+		
+		if ($newCurrent !== null) {
+			// Force this to be only in testing environment?
+			static::$Current = $newCurrent;
+		}
+		
+		return $current;
+	}
+
+	/**
 	 * Indicates if the application has "booted".
 	 *
 	 * @var bool
@@ -64,6 +87,9 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function __construct()
 	{
+		// Auto push master Application
+		if (static::getCurrent() == null) static::setCurrent($this);
+
 		$this['request'] = Request::createFromGlobals();
 
 		// The exception handler class takes care of determining which of the bound
