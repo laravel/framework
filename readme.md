@@ -69,3 +69,4 @@
 - Added new configuration option for specifying session cookie name.
 - Escape Blade echos by default. Made `{{{ foo }}}` echo for raw output with no escaping.
 - Allow the sending of e-mails with only plain text parts.
+- Added Model::creating(Closure) and Model::updating(Closure) methods for hooking into Eloquent save events (Thank Phil Sturgeon)
