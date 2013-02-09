@@ -272,7 +272,7 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	protected function loadDeferredProviders()
+	public function loadDeferredProviders()
 	{
 		// We will simply spin through each of the deferred providers and register each
 		// one and boot them if the application has booted. This should make each of
