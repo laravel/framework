@@ -22,7 +22,6 @@ class ArrayStore extends CacheDrivenStore {
 	 * Finish the session handling for the request.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\CookieJar  $cookie
 	 * @param  int  $lifetime
 	 * @return void
 	 */
