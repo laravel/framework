@@ -7,6 +7,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function tearDown()
 	{
 		m::close();
+
+		Illuminate\Database\Eloquent\Model::unsetEventDispatcher();
 	}
 
 
@@ -95,11 +97,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('update')->once()->with(array('id' => 1, 'name' => 'taylor'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
 
 		$model->id = 1;
 		$model->name = 'taylor';
 		$model->exists = true;
 		$this->assertTrue($model->save());
+	}
+
+
+	public function testUpdateIsCancelledIfCreatingEventReturnsFalse()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
+		$model->exists = true;
+
+		$this->assertFalse($model->save());
 	}
 
 
@@ -178,6 +195,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
 
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+
 		$model->name = 'taylor';
 		$model->exists = false;
 		$this->assertTrue($model->save());
@@ -191,11 +211,27 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setIncrementing(false);
 
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+
 		$model->name = 'taylor';
 		$model->exists = false;
 		$this->assertTrue($model->save());
 		$this->assertNull($model->id);
 		$this->assertTrue($model->exists);
+	}
+
+
+	public function testInsertIsCancelledIfCreatingEventReturnsFalse()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
+
+		$this->assertFalse($model->save());
+		$this->assertFalse($model->exists);
 	}
 
 
