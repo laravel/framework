@@ -529,6 +529,20 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Register a 404 error handler.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function missing(Closure $callback)
+	{
+		$this->error(function(NotFoundHttpException $e) use ($callback)
+		{
+			return call_user_func($callback, $e);
+		});
+	}
+
+	/**
 	 * Register an application error handler.
 	 *
 	 * @param  Closure  $callback
@@ -548,20 +562,6 @@ class Application extends Container implements HttpKernelInterface {
 	public function fatal(Closure $callback)
 	{
 		$this->error(function(FatalErrorException $e) use ($callback)
-		{
-			return call_user_func($callback, $e);
-		});
-	}
-
-	/**
-	 * Register a 404 error handler.
-	 *
-	 * @param  Closure  $callback
-	 * @return void
-	 */
-	public function missing(Closure $callback)
-	{
-		$this->error(function(NotFoundHttpException $e) use ($callback)
 		{
 			return call_user_func($callback, $e);
 		});
