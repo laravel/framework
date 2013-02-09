@@ -285,7 +285,7 @@ class Router {
 	{
 		if (isset($options['only']))
 		{
-			return $options['only'];
+			return array_intersect($defaults, $options['only']);
 		}
 		elseif (isset($options['except']))
 		{
