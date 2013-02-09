@@ -7,6 +7,18 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 class DatabaseServiceProvider extends ServiceProvider {
 
 	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		Model::setConnectionResolver($this->app['db']);
+
+		Model::setEventDispatcher($this->app['events']);
+	}
+
+	/**
 	 * Register the service provider.
 	 *
 	 * @return void
@@ -28,18 +40,6 @@ class DatabaseServiceProvider extends ServiceProvider {
 		{
 			return new DatabaseManager($app, $app['db.factory']);
 		});
-
-		$this->registerEloquent();
-	}
-
-	/**
-	 * Register the database connections with the Eloquent ORM.
-	 *
-	 * @return void
-	 */
-	protected function registerEloquent()
-	{
-		Model::setConnectionResolver($this->app['db']);
 	}
 
 }
