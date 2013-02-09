@@ -65,6 +65,8 @@ class Artisan {
 	{
 		if ( ! is_null($this->artisan)) return $this->artisan;
 
+		$this->app->loadDeferredProviders();
+
 		return $this->artisan = ConsoleApplication::start($this->app);
 	}
 

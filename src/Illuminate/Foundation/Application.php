@@ -268,22 +268,23 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
-	 * Resolve the given type from the container.
+	 * Load and boot all of the remaining deferred providers.
 	 *
-	 * (Overriding Container::make)
-	 *
-	 * @param  string  $abstract
-	 * @param  array   $parameters
-	 * @return mixed
+	 * @return void
 	 */
-	public function make($abstract, $parameters = array())
+	protected function loadDeferredProviders()
 	{
-		if (isset($this->deferredServices[$abstract]))
+		// We will simply spin through each of the deferred providers and register each
+		// one and boot them if the application has booted. This should make each of
+		// the remaining services available to this application for immediate use.
+		foreach (array_unique($this->deferredServices) as $provider)
 		{
-			$this->loadDeferredProvider($abstract);
+			$this->register($instance = new $provider($this));
+
+			if ($this->booted) $instance->boot();
 		}
 
-		return parent::make($abstract, $parameters);
+		$this->deferredServices = array();
 	}
 
 	/**
@@ -307,6 +308,25 @@ class Application extends Container implements HttpKernelInterface {
 
 			if ($this->booted) $instance->boot();
 		}
+	}
+
+	/**
+	 * Resolve the given type from the container.
+	 *
+	 * (Overriding Container::make)
+	 *
+	 * @param  string  $abstract
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function make($abstract, $parameters = array())
+	{
+		if (isset($this->deferredServices[$abstract]))
+		{
+			$this->loadDeferredProvider($abstract);
+		}
+
+		return parent::make($abstract, $parameters);
 	}
 
 	/**
