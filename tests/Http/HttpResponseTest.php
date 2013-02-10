@@ -71,6 +71,16 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $response->withErrors($provider);
     }
 
+    public function testRedirectWithErrorsArrayConvertsToMessageBag()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+        $response->setSession($session = m::mock('Illuminate\Session\Store'));
+        $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\MessageBag'));
+        $provider = array('foo' => 'bar');
+        $response->withErrors($provider);
+    }
+
 }
 
 class JsonableStub implements JsonableInterface {

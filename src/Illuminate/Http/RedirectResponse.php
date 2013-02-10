@@ -3,6 +3,7 @@
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Contracts\MessageProviderInterface;
+use Illuminate\Support\MessageBag;
 
 class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectResponse {
 
@@ -98,7 +99,9 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 		}
 		else
 		{
-			$this->with('errors', (array) $provider);
+			$errors = new MessageBag;
+			$errors->merge($provider);
+			$this->with('errors', $errors);
 		}
 
 		return $this;
