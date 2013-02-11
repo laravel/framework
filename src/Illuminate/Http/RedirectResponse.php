@@ -100,7 +100,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 		else
 		{
 			$errors = new MessageBag;
-			$errors->merge($provider);
+			$errors->merge((array) $provider);
 			$this->with('errors', $errors);
 		}
 
