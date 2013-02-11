@@ -304,9 +304,11 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 * @param  dynamic  string
 	 * @return void
 	 */
-	public function flashOnly()
+	public function flashOnly($keys)
 	{
-		return $this->flash('only', func_get_args());
+		$keys = is_array($keys) ? $keys : func_get_args();
+		
+		return $this->flash('only', $keys);
 	}
 
 	/**
@@ -315,9 +317,11 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 * @param  dynamic  string
 	 * @return void
 	 */
-	public function flashExcept()
+	public function flashExcept($keys)
 	{
-		return $this->flash('except', func_get_args());
+		$keys = is_array($keys) ? $keys : func_get_args();
+		
+		return $this->flash('except', $keys);
 	}
 
 	/**
