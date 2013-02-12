@@ -68,14 +68,46 @@ class ClassLoader {
 	/**
 	 * Add directories to the class loader.
 	 *
-	 * @param  array  $directories
+	 * @param  string|array  $directories
 	 * @return void
 	 */
-	public static function addDirectories(array $directories)
+	public static function addDirectories($directories)
 	{
-		static::$directories = array_merge(static::$directories, $directories);
+		static::$directories = array_merge(static::$directories, (array) $directories);
 
 		static::$directories = array_unique(static::$directories);
+	}
+
+	/**
+	 * Remove directories from the class loader.
+	 *
+	 * @param  string|array  $directories
+	 * @return void
+	 */
+	public static function removeDirectories($directories = null)
+	{
+		if (is_null($directories))
+		{
+			static::$directories = array();
+		}
+		else
+		{
+			$directories = (array) $directories;
+
+			static::$directories = array_filter(static::$directories, function($directory) use ($directories)
+			{
+				return ( ! in_array($directory, $directories));
+			});
+		}
+	}
+
+	/**
+	 * Gets all the directories registered with the
+	 * class loader.
+	 */
+	public static function getDirectories()
+	{
+		return static::$directories;
 	}
 
 }

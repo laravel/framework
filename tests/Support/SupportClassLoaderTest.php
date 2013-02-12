@@ -15,23 +15,31 @@ class SupportClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, ClassLoader::normalizeClass($php52Class));
 	}
 
-	/**
-	 * We want to run in a separate process to ensure that
-	 * we don't possibly interfere with any other potential
-	 * tests that may interact with the classloader statically.
-	 *
-	 * @runInSeparateProcess
-	 */
+
+	public function testManipulatingDirectories()
+	{
+		ClassLoader::removeDirectories();
+		$this->assertEmpty(ClassLoader::getDirectories());
+		ClassLoader::addDirectories($directories = array('foo', 'bar'));
+		$this->assertEquals($directories, ClassLoader::getDirectories());
+		ClassLoader::addDirectories('baz');
+		$this->assertEquals(array_merge($directories, array('baz')), ClassLoader::getDirectories());
+		ClassLoader::removeDirectories('baz');
+		$this->assertEquals($directories, ClassLoader::getDirectories());
+		ClassLoader::removeDirectories($directories);
+		$this->assertEmpty(ClassLoader::getDirectories());
+	}
+
+
 	public function testClassLoadingWorks()
 	{
 		$php53Class = 'Foo\Bar\Php53';
 		$php52Class = 'Foo_Bar_Php52';
 
-		// We're not actually registering an autoloader now
-		// but rather testing our methods work as expected.
-		ClassLoader::addDirectories(__DIR__.'/stubs/psr');
+		ClassLoader::addDirectories($directory = __DIR__.'/stubs/psr');
 		$this->assertTrue(ClassLoader::load($php53Class));
 		$this->assertTrue(ClassLoader::load($php52Class));
+		ClassLoader::removeDirectories($directory);
 	}
 
 }
