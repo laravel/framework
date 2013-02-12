@@ -47,7 +47,7 @@ class ClassLoader {
 	{
 		if ($class[0] == '\\') $class = substr($class, 1);
 
-		return str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+		return str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $class).'.php';
 	}
 
 	/**
@@ -74,7 +74,7 @@ class ClassLoader {
 	public static function addDirectories(array $directories)
 	{
 		static::$directories = array_merge(static::$directories, $directories);
-		
+
 		static::$directories = array_unique(static::$directories);
 	}
 
