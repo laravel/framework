@@ -104,6 +104,8 @@ class ClassLoader {
 	/**
 	 * Gets all the directories registered with the
 	 * class loader.
+	 *
+	 * @return array
 	 */
 	public static function getDirectories()
 	{
