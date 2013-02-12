@@ -27,12 +27,11 @@ class SupportClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$php53Class = 'Foo\Bar\Php53';
 		$php52Class = 'Foo_Bar_Php52';
 
+		// We're not actually registering an autoloader now
+		// but rather testing our methods work as expected.
 		ClassLoader::addDirectories(__DIR__.'/stubs/psr');
-		ClassLoader::load($php53Class);
-		ClassLoader::load($php52Class);
-
-		$this->assertTrue(class_exists($php53Class));
-		$this->assertTrue(class_exists($php52Class));
+		$this->assertTrue(ClassLoader::load($php53Class));
+		$this->assertTrue(ClassLoader::load($php52Class));
 	}
 
 }
