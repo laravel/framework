@@ -480,6 +480,21 @@ function str_plural($value, $count = 2)
 }
 
 /**
+ * Generate a "random" alpha-numeric string.
+ *
+ * Should not be considered sufficient for cryptography, etc.
+ *
+ * @param  int     $length
+ * @return string
+ */
+function str_random($length = 16)
+{
+	$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+	return substr(str_shuffle(str_repeat($pool, 5)), 0, $length); 
+}
+
+/**
  * Get the singular form of an English word.
  *
  * @param  string  $value
