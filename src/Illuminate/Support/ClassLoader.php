@@ -28,7 +28,7 @@ class ClassLoader {
 
 		foreach (static::$directories as $directory)
 		{
-			if (file_exists($path = $directory.'/'.$class))
+			if (file_exists($path = $directory.DIRECTORY_SEPARATOR.$class))
 			{
 				require_once $path;
 
