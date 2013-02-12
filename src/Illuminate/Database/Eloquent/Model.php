@@ -581,7 +581,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		{
 			$keyName = $this->getKeyName();
 
-			$this->$keyName = $query->insertGetId($attributes, $keyName);
+			$this->setAttribute($keyName, $query->insertGetId($attributes, $keyName));
 		}
 
 		// If the table is not incrementing we'll simply insert this attirbutes as they
