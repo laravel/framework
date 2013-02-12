@@ -162,7 +162,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 			// assignment to the model, and all others will just be ignored.
 			if ($this->isFillable($key))
 			{
-				$this->$key = $value;
+				$this->setAttribute($key, $value);
 			}
 		}
 
