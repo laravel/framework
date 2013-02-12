@@ -143,11 +143,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	protected function createSessionID()
 	{
-		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-		$value = substr(str_shuffle(str_repeat($pool, 5)), 0, 40);
-
-		return sha1($value.time());
+		return sha1(str_random(40).time());
 	}
 
 	/**
