@@ -3,17 +3,41 @@
 class Str {
 
 	/**
-	 * Determine if a string starts with a given needle.
+	 * Transliterate a UTF-8 value to ASCII.
 	 *
-	 * @param  string  $haystack
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function ascii($value)
+	{
+		return \Patchwork\Utf8::toAscii($value);
+	}
+
+	/**
+	 * Convert a value to camel case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function camel($value)
+	{
+		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
+
+		return str_replace(' ', '', $value);
+	}
+
+	/**
+	 * Determine if a given string contains a given sub-string.
+	 *
+	 * @param  string        $haystack
 	 * @param  string|array  $needle
 	 * @return bool
 	 */
-	public static function startsWith($haystack, $needles)
+	public static function contains($haystack, $needle)
 	{
-		foreach ((array) $needles as $needle)
+		foreach ((array) $needle as $n)
 		{
-			if (strpos($haystack, $needle) === 0) return true;
+			if (strpos($haystack, $n) !== false) return true;
 		}
 
 		return false;
@@ -68,20 +92,30 @@ class Str {
 	}
 
 	/**
-	 * Determine if a given string contains a given sub-string.
+	 * Limit the number of characters in a string.
 	 *
-	 * @param  string        $haystack
-	 * @param  string|array  $needle
-	 * @return bool
+	 * @param  string  $value
+	 * @param  int     $limit
+	 * @param  string  $end
+	 * @return string
 	 */
-	public static function contains($haystack, $needle)
+	public static function limit($value, $limit = 100, $end = '...')
 	{
-		foreach ((array) $needle as $n)
-		{
-			if (strpos($haystack, $n) !== false) return true;
-		}
+		if (static::length($value) <= $limit) return $value;
 
-		return false;
+		return mb_substr($value, 0, $limit, 'UTF-8').$end;
+	}
+
+	/**
+	 * Get the plural form of an English word.
+	 *
+	 * @param  string  $value
+	 * @param  int  $count
+	 * @return string
+	 */
+	public static function plural($value, $count = 2)
+	{
+		return Pluralizer::plural($value, $count);
 	}
 
 	/**
@@ -96,15 +130,23 @@ class Str {
 	}
 
 	/**
-	 * Get the plural form of an English word.
+	 * Generate a URL friendly "slug" from a given string.
 	 *
-	 * @param  string  $value
-	 * @param  int  $count
+	 * @param  string  $title
+	 * @param  string  $separator
 	 * @return string
 	 */
-	public static function plural($value, $count = 2)
+	public static function slug($title, $separator = '-')
 	{
-		return Pluralizer::plural($value, $count);
+		$title = static::ascii($title);
+
+		// Remove all characters that are not the separator, letters, numbers, or whitespace.
+		$title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
+
+		// Replace all separator characters and whitespace by a single separator
+		$title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
+
+		return trim($title, $separator);
 	}
 
 	/**
@@ -124,16 +166,20 @@ class Str {
 	}
 
 	/**
-	 * Convert a value to camel case.
+	 * Determine if a string starts with a given needle.
 	 *
-	 * @param  string  $value
-	 * @return string
+	 * @param  string  $haystack
+	 * @param  string|array  $needle
+	 * @return bool
 	 */
-	public static function camel($value)
+	public static function startsWith($haystack, $needles)
 	{
-		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
+		foreach ((array) $needles as $needle)
+		{
+			if (strpos($haystack, $needle) === 0) return true;
+		}
 
-		return str_replace(' ', '', $value);
+		return false;
 	}
 
 }
