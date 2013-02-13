@@ -110,9 +110,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerEnvironment()
 	{
-		$me = $this;
-
-		$this->app['view'] = $this->app->share(function($app) use ($me)
+		$this->app['view'] = $this->app->share(function($app)
 		{
 			// Next we need to grab the engine resolver instance that will be used by the
 			// environment. The resolver will be used by an environment to get each of
