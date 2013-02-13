@@ -2,6 +2,7 @@
 
 use Closure;
 use ArrayAccess;
+use Illuminate\Support\Str;
 use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -143,11 +144,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	protected function createSessionID()
 	{
-		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-		$value = substr(str_shuffle(str_repeat($pool, 5)), 0, 40);
-
-		return sha1($value.time());
+		return Str::secureRandom(40);
 	}
 
 	/**
