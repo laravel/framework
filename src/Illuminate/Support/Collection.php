@@ -56,7 +56,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function each(Closure $callback)
 	{
-		$this->items = array_map($callback, $this->items);
+		array_map($callback, $this->items);
 
 		return $this;
 	}
