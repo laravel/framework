@@ -25,7 +25,8 @@
         "symfony/http-kernel": "2.2.*",
         "symfony/process": "2.2.*",
         "symfony/routing": "2.2.*",
-        "symfony/translation": "2.2.*"
+        "symfony/translation": "2.2.*",
+        "aws/aws-sdk-php": "2.1.*"
     },
     "replace": {
         "illuminate/auth": "self.version",
@@ -56,7 +57,6 @@
         "illuminate/workbench": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "2.1.*",
         "mockery/mockery": "0.7.2"
     },
     "autoload": {
