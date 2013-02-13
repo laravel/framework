@@ -3,6 +3,7 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
+use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 
@@ -123,7 +124,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function registerConnectors($manager)
 	{
-		foreach (array('Sync', 'Beanstalkd') as $connector)
+		foreach (array('Sync', 'Beanstalkd', 'Sqs') as $connector)
 		{
 			$this->{"register{$connector}Connector"}($manager);
 		}
@@ -154,6 +155,20 @@ class QueueServiceProvider extends ServiceProvider {
 		$manager->addConnector('beanstalkd', function()
 		{
 			return new BeanstalkdConnector;
+		});
+	}
+
+	/**
+	 * Register the Amazon SQS queue connector.
+	 *
+	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @return void
+	 */
+	protected function registerSqsConnector($manager)
+	{
+		$manager->addConnector('sqs', function()
+		{
+			return new SqsConnector;
 		});
 	}
 
