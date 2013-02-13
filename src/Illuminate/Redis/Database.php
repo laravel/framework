@@ -45,7 +45,7 @@ class Database {
 	 * @param  int     $database
 	 * @return void
 	 */
-	public function __construct($host, $port, $password=NULL, $database = 0)
+	public function __construct($host, $port, $password=null, $database = 0)
 	{
 		$this->host = $host;
 		$this->port = $port;
