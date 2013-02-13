@@ -125,7 +125,25 @@ class Validator implements MessageProviderInterface {
 			}
 		}
 
-		return $data;
+		$flattenKeys = function($array, $prefix = '') use (&$flattenKeys) {
+			$data = array();
+
+			foreach($array AS $key => $value)
+			{
+				if(is_array($value))
+				{
+					$data += $flattenKeys($value, $prefix . $key . '.');
+				}
+				else
+				{
+					$data[$prefix . $key] = $value;
+				}
+			}
+
+			return $data;
+		};
+
+		return $flattenKeys($data);
 	}
 
 	/**
@@ -211,9 +229,9 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getValue($attribute)
 	{
-		if ($value = array_get($this->data, $attribute))
+		if (array_key_exists($attribute, $this->data))
 		{
-			return $value;
+			return $this->data[$attribute];
 		}
 		elseif (array_key_exists($attribute, $this->files))
 		{
@@ -343,7 +361,7 @@ class Validator implements MessageProviderInterface {
 
 		foreach ($attributes as $key)
 		{
-			if (array_get($this->data, $key) or isset($this->files[$key]))
+			if (isset($this->data[$key]) or isset($this->files[$key]))
 			{
 				$count++;
 			}
@@ -375,9 +393,8 @@ class Validator implements MessageProviderInterface {
 	protected function validateSame($attribute, $value, $parameters)
 	{
 		$other = $parameters[0];
-		$other_value = array_get($this->data, $other);
 
-		return $value == $other_value;
+		return isset($this->data[$other]) and $value == $this->data[$other];
 	}
 
 	/**
@@ -391,9 +408,8 @@ class Validator implements MessageProviderInterface {
 	protected function validateDifferent($attribute, $value, $parameters)
 	{
 		$other = $parameters[0];
-		$other_value = array_get($this->data, $other);
 
-		return $value != $other_value;
+		return isset($this->data[$other]) and $value != $this->data[$other];
 	}
 
 	/**
@@ -533,7 +549,7 @@ class Validator implements MessageProviderInterface {
 	 	// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
-			return array_get($this->data, $attribute);
+			return $this->data[$attribute];
 		}
 		elseif ($value instanceof File)
 		{
