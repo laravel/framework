@@ -125,7 +125,25 @@ class Validator implements MessageProviderInterface {
 			}
 		}
 
-		return $data;
+		$flattenKeys = function($array, $prefix = '') use (&$flattenKeys) {
+			$data = array();
+
+			foreach($array AS $key => $value)
+			{
+				if(is_array($value))
+				{
+					$data += $flattenKeys($value, $prefix . $key . '.');
+				}
+				else
+				{
+					$data[$prefix . $key] = $value;
+				}
+			}
+
+			return $data;
+		};
+
+		return $flattenKeys($data);
 	}
 
 	/**
