@@ -40,4 +40,20 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 		$d->fire('foo', array('foo', 'bar'));
 	}
 
+
+	public function testQueuedEventsAreFired()
+	{
+		unset($_SERVER['__event.test']);
+		$d = new Dispatcher;
+		$d->queue('update', array('name' => 'taylor'));
+		$d->listen('update', function($name)
+		{
+			$_SERVER['__event.test'] = $name;
+		});
+
+		$this->assertFalse(isset($_SERVER['__event.test']));
+		$d->flush('update');
+		$this->assertEquals('taylor', $_SERVER['__event.test']);
+	}
+
 }

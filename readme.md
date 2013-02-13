@@ -3,6 +3,7 @@
 ## Beta 4
 
 - Added Model::creating(Closure) and Model::updating(Closure) methods for hooking into Eloquent save events. Thank Phil Sturgeon for finally pressuring me into doing this... :)
+- Added `Event::queue` and `Event::flush`.
 
 ## Beta 3
 
