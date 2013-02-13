@@ -196,11 +196,9 @@ class Str {
 	 */
 	public static function snake($value, $delimiter = '_')
 	{
-		return trim(preg_replace_callback('/[A-Z]/', function($match) use ($delimiter)
-		{
-			return $delimiter.strtolower($match[0]);
+		$replace = '$1'.$delimiter.'$2';
 
-		}, $value), $delimiter);
+		return ctype_lower($value) ? $value : strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
 	}
 
 	/**
