@@ -247,6 +247,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => '1.23'), array('foo' => 'Numeric'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('1.23','3.14')), array('foo' => 'Numeric'));
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('foo' => '-1'), array('foo' => 'Numeric'));
 		$this->assertTrue($v->passes());
 
@@ -267,6 +270,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => '1.23'), array('foo' => 'Integer'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('1.23', '0.12')), array('foo' => 'Integer'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('foo' => '-1'), array('foo' => 'Integer'));
 		$this->assertTrue($v->passes());
 
@@ -284,6 +290,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => '12345'), array('foo' => 'Digits:5'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('12345','56789')), array('foo' => 'Digits:5'));
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('foo' => '123'), array('foo' => 'Digits:200'));
 		$this->assertFalse($v->passes());
 
@@ -291,7 +300,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => '12345'), array('foo' => 'digits_between:1,6'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('12345','22345')), array('foo' => 'digits_between:1,6'));
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('foo' => '123'), array('foo' => 'digits_between:4,5'));
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('123','789')), array('foo' => 'digits_between:4,5'));
 		$this->assertFalse($v->passes());
 	}
 
@@ -305,10 +320,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => 'anc'), array('foo' => 'Size:3'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('anc','spq')), array('foo' => 'Size:3'));
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('foo' => '123'), array('foo' => 'Numeric|Size:3'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('123','456')), array('foo' => 'Numeric|Size:3'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('foo' => '3'), array('foo' => 'Numeric|Size:3'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('3','3')), array('foo' => 'Numeric|Size:3'));
 		$this->assertTrue($v->passes());
 
 		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
@@ -331,7 +355,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => 'asdad'), array('foo' => 'Between:3,4'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('asdad','qwert')), array('foo' => 'Between:3,4'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('foo' => 'anc'), array('foo' => 'Between:3,5'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('anc','spq')), array('foo' => 'Between:3,5'));
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('foo' => 'ancf'), array('foo' => 'Between:3,5'));
@@ -340,10 +370,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => 'ancfs'), array('foo' => 'Between:3,5'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('ancfs','zxcvb')), array('foo' => 'Between:3,5'));
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('foo' => '123'), array('foo' => 'Numeric|Between:50,100'));
 		$this->assertFalse($v->passes());
 
 		$v = new Validator($trans, array('foo' => '3'), array('foo' => 'Numeric|Between:1,5'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('3','4')), array('foo' => 'Numeric|Between:1,5'));
 		$this->assertTrue($v->passes());
 
 		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
@@ -366,7 +402,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => '3'), array('foo' => 'Min:3'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('3','2')), array('foo' => 'Min:3'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('foo' => 'anc'), array('foo' => 'Min:3'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('anc','qwe')), array('foo' => 'Min:3'));
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('foo' => '2'), array('foo' => 'Numeric|Min:3'));
@@ -525,7 +567,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('ip' => 'aslsdlks'), array('ip' => 'Ip'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('ip' => array('127.0.0.1','localhost')), array('ip' => 'Ip'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('ip' => '127.0.0.1'), array('ip' => 'Ip'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('ip' => array('127.0.0.1','192.168.0.1')), array('ip' => 'Ip'));
 		$this->assertTrue($v->passes());
 	}
 
@@ -536,7 +584,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => 'Email'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('x' => array('aslsdlks','foo@gmail.com')), array('x' => 'Email'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('x' => 'foo@gmail.com'), array('x' => 'Email'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => array('foo@gmail.com','bar@gmail.com')), array('x' => 'Email'));
 		$this->assertTrue($v->passes());
 	}
 
@@ -648,6 +702,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => '2000-01-01'), array('x' => 'date'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('x' => array('2000-01-01','2013-01-01')), array('x' => 'date'));
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('x' => 'Not a date'), array('x' => 'date'));
 		$this->assertTrue($v->fails());
 
@@ -655,6 +712,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('x' => '01/01/2001'), array('x' => 'date_format:Y-m-d'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('x' => array('01/01/2001','02/02/2002')), array('x' => 'date_format:Y-m-d'));
 		$this->assertTrue($v->fails());
 	}
 

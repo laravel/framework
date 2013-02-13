@@ -572,7 +572,7 @@ class Validator implements MessageProviderInterface {
 	 	// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
-			return $this->getValue($attribute);
+			return $value;
 		}
 		elseif ($value instanceof File)
 		{
@@ -692,8 +692,7 @@ class Validator implements MessageProviderInterface {
 		$column = isset($parameters[1]) ? $parameters[1] : $attribute;
 
 		// Search for the array by attribute in data/files, to use in whereIn.
-		// Assuming, we won't be dealing with FILES array, this could be changed to array_get
-		if ( is_array($arrayValue = $this->getValue($attribute)) )
+		if ( is_array($arrayValue = array_get($this->data, $attribute)) )
 		{
 			$value = $arrayValue;
 		}
