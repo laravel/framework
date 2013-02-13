@@ -102,8 +102,7 @@ class ClassLoader {
 	}
 
 	/**
-	 * Gets all the directories registered with the
-	 * class loader.
+	 * Gets all the directories registered with the loader.
 	 *
 	 * @return array
 	 */
