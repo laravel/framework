@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue\Jobs;
 
+use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 
 class SqsJob extends Job {
