@@ -56,7 +56,7 @@
         "illuminate/workbench": "self.version"
     },
     "require-dev": {
-        "iron-io/iron_mq": "1.4.*",
+        "aws/aws-sdk-php": "2.1.*",
         "mockery/mockery": "0.7.2"
     },
     "autoload": {

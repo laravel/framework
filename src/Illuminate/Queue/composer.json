@@ -14,6 +14,7 @@
         "symfony/process": "2.2.*"
     },
     "require-dev": {
+        "aws/aws-sdk-php": "2.1.*",
         "mockery/mockery": "0.7.2"
     },
     "autoload": {
