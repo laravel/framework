@@ -55,7 +55,7 @@ class RedisManager {
 	{
 		$config = $this->getConfig($name);
 
-		$connection = new Database($config['host'], $config['port'], $config['database']);
+		$connection = new Database($config['host'], $config['port'], array_key_exists('password', $config) ?$config['password']:NULL, $config['database']);
 
 		$connection->connect();
 
