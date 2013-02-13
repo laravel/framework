@@ -5,6 +5,7 @@
 - Added Model::creating(Closure) and Model::updating(Closure) methods for hooking into Eloquent save events. Thank Phil Sturgeon for finally pressuring me into doing this... :)
 - Added `Event::queue` and `Event::flush`.
 - Added a `Str` class in support component. Adopted Patchwork UTF-8 to provide solid UTF-8 handling for the framework.
+- Allow Eloquent attributes to be acceessed by camelCase in addition to snake_case.
 
 ## Beta 3
 
