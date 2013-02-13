@@ -941,6 +941,8 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function getAttribute($key)
 	{
+		$key = snake_case($key);
+
 		$inAttributes = array_key_exists($key, $this->attributes);
 
 		// If the key references an attribute, we can just go ahead and return the
@@ -1035,6 +1037,8 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function setAttribute($key, $value)
 	{
+		$key = snake_case($key);
+
 		// First we will check for the presence of a mutator for the set operation
 		// which simply lets the developers tweak the attribute as it is set on
 		// the model, such as "json_encoding" an listing of data for storage.
