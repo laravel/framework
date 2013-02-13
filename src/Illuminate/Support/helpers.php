@@ -480,6 +480,17 @@ function str_plural($value, $count = 2)
 }
 
 /**
+ * Returns a slug representation of a string.
+ *
+ * @param  string  $value
+ * @param  string  $separator
+ */
+function str_slug($value, $separator = '-')
+{
+	return Illuminate\Support\Slugifier::slug($value, $separator);
+}
+
+/**
  * Generate a "random" alpha-numeric string.
  *
  * Should not be considered sufficient for cryptography, etc.
@@ -491,7 +502,7 @@ function str_random($length = 16)
 {
 	$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-	return substr(str_shuffle(str_repeat($pool, 5)), 0, $length); 
+	return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
 }
 
 /**
