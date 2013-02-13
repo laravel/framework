@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.3.7",
         "ext-mcrypt": "*",
         "ircmaxell/password-compat": "1.0.*",
         "monolog/monolog": "1.3.*",

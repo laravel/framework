@@ -1303,7 +1303,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function __isset($key)
 	{
-		return isset($this->attributes[$key]);
+		return isset($this->attributes[$key]) or isset($this->relations[$key]);
 	}
 
 	/**
@@ -1315,6 +1315,8 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	public function __unset($key)
 	{
 		unset($this->attributes[$key]);
+
+		unset($this->relations[$key]);
 	}
 
 	/**
