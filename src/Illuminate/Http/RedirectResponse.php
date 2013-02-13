@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Http;
 
+use Illuminate\Support\MessageBag;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Contracts\MessageProviderInterface;
@@ -98,7 +99,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 		}
 		else
 		{
-			$this->with('errors', (array) $provider);
+			$this->with('errors', new MessageBag((array) $provider));
 		}
 
 		return $this;
