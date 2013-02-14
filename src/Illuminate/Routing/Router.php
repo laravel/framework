@@ -492,11 +492,31 @@ class Router {
 	 */
 	public function group(array $attributes, Closure $callback)
 	{
-		$this->groupStack[] = $attributes;
+		$this->updateGroupStack($attributes);
 
 		call_user_func($callback);
 
 		array_pop($this->groupStack);
+	}
+
+	/**
+	 * Update the group stack array.
+	 *
+	 * @param  array  $attributes
+	 * @return void
+	 */
+	protected function updateGroupStack(array $attributes)
+	{
+		if (count($this->groupStack) > 0)
+		{
+			$last = count($this->groupStack) - 1;
+
+			$this->groupStack[] = array_merge_recursive($this->groupStack[$last], $attributes);
+		}
+		else
+		{
+			$this->groupStack[] = $attributes;
+		}
 	}
 
 	/**

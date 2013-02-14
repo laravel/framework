@@ -363,7 +363,9 @@ class Route extends BaseRoute {
 	 */
 	public function setBeforeFilters($value)
 	{
-		$this->setOption('_before', explode('|', $value));
+		$filters = is_string($value) ? explode('|', $value) : (array) $value;
+
+		$this->setOption('_before', $filters);
 	}
 
 	/**
@@ -384,7 +386,9 @@ class Route extends BaseRoute {
 	 */
 	public function setAfterFilters($value)
 	{
-		$this->setOption('_after', explode('|', $value));
+		$filters = is_string($value) ? explode('|', $value) : (array) $value;
+
+		$this->setOption('_after', $filters);
 	}
 
 	/**

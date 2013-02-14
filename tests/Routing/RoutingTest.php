@@ -512,6 +512,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
 	
+
 	public function testRoutesArentOverriddenBySubDomainWithGroups()
 	{
 		$router = new Router(new Illuminate\Container\Container);
@@ -529,6 +530,21 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 		$request = Request::create('http://bar.com', 'GET');
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testNestedGroupRoutesInheritAllSettings()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->group(array('before' => 'foo'), function() use ($router)
+		{
+			$router->group(array('before' => 'bar'), function() use ($router)
+			{
+				$router->get('/', function() { return 'baz'; });
+			});
+		});
+
+		$this->assertEquals(array('foo', 'bar'), $router->getRoutes()->get('get /')->getOption('_before'));
 	}
 
 }
