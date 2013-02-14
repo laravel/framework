@@ -6,6 +6,7 @@
 - Added `Event::queue` and `Event::flush`.
 - Added a `Str` class in support component. Adopted Patchwork UTF-8 to provide solid UTF-8 handling for the framework.
 - Allow Eloquent attributes to be acceessed by camelCase in addition to snake_case.
+- Added `App::environment` method.
 
 ## Beta 3
 
