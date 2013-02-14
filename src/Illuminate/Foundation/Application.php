@@ -137,6 +137,16 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Get the current application environment.
+	 *
+	 * @return string
+	 */
+	public function environment()
+	{
+		return $this['env'];
+	}
+
+	/**
 	 * Detect the application's current environment.
 	 *
 	 * @param  array|string  $environments
@@ -146,9 +156,6 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		$base = $this['request']->getHost();
 
-		// First we will check to see if we have any command-line arguments and if
-		// if we do we will set this environment based on those arguments as we
-		// need to set it before each configurations are actually loaded out.
 		$arguments = $this['request']->server->get('argv');
 
 		if ($this->runningInConsole())
