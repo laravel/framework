@@ -193,13 +193,35 @@ class Validator implements MessageProviderInterface {
 		// that the attribute is required, rules are not run for missing values.
 		$value = $this->getValue($attribute);
 
-		$validatable = $this->isValidatable($rule, $attribute, $value);
-
-		$method = "validate{$rule}";
-
-		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+		if (is_array($value))
 		{
-			$this->addError($attribute, $rule, $parameters);
+			// In case if array is empty, we add one NULL element in order to
+			// continue with validation. Otherwise validator will just skip
+			// that attribute without checking even for required.
+			$value = (empty($value) ? array(null) : $value);
+
+			foreach ($value as $element)
+			{
+				$validatable = $this->isValidatable($rule, $attribute, $element);
+
+				$method = "validate{$rule}";
+
+				if ($validatable and ! $this->$method($attribute, $element, $parameters, $this))
+				{
+					$this->addError($attribute, $rule, $parameters);
+				}
+			}
+		}
+		else
+		{
+			$validatable = $this->isValidatable($rule, $attribute, $value);
+
+			$method = "validate{$rule}";
+
+			if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+			{
+				$this->addError($attribute, $rule, $parameters);
+			}
 		}
 	}
 
@@ -211,13 +233,14 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getValue($attribute)
 	{
-		if (array_key_exists($attribute, $this->data))
+		// Use array_get to search in array with dot notation
+		if ( ! is_null($value = array_get($this->data, $attribute)) )
 		{
-			return $this->data[$attribute];
+			return $value;
 		}
-		elseif (array_key_exists($attribute, $this->files))
+		elseif ( ! is_null($value = array_get($this->files, $attribute)) )
 		{
-			return $this->files[$attribute];
+			return $value;
 		}
 	}
 
@@ -275,7 +298,7 @@ class Validator implements MessageProviderInterface {
 		{
 			return false;
 		}
-		elseif (is_string($value) and trim($value) === '')
+		elseif ((is_string($value) and trim($value) === '') or (is_array($value) and empty($value)) )
 		{
 			return false;
 		}
@@ -347,6 +370,10 @@ class Validator implements MessageProviderInterface {
 			{
 				$count++;
 			}
+			elseif ( ! is_null(array_get($this->data, $key)) or ! is_null(array_get($this->files, $key)) )
+			{
+				$count++;
+			}
 		}
 
 		return $count;
@@ -376,7 +403,14 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value == $this->data[$other];
+		if ( is_array($arrayValue = array_get($this->data, $attribute)) )
+		{
+			return ! is_null($otherValue = array_get($this->data, $other)) and $arrayValue == $otherValue;
+		}
+		else
+		{
+			return isset($this->data[$other]) and $value == $this->data[$other];
+		}
 	}
 
 	/**
@@ -391,7 +425,14 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value != $this->data[$other];
+		if ( is_array($arrayValue = array_get($this->data, $attribute)) )
+		{
+			return ! is_null($otherValue = array_get($this->data, $other)) and $arrayValue != $otherValue;
+		}
+		else
+		{
+			return isset($this->data[$other]) and $value != $this->data[$other];
+		}
 	}
 
 	/**
@@ -531,7 +572,7 @@ class Validator implements MessageProviderInterface {
 	 	// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
-			return $this->data[$attribute];
+			return $value;
 		}
 		elseif ($value instanceof File)
 		{
@@ -649,6 +690,12 @@ class Validator implements MessageProviderInterface {
 		// verified as existing. If this parameter is not specified we will guess
 		// that the columns being "verified" shares the given attribute's name.
 		$column = isset($parameters[1]) ? $parameters[1] : $attribute;
+
+		// Search for the array by attribute in data/files, to use in whereIn.
+		if ( is_array($arrayValue = array_get($this->data, $attribute)) )
+		{
+			$value = $arrayValue;
+		}
 
 		$expected = (is_array($value)) ? count($value) : 1;
 
