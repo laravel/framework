@@ -196,9 +196,17 @@ class Str {
 	 */
 	public static function snake($value, $delimiter = '_')
 	{
-		$replace = '$1'.$delimiter.'$2';
+        if (ctype_lower($value)) {
+            return $value;
+        }
 
-		return ctype_lower($value) ? $value : strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
+        return strtolower(
+            preg_replace('/[^A-Z^a-z^0-9]+/', $delimiter,
+                preg_replace('/([a-z])([A-Z])/', '\1' . $delimiter . '\2',
+                    preg_replace('/([A-Z]+)([A-Z][a-z])/','\1' . $delimiter . '\2', $value)
+                )
+            )
+        );
 	}
 
 	/**

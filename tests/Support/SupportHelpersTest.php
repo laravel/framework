@@ -107,6 +107,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testSnakeCase()
 	{
 		$this->assertEquals('foo_bar', snake_case('fooBar'));
+        $this->assertEquals('test_html_translator', snake_case('TestHTMLTranslator'));
 	}
 
 
