@@ -193,6 +193,17 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor', $instance->default);
 	}
 
+
+	public function testResolvingCallbacksAreCalled()
+	{
+		$container = new Container;
+		$container->resolving(function($object) { return $object->name = 'taylor'; });
+		$container->bind('foo', function() { return new StdClass; });
+		$instance = $container->make('foo');
+
+		$this->assertEquals('taylor', $instance->name);
+	}
+
 }
 
 class ContainerConcreteStub {}

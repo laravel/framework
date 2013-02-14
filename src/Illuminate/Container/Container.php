@@ -26,6 +26,13 @@ class Container implements ArrayAccess {
 	protected $aliases = array();
 
 	/**
+	 * All of the registered resolving callbacks.
+	 *
+	 * @var array
+	 */
+	protected $resolvingCallbacks = array();
+
+	/**
 	 * Register a binding with the container.
 	 *
 	 * @param  string               $abstract
@@ -230,6 +237,8 @@ class Container implements ArrayAccess {
 			$this->instances[$abstract] = $object;
 		}
 
+		$this->fireResolvingCallbacks($object);
+
 		return $object;
 	}
 
@@ -350,6 +359,31 @@ class Container implements ArrayAccess {
 			$message = "Unresolvable dependency resolving [$parameter].";
 
 			throw new BindingResolutionException($message);
+		}
+	}
+
+	/**
+	 * Register a new resolving callback.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function resolving(Closure $callback)
+	{
+		$this->resolvingCallbacks[] = $callback;
+	}
+
+	/**
+	 * Fire all of the resolving callbacks.
+	 *
+	 * @param  mixed  $object
+	 * @return void
+	 */
+	protected function fireResolvingCallbacks($object)
+	{
+		foreach ($this->resolvingCallbacks as $callback)
+		{
+			call_user_func($callback, $object);
 		}
 	}
 
