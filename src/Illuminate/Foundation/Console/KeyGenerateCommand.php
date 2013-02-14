@@ -62,7 +62,7 @@ class KeyGenerateCommand extends Command {
 	 */
 	protected function getRandomKey()
 	{
-		return Illuminate\Support\Str::secureRandom(32);
+		return Illuminate\Support\Str::random(32);
 	}
 
 }
