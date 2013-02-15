@@ -8,6 +8,7 @@
 - Allow Eloquent attributes to be acceessed by camelCase in addition to snake_case.
 - Added `App::environment` method.
 - Added `resolving` method to IoC container for catching resolutions.
+- Added `shouldReceive` and `swap` methods to facade.
 
 ## Beta 3
 
