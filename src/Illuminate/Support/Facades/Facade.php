@@ -24,7 +24,7 @@ abstract class Facade {
 	 */
 	public static function swap($instance)
 	{
-		static::$resolvedInstance = $instance;
+		static::$resolvedInstance[static::getFacadeAccessor()] = $instance;
 
 		static::$app->instance(static::getFacadeAccessor(), $instance);
 	}
@@ -37,9 +37,11 @@ abstract class Facade {
 	 */
 	public static function shouldReceive()
 	{
-		static::$resolvedInstance = $mock = \Mockery::mock(get_class(static::getFacadeRoot()));
+		$name = static::getFacadeAccessor();
 
-		static::$app->instance(static::getFacadeAccessor(), $mock);
+		static::$resolvedInstance[$name] = $mock = \Mockery::mock(get_class(static::getFacadeRoot()));
+
+		static::$app->instance($name, $mock);
 
 		return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
 	}
