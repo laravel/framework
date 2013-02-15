@@ -1132,7 +1132,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function setRawAttributes(array $attributes, $sync = false)
 	{
-		$this->attributes = $attributes;
+		$this->attributes = array_combine(array_map('snake_case',array_keys($attributes)),$attributes);
 
 		if ($sync) $this->syncOriginal();
 	}
