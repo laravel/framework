@@ -33,6 +33,17 @@ class Container implements ArrayAccess {
 	protected $resolvingCallbacks = array();
 
 	/**
+	 * Determine if the given abstract type has been bound.
+	 *
+	 * @param  string  $abstract
+	 * @return bool
+	 */
+	public function bound($abstract)
+	{
+		return isset($this[$abstract]);
+	}
+
+	/**
 	 * Register a binding with the container.
 	 *
 	 * @param  string               $abstract

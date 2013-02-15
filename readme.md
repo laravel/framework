@@ -9,6 +9,7 @@
 - Added `App::environment` method.
 - Added `resolving` method to IoC container for catching resolutions.
 - Added `shouldReceive` and `swap` methods to facade.
+- Added `bound` method to the IoC container.
 
 ## Beta 3
 
