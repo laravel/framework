@@ -17,6 +17,34 @@ abstract class Facade {
 	protected static $resolvedInstance;
 
 	/**
+	 * Hotswap the underlying instance behind the facade.
+	 *
+	 * @param  mixed  $instance
+	 * @return void
+	 */
+	public static function swap($instance)
+	{
+		static::$resolvedInstance = $instance;
+
+		static::$app->instance(static::getFacadeAccessor(), $instance);
+	}
+
+	/**
+	 * Initiate a mock expectation on the facade.
+	 *
+	 * @param  dynamic
+	 * @return Mockery\Expectation
+	 */
+	public static function shouldReceive()
+	{
+		static::$resolvedInstance = $mock = \Mockery::mock(get_class(static::getFacadeRoot()));
+
+		static::$app->instance(static::getFacadeAccessor(), $mock);
+
+		return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
+	}
+
+	/**
 	 * Get the root object behind the facade.
 	 *
 	 * @return mixed
