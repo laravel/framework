@@ -941,24 +941,24 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function getAttribute($key)
 	{
-		$key = snake_case($key);
+		$snake = snake_case($key);
 
-		$inAttributes = array_key_exists($key, $this->attributes);
+		$inAttributes = array_key_exists($snake, $this->attributes);
 
 		// If the key references an attribute, we can just go ahead and return the
 		// plain attribute value from the model. This allows every attribute to
 		// be dynamically accessed through the _get method without accessors.
-		if ($inAttributes or $this->hasGetMutator($key))
+		if ($inAttributes or $this->hasGetMutator($snake))
 		{
-			return $this->getPlainAttribute($key);
+			return $this->getPlainAttribute($snake);
 		}
 
 		// If the key already exists in the relationships array, it just means the
 		// relationship has already been loaded, so we'll just return it out of
 		// here because there is no need to query within the relations twice.
-		if (array_key_exists($key, $this->relations))
+		if (array_key_exists($snake, $this->relations))
 		{
-			return $this->relations[$key];
+			return $this->relations[$snake];
 		}
 
 		// If the "attribute" exists as a method on the model, we will just assume
@@ -968,7 +968,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		{
 			$relations = $this->$key()->getResults();
 
-			return $this->relations[$key] = $relations;
+			return $this->relations[$snake] = $relations;
 		}
 	}
 
