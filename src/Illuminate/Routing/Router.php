@@ -365,7 +365,7 @@ class Router {
 	 */
 	protected function addResourceEdit($name, $base, $controller)
 	{
-		$uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
+		$uri = $this->getResourceUri($name).'/{id}/edit';
 
 		return $this->get($uri, $this->getResourceAction($name, $controller, 'edit'));
 	}
