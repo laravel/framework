@@ -144,7 +144,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	protected function createSessionID()
 	{
-		return Str::secureRandom(40);
+		return Str::random(40);
 	}
 
 	/**

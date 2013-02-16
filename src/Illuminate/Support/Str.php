@@ -119,27 +119,12 @@ class Str {
 	}
 
 	/**
-	 * Generate a "random" alpha-numeric string.
-	 *
-	 * Should not be considered sufficient for cryptography, etc.
-	 *
-	 * @param  int     $length
-	 * @return string
-	 */
-	public static function random($length = 16)
-	{
-		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length); 
-	}
-
-	/**
 	 * Generate a more truly "random" alpha-numeric string.
 	 *
 	 * @param  int     $length
 	 * @return string
 	 */
-	public static function secureRandom($length = 16)
+	public static function random($length = 16)
 	{
 		if (function_exists('openssl_random_pseudo_bytes'))
 		{
@@ -153,7 +138,22 @@ class Str {
 			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
 		}
 
-		return static::random($length);
+		return static::quickRandom($length);
+	}
+
+	/**
+	 * Generate a "random" alpha-numeric string.
+	 *
+	 * Should not be considered sufficient for cryptography, etc.
+	 *
+	 * @param  int     $length
+	 * @return string
+	 */
+	public static function quickRandom($length = 16)
+	{
+		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length); 
 	}
 
 	/**
