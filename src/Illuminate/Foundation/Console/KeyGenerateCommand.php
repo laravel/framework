@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
@@ -62,9 +63,7 @@ class KeyGenerateCommand extends Command {
 	 */
 	protected function getRandomKey()
 	{
-		$pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$()-+';
-
-		return substr(str_shuffle(str_repeat($pool, 5)), 0, 32);
+		return Str::random(32);
 	}
 
 }
