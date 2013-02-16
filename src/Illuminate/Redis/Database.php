@@ -24,6 +24,13 @@ class Database {
 	protected $database;
 
 	/**
+	 * The password value.
+	 *
+	 * @var string
+	 */
+	protected $password;
+
+	/**
 	 * The Redis connection handler.
 	 *
 	 * @var resource
@@ -36,13 +43,15 @@ class Database {
 	 * @param  string  $host
 	 * @param  int     $port
 	 * @param  int     $database
+	 * @param  string  $password
 	 * @return void
 	 */
-	public function __construct($host, $port, $database = 0)
+	public function __construct($host, $port, $database = 0, $password = null)
 	{
 		$this->host = $host;
 		$this->port = $port;
 		$this->database = $database;
+		$this->password = $password;
 	}
 
 	/**
@@ -55,6 +64,11 @@ class Database {
 		if ( ! is_null($this->connection)) return;
 
 		$this->connection = $this->openSocket();
+
+		if ( ! is_null($this->password))
+		{
+			$this->command('auth', array($this->password));
+		}
 
 		$this->command('select', array($this->database));
 	}
