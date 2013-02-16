@@ -10,6 +10,7 @@
 - Added `resolving` method to IoC container for catching resolutions.
 - Added `shouldReceive` and `swap` methods to facade.
 - Added `bound` method to the IoC container.
+- Utilize `checkdate` in the `date` validation rule to make sure the date is actually valid.
 
 ## Beta 3
 
