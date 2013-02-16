@@ -29,17 +29,35 @@ class UrlGenerator {
 	protected $generator;
 
 	/**
+	 * The locale for the current request
+	 * 
+	 * @var String
+	 */
+	protected $locale;
+    
+	/**
+	 * The available application languages
+	 * 
+	 * @var Array
+	 */
+	protected $languages;
+
+	/**
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  Symfony\Component\Routing\RouteCollection  $routes
 	 * @param  Symfony\Component\HttpFoundation\Request   $request
 	 * @return void
 	 */
-	public function __construct(RouteCollection $routes, Request $request)
+	public function __construct(RouteCollection $routes, Request $request, $locale, $languages)
 	{
 		$this->routes = $routes;
 
 		$this->setRequest($request);
+
+		$this->locale = $locale;
+
+		$this->languages = $languages;
 	}
 
 	/**
@@ -50,7 +68,7 @@ class UrlGenerator {
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function to($path, $parameters = array(), $secure = null)
+	public function to($path, $parameters = array(), $secure = null, $locale = true)
 	{
 		if ($this->isValidUrl($path)) return $path;
 
@@ -62,6 +80,14 @@ class UrlGenerator {
 		$tail = trim(implode('/', (array) $parameters), '/');
 
 		$root = $this->getRootUrl($scheme);
+
+		if ($locale && count($this->languages) > 1)
+		{
+			if (in_array($default = $this->locale, $this->languages))
+			{
+				$root = rtrim($root, '/').'/'.$default;
+			}
+		}
 
 		return $root.rtrim('/'.$path.'/'.$tail, '/');
 	}
@@ -138,9 +164,17 @@ class UrlGenerator {
 	 * @param  bool    $absolute
 	 * @return string
 	 */
-	public function route($name, $parameters = array(), $absolute = true)
+	public function route($name, $parameters = array(), $absolute = true, $locale = true)
 	{
 		$route = $this->routes->get($name);
+
+		if ($locale && count($this->languages) > 1)
+		{
+			if (in_array($default = $this->locale, $this->languages))
+			{
+				$route->setPath($default.$route->getPath());
+			}
+		}
 
 		if (isset($route) and $this->usingQuickParameters($parameters))
 		{
