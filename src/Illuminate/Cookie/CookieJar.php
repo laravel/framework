@@ -138,6 +138,18 @@ class CookieJar {
 	}
 
 	/**
+	 * Set the value of a cookie otpion.
+	 *
+	 * @param  string  $option
+	 * @param  string  $value
+	 * @return void
+	 */
+	public function setDefault($option, $value)
+	{
+		$this->defaults[$option] = $value;
+	}
+
+	/**
 	 * Get the request instance.
 	 *
 	 * @return Symfony\Component\HttpFoundation\Request
