@@ -12,7 +12,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testEnvironmenetDetection()
+	public function testEnvironmentDetection()
 	{
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
@@ -23,7 +23,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app->detectEnvironment(array(
 			'local'   => array('localhost')
 		));
-		$this->assertEquals('production', $app['env']);
+		$this->assertEquals('testing', $app['env']);
 
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
