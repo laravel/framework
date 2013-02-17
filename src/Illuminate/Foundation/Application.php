@@ -197,7 +197,7 @@ class Application extends Container implements HttpKernelInterface {
 			}
 		}
 
-		return $this['env'] = 'production';
+		return $this['env'] = 'testing';
 	}
 
 	/**
