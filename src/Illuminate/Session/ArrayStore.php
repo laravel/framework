@@ -30,4 +30,17 @@ class ArrayStore extends CacheDrivenStore {
 		// No storage on array sessions...
 	}
 
+	/**
+	 * Write the session cookie to the response.
+	 *
+	 * @param  Illuminate\Cookie\CookieJar  $cookie
+	 * @param  string  $name
+	 * @param  int  $lifetime
+	 * @return void
+	 */
+	public function getCookie(CookieJar $cookie, $name, $lifetime)
+	{
+		//
+	}
+
 }
