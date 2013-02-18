@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\View\View;
+use Illuminate\Support\Contracts\ArrayableInterface;
 
 class ViewTest extends PHPUnit_Framework_TestCase {
 
@@ -60,6 +61,21 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testViewAcceptsArrayableImplementations()
+	{
+		$view = new View(
+			m::mock('Illuminate\View\Environment'),
+			m::mock('Illuminate\View\Engines\EngineInterface'),
+			'view',
+			'path',
+			new ArrayablePayloadStub
+		);
+
+		$this->assertEquals('bar', $view->foo);
+		$this->assertEquals(array('qux', 'corge'), $view->baz);
+	}
+
+
 	protected function getView()
 	{
 		return new View(
@@ -69,6 +85,15 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 			'path',
 			array('foo' => 'bar')
 		);
+	}
+
+}
+
+class ArrayablePayloadStub implements ArrayableInterface {
+
+	public function toArray()
+	{
+		return array('foo' => 'bar', 'baz' => array('qux', 'corge'));
 	}
 
 }
