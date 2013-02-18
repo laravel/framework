@@ -96,7 +96,10 @@ class SessionServiceProvider extends ServiceProvider {
 
 			$cookie = $session->getCookie($app['cookie'], $config['cookie'], $config['lifetime']);
 
-			$response->headers->setCookie($cookie);
+			if ( ! is_null($cookie))
+			{
+				$response->headers->setCookie($cookie);
+			}
 		});
 	}
 
