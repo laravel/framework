@@ -247,6 +247,17 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	}
 
 	/**
+	 * Determine if the old input contains an item.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function hasOldInput($key)
+	{
+		return ! is_null($this->getOldInput($key));
+	}
+
+	/**
 	 * Get the requested item from the flashed input array.
 	 *
 	 * @param  string  $key
