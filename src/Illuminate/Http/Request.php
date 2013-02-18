@@ -148,7 +148,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 			return true;
 		}
 
-		return trim((string) $this->input($key)) !== '';
+		return null !== $this->input($key);
 	}
 
 	/**
