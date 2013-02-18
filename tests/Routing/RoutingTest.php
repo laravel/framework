@@ -109,6 +109,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 		$router->resource('foo', 'FooController');
 
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.index'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.show'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.create'));
@@ -120,6 +121,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 		$router->resource('foo.bar', 'FooController');
 
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar'))
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.index'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.show'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.create'));
@@ -135,6 +137,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 		$router->resource('foo.bar', 'FooController');
 
+		$this->assertEquals('/foo/{foo}/bar', $router->getRoutes()->get('foo.bar')->getPath());
 		$this->assertEquals('/foo/{foo}/bar', $router->getRoutes()->get('foo.bar.index')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.show')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/create', $router->getRoutes()->get('foo.bar.create')->getPath());
