@@ -58,6 +58,41 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 	}
 
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testBasicWithTrailingSlashNotRoot2()
+	{
+		$router = new Router;
+		$router->get('/foo', function() { return 'bar'; });
+
+		$request = Request::create('///foo/', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
+	}
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testBasicWithoutTrailingSlashNotRoot()
+	{
+		$router = new Router;
+		$router->get('/foo', function() { return 'bar'; });
+
+		$request = Request::create('///foo', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
+	}
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testBasicRootWithExtraTrailingSlash()
+	{
+		$router = new Router;
+		$router->get('/', function() { return 'root'; });
+
+		$request = Request::create('http://foo.com//', 'GET');
+		$this->assertEquals('root', $router->dispatch($request)->getContent());
+	}
 
 	public function testCurrentRequestAndRouteIsSetOnRouter()
 	{
