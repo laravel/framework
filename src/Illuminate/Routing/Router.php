@@ -866,12 +866,10 @@ class Router {
 			return '/';
 		}
 
-		if (strpos($path, '//'))
+		if (strpos($path, '//') === false)
 		{
-			return; // (404)
+			return rtrim($path, '/');
 		}
-
-		return rtrim($path, '/');
 	}
 
 	/**
