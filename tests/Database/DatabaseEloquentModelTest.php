@@ -250,7 +250,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelScopedStub();
 		$result = $model->scope()->get();
 		
+		// Make sure the first scoped query does not affect the next one
+		$result2 = $model->scope2()->get();
+		
 		$this->assertEquals('baz', $result);
+		$this->assertEquals('bam', $result2);
 	}
 
 
@@ -515,12 +519,19 @@ class EloquentModelScopedStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('where')->once()->with('foo', 'bar')->andReturn($mock);
+		$mock->shouldReceive('where')->once()->with('test', 'value')->andReturn($mock);
 		$mock->shouldReceive('get')->once()->andReturn('baz');
+		$mock->shouldReceive('get')->once()->andReturn('bam');
 		return $mock;
 	}
 	public function scope()
 	{
 		$this->scopedQuery()->where('foo', 'bar');
+		return $this;
+	}
+	public function scope2()
+	{
+		$this->scopedQuery()->where('test', 'value');
 		return $this;
 	}
 }
