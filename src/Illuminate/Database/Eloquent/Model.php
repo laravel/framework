@@ -594,6 +594,19 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		
 		return $this->scopedQuery;
 	}
+	
+	/**
+	 * Reset the current scoped query builder object.
+	 * 
+	 * This method makes sure no constraints from previously called scopes
+	 * remain on the scoped query builder object.
+	 * 
+	 * @return void
+	 */
+	protected function resetScopedQuery()
+	{
+		$this->scopedQuery = $this->newQuery();
+	}
 
 	/**
 	 * Get a new query builder instance for the connection.
@@ -1215,6 +1228,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	public function __call($method, $parameters)
 	{
 		$query = $this->scopedQuery();
+		$this->resetScopedQuery();
 
 		return call_user_func_array(array($query, $method), $parameters);
 	}
