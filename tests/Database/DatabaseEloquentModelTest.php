@@ -520,8 +520,7 @@ class EloquentModelScopedStub extends Illuminate\Database\Eloquent\Model {
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('where')->once()->with('foo', 'bar')->andReturn($mock);
 		$mock->shouldReceive('where')->once()->with('test', 'value')->andReturn($mock);
-		$mock->shouldReceive('get')->once()->andReturn('baz');
-		$mock->shouldReceive('get')->once()->andReturn('bam');
+		$mock->shouldReceive('get')->twice()->andReturn('baz', 'bam');
 		return $mock;
 	}
 	public function scope()
