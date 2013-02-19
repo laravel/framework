@@ -279,6 +279,19 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $model->getKey());
 		$this->assertEquals('id', $model->getKeyName());
 	}
+	
+	
+	public function testScopedQuery()
+	{
+		$model = new EloquentModelScopedStub();
+		$result = $model->scope()->get();
+		
+		// Make sure the first scoped query does not affect the next one
+		$result2 = $model->scope2()->get();
+		
+		$this->assertEquals('baz', $result);
+		$this->assertEquals('bam', $result2);
+	}
 
 
 	public function testConnectionManagement()
@@ -534,6 +547,27 @@ class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('with')->once()->with(array('foo', 'bar'))->andReturn('foo');
 		return $mock;
+	}
+}
+
+class EloquentModelScopedStub extends Illuminate\Database\Eloquent\Model {
+	public function newQuery()
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('where')->once()->with('foo', 'bar')->andReturn($mock);
+		$mock->shouldReceive('where')->once()->with('test', 'value')->andReturn($mock);
+		$mock->shouldReceive('get')->twice()->andReturn('baz', 'bam');
+		return $mock;
+	}
+	public function scope()
+	{
+		$this->scopedQuery()->where('foo', 'bar');
+		return $this;
+	}
+	public function scope2()
+	{
+		$this->scopedQuery()->where('test', 'value');
+		return $this;
 	}
 }
 
