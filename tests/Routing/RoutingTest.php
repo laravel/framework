@@ -61,7 +61,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
-	public function testBasicWithTrailingSlashNotRoot()
+	public function testBasicWithTrailingSlashNotRoot2()
 	{
 		$router = new Router;
 		$router->get('/foo', function() { return 'bar'; });
