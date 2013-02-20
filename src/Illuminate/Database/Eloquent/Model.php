@@ -918,7 +918,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 			// collections to their proper array form and we'll set the values.
 			if ($value instanceof ArrayableInterface)
 			{
-				$attributes[$key] = $value->toArray();
+				$attributes[snake_case($key)] = $value->toArray();
 			}
 
 			// If the value is null, we'll still go ahead and set it in this list of
