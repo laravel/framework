@@ -61,6 +61,8 @@ class UrlGenerator {
 		// for passing the array of parameters to this URL as a list of segments.
 		$tail = trim(implode('/', (array) $parameters), '/');
 
+		$path = ltrim($path, '/');
+		
 		$root = $this->getRootUrl($scheme);
 
 		return $root.rtrim('/'.$path.'/'.$tail, '/');
