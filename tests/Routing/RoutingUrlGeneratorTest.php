@@ -18,8 +18,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$gen = $this->getGenerator();
 		$gen->setRequest(Request::create('http://foobar.com/foo/bar', 'GET'));
 
+		$this->assertEquals('http://foobar.com/', $gen->to('/'));
+		$this->assertEquals('http://foobar.com/something', $gen->to('/something'));
 		$this->assertEquals('http://foobar.com/something', $gen->to('something'));
+		
+		$this->assertEquals('https://foobar.com/', $gen->secure('/'));
+		$this->assertEquals('https://foobar.com/something', $gen->secure('/something'));
 		$this->assertEquals('https://foobar.com/something', $gen->secure('something'));
+		
+		$this->assertEquals('http://foobar.com/dayle/rees', $gen->to('/', array('dayle', 'rees')));
+		$this->assertEquals('http://foobar.com/dayle/rees', $gen->to(null, array('dayle', 'rees')));
+		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('/something', array('dayle', 'rees')));
 		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('something', array('dayle', 'rees')));
 	}
 
@@ -29,8 +38,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$gen = $this->getGenerator();
 		$gen->setRequest(Request::create('https://foobar.com/foo/bar', 'GET'));
 
-		$this->assertEquals('https://foobar.com/something', $gen->to('something'));
-		$this->assertEquals('http://foobar.com/something', $gen->to('something', array(), false));
+		$this->assertEquals('https://foobar.com/something', $gen->to('/something'));
+		$this->assertEquals('http://foobar.com/something', $gen->to('/something', array(), false));
 	}
 
 
@@ -39,8 +48,9 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$gen = $this->getGenerator();
 		$gen->setRequest(Request::create('http://foobar.com/index.php/foo/bar', 'GET'));
 
-		$this->assertEquals('http://foobar.com/something', $gen->asset('something'));
-		$this->assertEquals('https://foobar.com/something', $gen->secureAsset('something'));
+		$this->assertEquals('http://foobar.com/', $gen->asset('/'));
+		$this->assertEquals('http://foobar.com/something', $gen->asset('/something'));
+		$this->assertEquals('https://foobar.com/something', $gen->secureAsset('/something'));
 	}
 
 
