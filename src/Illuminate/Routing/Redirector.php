@@ -67,8 +67,6 @@ class Redirector {
 	 */
 	public function to($path, $status = 302, $headers = array(), $secure = null)
 	{
-		$path = ltrim($path, '/');
-		
 		$path = $this->generator->to($path, array(), $secure);
 
 		return $this->createRedirect($path, $status, $headers);
