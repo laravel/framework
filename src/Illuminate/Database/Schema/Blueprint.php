@@ -313,11 +313,12 @@ class Blueprint {
 	 * Create a new auto-incrementing column on the table.
 	 *
 	 * @param  string  $column
+	 * @param  int   $digits
 	 * @return Illuminate\Support\Fluent
 	 */
-	public function increments($column)
+	public function increments($column, $digits = false)
 	{
-		return $this->unsignedInteger($column, true);
+		return $this->unsignedInteger($column, true, $digits);
 	}
 
 	/**
@@ -349,11 +350,12 @@ class Blueprint {
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
 	 * @param  bool  $unsigned
+	 * @param  int   $digits
 	 * @return Illuminate\Support\Fluent
 	 */
-	public function integer($column, $autoIncrement = false, $unsigned = false)
+	public function integer($column, $autoIncrement = false, $unsigned = false, $digits = false)
 	{
-		return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
+		return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned', 'digits'));
 	}
 
 	/**
@@ -362,11 +364,12 @@ class Blueprint {
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
 	 * @param  bool  $unsigned
+	 * @param  int   $digits
 	 * @return Illuminate\Support\Fluent
 	 */
-	public function unsignedInteger($column, $autoIncrement = false)
+	public function unsignedInteger($column, $autoIncrement = false, $digits = false)
 	{
-		return $this->integer($column, $autoIncrement, true);
+		return $this->integer($column, $autoIncrement, true, $digits);
 	}
 
 	/**
