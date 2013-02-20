@@ -392,9 +392,10 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 			return $default;
 		}
 		
+		static $json;
+
 		if ( ! isset($json))
 		{
-			static $json;
 			$json = json_decode($this->getContent(), true);
 		}
 
