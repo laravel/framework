@@ -251,8 +251,8 @@ class MySqlGrammar extends Grammar {
 	 * @return string
 	 */
 	protected function typeInteger(Fluent $column)
-	{
-		return 'int';
+    {
+        return $column->digits ? "int({$column->digits})" : 'int';
 	}
 
 	/**
