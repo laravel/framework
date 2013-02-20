@@ -5,7 +5,7 @@ class RoutingControllerInspectorTest extends PHPUnit_Framework_TestCase {
 	public function testMethodsAreCorrectlyDetermined()
 	{
 		$inspector = new Illuminate\Routing\Controllers\Inspector;
-		$data = $inspector->getRoutable('RoutingControllerInspectorStub', 'prefix');
+		$data = $inspector->getRoutable('\\RoutingControllerInspectorStub', 'prefix');
 
 		$this->assertEquals(3, count($data));
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix', 'uri' => 'prefix'), $data['getIndex'][0]);
