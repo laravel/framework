@@ -510,8 +510,16 @@ class Router {
 		if (count($this->groupStack) > 0)
 		{
 			$last = count($this->groupStack) - 1;
+			$newStack = array_merge_recursive($this->groupStack[$last], $attributes);
 
-			$this->groupStack[] = array_merge_recursive($this->groupStack[$last], $attributes);
+			if (isset($attributes['prefix']))
+			{
+				$oldPrefix = array_get($this->groupStack[$last], 'prefix', '');
+				$newPrefix = array_get($attributes, 'prefix', '');
+				$newStack['prefix'] = trim($oldPrefix.'/'.$newPrefix, '/');	
+			}
+			
+			$this->groupStack[] = $newStack;
 		}
 		else
 		{
