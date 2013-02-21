@@ -21,12 +21,17 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->app['session.manager'] = $this->app->share(function($app)
+		{
+			return new SessionManager($app);
+		});
+
 		$this->app['session'] = $this->app->share(function($app)
 		{
 			// First, we will create the session manager which is responsible for the
 			// creation of the various session drivers when they are needed by the
 			// application instance, and will resolve them on a lazy load basis.
-			$manager = new SessionManager($app);
+			$manager = $app['session.manager'];
 
 			$driver = $manager->driver();
 
