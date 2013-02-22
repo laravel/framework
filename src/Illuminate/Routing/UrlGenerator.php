@@ -59,11 +59,11 @@ class UrlGenerator {
 		// Once we have the scheme we will compile the "tail" by collapsing the values
 		// into a single string delimited by slashes. This just makes it convenient
 		// for passing the array of parameters to this URL as a list of segments.
-		$tail = '/'.implode('/', (array) $parameters);
+		$tail = implode('/', (array) $parameters);
 
 		$root = $this->getRootUrl($scheme);
 
-		return $root.'/'.trim($path.$tail, '/');
+		return $root.'/'.trim($path.'/'.$tail, '/');
 	}
 
 	/**
