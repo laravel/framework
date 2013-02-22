@@ -40,6 +40,13 @@ class Environment {
 	 * @var int
 	 */
 	protected $currentPage;
+	
+	/**
+	 * The name of the page parameter
+	 *
+	 * @var string
+	 */
+	protected $pageParam = 'page';
 
 	/**
 	 * The locale to be used by the translator.
@@ -116,7 +123,7 @@ class Environment {
 	 */
 	public function getCurrentPage()
 	{
-		return $this->currentPage ?: $this->request->query->get('page', 1);
+		return $this->currentPage ?: $this->request->query->get($this->pageParam, 1);
 	}
 	
 	/**
@@ -244,5 +251,26 @@ class Environment {
 	{
 		return $this->trans;
 	}
-
+	
+	/**
+	 * Get the current name of the page parameter for the environment.
+	 *
+	 * @return string
+	 */
+	public function getPageParam()
+	{
+		return $this->pageParam;
+	}
+	
+	/*
+	 * Set the name of the page parameter for the environment.
+	 *
+	 * @param string $name
+	 * @return void
+	 */
+	public function setPageParam($name)
+	{
+		$this->pageParam = $name;
+	}
+	
 }

@@ -48,6 +48,13 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 * @return int
 	 */
 	protected $lastPage;
+	
+	/**
+	 * The name of the page parameter
+	 *
+	 * @var string
+	 */
+	protected $pageParam;
 
 	/**
 	 * All of the additional query string values.
@@ -83,6 +90,8 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 		$this->lastPage = ceil($this->total / $this->perPage);
 
 		$this->currentPage = $this->calculateCurrentPage($this->lastPage);
+		
+		$this->pageParam = $this->env->getPageParam();
 
 		return $this;
 	}
@@ -137,7 +146,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	public function getUrl($page)
 	{
-		$url = $this->env->getCurrentUrl().'?page='.$page;
+		$url = $this->env->getCurrentUrl().'?'.$this->pageParam.'='.$page;
 
 		// If we have any extra query string key / value pairs that need to be added
 		// onto the URL, we will put them in query string form and then attach it
@@ -214,6 +223,16 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getTotal()
 	{
 		return $this->total;
+	}
+	
+	/**
+	 * Get the name of the page parameter for this instance.
+	 *
+	 * @return string
+	 */
+	public function getPageParam()
+	{
+		return $this->pageParam;
 	}
 
 	/**
