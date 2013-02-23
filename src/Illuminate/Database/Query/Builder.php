@@ -263,6 +263,13 @@ class Builder {
 			return $this->whereSub($column, $operator, $value, $boolean);
 		}
 
+        // If the value is null we switch to calling whereNull to deal with the proper
+        // operators otherwise where column = null is produced which is not valid SQL
+        if (is_null($value))
+        {
+            return $this->whereNull($column, $boolean);
+        }
+
 		// Now that we are working with just a simple query we can put the elements
 		// in our array and add the query binding to our array of bindings that
 		// will be bound to each SQL statements when it is finally executed.
