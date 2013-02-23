@@ -20,7 +20,7 @@ abstract class Queue {
 	 */
 	protected function createPayload($job, $data = '')
 	{
-		return serialize(array('job' => $job, 'data' => $data));
+		return json_encode(array('job' => $job, 'data' => $data));
 	}
 
 	/**
