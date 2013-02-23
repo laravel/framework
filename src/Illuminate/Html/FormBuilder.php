@@ -21,6 +21,13 @@ class FormBuilder {
 	protected $tokenProvider;
 
 	/**
+	 * An array of label names we've created.
+	 *
+	 * @var array
+	 */
+	protected $labels = array();
+
+	/**
 	 * The reserved form open attributes.
 	 *
 	 * @var array
@@ -65,9 +72,7 @@ class FormBuilder {
 		$append = $this->getAppendage($method);
 
 		$attributes = array_merge(
-
 			$attributes, array_except($options, $this->reserved)
-
 		);
 
 		// Finally we're ready to create the final form HTML field. We will attribute
@@ -179,6 +184,9 @@ class FormBuilder {
 
 		$attributes['id'] = $this->getIdAttribute($name, $attributes);
 
+		// Next we will look for the rows and cols attributes, as each of these are put
+		// on the textarea element definition. If they are not present, we will just
+		// assume some sane default values for these attributes for the developer.
 		if ( ! isset($attributes['rows'])) $attributes['rows'] = 10;
 
 		if ( ! isset($attributes['cols'])) $attributes['cols'] = 50;
@@ -207,11 +215,12 @@ class FormBuilder {
 	 */
 	protected function getAction(array $options)
 	{
-		if (isset($options['url']))
-		{
-			return $options['url'];
-		}
-		elseif (isset($options['route']))
+		if (isset($options['url'])) return $options['url'];
+
+		// We will also check for a "route" or "action" parameter on the array so that
+		// developers can easily specify a route or controller action when creating
+		// a form providing a convenient interface for creating the form actions.
+		if (isset($options['route']))
 		{
 			return $this->url->route($options['route']);
 		}
