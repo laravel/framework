@@ -70,12 +70,17 @@ class Environment {
 	 * @param  Illuminate\Translation\TranslatorInterface  $trans
 	 * @return void
 	 */
-	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans)
+	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageParam = null)
 	{
 		$this->view = $view;
 		$this->trans = $trans;
 		$this->request = $request;
 		$this->setupPaginationEnvironment();
+
+		if (isset($pageParam))
+		{
+			$this->pageParam = $pageParam;
+		}
 	}
 
 	/**
