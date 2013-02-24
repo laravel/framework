@@ -33,10 +33,10 @@ class Environment {
 	 * @var string
 	 */
 	protected $viewName;
-	
+
 	/**
 	 * The number of the current page.
-	 * 
+	 *
 	 * @var int
 	 */
 	protected $currentPage;
@@ -54,6 +54,13 @@ class Environment {
 	 * @var string
 	 */
 	protected $baseUrl;
+
+	/**
+	 * The input parameter used for the current page.
+	 *
+	 * @var string
+	 */
+	protected $pageParam = 'page';
 
 	/**
 	 * Create a new pagination environment.
@@ -118,10 +125,10 @@ class Environment {
 	{
 		return $this->currentPage ?: $this->request->query->get('page', 1);
 	}
-	
+
 	/**
 	 * Set the number of the current page.
-	 * 
+	 *
 	 * @param  int  $number
 	 * @return void
 	 */
@@ -149,6 +156,27 @@ class Environment {
 	public function setBaseUrl($baseUrl)
 	{
 		$this->baseUrl = $baseUrl;
+	}
+
+	/**
+	 * Set the input page parameter in use by the paginator.
+	 *
+	 * @param  string  $pageParam
+	 * @return void
+	 */
+	public function setPageParam($pageParam)
+	{
+		$this->pageParam = $pageParam;
+	}
+
+	/**
+	 * Get the input page parameter in use by the paginator.
+	 *
+	 * @return string
+	 */
+	public function getPageParam()
+	{
+		return $this->pageParam;
 	}
 
 	/**
