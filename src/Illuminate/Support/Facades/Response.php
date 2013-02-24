@@ -27,11 +27,12 @@ class Response {
 	{
 		$response = new \Symfony\Component\HttpFoundation\JsonResponse($data, $status, $headers);
 
-        if(Input::has('callback')) {
-            $response->setCallback(Input::get('callback'));
-        }
+		if (Input::has('callback'))
+		{
+				$response->setCallback(Input::get('callback'));
+		}
 
-        return $response;
+		return $response;
 	}
 
 	/**
