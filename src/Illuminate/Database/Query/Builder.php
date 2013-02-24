@@ -263,8 +263,6 @@ class Builder {
 			return $this->whereSub($column, $operator, $value, $boolean);
 		}
 
-        // If the value is null we switch to calling whereNull to deal with the proper
-        // operators otherwise where column = null is produced which is not valid SQL
         if (is_null($value))
         {
             return $this->whereNull($column, $boolean);
