@@ -305,9 +305,11 @@ class Router {
 	 */
 	protected function addResourceIndex($name, $base, $controller)
 	{
-		$action = $this->getResourceAction($name, $controller, 'index');
-
-		return $this->get($this->getResourceUri($name), $action);
+		$uri = $this->getResourceUri($name);
+		
+		$this->get($uri, $this->getResourceAction($name, $controller, ''));
+		
+		return $this->get($uri, $this->getResourceAction($name, $controller, 'index'));
 	}
 
 	/**
@@ -467,7 +469,16 @@ class Router {
 	 */
 	protected function getResourceAction($resource, $controller, $method)
 	{
-		return array('as' => $resource.'.'.$method, 'uses' => $controller.'@'.$method);
+		if ($method)
+		{
+			$resource .= '.'.$method;
+		}
+		else
+		{
+			$method = 'index';
+		}
+		
+		return array('as' => $resource, 'uses' => $controller.'@'.$method);
 	}
 
 	/**
