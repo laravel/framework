@@ -109,6 +109,26 @@ class Environment {
 	}
 
 	/**
+	 * Determine if a given view exists.
+	 *
+	 * @param  string  $view
+	 * @return bool
+	 */
+	public function exists($view)
+	{
+		try
+		{
+			$this->finder->find($view);
+		}
+		catch (\InvalidArgumentException $e)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Get the rendered contents of a partial from a loop.
 	 *
 	 * @param  string  $view
@@ -230,7 +250,7 @@ class Environment {
 		elseif (is_string($callback))
 		{
 			return $this->addClassComposer($view, $callback);
-		}		
+		}
 	}
 
 	/**
