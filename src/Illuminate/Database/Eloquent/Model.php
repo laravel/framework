@@ -503,7 +503,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 			$name = get_called_class();
 
 			static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
-		}	
+		}
 	}
 
 	/**
@@ -708,7 +708,9 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function getTable()
 	{
-		return $this->table ?: snake_case(str_plural(get_class($this)));
+		if (isset($this->table)) return $this->table;
+
+		return str_replace('\\', '', snake_case(str_plural(get_class($this))));
 	}
 
 	/**
