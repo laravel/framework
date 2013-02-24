@@ -123,7 +123,7 @@ class Environment {
 	 */
 	public function getCurrentPage()
 	{
-		return $this->currentPage ?: $this->request->query->get('page', 1);
+		return $this->currentPage ?: $this->request->query->get($this->pageParam, 1);
 	}
 
 	/**
