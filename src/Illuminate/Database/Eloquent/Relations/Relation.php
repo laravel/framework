@@ -121,7 +121,7 @@ abstract class Relation {
 	 * @param  array  $models
 	 * @return array
 	 */
-	protected function getKeys(array $models)
+	public function getKeys(array $models)
 	{
 		return array_values(array_map(function($value)
 		{
