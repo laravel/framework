@@ -238,6 +238,9 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$store->forget('foo.bat');
 		$this->assertEquals(array('bar' => 'baz'), $store->get('foo'));
 		$this->assertFalse($store->has('foo.bat'));
+		$store->flash('flash.foo', 'bar');
+		$this->assertEquals(array('foo' => 'bar'), $store->get('flash'));
+		$store->forget('flash');
 	}
 
 
