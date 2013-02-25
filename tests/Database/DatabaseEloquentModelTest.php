@@ -451,6 +451,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelWithoutTableStub;
 		$this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
+
+		require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+		$namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
+		$this->assertEquals('foo_bar_eloquent_model_namespaced_stubs', $namespacedModel->getTable());
 	}
 
 
