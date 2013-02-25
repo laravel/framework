@@ -203,7 +203,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	public function testJSONMethod()
 	{
 		$payload = array('name' => 'taylor');
-		$request = Request::create('/', 'GET', array(), array(), array(), array(), json_encode($payload));
+		$request = Request::create('/', 'GET', array(), array(), array(), array('CONTENT_TYPE' => 'application/json'), json_encode($payload));
 		
 		$name = $request->json('name');
 		$this->assertEquals('taylor', $name);
