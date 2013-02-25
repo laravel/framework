@@ -11,7 +11,7 @@ class Inspector {
 	 * @var array
 	 */
 	protected $verbs = array(
-		'any', 'get', 'post', 'put', 
+		'any', 'get', 'post', 'put',
 		'delete', 'head', 'options'
 	);
 
@@ -69,8 +69,6 @@ class Inspector {
 	 */
 	public function isRoutable(ReflectionMethod $method, $controller)
 	{
-		if ($method->class != $controller) return false;
-
 		return $method->isPublic() and starts_with($method->name, $this->verbs);
 	}
 
