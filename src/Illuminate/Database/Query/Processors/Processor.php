@@ -29,17 +29,9 @@ class Processor {
 	{
 		$query->getConnection()->insert($sql, $values);
 
-		// If the table has an incrementing primary key, we will
-		// receive the ID back as the next incremental value of
-		// the primary key. However, sometimes we won't have
-		// incrementing primary keys, in which case casting as
-		// an ID would return 0.
-		if (is_numeric($id = $query->getConnection()->getPdo()->lastInsertId($sequence)))
-		{
-			return (int) $id;
-		}
+		$id = $query->getConnection()->getPdo()->lastInsertId($sequence);
 
-		return $id;
+		return is_numeric($id) ? (int) $id : $id;
 	}
 
 }
