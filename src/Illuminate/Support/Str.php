@@ -182,7 +182,8 @@ class Str {
 		$title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
 
 		// Convert all dashes/undescores into separator
-		$flip = ($separator == '-' ? '_' : '-');
+		$flip = $separator == '-' ? '_' : '-';
+
 		$title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 
 		// Replace all separator characters and whitespace by a single separator
