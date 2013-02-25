@@ -33,7 +33,7 @@ class Inspector {
 		// is a publicly routable method. If so, we will add it to this listings.
 		foreach ($reflection->getMethods() as $method)
 		{
-			if ($this->isRoutable($method, $controller))
+			if ($this->isRoutable($method, $reflection->name))
 			{
 				$data = $this->getMethodData($method, $prefix);
 
