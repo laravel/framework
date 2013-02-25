@@ -101,7 +101,7 @@ class Str {
 	 */
 	public static function limit($value, $limit = 100, $end = '...')
 	{
-		if (static::length($value) <= $limit) return $value;
+		if (mb_strlen($value) <= $limit) return $value;
 
 		return mb_substr($value, 0, $limit, 'UTF-8').$end;
 	}
@@ -153,7 +153,7 @@ class Str {
 	{
 		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length); 
+		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
 	}
 
 	/**
