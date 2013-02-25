@@ -83,6 +83,10 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array('name' => 'Taylor', 'email' => 'foo'));
 		$this->assertTrue($request->has('name'));
 		$this->assertTrue($request->has('name', 'email'));
+
+		//test arrays within query string
+		$request = Request::create('/', 'GET', array('foo' => array('bar', 'baz')));
+		$this->assertTrue($request->has('foo'));
 	}
 
 

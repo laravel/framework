@@ -11,6 +11,8 @@
 - Added `shouldReceive` and `swap` methods to facade.
 - Added `bound` method to the IoC container.
 - Utilize `checkdate` in the `date` validation rule to make sure the date is actually valid.
+- Allow controller actions in base classes to be routed via `Route::controller`.
+- Encode queue payloads as JSON instead of serializing, to make the Queue place nicely with other languages.
 
 ## Beta 3
 

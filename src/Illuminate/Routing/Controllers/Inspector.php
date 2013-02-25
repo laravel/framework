@@ -69,7 +69,7 @@ class Inspector {
 	 */
 	public function isRoutable(ReflectionMethod $method, $controller)
 	{
-		if ($method->class != $controller) return false;
+		if ($method->class == 'Illuminate\Routing\Controllers\Controller') return false;
 
 		return $method->isPublic() and starts_with($method->name, $this->verbs);
 	}
