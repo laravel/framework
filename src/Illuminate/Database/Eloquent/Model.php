@@ -504,7 +504,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	}
 
 	/**
-	 * Register a creating model event with the dispatcher.
+	 * Register a created model event with the dispatcher.
 	 * The callback will be evaluated after the model is saved.
 	 *
 	 * @param  Closure  $callback
