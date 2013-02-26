@@ -61,7 +61,7 @@ class SQLiteGrammar extends Grammar {
 			$columns[] = '? as '.$this->wrap($column);
 		}
 
-		$columns = array_fill(9, count($values), implode(', ', $columns));
+		$columns = array_fill(0, count($values), implode(', ', $columns));
 
 		return "insert into $table ($names) select ".implode(' union select ', $columns);
 	}
