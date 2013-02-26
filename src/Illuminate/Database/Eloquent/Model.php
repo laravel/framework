@@ -469,7 +469,6 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 	/**
 	 * Register an updating model event with the dispatcher.
-	 * The callback will be evaluated before the model is saved.
 	 *
 	 * @param  Closure  $callback
 	 * @return void
@@ -481,7 +480,6 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 	/**
 	 * Register an updated model event with the dispatcher.
-	 * The callback will be evaluated after the model is saved.
 	 *
 	 * @param  Closure  $callback
 	 * @return void
@@ -493,7 +491,6 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 	/**
 	 * Register a creating model event with the dispatcher.
-	 * The callback will be evaluated before the model is saved.
 	 *
 	 * @param  Closure  $callback
 	 * @return void
@@ -505,7 +502,6 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 	/**
 	 * Register a created model event with the dispatcher.
-	 * The callback will be evaluated after the model is saved.
 	 *
 	 * @param  Closure  $callback
 	 * @return void
