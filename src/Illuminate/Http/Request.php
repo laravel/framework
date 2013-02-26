@@ -390,16 +390,9 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function json($key = null, $default = null)
 	{
-		$mime = $this->retrieveItem('server', 'CONTENT_TYPE', null);
-
-		if (strpos($mime, '/json') === false)
-		{
-			return $default;
-		}
-		
 		$json = json_decode($this->getContent(), true);
 
-		return array_get($json, $key, $default);
+		return $json ? array_get($json, $key, $default) : false;
 	}
 
 	/**
