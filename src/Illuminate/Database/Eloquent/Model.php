@@ -469,6 +469,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 	/**
 	 * Register an updating model event with the dispatcher.
+	 * The callback will be evaluated before the model is saved.
 	 *
 	 * @param  Closure  $callback
 	 * @return void
@@ -479,7 +480,20 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	}
 
 	/**
+	 * Register an updated model event with the dispatcher.
+	 * The callback will be evaluated after the model is saved.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function updated(Closure $callback)
+	{
+		static::registerModelEvent('updated', $callback);
+	}
+
+	/**
 	 * Register a creating model event with the dispatcher.
+	 * The callback will be evaluated before the model is saved.
 	 *
 	 * @param  Closure  $callback
 	 * @return void
@@ -487,6 +501,18 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	public static function creating(Closure $callback)
 	{
 		static::registerModelEvent('creating', $callback);
+	}
+
+	/**
+	 * Register a creating model event with the dispatcher.
+	 * The callback will be evaluated after the model is saved.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function created(Closure $callback)
+	{
+		static::registerModelEvent('created', $callback);
 	}
 
 	/**
@@ -559,6 +585,8 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 		$this->setKeysForSaveQuery($query)->update($this->attributes);
 
+		$this->fireModelEvent('updated');
+
 		return true;
 	}
 
@@ -591,6 +619,8 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 		{
 			$query->insert($attributes);
 		}
+
+		$this->fireModelEvent('created');
 
 		return true;
 	}
