@@ -581,7 +581,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 		$this->setKeysForSaveQuery($query)->update($this->attributes);
 
-		$this->fireModelEvent('updated');
+		$this->fireModelEvent('updated', false);
 
 		return true;
 	}
@@ -616,7 +616,7 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 			$query->insert($attributes);
 		}
 
-		$this->fireModelEvent('created');
+		$this->fireModelEvent('created', false);
 
 		return true;
 	}
@@ -626,13 +626,17 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 *
 	 * @return mixed
 	 */
-	protected function fireModelEvent($event)
+	protected function fireModelEvent($event, $halt = true)
 	{
 		if ( ! isset(static::$dispatcher)) return true;
 
 		$name = get_class($this);
 
-		return static::$dispatcher->until("eloquent.{$event}: {$name}", $this);
+		$event = "eloquent.{$event}: {$name}";
+
+		$method = $halt ? 'until' : 'fire';
+
+		return static::$dispatcher->$method($event, $this);
 	}
 
 	/**

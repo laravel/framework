@@ -99,7 +99,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
-		$events->shouldReceive('until')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
 
 		$model->id = 1;
 		$model->name = 'taylor';
@@ -198,7 +198,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
-		$events->shouldReceive('until')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
 
 		$model->name = 'taylor';
 		$model->exists = false;
@@ -215,7 +215,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
-		$events->shouldReceive('until')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
 
 		$model->name = 'taylor';
 		$model->exists = false;
