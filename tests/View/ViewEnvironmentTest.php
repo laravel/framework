@@ -24,6 +24,17 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExistsPassesAndFailsViews()
+	{
+		$env = $this->getEnvironment();
+		$env->getFinder()->shouldReceive('find')->once()->with('foo')->andThrow('InvalidArgumentException');
+		$env->getFinder()->shouldReceive('find')->once()->with('bar')->andReturn('path.php');
+
+		$this->assertFalse($env->exists('foo'));
+		$this->assertTrue($env->exists('bar'));
+	}
+
+
 	public function testRenderEachCreatesViewForEachItemInArray()
 	{
 		$env = m::mock('Illuminate\View\Environment[make]', $this->getEnvironmentArgs());
@@ -151,7 +162,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$environment->startSection('foo');
 		echo 'there';
 		$environment->stopSection();
-		$this->assertEquals('hi there', $environment->yieldContent('foo'));	
+		$this->assertEquals('hi there', $environment->yieldContent('foo'));
 	}
 
 

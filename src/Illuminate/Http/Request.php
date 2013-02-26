@@ -148,6 +148,11 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 			return true;
 		}
 
+		if (is_array($this->input($key)))
+		{
+			return true;
+		}
+
 		return trim((string) $this->input($key)) !== '';
 	}
 
@@ -379,15 +384,22 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	/**
 	 * Get the JSON payload for the request.
 	 *
-	 * @return object
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
 	 */
-	public function json()
+	public function json($key = null, $default = null)
 	{
-		$arguments = func_get_args();
+		$mime = $this->retrieveItem('server', 'CONTENT_TYPE', null);
 
-		array_unshift($arguments, $this->getContent());
+		if (strpos($mime, '/json') === false)
+		{
+			return $default;
+		}
+		
+		$json = json_decode($this->getContent(), true);
 
-		return call_user_func_array('json_decode', $arguments);
+		return array_get($json, $key, $default);
 	}
 
 	/**

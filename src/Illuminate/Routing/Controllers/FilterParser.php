@@ -29,7 +29,7 @@ class FilterParser {
 	 */
 	protected function getCodeFilters($controller, $request, $method, $filter)
 	{
-		$filters = $this->filterByClass($controller->getFilters(), $filter);
+		$filters = $this->filterByClass($controller->getControllerFilters(), $filter);
 
 		return $this->getNames($this->filter($filters, $request, $method));
 	}

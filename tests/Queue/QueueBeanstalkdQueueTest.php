@@ -16,7 +16,7 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
 		$pheanstalk = $queue->getPheanstalk();
 		$pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
 		$pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
-		$pheanstalk->shouldReceive('put')->twice()->with(serialize(array('job' => 'foo', 'data' => array('data'))));
+		$pheanstalk->shouldReceive('put')->twice()->with(json_encode(array('job' => 'foo', 'data' => array('data'))));
 
 		$queue->push('foo', array('data'), 'stack');
 		$queue->push('foo', array('data'));
@@ -29,7 +29,7 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
 		$pheanstalk = $queue->getPheanstalk();
 		$pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
 		$pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
-		$pheanstalk->shouldReceive('put')->twice()->with(serialize(array('job' => 'foo', 'data' => array('data'))), Pheanstalk::DEFAULT_PRIORITY, 5);
+		$pheanstalk->shouldReceive('put')->twice()->with(json_encode(array('job' => 'foo', 'data' => array('data'))), Pheanstalk::DEFAULT_PRIORITY, 5);
 
 		$queue->later(5, 'foo', array('data'), 'stack');
 		$queue->later(5, 'foo', array('data'));

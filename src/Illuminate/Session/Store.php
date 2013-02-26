@@ -307,7 +307,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function flash($key, $value)
 	{
-		$this->session['data'][':new:'][$key] = $value;
+		array_set($this->session['data'][':new:'], $key, $value);
 	}
 
 	/**
