@@ -240,7 +240,7 @@ function asset($path, $secure = null)
 }
 
 /**
- * Get the base to the base of the install.
+ * Get the path to the base of the install.
  *
  * @return string
  */
@@ -339,6 +339,16 @@ function path($path = null, array $parameters = array(), $secure = null)
 	$app = app();
 
 	return $app['url']->to($path, $parameters, $secure);
+}
+
+/**
+ * Get the path to the public folder.
+ *
+ * @return string
+ */
+function public_path()
+{
+	return app()->make('path.public');
 }
 
 /**
