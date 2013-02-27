@@ -13,7 +13,8 @@
 - Utilize `checkdate` in the `date` validation rule to make sure the date is actually valid.
 - Allow controller actions in base classes to be routed via `Route::controller`.
 - Encode queue payloads as JSON instead of serializing, to make the Queue place nicely with other languages.
-- Added Model::created(Closure) and Model::updated(Closure) methods for hooking into Eloquent post-save events.
+- Added `Model::created(Closure)` and `Model::updated(Closure)` methods for hooking into Eloquent post-save events.
+- Added `Model::boot` static method for a one time "booting" method for models.
 
 ## Beta 3
 
