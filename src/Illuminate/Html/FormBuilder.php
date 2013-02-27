@@ -46,7 +46,7 @@ class FormBuilder {
 	 *
 	 * @var array
 	 */
-	protected $reserved = array('method', 'url', 'route', 'action');
+	protected $reserved = array('method', 'url', 'route', 'action', 'files');
 
 	/**
 	 * Create a new form builder instance.
@@ -85,30 +85,33 @@ class FormBuilder {
 		// different method than it actually is, for convenience from the forms.
 		$append = $this->getAppendage($method);
 
-		$attributes = array_merge(
-			$attributes, array_except($options, $this->reserved)
-		);
+		if (isset($options['files']) and $options['files'])
+		{
+			$options['enctype'] = 'multipart/form-data';
+		}
 
 		// Finally we're ready to create the final form HTML field. We will attribute
 		// format the array of attributes. We will also add on the appendage which
 		// is used to spoof the requests for PUT and DELETE requests to the app.
-		$attributes = Html::attributes($attributes);
+		$attributes = array_merge(
+			$attributes, array_except($options, $this->reserved)
+		);
 
-		return '<form'.$attributes.'>'.$append;
+		return '<form'.Html::attributes($attributes).'>'.$append;
 	}
 
 	/**
 	 * Create a new model based form builder.
 	 *
 	 * @param  mixed  $model
-	 * @param  array  $attributes
+	 * @param  array  $options
 	 * @return string
 	 */
-	public function model($model, array $attributes)
+	public function model($model, array $options)
 	{
 		$this->model = $model;
 
-		return $this->open($attributes);
+		return $this->open($options);
 	}
 
 	/**
