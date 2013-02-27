@@ -583,6 +583,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testProvidingNullOrFalseAsSecondParameterBuildsCorrectly()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->where('foo', null);
+		$this->assertEquals('select * from "users" where "foo" is null', $builder->toSql());
+	}
+
+
 	protected function getBuilder()
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
