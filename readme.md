@@ -15,6 +15,7 @@
 - Encode queue payloads as JSON instead of serializing, to make the Queue place nicely with other languages.
 - Added `Model::created(Closure)` and `Model::updated(Closure)` methods for hooking into Eloquent post-save events.
 - Added `Model::boot` static method for a one time "booting" method for models.
+- Passing `null` into a `where` call will not short-cut into `whereNull`.
 
 ## Beta 3
 
