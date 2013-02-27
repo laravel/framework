@@ -42,6 +42,13 @@ class FormBuilder {
 	protected $labels = array();
 
 	/**
+	 * The registered form builder macros.
+	 *
+	 * @var array
+	 */
+	protected $macros = array();
+
+	/**
 	 * The reserved form open attributes.
 	 *
 	 * @var array
@@ -476,6 +483,18 @@ class FormBuilder {
 	}
 
 	/**
+	 * Register a custom form macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public function macro($name, $macro)
+	{
+		$this->macros[$name] = $macro;
+	}
+
+	/**
 	 * Parse the form action method.
 	 *
 	 * @param  string  $method
@@ -589,6 +608,23 @@ class FormBuilder {
 	public function setSessionStore(Session $session)
 	{
 		$this->session = $session;
+	}
+
+	/**
+	 * Dynamically handle calls to the form builder.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if (isset($this->macros[$method]))
+		{
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }
