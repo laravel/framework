@@ -16,6 +16,7 @@
 - Added `Model::created(Closure)` and `Model::updated(Closure)` methods for hooking into Eloquent post-save events.
 - Added `Model::boot` static method for a one time "booting" method for models.
 - Passing `null` into a `where` call will not short-cut into `whereNull`.
+- Changed Blade `{{ }}` to not escape. Made the triple brances escape.
 
 ## Beta 3
 
