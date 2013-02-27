@@ -2,7 +2,7 @@
 
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Html\HtmlBuilder as Html;
-use Illuminate\Support\Contracts\CsrfTokenProviderInterface;
+use Illuminate\Session\Store as Session;
 
 class FormBuilder {
 
@@ -14,11 +14,18 @@ class FormBuilder {
 	protected $url;
 
 	/**
-	 * The CSRF token provider implementation.
+	 * The CSRF token used by the form builder.
 	 *
-	 * @var Illuminate\Support\Contracts\CsrfTokenProviderInterface
+	 * @var string
 	 */
-	protected $tokenProvider;
+	protected $csrfToken;
+
+	/**
+	 * The session store implementation.
+	 *
+	 * @var Illuminate\Support\Contracts\SessionStoreInterface
+	 */
+	protected $session;
 
 	/**
 	 * The current model instance for the form.
@@ -45,13 +52,13 @@ class FormBuilder {
 	 * Create a new form builder instance.
 	 *
 	 * @param  Illuminate\Routing\UrlGenerator  $url
+	 * @param  string  $csrfToken
 	 * @return void
 	 */
-	public function __construct(UrlGenerator $url,
-                                CsrfTokenProviderInterface $tokenProvider)
+	public function __construct(UrlGenerator $url, $csrfToken)
 	{
 		$this->url = $url;
-		$this->tokenProvider = $tokenProvider;
+		$this->csrfToken = $csrfToken;
 	}
 
 	/**
@@ -111,6 +118,8 @@ class FormBuilder {
 	 */
 	public function close()
 	{
+		$this->labels = array();
+
 		$this->model = null;
 
 		return '</form>';
@@ -123,7 +132,24 @@ class FormBuilder {
 	 */
 	public function token()
 	{
-		return $this->hidden('csrf_token', $this->tokenProvider->getToken());
+		return $this->hidden('_token', $this->csrfToken);
+	}
+
+	/**
+	 * Create a form label element.
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function label($name, $value, $attributes = array())
+	{
+		$this->labels[] = $name;
+
+		$attributes = Html::attributes($attributes);
+
+		return '<label for="'.$name.'"'.$attributes.'>'.e($value).'</label>';
 	}
 
 	/**
@@ -189,9 +215,22 @@ class FormBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function hidden($name, $value, $attributes = array())
+	public function hidden($name, $value = null, $attributes = array())
 	{
 		return $this->input('hidden', $name, $value, $attributes);
+	}
+
+	/**
+	 * Create an e-mail input field.
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function email($name, $value = null, $attributes = array())
+	{
+		return $this->input('email', $name, $value, $attributes);
 	}
 
 	/**
@@ -246,6 +285,191 @@ class FormBuilder {
 		}
 
 		return array_merge($attributes, array('cols' => 50, 'rows' => 10));
+	}
+
+	/**
+	 * Create a select box field.
+	 *
+	 * @param  string  $name
+	 * @param  array   $options
+	 * @param  string  $selected
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function select($name, $options = array(), $selected = null, $attributes = array())
+	{
+		// When building a select box the "value" attribute is really the selected one
+		// so we will use that when checking the model or session for a value which
+		// should provide a convenient method of re-populating the forms on post.
+		$selected = $this->getValueAttribute($name, $selected);
+
+		$attributes['id'] = $this->getIdAttribute($name, $attributes);
+
+		$attributes['name'] = $name;
+
+		// We will simply loop through the options and build an HTML value for each of
+		// them until we have an array of HTML declarations. Then we will join them
+		// all together into one single HTML element that can be put on the form.
+		$html = array();
+
+		foreach ($options as $value => $display)
+		{
+			$html[] = $this->getSelectOption($display, $value, $selected);
+		}
+
+		// Once we have all of this HTML, we can join this into a single element after
+		// formatting the attributes into an HTML "attributes" string, then we will
+		// build out a final select statement, which will contain all the values.
+		$attributes = Html::attributes($attributes);
+
+		$list = implode('', $html);
+
+		return "<select{$attributes}>{$list}</select>";
+	}
+
+	/**
+	 * Get the select option for the given value.
+	 *
+	 * @param  string  $display
+	 * @param  string  $value
+	 * @param  string  $selected
+	 * @return string
+	 */
+	protected function getSelectOption($display, $value, $selected)
+	{
+		if (is_array($display))
+		{
+			return $this->optionGroup($display, $value, $selected);
+		}
+	
+		return $this->option($display, $value, $selected);
+	}
+
+	/**
+	 * Create an option group form element.
+	 *
+	 * @param  array   $options
+	 * @param  string  $label
+	 * @param  string  $selected
+	 * @return string
+	 */
+	protected function optionGroup($options, $label, $selected)
+	{
+		$html = array();
+
+		foreach ($options as $value => $display)
+		{
+			$html[] = $this->option($display, $value, $selected);
+		}
+
+		return '<optgroup label="'.e($label).'>'.implode('', $html).'</optgroup>';
+	}
+
+	/**
+	 * Create a select element option.
+	 *
+	 * @param  string  $display
+	 * @param  string  $value
+	 * @param  string  $selected
+	 * @return string
+	 */
+	protected function option($display, $value, $selected)
+	{
+		$selected = $this->getSelectedValue($value, $selected);
+
+		$attributes = array('value' => e($value), 'selected' => $selected);
+
+		return '<option'.Html::attributes($attributes).'>'.e($display).'</option>';
+	}
+
+	/**
+	 * Determine if the value is selected.
+	 *
+	 * @param  string  $value
+	 * @param  string  $selected
+	 * @return string
+	 */
+	protected function getSelectedValue($value, $selected)
+	{
+		if (is_array($selected))
+		{
+			return in_array($value, $selected) ? 'selected' : null;
+		}
+
+		return ((string) $value == (string) $selected) ? 'selected' : null;
+	}
+
+	/**
+	 * Create a checkbox input field.
+	 *
+	 * @param  string  $name
+	 * @param  mixed   $value
+	 * @param  bool    $checked
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function checkbox($name, $value = 1, $checked = null, $attributes = array())
+	{
+		return $this->checkable('checkbox', $name, $value, $checked, $attributes);
+	}
+
+	/**
+	 * Create a radio button input field.
+	 *
+	 * @param  string  $name
+	 * @param  mixed   $value
+	 * @param  bool    $checked
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function radio($name, $value = null, $checked = null, $attributes = array())
+	{
+		if (is_null($value)) $value = $name;
+
+		return $this->checkable('radio', $name, $value, $checked, $attributes);
+	}
+
+	/**
+	 * Create a checkable input field.
+	 *
+	 * @param  string  $type
+	 * @param  string  $name
+	 * @param  mixed   $value
+	 * @param  bool    $checked
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	protected function checkable($type, $name, $value, $checked, $attributs)
+	{
+		if (is_null($checked)) $checked = (bool) $this->getValueAttribute($name, null);
+
+		if ($checked) $attributes['checked'] = 'checked';
+
+		return $this->input($type, $name, $value, $attributes);
+	}
+
+	/**
+	 * Create a submit button element.
+	 *
+	 * @param  string  $value
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function submit($value = null, $attributes = array())
+	{
+		return $this->input('submit', null, $value, $attributes);
+	}
+
+	/**
+	 * Create a button element.
+	 *
+	 * @param  string  $value
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function button($value = null, $attributes = array())
+	{
+		return '<button'.Html::attributes($attributes).'>'.e($value).'</button>';
 	}
 
 	/**
@@ -331,7 +555,7 @@ class FormBuilder {
 	{
 		if ( ! is_null($value)) return $value;
 
-		if ($this->session->hasOldInput($name))
+		if (isset($this->session) and $this->session->hasOldInput($name))
 		{
 			return $this->session->getOldInput($name);
 		}
@@ -340,6 +564,28 @@ class FormBuilder {
 		{
 			return $this->model[$name];
 		}
+	}
+
+	/**
+	 * Get the session store implementation.
+	 *
+	 * @param  Illuminate\Session\Store  $session
+	 * @return void
+	 */
+	public function getSessionStore()
+	{
+		return $this->session;
+	}
+
+	/**
+	 * Set the session store implementation.
+	 *
+	 * @param  Illuminate\Session\Store  $session
+	 * @return void
+	 */
+	public function setSessionStore(Session $session)
+	{
+		$this->session = $session;
 	}
 
 }

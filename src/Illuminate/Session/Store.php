@@ -6,8 +6,9 @@ use Illuminate\Support\Str;
 use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Contracts\SessionStoreInterface;
 
-abstract class Store implements TokenProvider, ArrayAccess {
+abstract class Store implements ArrayAccess {
 
 	/**
 	 * The current session payload.
@@ -134,7 +135,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	{
 		$token = $this->createSessionID();
 
-		return array('csrf_token' => $token, ':old:' => array(), ':new:' => array());
+		return array('_token' => $token, ':old:' => array(), ':new:' => array());
 	}
 
 	/**
@@ -283,7 +284,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function getToken()
 	{
-		return $this->get('csrf_token');
+		return $this->get('_token');
 	}
 
 	/**
