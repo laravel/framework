@@ -137,6 +137,13 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	protected static $dispatcher;
 
 	/**
+	 * The array of booted models.
+	 *
+	 * @var array
+	 */
+	protected static $booted = array();
+
+	/**
 	 * Create a new Eloquent model instance.
 	 *
 	 * @param  array  $attributes
@@ -144,8 +151,22 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 */
 	public function __construct(array $attributes = array())
 	{
+		if ( ! isset(static::$booted[get_class($this)]))
+		{
+			static::boot();
+
+			static::$booted[get_class($this)] = true;
+		}
+
 		$this->fill($attributes);
 	}
+
+	/**
+	 * The "booting" method of the model.
+	 *
+	 * @return void
+	 */
+	protected static function boot() {}
 
 	/**
 	 * Fill the model with an array of attributes.
