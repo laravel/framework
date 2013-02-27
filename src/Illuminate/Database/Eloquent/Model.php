@@ -479,6 +479,17 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	}
 
 	/**
+	 * Register an updated model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function updated(Closure $callback)
+	{
+		static::registerModelEvent('updated', $callback);
+	}
+
+	/**
 	 * Register a creating model event with the dispatcher.
 	 *
 	 * @param  Closure  $callback
@@ -487,6 +498,17 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	public static function creating(Closure $callback)
 	{
 		static::registerModelEvent('creating', $callback);
+	}
+
+	/**
+	 * Register a created model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function created(Closure $callback)
+	{
+		static::registerModelEvent('created', $callback);
 	}
 
 	/**
@@ -559,6 +581,8 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 
 		$this->setKeysForSaveQuery($query)->update($this->attributes);
 
+		$this->fireModelEvent('updated', false);
+
 		return true;
 	}
 
@@ -592,6 +616,8 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 			$query->insert($attributes);
 		}
 
+		$this->fireModelEvent('created', false);
+
 		return true;
 	}
 
@@ -600,13 +626,17 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	 *
 	 * @return mixed
 	 */
-	protected function fireModelEvent($event)
+	protected function fireModelEvent($event, $halt = true)
 	{
 		if ( ! isset(static::$dispatcher)) return true;
 
 		$name = get_class($this);
 
-		return static::$dispatcher->until("eloquent.{$event}: {$name}", $this);
+		$event = "eloquent.{$event}: {$name}";
+
+		$method = $halt ? 'until' : 'fire';
+
+		return static::$dispatcher->$method($event, $this);
 	}
 
 	/**
