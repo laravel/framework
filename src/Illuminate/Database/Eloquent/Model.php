@@ -632,9 +632,10 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	{
 		if ( ! isset(static::$dispatcher)) return true;
 
-		$name = get_class($this);
-
-		$event = "eloquent.{$event}: {$name}";
+		// We will append the names of the class to the event to distinguish it from
+		// other model events that are fired, allowing us to listen on each model
+		// event set individually instead of catching event for all the models.
+		$event = "eloquent.{$event}: ".get_class($this);
 
 		$method = $halt ? 'until' : 'fire';
 
