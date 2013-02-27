@@ -572,16 +572,18 @@ abstract class Model implements ArrayableInterface, JsonableInterface {
 	{
 		if ($this->fireModelEvent('creating') === false) return false;
 
+		$attributes = $this->attributes;
+
 		// If the model has an incrementing key, we can use the "insertGetId" method on
 		// the query builder, which will give us back the final inserted ID for this
 		// table from the database. Not all tables have to be incrementing though.
-		$attributes = $this->attributes;
-
 		if ($this->incrementing)
 		{
 			$keyName = $this->getKeyName();
 
-			$this->setAttribute($keyName, $query->insertGetId($attributes, $keyName));
+			$id = $query->insertGetId($attributes, $keyName);
+
+			$this->setAttribute($keyName, $id);
 		}
 
 		// If the table is not incrementing we'll simply insert this attirbutes as they
