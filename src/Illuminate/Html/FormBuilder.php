@@ -274,16 +274,23 @@ class FormBuilder {
 	{
 		$options['name'] = $name;
 
-		$options['id'] = $this->getIdAttribute($name, $options);
-
 		// Next we will look for the rows and cols attributes, as each of these are put
 		// on the textarea element definition. If they are not present, we will just
 		// assume some sane default values for these attributes for the developer.
 		$options = $this->setTextAreaSize($options);
 
-		$value = (string) $this->getValueAttribute($value);
+		$options['id'] = $this->getIdAttribute($name, $options);
 
-		return '<textarea'.Html::attributes($options).'>'.e($value).'</textarea>';
+		$value = (string) $this->getValueAttribute($name, $value);
+
+		unset($options['size']);
+
+		// Next we will convert the attributes into a string form. Also we have removed
+		// the size attribute, as it was merely a short-cut for the rows and cols on
+		// the element. Then we'll create the final textarea elements HTML for us.
+		$options = Html::attributes($options);
+
+		return '<textarea'.$options.'>'.e($value).'</textarea>';
 	}
 
 	/**
