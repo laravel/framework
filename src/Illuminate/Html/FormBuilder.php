@@ -549,9 +549,11 @@ class FormBuilder {
 	 */
 	protected function getAppendage($method)
 	{
+		$method = strtoupper($method);
+
 		if ($method == 'PUT' or $method == 'DELETE')
 		{
-			$append = $this->hidden('_method', $method);
+			return $this->hidden('_method', $method);
 		}
 
 		return '';
