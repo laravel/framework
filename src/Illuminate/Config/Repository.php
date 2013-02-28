@@ -313,6 +313,16 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	{
 		return $this->loader;
 	}
+	
+	/**
+	 * Set the loader implementation.
+	 *
+	 * @return Illuminate\Config\LoaderInterface
+	 */
+	public function setLoader(LoaderInterface $loader)
+	{
+		$this->loader = $loader;
+	}
 
 	/**
 	 * Get the current configuration environment.
