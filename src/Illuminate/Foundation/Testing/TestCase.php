@@ -114,14 +114,12 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Seed a given database connection.
 	 *
-	 * @param  string  $connection
+	 * @param  string  $class
 	 * @return void
 	 */
-	public function seed($connection = null)
+	public function seed($class = 'DatabaseSeeder')
 	{
-		$connection = $this->app['db']->connection($connection);
-
-		$this->app['seeder']->seed($connection, $this->app['path'].'/database/seeds');
+		$this->app[$class]->run();
 	}
 
 	/**
