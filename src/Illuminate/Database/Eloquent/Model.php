@@ -1236,7 +1236,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function setRelation($relation, $value)
 	{
-		$this->relations[$relation] = $value;
+		$this->relations[snake_case($relation)] = $value;
 	}
 
 	/**
