@@ -76,7 +76,7 @@ class FormBuilder {
 	 */
 	public function open(array $options = array())
 	{
-		$method = strtoupper(array_get($options, 'method', 'post'));
+		$method = array_get($options, 'method', 'post');
 
 		// We need to extract the proper method from the attributes. If the method is
 		// something other than GET or POST we'll use POST since we will spoof the
@@ -101,10 +101,17 @@ class FormBuilder {
 		// format the array of attributes. We will also add on the appendage which
 		// is used to spoof the requests for PUT and DELETE requests to the app.
 		$attributes = array_merge(
+
 			$attributes, array_except($options, $this->reserved)
+
 		);
 
-		return '<form'.Html::attributes($attributes).'>'.$append;
+		// Finally, we will concatenate all of the attributes into a single string so
+		// we can build out the final form open statement. We'll also append on an
+		// extra value for the hidden _method field if it's needed for the form.
+		$attributes = Html::attributes($attributes);
+
+		return '<form'.$attributes.'>'.$append;
 	}
 
 	/**
@@ -150,16 +157,16 @@ class FormBuilder {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function label($name, $value, $attributes = array())
+	public function label($name, $value, $options = array())
 	{
 		$this->labels[] = $name;
 
-		$attributes = Html::attributes($attributes);
+		$options = Html::attributes($options);
 
-		return '<label for="'.$name.'"'.$attributes.'>'.e($value).'</label>';
+		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
 	}
 
 	/**
@@ -168,17 +175,17 @@ class FormBuilder {
 	 * @param  string  $type
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function input($type, $name, $value = null, $attributes = array())
+	public function input($type, $name, $value = null, $options = array())
 	{
-		$attributes['name'] = $name;
+		$options['name'] = $name;
 
 		// We will get the appropriate value for the given field. We will look for the
 		// value in the session for the value in the old input data then we'll look
 		// in the model instance if one is set. Otherwise we will just use empty.
-		$id = $this->getIdAttribute($name, $attributes);
+		$id = $this->getIdAttribute($name, $options);
 
 		$value = $this->getValueAttribute($name, $value);
 
@@ -187,9 +194,9 @@ class FormBuilder {
 		// Once we have the type, value, and ID we can marge them into the rest of the
 		// attributes array so we can convert them into their HTML attribute format
 		// when creating the HTML element. Then, we will return the entire input.
-		$attributes = array_merge($attributes, $merge);
+		$options = array_merge($options, $merge);
 
-		return '<input'.Html::attributes($attributes).'>';
+		return '<input'.Html::attributes($options).'>';
 	}
 
 	/**
@@ -197,24 +204,24 @@ class FormBuilder {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function text($name, $value = null, $attributes = array())
+	public function text($name, $value = null, $options = array())
 	{
-		return $this->input('text', $name, $value, $attributes);
+		return $this->input('text', $name, $value, $options);
 	}
 
 	/**
 	 * Create a password input field.
 	 *
 	 * @param  string  $name
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function password($name, $attributes = array())
+	public function password($name, $options = array())
 	{
-		return $this->input('password', $name, '', $attributes);
+		return $this->input('password', $name, '', $options);
 	}
 
 	/**
@@ -222,12 +229,12 @@ class FormBuilder {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function hidden($name, $value = null, $attributes = array())
+	public function hidden($name, $value = null, $options = array())
 	{
-		return $this->input('hidden', $name, $value, $attributes);
+		return $this->input('hidden', $name, $value, $options);
 	}
 
 	/**
@@ -235,24 +242,24 @@ class FormBuilder {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function email($name, $value = null, $attributes = array())
+	public function email($name, $value = null, $options = array())
 	{
-		return $this->input('email', $name, $value, $attributes);
+		return $this->input('email', $name, $value, $options);
 	}
 
 	/**
 	 * Create a file input field.
 	 *
 	 * @param  string  $name
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function file($name, $attributes = array())
+	public function file($name, $options = array())
 	{
-		return $this->input('file', $name, null, $attributes);
+		return $this->input('file', $name, null, $options);
 	}
 
 	/**
@@ -260,69 +267,69 @@ class FormBuilder {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function textarea($name, $value = null, $attributes = array())
+	public function textarea($name, $value = null, $options = array())
 	{
-		$attributes['name'] = $name;
+		$options['name'] = $name;
 
-		$attributes['id'] = $this->getIdAttribute($name, $attributes);
+		$options['id'] = $this->getIdAttribute($name, $options);
 
 		// Next we will look for the rows and cols attributes, as each of these are put
 		// on the textarea element definition. If they are not present, we will just
 		// assume some sane default values for these attributes for the developer.
-		$attributes = $this->setTextAreaSize($attributes);
+		$options = $this->setTextAreaSize($options);
 
 		$value = (string) $this->getValueAttribute($value);
 
-		return '<textarea'.Html::attributes($attributes).'>'.e($value).'</textarea>';
+		return '<textarea'.Html::attributes($options).'>'.e($value).'</textarea>';
 	}
 
 	/**
 	 * Set the text area size on the attributes.
 	 *
-	 * @param  array  $attributes
+	 * @param  array  $options
 	 * @return array
 	 */
-	protected function setTextAreaSize($attributes)
+	protected function setTextAreaSize($options)
 	{
-		if (isset($attributes['size']))
+		if (isset($options['size']))
 		{
-			$segments = explode('x', $attributes['size']);
+			$segments = explode('x', $options['size']);
 
-			return array_merge($attributes, array('cols' => $segments[0], 'rows' => $segments[1]));
+			return array_merge($options, array('cols' => $segments[0], 'rows' => $segments[1]));
 		}
 
-		return array_merge($attributes, array('cols' => 50, 'rows' => 10));
+		return array_merge($options, array('cols' => 50, 'rows' => 10));
 	}
 
 	/**
 	 * Create a select box field.
 	 *
 	 * @param  string  $name
-	 * @param  array   $options
+	 * @param  array   $list
 	 * @param  string  $selected
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function select($name, $options = array(), $selected = null, $attributes = array())
+	public function select($name, $list = array(), $selected = null, $options = array())
 	{
 		// When building a select box the "value" attribute is really the selected one
 		// so we will use that when checking the model or session for a value which
 		// should provide a convenient method of re-populating the forms on post.
 		$selected = $this->getValueAttribute($name, $selected);
 
-		$attributes['id'] = $this->getIdAttribute($name, $attributes);
+		$options['id'] = $this->getIdAttribute($name, $options);
 
-		$attributes['name'] = $name;
+		$options['name'] = $name;
 
 		// We will simply loop through the options and build an HTML value for each of
 		// them until we have an array of HTML declarations. Then we will join them
 		// all together into one single HTML element that can be put on the form.
 		$html = array();
 
-		foreach ($options as $value => $display)
+		foreach ($list as $value => $display)
 		{
 			$html[] = $this->getSelectOption($display, $value, $selected);
 		}
@@ -330,11 +337,11 @@ class FormBuilder {
 		// Once we have all of this HTML, we can join this into a single element after
 		// formatting the attributes into an HTML "attributes" string, then we will
 		// build out a final select statement, which will contain all the values.
-		$attributes = Html::attributes($attributes);
+		$options = Html::attributes($options);
 
 		$list = implode('', $html);
 
-		return "<select{$attributes}>{$list}</select>";
+		return "<select{$options}>{$list}</select>";
 	}
 
 	/**
@@ -358,16 +365,16 @@ class FormBuilder {
 	/**
 	 * Create an option group form element.
 	 *
-	 * @param  array   $options
+	 * @param  array   $list
 	 * @param  string  $label
 	 * @param  string  $selected
 	 * @return string
 	 */
-	protected function optionGroup($options, $label, $selected)
+	protected function optionGroup($list, $label, $selected)
 	{
 		$html = array();
 
-		foreach ($options as $value => $display)
+		foreach ($list as $value => $display)
 		{
 			$html[] = $this->option($display, $value, $selected);
 		}
@@ -387,9 +394,9 @@ class FormBuilder {
 	{
 		$selected = $this->getSelectedValue($value, $selected);
 
-		$attributes = array('value' => e($value), 'selected' => $selected);
+		$options = array('value' => e($value), 'selected' => $selected);
 
-		return '<option'.Html::attributes($attributes).'>'.e($display).'</option>';
+		return '<option'.Html::attributes($options).'>'.e($display).'</option>';
 	}
 
 	/**
@@ -415,12 +422,12 @@ class FormBuilder {
 	 * @param  string  $name
 	 * @param  mixed   $value
 	 * @param  bool    $checked
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function checkbox($name, $value = 1, $checked = null, $attributes = array())
+	public function checkbox($name, $value = 1, $checked = null, $options = array())
 	{
-		return $this->checkable('checkbox', $name, $value, $checked, $attributes);
+		return $this->checkable('checkbox', $name, $value, $checked, $options);
 	}
 
 	/**
@@ -429,14 +436,14 @@ class FormBuilder {
 	 * @param  string  $name
 	 * @param  mixed   $value
 	 * @param  bool    $checked
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function radio($name, $value = null, $checked = null, $attributes = array())
+	public function radio($name, $value = null, $checked = null, $options = array())
 	{
 		if (is_null($value)) $value = $name;
 
-		return $this->checkable('radio', $name, $value, $checked, $attributes);
+		return $this->checkable('radio', $name, $value, $checked, $options);
 	}
 
 	/**
@@ -446,40 +453,40 @@ class FormBuilder {
 	 * @param  string  $name
 	 * @param  mixed   $value
 	 * @param  bool    $checked
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
 	protected function checkable($type, $name, $value, $checked, $attributs)
 	{
 		if (is_null($checked)) $checked = (bool) $this->getValueAttribute($name, null);
 
-		if ($checked) $attributes['checked'] = 'checked';
+		if ($checked) $options['checked'] = 'checked';
 
-		return $this->input($type, $name, $value, $attributes);
+		return $this->input($type, $name, $value, $options);
 	}
 
 	/**
 	 * Create a submit button element.
 	 *
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function submit($value = null, $attributes = array())
+	public function submit($value = null, $options = array())
 	{
-		return $this->input('submit', null, $value, $attributes);
+		return $this->input('submit', null, $value, $options);
 	}
 
 	/**
 	 * Create a button element.
 	 *
 	 * @param  string  $value
-	 * @param  array   $attributes
+	 * @param  array   $options
 	 * @return string
 	 */
-	public function button($value = null, $attributes = array())
+	public function button($value = null, $options = array())
 	{
-		return '<button'.Html::attributes($attributes).'>'.e($value).'</button>';
+		return '<button'.Html::attributes($options).'>'.e($value).'</button>';
 	}
 
 	/**
@@ -513,15 +520,19 @@ class FormBuilder {
 	 */
 	protected function getAction(array $options)
 	{
-		if (isset($options['url'])) return $options['url'];
-
 		// We will also check for a "route" or "action" parameter on the array so that
 		// developers can easily specify a route or controller action when creating
 		// a form providing a convenient interface for creating the form actions.
+		if (isset($options['url'])) return $options['url'];
+
 		if (isset($options['route']))
 		{
 			return $this->url->route($options['route']);
 		}
+
+		// If an action is available, we are attempting to open a form to a controller
+		// action route. So, we will use the URL generator to get the path to these
+		// actions and return them from the method. Otherwise, we'll use current.
 		elseif (isset($options['action']))
 		{
 			return $this->url->action($options['action']);
