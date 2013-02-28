@@ -192,6 +192,17 @@ class FileLoader implements LoaderInterface {
 	{
 		$this->hints[$namespace] = $hint;
 	}
+	
+	/**
+	 * Returns all registered namespaces with the config
+	 * loader.
+	 *
+	 * @return array
+	 */
+	public function getNamespaces()
+	{
+		return $this->hints;
+	}
 
 	/**
 	 * Get a file's contents by requiring it.
