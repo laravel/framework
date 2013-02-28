@@ -305,6 +305,17 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	}
 
 	/**
+	 * Returns all registered namespaces with the config
+	 * loader.
+	 *
+	 * @return array
+	 */
+	public function getNamespaces()
+	{
+		return $this->loader->getNamespaces();
+	}
+
+	/**
 	 * Get the loader implementation.
 	 *
 	 * @return Illuminate\Config\LoaderInterface
