@@ -21,6 +21,13 @@ class FormBuilder {
 	protected $tokenProvider;
 
 	/**
+	 * The current model instance for the form.
+	 *
+	 * @var mixed
+	 */
+	protected $model;
+
+	/**
 	 * An array of label names we've created.
 	 *
 	 * @var array
@@ -84,6 +91,32 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a new model based form builder.
+	 *
+	 * @param  mixed  $model
+	 * @param  array  $attributes
+	 * @return string
+	 */
+	public function model($model, array $attributes)
+	{
+		$this->model = $model;
+
+		return $this->open($attributes);
+	}
+
+	/**
+	 * Close the current form.
+	 *
+	 * @return string
+	 */
+	public function close()
+	{
+		$this->model = null;
+
+		return '</form>';
+	}
+
+	/**
 	 * Generate a hidden field with the current CSRF token.
 	 *
 	 * @return string
@@ -106,15 +139,18 @@ class FormBuilder {
 	{
 		$attributes['name'] = $name;
 
-		$id = $this->getIdAttribute($name, $attributes);
-
 		// We will get the appropriate value for the given field. We will look for the
 		// value in the session for the value in the old input data then we'll look
 		// in the model instance if one is set. Otherwise we will just use empty.
+		$id = $this->getIdAttribute($name, $attributes);
+
 		$value = $this->getValueAttribute($name, $value);
 
 		$merge = compact('type', 'value', 'id');
 
+		// Once we have the type, value, and ID we can marge them into the rest of the
+		// attributes array so we can convert them into their HTML attribute format
+		// when creating the HTML element. Then, we will return the entire input.
 		$attributes = array_merge($attributes, $merge);
 
 		return '<input'.Html::attributes($attributes).'>';
@@ -187,13 +223,29 @@ class FormBuilder {
 		// Next we will look for the rows and cols attributes, as each of these are put
 		// on the textarea element definition. If they are not present, we will just
 		// assume some sane default values for these attributes for the developer.
-		if ( ! isset($attributes['rows'])) $attributes['rows'] = 10;
-
-		if ( ! isset($attributes['cols'])) $attributes['cols'] = 50;
+		$attributes = $this->setTextAreaSize($attributes);
 
 		$value = (string) $this->getValueAttribute($value);
 
 		return '<textarea'.Html::attributes($attributes).'>'.e($value).'</textarea>';
+	}
+
+	/**
+	 * Set the text area size on the attributes.
+	 *
+	 * @param  array  $attributes
+	 * @return array
+	 */
+	protected function setTextAreaSize($attributes)
+	{
+		if (isset($attributes['size']))
+		{
+			$segments = explode('x', $attributes['size']);
+
+			return array_merge($attributes, array('cols' => $segments[0], 'rows' => $segments[1]));
+		}
+
+		return array_merge($attributes, array('cols' => 50, 'rows' => 10));
 	}
 
 	/**
@@ -288,19 +340,6 @@ class FormBuilder {
 		{
 			return $this->model[$name];
 		}
-	}
-
-	/**
-	 * Create a new model based form builder.
-	 *
-	 * @param  mixed    $model
-	 * @param  array    $attributes
-	 * @param  Closure  $callback
-	 * @return void
-	 */
-	public function model($model, array $attributes, Closure $callback)
-	{
-		//
 	}
 
 }
