@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Html;
 
-class Html {
+class HtmlBuilder {
 
 	/**
 	 * Generate an ordered list of items.
@@ -108,7 +108,9 @@ class Html {
 		// form like required="required" instead of using incorrect numerics.
 		foreach ((array) $attributes as $key => $value)
 		{
-			$html[] = static::attributeElement($key, $value);
+			$element = static::attributeElement($key, $value);
+
+			if ( ! is_null($element)) $html[] = $element;
 		}
 
 		return count($html) > 0 ? ' '.implode(' ', $html) : '';
