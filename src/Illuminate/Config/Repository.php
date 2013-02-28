@@ -303,6 +303,29 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	{
 		return $this->loader->addNamespace($namespace, $hint);
 	}
+	
+	/**
+	 * Returns if a namespace is registered with the config
+	 * loader.
+	 *
+	 * @param  string  $namespace
+	 * @return bool
+	 */
+	public function hasNamespace($namespace)
+	{
+		return $this->loader->hasNamespace($namespace);
+	}
+
+	/**
+	 * Returns all registered namespaces with the config
+	 * loader.
+	 *
+	 * @return array
+	 */
+	public function getNamespaces()
+	{
+		return $this->loader->getNamespaces();
+	}
 
 	/**
 	 * Get the loader implementation.
