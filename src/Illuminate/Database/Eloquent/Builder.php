@@ -2,7 +2,6 @@
 
 use Closure;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Builder {
 
