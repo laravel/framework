@@ -407,7 +407,7 @@ class Builder {
 		$query = $this->newQuery();
 
 		// Once we have the query instance we can simply execute it so it can add all
-		// of the sub-select's conditions to itself, and then we can cache it off 
+		// of the sub-select's conditions to itself, and then we can cache it off
 		// in the array of where clauses for the "main" parent query instance.
 		call_user_func($callback, $query);
 
@@ -512,7 +512,6 @@ class Builder {
 	 *
 	 * @param  string  $column
 	 * @param  mixed   $values
-	 * @param  mixed   $value
 	 * @return Illuminate\Database\Query\Builder
 	 */
 	public function orWhereIn($column, $values)
@@ -543,7 +542,7 @@ class Builder {
 	public function orWhereNotIn($column, $values)
 	{
 		return $this->whereNotIn($column, $values, 'or');
-	}	
+	}
 
 	/**
 	 * Add a where in with a sub-select to the query.
@@ -973,7 +972,7 @@ class Builder {
 	 */
 	public function avg($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));	
+		return $this->aggregate(__FUNCTION__, array($column));
 	}
 
 	/**
@@ -1097,7 +1096,7 @@ class Builder {
 	/**
 	 * Delete a record from the database.
 	 *
-	 * @param  array  $values
+	 * @param  mixed  $id
 	 * @return int
 	 */
 	public function delete($id = null)
