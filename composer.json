@@ -58,6 +58,7 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "2.1.*",
+        "classpreloader/classpreloader": "dev-master",
         "mockery/mockery": "0.7.2"
     },
     "autoload": {
@@ -75,6 +76,9 @@
         "branch-alias": {
             "dev-master": "4.0-dev"
         }
+    },
+    "scripts": {
+        "post-autoload-dump": "./vendor/bin/classpreloader.php compile --config=preload/config.php --output=preload/compiled.php --fix_dir=1"
     },
     "minimum-stability": "dev"
 }
