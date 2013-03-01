@@ -23,7 +23,7 @@ class Str {
 	{
 		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
 
-		return str_replace(' ', '', $value);
+		return lcfirst(str_replace(' ', '', $value));
 	}
 
 	/**
