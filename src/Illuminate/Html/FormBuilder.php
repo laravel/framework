@@ -121,7 +121,7 @@ class FormBuilder {
 	 * @param  array  $options
 	 * @return string
 	 */
-	public function model($model, array $options)
+	public function model($model, array $options = array())
 	{
 		$this->model = $model;
 
