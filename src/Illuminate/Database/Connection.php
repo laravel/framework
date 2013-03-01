@@ -85,23 +85,33 @@ class Connection implements ConnectionInterface {
 	protected $tablePrefix = '';
 
 	/**
+	 * The name of the database connection.
+	 *
+	 * @var string
+	 */
+	protected $name;
+
+	/**
 	 * Create a new database connection instance.
 	 *
 	 * @param  PDO     $pdo
 	 * @param  string  $database
 	 * @param  string  $tablePrefix
+	 * @param  string  $name
 	 * @return void
 	 */
-	public function __construct(PDO $pdo, $database = '', $tablePrefix = '')
+	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', $name = null)
 	{
+		$this->pdo = $pdo;
+
 		// First we will setup the default properties. We keep track of the DB
 		// name we are connected to since it is needed when some reflective
 		// type commands are run such as checking whether a table exists.
-		$this->pdo = $pdo;
-
 		$this->database = $database;
 
 		$this->tablePrefix = $tablePrefix;
+
+		$this->name = $name;
 
 		// We need to initialize a query grammar and the query post processors
 		// which are both very important parts of the database abstractions
@@ -498,6 +508,16 @@ class Connection implements ConnectionInterface {
 	public function getPdo()
 	{
 		return $this->pdo;
+	}
+
+	/**
+	 * Get the database connection name.
+	 *
+	 * @return string|null
+	 */
+	public function getName()
+	{
+		return $this->name;
 	}
 
 	/**
