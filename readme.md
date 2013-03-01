@@ -17,6 +17,7 @@
 - Added `Model::boot` static method for a one time "booting" method for models.
 - Passing `null` into a `where` call will not short-cut into `whereNull`.
 - Changed Blade `{{ }}` to not escape. Made the triple brances escape.
+- Added `DB::getName` to get the configured name of the connection.
 
 ## Beta 3
 
