@@ -463,7 +463,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	protected function checkable($type, $name, $value, $checked, $attributs)
+	protected function checkable($type, $name, $value, $checked, $options)
 	{
 		if (is_null($checked)) $checked = (bool) $this->getValueAttribute($name, null);
 
