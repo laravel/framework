@@ -25,7 +25,14 @@ class Response {
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
-		return new \Symfony\Component\HttpFoundation\JsonResponse($data, $status, $headers);
+		$response = new \Symfony\Component\HttpFoundation\JsonResponse($data, $status, $headers);
+
+		if (Input::has('callback'))
+		{
+				$response->setCallback(Input::get('callback'));
+		}
+
+		return $response;
 	}
 
 	/**
