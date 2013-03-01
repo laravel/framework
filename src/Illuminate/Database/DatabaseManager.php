@@ -84,7 +84,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 			return call_user_func($this->extensions[$name], $config);
 		}
 
-		return $this->factory->make($name, $config);
+		return $this->factory->make($config, $name);
 	}
 
 	/**
