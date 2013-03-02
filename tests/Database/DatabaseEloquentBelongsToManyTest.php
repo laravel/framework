@@ -239,6 +239,8 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	{
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$related = m::mock('Illuminate\Database\Eloquent\Model');

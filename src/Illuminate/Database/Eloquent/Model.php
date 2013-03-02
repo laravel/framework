@@ -433,7 +433,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $id
 	 * @return Illuminate\Database\Eloquent\Relation\MorphMany
 	 */
-	public function morphMany($related, $name)
+	public function morphMany($related, $name, $type = null, $id = null)
 	{
 		$instance = new $related;
 
