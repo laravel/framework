@@ -365,9 +365,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Define an polymorphic, inverse one-to-one or many relationship.
 	 *
 	 * @param  string  $name
+	 * @param  string  $type
+	 * @param  string  $id
 	 * @return Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function morphTo($name = null)
+	public function morphTo($name = null, $type = null, $id = null)
 	{
 		// If no name is provided, we will use the backtrace to get the function name
 		// since that is most likely the name of the polymorphic interface. We can
@@ -379,7 +381,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$name = snake_case($caller['function']);
 		}
 
-		return $this->belongsTo($this->{"{$name}_type"}, "{$name}_id");
+		// Next we will guess the type and ID if necessary. The type and IDs may also
+		// be passed into the function so that the developers may manually specify
+		// them on the relations. Otherwise, we will just make a great estimate.
+		$type = $type ?: $name.'_type';
+
+		$id = $id ?: $id.'_id';
+
+		return $this->belongsTo($this->{$type}, $id);
 	}
 
 	/**
@@ -998,24 +1007,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getAttribute($key)
 	{
-		$snake = snake_case($key);
-
-		$inAttributes = array_key_exists($snake, $this->attributes);
+		$inAttributes = array_key_exists($$key, $this->attributes);
 
 		// If the key references an attribute, we can just go ahead and return the
 		// plain attribute value from the model. This allows every attribute to
 		// be dynamically accessed through the _get method without accessors.
-		if ($inAttributes or $this->hasGetMutator($snake))
+		if ($inAttributes or $this->hasGetMutator($$key))
 		{
-			return $this->getPlainAttribute($snake);
+			return $this->getPlainAttribute($$key);
 		}
 
 		// If the key already exists in the relationships array, it just means the
 		// relationship has already been loaded, so we'll just return it out of
 		// here because there is no need to query within the relations twice.
-		if (array_key_exists($snake, $this->relations))
+		if (array_key_exists($$key, $this->relations))
 		{
-			return $this->relations[$snake];
+			return $this->relations[$$key];
 		}
 
 		// If the "attribute" exists as a method on the model, we will just assume
@@ -1025,7 +1032,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$relations = $this->$key()->getResults();
 
-			return $this->relations[$snake] = $relations;
+			return $this->relations[$$key] = $relations;
 		}
 	}
 
@@ -1094,8 +1101,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function setAttribute($key, $value)
 	{
-		$key = snake_case($key);
-
 		// First we will check for the presence of a mutator for the set operation
 		// which simply lets the developers tweak the attribute as it is set on
 		// the model, such as "json_encoding" an listing of data for storage.
