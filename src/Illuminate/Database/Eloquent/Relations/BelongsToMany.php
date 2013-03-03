@@ -355,10 +355,7 @@ class BelongsToMany extends Relation {
 
 		foreach ($ids as $id)
 		{
-			if ( ! in_array($id, $current))
-			{
-				$this->attach($id);
-			}
+			if ( ! in_array($id, $current)) $this->attach($id);
 		}
 
 		// Next, we will take the differences of the currents and given IDs and detach
@@ -398,21 +395,38 @@ class BelongsToMany extends Relation {
 	{
 		$records = array();
 
-		$hasTimestamps = in_array('created_at', $this->pivotColumns);
+		$timed = in_array($this->createdAt(), $this->pivotColumns);
 
 		// To create the attachment records, we will simply spin through the IDs given
 		// and create a new record to insert for each ID. Each ID may actually be a
 		// key in the array, with extra attributes to be placed in other columns.
 		foreach ($ids as $key => $value)
 		{
-			list($id, $extra) = $this->getAttachId($key, $value, $attributes);
-
-			$record = $this->createAttachRecord($id, $hasTimestamps);
-
-			$records[] = array_merge($record, $extra);
+			$records[] = $this->attacher($key, $value, $attributes, $timed);
 		}
 
 		return $records;
+	}
+
+	/**
+	 * Create a full attachment record payload.
+	 *
+	 * @param  int    $key
+	 * @param  mixed  $value
+	 * @param  array  $attributes
+	 * @param  bool   $timed
+	 * @return array
+	 */
+	protected function attacher($key, $value, $attributes, $timed)
+	{
+		list($id, $extra) = $this->getAttachId($key, $value, $attributes);
+
+		// To create the attachment records, we will simply spin through the IDs given
+		// and create a new record to insert for each ID. Each ID may actually be a
+		// key in the array, with extra attributes to be placed in other columns.
+		$record = $this->createAttachRecord($id, $timed);
+
+		return array_merge($record, $extra);
 	}
 
 	/**
@@ -439,10 +453,10 @@ class BelongsToMany extends Relation {
 	 * Create a new pivot attachment record.
 	 *
 	 * @param  int   $id
-	 * @param  bool  $hasTimestamps
+	 * @param  bool  $timed
 	 * @return array
 	 */
-	protected function createAttachRecord($id, $hasTimestamps)
+	protected function createAttachRecord($id, $timed)
 	{
 		$record[$this->foreignKey] = $this->parent->getKey();
 
@@ -451,11 +465,11 @@ class BelongsToMany extends Relation {
 		// If the record needs to have creation and update timestamps, we will make
 		// them by calling the parent model's "freshTimestamp" method which will
 		// provide us with a fresh timestamp in this model's preferred format.
-		if ($hasTimestamps)
+		if ($timed)
 		{
-			$record['created_at'] = $this->parent->freshTimestamp();
+			$record[$this->createdAt()] = $this->parent->freshTimestamp();
 
-			$record['updated_at'] = $record['created_at'];
+			$record[$this->updatedAt()] = $record[$this->createdAt()];
 		}
 
 		return $record;
@@ -527,9 +541,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function newPivot(array $attributes = array(), $exists = false)
 	{
-		$connection = $this->parent->getConnectionName();
-
-		$pivot = new Pivot($attributes, $this->table, $connection, $exists);
+		$pivot = new Pivot($this->parent, $attributes, $this->table, $exists);
 
 		$pivot->setPivotKeys($this->foreignKey, $this->otherKey);
 
@@ -567,7 +579,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function withTimestamps()
 	{
-		$columns = array('created_at', 'updated_at');
+		$columns = array($this->createdAt(), $this->updatedAt());
 
 		$this->pivotColumns = array_merge($this->pivotColumns, $columns);
 

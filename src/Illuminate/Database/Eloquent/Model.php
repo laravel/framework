@@ -145,6 +145,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $booted = array();
 
 	/**
+	 * The name of the "created at" column.
+	 *
+	 * @var string
+	 */
+	const CREATED_AT = 'created_at';
+
+	/**
+	 * The name of the "updated at" column.
+	 *
+	 * @var string
+	 */
+	const UPDATED_AT = 'updated_at';
+
+	/**
 	 * Create a new Eloquent model instance.
 	 *
 	 * @param  array  $attributes
@@ -322,14 +336,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $name
-	 * @param  string  $foreignKey
+	 * @param  string  $type
+	 * @param  string  $id
 	 * @return Illuminate\Database\Eloquent\Relation\MorphOne
 	 */
-	public function morphOne($related, $name)
+	public function morphOne($related, $name, $type = null, $id = null)
 	{
 		$instance = new $related;
 
-		return new MorphOne($instance->newQuery(), $this, $name);
+		list($type, $id) = $this->getMorphs($name, $type, $id);
+
+		return new MorphOne($instance->newQuery(), $this, $type, $id);
 	}
 
 	/**
@@ -365,9 +382,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Define an polymorphic, inverse one-to-one or many relationship.
 	 *
 	 * @param  string  $name
+	 * @param  string  $type
+	 * @param  string  $id
 	 * @return Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function morphTo($name = null)
+	public function morphTo($name = null, $type = null, $id = null)
 	{
 		// If no name is provided, we will use the backtrace to get the function name
 		// since that is most likely the name of the polymorphic interface. We can
@@ -379,7 +398,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$name = snake_case($caller['function']);
 		}
 
-		return $this->belongsTo($this->{"{$name}_type"}, "{$name}_id");
+		list($type, $id) = $this->getMorphs($name, $type, $id);
+
+		// Next we will guess the type and ID if necessary. The type and IDs may also
+		// be passed into the function so that the developers may manually specify
+		// them on the relations. Otherwise, we will just make a great estimate.
+		$class = $this->$type;
+
+		return $this->belongsTo($class, $id);
 	}
 
 	/**
@@ -403,14 +429,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $name
-	 * @param  string  $foreignKey
+	 * @param  string  $type
+	 * @param  string  $id
 	 * @return Illuminate\Database\Eloquent\Relation\MorphMany
 	 */
-	public function morphMany($related, $name)
+	public function morphMany($related, $name, $type = null, $id = null)
 	{
 		$instance = new $related;
 
-		return new MorphMany($instance->newQuery(), $this, $name);
+		list($type, $id) = $this->getMorphs($name, $type, $id);
+
+		return new MorphMany($instance->newQuery(), $this, $type, $id);
 	}
 
 	/**
@@ -696,12 +725,54 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function updateTimestamps()
 	{
-		$this->updated_at = $this->freshTimestamp();
+		$this->setUpdatedAt($time = $this->freshTimestamp());
 
 		if ( ! $this->exists)
 		{
-			$this->created_at = $this->updated_at;
+			$this->setCreatedAt($time);
 		}
+	}
+
+	/**
+	 * Set the value of the "created at" attribute.
+	 *
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function setCreatedAt($value)
+	{
+		$this->{static::CREATED_AT} = $value;
+	}
+
+	/**
+	 * Set the value of the "updated at" attribute.
+	 *
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function setUpdatedAt($value)
+	{
+		$this->{static::UPDATED_AT} = $value;
+	}
+
+	/**
+	 * Get the name of the "created at" column.
+	 *
+	 * @return string
+	 */
+	public function getCreatedAtColumn()
+	{
+		return static::CREATED_AT;
+	}
+
+	/**
+	 * Get the name of the "updated at" column.
+	 *
+	 * @return string
+	 */
+	public function getUpdatedAtColumn()
+	{
+		return static::UPDATED_AT;
 	}
 
 	/**
@@ -807,6 +878,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function usesTimestamps()
 	{
 		return $this->timestamps;
+	}
+
+	/**
+	 * Get the polymorphic relationship columns.
+	 *
+	 * @param  string  $name
+	 * @param  string  $type
+	 * @param  string  $id
+	 * @return array
+	 */
+	protected function getMorphs($name, $type, $id)
+	{
+		$type = $type ?: $name.'_type';
+
+		$id = $id ?: $name.'_id';
+
+		return array($type, $id);
 	}
 
 	/**
@@ -998,24 +1086,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getAttribute($key)
 	{
-		$snake = snake_case($key);
-
-		$inAttributes = array_key_exists($snake, $this->attributes);
+		$inAttributes = array_key_exists($key, $this->attributes);
 
 		// If the key references an attribute, we can just go ahead and return the
 		// plain attribute value from the model. This allows every attribute to
 		// be dynamically accessed through the _get method without accessors.
-		if ($inAttributes or $this->hasGetMutator($snake))
+		if ($inAttributes or $this->hasGetMutator($key))
 		{
-			return $this->getPlainAttribute($snake);
+			return $this->getPlainAttribute($key);
 		}
 
 		// If the key already exists in the relationships array, it just means the
 		// relationship has already been loaded, so we'll just return it out of
 		// here because there is no need to query within the relations twice.
-		if (array_key_exists($snake, $this->relations))
+		if (array_key_exists($key, $this->relations))
 		{
-			return $this->relations[$snake];
+			return $this->relations[$key];
 		}
 
 		// If the "attribute" exists as a method on the model, we will just assume
@@ -1025,7 +1111,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$relations = $this->$key()->getResults();
 
-			return $this->relations[$snake] = $relations;
+			return $this->relations[$key] = $relations;
 		}
 	}
 
@@ -1094,8 +1180,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function setAttribute($key, $value)
 	{
-		$key = snake_case($key);
-
 		// First we will check for the presence of a mutator for the set operation
 		// which simply lets the developers tweak the attribute as it is set on
 		// the model, such as "json_encoding" an listing of data for storage.
