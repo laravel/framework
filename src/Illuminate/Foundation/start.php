@@ -116,7 +116,7 @@ $app->instance('config', $config);
 |
 | Here we will set the default timezone for PHP. PHP is notoriously mean
 | if the timezone is not explicitly set. This will be used by each of
-| the PHP date and date-time functions throoughout the application.
+| the PHP date and date-time functions throughout the application.
 |
 */
 
@@ -202,7 +202,7 @@ if (file_exists($path)) require $path;
 |
 | The environment start script is only loaded if it exists for the app
 | environment currently active, which allows some actions to happen
-| in one environment while not in the other, keeping thigs clean.
+| in one environment while not in the other, keeping things clean.
 |
 */
 

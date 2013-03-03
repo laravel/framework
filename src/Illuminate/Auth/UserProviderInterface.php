@@ -3,7 +3,7 @@
 interface UserProviderInterface {
 
 	/**
-	 * Retrieve a user by their unique idenetifier.
+	 * Retrieve a user by their unique identifier.
 	 *
 	 * @param  mixed  $identifier
 	 * @return Illuminate\Auth\UserInterface|null

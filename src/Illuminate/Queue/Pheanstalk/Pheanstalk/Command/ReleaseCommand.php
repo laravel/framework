@@ -42,7 +42,7 @@ class Pheanstalk_Command_ReleaseCommand
 	}
 
 	/* (non-phpdoc)
-	 * @see Pheanstalk_ResponseParser::parseRespose()
+	 * @see Pheanstalk_ResponseParser::parseResponse()
 	 */
 	public function parseResponse($responseLine, $responseData)
 	{

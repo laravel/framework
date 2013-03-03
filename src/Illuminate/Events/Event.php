@@ -12,7 +12,7 @@ class Event extends SymfonyEvent {
 	protected $payload;
 
 	/**
-	 * Create a new event instnace.
+	 * Create a new event instance.
 	 *
 	 * @param  mixed  $payload
 	 * @return void

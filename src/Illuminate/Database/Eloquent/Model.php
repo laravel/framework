@@ -661,7 +661,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->setAttribute($keyName, $id);
 		}
 
-		// If the table is not incrementing we'll simply insert this attirbutes as they
+		// If the table is not incrementing we'll simply insert this attributes as they
 		// are, as this attributes arrays must contain an "id" column already placed
 		// there by the developer as the manually determined key for these models.
 		else
@@ -707,7 +707,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Update the model's updat timestamp.
+	 * Update the model's update timestamp.
 	 *
 	 * @return bool
 	 */
@@ -1245,7 +1245,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get the format for databsae stored dates.
+	 * Get the format for database stored dates.
 	 *
 	 * @return string
 	 */
@@ -1538,7 +1538,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Conver the model to its string representation.
+	 * Convert the model to its string representation.
 	 *
 	 * @return string
 	 */
