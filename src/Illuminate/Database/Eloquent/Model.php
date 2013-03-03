@@ -1089,7 +1089,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 				$key = snake_case($key);
 			}
 
-			$attributes[$key] = $value;
+			$attributes[$key] = $relation;
 		}
 
 		return $attributes;
