@@ -124,6 +124,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public $exists = false;
 
 	/**
+	 * Indicates whether relationships are snake cased on arrays.
+	 *
+	 * @var bool
+	 */
+	public $snakeRelations = true;
+
+	/**
 	 * The connection resolver instance.
 	 *
 	 * @var Illuminate\Database\ConnectionResolverInterface
@@ -1063,7 +1070,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// collections to their proper array form and we'll set the values.
 			if ($value instanceof ArrayableInterface)
 			{
-				$attributes[$key] = $value->toArray();
+				$relation = $value->toArray();
 			}
 
 			// If the value is null, we'll still go ahead and set it in this list of
@@ -1071,8 +1078,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// if it a has one or belongs to type relationships on the models.
 			elseif (is_null($value))
 			{
-				$attributes[$key] = $value;
+				$relation = $value;
 			}
+
+			// If the relationships snake-casing is enabled, we will snake case this
+			// key so that the relation attribute is snake cased in this returned
+			// array to the developer, making this consisntent with attributes.
+			if ($this->snakeRelations)
+			{
+				$key = snake_case($key);
+			}
+
+			$attributes[$key] = $value;
 		}
 
 		return $attributes;

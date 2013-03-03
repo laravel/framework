@@ -317,6 +317,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testToArraySnakeRelations()
+	{
+		$model = new EloquentModelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$model->snakeRelations = true;
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['names_list'][0]['bar']);
+		$this->assertEquals('boom', $array['names_list'][1]['bam']);
+
+		$model->snakeRelations = false;
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['namesList'][0]['bar']);
+		$this->assertEquals('boom', $array['namesList'][1]['bam']);
+	}
+
+
 	public function testFillable()
 	{
 		$model = new EloquentModelStub;
