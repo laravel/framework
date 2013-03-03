@@ -1243,7 +1243,7 @@ class Router {
 	}
 
 	/**
-	 * Disable the runnning of all filters.
+	 * Disable the running of all filters.
 	 *
 	 * @return void
 	 */

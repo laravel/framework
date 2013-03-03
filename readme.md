@@ -5,7 +5,7 @@
 - Added `Model::creating(Closure)` and `Model::updating(Closure)` methods for hooking into Eloquent save events.
 - Added `Event::queue` and `Event::flush`.
 - Added a `Str` class in support component. Adopted Patchwork UTF-8 to provide solid UTF-8 handling for the framework.
-- Allow Eloquent attributes to be acceessed by camelCase in addition to snake_case.
+- Allow Eloquent attributes to be accessed by camelCase in addition to snake_case.
 - Added `App::environment` method.
 - Added `resolving` method to IoC container for catching resolutions.
 - Added `shouldReceive` and `swap` methods to facade.
@@ -16,7 +16,7 @@
 - Added `Model::created(Closure)` and `Model::updated(Closure)` methods for hooking into Eloquent post-save events.
 - Added `Model::boot` static method for a one time "booting" method for models.
 - Passing `null` into a `where` call will not short-cut into `whereNull`.
-- Changed Blade `{{ }}` to not escape. Made the triple brances escape.
+- Changed Blade `{{ }}` to not escape. Made the triple braces escape.
 - Added `DB::getName` to get the configured name of the connection.
 
 ## Beta 3
