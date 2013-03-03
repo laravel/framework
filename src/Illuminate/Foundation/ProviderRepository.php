@@ -88,7 +88,7 @@ class ProviderRepository {
 		{
 			$instance = $this->createProvider($app, $provider);
 
-			// When recomiling the service manifest, we will spin through each of the
+			// When recompiling the service manifest, we will spin through each of the
 			// providers and check if it's a deferred provider or not. If so we'll
 			// add it's provided services to the manifest and note the provider.
 			if ($instance->isDeferred())

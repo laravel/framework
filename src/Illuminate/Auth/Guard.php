@@ -194,7 +194,7 @@ class Guard {
 		$this->session->put($this->getName(), $id);
 
 		// If the user should be permanently "remembered" by the application we will
-		// queue a permament cookie that contains the encrypted copy of the user
+		// queue a permanent cookie that contains the encrypted copy of the user
 		// identifier. We will then decrypt this later to retrieve the users.
 		if ($remember)
 		{

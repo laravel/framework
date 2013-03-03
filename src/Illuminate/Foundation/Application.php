@@ -212,7 +212,7 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		foreach ($arguments as $key => $value)
 		{
-			// For the console environmnet, we'll just look for an argument that starts
+			// For the console environment, we'll just look for an argument that starts
 			// with "--env" then assume that it is setting the environment for every
 			// operation being performed, and we'll use that environment's config.
 			if (starts_with($value, '--env='))
