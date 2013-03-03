@@ -38,7 +38,7 @@ class ApcWrapper {
 	}
 
 	/**
-	 * Remove all itesm from the cache.
+	 * Remove all items from the cache.
 	 *
 	 * @return void
 	 */

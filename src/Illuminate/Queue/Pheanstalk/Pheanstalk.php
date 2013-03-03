@@ -378,7 +378,7 @@ class Pheanstalk
 	 * available.
 	 *
 	 * Using this method is equivalent to calling watch(), ignore() then 
-	 * reserve(), with the added benefit that it will not execute uneccessary
+	 * reserve(), with the added benefit that it will not execute unnecessary
 	 * WATCH or IGNORE commands if the client is already watching the
 	 * specified tube.
 	 *

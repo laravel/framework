@@ -263,7 +263,7 @@ class Builder {
 			return $this->whereSub($column, $operator, $value, $boolean);
 		}
 
-		// If the value is "null", we will just assume the developer wnats to add a
+		// If the value is "null", we will just assume the developer wants to add a
 		// where null clause to the query. So, we will allow a short-cut here to
 		// that method for convenience so the developer doesn't have to check.
 		if (is_null($value))

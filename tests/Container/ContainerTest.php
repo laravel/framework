@@ -115,7 +115,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testBindingsCanBeOverriden()
+	public function testBindingsCanBeOverridden()
 	{
 		$container = new Container;
 		$container['foo'] = 'bar';
