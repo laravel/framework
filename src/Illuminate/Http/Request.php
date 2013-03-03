@@ -109,6 +109,16 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		
 		return false;
 	}
+	
+	/**
+	 * Determine if the current request is via the command line.
+	 *
+	 * @return bool
+	 */
+	public static function cli()
+	{
+		return defined('STDIN') || (substr(PHP_SAPI, 0, 3) == 'cgi' && getenv('TERM'));
+	}
 
 	/**
 	 * Determine if the request is the result of an AJAX call.
