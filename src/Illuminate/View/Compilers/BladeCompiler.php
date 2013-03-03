@@ -36,6 +36,22 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	);
 
 	/**
+	 * Array representing the opening and closing
+	 * tags for echoing content.
+	 *
+	 * @var array
+	 */
+	protected $contentTags = array('{{', '}}');
+
+	/**
+	 * Array representing the opening and closing
+	 * tags for echoing raw content.
+	 *
+	 * @var array
+	 */
+	protected $rawContentTags = array('{{{', '}}}');
+
+	/**
 	 * Compile the view at the given path.
 	 *
 	 * @param  string  $path
@@ -75,7 +91,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function extend(Closure $compiler)
 	{
-		$this->extensions[] = $compiler;	
+		$this->extensions[] = $compiler;
 	}
 
 	/**
@@ -135,7 +151,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileComments($value)
 	{
-		return preg_replace('/\{\{--((.|\s)*?)--\}\}/', "<?php /* $1 */ ?>", $value);
+		return preg_replace(sprintf(
+			'/%s--((.|\s)*?)--%s/',
+			preg_quote($this->contentTags[0]),
+			preg_quote($this->contentTags[1])
+		), '<?php /* $1 */ ?>', $value);
 	}
 
 	/**
@@ -146,9 +166,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		$value = preg_replace('/\{\{\{\s*(.+?)\s*\}\}\}/s', '<?php echo $1; ?>', $value);
+		$value = preg_replace(sprintf(
+			'/%s\s*(.+?)\s*%s/s',
+			preg_quote($this->rawContentTags[0]),
+			preg_quote($this->rawContentTags[1])
+		), '<?php echo $1; ?>', $value);
 
-		return preg_replace('/\{\{\s*(.+?)\s*\}\}/s', '<?php echo e($1); ?>', $value);
+		return preg_replace(sprintf(
+			'/%s\s*(.+?)\s*%s/s',
+			preg_quote($this->contentTags[0]),
+			preg_quote($this->contentTags[1])
+		), '<?php echo e($1); ?>', $value);
 	}
 
 	/**
@@ -327,6 +355,36 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function createPlainMatcher($function)
 	{
 		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
+	}
+
+	/**
+	 * Sets the content tags used for the compiler.
+	 *
+	 * @param  array  $contentTags
+	 * @param  array  $raw
+	 * @return void
+	 */
+	public function setContentTags(array $contentTags, $raw = false)
+	{
+		if (($count = count($contentTags)) !== 2)
+		{
+			throw new \InvalidArgumentException("Invalid count [$count] of Blade content tags provided.");
+		}
+
+		$property = ($raw === true) ? 'rawContentTags' : 'contentTags';
+
+		$this->{$property} = array_values($contentTags);
+	}
+
+	/**
+	 * Sets the raw content tags used for the compiler.
+	 *
+	 * @param  array  $contentTags
+	 * @return void
+	 */
+	public function setRawContentTags(array $contentTags)
+	{
+		$this->setContentTags($contentTags, true);
 	}
 
 }
