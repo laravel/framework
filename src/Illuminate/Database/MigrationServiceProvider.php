@@ -187,10 +187,10 @@ class MigrationServiceProvider extends ServiceProvider {
 			// directories as well.
 			$creator->afterCreate(function() use ($app)
 			{
-				$packages = $app['files']->glob($app['path.base'].'/*/', GLOB_ONLYDIR);
+				$packages = $app['files']->glob($app['path.base'].'/workbench/*/', GLOB_ONLYDIR);
 				if ($packages === false) $packages = array();
 
-				$vendorPackages = $app['files']->glob($app['path.base'].'/*/*/', GLOB_ONLYDIR);
+				$vendorPackages = $app['files']->glob($app['path.base'].'/workbench/*/*/', GLOB_ONLYDIR);
 				if ($vendorPackages === false) $vendorPackages = array();
 
 				foreach (array_merge($packages, $vendorPackages) as $path)
