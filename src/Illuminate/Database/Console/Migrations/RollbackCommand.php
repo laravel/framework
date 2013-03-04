@@ -18,7 +18,7 @@ class RollbackCommand extends BaseCommand {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Rollback the last database migration';
+	protected $description = 'Rollback all previous database migrations';
 
 	/**
 	 * The migrator instance.
