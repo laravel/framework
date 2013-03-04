@@ -19,6 +19,7 @@
 - Changed Blade `{{ }}` to not escape. Made the triple braces escape.
 - Added `DB::getName` to get the configured name of the connection.
 - Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeRelations` property to model (default `true`) to control casing on relationships when using `toArray`.
+- Added `restart identity` to Postgres `truncate` SQL.
 
 ## Beta 3
 
