@@ -408,6 +408,10 @@ class Grammar extends BaseGrammar {
 		{
 			extract($having);
 
+			if ($type === 'raw') {
+				return $boolean.' '.$sql;
+			}
+
 			return 'and '.$me->wrap($column).' '.$operator.' '.$me->parameter($value);
 
 		}, $havings));
