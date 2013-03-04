@@ -183,6 +183,22 @@ class MigrationServiceProvider extends ServiceProvider {
 				$app['composer']->dumpAutoloads();
 			});
 
+			// After initial autoload dump has been done, we want to dump the workbench
+			// directories as well.
+			$creator->afterCreate(function() use ($app)
+			{
+				$packages = $app['files']->glob($app['path.base'].'/*/', GLOB_ONLYDIR);
+				if ($packages === false) $packages = array();
+
+				$vendorPackages = $app['files']->glob($app['path.base'].'/*/*/', GLOB_ONLYDIR);
+				if ($vendorPackages === false) $vendorPackages = array();
+
+				foreach (array_merge($packages, $vendorPackages) as $path)
+				{
+					$app['composer']->dumpAutoloads($path);
+				}
+			});
+
 			return $creator;
 		});
 	}
