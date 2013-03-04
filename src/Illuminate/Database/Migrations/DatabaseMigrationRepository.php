@@ -54,9 +54,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 *
 	 * @return array
 	 */
-	public function getLast()
+	public function getLast($offset = 0)
 	{
-		$query = $this->table()->where('batch', $this->getLastBatchNumber());
+		$query = $this->table()->where('batch', $this->getLastBatchNumber() + $offset);
 
 		return $query->orderBy('migration', 'desc')->get();
 	}
