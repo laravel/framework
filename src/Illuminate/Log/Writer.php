@@ -159,7 +159,7 @@ class Writer {
 	 */
 	public function getEventDispatcher()
 	{
-		return $this->dispathcer;
+		return $this->dispatcher;
 	}
 
 	/**
