@@ -64,7 +64,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('migration', 'foo')->andReturn($query);
 		$query->shouldReceive('delete')->once();
-		$migration = (object) array('migration' => 'foo');
+		$migration = 'foo';
 
 		$repo->delete($migration);
 	}
