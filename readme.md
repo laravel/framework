@@ -18,7 +18,7 @@
 - Passing `null` into a `where` call will not short-cut into `whereNull`.
 - Changed Blade `{{ }}` to not escape. Made the triple braces escape.
 - Added `DB::getName` to get the configured name of the connection.
-- Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeRelations` property to model (default `true`) to control casing on relationships when using `toArray`.
+- Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
 
 ## Beta 3
 

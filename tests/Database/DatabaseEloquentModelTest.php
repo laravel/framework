@@ -317,23 +317,35 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testToArraySnakeRelations()
+	public function testToArraySnakeAttributes()
 	{
 		$model = new EloquentModelStub;
 		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
 			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
 		)));
-		$model->snakeRelations = true;
 		$array = $model->toArray();
 
 		$this->assertEquals('baz', $array['names_list'][0]['bar']);
 		$this->assertEquals('boom', $array['names_list'][1]['bam']);
 
-		$model->snakeRelations = false;
+		$model = new EloquentModelCamelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
 		$array = $model->toArray();
 
 		$this->assertEquals('baz', $array['namesList'][0]['bar']);
 		$this->assertEquals('boom', $array['namesList'][1]['bam']);
+	}
+
+
+	public function testToArrayUsesMutators()
+	{
+		$model = new EloquentModelStub;
+		$model->list_items = array(1, 2, 3);
+		$array = $model->toArray();
+
+		$this->assertEquals(array(1, 2, 3), $array['list_items']);	
 	}
 
 
@@ -485,7 +497,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$class = new EloquentModelStub;
 
-		$this->assertEquals(array('ListItems', 'Password'), $class->getMutatedAttributes());
+		$this->assertEquals(array('list_items', 'password'), $class->getMutatedAttributes());
 	}
 
 
@@ -529,6 +541,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return $this->belongsTo('EloquentModelSaveStub', 'foo');
 	}
+}
+
+class EloquentModelCamelStub extends EloquentModelStub {
+	public static $snakeAttributes = false;
 }
 
 class EloquentDateModelStub extends EloquentModelStub {
