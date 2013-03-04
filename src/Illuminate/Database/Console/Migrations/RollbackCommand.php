@@ -82,11 +82,11 @@ class RollbackCommand extends BaseCommand {
 
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
 
-			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
-
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
 
 			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to rollback.', null),
+
+			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 		);
 	}
 
