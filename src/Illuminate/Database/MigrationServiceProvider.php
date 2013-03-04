@@ -79,7 +79,7 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerCommands()
 	{
-		$commands = array('Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make');
+		$commands = array('Migrate', 'Rollback', 'Install', 'Make');
 
 		// We'll simply spin through the list of commands that are migration related
 		// and register each one of them with an application container. They will
@@ -94,8 +94,7 @@ class MigrationServiceProvider extends ServiceProvider {
 		// when the Artisan application actually starts up and is getting used.
 		$this->commands(
 			'command.migrate', 'command.migrate.make',
-			'command.migrate.install', 'command.migrate.rollback',
-			'command.migrate.reset', 'command.migrate.refresh'
+			'command.migrate.install', 'command.migrate.rollback'
 		);
 	}
 
@@ -123,33 +122,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		$this->app['command.migrate.rollback'] = $this->app->share(function($app)
 		{
-			return new RollbackCommand($app['migrator']);
-		});
-	}
+			$packagePath = $app['path.base'].'/vendor';
 
-	/**
-	 * Register the "reset" migration command.
-	 *
-	 * @return void
-	 */
-	protected function registerResetCommand()
-	{
-		$this->app['command.migrate.reset'] = $this->app->share(function($app)
-		{
-			return new ResetCommand($app['migrator']);
-		});
-	}
-
-	/**
-	 * Register the "refresh" migration command.
-	 *
-	 * @return void
-	 */
-	protected function registerRefreshCommand()
-	{
-		$this->app['command.migrate.refresh'] = $this->app->share(function($app)
-		{
-			return new RefreshCommand;
+			return new RollbackCommand($app['migrator'], $packagePath);
 		});
 	}
 
@@ -208,6 +183,22 @@ class MigrationServiceProvider extends ServiceProvider {
 				$app['composer']->dumpAutoloads();
 			});
 
+			// After initial autoload dump has been done, we want to dump the workbench
+			// directories as well.
+			$creator->afterCreate(function() use ($app)
+			{
+				$packages = $app['files']->glob($app['path.base'].'/workbench/*/', GLOB_ONLYDIR);
+				if ($packages === false) $packages = array();
+
+				$vendorPackages = $app['files']->glob($app['path.base'].'/workbench/*/*/', GLOB_ONLYDIR);
+				if ($vendorPackages === false) $vendorPackages = array();
+
+				foreach (array_merge($packages, $vendorPackages) as $path)
+				{
+					$app['composer']->dumpAutoloads($path);
+				}
+			});
+
 			return $creator;
 		});
 	}
@@ -221,8 +212,7 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		return array(
 			'migrator', 'migration.repository', 'command.migrate',
-			'command.migrate.rollback', 'command.migrate.reset',
-			'command.migrate.refresh', 'command.migrate.install',
+			'command.migrate.rollback', 'command.migrate.install',
 			'migration.creator', 'command.migrate.make',
 		);
 	}

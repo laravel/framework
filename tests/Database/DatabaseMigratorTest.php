@@ -25,7 +25,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn(array(
 			'1_foo',
 		));
-		$migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->andReturn(1);
+		//$migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->andReturn(1);
 		$migrator->getRepository()->shouldReceive('log')->once()->with('2_bar', 1);
 		$migrator->getRepository()->shouldReceive('log')->once()->with('3_baz', 1);
 		$barMock = m::mock('stdClass');
@@ -54,7 +54,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn(array(
 			'1_foo',
 		));
-		$migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->andReturn(1);
+		//$migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->andReturn(1);
 
 		$barMock = m::mock('stdClass');
 		$barMock->shouldReceive('getConnection')->once()->andReturn(null);
@@ -102,7 +102,99 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testLastBatchOfMigrationsCanBeRolledBack()
+	public function testMigrationAreDownWhenIntersectingMigrationsExist()
+	{
+		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
+			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
+			m::mock('Illuminate\Filesystem\Filesystem'),
+		));
+		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
+			__DIR__.'/2_bar.php',
+			__DIR__.'/1_foo.php',
+			__DIR__.'/3_baz.php',
+		));
+		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn(array(
+			'2_bar',
+			'3_baz',
+		));
+		$migrator->getRepository()->shouldReceive('delete')->once()->with('2_bar');
+		$migrator->getRepository()->shouldReceive('delete')->once()->with('3_baz');
+		$barMock = m::mock('stdClass');
+		$barMock->shouldReceive('down')->once();
+		$bazMock = m::mock('stdClass');
+		$bazMock->shouldReceive('down')->once();
+		$migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('2_bar'))->will($this->returnValue($barMock));
+		$migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('3_baz'))->will($this->returnValue($bazMock));
+
+		$migrator->rollback(__DIR__);
+	}
+
+
+	public function testDownMigrationCanBePretended()
+	{
+		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
+			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
+			m::mock('Illuminate\Filesystem\Filesystem'),
+		));
+		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
+			__DIR__.'/2_bar.php',
+			__DIR__.'/1_foo.php',
+			__DIR__.'/3_baz.php',
+		));
+		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn(array(
+			'2_bar',
+			'3_baz',
+		));
+
+		$barMock = m::mock('stdClass');
+		$barMock->shouldReceive('getConnection')->once()->andReturn(null);
+		$barMock->shouldReceive('down')->once();
+
+		$bazMock = m::mock('stdClass');
+		$bazMock->shouldReceive('getConnection')->once()->andReturn(null);
+		$bazMock->shouldReceive('down')->once();
+
+		$migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('2_bar'))->will($this->returnValue($barMock));
+		$migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('3_baz'))->will($this->returnValue($bazMock));
+
+		$connection = m::mock('stdClass');
+		$connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function($closure)
+		{
+			$closure();
+			return array(array('query' => 'foo'));
+		},
+		function($closure)
+		{
+			$closure();
+			return array(array('query' => 'bar'));
+		});
+		$resolver->shouldReceive('connection')->with(null)->andReturn($connection);
+
+		$migrator->rollback(__DIR__, true);	
+	}
+
+
+	public function testNothingIsDoneWhenNoMigrationsAreIntersecting()
+	{
+		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
+			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
+			m::mock('Illuminate\Filesystem\Filesystem'),
+		));
+		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
+			__DIR__.'/1_foo.php',
+		));
+		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn(array(
+			'2_bar',
+		));
+
+		$migrator->rollback(__DIR__);
+	}
+
+
+/*	public function testLastBatchOfMigrationsCanBeRolledBack()
 	{
 		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
 			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
@@ -126,9 +218,8 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		$migrator->getRepository()->shouldReceive('delete')->once()->with($barMigration);
 		$migrator->getRepository()->shouldReceive('delete')->once()->with($fooMigration);
 
-		$migrator->rollback();
+		$migrator->rollback(__DIR__);
 	}
-
 
 	public function testRollbackMigrationsCanBePretended()
 	{
@@ -166,7 +257,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		});
 		$resolver->shouldReceive('connection')->with(null)->andReturn($connection);
 
-		$migrator->rollback(true);
+		$migrator->rollback(__DIR__, true);
 	}
 
 
@@ -179,8 +270,8 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		));
 		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array());
 
-		$migrator->rollback();
-	}
+		$migrator->rollback(__DIR__);
+	}*/
 
 }
 

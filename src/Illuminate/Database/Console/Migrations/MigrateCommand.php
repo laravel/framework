@@ -19,7 +19,7 @@ class MigrateCommand extends BaseCommand {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Run the database migrations';
+	protected $description = 'Run any outstanding database migrations';
 
 	/**
 	 * The migrator instance.
