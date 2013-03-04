@@ -152,6 +152,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $booted = array();
 
 	/**
+	 * The cache of the mutated attributes for each class.
+	 *
+	 * @var array
+	 */
+	protected static $mutatorCache = array();
+
+	/**
 	 * The name of the "created at" column.
 	 *
 	 * @var string
@@ -188,7 +195,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return void
 	 */
-	protected static function boot() {}
+	protected static function boot()
+	{
+		$class = get_called_class();
+
+		static::$mutatorCache[$class] = array();
+
+		// Here we will extract all of the mutated attributes so that we can quickly
+		// spin through them after we export models to their array form, which we
+		// need to be fast. This will let us always know the attributes mutate.
+		foreach (get_class_methods($class) as $method)
+		{
+			if (preg_match('/^get(.+)Attribute$/', $method, $matches))
+			{
+				static::$mutatorCache[$class][] = $matches[1];
+			}
+		}
+	}
 
 	/**
 	 * Fill the model with an array of attributes.
@@ -1110,7 +1133,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// be dynamically accessed through the _get method without accessors.
 		if ($inAttributes or $this->hasGetMutator($key))
 		{
-			return $this->getPlainAttribute($key);
+			return $this->getAttributeValue($key);
 		}
 
 		// If the key already exists in the relationships array, it just means the
@@ -1138,7 +1161,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function getPlainAttribute($key)
+	protected function getAttributeValue($key)
 	{
 		$value = $this->getAttributeFromArray($key);
 
@@ -1432,6 +1455,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function unsetEventDispatcher()
 	{
 		static::$dispatcher = null;
+	}
+
+	/**
+	 * Get the mutated attributes for a given instance.
+	 *
+	 * @return array
+	 */
+	public function getMutatedAttributes()
+	{
+		return static::$mutatorCache[get_class($this)];
 	}
 
 	/**

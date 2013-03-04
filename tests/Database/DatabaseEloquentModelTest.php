@@ -481,6 +481,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTheMutatorCacheIsPopulated()
+	{
+		$class = new EloquentModelStub;
+
+		$this->assertEquals(array('ListItems', 'Password'), $class->getMutatedAttributes());
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
