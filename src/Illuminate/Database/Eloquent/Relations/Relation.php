@@ -176,6 +176,26 @@ abstract class Relation {
 	}
 
 	/**
+	 * Get the name of the "created at" column.
+	 *
+	 * @return string
+	 */
+	public function createdAt()
+	{
+		return $this->parent->getCreatedAtColumn();
+	}
+
+	/**
+	 * Get the name of the "updated at" column.
+	 *
+	 * @return string
+	 */
+	public function updatedAt()
+	{
+		return $this->parent->getUpdatedAtColumn();
+	}
+
+	/**
 	 * Handle dynamic method calls to the relationship.
 	 *
 	 * @param  string  $method

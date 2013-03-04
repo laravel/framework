@@ -22,7 +22,7 @@ class MakeCommand extends BaseCommand {
 	protected $description = 'Create a new migration file';
 
 	/**
-	 * The migration creaotor instance.
+	 * The migration creator instance.
 	 *
 	 * @var Illuminate\Database\Migrations\MigrationCreator
 	 */

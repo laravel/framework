@@ -38,7 +38,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$builder = new EloquentMorphResetBuilderStub;
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
-		$relation = new MorphOne($builder, $parent, 'morph');
+		$relation = new MorphOne($builder, $parent, 'morph_type', 'morph_id');
 		$relation->where('foo', '=', 'bar');
 		list($wheres, $bindings) = $relation->getAndResetWheres();
 
@@ -79,7 +79,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$builder = new EloquentMorphResetBuilderStub;
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
-		$relation = new MorphMany($builder, $parent, 'morph');
+		$relation = new MorphMany($builder, $parent, 'morph_type', 'morph_id');
 		$relation->where('foo', '=', 'bar');
 		list($wheres, $bindings) = $relation->getAndResetWheres();
 
@@ -111,7 +111,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
 		$builder->shouldReceive('where')->once()->with('morph_type', get_class($parent));
-		return new MorphOne($builder, $parent, 'morph');
+		return new MorphOne($builder, $parent, 'morph_type', 'morph_id');
 	}
 
 
@@ -124,7 +124,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
 		$builder->shouldReceive('where')->once()->with('morph_type', get_class($parent));
-		return new MorphMany($builder, $parent, 'morph');
+		return new MorphMany($builder, $parent, 'morph_type', 'morph_id');
 	}
 
 }

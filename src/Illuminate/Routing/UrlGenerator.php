@@ -161,7 +161,7 @@ class UrlGenerator {
 	}
 
 	/**
-	 * Determine if we're short circuting the parameter list.
+	 * Determine if we're short circuiting the parameter list.
 	 *
 	 * @param  array  $parameters
 	 * @return bool
