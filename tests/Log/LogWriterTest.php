@@ -35,4 +35,46 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $writer->error('foo'));
 	}
 
+
+	public function testObservingLogging()
+	{
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
+		$monolog->shouldReceive('addError')->once()->with('foo');
+
+		$writer->logging(function($level, $parameters)
+		{
+			$_SERVER['__log.level']      = $level;
+			$_SERVER['__log.parameters'] = $parameters;
+		});
+
+		$writer->error('foo');
+		$this->assertTrue(isset($_SERVER['__log.level']));
+		$this->assertEquals('error', $_SERVER['__log.level']);
+		unset($_SERVER['__log.level']);
+		$this->assertTrue(isset($_SERVER['__log.parameters']));
+		$this->assertEquals(array('foo'), $_SERVER['__log.parameters']);
+		unset($_SERVER['__log.parameters']);
+	}
+
+
+	public function testWriterFiresEventsDispatcher()
+	{
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
+		$monolog->shouldReceive('addError')->once()->with('foo');
+
+		$events->listen('illuminate.log', function($level, $parameters)
+		{
+			$_SERVER['__log.level']      = $level;
+			$_SERVER['__log.parameters'] = $parameters;
+		});
+
+		$writer->error('foo');
+		$this->assertTrue(isset($_SERVER['__log.level']));
+		$this->assertEquals('error', $_SERVER['__log.level']);
+		unset($_SERVER['__log.level']);
+		$this->assertTrue(isset($_SERVER['__log.parameters']));
+		$this->assertEquals(array('foo'), $_SERVER['__log.parameters']);
+		unset($_SERVER['__log.parameters']);
+	}
+
 }
