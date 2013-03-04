@@ -653,7 +653,7 @@ class Builder {
 	}
 
 	/**
-	 * Add a raw where clause to the query.
+	 * Add a raw having clause to the query.
 	 *
 	 * @param  string  $sql
 	 * @param  array   $bindings
