@@ -124,11 +124,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public $exists = false;
 
 	/**
-	 * Indicates whether relationships are snake cased on arrays.
+	 * Indicates whether attributes are snake cased on arrays.
 	 *
 	 * @var bool
 	 */
-	public $snakeRelations = true;
+	public static $snakeAttributes = true;
 
 	/**
 	 * The connection resolver instance.
@@ -150,6 +150,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var array
 	 */
 	protected static $booted = array();
+
+	/**
+	 * The cache of the mutated attributes for each class.
+	 *
+	 * @var array
+	 */
+	protected static $mutatorCache = array();
 
 	/**
 	 * The name of the "created at" column.
@@ -188,7 +195,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return void
 	 */
-	protected static function boot() {}
+	protected static function boot()
+	{
+		$class = get_called_class();
+
+		static::$mutatorCache[$class] = array();
+
+		// Here we will extract all of the mutated attributes so that we can quickly
+		// spin through them after we export models to their array form, which we
+		// need to be fast. This will let us always know the attributes mutate.
+		foreach (get_class_methods($class) as $method)
+		{
+			if (preg_match('/^get(.+)Attribute$/', $method, $matches))
+			{
+				if (static::$snakeAttributes) $matches[1] = snake_case($matches[1]);
+
+				static::$mutatorCache[$class][] = lcfirst($matches[1]);
+			}
+		}
+	}
 
 	/**
 	 * Fill the model with an array of attributes.
@@ -1037,7 +1062,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  int  $options
 	 * @return string
 	 */
-	public function toJson($options = JSON_NUMERIC_CHECK)
+	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
 	}
@@ -1049,9 +1074,41 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function toArray()
 	{
-		$attributes = array_diff_key($this->attributes, array_flip($this->hidden));
+		$attributes = $this->attributesToArray();
 
 		return array_merge($attributes, $this->relationsToArray());
+	}
+
+	/**
+	 * Convert the model's attributes to an array.
+	 *
+	 * @return array
+	 */
+	public function attributesToArray()
+	{
+		$attributes = $this->getAccessibleAttributes();
+
+		// We want to spin through all the mutated attribtues for this model and call
+		// the mutator for the attribute. We cache off every mutated attributes so
+		// we don't have to constantly check on attributes that actually change.
+		foreach ($this->getMutatedAttributes() as $key)
+		{
+			if ( ! array_key_exists($key, $attributes)) continue;
+
+			$attributes[$key] = $this->mutateAttribute($key, $attributes[$key]);
+		}
+
+		return $attributes;
+	}
+
+	/**
+	 * Get an attribute array of all accessible attributes.
+	 *
+	 * @return array
+	 */
+	protected function getAccessibleAttributes()
+	{
+		return array_diff_key($this->attributes, array_flip($this->hidden));
 	}
 
 	/**
@@ -1084,7 +1141,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// If the relationships snake-casing is enabled, we will snake case this
 			// key so that the relation attribute is snake cased in this returned
 			// array to the developer, making this consisntent with attributes.
-			if ($this->snakeRelations)
+			if (static::$snakeAttributes)
 			{
 				$key = snake_case($key);
 			}
@@ -1110,7 +1167,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// be dynamically accessed through the _get method without accessors.
 		if ($inAttributes or $this->hasGetMutator($key))
 		{
-			return $this->getPlainAttribute($key);
+			return $this->getAttributeValue($key);
 		}
 
 		// If the key already exists in the relationships array, it just means the
@@ -1138,7 +1195,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function getPlainAttribute($key)
+	protected function getAttributeValue($key)
 	{
 		$value = $this->getAttributeFromArray($key);
 
@@ -1147,9 +1204,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// retrieval from the model to a form that is more useful for usage.
 		if ($this->hasGetMutator($key))
 		{
-			$accessor = 'get'.camel_case($key).'Attribute';
-
-			return $this->{$accessor}($value);
+			return $this->mutateAttribute($key, $value);
 		}
 
 		// If the attribute is listed as a date, we will convert it to a DateTime
@@ -1186,6 +1241,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function hasGetMutator($key)
 	{
 		return method_exists($this, 'get'.camel_case($key).'Attribute');
+	}
+
+	/**
+	 * Get the value of an attribute using its mutator.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return mixed
+	 */
+	protected function mutateAttribute($key, $value)
+	{
+		return $this->{'get'.camel_case($key).'Attribute'}($value);
 	}
 
 	/**
@@ -1432,6 +1499,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function unsetEventDispatcher()
 	{
 		static::$dispatcher = null;
+	}
+
+	/**
+	 * Get the mutated attributes for a given instance.
+	 *
+	 * @return array
+	 */
+	public function getMutatedAttributes()
+	{
+		$class = get_class($this);
+
+		if (isset(static::$mutatorCache[$class]))
+		{
+			return static::$mutatorCache[get_class($this)];			
+		}
+		
+		return array();
 	}
 
 	/**
