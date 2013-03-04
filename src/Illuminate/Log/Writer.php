@@ -147,7 +147,7 @@ class Writer {
 	 * @param  Closure  $callback
 	 * @return void
 	 */
-	public function logging(Closure $callback)
+	public function listen(Closure $callback)
 	{
 		$this->handlers[] = $callback;
 	}

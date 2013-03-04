@@ -36,12 +36,12 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testObservingLogging()
+	public function testListening()
 	{
 		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
 		$monolog->shouldReceive('addError')->once()->with('foo');
 
-		$writer->logging(function($level, $parameters)
+		$writer->listen(function($level, $parameters)
 		{
 			$_SERVER['__log.level']      = $level;
 			$_SERVER['__log.parameters'] = $parameters;
