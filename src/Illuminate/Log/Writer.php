@@ -144,7 +144,7 @@ class Writer {
 	{
 		if ( ! isset($this->dispatcher))
 		{
-			throw new \RuntimeException("Events dispatcher has not been set for log writer, cannot listen.");
+			throw new \RuntimeException("Events dispatcher has not been set.");
 		}
 
 		$this->dispatcher->listen('illuminate.log', $callback);
@@ -180,10 +180,9 @@ class Writer {
 	 */
 	protected function fireLogEvent($level, $message, array $context = array())
 	{
-		// If the events dispatche has been setup with the
-		// log writer, we will call an event on the writer,
-		// passing through the level, message and context to
-		// any listeners.
+		// If the event dispatcher is set, we will pass along the parameters to the
+		// log listeners. These are useful for building profilers or other tools
+		// that aggregate all of the log messages for a given "request" cycle.
 		if (isset($this->dispatcher))
 		{
 			$this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
