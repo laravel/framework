@@ -36,7 +36,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
 		$query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
-		$query->shouldReceive('get')->once()->andReturn('foo');
+		$query->shouldReceive('lists')->once()->andReturn('foo');
 
 		$this->assertEquals('foo', $repo->getLast());
 	}
@@ -54,7 +54,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
 		$query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
-		$query->shouldReceive('get')->once()->andReturn('foo');
+		$query->shouldReceive('lists')->once()->andReturn('foo');
 
 		$this->assertEquals('foo', $repo->getLast(-4));
 	}
@@ -82,9 +82,8 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('migration', 'foo')->andReturn($query);
 		$query->shouldReceive('delete')->once();
-		$migration = (object) array('migration' => 'foo');
 
-		$repo->delete($migration);
+		$repo->delete('foo');
 	}
 
 

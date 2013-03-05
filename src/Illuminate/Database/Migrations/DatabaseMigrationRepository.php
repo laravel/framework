@@ -58,7 +58,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	{
 		$query = $this->table()->where('batch', $this->getLastBatchNumber() + $offset);
 
-		return $query->orderBy('migration', 'desc')->get();
+		return $query->orderBy('migration', 'desc')->lists('migration');
 	}
 
 	/**
@@ -81,9 +81,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 * @param  StdClass  $migration
 	 * @return void
 	 */
-	public function delete($migration)
+	public function delete($file)
 	{
-		$query = $this->table()->where('migration', $migration->migration)->delete();
+		$query = $this->table()->where('migration', $file)->delete();
 	}
 
 	/**
