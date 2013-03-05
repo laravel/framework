@@ -85,7 +85,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function get($columns = array('*'))
 	{
-		$models = $this->query->getModels($this->getSelectColumns());
+		$models = $this->query->getModels($this->getSelectColumns($columns));
 
 		$this->hydratePivotRelation($models);
 
@@ -162,9 +162,12 @@ class BelongsToMany extends Relation {
 	 *
 	 * @return Illuminate\Database\Eloquent\Relation\BelongsToMany
 	 */
-	protected function getSelectColumns()
+	protected function getSelectColumns(array $columns = array('*'))
 	{
-		$columns = array($this->related->getTable().'.*');
+		if ($columns == array('*'))
+		{
+			$columns = array($this->related->getTable().'.*');
+		}
 
 		return array_merge($columns, $this->getAliasedPivotColumns());
 	}
