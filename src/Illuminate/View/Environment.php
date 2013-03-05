@@ -488,6 +488,8 @@ class Environment {
 			$this->engines->register($engine, $resolver);
 		}
 
+		if (isset($this->extensions[$engine])) unset($this->extensions[$engine]);
+
 		$this->extensions = array_merge(array($extension => $engine), $this->extensions);
 	}
 
