@@ -13,9 +13,11 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testRollbackCommandCallsMigratorWithProperArguments()
 	{
-		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
+		$app = array('path' => __DIR__);
+		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
-		$migrator->shouldReceive('rollback')->once()->with(false);
+		$migrator->shouldReceive('rollback')->once()->with(__DIR__.'/database/migrations', false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 
 		$this->runCommand($command);
@@ -24,9 +26,11 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testRollbackCommandCanBePretended()
 	{
-		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
+		$app = array('path' => __DIR__);
+		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with('foo');
-		$migrator->shouldReceive('rollback')->once()->with(true);
+		$migrator->shouldReceive('rollback')->once()->with(__DIR__.'/database/migrations', true);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 
 		$this->runCommand($command, array('--pretend' => true, '--database' => 'foo'));
