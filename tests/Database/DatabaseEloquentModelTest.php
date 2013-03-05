@@ -317,6 +317,38 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testToArraySnakeAttributes()
+	{
+		$model = new EloquentModelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['names_list'][0]['bar']);
+		$this->assertEquals('boom', $array['names_list'][1]['bam']);
+
+		$model = new EloquentModelCamelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['namesList'][0]['bar']);
+		$this->assertEquals('boom', $array['namesList'][1]['bam']);
+	}
+
+
+	public function testToArrayUsesMutators()
+	{
+		$model = new EloquentModelStub;
+		$model->list_items = array(1, 2, 3);
+		$array = $model->toArray();
+
+		$this->assertEquals(array(1, 2, 3), $array['list_items']);	
+	}
+
+
 	public function testFillable()
 	{
 		$model = new EloquentModelStub;
@@ -461,6 +493,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTheMutatorCacheIsPopulated()
+	{
+		$class = new EloquentModelStub;
+
+		$this->assertEquals(array('list_items', 'password'), $class->getMutatedAttributes());
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -501,6 +541,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return $this->belongsTo('EloquentModelSaveStub', 'foo');
 	}
+}
+
+class EloquentModelCamelStub extends EloquentModelStub {
+	public static $snakeAttributes = false;
 }
 
 class EloquentDateModelStub extends EloquentModelStub {

@@ -208,7 +208,7 @@ abstract class Store implements ArrayAccess {
 
 		// First we will check for the value in the general session data and if it
 		// is not present in that array we'll check the session flash datas to
-		// get the data from there. If netiher is there we give the default.
+		// get the data from there. If neither is there we give the default.
 		$data = $this->session['data'];
 
 		return array_get($data, $key, function() use ($me, $key, $default)
@@ -416,7 +416,7 @@ abstract class Store implements ArrayAccess {
 		}
 
 		// If this driver implements the "Sweeper" interface and hits the sweepers
-		// lottery we will sweep sessoins from storage that are expired so the
+		// lottery we will sweep sessions from storage that are expired so the
 		// storage spot does not get junked up with expired session storage.
 		if ($this instanceof Sweeper and $this->hitsLottery())
 		{

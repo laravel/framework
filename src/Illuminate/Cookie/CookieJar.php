@@ -138,7 +138,7 @@ class CookieJar {
 	}
 
 	/**
-	 * Set the value of a cookie otpion.
+	 * Set the value of a cookie option.
 	 *
 	 * @param  string  $option
 	 * @param  string  $value

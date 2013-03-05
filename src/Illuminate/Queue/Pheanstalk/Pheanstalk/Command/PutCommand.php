@@ -72,7 +72,7 @@ class Pheanstalk_Command_PutCommand
 	}
 
 	/* (non-phpdoc)
-	 * @see Pheanstalk_ResponseParser::parseRespose()
+	 * @see Pheanstalk_ResponseParser::parseResponse()
 	 */
 	public function parseResponse($responseLine, $responseData)
 	{

@@ -78,7 +78,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRouteParametersCanBeShortCircuted()
+	public function testRouteParametersCanBeShortCircuited()
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
@@ -90,7 +90,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRouteParametersCanBeShortCircutedWithOptionals()
+	public function testRouteParametersCanBeShortCircuitedWithOptionals()
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');

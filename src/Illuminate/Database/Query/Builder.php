@@ -263,7 +263,7 @@ class Builder {
 			return $this->whereSub($column, $operator, $value, $boolean);
 		}
 
-		// If the value is "null", we will just assume the developer wnats to add a
+		// If the value is "null", we will just assume the developer wants to add a
 		// where null clause to the query. So, we will allow a short-cut here to
 		// that method for convenience so the developer doesn't have to check.
 		if (is_null($value))
@@ -643,11 +643,44 @@ class Builder {
 	 */
 	public function having($column, $operator = null, $value = null)
 	{
-		$this->havings[] = compact('column', 'operator', 'value');
+		$type = 'basic';
+
+		$this->havings[] = compact('type', 'column', 'operator', 'value');
 
 		$this->bindings[] = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Add a raw having clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array   $bindings
+	 * @param  string  $boolean
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function havingRaw($sql, array $bindings = array(), $boolean = 'and')
+	{
+		$type = 'raw';
+
+		$this->havings[] = compact('type', 'sql', 'boolean');
+
+		$this->bindings = array_merge($this->bindings, $bindings);
+
+		return $this;
+	}
+
+	/**
+	 * Add a raw or having clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array   $bindings
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function orHavingRaw($sql, array $bindings = array())
+	{
+		return $this->havingRaw($sql, $bindings, 'or');
 	}
 
 	/**
