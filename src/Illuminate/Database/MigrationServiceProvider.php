@@ -123,7 +123,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		$this->app['command.migrate.rollback'] = $this->app->share(function($app)
 		{
-			return new RollbackCommand($app['migrator']);
+			$packagePath = $app['path.base'].'/vendor';
+
+			return new RollbackCommand($app['migrator'], $packagePath);
 		});
 	}
 
