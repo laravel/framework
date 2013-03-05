@@ -672,7 +672,8 @@ class Router {
 			if (isset($group['prefix']))
 			{
 				if (is_array($group['prefix'])) return implode('/', $group['prefix']);
-				else return $group['prefix'];
+
+				return $group['prefix'];
 			}
 		}
 
