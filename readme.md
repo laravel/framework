@@ -20,6 +20,7 @@
 - Added `DB::getName` to get the configured name of the connection.
 - Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
 - Added `restart identity` to Postgres `truncate` SQL.
+- Added `Log::listen` callback and `illuminate.log` event which can be hooked into for custom logging handling.
 
 ## Beta 3
 

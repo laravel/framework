@@ -12,7 +12,8 @@
         "monolog/monolog": "1.3.*"
     },
     "require-dev": {
-        "mockery/mockery": "0.7.2"
+        "mockery/mockery": "0.7.2",
+        "illuminate/events": "4.0.x"
     },
     "autoload": {
         "psr-0": {
