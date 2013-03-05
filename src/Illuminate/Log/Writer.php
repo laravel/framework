@@ -39,13 +39,6 @@ class Writer {
 	protected $dispatcher;
 
 	/**
-	 * Any handlers registered for logging events.
-	 *
-	 * @var array
-	 */
-	protected $handlers = array();
-
-	/**
 	 * Create a new log writer instance.
 	 *
 	 * @param  Monolog\Logger  $monolog
@@ -149,7 +142,12 @@ class Writer {
 	 */
 	public function listen(Closure $callback)
 	{
-		$this->handlers[] = $callback;
+		if ( ! isset($this->dispatcher))
+		{
+			throw new \RuntimeException("Events dispatcher has not been set for log writer, cannot listen.");
+		}
+
+		$this->dispatcher->listen('illuminate.log', $callback);
 	}
 
 	/**
@@ -180,24 +178,15 @@ class Writer {
 	 * @param  array   $parameters
 	 * @return void
 	 */
-	protected function fireLogEvent($level, $parameters = array())
+	protected function fireLogEvent($level, $message, array $context = array())
 	{
-		if ( ! is_array($parameters)) $parameters = (array) $parameters;
-
-		// We will loop through any handlers which have been registered with
-		// the writer and pass through the level and any parameters which were
-		// given.
-		foreach ($this->handlers as $handler)
-		{
-			$handler($level, $parameters);
-		}
-
-		// If the events dispatcher has been setup with our writer, we will also
-		// fire an event which can be observed, accepting the same parameters as
-		// standard handlers.
+		// If the events dispatche has been setup with the
+		// log writer, we will call an event on the writer,
+		// passing through the level, message and context to
+		// any listeners.
 		if (isset($this->dispatcher))
 		{
-			$this->dispatcher->fire('illuminate.log', array($level, $parameters));
+			$this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
 		}
 	}
 
@@ -212,7 +201,7 @@ class Writer {
 	{
 		if (in_array($method, $this->levels))
 		{
-			$this->fireLogEvent($method, $parameters);
+			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
 
 			$method = 'add'.ucfirst($method);
 
