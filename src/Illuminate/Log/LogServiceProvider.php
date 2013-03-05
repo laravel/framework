@@ -18,7 +18,7 @@ class LogServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$logger = new Writer(new \Monolog\Logger('log'));
+		$logger = new Writer(new \Monolog\Logger('log'), $this->app['events']);
 
 		$this->app->instance('log', $logger);
 
