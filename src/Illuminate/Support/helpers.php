@@ -261,12 +261,12 @@ function camel_case($value)
 }
 
 /**
- * Convert a value to studly caps.
+ * Convert a value to studly caps case.
  *
  * @param  string  $value
  * @return string
  */
-function studly_caps($value)
+function studly_case($value)
 {
 	return Illuminate\Support\Str::studly($value);
 }
