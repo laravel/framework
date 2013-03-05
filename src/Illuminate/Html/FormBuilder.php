@@ -534,7 +534,7 @@ class FormBuilder {
 
 		if (isset($options['route']))
 		{
-			return $this->url->route($options['route']);
+			return $this->getRouteAction($options['route']);
 		}
 
 		// If an action is available, we are attempting to open a form to a controller
@@ -542,10 +542,42 @@ class FormBuilder {
 		// actions and return them from the method. Otherwise, we'll use current.
 		elseif (isset($options['action']))
 		{
-			return $this->url->action($options['action']);
+			return $this->getControllerAction($options['action']);
 		}
 
 		return $this->url->current();
+	}
+
+	/**
+	 * Get the action for a "route" option.
+	 *
+	 * @param  array|string  $options
+	 * @return string
+	 */
+	protected function getRouteAction($options)
+	{
+		if (is_array($options))
+		{
+			return $this->url->route($options[0], array_slice($options, 1));
+		}
+
+		return $this->url->route($options);
+	}
+
+	/**
+	 * Get the action for an "action" option.
+	 *
+	 * @param  array|string  $options
+	 * @return string
+	 */
+	protected function getControllerAction($options)
+	{
+		if (is_array($options))
+		{
+			return $this->url->action($options[0], array_slice($options, 1));
+		}
+
+		return $this->url->action($options);
 	}
 
 	/**
