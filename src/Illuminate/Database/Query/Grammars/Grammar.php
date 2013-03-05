@@ -188,6 +188,8 @@ class Grammar extends BaseGrammar {
 	{
 		$sql = array();
 
+		if (is_null($query->wheres)) return '';
+
 		// Each type of where clauses has its own compiler function which is responsible
 		// for actually creating the where clauses SQL. This helps keep the code nice
 		// and maintainable since each clause has a very small method that it uses.
@@ -404,15 +406,43 @@ class Grammar extends BaseGrammar {
 	{
 		$me = $this;
 
-		$sql = implode(' ', array_map(function($having) use ($me)
-		{
-			extract($having);
-
-			return 'and '.$me->wrap($column).' '.$operator.' '.$me->parameter($value);
-
-		}, $havings));
+		$sql = implode(' ', array_map(array($this, 'compileHaving'), $havings));
 
 		return 'having '.preg_replace('/and /', '', $sql, 1);
+	}
+
+	/**
+	 * Compile a single having clause.
+	 *
+	 * @param  array   $having
+	 * @return string
+	 */
+	protected function compileHaving(array $having)
+	{
+		// If the having clause is "raw", we can just return the clause straight away
+		// without doing any more processing on it. Otherwise, we will compile the
+		// clause into SQL based on the components that make it up from builder.
+		if ($having['type'] === 'raw')
+		{
+			return $having['boolean'].' '.$having['sql'];
+		}
+
+		return $this->compileBasicHaving($having);
+	}
+
+	/**
+	 * Compile a basic having clause.
+	 *
+	 * @param  array   $having
+	 * @return string
+	 */
+	protected function compileBasicHaving($having)
+	{
+		$column = $this->wrap($having['column']);
+
+		$parameter = $this->parameter($having['value']);
+
+		return 'and '.$column.' '.$having['operator'].' '.$parameter;
 	}
 
 	/**

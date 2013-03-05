@@ -19,4 +19,15 @@ class PostgresGrammar extends Grammar {
 		return $this->compileInsert($query, $values).' returning '.$this->wrap($sequence);
 	}
 
+	/**
+	 * Compile a truncate table statement into SQL.
+	 *
+	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @return array
+	 */
+	public function compileTruncate(Builder $query)
+	{
+		return array('truncate '.$this->wrapTable($query->from).' restart identity' => array());
+	}
+
 }

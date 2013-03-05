@@ -105,12 +105,17 @@ abstract class Relation {
 	 */
 	public function removeFirstWhereClause()
 	{
-		array_shift($this->getBaseQuery()->wheres);
+		$first = array_shift($this->getBaseQuery()->wheres);
+
+		$bindings = $this->getBaseQuery()->getBindings();
 
 		// When resetting the relation where clause, we want to shift the first element
 		// off of the bindings, leaving only the constraints that the developers put
 		// as "extra" on the relationships, and not original relation constraints.
-		$bindings = array_slice($this->getBaseQuery()->getBindings(), 1);
+		if (array_key_exists('value', $first))
+		{
+			$bindings = array_slice($bindings, 1);
+		}
 
 		$this->getBaseQuery()->setBindings(array_values($bindings));
 	}
@@ -168,6 +173,26 @@ abstract class Relation {
 	public function getRelated()
 	{
 		return $this->related;
+	}
+
+	/**
+	 * Get the name of the "created at" column.
+	 *
+	 * @return string
+	 */
+	public function createdAt()
+	{
+		return $this->parent->getCreatedAtColumn();
+	}
+
+	/**
+	 * Get the name of the "updated at" column.
+	 *
+	 * @return string
+	 */
+	public function updatedAt()
+	{
+		return $this->parent->getUpdatedAtColumn();
 	}
 
 	/**

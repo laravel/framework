@@ -23,8 +23,8 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 		$connector->shouldReceive('connect')->once()->with($config)->andReturn($pdo);
 		$factory->expects($this->once())->method('createConnector')->with($config)->will($this->returnValue($connector));
 		$mockConnection = m::mock('stdClass');
-		$factory->expects($this->once())->method('createConnection')->with($this->equalTo('mysql'), $this->equalTo($pdo), $this->equalTo('database'), $this->equalTo('prefix'))->will($this->returnValue($mockConnection));
-		$connection = $factory->make($config);
+		$factory->expects($this->once())->method('createConnection')->with($this->equalTo('mysql'), $this->equalTo($pdo), $this->equalTo('database'), $this->equalTo('prefix'), $this->equalTo('foo'))->will($this->returnValue($mockConnection));
+		$connection = $factory->make($config, 'foo');
 
 		$this->assertEquals($mockConnection, $connection);
 	}

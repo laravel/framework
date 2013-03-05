@@ -35,4 +35,50 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $writer->error('foo'));
 	}
 
+
+	public function testWriterFiresEventsDispatcher()
+	{
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
+		$monolog->shouldReceive('addError')->once()->with('foo');
+
+		$events->listen('illuminate.log', function($level, $message, array $context = array())
+		{
+			$_SERVER['__log.level']      = $level;
+			$_SERVER['__log.message'] = $message;
+			$_SERVER['__log.context']    = $context;
+		});
+
+		$writer->error('foo');
+		$this->assertTrue(isset($_SERVER['__log.level']));
+		$this->assertEquals('error', $_SERVER['__log.level']);
+		unset($_SERVER['__log.level']);
+		$this->assertTrue(isset($_SERVER['__log.message']));
+		$this->assertEquals('foo', $_SERVER['__log.message']);
+		unset($_SERVER['__log.message']);
+		$this->assertTrue(isset($_SERVER['__log.context']));
+		$this->assertEquals(array(), $_SERVER['__log.context']);
+		unset($_SERVER['__log.context']);
+	}
+
+
+	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testListenShortcutFailsWithNoDispatcher()
+	{
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
+		$writer->listen(function() {});
+	}
+
+
+	public function testListenShortcut()
+	{
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Events\Dispatcher'));
+
+		$callback = function() { return 'success'; };
+		$events->shouldReceive('listen')->with('illuminate.log', $callback)->once();
+
+		$writer->listen($callback);
+	}
+
 }

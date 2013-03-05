@@ -157,7 +157,7 @@ class Database {
 	}
 
 	/**
-	 * Parse an inline response from the databsae.
+	 * Parse an inline response from the database.
 	 *
 	 * @param  string  $response
 	 * @return string
@@ -288,7 +288,7 @@ class Database {
 	/**
 	 * Write the given command to the file resource.
 	 *
-	 * @param  string  $commnad
+	 * @param  string  $command
 	 * @return void
 	 */
 	public function fileWrite($command)

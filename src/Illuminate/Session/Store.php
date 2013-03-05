@@ -6,8 +6,9 @@ use Illuminate\Support\Str;
 use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Contracts\SessionStoreInterface;
 
-abstract class Store implements TokenProvider, ArrayAccess {
+abstract class Store implements ArrayAccess {
 
 	/**
 	 * The current session payload.
@@ -134,7 +135,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	{
 		$token = $this->createSessionID();
 
-		return array('csrf_token' => $token, ':old:' => array(), ':new:' => array());
+		return array('_token' => $token, ':old:' => array(), ':new:' => array());
 	}
 
 	/**
@@ -207,7 +208,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 
 		// First we will check for the value in the general session data and if it
 		// is not present in that array we'll check the session flash datas to
-		// get the data from there. If netiher is there we give the default.
+		// get the data from there. If neither is there we give the default.
 		$data = $this->session['data'];
 
 		return array_get($data, $key, function() use ($me, $key, $default)
@@ -247,6 +248,17 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	}
 
 	/**
+	 * Determine if the old input contains an item.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function hasOldInput($key)
+	{
+		return ! is_null($this->getOldInput($key));
+	}
+
+	/**
 	 * Get the requested item from the flashed input array.
 	 *
 	 * @param  string  $key
@@ -272,7 +284,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function getToken()
 	{
-		return $this->get('csrf_token');
+		return $this->get('_token');
 	}
 
 	/**
@@ -296,7 +308,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function flash($key, $value)
 	{
-		$this->session['data'][':new:'][$key] = $value;
+		array_set($this->session['data'][':new:'], $key, $value);
 	}
 
 	/**
@@ -404,7 +416,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 		}
 
 		// If this driver implements the "Sweeper" interface and hits the sweepers
-		// lottery we will sweep sessoins from storage that are expired so the
+		// lottery we will sweep sessions from storage that are expired so the
 		// storage spot does not get junked up with expired session storage.
 		if ($this instanceof Sweeper and $this->hitsLottery())
 		{

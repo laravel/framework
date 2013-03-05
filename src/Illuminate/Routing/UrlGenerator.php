@@ -43,6 +43,16 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Get the current URL for the request.
+	 *
+	 * @return string
+	 */
+	public function current()
+	{
+		return $this->to($this->request->getPathInfo());
+	}
+
+	/**
 	 * Generate a absolute URL to the given path.
 	 *
 	 * @param  string  $path
@@ -151,7 +161,7 @@ class UrlGenerator {
 	}
 
 	/**
-	 * Determine if we're short circuting the parameter list.
+	 * Determine if we're short circuiting the parameter list.
 	 *
 	 * @param  array  $parameters
 	 * @return bool
