@@ -1146,7 +1146,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 				$key = snake_case($key);
 			}
 
-			$attributes[$key] = $relation;
+			// If the relation value has been set, we will set it on this attributes
+			// list for returning. If it was not arrayable or null, we'll not set
+			// the value on the array because it is some type of invalid value.
+			if (isset($relation))
+			{
+				$attributes[$key] = $relation;
+			}
 		}
 
 		return $attributes;
