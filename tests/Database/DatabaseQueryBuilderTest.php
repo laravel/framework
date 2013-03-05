@@ -205,6 +205,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRawHavings()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->havingRaw('user_foo < user_bar');
+		$this->assertEquals('select * from "users" having user_foo < user_bar', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->having('baz', '=', 1)->orHavingRaw('user_foo < user_bar');
+		$this->assertEquals('select * from "users" having "baz" = ? or user_foo < user_bar', $builder->toSql());
+	}
+
+
 	public function testLimitsAndOffsets()
 	{
 		$builder = $this->getBuilder();
