@@ -4,7 +4,7 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class ResetCommand extends Command {
+class ResetCommand extends BaseCommand {
 
 	/**
 	 * The console command name.
@@ -33,11 +33,12 @@ class ResetCommand extends Command {
 	 * @param  Illuminate\Database\Migrations\Migrator  $migrator
 	 * @return void
 	 */
-	public function __construct(Migrator $migrator)
+	public function __construct(Migrator $migrator, $packagePath)
 	{
 		parent::__construct();
 
 		$this->migrator = $migrator;
+		$this->packagePath = $packagePath;
 	}
 
 	/**
@@ -49,11 +50,13 @@ class ResetCommand extends Command {
 	{
 		$this->migrator->setConnection($this->input->getOption('database'));
 
+		$path = $this->getMigrationPath();
+
 		$pretend = $this->input->getOption('pretend');
 
 		while (true)
 		{
-			$count = $this->migrator->rollback($pretend);
+			$count = $this->migrator->rollback($path, $pretend);
 
 			// Once the migrator has run we will grab the note output and send it out to
 			// the console screen, since the migrator itself functions without having
@@ -75,7 +78,13 @@ class ResetCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
+
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
+
+			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 		);
