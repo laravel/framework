@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Support\Contracts\ArrayableInterface;
+
 class Response {
 
 	/**
