@@ -208,6 +208,22 @@ class MigrationServiceProvider extends ServiceProvider {
 				$app['composer']->dumpAutoloads();
 			});
 
+			// We also want to regenerate autoload files for any workbench
+			// packages.
+			$creator->afterCreate(function() use ($app)
+			{
+				$packages = $app['files']->glob($app['path.base'].'/workbench/*', GLOB_ONLYDIR);
+				$vendors = $app['files']->glob($app['path.base'].'/workbench/*/*', GLOB_ONLYDIR);
+
+				if ($packages === false) $packages = array();
+				if ($vendors === false) $vendors = array();
+
+				foreach (array_merge($packages, $vendors) as $path)
+				{
+					$app['composer']->dumpAutoloads($path);
+				}
+			});
+
 			return $creator;
 		});
 	}
