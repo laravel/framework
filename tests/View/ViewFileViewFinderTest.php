@@ -107,6 +107,15 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingExtensionPrependsNotAppends()
+	{
+		$finder = $this->getFinder();
+		$finder->addExtension('baz');
+		$extensions = $finder->getExtensions();
+		$this->assertEquals('baz', reset($extensions));
+	}
+
+
 	protected function getFinder()
 	{
 		return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__));

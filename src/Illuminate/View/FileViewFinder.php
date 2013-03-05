@@ -176,7 +176,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function addExtension($extension)
 	{
-		$this->extensions[] = $extension;
+		array_unshift($this->extensions, $extension);
 	}
 
 	/**
