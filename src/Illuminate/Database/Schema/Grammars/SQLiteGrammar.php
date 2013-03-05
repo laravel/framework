@@ -100,11 +100,11 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile a create table command.
+	 * Compile alter table commands for adding columns
 	 *
 	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  Illuminate\Support\Fluent  $command
-	 * @return string
+	 * @return array
 	 */
 	public function compileAdd(Blueprint $blueprint, Fluent $command)
 	{
@@ -112,7 +112,12 @@ class SQLiteGrammar extends Grammar {
 
 		$columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
-		return 'alter table '.$table.' '.implode(', ', $columns);
+		foreach ($columns as $column) 
+		{
+			$statements[] = 'alter table '.$table.' '.$column;
+		}
+
+		return $statements;
 	}
 
 	/**
