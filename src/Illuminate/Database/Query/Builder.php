@@ -643,11 +643,44 @@ class Builder {
 	 */
 	public function having($column, $operator = null, $value = null)
 	{
-		$this->havings[] = compact('column', 'operator', 'value');
+		$type = 'Basic';
+
+		$this->havings[] = compact('type', 'column', 'operator', 'value');
 
 		$this->bindings[] = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Add a raw having clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array   $bindings
+	 * @param  string  $boolean
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function havingRaw($sql, array $bindings = array(), $boolean = 'and')
+	{
+		$type = 'raw';
+
+		$this->havings[] = compact('type', 'sql', 'boolean');
+
+		$this->bindings = array_merge($this->bindings, $bindings);
+
+		return $this;
+	}
+
+	/**
+	 * Add a raw or having clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array   $bindings
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function orHavingRaw($sql, array $bindings = array())
+	{
+		return $this->havingRaw($sql, $bindings, 'or');
 	}
 
 	/**
