@@ -138,7 +138,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		$this->app['command.migrate.reset'] = $this->app->share(function($app)
 		{
-			return new ResetCommand($app['migrator']);
+			$packagePath = $app['path.base'].'/vendor';
+
+			return new ResetCommand($app['migrator'], $packagePath);
 		});
 	}
 
