@@ -474,7 +474,7 @@ class Router {
 		// a different prefix. We'll then return out the complete action arrays.
 		if (count($this->groupStack) > 0)
 		{
-			$name = $this->getResourcePrefix($resouce, $method);
+			$name = $this->getResourcePrefix($resource, $method);
 		}
 		else
 		{
@@ -669,7 +669,11 @@ class Router {
 		{
 			$group = $this->groupStack[count($this->groupStack) - 1];
 
-			if (isset($group['prefix'])) return implode('/', $group['prefix']);
+			if (isset($group['prefix']))
+			{
+				if (is_array($group['prefix'])) return implode('/', $group['prefix']);
+				else return $group['prefix'];
+			}
 		}
 
 		return '';
