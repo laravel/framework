@@ -109,9 +109,14 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
+		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
+			__DIR__.'/bar.php',
+			__DIR__.'/foo.php',
+			__DIR__.'/baz.php',
+		));
 		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array(
-			$fooMigration = new MigratorTestMigrationStub('foo'),
-			$barMigration = new MigratorTestMigrationStub('bar'),
+			'foo',
+			'bar',
 		));
 
 		$barMock = m::mock('stdClass');
@@ -123,10 +128,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		$migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('foo'))->will($this->returnValue($barMock));
 		$migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('bar'))->will($this->returnValue($fooMock));
 
-		$migrator->getRepository()->shouldReceive('delete')->once()->with($barMigration);
-		$migrator->getRepository()->shouldReceive('delete')->once()->with($fooMigration);
+		$migrator->getRepository()->shouldReceive('delete')->once()->with('foo');
+		$migrator->getRepository()->shouldReceive('delete')->once()->with('bar');
 
-		$migrator->rollback();
+		$migrator->rollback(__DIR__);
 	}
 
 
@@ -137,9 +142,14 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
+		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
+			__DIR__.'/bar.php',
+			__DIR__.'/foo.php',
+			__DIR__.'/baz.php',
+		));
 		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array(
-			$fooMigration = new MigratorTestMigrationStub('foo'),
-			$barMigration = new MigratorTestMigrationStub('bar'),
+			'foo',
+			'bar',
 		));
 
 		$barMock = m::mock('stdClass');
@@ -166,7 +176,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		});
 		$resolver->shouldReceive('connection')->with(null)->andReturn($connection);
 
-		$migrator->rollback(true);
+		$migrator->rollback(__DIR__, true);
 	}
 
 
@@ -177,9 +187,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
+		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array());
 		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array());
 
-		$migrator->rollback();
+		$migrator->rollback(__DIR__);
 	}
 
 }

@@ -150,20 +150,32 @@ class Migrator {
 	 * @param  bool   $pretend
 	 * @return int
 	 */
-	public function rollback($pretend = false)
+	public function rollback($path, $pretend = false)
 	{
 		$this->notes = array();
 
-		// We want to pull in the last batch of migrations that ran on the previous
-		// migration operation. We'll then reverse those migrations and run each
-		// of them "down" to reverse the last migration "operation" which ran.
+		$files = $this->getMigrationFiles($path);
+
+		// We loop all migrations from latest to oldest looking for
+		// a migration that exists in our current migration path.
+		// Conflicts would be near impossible as the migration files
+		// are timestamped.
 		$migrations = $this->repository->getLast();
-
-		if (count($migrations) == 0)
+		$offset = 0;
+		while (empty($migrations) and $offset++)
 		{
-			$this->note('<info>Nothing to rollback.</info>');
+			$migrations = array();
 
-			return count($migrations);
+			if ($this->repository->getLastBatchNumber() - $offset == 0)
+			{
+				$this->note('Nothing to rollback.');
+
+				return;
+			}
+
+			// Intersect last batch of migration files with the files that exists
+			// within our current migration space.
+			$migrations = array_intersect($this->repository->getLast(-$offset), $files);
 		}
 
 		// We need to reverse these migrations so that they are "downed" in reverse
@@ -184,10 +196,8 @@ class Migrator {
 	 * @param  bool  $pretend
 	 * @return void
 	 */
-	protected function runDown($migration, $pretend)
+	protected function runDown($file, $pretend)
 	{
-		$file = $migration->migration;
-
 		// First we will get the file name of the migration so we can resolve out an
 		// instance of the migration. Once we get an instance we can either run a
 		// pretend execution of the migration or we can run the real migration.
@@ -203,7 +213,7 @@ class Migrator {
 		// Once we have successfully run the migration "down" we will remove it from
 		// the migration repository so it will be considered to have not been run
 		// by the application then will be able to fire by any later operation.
-		$this->repository->delete($migration);
+		$this->repository->delete($file);
 
 		$this->note("<info>Rolled back:</info> $file");
 	}
