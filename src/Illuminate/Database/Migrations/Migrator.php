@@ -160,15 +160,15 @@ class Migrator {
 		// a migration that exists in our current migration path.
 		// Conflicts would be near impossible as the migration files
 		// are timestamped.
-		$migrations = $this->repository->getLast();
+		$migrations = array();
 		$offset = 0;
-		while (empty($migrations) and $offset++)
+		while (empty($migrations))
 		{
 			$migrations = array();
 
 			if ($this->repository->getLastBatchNumber() - $offset == 0)
 			{
-				$this->note('Nothing to rollback.');
+				$this->note('<info>Nothing to rollback.</info>');
 
 				return;
 			}
@@ -176,6 +176,8 @@ class Migrator {
 			// Intersect last batch of migration files with the files that exists
 			// within our current migration space.
 			$migrations = array_intersect($this->repository->getLast(-$offset), $files);
+
+			$offset++;
 		}
 
 		// We need to reverse these migrations so that they are "downed" in reverse

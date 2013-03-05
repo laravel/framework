@@ -114,10 +114,17 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 			__DIR__.'/foo.php',
 			__DIR__.'/baz.php',
 		));
-		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array(
-			'foo',
-			'bar',
-		));
+		$migrator->getRepository()->shouldReceive('getLast')->twice()->andReturn(
+			array(
+				'oof',
+				'rab',
+			),
+			array(
+				'foo',
+				'bar',
+			)
+		);
+		$migrator->getRepository()->shouldReceive('getLastBatchNumber')->twice()->andReturn(2);
 
 		$barMock = m::mock('stdClass');
 		$barMock->shouldReceive('down')->once();
@@ -151,6 +158,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 			'foo',
 			'bar',
 		));
+		$migrator->getRepository()->shouldReceive('getLastBatchNumber')->once()->andReturn(2);
 
 		$barMock = m::mock('stdClass');
 		$barMock->shouldReceive('getConnection')->once()->andReturn(null);
@@ -188,7 +196,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
 		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array());
-		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array());
+		$migrator->getRepository()->shouldReceive('getLastBatchNumber')->once()->andReturn(0);
 
 		$migrator->rollback(__DIR__);
 	}
