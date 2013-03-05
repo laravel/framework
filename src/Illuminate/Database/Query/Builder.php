@@ -643,7 +643,7 @@ class Builder {
 	 */
 	public function having($column, $operator = null, $value = null)
 	{
-		$type = 'Basic';
+		$type = 'basic';
 
 		$this->havings[] = compact('type', 'column', 'operator', 'value');
 
