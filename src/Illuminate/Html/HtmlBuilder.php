@@ -78,7 +78,7 @@ class HtmlBuilder {
 	/**
 	 * Create the HTML for a listing element.
 	 *
-	 * @param  mied    $key
+	 * @param  mixed    $key
 	 * @param  string  $type
 	 * @param  string  $value
 	 * @return string
@@ -98,7 +98,7 @@ class HtmlBuilder {
 	/**
 	 * Create the HTML for a nested listing attribute.
 	 *
-	 * @param  mied    $key
+	 * @param  mixed    $key
 	 * @param  string  $type
 	 * @param  string  $value
 	 * @return string

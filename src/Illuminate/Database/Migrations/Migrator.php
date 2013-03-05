@@ -285,7 +285,7 @@ class Migrator {
 	{
 		$file = implode('_', array_slice(explode('_', $file), 4));
 
-		$class = studly_caps($file);
+		$class = studly_case($file);
 
 		return new $class;
 	}

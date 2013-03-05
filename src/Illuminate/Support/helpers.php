@@ -261,17 +261,6 @@ function camel_case($value)
 }
 
 /**
- * Convert a value to studly caps.
- *
- * @param  string  $value
- * @return string
- */
-function studly_caps($value)
-{
-	return Illuminate\Support\Str::studly($value);
-}
-
-/**
  * Get the class "basename" of the given object / class.
  *
  * @param  string|object  $class
@@ -494,6 +483,17 @@ function str_random($length = 16)
 function str_singular($value)
 {
 	return Illuminate\Support\Str::singular($value);
+}
+
+/**
+ * Convert a value to studly caps case.
+ *
+ * @param  string  $value
+ * @return string
+ */
+function studly_case($value)
+{
+	return Illuminate\Support\Str::studly($value);
 }
 
 /**

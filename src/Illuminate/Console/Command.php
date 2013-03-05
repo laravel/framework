@@ -80,7 +80,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
-	 * Run the conosle command.
+	 * Run the console command.
 	 *
 	 * @param  Symfony\Component\Console\Input\InputInterface  $input
 	 * @param  Symfony\Component\Console\Output\OutputInterface  $output

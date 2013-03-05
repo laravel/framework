@@ -24,16 +24,17 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 *
 	 * @param  Illuminate\Database\Eloquent\Builder  $query
 	 * @param  Illuminate\Database\Eloquent\Model  $parent
-	 * @param  string  $morphName
+	 * @param  string  $type
+	 * @param  string  $id
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $parent, $morphName)
+	public function __construct(Builder $query, Model $parent, $type, $id)
 	{
-		$this->morphType = "{$morphName}_type";
+		$this->morphType = $type;
 
 		$this->morphClass = get_class($parent);
 
-		parent::__construct($query, $parent, "{$morphName}_id");
+		parent::__construct($query, $parent, $id);
 	}
 
 	/**

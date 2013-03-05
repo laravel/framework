@@ -15,7 +15,7 @@ class AuthManager extends Manager {
 		$guard = parent::createDriver($driver);
 
 		// When using the remember me functionality of the authentication services we
-		// will need to be set the encryption isntance of the guard, which allows
+		// will need to be set the encryption instance of the guard, which allows
 		// secure, encrypted cookie values to get generated for those cookies.
 		$guard->setCookieJar($this->app['cookie']);
 

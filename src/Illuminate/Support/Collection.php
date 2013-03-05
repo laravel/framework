@@ -115,7 +115,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  int  $options
 	 * @return string
 	 */
-	public function toJson($options = JSON_NUMERIC_CHECK)
+	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
 	}

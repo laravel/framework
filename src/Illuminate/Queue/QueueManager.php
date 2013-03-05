@@ -115,7 +115,7 @@ class QueueManager {
 	}
 
 	/**
-	 * Dyncamially pass calls to the default connection.
+	 * Dynamically pass calls to the default connection.
 	 *
 	 * @param  string  $method
 	 * @param  array   $parameters
