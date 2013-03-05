@@ -176,6 +176,14 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function addExtension($extension)
 	{
+		// We will remove the existing extension from our extensions
+		// if it exists. This will ensure the newly registered extension
+		// is prepended as expected.
+		if (($index = array_search($extension, $this->extensions)) !== false)
+		{
+			unset($this->extensions[$index]);
+		}
+
 		array_unshift($this->extensions, $extension);
 	}
 
