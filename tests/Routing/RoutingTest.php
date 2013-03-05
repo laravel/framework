@@ -547,6 +547,21 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), $router->getRoutes()->get('get /')->getOption('_before'));
 	}
 
+
+	public function testNestedPrefixedRoutes()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->group(array('prefix' => 'first'), function() use ($router)
+		{
+			$router->group(array('prefix' => 'second'), function() use ($router)
+			{
+				$router->get('third', function() {});
+			});
+		});
+
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('get first/second/third'));
+	}
+
 }
 
 class RoutingModelBindingStub {
