@@ -1252,7 +1252,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function mutateAttribute($key, $value)
 	{
-		return $this->{'get'.camel_case($key).'Attribute'}($value);
+		return $this->{'get'.studly_caps($key).'Attribute'}($value);
 	}
 
 	/**
