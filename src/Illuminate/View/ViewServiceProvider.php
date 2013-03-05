@@ -84,9 +84,6 @@ class ViewServiceProvider extends ServiceProvider {
 			// instance to pass into the engine so it can compile the views properly.
 			$compiler = new BladeCompiler($app['files'], $cache);
 
-			$compiler->setContentTags($app['config']['view.content_tags']);
-			$compiler->setRawContentTags($app['config']['view.raw_content_tags']);
-
 			return new CompilerEngine($compiler, $app['files']);
 		});
 	}
