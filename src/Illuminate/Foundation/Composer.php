@@ -35,11 +35,12 @@ class Composer {
 	/**
 	 * Regenerate the Composer autoloader files.
 	 *
+	 * @param string $path
 	 * @return void
 	 */
-	public function dumpAutoloads()
+	public function dumpAutoloads($path = null)
 	{
-		$process = $this->getProcess();
+		$process = $this->getProcess($path);
 
 		$process->setCommandLine($this->findComposer().' dump-autoload --optimize');
 
@@ -55,7 +56,9 @@ class Composer {
 	{
 		if ($this->files->exists($this->workingPath.'/composer.phar'))
 		{
-			return 'php composer.phar';
+			// We explicitly specify composer path because we might not
+			// be in the workingPath.
+			return "php '{$this->workingPath}/composer.phar'";
 		}
 		else
 		{
@@ -66,11 +69,13 @@ class Composer {
 	/**
 	 * Get a new Symfony process instance.
 	 *
+	 * @param string $path
 	 * @return Symfony\Component\Process\Process
 	 */
-	protected function getProcess()
+	protected function getProcess($path = null)
 	{
-		return new Process('', $this->workingPath);
+		if (!$path) $path = $this->workingPath;
+		return new Process('', $path);
 	}
 
 }
