@@ -49,7 +49,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $rawContentTags = array('{{{', '}}}');
+	protected $escapedContentTags = array('{{{', '}}}');
 
 	/**
 	 * Compile the view at the given path.
@@ -168,15 +168,15 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$value = preg_replace(sprintf(
 			'/%s\s*(.+?)\s*%s/s',
-			preg_quote($this->rawContentTags[0]),
-			preg_quote($this->rawContentTags[1])
-		), '<?php echo $1; ?>', $value);
+			preg_quote($this->escapedContentTags[0]),
+			preg_quote($this->escapedContentTags[1])
+		), '<?php echo e($1); ?>', $value);
 
 		return preg_replace(sprintf(
 			'/%s\s*(.+?)\s*%s/s',
 			preg_quote($this->contentTags[0]),
 			preg_quote($this->contentTags[1])
-		), '<?php echo e($1); ?>', $value);
+		), '<?php echo $1; ?>', $value);
 	}
 
 	/**
@@ -371,7 +371,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			throw new \InvalidArgumentException("Invalid count [$count] of Blade content tags provided.");
 		}
 
-		$property = ($raw === true) ? 'rawContentTags' : 'contentTags';
+		$property = ($raw === true) ? 'escapedContentTags' : 'contentTags';
 
 		$this->{$property} = array_values($contentTags);
 	}
@@ -382,7 +382,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @param  array  $contentTags
 	 * @return void
 	 */
-	public function setRawContentTags(array $contentTags)
+	public function setEscapedContentTags(array $contentTags)
 	{
 		$this->setContentTags($contentTags, true);
 	}
