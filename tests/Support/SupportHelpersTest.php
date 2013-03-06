@@ -112,8 +112,19 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
 	public function testCamelCase()
 	{
-		$this->assertEquals('FooBar', camel_case('foo_bar'));
-		$this->assertEquals('FooBarBaz', camel_case('foo-bar_baz'));
+		$this->assertEquals('fooBar', camel_case('FooBar'));
+		$this->assertEquals('fooBar', camel_case('foo_bar'));
+		$this->assertEquals('fooBarBaz', camel_case('Foo-barBaz'));
+		$this->assertEquals('fooBarBaz', camel_case('foo-bar_baz'));
+	}
+
+
+	public function testStudlyCase()
+	{
+		$this->assertEquals('FooBar', studly_case('fooBar'));
+		$this->assertEquals('FooBar', studly_case('foo_bar'));
+		$this->assertEquals('FooBarBaz', studly_case('foo-barBaz'));
+		$this->assertEquals('FooBarBaz', studly_case('foo-bar_baz'));
 	}
 
 
