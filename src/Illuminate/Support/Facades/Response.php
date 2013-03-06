@@ -27,8 +27,6 @@ class Response {
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
-		// If the data is "Arrayable" we will convert it to its array form before 
-		// sending it as JSON.
 		if ($data instanceof ArrayableInterface)
 		{
 			$data = $data->toArray();
