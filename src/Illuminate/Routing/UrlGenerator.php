@@ -47,7 +47,7 @@ class UrlGenerator {
 	 *
 	 * @return string
 	 */
-	public function back()
+	public function previous()
 	{
 		return $this->to($this->request->headers->get('referer'));
 	}
