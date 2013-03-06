@@ -11,7 +11,7 @@ class SupportFacadeResponseTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testArrayfyDataBeforeSendingAsJson()
+	public function testArrayifyDataBeforeSendingAsJson()
 	{
 		$data = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
 		$data->shouldReceive('toArray')->andReturn(array('foo' => 'bar'));
