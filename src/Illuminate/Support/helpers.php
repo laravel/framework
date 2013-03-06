@@ -450,6 +450,50 @@ function str_is($pattern, $value)
 }
 
 /**
+ * Determine if a given string is json encoded
+ * 
+ * @param  string $string
+ * @return bool
+ */
+function str_is_json($value)
+{
+	return Illuminate\Support\Str::isJson($value);
+}
+
+/**
+ * Determine if a given string is a valid XML
+ * 
+ * @param  string $string
+ * @return bool
+ */
+function str_is_xml($value)
+{
+	return Illuminate\Support\Str::isXml($value);
+}
+
+/**
+ * Determine if a given string is serialized
+ * 
+ * @param  string $string
+ * @return bool
+ */
+function str_is_serialized($value)
+{
+	return Illuminate\Support\Str::isSerialized($value);
+}
+
+/**
+ * Determine if a given string is html
+ * 
+ * @param  string $string
+ * @return bool
+ */
+function str_is_html($value)
+{
+	return Illuminate\Support\Str::isHtml($value);
+}
+
+/**
  * Get the plural form of an English word.
  *
  * @param  string  $value
