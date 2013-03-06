@@ -49,6 +49,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	* Get the last item from the collection
+	*
+	* @return mixed|null
+	*/
+	public function last()
+	{
+		return count($this->items) > 0 ? end($this->items) : null;
+	}
+
+	/**
 	 * Execute a callback over each item.
 	 *
 	 * @param  Closure  $callback
