@@ -89,7 +89,7 @@ class MigrationCreator {
 	 */
 	protected function populateStub($name, $stub, $table)
 	{
-		$stub = str_replace('{{class}}', camel_case($name), $stub);
+		$stub = str_replace('{{class}}', studly_case($name), $stub);
 
 		// Here we will replace the table place-holders with the table specified by
 		// the developer, which is useful for quickly creating a tables creation

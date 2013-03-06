@@ -486,6 +486,17 @@ function str_singular($value)
 }
 
 /**
+ * Convert a value to studly caps case.
+ *
+ * @param  string  $value
+ * @return string
+ */
+function studly_case($value)
+{
+	return Illuminate\Support\Str::studly($value);
+}
+
+/**
  * Translate the given message.
  *
  * @param  string  $id

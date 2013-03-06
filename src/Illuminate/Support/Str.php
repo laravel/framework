@@ -21,9 +21,7 @@ class Str {
 	 */
 	public static function camel($value)
 	{
-		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
-
-		return str_replace(' ', '', $value);
+		return lcfirst(static::studly($value));
 	}
 
 	/**
@@ -221,6 +219,19 @@ class Str {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Convert a value to studly caps case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function studly($value)
+	{
+		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
+
+		return str_replace(' ', '', $value);
 	}
 
 }
