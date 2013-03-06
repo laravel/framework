@@ -21,6 +21,7 @@
 - Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
 - Added `restart identity` to Postgres `truncate` SQL.
 - Added `Log::listen` callback and `illuminate.log` event which can be hooked into for custom logging handling.
+- `camel_case` function now returns strings with lower-case leading letters. Previous behavior of this function can be found in new `studly_case` helper.
 
 ## Beta 3
 
