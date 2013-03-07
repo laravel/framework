@@ -11,6 +11,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $c->first());
 	}
 
+	public function testLastReturnsLastItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('bar', $c->last());
+	}
+
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
