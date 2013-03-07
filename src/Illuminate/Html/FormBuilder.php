@@ -530,7 +530,10 @@ class FormBuilder {
 		// We will also check for a "route" or "action" parameter on the array so that
 		// developers can easily specify a route or controller action when creating
 		// a form providing a convenient interface for creating the form actions.
-		if (isset($options['url'])) return $options['url'];
+		if (isset($options['url']))
+		{
+			return $this->getUrlAction($options['url']);
+		}
 
 		if (isset($options['route']))
 		{
@@ -546,6 +549,22 @@ class FormBuilder {
 		}
 
 		return $this->url->current();
+	}
+
+	/**
+	 * Get the action for a "url" option.
+	 *
+	 * @param  array|string  $options
+	 * @return string
+	 */
+	protected function getUrlAction($options)
+	{
+		if (is_array($options))
+		{
+			return $this->url->to($options[0], array_slice($options, 1));
+		}
+
+		return $this->url->to($options);
 	}
 
 	/**
