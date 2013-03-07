@@ -245,6 +245,17 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a tiny integer type.
+	 *
+	 * @param  Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTinyInteger(Fluent $column)
+	{
+		return 'smallint';
+	}
+
+	/**
 	 * Create the column definition for a float type.
 	 *
 	 * @param  Illuminate\Support\Fluent  $column
