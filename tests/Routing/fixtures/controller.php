@@ -63,6 +63,16 @@ class FooController extends BaseController {
 	}
 
 	/**
+	 * Ask for confirmation for deleting the specified resource.
+	 *
+	 * @return Response
+	 */
+	public function delete($id)
+	{
+		//
+	}
+
+	/**
 	 * Remove the specified resource from storage.
 	 *
 	 * @return Response

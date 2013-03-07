@@ -88,7 +88,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->resource('foo', 'FooController');
 		$routes = $router->getRoutes();
 
-		$this->assertEquals(8, count($routes));
+		$this->assertEquals(9, count($routes));
 
 		$router = new Router;
 		$router->resource('foo', 'FooController', array('only' => array('show', 'destroy')));
@@ -100,7 +100,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router->resource('foo', 'FooController', array('except' => array('show', 'destroy')));
 		$routes = $router->getRoutes();
 
-		$this->assertEquals(6, count($routes));
+		$this->assertEquals(7, count($routes));
 	}
 
 
@@ -115,6 +115,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.store'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.edit'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.update'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.delete'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.destroy'));
 
 		$router = new Router;
@@ -126,6 +127,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.store'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.edit'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.update'));
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.delete'));
 		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('foo.bar.destroy'));
 	}
 
@@ -141,6 +143,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/{foo}/bar', $router->getRoutes()->get('foo.bar.store')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}/edit', $router->getRoutes()->get('foo.bar.edit')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.update')->getPath());
+		$this->assertEquals('/foo/{foo}/bar/{bar}/delete', $router->getRoutes()->get('foo.bar.delete')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.destroy')->getPath());
 	}
 

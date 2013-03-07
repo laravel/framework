@@ -264,7 +264,7 @@ class Router {
 	 */
 	public function resource($resource, $controller, array $options = array())
 	{
-		$defaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+		$defaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'delete', 'destroy');
 
 		$base = $this->getBaseResource($resource);
 
@@ -413,6 +413,21 @@ class Router {
 		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
 		$this->patch($uri, $controller.'@update');
+	}
+
+	/**
+	 * Add the delete method for a resourceful route.
+	 *
+	 * @param  string  $name
+	 * @param  string  $base
+	 * @param  string  $controller
+	 * @return void
+	 */
+	protected function addResourceDelete($name, $base, $controller)
+	{
+		$uri = $this->getResourceUri($name).'/{'.$base.'}/delete';
+
+		return $this->get($uri, $this->getResourceAction($name, $controller, 'delete'));
 	}
 
 	/**
