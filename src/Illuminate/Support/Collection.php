@@ -49,7 +49,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	* Get the last item from the collection
+	* Get the last item from the collection.
 	*
 	* @return mixed|null
 	*/
