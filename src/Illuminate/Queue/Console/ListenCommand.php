@@ -59,19 +59,22 @@ class ListenCommand extends Command {
 
 		$timeout = $this->input->getOption('timeout');
 
-		$this->listener->listen($connection, $this->getQueue(), $delay, $memory, $timeout);
+		$queue = $this->getQueue($connection);
+
+		$this->listener->listen($connection, $queue, $delay, $memory, $timeout);
 	}
 
 	/**
 	 * Get the name of the queue connection to listen on.
 	 *
+	 * @param  string  $connection
 	 * @return string
 	 */
-	protected function getQueue()
+	protected function getQueue($connection)
 	{
-		$queue = $this->input->getOption('queue');
+		$queue = $this->laravel['config']->get("queue.{$connection}.queue", 'default');
 
-		return $queue ?: $this->laravel['config']['queue.default'];
+		return $this->input->getOption('queue') ?: $queue;
 	}
 
 	/**
@@ -94,7 +97,7 @@ class ListenCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', 'default'),
+			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', null),
 
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
 
