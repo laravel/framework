@@ -57,7 +57,9 @@ class ListenCommand extends Command {
 
 		$connection = $this->input->getArgument('connection');
 
-		$this->listener->listen($connection, $this->getQueue(), $delay, $memory);
+		$timeout = $this->input->getOption('timeout');
+
+		$this->listener->listen($connection, $this->getQueue(), $delay, $memory, $timeout);
 	}
 
 	/**
@@ -97,6 +99,8 @@ class ListenCommand extends Command {
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
 
 			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
+
+			array('timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60),
 		);
 	}
 

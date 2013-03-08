@@ -29,11 +29,12 @@ class Listener {
 	 * @param  string  $queue
 	 * @param  string  $delay
 	 * @param  string  $memory
+	 * @param  int     $timeout
 	 * @return void
 	 */
-	public function listen($connection, $queue, $delay, $memory)
+	public function listen($connection, $queue, $delay, $memory, $timeout = 60)
 	{
-		$process = $this->makeProcess($connection, $queue, $delay, $memory);
+		$process = $this->makeProcess($connection, $queue, $delay, $memory, $timeout);
 
 		while(true)
 		{
@@ -68,15 +69,16 @@ class Listener {
 	 * @param  string  $queue
 	 * @param  int     $delay
 	 * @param  int     $memory
+	 * @param  int     $timeout
 	 * @return Symfony\Component\Process\Process
 	 */
-	public function makeProcess($connection, $queue, $delay, $memory)
+	public function makeProcess($connection, $queue, $delay, $memory, $timeout)
 	{
 		$string = 'php artisan queue:work %s --queue=%s --delay=%s --memory=%s --sleep';
 
 		$command = sprintf($string, $connection, $queue, $delay, $memory);
 
-		return new Process($command, $this->commandPath);
+		return new Process($command, $this->commandPath, null, null, $timeout);
 	}
 
 	/**
