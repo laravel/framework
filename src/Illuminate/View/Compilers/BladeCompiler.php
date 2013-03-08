@@ -360,31 +360,29 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Sets the content tags used for the compiler.
 	 *
-	 * @param  array  $contentTags
-	 * @param  array  $raw
+	 * @param  string  $openTag
+	 * @param  string  $closeTag
+	 * @param  array   $raw
 	 * @return void
 	 */
-	public function setContentTags(array $contentTags, $raw = false)
+	public function setContentTags($openTag, $closeTag, $raw = false)
 	{
-		if (($count = count($contentTags)) !== 2)
-		{
-			throw new \InvalidArgumentException("Invalid count [$count] of Blade content tags provided.");
-		}
 
 		$property = ($raw === true) ? 'escapedContentTags' : 'contentTags';
 
-		$this->{$property} = array_values($contentTags);
+		$this->{$property} = array($openTag, $closeTag);
 	}
 
 	/**
 	 * Sets the raw content tags used for the compiler.
 	 *
-	 * @param  array  $contentTags
+	 * @param  string  $openTag
+	 * @param  string  $closeTag
 	 * @return void
 	 */
-	public function setEscapedContentTags(array $contentTags)
+	public function setEscapedContentTags($openTag, $closeTag)
 	{
-		$this->setContentTags($contentTags, true);
+		$this->setContentTags($openTag, $closeTag, true);
 	}
 
 }

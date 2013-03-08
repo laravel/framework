@@ -223,21 +223,11 @@ breeze
 	}
 
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
-	public function testSettingContentTagsThrowsExceptionForBadArray()
-	{
-		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->setContentTags(array('should', 'be', 'two'));
-	}
-
-
 	public function testConfiguringContentTags()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->setContentTags(array('[[', ']]'));
-		$compiler->setEscapedContentTags(array('[[[', ']]]'));
+		$compiler->setContentTags('[[', ']]');
+		$compiler->setEscapedContentTags('[[[', ']]]');
 
 		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[[ $name ]]]'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('[[ $name ]]'));
