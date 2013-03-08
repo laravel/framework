@@ -44,6 +44,17 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPaginationContextHandlesPageLessThanOneAsString()
+	{
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
+		$env->shouldReceive('getCurrentPage')->once()->andReturn('-1');
+		$p->setupPaginationContext();
+
+		$this->assertEquals(2, $p->getLastPage());
+		$this->assertEquals(1, $p->getCurrentPage());
+	}
+
+
 	public function testPaginationContextHandlesPageInvalidFormat()
 	{
 		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);

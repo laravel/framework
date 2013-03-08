@@ -116,7 +116,14 @@ class Environment {
 	 */
 	public function getCurrentPage()
 	{
-		return $this->currentPage ?: $this->request->query->get('page', 1);
+		$page = (int) $this->currentPage ?: $this->request->query->get('page', 1);
+
+		if ($page < 1 or filter_var($page, FILTER_VALIDATE_INT) === false)
+		{
+			return 1;
+		}
+
+		return $page;
 	}
 	
 	/**
