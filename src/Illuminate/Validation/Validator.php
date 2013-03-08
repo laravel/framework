@@ -525,10 +525,10 @@ class Validator implements MessageProviderInterface {
 	{
 		$hasNumeric = $this->hasRule($attribute, $this->numericRules);
 
-	 	// This method will determine if the attribute is a number, string, or file and
-	 	// return the proper size accordingly. If it is a number, then number itself
-	 	// is the size. If it is a file, we take kilobytes, and for a string the
-	 	// entire length of the string will be considered the attribute size.
+		// This method will determine if the attribute is a number, string, or file and
+		// return the proper size accordingly. If it is a number, then number itself
+		// is the size. If it is a file, we take kilobytes, and for a string the
+		// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
 			return $this->data[$attribute];
@@ -1285,17 +1285,16 @@ class Validator implements MessageProviderInterface {
 		// The format for specifying validation rules and parameters follows an
 		// easy {rule}:{parameters} formatting convention. For instance the
 		// rule "Max:3" states that the value may only be three letters.
-		if (($colon = strpos($rule, ':')) !== false)
+		if (strpos($rule, ':') !== false)
 		{
-			$parameters = str_getcsv(substr($rule, $colon + 1));
-		}
+			// Split the rule into the rule name and the parameter sections
+			// Regex rules with a colon are safe due to $limit = 2
+			list($rule, $parameter) = explode(':', $rule, 2);
 
-		// If we found a colon in the rule string it means a parameter has been
-		// specified, and we need to extract the "plain" rule name from this
-		// string so that we can call the proper validation method for it.
-		if (is_numeric($colon))
-		{
-			$rule = substr($rule, 0, $colon);
+			// Create an array of parameters
+			// For regex rules, keep the parameter as-is
+			// otherwise split the parameters by commas
+			$parameters = (strtolower($rule) === 'regex')? array($parameter) : str_getcsv($parameter);
 		}
 
 		return array(studly_case($rule), $parameters);
