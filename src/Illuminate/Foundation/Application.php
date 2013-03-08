@@ -37,11 +37,18 @@ class Application extends Container implements HttpKernelInterface {
 	protected $booted = false;
 
 	/**
-	 * Get the booting callbacks.
+	 * The array of booting callbacks.
 	 *
 	 * @var array
 	 */
 	protected $bootingCallbacks = array();
+
+	/**
+	 * The array of booted callbacks.
+	 *
+	 * @var array
+	 */
+	protected $bootedCallbacks = array();
 
 	/**
 	 * All of the registered service providers.
@@ -448,9 +455,14 @@ class Application extends Container implements HttpKernelInterface {
 			$provider->boot();
 		}
 
-		$this->fireBootingCallbacks();
+		$this->fireAppCallbacks($this->bootingCallbacks);
 
+		// Once the application has booted we will also fire some "booted" callbacks
+		// for any listeners that need to do work after this initial booting gets
+		// finished. This is useful when ordering the boot-up processes we run.
 		$this->booted = true;
+
+		$this->fireAppCallbacks($this->bootedCallbacks);
 	}
 
 	/**
@@ -465,13 +477,24 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Register a new "booted" listener.
+	 *
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function booted($callback)
+	{
+		$this->bootedCallbacks[] = $callback;
+	}
+
+	/**
 	 * Call the booting callbacks for the application.
 	 *
 	 * @return void
 	 */
-	protected function fireBootingCallbacks()
+	protected function fireAppCallbacks(array $callbacks)
 	{
-		foreach ($this->bootingCallbacks as $callback)
+		foreach ($callbacks as $callback)
 		{
 			call_user_func($callback, $this);
 		}
