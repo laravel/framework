@@ -380,24 +380,6 @@ if ( ! function_exists('head'))
 	}
 }
 
-if ( ! function_exists('path'))
-{
-	/**
-	 * Generate a path for the application.
-	 *
-	 * @param  string  $path
-	 * @param  array   $parameters
-	 * @param  bool    $secure
-	 * @return string
-	 */
-	function path($path = null, array $parameters = array(), $secure = null)
-	{
-		$app = app();
-
-		return $app['url']->to($path, $parameters, $secure);
-	}
-}
-
 if ( ! function_exists('public_path'))
 {
 	/**
@@ -628,6 +610,24 @@ if ( ! function_exists('trans_choice'))
 		$app = app();
 
 		return $app['translator']->transChoice($id, $number, $parameters, $domain, $locale);
+	}
+}
+
+if ( ! function_exists('url'))
+{
+	/**
+	 * Generate a path for the application.
+	 *
+	 * @param  string  $path
+	 * @param  array   $parameters
+	 * @param  bool    $secure
+	 * @return string
+	 */
+	function url($path = null, array $parameters = array(), $secure = null)
+	{
+		$app = app();
+
+		return $app['url']->to($path, $parameters, $secure);
 	}
 }
 
