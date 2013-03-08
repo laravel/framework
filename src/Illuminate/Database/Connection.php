@@ -686,7 +686,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @return void
 	 */
-	public function clearQueryLog()
+	public function flushQueryLog()
 	{
 		$this->queryLog = array();
 	}
