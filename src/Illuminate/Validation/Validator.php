@@ -1298,7 +1298,7 @@ class Validator implements MessageProviderInterface {
 			$rule = substr($rule, 0, $colon);
 		}
 
-		return array(camel_case($rule), $parameters);
+		return array(studly_case($rule), $parameters);
 	}
 
 	/**
@@ -1334,7 +1334,7 @@ class Validator implements MessageProviderInterface {
 
 		foreach ($extensions as $rule => $extension)
 		{
-			$this->implicitRules[] = camel_case($rule);
+			$this->implicitRules[] = studly_case($rule);
 		}
 	}
 
@@ -1361,7 +1361,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->addExtension($rule, $extension);
 
-		$this->implicitRules[] = camel_case($rule);
+		$this->implicitRules[] = studly_case($rule);
 	}
 
 	/**
@@ -1488,7 +1488,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the messages for the instance.
 	 *
-	 * @return ILluminate\Support\MessageBag
+	 * @return Illuminate\Support\MessageBag
 	 */
 	public function getMessageBag()
 	{

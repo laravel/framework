@@ -467,7 +467,37 @@ class Router {
 	 */
 	protected function getResourceAction($resource, $controller, $method)
 	{
-		return array('as' => $resource.'.'.$method, 'uses' => $controller.'@'.$method);
+		$name = $resource.'.'.$method;
+
+		// If we have a group stack, we will append the full prefix onto the resource
+		// route name so that we don't override other route with the same name but
+		// a different prefix. We'll then return out the complete action arrays.
+		if (count($this->groupStack) > 0)
+		{
+			$name = $this->getResourcePrefix($resource, $method);
+		}
+		else
+		{
+			$name = $resource.'.'.$method;
+		}
+
+		return array('as' => $name, 'uses' => $controller.'@'.$method);
+	}
+
+	/**
+	 * Get the resource prefix for a resource route.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $method
+	 * @return string
+	 */
+	protected function getResourcePrefix($resource, $method)
+	{
+		$prefix = str_replace('/', '.', $this->getGroupPrefix());
+
+		if ($prefix != '') $prefix .= '.';
+
+		return "{$prefix}{$resource}.{$method}";
 	}
 
 	/**
@@ -546,7 +576,7 @@ class Router {
 		{
 			$index = $groupCount - 1;
 
-			$action = array_merge($this->groupStack[$index], $action);
+			$action = $this->mergeGroup($action, $index);
 		}
 
 		// Next we will parse the pattern and add any specified prefix to the it so
@@ -605,6 +635,62 @@ class Router {
 		}
 
 		throw new \InvalidArgumentException("Unroutable action.");
+	}
+
+	/**
+	 * Merge the current group stack into a given action.
+	 *
+	 * @param  array  $action
+	 * @param  int    $index
+	 * @return array
+	 */
+	protected function mergeGroup($action, $index)
+	{
+		$prefix = $this->mergeGroupPrefix($action);
+
+		$action = array_merge($this->groupStack[$index], $action);
+
+		// If we have a prefix, we will override the merged prefix with this correctly
+		// concatenated one since prefixes shouldn't merge like the other groupable
+		// attributes on the action. Then we can return this final merged arrays.
+		if ($prefix != '') $action['prefix'] = $prefix;
+
+		return $action;
+	}
+
+	/**
+	 * Get the full group prefix for the current stack.
+	 *
+	 * @return string
+	 */
+	protected function getGroupPrefix()
+	{
+		if (count($this->groupStack) > 0)
+		{
+			$group = $this->groupStack[count($this->groupStack) - 1];
+
+			if (isset($group['prefix']))
+			{
+				if (is_array($group['prefix'])) return implode('/', $group['prefix']);
+
+				return $group['prefix'];
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get the fully merged prefix for a given action.
+	 *
+	 * @param  array   $action
+	 * @return string
+	 */
+	protected function mergeGroupPrefix($action)
+	{
+		$prefix = isset($action['prefix']) ? $action['prefix'] : '';
+
+		return trim($this->getGroupPrefix().'/'.$prefix, '/');
 	}
 
 	/**
@@ -1243,7 +1329,7 @@ class Router {
 	}
 
 	/**
-	 * Disable the runnning of all filters.
+	 * Disable the running of all filters.
 	 *
 	 * @return void
 	 */

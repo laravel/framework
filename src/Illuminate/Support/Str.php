@@ -21,9 +21,7 @@ class Str {
 	 */
 	public static function camel($value)
 	{
-		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
-
-		return str_replace(' ', '', $value);
+		return lcfirst(static::studly($value));
 	}
 
 	/**
@@ -101,7 +99,7 @@ class Str {
 	 */
 	public static function limit($value, $limit = 100, $end = '...')
 	{
-		if (static::length($value) <= $limit) return $value;
+		if (mb_strlen($value) <= $limit) return $value;
 
 		return mb_substr($value, 0, $limit, 'UTF-8').$end;
 	}
@@ -153,7 +151,7 @@ class Str {
 	{
 		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length); 
+		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
 	}
 
 	/**
@@ -180,6 +178,11 @@ class Str {
 
 		// Remove all characters that are not the separator, letters, numbers, or whitespace.
 		$title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
+
+		// Convert all dashes/undescores into separator
+		$flip = $separator == '-' ? '_' : '-';
+
+		$title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 
 		// Replace all separator characters and whitespace by a single separator
 		$title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
@@ -216,6 +219,19 @@ class Str {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Convert a value to studly caps case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function studly($value)
+	{
+		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
+
+		return str_replace(' ', '', $value);
 	}
 
 }

@@ -60,7 +60,7 @@ class SqsJob extends Job {
 	 */
 	public function fire()
 	{
-		$payload = unserialize($this->job['Body']);
+		$payload = json_decode($this->job['Body'], true);
 
 		// Once we have the message payload, we can create the given class and fire
 		// it off with the given data. The data is in the messages serialized so

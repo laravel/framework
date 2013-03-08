@@ -192,8 +192,28 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testHavings()
 	{
 		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->having('email', '>', 1);
+		$this->assertEquals('select * from "users" having "email" > ?', $builder->toSql());
+		
+		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy('email')->having('email', '>', 1);
 		$this->assertEquals('select * from "users" group by "email" having "email" > ?', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('email as foo_email')->from('users')->having('foo_email', '>', 1);
+		$this->assertEquals('select "email" as "foo_email" from "users" having "foo_email" > ?', $builder->toSql());
+	}
+
+
+	public function testRawHavings()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->havingRaw('user_foo < user_bar');
+		$this->assertEquals('select * from "users" having user_foo < user_bar', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->having('baz', '=', 1)->orHavingRaw('user_foo < user_bar');
+		$this->assertEquals('select * from "users" having "baz" = ? or user_foo < user_bar', $builder->toSql());
 	}
 
 
@@ -580,6 +600,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->mergeWheres(array('wheres'), array(12 => 'foo', 13 => 'bar'));
 		$this->assertEquals(array('foo', 'wheres'), $builder->wheres);
 		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
+	}
+
+
+	public function testProvidingNullOrFalseAsSecondParameterBuildsCorrectly()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->where('foo', null);
+		$this->assertEquals('select * from "users" where "foo" is null', $builder->toSql());
 	}
 
 

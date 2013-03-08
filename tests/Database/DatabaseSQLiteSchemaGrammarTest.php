@@ -27,8 +27,12 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$blueprint->string('email');
 		$statements = $blueprint->toSql($this->getGrammar());
 
-		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement, add column "email" varchar not null', $statements[0]);
+		$this->assertEquals(2, count($statements));
+		$expected = array(
+			'alter table "users" add column "id" integer not null primary key autoincrement',
+			'alter table "users" add column "email" varchar not null',
+		);
+		$this->assertEquals($expected, $statements);
 	}
 
 
@@ -211,6 +215,17 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingTinyInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->tinyInteger('foo');
+		$statements = $blueprint->toSql($this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
+	}
+
+
 	public function testAddingFloat()
 	{
 		$blueprint = new Blueprint('users');
@@ -305,8 +320,12 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$blueprint->timestamps();
 		$statements = $blueprint->toSql($this->getGrammar());
 
-		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "created_at" datetime not null, add column "updated_at" datetime not null', $statements[0]);
+		$this->assertEquals(2, count($statements));
+		$expected = array(
+			'alter table "users" add column "created_at" datetime not null',
+			'alter table "users" add column "updated_at" datetime not null'
+		);
+		$this->assertEquals($expected, $statements);
 	}
 
 

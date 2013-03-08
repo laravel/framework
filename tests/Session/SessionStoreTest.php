@@ -38,8 +38,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session = $store->getSession();
 		$this->assertFalse($store->sessionExists());
 		$this->assertTrue(strlen($session['id']) == 40);
-		$this->assertTrue(strlen($session['data']['csrf_token']) == 40);
-		$this->assertEquals($session['data']['csrf_token'], $store->getToken());
+		$this->assertTrue(strlen($session['data']['_token']) == 40);
+		$this->assertEquals($session['data']['_token'], $store->getToken());
 		$this->assertFalse(isset($session['last_activity']));
 	}
 
@@ -238,6 +238,9 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$store->forget('foo.bat');
 		$this->assertEquals(array('bar' => 'baz'), $store->get('foo'));
 		$this->assertFalse($store->has('foo.bat'));
+		$store->flash('flash.foo', 'bar');
+		$this->assertEquals(array('foo' => 'bar'), $store->get('flash'));
+		$store->forget('flash');
 	}
 
 

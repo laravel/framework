@@ -13,7 +13,7 @@ class DatabaseProcessorTest extends PHPUnit_Framework_TestCase {
 	public function testInsertGetIdProcessing()
 	{
 		$pdo = $this->getMock('ProcessorTestPDOStub');
-		$pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->will($this->returnValue(1));
+		$pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->will($this->returnValue('1'));
 		$connection = m::mock('Illuminate\Database\Connection');
 		$connection->shouldReceive('insert')->once()->with('sql', array('foo'));
 		$connection->shouldReceive('getPdo')->once()->andReturn($pdo);
@@ -21,7 +21,7 @@ class DatabaseProcessorTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('getConnection')->andReturn($connection);
 		$processor = new Illuminate\Database\Query\Processors\Processor;
 		$result = $processor->processInsertGetId($builder, 'sql', array('foo'), 'id');
-		$this->assertEquals(1, $result);
+		$this->assertSame(1, $result);
 	}
 
 }

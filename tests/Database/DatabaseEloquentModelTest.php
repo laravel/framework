@@ -99,6 +99,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
 
 		$model->id = 1;
 		$model->name = 'taylor';
@@ -107,7 +108,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testUpdateIsCancelledIfCreatingEventReturnsFalse()
+	public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -197,6 +198,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
 
 		$model->name = 'taylor';
 		$model->exists = false;
@@ -213,6 +215,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
 
 		$model->name = 'taylor';
 		$model->exists = false;
@@ -311,6 +314,38 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
 		$this->assertFalse(isset($array['password']));
+	}
+
+
+	public function testToArraySnakeAttributes()
+	{
+		$model = new EloquentModelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['names_list'][0]['bar']);
+		$this->assertEquals('boom', $array['names_list'][1]['bam']);
+
+		$model = new EloquentModelCamelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['namesList'][0]['bar']);
+		$this->assertEquals('boom', $array['namesList'][1]['bam']);
+	}
+
+
+	public function testToArrayUsesMutators()
+	{
+		$model = new EloquentModelStub;
+		$model->list_items = array(1, 2, 3);
+		$array = $model->toArray();
+
+		$this->assertEquals(array(1, 2, 3), $array['list_items']);	
 	}
 
 
@@ -451,6 +486,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelWithoutTableStub;
 		$this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
+
+		require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+		$namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
+		$this->assertEquals('foo_bar_eloquent_model_namespaced_stubs', $namespacedModel->getTable());
+	}
+
+
+	public function testTheMutatorCacheIsPopulated()
+	{
+		$class = new EloquentModelStub;
+
+		$this->assertEquals(array('list_items', 'password'), $class->getMutatedAttributes());
 	}
 
 
@@ -494,6 +541,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return $this->belongsTo('EloquentModelSaveStub', 'foo');
 	}
+}
+
+class EloquentModelCamelStub extends EloquentModelStub {
+	public static $snakeAttributes = false;
 }
 
 class EloquentDateModelStub extends EloquentModelStub {

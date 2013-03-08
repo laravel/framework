@@ -164,7 +164,7 @@ class PackageCreator {
 	}
 
 	/**
-	 * Create the public directory for the pacakge.
+	 * Create the public directory for the package.
 	 *
 	 * @param  Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
@@ -180,7 +180,7 @@ class PackageCreator {
 	}
 
 	/**
-	 * Create the test directory for the pacakge.
+	 * Create the test directory for the package.
 	 *
 	 * @param  Illuminate\Workbench\Package  $package
 	 * @param  string  $directory

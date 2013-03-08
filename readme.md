@@ -2,15 +2,26 @@
 
 ## Beta 4
 
-- Added Model::creating(Closure) and Model::updating(Closure) methods for hooking into Eloquent save events. Thank Phil Sturgeon for finally pressuring me into doing this... :)
+- Added `Model::creating(Closure)` and `Model::updating(Closure)` methods for hooking into Eloquent save events.
 - Added `Event::queue` and `Event::flush`.
 - Added a `Str` class in support component. Adopted Patchwork UTF-8 to provide solid UTF-8 handling for the framework.
-- Allow Eloquent attributes to be acceessed by camelCase in addition to snake_case.
+- Allow Eloquent attributes to be accessed by camelCase in addition to snake_case.
 - Added `App::environment` method.
 - Added `resolving` method to IoC container for catching resolutions.
 - Added `shouldReceive` and `swap` methods to facade.
 - Added `bound` method to the IoC container.
 - Utilize `checkdate` in the `date` validation rule to make sure the date is actually valid.
+- Allow controller actions in base classes to be routed via `Route::controller`.
+- Encode queue payloads as JSON instead of serializing, to make the Queue place nicely with other languages.
+- Added `Model::created(Closure)` and `Model::updated(Closure)` methods for hooking into Eloquent post-save events.
+- Added `Model::boot` static method for a one time "booting" method for models.
+- Passing `null` into a `where` call will not short-cut into `whereNull`.
+- Changed Blade `{{ }}` to not escape. Made the triple braces escape.
+- Added `DB::getName` to get the configured name of the connection.
+- Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
+- Added `restart identity` to Postgres `truncate` SQL.
+- Added `Log::listen` callback and `illuminate.log` event which can be hooked into for custom logging handling.
+- `camel_case` function now returns strings with lower-case leading letters. Previous behavior of this function can be found in new `studly_case` helper.
 
 ## Beta 3
 

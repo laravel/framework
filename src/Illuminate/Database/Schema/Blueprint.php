@@ -357,6 +357,17 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new tiny integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @return Illuminate\Support\Fluent
+	 */
+	public function tinyInteger($column)
+	{
+		return $this->addColumn('tinyInteger', $column);
+	}
+
+	/**
 	 * Create a new unsigned integer column on the table.
 	 *
 	 * @param  string  $column

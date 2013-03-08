@@ -188,7 +188,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 		list($namespace, $item) = explode('::', $key);
 
 		// If the namespace is registered as a package, we will just assume the group
-		// is equal to the naemspace since all packages cascade in this way having
+		// is equal to the namespace since all packages cascade in this way having
 		// a single file per package, otherwise we'll just parse them as normal.
 		if (in_array($namespace, $this->packages))
 		{
@@ -305,6 +305,17 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	}
 
 	/**
+	 * Returns all registered namespaces with the config
+	 * loader.
+	 *
+	 * @return array
+	 */
+	public function getNamespaces()
+	{
+		return $this->loader->getNamespaces();
+	}
+
+	/**
 	 * Get the loader implementation.
 	 *
 	 * @return Illuminate\Config\LoaderInterface
@@ -312,6 +323,16 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	public function getLoader()
 	{
 		return $this->loader;
+	}
+	
+	/**
+	 * Set the loader implementation.
+	 *
+	 * @return Illuminate\Config\LoaderInterface
+	 */
+	public function setLoader(LoaderInterface $loader)
+	{
+		$this->loader = $loader;
 	}
 
 	/**

@@ -95,9 +95,9 @@ class WorkbenchMakeCommand extends Command {
 	 */
 	protected function buildPackage()
 	{
-		$vendor = camel_case($this->ask('What is vendor name of the package?'));
+		$vendor = studly_case($this->ask('What is vendor name of the package?'));
 
-		$name = camel_case($this->ask('What is the package name?'));
+		$name = studly_case($this->ask('What is the package name?'));
 
 		$author = $this->ask('What is your name?');
 

@@ -326,7 +326,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Resolve all of the dependencies from the ReflectionParameters.
 	 *
-	 * @param  array  $parameterrs
+	 * @param  array  $parameters
 	 * @return array
 	 */
 	protected function getDependencies($parameters)

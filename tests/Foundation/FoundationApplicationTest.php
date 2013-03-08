@@ -12,7 +12,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testEnvironmenetDetection()
+	public function testEnvironmentDetection()
 	{
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');

@@ -38,7 +38,7 @@ class Pheanstalk_Command_ReserveCommand
 	}
 
 	/* (non-phpdoc)
-	 * @see Pheanstalk_ResponseParser::parseRespose()
+	 * @see Pheanstalk_ResponseParser::parseResponse()
 	 */
 	public function parseResponse($responseLine, $responseData)
 	{
