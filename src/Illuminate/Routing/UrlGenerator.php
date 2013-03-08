@@ -53,6 +53,16 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Get the URL for the previous request.
+	 *
+	 * @return string
+	 */
+	public function previous()
+	{
+		return $this->to($this->request->headers->get('referer'));
+	}
+
+	/**
 	 * Generate a absolute URL to the given path.
 	 *
 	 * @param  string  $path
@@ -151,6 +161,8 @@ class UrlGenerator {
 	public function route($name, $parameters = array(), $absolute = true)
 	{
 		$route = $this->routes->get($name);
+
+		$parameters = (array) $parameters;
 
 		if (isset($route) and $this->usingQuickParameters($parameters))
 		{

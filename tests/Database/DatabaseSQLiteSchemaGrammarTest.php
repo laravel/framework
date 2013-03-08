@@ -215,6 +215,17 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingTinyInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->tinyInteger('foo');
+		$statements = $blueprint->toSql($this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
+	}
+
+
 	public function testAddingFloat()
 	{
 		$blueprint = new Blueprint('users');

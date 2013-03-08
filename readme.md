@@ -21,7 +21,14 @@
 - Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
 - Added `restart identity` to Postgres `truncate` SQL.
 - Added `Log::listen` callback and `illuminate.log` event which can be hooked into for custom logging handling.
+- Allow blade templates to be configurable (advanced usage). Can swap out `{{ }}` for `[[ ]]` as an example, to avoid conflicts with other engines (such as handlebars).
 - `camel_case` function now returns strings with lower-case leading letters. Previous behavior of this function can be found in new `studly_case` helper.
+- Added `find` method to Eloquent Collection.
+- When using MySQL, new `after` method may be used when building Schema columns to specify column order. (`$t->string('name')->after('foo')`)
+- Added new `--timeout` option to `queue:listen` command.
+- Fixed bug that sometimes caused custom view engines to not be properly utilized.
+- Added `URL::previous` method for getting previous URL from `referer` $_SERVER variable.
+- Renamed `path` helper to `url` for consistency.
 
 ## Beta 3
 

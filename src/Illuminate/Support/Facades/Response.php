@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Support\Contracts\ArrayableInterface;
+
 class Response {
 
 	/**
@@ -25,6 +27,11 @@ class Response {
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
+		if ($data instanceof ArrayableInterface)
+		{
+			$data = $data->toArray();
+		}
+
 		return new \Symfony\Component\HttpFoundation\JsonResponse($data, $status, $headers);
 	}
 
