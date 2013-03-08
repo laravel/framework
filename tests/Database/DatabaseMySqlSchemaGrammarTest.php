@@ -208,6 +208,17 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingColumnAfterAnotherColumn()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->string('name')->after('foo');
+		$statements = $blueprint->toSql($this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);	
+	}
+
+
 	public function testAddingString()
 	{
 		$blueprint = new Blueprint('users');
