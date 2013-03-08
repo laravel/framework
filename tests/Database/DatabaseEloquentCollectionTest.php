@@ -34,6 +34,16 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFindMethodFindsModelById()
+	{
+		$mockModel = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel->shouldReceive('getKey')->andReturn(1);
+		$c = new Collection(array($mockModel));
+
+		$this->assertTrue($mockModel === $c->find(1));
+	}
+
+
 	public function testLoadMethodEagerLoadsGivenRelationships()
 	{
 		$c = $this->getMock('Illuminate\Database\Eloquent\Collection', array('first'), array(array('foo')));
