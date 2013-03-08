@@ -21,7 +21,7 @@ class Fluent {
 	{
 		foreach ($attributes as $key => $value)
 		{
-			$this->$key = $value;
+			$this->attributes[$key] = $value;
 		}
 	}
 
