@@ -195,7 +195,7 @@ class Application extends Container implements HttpKernelInterface {
 			// To determine the current environment, we'll simply iterate through the
 			// possible environments and look for a host that matches this host in
 			// the request's context, then return back that environment's names.
-			foreach ($hosts as $host)
+			foreach ((array) $hosts as $host)
 			{
 				if (str_is($host, $base) or $this->isMachine($host))
 				{
