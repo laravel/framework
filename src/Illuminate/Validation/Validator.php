@@ -1287,17 +1287,26 @@ class Validator implements MessageProviderInterface {
 		// rule "Max:3" states that the value may only be three letters.
 		if (strpos($rule, ':') !== false)
 		{
-			// Split the rule into the rule name and the parameter sections
-			// Regex rules with a colon are safe due to $limit = 2
 			list($rule, $parameter) = explode(':', $rule, 2);
 
-			// Create an array of parameters
-			// For regex rules, keep the parameter as-is
-			// otherwise split the parameters by commas
-			$parameters = (strtolower($rule) === 'regex')? array($parameter) : str_getcsv($parameter);
+			$parameters = $this->parseParameters($rule, $parameter);
 		}
 
 		return array(studly_case($rule), $parameters);
+	}
+
+	/**
+	 * Parse a parameter list.
+	 *
+	 * @param  string  $rule
+	 * @param  string  $parameter
+	 * @return array
+	 */
+	protected function parseParameters($rule, $parameter)
+	{
+		if (strtolower($rule) == 'regex') return array($parameter);
+
+		return str_getcsv($parameter);
 	}
 
 	/**
