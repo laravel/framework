@@ -36,20 +36,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	);
 
 	/**
-	 * Array representing the opening and closing
-	 * tags for echoing content.
+	 * Array of opening and closing tags for echos.
 	 *
 	 * @var array
 	 */
 	protected $contentTags = array('{{', '}}');
 
 	/**
-	 * Array representing the opening and closing
-	 * tags for echoing raw content.
+	 * Array of opening and closing tags for escaped echos.
 	 *
 	 * @var array
 	 */
-	protected $escapedContentTags = array('{{{', '}}}');
+	protected $escapedTags = array('{{{', '}}}');
 
 	/**
 	 * Compile the view at the given path.
@@ -166,17 +164,33 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		$value = preg_replace(sprintf(
-			'/%s\s*(.+?)\s*%s/s',
-			preg_quote($this->escapedContentTags[0]),
-			preg_quote($this->escapedContentTags[1])
-		), '<?php echo e($1); ?>', $value);
+		return $this->compileEscapedEchos($this->compileRegularEchos($value));
+	}
 
-		return preg_replace(sprintf(
-			'/%s\s*(.+?)\s*%s/s',
-			preg_quote($this->contentTags[0]),
-			preg_quote($this->contentTags[1])
-		), '<?php echo $1; ?>', $value);
+	/**
+	 * Compile the "regular" echo statements.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileRegularEchos($value)
+	{
+		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
+
+		return preg_replace($pattern, '<?php echo e($1); ?>', $value);
+	}
+
+	/**
+	 * Compile the escaped echo statements.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileEscapedEchos($value)
+	{
+		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
+
+		return preg_replace($pattern, '<?php echo $1; ?>', $value);
 	}
 
 	/**
@@ -367,10 +381,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function setContentTags($openTag, $closeTag, $raw = false)
 	{
+		$property = ($raw === true) ? 'escapedTags' : 'contentTags';
 
-		$property = ($raw === true) ? 'escapedContentTags' : 'contentTags';
-
-		$this->{$property} = array($openTag, $closeTag);
+		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
 	}
 
 	/**
