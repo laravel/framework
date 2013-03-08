@@ -152,6 +152,8 @@ class UrlGenerator {
 	{
 		$route = $this->routes->get($name);
 
+		$parameters = (array) $parameters;
+
 		if (isset($route) and $this->usingQuickParameters($parameters))
 		{
 			$parameters = $this->buildParameterList($route, $parameters);
