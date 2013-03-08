@@ -27,6 +27,7 @@
 - Added new `--timeout` option to `queue:listen` command.
 - Fixed bug that sometimes caused custom view engines to not be properly utilized.
 - Added `URL::previous` method for getting previous URL from `referer` $_SERVER variable.
+- Renamed `path` helper to `url` for consistency.
 
 ## Beta 3
 
