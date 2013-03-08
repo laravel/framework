@@ -1122,6 +1122,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($this->relations as $key => $value)
 		{
+			if (in_array($key, $this->hidden)) continue;
+
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
 			// collections to their proper array form and we'll set the values.

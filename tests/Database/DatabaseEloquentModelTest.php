@@ -317,6 +317,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHiddenCanAlsoExcludeRelationships()
+	{
+		$model = new EloquentModelStub;
+		$model->name = 'Taylor';
+		$model->setRelation('foo', array('bar'));
+		$model->setHidden(array('foo'));
+		$array = $model->toArray();
+
+		$this->assertEquals(array('name' => 'Taylor'), $array);
+	}
+
+
 	public function testToArraySnakeAttributes()
 	{
 		$model = new EloquentModelStub;
