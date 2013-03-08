@@ -51,6 +51,13 @@ class Application extends Container implements HttpKernelInterface {
 	protected $bootedCallbacks = array();
 
 	/**
+	 * The array of shutdown callbacks.
+	 *
+	 * @var array
+	 */
+	protected $shutdownCallbacks = array();
+
+	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
@@ -392,6 +399,24 @@ class Application extends Container implements HttpKernelInterface {
 	public function finish($callback)
 	{
 		$this['router']->finish($callback);
+	}
+
+	/**
+	 * Register a "shutdown" callback.
+	 *
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function shutdown($callback = null)
+	{
+		if (is_null($callback))
+		{
+			$this->fireAppCallbacks($this->shutdownCallbacks);
+		}
+		else
+		{
+			$this->shutdownCallbacks[] = $callback;
+		}
 	}
 
 	/**
