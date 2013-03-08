@@ -72,7 +72,7 @@ class ListenCommand extends Command {
 	 */
 	protected function getQueue($connection)
 	{
-		$queue = $this->laravel['config']->get("queue.{$connection}.queue", 'default');
+		$queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
 
 		return $this->input->getOption('queue') ?: $queue;
 	}
