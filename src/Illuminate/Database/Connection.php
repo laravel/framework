@@ -682,6 +682,16 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Clear the query log.
+	 *
+	 * @return void
+	 */
+	public function clearQueryLog()
+	{
+		$this->queryLog = array();
+	}
+
+	/**
 	 * Get the name of the connected database.
 	 *
 	 * @return string
