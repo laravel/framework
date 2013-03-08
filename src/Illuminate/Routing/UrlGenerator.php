@@ -41,6 +41,16 @@ class UrlGenerator {
 
 		$this->setRequest($request);
 	}
+	
+	/**
+	 * Get the URL to the previous location.
+	 *
+	 * @return string
+	 */
+	public function previous()
+	{
+		return $this->to($this->request->headers->get('referer'));
+	}
 
 	/**
 	 * Get the current URL for the request.
