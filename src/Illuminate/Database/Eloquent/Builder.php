@@ -281,7 +281,7 @@ class Builder {
 		// that start with the given top relations and adds them to our arrays.
 		foreach ($this->eagerLoad as $name => $constraints)
 		{
-			if (str_contains($name, '.') and starts_with($name, $relation) and $name !== $relation)
+			if (str_contains($name, '.') and starts_with($name, $relation) and $name != $relation)
 			{
 				$nested[substr($name, strlen($relation.'.'))] = $constraints;
 			}
