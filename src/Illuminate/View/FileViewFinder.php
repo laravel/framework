@@ -30,7 +30,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array('php', 'blade.php');
+	protected $extensions = array('blade.php', 'php');
 
 	/**
 	 * Create a new file view loader instance.
@@ -176,7 +176,15 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function addExtension($extension)
 	{
-		$this->extensions[] = $extension;
+		// We will remove the existing extension from our extensions
+		// if it exists. This will ensure the newly registered extension
+		// is prepended as expected.
+		if (($index = array_search($extension, $this->extensions)) !== false)
+		{
+			unset($this->extensions[$index]);
+		}
+
+		array_unshift($this->extensions, $extension);
 	}
 
 	/**

@@ -83,6 +83,34 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingExtensionPrependsNotAppends()
+	{
+		$environment = $this->getEnvironment();
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+
+		$environment->addExtension('foo', 'bar');
+
+		$extensions = $environment->getExtensions();
+		$this->assertEquals('bar', reset($extensions));
+		$this->assertEquals('foo', key($extensions));
+	}
+
+
+	public function testPrependedExtensionOverridesExistingExtensions()
+	{
+		$environment = $this->getEnvironment();
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('baz');
+
+		$environment->addExtension('foo', 'bar');
+		$environment->addExtension('baz', 'bar');
+
+		$extensions = $environment->getExtensions();
+		$this->assertEquals('bar', reset($extensions));
+		$this->assertEquals('baz', key($extensions));
+	}
+
+
 	public function testComposersAreProperlyRegistered()
 	{
 		$env = $this->getEnvironment();

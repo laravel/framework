@@ -488,7 +488,9 @@ class Environment {
 			$this->engines->register($engine, $resolver);
 		}
 
-		$this->extensions[$extension] = $engine;
+		if (isset($this->extensions[$engine])) unset($this->extensions[$engine]);
+
+		$this->extensions = array_merge(array($extension => $engine), $this->extensions);
 	}
 
 	/**
@@ -529,6 +531,16 @@ class Environment {
 	public function getContainer()
 	{
 		return $this->container;
+	}
+
+	/**
+	 * Get the extension to engine bindings.
+	 *
+	 * @return array
+	 */
+	public function getExtensions()
+	{
+		return $this->extensions;
 	}
 
 	/**
