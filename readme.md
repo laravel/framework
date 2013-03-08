@@ -25,6 +25,7 @@
 - Added `find` method to Eloquent Collection.
 - When using MySQL, new `after` method may be used when building Schema columns to specify column order. (`$t->string('name')->after('foo')`)
 - Added new `--timeout` option to `queue:listen` command.
+- Fixed bug that sometimes caused custom view engines to not be properly utilized.
 
 ## Beta 3
 
