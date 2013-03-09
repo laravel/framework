@@ -404,7 +404,7 @@ class SQLiteGrammar extends Grammar {
 	{
 		if ( ! is_null($column->default))
 		{
-			return " default '".$this->getDefaultValue($column->default)."'";
+			return " default ".$this->getDefaultValue($column->default);
 		}
 	}
 

@@ -241,6 +241,13 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table `users` add `foo` varchar(100) null default \'bar\'', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->string('foo', 100)->nullable()->default(new Illuminate\Database\Query\Expression('CURRENT TIMESTAMP'));
+		$statements = $blueprint->toSql($this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` varchar(100) null default CURRENT TIMESTAMP', $statements[0]);
 	}
 
 
