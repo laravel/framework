@@ -101,6 +101,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
 
+		$model->foo = 'bar';
+		// make sure foo isn't synced so we can test that dirty attributes only are updated
+		$model->syncOriginal();
 		$model->id = 1;
 		$model->name = 'taylor';
 		$model->exists = true;

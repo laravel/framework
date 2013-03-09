@@ -646,6 +646,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->exists = $saved;
 		}
 
+		$this->syncOriginal();
+
 		return $saved;
 	}
 
@@ -660,10 +662,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the updating event returns false, we will cancel the update operation so
 		// developers can hook Validation systems into their models and cancel this
 		// operation if the model does not pass validation. Otherwise, we update.
-		if ($this->fireModelEvent('updating') === false) return false;
+		if ($this->fireModelEvent('updating') === false)
+		{
+			return false;
+		}
 
-		$this->setKeysForSaveQuery($query)->update($this->attributes);
+		$dirty = $this->getDirty();
 
+		$this->setKeysForSaveQuery($query)->update($dirty);
+
+		// Once we have run the update operation, we will fire the "updated" event for
+		// this model instance. This will allow developers to hook into these after
+		// models are updated, giving them a chance to do any special processing.
 		$this->fireModelEvent('updated', false);
 
 		return true;
@@ -1385,11 +1395,33 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Sync the original attributes with the current.
 	 *
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Model
 	 */
 	public function syncOriginal()
 	{
 		$this->original = $this->attributes;
+
+		return $this;
+	}
+
+	/**
+	 * Get the attributes that have been changed since last sync.
+	 *
+	 * @return array
+	 */
+	public function getDirty()
+	{
+		$dirty = array();
+
+		foreach ($this->attributes as $key => $value)
+		{
+			if ( ! array_key_exists($key, $this->original) or $value != $this->original[$key])
+			{
+				$dirty[$key] = $value;
+			}
+		}
+
+		return $dirty;	
 	}
 
 	/**
