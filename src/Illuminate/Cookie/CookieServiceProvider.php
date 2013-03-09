@@ -32,7 +32,10 @@ class CookieServiceProvider extends ServiceProvider {
 	protected function cookieDefaults()
 	{
 		return array(
-			'path' => '/', 'domain' => null, 'secure' => false, 'httpOnly' => true,
+			'path'     => $this->app['request']->getBasePath(),
+			'domain'   => null,
+			'secure'   => false,
+			'httpOnly' => true,
 		);
 	}
 
