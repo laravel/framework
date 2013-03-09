@@ -323,6 +323,25 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Save an array of new models and attach them to the parent model.
+	 *
+	 * @param  array  $models
+	 * @param  array  $joinings
+	 * @return array
+	 */
+	public function saveMany(array $models, array $joinings = array())
+	{
+		foreach ($models as $key => $model)
+		{
+			$joining = isset($joinings[$key]) ? $joinings[$key] : array();
+
+			$this->save($model, $joining);
+		}
+
+		return $models;
+	}
+
+	/**
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes
@@ -339,6 +358,27 @@ class BelongsToMany extends Relation {
 		$instance->save();
 
 		$this->attach($instance->getKey(), $joining);
+
+		return $instance;
+	}
+
+	/**
+	 * Create an array of new instances of the related models.
+	 *
+	 * @param  array  $attributes
+	 * @param  array  $joining
+	 * @return Illuminate\Database\Eloquent\Model
+	 */
+	public function createMany(array $records, array $joinings = array())
+	{
+		$instances = array();
+
+		foreach ($records as $key => $record)
+		{
+			$joining = isset($joinings[$key]) ? $joinings[$key] : array();
+
+			$instances[] = $this->create($record, $joining);		
+		}
 
 		return $instance;
 	}
