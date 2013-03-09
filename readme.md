@@ -30,6 +30,7 @@
 - Added `URL::previous` method for getting previous URL from `referer` $_SERVER variable.
 - Renamed `path` helper to `url` for consistency.
 - Added `App::shutdown` method for registering callbacks to be fired at very end of both web and Artisan life-cycle.
+- Added `saveMany` and `createMany` to 1:1, 1:*, and *:* relations.
 
 ## Beta 3
 
