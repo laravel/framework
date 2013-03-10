@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Filesystem;
 
+ini_set('memory_limit', '1200M');
 use FilesystemIterator;
+use Illuminate\Support\Str;
 
 class FileNotFoundException extends \Exception {}
 
@@ -126,13 +128,30 @@ class Filesystem {
 
 	/**
 	 * Extract the file extension from a file path.
-	 * 
+	 *
 	 * @param  string  $path
 	 * @return string
 	 */
 	public function extension($path)
 	{
 		return pathinfo($path, PATHINFO_EXTENSION);
+	}
+
+	/**
+	 * Returns a sanitized filename
+	 *
+	 * @param string $filename A filename
+	 *
+	 * @return string
+	 */
+	public function sanitize($filename)
+	{
+		$extension = '.'.substr(strrchr($filename, '.'), 1);
+
+		$sanitized = str_replace($extension, null, $filename);
+		$sanitized = Str::slug($sanitized).$extension;
+
+		return $sanitized;
 	}
 
 	/**
