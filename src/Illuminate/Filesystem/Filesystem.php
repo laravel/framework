@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Filesystem;
 
-ini_set('memory_limit', '1200M');
 use FilesystemIterator;
 use Illuminate\Support\Str;
 
