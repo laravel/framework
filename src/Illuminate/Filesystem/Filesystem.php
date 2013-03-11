@@ -147,7 +147,7 @@ class Filesystem {
 		$extension = $this->extension($filename);
 
 		$sanitized = str_replace($extension, '', $filename);
-		$sanitized = Str::slug($sanitized).$extension;
+		$sanitized = Str::slug($sanitized).'.'.$extension;
 
 		return $sanitized;
 	}
