@@ -137,7 +137,7 @@ class Filesystem {
 	}
 
 	/**
-	 * Returns a sanitized filename
+	 * Returns a sanitized filename.
 	 *
 	 * @param  string  $filename
 	 * @return string
