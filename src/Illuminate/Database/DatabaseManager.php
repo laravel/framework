@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Manager;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use \Config;
 
 class DatabaseManager implements ConnectionResolverInterface {
 
@@ -77,12 +78,24 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	protected function makeConnection($name)
 	{
-		$config = $this->getConfig($name);
-
-		if (isset($this->extensions[$name]))
+        // Resolve the package name if there is one.
+        $parts = explode(':',$name);
+        $packageName = $parts[0];
+        // If the package has a registered connection resolver,
+        // then use it to return a connection by name
+		if (isset($this->extensions[$packageName]))
 		{
-			return call_user_func($this->extensions[$name], $config);
-		}
+			$resolver = call_user_func($this->extensions[$packageName], $this->app, $this->factory);
+            return $resolver->connection($name);
+		} else {
+            // If there is no connection resolver, try to use the global Config object to see
+            // if a database config file exists in the app config.
+            if($config = Config::get($name)) {
+            } else {
+                // Otherwise use the default connection
+                $config = $this->getConfig($name);
+            }
+        }
 
 		return $this->factory->make($config, $name);
 	}
