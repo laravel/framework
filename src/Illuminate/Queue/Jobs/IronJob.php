@@ -37,14 +37,14 @@ class IronJob extends Job {
 	 * Create a new job instance.
 	 *
 	 * @param  Illuminate\Container  $container
-	 * @param  IronMQ  $iron
-	 * @param  array   $job
-	 * @param  string  $queue
+	 * @param  IronMQ    $iron
+	 * @param  StdClass  $job
+	 * @param  string    $queue
 	 * @return void
 	 */
 	public function __construct(Container $container,
                                 IronMQ $iron,
-                                array $job,
+                                $job,
                                 $queue)
 	{
 		$this->job = $job;
@@ -60,11 +60,11 @@ class IronJob extends Job {
 	 */
 	public function fire()
 	{
-		$payload = json_decode($this->job->body, true);
-
 		// Once we have the message payload, we can create the given class and fire
 		// it off with the given data. The data is in the messages serialized so
 		// we will unserialize it and pass into the jobs in its original form.
+		$payload = json_decode($this->job->body, true);
+
 		$this->instance = $this->container->make($payload['job']);
 
 		$this->instance->fire($this, $payload['data']);
@@ -98,7 +98,7 @@ class IronJob extends Job {
 	 */
 	public function attempts()
 	{
-		//
+		throw new \LogicException("This driver doesn't support attempt counting.");
 	}
 
 	/**
