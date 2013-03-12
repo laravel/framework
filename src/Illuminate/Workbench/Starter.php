@@ -18,7 +18,7 @@ class Starter {
 		// We will use the finder to locate all "autoload.php" files in the workbench
 		// directory, then we will include them each so that they are able to load
 		// the appropriate classes and file used by the given workbench package.
-		$autoloads = $finder->in($path)->files()->name('autoload.php');
+		$autoloads = $finder->in($path)->depth('< 5')->files()->name('autoload.php');
 
 		foreach ($autoloads as $file)
 		{
