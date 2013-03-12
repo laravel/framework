@@ -144,10 +144,10 @@ class Filesystem {
 	 */
 	public function sanitize($filename)
 	{
-		$extension = $this->extension($filename);
+		$extension = '.'.$this->extension($filename);
 
-		$sanitized = str_replace($extension, '', $filename);
-		$sanitized = Str::slug($sanitized).'.'.$extension;
+		$sanitized = strstr($filename, $extension, true);
+		$sanitized = Str::slug($sanitized).$extension;
 
 		return $sanitized;
 	}
