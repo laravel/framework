@@ -140,7 +140,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispacher
+	 * @var Illuminate\Events\Dispatcher
 	 */
 	protected static $dispatcher;
 
@@ -1517,7 +1517,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function getEventDispatcher()
 	{
-		return static::$dispathcer;
+		return static::$dispatcher;
 	}
 
 	/**
