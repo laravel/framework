@@ -155,7 +155,7 @@ class Validator implements MessageProviderInterface {
 
 		// We'll spin through each rule, validating the attributes attached to that
 		// rule. Any error messages will be added to the containers with each of
-		// the other error messages and we'll return true if we have messages.
+		// the other error messages, returning true if we don't have messages.
 		foreach ($this->rules as $attribute => $rules)
 		{
 			foreach ($rules as $rule)
