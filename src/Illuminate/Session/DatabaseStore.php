@@ -54,6 +54,8 @@ class DatabaseStore extends Store implements Sweeper {
 
 		if ( ! is_null($session))
 		{
+			if (is_array($session)) $session = (object) $session;
+
 			return $this->encrypter->decrypt($session->payload);
 		}
 	}
