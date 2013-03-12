@@ -88,7 +88,7 @@ class IronJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
-		//
+		$this->iron->releaseMessage($this->queue, $this->job->id);
 	}
 
 	/**
