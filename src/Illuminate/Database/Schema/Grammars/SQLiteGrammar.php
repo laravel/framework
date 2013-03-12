@@ -197,7 +197,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	public function compileDropColumn(Blueprint $blueprint, Fluent $command)
 	{
-		throw new \BadMethodCallException("Drop table not supported for SQLite.");
+		throw new \BadMethodCallException("Drop column not supported for SQLite.");
 	}
 
 	/**
