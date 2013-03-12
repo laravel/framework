@@ -78,7 +78,10 @@ class MakeControllerCommand extends Command {
 
 		$options = $this->getBuildOptions();
 
-		$this->generator->make($controller, $path, $options);
+		if ( ! $this->generator->make($controller, $path, $options))
+		{
+			$this->error('Controller already exists!');
+		}
 	}
 
 	/**
