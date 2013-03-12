@@ -60,7 +60,7 @@ class IronJob extends Job {
 	 */
 	public function fire()
 	{
-		$payload = unserialize($this->job->body);
+		$payload = json_decode($this->job->body, true);
 
 		// Once we have the message payload, we can create the given class and fire
 		// it off with the given data. The data is in the messages serialized so
@@ -87,6 +87,16 @@ class IronJob extends Job {
 	 * @return void
 	 */
 	public function release($delay = 0)
+	{
+		//
+	}
+
+	/**
+	 * Get the number of times the job has been attempted.
+	 *
+	 * @return int
+	 */
+	public function attempts()
 	{
 		//
 	}

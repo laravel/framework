@@ -60,9 +60,7 @@ class IronQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->createPayload($job, $data);
 
-		$payload = array('body' => $payload, 'delay' => $delay);
-
-		$this->iron->postMessage($this->getQueue($queue), $payload);
+		$this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'));
 	}
 
 	/**
