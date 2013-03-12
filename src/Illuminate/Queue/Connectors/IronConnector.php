@@ -13,9 +13,9 @@ class IronConnector implements ConnectorInterface {
 	 */
 	public function connect(array $config)
 	{
-		$config = array('token' => $config['token'], 'project_id' => $config['project']);
+		$ironConfig = array('token' => $config['token'], 'project_id' => $config['project']);
 
-		return new IronQueue(new IronMQ($config), $config['queue']);
+		return new IronQueue(new IronMQ($ironConfig), $config['queue']);
 	}
 
 }
