@@ -32,9 +32,9 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 	public function testReleaseProperlyReleasesJobOntoIron()
 	{
 		$job = $this->getJob();
-		$job->getIron()->shouldReceive('releaseMessage')->once()->with('default', 1);
+		$job->getIron()->shouldReceive('releaseMessage')->once()->with('default', 1, 5);
 
-		$job->release();
+		$job->release(5);
 	}
 
 

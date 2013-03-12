@@ -59,7 +59,7 @@
     "require-dev": {
         "aws/aws-sdk-php": "2.2.*",
         "classpreloader/classpreloader": "dev-master",
-        "iron-io/iron_mq": "1.4.2",
+        "iron-io/iron_mq": "1.4.4",
         "mockery/mockery": "0.7.2"
     },
     "autoload": {
