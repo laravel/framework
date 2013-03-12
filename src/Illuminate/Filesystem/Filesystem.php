@@ -146,7 +146,7 @@ class Filesystem {
 	{
 		$extension = '.'.$this->extension($filename);
 
-		$sanitized = strstr($filename, $extension, true);
+		$sanitized = substr($filename, 0, -strlen($extension));
 		$sanitized = Str::slug($sanitized).$extension;
 
 		return $sanitized;

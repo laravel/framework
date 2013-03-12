@@ -114,6 +114,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('this-is-unsnitized.jpg', $files->sanitize('Th.îs—I._s-«Uns@ñïTî//\zèd.jpg'));
 		$this->assertEquals('eoaujpegpngjpg.jpg', $files->sanitize('èôàùjpegpngjpg.jpg'));
+		$this->assertEquals('myjpgfile.jpg', $files->sanitize('my.jpgfile.jpg'));
 	}
 
 }
