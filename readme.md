@@ -31,6 +31,7 @@
 - Renamed `path` helper to `url` for consistency.
 - Added `App::shutdown` method for registering callbacks to be fired at very end of both web and Artisan life-cycle.
 - Added `saveMany` and `createMany` to 1:1, 1:*, and *:* relations.
+- Support for [IronMQ](http://www.iron.io/mq) message queue added. Driver is `iron`.
 
 ## Beta 3
 
