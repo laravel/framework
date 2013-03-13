@@ -45,14 +45,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testArrayExcept()
 	{
 		$array = array('name' => 'taylor', 'age' => 26);
-		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
+		$this->assertEquals(array('age' => 26), array_except($array, array('name')));
 	}
 
 
 	public function testArrayOnly()
 	{
 		$array = array('name' => 'taylor', 'age' => 26);
-		$this->assertEquals(array('age' => 26), array_except($array, array('name')));
+		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
 	}
 
 
