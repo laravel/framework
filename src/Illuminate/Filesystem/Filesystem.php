@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Filesystem;
 
 use FilesystemIterator;
+use Illuminate\Support\Str;
 
 class FileNotFoundException extends \Exception {}
 
@@ -126,13 +127,29 @@ class Filesystem {
 
 	/**
 	 * Extract the file extension from a file path.
-	 * 
+	 *
 	 * @param  string  $path
 	 * @return string
 	 */
 	public function extension($path)
 	{
 		return pathinfo($path, PATHINFO_EXTENSION);
+	}
+
+	/**
+	 * Returns a sanitized filename.
+	 *
+	 * @param  string  $filename
+	 * @return string
+	 */
+	public function sanitize($filename)
+	{
+		$extension = '.'.$this->extension($filename);
+
+		$sanitized = substr($filename, 0, -strlen($extension));
+		$sanitized = Str::slug($sanitized).$extension;
+
+		return $sanitized;
 	}
 
 	/**
