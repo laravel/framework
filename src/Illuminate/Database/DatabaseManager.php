@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Manager;
 use Illuminate\Database\Connectors\ConnectionFactory;
-use \Config;
 
 class DatabaseManager implements ConnectionResolverInterface {
 
