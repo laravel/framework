@@ -80,6 +80,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 		// Resolve the package name if there is one.
 		$parts = explode(':',$name);
 		$packageName = $parts[0];
+
 		// If the package has a registered connection resolver,
 		// then use it to return a connection by name
 		if (isset($this->extensions[$packageName]))
