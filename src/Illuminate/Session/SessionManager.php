@@ -21,7 +21,7 @@ class SessionManager extends Manager {
 	 */
 	protected function createFileDriver()
 	{
-		$path = $this->app['config']['session.path'];
+		$path = $this->app['config']['session.files'];
 
 		return new FileStore($this->app['files'], $path);
 	}
