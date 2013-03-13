@@ -431,10 +431,10 @@ if ( ! function_exists('secure_url'))
 	 * Generate a HTTPS url for the application.
 	 *
 	 * @param  string  $path
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @return string
 	 */
-	function secure_url($path, array $parameters = array())
+	function secure_url($path, $parameters = array())
 	{
 		return url($path, $parameters, true);
 	}
@@ -619,11 +619,11 @@ if ( ! function_exists('url'))
 	 * Generate a url for the application.
 	 *
 	 * @param  string  $path
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	function url($path = null, array $parameters = array(), $secure = null)
+	function url($path = null, $parameters = array(), $secure = null)
 	{
 		$app = app();
 
