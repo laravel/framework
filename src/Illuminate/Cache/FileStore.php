@@ -121,7 +121,7 @@ class FileStore extends Store {
 	 */
 	protected function path($key)
 	{
-		return $this->directory.'/'.$key;
+		return $this->directory.'/'.md5($key);
 	}
 
 	/**
