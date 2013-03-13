@@ -65,9 +65,7 @@ class Handler {
 			}
 			catch (\Exception $e)
 			{
-				$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
-
-				$response = 'Error in exception handler: '.$location;
+				$response = $this->formatException($e);
 			}
 
 			// If the handler returns a "non-null" response, we will return it so it
@@ -108,6 +106,19 @@ class Handler {
 		$expected = $parameters[0];
 
 		return ! $expected->getClass() or $expected->getClass()->isInstance($exception);
+	}
+
+	/**
+	 * Format an exception thrown by a handler.
+	 *
+	 * @param  Exception  $e
+	 * @return string
+	 */
+	protected function formatException(\Exception $e)
+	{
+		$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
+
+		return 'Error in exception handler: '.$location;
 	}
 
 	/**
