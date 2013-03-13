@@ -24,7 +24,9 @@ class ConnectionFactory {
 
 		$pdo = $this->createConnector($config)->connect($config);
 
-		return $this->createConnection($config['driver'], $pdo, $config['database'], $config['prefix'], $name);
+		$config['name'] = $name;
+
+		return $this->createConnection($config['driver'], $pdo, $config['database'], $config['prefix'], $config);
 	}
 
 	/**
