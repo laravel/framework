@@ -72,7 +72,7 @@ class Migrator {
 	{
 		$this->notes = array();
 
-		$files = $this->getMigrationFiles($path);
+		$this->requireFiles($path, $files = $this->getMigrationFiles($path));
 
 		// Once we grab all of the migration files for the path, we will compare them
 		// against the migrations that have already been run for this package then
@@ -235,6 +235,17 @@ class Migrator {
 		sort($files);
 
 		return $files;
+	}
+
+	/**
+	 * Require in all the migration files in a given path.
+	 *
+	 * @param  array  $files
+	 * @return void
+	 */
+	public function requireFiles($path, array $files)
+	{
+		foreach ($files as $file) $this->files->requireOnce($path.'/'.$file.'.php');
 	}
 
 	/**
