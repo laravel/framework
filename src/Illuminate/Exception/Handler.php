@@ -56,12 +56,22 @@ class Handler {
 				$code = 500;
 			}
 
-			$response = $handler($exception, $code, $fromConsole);
+			// We will wrap this handler in a try / catch and avoid white screens of
+			// death if any exceptions are thrown from a handler itself. This way
+			// we will at least log some errors, and avoid errors with no data.
+			try
+			{
+				$response = $handler($exception, $code, $fromConsole);
+			}
+			catch (\Exception $e)
+			{
+				//	
+			}
 
 			// If the handler returns a "non-null" response, we will return it so it
 			// will get sent back to the browsers. Once a handler returns a valid
 			// response we will cease iterating and calling the other handlers.
-			if ( ! is_null($response))
+			if (isset($response) and ! is_null($response))
 			{
 				return $response;
 			}
