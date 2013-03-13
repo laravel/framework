@@ -27,7 +27,7 @@ class HtmlBuilder {
 	/**
 	 * Generate an ordered list of items.
 	 *
-	 * @param  array   $items
+	 * @param  array   $list
 	 * @param  array   $attributes
 	 * @return string
 	 */
@@ -39,7 +39,7 @@ class HtmlBuilder {
 	/**
 	 * Generate an un-ordered list of items.
 	 *
-	 * @param  array   $items
+	 * @param  array   $list
 	 * @param  array   $attributes
 	 * @return string
 	 */
