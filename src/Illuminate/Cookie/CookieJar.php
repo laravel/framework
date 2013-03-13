@@ -23,24 +23,15 @@ class CookieJar {
 	protected $encrypter;
 
 	/**
-	 * The default cookie options.
-	 *
-	 * @var array
-	 */
-	protected $defaults = array();
-
-	/**
 	 * Create a new cookie manager instance.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @param  Illuminate\Encryption\Encrypter  $encrypter
-	 * @param  array   $defaults
 	 * @return void
 	 */
-	public function __construct(Request $request, Encrypter $encrypter, array $defaults)
+	public function __construct(Request $request, Encrypter $encrypter)
 	{
 		$this->request = $request;
-		$this->defaults = $defaults;
 		$this->encrypter = $encrypter;
 	}
 
@@ -98,12 +89,14 @@ class CookieJar {
 	 * @param  string  $name
 	 * @param  string  $value
 	 * @param  int     $minutes
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @param  bool    $secure
+	 * @param  bool    $httpOnly
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function make($name, $value, $minutes = 0)
+	public function make($name, $value, $minutes = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
 	{
-		extract($this->defaults);
-
 		// Once we calculate the time we can encrypt the message. All cookies will be
 		// encrypted using the Illuminate encryption component and will have a MAC
 		// assigned to them by the encrypter to make sure they remain authentic.
@@ -119,11 +112,15 @@ class CookieJar {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @param  bool    $secure
+	 * @param  bool    $httpOnly
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function forever($name, $value)
+	public function forever($name, $value, $path = '/', $domain = null, $secure = false, $httpOnly = true)
 	{
-		return $this->make($name, $value, 2628000);
+		return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly);
 	}
 
 	/**
@@ -135,18 +132,6 @@ class CookieJar {
 	public function forget($name)
 	{
 		return $this->make($name, null, -2628000);
-	}
-
-	/**
-	 * Set the value of a cookie option.
-	 *
-	 * @param  string  $option
-	 * @param  string  $value
-	 * @return void
-	 */
-	public function setDefault($option, $value)
-	{
-		$this->defaults[$option] = $value;
 	}
 
 	/**

@@ -88,19 +88,42 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerCloseEvent($app, $config)
 	{
-		$app->close(function($request, $response) use ($app, $config)
+		$me = $this;
+
+		$app->close(function($request, $response) use ($me, $app, $config)
 		{
 			$session = $app['session'];
 
+			// Once we finish the session handling for the request, we will need to get a
+			// cookie that we can attach to the response from the application. This is
+			// used to identify the session on future requests into the application.
 			$session->finish($response, $config['lifetime']);
 
-			$cookie = $session->getCookie($app['cookie'], $config['cookie'], $config['lifetime']);
+			$cookie = $me->makeCookie($session, $config);
 
 			if ( ! is_null($cookie))
 			{
 				$response->headers->setCookie($cookie);
 			}
 		});
+	}
+
+	/**
+	 * Create a session cookie based on the given config.
+	 *
+	 * @param  Illuminate\Session\Store  $session
+	 * @param  array  $config
+	 * @return Symfony\Component\HttpFoundation\Cookie
+	 */
+	public function makeCookie($session, $config)
+	{
+		$app = $this->app;
+
+		return $session->getCookie(
+
+			$app['cookie'], $config['cookie'], $config['lifetime'], $config['path'], $config['domain']
+
+		);
 	}
 
 }
