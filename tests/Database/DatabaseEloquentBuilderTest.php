@@ -131,12 +131,12 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$records[] = array('name' => 'taylor', 'age' => 26);
 		$records[] = array('name' => 'dayle', 'age' => 28);
 		$builder->getQuery()->shouldReceive('get')->once()->with(array('foo'))->andReturn($records);
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,newInstance]');
 		$model->shouldReceive('getTable')->once()->andReturn('foobars');
 		$builder->getQuery()->shouldReceive('from')->once()->with('foobars');
 		$builder->setModel($model);
 		$model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
-		$model->shouldReceive('newExisting')->twice()->andReturn(new EloquentBuilderTestModelStub, new EloquentBuilderTestModelStub);
+		$model->shouldReceive('newInstance')->andReturnUsing(function() { return new EloquentBuilderTestModelStub; });
 		$models = $builder->getModels(array('foo'));
 
 		$this->assertEquals('taylor', $models[0]->name);
