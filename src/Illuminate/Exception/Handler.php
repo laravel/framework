@@ -65,7 +65,9 @@ class Handler {
 			}
 			catch (\Exception $e)
 			{
-				//	
+				$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
+
+				$response = 'Error in exception handler: '.$location;
 			}
 
 			// If the handler returns a "non-null" response, we will return it so it
