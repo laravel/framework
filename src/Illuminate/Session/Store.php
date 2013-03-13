@@ -461,12 +461,14 @@ abstract class Store implements ArrayAccess {
 	 *
 	 * @param  Illuminate\Cookie\CookieJar  $cookie
 	 * @param  string  $name
-	 * @param  int  $lifetime
+	 * @param  int     $lifetime
+	 * @param  string  $path
+	 * @param  string  $domain
 	 * @return void
 	 */
-	public function getCookie(CookieJar $cookie, $name, $lifetime)
+	public function getCookie(CookieJar $cookie, $name, $lifetime, $path, $domain)
 	{
-		return $cookie->make($name, $this->getSessionId(), $lifetime);
+		return $cookie->make($name, $this->getSessionId(), $lifetime, $path, $domain);
 	}
 
 	/**
