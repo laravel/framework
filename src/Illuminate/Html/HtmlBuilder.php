@@ -56,7 +56,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	protected static function listing($type, $list, $attributes)
+	protected static function listing($type, $list, $attributes = array())
 	{
 		$html = '';
 
