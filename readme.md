@@ -35,6 +35,7 @@
 - Added `domain` and `path` options to session configuration. Named prior `path` option to `files`.
 - Add collation and character set to create table statements in MySQL schema builder.
 - Allow session payload cookie name to be configurable.
+- `shouldReceive` may now be called on a Facade multiple times without using `getMock`.
 
 ## Beta 3
 
