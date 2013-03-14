@@ -103,6 +103,11 @@ class Environment {
 	 */
 	public function make($view, array $data = array())
 	{
+		if (is_object($data))
+		{
+			$data = get_object_vars($data);
+		}
+		
 		$path = $this->finder->find($view);
 
 		return new View($this, $this->getEngineFromPath($path), $view, $path, $data);
