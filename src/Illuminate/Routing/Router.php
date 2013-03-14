@@ -539,9 +539,9 @@ class Router {
 	{
 		if (count($this->groupStack) > 0)
 		{
-			$last = count($this->groupStack) - 1;
+			$last = $this->groupStack[count($this->groupStack) - 1];
 
-			$this->groupStack[] = array_merge_recursive($this->groupStack[$last], $attributes);
+			$this->groupStack[] = array_merge_recursive($last, $attributes);
 		}
 		else
 		{

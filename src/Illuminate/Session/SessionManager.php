@@ -11,7 +11,9 @@ class SessionManager extends Manager {
 	 */
 	protected function createCookieDriver()
 	{
-		return new CookieStore($this->app['cookie']);
+		$payload = $this->app['config']->get('session.payload', 'illuminate_payload');
+
+		return new CookieStore($this->app['cookie'], $payload);
 	}
 
 	/**
