@@ -24,7 +24,7 @@ class Collection extends BaseCollection {
 			$this->buildDictionary();
 		}
 
-		return $this->dictionary[$key];
+		return isset($this->dictionary[$key]) ? $this->dictionary[$key] : null;
 	}
 
 	/**
