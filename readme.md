@@ -33,6 +33,7 @@
 - Added `saveMany` and `createMany` to 1:1, 1:*, and *:* relations.
 - Support for [IronMQ](http://www.iron.io/mq) message queue added. Driver is `iron`.
 - Added `domain` and `path` options to session configuration. Named prior `path` option to `files`.
+- Add collation and character set to create table statements in MySQL schema builder.
 
 ## Beta 3
 

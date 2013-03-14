@@ -51,7 +51,7 @@ class Blueprint {
 	 */
 	public function build(Connection $connection, Grammar $grammar)
 	{
-		foreach ($this->toSql($grammar) as $statement)
+		foreach ($this->toSql($connection, $grammar) as $statement)
 		{
 			$connection->statement($statement);
 		}
@@ -60,10 +60,11 @@ class Blueprint {
 	/**
 	 * Get the raw SQL statements for the blueprint.
 	 *
+	 * @param  Illuminate\Database\Connection  $connection
 	 * @param  Illuminate\Database\Schema\Grammars\Grammar  $grammar
 	 * @return array
 	 */
-	public function toSql(Grammar $grammar)
+	public function toSql(Connection $connection, Grammar $grammar)
 	{
 		$this->addImpliedCommands();
 
@@ -78,7 +79,7 @@ class Blueprint {
 
 			if (method_exists($grammar, $method))
 			{
-				if ( ! is_null($sql = $grammar->$method($this, $command)))
+				if ( ! is_null($sql = $grammar->$method($this, $command, $connection)))
 				{
 					$statements = array_merge($statements, (array) $sql);
 				}

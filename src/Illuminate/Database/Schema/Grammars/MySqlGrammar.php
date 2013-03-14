@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 
 class MySqlGrammar extends Grammar {
@@ -34,13 +35,38 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  Illuminate\Support\Fluent  $command
+	 * @param  Illuminate\Database\Connection  $connection
 	 * @return string
 	 */
-	public function compileCreate(Blueprint $blueprint, Fluent $command)
+	public function compileCreate(Blueprint $blueprint, Fluent $command, Connection $connection)
 	{
 		$columns = implode(', ', $this->getColumns($blueprint));
 
-		return 'create table '.$this->wrapTable($blueprint)." ($columns)";
+		$sql = 'create table '.$this->wrapTable($blueprint)." ($columns)";
+
+		return $this->compileCreateEncoding($sql, $connection);
+	}
+
+	/**
+	 * Append the character set specifications to a command.
+	 *
+	 * @param  string  $sql
+	 * @param  Illuminate\Database\Connection  $connection
+	 * @return string
+	 */
+	protected function compileCreateEncoding($sql, Connection $connection)
+	{
+		if ( ! is_null($charset = $connection->getConfig('charset')))
+		{
+			$sql .= ' default character set '.$charset;
+		}
+
+		if ( ! is_null($collation = $connection->getConfig('collation')))
+		{
+			$sql .= ' collate '.$collation;
+		}
+
+		return $sql;
 	}
 
 	/**
