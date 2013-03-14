@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Mockery\MockInterface;
+
 abstract class Facade {
 
 	/**
@@ -62,8 +64,7 @@ abstract class Facade {
 	{
 		$name = static::getFacadeAccessor();
 
-		return (isset(static::$resolvedInstance[$name])
-			and static::$resolvedInstance[$name] instanceof \Mockery\MockInterface);
+		return (isset(static::$resolvedInstance[$name]) and static::$resolvedInstance[$name] instanceof MockInterface);
 	}
 
 	/**
