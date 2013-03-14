@@ -34,6 +34,7 @@
 - Support for [IronMQ](http://www.iron.io/mq) message queue added. Driver is `iron`.
 - Added `domain` and `path` options to session configuration. Named prior `path` option to `files`.
 - Add collation and character set to create table statements in MySQL schema builder.
+- Allow session payload cookie name to be configurable.
 
 ## Beta 3
 
