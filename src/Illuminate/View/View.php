@@ -131,6 +131,10 @@ class View implements ArrayAccess, Renderable {
 		{
 			$this->data = array_merge($this->data, $key);
 		}
+		else if (is_object($key))
+		{
+			$this->data = array_merge($this->data, get_object_vars($key));
+		}
 		else
 		{
 			$this->data[$key] = $value;
