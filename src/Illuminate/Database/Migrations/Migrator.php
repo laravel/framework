@@ -171,7 +171,7 @@ class Migrator {
 		// and properly reverse the entire database schema operation that ran.
 		foreach ($migrations as $migration)
 		{
-			$this->runDown($migration, $pretend);
+			$this->runDown((object) $migration, $pretend);
 		}
 
 		return count($migrations);

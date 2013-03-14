@@ -1,7 +1,7 @@
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  int $id
+	 * @param  int  $id
 	 * @return Response
 	 */
 	public function update($id)
