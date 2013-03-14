@@ -36,6 +36,7 @@
 - Add collation and character set to create table statements in MySQL schema builder.
 - Allow session payload cookie name to be configurable.
 - `shouldReceive` may now be called on a Facade multiple times without using `getMock`.
+- Allow default value to be passed to Eloquent collection `find` method.
 
 ## Beta 3
 
