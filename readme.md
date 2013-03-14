@@ -37,6 +37,7 @@
 - Allow session payload cookie name to be configurable.
 - `shouldReceive` may now be called on a Facade multiple times without using `getMock`.
 - Allow default value to be passed to Eloquent collection `find` method.
+- Intelligently parse resource routes containing slashes.
 
 ## Beta 3
 
