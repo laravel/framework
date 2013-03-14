@@ -39,11 +39,31 @@ abstract class Facade {
 	{
 		$name = static::getFacadeAccessor();
 
-		static::$resolvedInstance[$name] = $mock = \Mockery::mock(get_class(static::getFacadeRoot()));
+		if (static::isMock())
+		{
+			$mock = static::$resolvedInstance[$name];
+		}
+		else
+		{
+			static::$resolvedInstance[$name] = $mock = \Mockery::mock(get_class(static::getFacadeRoot()));
 
-		static::$app->instance($name, $mock);
+			static::$app->instance($name, $mock);
+		}
 
 		return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
+	}
+
+	/**
+	 * Determines whether a mock is set as the instance of the facade
+	 *
+	 * @return bool
+	 */
+	protected static function isMock()
+	{
+		$name = static::getFacadeAccessor();
+
+		return (isset(static::$resolvedInstance[$name])
+			and static::$resolvedInstance[$name] instanceof \Mockery\MockInterface);
 	}
 
 	/**

@@ -36,6 +36,18 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $app['foo']->foo('bar'));
 	}
 
+	public function testShouldReceiveCanBeCalledTwice()
+	{
+		$app = new ApplicationStub;
+		$app->setAttributes(array('foo' => new StdClass));
+		FacadeStub::setFacadeApplication($app);
+
+		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
+		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
+		$this->assertEquals('baz', $app['foo']->foo('bar'));
+		$this->assertEquals('baz2', $app['foo']->foo2('bar2'));
+	}
+
 }
 
 class FacadeStub extends Illuminate\Support\Facades\Facade {
