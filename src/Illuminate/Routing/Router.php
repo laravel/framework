@@ -102,6 +102,13 @@ class Router {
 	protected $runFilters = true;
 
 	/**
+	 * The default actions for a resourceful controller.
+	 *
+	 * @var array
+	 */
+	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+
+	/**
 	 * Create a new router instance.
 	 *
 	 * @param  Illuminate\Container  $container
@@ -264,14 +271,60 @@ class Router {
 	 */
 	public function resource($resource, $controller, array $options = array())
 	{
-		$defaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+		// If the resource name contains a slash, we will assume the developer wishes to
+		// register these resource routes with a prefix so we will set that up out of
+		// the box so they don't have to mess with it. Otherwise, we will continue.
+		if (str_contains($resource, '/'))
+		{
+			$this->prefixedResource($resource, $controller, $options);
 
+			return;
+		}
+
+		// We need to extract the base resource from the resource name. Nested resources
+		// are supported in the framework, but we need to know what name to use for a
+		// place-holder on the route wildcards, which should be the base resources.
 		$base = $this->getBaseResource($resource);
+
+		$defaults = $this->resourceDefaults;
 
 		foreach ($this->getResourceMethods($defaults, $options) as $method)
 		{
 			$this->{'addResource'.ucfirst($method)}($resource, $base, $controller);
 		}
+	}
+
+	/**
+	 * Build a set of prefixed resource routes.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $controller
+	 * @param  array   $options
+	 * @return void
+	 */
+	protected function prefixedResource($resource, $controller, array $options)
+	{
+		list($resource, $prefix) = $this->extractResourcePrefix($resource);
+
+		$me = $this;
+
+		return $this->group(array('prefix' => $prefix), function() use ($me, $resource, $controller, $options)
+		{
+			$me->resource($resource, $controller, $options);
+		});
+	}
+
+	/**
+	 * Extract the resource and prefix from a resource name.
+	 *
+	 * @param  string  $resource
+	 * @return array
+	 */
+	protected function extractResourcePrefix($resource)
+	{
+		$segments = explode('/', $resource);
+
+		return array($segments[count($segments) - 1], implode('/', array_slice($segments, 0, -1)));
 	}
 
 	/**
