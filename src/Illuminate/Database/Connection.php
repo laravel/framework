@@ -528,7 +528,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getConfig($option)
 	{
-		return array_get($config, $option);
+		return array_get($this->config, $option);
 	}
 
 	/**
