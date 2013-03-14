@@ -38,6 +38,7 @@
 - `shouldReceive` may now be called on a Facade multiple times without using `getMock`.
 - Allow default value to be passed to Eloquent collection `find` method.
 - Intelligently parse resource routes containing slashes.
+- `Route::options` is now available for routing HTTP `OPTIONS` verb.
 
 ## Beta 3
 

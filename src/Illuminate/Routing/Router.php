@@ -186,6 +186,18 @@ class Router {
 	/**
 	 * Add a new route to the collection.
 	 *
+	 * @param  string  $pattern
+	 * @param  mixed   $action
+	 * @return Illuminate\Routing\Route
+	 */
+	public function options($pattern, $action)
+	{
+		return $this->createRoute('options', $pattern, $action);
+	}
+
+	/**
+	 * Add a new route to the collection.
+	 *
 	 * @param  string  $method
 	 * @param  string  $pattern
 	 * @param  mixed   $action
