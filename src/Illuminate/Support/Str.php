@@ -107,20 +107,12 @@ class Str {
 	/**
 	 * Limit the number of words in a string.
 	 *
-	 * <code>
-	 *		// Returns "This is a..."
-	 *		echo Str::words('This is a sentence.', 3);
-	 *
-	 *		// Limit the number of words and append a custom ending
-	 *		echo Str::words('This is a sentence.', 3, '---');
-	 * </code>
-	 *
 	 * @param  string  $value
 	 * @param  int     $words
 	 * @param  string  $end
 	 * @return string
 	 */
-	public static function limitWords($value, $words = 100, $end = '...')
+	public static function words($value, $words = 100, $end = '...')
 	{
 		if (trim($value) == '') return '';
 
