@@ -41,6 +41,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$c = new Collection(array($mockModel));
 
 		$this->assertTrue($mockModel === $c->find(1));
+		$this->assertTrue('taylor' === $c->find(2, 'taylor'));
 	}
 
 
