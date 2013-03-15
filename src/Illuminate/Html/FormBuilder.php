@@ -65,7 +65,7 @@ class FormBuilder {
 	public function __construct(UrlGenerator $url, Session $session)
 	{
 		$this->url = $url;
-		$this->csrfToken = $session-getToken();
+		$this->csrfToken = $session->getToken();
 
 		$this->setSessionStore( $session );
 	}
