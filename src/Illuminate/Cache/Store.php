@@ -35,6 +35,24 @@ abstract class Store implements ArrayAccess {
 	abstract protected function storeItem($key, $value, $minutes);
 
 	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	abstract protected function incrementValue($key, $value);
+
+	/**
+	 * Decrement the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	abstract protected function decrementValue($key, $value);
+
+	/**
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
@@ -78,14 +96,6 @@ abstract class Store implements ArrayAccess {
 	 */
 	public function get($key, $default = null)
 	{
-		// The store keeps all already accessed items in memory so they don't need
-		// to be retrieved again on subsequent calls into the cache. This is to
-		// help increase the speed of an application and not waste any trips.
-		if (array_key_exists($key, $this->items))
-		{
-			return $this->items[$key];
-		}
-
 		$value = $this->retrieveItem($key);
 
 		// If the items are not present in the caches, we will return this default
@@ -96,7 +106,7 @@ abstract class Store implements ArrayAccess {
 			return value($default);
 		}
 
-		return $this->items[$key] = $value;
+		return $value;
 	}
 
 	/**
@@ -109,8 +119,6 @@ abstract class Store implements ArrayAccess {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$this->items[$key] = $value;
-
 		return $this->storeItem($key, $value, $minutes);
 	}
 
@@ -125,6 +133,30 @@ abstract class Store implements ArrayAccess {
 	public function add($key, $value, $minutes)
 	{
 		if (is_null($this->get($key))) $this->put($key, $value, $minutes);
+	}
+
+	/**
+	 * Increment the value at a given key.
+	 *
+	 * @param  string  $key
+	 * @param  int     $value
+	 * @return void
+	 */
+	public function increment($key, $value = 1)
+	{
+		return $this->incrementValue($key, $value);
+	}
+
+	/**
+	 * Decrement the value at a given key.
+	 *
+	 * @param  string  $key
+	 * @param  int     $value
+	 * @return void
+	 */
+	public function decrement($key, $value = 1)
+	{
+		return $this->decrementValue($key, $value);
 	}
 
 	/**
@@ -251,29 +283,6 @@ abstract class Store implements ArrayAccess {
 	public function getMemory()
 	{
 		return $this->items;
-	}
-
-	/**
-	 * Get the value of an item in memory.
-	 *
-	 * @param  string  $key
-	 * @return mixed
-	 */
-	public function getFromMemory($key)
-	{
-		return $this->items[$key];
-	}
-
-	/**
-	 * Set the value of an item in memory.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
-	public function setInMemory($key, $value)
-	{
-		$this->items[$key] = $value;
 	}
 
 	/**

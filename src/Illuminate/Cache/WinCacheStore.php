@@ -50,6 +50,30 @@ class WinCacheStore extends Store {
 	}
 
 	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function incrementValue($key, $value)
+	{
+		wincache_ucache_inc($this->prefix.$key, $value);
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function decrementValue($key, $value)
+	{
+		wincache_ucache_dec($this->prefix.$key, $value);
+	}
+
+	/**
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key

@@ -41,6 +41,7 @@
 - `Route::options` is now available for routing HTTP `OPTIONS` verb.
 - New `secret` method may be called from Artisan commands for password style input.
 - Added `Cache::add` method to store a value in the cache if the key does not exist in the cache already.
+- Added `Cache::increment` and `Cache::decrement` methods to all but file and database cache drivers.
 
 ## Beta 3
 

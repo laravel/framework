@@ -108,6 +108,30 @@ class DatabaseStore extends Store {
 	}
 
 	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function incrementValue($key, $value)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function decrementValue($key, $value)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
+	}
+
+	/**
 	 * Get the current system time.
 	 *
 	 * @return int

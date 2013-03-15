@@ -29,6 +29,24 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIncrementMethodProperlyCallsMemcache()
+	{
+		$memcache = $this->getMock('Memcached', array('increment'));
+		$memcache->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
+		$store = new Illuminate\Cache\MemcachedStore($memcache);
+		$store->increment('foo', 5);
+	}
+
+
+	public function testDecrementMethodProperlyCallsMemcache()
+	{
+		$memcache = $this->getMock('Memcached', array('decrement'));
+		$memcache->expects($this->once())->method('decrement')->with($this->equalTo('foo'), $this->equalTo(5));
+		$store = new Illuminate\Cache\MemcachedStore($memcache);
+		$store->decrement('foo', 5);
+	}
+
+
 	public function testStoreItemForeverProperlyCallsMemcached()
 	{
 		$memcache = $this->getMock('Memcached', array('set'));
