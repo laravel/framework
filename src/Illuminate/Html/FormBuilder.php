@@ -62,10 +62,12 @@ class FormBuilder {
 	 * @param  string  $csrfToken
 	 * @return void
 	 */
-	public function __construct(UrlGenerator $url, $csrfToken)
+	public function __construct(UrlGenerator $url, Session $session)
 	{
 		$this->url = $url;
-		$this->csrfToken = $csrfToken;
+		$this->csrfToken = $session-getToken();
+
+		$this->setSessionStore( $session );
 	}
 
 	/**

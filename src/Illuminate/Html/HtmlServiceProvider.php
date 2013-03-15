@@ -20,7 +20,7 @@ class HtmlServiceProvider extends ServiceProvider {
 	{
 		$this->app['form'] = $this->app->share(function($app)
 		{
-			return new FormBuilder($app['url'], $app['session']->getToken());
+			return new FormBuilder($app['url'], $app['session']);
 		});
 	}
 
