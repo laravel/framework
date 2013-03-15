@@ -178,6 +178,20 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
+	 * Prompt the user for input but hide the answer from the console.
+	 *
+	 * @param  string  $question
+	 * @param  string  $default
+	 * @return string
+	 */
+	protected function askHidden($question, $default = null)
+	{
+		$dialog = $this->getHelperSet()->get('dialog');
+
+		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $default);
+	}
+
+	/**
 	 * Write a string as standard output.
 	 *
 	 * @param  string  $string
