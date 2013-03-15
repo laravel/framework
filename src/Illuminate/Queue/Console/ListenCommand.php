@@ -74,7 +74,7 @@ class ListenCommand extends Command {
 	{
 		if (is_null($connection))
 		{
-			$connection = $this->laravel['config']->get("queue.default");
+			$connection = $this->laravel['config']['queue.default'];
 		}
 		
 		$queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
