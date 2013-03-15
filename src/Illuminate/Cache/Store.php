@@ -115,6 +115,19 @@ abstract class Store implements ArrayAccess {
 	}
 
 	/**
+	 * Store an item in the cache if the key does not exist.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @param  int     $minutes
+	 * @return void
+	 */
+	public function add($key, $value, $minutes)
+	{
+		if (is_null($this->get($key))) $this->put($key, $value, $minutes);
+	}
+
+	/**
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
