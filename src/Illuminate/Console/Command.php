@@ -184,7 +184,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $default
 	 * @return string
 	 */
-	protected function askHidden($question, $default = null)
+	protected function secret($question, $default = null)
 	{
 		$dialog = $this->getHelperSet()->get('dialog');
 
