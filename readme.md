@@ -39,6 +39,7 @@
 - Allow default value to be passed to Eloquent collection `find` method.
 - Intelligently parse resource routes containing slashes.
 - `Route::options` is now available for routing HTTP `OPTIONS` verb.
+- New `secret` method may be called from Artisan commands for password style input.
 
 ## Beta 3
 
