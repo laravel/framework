@@ -44,7 +44,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->createPayload($job, $data);
 
-		$this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
+		return $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
 	}
 
 	/**
@@ -60,7 +60,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->createPayload($job, $data);
 
-		$this->sqs->sendMessage(array(
+		return $this->sqs->sendMessage(array(
 
 			'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, 'DelaySeconds' => $delay,
 
