@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
 use Illuminate\Support\Contracts\ArrayableInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class Response {
 
@@ -56,9 +57,16 @@ class Response {
 	 * @param  array  $headers
 	 * @return Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
-	public static function download($file, $status = 200, $headers = array())
+	public static function download($file, $name = null, $headers = array())
 	{
-		return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file, $status, $headers);
+		$response = new BinaryFileResponse($file, 200, $headers, true, 'attachment');
+
+		if ( ! is_null($name))
+		{
+			return $response->setContentDisposition('attachment', $name);
+		}
+
+		return $response;
 	}
 
 }
