@@ -80,7 +80,11 @@ class OptimizeCommand extends Command {
 	 */
 	protected function getClassFiles()
 	{
-		return array();
+		$app = $this->app;
+
+		$core = require __DIR__.'/Optimize/config.php';
+
+		return array_merge($core, $this->laravel['config']['compile']);
 	}
 
 	/**
