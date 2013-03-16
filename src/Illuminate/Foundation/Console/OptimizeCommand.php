@@ -52,7 +52,7 @@ class OptimizeCommand extends Command {
 	{
 		$this->info('Generating optimized class loader...');
 
-		$this->composer->dumpAutoloads();
+		$this->composer->dumpOptimized();
 
 		$this->info('Compiling common classes...');
 
