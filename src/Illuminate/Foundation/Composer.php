@@ -35,15 +35,26 @@ class Composer {
 	/**
 	 * Regenerate the Composer autoloader files.
 	 *
+	 * @param  string  $extra
 	 * @return void
 	 */
-	public function dumpAutoloads()
+	public function dumpAutoloads($extra = '')
 	{
 		$process = $this->getProcess();
 
-		$process->setCommandLine($this->findComposer().' dump-autoload --optimize');
+		$process->setCommandLine(trim($this->findComposer().' dump-autoload '.$extra));
 
 		$process->run();
+	}
+
+	/**
+	 * Regenerate the optimized Composer autoloader files.
+	 *
+	 * @return void
+	 */
+	public function dumpOptimized()
+	{
+		$this->dumpAutoloads('--optimize');
 	}
 
 	/**
