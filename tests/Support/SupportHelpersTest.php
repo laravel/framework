@@ -83,7 +83,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testArrayAssoc()
 	{
 		$array = array(1, 2, 3);
-		$this->assertEquals(array(1 => [], 2 => [], 3 => []), array_assoc($array));
+		$this->assertEquals(array(1 => array(), 2 => array(), 3 => array()), array_assoc($array));
 
 		$array = array(1 => 'test1', 2 => 'test2', 3 => 'test3');
 		$this->assertEquals(array(1 => 'test1', 2 => 'test2', 3 => 'test3'), array_assoc($array));
