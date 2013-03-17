@@ -316,9 +316,13 @@ class Blueprint {
 	 * @param  string  $column
 	 * @return Illuminate\Support\Fluent
 	 */
-	public function increments($column)
+	public function increments($column, $unsigned = true)
 	{
-		return $this->unsignedInteger($column, true);
+		if ($unsigned) {
+          return $this->unsignedInteger($column, true);
+        } else {
+            return $this->integer($column, true, false);
+        }
 	}
 
 	/**
