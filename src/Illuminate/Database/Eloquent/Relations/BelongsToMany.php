@@ -396,6 +396,11 @@ class BelongsToMany extends Relation {
 		// if they exist in the array of current ones, and if not we will insert.
 		$current = $this->newPivotQuery()->lists($this->otherKey);
 
+		$current = array_map(function($value)
+		{
+			return (int)$value;
+		}, $current);
+
 		foreach ($ids as $id)
 		{
 			if ( ! in_array($id, $current)) $this->attach($id);
