@@ -264,7 +264,7 @@ if ( ! function_exists('array_assoc'))
 	 * @param  mixed   $defaultValue
 	 * @return array
 	 */
-	function array_assoc($array, $defaultValue = [])
+	function array_assoc($array, $defaultValue = array())
 	{
 		$results = array();
 
@@ -289,7 +289,7 @@ if ( ! function_exists('is_assoc'))
 	 * @param  array   $array
 	 * @return bool
 	 */
-	function is_assoc($array, $defaultValue = [])
+	function is_assoc($array)
 	{
 		// Keys of the array
 		$keys = array_keys($array);
