@@ -255,6 +255,51 @@ if ( ! function_exists('array_set'))
 	}
 }
 
+if ( ! function_exists('array_assoc'))
+{
+	/**
+	 * Convert a sequential array to an associative arrray.
+	 *
+	 * @param  array   $array
+	 * @param  mixed   $defaultValue
+	 * @return array
+	 */
+	function array_assoc($array, $defaultValue = [])
+	{
+		$results = array();
+
+		if ( ! is_assoc($array) )
+		{
+			foreach ($array as $key => $value) {
+				$results[$value] = $defaultValue;
+			}
+
+			return $results;
+		}
+
+		return $array;
+	}
+}
+
+if ( ! function_exists('is_assoc'))
+{
+	/**
+	 * Checks if an array is associative
+	 *
+	 * @param  array   $array
+	 * @return bool
+	 */
+	function is_assoc($array, $defaultValue = [])
+	{
+		// Keys of the array
+		$keys = array_keys($array);
+
+		// If the array keys of the keys match the keys, then the array must
+		// not be associative (e.g. the keys array looked like {0:0, 1:1...}).
+		return array_keys($keys) !== $keys;
+	}
+}
+
 if ( ! function_exists('asset'))
 {
 	/**

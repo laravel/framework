@@ -401,15 +401,16 @@ class BelongsToMany extends Relation {
 			return (int)$value;
 		}, $current);
 
-		foreach ($ids as $id)
+		$ids = array_assoc($ids);
+		foreach ($ids as $id => $attributes)
 		{
-			if ( ! in_array($id, $current)) $this->attach($id);
+			if ( ! in_array($id, $current)) $this->attach($id, $attributes);
 		}
 
 		// Next, we will take the differences of the currents and given IDs and detach
 		// all of the entities that exist in the "current" array but are not in the
 		// the array of the IDs given to the method which will complete the sync.
-		$detach = array_diff($current, $ids);
+		$detach = array_diff($current, array_keys($ids));
 
 		if (count($detach) > 0)
 		{
