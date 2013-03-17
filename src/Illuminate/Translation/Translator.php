@@ -130,10 +130,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		$locale = $locale ?: $this->locale;
 
-		if ( ! is_null($line = $this->get($key, $replace, $locale)))
-		{
-			return $this->getSelector()->choose($line, $number, $locale);
-		}
+		return $this->getSelector()->choose($line, $number, $locale);
 	}
 
 	/**
