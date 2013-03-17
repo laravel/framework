@@ -391,7 +391,17 @@ class BelongsToMany extends Relation {
 	 */
 	public function sync(array $ids)
 	{
-		// First we need to attach any of the associated models that are not currently
+		// First we will take the differences of the currents and given IDs and detach
+		// all of the entities that exist in the "current" array but are not in the
+		// the array of the IDs given to the method which will complete the sync.
+		$detach = array_diff($current, $ids);
+
+		if (count($detach) > 0)
+		{
+			$this->detach($detach);
+		}
+
+		// Next, we need to attach any of the associated models that are not currently
 		// in this joining table. We'll spin through the given IDs, checking to see
 		// if they exist in the array of current ones, and if not we will insert.
 		$current = $this->newPivotQuery()->lists($this->otherKey);
@@ -404,16 +414,6 @@ class BelongsToMany extends Relation {
 		foreach ($ids as $id)
 		{
 			if ( ! in_array($id, $current)) $this->attach($id);
-		}
-
-		// Next, we will take the differences of the currents and given IDs and detach
-		// all of the entities that exist in the "current" array but are not in the
-		// the array of the IDs given to the method which will complete the sync.
-		$detach = array_diff($current, $ids);
-
-		if (count($detach) > 0)
-		{
-			$this->detach($detach);
 		}
 	}
 
