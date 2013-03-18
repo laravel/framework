@@ -217,5 +217,22 @@ class Str {
 
 		return false;
 	}
+	
+		public static function lower($value)
+	{
+		return mb_strtolower($value);
+	}
+	
+	/**
+	* Convert a value to uppercase
+	* 
+	* @param  string $value
+	* @return string
+	*/
+	public static function upper($value)
+	{
+		return mb_strtoupper($value);
+	}
+
 
 }
