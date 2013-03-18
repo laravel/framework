@@ -67,7 +67,7 @@ class MemcachedStore extends Store {
 	 */
 	protected function incrementValue($key, $value)
 	{
-		$this->memcached->increment($this->prefix.$key, $value);
+		return $this->memcached->increment($this->prefix.$key, $value);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class MemcachedStore extends Store {
 	 */
 	protected function decrementValue($key, $value)
 	{
-		$this->memcached->decrement($this->prefix.$key, $value);
+		return $this->memcached->decrement($this->prefix.$key, $value);
 	}
 
 	/**

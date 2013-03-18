@@ -58,7 +58,7 @@ class WinCacheStore extends Store {
 	 */
 	protected function incrementValue($key, $value)
 	{
-		wincache_ucache_inc($this->prefix.$key, $value);
+		return wincache_ucache_inc($this->prefix.$key, $value);
 	}
 
 	/**
@@ -70,7 +70,7 @@ class WinCacheStore extends Store {
 	 */
 	protected function decrementValue($key, $value)
 	{
-		wincache_ucache_dec($this->prefix.$key, $value);
+		return wincache_ucache_dec($this->prefix.$key, $value);
 	}
 
 	/**

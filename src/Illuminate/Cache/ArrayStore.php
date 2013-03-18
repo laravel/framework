@@ -46,6 +46,8 @@ class ArrayStore extends Store {
 	protected function incrementValue($key, $value)
 	{
 		$this->storage[$key] = $this->storage[$key] + $value;
+
+		return $this->storage[$key];
 	}
 
 	/**
@@ -58,6 +60,8 @@ class ArrayStore extends Store {
 	protected function decrementValue($key, $value)
 	{
 		$this->storage[$key] = $this->storage[$key] - $value;
+
+		return $this->storage[$key];
 	}
 
 	/**

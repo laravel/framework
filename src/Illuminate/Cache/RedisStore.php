@@ -69,7 +69,7 @@ class RedisStore extends Store {
 	 */
 	protected function incrementValue($key, $value)
 	{
-		$this->redis->incrby($this->prefix.$key, $value);
+		return $this->redis->incrby($this->prefix.$key, $value);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class RedisStore extends Store {
 	 */
 	protected function decrementValue($key, $value)
 	{
-		$this->redis->decrby($this->prefix.$key, $value);
+		return $this->redis->decrby($this->prefix.$key, $value);
 	}
 
 	/**
