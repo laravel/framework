@@ -439,6 +439,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return bool
 	 */
 	protected function validateDigits($attribute, $value, $parameters)
@@ -451,6 +452,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return bool
 	 */
 	protected function validateDigitsBetween($attribute, $value, $parameters)
@@ -809,6 +811,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return bool
 	 */
 	protected function validateRegex($attribute, $value, $parameters)
