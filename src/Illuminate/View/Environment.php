@@ -195,9 +195,14 @@ class Environment {
 	{
 		$extensions = array_keys($this->extensions);
 
-		return array_first($extensions, function($key, $value) use ($path)
+		return array_reduce($extensions, function($match, $candidate) use ($path)
 		{
-			return ends_with($path, $value);
+			if (strlen($match) < strlen($candidate))
+			{
+				$match = ends_with($path, '.'.$candidate) ? $candidate : $match;
+			}
+
+			return $match;
 		});
 	}
 

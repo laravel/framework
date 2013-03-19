@@ -23,6 +23,28 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($engine === $view->getEngine());
 	}
 
+	public function testEnvironmentReturnsLongestMatchingExtensionForGivenPath()
+	{
+		$extensions = array(
+			'blade.php' => 'blade',
+			'php'       => 'php',
+			'twig.php'  => 'twig',
+		);
+
+		$env = $this->getEnvironment();
+		$env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.twig.php');
+		$env->getEngineResolver()->shouldReceive('resolve')->once()->with('twig')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
+		$env->getFinder()->shouldReceive('addExtension')->times(count($extensions))->with('/(php|blade|twig)$/');
+
+		foreach ($extensions as $ext => $eng)
+		{
+			$env->addExtension($ext, $eng);
+		}
+
+		$view = $env->make('view', array('data'));
+
+		$this->assertTrue($engine === $view->getEngine());
+	}
 
 	public function testExistsPassesAndFailsViews()
 	{
