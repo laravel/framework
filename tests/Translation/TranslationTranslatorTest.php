@@ -26,8 +26,9 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	public function testGetMethodProperlyLoadsAndRetrievesItem()
 	{
 		$t = $this->getMock('Illuminate\Translation\Translator', null, array($this->getLoader(), 'en'));
-		$t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(array('baz' => 'breeze :foo'));
+		$t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(array('foo' => 'foo', 'baz' => 'breeze :foo'));
 		$this->assertEquals('breeze bar', $t->get('foo::bar.baz', array('foo' => 'bar'), 'en'));
+		$this->assertEquals('foo', $t->get('foo::bar.foo'));
 	}
 
 
