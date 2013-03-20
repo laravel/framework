@@ -131,14 +131,9 @@ class PackageCreator {
 	 */
 	protected function getComposerStub($plain)
 	{
-		if ($plain)
-		{
-			return $this->files->get(__DIR__.'/stubs/plain.composer.json');
-		}
-		else
-		{
-			return $this->files->get(__DIR__.'/stubs/composer.json');
-		}
+		if ($plain) return $this->files->get(__DIR__.'/stubs/plain.composer.json');
+
+		return $this->files->get(__DIR__.'/stubs/composer.json');
 	}
 
 	/**
@@ -227,14 +222,9 @@ class PackageCreator {
 	 */
 	protected function getProviderStub($plain)
 	{
-		if ($plain)
-		{
-			return $this->files->get(__DIR__.'/stubs/plain.provider.php');
-		}
-		else
-		{
-			return $this->files->get(__DIR__.'/stubs/provider.php');
-		}
+		if ($plain) return $this->files->get(__DIR__.'/stubs/plain.provider.php');
+		
+		return $this->files->get(__DIR__.'/stubs/provider.php');
 	}
 
 	/**
