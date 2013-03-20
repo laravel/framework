@@ -105,6 +105,17 @@ class Str {
 	}
 
 	/**
+	 * Convert the given string to lower-case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function lower($value)
+	{
+		return mb_strtolower($value);
+	}
+
+	/**
 	 * Limit the number of words in a string.
 	 *
 	 * @param  string  $value
@@ -174,6 +185,17 @@ class Str {
 		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
+	}
+
+	/**
+	 * Convert the given string to upper-case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function upper($value)
+	{
+		return mb_strtoupper($value);
 	}
 
 	/**
