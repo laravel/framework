@@ -39,8 +39,6 @@ class ListenCommand extends Command {
 		parent::__construct();
 
 		$this->listener = $listener;
-
-		$this->listener->setEnvironment($this->laravel->environment());
 	}
 
 	/**
@@ -50,6 +48,8 @@ class ListenCommand extends Command {
 	 */
 	public function fire()
 	{
+		$this->listener->setEnvironment($this->laravel->environment());
+
 		$delay = $this->input->getOption('delay');
 
 		// The memory limit is the amount of memory we will allow the script to occupy
