@@ -497,7 +497,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function submit($value = 'Submit', $options = array())
+	public function submit($value = null, $options = array())
 	{
 		return $this->input('submit', null, $value, $options);
 	}
