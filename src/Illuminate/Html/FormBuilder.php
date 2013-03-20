@@ -658,7 +658,7 @@ class FormBuilder {
 	/**
 	 * Get the value that should be assigned to the field.
 	 *
-	 * This returns either old input for this field, the
+	 * If a name is given, this returns either old input for this field, the
 	 * value passed to this method or the equally-named attribute of the
 	 * current model instance (in this order of precedence).
 	 *
@@ -668,6 +668,8 @@ class FormBuilder {
 	 */
 	protected function getValueAttribute($name, $value)
 	{
+		if (is_null($name)) return $value;
+
 		if (isset($this->session) and $this->session->hasOldInput($name))
 		{
 			return $this->session->getOldInput($name);
