@@ -422,7 +422,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$routes = array_values($router->getRoutes()->getIterator()->getArrayCopy());
 
 		$this->assertEquals(array('foo'), $routes[0]->getOption('_before'));
-		$this->assertEquals(array('bar'), $routes[1]->getOption('_before'));
+		$this->assertEquals(array('foo', 'bar'), $routes[1]->getOption('_before'));
 	}
 
 

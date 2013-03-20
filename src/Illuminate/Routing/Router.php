@@ -713,7 +713,7 @@ class Router {
 	{
 		$prefix = $this->mergeGroupPrefix($action);
 
-		$action = array_merge($this->groupStack[$index], $action);
+		$action = array_merge_recursive($this->groupStack[$index], $action);
 
 		// If we have a prefix, we will override the merged prefix with this correctly
 		// concatenated one since prefixes shouldn't merge like the other groupable
