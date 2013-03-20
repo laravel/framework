@@ -39,6 +39,8 @@ class ListenCommand extends Command {
 		parent::__construct();
 
 		$this->listener = $listener;
+
+		$this->listener->setEnvironment($this->laravel->environment());
 	}
 
 	/**
