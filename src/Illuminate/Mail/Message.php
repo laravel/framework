@@ -65,6 +65,7 @@ class Message {
 		return $this;
 	}
 
+
 	/**
 	 * Add a recipient to the message.
 	 *
@@ -103,6 +104,20 @@ class Message {
 	public function bcc($address, $name = null)
 	{
 		$this->swift->addBcc($address, $name);
+
+		return $this;
+	}
+
+	/**
+	 * Add a reply to address to the message.
+	 *
+	 * @param  string  $address
+	 * @param  string  $name
+	 * @return Illuminate\Mail\Message
+	 */
+	public function replyTo($address, $name = null)
+	{
+		$this->swift->addReplyTo($address, $name);
 
 		return $this;
 	}
