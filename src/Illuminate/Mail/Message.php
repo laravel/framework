@@ -65,7 +65,6 @@ class Message {
 		return $this;
 	}
 
-
 	/**
 	 * Add a recipient to the message.
 	 *
