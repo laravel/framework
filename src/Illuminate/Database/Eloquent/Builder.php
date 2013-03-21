@@ -441,6 +441,8 @@ class Builder {
 	{
 		if (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
 		{
+			array_unshift($parameters, $this);
+
 			call_user_func_array(array($this->model, $scope), $parameters);
 		}
 		else
