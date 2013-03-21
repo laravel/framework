@@ -22,16 +22,6 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testArraysAreCollapsedIntoDotNotation()
-	{
-		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
-		$files->shouldReceive('exists')->once()->with(__DIR__.'/en/foo.php')->andReturn(true);
-		$files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/foo.php')->andReturn(array('messages' => array('foo' => 'bar')));
-
-		$this->assertEquals(array('messages.foo' => 'bar'), $loader->load('en', 'foo', null));	
-	}
-
-
 	public function testLoadMethodWithNamespacesProperlyCallsLoader()
 	{
 		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);

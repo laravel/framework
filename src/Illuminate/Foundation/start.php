@@ -20,6 +20,19 @@ use Illuminate\Foundation\ProviderRepository;
 
 /*
 |--------------------------------------------------------------------------
+| Bind The Application In The Container
+|--------------------------------------------------------------------------
+|
+| This may look strange, but we actually want to bind the app into itself
+| in case we need to Facade test an application. This will allow us to
+| resolve the "app" key out of this container for this app's facade.
+|
+*/
+
+$app['app'] = $app->share(function($app) { return $app; });
+
+/*
+|--------------------------------------------------------------------------
 | Check For The Test Environment
 |--------------------------------------------------------------------------
 |

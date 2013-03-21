@@ -66,7 +66,7 @@ class UrlGenerator {
 	 * Generate a absolute URL to the given path.
 	 *
 	 * @param  string  $path
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $secure
 	 * @return string
 	 */
@@ -154,7 +154,7 @@ class UrlGenerator {
 	 * Get the URL to a named route.
 	 *
 	 * @param  string  $name
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $absolute
 	 * @return string
 	 */
@@ -211,7 +211,7 @@ class UrlGenerator {
 	 * Get the URL to a controller action.
 	 *
 	 * @param  string  $action
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $absolute
 	 * @return string
 	 */

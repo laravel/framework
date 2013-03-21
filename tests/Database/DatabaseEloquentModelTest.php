@@ -101,6 +101,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
 
+		$model->foo = 'bar';
+		// make sure foo isn't synced so we can test that dirty attributes only are updated
+		$model->syncOriginal();
 		$model->id = 1;
 		$model->name = 'taylor';
 		$model->exists = true;
@@ -314,6 +317,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
 		$this->assertFalse(isset($array['password']));
+	}
+
+
+	public function testHiddenCanAlsoExcludeRelationships()
+	{
+		$model = new EloquentModelStub;
+		$model->name = 'Taylor';
+		$model->setRelation('foo', array('bar'));
+		$model->setHidden(array('foo'));
+		$array = $model->toArray();
+
+		$this->assertEquals(array('name' => 'Taylor'), $array);
 	}
 
 

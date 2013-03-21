@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Mockery\MockInterface;
+
 abstract class Facade {
 
 	/**
@@ -39,11 +41,40 @@ abstract class Facade {
 	{
 		$name = static::getFacadeAccessor();
 
-		static::$resolvedInstance[$name] = $mock = \Mockery::mock(get_class(static::getFacadeRoot()));
+		if (static::isMock())
+		{
+			$mock = static::$resolvedInstance[$name];
+		}
+		else
+		{
+			static::$resolvedInstance[$name] = $mock = \Mockery::mock(static::getMockableClass($name));
 
-		static::$app->instance($name, $mock);
+			static::$app->instance($name, $mock);
+		}
 
 		return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
+	}
+
+	/**
+	 * Determines whether a mock is set as the instance of the facade.
+	 *
+	 * @return bool
+	 */
+	protected static function isMock()
+	{
+		$name = static::getFacadeAccessor();
+
+		return isset(static::$resolvedInstance[$name]) and static::$resolvedInstance[$name] instanceof MockInterface;
+	}
+
+	/**
+	 * Get the mockable class for the bound instance.
+	 *
+	 * @return string
+	 */
+	protected static function getMockableClass()
+	{
+		return get_class(static::getFacadeRoot());
 	}
 
 	/**

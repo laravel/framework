@@ -140,7 +140,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispacher
+	 * @var Illuminate\Events\Dispatcher
 	 */
 	protected static $dispatcher;
 
@@ -262,9 +262,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $attributes
 	 * @return Illuminate\Database\Eloquent\Model
 	 */
-	public function newExisting($attributes = array())
+	public function newFromBuilder($attributes = array())
 	{
-		return $this->newInstance($attributes, true);
+		$instance = $this->newInstance(array(), true);
+
+		$instance->setRawAttributes((array) $attributes, true);
+
+		return $instance;
 	}
 
 	/**
@@ -646,6 +650,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->exists = $saved;
 		}
 
+		$this->syncOriginal();
+
 		return $saved;
 	}
 
@@ -657,14 +663,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function performUpdate($query)
 	{
-		// If the updating event returns false, we will cancel the update operation so
-		// developers can hook Validation systems into their models and cancel this
-		// operation if the model does not pass validation. Otherwise, we update.
-		if ($this->fireModelEvent('updating') === false) return false;
+		$dirty = $this->getDirty();
 
-		$this->setKeysForSaveQuery($query)->update($this->attributes);
+		if (count($dirty) > 0)
+		{
+			// If the updating event returns false, we will cancel the update operation so
+			// developers can hook Validation systems into their models and cancel this
+			// operation if the model does not pass validation. Otherwise, we update.
+			if ($this->fireModelEvent('updating') === false)
+			{
+				return false;
+			}
 
-		$this->fireModelEvent('updated', false);
+			// Once we have run the update operation, we will fire the "updated" event for
+			// this model instance. This will allow developers to hook into these after
+			// models are updated, giving them a chance to do any special processing.
+			$this->setKeysForSaveQuery($query)->update($dirty);
+
+			$this->fireModelEvent('updated', false);
+		}
 
 		return true;
 	}
@@ -1122,6 +1139,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($this->relations as $key => $value)
 		{
+			if (in_array($key, $this->hidden)) continue;
+
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
 			// collections to their proper array form and we'll set the values.
@@ -1287,7 +1306,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			if ($value)
 			{
-				$this->attributes[$key] = $this->fromDateTime($value);
+				$value = $this->fromDateTime($value);
 			}
 		}
 
@@ -1383,11 +1402,33 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Sync the original attributes with the current.
 	 *
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Model
 	 */
 	public function syncOriginal()
 	{
 		$this->original = $this->attributes;
+
+		return $this;
+	}
+
+	/**
+	 * Get the attributes that have been changed since last sync.
+	 *
+	 * @return array
+	 */
+	public function getDirty()
+	{
+		$dirty = array();
+
+		foreach ($this->attributes as $key => $value)
+		{
+			if ( ! array_key_exists($key, $this->original) or $value != $this->original[$key])
+			{
+				$dirty[$key] = $value;
+			}
+		}
+
+		return $dirty;	
 	}
 
 	/**
@@ -1483,7 +1524,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function getEventDispatcher()
 	{
-		return static::$dispathcer;
+		return static::$dispatcher;
 	}
 
 	/**

@@ -274,12 +274,20 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Register a service provider with the application.
 	 *
-	 * @param  Illuminate\Support\ServiceProvider  $provider
+	 * @param  Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
 	 * @return void
 	 */
-	public function register(ServiceProvider $provider, $options = array())
+	public function register($provider, $options = array())
 	{
+		// If the given "provider" is a string, we will resolve it, passing in the
+		// application instance automatically for the developer. This is simply
+		// a more convenient way of specifying your service provider classes.
+		if (is_string($provider))
+		{
+			$provider = $this->resolveProviderClass($provider);
+		}
+
 		$provider->register();
 
 		// Once we have registered the service we will iterate through the options
@@ -293,6 +301,17 @@ class Application extends Container implements HttpKernelInterface {
 		$this->serviceProviders[] = $provider;
 
 		$this->loadedProviders[get_class($provider)] = true;
+	}
+
+	/**
+	 * Resolve a service provider instance from the class name.
+	 *
+	 * @param  string  $provider
+	 * @return Illuminate\Support\ServiceProvider
+	 */
+	protected function resolveProviderClass($provider)
+	{
+		return new $provider($this);
 	}
 
 	/**

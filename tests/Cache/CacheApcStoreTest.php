@@ -11,7 +11,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testMemcacheValueIsReturned()
+	public function testAPCValueIsReturned()
 	{
 		$apc = $this->getMock('Illuminate\Cache\ApcWrapper', array('get'));
 		$apc->expects($this->once())->method('get')->will($this->returnValue('bar'));
@@ -20,7 +20,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testSetMethodProperlyCallsMemcache()
+	public function testSetMethodProperlyCallsAPC()
 	{
 		$apc = $this->getMock('Illuminate\Cache\ApcWrapper', array('put'));
 		$apc->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60));
@@ -29,7 +29,25 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testStoreItemForeverProperlyCallsMemcached()
+	public function testIncrementMethodProperlyCallsAPC()
+	{
+		$apc = $this->getMock('Illuminate\Cache\ApcWrapper', array('increment'));
+		$apc->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
+		$store = new Illuminate\Cache\ApcStore($apc);
+		$store->increment('foo', 5);
+	}
+
+
+	public function testDecrementMethodProperlyCallsAPC()
+	{
+		$apc = $this->getMock('Illuminate\Cache\ApcWrapper', array('decrement'));
+		$apc->expects($this->once())->method('decrement')->with($this->equalTo('foo'), $this->equalTo(5));
+		$store = new Illuminate\Cache\ApcStore($apc);
+		$store->decrement('foo', 5);
+	}
+
+
+	public function testStoreItemForeverProperlyCallsAPC()
 	{
 		$apc = $this->getMock('Illuminate\Cache\ApcWrapper', array('put'));
 		$apc->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0));
@@ -38,7 +56,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testForgetMethodProperlyCallsMemcache()
+	public function testForgetMethodProperlyCallsAPC()
 	{
 		$apc = $this->getMock('Illuminate\Cache\ApcWrapper', array('delete'));
 		$apc->expects($this->once())->method('delete')->with($this->equalTo('foo'));

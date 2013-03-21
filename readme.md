@@ -30,6 +30,20 @@
 - Added `URL::previous` method for getting previous URL from `referer` $_SERVER variable.
 - Renamed `path` helper to `url` for consistency.
 - Added `App::shutdown` method for registering callbacks to be fired at very end of both web and Artisan life-cycle.
+- Added `saveMany` and `createMany` to 1:1, 1:*, and *:* relations.
+- Support for [IronMQ](http://www.iron.io/mq) message queue added. Driver is `iron`.
+- Added `domain` and `path` options to session configuration. Named prior `path` option to `files`.
+- Add collation and character set to create table statements in MySQL schema builder.
+- Allow session payload cookie name to be configurable.
+- `shouldReceive` may now be called on a Facade multiple times without using `getMock`.
+- Allow default value to be passed to Eloquent collection `find` method.
+- Intelligently parse resource routes containing slashes.
+- `Route::options` is now available for routing HTTP `OPTIONS` verb.
+- New `secret` method may be called from Artisan commands for password style input.
+- Added `Cache::add` method to store a value in the cache if the key does not exist in the cache already.
+- Added `Cache::increment` and `Cache::decrement` methods to all but file and database cache drivers.
+- Updated `asset:publish` command to automatically find packages with asset directories.
+- Implement Eloquent scopes.
 
 ## Beta 3
 

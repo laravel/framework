@@ -16,7 +16,7 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 	public function testCookiesAreCreatedWithProperOptions()
 	{
 		$cookie = $this->getCreator();
-		$c = $cookie->make('color', 'blue', 10);
+		$c = $cookie->make('color', 'blue', 10, '/path', '/domain', true, false);
 		$value = $cookie->getEncrypter()->decrypt($c->getValue());
 		$this->assertEquals('blue', $value);
 		$this->assertFalse($c->isHttpOnly());
@@ -24,7 +24,7 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/domain', $c->getDomain());
 		$this->assertEquals('/path', $c->getPath());
 
-		$c2 = $cookie->forever('color', 'blue');
+		$c2 = $cookie->forever('color', 'blue', '/path', '/domain', true, false);
 		$value = $cookie->getEncrypter()->decrypt($c2->getValue());
 		$this->assertEquals('blue', $value);
 		$this->assertFalse($c2->isHttpOnly());

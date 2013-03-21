@@ -58,8 +58,6 @@ class MakeControllerCommand extends Command {
 	public function fire()
 	{
 		$this->generateController();
-
-		$this->info('Controller created successfully!');
 	}
 
 	/**
@@ -78,7 +76,14 @@ class MakeControllerCommand extends Command {
 
 		$options = $this->getBuildOptions();
 
-		$this->generator->make($controller, $path, $options);
+		if ( ! $this->generator->make($controller, $path, $options))
+		{
+			$this->error('Controller already exists!');
+		}
+		else
+		{
+			$this->info('Controller created successfully!');
+		}
 	}
 
 	/**

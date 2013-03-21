@@ -303,12 +303,30 @@ class FormBuilder {
 	{
 		if (isset($options['size']))
 		{
-			$segments = explode('x', $options['size']);
-
-			return array_merge($options, array('cols' => $segments[0], 'rows' => $segments[1]));
+			return $this->setQuickTextAreaSize($options);
 		}
 
-		return array_merge($options, array('cols' => 50, 'rows' => 10));
+		// If the "size" attribute was not specified, we will just look for the regular
+		// columns and rows attributes, using sane defaults if these do not exist on
+		// the attributes array. We'll then return this entire options array back.
+		$cols = array_get($options, 'cols', 50);
+
+		$rows = array_get($options, 'rows', 10);
+
+		return array_merge($options, compact('cols', 'rows'));
+	}
+
+	/**
+	 * Set the text area size using the quick "size" attribute.
+	 *
+	 * @param  array  $options
+	 * @return array
+	 */
+	protected function setQuickTextAreaSize($options)
+	{
+		$segments = explode('x', $options['size']);
+
+		return array_merge($options, array('cols' => $segments[0], 'rows' => $segments[1]));
 	}
 
 	/**
@@ -365,7 +383,7 @@ class FormBuilder {
 		{
 			return $this->optionGroup($display, $value, $selected);
 		}
-	
+
 		return $this->option($display, $value, $selected);
 	}
 
@@ -479,7 +497,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function submit($value = null, $options = array())
+	public function submit($value = 'Submit', $options = array())
 	{
 		return $this->input('submit', null, $value, $options);
 	}

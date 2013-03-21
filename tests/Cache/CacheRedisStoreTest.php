@@ -35,6 +35,22 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIncrementMethodProperlyCallsRedis()
+	{
+		$redis = $this->getRedis();
+		$redis->getRedis()->shouldReceive('incrby')->once()->with('prefixfoo', 5);
+		$redis->increment('foo', 5);
+	}
+
+
+	public function testDecrementMethodProperlyCallsRedis()
+	{
+		$redis = $this->getRedis();
+		$redis->getRedis()->shouldReceive('decrby')->once()->with('prefixfoo', 5);
+		$redis->decrement('foo', 5);
+	}
+
+
 	public function testStoreItemForeverProperlyCallsRedis()
 	{
 		$redis = $this->getRedis();

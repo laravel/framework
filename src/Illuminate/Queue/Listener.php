@@ -12,14 +12,23 @@ class Listener {
 	protected $commandPath;
 
 	/**
+	 * The environment the workers should run under.
+	 *
+	 * @var string
+	 */
+	protected $environment;
+
+	/**
 	 * Create a new queue listener.
 	 *
 	 * @param  string  $commandPath
+	 * @param  string  $environment
 	 * @return void
 	 */
-	public function __construct($commandPath)
+	public function __construct($commandPath, $environment = null)
 	{
 		$this->commandPath = $commandPath;
+		$this->environment = $environment;
 	}
 
 	/**
@@ -76,6 +85,14 @@ class Listener {
 	{
 		$string = 'php artisan queue:work %s --queue=%s --delay=%s --memory=%s --sleep';
 
+		// If the environment is set, we will append it to the command string so the
+		// workers will run under the specified environment. Otherwise, they will
+		// just run under the production environment which is not always right.
+		if (isset($this->environment))
+		{
+			$string .= ' --env='.$this->environment;
+		}
+
 		$command = sprintf($string, $connection, $queue, $delay, $memory);
 
 		return new Process($command, $this->commandPath, null, null, $timeout);
@@ -100,6 +117,27 @@ class Listener {
 	public function stop()
 	{
 		die;
+	}
+
+	/**
+	 * Get the current listener environment.
+	 *
+	 * @return string
+	 */
+	public function getEnvironment()
+	{
+		return $this->environment;
+	}
+
+	/**
+	 * Set the current environment.
+	 *
+	 * @param  string  $environment
+	 * @return void
+	 */
+	public function setEnvironment($environment)
+	{
+		$this->environment = $environment;
 	}
 
 }

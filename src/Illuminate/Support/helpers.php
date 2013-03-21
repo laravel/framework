@@ -425,18 +425,18 @@ if ( ! function_exists('secure_asset'))
 	}
 }
 
-if ( ! function_exists('secure_path'))
+if ( ! function_exists('secure_url'))
 {
 	/**
-	 * Generate a HTTPS path for the application.
+	 * Generate a HTTPS url for the application.
 	 *
 	 * @param  string  $path
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @return string
 	 */
-	function secure_path($path, array $parameters = array())
+	function secure_url($path, $parameters = array())
 	{
-		return path($path, $parameters, true);
+		return url($path, $parameters, true);
 	}
 }
 
@@ -616,14 +616,14 @@ if ( ! function_exists('trans_choice'))
 if ( ! function_exists('url'))
 {
 	/**
-	 * Generate a path for the application.
+	 * Generate a url for the application.
 	 *
 	 * @param  string  $path
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	function url($path = null, array $parameters = array(), $secure = null)
+	function url($path = null, $parameters = array(), $secure = null)
 	{
 		$app = app();
 

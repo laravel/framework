@@ -45,7 +45,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	public function load($locale, $group, $namespace = null)
 	{
-		if (is_null($namespace))
+		if (is_null($namespace) or $namespace == '*')
 		{
 			return $this->loadPath($this->path, $locale, $group);
 		}
@@ -61,6 +61,7 @@ class FileLoader implements LoaderInterface {
 	 * @param  string  $locale
 	 * @param  string  $group
 	 * @param  string  $namespace
+	 * @return array
 	 */
 	protected function loadNamespaced($locale, $group, $namespace)
 	{
@@ -84,7 +85,7 @@ class FileLoader implements LoaderInterface {
 	{
 		if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php"))
 		{
-			return array_dot($this->files->getRequire($full));
+			return $this->files->getRequire($full);
 		}
 
 		return array();

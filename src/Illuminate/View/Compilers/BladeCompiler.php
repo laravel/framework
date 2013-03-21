@@ -129,16 +129,24 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		// Next, we just want to split the values by lines, and create an expression
 		// to include the parent layout at the end of the templates. Which allows
 		// the sections to get registered before the parent view gets rendered.
+		$lines = $this->compileLayoutExtends($lines);
+
+		return implode("\r\n", array_slice($lines, 1));
+	}
+
+	/**
+	 * Compile the proper template inheritance for the lines.
+	 *
+	 * @param  array  $lines
+	 * @return array
+	 */
+	protected function compileLayoutExtends($lines)
+	{
 		$pattern = $this->createMatcher('extends');
 
-		$replace = '$1@include$2';
+		$lines[] = preg_replace($pattern, '$1@include$2', $lines[0]);
 
-		$lines[] = preg_replace($pattern, $replace, $lines[0]);
-
-		// Once we've made the replacements, we'll slice off the first line as it is
-		// now just an empty line since the template has been moved to the end of
-		// the files. We will let the other sections be registered before this.
-		return implode("\r\n", array_slice($lines, 1));
+		return $lines;
 	}
 
 	/**
@@ -149,11 +157,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileComments($value)
 	{
-		return preg_replace(sprintf(
-			'/%s--((.|\s)*?)--%s/',
-			preg_quote($this->contentTags[0]),
-			preg_quote($this->contentTags[1])
-		), '<?php /* $1 */ ?>', $value);
+		$pattern = sprintf('/%s--((.|\s)*?)--%s/', $this->contentTags[0], $this->contentTags[1]);
+
+		return preg_replace($pattern, '<?php /* $1 */ ?>', $value);
 	}
 
 	/**

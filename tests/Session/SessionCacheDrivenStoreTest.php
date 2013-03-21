@@ -33,7 +33,7 @@ class SessionCacheDrivenStoreTest extends PHPUnit_Framework_TestCase {
 
 	protected function getCacheMock()
 	{
-		return $this->getMock('Illuminate\Cache\Store', array('get', 'forever', 'retrieveItem', 'storeItem', 'storeItemForever', 'removeItem', 'flushItems'));
+		return $this->getMock('Illuminate\Cache\Store', array('get', 'forever', 'retrieveItem', 'storeItem', 'storeItemForever', 'removeItem', 'flushItems', 'incrementValue', 'decrementValue'));
 	}
 
 }

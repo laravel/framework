@@ -65,7 +65,7 @@ class Pivot extends Model {
 	{
 		$query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
-		$query->where($this->otherKey, $this->getAttribute($this->otherKey));
+		return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
 	}
 
 	/**
