@@ -157,6 +157,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var array
 	 */
 	protected static $mutatorCache = array();
+	
+	/**
+	 * Private singleton for the static calls
+	 * 
+	 * @var Illuminate\Database\Eloquent\Model
+	 */
+	protected static $emptyInstance;
 
 	/**
 	 * The name of the "created at" column.
@@ -312,7 +319,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function all($columns = array('*'))
 	{
-		$instance = new static;
+		$instance = self::getEmptyInstance();
 
 		return $instance->newQuery()->get($columns);
 	}
@@ -326,7 +333,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function find($id, $columns = array('*'))
 	{
-		$instance = new static;
+		$instance = self::getEmptyInstance();
 
 		if (is_array($id))
 		{
@@ -346,7 +353,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if (is_string($relations)) $relations = func_get_args();
 
-		$instance = new static;
+		$instance = self::getEmptyInstance();
 
 		return $instance->newQuery()->with($relations);
 	}
@@ -1631,6 +1638,21 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function offsetUnset($offset)
 	{
 		unset($this->$offset);
+	}
+	
+	/**
+	 * Lazyloads a singleton
+	 * 
+	 * @var Illuminate\Database\Eloquent\Model
+	 */
+	protected static function getEmptyInstance()
+	{
+		if(is_null(self::$emptyInstance)
+		{
+			self::$emptyInstance = new static;
+		}
+			
+		return self::$emptyInstance;
 	}
 
 	/**
