@@ -252,7 +252,7 @@ class Str {
 	 * Determine if a string starts with a given needle.
 	 *
 	 * @param  string  $haystack
-	 * @param  string|array  $needle
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
 	public static function startsWith($haystack, $needles)

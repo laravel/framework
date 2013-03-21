@@ -60,7 +60,7 @@ class Environment {
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @param  Illuminate\View\Environment  $view
-	 * @param  Illuminate\Translation\TranslatorInterface  $trans
+	 * @param  Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @return void
 	 */
 	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans)

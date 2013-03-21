@@ -7,7 +7,7 @@ class Dispatcher {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var Illuminate\Container
+	 * @var Illuminate\Container\Container
 	 */
 	protected $container;
 
@@ -28,7 +28,7 @@ class Dispatcher {
 	/**
 	 * Create a new event dispatcher instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function __construct(Container $container = null)

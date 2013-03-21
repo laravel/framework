@@ -536,7 +536,7 @@ class Environment {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return Illuminate\Container
+	 * @return Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{
@@ -546,7 +546,7 @@ class Environment {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

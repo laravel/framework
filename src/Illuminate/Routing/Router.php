@@ -111,7 +111,7 @@ class Router {
 	/**
 	 * Create a new router instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function __construct(Container $container = null)
@@ -1164,7 +1164,7 @@ class Router {
 	/**
 	 * Find the patterned filters matching a request.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return array
 	 */
 	public function findPatternFilters(Request $request)
@@ -1315,7 +1315,7 @@ class Router {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
