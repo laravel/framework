@@ -439,7 +439,14 @@ class Builder {
 	 */
 	public function __call($method, $parameters)
 	{
-		$result = call_user_func_array(array($this->query, $method), $parameters);
+		if (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
+		{
+			$this->model->$scope($this);
+		}
+		else
+		{
+			$result = call_user_func_array(array($this->query, $method), $parameters);
+		}
 
 		return in_array($method, $this->passthru) ? $result : $this;
 	}

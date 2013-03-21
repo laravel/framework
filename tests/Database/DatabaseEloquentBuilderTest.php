@@ -252,6 +252,18 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testQueryScopes()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('from');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar');
+		$builder->setModel($model = new EloquentBuilderTestScopeStub);
+		$result = $builder->approved();
+
+		$this->assertEquals($builder, $result);
+	}
+
+
 	protected function getBuilder()
 	{
 		return new Builder(m::mock('Illuminate\Database\Query\Builder'));
@@ -266,3 +278,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentBuilderTestModelStub extends Illuminate\Database\Eloquent\Model {}
+class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
+	public function scopeApproved($query)
+	{
+		$query->where('foo', 'bar');
+	}
+}
