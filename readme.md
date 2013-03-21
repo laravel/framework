@@ -42,6 +42,7 @@
 - New `secret` method may be called from Artisan commands for password style input.
 - Added `Cache::add` method to store a value in the cache if the key does not exist in the cache already.
 - Added `Cache::increment` and `Cache::decrement` methods to all but file and database cache drivers.
+- Updated `asset:publish` command to automatically find packages with asset directories.
 
 ## Beta 3
 
