@@ -148,10 +148,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 			return true;
 		}
 
-		if (is_array($this->input($key)))
-		{
-			return true;
-		}
+		if (is_array($this->input($key))) return true;
 
 		return trim((string) $this->input($key)) !== '';
 	}
