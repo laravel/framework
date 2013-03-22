@@ -100,6 +100,140 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the client response has an OK status code.
+	 *
+	 * @return void
+	 */
+	public function assertResponseOk()
+	{
+		return $this->assertTrue($this->client->getResponse()->isOk());
+	}
+
+	/**
+	 * Assert that the response view has a given piece of bound data.
+	 *
+	 * @param  string|array  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function assertViewHas($key, $value = null)
+	{
+		if (is_array($key)) return $this->assertViewHasAll($key);
+
+		$response = $this->client->getResponse()->original;
+
+		if (is_null($value))
+		{
+			$this->assertArrayHasKey($key, $response->getData());
+		}
+		else
+		{
+			$this->assertEquals($value, $response->$key);
+		}
+	}
+
+	/**
+	 * Assert that the view has a given list of bound data.
+	 *
+	 * @param  array  $bindings
+	 * @return void
+	 */
+	public function assertViewHasAll(array $bindings)
+	{
+		foreach ($bindings as $key => $value)
+		{
+			$this->assertViewHas($key, $value);
+		}
+	}
+
+	/**
+	 * Assert whether the client was redirected to a given URI.
+	 *
+	 * @param  string  $uri
+	 * @param  array   $with
+	 * @return void
+	 */
+	public function assertRedirectedTo($uri, $with = array())
+	{
+		$response = $this->client->getResponse();
+
+		$this->assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
+
+		$this->assertEquals($this->app['url']->to($uri), $response->headers->get('Location'));
+
+		$this->assertSessionHasAll($with);
+	}
+
+	/**
+	 * Assert whether the client was redirected to a given route.
+	 *
+	 * @param  string  $name
+	 * @param  array   $with
+	 * @return void
+	 */
+	public function assertRedirectedToRoute($name, $with = array())
+	{
+		$this->assertRedirectedTo($this->app['url']->route($name), $with);
+	}
+
+	/**
+	 * Assert whether the client was redirected to a given action.
+	 *
+	 * @param  string  $name
+	 * @param  array   $with
+	 * @return void
+	 */
+	public function assertRedirectedToAction($name, $with = array())
+	{
+		$this->assertRedirectedTo($this->app['url']->action($name), $with);
+	}
+
+	/**
+	 * Assert that the session has a given list of values.
+	 *
+	 * @param  string|array  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function assertSessionHas($key, $value = null)
+	{
+		if (is_array($key)) return $this->assertSessionHasAll($key);
+
+		if (is_null($value))
+		{
+			$this->assertTrue($this->app['session']->has($key));
+		}
+		else
+		{
+			$this->assertEquals($value, $this->app['session']->get($key));
+		}
+	}
+
+	/**
+	 * Assert that the session has a given list of values.
+	 *
+	 * @param  array  $bindings
+	 * @return void
+	 */
+	public function assertSessionHasAll(array $bindings)
+	{
+		foreach ($bindings as $key => $value)
+		{
+			$this->assertSessionHas($key, $value);
+		}
+	}
+
+	/**
+	 * Assert that the session has errors bound.
+	 *
+	 * @return void
+	 */
+	public function assertSessionHasErrors()
+	{
+		return $this->assertSessionHas('errors');
+	}
+
+	/**
 	 * Set the currently logged in user for the application.
 	 *
 	 * @param  Illuminate\Auth\UserInterface  $user
