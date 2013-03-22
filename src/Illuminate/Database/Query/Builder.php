@@ -641,7 +641,7 @@ class Builder {
 
 		foreach ($segments as $segment)
 		{
-			// If the segment is not a boolean connector, we can assume it it's a column name
+			// If the segment is not a boolean connector, we can assume it is a column's name
 			// and we will add it to the query as a new constraint as a where clause, then
 			// we can keep iterating through the dynamic method string's segments again.
 			if ($segment != 'And' and $segment != 'Or')
@@ -653,7 +653,7 @@ class Builder {
 
 			// Otherwise, we will store the connector so we know how the next where clause we
 			// find in the query should be connected to the previous ones, meaning we will
-			// have the proper booelan connector to connect the next where clause found.
+			// have the proper boolean connector to connect the next where clause found.
 			else
 			{
 				$connector = $segment;
