@@ -85,7 +85,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereRaw('id = ? or email = ?', array(1, 'foo'));
 		$this->assertEquals('select * from "users" where id = ? or email = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());	
+		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());
 	}
 
 	public function testRawOrWheres()
@@ -93,7 +93,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereRaw('email = ?', array('foo'));
 		$this->assertEquals('select * from "users" where "id" = ? or email = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());	
+		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());
 	}
 
 
@@ -194,7 +194,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->having('email', '>', 1);
 		$this->assertEquals('select * from "users" having "email" > ?', $builder->toSql());
-		
+
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy('email')->having('email', '>', 1);
 		$this->assertEquals('select * from "users" group by "email" having "email" > ?', $builder->toSql());
@@ -338,7 +338,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', array(1))->andReturn(array(array('foo' => 'bar')));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')));
 		$results = $builder->from('users')->where('id', '=', 1)->first();
-		$this->assertEquals(array('foo' => 'bar'), $results);	
+		$this->assertEquals(array('foo' => 'bar'), $results);
 	}
 
 
@@ -354,7 +354,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('id' => 1, 'foo' => 'bar'), array('id' => 10, 'foo' => 'baz')));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('id' => 1, 'foo' => 'bar'), array('id' => 10, 'foo' => 'baz')));
 		$results = $builder->from('users')->where('id', '=', 1)->lists('foo', 'id');
-		$this->assertEquals(array(1 => 'bar', 10 => 'baz'), $results);	
+		$this->assertEquals(array(1 => 'bar', 10 => 'baz'), $results);
 	}
 
 
@@ -417,7 +417,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', array(1))->andReturn(array(array('foo' => 'bar')));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')));
 		$results = $builder->from('users')->where('id', '=', 1)->pluck('foo');
-		$this->assertEquals('bar', $results);	
+		$this->assertEquals('bar', $results);
 	}
 
 
@@ -608,6 +608,54 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('foo', null);
 		$this->assertEquals('select * from "users" where "foo" is null', $builder->toSql());
+	}
+
+
+	public function testDynamicWhere()
+	{
+		$method     = 'whereFooBarAndBazOrQux';
+		$parameters = array('corge', 'waldo', 'fred');
+		$builder    = m::mock('Illuminate\Database\Query\Builder[where]');
+
+		$builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturn($builder);
+		$builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturn($builder);
+		$builder->shouldReceive('where')->with('qux', '=', $parameters[2], 'or')->once()->andReturn($builder);
+
+		$this->assertEquals($builder, $builder->dynamicWhere($method, $parameters));
+	}
+
+
+	public function testDynamicWhereIsNotGreedy()
+	{
+		$method     = 'whereIosVersionAndAndroidVersionOrOrientation';
+		$parameters = array('6.1', '4.2', 'Vertical');
+		$builder    = m::mock('Illuminate\Database\Query\Builder[where]');
+
+		$builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturn($builder);
+		$builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);
+		$builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturn($builder);
+
+		$builder->dynamicWhere($method, $parameters);
+	}
+
+
+	public function testCallTriggersDynamicWhere()
+	{
+		$builder = $this->getBuilder();
+
+		$this->assertEquals($builder, $builder->whereFooAndBar('baz', 'qux'));
+		$this->assertCount(2, $builder->wheres);
+	}
+
+
+	/**
+	 * @expectedException BadMethodCallException
+	 */
+	public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
+	{
+		$builder = $this->getBuilder();
+
+		$builder->noValidMethodHere();
 	}
 
 
