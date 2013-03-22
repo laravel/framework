@@ -82,7 +82,7 @@ class Encrypter {
 	/**
 	 * Decrypt the given value.
 	 *
-	 * @param  string  $value
+	 * @param  string  $payload
 	 * @return string
 	 */
 	public function decrypt($payload)

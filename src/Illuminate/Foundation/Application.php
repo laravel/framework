@@ -455,7 +455,7 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Handle the given request and get the response.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
@@ -470,7 +470,7 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @implements HttpKernelInterface::handle
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
 	 * @return Symfony\Component\HttpFoundation\Response
@@ -547,8 +547,8 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Prepare the request by injecting any services.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
-	 * @return Illuminate\Foundation\Request
+	 * @param  Illuminate\Http\Request  $request
+	 * @return Illuminate\Http\Request
 	 */
 	public function prepareRequest(Request $request)
 	{
@@ -564,7 +564,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepareResponse($value, Request $request)

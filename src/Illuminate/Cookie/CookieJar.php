@@ -147,7 +147,7 @@ class CookieJar {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return Illuminate\Encrypter
+	 * @return Illuminate\Encryption\Encrypter
 	 */
 	public function getEncrypter()
 	{

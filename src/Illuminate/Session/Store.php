@@ -82,7 +82,7 @@ abstract class Store implements ArrayAccess {
 	/**
 	 * Load the session for the request.
 	 *
-	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  Illuminate\Cookie\CookieJar  $cookies
 	 * @param  string  $name
 	 * @return void
 	 */

@@ -90,6 +90,7 @@ class UrlGenerator {
 	 * Generate a secure, absolute URL to the given path.
 	 *
 	 * @param  string  $path
+	 * @param  array   $parameters
 	 * @return string
 	 */
 	public function secure($path, $parameters = array())

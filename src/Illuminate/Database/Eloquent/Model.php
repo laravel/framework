@@ -356,7 +356,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
-	 * @return Illuminate\Database\Eloquent\Relation\HasOne
+	 * @return Illuminate\Database\Eloquent\Relations\HasOne
 	 */
 	public function hasOne($related, $foreignKey = null)
 	{
@@ -374,7 +374,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
-	 * @return Illuminate\Database\Eloquent\Relation\MorphOne
+	 * @return Illuminate\Database\Eloquent\Relations\MorphOne
 	 */
 	public function morphOne($related, $name, $type = null, $id = null)
 	{
@@ -467,7 +467,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
-	 * @return Illuminate\Database\Eloquent\Relation\MorphMany
+	 * @return Illuminate\Database\Eloquent\Relations\MorphMany
 	 */
 	public function morphMany($related, $name, $type = null, $id = null)
 	{

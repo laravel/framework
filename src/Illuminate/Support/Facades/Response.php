@@ -21,7 +21,7 @@ class Response {
 	/**
 	 * Return a new JSON response from the application.
 	 *
-	 * @param  string  $content
+	 * @param  string|array  $data
 	 * @param  int     $status
 	 * @param  array   $headers
 	 * @return Symfony\Component\HttpFoundation\JsonResponse

@@ -93,7 +93,7 @@ class Controller {
 	/**
 	 * Execute an action on the controller.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @param  Illuminate\Routing\Router  $router
 	 * @param  string  $method
 	 * @param  array   $parameters
