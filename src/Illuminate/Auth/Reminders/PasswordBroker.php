@@ -120,8 +120,7 @@ class PasswordBroker {
 	/**
 	 * Reset the password for the given token.
 	 *
-	 * @param  string   $token
-	 * @param  string   $newPassword
+	 * @param  array   $credentials
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */

@@ -516,7 +516,7 @@ class Environment {
 	/**
 	 * Get the view finder instance.
 	 *
-	 * @return Illuminate\View\ViewFinder
+	 * @return Illuminate\View\ViewFinderInterface
 	 */
 	public function getFinder()
 	{

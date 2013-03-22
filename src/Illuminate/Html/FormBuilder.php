@@ -680,8 +680,7 @@ class FormBuilder {
 	/**
 	 * Get the session store implementation.
 	 *
-	 * @param  Illuminate\Session\Store  $session
-	 * @return void
+	 * @return  Illuminate\Session\Store  $session
 	 */
 	public function getSessionStore()
 	{
