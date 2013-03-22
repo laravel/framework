@@ -205,7 +205,7 @@ class PasswordBroker {
 	 * Get the user for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return Illuminate\Auth\RemindableInterface
+	 * @return Illuminate\Auth\Reminders\RemindableInterface
 	 */
 	public function getUser(array $credentials)
 	{
