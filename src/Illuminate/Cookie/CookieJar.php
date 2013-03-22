@@ -23,6 +23,20 @@ class CookieJar {
 	protected $encrypter;
 
 	/**
+	 * The default path (if specified).
+	 *
+	 * @var string
+	 */
+	protected $path = '/';
+
+	/**
+	 * The default domain (if specified).
+	 *
+	 * @var string
+	 */
+	protected $domain = null;
+
+	/**
 	 * Create a new cookie manager instance.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
@@ -95,8 +109,10 @@ class CookieJar {
 	 * @param  bool    $httpOnly
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function make($name, $value, $minutes = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
+	public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
+		list($path, $domain) = $this->getPathAndDomain($path, $domain);
+
 		// Once we calculate the time we can encrypt the message. All cookies will be
 		// encrypted using the Illuminate encryption component and will have a MAC
 		// assigned to them by the encrypter to make sure they remain authentic.
@@ -118,7 +134,7 @@ class CookieJar {
 	 * @param  bool    $httpOnly
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function forever($name, $value, $path = '/', $domain = null, $secure = false, $httpOnly = true)
+	public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
 		return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly);
 	}
@@ -132,6 +148,32 @@ class CookieJar {
 	public function forget($name)
 	{
 		return $this->make($name, null, -2628000);
+	}
+
+	/**
+	 * Get the path and domain, or the default values.
+	 *
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @return array
+	 */
+	protected function getPathAndDomain($path, $domain)
+	{
+		return array($path ?: $this->path, $domain ?: $this->domain);
+	}
+
+	/**
+	 * Set the default path and domain for the jar.
+	 *
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @return void
+	 */
+	public function setDefaultPathAndDomain($path, $domain)
+	{
+		list($this->path, $this->domain) = array($path, $domain);
+
+		return $this;
 	}
 
 	/**
