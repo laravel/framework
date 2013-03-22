@@ -23,24 +23,29 @@ class CookieJar {
 	protected $encrypter;
 
 	/**
-	 * The default cookie options.
+	 * The default path (if specified).
 	 *
-	 * @var array
+	 * @var string
 	 */
-	protected $defaults = array();
+	protected $path = '/';
+
+	/**
+	 * The default domain (if specified).
+	 *
+	 * @var string
+	 */
+	protected $domain = null;
 
 	/**
 	 * Create a new cookie manager instance.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @param  Illuminate\Encryption\Encrypter  $encrypter
-	 * @param  array   $defaults
 	 * @return void
 	 */
-	public function __construct(Request $request, Encrypter $encrypter, array $defaults)
+	public function __construct(Request $request, Encrypter $encrypter)
 	{
 		$this->request = $request;
-		$this->defaults = $defaults;
 		$this->encrypter = $encrypter;
 	}
 
@@ -98,11 +103,15 @@ class CookieJar {
 	 * @param  string  $name
 	 * @param  string  $value
 	 * @param  int     $minutes
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @param  bool    $secure
+	 * @param  bool    $httpOnly
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function make($name, $value, $minutes = 0)
+	public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
-		extract($this->defaults);
+		list($path, $domain) = $this->getPathAndDomain($path, $domain);
 
 		// Once we calculate the time we can encrypt the message. All cookies will be
 		// encrypted using the Illuminate encryption component and will have a MAC
@@ -119,11 +128,15 @@ class CookieJar {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @param  bool    $secure
+	 * @param  bool    $httpOnly
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function forever($name, $value)
+	public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
-		return $this->make($name, $value, 2628000);
+		return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly);
 	}
 
 	/**
@@ -135,6 +148,32 @@ class CookieJar {
 	public function forget($name)
 	{
 		return $this->make($name, null, -2628000);
+	}
+
+	/**
+	 * Get the path and domain, or the default values.
+	 *
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @return array
+	 */
+	protected function getPathAndDomain($path, $domain)
+	{
+		return array($path ?: $this->path, $domain ?: $this->domain);
+	}
+
+	/**
+	 * Set the default path and domain for the jar.
+	 *
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @return void
+	 */
+	public function setDefaultPathAndDomain($path, $domain)
+	{
+		list($this->path, $this->domain) = array($path, $domain);
+
+		return $this;
 	}
 
 	/**
@@ -150,7 +189,7 @@ class CookieJar {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return Illuminate\Encrypter
+	 * @return Illuminate\Encryption\Encrypter
 	 */
 	public function getEncrypter()
 	{

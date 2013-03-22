@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Support\Contracts\ArrayableInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
 class Response {
 
 	/**
@@ -18,13 +21,18 @@ class Response {
 	/**
 	 * Return a new JSON response from the application.
 	 *
-	 * @param  string  $content
+	 * @param  string|array  $data
 	 * @param  int     $status
 	 * @param  array   $headers
 	 * @return Symfony\Component\HttpFoundation\JsonResponse
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
+		if ($data instanceof ArrayableInterface)
+		{
+			$data = $data->toArray();
+		}
+
 		return new \Symfony\Component\HttpFoundation\JsonResponse($data, $status, $headers);
 	}
 
@@ -49,9 +57,16 @@ class Response {
 	 * @param  array  $headers
 	 * @return Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
-	public static function download($file, $status = 200, $headers = array())
+	public static function download($file, $name = null, $headers = array())
 	{
-		return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file, $status, $headers);
+		$response = new BinaryFileResponse($file, 200, $headers, true, 'attachment');
+
+		if ( ! is_null($name))
+		{
+			return $response->setContentDisposition('attachment', $name);
+		}
+
+		return $response;
 	}
 
 }

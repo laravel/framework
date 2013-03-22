@@ -579,7 +579,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('x' => 'aasd234fsd1'), array('x' => 'Regex:/^([a-z])+$/i'));
-		$this->assertFalse($v->passes());	
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('x' => 'a,b'), array('x' => 'Regex:/^a,b$/i'));
+		$this->assertTrue($v->passes());
 	}
 
 	public function testValidateDateAndFormat()

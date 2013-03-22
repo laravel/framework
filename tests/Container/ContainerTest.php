@@ -115,7 +115,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testBindingsCanBeOverriden()
+	public function testBindingsCanBeOverridden()
 	{
 		$container = new Container;
 		$container['foo'] = 'bar';
@@ -191,6 +191,17 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$instance = $container->make('ContainerDefaultValueStub');
 		$this->assertInstanceOf('ContainerConcreteStub', $instance->stub);
 		$this->assertEquals('taylor', $instance->default);
+	}
+
+
+	public function testResolvingCallbacksAreCalled()
+	{
+		$container = new Container;
+		$container->resolving(function($object) { return $object->name = 'taylor'; });
+		$container->bind('foo', function() { return new StdClass; });
+		$instance = $container->make('foo');
+
+		$this->assertEquals('taylor', $instance->name);
 	}
 
 }

@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Finder\Finder;
 use Illuminate\Foundation\AssetPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -48,8 +49,20 @@ class AssetPublishCommand extends Command {
 	 */
 	public function fire()
 	{
-		$package = $this->getPackage();
+		foreach ($this->getPackages() as $package)
+		{
+			$this->publishAssets($package);
+		}
+	}
 
+	/**
+	 * Publish the assets for a given package name.
+	 *
+	 * @param  string  $package
+	 * @return void
+	 */
+	protected function publishAssets($package)
+	{
 		if ( ! is_null($path = $this->getPath()))
 		{
 			$this->assets->publish($package, $path);
@@ -67,18 +80,37 @@ class AssetPublishCommand extends Command {
 	 *
 	 * @return string
 	 */
-	protected function getPackage()
+	protected function getPackages()
 	{
 		if ( ! is_null($package = $this->input->getArgument('package')))
 		{
-			return $package;
+			return array($package);
 		}
 		elseif ( ! is_null($bench = $this->input->getOption('bench')))
 		{
-			return $bench;
+			return array($bench);
 		}
 
-		throw new \Exception("Package or bench must be specified.");
+		return $this->findAllAssetPackages();
+	}
+
+	/**
+	 * Find all the asset hosting packages in the system.
+	 *
+	 * @return array
+	 */
+	protected function findAllAssetPackages()
+	{
+		$vendor = $this->laravel['path.base'].'/vendor';
+
+		$packages = array();
+
+		foreach (Finder::create()->directories()->in($vendor)->name('public')->depth('< 3') as $package)
+		{
+			$packages[] = $package->getRelativePath();
+		}
+
+		return $packages;
 	}
 
 	/**

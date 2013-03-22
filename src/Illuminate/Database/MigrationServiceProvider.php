@@ -29,11 +29,11 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		$this->registerRepository();
 
-		$this->registerMigrator();
-
 		// Once we have registered the migrator instance we will go ahead and register
 		// all of the migration related commands that are used by the "Artisan" CLI
 		// so that they may be easily accessed for registering with the consoles.
+		$this->registerMigrator();
+
 		$this->registerCommands();
 
 		$this->registerPostCreationHook();

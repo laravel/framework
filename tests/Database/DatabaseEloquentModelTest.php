@@ -7,6 +7,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function tearDown()
 	{
 		m::close();
+
+		Illuminate\Database\Eloquent\Model::unsetEventDispatcher();
 	}
 
 
@@ -95,11 +97,30 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('update')->once()->with(array('id' => 1, 'name' => 'taylor'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
 
+		$model->foo = 'bar';
+		// make sure foo isn't synced so we can test that dirty attributes only are updated
+		$model->syncOriginal();
 		$model->id = 1;
 		$model->name = 'taylor';
 		$model->exists = true;
 		$this->assertTrue($model->save());
+	}
+
+
+	public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
+		$model->exists = true;
+
+		$this->assertFalse($model->save());
 	}
 
 
@@ -178,6 +199,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
 
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+
 		$model->name = 'taylor';
 		$model->exists = false;
 		$this->assertTrue($model->save());
@@ -191,11 +216,28 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setIncrementing(false);
 
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+
 		$model->name = 'taylor';
 		$model->exists = false;
 		$this->assertTrue($model->save());
 		$this->assertNull($model->id);
 		$this->assertTrue($model->exists);
+	}
+
+
+	public function testInsertIsCancelledIfCreatingEventReturnsFalse()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
+
+		$this->assertFalse($model->save());
+		$this->assertFalse($model->exists);
 	}
 
 
@@ -275,6 +317,50 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
 		$this->assertFalse(isset($array['password']));
+	}
+
+
+	public function testHiddenCanAlsoExcludeRelationships()
+	{
+		$model = new EloquentModelStub;
+		$model->name = 'Taylor';
+		$model->setRelation('foo', array('bar'));
+		$model->setHidden(array('foo'));
+		$array = $model->toArray();
+
+		$this->assertEquals(array('name' => 'Taylor'), $array);
+	}
+
+
+	public function testToArraySnakeAttributes()
+	{
+		$model = new EloquentModelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['names_list'][0]['bar']);
+		$this->assertEquals('boom', $array['names_list'][1]['bam']);
+
+		$model = new EloquentModelCamelStub;
+		$model->setRelation('namesList', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$array = $model->toArray();
+
+		$this->assertEquals('baz', $array['namesList'][0]['bar']);
+		$this->assertEquals('boom', $array['namesList'][1]['bam']);
+	}
+
+
+	public function testToArrayUsesMutators()
+	{
+		$model = new EloquentModelStub;
+		$model->list_items = array(1, 2, 3);
+		$array = $model->toArray();
+
+		$this->assertEquals(array(1, 2, 3), $array['list_items']);	
 	}
 
 
@@ -415,6 +501,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelWithoutTableStub;
 		$this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
+
+		require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+		$namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
+		$this->assertEquals('foo_bar_eloquent_model_namespaced_stubs', $namespacedModel->getTable());
+	}
+
+
+	public function testTheMutatorCacheIsPopulated()
+	{
+		$class = new EloquentModelStub;
+
+		$this->assertEquals(array('list_items', 'password'), $class->getMutatedAttributes());
 	}
 
 
@@ -430,19 +528,19 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
-	public function giveListItems($value)
+	public function getListItemsAttribute($value)
 	{
 		return json_decode($value, true);
 	}
-	public function takeListItems($value)
+	public function setListItemsAttribute($value)
 	{
 		$this->attributes['list_items'] = json_encode($value);
 	}
-	public function givePassword()
+	public function getPasswordAttribute()
 	{
 		return '******';
 	}
-	public function takePassword($value)
+	public function setPasswordAttribute($value)
 	{
 		$this->attributes['password_hash'] = md5($value);
 	}
@@ -458,6 +556,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return $this->belongsTo('EloquentModelSaveStub', 'foo');
 	}
+}
+
+class EloquentModelCamelStub extends EloquentModelStub {
+	public static $snakeAttributes = false;
 }
 
 class EloquentDateModelStub extends EloquentModelStub {

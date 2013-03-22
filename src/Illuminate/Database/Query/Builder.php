@@ -119,7 +119,7 @@ class Builder {
 	 */
 	protected $operators = array(
 		'=', '<', '>', '<=', '>=', '<>', '!=',
-		'like', 'not like', 'between',
+		'like', 'not like', 'between', 'ilike',
 	);
 
 	/**
@@ -261,6 +261,14 @@ class Builder {
 		if ($value instanceof Closure)
 		{
 			return $this->whereSub($column, $operator, $value, $boolean);
+		}
+
+		// If the value is "null", we will just assume the developer wants to add a
+		// where null clause to the query. So, we will allow a short-cut here to
+		// that method for convenience so the developer doesn't have to check.
+		if (is_null($value))
+		{
+			return $this->whereNull($column, $boolean);
 		}
 
 		// Now that we are working with just a simple query we can put the elements
@@ -504,7 +512,6 @@ class Builder {
 	 *
 	 * @param  string  $column
 	 * @param  mixed   $values
-	 * @param  mixed   $value
 	 * @return Illuminate\Database\Query\Builder
 	 */
 	public function orWhereIn($column, $values)
@@ -684,11 +691,44 @@ class Builder {
 	 */
 	public function having($column, $operator = null, $value = null)
 	{
-		$this->havings[] = compact('column', 'operator', 'value');
+		$type = 'basic';
+
+		$this->havings[] = compact('type', 'column', 'operator', 'value');
 
 		$this->bindings[] = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Add a raw having clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array   $bindings
+	 * @param  string  $boolean
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function havingRaw($sql, array $bindings = array(), $boolean = 'and')
+	{
+		$type = 'raw';
+
+		$this->havings[] = compact('type', 'sql', 'boolean');
+
+		$this->bindings = array_merge($this->bindings, $bindings);
+
+		return $this;
+	}
+
+	/**
+	 * Add a raw or having clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array   $bindings
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function orHavingRaw($sql, array $bindings = array())
+	{
+		return $this->havingRaw($sql, $bindings, 'or');
 	}
 
 	/**
@@ -1006,6 +1046,17 @@ class Builder {
 	}
 
 	/**
+	 * Retrieve the average of the values of a given column.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function avg($column)
+	{
+		return $this->aggregate(__FUNCTION__, array($column));
+	}
+
+	/**
 	 * Execute an aggregate function on the database.
 	 *
 	 * @param  string  $function
@@ -1126,7 +1177,7 @@ class Builder {
 	/**
 	 * Delete a record from the database.
 	 *
-	 * @param  array  $values
+	 * @param  mixed  $id
 	 * @return int
 	 */
 	public function delete($id = null)

@@ -13,7 +13,7 @@
 
 use Illuminate\Console\Application;
 
-$artisan = new Application('Laravel Framework', LARAVEL_VERSION);
+$artisan = new Application('Laravel Framework', $app::VERSION);
 
 $app->instance('artisan', $artisan);
 

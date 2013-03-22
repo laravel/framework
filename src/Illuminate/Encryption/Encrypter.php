@@ -19,7 +19,7 @@ class Encrypter {
 	protected $cipher = 'rijndael-256';
 
 	/**
-	 * The mode used for encrpytion.
+	 * The mode used for encryption.
 	 *
 	 * @var string
 	 */
@@ -66,7 +66,7 @@ class Encrypter {
 	}
 
 	/**
-	 * Padd and use mcrypt on the given value and input vector.
+	 * Pad and use mcrypt on the given value and input vector.
 	 *
 	 * @param  string  $value
 	 * @param  string  $iv
@@ -82,7 +82,7 @@ class Encrypter {
 	/**
 	 * Decrypt the given value.
 	 *
-	 * @param  string  $value
+	 * @param  string  $payload
 	 * @return string
 	 */
 	public function decrypt($payload)
@@ -123,7 +123,7 @@ class Encrypter {
 
 		// If the payload is not valid JSON or does not have the proper keys set we will
 		// assume it is invalid and bail out of the routine since we will not be able
-		// to decrypt the given value. We'll also check the MAC for this encrypion.
+		// to decrypt the given value. We'll also check the MAC for this encryption.
 		if ( ! $payload or $this->invalidPayload($payload))
 		{
 			throw new DecryptException("Invalid data passed to encrypter.");

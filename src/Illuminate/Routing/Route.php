@@ -185,7 +185,7 @@ class Route extends BaseRoute {
 	{
 		// If we have already parsed the parameters, we will just return the listing
 		// the we already parsed, as some of these may have been resolved through
-		// a binder that uses a database repository and should'nt be run again.
+		// a binder that uses a database repository and shouldn't be run again.
 		if (isset($this->parsedParameters))
 		{
 			return $this->parsedParameters;
@@ -280,7 +280,7 @@ class Route extends BaseRoute {
 	 */
 	public function getParameterKeys()
 	{
-		return array_keys($this->getParameters());
+		return $this->compile()->getVariables();
 	}
 
 	/**
@@ -363,7 +363,9 @@ class Route extends BaseRoute {
 	 */
 	public function setBeforeFilters($value)
 	{
-		$this->setOption('_before', explode('|', $value));
+		$filters = is_string($value) ? explode('|', $value) : (array) $value;
+
+		$this->setOption('_before', $filters);
 	}
 
 	/**
@@ -384,7 +386,9 @@ class Route extends BaseRoute {
 	 */
 	public function setAfterFilters($value)
 	{
-		$this->setOption('_after', explode('|', $value));
+		$filters = is_string($value) ? explode('|', $value) : (array) $value;
+
+		$this->setOption('_after', $filters);
 	}
 
 	/**

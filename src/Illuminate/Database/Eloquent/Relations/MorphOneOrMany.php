@@ -24,16 +24,17 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 *
 	 * @param  Illuminate\Database\Eloquent\Builder  $query
 	 * @param  Illuminate\Database\Eloquent\Model  $parent
-	 * @param  string  $morphName
+	 * @param  string  $type
+	 * @param  string  $id
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $parent, $morphName)
+	public function __construct(Builder $query, Model $parent, $type, $id)
 	{
-		$this->morphType = "{$morphName}_type";
+		$this->morphType = $type;
 
 		$this->morphClass = get_class($parent);
 
-		parent::__construct($query, $parent, "{$morphName}_id");
+		parent::__construct($query, $parent, $id);
 	}
 
 	/**
@@ -76,6 +77,19 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 		$this->removeFirstWhereClause();
 
 		return parent::getAndResetWheres();
+	}
+
+	/**
+	 * Attach a model instance to the parent model.
+	 *
+	 * @param  Illuminate\Database\Eloquent\Model  $model
+	 * @return Illuminate\Database\Eloquent\Model
+	 */
+	public function save(Model $model)
+	{
+		$model->setAttribute($this->morphType, $this->morphClass);
+
+		return parent::save($model);
 	}
 
 	/**

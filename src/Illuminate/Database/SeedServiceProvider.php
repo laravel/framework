@@ -23,7 +23,7 @@ class SeedServiceProvider extends ServiceProvider {
 
 		$this->app['seeder'] = $this->app->share(function($app)
 		{
-			return new Seeder($app['files'], $app['events']);
+			return new Seeder;
 		});
 
 		$this->commands('command.seed');
@@ -38,9 +38,7 @@ class SeedServiceProvider extends ServiceProvider {
 	{
 		$this->app['command.seed'] = $this->app->share(function($app)
 		{
-			$path = $app['path'].'/database/seeds';
-
-			return new SeedCommand($app['db'], $app['seeder'], $app['events'], $path);
+			return new SeedCommand($app['db']);
 		});
 	}
 

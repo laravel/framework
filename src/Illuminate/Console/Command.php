@@ -80,7 +80,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
-	 * Run the conosle command.
+	 * Run the console command.
 	 *
 	 * @param  Symfony\Component\Console\Input\InputInterface  $input
 	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
@@ -175,6 +175,20 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		$dialog = $this->getHelperSet()->get('dialog');
 
 		return $dialog->ask($this->output, "<question>$question</question>", $default);
+	}
+
+	/**
+	 * Prompt the user for input but hide the answer from the console.
+	 *
+	 * @param  string  $question
+	 * @param  string  $default
+	 * @return string
+	 */
+	protected function secret($question, $default = null)
+	{
+		$dialog = $this->getHelperSet()->get('dialog');
+
+		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $default);
 	}
 
 	/**

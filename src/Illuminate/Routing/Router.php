@@ -67,6 +67,13 @@ class Router {
 	protected $inspector;
 
 	/**
+	 * The global parameter patterns.
+	 *
+	 * @var array
+	 */
+	protected $patterns = array();
+
+	/**
 	 * The registered route binders.
 	 *
 	 * @var array
@@ -95,9 +102,16 @@ class Router {
 	protected $runFilters = true;
 
 	/**
+	 * The default actions for a resourceful controller.
+	 *
+	 * @var array
+	 */
+	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+
+	/**
 	 * Create a new router instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function __construct(Container $container = null)
@@ -167,6 +181,18 @@ class Router {
 	public function delete($pattern, $action)
 	{
 		return $this->createRoute('delete', $pattern, $action);
+	}
+
+	/**
+	 * Add a new route to the collection.
+	 *
+	 * @param  string  $pattern
+	 * @param  mixed   $action
+	 * @return Illuminate\Routing\Route
+	 */
+	public function options($pattern, $action)
+	{
+		return $this->createRoute('options', $pattern, $action);
 	}
 
 	/**
@@ -257,14 +283,60 @@ class Router {
 	 */
 	public function resource($resource, $controller, array $options = array())
 	{
-		$defaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+		// If the resource name contains a slash, we will assume the developer wishes to
+		// register these resource routes with a prefix so we will set that up out of
+		// the box so they don't have to mess with it. Otherwise, we will continue.
+		if (str_contains($resource, '/'))
+		{
+			$this->prefixedResource($resource, $controller, $options);
 
+			return;
+		}
+
+		// We need to extract the base resource from the resource name. Nested resources
+		// are supported in the framework, but we need to know what name to use for a
+		// place-holder on the route wildcards, which should be the base resources.
 		$base = $this->getBaseResource($resource);
+
+		$defaults = $this->resourceDefaults;
 
 		foreach ($this->getResourceMethods($defaults, $options) as $method)
 		{
 			$this->{'addResource'.ucfirst($method)}($resource, $base, $controller);
 		}
+	}
+
+	/**
+	 * Build a set of prefixed resource routes.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $controller
+	 * @param  array   $options
+	 * @return void
+	 */
+	protected function prefixedResource($resource, $controller, array $options)
+	{
+		list($resource, $prefix) = $this->extractResourcePrefix($resource);
+
+		$me = $this;
+
+		return $this->group(array('prefix' => $prefix), function() use ($me, $resource, $controller, $options)
+		{
+			$me->resource($resource, $controller, $options);
+		});
+	}
+
+	/**
+	 * Extract the resource and prefix from a resource name.
+	 *
+	 * @param  string  $resource
+	 * @return array
+	 */
+	protected function extractResourcePrefix($resource)
+	{
+		$segments = explode('/', $resource);
+
+		return array($segments[count($segments) - 1], implode('/', array_slice($segments, 0, -1)));
 	}
 
 	/**
@@ -278,7 +350,7 @@ class Router {
 	{
 		if (isset($options['only']))
 		{
-			return $options['only'];
+			return array_intersect($defaults, $options['only']);
 		}
 		elseif (isset($options['except']))
 		{
@@ -460,7 +532,37 @@ class Router {
 	 */
 	protected function getResourceAction($resource, $controller, $method)
 	{
-		return array('as' => $resource.'.'.$method, 'uses' => $controller.'@'.$method);
+		$name = $resource.'.'.$method;
+
+		// If we have a group stack, we will append the full prefix onto the resource
+		// route name so that we don't override other route with the same name but
+		// a different prefix. We'll then return out the complete action arrays.
+		if (count($this->groupStack) > 0)
+		{
+			$name = $this->getResourcePrefix($resource, $method);
+		}
+		else
+		{
+			$name = $resource.'.'.$method;
+		}
+
+		return array('as' => $name, 'uses' => $controller.'@'.$method);
+	}
+
+	/**
+	 * Get the resource prefix for a resource route.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $method
+	 * @return string
+	 */
+	protected function getResourcePrefix($resource, $method)
+	{
+		$prefix = str_replace('/', '.', $this->getGroupPrefix());
+
+		if ($prefix != '') $prefix .= '.';
+
+		return "{$prefix}{$resource}.{$method}";
 	}
 
 	/**
@@ -485,11 +587,31 @@ class Router {
 	 */
 	public function group(array $attributes, Closure $callback)
 	{
-		$this->groupStack[] = $attributes;
+		$this->updateGroupStack($attributes);
 
 		call_user_func($callback);
 
 		array_pop($this->groupStack);
+	}
+
+	/**
+	 * Update the group stack array.
+	 *
+	 * @param  array  $attributes
+	 * @return void
+	 */
+	protected function updateGroupStack(array $attributes)
+	{
+		if (count($this->groupStack) > 0)
+		{
+			$last = $this->groupStack[count($this->groupStack) - 1];
+
+			$this->groupStack[] = array_merge_recursive($last, $attributes);
+		}
+		else
+		{
+			$this->groupStack[] = $attributes;
+		}
 	}
 
 	/**
@@ -519,7 +641,7 @@ class Router {
 		{
 			$index = $groupCount - 1;
 
-			$action = array_merge($this->groupStack[$index], $action);
+			$action = $this->mergeGroup($action, $index);
 		}
 
 		// Next we will parse the pattern and add any specified prefix to the it so
@@ -529,9 +651,9 @@ class Router {
 
 		if (isset($action['prefix']))
 		{
-			$pattern = trim($action['prefix'], '/').'/'.ltrim($pattern, '/');
+			$prefix = $action['prefix'];
 
-			$pattern = trim($pattern, '/');
+			$pattern = $this->addPrefix($pattern, $prefix);
 		}
 
 		// We will create the routes, setting the Closure callbacks on the instance
@@ -541,7 +663,7 @@ class Router {
 
 			'_call' => $this->getCallback($action),
 
-		))->setRouter($this);
+		))->setRouter($this)->addRequirements($this->patterns);
 
 		$route->setRequirement('_method', $method);
 
@@ -578,6 +700,76 @@ class Router {
 		}
 
 		throw new \InvalidArgumentException("Unroutable action.");
+	}
+
+	/**
+	 * Merge the current group stack into a given action.
+	 *
+	 * @param  array  $action
+	 * @param  int    $index
+	 * @return array
+	 */
+	protected function mergeGroup($action, $index)
+	{
+		$prefix = $this->mergeGroupPrefix($action);
+
+		$action = array_merge_recursive($this->groupStack[$index], $action);
+
+		// If we have a prefix, we will override the merged prefix with this correctly
+		// concatenated one since prefixes shouldn't merge like the other groupable
+		// attributes on the action. Then we can return this final merged arrays.
+		if ($prefix != '') $action['prefix'] = $prefix;
+
+		return $action;
+	}
+
+	/**
+	 * Get the full group prefix for the current stack.
+	 *
+	 * @return string
+	 */
+	protected function getGroupPrefix()
+	{
+		if (count($this->groupStack) > 0)
+		{
+			$group = $this->groupStack[count($this->groupStack) - 1];
+
+			if (isset($group['prefix']))
+			{
+				if (is_array($group['prefix'])) return implode('/', $group['prefix']);
+
+				return $group['prefix'];
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get the fully merged prefix for a given action.
+	 *
+	 * @param  array   $action
+	 * @return string
+	 */
+	protected function mergeGroupPrefix($action)
+	{
+		$prefix = isset($action['prefix']) ? $action['prefix'] : '';
+
+		return trim($this->getGroupPrefix().'/'.$prefix, '/');
+	}
+
+	/**
+	 * Add the given prefix to the given URI pattern.
+	 *
+	 * @param  string  $pattern
+	 * @param  string  $prefix
+	 * @return string
+	 */
+	protected function addPrefix($pattern, $prefix)
+	{
+		$pattern = trim($prefix, '/').'/'.ltrim($pattern, '/');
+
+		return trim($pattern, '/');
 	}
 
 	/**
@@ -753,16 +945,22 @@ class Router {
 
 		if ( ! is_null($response))
 		{
-			return $this->prepare($response, $request);
+			$response = $this->prepare($response, $request);
 		}
-
-		$this->currentRoute = $route = $this->findRoute($request);
 
 		// Once we have the route, we can just run it to get the responses, which will
 		// always be instances of the Response class. Once we have the responses we
 		// will execute the global "after" middlewares to finish off the request.
-		$response = $route->run($request);
+		else
+		{
+			$this->currentRoute = $route = $this->findRoute($request);
 
+			$response = $route->run($request);
+		}
+
+		// Finally after the route has been run we can call the after and close global
+		// filters for the request, giving a chance for any final processing to get
+		// done before the response gets returned back to the user's web browser.
 		$this->callAfterFilter($request, $response);
 
 		return $response;
@@ -923,11 +1121,29 @@ class Router {
 			// to test a Closure. So, we will resolve the class out of the container.
 			if (is_string($filter))
 			{
-				return array($this->container->make($filter), 'filter');
+				return $this->getClassBasedFilter($filter);
 			}
 
 			return $filter;
 		}
+	}
+
+	/**
+	 * Get a callable array for a class based filter.
+	 *
+	 * @param  string  $filter
+	 * @return array
+	 */
+	protected function getClassBasedFilter($filter)
+	{
+		if (str_contains($filter, '@'))
+		{
+			list($class, $method) = explode('@', $filter);
+
+			return array($this->container->make($class), $method);
+		}
+
+		return array($this->container->make($filter), 'filter');
 	}
 
 	/**
@@ -948,7 +1164,7 @@ class Router {
 	/**
 	 * Find the patterned filters matching a request.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return array
 	 */
 	public function findPatternFilters(Request $request)
@@ -1024,6 +1240,18 @@ class Router {
 	}
 
 	/**
+	 * Set a global where pattern on all routes
+	 *
+	 * @param  string  $key
+	 * @param  string  $pattern
+	 * @return void
+	 */
+	public function pattern($key, $pattern)
+	{
+		$this->patterns[$key] = $pattern;
+	}
+
+	/**
 	 * Register a model binder for a wildcard.
 	 *
 	 * @param  string  $key
@@ -1087,7 +1315,7 @@ class Router {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
@@ -1166,7 +1394,7 @@ class Router {
 	}
 
 	/**
-	 * Disable the runnning of all filters.
+	 * Disable the running of all filters.
 	 *
 	 * @return void
 	 */
@@ -1214,6 +1442,26 @@ class Router {
 	public function setCurrentRoute(Route $route)
 	{
 		$this->currentRoute = $route;
+	}
+
+	/**
+	 * Get the filters defined on the router.
+	 *
+	 * @return array
+	 */
+	public function getFilters()
+	{
+		return $this->filters;
+	}
+
+	/**
+	 * Get the global filters defined on the router.
+	 *
+	 * @return array
+	 */
+	public function getGlobalFilters()
+	{
+		return $this->globalFilters;
 	}
 
 	/**

@@ -12,11 +12,29 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testStoreItemForeverProperlyCallsMemcached()
+	public function testStoreItemForeverProperlyStoresInArray()
 	{
 		$mock = $this->getMock('Illuminate\Cache\ArrayStore', array('storeItem'));
 		$mock->expects($this->once())->method('storeItem')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0));
 		$mock->forever('foo', 'bar');
+	}
+
+
+	public function testValuesCanBeIncremented()
+	{
+		$store = new ArrayStore;
+		$store->put('foo', 1, 10);
+		$store->increment('foo');
+		$this->assertEquals(2, $store->get('foo'));
+	}
+
+
+	public function testValuesCanBeDecremented()
+	{
+		$store = new ArrayStore;
+		$store->put('foo', 1, 10);
+		$store->decrement('foo');
+		$this->assertEquals(0, $store->get('foo'));
 	}
 
 

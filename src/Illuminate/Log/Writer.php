@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Log;
 
+use Closure;
+use Illuminate\Events\Dispatcher;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\RotatingFileHandler;
@@ -30,14 +32,27 @@ class Writer {
 	);
 
 	/**
+	 * The event dispatcher instance.
+	 *
+	 * @var Illuminate\Events\Dispacher
+	 */
+	protected $dispatcher;
+
+	/**
 	 * Create a new log writer instance.
 	 *
 	 * @param  Monolog\Logger  $monolog
+	 * @param  Illuminate\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
-	public function __construct(MonologLogger $monolog)
+	public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
 	{
 		$this->monolog = $monolog;
+
+		if (isset($dispatcher))
+		{
+			$this->dispatcher = $dispatcher;
+		}
 	}
 
 	/**
@@ -119,6 +134,62 @@ class Writer {
 	}
 
 	/**
+	 * Register a new callback handler for when
+	 * a log event is triggered.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function listen(Closure $callback)
+	{
+		if ( ! isset($this->dispatcher))
+		{
+			throw new \RuntimeException("Events dispatcher has not been set.");
+		}
+
+		$this->dispatcher->listen('illuminate.log', $callback);
+	}
+
+	/**
+	 * Get the event dispatcher instance.
+	 *
+	 * @return Illuminate\Events\Dispatcher
+	 */
+	public function getEventDispatcher()
+	{
+		return $this->dispatcher;
+	}
+
+	/**
+	 * Set the event dispatcher instance.
+	 *
+	 * @param  Illuminate\Events\Dispatcher
+	 * @return void
+	 */
+	public function setEventDispatcher(Dispatcher $dispatcher)
+	{
+		$this->dispatcher = $dispatcher;
+	}
+
+	/**
+	 * Fires a log event.
+	 *
+	 * @param  string  $level
+	 * @param  array   $parameters
+	 * @return void
+	 */
+	protected function fireLogEvent($level, $message, array $context = array())
+	{
+		// If the event dispatcher is set, we will pass along the parameters to the
+		// log listeners. These are useful for building profilers or other tools
+		// that aggregate all of the log messages for a given "request" cycle.
+		if (isset($this->dispatcher))
+		{
+			$this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
+		}
+	}
+
+	/**
 	 * Dynamically handle error additions.
 	 *
 	 * @param  string  $method
@@ -129,6 +200,8 @@ class Writer {
 	{
 		if (in_array($method, $this->levels))
 		{
+			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
+
 			$method = 'add'.ucfirst($method);
 
 			return call_user_func_array(array($this->monolog, $method), $parameters);

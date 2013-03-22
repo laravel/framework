@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Mockery\MockInterface;
+
 abstract class Facade {
 
 	/**
@@ -15,6 +17,65 @@ abstract class Facade {
 	 * @var array
 	 */
 	protected static $resolvedInstance;
+
+	/**
+	 * Hotswap the underlying instance behind the facade.
+	 *
+	 * @param  mixed  $instance
+	 * @return void
+	 */
+	public static function swap($instance)
+	{
+		static::$resolvedInstance[static::getFacadeAccessor()] = $instance;
+
+		static::$app->instance(static::getFacadeAccessor(), $instance);
+	}
+
+	/**
+	 * Initiate a mock expectation on the facade.
+	 *
+	 * @param  dynamic
+	 * @return Mockery\Expectation
+	 */
+	public static function shouldReceive()
+	{
+		$name = static::getFacadeAccessor();
+
+		if (static::isMock())
+		{
+			$mock = static::$resolvedInstance[$name];
+		}
+		else
+		{
+			static::$resolvedInstance[$name] = $mock = \Mockery::mock(static::getMockableClass($name));
+
+			static::$app->instance($name, $mock);
+		}
+
+		return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
+	}
+
+	/**
+	 * Determines whether a mock is set as the instance of the facade.
+	 *
+	 * @return bool
+	 */
+	protected static function isMock()
+	{
+		$name = static::getFacadeAccessor();
+
+		return isset(static::$resolvedInstance[$name]) and static::$resolvedInstance[$name] instanceof MockInterface;
+	}
+
+	/**
+	 * Get the mockable class for the bound instance.
+	 *
+	 * @return string
+	 */
+	protected static function getMockableClass()
+	{
+		return get_class(static::getFacadeRoot());
+	}
 
 	/**
 	 * Get the root object behind the facade.

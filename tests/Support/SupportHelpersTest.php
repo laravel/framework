@@ -45,14 +45,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testArrayExcept()
 	{
 		$array = array('name' => 'taylor', 'age' => 26);
-		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
+		$this->assertEquals(array('age' => 26), array_except($array, array('name')));
 	}
 
 
 	public function testArrayOnly()
 	{
 		$array = array('name' => 'taylor', 'age' => 26);
-		$this->assertEquals(array('age' => 26), array_except($array, array('name')));
+		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
 	}
 
 
@@ -112,8 +112,19 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
 	public function testCamelCase()
 	{
-		$this->assertEquals('FooBar', camel_case('foo_bar'));
-		$this->assertEquals('FooBarBaz', camel_case('foo-bar_baz'));
+		$this->assertEquals('fooBar', camel_case('FooBar'));
+		$this->assertEquals('fooBar', camel_case('foo_bar'));
+		$this->assertEquals('fooBarBaz', camel_case('Foo-barBaz'));
+		$this->assertEquals('fooBarBaz', camel_case('foo-bar_baz'));
+	}
+
+
+	public function testStudlyCase()
+	{
+		$this->assertEquals('FooBar', studly_case('fooBar'));
+		$this->assertEquals('FooBar', studly_case('foo_bar'));
+		$this->assertEquals('FooBarBaz', studly_case('foo-barBaz'));
+		$this->assertEquals('FooBarBaz', studly_case('foo-bar_baz'));
 	}
 
 

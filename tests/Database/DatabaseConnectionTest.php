@@ -177,7 +177,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$connection = $this->getMockConnection();
 		$connection->logQuery('foo', array(), time());
 		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-		$events->shouldReceive('fire')->once()->with('illuminate.query', array('query' => 'foo', 'bindings' => array(), 'time' => null));
+		$events->shouldReceive('fire')->once()->with('illuminate.query', array('foo', array(), null));
 		$connection->logQuery('foo', array(), null);
 	}
 

@@ -28,7 +28,7 @@ class ClassLoader {
 
 		foreach (static::$directories as $directory)
 		{
-			if (file_exists($path = $directory.'/'.$class))
+			if (file_exists($path = $directory.DIRECTORY_SEPARATOR.$class))
 			{
 				require_once $path;
 
@@ -47,7 +47,7 @@ class ClassLoader {
 	{
 		if ($class[0] == '\\') $class = substr($class, 1);
 
-		return str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+		return str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $class).'.php';
 	}
 
 	/**
@@ -68,14 +68,47 @@ class ClassLoader {
 	/**
 	 * Add directories to the class loader.
 	 *
-	 * @param  array  $directories
+	 * @param  string|array  $directories
 	 * @return void
 	 */
-	public static function addDirectories(array $directories)
+	public static function addDirectories($directories)
 	{
-		static::$directories = array_merge(static::$directories, $directories);
-		
+		static::$directories = array_merge(static::$directories, (array) $directories);
+
 		static::$directories = array_unique(static::$directories);
+	}
+
+	/**
+	 * Remove directories from the class loader.
+	 *
+	 * @param  string|array  $directories
+	 * @return void
+	 */
+	public static function removeDirectories($directories = null)
+	{
+		if (is_null($directories))
+		{
+			static::$directories = array();
+		}
+		else
+		{
+			$directories = (array) $directories;
+
+			static::$directories = array_filter(static::$directories, function($directory) use ($directories)
+			{
+				return ( ! in_array($directory, $directories));
+			});
+		}
+	}
+
+	/**
+	 * Gets all the directories registered with the loader.
+	 *
+	 * @return array
+	 */
+	public static function getDirectories()
+	{
+		return static::$directories;
 	}
 
 }

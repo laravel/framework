@@ -12,6 +12,23 @@ class Collection extends BaseCollection {
 	protected $dictionary = array();
 
 	/**
+	 * Find a model in the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @param  mixed  $default
+	 * @return Illuminate\Database\Eloquent\Model
+	 */
+	public function find($key, $default = null)
+	{
+		if (count($this->dictionary) == 0)
+		{
+			$this->buildDictionary();
+		}
+
+		return array_get($this->dictionary, $key, $default);
+	}
+
+	/**
 	 * Load a set of relationships onto the collection.
 	 *
 	 * @param  dynamic  string
@@ -88,7 +105,7 @@ class Collection extends BaseCollection {
 		{
 			if ($item instanceof Model)
 			{
-				$this->dictionary[$item->getKey()] = true;
+				$this->dictionary[$item->getKey()] = $item;
 			}
 		}
 	}

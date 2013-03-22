@@ -61,7 +61,8 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	public function testEagerConstraintsAreProperlyAdded()
 	{
 		$relation = $this->getRelation();
-		$relation->getQuery()->shouldReceive('whereIn')->once()->with('foreign_key', array(1, 2));
+		$relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
+		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', array(1, 2));
 		$model1 = new EloquentHasOneModelStub;
 		$model1->id = 1;
 		$model2 = new EloquentHasOneModelStub;
@@ -102,6 +103,8 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 		return new HasOne($builder, $parent, 'foreign_key');
 	}
 

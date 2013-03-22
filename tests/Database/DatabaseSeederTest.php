@@ -11,23 +11,15 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testTablesAreSeededFromSeedFiles()
+	public function testCallResolveTheClassAndCallsRun()
 	{
-		$seeder = new Seeder($files = m::mock('Illuminate\Filesystem\Filesystem'), $events = m::mock('Illuminate\Events\Dispatcher'));
-		$files->shouldReceive('glob')->once()->with('path/*.php')->andReturn(array('path/b.php', 'path/a.php'));
-		$files->shouldReceive('getRequire')->once()->with('path/a.php')->andReturn(array('table' => 'a_table', array('name' => 'Taylor')));
-		$files->shouldReceive('getRequire')->once()->with('path/b.php')->andReturn(array(array('name' => 'Dayle')));
-		$connection = m::mock('Illuminate\Database\Connection');
-		$table = m::mock('Illuminate\Database\Query\Builder');
-		$connection->shouldReceive('table')->with('a_table')->andReturn($table);
-		$table->shouldReceive('delete')->twice();
-		$table->shouldReceive('insert')->once()->with(array(array('name' => 'Taylor')));
-		$connection->shouldReceive('table')->with('b')->andReturn($table);
-		$table->shouldReceive('insert')->once()->with(array(array('name' => 'Dayle')));
-		$events->shouldReceive('fire')->once()->with('illuminate.seeding', array('table' => 'a_table', 'count' => 1));
-		$events->shouldReceive('fire')->once()->with('illuminate.seeding', array('table' => 'b', 'count' => 1));
+		$seeder = new Seeder;
+		$seeder->setContainer($container = m::mock('Illuminate\Container\Container'));
+		$container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock('StdClass'));
+		$child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
+		$child->shouldReceive('run')->once();
 
-		$this->assertEquals(2, $seeder->seed($connection, 'path'));
+		$seeder->call('ClassName');
 	}
 
 }

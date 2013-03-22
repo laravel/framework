@@ -65,7 +65,21 @@ class Artisan {
 	{
 		if ( ! is_null($this->artisan)) return $this->artisan;
 
+		$this->app->loadDeferredProviders();
+
 		return $this->artisan = ConsoleApplication::start($this->app);
+	}
+
+	/**
+	 * Dynamically pass all missing methods to console Artisan.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		return call_user_func_array(array($this->getArtisan(), $method), $parameters);
 	}
 
 }

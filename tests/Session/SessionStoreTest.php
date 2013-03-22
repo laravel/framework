@@ -17,10 +17,10 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->storeMock('isInvalid');
 		$session = $this->dummySession();
 		$cookies = m::mock('Illuminate\Cookie\CookieJar');
-		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn('foo');
+		$cookies->shouldReceive('get')->once()->with('name')->andReturn('foo');
 		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue($session));
 		$store->expects($this->once())->method('isInvalid')->with($this->equalTo($session))->will($this->returnValue(false));
-		$store->start($cookies);
+		$store->start($cookies, 'name');
 		$this->assertEquals($session, $store->getSession());
 	}
 
@@ -30,16 +30,16 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->storeMock('isInvalid');
 		$session = $this->dummySession();
 		$cookies = m::mock('Illuminate\Cookie\CookieJar');
-		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn('foo');
+		$cookies->shouldReceive('get')->once()->with('name')->andReturn('foo');
 		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue($session));
 		$store->expects($this->once())->method('isInvalid')->with($this->equalTo($session))->will($this->returnValue(true));
-		$store->start($cookies);
+		$store->start($cookies, 'name');
 
 		$session = $store->getSession();
 		$this->assertFalse($store->sessionExists());
 		$this->assertTrue(strlen($session['id']) == 40);
-		$this->assertTrue(strlen($session['data']['csrf_token']) == 40);
-		$this->assertEquals($session['data']['csrf_token'], $store->getToken());
+		$this->assertTrue(strlen($session['data']['_token']) == 40);
+		$this->assertEquals($session['data']['_token'], $store->getToken());
 		$this->assertFalse(isset($session['last_activity']));
 	}
 
@@ -48,12 +48,12 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$store = $this->storeMock('createFreshSession');
 		$cookies = m::mock('Illuminate\Cookie\CookieJar');
-		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn('foo');
+		$cookies->shouldReceive('get')->once()->with('name')->andReturn('foo');
 		$session = $this->dummySession();
 		$session['last_activity'] = '1111111111';
 		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue($session));
 		$store->expects($this->once())->method('createFreshSession');
-		$store->start($cookies);
+		$store->start($cookies, 'name');
 	}
 
 
@@ -61,10 +61,10 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$store = $this->storeMock('createFreshSession');
 		$cookies = m::mock('Illuminate\Cookie\CookieJar');
-		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn('foo');
+		$cookies->shouldReceive('get')->once()->with('name')->andReturn('foo');
 		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue(null));
 		$store->expects($this->once())->method('createFreshSession');
-		$store->start($cookies);
+		$store->start($cookies, 'name');
 	}
 
 
@@ -72,8 +72,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$store = $this->storeMock('isInvalid');
 		$cookies = m::mock('Illuminate\Cookie\CookieJar');
-		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn('foo');
-		$store->start($cookies);
+		$cookies->shouldReceive('get')->once()->with('name')->andReturn('foo');
+		$store->start($cookies, 'name');
 
 		$store->put('foo', 'bar');
 		$this->assertEquals('bar', $store->get('foo'));
@@ -181,22 +181,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$store->setExists(false);
 		$response = new Response;
 		$cookie = $this->getCookieJarMock();
-		$store->finish($response, $cookie, 0);	
-	}
-
-
-	public function testFinishMethodSetsCookie()
-	{
-		$store = $this->storeMock('getCurrentTime');
-		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
-		$response = new Response;
-		$cookieJar = $this->getCookieJarMock();
-		$store->finish($response, $cookieJar, 0);
-
-		$cookies = $response->headers->getCookies();
-		$this->assertTrue(count($cookies) === 1);
-		$cookie = $cookies[0];
-		$this->assertEquals('bar', $cookie->getValue());
+		$store->finish($response, $cookie, 0);
 	}
 
 
@@ -233,6 +218,29 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $store->getOldInput());
 		$this->assertEquals('bar', $store->getOldInput('adslkasd', 'bar'));
 		$this->assertEquals('bar', $store->getOldInput('adlkasdf', function() { return 'bar'; }));
+	}
+
+
+	public function testComplexArrayPayloadManipulation()
+	{
+		$store = $this->storeMock('isInvalid');
+		$cookies = m::mock('Illuminate\Cookie\CookieJar');
+		$cookies->shouldReceive('get')->once()->with('name')->andReturn('foo');
+		$store->start($cookies, 'name');
+
+		$store->put('foo.bar', 'baz');
+		$this->assertEquals('baz', $store->get('foo.bar'));
+		$this->assertEquals(array('bar' => 'baz'), $store->get('foo'));
+		$store->put('foo.bat', 'qux');
+		$this->assertCount(2, $store->get('foo'));
+		$this->assertEquals(array('bar' => 'baz', 'bat' => 'qux'), $store->get('foo'));
+		$this->assertTrue($store->has('foo.bat'));
+		$store->forget('foo.bat');
+		$this->assertEquals(array('bar' => 'baz'), $store->get('foo'));
+		$this->assertFalse($store->has('foo.bat'));
+		$store->flash('flash.foo', 'bar');
+		$this->assertEquals(array('foo' => 'bar'), $store->get('flash'));
+		$store->forget('flash');
 	}
 
 

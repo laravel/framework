@@ -110,9 +110,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerEnvironment()
 	{
-		$me = $this;
-
-		$this->app['view'] = $this->app->share(function($app) use ($me)
+		$this->app['view'] = $this->app->share(function($app)
 		{
 			// Next we need to grab the engine resolver instance that will be used by the
 			// environment. The resolver will be used by an environment to get each of
@@ -143,7 +141,7 @@ class ViewServiceProvider extends ServiceProvider {
 	{
 		list($app, $me) = array($this->app, $this);
 
-		$app->before(function() use ($app, $me)
+		$app->booted(function() use ($app, $me)
 		{
 			// If the current session has an "errors" variable bound to it, we will share
 			// its value with all view instances so the views can easily access errors

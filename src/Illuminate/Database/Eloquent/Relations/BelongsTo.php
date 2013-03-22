@@ -66,6 +66,8 @@ class BelongsTo extends Relation {
 		// our eagerly loading query so it returns the proper models from execution.
 		$key = $this->related->getKeyName();
 
+		$key = $this->related->getTable().'.'.$key;
+
 		$this->query->whereIn($key, $this->getEagerModelKeys($models));
 	}
 
@@ -133,8 +135,6 @@ class BelongsTo extends Relation {
 		// First we will get to build a dictionary of the child models by their primary
 		// key of the relationship, then we can easily match the children back onto
 		// the parents using that dictionary and the primary key of the children.
-		$key = $this->related->getKeyName();
-
 		$dictionary = array();
 
 		foreach ($results as $result)

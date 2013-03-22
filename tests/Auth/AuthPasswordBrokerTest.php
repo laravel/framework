@@ -84,7 +84,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn(null);
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
 		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
-		$redirect->shouldReceive('with')->once()->with('reason', 'user')->andReturn($redirect);
+		$redirect->shouldReceive('with')->once()->with('reason', 'reminders.user')->andReturn($redirect);
 
 		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
 	}
@@ -100,7 +100,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn('bar');
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
 		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
-		$redirect->shouldReceive('with')->once()->with('reason', 'password')->andReturn($redirect);
+		$redirect->shouldReceive('with')->once()->with('reason', 'reminders.password')->andReturn($redirect);
 
 		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
 	}
@@ -116,7 +116,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn(null);
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
 		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
-		$redirect->shouldReceive('with')->once()->with('reason', 'password')->andReturn($redirect);
+		$redirect->shouldReceive('with')->once()->with('reason', 'reminders.password')->andReturn($redirect);
 
 		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
 	}
@@ -132,7 +132,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn('abc');
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
 		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
-		$redirect->shouldReceive('with')->once()->with('reason', 'password')->andReturn($redirect);
+		$redirect->shouldReceive('with')->once()->with('reason', 'reminders.password')->andReturn($redirect);
 
 		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
 	}
@@ -149,7 +149,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$mocks['reminders']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
 		$redirect->shouldReceive('with')->once()->with('error', true)->andReturn($redirect);
-		$redirect->shouldReceive('with')->once()->with('reason', 'token')->andReturn($redirect);
+		$redirect->shouldReceive('with')->once()->with('reason', 'reminders.token')->andReturn($redirect);
 
 		$this->assertInstanceof('Illuminate\Http\RedirectResponse', $broker->reset(array('creds'), function() {}));
 	}

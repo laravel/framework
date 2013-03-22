@@ -11,10 +11,11 @@ class ConnectionFactory {
 	/**
 	 * Establish a PDO connection based on the configuration.
 	 *
-	 * @param  array  $config
+	 * @param  array   $config
+	 * @param  string  $name
 	 * @return Illuminate\Database\Connection
 	 */
-	public function make(array $config)
+	public function make(array $config, $name = null)
 	{
 		if ( ! isset($config['prefix']))
 		{
@@ -23,7 +24,9 @@ class ConnectionFactory {
 
 		$pdo = $this->createConnector($config)->connect($config);
 
-		return $this->createConnection($config['driver'], $pdo, $config['database'], $config['prefix']);
+		$config['name'] = $name;
+
+		return $this->createConnection($config['driver'], $pdo, $config['database'], $config['prefix'], $config);
 	}
 
 	/**
@@ -64,23 +67,24 @@ class ConnectionFactory {
 	 * @param  PDO     $connection
 	 * @param  string  $database
 	 * @param  string  $tablePrefix
+	 * @param  string  $name
 	 * @return Illuminate\Database\Connection
 	 */
-	protected function createConnection($driver, PDO $connection, $database, $tablePrefix = '')
+	protected function createConnection($driver, PDO $connection, $database, $tablePrefix = '', $name = null)
 	{
 		switch ($driver)
 		{
 			case 'mysql':
-				return new MySqlConnection($connection, $database, $tablePrefix);
+				return new MySqlConnection($connection, $database, $tablePrefix, $name);
 
 			case 'pgsql':
-				return new PostgresConnection($connection, $database, $tablePrefix);
+				return new PostgresConnection($connection, $database, $tablePrefix, $name);
 
 			case 'sqlite':
-				return new SQLiteConnection($connection, $database, $tablePrefix);
+				return new SQLiteConnection($connection, $database, $tablePrefix, $name);
 
 			case 'sqlsrv':
-				return new SqlServerConnection($connection, $database, $tablePrefix);
+				return new SqlServerConnection($connection, $database, $tablePrefix, $name);
 		}
 
 		throw new \InvalidArgumentException("Unsupported driver [$driver]");

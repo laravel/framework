@@ -40,7 +40,7 @@ class PublisherServiceProvider extends ServiceProvider {
 
 		$this->app['asset.publisher'] = $this->app->share(function($app)
 		{
-			$publicPath = $app['path.base'].'/public';
+			$publicPath = $app['path.public'];
 
 			// The asset "publisher" is responsible for moving package's assets into the
 			// web accessible public directory of an application so they can actually

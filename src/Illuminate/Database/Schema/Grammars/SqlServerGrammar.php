@@ -241,6 +241,17 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a tiny integer type.
+	 *
+	 * @param  Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTinyInteger(Fluent $column)
+	{
+		return 'tinyint';
+	}
+
+	/**
 	 * Create the column definition for a float type.
 	 *
 	 * @param  Illuminate\Support\Fluent  $column
@@ -362,7 +373,7 @@ class SqlServerGrammar extends Grammar {
 	{
 		if ( ! is_null($column->default))
 		{
-			return " default '".$this->getDefaultValue($column->default)."'";
+			return " default ".$this->getDefaultValue($column->default);
 		}
 	}
 

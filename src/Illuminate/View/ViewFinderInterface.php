@@ -5,7 +5,7 @@ interface ViewFinderInterface {
 	/**
 	 * Get the fully qualified location of the view.
 	 *
-	 * @param  string  $name
+	 * @param  string  $view
 	 * @return string
 	 */
 	public function find($view);

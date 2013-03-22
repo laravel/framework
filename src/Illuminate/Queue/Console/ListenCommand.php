@@ -48,7 +48,7 @@ class ListenCommand extends Command {
 	 */
 	public function fire()
 	{
-		$queue = $this->input->getOption('queue');
+		$this->listener->setEnvironment($this->laravel->environment());
 
 		$delay = $this->input->getOption('delay');
 
@@ -59,21 +59,32 @@ class ListenCommand extends Command {
 
 		$connection = $this->input->getArgument('connection');
 
-		$this->listener->listen($connection, $queue, $delay, $memory);
+		$timeout = $this->input->getOption('timeout');
+
+		// We need to get the right queue for the connection which is set in the queue
+		// configuration file for the application. We will pull it based on the set
+		// connection being run for the queue operation currently being executed.
+		$queue = $this->getQueue($connection);
+
+		$this->listener->listen($connection, $queue, $delay, $memory, $timeout);
 	}
 
 	/**
-	 * Listen to the given queue connection.
+	 * Get the name of the queue connection to listen on.
 	 *
 	 * @param  string  $connection
-	 * @param  string  $queue
-	 * @param  int     $delay
-	 * @param  int     $memory
-	 * @return void
+	 * @return string
 	 */
-	public function listen($connection, $queue, $delay, $memory)
+	protected function getQueue($connection)
 	{
+		if (is_null($connection))
+		{
+			$connection = $this->laravel['config']['queue.default'];
+		}
+		
+		$queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
 
+		return $this->input->getOption('queue') ?: $queue;
 	}
 
 	/**
@@ -83,10 +94,8 @@ class ListenCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		$default = $this->laravel['config']['queue.default'];
-
 		return array(
-			array('connection', InputArgument::OPTIONAL, 'The name of connection', $default),
+			array('connection', InputArgument::OPTIONAL, 'The name of connection'),
 		);
 	}
 
@@ -98,11 +107,13 @@ class ListenCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', 'default'),
+			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', null),
 
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
 
 			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
+
+			array('timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60),
 		);
 	}
 

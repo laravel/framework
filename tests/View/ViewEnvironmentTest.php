@@ -24,6 +24,17 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExistsPassesAndFailsViews()
+	{
+		$env = $this->getEnvironment();
+		$env->getFinder()->shouldReceive('find')->once()->with('foo')->andThrow('InvalidArgumentException');
+		$env->getFinder()->shouldReceive('find')->once()->with('bar')->andReturn('path.php');
+
+		$this->assertFalse($env->exists('foo'));
+		$this->assertTrue($env->exists('bar'));
+	}
+
+
 	public function testRenderEachCreatesViewForEachItemInArray()
 	{
 		$env = m::mock('Illuminate\View\Environment[make]', $this->getEnvironmentArgs());
@@ -72,6 +83,34 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingExtensionPrependsNotAppends()
+	{
+		$environment = $this->getEnvironment();
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+
+		$environment->addExtension('foo', 'bar');
+
+		$extensions = $environment->getExtensions();
+		$this->assertEquals('bar', reset($extensions));
+		$this->assertEquals('foo', key($extensions));
+	}
+
+
+	public function testPrependedExtensionOverridesExistingExtensions()
+	{
+		$environment = $this->getEnvironment();
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('baz');
+
+		$environment->addExtension('foo', 'bar');
+		$environment->addExtension('baz', 'bar');
+
+		$extensions = $environment->getExtensions();
+		$this->assertEquals('bar', reset($extensions));
+		$this->assertEquals('baz', key($extensions));
+	}
+
+
 	public function testComposersAreProperlyRegistered()
 	{
 		$env = $this->getEnvironment();
@@ -97,12 +136,26 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testClassCallbacksWithMethods()
+	{
+		$env = $this->getEnvironment();
+		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$env->setContainer($container = m::mock('Illuminate\Container\Container'));
+		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
+		$composer->shouldReceive('doComposer')->once()->with('view')->andReturn('composed');
+		$callback = $env->composer('foo', 'FooComposer@doComposer');
+		$callback = $callback[0];
+
+		$this->assertEquals('composed', $callback('view'));
+	}
+
+
 	public function testCallComposerCallsProperEvent()
 	{
 		$env = $this->getEnvironment();
 		$view = m::mock('Illuminate\View\View');
 		$view->shouldReceive('getName')->once()->andReturn('name');
-		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', array('view' => $view));
+		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', array($view));
 
 		$env->callComposer($view);
 	}
@@ -137,7 +190,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$environment->startSection('foo');
 		echo 'there';
 		$environment->stopSection();
-		$this->assertEquals('hi there', $environment->yieldContent('foo'));	
+		$this->assertEquals('hi there', $environment->yieldContent('foo'));
 	}
 
 

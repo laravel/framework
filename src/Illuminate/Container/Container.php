@@ -26,6 +26,24 @@ class Container implements ArrayAccess {
 	protected $aliases = array();
 
 	/**
+	 * All of the registered resolving callbacks.
+	 *
+	 * @var array
+	 */
+	protected $resolvingCallbacks = array();
+
+	/**
+	 * Determine if the given abstract type has been bound.
+	 *
+	 * @param  string  $abstract
+	 * @return bool
+	 */
+	public function bound($abstract)
+	{
+		return isset($this[$abstract]);
+	}
+
+	/**
 	 * Register a binding with the container.
 	 *
 	 * @param  string               $abstract
@@ -230,6 +248,8 @@ class Container implements ArrayAccess {
 			$this->instances[$abstract] = $object;
 		}
 
+		$this->fireResolvingCallbacks($object);
+
 		return $object;
 	}
 
@@ -306,7 +326,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Resolve all of the dependencies from the ReflectionParameters.
 	 *
-	 * @param  array  $parameterrs
+	 * @param  array  $parameters
 	 * @return array
 	 */
 	protected function getDependencies($parameters)
@@ -350,6 +370,31 @@ class Container implements ArrayAccess {
 			$message = "Unresolvable dependency resolving [$parameter].";
 
 			throw new BindingResolutionException($message);
+		}
+	}
+
+	/**
+	 * Register a new resolving callback.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function resolving(Closure $callback)
+	{
+		$this->resolvingCallbacks[] = $callback;
+	}
+
+	/**
+	 * Fire all of the resolving callbacks.
+	 *
+	 * @param  mixed  $object
+	 * @return void
+	 */
+	protected function fireResolvingCallbacks($object)
+	{
+		foreach ($this->resolvingCallbacks as $callback)
+		{
+			call_user_func($callback, $object);
 		}
 	}
 

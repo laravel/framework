@@ -49,6 +49,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	* Get the last item from the collection.
+	*
+	* @return mixed|null
+	*/
+	public function last()
+	{
+		return count($this->items) > 0 ? end($this->items) : null;
+	}
+
+	/**
 	 * Execute a callback over each item.
 	 *
 	 * @param  Closure  $callback
@@ -56,9 +66,20 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function each(Closure $callback)
 	{
-		$this->items = array_map($callback, $this->items);
+		array_map($callback, $this->items);
 
 		return $this;
+	}
+
+	/**
+	 * Run a map over each of the items.
+	 *
+	 * @param  Closure  $callback
+	 * @return array
+	 */
+	public function map(Closure $callback)
+	{
+		return array_map($callback, $this->items);
 	}
 
 	/**
@@ -104,7 +125,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  int  $options
 	 * @return string
 	 */
-	public function toJson($options = JSON_NUMERIC_CHECK)
+	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
 	}

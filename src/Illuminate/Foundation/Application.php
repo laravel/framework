@@ -23,6 +23,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class Application extends Container implements HttpKernelInterface {
 
 	/**
+	 * The Laravel framework version.
+	 *
+	 * @var string
+	 */
+	const VERSION = '4.0.0';
+
+	/**
 	 * Indicates if the application has "booted".
 	 *
 	 * @var bool
@@ -30,11 +37,25 @@ class Application extends Container implements HttpKernelInterface {
 	protected $booted = false;
 
 	/**
-	 * Get the booting callbacks.
+	 * The array of booting callbacks.
 	 *
 	 * @var array
 	 */
 	protected $bootingCallbacks = array();
+
+	/**
+	 * The array of booted callbacks.
+	 *
+	 * @var array
+	 */
+	protected $bootedCallbacks = array();
+
+	/**
+	 * The array of shutdown callbacks.
+	 *
+	 * @var array
+	 */
+	protected $shutdownCallbacks = array();
 
 	/**
 	 * All of the registered service providers.
@@ -77,6 +98,21 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Bind the installation paths to the application.
+	 *
+	 * @param  array  $paths
+	 * @return void
+	 */
+	public function bindInstallPaths(array $paths)
+	{
+		$this->instance('path', $paths['app']);
+
+		$this->instance('path.base', $paths['base']);
+
+		$this->instance('path.public', $paths['public']);
+	}
+
+	/**
 	 * Get the application bootstrap file.
 	 *
 	 * @return string
@@ -115,6 +151,16 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Get the current application environment.
+	 *
+	 * @return string
+	 */
+	public function environment()
+	{
+		return $this['env'];
+	}
+
+	/**
 	 * Detect the application's current environment.
 	 *
 	 * @param  array|string  $environments
@@ -124,9 +170,6 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		$base = $this['request']->getHost();
 
-		// First we will check to see if we have any command-line arguments and if
-		// if we do we will set this environment based on those arguments as we
-		// need to set it before each configurations are actually loaded out.
 		$arguments = $this['request']->server->get('argv');
 
 		if ($this->runningInConsole())
@@ -159,7 +202,7 @@ class Application extends Container implements HttpKernelInterface {
 			// To determine the current environment, we'll simply iterate through the
 			// possible environments and look for a host that matches this host in
 			// the request's context, then return back that environment's names.
-			foreach ($hosts as $host)
+			foreach ((array) $hosts as $host)
 			{
 				if (str_is($host, $base) or $this->isMachine($host))
 				{
@@ -183,7 +226,7 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		foreach ($arguments as $key => $value)
 		{
-			// For the console environmnet, we'll just look for an argument that starts
+			// For the console environment, we'll just look for an argument that starts
 			// with "--env" then assume that it is setting the environment for every
 			// operation being performed, and we'll use that environment's config.
 			if (starts_with($value, '--env='))
@@ -231,12 +274,20 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Register a service provider with the application.
 	 *
-	 * @param  Illuminate\Support\ServiceProvider  $provider
+	 * @param  Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
 	 * @return void
 	 */
-	public function register(ServiceProvider $provider, $options = array())
+	public function register($provider, $options = array())
 	{
+		// If the given "provider" is a string, we will resolve it, passing in the
+		// application instance automatically for the developer. This is simply
+		// a more convenient way of specifying your service provider classes.
+		if (is_string($provider))
+		{
+			$provider = $this->resolveProviderClass($provider);
+		}
+
 		$provider->register();
 
 		// Once we have registered the service we will iterate through the options
@@ -253,22 +304,34 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
-	 * Resolve the given type from the container.
+	 * Resolve a service provider instance from the class name.
 	 *
-	 * (Overriding Container::make)
-	 *
-	 * @param  string  $abstract
-	 * @param  array   $parameters
-	 * @return mixed
+	 * @param  string  $provider
+	 * @return Illuminate\Support\ServiceProvider
 	 */
-	public function make($abstract, $parameters = array())
+	protected function resolveProviderClass($provider)
 	{
-		if (isset($this->deferredServices[$abstract]))
+		return new $provider($this);
+	}
+
+	/**
+	 * Load and boot all of the remaining deferred providers.
+	 *
+	 * @return void
+	 */
+	public function loadDeferredProviders()
+	{
+		// We will simply spin through each of the deferred providers and register each
+		// one and boot them if the application has booted. This should make each of
+		// the remaining services available to this application for immediate use.
+		foreach (array_unique($this->deferredServices) as $provider)
 		{
-			$this->loadDeferredProvider($abstract);
+			$this->register($instance = new $provider($this));
+
+			if ($this->booted) $instance->boot();
 		}
 
-		return parent::make($abstract, $parameters);
+		$this->deferredServices = array();
 	}
 
 	/**
@@ -292,6 +355,25 @@ class Application extends Container implements HttpKernelInterface {
 
 			if ($this->booted) $instance->boot();
 		}
+	}
+
+	/**
+	 * Resolve the given type from the container.
+	 *
+	 * (Overriding Container::make)
+	 *
+	 * @param  string  $abstract
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function make($abstract, $parameters = array())
+	{
+		if (isset($this->deferredServices[$abstract]))
+		{
+			$this->loadDeferredProvider($abstract);
+		}
+
+		return parent::make($abstract, $parameters);
 	}
 
 	/**
@@ -339,6 +421,24 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Register a "shutdown" callback.
+	 *
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function shutdown($callback = null)
+	{
+		if (is_null($callback))
+		{
+			$this->fireAppCallbacks($this->shutdownCallbacks);
+		}
+		else
+		{
+			$this->shutdownCallbacks[] = $callback;
+		}
+	}
+
+	/**
 	 * Handles the given request and delivers the response.
 	 *
 	 * @return void
@@ -355,16 +455,11 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Handle the given request and get the response.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
-		// Before we handle the requests we need to make sure the application has been
-		// booted up. The boot process will call the "boot" method on each service
-		// provider giving them all a chance to register any application events.
-		if ( ! $this->booted) $this->boot();
-
 		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
@@ -375,7 +470,7 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @implements HttpKernelInterface::handle
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
 	 * @return Symfony\Component\HttpFoundation\Response
@@ -394,14 +489,24 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function boot()
 	{
+		if ($this->booted) return;
+
+		// To boot the application we will simply spin through each service provider
+		// and call the boot method, which will give them a chance to override on
+		// something that was registered by another provider when it registers.
 		foreach ($this->serviceProviders as $provider)
 		{
-			$provider->boot($this);
+			$provider->boot();
 		}
 
-		$this->fireBootingCallbacks();
+		$this->fireAppCallbacks($this->bootingCallbacks);
 
+		// Once the application has booted we will also fire some "booted" callbacks
+		// for any listeners that need to do work after this initial booting gets
+		// finished. This is useful when ordering the boot-up processes we run.
 		$this->booted = true;
+
+		$this->fireAppCallbacks($this->bootedCallbacks);
 	}
 
 	/**
@@ -416,13 +521,24 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Register a new "booted" listener.
+	 *
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function booted($callback)
+	{
+		$this->bootedCallbacks[] = $callback;
+	}
+
+	/**
 	 * Call the booting callbacks for the application.
 	 *
 	 * @return void
 	 */
-	protected function fireBootingCallbacks()
+	protected function fireAppCallbacks(array $callbacks)
 	{
-		foreach ($this->bootingCallbacks as $callback)
+		foreach ($callbacks as $callback)
 		{
 			call_user_func($callback, $this);
 		}
@@ -431,8 +547,8 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Prepare the request by injecting any services.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
-	 * @return Illuminate\Foundation\Request
+	 * @param  Illuminate\Http\Request  $request
+	 * @return Illuminate\Http\Request
 	 */
 	public function prepareRequest(Request $request)
 	{
@@ -448,7 +564,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepareResponse($value, Request $request)
@@ -470,7 +586,7 @@ class Application extends Container implements HttpKernelInterface {
 
 		$this['translator']->setLocale($locale);
 
-		$this['events']->fire('locale.changed', compact('locale'));
+		$this['events']->fire('locale.changed', array($locale));
 	}
 
 	/**
@@ -494,6 +610,20 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Register a 404 error handler.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function missing(Closure $callback)
+	{
+		$this->error(function(NotFoundHttpException $e) use ($callback)
+		{
+			return call_user_func($callback, $e);
+		});
+	}
+
+	/**
 	 * Register an application error handler.
 	 *
 	 * @param  Closure  $callback
@@ -513,20 +643,6 @@ class Application extends Container implements HttpKernelInterface {
 	public function fatal(Closure $callback)
 	{
 		$this->error(function(FatalErrorException $e) use ($callback)
-		{
-			return call_user_func($callback, $e);
-		});
-	}
-
-	/**
-	 * Register a 404 error handler.
-	 *
-	 * @param  Closure  $callback
-	 * @return void
-	 */
-	public function missing(Closure $callback)
-	{
-		$this->error(function(NotFoundHttpException $e) use ($callback)
 		{
 			return call_user_func($callback, $e);
 		});

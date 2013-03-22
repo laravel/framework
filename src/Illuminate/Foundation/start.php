@@ -2,22 +2,6 @@
 
 /*
 |--------------------------------------------------------------------------
-| Define The Laravel Version
-|--------------------------------------------------------------------------
-|
-| Here we will set the Laravel version that is utilized to identify this
-| installation of the framework. It is primarily used via the console
-| to display the version to the developer for information purposes.
-|
-*/
-
-if ( ! defined('LARAVEL_VERSION'))
-{
-	define('LARAVEL_VERSION', '4.0.0');
-}
-
-/*
-|--------------------------------------------------------------------------
 | Register Class Imports
 |--------------------------------------------------------------------------
 |
@@ -33,6 +17,19 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\ProviderRepository;
+
+/*
+|--------------------------------------------------------------------------
+| Bind The Application In The Container
+|--------------------------------------------------------------------------
+|
+| This may look strange, but we actually want to bind the app into itself
+| in case we need to Facade test an application. This will allow us to
+| resolve the "app" key out of this container for this app's facade.
+|
+*/
+
+$app['app'] = $app->share(function($app) { return $app; });
 
 /*
 |--------------------------------------------------------------------------
@@ -91,9 +88,9 @@ Facade::setFacadeApplication($app);
 |
 */
 
-$app->bindIf('config.loader', function($app) use ($appPath)
+$app->bindIf('config.loader', function($app)
 {
-	return new FileLoader(new Filesystem, $appPath.'/config');
+	return new FileLoader(new Filesystem, $app['path'].'/config');
 
 }, true);
 
@@ -132,7 +129,7 @@ $app->instance('config', $config);
 |
 | Here we will set the default timezone for PHP. PHP is notoriously mean
 | if the timezone is not explicitly set. This will be used by each of
-| the PHP date and date-time functions throoughout the application.
+| the PHP date and date-time functions throughout the application.
 |
 */
 
@@ -185,6 +182,19 @@ $services->load($app, $config['providers']);
 
 /*
 |--------------------------------------------------------------------------
+| Boot The Application
+|--------------------------------------------------------------------------
+|
+| Before we handle the requests we need to make sure the application has
+| been booted up. The boot process will call the "boot" method on all
+| service provider giving all a chance to register their overrides.
+|
+*/
+
+$app->boot();
+
+/*
+|--------------------------------------------------------------------------
 | Load The Application Start Script
 |--------------------------------------------------------------------------
 |
@@ -194,7 +204,7 @@ $services->load($app, $config['providers']);
 |
 */
 
-$path = $appPath.'/start/global.php';
+$path = $app['path'].'/start/global.php';
 
 if (file_exists($path)) require $path;
 
@@ -205,11 +215,11 @@ if (file_exists($path)) require $path;
 |
 | The environment start script is only loaded if it exists for the app
 | environment currently active, which allows some actions to happen
-| in one environment while not in the other, keeping thigs clean.
+| in one environment while not in the other, keeping things clean.
 |
 */
 
-$path = $appPath."/start/{$env}.php";
+$path = $app['path']."/start/{$env}.php";
 
 if (file_exists($path)) require $path;
 
@@ -224,4 +234,4 @@ if (file_exists($path)) require $path;
 |
 */
 
-require $appPath.'/routes.php';
+require $app['path'].'/routes.php';

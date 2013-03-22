@@ -72,7 +72,7 @@ class Migrator {
 	{
 		$this->notes = array();
 
-		$files = $this->getMigrationFiles($path);
+		$this->requireFiles($path, $files = $this->getMigrationFiles($path));
 
 		// Once we grab all of the migration files for the path, we will compare them
 		// against the migrations that have already been run for this package then
@@ -171,7 +171,7 @@ class Migrator {
 		// and properly reverse the entire database schema operation that ran.
 		foreach ($migrations as $migration)
 		{
-			$this->runDown($migration, $pretend);
+			$this->runDown((object) $migration, $pretend);
 		}
 
 		return count($migrations);
@@ -238,6 +238,17 @@ class Migrator {
 	}
 
 	/**
+	 * Require in all the migration files in a given path.
+	 *
+	 * @param  array  $files
+	 * @return void
+	 */
+	public function requireFiles($path, array $files)
+	{
+		foreach ($files as $file) $this->files->requireOnce($path.'/'.$file.'.php');
+	}
+
+	/**
 	 * Pretend to run the migrations.
 	 *
 	 * @param  object  $migration
@@ -285,7 +296,7 @@ class Migrator {
 	{
 		$file = implode('_', array_slice(explode('_', $file), 4));
 
-		$class = camel_case($file);
+		$class = studly_case($file);
 
 		return new $class;
 	}

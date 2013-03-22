@@ -78,6 +78,30 @@ class FileStore extends Store {
 	}
 
 	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function incrementValue($key, $value)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function decrementValue($key, $value)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
+	}
+
+	/**
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
@@ -107,7 +131,10 @@ class FileStore extends Store {
 	 */
 	protected function flushItems()
 	{
-		$this->files->cleanDirectory($this->directory);
+		foreach ($this->files->files($this->directory) as $file)
+		{
+			$this->files->delete($file);
+		}
 	}
 
 	/**
@@ -118,7 +145,7 @@ class FileStore extends Store {
 	 */
 	protected function path($key)
 	{
-		return $this->directory.'/'.$key;
+		return $this->directory.'/'.md5($key);
 	}
 
 	/**

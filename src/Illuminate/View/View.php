@@ -281,6 +281,28 @@ class View implements ArrayAccess, Renderable {
 	}
 
 	/**
+	 * Check if a piece of data is bound to the view.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function __isset($key)
+	{
+		return isset($this->data[$key]);
+	}
+
+	/**
+	 * Remove a piece of bound data from the view.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function __unset($key)
+	{
+		unset($this->data[$key]);
+	}
+
+	/**
 	 * Get the string contents of the view.
 	 *
 	 * @return string

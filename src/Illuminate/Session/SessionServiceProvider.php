@@ -59,16 +59,71 @@ class SessionServiceProvider extends ServiceProvider {
 		// the session "payloads", as well as writing them after each request.
 		if ( ! is_null($config['driver']))
 		{
-			$app->booting(function($app)
-			{
-				$app['session']->start($app['cookie']);
-			});
+			$this->registerBootingEvent($app);
 
-			$app->close(function($request, $response) use ($app, $config)
-			{
-				$app['session']->finish($response, $app['cookie'], $config['lifetime']);
-			});
+			$this->registerCloseEvent($app, $config);
 		}
+	}
+
+	/**
+	 * Register the session booting event.
+	 *
+	 * @param  Illuminate\Foundation\Application  $app
+	 * @return void
+	 */
+	protected function registerBootingEvent($app)
+	{
+		$app->booting(function($app)
+		{
+			$app['session']->start($app['cookie'], $app['config']['session.cookie']);
+		});
+	}
+
+	/**
+	 * Register the session close event.
+	 *
+	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  array $config
+	 * @return void
+	 */
+	protected function registerCloseEvent($app, $config)
+	{
+		$me = $this;
+
+		$app->close(function($request, $response) use ($me, $app, $config)
+		{
+			$session = $app['session'];
+
+			// Once we finish the session handling for the request, we will need to get a
+			// cookie that we can attach to the response from the application. This is
+			// used to identify the session on future requests into the application.
+			$session->finish($response, $config['lifetime']);
+
+			$cookie = $me->makeCookie($session, $config);
+
+			if ( ! is_null($cookie))
+			{
+				$response->headers->setCookie($cookie);
+			}
+		});
+	}
+
+	/**
+	 * Create a session cookie based on the given config.
+	 *
+	 * @param  Illuminate\Session\Store  $session
+	 * @param  array  $config
+	 * @return Symfony\Component\HttpFoundation\Cookie
+	 */
+	public function makeCookie($session, $config)
+	{
+		$app = $this->app;
+
+		return $session->getCookie(
+
+			$app['cookie'], $config['cookie'], $config['lifetime'], $config['path'], $config['domain']
+
+		);
 	}
 
 }

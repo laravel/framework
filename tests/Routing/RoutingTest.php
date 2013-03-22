@@ -142,6 +142,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/{foo}/bar/{bar}/edit', $router->getRoutes()->get('foo.bar.edit')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.update')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.destroy')->getPath());
+
+		$router->resource('admin/foo.baz', 'FooController');
+
+		$this->assertEquals('/admin/foo/{foo}/baz', $router->getRoutes()->get('admin.foo.baz.index')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}', $router->getRoutes()->get('admin.foo.baz.show')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/create', $router->getRoutes()->get('admin.foo.baz.create')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz', $router->getRoutes()->get('admin.foo.baz.store')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}/edit', $router->getRoutes()->get('admin.foo.baz.edit')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}', $router->getRoutes()->get('admin.foo.baz.update')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}', $router->getRoutes()->get('admin.foo.baz.destroy')->getPath());
 	}
 
 
@@ -350,12 +360,38 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
 	public function testWhereMethodForcesRegularExpressionMatch()
 	{
 		$router = new Router;
 		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; })->where('age', '[0-9]+');
-		$request = Request::create('/foo/taylor/25', 'GET');
-		$this->assertEquals('taylor25', $router->dispatch($request)->getContent());
+		$request = Request::create('/foo/taylor/abc', 'GET');
+		$this->assertEquals('taylorabc', $router->dispatch($request)->getContent());
+	}
+
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testGlobalParameterPatternsAreApplied()
+	{
+		$router = new Router;
+		$router->pattern('age', '[0-9]+');
+		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; });
+		$request = Request::create('/foo/taylor/abc', 'GET');
+		$this->assertEquals('taylorabc', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testGlobalParameterPatternsDontInterfereWithRoutesTheyDontApplyTo()
+	{
+		$router = new Router;
+		$router->pattern('age', '[0-9]+');
+		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; });
+		$request = Request::create('/foo/taylor/123', 'GET');
+		$this->assertEquals('taylor123', $router->dispatch($request)->getContent());
 	}
 
 
@@ -386,7 +422,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$routes = array_values($router->getRoutes()->getIterator()->getArrayCopy());
 
 		$this->assertEquals(array('foo'), $routes[0]->getOption('_before'));
-		$this->assertEquals(array('bar'), $routes[1]->getOption('_before'));
+		$this->assertEquals(array('foo', 'bar'), $routes[1]->getOption('_before'));
 	}
 
 
@@ -397,6 +433,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$container->shouldReceive('make')->once()->with('FooFilter')->andReturn('bar');
 
 		$this->assertEquals(array('bar', 'filter'), $router->getFilter('foo'));
+	}
+
+
+	public function testStringFilterAreResolvedOutOfTheContainerWithCustomMethods()
+	{
+		$router = new Router($container = m::mock('Illuminate\Container\Container'));
+		$router->addFilter('foo', 'FooFilter@something');
+		$container->shouldReceive('make')->once()->with('FooFilter')->andReturn('bar');
+
+		$this->assertEquals(array('bar', 'something'), $router->getFilter('foo'));
 	}
 
 
@@ -476,6 +522,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
 	}
 	
+
 	public function testRoutesArentOverriddenBySubDomainWithGroups()
 	{
 		$router = new Router(new Illuminate\Container\Container);
@@ -493,6 +540,36 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 		$request = Request::create('http://bar.com', 'GET');
 		$this->assertEquals('sub', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testNestedGroupRoutesInheritAllSettings()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->group(array('before' => 'foo'), function() use ($router)
+		{
+			$router->group(array('before' => 'bar'), function() use ($router)
+			{
+				$router->get('/', function() { return 'baz'; });
+			});
+		});
+
+		$this->assertEquals(array('foo', 'bar'), $router->getRoutes()->get('get /')->getOption('_before'));
+	}
+
+
+	public function testNestedPrefixedRoutes()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$router->group(array('prefix' => 'first'), function() use ($router)
+		{
+			$router->group(array('prefix' => 'second'), function() use ($router)
+			{
+				$router->get('third', function() {});
+			});
+		});
+
+		$this->assertInstanceOf('Illuminate\Routing\Route', $router->getRoutes()->get('get first/second/third'));
 	}
 
 }

@@ -12,7 +12,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testEnvironmenetDetection()
+	public function testEnvironmentDetection()
 	{
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
@@ -144,7 +144,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app['translator'] = $trans = m::mock('StdClass');
 		$trans->shouldReceive('setLocale')->once()->with('foo');
 		$app['events'] = $events = m::mock('StdClass');
-		$events->shouldReceive('fire')->once()->with('locale.changed', array('locale' => 'foo'));
+		$events->shouldReceive('fire')->once()->with('locale.changed', array('foo'));
 
 		$app->setLocale('foo');
 	}

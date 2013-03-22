@@ -17,17 +17,19 @@ class CookieStore extends Store {
 	 *
 	 * @var string
 	 */
-	protected $payload = 'illuminate_payload';
+	protected $payload;
 
 	/**
 	 * Create a new Cookie based session store.
 	 *
-	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  Illuminate\Cookie\CookieJar  $cookies
+	 * @param  string  $payload
 	 * @return void
 	 */
-	public function __construct(CookieJar $cookies)
+	public function __construct(CookieJar $cookies, $payload = 'illuminate_payload')
 	{
 		$this->cookies = $cookies;
+		$this->payload = $payload;
 	}
 
 	/**
@@ -83,7 +85,7 @@ class CookieStore extends Store {
 	/**
 	 * Get the cookie jar instance.
 	 *
-	 * @return Illuminate\CookieJar
+	 * @return Illuminate\Cookie\CookieJar
 	 */
 	public function getCookieJar()
 	{

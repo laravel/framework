@@ -55,7 +55,12 @@ class RedisManager {
 	{
 		$config = $this->getConfig($name);
 
-		$connection = new Database($config['host'], $config['port'], $config['database']);
+		// Redis may optionally have a password. So, we will attempt to extract out
+		// the password from the configuration. But one is not required so we'll
+		// just use array_get to return null if one hasn't been set in config.
+		$password = array_get($config, 'password');
+
+		$connection = new Database($config['host'], $config['port'], $config['database'], $password);
 
 		$connection->connect();
 

@@ -109,6 +109,26 @@ class Environment {
 	}
 
 	/**
+	 * Determine if a given view exists.
+	 *
+	 * @param  string  $view
+	 * @return bool
+	 */
+	public function exists($view)
+	{
+		try
+		{
+			$this->finder->find($view);
+		}
+		catch (\InvalidArgumentException $e)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Get the rendered contents of a partial from a loop.
 	 *
 	 * @param  string  $view
@@ -230,7 +250,7 @@ class Environment {
 		elseif (is_string($callback))
 		{
 			return $this->addClassComposer($view, $callback);
-		}		
+		}
 	}
 
 	/**
@@ -247,19 +267,45 @@ class Environment {
 		// When registering a class based view "composer", we will simply resolve the
 		// classes from the application IoC container then call the compose method
 		// on the instance. This allows for convenient, testable view composers.
-		$container = $this->container;
+		$callback = $this->buildClassComposerCallback($class);
 
-		$callback = function($event) use ($class, $container)
-		{
-			return $container->make($class)->compose($event);
-		};
-
-		// Once we've created a function to handle each class callback we'll register
-		// it with an event dispatcher so that it will be called when the composer
-		// event is fired for the view, and the composers will be resolved then.
 		$this->events->listen($name, $callback);
 
 		return $callback;
+	}
+
+	/**
+	 * Build a class based container callback Closure.
+	 *
+	 * @param  string   $class
+	 * @return Closure
+	 */
+	protected function buildClassComposerCallback($class)
+	{
+		$container = $this->container;
+
+		list($class, $method) = $this->parseClassComposer($class);
+
+		// Once we have the class and method name, we can build the Closure to resolve
+		// the instance out of the IoC container and call the method on it with the
+		// given arguments that are passed to the Closure as the composer's data.
+		return function() use ($class, $method, $container)
+		{
+			$callable = array($container->make($class), $method);
+
+			return call_user_func_array($callable, func_get_args());
+		};
+	}
+
+	/**
+	 * Parse a class based composer name.
+	 *
+	 * @param  string  $class
+	 * @return array
+	 */
+	protected function parseClassComposer($class)
+	{
+		return str_contains($class, '@') ? explode('@', $class) : array($class, 'compose');
 	}
 
 	/**
@@ -270,7 +316,7 @@ class Environment {
 	 */
 	public function callComposer(View $view)
 	{
-		$this->events->fire('composing: '.$view->getName(), compact('view'));
+		$this->events->fire('composing: '.$view->getName(), array($view));
 	}
 
 	/**
@@ -442,7 +488,19 @@ class Environment {
 			$this->engines->register($engine, $resolver);
 		}
 
-		$this->extensions[$extension] = $engine;
+		unset($this->extensions[$engine]);
+
+		$this->extensions = array_merge(array($extension => $engine), $this->extensions);
+	}
+
+	/**
+	 * Get the extension to engine bindings.
+	 *
+	 * @return array
+	 */
+	public function getExtensions()
+	{
+		return $this->extensions;
 	}
 
 	/**
@@ -478,7 +536,7 @@ class Environment {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return Illuminate\Container
+	 * @return Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{
@@ -488,7 +546,7 @@ class Environment {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

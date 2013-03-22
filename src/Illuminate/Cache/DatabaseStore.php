@@ -67,6 +67,8 @@ class DatabaseStore extends Store {
 		// remove the records from the database table so it isn't returned again.
 		if ( ! is_null($cache))
 		{
+			if (is_array($cache)) $cache = (object) $cache;
+
 			if (time() >= $cache->expiration)
 			{
 				return $this->removeItem($key);
@@ -103,6 +105,30 @@ class DatabaseStore extends Store {
 		{
 			$this->table()->where('key', $key)->update(compact('value', 'expiration'));
 		}
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function incrementValue($key, $value)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function decrementValue($key, $value)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
 	}
 
 	/**
