@@ -63,12 +63,15 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testViewAcceptsArrayableImplementations()
 	{
+		$arrayable = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$arrayable->shouldReceive('toArray')->once()->andReturn(array('foo' => 'bar', 'baz' => array('qux', 'corge')));
+
 		$view = new View(
 			m::mock('Illuminate\View\Environment'),
 			m::mock('Illuminate\View\Engines\EngineInterface'),
 			'view',
 			'path',
-			new ArrayablePayloadStub
+			$arrayable
 		);
 
 		$this->assertEquals('bar', $view->foo);
@@ -85,15 +88,6 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 			'path',
 			array('foo' => 'bar')
 		);
-	}
-
-}
-
-class ArrayablePayloadStub implements ArrayableInterface {
-
-	public function toArray()
-	{
-		return array('foo' => 'bar', 'baz' => array('qux', 'corge'));
 	}
 
 }

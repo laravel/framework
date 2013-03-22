@@ -664,7 +664,7 @@ class Builder {
 	}
 
 	/**
-	 * Add a single dynamic where clause statemnet to the query.
+	 * Add a single dynamic where clause statement to the query.
 	 *
 	 * @param  string  $segment
 	 * @param  string  $connector
