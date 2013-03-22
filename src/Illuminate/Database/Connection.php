@@ -488,6 +488,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @param  string  $query
 	 * @param  array   $bindings
+	 * @param  $time
 	 * @return void
 	 */
 	public function logQuery($query, $bindings, $time = null)

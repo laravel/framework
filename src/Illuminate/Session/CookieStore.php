@@ -22,7 +22,7 @@ class CookieStore extends Store {
 	/**
 	 * Create a new Cookie based session store.
 	 *
-	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  Illuminate\Cookie\CookieJar  $cookies
 	 * @param  string  $payload
 	 * @return void
 	 */
@@ -85,7 +85,7 @@ class CookieStore extends Store {
 	/**
 	 * Get the cookie jar instance.
 	 *
-	 * @return Illuminate\CookieJar
+	 * @return Illuminate\Cookie\CookieJar
 	 */
 	public function getCookieJar()
 	{
