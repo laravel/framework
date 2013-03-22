@@ -98,10 +98,10 @@ class Environment {
 	 * Get a evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
-	 * @param  array   $data
+	 * @param  mixed   $data
 	 * @return Illuminate\View\View
 	 */
-	public function make($view, array $data = array())
+	public function make($view, $data = array())
 	{
 		$path = $this->finder->find($view);
 
