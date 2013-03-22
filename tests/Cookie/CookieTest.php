@@ -16,6 +16,7 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 	public function testCookiesAreCreatedWithProperOptions()
 	{
 		$cookie = $this->getCreator();
+		$cookie->setDefaultPathAndDomain('foo', 'bar');
 		$c = $cookie->make('color', 'blue', 10, '/path', '/domain', true, false);
 		$value = $cookie->getEncrypter()->decrypt($c->getValue());
 		$this->assertEquals('blue', $value);
