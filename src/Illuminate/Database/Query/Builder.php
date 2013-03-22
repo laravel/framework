@@ -630,35 +630,30 @@ class Builder {
 	{
 		$finder = substr($method, 5);
 
-		$flags = PREG_SPLIT_DELIM_CAPTURE;
+		$segments = preg_split('/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-		$segments = preg_split('/(And|Or)(?=[A-Z])/', $finder, -1, $flags);
-
-		// The connector variable will determine which connector will be used
-		// for the condition. We'll change it as we come across new boolean
-		// connectors in the dynamic method string.
+		// The connector variable will determine which connector will be used for the
+		// query condition. We will change it as we come across new boolean values
+		// in the dynamic method strings, which could contain a number of these.
 		$connector = 'and';
 
-		// The index variable helps us get the correct parameter value for
-		// the where condition. We increment it each time we add another
-		// condition to the query's where clause.
 		$index = 0;
 
 		foreach ($segments as $segment)
 		{
-			// If the segment is not a boolean connector, we can assume it it is
-			// a column name, and we'll add it to the query as a new constraint
-			// of the query's where clause and keep iterating the segments.
+			// If the segment is not a boolean connector, we can assume it it's a column name
+			// and we will add it to the query as a new constraint as a where clause, then
+			// we can keep iterating through the dynamic method string's segments again.
 			if ($segment != 'And' and $segment != 'Or')
 			{
-				$this->where(snake_case($segment), '=', $parameters[$index], strtolower($connector));
+				$this->addDynamic($segment, $connector, $parameters, $index);
 
 				$index++;
 			}
 
-			// Otherwise, we will store the connector so we know how the next
-			// where clause we find in the query should be connected to the
-			// previous one and will add it when we find the next one.
+			// Otherwise, we will store the connector so we know how the next where clause we
+			// find in the query should be connected to the previous ones, meaning we will
+			// have the proper booelan connector to connect the next where clause found.
 			else
 			{
 				$connector = $segment;
@@ -666,6 +661,25 @@ class Builder {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Add a single dynamic where clause statemnet to the query.
+	 *
+	 * @param  string  $segment
+	 * @param  string  $connector
+	 * @param  array   $parameters
+	 * @param  int     $index
+	 * @return void
+	 */
+	protected function addDynamic($segment, $connector, $parameters, $index)
+	{
+		// Once we have parsed out the columns and formatted the boolean operators we
+		// are ready to add it to this query as a where clause just like any other
+		// clause on the query. Then we'll increment the parameter index values.
+		$bool = strtolower($connector);
+
+		$this->where(snake_case($segment), '=', $parameters[$index], $bool);
 	}
 
 	/**
