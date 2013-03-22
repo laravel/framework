@@ -3,6 +3,7 @@
 use ArrayAccess;
 use Illuminate\View\Engines\EngineInterface;
 use Illuminate\Support\Contracts\RenderableInterface as Renderable;
+use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
 
 class View implements ArrayAccess, Renderable {
 
@@ -51,11 +52,23 @@ class View implements ArrayAccess, Renderable {
 	 * @param  array   $data
 	 * @return void
 	 */
-	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, array $data = array())
+	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array())
 	{
+		if (is_array($data))
+		{
+			$this->data = $data;
+		}
+		elseif ($data instanceof Arrayable)
+		{
+			$this->data = $data->toArray();
+		}
+		else
+		{
+			throw new \InvalidArgumentException('Invalid data type '.gettype($data).' for view.');
+		}
+
 		$this->view = $view;
 		$this->path = $path;
-		$this->data = $data;
 		$this->engine = $engine;
 		$this->environment = $environment;
 	}
@@ -135,7 +148,7 @@ class View implements ArrayAccess, Renderable {
 		{
 			$this->data[$key] = $value;
 		}
-		
+
 		return $this;
 	}
 
