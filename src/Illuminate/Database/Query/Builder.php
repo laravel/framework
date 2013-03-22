@@ -621,6 +621,54 @@ class Builder {
 	}
 
 	/**
+	 * Handles dynamic "where" clauses to the query.
+	 *
+	 * @param  string  $method
+	 * @param  string  $parameters
+	 */
+	public function dynamicWhere($method, $parameters)
+	{
+		$finder = substr($method, 5);
+
+		$flags = PREG_SPLIT_DELIM_CAPTURE;
+
+		$segments = preg_split('/(And|Or)(?=[A-Z])/', $finder, -1, $flags);
+
+		// The connector variable will determine which connector will be used
+		// for the condition. We'll change it as we come across new boolean
+		// connectors in the dynamic method string.
+		$connector = 'and';
+
+		// The index variable helps us get the correct parameter value for
+		// the where condition. We increment it each time we add another
+		// condition to the query's where clause.
+		$index = 0;
+
+		foreach ($segments as $segment)
+		{
+			// If the segment is not a boolean connector, we can assume it it is
+			// a column name, and we'll add it to the query as a new constraint
+			// of the query's where clause and keep iterating the segments.
+			if ($segment != 'And' and $segment != 'Or')
+			{
+				$this->where(snake_case($segment), '=', $parameters[$index], strtolower($connector));
+
+				$index++;
+			}
+
+			// Otherwise, we will store the connector so we know how the next
+			// where clause we find in the query should be connected to the
+			// previous one and will add it when we find the next one.
+			else
+			{
+				$connector = $segment;
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Add a "group by" clause to the query.
 	 *
 	 * @param  dynamic  $columns
@@ -1280,6 +1328,24 @@ class Builder {
 	public function getGrammar()
 	{
 		return $this->grammar;
+	}
+
+	/**
+	 * Handle dynamic method calls into the method.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if (starts_with($method, 'where'))
+		{
+			return $this->dynamicWhere($method, $parameters);
+		}
+
+		$className = get_class($this);
+		throw new \BadMethodCallException("Call to undefined method {$className}::{$method}()");
 	}
 
 }
