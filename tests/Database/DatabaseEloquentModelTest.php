@@ -375,6 +375,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUnderscorePropertiesAreNotFilled()
+	{
+		$model = new EloquentModelStub;
+		$model->fill(array('_method' => 'PUT'));
+		$this->assertEquals(array(), $model->getAttributes());
+	}
+
+
 	public function testGuarded()
 	{
 		$model = new EloquentModelStub;
