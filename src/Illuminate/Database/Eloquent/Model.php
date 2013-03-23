@@ -1049,7 +1049,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return false;
 		}
 
-		return empty($this->fillable);
+		return empty($this->fillable) and ! starts_with($key, '_');
 	}
 
 	/**
