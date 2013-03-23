@@ -45,6 +45,7 @@
 - Updated `asset:publish` command to automatically find packages with asset directories.
 - Implement Eloquent scopes.
 - Added `assertResponseOk`, `assertViewHas`, `assertSessionHas`, `assertRedirectedTo`, `assertRedirectedToRoute`, `assertRedirectedToAction` test assertions.
+- Added new `setAttributeNames` to `Validator` to allow dynamically passing custom attribute names per instance.
 
 ## Beta 3
 

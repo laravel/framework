@@ -48,6 +48,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('Name is required!', $v->messages()->first('name'));
+
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.required' => ':attribute is required!'), 'en', 'messages');
+		$v = new Validator($trans, array('name' => ''), array('name' => 'Required'));
+		$v->setAttributeNames(array('name' => 'Name'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('Name is required!', $v->messages()->first('name'));
 	}
 
 

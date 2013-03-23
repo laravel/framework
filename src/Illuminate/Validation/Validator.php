@@ -58,6 +58,13 @@ class Validator implements MessageProviderInterface {
 	protected $customMessages = array();
 
 	/**
+	 * The array of custom attribute names.
+	 *
+	 * @var array
+	 */
+	protected $customAttributes = array();
+
+	/**
 	 * All of the custom validator extensions.
 	 *
 	 * @var array
@@ -1024,11 +1031,19 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getAttribute($attribute)
 	{
+		// The developer may dynamically specify the array of custom attributes
+		// on this Validator instance. If the attribute exists in this array
+		// it takes precedence over all other ways we can pull attributes.
+		if (isset($this->customAttributes[$attribute]))
+		{
+			return $this->customAttributes[$attribute];
+		}
+
+		$key = "validation.attributes.{$attribute}";
+
 		// We allow for the developer to specify language lines for each of the
 		// attributes allowing for more displayable counterparts of each of
 		// the attributes. This provides the ability for simple formats.
-		$key = "validation.attributes.{$attribute}";
-
 		if (($line = $this->translator->trans($key)) !== $key)
 		{
 			return $line;
@@ -1404,6 +1419,19 @@ class Validator implements MessageProviderInterface {
 	public function getRules()
 	{
 		return $this->rules;
+	}
+
+	/**
+	 * Set the custom attributes on the validator.
+	 *
+	 * @param  array  $attributes
+	 * @return Illuminate\Validation\Validator
+	 */
+	public function setAttributeNames(array $attributes)
+	{
+		$this->customAttributes = $attributes;
+
+		return $this;
 	}
 
 	/**
