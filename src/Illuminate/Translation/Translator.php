@@ -120,7 +120,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get a translation according to an integer value.
 	 *
-	 * @param  string  $id
+	 * @param  string  $key
 	 * @param  int     $number
 	 * @param  array   $replace
 	 * @param  string  $locale

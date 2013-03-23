@@ -136,6 +136,7 @@ class Dispatcher {
 	 *
 	 * @param  string  $event
 	 * @param  mixed   $payload
+	 * @param  boolean $halt
 	 * @return void
 	 */
 	public function fire($event, $payload = array(), $halt = false)
