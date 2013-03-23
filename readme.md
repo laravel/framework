@@ -44,7 +44,7 @@
 - Added `Cache::increment` and `Cache::decrement` methods to all but file and database cache drivers.
 - Updated `asset:publish` command to automatically find packages with asset directories.
 - Implement Eloquent scopes.
-- Added `assertRedirectedTo`, `assertRedirectedToRoute`, `assertRedirectedToAction` test assertions.
+- Added `assertResponseOk`, `assertViewHas`, `assertSessionHas`, `assertRedirectedTo`, `assertRedirectedToRoute`, `assertRedirectedToAction` test assertions.
 
 ## Beta 3
 
