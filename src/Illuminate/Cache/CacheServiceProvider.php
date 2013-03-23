@@ -40,7 +40,16 @@ class CacheServiceProvider extends ServiceProvider {
 	{
 		$this->app['command.cache.clear'] = $this->app->share(function($app)
 		{
-			return new Console\ClearCommand($app['cache']);
+			$manifestFile = $app['config']['app.manifest'];
+
+			// The cache clear command clears the entire cache as well as the
+			// service providers manifest file, which contains a list of all
+			// service providers mapped to the services they provide.
+			return new Console\ClearCommand(
+
+				$app['cache'], $app['files'], $manifestFile
+
+			);
 		});
 
 		$this->commands('command.cache.clear');

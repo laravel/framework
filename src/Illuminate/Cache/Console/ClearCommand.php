@@ -2,6 +2,7 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Filesystem\Filesystem;
 
 class ClearCommand extends Command {
 
@@ -27,16 +28,34 @@ class ClearCommand extends Command {
 	protected $cache;
 
 	/**
+	 * The file system instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
+	 * The path to the service provider manifest file.
+	 *
+	 * @var string
+	 */
+	protected $manifest;
+
+	/**
 	 * Create a new cache clear command instance.
 	 *
 	 * @param  \Illuminate\Cache\CacheManager  $cache
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  string  $manifest
 	 * @return void
 	 */
-	public function __construct(CacheManager $cache)
+	public function __construct(CacheManager $cache, Filesystem $files, $manifest)
 	{
 		parent::__construct();
 
 		$this->cache = $cache;
+		$this->files = $files;
+		$this->manifest = $manifest;
 	}
 
 	/**
@@ -47,6 +66,8 @@ class ClearCommand extends Command {
 	public function fire()
 	{
 		$this->cache->flush();
+
+		$this->files->delete($this->manifest);
 	}
 
 }
