@@ -21,6 +21,7 @@ abstract class Compiler {
 	/**
 	 * Create a new compiler instance.
 	 *
+	 * @param  Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $cachePath
 	 * @return void
 	 */

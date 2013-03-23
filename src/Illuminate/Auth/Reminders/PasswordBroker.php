@@ -120,8 +120,7 @@ class PasswordBroker {
 	/**
 	 * Reset the password for the given token.
 	 *
-	 * @param  string   $token
-	 * @param  string   $newPassword
+	 * @param  array   $credentials
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */
@@ -206,7 +205,7 @@ class PasswordBroker {
 	 * Get the user for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return Illuminate\Auth\RemindableInterface
+	 * @return Illuminate\Auth\Reminders\RemindableInterface
 	 */
 	public function getUser(array $credentials)
 	{

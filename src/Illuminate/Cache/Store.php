@@ -179,7 +179,7 @@ abstract class Store implements ArrayAccess {
 	 * @param  string   $key
 	 * @param  int      $minutes
 	 * @param  Closure  $callback
-	 * @return 
+	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
 	{
@@ -201,7 +201,7 @@ abstract class Store implements ArrayAccess {
 	 *
 	 * @param  string   $key
 	 * @param  Closure  $callback
-	 * @return 
+	 * @return mixed
 	 */
 	public function rememberForever($key, Closure $callback)
 	{

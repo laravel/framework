@@ -32,7 +32,7 @@ class Guard {
 	/**
 	 * The Illuminate cookie creator service.
 	 *
-	 * @var Illuminate\CookieJar
+	 * @var Illuminate\Cookie\CookieJar
 	 */
 	protected $cookie;
 
@@ -296,7 +296,7 @@ class Guard {
 	/**
 	 * Get the cookie creator instance used by the guard.
 	 *
-	 * @return Illuminate\CookieJar
+	 * @return Illuminate\Cookie\CookieJar
 	 */
 	public function getCookieJar()
 	{
@@ -311,7 +311,7 @@ class Guard {
 	/**
 	 * Set the cookie creator instance used by the guard.
 	 *
-	 * @param  Illuminate\CookieJar  $cookie
+	 * @param  Illuminate\Cookie\CookieJar  $cookie
 	 * @return void
 	 */
 	public function setCookieJar(CookieJar $cookie)
