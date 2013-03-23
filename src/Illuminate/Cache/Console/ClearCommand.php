@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Cache\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Cache\CacheManager;
 
 class ClearCommand extends Command {
 
