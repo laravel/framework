@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class ApcStore extends Store {
+class ApcStore implements StoreInterface {
 
 	/**
 	 * The APC wrapper instance.
@@ -35,7 +35,7 @@ class ApcStore extends Store {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function retrieveItem($key)
+	public function get($key)
 	{
 		$value = $this->apc->get($this->prefix.$key);
 
@@ -53,7 +53,7 @@ class ApcStore extends Store {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	protected function storeItem($key, $value, $minutes)
+	public function put($key, $value, $minutes)
 	{
 		$this->apc->put($this->prefix.$key, $value, $minutes * 60);
 	}
@@ -65,7 +65,7 @@ class ApcStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function incrementValue($key, $value)
+	public function increment($key, $value = 1)
 	{
 		return $this->apc->increment($this->prefix.$key, $value);
 	}
@@ -77,7 +77,7 @@ class ApcStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function decrementValue($key, $value)
+	public function decrement($key, $value = 1)
 	{
 		return $this->apc->decrement($this->prefix.$key, $value);
 	}
@@ -89,9 +89,9 @@ class ApcStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function storeItemForever($key, $value)
+	public function forever($key, $value)
 	{
-		return $this->storeItem($key, $value, 0);
+		return $this->put($key, $value, 0);
 	}
 
 	/**
@@ -100,7 +100,7 @@ class ApcStore extends Store {
 	 * @param  string  $key
 	 * @return void
 	 */
-	protected function removeItem($key)
+	public function forget($key)
 	{
 		$this->apc->delete($this->prefix.$key);
 	}
@@ -110,7 +110,7 @@ class ApcStore extends Store {
 	 *
 	 * @return void
 	 */
-	protected function flushItems()
+	public function flush()
 	{
 		$this->apc->flush();
 	}

@@ -3,7 +3,7 @@
 use Illuminate\Database\Connection;
 use Illuminate\Encryption\Encrypter;
 
-class DatabaseStore extends Store {
+class DatabaseStore implements StoreInterface {
 
 	/**
 	 * The database connection instance.
@@ -56,7 +56,7 @@ class DatabaseStore extends Store {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function retrieveItem($key)
+	public function get($key)
 	{
 		$prefixed = $this->prefix.$key;
 
@@ -71,7 +71,7 @@ class DatabaseStore extends Store {
 
 			if (time() >= $cache->expiration)
 			{
-				return $this->removeItem($key);
+				return $this->forget($key);
 			}
 
 			return $this->encrypter->decrypt($cache->value);
@@ -86,7 +86,7 @@ class DatabaseStore extends Store {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	protected function storeItem($key, $value, $minutes)
+	public function put($key, $value, $minutes)
 	{
 		$key = $this->prefix.$key;
 
@@ -114,7 +114,7 @@ class DatabaseStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function incrementValue($key, $value)
+	public function increment($key, $value = 1)
 	{
 		throw new \LogicException("Increment operations not supported by this driver.");
 	}
@@ -126,7 +126,7 @@ class DatabaseStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function decrementValue($key, $value)
+	public function decrement($key, $value = 1)
 	{
 		throw new \LogicException("Increment operations not supported by this driver.");
 	}
@@ -148,9 +148,9 @@ class DatabaseStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function storeItemForever($key, $value)
+	public function forever($key, $value)
 	{
-		return $this->storeItem($key, $value, 5256000);
+		return $this->put($key, $value, 5256000);
 	}
 
 	/**
@@ -159,7 +159,7 @@ class DatabaseStore extends Store {
 	 * @param  string  $key
 	 * @return void
 	 */
-	protected function removeItem($key)
+	public function forget($key)
 	{
 		$this->table()->where('key', $this->prefix.$key)->delete();
 	}
@@ -169,7 +169,7 @@ class DatabaseStore extends Store {
 	 *
 	 * @return void
 	 */
-	protected function flushItems()
+	public function flush()
 	{
 		$this->table()->delete();
 	}

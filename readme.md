@@ -47,6 +47,7 @@
 - Added `assertResponseOk`, `assertViewHas`, `assertSessionHas`, `assertRedirectedTo`, `assertRedirectedToRoute`, `assertRedirectedToAction` test assertions.
 - Added new `setAttributeNames` to `Validator` to allow dynamically passing custom attribute names per instance.
 - Properties passed to Eloquent `fill` or `__construct` beginning with an underscore will be ignored.
+- Changed cache stores to be implementors of a `StoreInterface` rather than extenders of a `Store` abstract class. Injected implementations into a `Cache\Repository` class.
 
 ## Beta 3
 

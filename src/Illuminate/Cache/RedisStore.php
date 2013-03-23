@@ -2,7 +2,7 @@
 
 use Illuminate\Redis\Database as Redis;
 
-class RedisStore extends Store {
+class RedisStore implements StoreInterface {
 
 	/**
 	 * The Redis database connection.
@@ -37,7 +37,7 @@ class RedisStore extends Store {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function retrieveItem($key)
+	public function get($key)
 	{
 		if ( ! is_null($value = $this->redis->get($this->prefix.$key)))
 		{
@@ -53,7 +53,7 @@ class RedisStore extends Store {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	protected function storeItem($key, $value, $minutes)
+	public function put($key, $value, $minutes)
 	{
 		$this->redis->set($this->prefix.$key, serialize($value));
 
@@ -67,7 +67,7 @@ class RedisStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function incrementValue($key, $value)
+	public function increment($key, $value = 1)
 	{
 		return $this->redis->incrby($this->prefix.$key, $value);
 	}
@@ -79,7 +79,7 @@ class RedisStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function decrementValue($key, $value)
+	public function decrement($key, $value = 1)
 	{
 		return $this->redis->decrby($this->prefix.$key, $value);
 	}
@@ -91,7 +91,7 @@ class RedisStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function storeItemForever($key, $value)
+	public function forever($key, $value)
 	{
 		$this->redis->set($this->prefix.$key, serialize($value));
 	}
@@ -102,7 +102,7 @@ class RedisStore extends Store {
 	 * @param  string  $key
 	 * @return void
 	 */
-	protected function removeItem($key)
+	public function forget($key)
 	{
 		$this->redis->del($this->prefix.$key);
 	}
@@ -112,7 +112,7 @@ class RedisStore extends Store {
 	 *
 	 * @return void
 	 */
-	protected function flushItems()
+	public function flush()
 	{
 		$this->redis->flushdb();
 	}

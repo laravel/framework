@@ -1,13 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class ArrayStore implements StoreInterface {
-
-	/**
-	 * The array of stored values.
-	 *
-	 * @var array
-	 */
-	protected $storage = array();
+interface StoreInterface {
 
 	/**
 	 * Retrieve an item from the cache by key.
@@ -15,13 +8,7 @@ class ArrayStore implements StoreInterface {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	public function get($key)
-	{
-		if (array_key_exists($key, $this->storage))
-		{
-			return $this->storage[$key];
-		}
-	}
+	public function get($key);
 
 	/**
 	 * Store an item in the cache for a given number of minutes.
@@ -31,10 +18,7 @@ class ArrayStore implements StoreInterface {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	public function put($key, $value, $minutes)
-	{
-		$this->storage[$key] = $value;
-	}
+	public function put($key, $value, $minutes);
 
 	/**
 	 * Increment the value of an item in the cache.
@@ -43,12 +27,7 @@ class ArrayStore implements StoreInterface {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function increment($key, $value = 1)
-	{
-		$this->storage[$key] = $this->storage[$key] + $value;
-
-		return $this->storage[$key];
-	}
+	public function increment($key, $value = 1);
 
 	/**
 	 * Increment the value of an item in the cache.
@@ -57,12 +36,7 @@ class ArrayStore implements StoreInterface {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function decrement($key, $value = 1)
-	{
-		$this->storage[$key] = $this->storage[$key] - $value;
-
-		return $this->storage[$key];
-	}
+	public function decrement($key, $value = 1);
 
 	/**
 	 * Store an item in the cache indefinitely.
@@ -71,10 +45,7 @@ class ArrayStore implements StoreInterface {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function forever($key, $value)
-	{
-		return $this->put($key, $value, 0);
-	}
+	public function forever($key, $value);
 
 	/**
 	 * Remove an item from the cache.
@@ -82,19 +53,13 @@ class ArrayStore implements StoreInterface {
 	 * @param  string  $key
 	 * @return void
 	 */
-	public function forget($key)
-	{
-		unset($this->storage[$key]);
-	}
+	public function forget($key);
 
 	/**
 	 * Remove all items from the cache.
 	 *
 	 * @return void
 	 */
-	public function flush()
-	{
-		$this->storage = array();
-	}
+	public function flush();
 
 }

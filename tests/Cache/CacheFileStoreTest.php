@@ -20,8 +20,8 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 		$files->expects($this->once())->method('exists')->will($this->returnValue(true));
 		$contents = '0000000000';
 		$files->expects($this->once())->method('get')->will($this->returnValue($contents));
-		$store = $this->getMock('Illuminate\Cache\FileStore', array('removeItem'), array($files, __DIR__));
-		$store->expects($this->once())->method('removeItem');
+		$store = $this->getMock('Illuminate\Cache\FileStore', array('forget'), array($files, __DIR__));
+		$store->expects($this->once())->method('forget');
 		$value = $store->get('foo');
 		$this->assertNull($value);
 	}

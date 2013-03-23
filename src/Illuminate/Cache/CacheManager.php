@@ -11,7 +11,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createApcDriver()
 	{
-		return new ApcStore(new ApcWrapper);
+		return $this->repository(new ApcStore(new ApcWrapper));
 	}
 
 	/**
@@ -21,7 +21,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createArrayDriver()
 	{
-		return new ArrayStore;
+		return $this->repository(new ArrayStore);
 	}
 
 	/**
@@ -33,7 +33,7 @@ class CacheManager extends Manager {
 	{
 		$path = $this->app['config']['cache.path'];
 
-		return new FileStore($this->app['files'], $path);
+		return $this->repository(new FileStore($this->app['files'], $path));
 	}
 
 	/**
@@ -47,7 +47,7 @@ class CacheManager extends Manager {
 
 		$memcached = $this->app['memcached.connector']->connect($servers);
 
-		return new MemcachedStore($memcached, $this->app['config']['cache.prefix']);
+		return $this->repository(new MemcachedStore($memcached, $this->app['config']['cache.prefix']));
 	}
 
 	/**
@@ -57,7 +57,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createWincacheDriver()
 	{
-		return new WinCacheStore($this->app['config']['cache.prefix']);
+		return $this->repository(new WinCacheStore($this->app['config']['cache.prefix']));
 	}
 
 	/**
@@ -69,7 +69,7 @@ class CacheManager extends Manager {
 	{
 		$redis = $this->app['redis']->connection();
 
-		return new RedisStore($redis, $this->app['config']['cache.prefix']);
+		return $this->repository(new RedisStore($redis, $this->app['config']['cache.prefix']));
 	}
 
 	/**
@@ -90,7 +90,7 @@ class CacheManager extends Manager {
 
 		$prefix = $this->app['config']['cache.prefix'];
 
-		return new DatabaseStore($connection, $encrypter, $table, $prefix);
+		return $this->repository(new DatabaseStore($connection, $encrypter, $table, $prefix));
 	}
 
 	/**
@@ -103,6 +103,17 @@ class CacheManager extends Manager {
 		$connection = $this->app['config']['cache.connection'];
 
 		return $this->app['db']->connection($connection);
+	}
+
+	/**
+	 * Create a new cache repository with the given implementation.
+	 *
+	 * @param  Illuminate\Cache\StoreInterface  $store
+	 * @return Illuminate\Cache\Repository
+	 */
+	protected function repository(StoreInterface $store)
+	{
+		return new Repository($store);
 	}
 
 	/**
