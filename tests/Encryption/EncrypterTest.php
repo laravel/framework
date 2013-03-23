@@ -7,9 +7,9 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	public function testEncryption()
 	{
 		$e = $this->getEncrypter();
-		$this->assertFalse('foo' == $e->encrypt('foo'));
-		$encrypted = $e->encrypt('foo');
-		$this->assertTrue('foo' == $e->decrypt($encrypted));
+		$this->assertFalse('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' == $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'));
+		$encrypted = $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+		$this->assertTrue('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' == $e->decrypt($encrypted));
 	}
 
 
