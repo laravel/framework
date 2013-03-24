@@ -746,7 +746,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the keys for a save update query.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Builder
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Builder
 	 */
 	protected function setKeysForSaveQuery($query)
 	{
