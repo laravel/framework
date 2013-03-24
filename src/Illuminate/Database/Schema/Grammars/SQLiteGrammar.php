@@ -112,7 +112,7 @@ class SQLiteGrammar extends Grammar {
 
 		$columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
-		foreach ($columns as $column) 
+		foreach ($columns as $column)
 		{
 			$statements[] = 'alter table '.$table.' '.$column;
 		}
@@ -390,7 +390,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function modifyNullable(Blueprint $blueprint, Fluent $column)
 	{
-		return $column->nullable ? ' null' : ' not null';
+		return ' null';
 	}
 
 	/**
