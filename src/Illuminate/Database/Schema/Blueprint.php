@@ -252,6 +252,16 @@ class Blueprint {
 	}
 
 	/**
+	 * Indicate that the timestamp columns should be dropped.
+	 *
+	 * @return void
+	 */
+	public function dropTimestamps()
+	{
+		$this->dropColumns('created_at', 'updated_at');
+	}
+
+	/**
 	 * Rename the table to a given name.
 	 *
 	 * @param  string  $to
