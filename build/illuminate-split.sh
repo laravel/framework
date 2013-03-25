@@ -1,4 +1,4 @@
-git subsplit init git@github.com:laravel/framework.git --no-tags
+git subsplit init git@github.com:laravel/framework.git
 git subsplit publish src/Illuminate/Auth:git@github.com:illuminate/auth.git --no-tags
 git subsplit publish src/Illuminate/Cache:git@github.com:illuminate/cache.git --no-tags
 git subsplit publish src/Illuminate/Config:git@github.com:illuminate/config.git --no-tags
