@@ -512,7 +512,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function submit($value = 'Submit', $options = array())
+	public function submit($value = null, $options = array())
 	{
 		return $this->input('submit', null, $value, $options);
 	}
@@ -673,18 +673,24 @@ class FormBuilder {
 	/**
 	 * Get the value that should be assigned to the field.
 	 *
+	 * If a name is given, this returns either old input for this field, the
+	 * value passed to this method or the equally-named attribute of the
+	 * current model instance (in this order of precedence).
+	 *
 	 * @param  string  $name
 	 * @param  string  $value
 	 * @return string
 	 */
 	protected function getValueAttribute($name, $value = null)
 	{
-		if ( ! is_null($value)) return $value;
+		if (is_null($name)) return $value;
 
 		if (isset($this->session) and $this->session->hasOldInput($name))
 		{
 			return $this->session->getOldInput($name);
 		}
+
+		if ( ! is_null($value)) return $value;
 
 		if (isset($this->model) and isset($this->model[$name]))
 		{
