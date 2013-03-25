@@ -483,11 +483,26 @@ class FormBuilder {
 	 */
 	protected function checkable($type, $name, $value, $checked, $options)
 	{
-		if (is_null($checked)) $checked = (bool) $this->getValueAttribute($name, null);
+		if (is_null($checked)) $checked = $this->getCheckedState($type, $name, $value);
 
 		if ($checked) $options['checked'] = 'checked';
 
 		return $this->input($type, $name, $value, $options);
+	}
+
+	/**
+	 * Get the check state for a checkable input.
+	 *
+	 * @param  string  $type
+	 * @param  string  $name
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function getCheckedState($type, $name, $value)
+	{
+		if ($type == 'checkbox') return (bool) $this->getValueAttribute($name);
+
+		return $this->getValueAttribute($name) == $value;
 	}
 
 	/**
@@ -662,7 +677,7 @@ class FormBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected function getValueAttribute($name, $value)
+	protected function getValueAttribute($name, $value = null)
 	{
 		if ( ! is_null($value)) return $value;
 
