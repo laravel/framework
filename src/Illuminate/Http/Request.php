@@ -1,8 +1,16 @@
 <?php namespace Illuminate\Http;
 
 use Illuminate\Session\Store as SessionStore;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Request extends \Symfony\Component\HttpFoundation\Request {
+
+	/**
+	 * The decoded JSON content for the request.
+	 *
+	 * @var string
+	 */
+	protected $json;
 
 	/**
 	 * The Illuminate session store implementation.
@@ -387,9 +395,14 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function json($key = null, $default = null)
 	{
-		$json = json_decode($this->getContent(), true);
+		if ( ! isset($this->json))
+		{
+			$this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+		}
 
-		return $json ? array_get($json, $key, $default) : false;
+		if (is_null($key)) return $this->json;
+
+		return array_get($this->json->all(), $key, $default);
 	}
 
 	/**
@@ -399,7 +412,19 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	protected function getInputSource()
 	{
+		if ($this->isJson()) return $this->json();
+
 		return $this->getMethod() == 'GET' ? $this->query : $this->request;
+	}
+
+	/**
+	 * Determine if the request is sending JSON.
+	 *
+	 * @return bool
+	 */
+	public function isJson()
+	{
+		return str_contains($this->server->get('CONTENT_TYPE'), '/json');
 	}
 
 	/**
