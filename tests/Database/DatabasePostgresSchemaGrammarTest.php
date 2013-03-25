@@ -127,6 +127,17 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDropTimestamps()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->dropTimestamps();
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" drop column "created_at", drop column "updated_at"', $statements[0]);
+	}
+
+
 	public function testRenameTable()
 	{
 		$blueprint = new Blueprint('users');
