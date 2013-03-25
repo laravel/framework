@@ -19,6 +19,32 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPopReturnsAndRemovesLastItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('bar', $c->pop());
+		$this->assertEquals('foo', $c->first());
+	}
+
+
+	public function testShiftReturnsAndRemovesFirstItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('foo', $c->shift());
+		$this->assertEquals('bar', $c->first());
+	}
+
+
+	public function testEmptyCollectionIsEmpty()
+	{
+		$c = new Collection();
+
+		$this->assertTrue($c->isEmpty());
+	} 
+
+
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
 		$item1 = m::mock('stdClass');
