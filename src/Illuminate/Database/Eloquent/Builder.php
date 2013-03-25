@@ -94,6 +94,41 @@ class Builder {
 	}
 
 	/**
+	 * Get an array with the values of a given model attribute.
+	 *
+	 * @param  string  $column
+	 * @param  string  $key
+	 * @return array
+	 */
+	public function lists($column, $key = null)
+	{
+		$columns = is_null($key) ? array($column) : array($column, $key);
+
+		// First we will just get all of the column values for the model result set
+		// then we can associate those values with the attribute if it was specified
+		// otherwise we can just give these values back without a specific key.
+		$values = array_map(function($model) use ($column)
+		{
+			return $model->getAttribute($column);
+
+		}, $models = $this->getModels($columns));
+
+		// If a key was specified and we have results, we will go ahead and combine
+		// the values with the keys of all of the records so that the values can
+		// be accessed by the key of the models instead of simply being numeric.
+		if ( ! is_null($key) and count($models) > 0)
+		{
+			return array_combine(array_map(function($model) use ($key)
+			{
+				return $model->getAttribute($key);
+
+			}, $models), $values);
+		}
+
+		return $values;
+	}
+
+	/**
 	 * Get a paginator for the "select" statement.
 	 *
 	 * @param  int    $perPage
