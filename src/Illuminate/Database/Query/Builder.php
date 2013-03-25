@@ -154,6 +154,21 @@ class Builder {
 	}
 
 	/**
+	 * Add a new select column to the query.
+	 *
+	 * @param  mixed  $column
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function addSelect($column)
+	{
+		if ( ! isset($this->columns)) $this->columns = array();
+
+		$this->columns = array_merge($this->columns, $column);
+
+		return $this;
+	}
+
+	/**
 	 * Force the query to only return distinct results.
 	 *
 	 * @return Illuminate\Database\Query\Builder

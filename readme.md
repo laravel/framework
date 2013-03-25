@@ -50,6 +50,7 @@
 - Changed cache stores to be implementors of a `StoreInterface` rather than extenders of a `Store` abstract class. Injected implementations into a `Cache\Repository` class.
 - Added `array_fetch` and `array_flatten`. Added `fetch` and `flatten` to `Collection` class.
 - Added `merge` method to the Collection class.
+- Added an `addSelect` method to the query builder.
 
 ## Beta 3
 
