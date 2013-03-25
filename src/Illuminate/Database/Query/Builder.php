@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Query;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -882,27 +883,18 @@ class Builder {
 		// First we will just get all of the column values for the record result set
 		// then we can associate those values with the column if it was specified
 		// otherwise we can just give these values back without a specific key.
-		$values = array_map(function($row) use ($column)
-		{
-			$row = (object) $row;
+		$results = new Collection($this->get($columns));
 
-			return $row->$column;
-
-		}, $results = $this->get($columns));
-
+		$values = $results->fetch($column)->all();
 
 		// If a key was specified and we have results, we will go ahead and combine
 		// the values with the keys of all of the records so that the values can
 		// be accessed by the key of the rows instead of simply being numeric.
 		if ( ! is_null($key) and count($results) > 0)
 		{
-			return array_combine(array_map(function($row) use ($key)
-			{
-				$row = (object) $row;
+			$keys = $results->fetch($key)->all();
 
-				return $row->$key;
-
-			}, $results), $values);
+			return array_combine($keys, $values);
 		}
 
 		return $values;
