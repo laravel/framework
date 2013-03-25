@@ -96,11 +96,21 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Get and remove the first item from the collection.
+	 * Get and remove the last item from the collection.
 	 *
 	 * @return mixed|null
 	 */
 	public function pop()
+	{
+		return array_pop($this->items);
+	}
+
+	/**
+	 * Get and remove the first item from the collection.
+	 *
+	 * @return mixed|null
+	 */
+	public function shift()
 	{
 		return array_shift($this->items);
 	}

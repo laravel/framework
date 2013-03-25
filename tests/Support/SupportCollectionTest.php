@@ -21,11 +21,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPopReturnsAndRemovesFirstItemInCollection()
+	public function testPopReturnsAndRemovesLastItemInCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
 
-		$this->assertEquals('foo', $c->pop());
+		$this->assertEquals('bar', $c->pop());
+		$this->assertEquals('foo', $c->first());
+	}
+
+
+	public function testShiftReturnsAndRemovesFirstItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('foo', $c->shift());
 		$this->assertEquals('bar', $c->first());
 	}
 
