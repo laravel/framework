@@ -601,7 +601,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('whereIn')->once()->with(array(1, 2))->andReturn($mock);
+		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2))->andReturn($mock);
 		$mock->shouldReceive('get')->once()->with(array('*'))->andReturn('foo');
 		return $mock;
 	}
