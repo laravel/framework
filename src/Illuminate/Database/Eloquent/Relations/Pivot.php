@@ -26,6 +26,13 @@ class Pivot extends Model {
 	protected $otherKey;
 
 	/**
+	 * The attribute that aren't mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $guarded = array();
+
+	/**
 	 * Create a new pivot model instance.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Model  $parent

@@ -52,6 +52,7 @@
 - Added `merge` method to the Collection class.
 - Added an `addSelect` method to the query builder.
 - Added `Route::currentRouteName` and `Route::currentRouteAction`.
+- Protect against mass assignment by default.
 
 ## Beta 3
 

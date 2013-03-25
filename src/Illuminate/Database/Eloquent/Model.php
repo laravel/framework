@@ -100,7 +100,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @var array
 	 */
-	protected $guarded = array();
+	protected $guarded = array('*');
 
 	/**
 	 * The date fields for the model.clear
@@ -231,6 +231,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			if ($this->isFillable($key))
 			{
 				$this->setAttribute($key, $value);
+			}
+			elseif ( ! starts_with($key, '_'))
+			{
+				throw new MassAssignmentException($key);
 			}
 		}
 

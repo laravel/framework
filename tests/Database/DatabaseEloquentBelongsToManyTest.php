@@ -258,7 +258,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentBelongsToManyModelStub extends Illuminate\Database\Eloquent\Model {
-
+	protected $guarded = array();
 }
 
 class EloquentBelongsToManyModelPivotStub extends Illuminate\Database\Eloquent\Model {

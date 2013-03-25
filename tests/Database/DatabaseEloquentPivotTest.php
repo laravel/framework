@@ -51,6 +51,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 	public function testDeleteMethodDeletesModelByKeys()
 	{
 		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent->guard(array());
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 		$pivot = $this->getMock('Illuminate\Database\Eloquent\Relations\Pivot', array('newQuery'), array($parent, array('foo' => 'bar'), 'table'));
 		$pivot->setPivotKeys('foreign', 'other');

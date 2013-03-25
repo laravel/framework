@@ -368,8 +368,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelStub;
 		$model->fillable(array('name', 'age'));
-		$model->fill(array('name' => 'foo', 'age' => 'bar', 'password' => 'baz'));
-		$this->assertFalse(isset($model->password));
+		$model->fill(array('name' => 'foo', 'age' => 'bar'));
 		$this->assertEquals('foo', $model->name);
 		$this->assertEquals('bar', $model->age);
 	}
@@ -383,21 +382,25 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\MassAssignmentException
+	 */
 	public function testGuarded()
 	{
 		$model = new EloquentModelStub;
 		$model->guard(array('name', 'age'));
-		$model->fill(array('name' => 'foo', 'age' => 'bar', 'votes' => 'baz'));
-		$this->assertFalse(isset($model->name));
-		$this->assertFalse(isset($model->age));
-		$this->assertEquals('baz', $model->votes);
+		$model->fill(array('name' => 'foo', 'age' => 'bar'));
+	}
 
+
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\MassAssignmentException
+	 */
+	public function testGlobalGuarded()
+	{
 		$model = new EloquentModelStub;
 		$model->guard(array('*'));
 		$model->fill(array('name' => 'foo', 'age' => 'bar', 'votes' => 'baz'));
-		$this->assertFalse(isset($model->name));
-		$this->assertFalse(isset($model->age));
-		$this->assertFalse(isset($model->votes));
 	}
 
 
@@ -536,6 +539,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
+	protected $guarded = array();
 	public function getListItemsAttribute($value)
 	{
 		return json_decode($value, true);
@@ -576,6 +580,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'save_stub';
+	protected $guarded = array();
 	public function save() { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{
