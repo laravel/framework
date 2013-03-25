@@ -21,14 +21,6 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPeekReturnsFirstItemInCollection()
-	{
-		$c = new Collection(array('foo', 'bar'));
-
-		$this->assertEquals('foo', $c->peek());
-	}
-
-
 	public function testPopReturnsAndRemovesFirstItemInCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
