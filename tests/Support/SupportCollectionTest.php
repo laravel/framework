@@ -25,16 +25,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$c = new Collection(array('foo', 'bar'));
 
-		$this->assertEquals('foo', $c->first());
+		$this->assertEquals('foo', $c->peek());
 	}
-
-
-	public function testEmptyCollectionIsEmpty()
-	{
-		$c = new Collection();
-
-		$this->assertTrue($c->isEmpty());
-	} 
 
 
 	public function testPopReturnsAndRemovesFirstItemInCollection()
@@ -44,6 +36,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $c->pop());
 		$this->assertEquals('bar', $c->first());
 	}
+
+
+	public function testEmptyCollectionIsEmpty()
+	{
+		$c = new Collection();
+
+		$this->assertTrue($c->isEmpty());
+	} 
 
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
