@@ -26,7 +26,7 @@ class Pivot extends Model {
 	protected $otherKey;
 
 	/**
-	 * The attribute that aren't mass assignable.
+	 * The attributes that aren't mass assignable.
 	 *
 	 * @var array
 	 */

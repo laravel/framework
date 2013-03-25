@@ -96,7 +96,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $fillable = array();
 
 	/**
-	 * The attribute that aren't mass assignable.
+	 * The attributes that aren't mass assignable.
 	 *
 	 * @var array
 	 */
