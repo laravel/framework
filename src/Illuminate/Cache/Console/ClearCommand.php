@@ -18,44 +18,35 @@ class ClearCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = "Flush the entire cache.";
+	protected $description = "Flush the application cache";
 
 	/**
 	 * The cache manager instance.
 	 *
-	 * @var \Illuminate\Cache\CacheManager
+	 * @var Illuminate\Cache\CacheManager
 	 */
 	protected $cache;
 
 	/**
 	 * The file system instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
 	/**
-	 * The path to the service provider manifest file.
-	 *
-	 * @var string
-	 */
-	protected $manifest;
-
-	/**
 	 * Create a new cache clear command instance.
 	 *
-	 * @param  \Illuminate\Cache\CacheManager  $cache
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string  $manifest
+	 * @param  Illuminate\Cache\CacheManager  $cache
+	 * @param  Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(CacheManager $cache, Filesystem $files, $manifest)
+	public function __construct(CacheManager $cache, Filesystem $files)
 	{
 		parent::__construct();
 
 		$this->cache = $cache;
 		$this->files = $files;
-		$this->manifest = $manifest;
 	}
 
 	/**
@@ -67,7 +58,9 @@ class ClearCommand extends Command {
 	{
 		$this->cache->flush();
 
-		$this->files->delete($this->manifest);
+		$this->files->delete($this->laravel['config']['app.manifest'].'/services.json');
+
+		$this->info('Application cache cleared!');
 	}
 
 }
