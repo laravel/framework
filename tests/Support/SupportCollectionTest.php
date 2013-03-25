@@ -8,14 +8,33 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testFirstReturnsFirstItemInCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
+		
 		$this->assertEquals('foo', $c->first());
 	}
+
 
 	public function testLastReturnsLastItemInCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
 
 		$this->assertEquals('bar', $c->last());
+	}
+
+
+	public function testPeekReturnsFirstItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('foo', $c->first());
+	}
+
+
+	public function testPopReturnsAndRemovesFirstItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('foo', $c->pop());
+		$this->assertEquals('bar', $c->first());
 	}
 
 

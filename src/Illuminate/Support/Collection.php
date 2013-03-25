@@ -96,6 +96,26 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Get the first item from the collection.
+	 *
+	 * @return mixed|null
+	 */
+	public function peek()
+	{
+		return $this->first();
+	}
+
+	/**
+	 * Get and remove the first item from the collection.
+	 *
+	 * @return mixed|null
+	 */
+	public function pop()
+	{
+		return array_shift($this->items);
+	}
+
+	/**
 	 * Determine if the collection is empty or not.
 	 *
 	 * @return bool
