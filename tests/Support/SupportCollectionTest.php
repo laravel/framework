@@ -77,4 +77,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo'), $c->getIterator()->getArrayCopy());
 	}
 
+
+	public function testFlatten()
+	{
+		$c = new Collection(array(array('#foo', '#bar'), array('#baz')));
+		$this->assertEquals(array('#foo', '#bar', '#baz'), $c->flatten());
+	}
+
 }

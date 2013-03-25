@@ -72,6 +72,48 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayFetch()
+	{
+		$data = array(
+			'post-1' => array(
+				'comments' => array(
+					'tags' => array(
+						'#foo', '#bar',
+					),
+				),
+			),
+			'post-2' => array(
+				'comments' => array(
+					'tags' => array(
+						'#baz',
+					),
+				),
+			),
+		);
+
+		$this->assertEquals(array(
+			0 => array(
+				'tags' => array(
+					'#foo', '#bar',
+				),
+			),
+			1 => array(
+				'tags' => array(
+					'#baz',
+				),
+			),
+		), array_fetch($data, 'comments'));
+
+		$this->assertEquals(array(array('#foo', '#bar'), array('#baz')), array_fetch($data, 'comments.tags'));
+	}
+
+
+	public function testArrayFlatten()
+	{
+		$this->assertEquals(array('#foo', '#bar', '#baz'), array_flatten(array(array('#foo', '#bar'), array('#baz'))));
+	}
+
+
 	public function testStrIs()
 	{
 		$this->assertTrue(str_is('*.dev', 'localhost.dev'));

@@ -96,6 +96,27 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Fetch a nested element of the collection.
+	 *
+	 * @param  string  $key
+	 * @retunr Illuminate\Support\Collection
+	 */
+	public function fetch($key)
+	{
+		return new Collection(array_fetch($this, $key));
+	}
+
+	/**
+	 * Get a flattened array of the items in the collection.
+	 *
+	 * @return array
+	 */
+	public function flatten()
+	{
+		return array_flatten($this->items);
+	}
+
+	/**
 	 * Determine if the collection is empty or not.
 	 *
 	 * @return bool
