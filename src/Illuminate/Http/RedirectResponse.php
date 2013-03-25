@@ -28,9 +28,16 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * @param  mixed   $value
 	 * @return Illuminate\Http\RedirectResponse
 	 */
-	public function with($key, $value)
+	public function with($key, $value = null)
 	{
-		$this->session->flash($key, $value);
+		if (is_array($key))
+		{
+			foreach ($key as $k => $v) $this->with($k, $v);
+		}
+		else
+		{
+			$this->session->flash($key, $value);
+		}
 
 		return $this;
 	}
