@@ -458,6 +458,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCurrentRouteNameCanBeRetrieved()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$route = $router->get('foo', array('as' => 'foo.route', function() {}));
+		$router->setCurrentRoute($route);
+
+		$this->assertEquals('foo.route', $router->currentRouteName());
+	}
+
+
 	public function testCurrentRouteActionCanBeChecked()
 	{
 		$router = new Router(new Illuminate\Container\Container);

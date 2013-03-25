@@ -51,6 +51,7 @@
 - Added `array_fetch` and `array_flatten`. Added `fetch` and `flatten` to `Collection` class.
 - Added `merge` method to the Collection class.
 - Added an `addSelect` method to the query builder.
+- Added `Route::currentRouteName` and `Route::currentRouteAction`.
 
 ## Beta 3
 

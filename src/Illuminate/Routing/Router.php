@@ -1350,6 +1350,19 @@ class Router {
 	}
 
 	/**
+	 * Get the current route name.
+	 *
+	 * @return string|null
+	 */
+	public function currentRouteName()
+	{
+		foreach ($this->routes->all() as $name => $route)
+		{
+			if ($route === $this->currentRoute) return $name;
+		}
+	}
+
+	/**
 	 * Determine if the current route has a given name.
 	 *
 	 * @param  string  $name
@@ -1363,6 +1376,16 @@ class Router {
 	}
 
 	/**
+	 * Get the current route action.
+	 *
+	 * @return string|null
+	 */
+	public function currentRouteAction()
+	{
+		return $this->currentRoute->getOption('_uses');
+	}
+
+	/**
 	 * Determine if the current route uses a given controller action.
 	 *
 	 * @param  string  $action
@@ -1370,7 +1393,7 @@ class Router {
 	 */
 	public function currentRouteUses($action)
 	{
-		return $this->currentRoute->getOption('_uses') === $action;
+		return $this->currentRouteAction() === $action;
 	}
 
 	/**
