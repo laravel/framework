@@ -53,6 +53,7 @@
 - Added an `addSelect` method to the query builder.
 - Added `Route::currentRouteName` and `Route::currentRouteAction`.
 - Protect against mass assignment by default.
+- Make `add` and `merge` methods on the `MessageBag` chainable.
 
 ## Beta 3
 
