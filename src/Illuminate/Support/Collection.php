@@ -117,6 +117,23 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Merge the collection itmes into a single array.
+	 *
+	 * @return Illuminate\Support\Collection
+	 */
+	public function merge()
+	{
+		$results = array();
+
+		foreach ($this->items as $values)
+		{
+			$results = array_merge($results, $values);
+		}
+
+		$this->items = $results;
+	}
+
+	/**
 	 * Determine if the collection is empty or not.
 	 *
 	 * @return bool
