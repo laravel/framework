@@ -78,7 +78,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
-	
+
 	/**
 	 * Call a named route and return the Response.
 	 *
@@ -219,7 +219,14 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		foreach ($bindings as $key => $value)
 		{
-			$this->assertSessionHas($key, $value);
+			if(is_int($key))
+			{
+				$this->assertSessionHas($value);
+			}
+			else
+			{
+				$this->assertSessionHas($key, $value);
+			}
 		}
 	}
 
