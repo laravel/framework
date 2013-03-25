@@ -142,7 +142,14 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		foreach ($bindings as $key => $value)
 		{
-			$this->assertViewHas($key, $value);
+			if (is_int($key))
+			{
+				$this->assertViewHas($value);
+			}
+			else
+			{
+				$this->assertViewHas($key, $value);
+			}
 		}
 	}
 
