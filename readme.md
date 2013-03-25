@@ -49,6 +49,7 @@
 - Properties passed to Eloquent `fill` or `__construct` beginning with an underscore will be ignored.
 - Changed cache stores to be implementors of a `StoreInterface` rather than extenders of a `Store` abstract class. Injected implementations into a `Cache\Repository` class.
 - Added `array_fetch` and `array_flatten`. Added `fetch` and `flatten` to `Collection` class.
+- Added `merge` method to the Collection class.
 
 ## Beta 3
 
