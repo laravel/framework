@@ -552,9 +552,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ($this->exists)
 		{
-			$key = $this->getKeyName();
+			// After firing the "deleting" event, we can go ahead and delete off the model
+			// then call the "deleted" event. These events could give the developer the
+			// opportunity to clear any relationships on the model or do other works.
+			$this->fireModelEvent('deleting', false);
 
-			return $this->newQuery()->where($key, $this->getKey())->delete();
+			$this->newQuery()->where($this->getKeyName(), $this->getKey())->delete();
+
+			$this->fireModelEvent('deleted', false);
 		}
 	}
 
@@ -600,6 +605,28 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function created(Closure $callback)
 	{
 		static::registerModelEvent('created', $callback);
+	}
+
+	/**
+	 * Register a deleting model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function deleting(Closure $callback)
+	{
+		static::registerModelEvent('deleting', $callback);
+	}
+
+	/**
+	 * Register a deleted model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function deleted(Closure $callback)
+	{
+		static::registerModelEvent('deleted', $callback);
 	}
 
 	/**
