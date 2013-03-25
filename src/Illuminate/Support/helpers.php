@@ -121,7 +121,12 @@ if ( ! function_exists('array_fetch'))
 		{
 			$results = array();
 
-			foreach ($array as $value) $results[] = $value[$segment];
+			foreach ($array as $value)
+			{
+				$value = (array) $value;
+
+				$results[] = $value[$segment];
+			}
 
 			$array = array_values($results);
 		}

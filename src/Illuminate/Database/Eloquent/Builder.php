@@ -94,6 +94,33 @@ class Builder {
 	}
 
 	/**
+	 * Get an array with the values of a given column.
+	 *
+	 * @param  string  $column
+	 * @param  string  $key
+	 * @return array
+	 */
+	public function lists($column, $key = null)
+	{
+		$results = $this->query->lists($column, $key);
+
+		// If the model has a mutator for the requested column, we will spin through
+		// the results and mutate the values so that the mutated version of these
+		// columns are returned as you would expect from these Eloquent models.
+		if ($this->model->hasGetMutator($column))
+		{
+			foreach ($results as $key => &$value)
+			{
+				$fill = array($column => $value);
+
+				$value = $this->model->newInstance($fill)->$column;
+			}
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Get a paginator for the "select" statement.
 	 *
 	 * @param  int    $perPage
