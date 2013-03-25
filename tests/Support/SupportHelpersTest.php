@@ -71,6 +71,23 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('dayle', array_first($array, function($key, $value) { return $value == 'dayle'; }));
 	}
 
+	public function testIsAssoc()
+	{
+		$array = array(1, 2, 3);
+		$this->assertEquals(false, is_assoc($array));
+
+		$array = array(1 => 'test', 2 => 'test1', 3 => 'test2');
+		$this->assertEquals(true, is_assoc($array));
+	}	
+
+	public function testArrayAssoc()
+	{
+		$array = array(1, 2, 3);
+		$this->assertEquals(array(1 => array(), 2 => array(), 3 => array()), array_assoc($array));
+
+		$array = array(1 => 'test1', 2 => 'test2', 3 => 'test3');
+		$this->assertEquals(array(1 => 'test1', 2 => 'test2', 3 => 'test3'), array_assoc($array));
+	}
 
 	public function testArrayFetch()
 	{
