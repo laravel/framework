@@ -219,7 +219,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		foreach ($bindings as $key => $value)
 		{
-			if(is_int($key))
+			if (is_int($key))
 			{
 				$this->assertSessionHas($value);
 			}
