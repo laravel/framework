@@ -8,8 +8,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testFirstReturnsFirstItemInCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
+
 		$this->assertEquals('foo', $c->first());
 	}
+
 
 	public function testLastReturnsLastItemInCollection()
 	{
@@ -17,6 +19,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('bar', $c->last());
 	}
+
+
+	public function testPopReturnsAndRemovesFirstItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('foo', $c->pop());
+		$this->assertEquals('bar', $c->first());
+	}
+
+
+	public function testEmptyCollectionIsEmpty()
+	{
+		$c = new Collection();
+
+		$this->assertTrue($c->isEmpty());
+	} 
 
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
