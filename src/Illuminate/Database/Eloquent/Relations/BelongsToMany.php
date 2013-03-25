@@ -396,19 +396,56 @@ class BelongsToMany extends Relation {
 		// if they exist in the array of current ones, and if not we will insert.
 		$current = $this->newPivotQuery()->lists($this->otherKey);
 
-		foreach ($ids as $id)
-		{
-			if ( ! in_array($id, $current)) $this->attach($id);
-		}
+		$records = $this->formatSyncList($ids);
+
+		$this->attachNew($records, $current);
+
+		$detach = array_diff($current, array_keys($records));
 
 		// Next, we will take the differences of the currents and given IDs and detach
 		// all of the entities that exist in the "current" array but are not in the
 		// the array of the IDs given to the method which will complete the sync.
-		$detach = array_diff($current, $ids);
-
 		if (count($detach) > 0)
 		{
 			$this->detach($detach);
+		}
+	}
+
+	/**
+	 * Format the sync list so that is is keyed by ID.
+	 *
+	 * @param  array  $records
+	 * @return array
+	 */
+	protected function formatSyncList(array $records)
+	{
+		$results = array();
+
+		foreach ($records as $id => $attributes)
+		{
+			if (is_int($attributes))
+			{
+				list($id, $attributes) = array($attributes, array());
+			}
+
+			$results[$id] = $attributes;
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Attach all of the IDs that aren't in the current array.
+	 *
+	 * @param  array  $records
+	 * @param  array  $current
+	 * @return void
+	 */
+	protected function attachNew(array $records, array $current)
+	{
+		foreach ($records as $id => $attributes)
+		{
+			if ( ! in_array($id, $current)) $this->attach($id, $attributes);
 		}
 	}
 

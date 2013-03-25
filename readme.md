@@ -57,6 +57,7 @@
 - Added `deleting` and `deleted` methods to Eloquent models. Both new events.
 - Added `pop` and `shift` methods to Eloquent collection.
 - Allow `Input::get` to be used on JSON requests to give unified API across request types.
+- Allow `sync` to also update the other pivot table attributes.
 
 ## Beta 3
 
