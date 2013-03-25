@@ -130,7 +130,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 			$results = array_merge($results, $values);
 		}
 
-		$this->items = $results;
+		return new Collection($results);
 	}
 
 	/**

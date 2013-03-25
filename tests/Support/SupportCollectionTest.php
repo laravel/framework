@@ -84,4 +84,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('#foo', '#bar', '#baz'), $c->flatten());
 	}
 
+
+	public function testMerge()
+	{
+		$data = new Collection(array(array($object1 = new StdClass), array($object2 = new StdClass)));
+		$this->assertEquals(array($object1, $object2), $data->merge()->all());
+	}
+
 }
