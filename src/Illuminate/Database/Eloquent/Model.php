@@ -232,10 +232,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			{
 				$this->setAttribute($key, $value);
 			}
-			elseif ( ! starts_with($key, '_'))
-			{
-				throw new MassAssignmentException($key);
-			}
 		}
 
 		return $this;
