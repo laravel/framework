@@ -18,13 +18,36 @@ class HtmlServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->registerHtmlBuilder();
+
+		$this->registerFormBuilder();
+	}
+
+	/**
+	 * Register the HTML builder instance.
+	 *
+	 * @return void
+	 */
+	protected function registerHtmlBuilder()
+	{
+		$this->app['html'] = $this->app->share(function($app)
+		{
+			return new HtmlBuilder($app['url']);
+		});
+	}
+
+	/**
+	 * Register the form builder instance.
+	 *
+	 * @return void
+	 */
+	protected function registerFormBuilder()
+	{
 		$this->app['form'] = $this->app->share(function($app)
 		{
-			$form = new FormBuilder($app['url'], $app['session']->getToken());
+			$form = new FormBuilder($app['html'], $app['url'], $app['session']->getToken());
 
-			$form->setSessionStore($app['session']);
-
-			return $form;
+			return $form->setSessionStore($app['session']);
 		});
 	}
 
@@ -35,7 +58,7 @@ class HtmlServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('form');
+		return array('html', 'form');
 	}
 
 }

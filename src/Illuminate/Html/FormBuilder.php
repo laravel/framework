@@ -7,6 +7,13 @@ use Illuminate\Session\Store as Session;
 class FormBuilder {
 
 	/**
+	 * The HTML builder instance.
+	 *
+	 * @var Illuminate\Html\HtmlBuilder
+	 */
+	protected $html;
+
+	/**
 	 * The URL generator instance.
 	 *
 	 * @var Illuminate\Routing\UrlGenerator  $url
@@ -59,12 +66,14 @@ class FormBuilder {
 	 * Create a new form builder instance.
 	 *
 	 * @param  Illuminate\Routing\UrlGenerator  $url
+	 * @param  Illuminate\Html\HtmlBuilder  $html
 	 * @param  string  $csrfToken
 	 * @return void
 	 */
-	public function __construct(UrlGenerator $url, $csrfToken)
+	public function __construct(HtmlBuilder $html, UrlGenerator $url, $csrfToken)
 	{
 		$this->url = $url;
+		$this->html = $html;
 		$this->csrfToken = $csrfToken;
 	}
 
@@ -109,7 +118,7 @@ class FormBuilder {
 		// Finally, we will concatenate all of the attributes into a single string so
 		// we can build out the final form open statement. We'll also append on an
 		// extra value for the hidden _method field if it's needed for the form.
-		$attributes = Html::attributes($attributes);
+		$attributes = $this->html->attributes($attributes);
 
 		return '<form'.$attributes.'>'.$append;
 	}
@@ -164,7 +173,7 @@ class FormBuilder {
 	{
 		$this->labels[] = $name;
 
-		$options = Html::attributes($options);
+		$options = $this->html->attributes($options);
 
 		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
 	}
@@ -196,7 +205,7 @@ class FormBuilder {
 		// when creating the HTML element. Then, we will return the entire input.
 		$options = array_merge($options, $merge);
 
-		return '<input'.Html::attributes($options).'>';
+		return '<input'.$this->html->attributes($options).'>';
 	}
 
 	/**
@@ -288,7 +297,7 @@ class FormBuilder {
 		// Next we will convert the attributes into a string form. Also we have removed
 		// the size attribute, as it was merely a short-cut for the rows and cols on
 		// the element. Then we'll create the final textarea elements HTML for us.
-		$options = Html::attributes($options);
+		$options = $this->html->attributes($options);
 
 		return '<textarea'.$options.'>'.e($value).'</textarea>';
 	}
@@ -362,7 +371,7 @@ class FormBuilder {
 		// Once we have all of this HTML, we can join this into a single element after
 		// formatting the attributes into an HTML "attributes" string, then we will
 		// build out a final select statement, which will contain all the values.
-		$options = Html::attributes($options);
+		$options = $this->html->attributes($options);
 
 		$list = implode('', $html);
 
@@ -421,7 +430,7 @@ class FormBuilder {
 
 		$options = array('value' => e($value), 'selected' => $selected);
 
-		return '<option'.Html::attributes($options).'>'.e($display).'</option>';
+		return '<option'.$this->html->attributes($options).'>'.e($display).'</option>';
 	}
 
 	/**
@@ -531,7 +540,7 @@ class FormBuilder {
 			$options['type'] = 'button';
 		}
 		
-		return '<button'.Html::attributes($options).'>'.e($value).'</button>';
+		return '<button'.$this->html->attributes($options).'>'.e($value).'</button>';
 	}
 
 	/**
@@ -713,11 +722,13 @@ class FormBuilder {
 	 * Set the session store implementation.
 	 *
 	 * @param  Illuminate\Session\Store  $session
-	 * @return void
+	 * @return Illuminate\Html\FormBuilder
 	 */
 	public function setSessionStore(Session $session)
 	{
 		$this->session = $session;
+
+		return $this;
 	}
 
 	/**

@@ -1,6 +1,26 @@
 <?php namespace Illuminate\Html;
 
+use Illuminate\Routing\UrlGenerator;
+
 class HtmlBuilder {
+
+	/**
+	 * The URL generator instance.
+	 *
+	 * @var Illuminate\Routing\UrlGenerator
+	 */
+	protected $url;
+
+	/**
+	 * Create a new HTML builder instance.
+	 *
+	 * @param  Illuminate\Routing\UrlGenerator  $url
+	 * @return void
+	 */
+	public function __construct(UrlGenerator $url = null)
+	{
+		$this->url = $url;
+	}
 
 	/**
 	 * Convert an HTML string to entities.
@@ -8,7 +28,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	public static function entities($value)
+	public function entities($value)
 	{
 		return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
 	}
@@ -19,9 +39,97 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	public static function decode($value)
+	public function decode($value)
 	{
 		return html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+	}
+
+	/**
+	 * Generate a HTML link.
+	 *
+	 * @param  string  $url
+	 * @param  string  $title
+	 * @param  array   $attributes
+	 * @param  bool    $secure
+	 * @return string
+	 */
+	public function link($url, $title = null, $attributes = array(), $secure = null)
+	{
+		$url = $this->url->to($url, $secure);
+
+		$title = $title ?: $url;
+
+		return '<a href="'.$url.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
+	}
+
+	/**
+	 * Generate a HTTPS HTML link.
+	 *
+	 * @param  string  $url
+	 * @param  string  $title
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function secureLink($url, $title = null, $attributes = array())
+	{
+		return $this->link($url, $title, $attributes, true);
+	}
+
+	/**
+	 * Generate a HTML link to an asset.
+	 *
+	 * @param  string  $url
+	 * @param  string  $title
+	 * @param  array   $attributes
+	 * @param  bool    $secure
+	 * @return string
+	 */
+	public function linkAsset($url, $title = null, $attributes = array(), $secure = null)
+	{
+		$url = $this->url->asset($url, $secure);
+
+		return $this->to($url, $title ?: $url, $attributes, $secure);
+	}
+
+	/**
+	 * Generate a HTML link to an asset.
+	 *
+	 * @param  string  $url
+	 * @param  string  $title
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function linkSecureAsset($url, $title = null, $attributes = array())
+	{
+		return $this->linkAsset($url, $title, $attributes, true);
+	}
+
+	/**
+	 * Generate a HTML link to a named route.
+	 *
+	 * @param  string  $name
+	 * @param  string  $title
+	 * @param  array   $parameters
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function linkRoute($name, $title = null, $parameters = array(), $attributes = array())
+	{
+		return $this->link($this->url->route($name, $parameters), $title, $attributes);
+	}
+
+	/**
+	 * Generate a HTML link to a controller action.
+	 *
+	 * @param  string  $action
+	 * @param  string  $title
+	 * @param  array   $parameters
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function linkAction($action, $title = null, $parameters = array(), $attributes = array())
+	{
+		return $this->link($this->url->action($action, $parameters), $title, $attributes);
 	}
 
 	/**
@@ -31,9 +139,9 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public static function ol($list, $attributes = array())
+	public function ol($list, $attributes = array())
 	{
-		return static::listing('ol', $list, $attributes);
+		return $this->listing('ol', $list, $attributes);
 	}
 
 	/**
@@ -43,9 +151,9 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public static function ul($list, $attributes = array())
+	public function ul($list, $attributes = array())
 	{
-		return static::listing('ul', $list, $attributes);
+		return $this->listing('ul', $list, $attributes);
 	}
 
 	/**
@@ -67,10 +175,10 @@ class HtmlBuilder {
 		// present in the array. Then we will build out the final listing elements.
 		foreach ($list as $key => $value)
 		{
-			$html .= static::listingElement($key, $type, $value);
+			$html .= $this->listingElement($key, $type, $value);
 		}
 
-		$attributes = static::attributes($attributes);
+		$attributes = $this->attributes($attributes);
 
 		return "<{$type}{$attributes}>{$html}</{$type}>";
 	}
@@ -87,7 +195,7 @@ class HtmlBuilder {
 	{
 		if (is_array($value))
 		{
-			return static::nestedListing($key, $type, $value);
+			return $this->nestedListing($key, $type, $value);
 		}
 		else
 		{
@@ -107,11 +215,11 @@ class HtmlBuilder {
 	{
 		if (is_int($key))
 		{
-			return static::listing($type, $value);
+			return $this->listing($type, $value);
 		}
 		else
 		{
-			return '<li>'.$key.static::listing($type, $value).'</li>';
+			return '<li>'.$key.$this->listing($type, $value).'</li>';
 		}
 	}
 
@@ -121,7 +229,7 @@ class HtmlBuilder {
 	 * @param  array  $attributes
 	 * @return string
 	 */
-	public static function attributes($attributes)
+	public function attributes($attributes)
 	{
 		$html = array();
 
@@ -130,7 +238,7 @@ class HtmlBuilder {
 		// form like required="required" instead of using incorrect numerics.
 		foreach ((array) $attributes as $key => $value)
 		{
-			$element = static::attributeElement($key, $value);
+			$element = $this->attributeElement($key, $value);
 
 			if ( ! is_null($element)) $html[] = $element;
 		}
