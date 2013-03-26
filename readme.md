@@ -63,6 +63,7 @@
 - Added `@lang` and `@choice` Blade directives.
 - Do not run route level after filters if response is returned from before filter.
 - Added support for "mail" in addition to "smtp" in `Mail`.
+- Added `link_to`, `link_to_asset`, `link_to_route`, `link_to_action` helpers.
 
 ## Beta 3
 
