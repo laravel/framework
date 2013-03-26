@@ -646,7 +646,7 @@ class Builder {
 	{
 		$finder = substr($method, 5);
 
-		$segments = preg_split('/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$segments = preg_split('/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
 		// The connector variable will determine which connector will be used for the
 		// query condition. We will change it as we come across new boolean values
