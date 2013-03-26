@@ -62,6 +62,7 @@
 - Made `storage` path configurable.
 - Added `@lang` and `@choice` Blade directives.
 - Do not run route level after filters if response is returned from before filter.
+- Added support for "mail" in addition to "smtp" in `Mail`.
 
 ## Beta 3
 
