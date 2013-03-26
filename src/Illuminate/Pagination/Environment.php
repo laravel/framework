@@ -33,10 +33,10 @@ class Environment {
 	 * @var string
 	 */
 	protected $viewName;
-	
+
 	/**
 	 * The number of the current page.
-	 * 
+	 *
 	 * @var int
 	 */
 	protected $currentPage;
@@ -56,6 +56,13 @@ class Environment {
 	protected $baseUrl;
 
 	/**
+	 * The input parameter used for the current page.
+	 *
+	 * @var string
+	 */
+	protected $pageParam = 'page';
+
+	/**
 	 * Create a new pagination environment.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
@@ -63,12 +70,17 @@ class Environment {
 	 * @param  Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @return void
 	 */
-	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans)
+	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageParam = null)
 	{
 		$this->view = $view;
 		$this->trans = $trans;
 		$this->request = $request;
 		$this->setupPaginationEnvironment();
+
+		if (isset($pageParam))
+		{
+			$this->pageParam = $pageParam;
+		}
 	}
 
 	/**
@@ -116,7 +128,7 @@ class Environment {
 	 */
 	public function getCurrentPage()
 	{
-		$page = (int) $this->currentPage ?: $this->request->query->get('page', 1);
+		$page = (int) $this->currentPage ?: $this->request->query->get($this->pageParam, 1);
 
 		if ($page < 1 or filter_var($page, FILTER_VALIDATE_INT) === false)
 		{
@@ -125,10 +137,10 @@ class Environment {
 
 		return $page;
 	}
-	
+
 	/**
 	 * Set the number of the current page.
-	 * 
+	 *
 	 * @param  int  $number
 	 * @return void
 	 */
@@ -156,6 +168,27 @@ class Environment {
 	public function setBaseUrl($baseUrl)
 	{
 		$this->baseUrl = $baseUrl;
+	}
+
+	/**
+	 * Set the input page parameter in use by the paginator.
+	 *
+	 * @param  string  $pageParam
+	 * @return void
+	 */
+	public function setPageParam($pageParam)
+	{
+		$this->pageParam = $pageParam;
+	}
+
+	/**
+	 * Get the input page parameter in use by the paginator.
+	 *
+	 * @return string
+	 */
+	public function getPageParam()
+	{
+		return $this->pageParam;
 	}
 
 	/**
