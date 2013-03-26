@@ -36,9 +36,27 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
 		$query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
-		$query->shouldReceive('get')->once()->andReturn('foo');
+		$query->shouldReceive('lists')->once()->andReturn('foo');
 
 		$this->assertEquals('foo', $repo->getLast());
+	}
+
+
+	public function testGetLastMigrationsWithOffsetGetsFromCorrectOffset()
+	{
+		$repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', array('getLastBatchNumber'), array(
+			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations'
+		));
+		$repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(5));
+		$query = m::mock('stdClass');
+		$connectionMock = m::mock('Illuminate\Database\Connection');
+		$repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
+		$query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
+		$query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
+		$query->shouldReceive('lists')->once()->andReturn('foo');
+
+		$this->assertEquals('foo', $repo->getLast(-4));
 	}
 
 
@@ -64,9 +82,8 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('migration', 'foo')->andReturn($query);
 		$query->shouldReceive('delete')->once();
-		$migration = (object) array('migration' => 'foo');
 
-		$repo->delete($migration);
+		$repo->delete('foo');
 	}
 
 
