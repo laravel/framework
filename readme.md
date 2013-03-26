@@ -61,6 +61,7 @@
 - Pass console `Command` instance to database seeders.
 - Made `storage` path configurable.
 - Added `@lang` and `@choice` Blade directives.
+- Do not run route level after filters if response is returned from before filter.
 
 ## Beta 3
 

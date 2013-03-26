@@ -322,6 +322,23 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAfterMiddlewaresAreNotCalledWhenRouteIsNotCalled()
+	{
+		$router = new Router;
+		$_SERVER['__filter.before'] = false;
+		$_SERVER['__filter.after'] = false;
+		$router->addFilter('before-filter', function() { $_SERVER['__filter.before'] = true; return 'foo'; });
+		$router->addFilter('after-filter', function() { $_SERVER['__filter.after'] = true; });
+		$router->get('/foo', array('before' => 'before-filter', 'after' => 'after-filter', function() { return 'bar'; }));
+		$request = Request::create('/foo', 'GET');
+		$this->assertEquals('foo', $router->dispatch($request)->getContent());
+		$this->assertTrue($_SERVER['__filter.before']);
+		$this->assertFalse($_SERVER['__filter.after']);
+		unset($_SERVER['__filter.before']);
+		unset($_SERVER['__filter.after']);
+	}
+
+
 	public function testAfterMiddlewaresAreCalledWithProperArguments()
 	{
 		$router = new Router;

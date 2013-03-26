@@ -37,14 +37,22 @@ class Route extends BaseRoute {
 	{
 		$this->parsedParameters = null;
 
-		$response = $this->callBeforeFilters($request);
-
 		// We will only call the router callable if no "before" middlewares returned
 		// a response. If they do, we will consider that the response to requests
 		// so that the request "lifecycle" will be easily halted for filtering.
+		$response = $this->callBeforeFilters($request);
+
 		if ( ! isset($response))
 		{
 			$response = $this->callCallable();
+		}
+
+		// If the response is from a filter we want to note that so that we can skip
+		// the "after" filters which should only run when the route method is run
+		// for the incoming request. Otherwise only app level filters will run.
+		else
+		{
+			$fromFilter = true;
 		}
 
 		$response = $this->router->prepare($response, $request);
@@ -52,9 +60,9 @@ class Route extends BaseRoute {
 		// Once we have the "prepared" response, we will iterate through every after
 		// filter and call each of them with the request and the response so they
 		// can perform any final work that needs to be done after a route call.
-		foreach ($this->getAfterFilters() as $filter)
+		if ( ! isset($fromFilter))
 		{
-			$this->callFilter($filter, $request, array($response));
+			$this->callAfterFilters($request, $response);
 		}
 
 		return $response;
@@ -106,6 +114,21 @@ class Route extends BaseRoute {
 		$before = $this->getBeforeFilters();
 
 		return array_merge($before, $this->router->findPatternFilters($request));	
+	}
+
+	/**
+	 * Call all of the "after" filters for a route.
+	 *
+	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @return void
+	 */
+	protected function callAfterFilters(Request $request, Response $response)
+	{
+		foreach ($this->getAfterFilters() as $filter)
+		{
+			$this->callFilter($filter, $request, array($response));
+		}
 	}
 
 	/**
