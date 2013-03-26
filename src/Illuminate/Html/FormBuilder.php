@@ -526,6 +526,11 @@ class FormBuilder {
 	 */
 	public function button($value = null, $options = array())
 	{
+		if ( ! array_key_exists('type', $options) )
+		{
+			$options['type'] = 'button';
+		}
+		
 		return '<button'.Html::attributes($options).'>'.e($value).'</button>';
 	}
 
