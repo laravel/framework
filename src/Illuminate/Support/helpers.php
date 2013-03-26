@@ -463,7 +463,7 @@ if ( ! function_exists('link_to_asset'))
 	{
 		$app = app();
 
-		return $app['html']->linkToAsset($url, $title, $attributes, $secure);
+		return $app['html']->linkAsset($url, $title, $attributes, $secure);
 	}
 }
 
@@ -482,7 +482,7 @@ if ( ! function_exists('link_to_route'))
 	{
 		$app = app();
 
-		return $app['html']->linkToRoute($name, $title, $parameters, $attributes);
+		return $app['html']->linkRoute($name, $title, $parameters, $attributes);
 	}
 }
 
@@ -501,7 +501,7 @@ if ( ! function_exists('link_to_action'))
 	{
 		$app = app();
 
-		return $app['html']->linkToAction($action, $title, $parameters, $attributes);
+		return $app['html']->linkAction($action, $title, $parameters, $attributes);
 	}
 }
 
