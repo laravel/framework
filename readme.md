@@ -58,6 +58,7 @@
 - Added `pop` and `shift` methods to Eloquent collection.
 - Allow `Input::get` to be used on JSON requests to give unified API across request types.
 - Allow `sync` to also update the other pivot table attributes.
+- Pass console `Command` instance to database seeders.
 
 ## Beta 3
 
