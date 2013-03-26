@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Queue;
 
-use Pheanstalk;
 use Pheanstalk_Job;
+use Pheanstalk_Pheanstalk as Pheanstalk;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 
 class BeanstalkdQueue extends Queue implements QueueInterface {

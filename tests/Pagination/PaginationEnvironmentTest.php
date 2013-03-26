@@ -83,9 +83,9 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 	public function testOverridingPageParam()
 	{
 		$env = $this->getEnvironment();
-		$this->assertEquals('page', $env->getPageParam());
-		$env->setPageParam('foo');
-		$this->assertEquals('foo', $env->getPageParam());
+		$this->assertEquals('page', $env->getPageName());
+		$env->setPageName('foo');
+		$this->assertEquals('foo', $env->getPageName());
 	}
 
 

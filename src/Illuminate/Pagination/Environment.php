@@ -60,7 +60,7 @@ class Environment {
 	 *
 	 * @var string
 	 */
-	protected $pageParam = 'page';
+	protected $pageName;
 
 	/**
 	 * Create a new pagination environment.
@@ -68,19 +68,16 @@ class Environment {
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @param  Illuminate\View\Environment  $view
 	 * @param  Symfony\Component\Translation\TranslatorInterface  $trans
+	 * @param  string  $pageName
 	 * @return void
 	 */
-	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageParam = null)
+	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageName = 'page')
 	{
 		$this->view = $view;
 		$this->trans = $trans;
 		$this->request = $request;
+		$this->pageName = $pageName;
 		$this->setupPaginationEnvironment();
-
-		if (isset($pageParam))
-		{
-			$this->pageParam = $pageParam;
-		}
 	}
 
 	/**
@@ -128,7 +125,7 @@ class Environment {
 	 */
 	public function getCurrentPage()
 	{
-		$page = (int) $this->currentPage ?: $this->request->query->get($this->pageParam, 1);
+		$page = (int) $this->currentPage ?: $this->request->query->get($this->pageName, 1);
 
 		if ($page < 1 or filter_var($page, FILTER_VALIDATE_INT) === false)
 		{
@@ -171,24 +168,24 @@ class Environment {
 	}
 
 	/**
-	 * Set the input page parameter in use by the paginator.
+	 * Set the input page parameter name used by the paginator.
 	 *
-	 * @param  string  $pageParam
+	 * @param  string  $pageName
 	 * @return void
 	 */
-	public function setPageParam($pageParam)
+	public function setPageName($pageName)
 	{
-		$this->pageParam = $pageParam;
+		$this->pageName = $pageName;
 	}
 
 	/**
-	 * Get the input page parameter in use by the paginator.
+	 * Get the input page parameter name used by the paginator.
 	 *
 	 * @return string
 	 */
-	public function getPageParam()
+	public function getPageName()
 	{
-		return $this->pageParam;
+		return $this->pageName;
 	}
 
 	/**

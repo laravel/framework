@@ -232,6 +232,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			{
 				$this->setAttribute($key, $value);
 			}
+			elseif ($this->totallyGuarded())
+			{
+				throw new MassAssignmentException($key);
+			}
 		}
 
 		return $this;
@@ -1077,6 +1081,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return empty($this->fillable) and ! starts_with($key, '_');
+	}
+
+	/**
+	 * Determine if the model is totally guarded.
+	 *
+	 * @return bool
+	 */
+	public function totallyGuarded()
+	{
+		return count($this->fillable) == 0 and $this->guarded == array('*');
 	}
 
 	/**

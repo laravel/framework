@@ -393,14 +393,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\MassAssignmentException
+	 */
 	public function testGlobalGuarded()
 	{
 		$model = new EloquentModelStub;
 		$model->guard(array('*'));
 		$model->fill(array('name' => 'foo', 'age' => 'bar', 'votes' => 'baz'));
-		$this->assertFalse(isset($model->name));
-		$this->assertFalse(isset($model->age));
-		$this->assertFalse(isset($model->votes));
 	}
 
 
