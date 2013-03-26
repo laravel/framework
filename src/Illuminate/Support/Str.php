@@ -90,6 +90,62 @@ class Str {
 	}
 
 	/**
+	 * Determine if a given string is json encoded
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	public static function isJson($string)
+	{
+		json_decode($string);
+		return json_last_error() === JSON_ERROR_NONE;
+	}
+
+	/**
+	 * Determine if a given string is a valid XML
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	public static function isXml($string)
+	{
+		if ( ! defined('LIBXML_COMPACT'))
+		{
+			throw new \BadFunctionCallException('libxml is required to use isXml()');
+		}
+
+		$internalErrors = libxml_use_internal_errors();
+		libxml_use_internal_errors(true);
+		$result = simplexml_load_string($string) !== false;
+		libxml_use_internal_errors($internalErrors);
+
+		return $result;
+	}
+
+	/**
+	 * Determine if a given string is serialized
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	public static function isSerialized($string)
+	{
+		$array = @unserialize($string);
+		return ! ($array === false and $string !== 'b:0;');
+	}
+
+	/**
+	 * Determine if a given string is html
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	public static function isHtml($string)
+	{
+		return strlen(strip_tags($string)) < strlen($string);
+	}
+
+	/**
 	 * Limit the number of characters in a string.
 	 *
 	 * @param  string  $value

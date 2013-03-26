@@ -125,6 +125,59 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testStrIsJson()
+	{
+		$array = array('name' => 'taylor', 'age' => 26);
+
+		$this->assertTrue(str_is_json(json_encode($array)));
+		$this->assertFalse(str_is_json(serialize($array)));
+	}
+
+
+	public function testStrIsXml()
+	{
+		$validXml = '<?xml version="1.0" encoding="UTF-8"?>
+						<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="bootstrap/autoload.php">
+							<testsuites>
+								<testsuite name="Application Test Suite">
+								<directory>./app/tests/</directory>
+								</testsuite>
+							</testsuites>
+						</phpunit>';
+
+		$invalidXml = '<?xml version="1.0" encoding="UTF-8"?>
+						<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="bootstrap/autoload.php">
+							<testsuites>
+								<testsuite name="Application Test Suite">
+								<directory>./app/tests/</directory>
+								</
+							</testsuites>
+						</phpunit>';
+
+		$this->assertTrue(str_is_xml($validXml));
+		$this->assertFalse(str_is_xml($invalidXml));
+	}
+
+
+	public function testStrIsSerialized()
+	{
+		$array = array('name' => 'taylor', 'age' => 26);
+
+		$this->assertTrue(str_is_serialized(serialize($array)));
+		$this->assertFalse(str_is_serialized(json_encode($array)));
+	}
+
+
+	public function testStrIsHtml()
+	{
+		$html = '<div class="container"><h1>A Framework For Web Artisans</h1></div>';
+		$string = strip_tags($html);
+
+		$this->assertTrue(str_is_html($html));
+		$this->assertFalse(str_is_html($string));
+	}
+
+
 	public function testStartsWith()
 	{
 		$this->assertTrue(starts_with('jason', 'jas'));

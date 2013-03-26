@@ -653,6 +653,62 @@ if ( ! function_exists('str_is'))
 	}
 }
 
+if ( ! function_exists('str_is_json'))
+{
+	/**
+	 * Determine if a given string is json encoded
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	function str_is_json($value)
+	{
+		return Illuminate\Support\Str::isJson($value);
+	}
+}
+
+if ( ! function_exists('str_is_xml'))
+{
+	/**
+	 * Determine if a given string is a valid XML
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	function str_is_xml($value)
+	{
+		return Illuminate\Support\Str::isXml($value);
+	}
+}
+
+if ( ! function_exists('str_is_serialized'))
+{
+	/**
+	 * Determine if a given string is serialized
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	function str_is_serialized($value)
+	{
+		return Illuminate\Support\Str::isSerialized($value);
+	}
+}
+
+if ( ! function_exists('str_is_html'))
+{
+	/**
+	 * Determine if a given string is html
+	 * 
+	 * @param  string $string
+	 * @return bool
+	 */
+	function str_is_html($value)
+	{
+		return Illuminate\Support\Str::isHtml($value);
+	}
+}
+
 if ( ! function_exists('str_plural'))
 {
 	/**
