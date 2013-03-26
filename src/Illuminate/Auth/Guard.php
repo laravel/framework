@@ -233,6 +233,7 @@ class Guard {
 		}
 
 		$this->user = $user;
+		$this->loggedOut = false;
 	}
 
 	/**
