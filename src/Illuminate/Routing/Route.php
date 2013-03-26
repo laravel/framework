@@ -123,7 +123,7 @@ class Route extends BaseRoute {
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
-	protected function callAfterFilters(Request $request, Response $response)
+	protected function callAfterFilters(Request $request, $response)
 	{
 		foreach ($this->getAfterFilters() as $filter)
 		{
