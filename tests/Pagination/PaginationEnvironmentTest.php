@@ -22,7 +22,7 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com', 'GET');
 		$env->setRequest($request);
-		
+
 		$this->assertInstanceOf('Illuminate\Pagination\Paginator', $env->make(array('foo', 'bar'), 2, 2));
 	}
 
@@ -51,15 +51,15 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, $env->getCurrentPage());
 	}
-	
-	
+
+
 	public function testSettingCurrentUrlOverrulesRequest()
 	{
 		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
 		$env->setRequest($request);
 		$env->setCurrentPage(3);
-		
+
 		$this->assertEquals(3, $env->getCurrentPage());
 	}
 
@@ -76,7 +76,16 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
 		$env->setRequest($request);
 
-		$this->assertEquals('http://foo.com', $env->getCurrentUrl());		
+		$this->assertEquals('http://foo.com', $env->getCurrentUrl());
+	}
+
+
+	public function testOverridingPageParam()
+	{
+		$env = $this->getEnvironment();
+		$this->assertEquals('page', $env->getPageParam());
+		$env->setPageParam('foo');
+		$this->assertEquals('foo', $env->getPageParam());
 	}
 
 
@@ -87,7 +96,7 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$trans = m::mock('Symfony\Component\Translation\TranslatorInterface');
 		$view->shouldReceive('addNamespace')->once()->with('pagination', realpath(__DIR__.'/../../src/Illuminate/Pagination').'/views');
 
-		return new Environment($request, $view, $trans);
+		return new Environment($request, $view, $trans, 'page');
 	}
 
 }
