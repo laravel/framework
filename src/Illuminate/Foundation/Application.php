@@ -107,9 +107,10 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		$this->instance('path', $paths['app']);
 
-		$this->instance('path.base', $paths['base']);
-
-		$this->instance('path.public', $paths['public']);
+		foreach (array_except($paths, array('app')) as $key => $value)
+		{
+			$this->instance("path.{$key}", $value);
+		}
 	}
 
 	/**

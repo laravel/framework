@@ -519,6 +519,19 @@ if ( ! function_exists('starts_with'))
 	}
 }
 
+if ( ! function_exists('storage_path'))
+{
+	/**
+	 * Get the path to the storage folder.
+	 *
+	 * @return  string
+	 */
+	function storage_path()
+	{
+		return app('path.storage');
+	}
+}
+
 if ( ! function_exists('str_contains'))
 {
 	/**
