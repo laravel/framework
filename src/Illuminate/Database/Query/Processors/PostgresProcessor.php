@@ -21,7 +21,7 @@ class PostgresProcessor extends Processor {
 
 		$result = (array) $results[0];
 
-		return (int) $row[$sequence];
+		return (int) $result[$sequence];
 	}
 
 }
