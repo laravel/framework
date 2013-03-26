@@ -156,7 +156,7 @@ class RoutesCommand extends Command {
 
 		foreach($this->getColumns($routes) as $key => $column)
 		{
-			$widths[$key] = max(array_map('strlen', $column));
+			$widths[$key] = max(array_map('strlen', $column)) + $padding;
 		}
 
 		return $widths;
