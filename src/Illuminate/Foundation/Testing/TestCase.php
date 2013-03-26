@@ -60,6 +60,27 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Call the given HTTPS URI and return the Response.
+	 *
+	 * @param  string  $method
+	 * @param  string  $uri
+	 * @param  array   $parameters
+	 * @param  array   $files
+	 * @param  array   $server
+	 * @param  string  $content
+	 * @param  bool    $changeHistory
+	 * @return Illuminate\Http\Response
+	 */
+	public function callSecure()
+	{
+		$parameters = func_get_args();
+
+		$parameters[1] = 'https://localhost/'.ltrim($parameters[1], '/');
+
+		return call_user_func_array(array($this, 'call'), $parameters);
+	}
+
+	/**
 	 * Call a controller action and return the Response.
 	 *
 	 * @param  string  $method
