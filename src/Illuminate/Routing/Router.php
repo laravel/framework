@@ -1012,12 +1012,15 @@ class Router {
 	{
 		$path = $request->getPathInfo();
 
-		if (strlen($path) > 1 and ends_with($path, '/'))
+		if ($path == '/')
 		{
-			return '/'.ltrim(substr($path, 0, -1), '/');
+			return '/';
 		}
 
-		return '/'.ltrim($path, '/');
+		if (strpos($path, '//') === false)
+		{
+			return rtrim($path, '/');
+		}
 	}
 
 	/**
