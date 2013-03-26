@@ -16,7 +16,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$memcache = $this->getMock('Memcached', array('get', 'getResultCode'));
 		$memcache->expects($this->once())->method('get')->will($this->returnValue('bar'));
-		$memcache->expects($this->once())->method('get')->will($this->returnValue(0));
+		$memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));
 		$store = new Illuminate\Cache\MemcachedStore($memcache);
 		$this->assertEquals('bar', $store->get('foo'));
 	}

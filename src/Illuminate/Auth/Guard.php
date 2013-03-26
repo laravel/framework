@@ -232,7 +232,7 @@ class Guard {
 			$this->events->fire('auth.login', array($user, $remember));
 		}
 
-		$this->user = $user;
+		$this->setUser($user);
 	}
 
 	/**
@@ -388,6 +388,8 @@ class Guard {
 	public function setUser(UserInterface $user)
 	{
 		$this->user = $user;
+
+		$this->loggedOut = false;
 	}
 
 	/**
