@@ -65,6 +65,7 @@
 - Added support for "mail" in addition to "smtp" in `Mail`.
 - Added `link_to`, `link_to_asset`, `link_to_route`, `link_to_action` helpers.
 - Routes with too many leading or trailing slashes will now 404.
+- Added `callSecure` test helper.
 
 ## Beta 3
 
