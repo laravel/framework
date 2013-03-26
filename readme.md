@@ -60,6 +60,7 @@
 - Allow `sync` to also update the other pivot table attributes.
 - Pass console `Command` instance to database seeders.
 - Made `storage` path configurable.
+- Added `@lang` and `@choice` Blade directives.
 
 ## Beta 3
 

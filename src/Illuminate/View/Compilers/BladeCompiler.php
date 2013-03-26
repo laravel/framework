@@ -31,9 +31,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'Each',
 		'Yields',
 		'Shows',
+		'Language',
 		'SectionStart',
 		'SectionStop',
-		'Language',
 	);
 
 	/**
@@ -320,6 +320,23 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile Blade language and language choice statements into valid PHP.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileLanguage($value)
+	{
+		$pattern = $this->createMatcher('lang');
+
+		$value = preg_replace($pattern, '$1<?php echo Lang::get$2; ?>', $value);
+
+		$pattern = $this->createMatcher('choice');
+
+		return preg_replace($pattern, '$1<?php echo Lang::choice$2; ?>', $value);
+	}
+
+	/**
 	 * Compile Blade section start statements into valid PHP.
 	 *
 	 * @param  string  $value
@@ -343,22 +360,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$pattern = $this->createPlainMatcher('stop');
 
 		return preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
-	}
-	
-	/**
-	 * Compile Blade language and language choice statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileLanguage($value)
-	{
-		$pattern = $this->createMatcher('lang');
-		$value = preg_replace($pattern, '$1<?php echo Lang::get$2; ?>', $value);
-		
-		$pattern = $this->createMatcher('choice');
-		return preg_replace($pattern, '$1<?php echo Lang::choice$2; ?>', $value);
-		
 	}
 
 	/**
