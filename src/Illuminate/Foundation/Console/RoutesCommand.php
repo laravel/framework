@@ -94,7 +94,7 @@ class RoutesCommand extends Command {
 
 		$action = $route->getAction() ?: 'Closure';
 
-		return array('uri' => $uri, 'name' => $name, 'action' => $action);
+		return array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action);
 	}
 
 	/**
@@ -178,6 +178,17 @@ class RoutesCommand extends Command {
 		}
 
 		return $columns;
+	}
+
+	/**
+	 * Get the route name for the given name.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getRouteName($name)
+	{
+		return str_contains($name, ' ') ? '' : $name;
 	}
 
 }
