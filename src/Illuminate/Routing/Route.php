@@ -369,6 +369,16 @@ class Route extends BaseRoute {
 	}
 
 	/**
+	 * Get the name of the action (if any) used by the route.
+	 *
+	 * @return string
+	 */
+	public function getAction()
+	{
+		return $this->getOption('_uses');
+	}
+
+	/**
 	 * Get the before filters on the route.
 	 *
 	 * @return array
