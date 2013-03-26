@@ -39,7 +39,8 @@ class MemcachedStore implements StoreInterface {
 	{
 		$value = $this->memcached->get($this->prefix.$key);
 
-		if ($value !== false)
+		// Memcached::RES_SUCCESS === 0
+		if ($this->memcached->getResultCode() === 0)
 		{
 			return $value;
 		}
