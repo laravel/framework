@@ -59,6 +59,26 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Get and remove the first item from the collection.
+	 *
+	 * @return mixed|null
+	 */
+	public function shift()
+	{
+		return array_shift($this->items);
+	}
+
+	/**
+	 * Get and remove the last item from the collection.
+	 *
+	 * @return mixed|null
+	 */
+	public function pop()
+	{
+		return array_pop($this->items);
+	}
+
+	/**
 	 * Execute a callback over each item.
 	 *
 	 * @param  Closure  $callback
@@ -93,6 +113,44 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		$this->items = array_filter($this->items, $callback);
 
 		return $this;
+	}
+
+	/**
+	 * Fetch a nested element of the collection.
+	 *
+	 * @param  string  $key
+	 * @retunr Illuminate\Support\Collection
+	 */
+	public function fetch($key)
+	{
+		return new Collection(array_fetch($this, $key));
+	}
+
+	/**
+	 * Get a flattened array of the items in the collection.
+	 *
+	 * @return array
+	 */
+	public function flatten()
+	{
+		return array_flatten($this->items);
+	}
+
+	/**
+	 * Merge the collection itmes into a single array.
+	 *
+	 * @return Illuminate\Support\Collection
+	 */
+	public function merge()
+	{
+		$results = array();
+
+		foreach ($this->items as $values)
+		{
+			$results = array_merge($results, $values);
+		}
+
+		return new Collection($results);
 	}
 
 	/**

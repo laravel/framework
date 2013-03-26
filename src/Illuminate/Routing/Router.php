@@ -102,9 +102,16 @@ class Router {
 	protected $runFilters = true;
 
 	/**
+	 * The default actions for a resourceful controller.
+	 *
+	 * @var array
+	 */
+	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+
+	/**
 	 * Create a new router instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function __construct(Container $container = null)
@@ -174,6 +181,18 @@ class Router {
 	public function delete($pattern, $action)
 	{
 		return $this->createRoute('delete', $pattern, $action);
+	}
+
+	/**
+	 * Add a new route to the collection.
+	 *
+	 * @param  string  $pattern
+	 * @param  mixed   $action
+	 * @return Illuminate\Routing\Route
+	 */
+	public function options($pattern, $action)
+	{
+		return $this->createRoute('options', $pattern, $action);
 	}
 
 	/**
@@ -264,14 +283,60 @@ class Router {
 	 */
 	public function resource($resource, $controller, array $options = array())
 	{
-		$defaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+		// If the resource name contains a slash, we will assume the developer wishes to
+		// register these resource routes with a prefix so we will set that up out of
+		// the box so they don't have to mess with it. Otherwise, we will continue.
+		if (str_contains($resource, '/'))
+		{
+			$this->prefixedResource($resource, $controller, $options);
 
+			return;
+		}
+
+		// We need to extract the base resource from the resource name. Nested resources
+		// are supported in the framework, but we need to know what name to use for a
+		// place-holder on the route wildcards, which should be the base resources.
 		$base = $this->getBaseResource($resource);
+
+		$defaults = $this->resourceDefaults;
 
 		foreach ($this->getResourceMethods($defaults, $options) as $method)
 		{
 			$this->{'addResource'.ucfirst($method)}($resource, $base, $controller);
 		}
+	}
+
+	/**
+	 * Build a set of prefixed resource routes.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $controller
+	 * @param  array   $options
+	 * @return void
+	 */
+	protected function prefixedResource($resource, $controller, array $options)
+	{
+		list($resource, $prefix) = $this->extractResourcePrefix($resource);
+
+		$me = $this;
+
+		return $this->group(array('prefix' => $prefix), function() use ($me, $resource, $controller, $options)
+		{
+			$me->resource($resource, $controller, $options);
+		});
+	}
+
+	/**
+	 * Extract the resource and prefix from a resource name.
+	 *
+	 * @param  string  $resource
+	 * @return array
+	 */
+	protected function extractResourcePrefix($resource)
+	{
+		$segments = explode('/', $resource);
+
+		return array($segments[count($segments) - 1], implode('/', array_slice($segments, 0, -1)));
 	}
 
 	/**
@@ -539,9 +604,9 @@ class Router {
 	{
 		if (count($this->groupStack) > 0)
 		{
-			$last = count($this->groupStack) - 1;
+			$last = $this->groupStack[count($this->groupStack) - 1];
 
-			$this->groupStack[] = array_merge_recursive($this->groupStack[$last], $attributes);
+			$this->groupStack[] = array_merge_recursive($last, $attributes);
 		}
 		else
 		{
@@ -648,7 +713,7 @@ class Router {
 	{
 		$prefix = $this->mergeGroupPrefix($action);
 
-		$action = array_merge($this->groupStack[$index], $action);
+		$action = array_merge_recursive($this->groupStack[$index], $action);
 
 		// If we have a prefix, we will override the merged prefix with this correctly
 		// concatenated one since prefixes shouldn't merge like the other groupable
@@ -914,7 +979,7 @@ class Router {
 		// that's used by the Illuminate foundation framework for responses.
 		try
 		{
-			$path = $this->formatRequestPath($request);
+			$path = $request->getPathInfo();
 
 			$parameters = $this->getUrlMatcher($request)->match($path);
 		}
@@ -935,24 +1000,6 @@ class Router {
 		$route->setParameters($parameters);
 
 		return $route;
-	}
-
-	/**
-	 * Format the request path info for routing.
-	 *
-	 * @param  Illuminate\Http\Request  $request
-	 * @return string
-	 */
-	protected function formatRequestPath($request)
-	{
-		$path = $request->getPathInfo();
-
-		if (strlen($path) > 1 and ends_with($path, '/'))
-		{
-			return '/'.ltrim(substr($path, 0, -1), '/');
-		}
-
-		return '/'.ltrim($path, '/');
 	}
 
 	/**
@@ -1099,7 +1146,7 @@ class Router {
 	/**
 	 * Find the patterned filters matching a request.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return array
 	 */
 	public function findPatternFilters(Request $request)
@@ -1250,7 +1297,7 @@ class Router {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
@@ -1285,6 +1332,19 @@ class Router {
 	}
 
 	/**
+	 * Get the current route name.
+	 *
+	 * @return string|null
+	 */
+	public function currentRouteName()
+	{
+		foreach ($this->routes->all() as $name => $route)
+		{
+			if ($route === $this->currentRoute) return $name;
+		}
+	}
+
+	/**
 	 * Determine if the current route has a given name.
 	 *
 	 * @param  string  $name
@@ -1298,6 +1358,16 @@ class Router {
 	}
 
 	/**
+	 * Get the current route action.
+	 *
+	 * @return string|null
+	 */
+	public function currentRouteAction()
+	{
+		return $this->currentRoute->getOption('_uses');
+	}
+
+	/**
 	 * Determine if the current route uses a given controller action.
 	 *
 	 * @param  string  $action
@@ -1305,7 +1375,7 @@ class Router {
 	 */
 	public function currentRouteUses($action)
 	{
-		return $this->currentRoute->getOption('_uses') === $action;
+		return $this->currentRouteAction() === $action;
 	}
 
 	/**

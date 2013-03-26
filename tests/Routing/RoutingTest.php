@@ -20,9 +20,6 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('bar', $router->dispatch($request)->getContent());
 
-		$request = Request::create('/foo/', 'GET');
-		$this->assertEquals('bar', $router->dispatch($request)->getContent());
-
 		$request = Request::create('http://foo.com', 'GET');
 		$this->assertEquals('root', $router->dispatch($request)->getContent());
 
@@ -142,6 +139,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/{foo}/bar/{bar}/edit', $router->getRoutes()->get('foo.bar.edit')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.update')->getPath());
 		$this->assertEquals('/foo/{foo}/bar/{bar}', $router->getRoutes()->get('foo.bar.destroy')->getPath());
+
+		$router->resource('admin/foo.baz', 'FooController');
+
+		$this->assertEquals('/admin/foo/{foo}/baz', $router->getRoutes()->get('admin.foo.baz.index')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}', $router->getRoutes()->get('admin.foo.baz.show')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/create', $router->getRoutes()->get('admin.foo.baz.create')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz', $router->getRoutes()->get('admin.foo.baz.store')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}/edit', $router->getRoutes()->get('admin.foo.baz.edit')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}', $router->getRoutes()->get('admin.foo.baz.update')->getPath());
+		$this->assertEquals('/admin/foo/{foo}/baz/{baz}', $router->getRoutes()->get('admin.foo.baz.destroy')->getPath());
 	}
 
 
@@ -312,6 +319,23 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAfterMiddlewaresAreNotCalledWhenRouteIsNotCalled()
+	{
+		$router = new Router;
+		$_SERVER['__filter.before'] = false;
+		$_SERVER['__filter.after'] = false;
+		$router->addFilter('before-filter', function() { $_SERVER['__filter.before'] = true; return 'foo'; });
+		$router->addFilter('after-filter', function() { $_SERVER['__filter.after'] = true; });
+		$router->get('/foo', array('before' => 'before-filter', 'after' => 'after-filter', function() { return 'bar'; }));
+		$request = Request::create('/foo', 'GET');
+		$this->assertEquals('foo', $router->dispatch($request)->getContent());
+		$this->assertTrue($_SERVER['__filter.before']);
+		$this->assertFalse($_SERVER['__filter.after']);
+		unset($_SERVER['__filter.before']);
+		unset($_SERVER['__filter.after']);
+	}
+
+
 	public function testAfterMiddlewaresAreCalledWithProperArguments()
 	{
 		$router = new Router;
@@ -412,7 +436,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$routes = array_values($router->getRoutes()->getIterator()->getArrayCopy());
 
 		$this->assertEquals(array('foo'), $routes[0]->getOption('_before'));
-		$this->assertEquals(array('bar'), $routes[1]->getOption('_before'));
+		$this->assertEquals(array('foo', 'bar'), $routes[1]->getOption('_before'));
 	}
 
 
@@ -445,6 +469,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($router->currentRouteNamed('foo.route'));
 		$this->assertFalse($router->currentRouteNamed('bar.route'));
+	}
+
+
+	public function testCurrentRouteNameCanBeRetrieved()
+	{
+		$router = new Router(new Illuminate\Container\Container);
+		$route = $router->get('foo', array('as' => 'foo.route', function() {}));
+		$router->setCurrentRoute($route);
+
+		$this->assertEquals('foo.route', $router->currentRouteName());
 	}
 
 

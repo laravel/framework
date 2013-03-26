@@ -1,9 +1,8 @@
 <?php namespace Illuminate\Translation;
 
 use Illuminate\Support\NamespacedItemResolver;
-use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Translation\Translator as SymfonyTranslator;
 
 class Translator extends NamespacedItemResolver implements TranslatorInterface {
 
@@ -15,18 +14,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	protected $loader;
 
 	/**
-	 * The Symfony translator instance.
-	 *
-	 * @var Symfony\Translation\Translator
-	 */
-	protected $trans;
-
-	/**
-	 * The fallback locale for the translator.
+	 * The default locale being used by the translator.
 	 *
 	 * @var string
 	 */
-	protected $fallback;
+	protected $default;
 
 	/**
 	 * The array of loaded translation groups.
@@ -38,40 +30,14 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Create a new translator instance.
 	 *
-	 * @param  Illuminate\Translation\LoaderInterface
-	 * @param  array   $locales
-	 * @param  string  $default
-	 * @param  string  $fallback
+	 * @param  Illuminate\Translation\LoaderInterface  $loader
+	 * @param  string  $locale
 	 * @return void
 	 */
-	public function __construct(LoaderInterface $loader, $default, $fallback)
+	public function __construct(LoaderInterface $loader, $locale)
 	{
 		$this->loader = $loader;
-
-		$this->fallback = $fallback;
-
-		$this->trans = $this->createSymfonyTranslator($default, $fallback);
-	}
-
-	/**
-	 * Create a new Symfony translator instance.
-	 *
-	 * @param  string  $default
-	 * @param  string  $fallback
-	 * @return Symfony\Component\Translation\Translator
-	 */
-	protected function createSymfonyTranslator($default, $fallback)
-	{
-		$trans = new SymfonyTranslator($default);
-
-		// After creating the translator instance we will set the fallback locale
-		// as well as the array loader so that messages can be properly loaded
-		// from the application. Then we're ready to get the language lines.
-		$trans->setFallbackLocale($fallback);
-
-		$trans->addLoader('array', new ArrayLoader);
-
-		return $trans;
+		$this->locale = $locale;
 	}
 
 	/**
@@ -87,52 +53,86 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	}
 
 	/**
-	 * Get the translation for a given key.
+	 * Get the translation for the given key.
 	 *
-	 * @param  string  $id
-	 * @param  array   $parameters
+	 * @param  string  $key
+	 * @param  array   $replace
 	 * @param  string  $locale
 	 * @return string
 	 */
-	public function get($key, $parameters = array(), $locale = null)
+	public function get($key, $replace = array(), $locale = null)
 	{
 		list($namespace, $group, $item) = $this->parseKey($key);
 
-		$parameters = $this->formatParameters($parameters);
+		// Here we will get the locale that should be used for the language line. If one
+		// was not passed, we will use the default locales which was given to us when
+		// the translator was instantiated. Then, we can load the lines and return.
+		$locale = $locale ?: $this->getLocale();
 
-		// Once we call the "load" method, we will receive back the "domain" for the
-		// namespace and group. The "domain" is used by the Symfony translator to
-		// logically separate related groups of messages, and should be unique.
-		$domain = $this->load($group, $namespace, $locale);
+		$this->load($namespace, $group, $locale);
 
-		$line = $this->trans->trans($item, $parameters, $domain, $locale);
+		$line = $this->getLine(
+			$namespace, $group, $locale, $item, $replace
+		);
 
-		return $line == $item ? $key : $line;
+		// If the line doesn't exist, we will return back the key which was requested as
+		// that will be quick to spot in the UI if language keys are wrong or missing
+		// from the application's language files. Otherwise we can return the line.
+		if (is_null($line)) return $key;
+
+		return $line;
+	}
+
+	/**
+	 * Retrieve a language line out the loaded array.
+	 *
+	 * @param  string  $namespace
+	 * @param  string  $group
+	 * @param  string  $locale
+	 * @param  string  $item
+	 * @param  array   $replace
+	 * @return string|null
+	 */
+	protected function getLine($namespace, $group, $locale, $item, $replace)
+	{
+		$line = array_get($this->loaded[$namespace][$group][$locale], $item);
+
+		if ($line) return $this->makeReplacements($line, $replace);
+	}
+
+	/**
+	 * Make the place-holder replacements on a line.
+	 *
+	 * @param  string  $line
+	 * @param  array   $replace
+	 * @return string
+	 */
+	protected function makeReplacements($line, $replace)
+	{
+		foreach ($replace as $key => $value)
+		{
+			$line = str_replace(':'.$key, $value, $line);
+		}
+
+		return $line;
 	}
 
 	/**
 	 * Get a translation according to an integer value.
 	 *
-	 * @param  string  $id
+	 * @param  string  $key
 	 * @param  int     $number
-	 * @param  array   $parameters
+	 * @param  array   $replace
 	 * @param  string  $locale
 	 * @return string
 	 */
-	public function choice($key, $number, $parameters = array(), $locale = null)
+	public function choice($key, $number, $replace = array(), $locale = null)
 	{
-		list($namespace, $group, $item) = $this->parseKey($key);
+		$locale = $locale ?: $this->locale;
 
-		$parameters = $this->formatParameters($parameters);
+		$line = $this->get($key, $replace, $locale);
 
-		// Once we call the "load" method, we will receive back the "domain" for the
-		// namespace and group. The "domain" is used by the Symfony translator to
-		// logically separate related groups of messages, and should be unique.
-		$domain = $this->load($group, $namespace, $locale);
-
-		$line = $this->trans->transChoice($item, $number, $parameters, $domain, $locale);
-
-		return $line == $item ? $key : $line;
+		return $this->getSelector()->choose($line, $number, $locale);
 	}
 
 	/**
@@ -167,106 +167,34 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Load the specified language group.
 	 *
-	 * @param  string  $group
 	 * @param  string  $namespace
+	 * @param  string  $group
 	 * @param  string  $locale
 	 * @return string
 	 */
-	public function load($group, $namespace, $locale)
+	public function load($namespace, $group, $locale)
 	{
-		$domain = $namespace.'::'.$group;
+		if ($this->isLoaded($namespace, $group, $locale)) return;
 
-		foreach ($this->getLocales($locale) as $locale)
-		{
-			// The domain is used to store the messages in the Symfony translator object
-			// and functions as a sort of logical separator of message types so we'll
-			// use the namespace and group as the "domain", which should be unique.
-			if ($this->loaded($group, $namespace, $locale))
-			{
-				return $domain;
-			}
+		// The loader is responsible for returning the array of language lines for the
+		// given namespace, group, and locale. We'll set the lines in this array of
+		// lines that have already been loaded so that we can easily access them.
+		$lines = $this->loader->load($locale, $group, $namespace);
 
-			$lines = $this->loader->load($locale, $group, $namespace);
-
-			// We're finally ready to load the array of messages from the loader and add
-			// them to the Symfony translator. We will also convert this array to dot
-			// format so that deeply nested items will be accessed by a translator.
-			$this->addResource(array_dot($lines), $locale, $domain);
-
-			$this->setLoaded($group, $namespace, $locale);
-		}
-
-		return $domain;
-	}
-
-	/**
-	 * Get the locales to be loaded.
-	 *
-	 * @param  string  $locale
-	 * @return array
-	 */
-	protected function getLocales($locale)
-	{
-		$locale = $locale ?: $this->getLocale();
-
-		return array_unique(array($locale, $this->fallback));
-	}
-
-	/**
-	 * Add an array resource to the Symfony translator.
-	 *
-	 * @param  array   $lines
-	 * @param  string  $locale
-	 * @param  string  $domain
-	 * @return void
-	 */
-	protected function addResource(array $lines, $locale, $domain)
-	{
-		$this->trans->addResource('array', $lines, $locale, $domain);
-	}
-
-	/**
-	 * Format the parameter array.
-	 *
-	 * @param  array  $parameters
-	 * @return array
-	 */
-	protected function formatParameters($parameters)
-	{
-		foreach ($parameters as $key => $value)
-		{
-			$parameters[':'.$key] = $value;
-
-			unset($parameters[$key]);
-		}
-
-		return $parameters;
+		$this->loaded[$namespace][$group][$locale] = $lines;
 	}
 
 	/**
 	 * Determine if the given group has been loaded.
 	 *
-	 * @param  string  $group
 	 * @param  string  $namespace
+	 * @param  string  $group
 	 * @param  string  $locale
 	 * @return bool
 	 */
-	protected function loaded($group, $namespace, $locale)
+	protected function isLoaded($namespace, $group, $locale)
 	{
-		return array_key_exists($group.$namespace.$locale, $this->loaded);
-	}
-
-	/**
-	 * Set the given translation group as being loaded.
-	 *
-	 * @param  string  $group
-	 * @param  string  $namespace
-	 * @param  string  $locale
-	 * @return void
-	 */
-	protected function setLoaded($group, $namespace, $locale)
-	{
-		$this->loaded[$group.$namespace.$locale] = true;
+		return isset($this->loaded[$namespace][$group][$locale]);
 	}
 
 	/**
@@ -282,13 +210,64 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	}
 
 	/**
+	 * Parse a key into namespace, group, and item.
+	 *
+	 * @param  string  $key
+	 * @return array
+	 */
+	public function parseKey($key)
+	{
+		$segments = parent::parseKey($key);
+
+		if (is_null($segments[0])) $segments[0] = '*';
+
+		return $segments;
+	}
+
+	/**
+	 * Get the message selector instance.
+	 *
+	 * @return Symfony\Component\Translation\MessageSelector
+	 */
+	public function getSelector()
+	{
+		if ( ! isset($this->selector))
+		{
+			$this->selector = new MessageSelector;
+		}
+
+		return $this->selector;
+	}
+
+	/**
+	 * Set the message selector instance.
+	 *
+	 * @param  Symfony\Component\Translation\MessageSelector  $selector
+	 * @return void
+	 */
+	public function setSelector(MessageSelector $selector)
+	{
+		$this->selector = $selector;
+	}
+
+	/**
+	 * Get the language line loader implementation.
+	 *
+	 * @return Illuminate\Translation\LoaderInterface
+	 */
+	public function getLoader()
+	{
+		return $this->loader;
+	}
+
+	/**
 	 * Get the default locale being used.
 	 *
 	 * @return string
 	 */
 	public function getLocale()
 	{
-		return $this->trans->getLocale();
+		return $this->locale;
 	}
 
 	/**
@@ -299,28 +278,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function setLocale($locale)
 	{
-		$this->trans->setLocale($locale);
-	}
-
-	/**
-	 * Get the base Symfony translator instance.
-	 *
-	 * @return Symfony\Translation\Translator
-	 */
-	public function getSymfonyTranslator()
-	{
-		return $this->trans;
-	}
-
-	/**
-	 * Get the base Symfony translator instance.
-	 *
-	 * @param  Symfony\Translation\Translator  $trans
-	 * @return void
-	 */
-	public function setSymfonyTranslator(SymfonyTranslator $trans)
-	{
-		$this->trans = $trans;
+		$this->locale = $locale;
 	}
 
 }

@@ -69,11 +69,26 @@ class MakeCommand extends BaseCommand {
 		// Now we're ready to get the path where these migrations should be placed
 		// on disk. This may be specified via the package option on the command
 		// and we will verify that option to determine the appropriate paths.
+		$path = $this->writeMigration($name, $table, $create);
+		
+		$file = pathinfo($path, PATHINFO_FILENAME);
+
+		$this->line("<info>Created Migration:</info> $file");
+	}
+
+	/**
+	 * Write the migration file to disk.
+	 *
+	 * @param  string  $name
+	 * @param  string  $table
+	 * @param  bool    $create
+	 * @return string
+	 */
+	protected function writeMigration($name, $table, $create)
+	{
 		$path = $this->getMigrationPath();
 
-		$this->creator->create($name, $path, $table, $create);
-
-		$this->info('Migration created successfully!');
+		return $this->creator->create($name, $path, $table, $create);
 	}
 
 	/**

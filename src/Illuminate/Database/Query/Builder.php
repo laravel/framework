@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Query;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -148,6 +149,21 @@ class Builder {
 	public function select($columns = array('*'))
 	{
 		$this->columns = is_array($columns) ? $columns : func_get_args();
+
+		return $this;
+	}
+
+	/**
+	 * Add a new select column to the query.
+	 *
+	 * @param  mixed  $column
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function addSelect($column)
+	{
+		if ( ! isset($this->columns)) $this->columns = array();
+
+		$this->columns = array_merge($this->columns, $column);
 
 		return $this;
 	}
@@ -621,6 +637,68 @@ class Builder {
 	}
 
 	/**
+	 * Handles dynamic "where" clauses to the query.
+	 *
+	 * @param  string  $method
+	 * @param  string  $parameters
+	 */
+	public function dynamicWhere($method, $parameters)
+	{
+		$finder = substr($method, 5);
+
+		$segments = preg_split('/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+		// The connector variable will determine which connector will be used for the
+		// query condition. We will change it as we come across new boolean values
+		// in the dynamic method strings, which could contain a number of these.
+		$connector = 'and';
+
+		$index = 0;
+
+		foreach ($segments as $segment)
+		{
+			// If the segment is not a boolean connector, we can assume it is a column's name
+			// and we will add it to the query as a new constraint as a where clause, then
+			// we can keep iterating through the dynamic method string's segments again.
+			if ($segment != 'And' and $segment != 'Or')
+			{
+				$this->addDynamic($segment, $connector, $parameters, $index);
+
+				$index++;
+			}
+
+			// Otherwise, we will store the connector so we know how the next where clause we
+			// find in the query should be connected to the previous ones, meaning we will
+			// have the proper boolean connector to connect the next where clause found.
+			else
+			{
+				$connector = $segment;
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add a single dynamic where clause statement to the query.
+	 *
+	 * @param  string  $segment
+	 * @param  string  $connector
+	 * @param  array   $parameters
+	 * @param  int     $index
+	 * @return void
+	 */
+	protected function addDynamic($segment, $connector, $parameters, $index)
+	{
+		// Once we have parsed out the columns and formatted the boolean operators we
+		// are ready to add it to this query as a where clause just like any other
+		// clause on the query. Then we'll increment the parameter index values.
+		$bool = strtolower($connector);
+
+		$this->where(snake_case($segment), '=', $parameters[$index], $bool);
+	}
+
+	/**
 	 * Add a "group by" clause to the query.
 	 *
 	 * @param  dynamic  $columns
@@ -820,27 +898,18 @@ class Builder {
 		// First we will just get all of the column values for the record result set
 		// then we can associate those values with the column if it was specified
 		// otherwise we can just give these values back without a specific key.
-		$values = array_map(function($row) use ($column)
-		{
-			$row = (object) $row;
+		$results = new Collection($this->get($columns));
 
-			return $row->$column;
-
-		}, $results = $this->get($columns));
-
+		$values = $results->fetch($column)->all();
 
 		// If a key was specified and we have results, we will go ahead and combine
 		// the values with the keys of all of the records so that the values can
 		// be accessed by the key of the rows instead of simply being numeric.
 		if ( ! is_null($key) and count($results) > 0)
 		{
-			return array_combine(array_map(function($row) use ($key)
-			{
-				$row = (object) $row;
+			$keys = $results->fetch($key)->all();
 
-				return $row->$key;
-
-			}, $results), $values);
+			return array_combine($keys, $values);
 		}
 
 		return $values;
@@ -1280,6 +1349,24 @@ class Builder {
 	public function getGrammar()
 	{
 		return $this->grammar;
+	}
+
+	/**
+	 * Handle dynamic method calls into the method.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if (starts_with($method, 'where'))
+		{
+			return $this->dynamicWhere($method, $parameters);
+		}
+
+		$className = get_class($this);
+		throw new \BadMethodCallException("Call to undefined method {$className}::{$method}()");
 	}
 
 }

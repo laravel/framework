@@ -98,10 +98,10 @@ class Environment {
 	 * Get a evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
-	 * @param  array   $data
+	 * @param  mixed   $data
 	 * @return Illuminate\View\View
 	 */
-	public function make($view, array $data = array())
+	public function make($view, $data = array())
 	{
 		$path = $this->finder->find($view);
 
@@ -488,7 +488,19 @@ class Environment {
 			$this->engines->register($engine, $resolver);
 		}
 
-		$this->extensions[$extension] = $engine;
+		unset($this->extensions[$engine]);
+
+		$this->extensions = array_merge(array($extension => $engine), $this->extensions);
+	}
+
+	/**
+	 * Get the extension to engine bindings.
+	 *
+	 * @return array
+	 */
+	public function getExtensions()
+	{
+		return $this->extensions;
 	}
 
 	/**
@@ -504,7 +516,7 @@ class Environment {
 	/**
 	 * Get the view finder instance.
 	 *
-	 * @return Illuminate\View\ViewFinder
+	 * @return Illuminate\View\ViewFinderInterface
 	 */
 	public function getFinder()
 	{
@@ -524,7 +536,7 @@ class Environment {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return Illuminate\Container
+	 * @return Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{
@@ -534,7 +546,7 @@ class Environment {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

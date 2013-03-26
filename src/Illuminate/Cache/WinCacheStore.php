@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class WinCacheStore extends Store {
+class WinCacheStore implements StoreInterface {
 
 	/**
 	 * A string that should be prepended to keys.
@@ -26,7 +26,7 @@ class WinCacheStore extends Store {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function retrieveItem($key)
+	public function get($key)
 	{
 		$value = wincache_ucache_get($this->prefix.$key);
 
@@ -44,9 +44,33 @@ class WinCacheStore extends Store {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	protected function storeItem($key, $value, $minutes)
+	public function put($key, $value, $minutes)
 	{
 		wincache_ucache_add($this->prefix.$key, $value, $minutes * 60);
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function increment($key, $value = 1)
+	{
+		return wincache_ucache_inc($this->prefix.$key, $value);
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function decrement($key, $value = 1)
+	{
+		return wincache_ucache_dec($this->prefix.$key, $value);
 	}
 
 	/**
@@ -56,9 +80,9 @@ class WinCacheStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function storeItemForever($key, $value)
+	public function forever($key, $value)
 	{
-		return $this->storeItem($key, $value, 0);
+		return $this->put($key, $value, 0);
 	}
 
 	/**
@@ -67,7 +91,7 @@ class WinCacheStore extends Store {
 	 * @param  string  $key
 	 * @return void
 	 */
-	protected function removeItem($key)
+	public function forget($key)
 	{
 		wincache_ucache_delete($this->prefix.$key);
 	}
@@ -77,7 +101,7 @@ class WinCacheStore extends Store {
 	 *
 	 * @return void
 	 */
-	protected function flushItems()
+	public function flush()
 	{
 		wincache_ucache_clear();
 	}

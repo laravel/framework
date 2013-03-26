@@ -51,6 +51,13 @@ class Application extends Container implements HttpKernelInterface {
 	protected $bootedCallbacks = array();
 
 	/**
+	 * The array of shutdown callbacks.
+	 *
+	 * @var array
+	 */
+	protected $shutdownCallbacks = array();
+
+	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
@@ -100,9 +107,10 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		$this->instance('path', $paths['app']);
 
-		$this->instance('path.base', $paths['base']);
-
-		$this->instance('path.public', $paths['public']);
+		foreach (array_except($paths, array('app')) as $key => $value)
+		{
+			$this->instance("path.{$key}", $value);
+		}
 	}
 
 	/**
@@ -195,7 +203,7 @@ class Application extends Container implements HttpKernelInterface {
 			// To determine the current environment, we'll simply iterate through the
 			// possible environments and look for a host that matches this host in
 			// the request's context, then return back that environment's names.
-			foreach ($hosts as $host)
+			foreach ((array) $hosts as $host)
 			{
 				if (str_is($host, $base) or $this->isMachine($host))
 				{
@@ -267,12 +275,20 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Register a service provider with the application.
 	 *
-	 * @param  Illuminate\Support\ServiceProvider  $provider
+	 * @param  Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
 	 * @return void
 	 */
-	public function register(ServiceProvider $provider, $options = array())
+	public function register($provider, $options = array())
 	{
+		// If the given "provider" is a string, we will resolve it, passing in the
+		// application instance automatically for the developer. This is simply
+		// a more convenient way of specifying your service provider classes.
+		if (is_string($provider))
+		{
+			$provider = $this->resolveProviderClass($provider);
+		}
+
 		$provider->register();
 
 		// Once we have registered the service we will iterate through the options
@@ -286,6 +302,17 @@ class Application extends Container implements HttpKernelInterface {
 		$this->serviceProviders[] = $provider;
 
 		$this->loadedProviders[get_class($provider)] = true;
+	}
+
+	/**
+	 * Resolve a service provider instance from the class name.
+	 *
+	 * @param  string  $provider
+	 * @return Illuminate\Support\ServiceProvider
+	 */
+	protected function resolveProviderClass($provider)
+	{
+		return new $provider($this);
 	}
 
 	/**
@@ -395,6 +422,24 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Register a "shutdown" callback.
+	 *
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function shutdown($callback = null)
+	{
+		if (is_null($callback))
+		{
+			$this->fireAppCallbacks($this->shutdownCallbacks);
+		}
+		else
+		{
+			$this->shutdownCallbacks[] = $callback;
+		}
+	}
+
+	/**
 	 * Handles the given request and delivers the response.
 	 *
 	 * @return void
@@ -411,7 +456,7 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Handle the given request and get the response.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
@@ -426,7 +471,7 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @implements HttpKernelInterface::handle
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
 	 * @return Symfony\Component\HttpFoundation\Response
@@ -503,8 +548,8 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Prepare the request by injecting any services.
 	 *
-	 * @param  Illuminate\Foundation\Request  $request
-	 * @return Illuminate\Foundation\Request
+	 * @param  Illuminate\Http\Request  $request
+	 * @return Illuminate\Http\Request
 	 */
 	public function prepareRequest(Request $request)
 	{
@@ -520,7 +565,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Foundation\Request  $request
+	 * @param  Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepareResponse($value, Request $request)

@@ -227,6 +227,22 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSyncMethodSyncsIntermediateTableWithGivenArrayAndAttributes()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('attach', 'detach'), $this->getRelationArguments());
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$query->shouldReceive('lists')->once()->with('role_id')->andReturn(array(1, 2, 3));
+		$relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo(array('foo' => 'bar')));
+		$relation->expects($this->once())->method('detach')->with($this->equalTo(array(1)));
+
+		$relation->sync(array(2, 3, 4 => array('foo' => 'bar')));
+	}
+
+
 	public function getRelation()
 	{
 		list($builder, $parent) = $this->getRelationArguments();
@@ -258,7 +274,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentBelongsToManyModelStub extends Illuminate\Database\Eloquent\Model {
-
+	protected $guarded = array();
 }
 
 class EloquentBelongsToManyModelPivotStub extends Illuminate\Database\Eloquent\Model {

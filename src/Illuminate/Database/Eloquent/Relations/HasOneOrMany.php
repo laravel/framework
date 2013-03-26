@@ -161,6 +161,19 @@ abstract class HasOneOrMany extends Relation {
 	}
 
 	/**
+	 * Attach an array of models to the parent instance.
+	 *
+	 * @param  array  $models
+	 * @return array
+	 */
+	public function saveMany(array $models)
+	{
+		array_walk($models, array($this, 'save'));
+
+		return $models;
+	}
+
+	/**
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes
@@ -180,6 +193,24 @@ abstract class HasOneOrMany extends Relation {
 		$instance->save();
 
 		return $instance;
+	}
+
+	/**
+	 * Create an array of new instances of the related model.
+	 *
+	 * @param  array  $records
+	 * @return array
+	 */
+	public function createMany(array $records)
+	{
+		$instances = array();
+
+		foreach ($records as $record)
+		{
+			$instances[] = $this->create($record);
+		}
+
+		return $instances;
 	}
 
 	/**

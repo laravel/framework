@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class {{class}} extends Migration {
@@ -11,7 +12,7 @@ class {{class}} extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('{{table}}', function($table)
+		Schema::create('{{table}}', function(Blueprint $table)
 		{
 			$table->increments('id');
 		});

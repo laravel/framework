@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class ArrayStore extends Store {
+class ArrayStore implements StoreInterface {
 
 	/**
 	 * The array of stored values.
@@ -15,7 +15,7 @@ class ArrayStore extends Store {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function retrieveItem($key)
+	public function get($key)
 	{
 		if (array_key_exists($key, $this->storage))
 		{
@@ -31,9 +31,37 @@ class ArrayStore extends Store {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	protected function storeItem($key, $value, $minutes)
+	public function put($key, $value, $minutes)
 	{
 		$this->storage[$key] = $value;
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function increment($key, $value = 1)
+	{
+		$this->storage[$key] = $this->storage[$key] + $value;
+
+		return $this->storage[$key];
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function decrement($key, $value = 1)
+	{
+		$this->storage[$key] = $this->storage[$key] - $value;
+
+		return $this->storage[$key];
 	}
 
 	/**
@@ -43,9 +71,9 @@ class ArrayStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function storeItemForever($key, $value)
+	public function forever($key, $value)
 	{
-		return $this->storeItem($key, $value, 0);
+		return $this->put($key, $value, 0);
 	}
 
 	/**
@@ -54,7 +82,7 @@ class ArrayStore extends Store {
 	 * @param  string  $key
 	 * @return void
 	 */
-	protected function removeItem($key)
+	public function forget($key)
 	{
 		unset($this->storage[$key]);
 	}
@@ -64,7 +92,7 @@ class ArrayStore extends Store {
 	 *
 	 * @return void
 	 */
-	protected function flushItems()
+	public function flush()
 	{
 		$this->storage = array();
 	}

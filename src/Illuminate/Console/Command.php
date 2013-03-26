@@ -129,7 +129,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $key
 	 * @return string|array
 	 */
-	protected function argument($key = null)
+	public function argument($key = null)
 	{
 		if (is_null($key)) return $this->input->getArguments();
 
@@ -142,7 +142,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $key
 	 * @return string|array
 	 */
-	protected function option($key = null)
+	public function option($key = null)
 	{
 		if (is_null($key)) return $this->input->getOptions();
 
@@ -156,7 +156,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  bool    $default
 	 * @return bool
 	 */
-	protected function confirm($question, $default = true)
+	public function confirm($question, $default = true)
 	{
 		$dialog = $this->getHelperSet()->get('dialog');
 
@@ -170,11 +170,25 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $default
 	 * @return string
 	 */
-	protected function ask($question, $default = null)
+	public function ask($question, $default = null)
 	{
 		$dialog = $this->getHelperSet()->get('dialog');
 
 		return $dialog->ask($this->output, "<question>$question</question>", $default);
+	}
+
+	/**
+	 * Prompt the user for input but hide the answer from the console.
+	 *
+	 * @param  string  $question
+	 * @param  string  $default
+	 * @return string
+	 */
+	public function secret($question, $default = null)
+	{
+		$dialog = $this->getHelperSet()->get('dialog');
+
+		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $default);
 	}
 
 	/**
@@ -183,7 +197,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $string
 	 * @return void
 	 */
-	protected function line($string)
+	public function line($string)
 	{
 		$this->output->writeln($string);
 	}
@@ -194,7 +208,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $string
 	 * @return void
 	 */
-	protected function info($string)
+	public function info($string)
 	{
 		$this->output->writeln("<info>$string</info>");
 	}
@@ -205,7 +219,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $string
 	 * @return void
 	 */
-	protected function comment($string)
+	public function comment($string)
 	{
 		$this->output->writeln("<comment>$string</comment>");
 	}
@@ -216,7 +230,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $string
 	 * @return void
 	 */
-	protected function question($string)
+	public function question($string)
 	{
 		$this->output->writeln("<question>$string</question>");
 	}
@@ -227,7 +241,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string  $string
 	 * @return void
 	 */
-	protected function error($string)
+	public function error($string)
 	{
 		$this->output->writeln("<error>$string</error>");
 	}

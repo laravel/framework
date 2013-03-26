@@ -7,6 +7,13 @@ use Illuminate\Session\Store as Session;
 class FormBuilder {
 
 	/**
+	 * The HTML builder instance.
+	 *
+	 * @var Illuminate\Html\HtmlBuilder
+	 */
+	protected $html;
+
+	/**
 	 * The URL generator instance.
 	 *
 	 * @var Illuminate\Routing\UrlGenerator  $url
@@ -59,12 +66,14 @@ class FormBuilder {
 	 * Create a new form builder instance.
 	 *
 	 * @param  Illuminate\Routing\UrlGenerator  $url
+	 * @param  Illuminate\Html\HtmlBuilder  $html
 	 * @param  string  $csrfToken
 	 * @return void
 	 */
-	public function __construct(UrlGenerator $url, $csrfToken)
+	public function __construct(HtmlBuilder $html, UrlGenerator $url, $csrfToken)
 	{
 		$this->url = $url;
+		$this->html = $html;
 		$this->csrfToken = $csrfToken;
 	}
 
@@ -109,7 +118,7 @@ class FormBuilder {
 		// Finally, we will concatenate all of the attributes into a single string so
 		// we can build out the final form open statement. We'll also append on an
 		// extra value for the hidden _method field if it's needed for the form.
-		$attributes = Html::attributes($attributes);
+		$attributes = $this->html->attributes($attributes);
 
 		return '<form'.$attributes.'>'.$append;
 	}
@@ -164,7 +173,7 @@ class FormBuilder {
 	{
 		$this->labels[] = $name;
 
-		$options = Html::attributes($options);
+		$options = $this->html->attributes($options);
 
 		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
 	}
@@ -196,7 +205,7 @@ class FormBuilder {
 		// when creating the HTML element. Then, we will return the entire input.
 		$options = array_merge($options, $merge);
 
-		return '<input'.Html::attributes($options).'>';
+		return '<input'.$this->html->attributes($options).'>';
 	}
 
 	/**
@@ -288,7 +297,7 @@ class FormBuilder {
 		// Next we will convert the attributes into a string form. Also we have removed
 		// the size attribute, as it was merely a short-cut for the rows and cols on
 		// the element. Then we'll create the final textarea elements HTML for us.
-		$options = Html::attributes($options);
+		$options = $this->html->attributes($options);
 
 		return '<textarea'.$options.'>'.e($value).'</textarea>';
 	}
@@ -303,12 +312,30 @@ class FormBuilder {
 	{
 		if (isset($options['size']))
 		{
-			$segments = explode('x', $options['size']);
-
-			return array_merge($options, array('cols' => $segments[0], 'rows' => $segments[1]));
+			return $this->setQuickTextAreaSize($options);
 		}
 
-		return array_merge($options, array('cols' => 50, 'rows' => 10));
+		// If the "size" attribute was not specified, we will just look for the regular
+		// columns and rows attributes, using sane defaults if these do not exist on
+		// the attributes array. We'll then return this entire options array back.
+		$cols = array_get($options, 'cols', 50);
+
+		$rows = array_get($options, 'rows', 10);
+
+		return array_merge($options, compact('cols', 'rows'));
+	}
+
+	/**
+	 * Set the text area size using the quick "size" attribute.
+	 *
+	 * @param  array  $options
+	 * @return array
+	 */
+	protected function setQuickTextAreaSize($options)
+	{
+		$segments = explode('x', $options['size']);
+
+		return array_merge($options, array('cols' => $segments[0], 'rows' => $segments[1]));
 	}
 
 	/**
@@ -344,7 +371,7 @@ class FormBuilder {
 		// Once we have all of this HTML, we can join this into a single element after
 		// formatting the attributes into an HTML "attributes" string, then we will
 		// build out a final select statement, which will contain all the values.
-		$options = Html::attributes($options);
+		$options = $this->html->attributes($options);
 
 		$list = implode('', $html);
 
@@ -365,7 +392,7 @@ class FormBuilder {
 		{
 			return $this->optionGroup($display, $value, $selected);
 		}
-	
+
 		return $this->option($display, $value, $selected);
 	}
 
@@ -403,7 +430,7 @@ class FormBuilder {
 
 		$options = array('value' => e($value), 'selected' => $selected);
 
-		return '<option'.Html::attributes($options).'>'.e($display).'</option>';
+		return '<option'.$this->html->attributes($options).'>'.e($display).'</option>';
 	}
 
 	/**
@@ -465,11 +492,26 @@ class FormBuilder {
 	 */
 	protected function checkable($type, $name, $value, $checked, $options)
 	{
-		if (is_null($checked)) $checked = (bool) $this->getValueAttribute($name, null);
+		if (is_null($checked)) $checked = $this->getCheckedState($type, $name, $value);
 
 		if ($checked) $options['checked'] = 'checked';
 
 		return $this->input($type, $name, $value, $options);
+	}
+
+	/**
+	 * Get the check state for a checkable input.
+	 *
+	 * @param  string  $type
+	 * @param  string  $name
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function getCheckedState($type, $name, $value)
+	{
+		if ($type == 'checkbox') return (bool) $this->getValueAttribute($name);
+
+		return $this->getValueAttribute($name) == $value;
 	}
 
 	/**
@@ -493,7 +535,12 @@ class FormBuilder {
 	 */
 	public function button($value = null, $options = array())
 	{
-		return '<button'.Html::attributes($options).'>'.e($value).'</button>';
+		if ( ! array_key_exists('type', $options) )
+		{
+			$options['type'] = 'button';
+		}
+		
+		return '<button'.$this->html->attributes($options).'>'.e($value).'</button>';
 	}
 
 	/**
@@ -644,14 +691,16 @@ class FormBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected function getValueAttribute($name, $value)
+	protected function getValueAttribute($name, $value = null)
 	{
-		if ( ! is_null($value)) return $value;
+		if (is_null($name)) return $value;
 
 		if (isset($this->session) and $this->session->hasOldInput($name))
 		{
 			return $this->session->getOldInput($name);
 		}
+
+		if ( ! is_null($value)) return $value;
 
 		if (isset($this->model) and isset($this->model[$name]))
 		{
@@ -662,8 +711,7 @@ class FormBuilder {
 	/**
 	 * Get the session store implementation.
 	 *
-	 * @param  Illuminate\Session\Store  $session
-	 * @return void
+	 * @return  Illuminate\Session\Store  $session
 	 */
 	public function getSessionStore()
 	{
@@ -674,11 +722,13 @@ class FormBuilder {
 	 * Set the session store implementation.
 	 *
 	 * @param  Illuminate\Session\Store  $session
-	 * @return void
+	 * @return Illuminate\Html\FormBuilder
 	 */
 	public function setSessionStore(Session $session)
 	{
 		$this->session = $session;
+
+		return $this;
 	}
 
 	/**

@@ -68,7 +68,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{$name}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ 
 			$name
 		}}'));
 	}
@@ -200,6 +200,14 @@ breeze
 	}
 
 
+	public function testLanguageAndChoicesAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php echo Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
+		$this->assertEquals('<?php echo Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
+	}
+
+
 	public function testSectionStartsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -220,6 +228,20 @@ breeze
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$compiler->extend(function($value) { return str_replace('foo', 'bar', $value); });
 		$this->assertEquals('bar', $compiler->compileString('foo'));
+	}
+
+
+	public function testConfiguringContentTags()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setContentTags('[[', ']]');
+		$compiler->setEscapedContentTags('[[[', ']]]');
+
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[[ $name ]]]'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('[[ $name ]]'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('[[
+			$name
+		]]'));
 	}
 
 

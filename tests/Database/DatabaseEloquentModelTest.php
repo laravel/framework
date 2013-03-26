@@ -101,6 +101,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
 
+		$model->foo = 'bar';
+		// make sure foo isn't synced so we can test that dirty attributes only are updated
+		$model->syncOriginal();
 		$model->id = 1;
 		$model->name = 'taylor';
 		$model->exists = true;
@@ -317,6 +320,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHiddenCanAlsoExcludeRelationships()
+	{
+		$model = new EloquentModelStub;
+		$model->name = 'Taylor';
+		$model->setRelation('foo', array('bar'));
+		$model->setHidden(array('foo'));
+		$array = $model->toArray();
+
+		$this->assertEquals(array('name' => 'Taylor'), $array);
+	}
+
+
 	public function testToArraySnakeAttributes()
 	{
 		$model = new EloquentModelStub;
@@ -353,10 +368,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelStub;
 		$model->fillable(array('name', 'age'));
-		$model->fill(array('name' => 'foo', 'age' => 'bar', 'password' => 'baz'));
-		$this->assertFalse(isset($model->password));
+		$model->fill(array('name' => 'foo', 'age' => 'bar'));
 		$this->assertEquals('foo', $model->name);
 		$this->assertEquals('bar', $model->age);
+	}
+
+
+	public function testUnderscorePropertiesAreNotFilled()
+	{
+		$model = new EloquentModelStub;
+		$model->fill(array('_method' => 'PUT'));
+		$this->assertEquals(array(), $model->getAttributes());
 	}
 
 
@@ -364,11 +386,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelStub;
 		$model->guard(array('name', 'age'));
-		$model->fill(array('name' => 'foo', 'age' => 'bar', 'votes' => 'baz'));
+		$model->fill(array('name' => 'foo', 'age' => 'bar', 'foo' => 'bar'));
 		$this->assertFalse(isset($model->name));
 		$this->assertFalse(isset($model->age));
-		$this->assertEquals('baz', $model->votes);
+		$this->assertEquals('bar', $model->foo);
+	}
 
+
+	public function testGlobalGuarded()
+	{
 		$model = new EloquentModelStub;
 		$model->guard(array('*'));
 		$model->fill(array('name' => 'foo', 'age' => 'bar', 'votes' => 'baz'));
@@ -513,6 +539,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
+	protected $guarded = array();
 	public function getListItemsAttribute($value)
 	{
 		return json_decode($value, true);
@@ -553,6 +580,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'save_stub';
+	protected $guarded = array();
 	public function save() { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{
@@ -573,7 +601,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('whereIn')->once()->with(array(1, 2))->andReturn($mock);
+		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2))->andReturn($mock);
 		$mock->shouldReceive('get')->once()->with(array('*'))->andReturn('foo');
 		return $mock;
 	}

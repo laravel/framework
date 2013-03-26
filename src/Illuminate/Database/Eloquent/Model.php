@@ -96,11 +96,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $fillable = array();
 
 	/**
-	 * The attribute that aren't mass assignable.
+	 * The attributes that aren't mass assignable.
 	 *
 	 * @var array
 	 */
-	protected $guarded = array();
+	protected $guarded = array('*');
 
 	/**
 	 * The date fields for the model.clear
@@ -140,7 +140,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispacher
+	 * @var Illuminate\Events\Dispatcher
 	 */
 	protected static $dispatcher;
 
@@ -262,9 +262,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $attributes
 	 * @return Illuminate\Database\Eloquent\Model
 	 */
-	public function newExisting($attributes = array())
+	public function newFromBuilder($attributes = array())
 	{
-		return $this->newInstance($attributes, true);
+		$instance = $this->newInstance(array(), true);
+
+		$instance->setRawAttributes((array) $attributes, true);
+
+		return $instance;
 	}
 
 	/**
@@ -326,7 +330,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (is_array($id))
 		{
-			return $instance->newQuery()->whereIn($id)->get($columns);
+			return $instance->newQuery()->whereIn($instance->getKeyName(), $id)->get($columns);
 		}
 
 		return $instance->newQuery()->find($id, $columns);
@@ -352,7 +356,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
-	 * @return Illuminate\Database\Eloquent\Relation\HasOne
+	 * @return Illuminate\Database\Eloquent\Relations\HasOne
 	 */
 	public function hasOne($related, $foreignKey = null)
 	{
@@ -370,7 +374,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
-	 * @return Illuminate\Database\Eloquent\Relation\MorphOne
+	 * @return Illuminate\Database\Eloquent\Relations\MorphOne
 	 */
 	public function morphOne($related, $name, $type = null, $id = null)
 	{
@@ -463,7 +467,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
-	 * @return Illuminate\Database\Eloquent\Relation\MorphMany
+	 * @return Illuminate\Database\Eloquent\Relations\MorphMany
 	 */
 	public function morphMany($related, $name, $type = null, $id = null)
 	{
@@ -544,9 +548,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ($this->exists)
 		{
-			$key = $this->getKeyName();
+			// After firing the "deleting" event, we can go ahead and delete off the model
+			// then call the "deleted" event. These events could give the developer the
+			// opportunity to clear any relationships on the model or do other works.
+			$this->fireModelEvent('deleting', false);
 
-			return $this->newQuery()->where($key, $this->getKey())->delete();
+			$this->newQuery()->where($this->getKeyName(), $this->getKey())->delete();
+
+			$this->fireModelEvent('deleted', false);
 		}
 	}
 
@@ -592,6 +601,28 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function created(Closure $callback)
 	{
 		static::registerModelEvent('created', $callback);
+	}
+
+	/**
+	 * Register a deleting model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function deleting(Closure $callback)
+	{
+		static::registerModelEvent('deleting', $callback);
+	}
+
+	/**
+	 * Register a deleted model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function deleted(Closure $callback)
+	{
+		static::registerModelEvent('deleted', $callback);
 	}
 
 	/**
@@ -646,6 +677,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->exists = $saved;
 		}
 
+		$this->syncOriginal();
+
 		return $saved;
 	}
 
@@ -657,14 +690,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function performUpdate($query)
 	{
-		// If the updating event returns false, we will cancel the update operation so
-		// developers can hook Validation systems into their models and cancel this
-		// operation if the model does not pass validation. Otherwise, we update.
-		if ($this->fireModelEvent('updating') === false) return false;
+		$dirty = $this->getDirty();
 
-		$this->setKeysForSaveQuery($query)->update($this->attributes);
+		if (count($dirty) > 0)
+		{
+			// If the updating event returns false, we will cancel the update operation so
+			// developers can hook Validation systems into their models and cancel this
+			// operation if the model does not pass validation. Otherwise, we update.
+			if ($this->fireModelEvent('updating') === false)
+			{
+				return false;
+			}
 
-		$this->fireModelEvent('updated', false);
+			// Once we have run the update operation, we will fire the "updated" event for
+			// this model instance. This will allow developers to hook into these after
+			// models are updated, giving them a chance to do any special processing.
+			$this->setKeysForSaveQuery($query)->update($dirty);
+
+			$this->fireModelEvent('updated', false);
+		}
 
 		return true;
 	}
@@ -729,7 +773,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the keys for a save update query.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Builder
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Builder
 	 */
 	protected function setKeysForSaveQuery($query)
 	{
@@ -1032,7 +1076,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return false;
 		}
 
-		return empty($this->fillable);
+		return empty($this->fillable) and ! starts_with($key, '_');
 	}
 
 	/**
@@ -1122,6 +1166,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($this->relations as $key => $value)
 		{
+			if (in_array($key, $this->hidden)) continue;
+
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
 			// collections to their proper array form and we'll set the values.
@@ -1287,7 +1333,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			if ($value)
 			{
-				$this->attributes[$key] = $this->fromDateTime($value);
+				$value = $this->fromDateTime($value);
 			}
 		}
 
@@ -1383,11 +1429,33 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Sync the original attributes with the current.
 	 *
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Model
 	 */
 	public function syncOriginal()
 	{
 		$this->original = $this->attributes;
+
+		return $this;
+	}
+
+	/**
+	 * Get the attributes that have been changed since last sync.
+	 *
+	 * @return array
+	 */
+	public function getDirty()
+	{
+		$dirty = array();
+
+		foreach ($this->attributes as $key => $value)
+		{
+			if ( ! array_key_exists($key, $this->original) or $value != $this->original[$key])
+			{
+				$dirty[$key] = $value;
+			}
+		}
+
+		return $dirty;	
 	}
 
 	/**
@@ -1483,7 +1551,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function getEventDispatcher()
 	{
-		return static::$dispathcer;
+		return static::$dispatcher;
 	}
 
 	/**

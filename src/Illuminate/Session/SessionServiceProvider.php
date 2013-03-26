@@ -21,12 +21,37 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->registerSessionManager();
+
+		$this->registerSessionDriver();
+	}
+
+	/**
+	 * Register the session manager instance.
+	 *
+	 * @return void
+	 */
+	protected function registerSessionManager()
+	{
+		$this->app['session.manager'] = $this->app->share(function($app)
+		{
+			return new SessionManager($app);
+		});
+	}
+
+	/**
+	 * Register the session driver instance.
+	 *
+	 * @return void
+	 */
+	protected function registerSessionDriver()
+	{
 		$this->app['session'] = $this->app->share(function($app)
 		{
 			// First, we will create the session manager which is responsible for the
 			// creation of the various session drivers when they are needed by the
 			// application instance, and will resolve them on a lazy load basis.
-			$manager = new SessionManager($app);
+			$manager = $app['session.manager'];
 
 			$driver = $manager->driver();
 
@@ -88,19 +113,42 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerCloseEvent($app, $config)
 	{
-		$app->close(function($request, $response) use ($app, $config)
+		$me = $this;
+
+		$app->close(function($request, $response) use ($me, $app, $config)
 		{
 			$session = $app['session'];
 
+			// Once we finish the session handling for the request, we will need to get a
+			// cookie that we can attach to the response from the application. This is
+			// used to identify the session on future requests into the application.
 			$session->finish($response, $config['lifetime']);
 
-			$cookie = $session->getCookie($app['cookie'], $config['cookie'], $config['lifetime']);
+			$cookie = $me->makeCookie($session, $config);
 
 			if ( ! is_null($cookie))
 			{
 				$response->headers->setCookie($cookie);
 			}
 		});
+	}
+
+	/**
+	 * Create a session cookie based on the given config.
+	 *
+	 * @param  Illuminate\Session\Store  $session
+	 * @param  array  $config
+	 * @return Symfony\Component\HttpFoundation\Cookie
+	 */
+	public function makeCookie($session, $config)
+	{
+		$app = $this->app;
+
+		return $session->getCookie(
+
+			$app['cookie'], $config['cookie'], $config['lifetime'], $config['path'], $config['domain']
+
+		);
 	}
 
 }

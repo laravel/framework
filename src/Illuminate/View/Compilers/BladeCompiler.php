@@ -31,9 +31,24 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'Each',
 		'Yields',
 		'Shows',
+		'Language',
 		'SectionStart',
 		'SectionStop',
 	);
+
+	/**
+	 * Array of opening and closing tags for echos.
+	 *
+	 * @var array
+	 */
+	protected $contentTags = array('{{', '}}');
+
+	/**
+	 * Array of opening and closing tags for escaped echos.
+	 *
+	 * @var array
+	 */
+	protected $escapedTags = array('{{{', '}}}');
 
 	/**
 	 * Compile the view at the given path.
@@ -75,7 +90,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function extend(Closure $compiler)
 	{
-		$this->extensions[] = $compiler;	
+		$this->extensions[] = $compiler;
 	}
 
 	/**
@@ -115,16 +130,24 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		// Next, we just want to split the values by lines, and create an expression
 		// to include the parent layout at the end of the templates. Which allows
 		// the sections to get registered before the parent view gets rendered.
+		$lines = $this->compileLayoutExtends($lines);
+
+		return implode("\r\n", array_slice($lines, 1));
+	}
+
+	/**
+	 * Compile the proper template inheritance for the lines.
+	 *
+	 * @param  array  $lines
+	 * @return array
+	 */
+	protected function compileLayoutExtends($lines)
+	{
 		$pattern = $this->createMatcher('extends');
 
-		$replace = '$1@include$2';
+		$lines[] = preg_replace($pattern, '$1@include$2', $lines[0]);
 
-		$lines[] = preg_replace($pattern, $replace, $lines[0]);
-
-		// Once we've made the replacements, we'll slice off the first line as it is
-		// now just an empty line since the template has been moved to the end of
-		// the files. We will let the other sections be registered before this.
-		return implode("\r\n", array_slice($lines, 1));
+		return $lines;
 	}
 
 	/**
@@ -135,7 +158,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileComments($value)
 	{
-		return preg_replace('/\{\{--((.|\s)*?)--\}\}/', "<?php /* $1 */ ?>", $value);
+		$pattern = sprintf('/%s--((.|\s)*?)--%s/', $this->contentTags[0], $this->contentTags[1]);
+
+		return preg_replace($pattern, '<?php /* $1 */ ?>', $value);
 	}
 
 	/**
@@ -146,9 +171,33 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		$value = preg_replace('/\{\{\{\s*(.+?)\s*\}\}\}/s', '<?php echo e($1); ?>', $value);
+		return $this->compileEscapedEchos($this->compileRegularEchos($value));
+	}
 
-		return preg_replace('/\{\{\s*(.+?)\s*\}\}/s', '<?php echo $1; ?>', $value);
+	/**
+	 * Compile the "regular" echo statements.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileRegularEchos($value)
+	{
+		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
+
+		return preg_replace($pattern, '<?php echo e($1); ?>', $value);
+	}
+
+	/**
+	 * Compile the escaped echo statements.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileEscapedEchos($value)
+	{
+		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
+
+		return preg_replace($pattern, '<?php echo $1; ?>', $value);
 	}
 
 	/**
@@ -271,6 +320,23 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile Blade language and language choice statements into valid PHP.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileLanguage($value)
+	{
+		$pattern = $this->createMatcher('lang');
+
+		$value = preg_replace($pattern, '$1<?php echo Lang::get$2; ?>', $value);
+
+		$pattern = $this->createMatcher('choice');
+
+		return preg_replace($pattern, '$1<?php echo Lang::choice$2; ?>', $value);
+	}
+
+	/**
 	 * Compile Blade section start statements into valid PHP.
 	 *
 	 * @param  string  $value
@@ -327,6 +393,33 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function createPlainMatcher($function)
 	{
 		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
+	}
+
+	/**
+	 * Sets the content tags used for the compiler.
+	 *
+	 * @param  string  $openTag
+	 * @param  string  $closeTag
+	 * @param  bool    $raw
+	 * @return void
+	 */
+	public function setContentTags($openTag, $closeTag, $raw = false)
+	{
+		$property = ($raw === true) ? 'escapedTags' : 'contentTags';
+
+		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
+	}
+
+	/**
+	 * Sets the raw content tags used for the compiler.
+	 *
+	 * @param  string  $openTag
+	 * @param  string  $closeTag
+	 * @return void
+	 */
+	public function setEscapedContentTags($openTag, $closeTag)
+	{
+		$this->setContentTags($openTag, $closeTag, true);
 	}
 
 }

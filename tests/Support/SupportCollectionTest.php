@@ -19,6 +19,32 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPopReturnsAndRemovesLastItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('bar', $c->pop());
+		$this->assertEquals('foo', $c->first());
+	}
+
+
+	public function testShiftReturnsAndRemovesFirstItemInCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('foo', $c->shift());
+		$this->assertEquals('bar', $c->first());
+	}
+
+
+	public function testEmptyCollectionIsEmpty()
+	{
+		$c = new Collection();
+
+		$this->assertTrue($c->isEmpty());
+	} 
+
+
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
 		$item1 = m::mock('stdClass');
@@ -75,6 +101,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$c = new Collection(array('foo'));
 		$this->assertInstanceOf('ArrayIterator', $c->getIterator());
 		$this->assertEquals(array('foo'), $c->getIterator()->getArrayCopy());
+	}
+
+
+	public function testFlatten()
+	{
+		$c = new Collection(array(array('#foo', '#bar'), array('#baz')));
+		$this->assertEquals(array('#foo', '#bar', '#baz'), $c->flatten());
+	}
+
+
+	public function testMerge()
+	{
+		$data = new Collection(array(array($object1 = new StdClass), array($object2 = new StdClass)));
+		$this->assertEquals(array($object1, $object2), $data->merge()->all());
 	}
 
 }

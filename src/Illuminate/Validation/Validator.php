@@ -58,6 +58,13 @@ class Validator implements MessageProviderInterface {
 	protected $customMessages = array();
 
 	/**
+	 * The array of custom attribute names.
+	 *
+	 * @var array
+	 */
+	protected $customAttributes = array();
+
+	/**
 	 * All of the custom validator extensions.
 	 *
 	 * @var array
@@ -155,7 +162,7 @@ class Validator implements MessageProviderInterface {
 
 		// We'll spin through each rule, validating the attributes attached to that
 		// rule. Any error messages will be added to the containers with each of
-		// the other error messages and we'll return true if we have messages.
+		// the other error messages, returning true if we don't have messages.
 		foreach ($this->rules as $attribute => $rules)
 		{
 			foreach ($rules as $rule)
@@ -439,6 +446,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return bool
 	 */
 	protected function validateDigits($attribute, $value, $parameters)
@@ -451,6 +459,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return bool
 	 */
 	protected function validateDigitsBetween($attribute, $value, $parameters)
@@ -525,10 +534,10 @@ class Validator implements MessageProviderInterface {
 	{
 		$hasNumeric = $this->hasRule($attribute, $this->numericRules);
 
-	 	// This method will determine if the attribute is a number, string, or file and
-	 	// return the proper size accordingly. If it is a number, then number itself
-	 	// is the size. If it is a file, we take kilobytes, and for a string the
-	 	// entire length of the string will be considered the attribute size.
+		// This method will determine if the attribute is a number, string, or file and
+		// return the proper size accordingly. If it is a number, then number itself
+		// is the size. If it is a file, we take kilobytes, and for a string the
+		// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
 			return $this->data[$attribute];
@@ -809,6 +818,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return bool
 	 */
 	protected function validateRegex($attribute, $value, $parameters)
@@ -1021,11 +1031,19 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getAttribute($attribute)
 	{
+		// The developer may dynamically specify the array of custom attributes
+		// on this Validator instance. If the attribute exists in this array
+		// it takes precedence over all other ways we can pull attributes.
+		if (isset($this->customAttributes[$attribute]))
+		{
+			return $this->customAttributes[$attribute];
+		}
+
+		$key = "validation.attributes.{$attribute}";
+
 		// We allow for the developer to specify language lines for each of the
 		// attributes allowing for more displayable counterparts of each of
 		// the attributes. This provides the ability for simple formats.
-		$key = "validation.attributes.{$attribute}";
-
 		if (($line = $this->translator->trans($key)) !== $key)
 		{
 			return $line;
@@ -1285,20 +1303,28 @@ class Validator implements MessageProviderInterface {
 		// The format for specifying validation rules and parameters follows an
 		// easy {rule}:{parameters} formatting convention. For instance the
 		// rule "Max:3" states that the value may only be three letters.
-		if (($colon = strpos($rule, ':')) !== false)
+		if (strpos($rule, ':') !== false)
 		{
-			$parameters = str_getcsv(substr($rule, $colon + 1));
-		}
+			list($rule, $parameter) = explode(':', $rule, 2);
 
-		// If we found a colon in the rule string it means a parameter has been
-		// specified, and we need to extract the "plain" rule name from this
-		// string so that we can call the proper validation method for it.
-		if (is_numeric($colon))
-		{
-			$rule = substr($rule, 0, $colon);
+			$parameters = $this->parseParameters($rule, $parameter);
 		}
 
 		return array(studly_case($rule), $parameters);
+	}
+
+	/**
+	 * Parse a parameter list.
+	 *
+	 * @param  string  $rule
+	 * @param  string  $parameter
+	 * @return array
+	 */
+	protected function parseParameters($rule, $parameter)
+	{
+		if (strtolower($rule) == 'regex') return array($parameter);
+
+		return str_getcsv($parameter);
 	}
 
 	/**
@@ -1393,6 +1419,19 @@ class Validator implements MessageProviderInterface {
 	public function getRules()
 	{
 		return $this->rules;
+	}
+
+	/**
+	 * Set the custom attributes on the validator.
+	 *
+	 * @param  array  $attributes
+	 * @return Illuminate\Validation\Validator
+	 */
+	public function setAttributeNames(array $attributes)
+	{
+		$this->customAttributes = $attributes;
+
+		return $this;
 	}
 
 	/**

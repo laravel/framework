@@ -323,6 +323,25 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Save an array of new models and attach them to the parent model.
+	 *
+	 * @param  array  $models
+	 * @param  array  $joinings
+	 * @return array
+	 */
+	public function saveMany(array $models, array $joinings = array())
+	{
+		foreach ($models as $key => $model)
+		{
+			$joining = isset($joinings[$key]) ? $joinings[$key] : array();
+
+			$this->save($model, $joining);
+		}
+
+		return $models;
+	}
+
+	/**
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes
@@ -344,6 +363,27 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Create an array of new instances of the related models.
+	 *
+	 * @param  array  $attributes
+	 * @param  array  $joining
+	 * @return Illuminate\Database\Eloquent\Model
+	 */
+	public function createMany(array $records, array $joinings = array())
+	{
+		$instances = array();
+
+		foreach ($records as $key => $record)
+		{
+			$joining = isset($joinings[$key]) ? $joinings[$key] : array();
+
+			$instances[] = $this->create($record, $joining);		
+		}
+
+		return $instance;
+	}
+
+	/**
 	 * Sync the intermediate tables with a list of IDs.
 	 *
 	 * @param  array  $ids
@@ -356,19 +396,56 @@ class BelongsToMany extends Relation {
 		// if they exist in the array of current ones, and if not we will insert.
 		$current = $this->newPivotQuery()->lists($this->otherKey);
 
-		foreach ($ids as $id)
-		{
-			if ( ! in_array($id, $current)) $this->attach($id);
-		}
+		$records = $this->formatSyncList($ids);
+
+		$this->attachNew($records, $current);
+
+		$detach = array_diff($current, array_keys($records));
 
 		// Next, we will take the differences of the currents and given IDs and detach
 		// all of the entities that exist in the "current" array but are not in the
 		// the array of the IDs given to the method which will complete the sync.
-		$detach = array_diff($current, $ids);
-
 		if (count($detach) > 0)
 		{
 			$this->detach($detach);
+		}
+	}
+
+	/**
+	 * Format the sync list so that is is keyed by ID.
+	 *
+	 * @param  array  $records
+	 * @return array
+	 */
+	protected function formatSyncList(array $records)
+	{
+		$results = array();
+
+		foreach ($records as $id => $attributes)
+		{
+			if (is_int($attributes))
+			{
+				list($id, $attributes) = array($attributes, array());
+			}
+
+			$results[$id] = $attributes;
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Attach all of the IDs that aren't in the current array.
+	 *
+	 * @param  array  $records
+	 * @param  array  $current
+	 * @return void
+	 */
+	protected function attachNew(array $records, array $current)
+	{
+		foreach ($records as $id => $attributes)
+		{
+			if ( ! in_array($id, $current)) $this->attach($id, $attributes);
 		}
 	}
 

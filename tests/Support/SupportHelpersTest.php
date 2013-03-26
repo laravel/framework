@@ -45,14 +45,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testArrayExcept()
 	{
 		$array = array('name' => 'taylor', 'age' => 26);
-		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
+		$this->assertEquals(array('age' => 26), array_except($array, array('name')));
 	}
 
 
 	public function testArrayOnly()
 	{
 		$array = array('name' => 'taylor', 'age' => 26);
-		$this->assertEquals(array('age' => 26), array_except($array, array('name')));
+		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
 	}
 
 
@@ -69,6 +69,48 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$array = array('name' => 'taylor', 'otherDeveloper' => 'dayle');
 		$this->assertEquals('dayle', array_first($array, function($key, $value) { return $value == 'dayle'; }));
+	}
+
+
+	public function testArrayFetch()
+	{
+		$data = array(
+			'post-1' => array(
+				'comments' => array(
+					'tags' => array(
+						'#foo', '#bar',
+					),
+				),
+			),
+			'post-2' => array(
+				'comments' => array(
+					'tags' => array(
+						'#baz',
+					),
+				),
+			),
+		);
+
+		$this->assertEquals(array(
+			0 => array(
+				'tags' => array(
+					'#foo', '#bar',
+				),
+			),
+			1 => array(
+				'tags' => array(
+					'#baz',
+				),
+			),
+		), array_fetch($data, 'comments'));
+
+		$this->assertEquals(array(array('#foo', '#bar'), array('#baz')), array_fetch($data, 'comments.tags'));
+	}
+
+
+	public function testArrayFlatten()
+	{
+		$this->assertEquals(array('#foo', '#bar', '#baz'), array_flatten(array(array('#foo', '#bar'), array('#baz'))));
 	}
 
 

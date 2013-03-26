@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Grammar as BaseGrammar;
 
@@ -182,9 +183,11 @@ abstract class Grammar extends BaseGrammar {
 	 */
 	protected function getDefaultValue($value)
 	{
-		if (is_bool($value)) return intval($value);
+		if ($value instanceof Expression) return $value;
 
-		return strval($value);
+		if (is_bool($value)) return "'".intval($value)."'";
+
+		return "'".strval($value)."'";
 	}
 
 }

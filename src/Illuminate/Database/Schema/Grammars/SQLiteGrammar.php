@@ -197,7 +197,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	public function compileDropColumn(Blueprint $blueprint, Fluent $command)
 	{
-		throw new \BadMethodCallException("Drop table not supported for SQLite.");
+		throw new \BadMethodCallException("Drop column not supported for SQLite.");
 	}
 
 	/**
@@ -390,7 +390,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function modifyNullable(Blueprint $blueprint, Fluent $column)
 	{
-		return $column->nullable ? ' null' : ' not null';
+		return ' null';
 	}
 
 	/**
@@ -404,7 +404,7 @@ class SQLiteGrammar extends Grammar {
 	{
 		if ( ! is_null($column->default))
 		{
-			return " default '".$this->getDefaultValue($column->default)."'";
+			return " default ".$this->getDefaultValue($column->default);
 		}
 	}
 

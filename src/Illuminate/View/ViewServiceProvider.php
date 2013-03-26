@@ -77,7 +77,7 @@ class ViewServiceProvider extends ServiceProvider {
 
 		$resolver->register('blade', function() use ($app)
 		{
-			$cache = $app['path'].'/storage/views';
+			$cache = $app['path.storage'].'/views';
 
 			// The Compiler engine requires an instance of the CompilerInterface, which in
 			// this case will be the Blade compiler, so we'll first create the compiler

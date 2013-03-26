@@ -74,7 +74,7 @@ class Filesystem {
 	 */
 	public function put($path, $contents)
 	{
-		return file_put_contents($path, $contents, LOCK_EX);
+		return file_put_contents($path, $contents);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class Filesystem {
 	 */
 	public function append($path, $data)
 	{
-		return file_put_contents($path, $data, LOCK_EX | FILE_APPEND);
+		return file_put_contents($path, $data, FILE_APPEND);
 	}
 
 	/**

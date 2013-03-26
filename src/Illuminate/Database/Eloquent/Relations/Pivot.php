@@ -26,6 +26,13 @@ class Pivot extends Model {
 	protected $otherKey;
 
 	/**
+	 * The attributes that aren't mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $guarded = array();
+
+	/**
 	 * Create a new pivot model instance.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Model  $parent
@@ -59,13 +66,13 @@ class Pivot extends Model {
 	 * Set the keys for a save update query.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Builder
-	 * @return void
+	 * @return Illuminate\Database\Eloquent\Builder
 	 */
 	protected function setKeysForSaveQuery($query)
 	{
 		$query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
-		$query->where($this->otherKey, $this->getAttribute($this->otherKey));
+		return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
 	}
 
 	/**

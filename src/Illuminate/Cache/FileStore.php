@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache; use Illuminate\Filesystem\Filesystem;
 
-class FileStore extends Store {
+class FileStore implements StoreInterface {
 
 	/**
 	 * The Illuminate Filesystem instance.
@@ -35,7 +35,7 @@ class FileStore extends Store {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function retrieveItem($key)
+	public function get($key)
 	{
 		$path = $this->path($key);
 
@@ -56,7 +56,7 @@ class FileStore extends Store {
 		// this directory much cleaner for us as old files aren't hanging out.
 		if (time() >= $expiration)
 		{
-			return $this->removeItem($key);
+			return $this->forget($key);
 		}
 
 		return unserialize(substr($contents, 10));
@@ -70,11 +70,35 @@ class FileStore extends Store {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	protected function storeItem($key, $value, $minutes)
+	public function put($key, $value, $minutes)
 	{
 		$value = $this->expiration($minutes).serialize($value);
 
 		$this->files->put($this->path($key), $value);
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function increment($key, $value = 1)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function decrement($key, $value = 1)
+	{
+		throw new \LogicException("Increment operations not supported by this driver.");
 	}
 
 	/**
@@ -84,9 +108,9 @@ class FileStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function storeItemForever($key, $value)
+	public function forever($key, $value)
 	{
-		return $this->storeItem($key, $value, 0);
+		return $this->put($key, $value, 0);
 	}
 
 	/**
@@ -95,7 +119,7 @@ class FileStore extends Store {
 	 * @param  string  $key
 	 * @return void
 	 */
-	protected function removeItem($key)
+	public function forget($key)
 	{
 		$this->files->delete($this->path($key));
 	}
@@ -105,9 +129,12 @@ class FileStore extends Store {
 	 *
 	 * @return void
 	 */
-	protected function flushItems()
+	public function flush()
 	{
-		$this->files->cleanDirectory($this->directory);
+		foreach ($this->files->files($this->directory) as $file)
+		{
+			$this->files->delete($file);
+		}
 	}
 
 	/**
@@ -118,7 +145,7 @@ class FileStore extends Store {
 	 */
 	protected function path($key)
 	{
-		return $this->directory.'/'.$key;
+		return $this->directory.'/'.md5($key);
 	}
 
 	/**

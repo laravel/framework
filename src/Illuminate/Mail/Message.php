@@ -108,6 +108,20 @@ class Message {
 	}
 
 	/**
+	 * Add a reply to address to the message.
+	 *
+	 * @param  string  $address
+	 * @param  string  $name
+	 * @return Illuminate\Mail\Message
+	 */
+	public function replyTo($address, $name = null)
+	{
+		$this->swift->addReplyTo($address, $name);
+
+		return $this;
+	}
+
+	/**
 	 * Set the subject of the message.
 	 *
 	 * @param  string  $subject

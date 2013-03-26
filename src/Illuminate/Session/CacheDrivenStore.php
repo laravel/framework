@@ -7,17 +7,17 @@ class CacheDrivenStore extends Store {
 	/**
 	 * The cache store instance.
 	 *
-	 * @var Illuminate\Cache\Store
+	 * @var Illuminate\Cache\Repository
 	 */
 	protected $cache;
 
 	/**
 	 * Create a new Memcache session instance.
 	 *
-	 * @param  Illuminate\Cache\Store  $cache
+	 * @param  Illuminate\Cache\Repository  $cache
 	 * @return void
 	 */
-	public function __construct(\Illuminate\Cache\Store $cache)
+	public function __construct(\Illuminate\Cache\Repository $cache)
 	{
 		$this->cache = $cache;
 	}

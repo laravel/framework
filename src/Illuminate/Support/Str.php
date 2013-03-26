@@ -105,6 +105,39 @@ class Str {
 	}
 
 	/**
+	 * Convert the given string to lower-case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function lower($value)
+	{
+		return mb_strtolower($value);
+	}
+
+	/**
+	 * Limit the number of words in a string.
+	 *
+	 * @param  string  $value
+	 * @param  int     $words
+	 * @param  string  $end
+	 * @return string
+	 */
+	public static function words($value, $words = 100, $end = '...')
+	{
+		if (trim($value) == '') return '';
+
+		preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
+
+		if (strlen($value) == strlen($matches[0]))
+		{
+			$end = '';
+		}
+
+		return rtrim($matches[0]).$end;
+	}
+
+	/**
 	 * Get the plural form of an English word.
 	 *
 	 * @param  string  $value
@@ -152,6 +185,17 @@ class Str {
 		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
+	}
+
+	/**
+	 * Convert the given string to upper-case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function upper($value)
+	{
+		return mb_strtoupper($value);
 	}
 
 	/**
@@ -208,7 +252,7 @@ class Str {
 	 * Determine if a string starts with a given needle.
 	 *
 	 * @param  string  $haystack
-	 * @param  string|array  $needle
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
 	public static function startsWith($haystack, $needles)

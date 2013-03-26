@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache; use Memcached;
 
-class MemcachedStore extends Store {
+class MemcachedStore implements StoreInterface {
 
 	/**
 	 * The Memcached instance.
@@ -35,11 +35,11 @@ class MemcachedStore extends Store {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	protected function retrieveItem($key)
+	public function get($key)
 	{
 		$value = $this->memcached->get($this->prefix.$key);
 
-		if ($value !== false)
+		if ($this->memcached->getResultCode() == 0)
 		{
 			return $value;
 		}
@@ -53,9 +53,33 @@ class MemcachedStore extends Store {
 	 * @param  int     $minutes
 	 * @return void
 	 */
-	protected function storeItem($key, $value, $minutes)
+	public function put($key, $value, $minutes)
 	{
 		$this->memcached->set($this->prefix.$key, $value, $minutes * 60);
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function increment($key, $value = 1)
+	{
+		return $this->memcached->increment($this->prefix.$key, $value);
+	}
+
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function decrement($key, $value = 1)
+	{
+		return $this->memcached->decrement($this->prefix.$key, $value);
 	}
 
 	/**
@@ -65,9 +89,9 @@ class MemcachedStore extends Store {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	protected function storeItemForever($key, $value)
+	public function forever($key, $value)
 	{
-		return $this->storeItem($key, $value, 0);
+		return $this->put($key, $value, 0);
 	}
 
 	/**
@@ -76,7 +100,7 @@ class MemcachedStore extends Store {
 	 * @param  string  $key
 	 * @return void
 	 */
-	protected function removeItem($key)
+	public function forget($key)
 	{
 		$this->memcached->delete($this->prefix.$key);
 	}
@@ -86,7 +110,7 @@ class MemcachedStore extends Store {
 	 *
 	 * @return void
 	 */
-	protected function flushItems()
+	public function flush()
 	{
 		$this->memcached->flush();
 	}

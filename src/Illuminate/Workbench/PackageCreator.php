@@ -19,7 +19,7 @@ class PackageCreator {
 	protected $basicBlocks = array(
 		'SupportFiles',
 		'TestDirectory',
-		'ServiceProvider'
+		'ServiceProvider',
 	);
 
 	/**
@@ -32,7 +32,7 @@ class PackageCreator {
 		'SupportDirectories',
 		'PublicDirectory',
 		'TestDirectory',
-		'ServiceProvider'
+		'ServiceProvider',
 	);
 
 	/**
@@ -77,7 +77,7 @@ class PackageCreator {
 	 */
 	public function writeSupportFiles(Package $package, $directory, $plain)
 	{
-		foreach (array('PhpUnit', 'Travis', 'Composer') as $file)
+		foreach (array('PhpUnit', 'Travis', 'Composer', 'Ignore') as $file)
 		{
 			$this->{"write{$file}File"}($package, $directory, $plain);
 		}
@@ -131,14 +131,21 @@ class PackageCreator {
 	 */
 	protected function getComposerStub($plain)
 	{
-		if ($plain)
-		{
-			return $this->files->get(__DIR__.'/stubs/plain.composer.json');
-		}
-		else
-		{
-			return $this->files->get(__DIR__.'/stubs/composer.json');
-		}
+		if ($plain) return $this->files->get(__DIR__.'/stubs/plain.composer.json');
+
+		return $this->files->get(__DIR__.'/stubs/composer.json');
+	}
+
+	/**
+	 * Write the stub .gitignore file for the package.
+	 *
+	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  string  $directory
+	 * @return void
+	 */
+	public function writeIgnoreFile(Package $package, $directory, $plain)
+	{
+		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');	
 	}
 
 	/**
@@ -227,14 +234,9 @@ class PackageCreator {
 	 */
 	protected function getProviderStub($plain)
 	{
-		if ($plain)
-		{
-			return $this->files->get(__DIR__.'/stubs/plain.provider.php');
-		}
-		else
-		{
-			return $this->files->get(__DIR__.'/stubs/provider.php');
-		}
+		if ($plain) return $this->files->get(__DIR__.'/stubs/plain.provider.php');
+		
+		return $this->files->get(__DIR__.'/stubs/provider.php');
 	}
 
 	/**

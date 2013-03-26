@@ -35,10 +35,12 @@ class ArrayStore extends CacheDrivenStore {
 	 *
 	 * @param  Illuminate\Cookie\CookieJar  $cookie
 	 * @param  string  $name
-	 * @param  int  $lifetime
+	 * @param  int     $lifetime
+	 * @param  string  $path
+	 * @param  string  $domain
 	 * @return void
 	 */
-	public function getCookie(CookieJar $cookie, $name, $lifetime)
+	public function getCookie(CookieJar $cookie, $name, $lifetime, $path, $domain)
 	{
 		//
 	}

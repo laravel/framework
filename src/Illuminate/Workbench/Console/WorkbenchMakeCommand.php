@@ -49,30 +49,26 @@ class WorkbenchMakeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$package = $this->buildPackage();
-
-		$this->info('Creating workbench...');
-
-		$path = $this->laravel['path.base'].'/workbench';
-
-		// A "plain" package simply does not contain the "views", "config" or any other
-		// Laravel intended directories. Plain packages don't contain those types of
-		// directories as they are primarily just plain libraries for consumption.
-		$plain = $this->input->getOption('plain');
-
-		$workbench = $this->creator->create($package, $path, $plain);
+		$workbench = $this->runCreator($this->buildPackage());
 
 		$this->info('Package workbench created!');
 
-		// If the "composer" option has been specified, we will call composer update for
-		// the workbench so the dependencies will be installed and the classmaps get
-		// generated for the package. This will allow the devs to start migrating.
-		if ($this->input->getOption('composer'))
-		{
-			$this->comment('Installing dependencies for workbench...');
+		$this->callComposerUpdate($workbench);
+	}
 
-			$this->callComposerUpdate($workbench);
-		}
+	/**
+	 * Run the package creator class for a given Package.
+	 *
+	 * @param  Illuminate\Workbench\Package  $package
+	 * @return string
+	 */
+	protected function runCreator($package)
+	{
+		$path = $this->laravel['path.base'].'/workbench';
+
+		$plain = $this->option('plain');
+
+		return $this->creator->create($package, $path, $plain);
 	}
 
 	/**
@@ -95,15 +91,35 @@ class WorkbenchMakeCommand extends Command {
 	 */
 	protected function buildPackage()
 	{
-		$vendor = studly_case($this->ask('What is vendor name of the package?'));
+		list($vendor, $name) = $this->getPackageSegments();
 
-		$name = studly_case($this->ask('What is the package name?'));
+		$config = $this->laravel['config']['workbench'];
 
-		$author = $this->ask('What is your name?');
+		return new Package($vendor, $name, $config['name'], $config['email']);
+	}
 
-		$email = $this->ask('What is your e-mail address?');
+	/**
+	 * Get the package vendor and name segments from the input.
+	 *
+	 * @return array
+	 */
+	protected function getPackageSegments()
+	{
+		$package = $this->argument('package');
 
-		return new Package($vendor, $name, $author, $email);
+		return array_map('studly_case', explode('/', $package, 2));		
+	}
+
+	/**
+	 * Get the console command arguments.
+	 *
+	 * @return array
+	 */
+	protected function getArguments()
+	{
+		return array(
+			array('package', InputArgument::REQUIRED, 'The name (vendor/name) of the package.'),
+		);
 	}
 
 	/**
@@ -114,8 +130,6 @@ class WorkbenchMakeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('composer', null, InputOption::VALUE_NONE, 'Call "composer update" after workbench creation.'),
-
 			array('plain', null, InputOption::VALUE_NONE, 'Skip creation of Laravel specific directories.'),
 		);
 	}

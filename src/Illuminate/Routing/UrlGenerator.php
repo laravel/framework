@@ -53,10 +53,20 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Get the URL for the previous request.
+	 *
+	 * @return string
+	 */
+	public function previous()
+	{
+		return $this->to($this->request->headers->get('referer'));
+	}
+
+	/**
 	 * Generate a absolute URL to the given path.
 	 *
 	 * @param  string  $path
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $secure
 	 * @return string
 	 */
@@ -80,6 +90,7 @@ class UrlGenerator {
 	 * Generate a secure, absolute URL to the given path.
 	 *
 	 * @param  string  $path
+	 * @param  array   $parameters
 	 * @return string
 	 */
 	public function secure($path, $parameters = array())
@@ -144,13 +155,15 @@ class UrlGenerator {
 	 * Get the URL to a named route.
 	 *
 	 * @param  string  $name
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $absolute
 	 * @return string
 	 */
 	public function route($name, $parameters = array(), $absolute = true)
 	{
 		$route = $this->routes->get($name);
+
+		$parameters = (array) $parameters;
 
 		if (isset($route) and $this->usingQuickParameters($parameters))
 		{
@@ -199,7 +212,7 @@ class UrlGenerator {
 	 * Get the URL to a controller action.
 	 *
 	 * @param  string  $action
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @param  bool    $absolute
 	 * @return string
 	 */

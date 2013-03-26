@@ -36,10 +36,11 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase {
 	public function testMakeProcessCorrectlyFormatsCommandLine()
 	{
 		$listener = new Illuminate\Queue\Listener(__DIR__);
-		$process = $listener->makeProcess('connection', 'queue', 1, 2);
+		$process = $listener->makeProcess('connection', 'queue', 1, 2, 3);
 
 		$this->assertInstanceOf('Symfony\Component\Process\Process', $process);
 		$this->assertEquals(__DIR__, $process->getWorkingDirectory());
+		$this->assertEquals(3, $process->getTimeout());
 		$this->assertEquals('php artisan queue:work connection --queue=queue --delay=1 --memory=2 --sleep', $process->getCommandLine());
 	}
 

@@ -44,6 +44,12 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env->setRequest($request);
 
 		$this->assertEquals(2, $env->getCurrentPage());
+
+		$env = $this->getEnvironment();
+		$request = Illuminate\Http\Request::create('http://foo.com?page=-1', 'GET');
+		$env->setRequest($request);
+
+		$this->assertEquals(1, $env->getCurrentPage());
 	}
 
 

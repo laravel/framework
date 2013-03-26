@@ -27,6 +27,30 @@ class ApcWrapper {
 	}
 
 	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function increment($key, $value)
+	{
+		return apc_inc($key, $value);
+	}
+
+	/**
+	 * Decremenet the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function decrement($key, $value)
+	{
+		return apc_dec($key, $value);
+	}
+
+	/**
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key

@@ -45,9 +45,9 @@ class PasswordBroker {
 	/**
 	 * Create a new password broker instance.
 	 *
-	 * @param  Illuminate\Auth\ReminderRepositoryInterface  $reminders
+	 * @param  Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
 	 * @param  Illuminate\Auth\UserProviderInterface  $users
-	 * @param  Illuminate\Routing\Redirector  $redirector
+	 * @param  Illuminate\Routing\Redirector  $redirect
 	 * @param  Illuminate\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
 	 * @return void
@@ -97,7 +97,7 @@ class PasswordBroker {
 	/**
 	 * Send the password reminder e-mail.
 	 *
-	 * @param  Illuminate\Auth\RemindableInterface  $user
+	 * @param  Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string   $token
 	 * @param  Closure  $callback
 	 * @return void
@@ -120,8 +120,7 @@ class PasswordBroker {
 	/**
 	 * Reset the password for the given token.
 	 *
-	 * @param  string   $token
-	 * @param  string   $newPassword
+	 * @param  array    $credentials
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */
@@ -206,7 +205,7 @@ class PasswordBroker {
 	 * Get the user for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return Illuminate\Auth\RemindableInterface
+	 * @return Illuminate\Auth\Reminders\RemindableInterface
 	 */
 	public function getUser(array $credentials)
 	{

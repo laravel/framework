@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Cache\DatabaseStore;
 
-class CacheDatabaseCacheTest extends PHPUnit_Framework_TestCase {
+class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
@@ -25,12 +25,12 @@ class CacheDatabaseCacheTest extends PHPUnit_Framework_TestCase {
 
 	public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
 	{
-		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('removeItem'), $this->getMocks());
+		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('forget'), $this->getMocks());
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
 		$table->shouldReceive('first')->once()->andReturn((object) array('expiration' => 1));
-		$store->expects($this->once())->method('removeItem')->with($this->equalTo('foo'))->will($this->returnValue(null));
+		$store->expects($this->once())->method('forget')->with($this->equalTo('foo'))->will($this->returnValue(null));
 
 		$this->assertNull($store->get('foo'));
 	}
@@ -82,8 +82,8 @@ class CacheDatabaseCacheTest extends PHPUnit_Framework_TestCase {
 
 	public function testForeverCallsStoreItemWithReallyLongTime()
 	{
-		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('storeItem'), $this->getMocks());
-		$store->expects($this->once())->method('storeItem')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(5256000));
+		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('put'), $this->getMocks());
+		$store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(5256000));
 		$store->forever('foo', 'bar');
 	}
 

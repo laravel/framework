@@ -85,11 +85,11 @@ class Connection implements ConnectionInterface {
 	protected $tablePrefix = '';
 
 	/**
-	 * The name of the database connection.
+	 * The database connection configuration options.
 	 *
 	 * @var string
 	 */
-	protected $name;
+	protected $config = array();
 
 	/**
 	 * Create a new database connection instance.
@@ -97,10 +97,10 @@ class Connection implements ConnectionInterface {
 	 * @param  PDO     $pdo
 	 * @param  string  $database
 	 * @param  string  $tablePrefix
-	 * @param  string  $name
+	 * @param  array   $config
 	 * @return void
 	 */
-	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', $name = null)
+	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = array())
 	{
 		$this->pdo = $pdo;
 
@@ -111,7 +111,7 @@ class Connection implements ConnectionInterface {
 
 		$this->tablePrefix = $tablePrefix;
 
-		$this->name = $name;
+		$this->config = $config;
 
 		// We need to initialize a query grammar and the query post processors
 		// which are both very important parts of the database abstractions
@@ -488,6 +488,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @param  string  $query
 	 * @param  array   $bindings
+	 * @param  $time
 	 * @return void
 	 */
 	public function logQuery($query, $bindings, $time = null)
@@ -517,7 +518,18 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getName()
 	{
-		return $this->name;
+		return $this->getConfig('name');
+	}
+
+	/**
+	 * Get an option from the configuration options.
+	 *
+	 * @param  string  $option
+	 * @return mixed
+	 */
+	public function getConfig($option)
+	{
+		return array_get($this->config, $option);
 	}
 
 	/**
@@ -679,6 +691,16 @@ class Connection implements ConnectionInterface {
 	public function getQueryLog()
 	{
 		return $this->queryLog;
+	}
+
+	/**
+	 * Clear the query log.
+	 *
+	 * @return void
+	 */
+	public function flushQueryLog()
+	{
+		$this->queryLog = array();
 	}
 
 	/**

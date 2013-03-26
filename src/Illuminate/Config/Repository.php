@@ -328,7 +328,8 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Set the loader implementation.
 	 *
-	 * @return Illuminate\Config\LoaderInterface
+	 * @param Illuminate\Config\LoaderInterface  $loader
+	 * @return void
 	 */
 	public function setLoader(LoaderInterface $loader)
 	{
@@ -391,7 +392,8 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 * Set a configuration option.
 	 *
 	 * @param  string  $key
-	 * @return bool
+	 * @param  string  $value
+	 * @return void
 	 */
 	public function offsetSet($key, $value)
 	{
@@ -402,7 +404,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 * Unset a configuration option.
 	 *
 	 * @param  string  $key
-	 * @return bool
+	 * @return void
 	 */
 	public function offsetUnset($key)
 	{

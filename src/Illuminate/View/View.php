@@ -2,6 +2,7 @@
 
 use ArrayAccess;
 use Illuminate\View\Engines\EngineInterface;
+use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
 use Illuminate\Support\Contracts\RenderableInterface as Renderable;
 
 class View implements ArrayAccess, Renderable {
@@ -51,13 +52,14 @@ class View implements ArrayAccess, Renderable {
 	 * @param  array   $data
 	 * @return void
 	 */
-	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, array $data = array())
+	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array())
 	{
 		$this->view = $view;
 		$this->path = $path;
-		$this->data = $data;
 		$this->engine = $engine;
 		$this->environment = $environment;
+
+		$this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
 	}
 
 	/**
@@ -135,7 +137,7 @@ class View implements ArrayAccess, Renderable {
 		{
 			$this->data[$key] = $value;
 		}
-		
+
 		return $this;
 	}
 
@@ -278,6 +280,28 @@ class View implements ArrayAccess, Renderable {
 	public function __set($key, $value)
 	{
 		$this->with($key, $value);
+	}
+
+	/**
+	 * Check if a piece of data is bound to the view.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function __isset($key)
+	{
+		return isset($this->data[$key]);
+	}
+
+	/**
+	 * Remove a piece of bound data from the view.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function __unset($key)
+	{
+		unset($this->data[$key]);
 	}
 
 	/**

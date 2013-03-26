@@ -82,7 +82,7 @@ class Encrypter {
 	/**
 	 * Decrypt the given value.
 	 *
-	 * @param  string  $value
+	 * @param  string  $payload
 	 * @return string
 	 */
 	public function decrypt($payload)
@@ -131,7 +131,7 @@ class Encrypter {
 
 		if ($payload['mac'] != $this->hash($payload['value']))
 		{
-			throw new DecryptException("Message authentication code invalid.");
+			throw new DecryptException("MAC for payload is invalid.");
 		}
 
 		return $payload;
@@ -183,7 +183,7 @@ class Encrypter {
 	 */
 	protected function paddingIsValid($pad, $value)
 	{
-		return $pad and $pad < $this->block and preg_match('/'.chr($pad).'{'.$pad.'}$/', $value);
+		return $pad and $pad <= $this->block and preg_match('/'.chr($pad).'{'.$pad.'}$/', $value);
 	}
 
 	/**

@@ -21,7 +21,51 @@
 - Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
 - Added `restart identity` to Postgres `truncate` SQL.
 - Added `Log::listen` callback and `illuminate.log` event which can be hooked into for custom logging handling.
+- Allow blade templates to be configurable (advanced usage). Can swap out `{{ }}` for `[[ ]]` as an example, to avoid conflicts with other engines (such as handlebars).
 - `camel_case` function now returns strings with lower-case leading letters. Previous behavior of this function can be found in new `studly_case` helper.
+- Added `find` method to Eloquent Collection.
+- When using MySQL, new `after` method may be used when building Schema columns to specify column order. (`$t->string('name')->after('foo')`)
+- Added new `--timeout` option to `queue:listen` command.
+- Fixed bug that sometimes caused custom view engines to not be properly utilized.
+- Added `URL::previous` method for getting previous URL from `referer` $_SERVER variable.
+- Renamed `path` helper to `url` for consistency.
+- Added `App::shutdown` method for registering callbacks to be fired at very end of both web and Artisan life-cycle.
+- Added `saveMany` and `createMany` to 1:1, 1:*, and *:* relations.
+- Support for [IronMQ](http://www.iron.io/mq) message queue added. Driver is `iron`.
+- Added `domain` and `path` options to session configuration. Named prior `path` option to `files`.
+- Add collation and character set to create table statements in MySQL schema builder.
+- Allow session payload cookie name to be configurable.
+- `shouldReceive` may now be called on a Facade multiple times without using `getMock`.
+- Allow default value to be passed to Eloquent collection `find` method.
+- Intelligently parse resource routes containing slashes.
+- `Route::options` is now available for routing HTTP `OPTIONS` verb.
+- New `secret` method may be called from Artisan commands for password style input.
+- Added `Cache::add` method to store a value in the cache if the key does not exist in the cache already.
+- Added `Cache::increment` and `Cache::decrement` methods to all but file and database cache drivers.
+- Updated `asset:publish` command to automatically find packages with asset directories.
+- Implement Eloquent scopes.
+- Added `assertResponseOk`, `assertViewHas`, `assertSessionHas`, `assertRedirectedTo`, `assertRedirectedToRoute`, `assertRedirectedToAction` test assertions.
+- Added new `setAttributeNames` to `Validator` to allow dynamically passing custom attribute names per instance.
+- Properties passed to Eloquent `fill` or `__construct` beginning with an underscore will be ignored.
+- Changed cache stores to be implementors of a `StoreInterface` rather than extenders of a `Store` abstract class. Injected implementations into a `Cache\Repository` class.
+- Added `array_fetch` and `array_flatten`. Added `fetch` and `flatten` to `Collection` class.
+- Added `merge` method to the Collection class.
+- Added an `addSelect` method to the query builder.
+- Added `Route::currentRouteName` and `Route::currentRouteAction`.
+- Protect against mass assignment by default.
+- Make `add` and `merge` methods on the `MessageBag` chainable.
+- Added `deleting` and `deleted` methods to Eloquent models. Both new events.
+- Added `pop` and `shift` methods to Eloquent collection.
+- Allow `Input::get` to be used on JSON requests to give unified API across request types.
+- Allow `sync` to also update the other pivot table attributes.
+- Pass console `Command` instance to database seeders.
+- Made `storage` path configurable.
+- Added `@lang` and `@choice` Blade directives.
+- Do not run route level after filters if response is returned from before filter.
+- Added support for "mail" in addition to "smtp" in `Mail`.
+- Added `link_to`, `link_to_asset`, `link_to_route`, `link_to_action` helpers.
+- Routes with too many leading or trailing slashes will now 404.
+- Added `callSecure` test helper.
 
 ## Beta 3
 
