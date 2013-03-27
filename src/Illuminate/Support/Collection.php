@@ -116,9 +116,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Reset items index.
+	 * Reset the keys on the underlying array.
 	 *
-	 * @return Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function values()
 	{
