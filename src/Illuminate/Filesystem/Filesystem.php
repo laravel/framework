@@ -25,7 +25,7 @@ class Filesystem {
 	 */
 	public function get($path)
 	{
-		if ($this->exists($path)) return file_get_contents($path);
+		if (is_file($path)) return file_get_contents($path);
 
 		throw new FileNotFoundException("File does not exist at path {$path}");
 	}
