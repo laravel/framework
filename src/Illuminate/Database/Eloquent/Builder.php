@@ -73,6 +73,19 @@ class Builder {
 	}
 
 	/**
+	 * Execute the query and get the first result or throw an exception.
+	 *
+	 * @param  array   $columns
+	 * @return array
+	 */
+	public function firstOrFail($columns = array('*'))
+	{
+		if ( ! is_null($model = $this->first($columns))) return $model;
+
+		throw new ModelNotFoundException;
+	}
+
+	/**
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns

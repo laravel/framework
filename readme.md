@@ -72,6 +72,7 @@
 - Added new `dump-autoload` Artisan command that runs optimized for app and all workbenches.
 - Refactored post `migrate:make` hooks to dump autoloads for workbenches.
 - Added `DB::listen(Closure)` method which may be used to listen for database queries.
+- Added `Model::findOrFail(id)` and `firstOrFail` methods to Eloquent. Throws `ModelNotFoundException`. Can listen in your apps and return 404 repsonses if you want.
 
 ## Beta 3
 

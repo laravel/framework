@@ -341,6 +341,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Find a model by its primary key or throw an exception.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return Illuminate\Database\Eloquent\Model|Collection
+	 */
+	public static function findOrFail($id, $columns = array('*'))
+	{
+		if ( ! is_null($model = static::find($id, $columns))) return $model;
+
+		throw new ModelNotFoundException;
+	}
+
+	/**
 	 * Being querying a model with eager loading.
 	 *
 	 * @param  array  $relations
