@@ -66,14 +66,12 @@ class MakeCommand extends BaseCommand {
 
 		$create = $this->input->getOption('create');
 
-		// Now we're ready to get the path where these migrations should be placed
-		// on disk. This may be specified via the package option on the command
-		// and we will verify that option to determine the appropriate paths.
-		$path = $this->writeMigration($name, $table, $create);
-		
-		$file = pathinfo($path, PATHINFO_FILENAME);
+		// Now we are ready to write the migration out to disk. Once we've written
+		// the migration out, we will dump-autoload for the entire framework to
+		// make sure that the migrations are registered by the class loaders.
+		$this->writeMigration($name, $table, $create);
 
-		$this->line("<info>Created Migration:</info> $file");
+		$this->call('dump-autoload');
 	}
 
 	/**
@@ -88,7 +86,9 @@ class MakeCommand extends BaseCommand {
 	{
 		$path = $this->getMigrationPath();
 
-		return $this->creator->create($name, $path, $table, $create);
+		$file = pathinfo($this->creator->create($name, $path, $table, $create), PATHINFO_FILENAME);
+
+		$this->line("<info>Created Migration:</info> $file");
 	}
 
 	/**

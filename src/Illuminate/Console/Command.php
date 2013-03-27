@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Console;
 
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -121,6 +122,22 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		$arguments['command'] = $command;
 
 		return $instance->run(new ArrayInput($arguments), $this->output);
+	}
+
+	/**
+	 * Call another console command silently.
+	 *
+	 * @param  string  $command
+	 * @param  array   $arguments
+	 * @return mixed
+	 */
+	public function callSilent($command, array $arguments = array())
+	{
+		$instance = $this->getApplication()->find($command);
+
+		$arguments['command'] = $command;
+
+		return $instance->run(new ArrayInput($arguments), new NullOutput);	
 	}
 
 	/**

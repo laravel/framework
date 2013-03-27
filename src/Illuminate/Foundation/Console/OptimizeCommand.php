@@ -70,7 +70,7 @@ class OptimizeCommand extends Command {
 
 		$outputPath = $this->laravel['path.base'].'/bootstrap/compiled.php';
 
-		$this->call('compile', array('--output' => $outputPath, '--config' => implode(',', $this->getClassFiles())));
+		$this->callSilent('compile', array('--output' => $outputPath, '--config' => implode(',', $this->getClassFiles())));
 	}
 
 	/**

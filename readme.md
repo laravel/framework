@@ -68,6 +68,8 @@
 - Added `callSecure` test helper.
 - Added `values` method to the `Collection` class.
 - Fix transaction handling for Microsoft SQL Server.
+- Added new `dump-autoload` Artisan command that runs optimized for app and all workbenches.
+- Refactored post `migrate:make` hooks to dump autoloads for workbenches.
 
 ## Beta 3
 

@@ -35,8 +35,6 @@ class MigrationServiceProvider extends ServiceProvider {
 		$this->registerMigrator();
 
 		$this->registerCommands();
-
-		$this->registerPostCreationHook();
 	}
 
 	/**
@@ -188,27 +186,6 @@ class MigrationServiceProvider extends ServiceProvider {
 			$packagePath = $app['path.base'].'/vendor';
 
 			return new MakeCommand($creator, $packagePath);
-		});
-	}
-
-	/**
-	 * Register the migration post create hook.
-	 *
-	 * @return void
-	 */
-	protected function registerPostCreationHook()
-	{
-		$this->app->extend('migration.creator', function($creator, $app)
-		{
-			// After a new migration is created, we will tell the Composer manager to
-			// regenerate the auto-load files for the framework. This simply makes
-			// sure that a migration will get immediately available for loading.
-			$creator->afterCreate(function() use ($app)
-			{
-				$app['composer']->dumpAutoloads();
-			});
-
-			return $creator;
 		});
 	}
 
