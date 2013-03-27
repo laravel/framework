@@ -398,8 +398,6 @@ class BelongsToMany extends Relation {
 
 		$records = $this->formatSyncList($ids);
 
-		$this->attachNew($records, $current);
-
 		$detach = array_diff($current, array_keys($records));
 
 		// Next, we will take the differences of the currents and given IDs and detach
@@ -409,6 +407,8 @@ class BelongsToMany extends Relation {
 		{
 			$this->detach($detach);
 		}
+
+		$this->attachNew($records, $current);
 	}
 
 	/**
