@@ -307,6 +307,34 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Touch all of the related models for the relationship.
+	 *
+	 * @return void
+	 */
+	public function touch()
+	{
+		$key = $this->getRelated()->getKeyName();
+
+		$columns = array($this->getRelated()->getUpdatedAtColumn() => new DateTime);
+
+		$this->getRelated()->newQuery()->whereIn($key, $this->getRelatedIds())->update($columns);
+	}
+
+	/**
+	 * Get all of the IDs for the related models.
+	 *
+	 * @return array
+	 */
+	protected function getRelatedIds()
+	{
+		$related = $this->getRelated();
+
+		$fullKey = $related->getQualifiedKeyName();
+
+		return $this->getQuery()->select($fullKey)->lists($related->getKeyName());
+	}
+
+	/**
 	 * Save a new model and attach it to the parent model.
 	 *
 	 * @param  Illuminate\Database\Eloquent\Model  $model

@@ -21,9 +21,8 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	public function testMorphOneEagerConstraintsAreProperlyAdded()
 	{
 		$relation = $this->getOneRelation();
-		$relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
 		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', array(1, 2));
-		$relation->getQuery()->shouldReceive('where')->once()->with('morph_type', get_class($relation->getParent()));
+		$relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
 		$model1 = new EloquentMorphResetModelStub;
 		$model1->id = 1;
@@ -62,9 +61,8 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	public function testMorphManyEagerConstraintsAreProperlyAdded()
 	{
 		$relation = $this->getManyRelation();
-		$relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
 		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', array(1, 2));
-		$relation->getQuery()->shouldReceive('where')->once()->with('morph_type', get_class($relation->getParent()));
+		$relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
 		$model1 = new EloquentMorphResetModelStub;
 		$model1->id = 1;
@@ -95,7 +93,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		// Doesn't matter which relation type we use since they share the code...
 		$relation = $this->getOneRelation();
 		$created = m::mock('stdClass');
-		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('name' => 'taylor', 'morph_id' => 1, 'morph_type' => get_class($relation->getParent())))->andReturn($created);
+		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('name' => 'taylor', 'table.morph_id' => 1, 'table.morph_type' => get_class($relation->getParent())))->andReturn($created);
 		$created->shouldReceive('save')->once()->andReturn(true);
 
 		$this->assertEquals($created, $relation->create(array('name' => 'taylor')));
@@ -105,26 +103,26 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	protected function getOneRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$builder->shouldReceive('where')->once()->with('morph_id', '=', 1);
+		$builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
-		$builder->shouldReceive('where')->once()->with('morph_type', get_class($parent));
-		return new MorphOne($builder, $parent, 'morph_type', 'morph_id');
+		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
+		return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id');
 	}
 
 
 	protected function getManyRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$builder->shouldReceive('where')->once()->with('morph_id', '=', 1);
+		$builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
-		$builder->shouldReceive('where')->once()->with('morph_type', get_class($parent));
-		return new MorphMany($builder, $parent, 'morph_type', 'morph_id');
+		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
+		return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id');
 	}
 
 }
