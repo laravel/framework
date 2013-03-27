@@ -15,7 +15,7 @@
 - Encode queue payloads as JSON instead of serializing, to make the Queue place nicely with other languages.
 - Added `Model::created(Closure)` and `Model::updated(Closure)` methods for hooking into Eloquent post-save events.
 - Added `Model::boot` static method for a one time "booting" method for models.
-- Passing `null` into a `where` call will not short-cut into `whereNull`.
+- Passing `null` into a `where` call will now short-cut into `whereNull`.
 - Changed Blade `{{ }}` to not escape. Made the triple braces escape.
 - Added `DB::getName` to get the configured name of the connection.
 - Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
