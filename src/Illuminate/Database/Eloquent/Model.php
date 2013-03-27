@@ -518,6 +518,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null)
 	{
+		$caller = $this->getBelongsToManyCaller();
+
 		// First, we'll need to determine the foreign key and "other key" for the
 		// relationship. Once we have determined the keys we'll make the query
 		// instances as well as the relationship instances we need for this.
@@ -540,7 +542,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// appropriate query constraint and entirely manages the hydrations.
 		$query = $instance->newQuery();
 
-		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey);
+		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $caller['function']);
+	}
+
+	/**
+	 * Get the relationship name of the belongs to many.
+	 *
+	 * @return  string
+	 */
+	protected function getBelongsToManyCaller()
+	{
+		$self = __FUNCTION__;
+
+		return array_first(debug_backtrace(false), function($trace) use ($self)
+		{
+			$caller = $trace['function'];
+
+			return $caller != 'belongsToMany' and $caller != $self;
+		});
 	}
 
 	/**
@@ -696,9 +715,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Save the model to the database.
 	 *
+	 * @param  array  $options
 	 * @return bool
 	 */
-	public function save()
+	public function save(array $options = array())
 	{
 		$query = $this->newQuery();
 
@@ -736,7 +756,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->exists = $saved;
 		}
 
-		if ($saved) $this->finishSave();
+		if ($saved) $this->finishSave($options);
 
 		return $saved;
 	}
@@ -746,13 +766,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return void
 	 */
-	protected function finishSave()
+	protected function finishSave(array $options)
 	{
 		$this->syncOriginal();
 
 		$this->fireModelEvent('saved', false);
 
-		$this->touchOwners();
+		if (array_get($options, 'touch', true)) $this->touchOwners();
 	}
 
 	/**
@@ -834,6 +854,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$this->$relation()->touch();
 		}
+	}
+
+	/**
+	 * Determine if the model touches a given relation.
+	 *
+	 * @param  string  $relation
+	 * @return bool
+	 */
+	public function touches($relation)
+	{
+		return in_array($relation, $this->touches);
 	}
 
 	/**
