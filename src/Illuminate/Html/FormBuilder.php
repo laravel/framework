@@ -189,7 +189,7 @@ class FormBuilder {
 	 */
 	public function input($type, $name, $value = null, $options = array())
 	{
-		$options['name'] = $name;
+		if ( ! isset($options['name'])) $options['name'] = $name;
 
 		// We will get the appropriate value for the given field. We will look for the
 		// value in the session for the value in the old input data then we'll look
