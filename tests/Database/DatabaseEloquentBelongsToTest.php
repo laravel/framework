@@ -27,8 +27,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	public function testEagerConstraintsAreProperlyAdded()
 	{
 		$relation = $this->getRelation();
-		$relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
-		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.id', array('foreign.value', 'foreign.value.two'));
+		$relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', array('foreign.value', 'foreign.value.two'));
 		$models = array(new EloquentBelongsToModelStub, new EloquentBelongsToModelStub, new AnotherEloquentBelongsToModelStub);
 		$relation->addEagerConstraints($models);
 	}
@@ -66,9 +65,10 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	protected function getRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$builder->shouldReceive('where')->with('id', '=', 'foreign.value');
+		$builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$related->shouldReceive('getKeyName')->andReturn('id');
+		$related->shouldReceive('getTable')->andReturn('relation');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = new EloquentBelongsToModelStub;
 		return new BelongsTo($builder, $parent, 'foreign_key');

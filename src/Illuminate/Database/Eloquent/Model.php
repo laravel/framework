@@ -368,7 +368,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$instance = new $related;
 
-		return new HasOne($instance->newQuery(), $this, $foreignKey);
+		return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey);
 	}
 
 	/**
@@ -386,7 +386,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
-		return new MorphOne($instance->newQuery(), $this, $type, $id);
+		$table = $instance->getTable();
+
+		return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id);
 	}
 
 	/**
@@ -461,7 +463,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$instance = new $related;
 
-		return new HasMany($instance->newQuery(), $this, $foreignKey);
+		return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey);
 	}
 
 	/**
@@ -479,7 +481,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
-		return new MorphMany($instance->newQuery(), $this, $type, $id);
+		$table = $instance->getTable();
+
+		return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id);
 	}
 
 	/**
