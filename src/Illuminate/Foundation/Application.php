@@ -693,4 +693,27 @@ class Application extends Container implements HttpKernelInterface {
 		$this[$key] = $value;
 	}
 
+	/**
+	 * Fetches a global from the application.
+	 *
+	 * @param  string $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function set($key, $value)
+	{
+		$this->$key = $value;
+	}
+
+	/**
+	 * Bind a global to the application.
+	 *
+	 * @param  string $key
+	 * @return mixed
+	 */
+	public function get($key)
+	{
+		return $this->$key;
+	}
+
 }
