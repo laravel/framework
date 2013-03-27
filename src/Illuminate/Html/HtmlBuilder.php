@@ -88,11 +88,11 @@ class HtmlBuilder {
 	{
 		$url = $this->url->asset($url, $secure);
 
-		return $this->to($url, $title ?: $url, $attributes, $secure);
+		return $this->link($url, $title ?: $url, $attributes, $secure);
 	}
 
 	/**
-	 * Generate a HTML link to an asset.
+	 * Generate a HTTPS HTML link to an asset.
 	 *
 	 * @param  string  $url
 	 * @param  string  $title
