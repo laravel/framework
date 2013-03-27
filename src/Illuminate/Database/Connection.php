@@ -17,35 +17,35 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The query grammar implementation.
 	 *
-	 * @var Illuminate\Database\Query\Grammars\Grammar
+	 * @var \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	protected $queryGrammar;
 
 	/**
 	 * The schema grammar implementation.
 	 *
-	 * @var Illuminate\Database\Schema\Grammars\Grammar
+	 * @var \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected $schemaGrammar;
 
 	/**
 	 * The query post processor implementation.
 	 *
-	 * @var Illuminate\Database\Query\Processors\Processor
+	 * @var \Illuminate\Database\Query\Processors\Processor
 	 */
 	protected $postProcessor;
 
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
 
 	/**
 	 * The paginator environment instance.
 	 *
-	 * @var Illuminate\Pagination\Paginator
+	 * @var \Illuminate\Pagination\Paginator
 	 */
 	protected $paginator;
 
@@ -134,7 +134,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the default query grammar instance.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	protected function getDefaultQueryGrammar()
 	{
@@ -154,7 +154,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the default schema grammar instance.
 	 *
-	 * @return Illuminate\Database\Schema\Grammars\Grammar
+	 * @return \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected function getDefaultSchemaGrammar() {}
 
@@ -171,7 +171,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the default post processor instance.
 	 *
-	 * @return Illuminate\Database\Query\Processors\Processor
+	 * @return \Illuminate\Database\Query\Processors\Processor
 	 */
 	protected function getDefaultPostProcessor()
 	{
@@ -181,7 +181,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get a schema builder instance for the connection.
 	 *
-	 * @return Illuminate\Database\Schema\Builder
+	 * @return \Illuminate\Database\Schema\Builder
 	 */
 	public function getSchemaBuilder()
 	{
@@ -194,7 +194,7 @@ class Connection implements ConnectionInterface {
 	 * Begin a fluent query against a database table.
 	 *
 	 * @param  string  $table
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function table($table)
 	{
@@ -209,7 +209,7 @@ class Connection implements ConnectionInterface {
 	 * Get a new raw query expression.
 	 *
 	 * @param  mixed  $value
-	 * @return Illuminate\Database\Query\Expression
+	 * @return \Illuminate\Database\Query\Expression
 	 */
 	public function raw($value)
 	{
@@ -545,7 +545,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the query grammar used by the connection.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	public function getQueryGrammar()
 	{
@@ -555,7 +555,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query grammar used by the connection.
 	 *
-	 * @param  Illuminate\Database\Query\Grammars\Grammar
+	 * @param  \Illuminate\Database\Query\Grammars\Grammar
 	 * @return void
 	 */
 	public function setQueryGrammar(Query\Grammars\Grammar $grammar)
@@ -566,7 +566,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the schema grammar used by the connection.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	public function getSchemaGrammar()
 	{
@@ -576,7 +576,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the schema grammar used by the connection.
 	 *
-	 * @param  Illuminate\Database\Schema\Grammars\Grammar
+	 * @param  \Illuminate\Database\Schema\Grammars\Grammar
 	 * @return void
 	 */
 	public function setSchemaGrammar(Schema\Grammars\Grammar $grammar)
@@ -587,7 +587,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the query post processor used by the connection.
 	 *
-	 * @return Illuminate\Database\Query\Processors\Processor
+	 * @return \Illuminate\Database\Query\Processors\Processor
 	 */
 	public function getPostProcessor()
 	{
@@ -597,7 +597,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query post processor used by the connection.
 	 *
-	 * @param  Illuminate\Database\Query\Processors\Processor
+	 * @param  \Illuminate\Database\Query\Processors\Processor
 	 * @return void
 	 */
 	public function setPostProcessor(Processor $processor)
@@ -608,7 +608,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the event dispatcher used by the connection.
 	 *
-	 * @return Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Events\Dispatcher
 	 */
 	public function getEventDispatcher()
 	{
@@ -618,7 +618,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the event dispatcher instance on the connection.
 	 *
-	 * @param  Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Events\Dispatcher
 	 * @return void
 	 */
 	public function setEventDispatcher(\Illuminate\Events\Dispatcher $events)
@@ -629,7 +629,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the paginator environment instance.
 	 *
-	 * @return Illuminate\Pagination\Environment
+	 * @return \Illuminate\Pagination\Environment
 	 */
 	public function getPaginator()
 	{
@@ -644,7 +644,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the pagination environment instance.
 	 *
-	 * @param  Illuminate\Pagination\Environment|Closure  $paginator
+	 * @param  \Illuminate\Pagination\Environment|Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)
@@ -748,8 +748,8 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the table prefix and return the grammar.
 	 *
-	 * @param  Illuminate\Database\Grammar  $grammar
-	 * @return Illuminate\Database\Grammar
+	 * @param  \Illuminate\Database\Grammar  $grammar
+	 * @return \Illuminate\Database\Grammar
 	 */
 	public function withTablePrefix(Grammar $grammar)
 	{

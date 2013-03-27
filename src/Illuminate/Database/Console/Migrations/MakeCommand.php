@@ -24,7 +24,7 @@ class MakeCommand extends BaseCommand {
 	/**
 	 * The migration creator instance.
 	 *
-	 * @var Illuminate\Database\Migrations\MigrationCreator
+	 * @var \Illuminate\Database\Migrations\MigrationCreator
 	 */
 	protected $creator;
 
@@ -38,7 +38,7 @@ class MakeCommand extends BaseCommand {
 	/**
 	 * Create a new migration install command instance.
 	 *
-	 * @param  Illuminate\Database\Migrations\MigrationCreator  $creator
+	 * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
 	 * @param  string  $packagePath
 	 * @return void
 	 */

@@ -10,28 +10,28 @@ class PasswordBroker {
 	/**
 	 * The password reminder repository.
 	 *
-	 * @var Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
+	 * @var \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
 	 */
 	protected $reminders;
 
 	/**
 	 * The user provider implementation.
 	 *
-	 * @var Illuminate\Auth\UserProviderInterface
+	 * @var \Illuminate\Auth\UserProviderInterface
 	 */
 	protected $users;
 
 	/**
 	 * The redirector instance.
 	 *
-	 * @var Illuminate\Routing\Redirector
+	 * @var \Illuminate\Routing\Redirector
 	 */
 	protected $redirector;
 
 	/**
 	 * The mailer instance.
 	 *
-	 * @var Illuminate\Mail\Mailer
+	 * @var \Illuminate\Mail\Mailer
 	 */
 	protected $mailer;
 
@@ -45,10 +45,10 @@ class PasswordBroker {
 	/**
 	 * Create a new password broker instance.
 	 *
-	 * @param  Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
-	 * @param  Illuminate\Auth\UserProviderInterface  $users
-	 * @param  Illuminate\Routing\Redirector  $redirect
-	 * @param  Illuminate\Mail\Mailer  $mailer
+	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
+	 * @param  \Illuminate\Auth\UserProviderInterface  $users
+	 * @param  \Illuminate\Routing\Redirector  $redirect
+	 * @param  \Illuminate\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
 	 * @return void
 	 */
@@ -70,7 +70,7 @@ class PasswordBroker {
 	 *
 	 * @param  array    $credentials
 	 * @param  Closure  $callback
-	 * @return Illuminate\Http\RedirectResponse
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function remind(array $credentials, Closure $callback = null)
 	{
@@ -97,7 +97,7 @@ class PasswordBroker {
 	/**
 	 * Send the password reminder e-mail.
 	 *
-	 * @param  Illuminate\Auth\Reminders\RemindableInterface  $user
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string   $token
 	 * @param  Closure  $callback
 	 * @return void
@@ -152,7 +152,7 @@ class PasswordBroker {
 	 * Validate a password reset for the given credentials.
 	 *
 	 * @param  array  $credenitals
-	 * @return Illuminate\Auth\RemindableInterface
+	 * @return \Illuminate\Auth\RemindableInterface
 	 */
 	protected function validateReset(array $credentials)
 	{
@@ -192,7 +192,7 @@ class PasswordBroker {
 	 * Make an error redirect response.
 	 *
 	 * @param  string  $reason
-	 * @return Illuminate\Http\RedirectResponse
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	protected function makeErrorRedirect($reason = '')
 	{
@@ -205,7 +205,7 @@ class PasswordBroker {
 	 * Get the user for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return Illuminate\Auth\Reminders\RemindableInterface
+	 * @return \Illuminate\Auth\Reminders\RemindableInterface
 	 */
 	public function getUser(array $credentials)
 	{
@@ -222,7 +222,7 @@ class PasswordBroker {
 	/**
 	 * Get the current request object.
 	 *
-	 * @return Illuminate\Http\Request
+	 * @return \Illuminate\Http\Request
 	 */
 	protected function getRequest()
 	{

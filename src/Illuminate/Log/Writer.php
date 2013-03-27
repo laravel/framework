@@ -34,7 +34,7 @@ class Writer {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispacher
+	 * @var \Illuminate\Events\Dispacher
 	 */
 	protected $dispatcher;
 
@@ -42,7 +42,7 @@ class Writer {
 	 * Create a new log writer instance.
 	 *
 	 * @param  Monolog\Logger  $monolog
-	 * @param  Illuminate\Events\Dispatcher  $dispatcher
+	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
 	public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
@@ -153,7 +153,7 @@ class Writer {
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Events\Dispatcher
 	 */
 	public function getEventDispatcher()
 	{
@@ -163,7 +163,7 @@ class Writer {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Events\Dispatcher
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $dispatcher)

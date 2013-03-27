@@ -7,7 +7,7 @@ abstract class Facade {
 	/**
 	 * The application instance being facaded.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected static $app;
 
@@ -128,7 +128,7 @@ abstract class Facade {
 	/**
 	 * Get the application instance behind the facade.
 	 *
-	 * @return Illuminate\Foundation\Application
+	 * @return \Illuminate\Foundation\Application
 	 */
 	public static function getFacadeApplication()
 	{
@@ -138,7 +138,7 @@ abstract class Facade {
 	/**
 	 * Set the application instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
 	public static function setFacadeApplication($app)

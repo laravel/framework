@@ -93,7 +93,7 @@ class SessionServiceProvider extends ServiceProvider {
 	/**
 	 * Register the session booting event.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
 	protected function registerBootingEvent($app)
@@ -107,7 +107,7 @@ class SessionServiceProvider extends ServiceProvider {
 	/**
 	 * Register the session close event.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @param  array $config
 	 * @return void
 	 */
@@ -136,7 +136,7 @@ class SessionServiceProvider extends ServiceProvider {
 	/**
 	 * Create a session cookie based on the given config.
 	 *
-	 * @param  Illuminate\Session\Store  $session
+	 * @param  \Illuminate\Session\Store  $session
 	 * @param  array  $config
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */

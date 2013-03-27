@@ -8,14 +8,14 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * The active database connection.
 	 *
-	 * @param  Illuminate\Database\Connection
+	 * @param  \Illuminate\Database\Connection
 	 */
 	protected $conn;
 
 	/**
 	 * The hasher implementation.
 	 *
-	 * @var Illuminate\Hashing\HasherInterface
+	 * @var \Illuminate\Hashing\HasherInterface
 	 */
 	protected $hasher;
 
@@ -29,8 +29,8 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * Create a new database user provider.
 	 *
-	 * @param  Illuminate\Database\Connection  $conn
-	 * @param  Illuminate\Hashing\HasherInterface  $hasher
+	 * @param  \Illuminate\Database\Connection  $conn
+	 * @param  \Illuminate\Hashing\HasherInterface  $hasher
 	 * @param  string  $table
 	 * @return void
 	 */
@@ -45,7 +45,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	 * Retrieve a user by their unique identifier.
 	 *
 	 * @param  mixed  $identifier
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function retrieveByID($identifier)
 	{
@@ -61,7 +61,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function retrieveByCredentials(array $credentials)
 	{
@@ -92,7 +92,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * Validate a user against the given credentials.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @param  array  $credentials
 	 * @return bool
 	 */

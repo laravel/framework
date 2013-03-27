@@ -22,8 +22,8 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	/**
 	 * Create a new has many relationship instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder  $query
-	 * @param  Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $type
 	 * @param  string  $id
 	 * @return void
@@ -82,8 +82,8 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	/**
 	 * Attach a model instance to the parent model.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $model
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function save(Model $model)
 	{
@@ -96,7 +96,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function create(array $attributes)
 	{

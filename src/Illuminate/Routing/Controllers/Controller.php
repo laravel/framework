@@ -11,7 +11,7 @@ class Controller {
 	/**
 	 * The controller filter parser.
 	 *
-	 * @var Illuminate\Routing\FilterParser
+	 * @var \Illuminate\Routing\FilterParser
 	 */
 	protected $filterParser;
 
@@ -32,7 +32,7 @@ class Controller {
 	/**
 	 * The layout used by the controller.
 	 *
-	 * @var Illuminate\View\View
+	 * @var \Illuminate\View\View
 	 */
 	protected $layout;
 
@@ -93,8 +93,8 @@ class Controller {
 	/**
 	 * Execute an action on the controller.
 	 *
-	 * @param  Illuminate\Container\Container  $container
-	 * @param  Illuminate\Routing\Router  $router
+	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return Symfony\Component\HttpFoundation\Response
@@ -141,7 +141,7 @@ class Controller {
 	/**
 	 * Process a controller action response.
 	 *
-	 * @param  Illuminate\Routing\Router  $router
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  string  $method
 	 * @param  mixed   $response
 	 * @return Symfony\Component\HttpFoundation\Response
@@ -163,7 +163,7 @@ class Controller {
 	/**
 	 * Call the before filters on the controller.
 	 *
-	 * @param  Illuminate\Routing\Router  $router
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  string  $method
 	 * @return mixed
 	 */
@@ -205,7 +205,7 @@ class Controller {
 	/**
 	 * Call the after filters on the controller.
 	 *
-	 * @param  Illuminate\Routing\Router  $router
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  string  $method
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
@@ -244,7 +244,7 @@ class Controller {
 	/**
 	 * Call the given route filter.
 	 *
-	 * @param  Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  string  $filter
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @param  array  $parameters

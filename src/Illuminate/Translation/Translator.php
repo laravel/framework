@@ -9,7 +9,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * The loader implementation.
 	 *
-	 * @var Illuminate\Translation\LoaderInterface
+	 * @var \Illuminate\Translation\LoaderInterface
 	 */
 	protected $loader;
 
@@ -30,7 +30,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Create a new translator instance.
 	 *
-	 * @param  Illuminate\Translation\LoaderInterface  $loader
+	 * @param  \Illuminate\Translation\LoaderInterface  $loader
 	 * @param  string  $locale
 	 * @return void
 	 */
@@ -253,7 +253,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get the language line loader implementation.
 	 *
-	 * @return Illuminate\Translation\LoaderInterface
+	 * @return \Illuminate\Translation\LoaderInterface
 	 */
 	public function getLoader()
 	{

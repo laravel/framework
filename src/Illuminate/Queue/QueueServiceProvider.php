@@ -120,7 +120,7 @@ class QueueServiceProvider extends ServiceProvider {
 	/**
 	 * Register the connectors on the queue manager.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	public function registerConnectors($manager)
@@ -134,7 +134,7 @@ class QueueServiceProvider extends ServiceProvider {
 	/**
 	 * Register the Sync queue connector.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	protected function registerSyncConnector($manager)
@@ -148,7 +148,7 @@ class QueueServiceProvider extends ServiceProvider {
 	/**
 	 * Register the Beanstalkd queue connector.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	protected function registerBeanstalkdConnector($manager)
@@ -162,7 +162,7 @@ class QueueServiceProvider extends ServiceProvider {
 	/**
 	 * Register the Amazon SQS queue connector.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	protected function registerSqsConnector($manager)
@@ -176,7 +176,7 @@ class QueueServiceProvider extends ServiceProvider {
 	/**
 	 * Register the IronMQ queue connector.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	protected function registerIronConnector($manager)

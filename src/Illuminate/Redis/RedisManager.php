@@ -7,7 +7,7 @@ class RedisManager {
 	/**
 	 * The application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 
@@ -21,7 +21,7 @@ class RedisManager {
 	/**
 	 * Create a new Redis manager instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct($app)
@@ -33,7 +33,7 @@ class RedisManager {
 	 * Get a Redis connection instance.
 	 *
 	 * @param  string  $name
-	 * @return Illuminate\Redis\Database
+	 * @return \Illuminate\Redis\Database
 	 */
 	public function connection($name = null)
 	{
@@ -49,7 +49,7 @@ class RedisManager {
 	 * Create the given connection by name.
 	 *
 	 * @param  string  $name
-	 * @return Illuminate\Redis\Database
+	 * @return \Illuminate\Redis\Database
 	 */
 	protected function createConnection($name)
 	{
