@@ -689,7 +689,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->updateTimestamps();
 		}
 
-		// If the saving event returns false, we will cancel the save operation
+		// If the "saving" event returns false we'll bail out of the save and return
+		// false, indicating that the save failed. This gives an opportunities to
+		// listeners to cancel save operations if validations fail or whatever.
 		if ($this->fireModelEvent('saving') === false)
 		{
 			return false;
@@ -713,11 +715,21 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->exists = $saved;
 		}
 
+		if ($saved) $this->finishSave();
+
+		return $saved;
+	}
+
+	/**
+	 * Finish processing on a successful save operation.
+	 *
+	 * @return void
+	 */
+	protected function finishSave()
+	{
 		$this->syncOriginal();
 
 		$this->fireModelEvent('saved', false);
-
-		return $saved;
 	}
 
 	/**
