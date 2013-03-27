@@ -20,6 +20,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingSelects()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('foo')->addSelect('bar')->addSelect(array('baz', 'boom'))->from('users');
+		$this->assertEquals('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
+	}
+
+
 	public function testBasicSelectWithPrefix()
 	{
 		$builder = $this->getBuilder();

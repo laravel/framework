@@ -161,9 +161,9 @@ class Builder {
 	 */
 	public function addSelect($column)
 	{
-		if ( ! isset($this->columns)) $this->columns = array();
+		$column = is_array($column) ? $column : func_get_args();
 
-		$this->columns = array_merge($this->columns, $column);
+		$this->columns = array_merge((array) $this->columns, $column);
 
 		return $this;
 	}
