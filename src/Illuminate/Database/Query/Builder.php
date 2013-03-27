@@ -1094,6 +1094,8 @@ class Builder {
 		// that more select queries can be executed against the database without
 		// the aggregate value getting in the way when the grammar builds it.
 		$this->aggregate = null;
+		
+		if (!isset($results[0])) return '0';
 
 		$result = (array) $results[0];
 
