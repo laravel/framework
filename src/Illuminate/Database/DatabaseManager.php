@@ -77,12 +77,18 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	protected function makeConnection($name)
 	{
-		$config = $this->getConfig($name);
+		// Resolve the package name if there is one.
+		$parts = explode(':',$name);
+		$packageName = $parts[0];
 
-		if (isset($this->extensions[$name]))
+		// If the package has a registered connection resolver,
+		// then use it to return a connection by name
+		if (isset($this->extensions[$packageName]))
 		{
-			return call_user_func($this->extensions[$name], $config);
+			$resolver = call_user_func($this->extensions[$packageName], $this->app, $this->factory);
+			return $resolver->connection($name);
 		}
+		$config = $this->getConfig($name);
 
 		return $this->factory->make($config, $name);
 	}
