@@ -566,7 +566,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->fireModelEvent('deleted', false);
 		}
 	}
-
+	
+	/**
+	 * Register a saving model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function saving(Closure $callback)
+	{
+		static::registerModelEvent('saving', $callback);
+	}
+	
+	/**
+	 * Register a saved model event with the dispatcher.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public static function saved(Closure $callback)
+	{
+		static::registerModelEvent('saved', $callback);
+	}
+	
 	/**
 	 * Register an updating model event with the dispatcher.
 	 *
@@ -667,6 +689,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->updateTimestamps();
 		}
 
+		// If the saving event returns false, we will cancel the save operation
+		if ($this->fireModelEvent('saving') === false)
+		{
+			return false;
+		}
+
 		// If the model already exists in the database we can just update our record
 		// that is already in this database using the current IDs in this "where"
 		// clause to only update this model. Otherwise, we'll just insert them.
@@ -686,6 +714,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		$this->syncOriginal();
+
+		$this->fireModelEvent('saved', false);
 
 		return $saved;
 	}
@@ -761,6 +791,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Fire the given event for the model.
 	 *
+	 * @param  string $event
+	 * @param  bool   $halt
 	 * @return mixed
 	 */
 	protected function fireModelEvent($event, $halt = true)
