@@ -116,6 +116,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Reset items index.
+	 *
+	 * @return Illuminate\Support\Collection
+	 */
+	public function values()
+	{
+		$this->items = array_values($this->items);
+
+		return $this;
+	}
+
+	/**
 	 * Fetch a nested element of the collection.
 	 *
 	 * @param  string  $key
