@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -83,6 +84,31 @@ abstract class Relation {
 	 * @return mixed
 	 */
 	abstract public function getResults();
+
+	/**
+	 * Touch all of the related models for the relationship.
+	 *
+	 * @return void
+	 */
+	public function touch()
+	{
+		$table = $this->getRelated()->getTable();
+
+		$column = $this->getRelated()->getUpdatedAtColumn();
+
+		$this->rawUpdate(array($table.'.'.$column => new DateTime));
+	}
+
+	/**
+	 * Run a raw update against the base query.
+	 *
+	 * @param  array  $attributes
+	 * @return int
+	 */
+	public function rawUpdate(array $attributes = array())
+	{
+		return $this->query->update($attributes);
+	}
 
 	/**
 	 * Remove the original where clause set by the relationship.

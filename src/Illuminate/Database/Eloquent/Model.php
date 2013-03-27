@@ -110,6 +110,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $dates = array();
 
 	/**
+	 * The relationships that should be touched on save.
+	 *
+	 * @var array
+	 */
+	protected $touches = array();
+
+	/**
 	 * The relations to eager load on every query.
 	 *
 	 * @var array
@@ -744,6 +751,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$this->syncOriginal();
 
 		$this->fireModelEvent('saved', false);
+
+		$this->touchOwners();
 	}
 
 	/**
@@ -812,6 +821,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$this->fireModelEvent('created', false);
 
 		return true;
+	}
+
+	/**
+	 * Touch the owning relations of the model.
+	 *
+	 * @return void
+	 */
+	public function touchOwners()
+	{
+		foreach ($this->touches as $relation)
+		{
+			$this->$relation()->touch();
+		}
 	}
 
 	/**
@@ -1010,6 +1032,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function getKeyName()
 	{
 		return $this->primaryKey;
+	}
+
+	/**
+	 * Get the table qualified key name.
+	 *
+	 * @return string
+	 */
+	public function getQualifiedKeyName()
+	{
+		return $this->getTable().'.'.$this->getKeyName();
 	}
 
 	/**
