@@ -66,7 +66,7 @@ class WorkbenchMakeCommand extends Command {
 	{
 		$path = $this->laravel['path.base'].'/workbench';
 
-		$plain = $this->option('plain');
+		$plain = ! $this->option('resources');
 
 		return $this->creator->create($package, $path, $plain);
 	}
@@ -130,7 +130,7 @@ class WorkbenchMakeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('plain', null, InputOption::VALUE_NONE, 'Skip creation of Laravel specific directories.'),
+			array('resources', null, InputOption::VALUE_NONE, 'Create Laravel specific directories.'),
 		);
 	}
 

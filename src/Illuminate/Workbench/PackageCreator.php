@@ -54,18 +54,42 @@ class PackageCreator {
 	 * @param  bool    $plain
 	 * @return string
 	 */
-	public function create(Package $package, $path, $plain = false)
+	public function create(Package $package, $path, $plain = true)
 	{
 		$directory = $this->createDirectory($package, $path);
 
-		$blocks = $plain ? $this->basicBlocks : $this->blocks;
-
-		foreach ($blocks as $block)
+		// To create the package, we will spin through a list of building blocks that
+		// make up each package. We'll then call the method to build that block on
+		// the class, which keeps the actual building of stuff nice and cleaned.
+		foreach ($this->getBlocks($plain) as $block)
 		{
 			$this->{"write{$block}"}($package, $directory, $plain);
 		}
 
 		return $directory;
+	}
+
+	/**
+	 * Create a package with all resource directories.
+	 *
+	 * @param  Package  $package
+	 * @param  string   $path
+	 * @return void
+	 */
+	public function createWithResources(Package $package, $path)
+	{
+		return $this->create($package, $path, false);
+	}
+
+	/**
+	 * Get the blocks for a given package.
+	 *
+	 * @param  bool   $plain
+	 * @return array
+	 */
+	protected function getBlocks($plain)
+	{
+		return $plain ? $this->basicBlocks : $this->blocks;
 	}
 
 	/**
@@ -92,7 +116,9 @@ class PackageCreator {
 	 */
 	protected function writePhpUnitFile(Package $package, $directory)
 	{
-		$this->files->copy(__DIR__.'/stubs/phpunit.xml', $directory.'/phpunit.xml');
+		$stub = __DIR__.'/stubs/phpunit.xml';
+
+		$this->files->copy($stub, $directory.'/phpunit.xml');
 	}
 
 	/**
@@ -104,7 +130,9 @@ class PackageCreator {
 	 */
 	protected function writeTravisFile(Package $package, $directory)
 	{
-		$this->files->copy(__DIR__.'/stubs/.travis.yml', $directory.'/.travis.yml');
+		$stub = __DIR__.'/stubs/.travis.yml';
+
+		$this->files->copy($stub, $directory.'/.travis.yml');
 	}
 
 	/**
@@ -118,7 +146,7 @@ class PackageCreator {
 	{
 		$stub = $this->getComposerStub($plain);
 
-		$stub = $this->formatPackageStub($stub, $package);
+		$stub = $this->formatPackageStub($package, $stub);
 
 		$this->files->put($directory.'/composer.json', $stub);
 	}
@@ -159,15 +187,28 @@ class PackageCreator {
 	{
 		foreach (array('config', 'lang', 'migrations', 'views') as $support)
 		{
-			// Once we create the source directory, we will write an empty file to the
-			// directory so that it will be kept in source control allowing the dev
-			// to go ahead and push these components to Github right on creation.
-			$path = $directory.'/src/'.$support;
-
-			$this->files->makeDirectory($path, 0777, true);
-
-			$this->files->put($path.'/.gitkeep', '');
+			$this->writeSupportDirectory($package, $support, $directory);
 		}
+	}
+
+	/**
+	 * Write a specific support directory for the package.
+	 *
+	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  string  $support
+	 * @param  string  $directory
+	 * @return void
+	 */
+	protected function writeSupportDirectory(Package $package, $support, $directory)
+	{
+		// Once we create the source directory, we will write an empty file to the
+		// directory so that it will be kept in source control allowing the dev
+		// to go ahead and push these components to Github right on creation.
+		$path = $directory.'/src/'.$support;
+
+		$this->files->makeDirectory($path, 0777, true);
+
+		$this->files->put($path.'/.gitkeep', '');
 	}
 
 	/**
