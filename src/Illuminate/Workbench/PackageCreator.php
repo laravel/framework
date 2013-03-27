@@ -212,10 +212,21 @@ class PackageCreator {
 		// Once we have the service provider stub, we will need to format it and make
 		// the necessary replacements to the class, namespaces, etc. Then we'll be
 		// able to write it out into the package's workbench directory for them.
-		$stub = $this->getProviderStub($plain);
+		$stub = $this->getProviderStub($package, $plain);
 
-		$stub = $this->formatPackageStub($stub, $package);
+		$this->writeProviderStub($package, $directory, $stub);
+	}
 
+	/**
+	 * Write the service provider stub for the package.
+	 *
+	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  string  $directory
+	 * @param  string  $stub
+	 * @return void
+	 */
+	protected function writeProviderStub(Package $package, $directory, $stub)
+	{
 		$path = $this->createClassDirectory($package, $directory);
 
 		// The primary source directory where the package's classes will live may not
@@ -229,14 +240,17 @@ class PackageCreator {
 	/**
 	 * Get the stub for a ServiceProvider.
 	 *
+	 * @param  Illuminate\Workbench\Package  $package
 	 * @param  bool    $plain
 	 * @return string
 	 */
-	protected function getProviderStub($plain)
+	protected function getProviderStub(Package $package, $plain)
 	{
 		if ($plain) return $this->files->get(__DIR__.'/stubs/plain.provider.php');
 		
-		return $this->files->get(__DIR__.'/stubs/provider.php');
+		$stub = $this->files->get(__DIR__.'/stubs/provider.php');
+
+		return $this->formatPackageStub($package, $stub);
 	}
 
 	/**
@@ -261,20 +275,15 @@ class PackageCreator {
 	/**
 	 * Format a generic package stub file.
 	 *
-	 * @param  string  $stub
 	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  string  $stub
 	 * @return string
 	 */
-	protected function formatPackageStub($stub, Package $package)
+	protected function formatPackageStub(Package $package, $stub)
 	{
-		// When replacing values in the stub, we can just take the object vars of
-		// the package and snake case them. This should give us the array with
-		// all the necessary replacements variables present and ready to go.
 		foreach (get_object_vars($package) as $key => $value)
 		{
-			$key = '{{'.snake_case($key).'}}';
-
-			$stub = str_replace($key, $value, $stub);
+			$stub = str_replace('{{'.snake_case($key).'}}', $value, $stub);
 		}
 		
 		return $stub;
