@@ -104,6 +104,26 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFilter()
+	{
+		$c = new Collection(array(array('id' => 1, 'name' => 'Hello'), array('id' => 2, 'name' => 'World')));
+		$this->assertEquals(array(1 => array('id' => 2, 'name' => 'World')), $c->filter(function($item)
+		{
+			return $item['id'] == 2;
+		})->all());
+	}
+
+
+	public function testValues()
+	{
+		$c = new Collection(array(array('id' => 1, 'name' => 'Hello'), array('id' => 2, 'name' => 'World')));
+		$this->assertEquals(array(array('id' => 2, 'name' => 'World')), $c->filter(function($item)
+		{
+			return $item['id'] == 2;
+		})->values()->all());
+	}
+
+
 	public function testFlatten()
 	{
 		$c = new Collection(array(array('#foo', '#bar'), array('#baz')));
