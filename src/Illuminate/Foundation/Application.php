@@ -696,8 +696,8 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Fetches a global from the application.
 	 *
-	 * @param  string $key
-	 * @param  mixed  $value
+	 * @param  string  $key
+	 * @param  mixed   $value
 	 * @return void
 	 */
 	public function set($key, $value)
@@ -708,12 +708,23 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Bind a global to the application.
 	 *
-	 * @param  string $key
+	 * @param  string  $key
 	 * @return mixed
 	 */
 	public function get($key)
 	{
 		return $this->$key;
+	}
+
+	/**
+	 * Checks if a given global is bound to the application.
+	 *
+	 * @param  string  $key
+	 * @return boolean
+	 */
+	public function isset($key)
+	{
+		return isset($this->$key);
 	}
 
 }
