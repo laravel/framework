@@ -9,7 +9,7 @@ class ArrayStore extends CacheDrivenStore {
 	/**
 	 * Load the session for the request.
 	 *
-	 * @param  Illuminate\CookieJar  $cookies
+	 * @param  \Illuminate\CookieJar  $cookies
 	 * @param  string  $name
 	 * @return void
 	 */
@@ -33,7 +33,7 @@ class ArrayStore extends CacheDrivenStore {
 	/**
 	 * Write the session cookie to the response.
 	 *
-	 * @param  Illuminate\Cookie\CookieJar  $cookie
+	 * @param  \Illuminate\Cookie\CookieJar  $cookie
 	 * @param  string  $name
 	 * @param  int     $lifetime
 	 * @param  string  $path

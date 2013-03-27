@@ -187,7 +187,7 @@ class UrlGenerator {
 	/**
 	 * Build the parameter list for short circuit parameters.
 	 *
-	 * @param  Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  array  $params
 	 * @return array
 	 */

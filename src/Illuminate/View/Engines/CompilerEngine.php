@@ -7,14 +7,14 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * The Blade compiler instance.
 	 *
-	 * @var Illuminate\View\Compilers\CompilerInterface
+	 * @var \Illuminate\View\Compilers\CompilerInterface
 	 */
 	protected $compiler;
 
 	/**
 	 * Create a new Blade view engine instance.
 	 *
-	 * @param  Illuminate\View\Compilers\CompilerInterface  $compiler
+	 * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
 	 * @return void
 	 */
 	public function __construct(CompilerInterface $compiler)
@@ -25,7 +25,7 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * Get the evaluated contents of the view.
 	 *
-	 * @param  Illuminate\View\Environment  $environment
+	 * @param  \Illuminate\View\Environment  $environment
 	 * @param  string  $view
 	 * @param  array   $data
 	 * @return string
@@ -48,7 +48,7 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * Get the compiler implementation.
 	 *
-	 * @return Illuminate\View\Compilers\CompilerInterface
+	 * @return \Illuminate\View\Compilers\CompilerInterface
 	 */
 	public function getCompiler()
 	{

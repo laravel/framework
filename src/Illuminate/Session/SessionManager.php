@@ -7,7 +7,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the cookie session driver.
 	 *
-	 * @return Illuminate\Session\CookieStore
+	 * @return \Illuminate\Session\CookieStore
 	 */
 	protected function createCookieDriver()
 	{
@@ -19,7 +19,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the file session driver.
 	 *
-	 * @return Illuminate\Session\FileStore
+	 * @return \Illuminate\Session\FileStore
 	 */
 	protected function createFileDriver()
 	{
@@ -31,7 +31,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the APC session driver.
 	 *
-	 * @return Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\CacheDrivenStore
 	 */
 	protected function createApcDriver()
 	{
@@ -41,7 +41,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Memcached session driver.
 	 *
-	 * @return Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\CacheDrivenStore
 	 */
 	protected function createMemcachedDriver()
 	{
@@ -51,7 +51,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Wincache session driver.
 	 *
-	 * @return Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\CacheDrivenStore
 	 */
 	protected function createWincacheDriver()
 	{
@@ -61,7 +61,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Redis session driver.
 	 *
-	 * @return Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\CacheDrivenStore
 	 */
 	protected function createRedisDriver()
 	{
@@ -71,7 +71,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the "array" session driver.
 	 *
-	 * @return Illuminate\Session\ArrayStore
+	 * @return \Illuminate\Session\ArrayStore
 	 */
 	protected function createArrayDriver()
 	{
@@ -81,7 +81,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the database session driver.
 	 *
-	 * @return Illuminate\Session\DatabaseStore
+	 * @return \Illuminate\Session\DatabaseStore
 	 */
 	protected function createDatabaseDriver()
 	{
@@ -95,7 +95,7 @@ class SessionManager extends Manager {
 	/**
 	 * Get the database connection for the database driver.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	protected function getDatabaseConnection()
 	{
@@ -107,7 +107,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of a cache driven driver.
 	 *
-	 * @return Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\CacheDrivenStore
 	 */
 	protected function createCacheBased($driver)
 	{

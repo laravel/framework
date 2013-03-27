@@ -9,7 +9,7 @@ class Route extends BaseRoute {
 	/**
 	 * The router instance.
 	 *
-	 * @var  Illuminate\Routing\Router
+	 * @var  \Illuminate\Routing\Router
 	 */
 	protected $router;
 
@@ -311,7 +311,7 @@ class Route extends BaseRoute {
 	 *
 	 * @param  string  $name
 	 * @param  string  $expression
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function where($name, $expression)
 	{
@@ -325,7 +325,7 @@ class Route extends BaseRoute {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function defaults($key, $value)
 	{
@@ -338,7 +338,7 @@ class Route extends BaseRoute {
 	 * Set the before filters on the route.
 	 *
 	 * @param  dynamic
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function before()
 	{
@@ -355,7 +355,7 @@ class Route extends BaseRoute {
 	 * Set the after filters on the route.
 	 *
 	 * @param  dynamic
-	 * @return Illuminate\Routing\Route
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function after()
 	{
@@ -438,8 +438,8 @@ class Route extends BaseRoute {
 	/**
 	 * Set the Router instance on the route.
 	 *
-	 * @param  Illuminate\Routing\Router  $router
-	 * @return Illuminate\Routing\Route
+	 * @param  \Illuminate\Routing\Router  $router
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function setRouter(Router $router)
 	{

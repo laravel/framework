@@ -25,14 +25,14 @@ class WorkbenchMakeCommand extends Command {
 	/**
 	 * The package creator instance.
 	 *
-	 * @var Illuminate\Workbench\PackageCreator
+	 * @var \Illuminate\Workbench\PackageCreator
 	 */
 	protected $creator;
 
 	/**
 	 * Create a new make workbench command instance.
 	 *
-	 * @param  Illuminate\Workbench\PackageCreator  $creator
+	 * @param  \Illuminate\Workbench\PackageCreator  $creator
 	 * @return void
 	 */
 	public function __construct(PackageCreator $creator)
@@ -59,7 +59,7 @@ class WorkbenchMakeCommand extends Command {
 	/**
 	 * Run the package creator class for a given Package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @return string
 	 */
 	protected function runCreator($package)
@@ -87,7 +87,7 @@ class WorkbenchMakeCommand extends Command {
 	/**
 	 * Build the package details from user input.
 	 *
-	 * @return Illuminate\Workbench\Package
+	 * @return \Illuminate\Workbench\Package
 	 */
 	protected function buildPackage()
 	{

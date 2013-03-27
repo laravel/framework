@@ -7,7 +7,7 @@ class Pivot extends Model {
 	/**
 	 * The parent model of the relationship.
 	 *
-	 * @var Illuminate\Database\Eloquent\Model
+	 * @var \Illuminate\Database\Eloquent\Model
 	 */
 	protected $parent;
 
@@ -35,7 +35,7 @@ class Pivot extends Model {
 	/**
 	 * Create a new pivot model instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  array   $attributes
 	 * @param  string  $table
 	 * @param  bool    $exists
@@ -65,8 +65,8 @@ class Pivot extends Model {
 	/**
 	 * Set the keys for a save update query.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder
-	 * @return Illuminate\Database\Eloquent\Builder
+	 * @param  \Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	protected function setKeysForSaveQuery($query)
 	{

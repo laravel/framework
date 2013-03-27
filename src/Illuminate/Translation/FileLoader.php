@@ -7,7 +7,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -28,7 +28,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Create a new file loader instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $path)

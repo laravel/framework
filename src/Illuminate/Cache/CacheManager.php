@@ -7,7 +7,7 @@ class CacheManager extends Manager {
 	/**
 	 * Create an instance of the APC cache driver.
 	 *
-	 * @return Illuminate\Cache\ApcStore
+	 * @return \Illuminate\Cache\ApcStore
 	 */
 	protected function createApcDriver()
 	{
@@ -17,7 +17,7 @@ class CacheManager extends Manager {
 	/**
 	 * Create an instance of the array cache driver.
 	 *
-	 * @return Illuminate\Cache\ArrayStore
+	 * @return \Illuminate\Cache\ArrayStore
 	 */
 	protected function createArrayDriver()
 	{
@@ -27,7 +27,7 @@ class CacheManager extends Manager {
 	/**
 	 * Create an instance of the file cache driver.
 	 *
-	 * @return Illuminate\Cache\FileStore
+	 * @return \Illuminate\Cache\FileStore
 	 */
 	protected function createFileDriver()
 	{
@@ -39,7 +39,7 @@ class CacheManager extends Manager {
 	/**
 	 * Create an instance of the Memcached cache driver.
 	 *
-	 * @return Illuminate\Cache\MemcachedStore
+	 * @return \Illuminate\Cache\MemcachedStore
 	 */
 	protected function createMemcachedDriver()
 	{
@@ -53,7 +53,7 @@ class CacheManager extends Manager {
 	/**
 	 * Create an instance of the WinCache cache driver.
 	 *
-	 * @return Illuminate\Cache\WinCacheStore
+	 * @return \Illuminate\Cache\WinCacheStore
 	 */
 	protected function createWincacheDriver()
 	{
@@ -63,7 +63,7 @@ class CacheManager extends Manager {
 	/**
 	 * Create an instance of the Redis cache driver.
 	 *
-	 * @return Illuminate\Cache\RedisStore
+	 * @return \Illuminate\Cache\RedisStore
 	 */
 	protected function createRedisDriver()
 	{
@@ -75,7 +75,7 @@ class CacheManager extends Manager {
 	/**
 	 * Create an instance of the database cache driver.
 	 *
-	 * @return Illuminate\Cache\DatabaseStore
+	 * @return \Illuminate\Cache\DatabaseStore
 	 */
 	protected function createDatabaseDriver()
 	{
@@ -96,7 +96,7 @@ class CacheManager extends Manager {
 	/**
 	 * Get the database connection for the database driver.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	protected function getDatabaseConnection()
 	{
@@ -108,8 +108,8 @@ class CacheManager extends Manager {
 	/**
 	 * Create a new cache repository with the given implementation.
 	 *
-	 * @param  Illuminate\Cache\StoreInterface  $store
-	 * @return Illuminate\Cache\Repository
+	 * @param  \Illuminate\Cache\StoreInterface  $store
+	 * @return \Illuminate\Cache\Repository
 	 */
 	protected function repository(StoreInterface $store)
 	{

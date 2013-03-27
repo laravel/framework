@@ -5,7 +5,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * The cache store implementation.
 	 *
-	 * @var Illuminate\Cache\StoreInterface
+	 * @var \Illuminate\Cache\StoreInterface
 	 */
 	protected $store;
 
@@ -19,7 +19,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * Create a new cache repository instance.
 	 *
-	 * @param  Illuminate\Cache\StoreInterface  $store
+	 * @param  \Illuminate\Cache\StoreInterface  $store
 	 */
 	public function __construct(StoreInterface $store)
 	{
@@ -132,7 +132,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * Get the cache store implementation.
 	 *
-	 * @return Illuminate\Cache\StoreInterface
+	 * @return \Illuminate\Cache\StoreInterface
 	 */
 	public function getStore()
 	{

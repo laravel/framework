@@ -8,7 +8,7 @@ class SqsJob extends Job {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var Illuminate\Container
+	 * @var \Illuminate\Container
 	 */
 	protected $container;
 
@@ -36,7 +36,7 @@ class SqsJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  \Illuminate\Container  $container
 	 * @param  Aws\Sqs\SqsClient  $sqs
 	 * @param  string  $queue
 	 * @param  array   $job
@@ -108,7 +108,7 @@ class SqsJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return Illuminate\Container
+	 * @return \Illuminate\Container
 	 */
 	public function getContainer()
 	{

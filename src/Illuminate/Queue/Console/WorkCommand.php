@@ -24,14 +24,14 @@ class WorkCommand extends Command {
 	/**
 	 * The queue listener instance.
 	 *
-	 * @var Illuminate\Queue\Listener
+	 * @var \Illuminate\Queue\Listener
 	 */
 	protected $worker;
 
 	/**
 	 * Create a new queue listen command.
 	 *
-	 * @param  Illuminate\Queue\Worker  $worker
+	 * @param  \Illuminate\Queue\Worker  $worker
 	 * @return void
 	 */
 	public function __construct(Worker $worker)

@@ -7,7 +7,7 @@ class FileViewFinder implements ViewFinderInterface {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -35,7 +35,7 @@ class FileViewFinder implements ViewFinderInterface {
 	/**
 	 * Create a new file view loader instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @param  array  $paths
 	 * @param  array  $extensions
 	 * @return void
@@ -187,7 +187,7 @@ class FileViewFinder implements ViewFinderInterface {
 	/**
 	 * Get the filesystem instance.
 	 *
-	 * @return Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem
 	 */
 	public function getFilesystem()
 	{

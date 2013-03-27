@@ -275,7 +275,7 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Register a service provider with the application.
 	 *
-	 * @param  Illuminate\Support\ServiceProvider|string  $provider
+	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
 	 * @return void
 	 */
@@ -308,7 +308,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * Resolve a service provider instance from the class name.
 	 *
 	 * @param  string  $provider
-	 * @return Illuminate\Support\ServiceProvider
+	 * @return \Illuminate\Support\ServiceProvider
 	 */
 	protected function resolveProviderClass($provider)
 	{
@@ -456,7 +456,7 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Handle the given request and get the response.
 	 *
-	 * @param  Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
@@ -471,7 +471,7 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @implements HttpKernelInterface::handle
 	 *
-	 * @param  Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
 	 * @return Symfony\Component\HttpFoundation\Response
@@ -548,8 +548,8 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Prepare the request by injecting any services.
 	 *
-	 * @param  Illuminate\Http\Request  $request
-	 * @return Illuminate\Http\Request
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Request
 	 */
 	public function prepareRequest(Request $request)
 	{
@@ -565,7 +565,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepareResponse($value, Request $request)

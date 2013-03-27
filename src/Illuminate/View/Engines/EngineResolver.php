@@ -34,7 +34,7 @@ class EngineResolver {
 	 * Resolver an engine instance by name.
 	 *
 	 * @param  string  $engine
-	 * @return Illuminate\View\Engines\EngineInterface
+	 * @return \Illuminate\View\Engines\EngineInterface
 	 */
 	public function resolve($engine)
 	{
