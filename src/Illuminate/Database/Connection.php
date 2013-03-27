@@ -502,6 +502,20 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Register a database query listener with the connection.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function listen(Closure $callback)
+	{
+		if (isset($this->events))
+		{
+			$this->events->listen('illuminate.query', $callback);
+		}
+	}
+
+	/**
 	 * Get the currently used PDO connection.
 	 *
 	 * @return PDO
