@@ -163,7 +163,7 @@ class Builder {
 	{
 		if ( ! isset($this->columns)) $this->columns = array();
 
-		$this->columns = array_merge($this->columns, $column);
+		$this->columns = array_merge($this->columns, (is_array($column) ? $column : func_get_args()));
 
 		return $this;
 	}
