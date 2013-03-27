@@ -67,6 +67,7 @@
 - Routes with too many leading or trailing slashes will now 404.
 - Added `callSecure` test helper.
 - Added `values` method to the `Collection` class.
+- Fix transaction handling for Microsoft SQL Server.
 
 ## Beta 3
 
