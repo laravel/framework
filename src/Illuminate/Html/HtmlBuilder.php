@@ -45,6 +45,21 @@ class HtmlBuilder {
 	}
 
 	/**
+	 * Generate an HTML image element.
+	 *
+	 * @param  string  $url
+	 * @param  string  $alt
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function image($url, $alt = null, $attributes = array())
+	{
+		$attributes['alt'] = $alt;
+
+		return '<img src="'.$this->url->asset($url).'"'.$this->attributes($attributes).'>';
+	}
+
+	/**
 	 * Generate a HTML link.
 	 *
 	 * @param  string  $url
