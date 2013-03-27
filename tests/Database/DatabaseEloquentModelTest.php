@@ -98,8 +98,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
 
 		$model->foo = 'bar';
 		// make sure foo isn't synced so we can test that dirty attributes only are updated
@@ -111,12 +113,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSaveIsCancelledIfSavingEventReturnsFalse()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(false);
+		$model->exists = true;
+
+		$this->assertFalse($model->save());
+	}
+	
+
 	public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
 		$model->exists = true;
 
@@ -200,8 +216,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
 
 		$model->name = 'taylor';
 		$model->exists = false;
@@ -217,8 +235,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->setIncrementing(false);
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
 
 		$model->name = 'taylor';
 		$model->exists = false;
@@ -234,6 +254,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
 
 		$this->assertFalse($model->save());
