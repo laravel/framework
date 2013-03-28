@@ -159,6 +159,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $booted = array();
 
 	/**
+	 * Indicates if all mass assignment is enabled.
+	 *
+	 * @var bool
+	 */
+	protected static $unguarded = false;
+
+	/**
 	 * The cache of the mutated attributes for each class.
 	 *
 	 * @var array
@@ -1191,6 +1198,27 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Disable all mass assignable restrictions.
+	 *
+	 * @return void
+	 */
+	public static function unguard()
+	{
+		static::$unguarded = true;
+	}
+
+	/**
+	 * Set "unguard" to a given state.
+	 *
+	 * @param  bool  $state
+	 * @return void
+	 */
+	public static function setUnguardState($state)
+	{
+		static::$unguarded = $state;
+	}
+
+	/**
 	 * Determine if the given attribute may be mass assigned.
 	 *
 	 * @param  string  $key
@@ -1198,14 +1226,27 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function isFillable($key)
 	{
+		if (static::$unguarded) return true;
+
+		// If the key is in the "fillable" array, we can of course assume tha it is
+		// a fillable attribute. Otherwise, we will check the guarded array when
+		// we need to determine if the attribute is black-listed on the model.
 		if (in_array($key, $this->fillable)) return true;
 
-		if (in_array($key, $this->guarded) or $this->guarded == array('*'))
-		{
-			return false;
-		}
+		if ($this->isGuarded($key)) return false;
 
 		return empty($this->fillable) and ! starts_with($key, '_');
+	}
+
+	/**
+	 * Determine if the given key is guarded.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function isGuarded($key)
+	{
+		return in_array($key, $this->guarded) or $this->guarded == array('*');
 	}
 
 	/**

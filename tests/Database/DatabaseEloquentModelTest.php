@@ -395,6 +395,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUnguardAllowsAnythingToBeSet()
+	{
+		$model = new EloquentModelStub;
+		EloquentModelStub::unguard();
+		$model->guard(array('*'));
+		$model->fill(array('name' => 'foo', 'age' => 'bar'));
+		$this->assertEquals('foo', $model->name);
+		$this->assertEquals('bar', $model->age);
+		EloquentModelStub::setUnguardState(false);
+	}
+
+
 	public function testUnderscorePropertiesAreNotFilled()
 	{
 		$model = new EloquentModelStub;
