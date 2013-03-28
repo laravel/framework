@@ -64,6 +64,13 @@ class Connection implements ConnectionInterface {
 	protected $queryLog = array();
 
 	/**
+	 * Indicates whether queries are being logged.
+	 *
+	 * @var bool
+	 */
+	protected $loggingQueries = true;
+
+	/**
 	 * Indicates if the connection is in a "dry run".
 	 *
 	 * @var bool
@@ -451,6 +458,10 @@ class Connection implements ConnectionInterface {
 		{
 			$result = $callback($this, $query, $bindings);
 		}
+
+		// If an exception occurs when attempting to run a query, we'll format the error
+		// message to include the bindings with SQL, which will make this exception a
+		// lot more helpful to the developer instead of just the database's errors.
 		catch (\Exception $e)
 		{
 			$this->handleQueryException($e, $query, $bindings);
@@ -459,7 +470,7 @@ class Connection implements ConnectionInterface {
 		// Once we have run the query we will calculate the time that it took to run and
 		// then log the query, bindings, and execution time so we will report them on
 		// the event that the developer needs them. We'll log time in milliseconds.
-		$time = number_format((microtime(true) - $start) * 1000, 2);
+		$time = $this->getElapsedTime($start);
 
 		$this->logQuery($query, $bindings, $time);
 
@@ -498,6 +509,8 @@ class Connection implements ConnectionInterface {
 			$this->events->fire('illuminate.query', array($query, $bindings, $time));
 		}
 
+		if ( ! $this->loggingQueries) return;
+
 		$this->queryLog[] = compact('query', 'bindings', 'time');
 	}
 
@@ -513,6 +526,17 @@ class Connection implements ConnectionInterface {
 		{
 			$this->events->listen('illuminate.query', $callback);
 		}
+	}
+
+	/**
+	 * Get the elapsed time since a given starting point.
+	 *
+	 * @param  int    $start
+	 * @return float
+	 */
+	protected function getElapsedTime($start)
+	{
+		return number_format((microtime(true) - $start) * 1000, 2);
 	}
 
 	/**
@@ -715,6 +739,26 @@ class Connection implements ConnectionInterface {
 	public function flushQueryLog()
 	{
 		$this->queryLog = array();
+	}
+
+	/**
+	 * Enable the query log on the connection.
+	 *
+	 * @return void
+	 */
+	public function enableQueryLog()
+	{
+		$this->loggingQueries = true;
+	}
+
+	/**
+	 * Disable the query log on the connection.
+	 *
+	 * @return void
+	 */
+	public function disableQueryLog()
+	{
+		$this->loggingQueries = false;
 	}
 
 	/**
