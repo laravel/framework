@@ -179,7 +179,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	protected static function listing($type, $list, $attributes = array())
+	protected function listing($type, $list, $attributes = array())
 	{
 		$html = '';
 
@@ -206,7 +206,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function listingElement($key, $type, $value)
+	protected function listingElement($key, $type, $value)
 	{
 		if (is_array($value))
 		{
@@ -226,7 +226,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function nestedListing($key, $type, $value)
+	protected function nestedListing($key, $type, $value)
 	{
 		if (is_int($key))
 		{
@@ -268,7 +268,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function attributeElement($key, $value)
+	protected function attributeElement($key, $value)
 	{
 		if (is_numeric($key)) $key = $value;
 
