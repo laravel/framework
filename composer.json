@@ -14,7 +14,7 @@
         "ext-mcrypt": "*",
         "classpreloader/classpreloader": "1.0.*",
         "ircmaxell/password-compat": "1.0.*",
-        "monolog/monolog": "1.3.*",
+        "monolog/monolog": "1.4.*",
         "patchwork/utf8": "1.0.*",
         "swiftmailer/swiftmailer": "4.3.*",
         "symfony/browser-kit": "2.2.*",
