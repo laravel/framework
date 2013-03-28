@@ -477,7 +477,7 @@ class BelongsToMany extends Relation {
 
 		foreach ($records as $id => $attributes)
 		{
-			if (is_int($attributes))
+			if (is_int($attributes) or (string)(int)$attributes === $attributes)
 			{
 				list($id, $attributes) = array($attributes, array());
 			}
