@@ -75,6 +75,7 @@
 - Added `Model::findOrFail(id)` and `firstOrFail` methods to Eloquent. Throws `ModelNotFoundException`. Can listen in your apps and return 404 repsonses if you want.
 - Added support for `touches` on Eloquent models. For example, adding `protected $touches = ['post']` to a Comment model will update the owning post's `updated_at` column when the Comment is updated.
 - Session driver now automatically set to `array` when running Artisan tasks.
+- Added static `unguard` method to Eloquent to disable all mass assignment protection.
 
 ## Beta 3
 
