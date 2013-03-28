@@ -199,6 +199,16 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Get the number of items to be displayed per page.
+	 *
+	 * @return int
+	 */
+	public function getPerPage()
+	{
+		return $this->perPage;
+	}
+
+	/**
 	 * Get the items being paginated.
 	 *
 	 * @return array
