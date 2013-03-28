@@ -344,7 +344,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @return array
 	 */
-	protected function getRelatedIds()
+	public function getRelatedIds()
 	{
 		$related = $this->getRelated();
 
@@ -457,6 +457,9 @@ class BelongsToMany extends Relation {
 			$this->detach($detach);
 		}
 
+		// Now we are finally ready to attach the new records. Note that we'll disable
+		// touching until after the entire operation is complete so we don't fire a
+		// ton of touch operations until we are totally done syncing the records.
 		$this->attachNew($records, $current, false);
 
 		$this->touchIfTouching();

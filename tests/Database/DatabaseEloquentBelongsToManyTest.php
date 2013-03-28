@@ -251,11 +251,38 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTouchMethodSyncsTimestamps()
+	{
+		$relation = $this->getRelation();
+		$relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+		$relation->getRelated()->shouldReceive('getQualifiedKeyName')->andReturn('table.id');
+		$relation->getQuery()->shouldReceive('select')->once()->with('table.id')->andReturn($relation->getQuery());
+		$relation->getQuery()->shouldReceive('lists')->once()->with('id')->andReturn(array(1, 2, 3));
+		$relation->getRelated()->shouldReceive('newQuery')->once()->andReturn($query = m::mock('StdClass'));
+		$query->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($query);
+		$query->shouldReceive('update')->once()->with(array('updated_at' => new DateTime));
+
+		$relation->touch();
+	}
+
+
+	public function testTouchIfTouching()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touch', 'touchingParent'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('touchingParent')->will($this->returnValue(true));
+		$relation->getParent()->shouldReceive('touch')->once();
+		$relation->getParent()->shouldReceive('touches')->once()->with('relation_name')->andReturn(true);
+		$relation->expects($this->once())->method('touch');
+
+		$relation->touchIfTouching();
+	}
+
+
 	public function getRelation()
 	{
 		list($builder, $parent) = $this->getRelationArguments();
 
-		return new BelongsToMany($builder, $parent, 'user_role', 'user_id', 'role_id');
+		return new BelongsToMany($builder, $parent, 'user_role', 'user_id', 'role_id', 'relation_name');
 	}
 
 
@@ -276,7 +303,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('join')->once()->with('user_role', 'roles.id', '=', 'user_role.role_id');
 		$builder->shouldReceive('where')->once()->with('user_role.user_id', '=', 1);
 
-		return array($builder, $parent, 'user_role', 'user_id', 'role_id');
+		return array($builder, $parent, 'user_role', 'user_id', 'role_id', 'relation_name');
 	}
 
 }
