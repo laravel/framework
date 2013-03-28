@@ -1219,6 +1219,27 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Get the relationships that are touched on save.
+	 *
+	 * @return array
+	 */
+	public function getTouchedRelations()
+	{
+		return $this->touches;
+	}
+
+	/**
+	 * Set the relationships that are touched on save.
+	 *
+	 * @param  array  $touches
+	 * @return void
+	 */
+	public function setTouchedRelations(array $touches)
+	{
+		$this->touches = $touches;
+	}
+
+	/**
 	 * Get the value indicating whether the IDs are incrementing.
 	 *
 	 * @return bool
