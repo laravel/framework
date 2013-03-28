@@ -647,20 +647,6 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Delete all record on the pivot table for this model.
-	 *
-	 * @return int
-	 */
-	public function delete()
-	{
-		$results = $this->newPivotQuery()->delete();
-
-		$this->touchIfTouching();
-
-		return $results;
-	}
-
-	/**
 	 * If we're touching the parent model, touch.
 	 *
 	 * @return void
