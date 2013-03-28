@@ -216,7 +216,10 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testSyncMethodSyncsIntermediateTableWithGivenArray()
+	/**
+	 * @dataProvider syncMethodListProvider
+	 */
+	public function testSyncMethodSyncsIntermediateTableWithGivenArray($list)
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('attach', 'detach'), $this->getRelationArguments());
 		$query = m::mock('stdClass');
@@ -230,7 +233,16 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$relation->getRelated()->shouldReceive('touches')->andReturn(false);
 		$relation->getParent()->shouldReceive('touches')->andReturn(false);
 
-		$relation->sync(array(2, 3, 4));
+		$relation->sync($list);
+	}
+
+
+	public function syncMethodListProvider()
+	{
+		return array(
+			array(array(2, 3, 4)),
+			array(array('2', '3', '4')),
+		);
 	}
 
 
