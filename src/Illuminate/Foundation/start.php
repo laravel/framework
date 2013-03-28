@@ -60,7 +60,7 @@ if (isset($unitTesting))
 
 if ($env != 'testing') ini_set('display_errors', 'Off');
 
-error_reporting(-1);
+//error_reporting(-1);
 
 /*
 |--------------------------------------------------------------------------
