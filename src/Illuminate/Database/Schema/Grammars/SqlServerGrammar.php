@@ -54,9 +54,9 @@ class SqlServerGrammar extends Grammar {
 	{
 		$table = $this->wrapTable($blueprint);
 
-		$columns = $this->prefixArray('add', $this->getColumns($blueprint));
+		$columns = $this->getColumns($blueprint);
 
-		return 'alter table '.$table.' '.implode(', ', $columns);
+		return 'alter table '.$table.' add '.implode(', ', $columns);
 	}
 
 	/**
@@ -128,11 +128,11 @@ class SqlServerGrammar extends Grammar {
 	 */
 	public function compileDropColumn(Blueprint $blueprint, Fluent $command)
 	{
-		$columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
+		$columns = $this->wrapArray($command->columns);
 
 		$table = $this->wrapTable($blueprint);
 
-		return 'alter table '.$table.' '.implode(', ', $columns);
+		return 'alter table '.$table.' drop column '.implode(', ', $columns);
 	}
 
 	/**
