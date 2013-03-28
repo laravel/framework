@@ -234,6 +234,24 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSyncMethodHandlesArrayWithStringFormattedIntegers()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('attach', 'detach'), $this->getRelationArguments());
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$query->shouldReceive('lists')->once()->with('role_id')->andReturn(array(1, 2, 3));
+		$relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo(array()), $this->equalTo(false));
+		$relation->expects($this->once())->method('detach')->with($this->equalTo(array(1)));
+		$relation->getRelated()->shouldReceive('touches')->andReturn(false);
+		$relation->getParent()->shouldReceive('touches')->andReturn(false);
+
+		$relation->sync(array('2', '3', '4'));
+	}
+
+
 	public function testSyncMethodSyncsIntermediateTableWithGivenArrayAndAttributes()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('attach', 'detach', 'touchIfTouching'), $this->getRelationArguments());
