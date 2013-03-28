@@ -284,7 +284,7 @@ class Builder {
 		// that method for convenience so the developer doesn't have to check.
 		if (is_null($value))
 		{
-			return $this->whereNull($column, $boolean);
+			return $this->whereNull($column, $boolean, $operator != '=');
 		}
 
 		// Now that we are working with just a simple query we can put the elements
