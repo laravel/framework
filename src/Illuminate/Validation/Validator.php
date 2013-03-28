@@ -200,13 +200,36 @@ class Validator implements MessageProviderInterface {
 		// that the attribute is required, rules are not run for missing values.
 		$value = $this->getValue($attribute);
 
-		$validatable = $this->isValidatable($rule, $attribute, $value);
-
-		$method = "validate{$rule}";
-
-		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+		if (strpos($attribute, '[]') !== false and is_array($value))
 		{
-			$this->addError($attribute, $rule, $parameters);
+
+			$value = empty($value) ? array(null) : $value;
+
+			foreach ($value as $item)
+			{
+				$validatable = $this->isValidatable($rule, $attribute, $item);
+
+				$method = "validate{$rule}";
+
+				if ($validatable and ! $this->$method($attribute, $item, $parameters, $this))
+				{
+					$this->addError($attribute, $rule, $parameters);
+				}
+			}
+
+		}
+		else
+		{
+
+			$validatable = $this->isValidatable($rule, $attribute, $value);
+
+			$method = "validate{$rule}";
+
+			if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+			{
+				$this->addError($attribute, $rule, $parameters);
+			}
+
 		}
 	}
 
@@ -218,6 +241,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getValue($attribute)
 	{
+		$attribute = str_replace('[]', '', $attribute);
+
 		if ( ! is_null($value = array_get($this->data, $attribute)))
 		{
 			return $value;
@@ -286,6 +311,10 @@ class Validator implements MessageProviderInterface {
 		{
 			return false;
 		}
+		elseif (is_array($value) and empty($value))
+		{
+			return false;
+		}
 		elseif ($value instanceof File)
 		{
 			return (string) $value->getPath() != '';
@@ -348,9 +377,9 @@ class Validator implements MessageProviderInterface {
 	{
 		$count = 0;
 
-		foreach ($attributes as $key)
+		foreach ($attributes as $attribute)
 		{
-			if (isset($this->data[$key]) or isset($this->files[$key]))
+			if (! is_null($this->getValue($attribute)))
 			{
 				$count++;
 			}
@@ -383,7 +412,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value == $this->data[$other];
+		return ! is_null($otherValue = $this->getValue($other)) and $value == $otherValue;
 	}
 
 	/**
@@ -398,7 +427,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value != $this->data[$other];
+		return ! is_null($otherValue = $this->getValue($other)) and $value != $otherValue;
 	}
 
 	/**
@@ -540,7 +569,7 @@ class Validator implements MessageProviderInterface {
 		// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
-			return $this->data[$attribute];
+			return $value;
 		}
 		elseif ($value instanceof File)
 		{
