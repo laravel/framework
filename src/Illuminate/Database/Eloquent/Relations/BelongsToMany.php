@@ -617,7 +617,7 @@ class BelongsToMany extends Relation {
 	 * @param  bool  $touch
 	 * @return int
 	 */
-	public function detach($ids, $touch = true)
+	public function detach($ids = array(), $touch = true)
 	{
 		if ($ids instanceof Model) $ids = (array) $ids->getKey();
 
@@ -662,7 +662,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @return void
 	 */
-	protected function touchIfTouching()
+	public function touchIfTouching()
 	{ 
 	 	if ($this->touchingParent()) $this->getParent()->touch();
 
