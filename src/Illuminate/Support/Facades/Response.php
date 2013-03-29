@@ -19,6 +19,20 @@ class Response {
 	}
 
 	/**
+	 * Return a new view response from the application.
+	 *
+	 * @param  string  $view
+	 * @param  array   $data
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @return Symfony\Component\HttpFoundation\Response
+	 */
+	public static function view($view, $data = array(), $status = 200, array $headers = array())
+	{
+		return static::make(static::$app['view']->make($view, $data), $status, $headers);
+	}
+
+	/**
 	 * Return a new JSON response from the application.
 	 *
 	 * @param  string|array  $data
