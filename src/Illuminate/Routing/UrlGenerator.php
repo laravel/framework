@@ -29,6 +29,13 @@ class UrlGenerator {
 	protected $generator;
 
 	/**
+	 * The global prefix for the generator.
+	 *
+	 * @var string
+	 */
+	protected $prefix;
+
+	/**
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  Symfony\Component\Routing\RouteCollection  $routes
@@ -83,7 +90,7 @@ class UrlGenerator {
 
 		$root = $this->getRootUrl($scheme);
 
-		return $root.'/'.trim($path.'/'.$tail, '/');
+		return $root.$this->getPrefix().'/'.trim($path.'/'.$tail, '/');
 	}
 
 	/**
@@ -109,17 +116,25 @@ class UrlGenerator {
 	{
 		if ($this->isValidUrl($path)) return $path;
 
-		$root = $this->getRootUrl($this->getScheme($secure));
-
 		// Once we get the root URL, we will check to see if it contains an index.php
 		// file in the paths. If it does, we will remove it since it is not needed
 		// for asset paths, but only for routes to endpoints in the application.
-		if (str_contains($root, 'index.php'))
-		{
-			$root = str_replace('/index.php', '', $root);
-		}
+		$root = $this->getRootUrl($this->getScheme($secure));
 
-		return $root.'/'.trim($path, '/');
+		return $this->removeIndex($root).'/'.trim($path, '/');
+	}
+
+	/**
+	 * Remove the index.php file from a path.
+	 *
+	 * @param  string  $root
+	 * @return string
+	 */
+	protected function removeIndex($root)
+	{
+		$i = 'index.php';
+
+		return str_contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
 	}
 
 	/**
@@ -156,10 +171,9 @@ class UrlGenerator {
 	 *
 	 * @param  string  $name
 	 * @param  mixed   $parameters
-	 * @param  bool    $absolute
 	 * @return string
 	 */
-	public function route($name, $parameters = array(), $absolute = true)
+	public function route($name, $parameters = array())
 	{
 		$route = $this->routes->get($name);
 
@@ -170,7 +184,7 @@ class UrlGenerator {
 			$parameters = $this->buildParameterList($route, $parameters);
 		}
 
-		return $this->generator->generate($name, $parameters, $absolute);
+		return $this->to($this->generator->generate($name, $parameters));
 	}
 
 	/**
@@ -263,6 +277,27 @@ class UrlGenerator {
 	public function isValidUrl($path)
 	{
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
+	}
+
+	/**
+	 * Set a global prefix on the generator.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return isset($this->prefix) ? '/'.$this->prefix : '';
+	}
+
+	/**
+	 * Set the global prefix on the generator.
+	 *
+	 * @param  string  $prefix
+	 * @return void
+	 */
+	public function setPrefix($prefix)
+	{
+		$this->prefix = $prefix;
 	}
 
 	/**
