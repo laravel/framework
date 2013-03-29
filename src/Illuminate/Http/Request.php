@@ -41,7 +41,10 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 
 		foreach ($locales as $locale)
 		{
-			if (starts_with($path, '/'.$locale)) return $this->removeLocaleFromUri($locale);
+			if (preg_match("#^\/{$locale}(?:$|/)#i", $path))
+			{
+				return $this->removeLocaleFromUri($locale);
+			}
 		}
 	}
 
