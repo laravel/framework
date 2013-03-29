@@ -7,7 +7,7 @@ class ControllerGenerator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -29,7 +29,7 @@ class ControllerGenerator {
 	/**
 	 * Create a new controller generator instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)

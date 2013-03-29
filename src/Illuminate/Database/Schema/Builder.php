@@ -9,21 +9,21 @@ class Builder {
 	/**
 	 * The database connection instance.
 	 *
-	 * @var Illuminate\Database\Connection
+	 * @var \Illuminate\Database\Connection
 	 */
 	protected $connection;
 
 	/**
 	 * The schema grammar instance.
 	 *
-	 * @var Illuminate\Database\Schema\Grammars\Grammar
+	 * @var \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected $grammar;
 
 	/**
 	 * Create a new database Schema manager.
 	 *
-	 * @param  Illuminate\Database\Connection  $connection
+	 * @param  \Illuminate\Database\Connection  $connection
 	 * @return void
 	 */
 	public function __construct(Connection $connection)
@@ -52,7 +52,7 @@ class Builder {
 	 *
 	 * @param  string   $table
 	 * @param  Closure  $callback
-	 * @return Illuminate\Database\Schema\Blueprint
+	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function table($table, Closure $callback)
 	{
@@ -64,7 +64,7 @@ class Builder {
 	 *
 	 * @param  string   $table
 	 * @param  Closure  $callback
-	 * @return Illuminate\Database\Schema\Blueprint
+	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function create($table, Closure $callback)
 	{
@@ -81,7 +81,7 @@ class Builder {
 	 * Drop a table from the schema.
 	 *
 	 * @param  string  $table
-	 * @return Illuminate\Database\Schema\Blueprint
+	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function drop($table)
 	{
@@ -96,7 +96,7 @@ class Builder {
 	 * Drop a table from the schema if it exists.
 	 *
 	 * @param  string  $table
-	 * @return Illuminate\Database\Schema\Blueprint
+	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function dropIfExists($table)
 	{
@@ -112,7 +112,7 @@ class Builder {
 	 *
 	 * @param  string  $from
 	 * @param  string  $to
-	 * @return Illuminate\Database\Schema\Blueprint
+	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function rename($from, $to)
 	{
@@ -126,7 +126,7 @@ class Builder {
 	/**
 	 * Execute the blueprint to build / modify the table.
 	 *
-	 * @param  Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @return void
 	 */
 	protected function build(Blueprint $blueprint)
@@ -139,7 +139,7 @@ class Builder {
 	 *
 	 * @param  string   $table
 	 * @param  Closure  $callback
-	 * @return Illuminate\Database\Schema\Blueprint
+	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	protected function createBlueprint($table, Closure $callback = null)
 	{
@@ -149,7 +149,7 @@ class Builder {
 	/**
 	 * Get the database connection instance.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function getConnection()
 	{
@@ -159,8 +159,8 @@ class Builder {
 	/**
 	 * Set the database connection instance.
 	 *
-	 * @param  Illuminate\Database\Connection
-	 * @return Illuminate\Database\Schema\Builder
+	 * @param  \Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Schema\Builder
 	 */
 	public function setConnection(Connection $connection)
 	{

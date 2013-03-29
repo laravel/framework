@@ -8,7 +8,7 @@ class FileStore extends Store implements Sweeper {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -22,7 +22,7 @@ class FileStore extends Store implements Sweeper {
 	/**
 	 * Create a new file session store instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @param  string  $path
 	 */
 	public function __construct(Filesystem $files, $path)

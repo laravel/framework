@@ -10,7 +10,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * The pagination environment.
 	 *
-	 * @var Illuminate\Pagination\Environment
+	 * @var \Illuminate\Pagination\Environment
 	 */
 	protected $env;
 
@@ -59,7 +59,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Create a new Paginator instance.
 	 *
-	 * @param  Illuminate\Pagination\Environment  $env
+	 * @param  \Illuminate\Pagination\Environment  $env
 	 * @param  array  $items
 	 * @param  int    $total
 	 * @param  int    $perPage
@@ -76,7 +76,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Setup the pagination context (current and last page).
 	 *
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function setupPaginationContext()
 	{
@@ -122,7 +122,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Get the pagination links view.
 	 *
-	 * @return Illuminate\View\View
+	 * @return \Illuminate\View\View
 	 */
 	public function links()
 	{
@@ -157,7 +157,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 *
 	 * @param  string  $key
 	 * @param  string  $value
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function appends($key, $value)
 	{
@@ -169,7 +169,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 *
 	 * @param  string  $key
 	 * @param  string  $value
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function addQuery($key, $value)
 	{

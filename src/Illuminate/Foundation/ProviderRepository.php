@@ -7,7 +7,7 @@ class ProviderRepository {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -21,7 +21,7 @@ class ProviderRepository {
 	/**
 	 * Create a new service repository instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @param  string  $manifestPath
 	 * @return void
 	 */
@@ -34,7 +34,7 @@ class ProviderRepository {
 	/**
 	 * Register the application service providers.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @param  array  $providers
 	 * @param  string  $path
 	 * @return void
@@ -73,7 +73,7 @@ class ProviderRepository {
 	/**
 	 * Compile the application manifest file.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @param  array  $providers
 	 * @return array
 	 */
@@ -114,9 +114,9 @@ class ProviderRepository {
 	/**
 	 * Create a new provider instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @param  string  $provider
-	 * @return Illuminate\Support\ServiceProvider
+	 * @return \Illuminate\Support\ServiceProvider
 	 */
 	public function createProvider(Application $app, $provider)
 	{
@@ -171,7 +171,7 @@ class ProviderRepository {
 	/**
 	 * Get the manifest file path.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return string
 	 */
 	protected function getManifestPath($app)
@@ -195,7 +195,7 @@ class ProviderRepository {
 	/**
 	 * Get the filesystem instance.
 	 *
-	 * @return Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem
 	 */
 	public function getFilesystem()
 	{

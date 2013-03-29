@@ -43,7 +43,7 @@ class JoinClause {
 	 * @param  string  $operator
 	 * @param  string  $second
 	 * @param  string  $boolean
-	 * @return Illuminate\Database\Query\JoinClause
+	 * @return \Illuminate\Database\Query\JoinClause
 	 */
 	public function on($first, $operator, $second, $boolean = 'and')
 	{
@@ -58,7 +58,7 @@ class JoinClause {
 	 * @param  string  $first
 	 * @param  string  $operator
 	 * @param  string  $second
-	 * @return Illuminate\Database\Query\JoinClause
+	 * @return \Illuminate\Database\Query\JoinClause
 	 */
 	public function orOn($first, $operator, $second)
 	{

@@ -16,7 +16,7 @@ class Environment {
 	/**
 	 * The view environment instance.
 	 *
-	 * @var Illuminate\View\Environment
+	 * @var \Illuminate\View\Environment
 	 */
 	protected $view;
 
@@ -66,7 +66,7 @@ class Environment {
 	 * Create a new pagination environment.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @param  Illuminate\View\Environment  $view
+	 * @param  \Illuminate\View\Environment  $view
 	 * @param  Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
 	 * @return void
@@ -96,7 +96,7 @@ class Environment {
 	 * @param  array  $items
 	 * @param  int    $perPage
 	 * @param  int    $total
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function make(array $items, $total, $perPage)
 	{
@@ -108,8 +108,8 @@ class Environment {
 	/**
 	 * Get the pagination view.
 	 *
-	 * @param  Illuminate\Pagination\Paginator  $paginator
-	 * @return Illuminate\View\View
+	 * @param  \Illuminate\Pagination\Paginator  $paginator
+	 * @return \Illuminate\View\View
 	 */
 	public function getPaginationView(Paginator $paginator)
 	{
@@ -254,7 +254,7 @@ class Environment {
 	/**
 	 * Get the current view driver.
 	 *
-	 * @return Illuminate\View\Environment
+	 * @return \Illuminate\View\Environment
 	 */
 	public function getViewDriver()
 	{
@@ -264,7 +264,7 @@ class Environment {
 	/**
 	 * Set the current view driver.
 	 *
-	 * @param  Illuminate\View\Environment  $view
+	 * @param  \Illuminate\View\Environment  $view
 	 * @return void
 	 */
 	public function setViewDriver(ViewEnvironment $view)

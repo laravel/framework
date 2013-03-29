@@ -8,7 +8,7 @@ class Composer {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -22,7 +22,7 @@ class Composer {
 	/**
 	 * Create a new Composer manager instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @param  string  $workingPath
 	 * @return void
 	 */
@@ -86,7 +86,7 @@ class Composer {
 	 * Set the working path used by the class.
 	 *
 	 * @param  string  $path
-	 * @return Illuminate\Foundation\Composer
+	 * @return \Illuminate\Foundation\Composer
 	 */
 	public function setWorkingPath($path)
 	{

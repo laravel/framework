@@ -24,14 +24,14 @@ class SeedCommand extends Command {
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var  Illuminate\Database\ConnectionResolverInterface
+	 * @var  \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected $resolver;
 
 	/**
 	 * Create a new database seed command instance.
 	 *
-	 * @param  Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
 	 * @return void
 	 */
 	public function __construct(Resolver $resolver)

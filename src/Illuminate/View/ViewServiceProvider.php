@@ -57,7 +57,7 @@ class ViewServiceProvider extends ServiceProvider {
 	/**
 	 * Register the PHP engine implementation.
 	 *
-	 * @param  Illuminate\View\Engines\EngineResolver  $resolver
+	 * @param  \Illuminate\View\Engines\EngineResolver  $resolver
 	 * @return void
 	 */
 	public function registerPhpEngine($resolver)
@@ -68,7 +68,7 @@ class ViewServiceProvider extends ServiceProvider {
 	/**
 	 * Register the Blade engine implementation.
 	 *
-	 * @param  Illuminate\View\Engines\EngineResolver  $resolver
+	 * @param  \Illuminate\View\Engines\EngineResolver  $resolver
 	 * @return void
 	 */
 	public function registerBladeEngine($resolver)
@@ -166,7 +166,7 @@ class ViewServiceProvider extends ServiceProvider {
 	/**
 	 * Determine if the application session has errors.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return bool
 	 */
 	public function sessionHasErrors($app)

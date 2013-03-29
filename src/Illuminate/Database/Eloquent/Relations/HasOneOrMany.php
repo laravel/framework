@@ -16,8 +16,8 @@ abstract class HasOneOrMany extends Relation {
 	/**
 	 * Create a new has many relationship instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder  $query
-	 * @param  Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $foreignKey
 	 * @return void
 	 */
@@ -55,7 +55,7 @@ abstract class HasOneOrMany extends Relation {
 	 * Match the eagerly loaded results to their single parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -68,7 +68,7 @@ abstract class HasOneOrMany extends Relation {
 	 * Match the eagerly loaded results to their many parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -81,7 +81,7 @@ abstract class HasOneOrMany extends Relation {
 	 * Match the eagerly loaded results to their many parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @param  string  $type
 	 * @return array
@@ -125,7 +125,7 @@ abstract class HasOneOrMany extends Relation {
 	/**
 	 * Build model dictionary keyed by the relation's foreign key.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @return array
 	 */
 	protected function buildDictionary(Collection $results)
@@ -148,8 +148,8 @@ abstract class HasOneOrMany extends Relation {
 	/**
 	 * Attach a model instance to the parent model.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $model
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function save(Model $model)
 	{
@@ -177,7 +177,7 @@ abstract class HasOneOrMany extends Relation {
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function create(array $attributes)
 	{

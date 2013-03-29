@@ -7,7 +7,7 @@ class PackageCreator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -38,7 +38,7 @@ class PackageCreator {
 	/**
 	 * Create a new package creator instance.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)
@@ -49,7 +49,7 @@ class PackageCreator {
 	/**
 	 * Create a new package stub.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $path
 	 * @param  bool    $plain
 	 * @return string
@@ -95,7 +95,7 @@ class PackageCreator {
 	/**
 	 * Write the support files to the package root.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -110,7 +110,7 @@ class PackageCreator {
 	/**
 	 * Write the PHPUnit stub file.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -124,7 +124,7 @@ class PackageCreator {
 	/**
 	 * Write the Travis stub file.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -138,7 +138,7 @@ class PackageCreator {
 	/**
 	 * Write the Composer.json stub file.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -167,7 +167,7 @@ class PackageCreator {
 	/**
 	 * Write the stub .gitignore file for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -179,7 +179,7 @@ class PackageCreator {
 	/**
 	 * Create the support directories for a package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -194,7 +194,7 @@ class PackageCreator {
 	/**
 	 * Write a specific support directory for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $support
 	 * @param  string  $directory
 	 * @return void
@@ -214,7 +214,7 @@ class PackageCreator {
 	/**
 	 * Create the public directory for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -230,7 +230,7 @@ class PackageCreator {
 	/**
 	 * Create the test directory for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -244,7 +244,7 @@ class PackageCreator {
 	/**
 	 * Write the stub ServiceProvider for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -261,7 +261,7 @@ class PackageCreator {
 	/**
 	 * Write the service provider stub for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @param  string  $stub
 	 * @return void
@@ -281,7 +281,7 @@ class PackageCreator {
 	/**
 	 * Get the stub for a ServiceProvider.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  bool    $plain
 	 * @return string
 	 */
@@ -297,7 +297,7 @@ class PackageCreator {
 	/**
 	 * Create the main source directory for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
 	 * @return string
 	 */
@@ -316,7 +316,7 @@ class PackageCreator {
 	/**
 	 * Format a generic package stub file.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $stub
 	 * @return string
 	 */
@@ -333,7 +333,7 @@ class PackageCreator {
 	/**
 	 * Create a workbench directory for the package.
 	 *
-	 * @param  Illuminate\Workbench\Package  $package
+	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $path
 	 * @return string
 	 */

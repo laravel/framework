@@ -9,14 +9,14 @@ class FormBuilder {
 	/**
 	 * The HTML builder instance.
 	 *
-	 * @var Illuminate\Html\HtmlBuilder
+	 * @var \Illuminate\Html\HtmlBuilder
 	 */
 	protected $html;
 
 	/**
 	 * The URL generator instance.
 	 *
-	 * @var Illuminate\Routing\UrlGenerator  $url
+	 * @var \Illuminate\Routing\UrlGenerator  $url
 	 */
 	protected $url;
 
@@ -30,7 +30,7 @@ class FormBuilder {
 	/**
 	 * The session store implementation.
 	 *
-	 * @var Illuminate\Session\Store
+	 * @var \Illuminate\Session\Store
 	 */
 	protected $session;
 
@@ -65,8 +65,8 @@ class FormBuilder {
 	/**
 	 * Create a new form builder instance.
 	 *
-	 * @param  Illuminate\Routing\UrlGenerator  $url
-	 * @param  Illuminate\Html\HtmlBuilder  $html
+	 * @param  \Illuminate\Routing\UrlGenerator  $url
+	 * @param  \Illuminate\Html\HtmlBuilder  $html
 	 * @param  string  $csrfToken
 	 * @return void
 	 */
@@ -711,7 +711,7 @@ class FormBuilder {
 	/**
 	 * Get the session store implementation.
 	 *
-	 * @return  Illuminate\Session\Store  $session
+	 * @return  \Illuminate\Session\Store  $session
 	 */
 	public function getSessionStore()
 	{
@@ -721,8 +721,8 @@ class FormBuilder {
 	/**
 	 * Set the session store implementation.
 	 *
-	 * @param  Illuminate\Session\Store  $session
-	 * @return Illuminate\Html\FormBuilder
+	 * @param  \Illuminate\Session\Store  $session
+	 * @return \Illuminate\Html\FormBuilder
 	 */
 	public function setSessionStore(Session $session)
 	{

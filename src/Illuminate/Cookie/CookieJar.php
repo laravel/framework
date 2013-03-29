@@ -18,7 +18,7 @@ class CookieJar {
 	/**
 	 * The encrypter instance.
 	 *
-	 * @var Illuminate\Encryption\Encrypter
+	 * @var \Illuminate\Encryption\Encrypter
 	 */
 	protected $encrypter;
 
@@ -40,7 +40,7 @@ class CookieJar {
 	 * Create a new cookie manager instance.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @param  Illuminate\Encryption\Encrypter  $encrypter
+	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
 	 * @return void
 	 */
 	public function __construct(Request $request, Encrypter $encrypter)
@@ -189,7 +189,7 @@ class CookieJar {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return Illuminate\Encryption\Encrypter
+	 * @return \Illuminate\Encryption\Encrypter
 	 */
 	public function getEncrypter()
 	{

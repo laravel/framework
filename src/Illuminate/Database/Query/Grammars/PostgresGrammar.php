@@ -7,7 +7,7 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Compile an insert and get ID statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array   $values
 	 * @param  string  $sequence
 	 * @return string
@@ -22,7 +22,7 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Compile a truncate table statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return array
 	 */
 	public function compileTruncate(Builder $query)

@@ -7,14 +7,14 @@ class HtmlBuilder {
 	/**
 	 * The URL generator instance.
 	 *
-	 * @var Illuminate\Routing\UrlGenerator
+	 * @var \Illuminate\Routing\UrlGenerator
 	 */
 	protected $url;
 
 	/**
 	 * Create a new HTML builder instance.
 	 *
-	 * @param  Illuminate\Routing\UrlGenerator  $url
+	 * @param  \Illuminate\Routing\UrlGenerator  $url
 	 * @return void
 	 */
 	public function __construct(UrlGenerator $url = null)

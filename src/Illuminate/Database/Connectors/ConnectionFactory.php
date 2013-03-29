@@ -13,7 +13,7 @@ class ConnectionFactory {
 	 *
 	 * @param  array   $config
 	 * @param  string  $name
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function make(array $config, $name = null)
 	{
@@ -33,7 +33,7 @@ class ConnectionFactory {
 	 * Create a connector instance based on the configuration.
 	 *
 	 * @param  array  $config
-	 * @return Illuminate\Database\Connectors\ConnectorInterface
+	 * @return \Illuminate\Database\Connectors\ConnectorInterface
 	 */
 	public function createConnector(array $config)
 	{
@@ -68,7 +68,7 @@ class ConnectionFactory {
 	 * @param  string  $database
 	 * @param  string  $tablePrefix
 	 * @param  string  $name
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	protected function createConnection($driver, PDO $connection, $database, $tablePrefix = '', $name = null)
 	{

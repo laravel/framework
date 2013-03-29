@@ -9,14 +9,14 @@ class Seeder {
 	/**
 	 * The container instance.
 	 *
-	 * @var Illuminate\Container\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
 	/**
 	 * The console command instance.
 	 *
-	 * @var Illuminate\Console\Command
+	 * @var \Illuminate\Console\Command
 	 */
 	protected $command;
 
@@ -42,7 +42,7 @@ class Seeder {
 	 * Resolve an instance of the given seeder class.
 	 *
 	 * @param  string  $class
-	 * @return Illuminate\Database\Seeder
+	 * @return \Illuminate\Database\Seeder
 	 */
 	protected function resolve($class)
 	{
@@ -61,7 +61,7 @@ class Seeder {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)
@@ -74,7 +74,7 @@ class Seeder {
 	/**
 	 * Set the console command instance.
 	 *
-	 * @param  Illuminate\Console\Command  $command
+	 * @param  \Illuminate\Console\Command  $command
 	 * @return void
 	 */
 	public function setCommand(Command $command)

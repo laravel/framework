@@ -8,14 +8,14 @@ class Builder {
 	/**
 	 * The base query builder instance.
 	 *
-	 * @var Illuminate\Database\Query\Builder
+	 * @var \Illuminate\Database\Query\Builder
 	 */
 	protected $query;
 
 	/**
 	 * The model being queried.
 	 *
-	 * @var Illuminate\Database\Eloquent\Model
+	 * @var \Illuminate\Database\Eloquent\Model
 	 */
 	protected $model;
 
@@ -39,7 +39,7 @@ class Builder {
 	/**
 	 * Create a new Eloquent query builder instance.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return void
 	 */
 	public function __construct(QueryBuilder $query)
@@ -52,7 +52,7 @@ class Builder {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function find($id, $columns = array('*'))
 	{
@@ -89,7 +89,7 @@ class Builder {
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns
-	 * @return Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function get($columns = array('*'))
 	{
@@ -138,7 +138,7 @@ class Builder {
 	 *
 	 * @param  int    $perPage
 	 * @param  array  $columns
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function paginate($perPage = null, $columns = array('*'))
 	{
@@ -159,10 +159,10 @@ class Builder {
 	/**
 	 * Get a paginator for a grouped statement.
 	 *
-	 * @param  Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	protected function groupedPaginate($paginator, $perPage, $columns)
 	{
@@ -174,10 +174,10 @@ class Builder {
 	/**
 	 * Get a paginator for an ungrouped statement.
 	 *
-	 * @param  Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
-	 * @return Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Pagination\Paginator
 	 */
 	protected function ungroupedPaginate($paginator, $perPage, $columns)
 	{
@@ -285,7 +285,7 @@ class Builder {
 	 * Get the relation instance for the given relation name.
 	 *
 	 * @param  string  $relation
-	 * @return Illuminate\Database\Eloquent\Relations\Relation
+	 * @return \Illuminate\Database\Eloquent\Relations\Relation
 	 */
 	public function getRelation($relation)
 	{
@@ -332,7 +332,7 @@ class Builder {
 	 * Set the relationships that should be eager loaded.
 	 *
 	 * @param  dynamic  $relation
-	 * @return Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function with($relations)
 	{
@@ -406,7 +406,7 @@ class Builder {
 	/**
 	 * Get the underlying query builder instance.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function getQuery()
 	{
@@ -416,7 +416,7 @@ class Builder {
 	/**
 	 * Set the underlying query builder instance.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return void
 	 */
 	public function setQuery($query)
@@ -448,7 +448,7 @@ class Builder {
 	/**
 	 * Get the model instance being queried.
 	 *
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function getModel()
 	{
@@ -458,8 +458,8 @@ class Builder {
 	/**
 	 * Set a model instance for the model being queried.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $model
-	 * @return Illuminate\Database\Eloquent\Builder
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function setModel(Model $model)
 	{

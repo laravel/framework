@@ -9,7 +9,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * The loader implementation.
 	 *
-	 * @var Illuminate\Config\LoaderInterface
+	 * @var \Illuminate\Config\LoaderInterface
 	 */
 	protected $loader;
 
@@ -44,7 +44,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Create a new configuration repository.
 	 *
-	 * @param  Illuminate\Config\LoaderInterface  $loader
+	 * @param  \Illuminate\Config\LoaderInterface  $loader
 	 * @param  string  $environment
 	 * @return void
 	 */
@@ -318,7 +318,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Get the loader implementation.
 	 *
-	 * @return Illuminate\Config\LoaderInterface
+	 * @return \Illuminate\Config\LoaderInterface
 	 */
 	public function getLoader()
 	{
@@ -328,7 +328,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Set the loader implementation.
 	 *
-	 * @param Illuminate\Config\LoaderInterface  $loader
+	 * @param \Illuminate\Config\LoaderInterface  $loader
 	 * @return void
 	 */
 	public function setLoader(LoaderInterface $loader)

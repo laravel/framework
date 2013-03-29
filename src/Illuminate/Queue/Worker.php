@@ -7,14 +7,14 @@ class Worker {
 	/**
 	 * THe queue manager instance.
 	 *
-	 * @var Illuminate\Queue\QueueManager
+	 * @var \Illuminate\Queue\QueueManager
 	 */
 	protected $manager;
 
 	/**
 	 * Create a new queue worker.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	public function __construct(QueueManager $manager)
@@ -54,7 +54,7 @@ class Worker {
 	/**
 	 * Process a given job from the queue.
 	 *
-	 * @param  Illuminate\Queue\Jobs\Job  $job
+	 * @param  \Illuminate\Queue\Jobs\Job  $job
 	 * @param  int  $delay
 	 * @return void
 	 */
@@ -95,7 +95,7 @@ class Worker {
 	/**
 	 * Get the queue manager instance.
 	 *
-	 * @return Illuminate\Queue\QueueManager
+	 * @return \Illuminate\Queue\QueueManager
 	 */
 	public function getManager()
 	{
@@ -105,7 +105,7 @@ class Worker {
 	/**
 	 * Set the queue manager instance.
 	 *
-	 * @param  Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @return void
 	 */
 	public function setManager(QueueManager $manager)

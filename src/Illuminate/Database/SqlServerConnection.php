@@ -38,7 +38,7 @@ class SqlServerConnection extends Connection {
 	/**
 	 * Get the default query grammar instance.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammars\Grammar
 	 */
 	protected function getDefaultQueryGrammar()
 	{
@@ -48,7 +48,7 @@ class SqlServerConnection extends Connection {
 	/**
 	 * Get the default schema grammar instance.
 	 *
-	 * @return Illuminate\Database\Schema\Grammars\Grammar
+	 * @return \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected function getDefaultSchemaGrammar()
 	{

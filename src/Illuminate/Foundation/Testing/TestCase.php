@@ -7,14 +7,14 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * The Illuminate application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 
 	/**
 	 * The HttpKernel client instance.
 	 *
-	 * @var Illuminate\Foundation\Testing\Client
+	 * @var \Illuminate\Foundation\Testing\Client
 	 */
 	protected $client;
 
@@ -50,7 +50,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function call()
 	{
@@ -69,7 +69,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function callSecure()
 	{
@@ -91,7 +91,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function action($method, $action, $wildcards = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
@@ -111,7 +111,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
@@ -271,7 +271,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Set the currently logged in user for the application.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @param  string  $driver
 	 * @return void
 	 */

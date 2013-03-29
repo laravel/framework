@@ -82,7 +82,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Execute a callback over each item.
 	 *
 	 * @param  Closure  $callback
-	 * @return Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function each(Closure $callback)
 	{
@@ -106,7 +106,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Run a filter over each of the items.
 	 *
 	 * @param  Closure  $callback
-	 * @return Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function filter(Closure $callback)
 	{
@@ -118,7 +118,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Reset the keys on the underlying array.
 	 *
-	 * @return \Illuminate\Support\Collection
+	 * @return \\Illuminate\Support\Collection
 	 */
 	public function values()
 	{
@@ -151,7 +151,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Merge the collection itmes into a single array.
 	 *
-	 * @return Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function merge()
 	{
