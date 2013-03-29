@@ -379,6 +379,47 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a HTML select element, using an Eloquent model.
+	 *
+	 * @param  string  $name
+	 * @param  object  $model
+	 * @param  array   $fields
+	 * @param  string  $selected
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function select_eloquent($name, $model, $fields = array(), $selected = null, $options = array())
+	{
+		// When building a select box the "value" attribute is really the selected one
+		// so we will use that when checking the model or session for a value which
+		// should provide a convenient method of re-populating the forms on post.
+		$selected = $this->getValueAttribute($name, $selected);
+
+		$options['id'] = $this->getIdAttribute($name, $options);
+
+		$options['name'] = $name;
+
+		// We will simply loop through the options and build an HTML value for each of
+		// them until we have an array of HTML declarations. Then we will join them
+		// all together into one single HTML element that can be put on the form.
+		$html = array();
+
+		foreach ($model as $row)
+		{
+			$html[] = $this->getSelectOption($row->{$fields[1]}, $row->{$fields[0]}, $selected);
+		}
+
+		// Once we have all of this HTML, we can join this into a single element after
+		// formatting the attributes into an HTML "attributes" string, then we will
+		// build out a final select statement, which will contain all the values.
+		$options = $this->html->attributes($options);
+
+		$list = implode('', $html);
+
+		return "<select{$options}>{$list}</select>";
+	}
+
+	/**
 	 * Get the select option for the given value.
 	 *
 	 * @param  string  $display
