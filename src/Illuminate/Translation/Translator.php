@@ -265,6 +265,16 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 *
 	 * @return string
 	 */
+	public function locale()
+	{
+		return $this->getLocale();
+	}
+
+	/**
+	 * Get the default locale being used.
+	 *
+	 * @return string
+	 */
 	public function getLocale()
 	{
 		return $this->locale;
