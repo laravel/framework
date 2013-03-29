@@ -15,7 +15,8 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "2.1.*",
-        "mockery/mockery": "0.7.2"
+        "mockery/mockery": "0.7.2",
+        "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
         "psr-0": {
