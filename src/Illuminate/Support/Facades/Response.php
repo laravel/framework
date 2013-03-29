@@ -29,7 +29,9 @@ class Response {
 	 */
 	public static function view($view, $data = array(), $status = 200, array $headers = array())
 	{
-		return static::make(static::$app['view']->make($view, $data), $status, $headers);
+		$app = Facade::getFacadeApplication();
+
+		return static::make($app['view']->make($view, $data), $status, $headers);
 	}
 
 	/**
