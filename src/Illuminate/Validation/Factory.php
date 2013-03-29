@@ -34,6 +34,13 @@ class Factory {
 	protected $implicitExtensions = array();
 
 	/**
+	 * List of new non iterable rules.
+	 *
+	 * @var array
+	 */
+	protected $nonIterative = array();
+
+	/**
 	 * The Validator resolver instance.
 	 *
 	 * @var Closure
@@ -77,6 +84,11 @@ class Factory {
 		// and accepted rule in that they are run even if the attributes is not in a
 		// array of data that is given to a validator instances via instantiation.
 		$implicit = $this->implicitExtensions;
+
+		if ( ! empty($this->nonIterative))
+		{
+			$validator->addNonIterative($this->nonIterative);
+		}
 
 		$validator->addImplicitExtensions($implicit);
 
@@ -125,6 +137,49 @@ class Factory {
 	public function extendImplicit($rule, Closure $extension)
 	{
 		$this->implicitExtensions[$rule] = $extension;
+	}
+
+	/**
+	 * Register non iterative rules.
+	 *
+	 * @param  string/array  $rules
+	 * @return void
+	 */
+	public function setNonIterative($rules)
+	{
+		$this->nonIterative = (array) $rules;
+	}
+
+	/**
+	 * Register additional non iterative rules.
+	 *
+	 * @param  string/array  $rules
+	 * @return void
+	 */
+	public function addNonIterative($rules)
+	{
+		$this->nonIterative = array_merge($this->nonIterative, (array) $rules);
+	}
+
+	/**
+	 * Remove non iterative rule.
+	 *
+	 * @param  string/array  $rules
+	 * @return void
+	 */
+	public function removeNonIterative($rules)
+	{
+		$this->nonIterative = array_diff($this->nonIterative, (array) $rules);
+	}
+
+	/**
+	 * Get non iterative rules.
+	 *
+	 * @return array
+	 */
+	public function getNonIterative()
+	{
+		return $this->nonIterative;
 	}
 
 	/**
