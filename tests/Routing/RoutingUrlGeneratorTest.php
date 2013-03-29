@@ -18,11 +18,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$gen = $this->getGenerator();
 		$gen->setRequest(Request::create('http://foobar.com/foo/bar', 'GET'));
 
-		$this->assertEquals('http://foobar.com/', $gen->to('/'));
+		$this->assertEquals('http://foobar.com', $gen->to('/'));
 		$this->assertEquals('http://foobar.com/something', $gen->to('/something'));
 		$this->assertEquals('http://foobar.com/something', $gen->to('something'));
 		
-		$this->assertEquals('https://foobar.com/', $gen->secure('/'));
+		$this->assertEquals('https://foobar.com', $gen->secure('/'));
 		$this->assertEquals('https://foobar.com/something', $gen->secure('/something'));
 		$this->assertEquals('https://foobar.com/something', $gen->secure('something'));
 		

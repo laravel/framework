@@ -90,7 +90,7 @@ class UrlGenerator {
 
 		$root = $this->getRootUrl($scheme);
 
-		return $root.$this->getPrefix().'/'.trim($path.'/'.$tail, '/');
+		return trim($root.$this->getPrefix().'/'.trim($path.'/'.$tail, '/'), '/');
 	}
 
 	/**

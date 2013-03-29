@@ -30,6 +30,35 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	}
 
 	/**
+	 * Setup the path info for a locale based URI.
+	 *
+	 * @param  array   $locales
+	 * @return string
+	 */
+	public function handleUriLocales(array $locales)
+	{
+		$path = $this->getPathInfo();
+
+		foreach ($locales as $locale)
+		{
+			if (starts_with($path, '/'.$locale)) return $this->removeLocaleFromUri($locale);
+		}
+	}
+
+	/**
+	 * Remove the given locale from the URI.
+	 *
+	 * @param  string  $locale
+	 * @return string
+	 */
+	protected function removeLocaleFromUri($locale)
+	{
+		$this->pathInfo = '/'.ltrim(substr($this->getPathInfo(), strlen($locale) + 1), '/');
+
+		return $locale;
+	}
+
+	/**
 	 * Get the root URL for the application.
 	 *
 	 * @return string

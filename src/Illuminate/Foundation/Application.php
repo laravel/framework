@@ -81,11 +81,12 @@ class Application extends Container implements HttpKernelInterface {
 	/**
 	 * Create a new Illuminate application instance.
 	 *
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(Request $request = null)
 	{
-		$this['request'] = Request::createFromGlobals();
+		$this['request'] = $this->createRequest($request);
 
 		// The exception handler class takes care of determining which of the bound
 		// exception handler Closures should be called for a given exception and
@@ -95,6 +96,47 @@ class Application extends Container implements HttpKernelInterface {
 		$this->register(new RoutingServiceProvider($this));
 
 		$this->register(new EventServiceProvider($this));
+	}
+
+	/**
+	 * Create the request for the application.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Htto\Request
+	 */
+	protected function createRequest(Request $request = null)
+	{
+		$request = $request ?: Request::createFromGlobals();
+
+		$this->registerLocaleHandler($request);
+
+		return $request;
+	}
+
+	/**
+	 * Register the URI locale boot handler.
+	 *
+	 * @param  Illuminate\Http\Request  $request
+	 * @return void
+	 */
+	protected function registerLocaleHandler(Request $request)
+	{
+		$this->booting(function($app) use ($request)
+		{
+			$locales = $app['config']->get('app.locales', array());
+
+			// Here, we will check to see if the incoming request begins with any of the
+			// supported locales. If it does, we will set that locale as this default
+			// for an application and remove it from the current request path info.
+			$locale = $request->handleUriLocales($locales);
+
+			if ($locale)
+			{
+				$app->setLocale($locale);
+
+				$app['url']->setPrefix($locale);
+			}
+		});
 	}
 
 	/**
