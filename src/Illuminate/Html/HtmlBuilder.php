@@ -70,7 +70,7 @@ class HtmlBuilder {
 	 */
 	public function link($url, $title = null, $attributes = array(), $secure = null)
 	{
-		$url = $this->url->to($url, $secure);
+		$url = $this->url->to($url, array(), $secure);
 
 		$title = $title ?: $url;
 
