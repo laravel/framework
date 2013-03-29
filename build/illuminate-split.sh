@@ -11,6 +11,7 @@ git subsplit publish --no-tags src/Illuminate/Events:git@github.com:illuminate/e
 git subsplit publish --no-tags src/Illuminate/Exception:git@github.com:illuminate/exception.git
 git subsplit publish --no-tags src/Illuminate/Filesystem:git@github.com:illuminate/filesystem.git
 git subsplit publish --no-tags src/Illuminate/Hashing:git@github.com:illuminate/hashing.git
+git subsplit publish --no-tags src/Illuminate/Html:git@github.com:illuminate/html.git
 git subsplit publish --no-tags src/Illuminate/Http:git@github.com:illuminate/http.git
 git subsplit publish --no-tags src/Illuminate/Log:git@github.com:illuminate/log.git
 git subsplit publish --no-tags src/Illuminate/Mail:git@github.com:illuminate/mail.git

@@ -468,11 +468,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$name = snake_case($caller['function']);
 		}
 
-		list($type, $id) = $this->getMorphs($name, $type, $id);
-
 		// Next we will guess the type and ID if necessary. The type and IDs may also
 		// be passed into the function so that the developers may manually specify
 		// them on the relations. Otherwise, we will just make a great estimate.
+		list($type, $id) = $this->getMorphs($name, $type, $id);
+
 		$class = $this->$type;
 
 		return $this->belongsTo($class, $id);

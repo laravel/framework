@@ -30,7 +30,7 @@ class FormBuilder {
 	/**
 	 * The session store implementation.
 	 *
-	 * @var Illuminate\Support\Contracts\SessionStoreInterface
+	 * @var Illuminate\Session\Store
 	 */
 	protected $session;
 
