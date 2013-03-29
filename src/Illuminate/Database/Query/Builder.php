@@ -907,6 +907,8 @@ class Builder {
 		// be accessed by the key of the rows instead of simply being numeric.
 		if ( ! is_null($key) and count($results) > 0)
 		{
+			$keyparts = explode('.', $key);
+			$key = array_pop($keyparts);
 			$keys = $results->fetch($key)->all();
 
 			return array_combine($keys, $values);
