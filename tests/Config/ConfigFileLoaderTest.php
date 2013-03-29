@@ -31,14 +31,47 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testEnvironmentArrayIsMerged()
 	{
+    $app_config = array(
+      'foo' => 'bar',
+      'database' => array(
+        'mysql' => array(
+          'user' => 'root',
+          'password' => '',
+          'db' => 'test',
+        ),
+      ),
+    );
+
+    $local_app_config = array(
+      'foo' => 'blah',
+      'baz' => 'boom',
+      'database' => array(
+        'mysql' => array(
+          'password' => 'toor',
+        ),
+      ),
+    );
+
+    $expected = array(
+      'foo' => 'blah',
+      'baz' => 'boom',
+      'database' => array(
+        'mysql' => array(
+          'user' => 'root',
+          'password' => 'toor',
+          'db' => 'test',
+        ),
+      ),
+    );
+
 		$loader = $this->getLoader();
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/app.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/local/app.php')->andReturn(true);
-		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/app.php')->andReturn(array('foo' => 'bar'));
-		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/app.php')->andReturn(array('foo' => 'blah', 'baz' => 'boom'));
+		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/app.php')->andReturn($app_config);
+		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/app.php')->andReturn($local_app_config);
 		$array = $loader->load('local', 'app', null);
 
-		$this->assertEquals(array('foo' => 'blah', 'baz' => 'boom'), $array);
+		$this->assertEquals($expected, $array);
 	}
 
 
@@ -77,14 +110,47 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testCascadingPackagesProperlyLoadsFiles()
 	{
+    $package_config = array(
+      'foo' => 'bar',
+      'database' => array(
+        'mysql' => array(
+          'user' => 'root',
+          'password' => '',
+          'db' => 'test',
+        ),
+      ),
+    );
+
+    $local_package_config = array(
+      'foo' => 'blah',
+      'baz' => 'boom',
+      'database' => array(
+        'mysql' => array(
+          'password' => 'toor',
+        ),
+      ),
+    );
+
+    $expected = array(
+      'foo' => 'blah',
+      'baz' => 'boom',
+      'database' => array(
+        'mysql' => array(
+          'user' => 'root',
+          'password' => 'toor',
+          'db' => 'test',
+        ),
+      ),
+    );
+
 		$loader = $this->getLoader();
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/packages/dayle/rees/group.php')->andReturn(true);
-		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/packages/dayle/rees/group.php')->andReturn(array('bar' => 'baz'));
+		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/packages/dayle/rees/group.php')->andReturn($package_config);
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/local/packages/dayle/rees/group.php')->andReturn(true);
-		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/packages/dayle/rees/group.php')->andReturn(array('foo' => 'boom'));
+		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/packages/dayle/rees/group.php')->andReturn($local_package_config);
 		$items = $loader->cascadePackage('local', 'dayle/rees', 'group', array('foo' => 'bar'));
 
-		$this->assertEquals(array('foo' => 'boom', 'bar' => 'baz'), $items);
+		$this->assertEquals($expected, $items);
 	}
 
 
