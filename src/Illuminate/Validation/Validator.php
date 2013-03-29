@@ -72,6 +72,13 @@ class Validator implements MessageProviderInterface {
 	protected $extensions = array();
 
 	/**
+	 * List of non iterable rules.
+	 *
+	 * @var array
+	 */
+	protected $nonIterative = array('Exists', 'Same', 'Different');
+
+	/**
 	 * The size related validation rules.
 	 *
 	 * @var array
@@ -200,14 +207,37 @@ class Validator implements MessageProviderInterface {
 		// that the attribute is required, rules are not run for missing values.
 		$value = $this->getValue($attribute);
 
-		$validatable = $this->isValidatable($rule, $attribute, $value);
-
 		$method = "validate{$rule}";
 
-		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+		if (is_array($value) and $this->isIterative($rule))
 		{
-			$this->addError($attribute, $rule, $parameters);
+
+			// Required, otherwise none of the validation rules will be applied
+			$value = empty($value) ? array(null) : $value;
+
+			foreach ($value as $item)
+			{
+
+				$validatable = $this->isValidatable($rule, $attribute, $item);
+
+				if ($validatable and ! $this->$method($attribute, $item, $parameters, $this))
+				{
+					$this->addError($attribute, $rule, $parameters);
+				}
+
+			}
+
+		} else {
+
+			$validatable = $this->isValidatable($rule, $attribute, $value);
+
+			if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+			{
+				$this->addError($attribute, $rule, $parameters);
+			}
+
 		}
+
 	}
 
 	/**
@@ -253,6 +283,17 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Determine if a given rule is iterative.
+	 *
+	 * @param  string  $rule
+	 * @return bool
+	 */
+	protected function isIterative($rule)
+	{
+		return ! in_array($rule, $this->nonIterative);
+	}
+
+	/**
 	 * Add an error message to the validator's collection of messages.
 	 *
 	 * @param  string  $attribute
@@ -283,6 +324,10 @@ class Validator implements MessageProviderInterface {
 			return false;
 		}
 		elseif (is_string($value) and trim($value) === '')
+		{
+			return false;
+		}
+		elseif (is_array($value) and empty($value))
 		{
 			return false;
 		}
@@ -348,9 +393,9 @@ class Validator implements MessageProviderInterface {
 	{
 		$count = 0;
 
-		foreach ($attributes as $key)
+		foreach ($attributes as $attribute)
 		{
-			if (isset($this->data[$key]) or isset($this->files[$key]))
+			if ( ! is_null($this->getValue($attribute)))
 			{
 				$count++;
 			}
@@ -383,7 +428,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value == $this->data[$other];
+		return ! is_null($otherValue = $this->getValue($other)) and $value == $otherValue;
 	}
 
 	/**
@@ -398,7 +443,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value != $this->data[$other];
+		return ! is_null($otherValue = $this->getValue($other)) and $value != $otherValue;
 	}
 
 	/**
@@ -540,7 +585,7 @@ class Validator implements MessageProviderInterface {
 		// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
-			return $this->data[$attribute];
+			return $value;
 		}
 		elseif ($value instanceof File)
 		{
@@ -1388,6 +1433,49 @@ class Validator implements MessageProviderInterface {
 		$this->addExtension($rule, $extension);
 
 		$this->implicitRules[] = studly_case($rule);
+	}
+
+	/**
+	 * Register non iterative rules.
+	 *
+	 * @param  string/array  $rules
+	 * @return void
+	 */
+	public function setNonIterative($rules)
+	{
+		$this->nonIterative = array_map('studly_case', (array) $rules);
+	}
+
+	/**
+	 * Register additional non iterative rules.
+	 *
+	 * @param  sring/array  $rules
+	 * @return void
+	 */
+	public function addNonIterative($rules)
+	{
+		$this->nonIterative = array_merge($this->nonIterative, array_map('studly_case', (array) $rules));
+	}
+
+	/**
+	 * Remove non iterative rule.
+	 *
+	 * @param  string/array  $rules
+	 * @return void
+	 */
+	public function removeNonIterative($rules)
+	{
+		$this->nonIterative = array_diff($this->nonIterative, (array) $rules);
+	}
+
+	/**
+	 * Get non iterative rules.
+	 *
+	 * @return array
+	 */
+	public function getNonIterative()
+	{
+		return $this->nonIterative;
 	}
 
 	/**
