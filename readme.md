@@ -1,9 +1,5 @@
 # Laravel 4 Beta Change Log
 
-## Beta 5
-
-- Implemented locale URI routing. (/en/foo/bar, etc.)
-
 ## Beta 4
 
 - Added `Model::creating(Closure)` and `Model::updating(Closure)` methods for hooking into Eloquent save events.
