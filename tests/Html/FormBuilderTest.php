@@ -167,27 +167,6 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 			array('class' => 'class-name', 'id' => 'select-id')
 		);
 		$this->assertEquals($select, '<select class="class-name" id="select-id" name="size"><option value="L">Large</option><option value="S">Small</option></select>');
-
-
-
-
-		$model1 = new EloquentModelStub;
-		$model1->id = 1;
-		$model1->title = 'First option';
-		$model2 = new EloquentModelStub;
-		$model2->id = 2;
-		$model2->title = 'Second option';
-		$model3 = new EloquentModelStub;
-		$model3->id = 3;
-		$model3->title = 'Third option';
-		$select = $this->formBuilder->select_eloquent(
-			'size', 
-			array($model1, $model2, $model3), 
-			array('id', 'title'),
-			3,
-			array('class' => 'class-name', 'id' => 'select-id')
-		);
-		$this->assertEquals($select, '<select class="class-name" id="select-id" name="size"><option value="1">First option</option><option value="2">Second option</option><option value="3" selected="selected">Third option</option></select>');
 	}
 
 
@@ -238,8 +217,4 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<button type="button">foo</button>', $form1);
 		$this->assertEquals('<button class="span2" type="button">foo</button>', $form2);
 	}
-}
-
-
-class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 }
