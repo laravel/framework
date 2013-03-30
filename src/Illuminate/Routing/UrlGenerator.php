@@ -184,7 +184,7 @@ class UrlGenerator {
 			$parameters = $this->buildParameterList($route, $parameters);
 		}
 
-		return $this->to($this->generator->generate($name, $parameters));
+		return $this->to($this->generator->generate($name, $parameters, SymfonyGenerator::RELATIVE_PATH));
 	}
 
 	/**
