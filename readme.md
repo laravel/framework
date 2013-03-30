@@ -1,5 +1,9 @@
 # Laravel 4 Beta Change Log
 
+## Beta 5
+
+- Added `Model::destroy` method to Eloquent.
+
 ## Beta 4
 
 - Added `Model::creating(Closure)` and `Model::updating(Closure)` methods for hooking into Eloquent save events.
