@@ -287,11 +287,25 @@ class PackageCreator {
 	 */
 	protected function getProviderStub(Package $package, $plain)
 	{
-		if ($plain) return $this->files->get(__DIR__.'/stubs/plain.provider.php');
-		
-		$stub = $this->files->get(__DIR__.'/stubs/provider.php');
+		return $this->formatPackageStub($package, $this->getProviderFile($plain));
+	}
 
-		return $this->formatPackageStub($package, $stub);
+	/**
+	 * Load the raw service provider file.
+	 *
+	 * @param  bool   $plain
+	 * @return string
+	 */
+	protected function getProviderFile($plain)
+	{
+		if ($plain)
+		{
+			return $this->files->get(__DIR__.'/stubs/plain.provider.php');
+		}
+		else
+		{
+			return $this->files->get(__DIR__.'/stubs/provider.php');
+		}
 	}
 
 	/**
