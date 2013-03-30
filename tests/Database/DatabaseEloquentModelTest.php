@@ -75,6 +75,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDestroyMethodCallsQueryBuilderCorrectly()
+	{
+		$result = EloquentModelDestroyStub::destroy(1, 2, 3);
+	}
+
+
 	public function testWithMethodCallsQueryBuilderCorrectly()
 	{
 		$result = EloquentModelWithStub::with('foo', 'bar');
@@ -626,6 +632,17 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
+		return $mock;
+	}
+}
+
+class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
+	public function newQuery()
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($mock);
+		$mock->shouldReceive('get')->once()->andReturn(array($model = m::mock('StdClass')));
+		$model->shouldReceive('delete')->once();
 		return $mock;
 	}
 }

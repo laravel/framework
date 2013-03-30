@@ -595,6 +595,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Destroy the models for the given IDs.
+	 *
+	 * @param  array|int  $ids
+	 * @return void
+	 */
+	public static function destroy($ids)
+	{
+		$ids = is_array($ids) ? $ids : func_get_args();
+
+		$instance = new static;
+
+		// We will actually pull the models from the database table and call delete on
+		// each of them individually so that their events get fired properly with a
+		// correct set of attributes in case the developers wants to check these.
+		$key = $instance->getKeyName();
+
+		foreach ($instance->whereIn($key, $ids)->get() as $model)
+		{
+			$model->delete();
+		}
+	}
+
+	/**
 	 * Delete the model from the database.
 	 *
 	 * @return void
@@ -603,12 +626,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ($this->exists)
 		{
+			$this->fireModelEvent('deleting', false);
+
 			// After firing the "deleting" event, we can go ahead and delete off the model
 			// then call the "deleted" event. These events could give the developer the
 			// opportunity to clear any relationships on the model or do other works.
-			$this->fireModelEvent('deleting', false);
+			$key = $this->getKeyName();
 
-			$this->newQuery()->where($this->getKeyName(), $this->getKey())->delete();
+			$this->newQuery()->where($key, $this->getKey())->delete();
 
 			$this->fireModelEvent('deleted', false);
 		}
