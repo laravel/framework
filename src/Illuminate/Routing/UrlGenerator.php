@@ -184,7 +184,7 @@ class UrlGenerator {
 			$parameters = $this->buildParameterList($route, $parameters);
 		}
 
-		return $this->to($this->generator->generate($name, $parameters));
+		return $this->getPrefix().$this->generator->generate($name, $parameters, true);
 	}
 
 	/**
