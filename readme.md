@@ -3,6 +3,7 @@
 ## Beta 5
 
 - Added `Model::destroy` method to Eloquent.
+- Touch owning models on delete.
 
 ## Beta 4
 
