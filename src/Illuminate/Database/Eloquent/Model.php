@@ -628,12 +628,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$this->fireModelEvent('deleting', false);
 
-			// After firing the "deleting" event, we can go ahead and delete off the model
-			// then call the "deleted" event. These events could give the developer the
-			// opportunity to clear any relationships on the model or do other works.
-			$key = $this->getKeyName();
+			// Here, we'll touch the owning models, verifying these timestamps get updated
+			// for the models. This will allow any caching to get broken on the parents
+			// by the timestamp. Then we will go ahead and delete the model instance.
+			$this->touchOwners();
 
-			$this->newQuery()->where($key, $this->getKey())->delete();
+			$this->newQuery()->where($this->getKeyName(), $this->getKey())->delete();
 
 			$this->fireModelEvent('deleted', false);
 		}
