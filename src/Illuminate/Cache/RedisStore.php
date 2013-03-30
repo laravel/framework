@@ -71,7 +71,15 @@ class RedisStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		return $this->redis->incrby($this->prefix.$key, $value);
+		$count = $this->get($key);
+
+		if ( ! is_null($count))
+		{
+			$count += $value;
+			$this->redis->set($this->prefix.$key, serialize($count));
+
+			return $count;
+		}
 	}
 
 	/**
@@ -83,7 +91,15 @@ class RedisStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return $this->redis->decrby($this->prefix.$key, $value);
+		$count = $this->get($key);
+
+		if ( ! is_null($count))
+		{
+			$count -= $value;
+			$this->redis->set($this->prefix.$key, serialize($count));
+
+			return $count;
+		}
 	}
 
 	/**
