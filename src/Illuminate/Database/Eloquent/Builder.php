@@ -126,7 +126,7 @@ class Builder {
 			{
 				$fill = array($column => $value);
 
-				$value = $this->model->newInstance($fill)->$column;
+				$value = $this->model->newFromBuilder($fill)->$column;
 			}
 		}
 
