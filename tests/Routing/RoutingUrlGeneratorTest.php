@@ -21,11 +21,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foobar.com', $gen->to('/'));
 		$this->assertEquals('http://foobar.com/something', $gen->to('/something'));
 		$this->assertEquals('http://foobar.com/something', $gen->to('something'));
-		
+
 		$this->assertEquals('https://foobar.com', $gen->secure('/'));
 		$this->assertEquals('https://foobar.com/something', $gen->secure('/something'));
 		$this->assertEquals('https://foobar.com/something', $gen->secure('something'));
-		
+
 		$this->assertEquals('http://foobar.com/dayle/rees', $gen->to('/', array('dayle', 'rees')));
 		$this->assertEquals('http://foobar.com/dayle/rees', $gen->to(null, array('dayle', 'rees')));
 		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('/something', array('dayle', 'rees')));
@@ -80,7 +80,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.bar', array('name' => 'taylor'), true)->andReturn('boom/breeze');
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.bar', array('name' => 'taylor'), true)->andReturn('http://foobar.com/boom/breeze');
 		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
 		$gen->setGenerator($symfonyGen);
 		$gen->setPrefix('en');
