@@ -2,6 +2,24 @@
 
 /*
 |--------------------------------------------------------------------------
+| Check Extensions
+|--------------------------------------------------------------------------
+|
+| Laravel requires a few extensions to function. Here we will check the
+| loaded extensions to make sure they are present. If not we'll just
+| bail from here. Otherwise, Composer will crazily fall back code.
+|
+*/
+
+if ( ! extension_loaded('mcrypt'))
+{
+	die('Laravel requires the Mcrypt PHP extension.');
+
+	exit(1);
+}
+
+/*
+|--------------------------------------------------------------------------
 | Register Class Imports
 |--------------------------------------------------------------------------
 |
