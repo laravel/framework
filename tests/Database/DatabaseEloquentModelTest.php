@@ -61,6 +61,30 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDestroyDeletesModel()
+	{
+		$builderMock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builderMock->shouldReceive('where')->once()->with('id', 1)->andReturn($builderMock);
+		$builderMock->shouldReceive('delete')->once();
+
+		EloquentModelDestroyStub::$builderMock = $builderMock;
+
+		EloquentModelDestroyStub::destroy(1);
+	}
+
+
+	public function testDestroyDeletesMultipleModels()
+	{
+		$builderMock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builderMock->shouldReceive('whereIn')->once()->with('id', array(1,2))->andReturn($builderMock);
+		$builderMock->shouldReceive('delete')->once();
+
+		EloquentModelDestroyStub::$builderMock = $builderMock;
+
+		EloquentModelDestroyStub::destroy(array(1,2));
+	}
+
+
 	public function testFindMethodCallsQueryBuilderCorrectly()
 	{
 		$result = EloquentModelFindStub::find(1);
@@ -624,6 +648,16 @@ class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	public function setIncrementing($value)
 	{
 		$this->incrementing = $value;
+	}
+}
+
+class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
+	public $primaryKey = 'id';
+	public static $builderMock;
+
+	public function newQuery()
+	{
+		return self::$builderMock;
 	}
 }
 

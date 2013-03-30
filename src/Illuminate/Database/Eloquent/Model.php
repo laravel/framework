@@ -336,6 +336,30 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	* Delete a model by its primary key.
+	*
+	* @param mixed $id
+	* @return void
+	*/
+	public static function destroy($id)
+	{
+		$instance = new static;
+
+		$instance->fireModelEvent('deleting', false);
+
+		if (is_array($id))
+		{
+			$instance->newQuery()->whereIn($instance->getKeyName(), $id)->delete();
+		}
+		else
+		{
+			$instance->newQuery()->where($instance->getKeyName(), $id)->delete();
+		}
+
+		$instance->fireModelEvent('deleted', false);
+	}
+
+	/**
 	 * Find a model by its primary key.
 	 *
 	 * @param  mixed  $id
