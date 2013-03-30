@@ -41,7 +41,7 @@ class RedisStore implements StoreInterface {
 	{
 		if ( ! is_null($value = $this->redis->get($this->prefix.$key)))
 		{
-			return unserialize($value);
+			return is_numeric($value) ? $value : unserialize($value);
 		}
 	}
 
@@ -55,7 +55,9 @@ class RedisStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$this->redis->set($this->prefix.$key, serialize($value));
+		$value = is_numeric($value) ? $value : serialize($value);
+
+		$this->redis->set($this->prefix.$key, $value);
 
 		$this->redis->expire($this->prefix.$key, $minutes * 60);
 	}
@@ -93,7 +95,9 @@ class RedisStore implements StoreInterface {
 	 */
 	public function forever($key, $value)
 	{
-		$this->redis->set($this->prefix.$key, serialize($value));
+		$value = is_numeric($value) ? $value : serialize($value);
+
+		$this->redis->set($this->prefix.$key, $value);
 	}
 
 	/**
