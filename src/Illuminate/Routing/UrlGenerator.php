@@ -29,13 +29,6 @@ class UrlGenerator {
 	protected $generator;
 
 	/**
-	 * The global prefix for the generator.
-	 *
-	 * @var string
-	 */
-	protected $prefix;
-
-	/**
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  Symfony\Component\Routing\RouteCollection  $routes
@@ -90,7 +83,7 @@ class UrlGenerator {
 
 		$root = $this->getRootUrl($scheme);
 
-		return trim($root.$this->getPrefix().'/'.trim($path.'/'.$tail, '/'), '/');
+		return trim($root.'/'.trim($path.'/'.$tail, '/'), '/');
 	}
 
 	/**
@@ -184,7 +177,7 @@ class UrlGenerator {
 			$parameters = $this->buildParameterList($route, $parameters);
 		}
 
-		return $this->getPrefix().$this->generator->generate($name, $parameters, true);
+		return $this->generator->generate($name, $parameters, true);
 	}
 
 	/**
@@ -277,27 +270,6 @@ class UrlGenerator {
 	public function isValidUrl($path)
 	{
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
-	}
-
-	/**
-	 * Set a global prefix on the generator.
-	 *
-	 * @return string
-	 */
-	public function getPrefix()
-	{
-		return isset($this->prefix) ? '/'.$this->prefix : '';
-	}
-
-	/**
-	 * Set the global prefix on the generator.
-	 *
-	 * @param  string  $prefix
-	 * @return void
-	 */
-	public function setPrefix($prefix)
-	{
-		$this->prefix = $prefix;
 	}
 
 	/**

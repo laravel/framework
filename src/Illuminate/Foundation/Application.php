@@ -106,37 +106,7 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	protected function createRequest(Request $request = null)
 	{
-		$request = $request ?: Request::createFromGlobals();
-
-		$this->registerLocaleHandler($request);
-
-		return $request;
-	}
-
-	/**
-	 * Register the URI locale boot handler.
-	 *
-	 * @param  Illuminate\Http\Request  $request
-	 * @return void
-	 */
-	protected function registerLocaleHandler(Request $request)
-	{
-		$this->booting(function($app) use ($request)
-		{
-			$locales = $app['config']->get('app.locales', array());
-
-			// Here, we will check to see if the incoming request begins with any of the
-			// supported locales. If it does, we will set that locale as this default
-			// for an application and remove it from the current request path info.
-			$locale = $request->handleUriLocales($locales);
-
-			if ($locale)
-			{
-				$app->setLocale($locale);
-
-				$app['url']->setPrefix($locale);
-			}
-		});
+		return $request ?: Request::createFromGlobals();
 	}
 
 	/**

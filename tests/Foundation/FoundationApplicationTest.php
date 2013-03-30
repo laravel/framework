@@ -161,20 +161,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(in_array($class, $app->getLoadedProviders()));
 	}
 
-
-	public function testLocaleDetectionOnBoot()
-	{
-		$request = Illuminate\Http\Request::create('/en/foo/bar', 'GET');
-		$application = $this->getMock('Illuminate\Foundation\Application', array('setLocale'), array($request));
-		$application->instance('config', $config = m::mock('StdClass'));
-		$config->shouldReceive('get')->once()->with('app.locales', array())->andReturn(array('en'));
-		$application->instance('url', $url = m::mock('StdClass'));
-		$url->shouldReceive('setPrefix')->once()->with('en');
-		$application->expects($this->once())->method('setLocale')->with($this->equalTo('en'));
-
-		$application->boot();
-	}
-
 }
 
 class ApplicationCustomExceptionHandlerStub extends Illuminate\Foundation\Application {
