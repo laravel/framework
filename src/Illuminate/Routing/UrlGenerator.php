@@ -164,9 +164,10 @@ class UrlGenerator {
 	 *
 	 * @param  string  $name
 	 * @param  mixed   $parameters
+	 * @param  bool    $absolute
 	 * @return string
 	 */
-	public function route($name, $parameters = array())
+	public function route($name, $parameters = array(), $absolute = true)
 	{
 		$route = $this->routes->get($name);
 
@@ -177,7 +178,7 @@ class UrlGenerator {
 			$parameters = $this->buildParameterList($route, $parameters);
 		}
 
-		return $this->generator->generate($name, $parameters, true);
+		return $this->generator->generate($name, $parameters, $absolute);
 	}
 
 	/**
