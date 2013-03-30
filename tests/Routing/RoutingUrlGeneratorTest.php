@@ -68,7 +68,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.bar', array('name' => 'taylor'));
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.bar', array('name' => 'taylor'), true);
 		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
 		$gen->setGenerator($symfonyGen);
 
@@ -80,7 +80,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.bar', array('name' => 'taylor'))->andReturn('boom/breeze');
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.bar', array('name' => 'taylor'), true)->andReturn('boom/breeze');
 		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
 		$gen->setGenerator($symfonyGen);
 		$gen->setPrefix('en');
@@ -95,7 +95,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.boom', array());
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.boom', array(), true);
 		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
 		$gen->setGenerator($symfonyGen);
 
@@ -107,7 +107,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.baz', array('name' => 'taylor', 'age' => 25));
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.baz', array('name' => 'taylor', 'age' => 25), true);
 		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
 		$gen->setGenerator($symfonyGen);
 
@@ -119,7 +119,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$gen = $this->getGenerator();
 		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.breeze', array('boom' => 'bar', 'breeze' => null));
+		$symfonyGen->shouldReceive('generate')->once()->with('foo.breeze', array('boom' => 'bar', 'breeze' => null), true);
 		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
 		$gen->setGenerator($symfonyGen);
 
