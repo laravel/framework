@@ -277,5 +277,18 @@ class Str {
 
 		return str_replace(' ', '', $value);
 	}
+	
+	/**
+	 * Capatilize first letter of each word of a string.
+	 * 
+	 * @param string  $value
+	 * @return string
+	 */ 
+	public static function capitalize($value)
+	{
+		$value = static::ascii($value);
+		
+		return ucwords($value);
+	}
 
 }
