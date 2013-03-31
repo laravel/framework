@@ -24,14 +24,14 @@ class MakeRemindersCommand extends Command {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
 	/**
 	 * Create a new reminder table command instance.
 	 *
-	 * @param  Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)

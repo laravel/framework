@@ -83,7 +83,7 @@ class UrlGenerator {
 
 		$root = $this->getRootUrl($scheme);
 
-		return $root.'/'.trim($path.'/'.$tail, '/');
+		return trim($root.'/'.trim($path.'/'.$tail, '/'), '/');
 	}
 
 	/**
@@ -109,17 +109,25 @@ class UrlGenerator {
 	{
 		if ($this->isValidUrl($path)) return $path;
 
-		$root = $this->getRootUrl($this->getScheme($secure));
-
 		// Once we get the root URL, we will check to see if it contains an index.php
 		// file in the paths. If it does, we will remove it since it is not needed
 		// for asset paths, but only for routes to endpoints in the application.
-		if (str_contains($root, 'index.php'))
-		{
-			$root = str_replace('/index.php', '', $root);
-		}
+		$root = $this->getRootUrl($this->getScheme($secure));
 
-		return $root.'/'.trim($path, '/');
+		return $this->removeIndex($root).'/'.trim($path, '/');
+	}
+
+	/**
+	 * Remove the index.php file from a path.
+	 *
+	 * @param  string  $root
+	 * @return string
+	 */
+	protected function removeIndex($root)
+	{
+		$i = 'index.php';
+
+		return str_contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
 	}
 
 	/**
@@ -187,7 +195,7 @@ class UrlGenerator {
 	/**
 	 * Build the parameter list for short circuit parameters.
 	 *
-	 * @param  Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  array  $params
 	 * @return array
 	 */

@@ -27,6 +27,22 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $wheres[0]['value']);
 	}
 
+
+	public function testTouchMethodUpdatesRelatedTimestamps()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getKey')->andReturn(1);
+		$builder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
+		$builder->shouldReceive('where');
+		$relation = new HasOne($builder, $parent, 'foreign_key');
+		$related->shouldReceive('getTable')->andReturn('table');
+		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+		$builder->shouldReceive('update')->once()->with(array('table.updated_at' => new DateTime));
+
+		$relation->touch();
+	}
+
 }
 
 

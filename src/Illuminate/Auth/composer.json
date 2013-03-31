@@ -18,7 +18,8 @@
     },
     "require-dev": {
         "illuminate/console": "4.0.x",
-        "illuminate/routing": "4.0.x"
+        "illuminate/routing": "4.0.x",
+        "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
         "psr-0": {"Illuminate\\Auth": ""}

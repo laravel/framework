@@ -10,7 +10,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	/**
 	 * Start the error handling facilities.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
 	public function startHandling($app)

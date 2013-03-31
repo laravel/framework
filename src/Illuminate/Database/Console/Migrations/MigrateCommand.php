@@ -24,7 +24,7 @@ class MigrateCommand extends BaseCommand {
 	/**
 	 * The migrator instance.
 	 *
-	 * @var Illuminate\Database\Migrations\Migrator
+	 * @var \Illuminate\Database\Migrations\Migrator
 	 */
 	protected $migrator;
 
@@ -36,7 +36,7 @@ class MigrateCommand extends BaseCommand {
 	/**
 	 * Create a new migration command instance.
 	 *
-	 * @param  Illuminate\Database\Migrations\Migrator  $migrator
+	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
 	 * @param  string  $packagePath
 	 * @return void
 	 */
@@ -72,6 +72,14 @@ class MigrateCommand extends BaseCommand {
 		foreach ($this->migrator->getNotes() as $note)
 		{
 			$this->output->writeln($note);
+		}
+
+		// Finally, if the "seed" option has been given, we will re-run the database
+		// seed task to re-populate the database, which is convenient when adding
+		// a migration and a seed at the same time, as it is only this command.
+		if ($this->input->getOption('seed'))
+		{
+			$this->call('db:seed');
 		}
 	}
 
@@ -109,6 +117,8 @@ class MigrateCommand extends BaseCommand {
 			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
+
+			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
 		);
 	}
 

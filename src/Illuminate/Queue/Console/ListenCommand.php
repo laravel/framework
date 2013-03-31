@@ -24,14 +24,14 @@ class ListenCommand extends Command {
 	/**
 	 * The queue listener instance.
 	 *
-	 * @var Illuminate\Queue\Listener
+	 * @var \Illuminate\Queue\Listener
 	 */
 	protected $listener;
 
 	/**
 	 * Create a new queue listen command.
 	 *
-	 * @param  Illuminate\Queue\Listener  $listener
+	 * @param  \Illuminate\Queue\Listener  $listener
 	 * @return void
 	 */
 	public function __construct(Listener $listener)

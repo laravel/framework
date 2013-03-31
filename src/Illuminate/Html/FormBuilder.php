@@ -9,14 +9,14 @@ class FormBuilder {
 	/**
 	 * The HTML builder instance.
 	 *
-	 * @var Illuminate\Html\HtmlBuilder
+	 * @var \Illuminate\Html\HtmlBuilder
 	 */
 	protected $html;
 
 	/**
 	 * The URL generator instance.
 	 *
-	 * @var Illuminate\Routing\UrlGenerator  $url
+	 * @var \Illuminate\Routing\UrlGenerator  $url
 	 */
 	protected $url;
 
@@ -30,7 +30,7 @@ class FormBuilder {
 	/**
 	 * The session store implementation.
 	 *
-	 * @var Illuminate\Support\Contracts\SessionStoreInterface
+	 * @var \Illuminate\Session\Store
 	 */
 	protected $session;
 
@@ -65,8 +65,8 @@ class FormBuilder {
 	/**
 	 * Create a new form builder instance.
 	 *
-	 * @param  Illuminate\Routing\UrlGenerator  $url
-	 * @param  Illuminate\Html\HtmlBuilder  $html
+	 * @param  \Illuminate\Routing\UrlGenerator  $url
+	 * @param  \Illuminate\Html\HtmlBuilder  $html
 	 * @param  string  $csrfToken
 	 * @return void
 	 */
@@ -189,20 +189,23 @@ class FormBuilder {
 	 */
 	public function input($type, $name, $value = null, $options = array())
 	{
-		$options['name'] = $name;
+		if ( ! isset($options['name'])) $options['name'] = $name;
 
 		// We will get the appropriate value for the given field. We will look for the
 		// value in the session for the value in the old input data then we'll look
 		// in the model instance if one is set. Otherwise we will just use empty.
 		$id = $this->getIdAttribute($name, $options);
 
-		$value = $this->getValueAttribute($name, $value);
-
-		$merge = compact('type', 'value', 'id');
+		if ($type != 'file')
+		{
+			$value = $this->getValueAttribute($name, $value);
+		}
 
 		// Once we have the type, value, and ID we can marge them into the rest of the
 		// attributes array so we can convert them into their HTML attribute format
 		// when creating the HTML element. Then, we will return the entire input.
+		$merge = compact('type', 'value', 'id');
+
 		$options = array_merge($options, $merge);
 
 		return '<input'.$this->html->attributes($options).'>';
@@ -711,7 +714,7 @@ class FormBuilder {
 	/**
 	 * Get the session store implementation.
 	 *
-	 * @return  Illuminate\Session\Store  $session
+	 * @return  \Illuminate\Session\Store  $session
 	 */
 	public function getSessionStore()
 	{
@@ -721,8 +724,8 @@ class FormBuilder {
 	/**
 	 * Set the session store implementation.
 	 *
-	 * @param  Illuminate\Session\Store  $session
-	 * @return Illuminate\Html\FormBuilder
+	 * @param  \Illuminate\Session\Store  $session
+	 * @return \Illuminate\Html\FormBuilder
 	 */
 	public function setSessionStore(Session $session)
 	{

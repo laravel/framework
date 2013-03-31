@@ -7,7 +7,7 @@ abstract class Queue {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var Illuminate\Container
+	 * @var \Illuminate\Container
 	 */
 	protected $container;
 
@@ -26,7 +26,7 @@ abstract class Queue {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  Illuminate\Container  $container
+	 * @param  \Illuminate\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

@@ -35,7 +35,7 @@ class HasMany extends HasOneOrMany {
 	 * Match the eagerly loaded results to their parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */

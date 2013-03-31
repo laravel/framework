@@ -9,22 +9,22 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * The exception handler instance.
 	 *
-	 * @var Illuminate\Exception\Handler
+	 * @var \Illuminate\Exception\Handler
 	 */
 	protected $exceptionHandler;
 
 	/**
 	 * The Laravel application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $laravel;
 
 	/**
 	 * Start a new Console application.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
-	 * @return Illuminate\Console\Application
+	 * @param  \Illuminate\Foundation\Application  $app
+	 * @return \Illuminate\Console\Application
 	 */
 	public static function start($app)
 	{
@@ -146,7 +146,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Set the exception handler instance.
 	 *
-	 * @param  Illuminate\Exception\Handler  $handler
+	 * @param  \Illuminate\Exception\Handler  $handler
 	 * @return void
 	 */
 	public function setExceptionHandler($handler)
@@ -157,7 +157,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $laravel
+	 * @param  \Illuminate\Foundation\Application  $laravel
 	 * @return void
 	 */
 	public function setLaravel($laravel)

@@ -25,14 +25,14 @@ class AssetPublishCommand extends Command {
 	/**
 	 * The asset publisher instance.
 	 *
-	 * @var Illuminate\Foundation\AssetPublisher
+	 * @var \Illuminate\Foundation\AssetPublisher
 	 */
 	protected $assets;
 
 	/**
 	 * Create a new asset publish command instance.
 	 *
-	 * @param  Illuminate\Foundation\AssetPublisher  $assets
+	 * @param  \Illuminate\Foundation\AssetPublisher  $assets
 	 * @return void
 	 */
 	public function __construct(AssetPublisher $assets)

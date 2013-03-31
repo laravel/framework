@@ -5,7 +5,7 @@ class MySqlConnection extends Connection {
 	/**
 	 * Get a schema builder instance for the connection.
 	 *
-	 * @return Illuminate\Database\Schema\Builder
+	 * @return \Illuminate\Database\Schema\Builder
 	 */
 	public function getSchemaBuilder()
 	{
@@ -17,7 +17,7 @@ class MySqlConnection extends Connection {
 	/**
 	 * Get the default query grammar instance.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammars\Grammar
 	 */
 	protected function getDefaultQueryGrammar()
 	{
@@ -27,7 +27,7 @@ class MySqlConnection extends Connection {
 	/**
 	 * Get the default schema grammar instance.
 	 *
-	 * @return Illuminate\Database\Schema\Grammars\Grammar
+	 * @return \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected function getDefaultSchemaGrammar()
 	{

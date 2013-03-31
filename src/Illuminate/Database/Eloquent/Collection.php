@@ -16,7 +16,7 @@ class Collection extends BaseCollection {
 	 *
 	 * @param  mixed  $key
 	 * @param  mixed  $default
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function find($key, $default = null)
 	{
@@ -48,7 +48,7 @@ class Collection extends BaseCollection {
 	 * Add an item to the collection.
 	 *
 	 * @param  mixed  $item
-	 * @return Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function add($item)
 	{

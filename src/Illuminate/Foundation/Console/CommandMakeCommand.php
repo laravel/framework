@@ -24,7 +24,7 @@ class CommandMakeCommand extends Command {
 	/**
 	 * Create a new command creator command.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)

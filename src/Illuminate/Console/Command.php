@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Console;
 
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -9,7 +10,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * The Laravel application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $laravel;
 
@@ -121,6 +122,22 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		$arguments['command'] = $command;
 
 		return $instance->run(new ArrayInput($arguments), $this->output);
+	}
+
+	/**
+	 * Call another console command silently.
+	 *
+	 * @param  string  $command
+	 * @param  array   $arguments
+	 * @return mixed
+	 */
+	public function callSilent($command, array $arguments = array())
+	{
+		$instance = $this->getApplication()->find($command);
+
+		$arguments['command'] = $command;
+
+		return $instance->run(new ArrayInput($arguments), new NullOutput);	
 	}
 
 	/**
@@ -279,7 +296,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @return Illuminate\Foundation\Application
+	 * @return \Illuminate\Foundation\Application
 	 */
 	public function getLaravel()
 	{
@@ -289,7 +306,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $laravel
+	 * @param  \Illuminate\Foundation\Application  $laravel
 	 * @return void
 	 */
 	public function setLaravel($laravel)

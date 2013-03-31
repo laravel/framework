@@ -1,6 +1,5 @@
 {
-    "name": "illuminate/support",
-    "description": "Various utilities and support functions.",
+    "name": "illuminate/html",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,22 +7,21 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.3.0",
+        "illuminate/http": "4.0.x",
+        "illuminate/session": "4.0.x",
+        "illuminate/support": "4.0.x"
     },
     "require-dev": {
-        "patchwork/utf8": "1.0.*",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
         "psr-0": {
-            "Illuminate\\Support": ""
-        },
-        "files": [
-            "Illuminate/Support/helpers.php"
-        ]
+            "Illuminate\\Html": ""
+        }
     },
-    "target-dir": "Illuminate/Support",
+    "target-dir": "Illuminate/Html",
     "extra": {
         "branch-alias": {
             "dev-master": "4.0-dev"

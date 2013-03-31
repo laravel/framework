@@ -1,8 +1,14 @@
 # Laravel 4 Beta Change Log
 
+## Beta 5
+
+- Added `Model::destroy` method to Eloquent.
+- Touch owning models on delete.
+
 ## Beta 4
 
 - Added `Model::creating(Closure)` and `Model::updating(Closure)` methods for hooking into Eloquent save events.
+- Added `Model::saving(Closure)` and `Model::saved(Closure)` methods for hooking into Eloquent save events.
 - Added `Event::queue` and `Event::flush`.
 - Added a `Str` class in support component. Adopted Patchwork UTF-8 to provide solid UTF-8 handling for the framework.
 - Allow Eloquent attributes to be accessed by camelCase in addition to snake_case.
@@ -15,7 +21,7 @@
 - Encode queue payloads as JSON instead of serializing, to make the Queue place nicely with other languages.
 - Added `Model::created(Closure)` and `Model::updated(Closure)` methods for hooking into Eloquent post-save events.
 - Added `Model::boot` static method for a one time "booting" method for models.
-- Passing `null` into a `where` call will not short-cut into `whereNull`.
+- Passing `null` into a `where` call will now short-cut into `whereNull`.
 - Changed Blade `{{ }}` to not escape. Made the triple braces escape.
 - Added `DB::getName` to get the configured name of the connection.
 - Made Eloquent casing agnostic. Will use whatever casing the properties use. Added `snakeAttributes` property to model (default `true`) to control casing on relationships when using `toArray`.
@@ -66,6 +72,16 @@
 - Added `link_to`, `link_to_asset`, `link_to_route`, `link_to_action` helpers.
 - Routes with too many leading or trailing slashes will now 404.
 - Added `callSecure` test helper.
+- Added `values` method to the `Collection` class.
+- Fix transaction handling for Microsoft SQL Server.
+- Added new `dump-autoload` Artisan command that runs optimized for app and all workbenches.
+- Refactored post `migrate:make` hooks to dump autoloads for workbenches.
+- Added `DB::listen(Closure)` method which may be used to listen for database queries.
+- Added `Model::findOrFail(id)` and `firstOrFail` methods to Eloquent. Throws `ModelNotFoundException`. Can listen in your apps and return 404 repsonses if you want.
+- Added support for `touches` on Eloquent models. For example, adding `protected $touches = ['post']` to a Comment model will update the owning post's `updated_at` column when the Comment is updated.
+- Session driver now automatically set to `array` when running Artisan tasks.
+- Added static `unguard` method to Eloquent to disable all mass assignment protection.
+- Added `--seed` option to `migrate` command.
 
 ## Beta 3
 

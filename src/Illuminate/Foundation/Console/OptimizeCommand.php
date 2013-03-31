@@ -26,14 +26,14 @@ class OptimizeCommand extends Command {
 	/**
 	 * The composer instance.
 	 *
-	 * @var Illuminate\Foundation\Composer
+	 * @var \Illuminate\Foundation\Composer
 	 */
 	protected $composer;
 
 	/**
 	 * Create a new optimize command instance.
 	 *
-	 * @param  Illuminate\Foundation\Composer  $composer
+	 * @param  \Illuminate\Foundation\Composer  $composer
 	 * @return void
 	 */
 	public function __construct(Composer $composer)
@@ -70,7 +70,7 @@ class OptimizeCommand extends Command {
 
 		$outputPath = $this->laravel['path.base'].'/bootstrap/compiled.php';
 
-		$this->call('compile', array('--output' => $outputPath, '--config' => implode(',', $this->getClassFiles())));
+		$this->callSilent('compile', array('--output' => $outputPath, '--config' => implode(',', $this->getClassFiles())));
 	}
 
 	/**

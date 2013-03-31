@@ -16,8 +16,8 @@ class BelongsTo extends Relation {
 	/**
 	 * Create a new has many relationship instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder  $query
-	 * @param  Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $foreignKey
 	 * @return void
 	 */
@@ -50,7 +50,9 @@ class BelongsTo extends Relation {
 		// of the related models matching on the foreign key that's on a parent.
 		$key = $this->related->getKeyName();
 
-		$this->query->where($key, '=', $this->parent->{$this->foreignKey});
+		$table = $this->related->getTable();
+
+		$this->query->where($table.'.'.$key, '=', $this->parent->{$this->foreignKey});
 	}
 
 	/**
@@ -124,7 +126,7 @@ class BelongsTo extends Relation {
 	 * Match the eagerly loaded results to their parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */

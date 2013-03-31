@@ -8,14 +8,14 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * The database connection instance.
 	 *
-	 * @var Illuminate\Database\Connection
+	 * @var \Illuminate\Database\Connection
 	 */
 	protected $connection;
 
 	/**
 	 * The encrypter instance.
 	 *
-	 * @param  Illuminate\Encrypter
+	 * @param  \Illuminate\Encrypter
 	 */
 	protected $encrypter;
 
@@ -36,8 +36,8 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Create a new database store.
 	 *
-	 * @param  Illuminate\Database\Connection  $connection
-	 * @param  Illuminate\Encrypter  $encrypter
+	 * @param  \Illuminate\Database\Connection  $connection
+	 * @param  \Illuminate\Encrypter  $encrypter
 	 * @param  string  $table
 	 * @param  string  $prefix
 	 * @return void
@@ -177,7 +177,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Get a query builder for the cache table.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function table()
 	{
@@ -187,7 +187,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Get the underlying database connection.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function getConnection()
 	{
@@ -197,7 +197,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return Illuminate\Encrypter
+	 * @return \Illuminate\Encrypter
 	 */
 	public function getEncrypter()
 	{

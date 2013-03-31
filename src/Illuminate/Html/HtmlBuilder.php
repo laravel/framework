@@ -7,14 +7,14 @@ class HtmlBuilder {
 	/**
 	 * The URL generator instance.
 	 *
-	 * @var Illuminate\Routing\UrlGenerator
+	 * @var \Illuminate\Routing\UrlGenerator
 	 */
 	protected $url;
 
 	/**
 	 * Create a new HTML builder instance.
 	 *
-	 * @param  Illuminate\Routing\UrlGenerator  $url
+	 * @param  \Illuminate\Routing\UrlGenerator  $url
 	 * @return void
 	 */
 	public function __construct(UrlGenerator $url = null)
@@ -70,7 +70,7 @@ class HtmlBuilder {
 	 */
 	public function link($url, $title = null, $attributes = array(), $secure = null)
 	{
-		$url = $this->url->to($url, $secure);
+		$url = $this->url->to($url, array(), $secure);
 
 		$title = $title ?: $url;
 
@@ -179,7 +179,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	protected static function listing($type, $list, $attributes = array())
+	protected function listing($type, $list, $attributes = array())
 	{
 		$html = '';
 
@@ -206,7 +206,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function listingElement($key, $type, $value)
+	protected function listingElement($key, $type, $value)
 	{
 		if (is_array($value))
 		{
@@ -226,7 +226,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function nestedListing($key, $type, $value)
+	protected function nestedListing($key, $type, $value)
 	{
 		if (is_int($key))
 		{
@@ -268,7 +268,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function attributeElement($key, $value)
+	protected function attributeElement($key, $value)
 	{
 		if (is_numeric($key)) $key = $value;
 

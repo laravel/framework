@@ -6,7 +6,7 @@ class Starter {
 	 * Load the workbench vendor auto-load files.
 	 *
 	 * @param  string  $path
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @return void
 	 */
 	public static function start($path, $finder = null, $files = null)
