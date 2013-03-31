@@ -279,12 +279,23 @@ class Str {
 	}
 	
 	/**
-	 * Capatilize first letter of each word of a string.
+	 * Convert a string to title case.
 	 * 
-	 * @param string  $value
+	 * @param  string  $value
 	 * @return string
 	 */ 
-	public static function capitalize($value)
+	public static function title($value)
+	{
+		return mb_convert_case($value, MB_CASE_TITLE);
+	}
+	
+	/**
+	 * Convert a string to title case (ASCII is output).
+	 * 
+	 * @param  string  $value
+	 * @return string
+	 */ 
+	public static function asciiTitle($value)
 	{
 		$value = static::ascii($value);
 		
