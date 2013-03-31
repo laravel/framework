@@ -46,7 +46,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * Add a cookie to the response.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return \Illuminate\Http\Response
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function withCookie(Cookie $cookie)
 	{
@@ -59,7 +59,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * Flash an array of input to the session.
 	 *
 	 * @param  array  $input
-	 * @return void
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function withInput(array $input = null)
 	{
@@ -74,7 +74,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * Flash an array of input to the session.
 	 *
 	 * @param  dynamic  string
-	 * @return void
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function onlyInput()
 	{
@@ -85,7 +85,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * Flash an array of input to the session.
 	 *
 	 * @param  dynamic  string
-	 * @return void
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function exceptInput()
 	{
@@ -96,7 +96,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * Flash a container of errors to the session.
 	 *
 	 * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
-	 * @return void
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function withErrors($provider)
 	{
