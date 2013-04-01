@@ -4,6 +4,7 @@
 
 - Added `Model::destroy` method to Eloquent.
 - Touch owning models on delete.
+- Added `Str::macro` method.
 
 ## Beta 4
 
