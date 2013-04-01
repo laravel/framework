@@ -28,7 +28,7 @@ class RedisStore implements StoreInterface {
 	public function __construct(Redis $redis, $prefix = '')
 	{
 		$this->redis = $redis;
-		$this->prefix = $prefix;
+		$this->prefix = $prefix.':';
 	}
 
 	/**
