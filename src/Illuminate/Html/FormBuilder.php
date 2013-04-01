@@ -694,7 +694,7 @@ class FormBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected function getValueAttribute($name, $value = null)
+	public function getValueAttribute($name, $value = null)
 	{
 		if (is_null($name)) return $value;
 
