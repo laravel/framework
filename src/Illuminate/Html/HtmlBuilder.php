@@ -12,6 +12,13 @@ class HtmlBuilder {
 	protected $url;
 
 	/**
+	 * The registered html macros.
+	 *
+	 * @var array
+	 */
+	protected $macros;
+
+	/**
 	 * Create a new HTML builder instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
@@ -20,6 +27,18 @@ class HtmlBuilder {
 	public function __construct(UrlGenerator $url = null)
 	{
 		$this->url = $url;
+	}
+
+	/**
+	 * Register a custom HTML macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public function macro($name, $macro)
+	{
+		$this->macros[$name] = $macro;
 	}
 
 	/**
@@ -273,6 +292,23 @@ class HtmlBuilder {
 		if (is_numeric($key)) $key = $value;
 
 		if ( ! is_null($value)) return $key.'="'.e($value).'"';
+	}
+
+	/**
+	 * Dynamically handle calls to the html class.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if (isset($this->macros[$method]))
+		{
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }
