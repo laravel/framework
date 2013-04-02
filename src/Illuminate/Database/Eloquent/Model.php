@@ -745,6 +745,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Update the model in the database.
+	 *
+	 * @param  array  $attributes
+	 * @return mixed
+	 */
+	public function update(array $attributes = array())
+	{
+		if ( ! $this->exists)
+		{
+			return $this->newQuery()->update($attributes);
+		}
+
+		return $this->fill($attributes)->save();	
+	}
+
+	/**
 	 * Save the model to the database.
 	 *
 	 * @param  array  $options
