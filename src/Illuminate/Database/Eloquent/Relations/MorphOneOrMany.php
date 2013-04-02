@@ -109,7 +109,10 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 
 		$attributes = array_merge($attributes, $foreign);
 
-		$instance = $this->related->newInstance($attributes);
+		$instance = $this->related->newInstance();
+
+		$instance->fillable(array_merge($instance->getFillable(), array_keys($foreign)));
+		$instance->fill($attributes);
 
 		$instance->save();
 
