@@ -841,6 +841,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			if ($this->timestamps)
 			{
 				$this->updateTimestamps();
+
+				$dirty = $this->getDirty();
 			}
 
 			// Once we have run the update operation, we will fire the "updated" event for
