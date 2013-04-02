@@ -64,6 +64,38 @@ class HtmlBuilder {
 	}
 
 	/**
+	 * Generate a link to a JavaScript file.
+	 *
+	 * @param  string  $url
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function script($url, $attributes = array())
+	{
+		$attributes['src'] = $this->url->asset($url);
+
+		return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
+	}
+
+	/**
+	 * Generate a link to a CSS file.
+	 *
+	 * @param  string  $url
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function style($url, $attributes = array())
+	{
+		$defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
+
+		$attributes = $attributes + $defaults;
+
+		$attributes['href'] = $this->url->asset($url);
+
+		return '<link'.$this->attributes($attributes).'>'.PHP_EOL;
+	}
+
+	/**
 	 * Generate an HTML image element.
 	 *
 	 * @param  string  $url
