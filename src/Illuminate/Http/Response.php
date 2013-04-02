@@ -36,14 +36,14 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	{
 		$this->original = $content;
 
-		// If the content is "JSONable" we will set the appropriate header and convert
-		// the content to JSON. This is useful when returning something like models
-		// from routes that will be automatically transformed to their JSON form.
-		if ($content instanceof JsonableInterface)
+		// If the content is "JSONable" or an array, we will set the appropriate header
+		// and convert the content to JSON. This is useful when returning something like 
+		// models from routes that will be automatically transformed to their JSON form.
+		if ($content instanceof JsonableInterface || is_array($content))
 		{
 			$this->headers->set('Content-Type', 'application/json');
 
-			$content = $content->toJson();
+			$content = is_array($content) ? json_encode($content) : $content->toJson();
 		}
 
 		// If this content implements the "RenderableInterface", then we will call the
