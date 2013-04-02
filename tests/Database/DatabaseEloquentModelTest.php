@@ -141,6 +141,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
 		$model->exists = true;
+		$model->foo = 'bar';
 
 		$this->assertFalse($model->save());
 	}
@@ -148,13 +149,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	public function testUpdateProcessWithoutTimestamps()
 	{
-		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps', 'fireModelEvent'));
 		$model->timestamps = false;
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$query->shouldReceive('where')->once()->with('id', '=', 1);
 		$query->shouldReceive('update')->once()->with(array('id' => 1, 'name' => 'taylor'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->never())->method('updateTimestamps');
+		$model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
 
 		$model->id = 1;
 		$model->name = 'taylor';
