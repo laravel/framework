@@ -13,7 +13,7 @@
 
 if ( ! extension_loaded('mcrypt'))
 {
-	die('Laravel requires the Mcrypt PHP extension.');
+	die("Laravel requires the Mcrypt PHP extension.\n");
 
 	exit(1);
 }
