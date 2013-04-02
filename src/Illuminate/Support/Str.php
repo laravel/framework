@@ -3,6 +3,13 @@
 class Str {
 
 	/**
+	 * The registered string macros.
+	 *
+	 * @var array
+	 */
+	protected static $macros = array();
+
+	/**
 	 * Transliterate a UTF-8 value to ASCII.
 	 *
 	 * @param  string  $value
@@ -276,6 +283,35 @@ class Str {
 		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
 
 		return str_replace(' ', '', $value);
+	}
+
+	/**
+	 * Register a custom string macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public static function macro($name, $macro)
+	{
+		static::$macros[$name] = $macro;
+	}
+
+	/**
+	 * Dynamically handle calls to the string class.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public static function __callStatic($method, $parameters)
+	{
+		if (isset(static::$macros[$method]))
+		{
+			return call_user_func_array(static::$macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

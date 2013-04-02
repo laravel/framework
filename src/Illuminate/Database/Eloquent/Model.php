@@ -745,6 +745,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Update the model in the database.
+	 *
+	 * @param  array  $attributes
+	 * @return mixed
+	 */
+	public function update(array $attributes = array())
+	{
+		if ( ! $this->exists)
+		{
+			return $this->newQuery()->update($attributes);
+		}
+
+		return $this->fill($attributes)->save();	
+	}
+
+	/**
 	 * Save the model to the database.
 	 *
 	 * @param  array  $options
@@ -753,14 +769,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function save(array $options = array())
 	{
 		$query = $this->newQuery();
-
-		// First we need to create a fresh query instance and touch the creation and
-		// update timestamp on the model which are maintained by us for developer
-		// convenience. Then we will just continue saving the model instances.
-		if ($this->timestamps)
-		{
-			$this->updateTimestamps();
-		}
 
 		// If the "saving" event returns false we'll bail out of the save and return
 		// false, indicating that the save failed. This gives an opportunities to
@@ -827,6 +835,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 				return false;
 			}
 
+			// First we need to create a fresh query instance and touch the creation and
+			// update timestamp on the model which are maintained by us for developer
+			// convenience. Then we will just continue saving the model instances.
+			if ($this->timestamps)
+			{
+				$this->updateTimestamps();
+			}
+
 			// Once we have run the update operation, we will fire the "updated" event for
 			// this model instance. This will allow developers to hook into these after
 			// models are updated, giving them a chance to do any special processing.
@@ -848,18 +864,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ($this->fireModelEvent('creating') === false) return false;
 
-		$attributes = $this->attributes;
+		// First we need to create a fresh query instance and touch the creation and
+		// update timestamp on the model which are maintained by us for developer
+		// convenience. Then we will just continue saving the model instances.
+		if ($this->timestamps)
+		{
+			$this->updateTimestamps();
+		}
 
 		// If the model has an incrementing key, we can use the "insertGetId" method on
 		// the query builder, which will give us back the final inserted ID for this
 		// table from the database. Not all tables have to be incrementing though.
+		$attributes = $this->attributes;
+
 		if ($this->incrementing)
 		{
-			$keyName = $this->getKeyName();
-
-			$id = $query->insertGetId($attributes, $keyName);
-
-			$this->setAttribute($keyName, $id);
+			$this->insertAndSetId($query, $attributes);
 		}
 
 		// If the table is not incrementing we'll simply insert this attributes as they
@@ -873,6 +893,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$this->fireModelEvent('created', false);
 
 		return true;
+	}
+
+	/**
+	 * Insert the given attributes and set the ID on the model.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  array  $attributes
+	 * @return void
+	 */
+	protected function insertAndSetId($query, $attributes)
+	{
+		$id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
+
+		$this->setAttribute($keyName, $id);
 	}
 
 	/**
@@ -1230,6 +1264,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function unguard()
 	{
 		static::$unguarded = true;
+	}
+
+	/**
+	 * Enable the mass assignment restrictions.
+	 *
+	 * @return void
+	 */
+	public static function reguard()
+	{
+		static::$unguarded = false;
 	}
 
 	/**
