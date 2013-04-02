@@ -264,16 +264,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function newInstance($attributes = array(), $exists = false)
 	{
-		static::unguard();
-
 		// This method just provides a convenient way for us to generate fresh model
 		// instances of this current model. It is particularly useful during the
 		// hydration of new objects via the Eloquent query builder instances.
 		$model = new static((array) $attributes);
 
 		$model->exists = $exists;
-
-		static::reguard();
 
 		return $model;
 	}

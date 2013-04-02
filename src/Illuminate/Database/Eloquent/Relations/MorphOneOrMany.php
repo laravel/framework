@@ -107,9 +107,9 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 		// the parent model. This makes the polymorphic item unique in the table.
 		$foreign[$this->morphType] = $this->morphClass;
 
-		$attributes = array_merge($attributes, $foreign);
+		$instance = $this->related->newInstance();
 
-		$instance = $this->related->newInstance($attributes);
+		$instance->setRawAttributes(array_merge($attributes, $foreign));
 
 		$instance->save();
 
