@@ -15,7 +15,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 *
 	 * @var array
 	 */
-	protected $items;
+	protected $items = array();
 
 	/**
 	 * Create a new collection.
