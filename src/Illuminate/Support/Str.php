@@ -145,15 +145,15 @@ class Str {
 	}
 
 	/**
-	 * Get the plural form of an English word.
+	 * Get the plural form of a word.
 	 *
 	 * @param  string  $value
 	 * @param  int  $count
 	 * @return string
 	 */
-	public static function plural($value, $count = 2)
+	public static function plural($value, $count = 2, $language = 'en')
 	{
-		return Pluralizer::plural($value, $count);
+		return Pluralizer::plural($value, $count, $language);
 	}
 
 	/**
@@ -206,14 +206,14 @@ class Str {
 	}
 
 	/**
-	 * Get the singular form of an English word.
+	 * Get the singular form of a word.
 	 *
 	 * @param  string  $value
 	 * @return string
 	 */
-	public static function singular($value)
+	public static function singular($value, $language = 'en')
 	{
-		return Pluralizer::singular($value);
+		return Pluralizer::singular($value, $language);
 	}
 
 	/**
