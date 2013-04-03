@@ -239,6 +239,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		foreach ($attributes as $key => $value)
 		{
+			$key = $this->removeTableFromKey($key);
+
 			// The developers may choose to place some attributes in the "fillable"
 			// array, which means only those attributes may be set through mass
 			// assignment to the model, and all others will just be ignored.
@@ -866,9 +868,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ($this->fireModelEvent('creating') === false) return false;
 
-		// First we need to create a fresh query instance and touch the creation and
-		// update timestamp on the model which are maintained by us for developer
-		// convenience. Then we will just continue saving the model instances.
+		// First we'll need to create a fresh query instance and touch the creation and
+		// update timestamps on this model, which are maintained by us for developer
+		// convenience. After, we will just continue saving these model instances.
 		if ($this->timestamps)
 		{
 			$this->updateTimestamps();
@@ -1328,6 +1330,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function totallyGuarded()
 	{
 		return count($this->fillable) == 0 and $this->guarded == array('*');
+	}
+
+	/**
+	 * Remove the table name from a given key.
+	 *
+	 * @param  string  $key
+	 * @return string
+	 */
+	protected function removeTableFromKey($key)
+	{
+		if ( ! str_contains($key, '.')) return $key;
+
+		return last(explode('.', $key));
 	}
 
 	/**
