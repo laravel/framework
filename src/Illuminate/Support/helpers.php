@@ -670,15 +670,15 @@ if ( ! function_exists('str_is'))
 if ( ! function_exists('str_plural'))
 {
 	/**
-	 * Get the plural form of an English word.
+	 * Get the plural form of a word.
 	 *
 	 * @param  string  $value
 	 * @param  int  $count
 	 * @return string
 	 */
-	function str_plural($value, $count = 2)
+	function str_plural($value, $count = 2, $language = 'en')
 	{
-		return Illuminate\Support\Str::plural($value, $count);
+		return Illuminate\Support\Str::plural($value, $count, $language);
 	}
 }
 
@@ -701,14 +701,14 @@ if ( ! function_exists('str_random'))
 if ( ! function_exists('str_singular'))
 {
 	/**
-	 * Get the singular form of an English word.
+	 * Get the singular form of a word.
 	 *
 	 * @param  string  $value
 	 * @return string
 	 */
-	function str_singular($value)
+	function str_singular($value, $language = 'en')
 	{
-		return Illuminate\Support\Str::singular($value);
+		return Illuminate\Support\Str::singular($value, $language);
 	}
 }
 
