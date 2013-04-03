@@ -7,13 +7,6 @@ use Pheanstalk_Pheanstalk as Pheanstalk;
 class BeanstalkdJob extends Job {
 
 	/**
-	 * The IoC container instance.
-	 *
-	 * @var \Illuminate\Container
-	 */
-	protected $container;
-
-	/**
 	 * The Pheanstalk instance.
 	 *
 	 * @var Pheanstalk
@@ -51,14 +44,7 @@ class BeanstalkdJob extends Job {
 	 */
 	public function fire()
 	{
-		$payload = json_decode($this->job->getData(), true);
-
-		// Once we have the message payload, we can create the given class and fire
-		// it off with the given data. The data is in the messages serialized so
-		// we will unserialize it and pass into the jobs in its original form.
-		$this->instance = $this->container->make($payload['job']);
-
-		$this->instance->fire($this, $payload['data']);
+		$this->resolveAndFire(json_decode($this->job->getData(), true));
 	}
 
 	/**

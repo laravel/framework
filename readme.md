@@ -6,6 +6,7 @@
 - Touch owning models on delete.
 - Added `Str::macro` method.
 - Calling `update` on a Model instance will fill and update that model.
+- Allow specification of methods when pushing to Queue (`Queue::push('Class@method')`).
 
 ## Beta 4
 
