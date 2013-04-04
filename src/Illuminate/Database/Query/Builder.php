@@ -245,6 +245,20 @@ class Builder {
 	}
 
 	/**
+	 * Add a right join to the query.
+	 *
+	 * @param  string  $table
+	 * @param  string  $first
+	 * @param  string  $operator
+	 * @param  string  $second
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function rightJoin($table, $first, $operator = null, $second = null)
+	{
+		return $this->join($table, $first, $operator, $second, 'right');
+	}
+
+	/**
 	 * Add a basic where clause to the query.
 	 *
 	 * @param  string  $column

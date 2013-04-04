@@ -306,8 +306,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testBasicJoins()
 	{
 		$builder = $this->getBuilder();
-		$builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->leftJoin('photos', 'users.id', '=', 'photos.id');
-		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id"', $builder->toSql());
+		$builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->leftJoin('photos', 'users.id', '=', 'photos.id')->rightJoin('photos', 'users.id', '=', 'photos.id')->fullJoin('photos', 'users.id', '=', 'photos.id');
+		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id" right join "photos" on "users"."id" = "photos"."id" full join "photos" on "users"."id" = "photos"."id"', $builder->toSql());
 	}
 
 
