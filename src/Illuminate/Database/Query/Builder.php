@@ -900,7 +900,8 @@ class Builder {
 		// otherwise we can just give these values back without a specific key.
 		$results = new Collection($this->get($columns));
 
-		$values = $results->fetch($column)->all();
+		$fetchColumn = explode('.', $column);
+		$values = $results->fetch(end($fetchColumn))->all();
 
 		// If a key was specified and we have results, we will go ahead and combine
 		// the values with the keys of all of the records so that the values can
