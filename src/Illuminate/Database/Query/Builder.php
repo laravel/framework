@@ -259,20 +259,6 @@ class Builder {
 	}
 
 	/**
-	 * Add a full join to the query.
-	 *
-	 * @param  string  $table
-	 * @param  string  $first
-	 * @param  string  $operator
-	 * @param  string  $second
-	 * @return \Illuminate\Database\Query\Builder
-	 */
-	public function fullJoin($table, $first, $operator = null, $second = null)
-	{
-		return $this->join($table, $first, $operator, $second, 'full');
-	}
-
-	/**
 	 * Add a basic where clause to the query.
 	 *
 	 * @param  string  $column
