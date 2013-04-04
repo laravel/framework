@@ -52,7 +52,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$mocks['reminders']->shouldReceive('create')->once()->with($user)->andReturn('token');
 		$callback = function() {};
 		$broker->expects($this->once())->method('sendReminder')->with($this->equalTo($user), $this->equalTo('token'), $this->equalTo($callback));
-		$mocks['redirect']->shouldReceive('refresh')->once();
+		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
+		$redirect->shouldReceive('with')->once()->with('success', true)->andReturn($redirect);
 
 		$broker->remind(array('foo'), $callback);
 	}
