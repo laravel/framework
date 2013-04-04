@@ -403,10 +403,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Array|Min:2'));
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Min:5'));
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Min:2'));
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Array|Min:2'));
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Array|Min:5'));
 		$this->assertFalse($v->passes());
 
 		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
