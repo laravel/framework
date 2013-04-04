@@ -623,7 +623,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'save_stub';
 	protected $guarded = array();
-	public function save() { $_SERVER['__eloquent.saved'] = true; }
+	public function save(array $options = array()) { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{
 		$this->incrementing = $value;
