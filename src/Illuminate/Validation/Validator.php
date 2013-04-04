@@ -386,9 +386,9 @@ class Validator implements MessageProviderInterface {
 	{
 		$count = 0;
 
-		foreach ($attributes as $key)
+		foreach ($attributes as $attribute)
 		{
-			if (isset($this->data[$key]) or isset($this->files[$key]))
+			if ( ! is_null($this->getValue($attribute)))
 			{
 				$count++;
 			}
@@ -421,7 +421,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value == $this->data[$other];
+		return ! is_null($otherValue = $this->getValue($other)) and $value == $otherValue;
 	}
 
 	/**
@@ -436,7 +436,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value != $this->data[$other];
+		return ! is_null($otherValue = $this->getValue($other)) and $value != $otherValue;
 	}
 
 	/**
@@ -465,6 +465,18 @@ class Validator implements MessageProviderInterface {
 	protected function validateNumeric($attribute, $value)
 	{
 		return is_numeric($value);
+	}
+
+	/**
+	 * Validate that an attribute is an array.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateArray($attribute, $value)
+	{
+		return is_array($value);
 	}
 
 	/**
@@ -578,7 +590,11 @@ class Validator implements MessageProviderInterface {
 		// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
-			return $this->data[$attribute];
+			return $value;
+		}
+		elseif (is_array($value))
+		{
+			return count($value);
 		}
 		elseif ($value instanceof File)
 		{
