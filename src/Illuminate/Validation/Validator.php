@@ -88,6 +88,13 @@ class Validator implements MessageProviderInterface {
 	protected $numericRules = array('Numeric', 'Integer');
 
 	/**
+	 * The array related validation rules.
+	 *
+	 * @var array
+	 */
+	protected $arrayRules = array('Array');
+
+	/**
 	 * The implicit validation rules.
 	 *
 	 * @var array
@@ -1072,6 +1079,10 @@ class Validator implements MessageProviderInterface {
 		if ($this->hasRule($attribute, $this->numericRules))
 		{
 			return 'numeric';
+		}
+		elseif ($this->hasRule($attribute, $this->arrayRules))
+		{
+			return 'array';
 		}
 		elseif (array_key_exists($attribute, $this->files))
 		{
