@@ -34,7 +34,7 @@ class ServeCommand extends Command {
 
 		$public = $this->laravel['path.public'];
 
-		$this->info("Laravel development server started on {$host}:{$port}...");
+		$this->info("Laravel development server started on http://{$host}:{$port}...");
 
 		passthru("php -S {$host}:{$port} -t \"{$public}\" server.php");
 	}
