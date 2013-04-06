@@ -91,7 +91,7 @@ class PasswordBroker {
 
 		$this->sendReminder($user, $token, $callback);
 
-		return $this->redirect->refresh();
+		return $this->redirect->refresh()->with('success', true);
 	}
 
 	/**
