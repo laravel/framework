@@ -8,6 +8,7 @@
 - Calling `update` on a Model instance will fill and update that model.
 - Allow specification of methods when pushing to Queue (`Queue::push('Class@method')`).
 - Removed HTML from default formatting in MessageBag.
+- Made Eloquent `deleting` event halting.
 
 ## Beta 4
 
