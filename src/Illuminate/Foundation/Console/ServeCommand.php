@@ -26,12 +26,7 @@ class ServeCommand extends Command {
 	 */
 	public function fire()
 	{
-		// The development server feature was added in PHP 5.4.
-		if (version_compare(PHP_VERSION, '5.4.0', '<'))
-		{
-			$this->error("PHP 5.4 is required to start the development server.");
-			return;
-		}
+		$this->checkPhpVersion();
 		
 		chdir($this->laravel['path.base']);
 
@@ -41,9 +36,22 @@ class ServeCommand extends Command {
 
 		$public = $this->laravel['path.public'];
 
-		$this->info("Laravel development server started on http://{$host}:{$port}...");
+		$this->info("Laravel development server started on http://{$host}:{$port}");
 
 		passthru("php -S {$host}:{$port} -t \"{$public}\" server.php");
+	}
+
+	/**
+	 * Check the current PHP version is >= 5.4.
+	 *
+	 * @return void
+	 */
+	protected function checkPhpVersion()
+	{
+		if (version_compare(PHP_VERSION, '5.4.0', '<'))
+		{
+			throw new \Exception('This PHP binary is not version 5.4 or greater.');
+		}
 	}
 
 	/**
