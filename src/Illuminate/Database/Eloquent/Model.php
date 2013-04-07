@@ -628,7 +628,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ($this->exists)
 		{
-			$this->fireModelEvent('deleting', false);
+			if ($this->fireModelEvent('deleting') === false) return false;
 
 			// Here, we'll touch the owning models, verifying these timestamps get updated
 			// for the models. This will allow any caching to get broken on the parents
