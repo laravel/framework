@@ -26,6 +26,13 @@ class ServeCommand extends Command {
 	 */
 	public function fire()
 	{
+		// The development server feature was added in PHP 5.4.
+		if (version_compare(PHP_VERSION, '5.4.0', '<'))
+		{
+			$this->error("PHP 5.4 is required to start the development server.");
+			return;
+		}
+		
 		chdir($this->laravel['path.base']);
 
 		$host = $this->input->getOption('host');
