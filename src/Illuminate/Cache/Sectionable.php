@@ -10,6 +10,13 @@ abstract class Sectionable implements StoreInterface {
 	public $implicit = true;
 
 	/**
+	 * Section key prefix
+	 *
+	 * @var bool
+	 */
+	public $sectionKeyPrefix = 'section-key';
+
+	/**
 	 * The implicit section key delimiter.
 	 *
 	 * @var string

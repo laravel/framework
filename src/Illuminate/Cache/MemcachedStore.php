@@ -201,7 +201,7 @@ class MemcachedStore extends Sectionable {
 	 */
 	protected function sectionKey($section)
 	{
-		return $section.'_section_key';
+		return $this->sectionKeyPrefix . '-' . $section;
 	}
 	
 	/**

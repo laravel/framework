@@ -86,7 +86,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 	public function testForgetSectionMethodProperlyCallsMemcache()
 	{
 		$memcache = $this->getMock('Memcached', array('increment'));
-		$memcache->expects($this->once())->method('increment')->with($this->equalTo('prefix:foo_section_key'));
+		$memcache->expects($this->once())->method('increment')->with($this->equalTo('prefix:section-key-foo'));
 		$store = new Illuminate\Cache\MemcachedStore($memcache, 'prefix');
 		$store->forgetSection('foo');
 	}
