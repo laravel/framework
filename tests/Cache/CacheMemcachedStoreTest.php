@@ -96,8 +96,10 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 	
 	public function testSearReturnProperlyCallback()
 	{
-		$memcache = $this->getMock('Memcached', array('set'));
+		$memcache = $this->getMock('Memcached', array('set', 'get', 'getResultCode'));
 		$memcache->expects($this->once())->method('set')->with($this->equalTo('prefix:bar'));
+		$memcache->expects($this->once())->method('get')->with($this->equalTo('prefix:bar'));
+		$memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));	
 		$store = new Illuminate\Cache\MemcachedStore($memcache, 'prefix');
 		$store->sear('bar', function(){ return 'foo';});
 	}
