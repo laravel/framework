@@ -5,6 +5,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
+use Symfony\Component\HttpFoundation\Response;
 
 class Guard {
 
@@ -35,6 +36,13 @@ class Guard {
 	 * @var \Illuminate\Cookie\CookieJar
 	 */
 	protected $cookie;
+
+	/**
+	 * The request instance.
+	 *
+	 * @var \Symfony\Component\HttpFoundation\Request
+	 */
+	protected $request;
 
 	/**
 	 * The cookies queued by the guards.
@@ -176,6 +184,53 @@ class Guard {
 	}
 
 	/**
+	 * Attempt to the authenticate using HTTP Basic Auth.
+	 *
+	 * @param  string  $field
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @return bool
+	 */
+	public function basic($field = 'email', Request $request = null)
+	{
+		if ($this->check()) return;
+
+		$request = $request ?: $this->getRequest();
+
+		if ($request->getUser())
+		{
+			if ($this->attemptBasic($request, $field)) return;
+		}
+
+		return $this->getBasicResponse();
+	}
+
+	/**
+	 * Attempt to authenticate using basic authentication.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  string  $field
+	 * @return bool
+	 */
+	protected function attemptBasic(Request $request, $field)
+	{
+		$pass = $request->getPassword();
+
+		return $this->attempt(array($field => $request->getUser(), 'password' => $pass));
+	}
+
+	/**
+	 * Get the response for basic authentication.
+	 *
+	 * @return Symfony\Component\HttpFoundation\Response
+	 */
+	protected function getBasicResponse()
+	{
+		$headers = array('WWW-Authenticate' => 'Basic');
+
+		return new Response('Invalid credentials.', 401, $headers);
+	}
+
+	/**
 	 * Attempt to authenticate a user using the given credentials.
 	 *
 	 * @param  array  $credentials
@@ -294,6 +349,16 @@ class Guard {
 	}
 
 	/**
+	 * Get the cookies queued by the guard.
+	 *
+	 * @return array
+	 */
+	public function getQueuedCookies()
+	{
+		return $this->queuedCookies;
+	}
+
+	/**
 	 * Get the cookie creator instance used by the guard.
 	 *
 	 * @return \Illuminate\Cookie\CookieJar
@@ -350,16 +415,6 @@ class Guard {
 	}
 
 	/**
-	 * Get the cookies queued by the guard.
-	 *
-	 * @return array
-	 */
-	public function getQueuedCookies()
-	{
-		return $this->queuedCookies;
-	}
-
-	/**
 	 * Get the user provider used by the guard.
 	 *
 	 * @return \Illuminate\Auth\UserProviderInterface
@@ -390,6 +445,29 @@ class Guard {
 		$this->user = $user;
 
 		$this->loggedOut = false;
+	}
+
+	/**
+	 * Get the current request instance.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request ?: Request::createFromGlobals();
+	}
+
+	/**
+	 * Set the current request instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request
+	 * @return \Illuminate\Auth\Guard
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
+
+		return $this;
 	}
 
 	/**

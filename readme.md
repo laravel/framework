@@ -9,6 +9,7 @@
 - Allow specification of methods when pushing to Queue (`Queue::push('Class@method')`).
 - Removed HTML from default formatting in MessageBag.
 - Made Eloquent `deleting` event halting.
+- Added `Auth::basic` for quickly implementing HTTP Basic authentication.
 
 ## Beta 4
 
