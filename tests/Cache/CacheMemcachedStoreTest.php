@@ -77,8 +77,9 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 	
 	public function testForgetNamespacedKeyMethodProperlyCallsMemcache()
 	{
-		$memcache = $this->getMock('Memcached', array('delete'));
+		$memcache = $this->getMock('Memcached', array('delete', 'get'));
 		$memcache->expects($this->once())->method('delete')->with($this->equalTo('prefix:namespace#1#foo'));
+		$memcache->expects($this->once())->method('get')->with($this->equalTo('prefix:section-key-namespace'));
 		$store = new Illuminate\Cache\MemcachedStore($memcache, 'prefix');
 		$store->forget('namespace::foo');
 	}
