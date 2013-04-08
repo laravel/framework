@@ -97,6 +97,18 @@ class Str {
 	}
 
 	/**
+	 * Get a string which is the concatentation of all strings in the array.
+	 *
+	 * @param  string  $seperator
+	 * @param  string  $value
+	 * @return array
+	 */
+	public static function join($seperator, $value)
+	{
+		return implode($seperator, $value);
+	}
+
+	/**
 	 * Limit the number of characters in a string.
 	 *
 	 * @param  string  $value
@@ -253,6 +265,18 @@ class Str {
 		$replace = '$1'.$delimiter.'$2';
 
 		return ctype_lower($value) ? $value : strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
+	}
+
+	/**
+	 * Split a string into an array.
+	 *
+	 * @param  string  $seperator
+	 * @param  string  value
+	 * @return string
+	 */
+	public static function split($seperator, $value)
+	{
+		return explode($seperator, $value);
 	}
 
 	/**
