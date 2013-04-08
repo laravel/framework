@@ -19,6 +19,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Events/EventServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Str.php',
+    $basePath.'/vendor/symfony/debug/Symfony/Component/Debug/ErrorHandler.php',
     $basePath.'/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Debug/ErrorHandler.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Config/Repository.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/NamespacedItemResolver.php',
