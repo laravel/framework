@@ -12,9 +12,43 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
 		*/
 		public function testStringCanBeLimitedByWords()
 		{
-			$this->assertEquals('Taylor...', Str::words('Taylor Otwell', 1));
-			$this->assertEquals('Taylor___', Str::words('Taylor Otwell', 1, '___'));
-			$this->assertEquals('Taylor Otwell', Str::words('Taylor Otwell', 3));
+			$this->assertEquals('Hello...', Str::words('Hello World', 1));
+			$this->assertEquals('Hello___', Str::words('Hello World', 1, '___'));
+			$this->assertEquals('Hello World', Str::words('Hello World', 3));
+		}
+
+
+		public function testStringContainsSubstring()
+		{
+			$this->assertTrue(Str::contains('Hello World', 'Hello'));
+		}
+
+
+		public function testStringEndsWith()
+		{
+			$this->assertTrue(Str::endsWith('Hello World', 'World'));
+		}
+
+
+		public function testStringJoin()
+		{
+			$join = Str::join(' ', array('Hello World'));
+
+			$this->assertEquals('Hello World', $join);
+		}
+
+
+		public function testStringSplit()
+		{
+			$s = Str::split(' ', 'Hello World');
+
+			$this->assertEquals(array('Hello', 'World'), $s);
+		}
+
+
+		public function testStringStartsWith()
+		{
+			$this->assertTrue(Str::startsWith('Hello World', 'Hello'));
 		}
 
 
