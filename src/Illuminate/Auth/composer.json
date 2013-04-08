@@ -14,7 +14,7 @@
         "illuminate/http": "4.0.x",
         "illuminate/session": "4.0.x",
         "illuminate/support": "4.0.x",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/http-foundation": "2.3.*"
     },
     "require-dev": {
         "illuminate/console": "4.0.x",

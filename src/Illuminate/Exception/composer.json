@@ -10,7 +10,7 @@
     "require": {
         "php": ">=5.3.0",
         "illuminate/support": "4.0.x",
-        "symfony/http-kernel": "2.2.*"
+        "symfony/http-kernel": "2.3.*"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",

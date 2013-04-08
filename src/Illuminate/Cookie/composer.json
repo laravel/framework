@@ -11,7 +11,7 @@
         "php": ">=5.3.0",
         "illuminate/encryption": "4.0.x",
         "illuminate/support": "4.0.x",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/http-foundation": "2.3.*"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",

@@ -12,8 +12,8 @@
         "illuminate/http": "4.0.x",
         "illuminate/support": "4.0.x",
         "illuminate/view": "4.0.x",
-        "symfony/http-foundation": "2.2.*",
-        "symfony/translation": "2.2.*"
+        "symfony/http-foundation": "2.3.*",
+        "symfony/translation": "2.3.*"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",
