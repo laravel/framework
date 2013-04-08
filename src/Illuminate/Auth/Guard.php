@@ -184,7 +184,7 @@ class Guard {
 	}
 
 	/**
-	 * Attempt to the authenticate using HTTP Basic Auth.
+	 * Attempt to authenticate using HTTP Basic Auth.
 	 *
 	 * @param  string  $field
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
