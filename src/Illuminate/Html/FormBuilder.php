@@ -550,7 +550,7 @@ class FormBuilder {
 			$options['type'] = 'button';
 		}
 		
-		return '<button'.$this->html->attributes($options).'>'.e($value).'</button>';
+		return '<button'.$this->html->attributes($options).'>'.$value.'</button>';
 	}
 
 	/**
