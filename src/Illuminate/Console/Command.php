@@ -113,7 +113,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 *
 	 * @param  string  $command
 	 * @param  array   $arguments
-	 * @return mixed
+	 * @return integer
 	 */
 	public function call($command, array $arguments = array())
 	{
@@ -129,7 +129,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 *
 	 * @param  string  $command
 	 * @param  array   $arguments
-	 * @return mixed
+	 * @return integer
 	 */
 	public function callSilent($command, array $arguments = array())
 	{
