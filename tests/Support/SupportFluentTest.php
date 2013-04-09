@@ -1,7 +1,6 @@
 <?php 
 
-use ReflectionObject,
-	Illuminate\Support\Fluent;
+use Illuminate\Support\Fluent;
 
 class SupportFluentTest extends PHPUnit_Framework_TestCase {
 
@@ -15,7 +14,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$array  = array('name' => 'Taylor', 'age' => 25);
 		$fluent = new Fluent($array);
 
-		$refl = new ReflectionObject($fluent);
+		$refl = new \ReflectionObject($fluent);
 		$attributes = $refl->getProperty('attributes');
 		$attributes->setAccessible(true);
 
