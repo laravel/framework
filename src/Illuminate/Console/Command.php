@@ -85,7 +85,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 *
 	 * @param  Symfony\Component\Console\Input\InputInterface  $input
 	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
-	 * @return mixed
+	 * @return integer
 	 */
 	public function run(InputInterface $input, OutputInterface $output)
 	{
