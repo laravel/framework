@@ -15,6 +15,7 @@
         "ircmaxell/password-compat": "1.0.*",
         "monolog/monolog": "1.4.*",
         "patchwork/utf8": "1.0.*",
+        "predis/predis": "0.*",
         "swiftmailer/swiftmailer": "4.3.*",
         "symfony/browser-kit": "2.3.*",
         "symfony/console": "2.3.*",
