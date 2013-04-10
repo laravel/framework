@@ -65,5 +65,42 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 		$store = new Illuminate\Cache\MemcachedStore($memcache);
 		$store->forget('foo');
 	}
-
+	
+	public function testMemcacheNamespacedKeyValueIsReturned()
+	{	
+		$memcache = $this->getMock('Memcached', array('get', 'getResultCode'));		
+		$memcache->expects($this->exactly(2))->method('get')->will($this->returnValue('bar'));
+		$memcache->expects($this->exactly(2))->method('getResultCode')->will($this->returnValue(0));		
+		$store = new Illuminate\Cache\MemcachedStore($memcache);
+		$this->assertEquals('bar', $store->get('namespace::foo'));
+	}
+	
+	public function testForgetNamespacedKeyMethodProperlyCallsMemcache()
+	{
+		$memcache = $this->getMock('Memcached', array('delete', 'get', 'getResultCode', 'increment', 'set'));
+		$memcache->expects($this->once())->method('delete')->with($this->equalTo('prefix:namespace#1#foo'));
+		$memcache->expects($this->once())->method('get')->with($this->equalTo('prefix:section-key-namespace'));
+		$memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));	
+		$memcache->expects($this->once())->method('set')->with($this->equalTo('prefix:section-key-namespace'));
+		$store = new Illuminate\Cache\MemcachedStore($memcache, 'prefix');
+		$store->forget('namespace::foo');
+	}
+	
+	public function testForgetSectionMethodProperlyCallsMemcache()
+	{
+		$memcache = $this->getMock('Memcached', array('increment'));
+		$memcache->expects($this->once())->method('increment')->with($this->equalTo('prefix:section-key-foo'));
+		$store = new Illuminate\Cache\MemcachedStore($memcache, 'prefix');
+		$store->forgetSection('foo');
+	}
+	
+	public function testSearReturnProperlyCallback()
+	{
+		$memcache = $this->getMock('Memcached', array('get', 'set', 'getResultCode'));
+		$memcache->expects($this->once())->method('get')->with($this->equalTo('prefix:bar'));
+		$memcache->expects($this->once())->method('set')->with($this->equalTo('prefix:bar'));
+		$memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));	
+		$store = new Illuminate\Cache\MemcachedStore($memcache, 'prefix');
+		$store->sear('bar', function(){ return 'foo';});
+	}
 }

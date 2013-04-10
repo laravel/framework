@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache; use Memcached;
 
-class MemcachedStore implements StoreInterface {
+class MemcachedStore extends Sectionable {
 
 	/**
 	 * The Memcached instance.
@@ -37,12 +37,21 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		$value = $this->memcached->get($this->prefix.$key);
-
-		if ($this->memcached->getResultCode() == 0)
+		if ($this->sectionable($key))
 		{
-			return $value;
+			list($section, $key) = $this->parse($key);
+		
+			return $this->getFromSection($section, $key);
 		}
+		else 
+		{
+			$value = $this->memcached->get($this->prefix.$key);
+	
+			if ($this->memcached->getResultCode() == 0)
+			{
+				return $value;
+			}
+		}		
 	}
 
 	/**
@@ -55,7 +64,16 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$this->memcached->set($this->prefix.$key, $value, $minutes * 60);
+		if ($this->sectionable($key))
+		{
+			list($section, $key) = $this->parse($key);
+		
+			return $this->putInSection($section, $key, $value, $minutes);
+		}
+		else
+		{
+			$this->memcached->set($this->prefix.$key, $value, $minutes * 60);
+		}		
 	}
 
 	/**
@@ -91,7 +109,16 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function forever($key, $value)
 	{
-		return $this->put($key, $value, 0);
+		if ($this->sectionable($key))
+		{
+			list($section, $key) = $this->parse($key);
+		
+			return $this->foreverInSection($section, $key, $value);
+		}
+		else
+		{
+			return $this->put($key, $value, 0);
+		}
 	}
 
 	/**
@@ -102,7 +129,93 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->memcached->delete($this->prefix.$key);
+		if ($this->sectionable($key))
+		{
+			list($section, $key) = $this->parse($key);
+		
+			if ($key == '*')
+			{
+				$this->forgetSection($section);
+			}
+			else
+			{
+				$this->forgetInSection($section, $key);
+			}
+		}
+		else
+		{
+			$this->memcached->delete($this->prefix.$key);
+		}		
+	}
+	
+	/**
+	 * Delete an entire section from the cache.
+	 *
+	 * @param  string    $section
+	 * @return int|bool
+	 */
+	public function forgetSection($section)
+	{
+		return $this->increment($this->sectionKey($section));
+	}
+	
+	/**
+	 * Get an item from the cache, or store the default value forever.
+	 *
+	 * @param  string   $key
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function sear($key, \Closure $callback)
+	{
+		
+			
+		// If the item exists in the cache we will just return this immediately
+		// otherwise we will execute the given Closure and cache the result
+		// of that execution for the given number of minutes. It's easy.
+		if (! is_null($value = $this->get($key)))  return $value;
+	
+		$this->forever($key, $value = $callback());
+	
+		return $value;
+	}
+	
+	/**
+	 * Get the current section ID for a given section.
+	 *
+	 * @param  string  $section
+	 * @return int
+	 */
+	protected function sectionId($section)
+	{		
+		return $this->sear($this->sectionKey($section), function()
+		{
+			//Set the section id to 1 if we don't have any section id set in the cache section key
+			return 1;
+		});
+	}
+	
+	/**
+	 * Get a section key name for a given section.
+	 *
+	 * @param  string  $section
+	 * @return string
+	 */
+	protected function sectionKey($section)
+	{
+		return $this->sectionKeyPrefix . '-' . $section;
+	}
+	
+	/**
+	 * Get a section item key for a given section and key.
+	 *
+	 * @param  string  $section
+	 * @param  string  $key
+	 * @return string
+	 */
+	protected function sectionItemKey($section, $key)
+	{
+		return $section.'#'.$this->sectionId($section).'#'.$key;
 	}
 
 	/**
