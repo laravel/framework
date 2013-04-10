@@ -400,10 +400,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyUnsigned(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->unsigned)
-		{
-			return ' unsigned';
-		}
+		if ($column->unsigned) return ' unsigned';
 	}
 
 	/**
