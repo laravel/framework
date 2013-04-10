@@ -96,6 +96,18 @@ class Repository implements ArrayAccess {
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */
+	public function sear($key, Closure $callback)
+	{
+		return $this->rememberForever($key, $callback);
+	}
+
+	/**
+	 * Get an item from the cache, or store the default value forever.
+	 *
+	 * @param  string   $key
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
 	public function rememberForever($key, Closure $callback)
 	{
 		// If the item exists in the cache we will just return this immediately
