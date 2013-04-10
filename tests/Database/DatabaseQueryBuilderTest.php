@@ -217,6 +217,21 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWheresWithHavings()
+	{
+		$builder = $this->getBuilder();
+		$builder->from('users')->where('registered', 1)->groupBy('city')->having('population', '>', 3);
+		$this->assertEquals('select * from "users" where "registered" = ? group by "city" having "population" > ?', $builder->toSql());
+		$this->assertEquals(array(0 => 1, 1 => 3), $builder->getBindings());
+
+		// This makes sure that the order of calling where() and having() does not matter.
+		$builder = $this->getBuilder();
+		$builder->from('users')->groupBy('city')->having('population', '>', 3)->where('registered', 1);
+		$this->assertEquals('select * from "users" where "registered" = ? group by "city" having "population" > ?', $builder->toSql());
+		$this->assertEquals(array(0 => 1, 1 => 3), $builder->getBindings());
+	}
+
+
 	public function testLimitsAndOffsets()
 	{
 		$builder = $this->getBuilder();
