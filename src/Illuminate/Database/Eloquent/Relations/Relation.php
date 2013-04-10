@@ -107,7 +107,7 @@ abstract class Relation {
 	{
 		$first = array_shift($this->getBaseQuery()->wheres);
 
-		$bindings = $this->getBaseQuery()->getBindings();
+		$bindings = $this->getBaseQuery()->getWhereBindings();
 
 		// When resetting the relation where clause, we want to shift the first element
 		// off of the bindings, leaving only the constraints that the developers put
@@ -117,7 +117,7 @@ abstract class Relation {
 			$bindings = array_slice($bindings, 1);
 		}
 
-		$this->getBaseQuery()->setBindings(array_values($bindings));
+		$this->getBaseQuery()->setWhereBindings(array_values($bindings));
 	}
 
 	/**
