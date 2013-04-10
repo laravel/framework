@@ -10,14 +10,14 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * The view environment instance.
 	 *
-	 * @var Illuminate\View\Environment
+	 * @var \Illuminate\View\Environment
 	 */
 	protected $environment;
 
 	/**
 	 * The engine implementation.
 	 *
-	 * @var Illuminate\View\Engines\EngineInterface
+	 * @var \Illuminate\View\Engines\EngineInterface
 	 */
 	protected $engine;
 
@@ -45,8 +45,8 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Create a new view instance.
 	 *
-	 * @param  Illuminate\View\Environment  $environment
-	 * @param  Illuminate\View\Engines\EngineInterface  $engine
+	 * @param  \Illuminate\View\Environment  $environment
+	 * @param  \Illuminate\View\Engines\EngineInterface  $engine
 	 * @param  string  $view
 	 * @param  string  $path
 	 * @param  array   $data
@@ -125,7 +125,7 @@ class View implements ArrayAccess, Renderable {
 	 *
 	 * @param  string|array  $key
 	 * @param  mixed   $value
-	 * @return Illuminate\View\View
+	 * @return \Illuminate\View\View
 	 */
 	public function with($key, $value = null)
 	{
@@ -147,7 +147,7 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $key
 	 * @param  string  $view
 	 * @param  array   $data
-	 * @return Illuminate\View\View
+	 * @return \Illuminate\View\View
 	 */
 	public function nest($key, $view, array $data = array())
 	{
@@ -157,7 +157,7 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Get the view environment instance.
 	 *
-	 * @return Illuminate\View\Environment
+	 * @return \Illuminate\View\Environment
 	 */
 	public function getEnvironment()
 	{
@@ -167,7 +167,7 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Get the view's rendering engine.
 	 *
-	 * @return Illuminate\View\Engines\EngineInterface
+	 * @return \Illuminate\View\Engines\EngineInterface
 	 */
 	public function getEngine()
 	{

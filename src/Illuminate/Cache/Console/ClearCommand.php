@@ -23,22 +23,22 @@ class ClearCommand extends Command {
 	/**
 	 * The cache manager instance.
 	 *
-	 * @var Illuminate\Cache\CacheManager
+	 * @var \Illuminate\Cache\CacheManager
 	 */
 	protected $cache;
 
 	/**
 	 * The file system instance.
 	 *
-	 * @var Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
 	/**
 	 * Create a new cache clear command instance.
 	 *
-	 * @param  Illuminate\Cache\CacheManager  $cache
-	 * @param  Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Cache\CacheManager  $cache
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(CacheManager $cache, Filesystem $files)

@@ -11,11 +11,12 @@
         "illuminate/console": "4.0.x",
         "illuminate/container": "4.0.x",
         "illuminate/support": "4.0.x",
-        "symfony/process": "2.2.*"
+        "symfony/process": "2.3.*"
     },
     "require-dev": {
         "aws/aws-sdk-php": "2.1.*",
-        "mockery/mockery": "0.7.2"
+        "mockery/mockery": "0.7.2",
+        "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
         "psr-0": {

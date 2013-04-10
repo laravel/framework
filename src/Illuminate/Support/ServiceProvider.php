@@ -7,7 +7,7 @@ abstract class ServiceProvider {
 	/**
 	 * The application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 
@@ -21,7 +21,7 @@ abstract class ServiceProvider {
 	/**
 	 * Create a new service provider instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct($app)

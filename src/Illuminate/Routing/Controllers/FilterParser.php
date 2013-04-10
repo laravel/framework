@@ -7,7 +7,7 @@ class FilterParser {
 	/**
 	 * Parse the given filters from the controller.
 	 *
-	 * @param  Illuminate\Routing\Controllers\Controller  $controller
+	 * @param  \Illuminate\Routing\Controllers\Controller  $controller
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @param  string  $filter
@@ -21,7 +21,7 @@ class FilterParser {
 	/**
 	 * Get the filters that were specified in code.
 	 *
-	 * @param  Illuminate\Routing\Controllers\Controller  $controller
+	 * @param  \Illuminate\Routing\Controllers\Controller  $controller
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @param  string  $filter

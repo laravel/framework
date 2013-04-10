@@ -16,8 +16,8 @@ abstract class HasOneOrMany extends Relation {
 	/**
 	 * Create a new has many relationship instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder  $query
-	 * @param  Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $foreignKey
 	 * @return void
 	 */
@@ -55,7 +55,7 @@ abstract class HasOneOrMany extends Relation {
 	 * Match the eagerly loaded results to their single parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -68,7 +68,7 @@ abstract class HasOneOrMany extends Relation {
 	 * Match the eagerly loaded results to their many parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -81,7 +81,7 @@ abstract class HasOneOrMany extends Relation {
 	 * Match the eagerly loaded results to their many parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @param  string  $type
 	 * @return array
@@ -125,19 +125,21 @@ abstract class HasOneOrMany extends Relation {
 	/**
 	 * Build model dictionary keyed by the relation's foreign key.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @return array
 	 */
 	protected function buildDictionary(Collection $results)
 	{
 		$dictionary = array();
 
+		$foreign = $this->getPlainForeignKey();
+
 		// First we will create a dictionary of models keyed by the foreign key of the
 		// relationship as this will allow us to quickly access all of the related
 		// models without having to do nested looping which will be quite slow.
 		foreach ($results as $result)
 		{
-			$dictionary[$result->{$this->foreignKey}][] = $result;
+			$dictionary[$result->{$foreign}][] = $result;
 		}
 
 		return $dictionary;
@@ -146,12 +148,12 @@ abstract class HasOneOrMany extends Relation {
 	/**
 	 * Attach a model instance to the parent model.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $model
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function save(Model $model)
 	{
-		$model->setAttribute($this->foreignKey, $this->parent->getKey());
+		$model->setAttribute($this->getPlainForeignKey(), $this->parent->getKey());
 
 		$model->save();
 
@@ -175,11 +177,13 @@ abstract class HasOneOrMany extends Relation {
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function create(array $attributes)
 	{
-		$foreign = array($this->foreignKey => $this->parent->getKey());
+		$foreign = array(
+			$this->getPlainForeignKey() => $this->parent->getKey()
+		);
 
 		// Here we will set the raw attributes to avoid hitting the "fill" method so
 		// that we do not have to worry about a mass accessor rules blocking sets
@@ -235,6 +239,18 @@ abstract class HasOneOrMany extends Relation {
 	public function getForeignKey()
 	{
 		return $this->foreignKey;
+	}
+
+	/**
+	 * Get the plain foreign key.
+	 *
+	 * @return string
+	 */
+	public function getPlainForeignKey()
+	{
+		$segments = explode('.', $this->getForeignKey());
+
+		return $segments[count($segments) - 1];
 	}
 
 }

@@ -5,7 +5,7 @@ class ApcStore implements StoreInterface {
 	/**
 	 * The APC wrapper instance.
 	 *
-	 * @var Illuminate\Cache\ApcWrapper
+	 * @var \Illuminate\Cache\ApcWrapper
 	 */
 	protected $apc;
 
@@ -19,7 +19,7 @@ class ApcStore implements StoreInterface {
 	/**
 	 * Create a new APC store.
 	 *
-	 * @param  Illuminate\Cache\ApcWrapper  $apc
+	 * @param  \Illuminate\Cache\ApcWrapper  $apc
 	 * @param  string                       $prefix
 	 * @return void
 	 */
@@ -113,6 +113,17 @@ class ApcStore implements StoreInterface {
 	public function flush()
 	{
 		$this->apc->flush();
+	}
+
+	/**
+	 * Begin executing a new section operation.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Cache\Section
+	 */
+	public function section($name)
+	{
+		return new Section($this, $name);
 	}
 
 }

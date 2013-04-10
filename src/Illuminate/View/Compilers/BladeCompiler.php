@@ -329,11 +329,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('lang');
 
-		$value = preg_replace($pattern, '$1<?php echo Lang::get$2; ?>', $value);
+		$value = preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::get$2; ?>', $value);
 
 		$pattern = $this->createMatcher('choice');
 
-		return preg_replace($pattern, '$1<?php echo Lang::choice$2; ?>', $value);
+		return preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::choice$2; ?>', $value);
 	}
 
 	/**

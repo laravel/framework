@@ -18,14 +18,14 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * The Presence Verifier implementation.
 	 *
-	 * @var Illuminate\Validation\PresenceVerifierInterface
+	 * @var \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	protected $presenceVerifier;
 
 	/**
 	 * The message bag instance.
 	 *
-	 * @var Illuminate\Support\MessageBag
+	 * @var \Illuminate\Support\MessageBag
 	 */
 	protected $messages;
 
@@ -90,7 +90,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @var array
 	 */
-	protected $implicitRules = array('Required', 'RequiredWith', 'Accepted');
+	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'Accepted');
 
 	/**
 	 * Create a new Validator instance.
@@ -336,6 +336,24 @@ class Validator implements MessageProviderInterface {
 		}
 
 		return $this->validateRequired($attribute, $value);
+	}
+
+	/**
+	 * Validate that an attribute exists when another attribute does not exists
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredWithout($attribute, $value, $parameters)
+	{
+		if ($this->anyFailingRequired($parameters))
+		{
+			return $this->validateRequired($attribute, $value);
+		}
+
+		return true;
 	}
 
 	/**
@@ -1199,6 +1217,20 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Replace all place-holders for the required_without rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
+	{
+		return str_replace(':values', implode(' / ', $parameters), $message);
+	}
+
+	/**
 	 * Replace all place-holders for the same rule.
 	 *
 	 * @param  string  $message
@@ -1425,7 +1457,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the custom attributes on the validator.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Validation\Validator
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setAttributeNames(array $attributes)
 	{
@@ -1448,7 +1480,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the files under validation.
 	 *
 	 * @param  array  $files
-	 * @return Illuminate\Validation\Validator
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setFiles(array $files)
 	{
@@ -1460,7 +1492,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the Presence Verifier implementation.
 	 *
-	 * @return Illuminate\Validation\PresenceVerifierInterface
+	 * @return \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	public function getPresenceVerifier()
 	{
@@ -1475,7 +1507,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the Presence Verifier implementation.
 	 *
-	 * @param  Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+	 * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
 	 * @return void
 	 */
 	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
@@ -1507,7 +1539,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the message container for the validator.
 	 *
-	 * @return Illuminate\Support\MessageBag
+	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function messages()
 	{
@@ -1517,7 +1549,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * An alternative more semantic shortcut to the message container.
 	 *
-	 * @return Illuminate\Support\MessageBag
+	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function errors()
 	{
@@ -1527,7 +1559,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the messages for the instance.
 	 *
-	 * @return Illuminate\Support\MessageBag
+	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function getMessageBag()
 	{

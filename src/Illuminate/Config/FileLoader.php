@@ -7,7 +7,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem
 	 */
 	protected $files;
 
@@ -35,7 +35,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Create a new file configuration loader.
 	 *
-	 * @param  Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem  $files
 	 * @param  string  $defaultPath
 	 * @return void
 	 */
@@ -218,7 +218,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Get the Filesystem instance.
 	 *
-	 * @return Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem
 	 */
 	public function getFilesystem()
 	{

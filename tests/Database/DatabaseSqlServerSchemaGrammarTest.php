@@ -28,7 +28,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add "id" int identity primary key not null, add "email" nvarchar(255) not null', $statements[0]);
+		$this->assertEquals('alter table "users" add "id" int identity primary key not null, "email" nvarchar(255) not null', $statements[0]);
 	}
 
 
@@ -50,14 +50,14 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" drop "foo"', $statements[0]);
+		$this->assertEquals('alter table "users" drop column "foo"', $statements[0]);
 
 		$blueprint = new Blueprint('users');
 		$blueprint->dropColumn(array('foo', 'bar'));
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" drop "foo", drop "bar"', $statements[0]);
+		$this->assertEquals('alter table "users" drop column "foo", "bar"', $statements[0]);
 	}
 
 
@@ -68,7 +68,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" drop "foo", drop "bar"', $statements[0]);
+		$this->assertEquals('alter table "users" drop column "foo", "bar"', $statements[0]);
 	}
 
 
@@ -123,7 +123,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" drop "created_at", drop "updated_at"', $statements[0]);
+		$this->assertEquals('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
 	}
 
 
@@ -342,7 +342,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add "created_at" datetime not null, add "updated_at" datetime not null', $statements[0]);
+		$this->assertEquals('alter table "users" add "created_at" datetime not null, "updated_at" datetime not null', $statements[0]);
 	}
 
 

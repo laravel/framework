@@ -75,6 +75,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDestroyMethodCallsQueryBuilderCorrectly()
+	{
+		$result = EloquentModelDestroyStub::destroy(1, 2, 3);
+	}
+
+
 	public function testWithMethodCallsQueryBuilderCorrectly()
 	{
 		$result = EloquentModelWithStub::with('foo', 'bar');
@@ -135,6 +141,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
 		$model->exists = true;
+		$model->foo = 'bar';
 
 		$this->assertFalse($model->save());
 	}
@@ -142,13 +149,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	public function testUpdateProcessWithoutTimestamps()
 	{
-		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps', 'fireModelEvent'));
 		$model->timestamps = false;
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$query->shouldReceive('where')->once()->with('id', '=', 1);
 		$query->shouldReceive('update')->once()->with(array('id' => 1, 'name' => 'taylor'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->never())->method('updateTimestamps');
+		$model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
 
 		$model->id = 1;
 		$model->name = 'taylor';
@@ -264,11 +272,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	public function testDeleteProperlyDeletesModel()
 	{
-		$model = $this->getMock('Illuminate\Database\Eloquent\Model', array('newQuery', 'updateTimestamps'));
+		$model = $this->getMock('Illuminate\Database\Eloquent\Model', array('newQuery', 'updateTimestamps', 'touchOwners'));
 		$query = m::mock('stdClass');
 		$query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
 		$query->shouldReceive('delete')->once();
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('touchOwners');
 		$model->exists = true;
 		$model->id = 1;
 		$model->delete();
@@ -392,6 +401,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->fill(array('name' => 'foo', 'age' => 'bar'));
 		$this->assertEquals('foo', $model->name);
 		$this->assertEquals('bar', $model->age);
+	}
+
+
+	public function testUnguardAllowsAnythingToBeSet()
+	{
+		$model = new EloquentModelStub;
+		EloquentModelStub::unguard();
+		$model->guard(array('*'));
+		$model->fill(array('name' => 'foo', 'age' => 'bar'));
+		$this->assertEquals('foo', $model->name);
+		$this->assertEquals('bar', $model->age);
+		EloquentModelStub::setUnguardState(false);
 	}
 
 
@@ -602,7 +623,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'save_stub';
 	protected $guarded = array();
-	public function save() { $_SERVER['__eloquent.saved'] = true; }
+	public function save(array $options = array()) { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{
 		$this->incrementing = $value;
@@ -614,6 +635,17 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
+		return $mock;
+	}
+}
+
+class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
+	public function newQuery()
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($mock);
+		$mock->shouldReceive('get')->once()->andReturn(array($model = m::mock('StdClass')));
+		$model->shouldReceive('delete')->once();
 		return $mock;
 	}
 }

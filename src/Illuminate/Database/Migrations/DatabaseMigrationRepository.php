@@ -9,7 +9,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * The database connection resolver instance.
 	 *
-	 * @var Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected $resolver;
 
@@ -30,7 +30,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Create a new database migration repository instance.
 	 *
-	 * @param  Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
 	 * @return void
 	 */
 	public function __construct(Resolver $resolver, $table)
@@ -143,7 +143,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Get a query builder for the migration table.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function table()
 	{
@@ -153,7 +153,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Get the connection resolver instance.
 	 *
-	 * @return Illuminate\Database\ConnectionResolverInterface
+	 * @return \Illuminate\Database\ConnectionResolverInterface
 	 */
 	public function getConnectionResolver()
 	{
@@ -163,7 +163,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Resolve the database connection instance.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function getConnection()
 	{

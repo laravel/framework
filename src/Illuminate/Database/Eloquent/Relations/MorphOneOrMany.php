@@ -22,8 +22,8 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	/**
 	 * Create a new has many relationship instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder  $query
-	 * @param  Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $type
 	 * @param  string  $id
 	 * @return void
@@ -82,8 +82,8 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	/**
 	 * Attach a model instance to the parent model.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Model  $model
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function save(Model $model)
 	{
@@ -96,17 +96,15 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function create(array $attributes)
 	{
-		$foreign = array($this->foreignKey => $this->parent->getKey());
+		$foreign = $this->getForeignAttributesForCreate();
 
 		// When saving a polymorphic relationship, we need to set not only the foreign
 		// key, but also the foreign key type, which is typically the class name of
 		// the parent model. This makes the polymorphic item unique in the table.
-		$foreign[$this->morphType] = $this->morphClass;
-
 		$attributes = array_merge($attributes, $foreign);
 
 		$instance = $this->related->newInstance($attributes);
@@ -114,6 +112,20 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 		$instance->save();
 
 		return $instance;
+	}
+
+	/**
+	 * Get the foreign ID and type for creating a related model.
+	 *
+	 * @return array
+	 */
+	protected function getForeignAttributesForCreate()
+	{
+		$foreign = array(last(explode('.', $this->foreignKey)) => $this->parent->getKey());
+
+		$foreign[last(explode('.', $this->morphType))] = $this->morphClass;
+
+		return $foreign;
 	}
 
 	/**

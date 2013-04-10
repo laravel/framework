@@ -9,14 +9,14 @@ class DatabaseStore extends Store implements Sweeper {
 	/**
 	 * The database connection instance.
 	 *
-	 * @var Illuminate\Database\Connection
+	 * @var \Illuminate\Database\Connection
 	 */
 	protected $connection;
 
 	/**
 	 * The encrypter instance.
 	 *
-	 * @var Illuminate\Encrypter
+	 * @var \Illuminate\Encrypter
 	 */
 	protected $encrypter;
 
@@ -30,8 +30,8 @@ class DatabaseStore extends Store implements Sweeper {
 	/**
 	 * Create a new database session store.
 	 *
-	 * @param  Illuminate\Database\Connection  $connection
-	 * @param  Illuminate\Encrypter  $encrypter
+	 * @param  \Illuminate\Database\Connection  $connection
+	 * @param  \Illuminate\Encrypter  $encrypter
 	 * @param  string  $table
 	 * @return void
 	 */
@@ -108,7 +108,7 @@ class DatabaseStore extends Store implements Sweeper {
 	/**
 	 * Get a query builder instance for the table.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function table()
 	{
@@ -118,7 +118,7 @@ class DatabaseStore extends Store implements Sweeper {
 	/**
 	 * Get the database connection instance.
 	 *
-	 * @return Illuminate\Database\Connection
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function getConnection()
 	{
@@ -128,7 +128,7 @@ class DatabaseStore extends Store implements Sweeper {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return Illuminate\Encrypter
+	 * @return \Illuminate\Encrypter
 	 */
 	public function getEncrypter()
 	{

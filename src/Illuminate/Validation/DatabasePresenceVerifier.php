@@ -7,7 +7,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	/**
 	 * The database connection instance.
 	 *
-	 * @var  Illuminate\Database\ConnectionResolverInterface
+	 * @var  \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected $db;
 
@@ -21,7 +21,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	/**
 	 * Create a new database presence verifier.
 	 *
-	 * @param  Illuminate\Database\ConnectionResolverInterface  $db
+	 * @param  \Illuminate\Database\ConnectionResolverInterface  $db
 	 * @return void
 	 */
 	public function __construct(ConnectionResolverInterface $db)
@@ -68,7 +68,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 * Get a query builder for the given table.
 	 *
 	 * @param  string  $table
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function table($table)
 	{

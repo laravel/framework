@@ -17,35 +17,35 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The query grammar implementation.
 	 *
-	 * @var Illuminate\Database\Query\Grammars\Grammar
+	 * @var \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	protected $queryGrammar;
 
 	/**
 	 * The schema grammar implementation.
 	 *
-	 * @var Illuminate\Database\Schema\Grammars\Grammar
+	 * @var \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected $schemaGrammar;
 
 	/**
 	 * The query post processor implementation.
 	 *
-	 * @var Illuminate\Database\Query\Processors\Processor
+	 * @var \Illuminate\Database\Query\Processors\Processor
 	 */
 	protected $postProcessor;
 
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
 
 	/**
 	 * The paginator environment instance.
 	 *
-	 * @var Illuminate\Pagination\Paginator
+	 * @var \Illuminate\Pagination\Paginator
 	 */
 	protected $paginator;
 
@@ -62,6 +62,13 @@ class Connection implements ConnectionInterface {
 	 * @var array
 	 */
 	protected $queryLog = array();
+
+	/**
+	 * Indicates whether queries are being logged.
+	 *
+	 * @var bool
+	 */
+	protected $loggingQueries = true;
 
 	/**
 	 * Indicates if the connection is in a "dry run".
@@ -134,7 +141,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the default query grammar instance.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	protected function getDefaultQueryGrammar()
 	{
@@ -154,7 +161,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the default schema grammar instance.
 	 *
-	 * @return Illuminate\Database\Schema\Grammars\Grammar
+	 * @return \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected function getDefaultSchemaGrammar() {}
 
@@ -171,7 +178,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the default post processor instance.
 	 *
-	 * @return Illuminate\Database\Query\Processors\Processor
+	 * @return \Illuminate\Database\Query\Processors\Processor
 	 */
 	protected function getDefaultPostProcessor()
 	{
@@ -181,7 +188,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get a schema builder instance for the connection.
 	 *
-	 * @return Illuminate\Database\Schema\Builder
+	 * @return \Illuminate\Database\Schema\Builder
 	 */
 	public function getSchemaBuilder()
 	{
@@ -194,7 +201,7 @@ class Connection implements ConnectionInterface {
 	 * Begin a fluent query against a database table.
 	 *
 	 * @param  string  $table
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function table($table)
 	{
@@ -209,7 +216,7 @@ class Connection implements ConnectionInterface {
 	 * Get a new raw query expression.
 	 *
 	 * @param  mixed  $value
-	 * @return Illuminate\Database\Query\Expression
+	 * @return \Illuminate\Database\Query\Expression
 	 */
 	public function raw($value)
 	{
@@ -451,6 +458,10 @@ class Connection implements ConnectionInterface {
 		{
 			$result = $callback($this, $query, $bindings);
 		}
+
+		// If an exception occurs when attempting to run a query, we'll format the error
+		// message to include the bindings with SQL, which will make this exception a
+		// lot more helpful to the developer instead of just the database's errors.
 		catch (\Exception $e)
 		{
 			$this->handleQueryException($e, $query, $bindings);
@@ -459,7 +470,7 @@ class Connection implements ConnectionInterface {
 		// Once we have run the query we will calculate the time that it took to run and
 		// then log the query, bindings, and execution time so we will report them on
 		// the event that the developer needs them. We'll log time in milliseconds.
-		$time = number_format((microtime(true) - $start) * 1000, 2);
+		$time = $this->getElapsedTime($start);
 
 		$this->logQuery($query, $bindings, $time);
 
@@ -498,6 +509,8 @@ class Connection implements ConnectionInterface {
 			$this->events->fire('illuminate.query', array($query, $bindings, $time));
 		}
 
+		if ( ! $this->loggingQueries) return;
+
 		$this->queryLog[] = compact('query', 'bindings', 'time');
 	}
 
@@ -513,6 +526,17 @@ class Connection implements ConnectionInterface {
 		{
 			$this->events->listen('illuminate.query', $callback);
 		}
+	}
+
+	/**
+	 * Get the elapsed time since a given starting point.
+	 *
+	 * @param  int    $start
+	 * @return float
+	 */
+	protected function getElapsedTime($start)
+	{
+		return number_format((microtime(true) - $start) * 1000, 2);
 	}
 
 	/**
@@ -559,7 +583,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the query grammar used by the connection.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	public function getQueryGrammar()
 	{
@@ -569,7 +593,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query grammar used by the connection.
 	 *
-	 * @param  Illuminate\Database\Query\Grammars\Grammar
+	 * @param  \Illuminate\Database\Query\Grammars\Grammar
 	 * @return void
 	 */
 	public function setQueryGrammar(Query\Grammars\Grammar $grammar)
@@ -580,7 +604,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the schema grammar used by the connection.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	public function getSchemaGrammar()
 	{
@@ -590,7 +614,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the schema grammar used by the connection.
 	 *
-	 * @param  Illuminate\Database\Schema\Grammars\Grammar
+	 * @param  \Illuminate\Database\Schema\Grammars\Grammar
 	 * @return void
 	 */
 	public function setSchemaGrammar(Schema\Grammars\Grammar $grammar)
@@ -601,7 +625,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the query post processor used by the connection.
 	 *
-	 * @return Illuminate\Database\Query\Processors\Processor
+	 * @return \Illuminate\Database\Query\Processors\Processor
 	 */
 	public function getPostProcessor()
 	{
@@ -611,7 +635,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query post processor used by the connection.
 	 *
-	 * @param  Illuminate\Database\Query\Processors\Processor
+	 * @param  \Illuminate\Database\Query\Processors\Processor
 	 * @return void
 	 */
 	public function setPostProcessor(Processor $processor)
@@ -622,7 +646,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the event dispatcher used by the connection.
 	 *
-	 * @return Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Events\Dispatcher
 	 */
 	public function getEventDispatcher()
 	{
@@ -632,7 +656,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the event dispatcher instance on the connection.
 	 *
-	 * @param  Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Events\Dispatcher
 	 * @return void
 	 */
 	public function setEventDispatcher(\Illuminate\Events\Dispatcher $events)
@@ -643,7 +667,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the paginator environment instance.
 	 *
-	 * @return Illuminate\Pagination\Environment
+	 * @return \Illuminate\Pagination\Environment
 	 */
 	public function getPaginator()
 	{
@@ -658,7 +682,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the pagination environment instance.
 	 *
-	 * @param  Illuminate\Pagination\Environment|Closure  $paginator
+	 * @param  \Illuminate\Pagination\Environment|Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)
@@ -718,6 +742,26 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Enable the query log on the connection.
+	 *
+	 * @return void
+	 */
+	public function enableQueryLog()
+	{
+		$this->loggingQueries = true;
+	}
+
+	/**
+	 * Disable the query log on the connection.
+	 *
+	 * @return void
+	 */
+	public function disableQueryLog()
+	{
+		$this->loggingQueries = false;
+	}
+
+	/**
 	 * Get the name of the connected database.
 	 *
 	 * @return string
@@ -762,8 +806,8 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the table prefix and return the grammar.
 	 *
-	 * @param  Illuminate\Database\Grammar  $grammar
-	 * @return Illuminate\Database\Grammar
+	 * @param  \Illuminate\Database\Grammar  $grammar
+	 * @return \Illuminate\Database\Grammar
 	 */
 	public function withTablePrefix(Grammar $grammar)
 	{

@@ -140,6 +140,60 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 	}
 
+	public function testValidateRequiredWithout()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'Taylor'), array('last' => 'required_without:first'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('first' => 'Taylor', 'last' => ''), array('last' => 'required_without:first'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('first' => ''), array('last' => 'required_without:first'));
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array(), array('last' => 'required_without:first'));
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('first' => 'Taylor', 'last' => 'Otwell'), array('last' => 'required_without:first'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('last' => 'Otwell'), array('last' => 'required_without:first'));
+		$this->assertTrue($v->passes());
+
+		$file = new File('', false);
+		$v = new Validator($trans, array('file' => $file), array('foo' => 'required_without:file'));
+		$this->assertFalse($v->passes());
+
+		$foo = new File('', false);
+		$v = new Validator($trans, array('foo' => $foo), array('foo' => 'required_without:file'));
+		$this->assertFalse($v->passes());
+
+		$foo = new File(__FILE__, false);
+		$v = new Validator($trans, array('foo' => $foo), array('foo' => 'required_without:file'));
+		$this->assertTrue($v->passes());
+
+		$file = new File(__FILE__, false);
+		$foo  = new File(__FILE__, false);
+		$v = new Validator($trans, array('file' => $file, 'foo' => $foo), array('foo' => 'required_without:file'));
+		$this->assertTrue($v->passes());
+
+		$file = new File(__FILE__, false);
+		$foo  = new File('', false);
+		$v = new Validator($trans, array('file' => $file, 'foo' => $foo), array('foo' => 'required_without:file'));
+		$this->assertTrue($v->passes());
+
+		$file = new File('', false);
+		$foo  = new File(__FILE__, false);
+		$v = new Validator($trans, array('file' => $file, 'foo' => $foo), array('foo' => 'required_without:file'));
+		$this->assertTrue($v->passes());
+
+		$file = new File('', false);
+		$foo  = new File('', false);
+		$v = new Validator($trans, array('file' => $file, 'foo' => $foo), array('foo' => 'required_without:file'));
+		$this->assertFalse($v->passes());
+	}
+
 	public function testValidateConfirmed()
 	{
 		$trans = $this->getRealTranslator();
@@ -279,7 +333,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
 		$v = new Validator($trans, array(), array('photo' => 'Size:3'));
 		$v->setFiles(array('photo' => $file));
-		$this->assertFalse($v->passes());		
+		$this->assertFalse($v->passes());
 	}
 
 
@@ -314,7 +368,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
 		$v = new Validator($trans, array(), array('photo' => 'Between:1,2'));
 		$v->setFiles(array('photo' => $file));
-		$this->assertFalse($v->passes());		
+		$this->assertFalse($v->passes());
 	}
 
 
@@ -343,7 +397,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
 		$v = new Validator($trans, array(), array('photo' => 'Min:10'));
 		$v->setFiles(array('photo' => $file));
-		$this->assertFalse($v->passes());		
+		$this->assertFalse($v->passes());
 	}
 
 
@@ -372,7 +426,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
 		$v = new Validator($trans, array(), array('photo' => 'Max:2'));
 		$v->setFiles(array('photo' => $file));
-		$this->assertFalse($v->passes());		
+		$this->assertFalse($v->passes());
 	}
 
 

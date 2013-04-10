@@ -203,8 +203,8 @@ breeze
 	public function testLanguageAndChoicesAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals('<?php echo Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
-		$this->assertEquals('<?php echo Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
+		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
+		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
 	}
 
 

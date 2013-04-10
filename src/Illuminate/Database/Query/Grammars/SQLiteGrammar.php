@@ -7,7 +7,7 @@ class SQLiteGrammar extends Grammar {
 	/**
 	 * Compile the "order by" portions of the query.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $orders
 	 * @return string
 	 */
@@ -25,7 +25,7 @@ class SQLiteGrammar extends Grammar {
 	/**
 	 * Compile an insert statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $values
 	 * @return string
 	 */
@@ -69,7 +69,7 @@ class SQLiteGrammar extends Grammar {
 	/**
 	 * Compile a truncate table statement into SQL.
 	 *
-	 * @param  Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return array
 	 */
 	public function compileTruncate(Builder $query)

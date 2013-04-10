@@ -7,7 +7,7 @@ class QueueManager {
 	/**
 	 * The application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 
@@ -21,7 +21,7 @@ class QueueManager {
 	/**
 	 * Create a new queue manager instance.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct($app)
@@ -33,7 +33,7 @@ class QueueManager {
 	 * Resolve a queue connection instance.
 	 *
 	 * @param  string  $name
-	 * @return Illuminate\Queue\QueueInterface
+	 * @return \Illuminate\Queue\QueueInterface
 	 */
 	public function connection($name = null)
 	{
@@ -56,7 +56,7 @@ class QueueManager {
 	 * Resolve a queue connection.
 	 *
 	 * @param  string  $name
-	 * @return Illuminate\Queue\QueueInterface
+	 * @return \Illuminate\Queue\QueueInterface
 	 */
 	protected function resolve($name)
 	{
@@ -69,7 +69,7 @@ class QueueManager {
 	 * Get the connector for a given driver.
 	 *
 	 * @param  string  $driver
-	 * @return Illuminate\Queue\Connectors\ConnectorInterface
+	 * @return \Illuminate\Queue\Connectors\ConnectorInterface
 	 */
 	protected function getConnector($driver)
 	{

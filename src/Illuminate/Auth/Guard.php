@@ -5,6 +5,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
+use Symfony\Component\HttpFoundation\Response;
 
 class Guard {
 
@@ -18,23 +19,30 @@ class Guard {
 	/**
 	 * The user provider implementation.
 	 *
-	 * @var Illuminate\Auth\UserProviderInterface
+	 * @var \Illuminate\Auth\UserProviderInterface
 	 */
 	protected $provider;
 
 	/**
 	 * The session store used by the guard.
 	 *
-	 * @var Illuminate\Session\Store
+	 * @var \Illuminate\Session\Store
 	 */
 	protected $session;
 
 	/**
 	 * The Illuminate cookie creator service.
 	 *
-	 * @var Illuminate\Cookie\CookieJar
+	 * @var \Illuminate\Cookie\CookieJar
 	 */
 	protected $cookie;
+
+	/**
+	 * The request instance.
+	 *
+	 * @var \Symfony\Component\HttpFoundation\Request
+	 */
+	protected $request;
 
 	/**
 	 * The cookies queued by the guards.
@@ -46,7 +54,7 @@ class Guard {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -60,8 +68,8 @@ class Guard {
 	/**
 	 * Create a new authentication guard.
 	 *
-	 * @param  Illuminate\Auth\UserProviderInterface  $provider
-	 * @param  Illuminate\Session\Store  $session
+	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
+	 * @param  \Illuminate\Session\Store  $session
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
@@ -94,7 +102,7 @@ class Guard {
 	/**
 	 * Get the currently authenticated user.
 	 *
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function user()
 	{
@@ -176,6 +184,53 @@ class Guard {
 	}
 
 	/**
+	 * Attempt to authenticate using HTTP Basic Auth.
+	 *
+	 * @param  string  $field
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @return bool
+	 */
+	public function basic($field = 'email', Request $request = null)
+	{
+		if ($this->check()) return;
+
+		$request = $request ?: $this->getRequest();
+
+		if ($request->getUser())
+		{
+			if ($this->attemptBasic($request, $field)) return;
+		}
+
+		return $this->getBasicResponse();
+	}
+
+	/**
+	 * Attempt to authenticate using basic authentication.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  string  $field
+	 * @return bool
+	 */
+	protected function attemptBasic(Request $request, $field)
+	{
+		$pass = $request->getPassword();
+
+		return $this->attempt(array($field => $request->getUser(), 'password' => $pass));
+	}
+
+	/**
+	 * Get the response for basic authentication.
+	 *
+	 * @return Symfony\Component\HttpFoundation\Response
+	 */
+	protected function getBasicResponse()
+	{
+		$headers = array('WWW-Authenticate' => 'Basic');
+
+		return new Response('Invalid credentials.', 401, $headers);
+	}
+
+	/**
 	 * Attempt to authenticate a user using the given credentials.
 	 *
 	 * @param  array  $credentials
@@ -206,7 +261,7 @@ class Guard {
 	/**
 	 * Log a user into the application.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @param  bool  $remember
 	 * @return void
 	 */
@@ -240,7 +295,7 @@ class Guard {
 	 *
 	 * @param  mixed  $id
 	 * @param  bool   $remember
-	 * @return Illuminate\Auth\UserInterface
+	 * @return \Illuminate\Auth\UserInterface
 	 */
 	public function loginUsingId($id, $remember = false)
 	{
@@ -294,9 +349,19 @@ class Guard {
 	}
 
 	/**
+	 * Get the cookies queued by the guard.
+	 *
+	 * @return array
+	 */
+	public function getQueuedCookies()
+	{
+		return $this->queuedCookies;
+	}
+
+	/**
 	 * Get the cookie creator instance used by the guard.
 	 *
-	 * @return Illuminate\Cookie\CookieJar
+	 * @return \Illuminate\Cookie\CookieJar
 	 */
 	public function getCookieJar()
 	{
@@ -311,7 +376,7 @@ class Guard {
 	/**
 	 * Set the cookie creator instance used by the guard.
 	 *
-	 * @param  Illuminate\Cookie\CookieJar  $cookie
+	 * @param  \Illuminate\Cookie\CookieJar  $cookie
 	 * @return void
 	 */
 	public function setCookieJar(CookieJar $cookie)
@@ -322,7 +387,7 @@ class Guard {
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Events\Dispatcher
 	 */
 	public function getDispatcher()
 	{
@@ -332,7 +397,7 @@ class Guard {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Events\Dispatcher
 	 */
 	public function setDispatcher(Dispatcher $events)
 	{
@@ -342,7 +407,7 @@ class Guard {
 	/**
 	 * Get the session store used by the guard.
 	 *
-	 * @return Illuminate\Session\Store
+	 * @return \Illuminate\Session\Store
 	 */
 	public function getSession()
 	{
@@ -350,19 +415,9 @@ class Guard {
 	}
 
 	/**
-	 * Get the cookies queued by the guard.
-	 *
-	 * @return array
-	 */
-	public function getQueuedCookies()
-	{
-		return $this->queuedCookies;
-	}
-
-	/**
 	 * Get the user provider used by the guard.
 	 *
-	 * @return Illuminate\Auth\UserProviderInterface
+	 * @return \Illuminate\Auth\UserProviderInterface
 	 */
 	public function getProvider()
 	{
@@ -372,7 +427,7 @@ class Guard {
 	/**
 	 * Return the currently cached user of the application.
 	 *
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Auth\UserInterface|null
 	 */
 	public function getUser()
 	{
@@ -382,7 +437,7 @@ class Guard {
 	/**
 	 * Set the current user of the application.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @return void
 	 */
 	public function setUser(UserInterface $user)
@@ -390,6 +445,29 @@ class Guard {
 		$this->user = $user;
 
 		$this->loggedOut = false;
+	}
+
+	/**
+	 * Get the current request instance.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request ?: Request::createFromGlobals();
+	}
+
+	/**
+	 * Set the current request instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request
+	 * @return \Illuminate\Auth\Guard
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
+
+		return $this;
 	}
 
 	/**

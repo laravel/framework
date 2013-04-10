@@ -7,14 +7,14 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * The Illuminate application instance.
 	 *
-	 * @var Illuminate\Foundation\Application
+	 * @var \Illuminate\Foundation\Application
 	 */
 	protected $app;
 
 	/**
 	 * The HttpKernel client instance.
 	 *
-	 * @var Illuminate\Foundation\Testing\Client
+	 * @var \Illuminate\Foundation\Testing\Client
 	 */
 	protected $client;
 
@@ -50,7 +50,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function call()
 	{
@@ -69,7 +69,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function callSecure()
 	{
@@ -91,7 +91,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function action($method, $action, $wildcards = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
@@ -111,7 +111,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $server
 	 * @param  string  $content
 	 * @param  bool    $changeHistory
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
@@ -260,18 +260,36 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Assert that the session has errors bound.
-	 *
+	 * 
+	 * @param  string|array  $bindings
+	 * @param  mixed  $format
 	 * @return void
 	 */
-	public function assertSessionHasErrors()
+	public function assertSessionHasErrors($bindings = array(), $format = null)
 	{
-		return $this->assertSessionHas('errors');
+		$this->assertSessionHas('errors');
+
+		$bindings = (array)$bindings;
+
+		$errors = $this->app['session']->get('errors');
+
+		foreach ($bindings as $key => $value)
+		{
+			if (is_int($key))
+			{
+				$this->assertTrue($errors->has($value));
+			}
+			else
+			{
+				$this->assertContains($value, $errors->get($key, $format));
+			}
+		}
 	}
 
 	/**
 	 * Set the currently logged in user for the application.
 	 *
-	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @param  string  $driver
 	 * @return void
 	 */

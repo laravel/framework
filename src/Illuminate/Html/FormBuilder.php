@@ -9,14 +9,14 @@ class FormBuilder {
 	/**
 	 * The HTML builder instance.
 	 *
-	 * @var Illuminate\Html\HtmlBuilder
+	 * @var \Illuminate\Html\HtmlBuilder
 	 */
 	protected $html;
 
 	/**
 	 * The URL generator instance.
 	 *
-	 * @var Illuminate\Routing\UrlGenerator  $url
+	 * @var \Illuminate\Routing\UrlGenerator  $url
 	 */
 	protected $url;
 
@@ -30,7 +30,7 @@ class FormBuilder {
 	/**
 	 * The session store implementation.
 	 *
-	 * @var Illuminate\Support\Contracts\SessionStoreInterface
+	 * @var \Illuminate\Session\Store
 	 */
 	protected $session;
 
@@ -63,10 +63,17 @@ class FormBuilder {
 	protected $reserved = array('method', 'url', 'route', 'action', 'files');
 
 	/**
+	 * The form methods that should be spoofed, in uppercase.
+	 * 
+	 * @var array
+	 */
+	protected $spoofedMethods = array('DELETE', 'PATCH', 'PUT');
+
+	/**
 	 * Create a new form builder instance.
 	 *
-	 * @param  Illuminate\Routing\UrlGenerator  $url
-	 * @param  Illuminate\Html\HtmlBuilder  $html
+	 * @param  \Illuminate\Routing\UrlGenerator  $url
+	 * @param  \Illuminate\Html\HtmlBuilder  $html
 	 * @param  string  $csrfToken
 	 * @return void
 	 */
@@ -89,15 +96,15 @@ class FormBuilder {
 
 		// We need to extract the proper method from the attributes. If the method is
 		// something other than GET or POST we'll use POST since we will spoof the
-		// actual method since forms don't support PUT or DELETE as native HTML.
+		// actual method since forms don't support the reserved methods in HTML.
 		$attributes['method'] = $this->getMethod($method);
 
 		$attributes['action'] = $this->getAction($options);
 
 		$attributes['accept-charset'] = 'UTF-8';
 
-		// If the method is PUT or DELETE, we will need to add a spoofer hidden field
-		// that will instruct this Symfony request to pretend that the method is a
+		// If the method is PUT, PATCH or DELETE we will need to add a spoofer hidden
+		// field that will instruct the Symfony request to pretend the method is a
 		// different method than it actually is, for convenience from the forms.
 		$append = $this->getAppendage($method);
 
@@ -108,7 +115,7 @@ class FormBuilder {
 
 		// Finally we're ready to create the final form HTML field. We will attribute
 		// format the array of attributes. We will also add on the appendage which
-		// is used to spoof the requests for PUT and DELETE requests to the app.
+		// is used to spoof requests for the PUT, PATCH, etc. methods on forms.
 		$attributes = array_merge(
 
 			$attributes, array_except($options, $this->reserved)
@@ -196,13 +203,16 @@ class FormBuilder {
 		// in the model instance if one is set. Otherwise we will just use empty.
 		$id = $this->getIdAttribute($name, $options);
 
-		$value = $this->getValueAttribute($name, $value);
-
-		$merge = compact('type', 'value', 'id');
+		if ($type != 'file')
+		{
+			$value = $this->getValueAttribute($name, $value);
+		}
 
 		// Once we have the type, value, and ID we can marge them into the rest of the
 		// attributes array so we can convert them into their HTML attribute format
 		// when creating the HTML element. Then, we will return the entire input.
+		$merge = compact('type', 'value', 'id');
+
 		$options = array_merge($options, $merge);
 
 		return '<input'.$this->html->attributes($options).'>';
@@ -540,7 +550,7 @@ class FormBuilder {
 			$options['type'] = 'button';
 		}
 		
-		return '<button'.$this->html->attributes($options).'>'.e($value).'</button>';
+		return '<button'.$this->html->attributes($options).'>'.$value.'</button>';
 	}
 
 	/**
@@ -660,7 +670,7 @@ class FormBuilder {
 	{
 		$method = strtoupper($method);
 
-		if ($method == 'PUT' or $method == 'DELETE')
+		if (in_array($method, $this->spoofedMethods))
 		{
 			return $this->hidden('_method', $method);
 		}
@@ -695,7 +705,7 @@ class FormBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected function getValueAttribute($name, $value = null)
+	public function getValueAttribute($name, $value = null)
 	{
 		if (is_null($name)) return $value;
 
@@ -715,7 +725,7 @@ class FormBuilder {
 	/**
 	 * Get the session store implementation.
 	 *
-	 * @return  Illuminate\Session\Store  $session
+	 * @return  \Illuminate\Session\Store  $session
 	 */
 	public function getSessionStore()
 	{
@@ -725,8 +735,8 @@ class FormBuilder {
 	/**
 	 * Set the session store implementation.
 	 *
-	 * @param  Illuminate\Session\Store  $session
-	 * @return Illuminate\Html\FormBuilder
+	 * @param  \Illuminate\Session\Store  $session
+	 * @return \Illuminate\Html\FormBuilder
 	 */
 	public function setSessionStore(Session $session)
 	{

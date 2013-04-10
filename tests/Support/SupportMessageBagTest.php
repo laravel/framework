@@ -121,8 +121,7 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = m::mock('Illuminate\Support\MessageBag[toJson]');
 		$container->shouldReceive('toJson')->once()->andReturn('foo');
-		$this->assertEquals('foo', (string) $container);
+		$this->assertEquals('foo', $container->__toString());
 	}
-
 
 }

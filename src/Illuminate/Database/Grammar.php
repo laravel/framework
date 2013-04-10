@@ -122,7 +122,7 @@ abstract class Grammar {
 	/**
 	 * Get the value of a raw expression.
 	 *
-	 * @param  Illuminate\Database\Query\Expression  $expression
+	 * @param  \Illuminate\Database\Query\Expression  $expression
 	 * @return string
 	 */
 	public function getValue($expression)
@@ -165,7 +165,7 @@ abstract class Grammar {
 	 * Set the grammar's table prefix.
 	 *
 	 * @param  string  $prefix
-	 * @return Illuminate\Database\Grammar
+	 * @return \Illuminate\Database\Grammar
 	 */
 	public function setTablePrefix($prefix)
 	{

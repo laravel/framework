@@ -15,14 +15,14 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	/**
 	 * The Illuminate session store implementation.
 	 *
-	 * @var Illuminate\Session\Store
+	 * @var \Illuminate\Session\Store
 	 */
 	protected $sessionStore;
 
 	/**
 	 * Return the Request instance.
 	 *
-	 * @return Illuminate\Http\Request
+	 * @return \Illuminate\Http\Request
 	 */
 	public function instance()
 	{
@@ -430,7 +430,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	/**
 	 * Get the Illuminate session store implementation.
 	 *
-	 * @return Illuminate\Session\Store
+	 * @return \Illuminate\Session\Store
 	 */
 	public function getSessionStore()
 	{
@@ -445,7 +445,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	/**
 	 * Set the Illuminate session store implementation.
 	 *
-	 * @param  Illuminate\Session\Store  $session
+	 * @param  \Illuminate\Session\Store  $session
 	 * @return void
 	 */
 	public function setSessionStore(SessionStore $session)

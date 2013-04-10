@@ -5,7 +5,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * The cache store implementation.
 	 *
-	 * @var Illuminate\Cache\StoreInterface
+	 * @var \Illuminate\Cache\StoreInterface
 	 */
 	protected $store;
 
@@ -19,7 +19,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * Create a new cache repository instance.
 	 *
-	 * @param  Illuminate\Cache\StoreInterface  $store
+	 * @param  \Illuminate\Cache\StoreInterface  $store
 	 */
 	public function __construct(StoreInterface $store)
 	{
@@ -46,14 +46,7 @@ class Repository implements ArrayAccess {
 	 */
 	public function get($key, $default = null)
 	{
-		$value = $this->store->get($key);
-
-		// If the items are not present in the caches, we will return this default
-		// value that was supplied. If it is a Closure we'll execute it so the
-		// the execution of an intensive operation will get lazily executed.
-		if (is_null($value)) return value($default);
-
-		return $value;
+		return $this->store->get($key) ?: value($default);
 	}
 
 	/**
@@ -87,6 +80,18 @@ class Repository implements ArrayAccess {
 		$this->put($key, $value = $callback(), $minutes);
 
 		return $value;
+	}
+
+	/**
+	 * Get an item from the cache, or store the default value forever.
+	 *
+	 * @param  string   $key
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function sear($key, Closure $callback)
+	{
+		return $this->rememberForever($key, $callback);
 	}
 
 	/**
@@ -132,7 +137,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * Get the cache store implementation.
 	 *
-	 * @return Illuminate\Cache\StoreInterface
+	 * @return \Illuminate\Cache\StoreInterface
 	 */
 	public function getStore()
 	{

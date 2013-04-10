@@ -7,19 +7,38 @@ class HtmlBuilder {
 	/**
 	 * The URL generator instance.
 	 *
-	 * @var Illuminate\Routing\UrlGenerator
+	 * @var \Illuminate\Routing\UrlGenerator
 	 */
 	protected $url;
 
 	/**
+	 * The registered html macros.
+	 *
+	 * @var array
+	 */
+	protected $macros;
+
+	/**
 	 * Create a new HTML builder instance.
 	 *
-	 * @param  Illuminate\Routing\UrlGenerator  $url
+	 * @param  \Illuminate\Routing\UrlGenerator  $url
 	 * @return void
 	 */
 	public function __construct(UrlGenerator $url = null)
 	{
 		$this->url = $url;
+	}
+
+	/**
+	 * Register a custom HTML macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public function macro($name, $macro)
+	{
+		$this->macros[$name] = $macro;
 	}
 
 	/**
@@ -42,6 +61,38 @@ class HtmlBuilder {
 	public function decode($value)
 	{
 		return html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+	}
+
+	/**
+	 * Generate a link to a JavaScript file.
+	 *
+	 * @param  string  $url
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function script($url, $attributes = array())
+	{
+		$attributes['src'] = $this->url->asset($url);
+
+		return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
+	}
+
+	/**
+	 * Generate a link to a CSS file.
+	 *
+	 * @param  string  $url
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function style($url, $attributes = array())
+	{
+		$defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
+
+		$attributes = $attributes + $defaults;
+
+		$attributes['href'] = $this->url->asset($url);
+
+		return '<link'.$this->attributes($attributes).'>'.PHP_EOL;
 	}
 
 	/**
@@ -70,7 +121,7 @@ class HtmlBuilder {
 	 */
 	public function link($url, $title = null, $attributes = array(), $secure = null)
 	{
-		$url = $this->url->to($url, $secure);
+		$url = $this->url->to($url, array(), $secure);
 
 		$title = $title ?: $url;
 
@@ -179,7 +230,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	protected static function listing($type, $list, $attributes = array())
+	protected function listing($type, $list, $attributes = array())
 	{
 		$html = '';
 
@@ -206,7 +257,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function listingElement($key, $type, $value)
+	protected function listingElement($key, $type, $value)
 	{
 		if (is_array($value))
 		{
@@ -226,7 +277,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function nestedListing($key, $type, $value)
+	protected function nestedListing($key, $type, $value)
 	{
 		if (is_int($key))
 		{
@@ -268,11 +319,28 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function attributeElement($key, $value)
+	protected function attributeElement($key, $value)
 	{
 		if (is_numeric($key)) $key = $value;
 
 		if ( ! is_null($value)) return $key.'="'.e($value).'"';
+	}
+
+	/**
+	 * Dynamically handle calls to the html class.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if (isset($this->macros[$method]))
+		{
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

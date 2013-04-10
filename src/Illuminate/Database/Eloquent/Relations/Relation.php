@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -9,29 +10,29 @@ abstract class Relation {
 	/**
 	 * The Eloquent query builder instance.
 	 *
-	 * @var Illuminate\Database\Eloquent\Builder
+	 * @var \Illuminate\Database\Eloquent\Builder
 	 */
 	protected $query;
 
 	/**
 	 * The parent model instance.
 	 *
-	 * @var Illuminate\Database\Eloquent\Model
+	 * @var \Illuminate\Database\Eloquent\Model
 	 */
 	protected $parent;
 
 	/**
 	 * The related model instance.
 	 *
-	 * @var Illuminate\Database\Eloquent\Model
+	 * @var \Illuminate\Database\Eloquent\Model
 	 */
 	protected $related;
 
 	/**
 	 * Create a new relation instance.
 	 *
-	 * @param  Illuminate\Database\Eloquent\Builder
-	 * @param  Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Builder
+	 * @param  \Illuminate\Database\Eloquent\Model
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent)
@@ -71,7 +72,7 @@ abstract class Relation {
 	 * Match the eagerly loaded results to their parents.
 	 *
 	 * @param  array   $models
-	 * @param  Illuminate\Database\Eloquent\Collection  $results
+	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -83,6 +84,31 @@ abstract class Relation {
 	 * @return mixed
 	 */
 	abstract public function getResults();
+
+	/**
+	 * Touch all of the related models for the relationship.
+	 *
+	 * @return void
+	 */
+	public function touch()
+	{
+		$table = $this->getRelated()->getTable();
+
+		$column = $this->getRelated()->getUpdatedAtColumn();
+
+		$this->rawUpdate(array($table.'.'.$column => new DateTime));
+	}
+
+	/**
+	 * Run a raw update against the base query.
+	 *
+	 * @param  array  $attributes
+	 * @return int
+	 */
+	public function rawUpdate(array $attributes = array())
+	{
+		return $this->query->update($attributes);
+	}
 
 	/**
 	 * Remove the original where clause set by the relationship.
@@ -138,7 +164,7 @@ abstract class Relation {
 	/**
 	 * Get the underlying query for the relation.
 	 *
-	 * @return Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function getQuery()
 	{
@@ -148,7 +174,7 @@ abstract class Relation {
 	/**
 	 * Get the base query builder driving the Eloquent builder.
 	 *
-	 * @return Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function getBaseQuery()
 	{
@@ -158,7 +184,7 @@ abstract class Relation {
 	/**
 	 * Get the parent model of the relation.
 	 *
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function getParent()
 	{
@@ -168,7 +194,7 @@ abstract class Relation {
 	/**
 	 * Get the related model of the relation.
 	 *
-	 * @return Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function getRelated()
 	{

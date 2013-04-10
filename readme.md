@@ -1,5 +1,18 @@
 # Laravel 4 Beta Change Log
 
+## Beta 5
+
+- Added `Model::destroy` method to Eloquent.
+- Touch owning models on delete.
+- Added `Str::macro` method.
+- Calling `update` on a Model instance will fill and update that model.
+- Allow specification of methods when pushing to Queue (`Queue::push('Class@method')`).
+- Removed HTML from default formatting in MessageBag.
+- Made Eloquent `deleting` event halting.
+- Added `Auth::basic` for quickly implementing HTTP Basic authentication.
+- Use [Predis](https://github.com/nrk/predis) as our Redis back-end. Supports pipelining, client side sharding / clustering.
+- Implement sectionable caching across all drivers which support incrmeent / decrement.
+
 ## Beta 4
 
 - Added `Model::creating(Closure)` and `Model::updating(Closure)` methods for hooking into Eloquent save events.
@@ -73,6 +86,10 @@
 - Refactored post `migrate:make` hooks to dump autoloads for workbenches.
 - Added `DB::listen(Closure)` method which may be used to listen for database queries.
 - Added `Model::findOrFail(id)` and `firstOrFail` methods to Eloquent. Throws `ModelNotFoundException`. Can listen in your apps and return 404 repsonses if you want.
+- Added support for `touches` on Eloquent models. For example, adding `protected $touches = ['post']` to a Comment model will update the owning post's `updated_at` column when the Comment is updated.
+- Session driver now automatically set to `array` when running Artisan tasks.
+- Added static `unguard` method to Eloquent to disable all mass assignment protection.
+- Added `--seed` option to `migrate` command.
 
 ## Beta 3
 

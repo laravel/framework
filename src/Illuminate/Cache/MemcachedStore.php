@@ -25,7 +25,7 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function __construct(Memcached $memcached, $prefix = '')
 	{
-		$this->prefix = $prefix;
+		$this->prefix = $prefix.':';
 		$this->memcached = $memcached;
 	}
 
@@ -113,6 +113,17 @@ class MemcachedStore implements StoreInterface {
 	public function flush()
 	{
 		$this->memcached->flush();
+	}
+
+	/**
+	 * Begin executing a new section operation.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Cache\Section
+	 */
+	public function section($name)
+	{
+		return new Section($this, $name);
 	}
 
 	/**

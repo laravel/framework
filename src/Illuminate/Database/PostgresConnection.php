@@ -5,7 +5,7 @@ class PostgresConnection extends Connection {
 	/**
 	 * Get the default query grammar instance.
 	 *
-	 * @return Illuminate\Database\Query\Grammars\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammars\Grammar
 	 */
 	protected function getDefaultQueryGrammar()
 	{
@@ -15,7 +15,7 @@ class PostgresConnection extends Connection {
 	/**
 	 * Get the default schema grammar instance.
 	 *
-	 * @return Illuminate\Database\Schema\Grammars\Grammar
+	 * @return \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected function getDefaultSchemaGrammar()
 	{
@@ -25,7 +25,7 @@ class PostgresConnection extends Connection {
 	/**
 	 * Get the default post processor instance.
 	 *
-	 * @return Illuminate\Database\Query\Processors\Processor
+	 * @return \Illuminate\Database\Query\Processors\Processor
 	 */
 	protected function getDefaultPostProcessor()
 	{
