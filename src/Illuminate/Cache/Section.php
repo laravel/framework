@@ -75,7 +75,7 @@ class Section {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		$this->store->decrement($this->sectionItemKey($key), $value);	
+		$this->store->decrement($this->sectionItemKey($key), $value);
 	}
 
 	/**
@@ -98,7 +98,7 @@ class Section {
 	 */
 	public function forget($key)
 	{
-		$this->store->forget($this->sectionItemKey($key), $value);	
+		$this->store->forget($this->sectionItemKey($key));
 	}
 
 	/**
