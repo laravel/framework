@@ -46,14 +46,7 @@ class Repository implements ArrayAccess {
 	 */
 	public function get($key, $default = null)
 	{
-		$value = $this->store->get($key);
-
-		// If the items are not present in the caches, we will return this default
-		// value that was supplied. If it is a Closure we'll execute it so the
-		// the execution of an intensive operation will get lazily executed.
-		if (is_null($value)) return value($default);
-
-		return $value;
+		return $this->store->get($key) ?: value($default);
 	}
 
 	/**

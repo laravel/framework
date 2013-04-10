@@ -116,6 +116,17 @@ class MemcachedStore implements StoreInterface {
 	}
 
 	/**
+	 * Begin executing a new section operation.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Cache\Section
+	 */
+	public function section($name)
+	{
+		return new Section($this, $name);
+	}
+
+	/**
 	 * Get the underlying Memcached connection.
 	 *
 	 * @return Memcached

@@ -11,6 +11,7 @@
 - Made Eloquent `deleting` event halting.
 - Added `Auth::basic` for quickly implementing HTTP Basic authentication.
 - Use [Predis](https://github.com/nrk/predis) as our Redis back-end. Supports pipelining, client side sharding / clustering.
+- Implement sectionable caching across all drivers that support incrmeent / decrement.
 
 ## Beta 4
 
