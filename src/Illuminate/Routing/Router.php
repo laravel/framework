@@ -1364,7 +1364,9 @@ class Router {
 	 */
 	public function currentRouteAction()
 	{
-		return $this->currentRoute->getOption('_uses');
+		$currentRoute = $this->currentRoute;
+
+		return ($currentRoute === null) ? null : $currentRoute->getOption('_uses');
 	}
 
 	/**
