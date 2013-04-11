@@ -48,7 +48,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testLoadMethodEagerLoadsGivenRelationships()
 	{
 		$c = $this->getMock('Illuminate\Database\Eloquent\Collection', array('first'), array(array('foo')));
-		$mockItem = m::mock('StdClass');
+		$mockItem = m::mock('stdClass');
 		$c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
 		$mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
 		$mockItem->shouldReceive('with')->with(array('bar', 'baz'))->andReturn($mockItem);

@@ -38,8 +38,8 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	public function testRenderEachCreatesViewForEachItemInArray()
 	{
 		$env = m::mock('Illuminate\View\Environment[make]', $this->getEnvironmentArgs());
-		$env->shouldReceive('make')->once()->with('foo', array('key' => 'bar', 'value' => 'baz'))->andReturn($mockView1 = m::mock('StdClass'));
-		$env->shouldReceive('make')->once()->with('foo', array('key' => 'breeze', 'value' => 'boom'))->andReturn($mockView2 = m::mock('StdClass'));
+		$env->shouldReceive('make')->once()->with('foo', array('key' => 'bar', 'value' => 'baz'))->andReturn($mockView1 = m::mock('stdClass'));
+		$env->shouldReceive('make')->once()->with('foo', array('key' => 'breeze', 'value' => 'boom'))->andReturn($mockView2 = m::mock('stdClass'));
 		$mockView1->shouldReceive('render')->once()->andReturn('dayle');
 		$mockView2->shouldReceive('render')->once()->andReturn('rees');
 
@@ -52,7 +52,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	public function testEmptyViewsCanBeReturnedFromRenderEach()
 	{
 		$env = m::mock('Illuminate\View\Environment[make]', $this->getEnvironmentArgs());
-		$env->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock('StdClass'));
+		$env->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock('stdClass'));
 		$mockView->shouldReceive('render')->once()->andReturn('empty');
 
 		$this->assertEquals('empty', $env->renderEach('view', array(), 'iterator', 'foo'));
@@ -127,7 +127,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
 		$env->setContainer($container = m::mock('Illuminate\Container\Container'));
-		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
+		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('stdClass'));
 		$composer->shouldReceive('compose')->once()->with('view')->andReturn('composed');
 		$callback = $env->composer('foo', 'FooComposer');
 		$callback = $callback[0];
@@ -141,7 +141,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
 		$env->setContainer($container = m::mock('Illuminate\Container\Container'));
-		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
+		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('stdClass'));
 		$composer->shouldReceive('doComposer')->once()->with('view')->andReturn('composed');
 		$callback = $env->composer('foo', 'FooComposer@doComposer');
 		$callback = $callback[0];

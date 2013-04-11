@@ -31,7 +31,7 @@ class IronJob extends Job {
 	 *
 	 * @param  \Illuminate\Container  $container
 	 * @param  IronMQ    $iron
-	 * @param  StdClass  $job
+	 * @param  stdClass  $job
 	 * @param  string    $queue
 	 * @return void
 	 */

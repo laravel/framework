@@ -21,8 +21,8 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 		);
 
 		$manager = new QueueManager($app);
-		$connector = m::mock('StdClass');
-		$queue = m::mock('StdClass');
+		$connector = m::mock('stdClass');
+		$queue = m::mock('stdClass');
 		$connector->shouldReceive('connect')->once()->with(array('driver' => 'sync'))->andReturn($queue);
 		$manager->addConnector('sync', function() use ($connector) { return $connector; });
 		$queue->shouldReceive('setContainer')->once()->with($app);
@@ -41,8 +41,8 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 		);
 
 		$manager = new QueueManager($app);
-		$connector = m::mock('StdClass');
-		$queue = m::mock('StdClass');
+		$connector = m::mock('stdClass');
+		$queue = m::mock('stdClass');
 		$connector->shouldReceive('connect')->once()->with(array('driver' => 'bar'))->andReturn($queue);
 		$manager->addConnector('bar', function() use ($connector) { return $connector; });
 		$queue->shouldReceive('setContainer')->once()->with($app);

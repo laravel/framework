@@ -504,7 +504,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 			)
 		));
 		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo('FooController@getFoo'));
-		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
+		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('stdClass')));
 		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
 
 		$router->controller('prefix', 'FooController');

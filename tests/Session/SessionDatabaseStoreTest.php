@@ -14,7 +14,7 @@ class SessionDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 	public function testRetrieveSessionReturnsDecryptedPayload()
 	{
 		$store = $this->getStore();
-		$table = m::mock('StdClass');
+		$table = m::mock('stdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$table->shouldReceive('find')->once()->with(1)->andReturn((object) array('payload' => 'bar'));
 		$store->getEncrypter()->shouldReceive('decrypt')->once()->with('bar')->andReturn('decrypted.bar');
@@ -26,7 +26,7 @@ class SessionDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 	public function testRetrieveSessionReturnsNullWhenSessionNotFound()
 	{
 		$store = $this->getStore();
-		$table = m::mock('StdClass');
+		$table = m::mock('stdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$table->shouldReceive('find')->once()->with(1)->andReturn(null);
 		$store->getEncrypter()->shouldReceive('decrypt')->never();
@@ -38,7 +38,7 @@ class SessionDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 	public function testCreateSessionStoresEncryptedPayload()
 	{
 		$store = $this->getStore();
-		$table = m::mock('StdClass');
+		$table = m::mock('stdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$store->getEncrypter()->shouldReceive('encrypt')->once()->with(array('session', 'last_activity' => 100))->andReturn(array('encrypted.session'));
 		$table->shouldReceive('insert')->once()->with(array('id' => 1, 'payload' => array('encrypted.session'), 'last_activity' => 100));
@@ -50,7 +50,7 @@ class SessionDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 	public function testUpdateSessionStoresEncryptedPayload()
 	{
 		$store = $this->getStore();
-		$table = m::mock('StdClass');
+		$table = m::mock('stdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$store->getEncrypter()->shouldReceive('encrypt')->once()->with(array('session', 'last_activity' => 100))->andReturn(array('encrypted.session'));
 		$table->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($table);
@@ -63,7 +63,7 @@ class SessionDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSweepRemovesExpiredSessions()
 	{
 		$store = $this->getStore();
-		$table = m::mock('StdClass');
+		$table = m::mock('stdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$table->shouldReceive('where')->once()->with('last_activity', '<', 100)->andReturn($table);
 		$table->shouldReceive('delete')->once();

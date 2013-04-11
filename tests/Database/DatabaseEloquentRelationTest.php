@@ -33,7 +33,7 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
-		$builder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
+		$builder->shouldReceive('getModel')->andReturn($related = m::mock('stdClass'));
 		$builder->shouldReceive('where');
 		$relation = new HasOne($builder, $parent, 'foreign_key');
 		$related->shouldReceive('getTable')->andReturn('table');
