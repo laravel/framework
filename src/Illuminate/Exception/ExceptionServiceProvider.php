@@ -179,7 +179,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function resourcePath()
 	{
-		if (is_dir($path = $this->app['path.base'].'/vendor/laravel/framework/src/Exception/resources'))
+		if (is_dir($path = $this->app['path.base'].'/vendor/laravel/framework/src/Illuminate/Exception/resources'))
 		{
 			return $path;
 		}
