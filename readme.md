@@ -14,6 +14,7 @@
 - Implement sectionable caching across all drivers which support incrmeent / decrement.
 - Added `Redirect::home` method from Laravel 3.
 - Added `Crypt::setKey`, `Crypt::setCipher`, and `Crypt::setMode`.
+- Allow "lazy" eager loading from an individual model: `$user->load('orders.lines');`.
 
 ## Beta 4
 
