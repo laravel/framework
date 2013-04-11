@@ -223,4 +223,37 @@ class Encrypter {
 		return MCRYPT_RAND;
 	}
 
+	/**
+	 * Set the encryption key.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function setKey($key)
+	{
+		$this->key = $key;
+	}
+
+	/**
+	 * Set the encryption cipher.
+	 *
+	 * @param  string  $cipher
+	 * @return void
+	 */
+	public function setCipher($cipher)
+	{
+		$this->cipher = $cipher;
+	}
+
+	/**
+	 * Set the encryption mode.
+	 *
+	 * @param  string  $mode
+	 * @return void
+	 */
+	public function setMode($model)
+	{
+		$this->mode = $mode;
+	}
+
 }
