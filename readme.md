@@ -13,6 +13,7 @@
 - Use [Predis](https://github.com/nrk/predis) as our Redis back-end. Supports pipelining, client side sharding / clustering.
 - Implement sectionable caching across all drivers which support incrmeent / decrement.
 - Added `Redirect::home` method from Laravel 3.
+- Added `Crypt::setKey`, `Crypt::setCipher`, and `Crypt::setMode`.
 
 ## Beta 4
 
