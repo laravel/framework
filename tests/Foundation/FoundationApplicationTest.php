@@ -122,6 +122,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testNoResponseFromCustomHandlerCallsKernelExceptionHandler()
 	{
 		$app = new Application;
+		$app['config'] = array('app.debug' => false);
 		$exception = new Exception;
 		$errorHandler = m::mock('stdClass');
 		$exceptionHandler = m::mock('stdClass');
