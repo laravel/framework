@@ -573,7 +573,7 @@ class FormBuilder {
 	 */
 	protected function getMethod($method)
 	{
-		return $method != 'GET' ? 'POST' : $method;
+		return $method != 'get' ? 'post' : $method;
 	}
 
 	/**
