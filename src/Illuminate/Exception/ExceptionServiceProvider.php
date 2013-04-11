@@ -1,7 +1,10 @@
 <?php namespace Illuminate\Exception;
 
 use Closure;
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 use Symfony\Component\HttpKernel\Debug\ExceptionHandler as KernelHandler;
 
@@ -43,6 +46,8 @@ class ExceptionServiceProvider extends ServiceProvider {
 		});
 
 		$this->registerExceptionHandler();
+
+		$this->registerWhoops();
 	}
 
 	/**
@@ -72,11 +77,11 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerExceptionHandler()
 	{
-		$app = $this->app;
+		list($me, $app) = array($this, $this->app);
 
-		$app['exception.function'] = function() use ($app)
+		$app['exception.function'] = function() use ($me, $app)
 		{
-			return function($exception) use ($app)
+			return function($exception) use ($me, $app)
 			{
 				$response = $app['exception']->handle($exception);
 
@@ -91,7 +96,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 				}
 				else
 				{
-					$app['kernel.exception']->handle($exception);
+					$me->displayException($exception);
 				}
 			};
 		};
@@ -112,6 +117,76 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 			$app['kernel.error']->handleFatal();
 		});
+	}
+
+	/**
+	 * Register the Whoops error display service.
+	 *
+	 * @return void
+	 */
+	protected function registerWhoops()
+	{
+		$this->registerWhoopsHandler();
+
+		$this->app['whoops'] = $this->app->share(function($app)
+		{
+			$whoops = new \Whoops\Run;
+
+			$whoops->allowQuit(false);
+
+			return $whoops->pushHandler($app['whoops.handler']);
+		});
+	}
+
+	/**
+	 * Register the Whoops handler for the request.
+	 *
+	 * @return void
+	 */
+	protected function registerWhoopsHandler()
+	{
+		if ($this->app['request']->ajax() or $this->app->runningInConsole())
+		{
+			$this->app['whoops.handler'] = function() { return new JsonResponseHandler; };
+		}
+		else
+		{
+			$this->app['whoops.handler'] = function()
+			{
+				with($handler = new PrettyPageHandler)->setResourcesPath(__DIR__.'/resources');
+				
+				return $handler;
+			};
+		}
+	}
+
+	/**
+	 * Display the given exception.
+	 *
+	 * @param  \Exception  $exception
+	 * @return void
+	 */
+	public function displayException($exception)
+	{
+		if ($this->app['config']['app.debug'])
+		{
+			return $this->displayWhoopsException($exception);
+		}
+
+		$this->app['kernel.exception']->handle($exception);
+	}
+
+	/**
+	 * Display a exception using the Whoops library.
+	 *
+	 * @param  \Exception  $exception
+	 * @return void
+	 */
+	protected function displayWhoopsException($exception)
+	{
+		ob_start(); $this->app['whoops']->handleException($exception);
+
+		with(new Response(ob_get_clean(), 500))->send();
 	}
 
 	/**
