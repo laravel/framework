@@ -80,6 +80,13 @@ abstract class ServiceProvider {
 		// Finally we will register the view namespace so that we can access each of
 		// the views available in this package. We use a standard convention when
 		// registering the paths to every package's views and other components.
+		$appview = App('path').'/views/packages/'. $package.'/'.$namespace;
+
+		if ($this->app['files']->isDirectory($appview))
+		{
+			$this->app['view']->addNamespace($namespace, $appview);
+		}
+
 		$view = $path.'/views';
 
 		if ($this->app['files']->isDirectory($view))
