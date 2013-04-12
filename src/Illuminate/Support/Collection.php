@@ -251,7 +251,14 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function offsetSet($key, $value)
 	{
-		$this->items[$key] = $value;
+		if(is_null($key))
+		{
+			$this->items[] = $value;
+		}
+		else
+		{
+			$this->items[$key] = $value;
+		}
 	}
 
 	/**

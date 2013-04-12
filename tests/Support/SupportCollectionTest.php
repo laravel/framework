@@ -86,6 +86,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(isset($c['name']));
 		unset($c['name']);
 		$this->assertFalse(isset($c['name']));
+		$c[] = 'jason';
+		$this->assertEquals('jason', $c[0]);
 	}
 
 
