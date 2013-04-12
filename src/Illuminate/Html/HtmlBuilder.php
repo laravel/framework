@@ -74,7 +74,7 @@ class HtmlBuilder {
 	{
 		$attributes['src'] = $this->url->asset($url);
 
-		return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
+		return '<script'.$this->attributes($attributes).' type="text/javascript"></script>'.PHP_EOL;
 	}
 
 	/**
