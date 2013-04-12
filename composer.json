@@ -13,7 +13,7 @@
         "php": ">=5.3.7",
         "classpreloader/classpreloader": "1.0.*",
         "ircmaxell/password-compat": "1.0.*",
-        "filp/whoops": "1.0.0",
+        "filp/whoops": "1.0.1",
         "monolog/monolog": "1.4.*",
         "patchwork/utf8": "1.0.*",
         "predis/predis": "0.8.*",
