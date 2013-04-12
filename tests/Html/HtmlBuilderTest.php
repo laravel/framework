@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\Routing\RouteCollection;
 
 
-class FormBuilderTest extends PHPUnit_Framework_TestCase {
+class HtmlBuilderTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Setup the test environment.
