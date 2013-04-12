@@ -203,7 +203,7 @@ class FormBuilder {
 		// in the model instance if one is set. Otherwise we will just use empty.
 		$id = $this->getIdAttribute($name, $options);
 
-		if ($type != 'file')
+		if ($type != 'file' && $type != 'radio')
 		{
 			$value = $this->getValueAttribute($name, $value);
 		}
