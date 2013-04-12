@@ -46,6 +46,7 @@
         "illuminate/foundation": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
+        "illuminate/html": "self.version",
         "illuminate/log": "self.version",
         "illuminate/mail": "self.version",
         "illuminate/pagination": "self.version",
