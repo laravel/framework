@@ -162,11 +162,13 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerPrettyWhoopsHandler()
 	{
-		$this->app['whoops.handler'] = function()
+		$me = $this;
+		
+		$this->app['whoops.handler'] = function() use ($me)
 		{
 			$handler = new PrettyPageHandler;
 
-			if ( ! is_null($path = $this->resourcePath())) $handler->setResourcesPath($path);
+			if ( ! is_null($path = $me->resourcePath())) $handler->setResourcesPath($path);
 			
 			return $handler;
 		};
@@ -177,7 +179,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 *
 	 * @return string
 	 */
-	protected function resourcePath()
+	public function resourcePath()
 	{
 		if (is_dir($path = $this->app['path.base'].'/vendor/laravel/framework/src/Illuminate/Exception/resources'))
 		{
