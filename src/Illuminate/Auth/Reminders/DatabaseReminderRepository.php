@@ -90,7 +90,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Determine if the reminder has expired.
 	 *
-	 * @param  StdClass  $reminder
+	 * @param  stdClass  $reminder
 	 * @return bool
 	 */
 	protected function reminderExpired($reminder)

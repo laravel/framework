@@ -5,7 +5,7 @@ class ViewEngineResolverTest extends PHPUnit_Framework_TestCase {
 	public function testResolversMayBeResolved()
 	{
 		$resolver = new Illuminate\View\Engines\EngineResolver;
-		$resolver->register('foo', function() { return new StdClass; });
+		$resolver->register('foo', function() { return new stdClass; });
 		$result = $resolver->resolve('foo');
 
 		$this->assertEquals(spl_object_hash($result), spl_object_hash($resolver->resolve('foo')));

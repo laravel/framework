@@ -70,7 +70,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		});
 		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->once()->andReturn('email');
-		$message = m::mock('StdClass');
+		$message = m::mock('stdClass');
 		$message->shouldReceive('to')->once()->with('email');
 		$result = $broker->sendReminder($user, 'token', $callback);
 		call_user_func($result, $message);
@@ -95,8 +95,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	{
 		$broker = $this->getBroker($mocks = $this->getMocks());
 		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
-		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
-		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('stdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('stdClass'));
 		$request->shouldReceive('input')->once()->with('password')->andReturn('foo');
 		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn('bar');
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
@@ -111,8 +111,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	{
 		$broker = $this->getBroker($mocks = $this->getMocks());
 		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
-		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
-		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('stdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('stdClass'));
 		$request->shouldReceive('input')->once()->with('password')->andReturn(null);
 		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn(null);
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
@@ -127,8 +127,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	{
 		$broker = $this->getBroker($mocks = $this->getMocks());
 		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
-		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
-		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('stdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('stdClass'));
 		$request->shouldReceive('input')->once()->with('password')->andReturn('abc');
 		$request->shouldReceive('input')->once()->with('password_confirmation')->andReturn('abc');
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));
@@ -144,8 +144,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$broker = $this->getMock('Illuminate\Auth\Reminders\PasswordBroker', array('validNewPasswords'), array_values($mocks = $this->getMocks()));
 		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 		$broker->expects($this->once())->method('validNewPasswords')->will($this->returnValue(true));
-		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('StdClass'));
-		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('StdClass'));
+		$mocks['redirect']->shouldReceive('getUrlGenerator')->andReturn($gen = m::mock('stdClass'));
+		$gen->shouldReceive('getRequest')->andReturn($request = m::mock('stdClass'));
 		$request->shouldReceive('input')->once()->with('token')->andReturn('token');
 		$mocks['reminders']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 		$mocks['redirect']->shouldReceive('refresh')->andReturn($redirect = m::mock('Illuminate\Http\RedirectResponse'));

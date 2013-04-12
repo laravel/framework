@@ -180,7 +180,7 @@ class Migrator {
 	/**
 	 * Run "down" a migration instance.
 	 *
-	 * @param  StdClass  $migration
+	 * @param  stdClass  $migration
 	 * @param  bool  $pretend
 	 * @return void
 	 */

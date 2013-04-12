@@ -13,7 +13,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testCreateInsertsNewRecordIntoTable()
 	{
 		$repo = $this->getRepo();
-		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
+		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
 		$query->shouldReceive('insert')->once();
 		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
@@ -27,7 +27,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testExistReturnsFalseIfNoRowFoundForUser()
 	{
 		$repo = $this->getRepo();
-		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
+		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
 		$query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$query->shouldReceive('first')->andReturn(null);
@@ -41,7 +41,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testExistReturnsFalseIfRecordIsExpired()
 	{
 		$repo = $this->getRepo();
-		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
+		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
 		$query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$date = date('Y-m-d H:i:s', time() - 300000);
@@ -56,7 +56,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testExistReturnsTrueIfValidRecordExists()
 	{
 		$repo = $this->getRepo();
-		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
+		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
 		$query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$date = date('Y-m-d H:i:s', time() - 200000);
@@ -71,7 +71,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testDeleteMethodDeletesByToken()
 	{
 		$repo = $this->getRepo();
-		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
+		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$query->shouldReceive('delete')->once();
 

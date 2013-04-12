@@ -14,7 +14,7 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testHasTableCorrectlyCallsGrammar()
 	{
 		$connection = m::mock('Illuminate\Database\Connection');
-		$grammar = m::mock('StdClass');
+		$grammar = m::mock('stdClass');
 		$connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
 		$builder = new Builder($connection);
 		$grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');

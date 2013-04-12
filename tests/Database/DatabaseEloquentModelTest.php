@@ -187,7 +187,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		);
 		$model = new EloquentDateModelStub;
 		Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-		$resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+		$resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('stdClass'));
 		$mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
 		$mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
 		$instance = $model->newInstance($timestamps);
@@ -204,7 +204,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		);
 		$model = new EloquentDateModelStub;
 		Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-		$resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+		$resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('stdClass'));
 		$mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
 		$mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
 		$instance = $model->newInstance($timestamps);
@@ -644,7 +644,7 @@ class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($mock);
-		$mock->shouldReceive('get')->once()->andReturn(array($model = m::mock('StdClass')));
+		$mock->shouldReceive('get')->once()->andReturn(array($model = m::mock('stdClass')));
 		$model->shouldReceive('delete')->once();
 		return $mock;
 	}

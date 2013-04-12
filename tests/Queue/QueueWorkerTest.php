@@ -14,7 +14,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 	public function testJobIsPoppedOffQueueAndProcessed()
 	{
 		$worker = $this->getMock('Illuminate\Queue\Worker', array('process'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
-		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('stdClass'));
 		$job = m::mock('Illuminate\Queue\Jobs\Job');
 		$connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
 		$worker->expects($this->once())->method('process')->with($this->equalTo($job));
@@ -26,7 +26,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 	public function testWorkerSleepsIfNoJobIsPresentAndSleepIsEnabled()
 	{
 		$worker = $this->getMock('Illuminate\Queue\Worker', array('process', 'sleep'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
-		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('stdClass'));
 		$connection->shouldReceive('pop')->once()->with('queue')->andReturn(null);
 		$worker->expects($this->never())->method('process');
 		$worker->expects($this->once())->method('sleep')->with($this->equalTo(1));

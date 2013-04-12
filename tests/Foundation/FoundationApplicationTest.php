@@ -17,7 +17,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
 		$app['request']->shouldReceive('getHost')->andReturn('foo');
-		$app['request']->server = m::mock('StdClass');
+		$app['request']->server = m::mock('stdClass');
 		$app['request']->server->shouldReceive('get')->once()->with('argv')->andReturn(array());
 		$app->shouldReceive('runningInConsole')->once()->andReturn(false);
 		$app->detectEnvironment(array(
@@ -28,7 +28,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
 		$app['request']->shouldReceive('getHost')->andReturn('localhost');
-		$app['request']->server = m::mock('StdClass');
+		$app['request']->server = m::mock('stdClass');
 		$app['request']->server->shouldReceive('get')->once()->with('argv')->andReturn(array());
 		$app->shouldReceive('runningInConsole')->once()->andReturn(false);
 		$app->detectEnvironment(array(
@@ -39,7 +39,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
 		$app['request']->shouldReceive('getHost')->andReturn('localhost');
-		$app['request']->server = m::mock('StdClass');
+		$app['request']->server = m::mock('stdClass');
 		$app['request']->server->shouldReceive('get')->once()->with('argv')->andReturn(array());
 		$app->shouldReceive('runningInConsole')->once()->andReturn(false);
 		$app->detectEnvironment(array(
@@ -50,7 +50,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
 		$app['request']->shouldReceive('getHost')->andReturn('localhost');
-		$app['request']->server = m::mock('StdClass');
+		$app['request']->server = m::mock('stdClass');
 		$app['request']->server->shouldReceive('get')->once()->with('argv')->andReturn(array());
 		$app->shouldReceive('runningInConsole')->once()->andReturn(false);
 		$host = gethostname();
@@ -66,7 +66,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app = m::mock('Illuminate\Foundation\Application[runningInConsole]');
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
 		$app['request']->shouldReceive('getHost')->andReturn('foo');
-		$app['request']->server = m::mock('StdClass');
+		$app['request']->server = m::mock('stdClass');
 		$app['request']->server->shouldReceive('get')->once()->with('argv')->andReturn(array());
 		$app->shouldReceive('runningInConsole')->once()->andReturn(false);
 		$app->detectEnvironment(function() { return 'foobar'; });
@@ -79,7 +79,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app = new Application;
 		$app['request'] = m::mock('Symfony\Component\HttpFoundation\Request');
 		$app['request']->shouldReceive('getHost')->andReturn('foo');
-		$app['request']->server = m::mock('StdClass');
+		$app['request']->server = m::mock('stdClass');
 		$app['request']->server->shouldReceive('get')->once()->with('argv')->andReturn(array('--env=local'));
 		$app->detectEnvironment(array(
 			'local'   => array('foobar')
@@ -140,11 +140,11 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
 	{
 		$app = new Application;
-		$app['config'] = $config = m::mock('StdClass');
+		$app['config'] = $config = m::mock('stdClass');
 		$config->shouldReceive('set')->once()->with('app.locale', 'foo');
-		$app['translator'] = $trans = m::mock('StdClass');
+		$app['translator'] = $trans = m::mock('stdClass');
 		$trans->shouldReceive('setLocale')->once()->with('foo');
-		$app['events'] = $events = m::mock('StdClass');
+		$app['events'] = $events = m::mock('stdClass');
 		$events->shouldReceive('fire')->once()->with('locale.changed', array('foo'));
 
 		$app->setLocale('foo');

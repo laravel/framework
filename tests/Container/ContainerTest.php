@@ -198,7 +198,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$container->resolving(function($object) { return $object->name = 'taylor'; });
-		$container->bind('foo', function() { return new StdClass; });
+		$container->bind('foo', function() { return new stdClass; });
 		$instance = $container->make('foo');
 
 		$this->assertEquals('taylor', $instance->name);

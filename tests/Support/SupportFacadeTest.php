@@ -19,7 +19,7 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	public function testFacadeCallsUnderlyingApplication()
 	{
 		$app = new ApplicationStub;
-		$app->setAttributes(array('foo' => $mock = m::mock('StdClass')));
+		$app->setAttributes(array('foo' => $mock = m::mock('stdClass')));
 		$mock->shouldReceive('bar')->once()->andReturn('baz');
 		FacadeStub::setFacadeApplication($app);
 		$this->assertEquals('baz', FacadeStub::bar());
@@ -29,7 +29,7 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	public function testShouldReceiveReturnsAMockeryMock()
 	{
 		$app = new ApplicationStub;
-		$app->setAttributes(array('foo' => new StdClass));
+		$app->setAttributes(array('foo' => new stdClass));
 		FacadeStub::setFacadeApplication($app);
 
 		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
@@ -39,7 +39,7 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	public function testShouldReceiveCanBeCalledTwice()
 	{
 		$app = new ApplicationStub;
-		$app->setAttributes(array('foo' => new StdClass));
+		$app->setAttributes(array('foo' => new stdClass));
 		FacadeStub::setFacadeApplication($app);
 
 		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());

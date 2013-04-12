@@ -51,7 +51,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(true);
 
 		// foo mock is just a deferred provider
-		$repo->shouldReceive('createProvider')->once()->with($app, 'foo')->andReturn($fooMock = m::mock('StdClass'));
+		$repo->shouldReceive('createProvider')->once()->with($app, 'foo')->andReturn($fooMock = m::mock('stdClass'));
 		$fooMock->shouldReceive('isDeferred')->once()->andReturn(true);
 		$fooMock->shouldReceive('provides')->once()->andReturn(array('foo.provides1', 'foo.provides2'));
 
