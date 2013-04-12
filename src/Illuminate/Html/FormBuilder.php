@@ -97,7 +97,7 @@ class FormBuilder {
 		// We need to extract the proper method from the attributes. If the method is
 		// something other than GET or POST we'll use POST since we will spoof the
 		// actual method since forms don't support the reserved methods in HTML.
-		$attributes['method'] = $this->getMethod($method);
+		$attributes['method'] = $this->getMethod(strtolower($method));
 
 		$attributes['action'] = $this->getAction($options);
 
@@ -215,7 +215,7 @@ class FormBuilder {
 
 		$options = array_merge($options, $merge);
 
-		return '<input'.$this->html->attributes($options).'>';
+		return '<input'.$this->html->attributes($options).$this->html->closingSlash().'>';
 	}
 
 	/**
@@ -573,7 +573,7 @@ class FormBuilder {
 	 */
 	protected function getMethod($method)
 	{
-		return $method != 'GET' ? 'POST' : $method;
+		return $method != 'get' ? 'post' : $method;
 	}
 
 	/**

@@ -19,14 +19,23 @@ class HtmlBuilder {
 	protected $macros;
 
 	/**
+	 * The config for HTML
+	 *
+	 * @var array
+	 */
+	protected $config;
+
+	/**
 	 * Create a new HTML builder instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
+	 * @param  array
 	 * @return void
 	 */
-	public function __construct(UrlGenerator $url = null)
+	public function __construct(UrlGenerator $url = null, $config = null)
 	{
 		$this->url = $url;
+		$this->config = $config;
 	}
 
 	/**
@@ -64,6 +73,54 @@ class HtmlBuilder {
 	}
 
 	/**
+	 * Generate a HTML !DOCTYPE
+	 *
+	 * @param  string  $type
+	 * @return string
+	 */
+	public function doctype($type = false)
+	{
+		if ($type === false && isset($this->config['doctype']))
+		{
+			$type = $this->config['doctype'];
+		}
+
+		if (isset($this->config['doctypes'][$type]))
+		{
+			return $this->config['doctypes'][$type];
+		}
+		elseif ($type == 'html5')
+		{
+			return '<!DOCTYPE html>';
+		}
+		else
+		{
+			throw new \InvalidArgumentException('Unknown doctype or it has not been listed in the config!');
+		}
+	}
+
+	/**
+	 * Return slash or empty string depending on html markup
+	 * defined in the config
+	 *
+	 * @return string
+	 */
+	public function closingSlash()
+	{
+		return ((isset($this->config['markup']) && $this->config['markup'] == 'xhtml') ? '/' : "");
+	}
+
+	/**
+	 * Set the markup
+	 *
+	 * Mainly for testing
+	 */
+	public function setMarkup($markup)
+	{
+		$this->config['markup'] = $markup;
+	}
+
+	/**
 	 * Generate a link to a JavaScript file.
 	 *
 	 * @param  string  $url
@@ -92,7 +149,7 @@ class HtmlBuilder {
 
 		$attributes['href'] = $this->url->asset($url);
 
-		return '<link'.$this->attributes($attributes).'>'.PHP_EOL;
+		return '<link'.$this->attributes($attributes).$this->closingSlash().'>'.PHP_EOL;
 	}
 
 	/**
@@ -107,7 +164,7 @@ class HtmlBuilder {
 	{
 		$attributes['alt'] = $alt;
 
-		return '<img src="'.$this->url->asset($url).'"'.$this->attributes($attributes).'>';
+		return '<img src="'.$this->url->asset($url).'"'.$this->attributes($attributes).$this->closingSlash().'>';
 	}
 
 	/**

@@ -32,7 +32,7 @@ class HtmlServiceProvider extends ServiceProvider {
 	{
 		$this->app['html'] = $this->app->share(function($app)
 		{
-			return new HtmlBuilder($app['url']);
+			return new HtmlBuilder($app['url'], $app['config']['html']);
 		});
 	}
 
