@@ -109,6 +109,17 @@ header {
       color:#999;
       word-wrap:break-word;
     }
+      .editor-link {
+        color: inherit;
+      }
+        .editor-link:hover strong {
+          color: #F0E5DF;
+        }
+
+        .editor-link-callout {
+          padding: 2px 4px;
+          background: #872D00;
+        }
 
     .frame-line {
       font-weight: bold;

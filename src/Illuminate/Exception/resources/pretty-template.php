@@ -67,7 +67,14 @@
               <?php $line = $frame->getLine(); ?>
                 <div class="frame-code <?php echo ($i == 0 ) ? 'active' : '' ?>" id="frame-code-<?php echo $i ?>">
                   <div class="frame-file">
-                    <strong><?php echo $e($frame->getFile() ?: '<#unknown>') ?></strong>
+                    <?php $filePath = $frame->getFile(); ?>
+                    <?php if($filePath && $editorHref = $v->handler->getEditorHref($filePath, (int) $line)): ?>
+                      <a href="<?php echo $editorHref ?>" class="editor-link">
+                        <span class="editor-link-callout">open:</span> <strong><?php echo $e($filePath ?: '<#unknown>') ?></strong>
+                      </a>
+                    <?php else: ?>
+                      <strong><?php echo $e($filePath ?: '<#unknown>') ?></strong>
+                    <?php endif ?>
                   </div>
                   <?php
                     // Do nothing if there's no line to work off
