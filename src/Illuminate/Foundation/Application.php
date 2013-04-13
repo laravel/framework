@@ -110,6 +110,18 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
+	 * Set the application request for the console environment.
+	 *
+	 * @return void
+	 */
+	public function setRequestForConsoleEnvironment()
+	{
+		$url = $this['config']['app.url'];
+
+		$this['request'] = Request::create($url, 'GET', array(), array(), array(), $_SERVER);
+	}
+
+	/**
 	 * Bind the installation paths to the application.
 	 *
 	 * @param  array  $paths
