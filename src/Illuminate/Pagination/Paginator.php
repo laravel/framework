@@ -165,16 +165,6 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
-	 * The pagination environment.
-	 *
-	 * @var \Illuminate\Pagination\Environment
-	 */
-	public function getEnvironment()
-	{
-		return $this->env;
-	}
-
-	/**
 	 * Add a query string value to the paginator.
 	 *
 	 * @param  string  $key
@@ -236,6 +226,16 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getTotal()
 	{
 		return $this->total;
+	}
+
+	/**
+	 * Get the pagination environment.
+	 *
+	 * @var \Illuminate\Pagination\Environment
+	 */
+	public function getEnvironment()
+	{
+		return $this->env;
 	}
 
 	/**
