@@ -55,4 +55,14 @@ class SqlServerConnection extends Connection {
 		return $this->withTablePrefix(new Schema\Grammars\SqlServerGrammar);
 	}
 
+	/**
+	 * Get the Doctrine DBAL Driver.
+	 *
+	 * @return \Doctrine\DBAL\Driver
+	 */
+	protected function getDoctrineDriver()
+	{
+		return new \Doctrine\DBAL\Driver\PDOSqlsrv\Driver;
+	}
+
 }

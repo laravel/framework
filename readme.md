@@ -15,6 +15,8 @@
 - Added `Redirect::home` method from Laravel 3.
 - Added `Crypt::setKey`, `Crypt::setCipher`, and `Crypt::setMode`.
 - Allow "lazy" eager loading from an individual model: `$user->load('orders.lines');`.
+- Added `renameColumn` support to schema builder.
+- Added `dropColumn` support to SQLite schema builder.
 
 ## Beta 4
 

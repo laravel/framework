@@ -34,4 +34,14 @@ class MySqlConnection extends Connection {
 		return $this->withTablePrefix(new Schema\Grammars\MySqlGrammar);
 	}
 
+	/**
+	 * Get the Doctrine DBAL Driver.
+	 *
+	 * @return \Doctrine\DBAL\Driver
+	 */
+	protected function getDoctrineDriver()
+	{
+		return new \Doctrine\DBAL\Driver\PDOMySql\Driver;
+	}
+
 }

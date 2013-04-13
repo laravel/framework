@@ -12,6 +12,7 @@
     "require": {
         "php": ">=5.3.7",
         "classpreloader/classpreloader": "1.0.*",
+        "doctrine/dbal": "2.4.x",
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.1",
         "monolog/monolog": "1.4.*",

@@ -208,6 +208,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Indicate that the given columns should be renamed.
+	 *
+	 * @param  string  $from
+	 * @param  string  $to
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function renameColumn($from, $to)
+	{
+		return $this->addCommand('renameColumn', compact('from', 'to'));
+	}
+
+	/**
 	 * Indicate that the given primary key should be dropped.
 	 *
 	 * @param  string|array  $index

@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 
 class SQLiteGrammar extends Grammar {
@@ -193,11 +194,23 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Illuminate\Support\Fluent  $command
-	 * @return string
+	 * @param  \Illuminate\Database\Connection  $connection
+	 * @return array
 	 */
-	public function compileDropColumn(Blueprint $blueprint, Fluent $command)
+	public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
 	{
-		throw new \BadMethodCallException("Drop column not supported for SQLite.");
+		$schema = $connection->getDoctrineSchemaManager();
+
+		$tableDiff = $this->getDoctrineTableDiff($blueprint, $schema);
+
+		foreach ($command->columns as $name)
+		{
+			$column = $connection->getDoctrineColumn($blueprint->getTable(), $name);
+
+			$tableDiff->removedColumns[$name] = $column;
+		}
+
+		return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
 	}
 
 	/**

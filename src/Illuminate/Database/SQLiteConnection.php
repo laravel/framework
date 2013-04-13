@@ -22,4 +22,14 @@ class SQLiteConnection extends Connection {
 		return $this->withTablePrefix(new Schema\Grammars\SQLiteGrammar);
 	}
 
+	/**
+	 * Get the Doctrine DBAL Driver.
+	 *
+	 * @return \Doctrine\DBAL\Driver
+	 */
+	protected function getDoctrineDriver()
+	{
+		return new \Doctrine\DBAL\Driver\PDOSqlite\Driver;
+	}
+
 }
