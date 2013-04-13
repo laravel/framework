@@ -17,6 +17,7 @@
 - Allow "lazy" eager loading from an individual model: `$user->load('orders.lines');`.
 - Added `renameColumn` support to schema builder.
 - Added `dropColumn` support to SQLite schema builder.
+- Added `url` option to configuration for use by the Artisan CLI.
 
 ## Beta 4
 
