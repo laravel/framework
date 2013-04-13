@@ -166,10 +166,10 @@ class ExceptionServiceProvider extends ServiceProvider {
 		
 		$this->app['whoops.handler'] = function() use ($me)
 		{
-			$handler = new PrettyPageHandler;
+			with($handler = new PrettyPageHandler)->setEditor('sublime');
 
 			if ( ! is_null($path = $me->resourcePath())) $handler->setResourcesPath($path);
-			
+
 			return $handler;
 		};
 	}
