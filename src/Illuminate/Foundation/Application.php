@@ -116,7 +116,7 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function setRequestForConsoleEnvironment()
 	{
-		$url = $this['config']['app.url'];
+		$url = $this['config']->get('app.url', 'http://localhost');
 
 		$this['request'] = Request::create($url, 'GET', array(), array(), array(), $_SERVER);
 	}
