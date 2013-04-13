@@ -23,7 +23,7 @@ abstract class Grammar extends BaseGrammar {
 	{
 		$schema = $connection->getDoctrineSchemaManager();
 
-		$column = $connection->getDoctrineColumn($blueprint->getTabel(), $command->from);
+		$column = $connection->getDoctrineColumn($blueprint->getTable(), $command->from);
 
 		$tableDiff = $this->getRenamedDiff($blueprint, $command, $column, $schema);
 
