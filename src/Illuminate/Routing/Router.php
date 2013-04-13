@@ -1366,7 +1366,7 @@ class Router {
 	{
 		$currentRoute = $this->currentRoute;
 
-		if ( ! is_null($currentRoute)) return $currentRoute->getOption('_users');
+		if ( ! is_null($currentRoute)) return $currentRoute->getOption('_uses');
 	}
 
 	/**
