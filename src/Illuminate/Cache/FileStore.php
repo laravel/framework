@@ -47,14 +47,12 @@ class FileStore implements StoreInterface {
 			return null;
 		}
 
-		$contents = $this->files->get($path);
-
-		$expiration = substr($contents, 0, 10);
+		$expire = substr($contents = $this->files->get($path), 0, 10);
 
 		// If the current time is greater than expiration timestamps we will delete
 		// the file and return null. This helps clean up the old files and keeps
 		// this directory much cleaner for us as old files aren't hanging out.
-		if (time() >= $expiration)
+		if (time() >= $expire)
 		{
 			return $this->forget($key);
 		}
@@ -73,12 +71,12 @@ class FileStore implements StoreInterface {
 	public function put($key, $value, $minutes)
 	{
 		$value = $this->expiration($minutes).serialize($value);
-		$path = $this->path($key);
-		$dir = dirname($path);
 
-		if( ! $this->files->isDirectory($dir))
+		$path = $this->path($key);
+
+		if ( ! $this->files->isDirectory($directory = dirname($path)))
 		{
-			$this->files->makeDirectory($dir, 0777, true);
+			$this->files->makeDirectory($directory, 0777, true);
 		}
 
 		$this->files->put($path, $value);
@@ -152,10 +150,9 @@ class FileStore implements StoreInterface {
 	 */
 	protected function path($key)
 	{
-		$md5 = md5($key);
-		$parts = array_slice(str_split($md5, 2), 0, 2);
+		$parts = array_slice(str_split($hash = md5($key), 2), 0, 2);
 
-		return $this->directory.'/'.join('/', $parts).'/'.$md5;
+		return $this->directory.'/'.join('/', $parts).'/'.$hash;
 	}
 
 	/**
