@@ -54,7 +54,7 @@ abstract class Grammar extends BaseGrammar {
 	 * @param  \Doctrine\DBAL\Schema\Column  $column
 	 * @return \Doctrine\DBAL\Schema\TableDiff
 	 */
-	protected function setRenamedColumns(TableDiff $tableDiff, Command $command, Column $column)
+	protected function setRenamedColumns(TableDiff $tableDiff, Fluent $command, Column $column)
 	{
 		$newColumn = new Column($command->to, $column->getType(), $column->toArray());
 
