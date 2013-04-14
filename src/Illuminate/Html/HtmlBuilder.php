@@ -127,7 +127,7 @@ class HtmlBuilder {
 
 		return '<a href="'.$url.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
-
+	
 	/**
 	 * Generate a HTTPS HTML link.
 	 *
@@ -196,6 +196,68 @@ class HtmlBuilder {
 	public function linkAction($action, $title = null, $parameters = array(), $attributes = array())
 	{
 		return $this->link($this->url->action($action, $parameters), $title, $attributes);
+	}
+
+	/**
+	 * Generate a HTML link to a mailto
+	 * @param  string  $email
+	 * @param  string  $title
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function mailto($email, $title = null, $attributes = array())
+	{
+		$email = static::email($email);
+		
+		$title = $title ?: $email;
+		
+		$email = static::obfuscate('mailto:') . $email;
+		
+		return '<a href="'.$email.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
+	}
+	
+	/**
+	 * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
+	 *
+	 * @param  string  $email
+	 * @return string
+	 */
+	public static function email($email)
+	{
+		return str_replace('@', '&#64;', static::obfuscate($email));
+	}
+
+	/**
+	 * Obfuscate a string to prevent spam-bots from sniffing it.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected static function obfuscate($value)
+	{
+		$safe = '';
+
+		foreach (str_split($value) as $letter)
+		{
+			// To properly obfuscate the value, we will randomly convert each
+			// letter to its entity or hexadecimal representation, keeping a
+			// bot from sniffing the randomly obfuscated letters.
+			switch (rand(1, 3))
+			{
+				case 1:
+					$safe .= '&#'.ord($letter).';';
+					break;
+
+				case 2:
+					$safe .= '&#x'.dechex(ord($letter)).';';
+					break;
+
+				case 3:
+					$safe .= $letter;
+			}
+		}
+
+		return $safe;
 	}
 
 	/**
