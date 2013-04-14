@@ -73,8 +73,15 @@ class FileStore implements StoreInterface {
 	public function put($key, $value, $minutes)
 	{
 		$value = $this->expiration($minutes).serialize($value);
+		$path = $this->path($key);
+		$dir = dirname($path);
 
-		$this->files->put($this->path($key), $value);
+		if( ! $this->files->isDirectory($dir))
+		{
+			$this->files->makeDirectory($dir, 0777, true);
+		}
+
+		$this->files->put($path, $value);
 	}
 
 	/**
@@ -145,7 +152,10 @@ class FileStore implements StoreInterface {
 	 */
 	protected function path($key)
 	{
-		return $this->directory.'/'.md5($key);
+		$md5 = md5($key);
+		$parts = array_slice(str_split($md5, 2), 0, 2);
+
+		return $this->directory.'/'.join('/', $parts).'/'.$md5;
 	}
 
 	/**
