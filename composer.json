@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.7",
+        "php": ">=5.3.0",
         "classpreloader/classpreloader": "1.0.*",
         "doctrine/dbal": "2.4.x",
         "ircmaxell/password-compat": "1.0.*",

@@ -3,6 +3,19 @@
 class BcryptHasher implements HasherInterface {
 
 	/**
+	 * Create a new Bcrypt hasher instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		if (version_compare(PHP_VERSION, '5.3.7') < 0)
+		{
+			throw new \RuntimeException("Bcrypt hashing requires PHP 5.3.7");
+		}
+	}
+
+	/**
 	 * Hash the given value.
 	 *
 	 * @param  string  $value
