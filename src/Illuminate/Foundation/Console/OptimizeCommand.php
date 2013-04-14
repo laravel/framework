@@ -50,13 +50,38 @@ class OptimizeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->info('Generating optimized class loader...');
+		if ($this->input->getOption('remove'))
+		{
+			if (is_file($this->getCompiledFile()))
+			{
+				$this->info('Deleting bootstrap/compiled.php');
+				unlink($this->getCompiledFile());
+			}
+			else
+			{
+				$this->info('bootstrap/compiled.php was not there...');
+			}
+		}
+		else
+		{
+			$this->info('Generating optimized class loader...');
 
-		$this->composer->dumpOptimized();
+			$this->composer->dumpOptimized();
 
-		$this->info('Compiling common classes...');
+			$this->info('Compiling common classes...');
 
-		$this->compileClasses();
+			$this->compileClasses();
+		}
+	}
+
+	/**
+	 * Get the path to compiled.php.
+	 *
+	 * @return string
+	 */
+	protected function getCompiledFile()
+	{
+		return $this->laravel['path.base'] . '/bootstrap/compiled.php';
 	}
 
 	/**
@@ -97,4 +122,15 @@ class OptimizeCommand extends Command {
 		$this->laravel['artisan']->add(new PreCompileCommand);
 	}
 
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('remove', null, InputOption::VALUE_NONE, 'Remove bootstrap/compiled.php.', null),
+		);
+	}
 }
