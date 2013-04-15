@@ -22,6 +22,7 @@
 - Pass `route` and `request` to Closure based controller before filters.
 - Added `Auth::basicStateless` method for easier API integration with basic auth.
 - Renamed `Auth::stateless` and `Auth::basicStateless` to `Auth::once` and `Auth::onceBasic`.
+- Added named view implementation which was in Laravel 3.
 
 ## Beta 4
 
