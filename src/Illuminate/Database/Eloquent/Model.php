@@ -657,10 +657,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a saving model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function saving(Closure $callback)
+	public static function saving($callback)
 	{
 		static::registerModelEvent('saving', $callback);
 	}
@@ -668,10 +668,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a saved model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function saved(Closure $callback)
+	public static function saved($callback)
 	{
 		static::registerModelEvent('saved', $callback);
 	}
@@ -679,10 +679,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register an updating model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function updating(Closure $callback)
+	public static function updating($callback)
 	{
 		static::registerModelEvent('updating', $callback);
 	}
@@ -690,10 +690,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register an updated model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function updated(Closure $callback)
+	public static function updated($callback)
 	{
 		static::registerModelEvent('updated', $callback);
 	}
@@ -701,10 +701,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a creating model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function creating(Closure $callback)
+	public static function creating($callback)
 	{
 		static::registerModelEvent('creating', $callback);
 	}
@@ -712,10 +712,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a created model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function created(Closure $callback)
+	public static function created($callback)
 	{
 		static::registerModelEvent('created', $callback);
 	}
@@ -723,10 +723,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a deleting model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function deleting(Closure $callback)
+	public static function deleting($callback)
 	{
 		static::registerModelEvent('deleting', $callback);
 	}
@@ -734,10 +734,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a deleted model event with the dispatcher.
 	 *
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public static function deleted(Closure $callback)
+	public static function deleted($callback)
 	{
 		static::registerModelEvent('deleted', $callback);
 	}
@@ -746,10 +746,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a model event with the dispatcher.
 	 *
 	 * @param  string   $event
-	 * @param  Closure  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	protected static function registerModelEvent($event, Closure $callback)
+	protected static function registerModelEvent($event, $callback)
 	{
 		if (isset(static::$dispatcher))
 		{
