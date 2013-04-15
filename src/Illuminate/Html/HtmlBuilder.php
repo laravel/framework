@@ -12,6 +12,13 @@ class HtmlBuilder {
 	protected $url;
 
 	/**
+	 * Whether or not secure link generation is enabled
+	 *
+	 * @var bool
+	 */
+	protected $secureEnabled;
+
+	/**
 	 * The registered html macros.
 	 *
 	 * @var array
@@ -22,11 +29,13 @@ class HtmlBuilder {
 	 * Create a new HTML builder instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
+	 * @param  bool  $secureEnabled
 	 * @return void
 	 */
-	public function __construct(UrlGenerator $url = null)
+	public function __construct(UrlGenerator $url = null, $secureEnabled = true)
 	{
 		$this->url = $url;
+		$this->secureEnabled = $secureEnabled;
 	}
 
 	/**
@@ -121,7 +130,7 @@ class HtmlBuilder {
 	 */
 	public function link($url, $title = null, $attributes = array(), $secure = null)
 	{
-		$url = $this->url->to($url, array(), $secure);
+		$url = $this->url->to($url, array(), $this->secureEnabled ? $secure : null);
 
 		$title = $title ?: $url;
 
@@ -152,9 +161,9 @@ class HtmlBuilder {
 	 */
 	public function linkAsset($url, $title = null, $attributes = array(), $secure = null)
 	{
-		$url = $this->url->asset($url, $secure);
+		$url = $this->url->asset($url, $this->secureEnabled ? $secure : null);
 
-		return $this->link($url, $title ?: $url, $attributes, $secure);
+		return $this->link($url, $title ?: $url, $attributes, $this->secureEnabled ? $secure : null);
 	}
 
 	/**
