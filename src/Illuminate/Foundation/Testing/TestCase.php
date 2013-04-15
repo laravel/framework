@@ -129,7 +129,9 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		$response = $this->client->getResponse();
 
-		return $this->assertTrue($response->isOk(), 'Expected status code 200, got ' .$response->getStatusCode());
+		$actual = $response->getStatusCode();
+
+		return $this->assertTrue($response->isOk(), 'Expected status code 200, got ' .$actual);
 	}
 
 	/**
