@@ -188,7 +188,7 @@ class Guard {
 	 *
 	 * @param  string  $field
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
-	 * @return bool
+	 * @return \Symfony\Component\HttpFoundation\Response|null
 	 */
 	public function basic($field = 'email', Request $request = null)
 	{
@@ -196,12 +196,32 @@ class Guard {
 
 		$request = $request ?: $this->getRequest();
 
+		// If a username is set on the HTTP basic request, we will return out without
+		// interrupting the request lifecycle. Otherwise, we'll need to generate a
+		// request indicating that the given credentials were invalid for login.
 		if ($request->getUser())
 		{
 			if ($this->attemptBasic($request, $field)) return;
 		}
 
 		return $this->getBasicResponse();
+	}
+
+	/**
+	 * Perform a stateless HTTP Basic login attempt.
+	 *
+	 * @param  string  $field
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @return \Symfony\Component\HttpFoundation\Response|null
+	 */
+	public function basicStateless($field = 'email', Request $request = null)
+	{
+		$request = $request ?: $this->getRequest();
+
+		if ( ! $this->stateless($this->getBasicCredentials($request, $field)))
+		{
+			return $this->getBasicResponse();
+		}
 	}
 
 	/**
@@ -213,9 +233,19 @@ class Guard {
 	 */
 	protected function attemptBasic(Request $request, $field)
 	{
-		$pass = $request->getPassword();
+		return $this->attempt($this->getBasicCredentials($request, $field));
+	}
 
-		return $this->attempt(array($field => $request->getUser(), 'password' => $pass));
+	/**
+	 * Get the credential array for a HTTP Basic request.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  string  $field
+	 * @return array
+	 */
+	protected function getBasicCredentials(Request $request, $field)
+	{
+		return array($field => $request->getUser(), 'password' => $request->getPassword());
 	}
 
 	/**

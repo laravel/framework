@@ -256,7 +256,7 @@ class Controller {
 		{
 			$callback = $this->callbackFilters[$filter];
 
-			return call_user_func_array($callback, $parameters);
+			return call_user_func_array($callback, array_merge(array($route, $request), $parameters));
 		}
 
 		return $route->callFilter($filter, $request, $parameters);

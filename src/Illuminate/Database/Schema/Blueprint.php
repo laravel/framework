@@ -198,7 +198,7 @@ class Blueprint {
 	 */
 	public function dropColumn($columns)
 	{
-		$columns = (array) $columns;
+		$columns = is_array($columns) ? $columns : (array) func_get_args();
 
 		return $this->addCommand('dropColumn', compact('columns'));
 	}

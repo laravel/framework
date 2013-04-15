@@ -18,6 +18,9 @@
 - Added `renameColumn` support to schema builder.
 - Added `dropColumn` support to SQLite schema builder.
 - Added `url` option to configuration for use by the Artisan CLI.
+- `dropColumn` now supports dynamic argument lists.
+- Pass `route` and `request` to Closure based controller before filters.
+- Added `Auth::basicStateless` method for easier API integration with basic auth.
 
 ## Beta 4
 
