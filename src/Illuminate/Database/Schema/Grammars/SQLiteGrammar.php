@@ -70,16 +70,40 @@ class SQLiteGrammar extends Grammar {
 		// are building, since SQLite needs foreign keys on the tables creation.
 		foreach ($foreigns as $foreign)
 		{
-			$on = $this->wrapTable($foreign->on);
+			$sql .= $this->getForeignKey($foreign);
 
-			$columns = $this->columnize($foreign->columns);
+			if ( ! is_null($foreign->onDelete))
+			{
+				$sql .= " on delete {$foreign->onDelete}";
+			}
 
-			$onColumns = $this->columnize((array) $foreign->references);
-
-			$sql .= ", foreign key($columns) references $on($onColumns)";
+			if ( ! is_null($foreign->onUpdate))
+			{
+				$sql .= " on update {$foreign->onUpdate}";
+			}
 		}
 
 		return $sql;
+	}
+
+	/**
+	 * Get the SQL for the foreign key.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $foreign
+	 * @return string
+	 */
+	protected function getForeignKey($foreign)
+	{
+		$on = $this->wrapTable($foreign->on);
+
+		// We need to columnize the columns that the foreign key is being defined for
+		// so that it is a properly formatted list. Once we have done this, we can
+		// return the foreign key SQL declaration to the calling method for use.
+		$columns = $this->columnize($foreign->columns);
+
+		$onColumns = $this->columnize((array) $foreign->references);
+
+		return ", foreign key($columns) references $on($onColumns)";
 	}
 
 	/**
