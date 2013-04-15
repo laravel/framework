@@ -29,6 +29,13 @@ class Blueprint {
 	protected $commands = array();
 
 	/**
+	 * The storage engine that should be used for the table.
+	 *
+	 * @var string
+	 */
+	protected $engine;
+
+	/**
 	 * Create a new schema blueprint.
 	 *
 	 * @param  string   $table

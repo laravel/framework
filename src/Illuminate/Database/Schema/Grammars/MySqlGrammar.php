@@ -44,7 +44,17 @@ class MySqlGrammar extends Grammar {
 
 		$sql = 'create table '.$this->wrapTable($blueprint)." ($columns)";
 
-		return $this->compileCreateEncoding($sql, $connection);
+		// Once we have the primary SQL, we can add the encoding option to the SQL for
+		// the table.  Then, we can check if a storage engine has been supplied for
+		// the table. If so, we will add the engine declaration to the SQL query.
+		$sql = $this->compileCreateEncoding($sql, $connection);
+
+		if (isset($blueprint->engine))
+		{
+			$sql .= ' engine = '.$blueprint->engine;
+		}
+
+		return $sql;
 	}
 
 	/**
