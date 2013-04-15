@@ -8,6 +8,8 @@ class BcryptHasherTest extends PHPUnit_Framework_TestCase {
 		$value = $hasher->make('password');
 		$this->assertTrue($value !== 'password');
 		$this->assertTrue($hasher->check('password', $value));
+		$this->assertTrue(!$hasher->needsRehash($value));
+		$this->assertTrue($hasher->needsRehash($value, array('rounds' => 1)));
 	}
 
 }
