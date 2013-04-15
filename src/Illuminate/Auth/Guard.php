@@ -160,7 +160,7 @@ class Guard {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function stateless(array $credentials = array())
+	public function once(array $credentials = array())
 	{
 		if ($this->validate($credentials))
 		{
@@ -214,11 +214,11 @@ class Guard {
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
 	 * @return \Symfony\Component\HttpFoundation\Response|null
 	 */
-	public function basicStateless($field = 'email', Request $request = null)
+	public function onceBasic($field = 'email', Request $request = null)
 	{
 		$request = $request ?: $this->getRequest();
 
-		if ( ! $this->stateless($this->getBasicCredentials($request, $field)))
+		if ( ! $this->once($this->getBasicCredentials($request, $field)))
 		{
 			return $this->getBasicResponse();
 		}

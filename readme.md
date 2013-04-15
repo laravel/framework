@@ -21,6 +21,7 @@
 - `dropColumn` now supports dynamic argument lists.
 - Pass `route` and `request` to Closure based controller before filters.
 - Added `Auth::basicStateless` method for easier API integration with basic auth.
+- Renamed `Auth::stateless` and `Auth::basicStateless` to `Auth::once` and `Auth::onceBasic`.
 
 ## Beta 4
 
