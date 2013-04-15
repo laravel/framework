@@ -77,6 +77,16 @@ class SQLiteGrammar extends Grammar {
 			$onColumns = $this->columnize((array) $foreign->references);
 
 			$sql .= ", foreign key($columns) references $on($onColumns)";
+
+			if ( ! is_null($foreign->onDelete))
+			{
+				$sql .= " on delete {$foreign->onDelete}";
+			}
+
+			if ( ! is_null($foreign->onUpdate))
+			{
+				$sql .= " on update {$foreign->onUpdate}";
+			}
 		}
 
 		return $sql;
