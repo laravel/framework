@@ -33,7 +33,7 @@ class Blueprint {
 	 *
 	 * @var string
 	 */
-	protected $engine;
+	public $engine;
 
 	/**
 	 * Create a new schema blueprint.
