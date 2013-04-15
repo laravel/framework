@@ -136,10 +136,7 @@ class FileStore implements StoreInterface {
 	 */
 	public function flush()
 	{
-		foreach ($this->files->files($this->directory) as $file)
-		{
-			$this->files->delete($file);
-		}
+		$this->files->cleanDirectory($this->directory);
 	}
 
 	/**
