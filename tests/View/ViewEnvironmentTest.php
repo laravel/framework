@@ -59,6 +59,29 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testAddANamedViews()
+    {
+        $env = $this->getEnvironment();
+        $env->name('bar', 'foo');
+
+        $this->assertEquals(array('foo' => 'bar'), $env->getNames());
+    }
+
+
+    public function testMakeAViewFromNamedView()
+    {
+        $env = $this->getEnvironment();
+        $env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
+        $env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
+        $env->getFinder()->shouldReceive('addExtension')->once()->with('php');
+        $env->addExtension('php', 'php');
+        $env->name('view', 'foo');
+        $view = $env->of('foo', array('data'));
+
+        $this->assertTrue($engine === $view->getEngine());
+    }
+
+
 	public function testRawStringsMayBeReturnedFromRenderEach()
 	{
 		$this->assertEquals('foo', $this->getEnvironment()->renderEach('foo', array(), 'item', 'raw|foo'));
