@@ -199,7 +199,8 @@ class HtmlBuilder {
 	}
 
 	/**
-	 * Generate a HTML link to a mailto
+	 * Generate a HTML link to an email address.
+	 * 
 	 * @param  string  $email
 	 * @param  string  $title
 	 * @param  array   $attributes
@@ -207,11 +208,11 @@ class HtmlBuilder {
 	 */
 	public function mailto($email, $title = null, $attributes = array())
 	{
-		$email = static::email($email);
+		$email = $this->email($email);
 		
 		$title = $title ?: $email;
 		
-		$email = static::obfuscate('mailto:') . $email;
+		$email = $this->obfuscate('mailto:') . $email;
 		
 		return '<a href="'.$email.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
@@ -222,7 +223,7 @@ class HtmlBuilder {
 	 * @param  string  $email
 	 * @return string
 	 */
-	public static function email($email)
+	public function email($email)
 	{
 		return str_replace('@', '&#64;', static::obfuscate($email));
 	}
@@ -233,7 +234,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected static function obfuscate($value)
+	protected function obfuscate($value)
 	{
 		$safe = '';
 
