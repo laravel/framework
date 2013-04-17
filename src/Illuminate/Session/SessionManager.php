@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
-use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
@@ -144,7 +143,7 @@ class SessionManager extends Manager {
 	{
 		$storage = new NativeSessionStorage($this->getOptions(), $handler);
 
-		return new Store($storage, null, new AutoExpireFlashBag);
+		return new Store($storage, null, new FlashBag);
 	}
 
 	/**
