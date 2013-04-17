@@ -65,7 +65,7 @@ class Store extends SymfonySession {
 	 */
 	public function getOldInput($key = null, $default = null)
 	{
-		$input = $this->getFlashBag()->peek('_old_input');
+		$input = $this->get('_old_input', array());
 
 		// Input that is flashed to the session can be easily retrieved by the
 		// developer, making repopulating old forms and the like much more
