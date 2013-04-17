@@ -44,13 +44,19 @@ class Redirector {
 	/**
 	 * Create a new redirect response to the previous location.
 	 *
-	 * @param  int    $status
-	 * @param  array  $headers
+	 * @param  string  $fallback
+	 * @param  int     $status
+	 * @param  array   $headers
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
-	public function back($status = 302, $headers = array())
+	public function back($fallback = null, $status = 302, $headers = array())
 	{
 		$back = $this->generator->getRequest()->headers->get('referer');
+
+		if (is_null($back))
+		{
+			$back = $fallback;
+		}
 
 		return $this->createRedirect($back, $status, $headers);
 	}
