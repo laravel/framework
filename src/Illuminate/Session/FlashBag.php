@@ -153,7 +153,7 @@ class FlashBag implements FlashBagInterface
      */
     public function set($type, $messages)
     {
-        $this->flashes['new'][$type] = array($messages);
+        $this->flashes['new'][$type] = is_object($messages) ? array($messages) : (array) $messages;
     }
 
     /**
