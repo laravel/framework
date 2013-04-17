@@ -359,6 +359,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createPlainMatcher('stop');
 
+		$value = preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
+
+		$pattern = $this->createPlainMatcher('endsection');
+
 		return preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
 	}
 
