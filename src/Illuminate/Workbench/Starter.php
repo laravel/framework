@@ -18,7 +18,9 @@ class Starter {
 		// the appropriate classes and file used by the given workbench package.
 		$files = $files ?: new \Illuminate\Filesystem\Filesystem;
 
-		$autoloads = $finder->in($path)->files()->name('autoload.php');
+		// The depth of the 3 assumes as autoload files are in <vendor>/<package>/vendor
+		// relative to the workbench directory.
+		$autoloads = $finder->in($path)->files()->name('autoload.php')->depth(3);
 
 		foreach ($autoloads as $file)
 		{
