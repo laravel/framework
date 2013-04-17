@@ -47,17 +47,6 @@ class Store extends SymfonySession {
 	}
 
 	/**
-	 * Determine if the session has a flash item.
-	 *
-	 * @param  string  $name
-	 * @return bool
-	 */
-	public function hasFlash($name)
-	{
-		return $this->has($name);
-	}
-
-	/**
 	 * Determine if the session contains old input.
 	 *
 	 * @param  string  $key
