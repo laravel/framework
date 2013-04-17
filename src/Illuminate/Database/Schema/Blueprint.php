@@ -204,17 +204,6 @@ class Blueprint {
 	}
 
 	/**
-	 * Indicate that the given columns should be dropped.
-	 *
-	 * @param  dynamic
-	 * @return \Illuminate\Support\Fluent
-	 */
-	public function dropColumns()
-	{
-		return $this->dropColumn(func_get_args());
-	}
-
-	/**
 	 * Indicate that the given columns should be renamed.
 	 *
 	 * @param  string  $from
@@ -277,7 +266,7 @@ class Blueprint {
 	 */
 	public function dropTimestamps()
 	{
-		$this->dropColumns('created_at', 'updated_at');
+		$this->dropColumn('created_at', 'updated_at');
 	}
 
 	/**

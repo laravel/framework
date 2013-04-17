@@ -26,6 +26,7 @@
 - Migrated entire session back-end to Symfony HttpFoundation Session. The `native` driver should now be used in place of the `cookie` driver. All other drivers are available and work the same. New sessions will not be backwards compatible after updating.
 - Renamed `Session::getToken` to `Session::token`.
 - Added a few more helper methods to the `Collection` class.
+- Removed `dropColumns` function.
 
 ## Beta 4
 
