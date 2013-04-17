@@ -23,7 +23,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the "array" session driver.
 	 *
-	 * @return \Illuminate\Session\Session
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createArrayDriver()
 	{
@@ -45,7 +45,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the database session driver.
 	 *
-	 * @return \Illuminate\Session\Session
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createDatabaseDriver()
 	{
