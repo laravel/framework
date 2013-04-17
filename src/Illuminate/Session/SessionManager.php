@@ -21,9 +21,19 @@ class SessionManager extends Manager {
 	}
 
 	/**
+	 * Create an instance of the "cookie" session driver.
+	 *
+	 * @return \Illuminate\Session\SessionManager
+	 */
+	protected function createCookieDriver()
+	{
+		return new Store(new MockArraySessionStorage, null, new FlashBag);
+	}
+	
+	/**
 	 * Create an instance of the "array" session driver.
 	 *
-	 * @return \Illuminate\Session\Session
+	 * @return \Illuminate\Session\SessionManager
 	 */
 	protected function createArrayDriver()
 	{
@@ -33,7 +43,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the native session driver.
 	 *
-	 * @return Illuminate\Session\Session
+	 * @return Illuminate\Session\SessionManager
 	 */
 	protected function createNativeDriver()
 	{
@@ -45,7 +55,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the database session driver.
 	 *
-	 * @return \Illuminate\Session\Session
+	 * @return \Illuminate\Session\SessionManager
 	 */
 	protected function createDatabaseDriver()
 	{
