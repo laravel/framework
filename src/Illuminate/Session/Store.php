@@ -60,6 +60,16 @@ class Store extends SymfonySession {
 	 *
 	 * @return string
 	 */
+	public function getToken()
+	{
+		return $this->token();
+	}
+
+	/**
+	 * Get the CSRF token value.
+	 *
+	 * @return string
+	 */
 	public function token()
 	{
 		return $this->get('_token');
