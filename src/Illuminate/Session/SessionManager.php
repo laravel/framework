@@ -31,6 +31,18 @@ class SessionManager extends Manager {
 	}
 
 	/**
+	 * Create an instance of the "cookie" session driver.
+	 *
+	 * @return \Illuminate\Session\Store
+	 */
+	protected function createCookieDriver()
+	{
+		$lifetime = $this->app['config']['session.lifetime'];
+
+		return $this->buildSession(new CookieSessionHandler($this->app['cookie'], $lifetime));
+	}
+
+	/**
 	 * Create an instance of the native session driver.
 	 *
 	 * @return Illuminate\Session\Session

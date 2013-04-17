@@ -5,7 +5,9 @@ use Illuminate\Cache\Repository;
 class CacheBasedSessionHandler implements \SessionHandlerInterface {
 
 	/**
-	 * @var \Memcached Memcached driver.
+	 * The cache repository instance.
+	 *
+	 * @var \Illuminate\Cache\Repository
 	 */
 	protected $cache;
 
