@@ -49,11 +49,11 @@ class SessionManager extends Manager {
 	 */
 	protected function createDatabaseDriver()
 	{
-		$pdo = $this->getDatabaseConnection()->getPdo();
+		$connection = $this->getDatabaseConnection();
 
-		$table = $this->app['config']['session.table'];
+		$table = $connection->getTablePrefix().$this->app['config']['session.table'];
 
-		return $this->buildSession(new PdoSessionHandler($pdo, $this->getDatabaseOptions()));
+		return $this->buildSession(new PdoSessionHandler($connection->getPdo(), $this->getDatabaseOptions($table)));
 	}
 
 	/**
@@ -73,10 +73,8 @@ class SessionManager extends Manager {
 	 *
 	 * @return array
 	 */
-	protected function getDatabaseOptions()
+	protected function getDatabaseOptions($table)
 	{
-		$table = $this->app['config']['session.table'];
-
 		return array('db_table' => $table, 'db_id_col' => 'id', 'db_data_col' => 'payload', 'db_time_col' => 'last_activity');
 	}
 
