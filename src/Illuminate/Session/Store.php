@@ -17,9 +17,25 @@ class Store extends SymfonySession {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function has($name)
+	public function save()
 	{
-		return parent::has($name) or $this->hasFlash($name);
+		$this->ageFlashData();
+
+		return parent::save();
+	}
+
+	/**
+	 * Age the flash data for the session.
+	 *
+	 * @return void
+	 */
+	protected function ageFlashData()
+	{
+		foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
+
+		$this->put('flash.old', $this->get('flash.new'));
+
+		$this->put('flash.new', array());
 	}
 
 	/**
@@ -27,9 +43,7 @@ class Store extends SymfonySession {
 	 */
 	public function get($name, $default = null)
 	{
-		if ( ! is_null($value = parent::get($name))) return $value;
-
-		return $this->getFlash($name, $default);
+		return parent::get($name) ?: value($default);
 	}
 
 	/**
@@ -40,21 +54,7 @@ class Store extends SymfonySession {
 	 */
 	public function hasFlash($name)
 	{
-		return ! is_null($this->getFlash($name));
-	}
-
-	/**
-	 * Get an item from the flashed session data.
-	 *
-	 * @param  string  $name
-	 * @param  mixed   $default
-	 * @return mixed
-	 */
-	public function getFlash($name, $default = null)
-	{
-		$value = $this->getFlashBag()->peek($name);
-
-		return count($value) > 0 ? $value[0] : value($default);
+		return $this->has($name);
 	}
 
 	/**
@@ -120,6 +120,22 @@ class Store extends SymfonySession {
 	}
 
 	/**
+	 * Push a value onto a session array.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function push($key, $value)
+	{
+		$array = $this->get($key, array());
+
+		$array[] = $value;
+
+		$this->put($key, $array);
+	}
+
+	/**
 	 * Flash a key / value pair to the session.
 	 *
 	 * @param  string  $key
@@ -128,7 +144,9 @@ class Store extends SymfonySession {
 	 */
 	public function flash($key, $value)
 	{
-		$this->getFlashBag()->set($key, $value);
+		$this->put($key, $value);
+
+		$this->push('flash.new', $key);
 	}
 
 	/**
@@ -140,33 +158,6 @@ class Store extends SymfonySession {
 	public function flashInput(array $value)
 	{
 		return $this->flash('_old_input', $value);
-	}
-
-	/**
-	 * Keep all of the session flash data from expiring.
-	 *
-	 * @return void
-	 */
-	public function reflash()
-	{
-		foreach ($this->getFlashBag()->peekAll() as $key => $value)
-		{
-			$this->getFlashBag()->set($key, $value);
-		}
-	}
-
-	/**
-	 * Keep a session flash item from expiring.
-	 *
-	 * @param  string|array  $keys
-	 * @return void
-	 */
-	public function keep($keys)
-	{
-		foreach (array_only($this->getFlashBag()->peekAll(), $keys) as $key => $value)
-		{
-			$this->getFlashBag()->set($key, $value);
-		}
 	}
 
 	/**

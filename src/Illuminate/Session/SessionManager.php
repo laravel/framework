@@ -27,7 +27,7 @@ class SessionManager extends Manager {
 	 */
 	protected function createArrayDriver()
 	{
-		return new Store(new MockArraySessionStorage, null, new FlashBag);
+		return new Store(new MockArraySessionStorage);
 	}
 
 	/**
@@ -140,9 +140,7 @@ class SessionManager extends Manager {
 	 */
 	protected function buildSession($handler)
 	{
-		$storage = new NativeSessionStorage($this->getOptions(), $handler);
-
-		return new Store($storage, null, new FlashBag);
+		return new Store(new NativeSessionStorage($this->getOptions(), $handler));
 	}
 
 	/**
