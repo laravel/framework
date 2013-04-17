@@ -29,11 +29,12 @@ class Store extends SymfonySession {
 	/**
 	 * Determine if the session contains old input.
 	 *
+	 * @param  string  $key
 	 * @return bool
 	 */
-	public function hasOldInput()
+	public function hasOldInput($key)
 	{
-		return ! is_null($this->getOldInput());
+		return ! is_null($this->getOldInput($key));
 	}
 
 	/**
