@@ -4,9 +4,9 @@ use Symfony\Component\HttpFoundation\Session\Session as SymfonySession;
 
 class Store extends SymfonySession {
 
-    /**
-     * {@inheritdoc}
-     */
+	/**
+	 * {@inheritdoc}
+	 */
 	public function start()
 	{
 		parent::start();
@@ -14,9 +14,17 @@ class Store extends SymfonySession {
 		if ( ! $this->has('_token')) $this->put('_token', str_random(40));
 	}
 
-    /**
-     * {@inheritdoc}
-     */
+	/**
+	 * {@inheritdoc}
+	 */
+	public function has($name)
+	{
+		return parent::has($name) or $this->hasFlash($name);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get($name, $default = null)
 	{
 		if ( ! is_null($value = parent::get($name))) return $value;
