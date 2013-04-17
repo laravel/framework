@@ -42,7 +42,7 @@ class Store extends SymfonySession {
 	 */
 	public function hasFlash($name)
 	{
-		return ! is_null($this->getFlashBag()->peek($name));
+		return count($this->getFlashBag()->peek($name)) > 0;
 	}
 
 	/**
