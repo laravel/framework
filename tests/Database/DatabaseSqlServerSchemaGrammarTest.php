@@ -58,6 +58,13 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" drop column "foo", "bar"', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->dropColumn('foo', 'bar');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" drop column "foo", "bar"', $statements[0]);
 	}
 
 
