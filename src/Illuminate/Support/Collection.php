@@ -29,6 +29,34 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Determine if an item exists in the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @return bool
+	 */
+	public function has($key)
+	{
+		return array_key_exists($key, $this->items);
+	}
+
+	/**
+	 * Get an item from the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @param  mixed  $default
+	 * @return mixed
+	 */
+	public function get($key, $default = null)
+	{
+		if (array_key_exists($key, $this->items))
+		{
+			return $this->items[$key];
+		}
+
+		return value($default);
+	}
+
+	/**
 	 * Get all of the items in the collection.
 	 *
 	 * @return array
@@ -36,6 +64,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function all()
 	{
 		return $this->items;
+	}
+
+	/**
+	 * Put an item in the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function put($key, $value)
+	{
+		$this->items[$key] = $value;
 	}
 
 	/**
@@ -69,6 +109,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Push an item onto the beginning of the collection.
+	 *
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function push($value)
+	{
+		array_unshift($this->items, $value);
+	}
+
+	/**
 	 * Get and remove the last item from the collection.
 	 *
 	 * @return mixed|null
@@ -76,6 +127,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function pop()
 	{
 		return array_pop($this->items);
+	}
+
+	/**
+	 * Remove an item from the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @return void
+	 */
+	public function forget($key)
+	{
+		unset($this->items[$key]);
 	}
 
 	/**
