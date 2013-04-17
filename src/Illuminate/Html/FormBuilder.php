@@ -235,12 +235,13 @@ class FormBuilder {
 	 * Create a password input field.
 	 *
 	 * @param  string  $name
+	 * @param  string  $value
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function password($name, $options = array())
+	public function password($name, $value = null, $options = array())
 	{
-		return $this->input('password', $name, '', $options);
+		return $this->input('password', $name, $value, $options);
 	}
 
 	/**
