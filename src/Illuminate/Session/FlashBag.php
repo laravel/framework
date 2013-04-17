@@ -7,6 +7,8 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ * ADDITIONS (@taylorotwell): "peek" function now will return values from "display" and "new".
  */
 
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;

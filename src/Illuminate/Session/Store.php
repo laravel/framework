@@ -28,10 +28,8 @@ class Store extends SymfonySession {
 	public function get($name, $default = null)
 	{
 		if ( ! is_null($value = parent::get($name))) return $value;
-		
-		$flash = $this->getFlashBag()->peek($name);
 
-		return count($flash) > 0 ? $flash[0] : value($default);
+		return $this->getFlash($name, $default);
 	}
 
 	/**
@@ -42,7 +40,21 @@ class Store extends SymfonySession {
 	 */
 	public function hasFlash($name)
 	{
-		return count($this->getFlashBag()->peek($name)) > 0;
+		return ! is_null($this->getFlash($name));
+	}
+
+	/**
+	 * Get an item from the flashed session data.
+	 *
+	 * @param  string  $name
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	public function getFlash($name, $default = null)
+	{
+		$value = $this->getFlashBag()->peek($name);
+
+		return count($value) > 0 ? $value[0] : value($default);
 	}
 
 	/**
