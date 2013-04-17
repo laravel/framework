@@ -21,4 +21,13 @@ interface HasherInterface {
 	 */
 	public function check($value, $hashedValue, array $options = array());
 
+	/**
+	 * Check if the given hash has been hashed using the given options.
+	 *
+	 * @param  string  $hashedValue
+	 * @param  array   $options
+	 * @return bool
+	 */
+	public function needsRehash($hashedValue, array $options = array());
+
 }
