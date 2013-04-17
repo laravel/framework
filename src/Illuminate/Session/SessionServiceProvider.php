@@ -68,18 +68,7 @@ class SessionServiceProvider extends ServiceProvider {
 			// application instance, and will resolve them on a lazy load basis.
 			$manager = $app['session.manager'];
 
-			$driver = $manager->driver();
-
-			$config = $app['config']['session'];
-
-			// Once we get an instance of the session driver, we need to set a few of
-			// the session options based on the application configuration, such as
-			// the session lifetime and the sweeper lottery configuration value.
-			$driver->setLifetime($config['lifetime']);
-
-			$driver->setSweepLottery($config['lottery']);
-
-			return $driver;
+			return $manager->driver();
 		});
 	}
 
@@ -99,71 +88,40 @@ class SessionServiceProvider extends ServiceProvider {
 		// the session "payloads", as well as writing them after each request.
 		if ( ! is_null($config['driver']))
 		{
-			$this->registerBootingEvent($app);
+			$this->registerBootingEvent();
 
-			$this->registerCloseEvent($app, $config);
+			$this->registerCloseEvent();
 		}
 	}
 
 	/**
 	 * Register the session booting event.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	protected function registerBootingEvent($app)
+	protected function registerBootingEvent()
 	{
-		$app->booting(function($app)
+		$app = $this->app;
+
+		$this->app->booting(function($app) use ($app)
 		{
-			$app['session']->start($app['cookie'], $app['config']['session.cookie']);
+			$app['session']->start();
 		});
 	}
 
 	/**
 	 * Register the session close event.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
-	 * @param  array $config
 	 * @return void
 	 */
-	protected function registerCloseEvent($app, $config)
-	{
-		$me = $this;
-
-		$app->close(function($request, $response) use ($me, $app, $config)
-		{
-			$session = $app['session'];
-
-			// Once we finish the session handling for the request, we will need to get a
-			// cookie that we can attach to the response from the application. This is
-			// used to identify the session on future requests into the application.
-			$session->finish($response, $config['lifetime']);
-
-			$cookie = $me->makeCookie($session, $config);
-
-			if ( ! is_null($cookie))
-			{
-				$response->headers->setCookie($cookie);
-			}
-		});
-	}
-
-	/**
-	 * Create a session cookie based on the given config.
-	 *
-	 * @param  \Illuminate\Session\Store  $session
-	 * @param  array  $config
-	 * @return Symfony\Component\HttpFoundation\Cookie
-	 */
-	public function makeCookie($session, $config)
+	protected function registerCloseEvent()
 	{
 		$app = $this->app;
 
-		return $session->getCookie(
-
-			$app['cookie'], $config['cookie'], $config['lifetime'], $config['path'], $config['domain']
-
-		);
+		$this->app->close(function() use ($app)
+		{
+			$app['session']->save();
+		});
 	}
 
 }

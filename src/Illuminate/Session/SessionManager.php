@@ -1,31 +1,83 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 
 class SessionManager extends Manager {
 
 	/**
-	 * Create an instance of the cookie session driver.
+	 * Call a custom driver creator.
 	 *
-	 * @return \Illuminate\Session\CookieStore
+	 * @param  string  $driver
+	 * @return mixed
 	 */
-	protected function createCookieDriver()
+	protected function callCustomCreator($driver)
 	{
-		$payload = $this->app['config']->get('session.payload', 'illuminate_payload');
-
-		return new CookieStore($this->app['cookie'], $payload);
+		return $this->buildSession(parent::callCustomCreator($driver));
 	}
 
 	/**
-	 * Create an instance of the file session driver.
+	 * Create an instance of the "array" session driver.
 	 *
-	 * @return \Illuminate\Session\FileStore
+	 * @return \Illuminate\Session\Session
 	 */
-	protected function createFileDriver()
+	protected function createArrayDriver()
+	{
+		return $this->buildSession(new NullSessionHandler);
+	}
+
+	/**
+	 * Create an instance of the native session driver.
+	 *
+	 * @return Illuminate\Session\Session
+	 */
+	protected function createNativeDriver()
 	{
 		$path = $this->app['config']['session.files'];
 
-		return new FileStore($this->app['files'], $path);
+		return $this->buildSession(new NativeFileSessionHandler($path));
+	}
+
+	/**
+	 * Create an instance of the database session driver.
+	 *
+	 * @return \Illuminate\Session\Session
+	 */
+	protected function createDatabaseDriver()
+	{
+		$pdo = $this->getDatabaseConnection()->getPdo();
+
+		$table = $this->app['config']['session.table'];
+
+		return $this->buildSession(new PdoSessionHandler($pdo, $this->getDatabaseOptions()));
+	}
+
+	/**
+	 * Get the database connection for the database driver.
+	 *
+	 * @return \Illuminate\Database\Connection
+	 */
+	protected function getDatabaseConnection()
+	{
+		$connection = $this->app['config']['session.connection'];
+
+		return $this->app['db']->connection($connection);
+	}
+
+	/**
+	 * Get the database session options.
+	 *
+	 * @return array
+	 */
+	protected function getDatabaseOptions()
+	{
+		$table = $this->app['config']['session.table'];
+
+		return array('db_table' => $table, 'db_id_col' => 'id', 'db_data_col' => 'payload', 'db_time_col' => 'last_activity');
 	}
 
 	/**
@@ -69,49 +121,46 @@ class SessionManager extends Manager {
 	}
 
 	/**
-	 * Create an instance of the "array" session driver.
-	 *
-	 * @return \Illuminate\Session\ArrayStore
-	 */
-	protected function createArrayDriver()
-	{
-		return new ArrayStore($this->app['cache']->driver('array'));
-	}
-
-	/**
-	 * Create an instance of the database session driver.
-	 *
-	 * @return \Illuminate\Session\DatabaseStore
-	 */
-	protected function createDatabaseDriver()
-	{
-		$connection = $this->getDatabaseConnection();
-
-		$table = $this->app['config']['session.table'];
-
-		return new DatabaseStore($connection, $this->app['encrypter'], $table);
-	}
-
-	/**
-	 * Get the database connection for the database driver.
-	 *
-	 * @return \Illuminate\Database\Connection
-	 */
-	protected function getDatabaseConnection()
-	{
-		$connection = $this->app['config']['session.connection'];
-
-		return $this->app['db']->connection($connection);
-	}
-
-	/**
 	 * Create an instance of a cache driven driver.
 	 *
 	 * @return \Illuminate\Session\CacheDrivenStore
 	 */
 	protected function createCacheBased($driver)
 	{
-		return new CacheDrivenStore($this->app['cache']->driver($driver));
+		$minutes = $this->app['config']['session.lifetime'];
+
+		$handler = new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
+
+		return $this->buildSession($handler);
+	}
+
+	/**
+	 * Build the session instance.
+	 *
+	 * @param  \SessionHandlerInterface  $handler
+	 * @return \Illuminate\Session\Store
+	 */
+	protected function buildSession($handler)
+	{
+		$storage = new NativeSessionStorage($this->getOptions(), $handler);
+
+		return new Store($storage, null, new AutoExpireFlashBag);
+	}
+
+	/**
+	 * Get the session options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		$config = $this->app['config']['session'];
+
+		return array(
+			'cookie_domain' => $config['domain'], 'cookie_lifetime' => $config['lifetime'] * 60,
+			'cookie_path' => $config['path'], 'gc_divisor' => $config['lottery'][1],
+			'gc_probability' => $config['lottery'][0], 'name' => $config['cookie'],
+		);
 	}
 
 	/**
