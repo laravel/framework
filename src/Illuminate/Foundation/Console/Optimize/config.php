@@ -18,6 +18,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Attribute/AttributeBag.php',
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Flash/FlashBagInterface.php',
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Flash/AutoExpireFlashBag.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Session/FlashBag.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/ServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Exception/ExceptionServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RoutingServiceProvider.php',
