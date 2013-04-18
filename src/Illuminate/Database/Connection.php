@@ -94,7 +94,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The database connection configuration options.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $config = array();
 
