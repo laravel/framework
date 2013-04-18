@@ -27,6 +27,7 @@
 - Renamed `Session::getToken` to `Session::token`.
 - Added a few more helper methods to the `Collection` class.
 - Removed `dropColumns` function.
+- Added chainable `header` method to Http Response.
 
 ## Beta 4
 
