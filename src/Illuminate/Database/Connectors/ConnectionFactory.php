@@ -57,7 +57,7 @@ class ConnectionFactory {
 				return new SqlServerConnector;
 		}
 
-		throw new \InvalidArgumentException("Unsupported driver [{$config['driver']}");
+		throw new \InvalidArgumentException("Unsupported driver [{$config['driver']}]");
 	}
 
 	/**
