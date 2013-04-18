@@ -45,7 +45,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the native session driver.
 	 *
-	 * @return Illuminate\Session\Session
+	 * @return \Illuminate\Session\Session
 	 */
 	protected function createNativeDriver()
 	{
