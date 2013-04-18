@@ -16,7 +16,7 @@
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.1",
         "monolog/monolog": "1.4.*",
-        "patchwork/utf8": "1.0.4",
+        "patchwork/utf8": "1.1.*",
         "predis/predis": "0.8.*",
         "swiftmailer/swiftmailer": "4.3.*",
         "symfony/browser-kit": "2.3.*",
