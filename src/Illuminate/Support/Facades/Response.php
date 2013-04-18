@@ -49,7 +49,7 @@ class Response {
 			$data = $data->toArray();
 		}
 
-		return new \Symfony\Component\HttpFoundation\JsonResponse($data, $status, $headers);
+		return static::make(json_encode($data), $status, $headers)->header('Content-Type', 'application/json');
 	}
 
 	/**
