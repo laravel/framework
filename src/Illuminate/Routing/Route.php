@@ -309,12 +309,20 @@ class Route extends BaseRoute {
 	/**
 	 * Force a given parameter to match a regular expression.
 	 *
-	 * @param  string  $name
+	 * @param  mixed   $name
 	 * @param  string  $expression
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function where($name, $expression)
+	public function where($name, $expression = null)
 	{
+		if ( is_array($name) ) {
+			foreach( $name as $param_name => $param_expression ) {
+				$this->setRequirement( $param_name , $param_expression );
+			}
+			
+			return $this;
+		}
+		
 		$this->setRequirement($name, $expression);
 
 		return $this;
