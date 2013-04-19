@@ -43,6 +43,13 @@ class View implements ArrayAccess, Renderable {
 	protected $path;
 
 	/**
+	 * View alias, its used when naming views.
+	 *
+	 * @var string|null
+	 */
+	protected $alias;
+
+	/**
 	 * Create a new view instance.
 	 *
 	 * @param  \Illuminate\View\Environment  $environment
@@ -50,14 +57,16 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $view
 	 * @param  string  $path
 	 * @param  array   $data
+	 * @param  string|null $alias
 	 * @return void
 	 */
-	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array())
+	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array(), $alias = null)
 	{
 		$this->view = $view;
 		$this->path = $path;
 		$this->engine = $engine;
 		$this->environment = $environment;
+		$this->alias = $alias;
 
 		$this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
 	}
@@ -213,6 +222,26 @@ class View implements ArrayAccess, Renderable {
 	public function setPath($path)
 	{
 		$this->path = $path;
+	}
+
+	/**
+	 * Returns view alias.
+	 *
+	 * @return null|string
+	 */
+	public function getAlias()
+	{
+		return $this->alias;
+	}
+
+	/**
+	 * Sets view alias.
+	 *
+	 * @param $alias
+	 */
+	public function setAlias($alias)
+	{
+		$this->alias = $alias;
 	}
 
 	/**

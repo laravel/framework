@@ -59,27 +59,27 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-    public function testAddANamedViews()
-    {
-        $env = $this->getEnvironment();
-        $env->name('bar', 'foo');
+	public function testAddANamedViews()
+	{
+		$env = $this->getEnvironment();
+		$env->name('bar', 'foo');
 
-        $this->assertEquals(array('foo' => 'bar'), $env->getNames());
-    }
+		$this->assertEquals(array('foo' => 'bar'), $env->getNames());
+	}
 
 
-    public function testMakeAViewFromNamedView()
-    {
-        $env = $this->getEnvironment();
-        $env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
-        $env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
-        $env->getFinder()->shouldReceive('addExtension')->once()->with('php');
-        $env->addExtension('php', 'php');
-        $env->name('view', 'foo');
-        $view = $env->of('foo', array('data'));
+	public function testMakeAViewFromNamedView()
+	{
+		$env = $this->getEnvironment();
+		$env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
+		$env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
+		$env->getFinder()->shouldReceive('addExtension')->once()->with('php');
+		$env->addExtension('php', 'php');
+		$env->name('view', 'foo');
+		$view = $env->of('foo', array('data'));
 
-        $this->assertTrue($engine === $view->getEngine());
-    }
+		$this->assertTrue($engine === $view->getEngine());
+	}
 
 
 	public function testRawStringsMayBeReturnedFromRenderEach()
@@ -178,7 +178,35 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env = $this->getEnvironment();
 		$view = m::mock('Illuminate\View\View');
 		$view->shouldReceive('getName')->once()->andReturn('name');
+		$view->shouldReceive('getAlias')->once()->andReturn(null);
 		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', array($view));
+
+		$env->callComposer($view);
+	}
+
+
+	public function testCallComposerWhenViewHaveAlias()
+	{
+		$env = $this->getEnvironment();
+		$view = m::mock('Illuminate\View\View');
+		$view->shouldReceive('getName')->once()->andReturn('name');
+		$view->shouldReceive('getAlias')->once()->andReturn('alias');
+		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', array($view));
+		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing.named: alias', array($view));
+
+		$env->callComposer($view);
+	}
+
+
+	public function testCallComposerWhenViewHaveAliasInEnvironmentButNotInClassItself()
+	{
+		$env = $this->getEnvironment();
+		$env->name('name', 'alias');
+		$view = m::mock('Illuminate\View\View');
+		$view->shouldReceive('getName')->twice()->andReturn('name');
+		$view->shouldReceive('getAlias')->once()->andReturn(null);
+		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', array($view));
+		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing.named: alias', array($view));
 
 		$env->callComposer($view);
 	}

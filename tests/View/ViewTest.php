@@ -61,6 +61,18 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testViewCanHaveAlias()
+	{
+		$view = $this->getView();
+
+		$this->assertNull($view->getAlias());
+
+		$view->setAlias('alias');
+
+		$this->assertEquals('alias', $view->getAlias());
+	}
+
+
 	public function testViewAcceptsArrayableImplementations()
 	{
 		$arrayable = m::mock('Illuminate\Support\Contracts\ArrayableInterface');

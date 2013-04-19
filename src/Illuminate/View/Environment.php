@@ -124,7 +124,11 @@ class Environment {
 	 */
 	public function of($view, $data = array())
 	{
-		return $this->make($this->names[$view], $data);
+		$v = $this->make($this->names[$view], $data);
+
+		$v->setAlias($view);
+
+		return $v;
 	}
 
 	/**
@@ -348,6 +352,29 @@ class Environment {
 	public function callComposer(View $view)
 	{
 		$this->events->fire('composing: '.$view->getName(), array($view));
+
+		if ($alias = $this->resolveAlias($view))
+		{
+			$this->events->fire('composing.named: '.$alias, array($view));
+		}
+	}
+
+	/**
+	 * Resolves alias for a given view.
+	 *
+	 * @param View $view
+	 * @return bool|int|null|string
+	 */
+	protected function resolveAlias(View $view)
+	{
+		if ($alias = $view->getAlias()) return $alias;
+
+		foreach ($this->names as $alias => $v)
+		{
+			if ($view->getName() == $v) return $alias;
+		}
+
+		return false;
 	}
 
 	/**
