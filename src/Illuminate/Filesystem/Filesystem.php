@@ -97,7 +97,7 @@ class Filesystem {
 	 */
 	public function delete($path)
 	{
-		return unlink($path);
+		return @unlink($path);
 	}
 
 	/**
