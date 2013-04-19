@@ -25,7 +25,7 @@ class {{class}} extends Migration {
 	 */
 	public function down()
 	{
-		Schema::table('{{table}}', function($table)
+		Schema::table('{{table}}', function(Blueprint $table)
 		{
 			//
 		});
