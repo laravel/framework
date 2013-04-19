@@ -227,7 +227,7 @@ class Router {
 	 * @param  string  $autoNaming
 	 * @return void
 	 */
-	public function controllers(array $controllers, $autoNaming = false)
+	public function controllers(array $controllers, $autoNamingPrefix = null)
 	{
 		foreach ($controllers as $uri => $name)
 		{
@@ -243,7 +243,7 @@ class Router {
 	 * @param  string  $autoNaming
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function controller($uri, $controller, $autoNaming = false)
+	public function controller($uri, $controller, $autoNamingPrefix = null)
 	{
 		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
@@ -254,14 +254,18 @@ class Router {
 		{
 			foreach ($routes as $route)
 			{
-				if ($autoNaming === false) {
-					$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
-				} else {
-					$routeName = str_replace('/', '.', $autoNaming . '.' . $route['plain']);
-					$this->{$route['verb']}($route['uri'], array(
+				if (!is_null($autoNamingPrefix) and is_string($autoNamingPrefix))
+				{
+					$routeName = str_replace('/', '.', $autoNamingPrefix.'.'.$route['plain']);
+					$action = array(
 						'as' => $routeName,
 						'uses' => $controller.'@'.$method
-					));
+					);
+					$this->{$route['verb']}($route['uri'], $action);
+				}
+				else 
+				{
+					$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
 				}
 			}
 		}
