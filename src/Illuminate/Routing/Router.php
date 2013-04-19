@@ -224,13 +224,14 @@ class Router {
 	 * Register an array of controllers with wildcard routing.
 	 *
 	 * @param  array  $controllers
+	 * @param  string  $autoNaming
 	 * @return void
 	 */
-	public function controllers(array $controllers)
+	public function controllers(array $controllers, $autoNamingPrefix = null)
 	{
 		foreach ($controllers as $uri => $name)
 		{
-			$this->controller($uri, $name);
+			$this->controller($uri, $name, $autoNamingPrefix);
 		}
 	}
 
@@ -239,9 +240,10 @@ class Router {
 	 *
 	 * @param  string  $uri
 	 * @param  string  $controller
+	 * @param  string  $autoNaming
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function controller($uri, $controller)
+	public function controller($uri, $controller, $autoNamingPrefix = null)
 	{
 		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
@@ -252,7 +254,19 @@ class Router {
 		{
 			foreach ($routes as $route)
 			{
-				$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
+				if (!is_null($autoNamingPrefix) and is_string($autoNamingPrefix))
+				{
+					$routeName = str_replace('/', '.', $autoNamingPrefix.'.'.$route['plain']);
+					$action = array(
+						'as' => $routeName,
+						'uses' => $controller.'@'.$method
+					);
+					$this->{$route['verb']}($route['uri'], $action);
+				}
+				else 
+				{
+					$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
+				}
 			}
 		}
 
