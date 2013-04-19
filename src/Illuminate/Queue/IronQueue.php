@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Queue;
 
 use IronMQ;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 
 class IronQueue extends Queue implements QueueInterface {
@@ -13,6 +15,13 @@ class IronQueue extends Queue implements QueueInterface {
 	protected $iron;
 
 	/**
+	 * The current request instance.
+	 *
+	 * @var \Illuminate\Http\Request
+	 */
+	protected $request;
+
+	/**
 	 * The name of the default tube.
 	 *
 	 * @var string
@@ -22,13 +31,15 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new IronMQ queue instance.
 	 *
-	 * @param  IronMQ  $iron
+	 * @param  \IronMQ  $iron
+	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
 	 * @return void
 	 */
-	public function __construct(IronMQ $iron, $default)
+	public function __construct(IronMQ $iron, Request $request, $default)
 	{
 		$this->iron = $iron;
+		$this->request = $request;
 		$this->default = $default;
 	}
 
@@ -82,12 +93,49 @@ class IronQueue extends Queue implements QueueInterface {
 	}
 
 	/**
+	 * Marshal a push queue request and fire the job.
+	 *
+	 * @return Illuminate\Http\Response
+	 */
+	public function marshal()
+	{
+		$this->createPushedIronJob($this->marshalPushedJob())->fire();
+
+		return new Response('OK');
+	}
+
+	/**
+	 * Marshal out the pushed job and payload.
+	 *
+	 * @return StdClass
+	 */
+	protected function marshalPushedJob()
+	{
+		$r = $this->request;
+
+		return (object) array(
+			'id' => $r->header('iron-message-id'), 'body' => $r->getContent()
+		);
+	}
+
+	/**
+	 * Create a new IronJob for a pushed job.
+	 *
+	 * @param  \StdClass  $job
+	 * @return \Illuminate\Queue\Jobs\IronJob
+	 */
+	protected function createPushedIronJob($job)
+	{
+		return new IronJob($this->container, $this->iron, $job, $this->default);
+	}
+
+	/**
 	 * Get the queue or return the default.
 	 *
 	 * @param  string|null  $queue
 	 * @return string
 	 */
-	protected function getQueue($queue)
+	public function getQueue($queue)
 	{
 		return $queue ?: $this->default;
 	}

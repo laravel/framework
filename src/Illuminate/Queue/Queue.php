@@ -12,6 +12,16 @@ abstract class Queue {
 	protected $container;
 
 	/**
+	 * Marshal a push queue request and fire the job.
+	 *
+	 * @return Illuminate\Http\Response
+	 */
+	public function marshal()
+	{
+		throw new \RuntimeException("Push queues only supported by Iron.");
+	}
+
+	/**
 	 * Create a payload string from the given job and data.
 	 *
 	 * @param  string  $job

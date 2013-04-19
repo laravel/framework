@@ -28,6 +28,8 @@
 - Added a few more helper methods to the `Collection` class.
 - Removed `dropColumns` function.
 - Added chainable `header` method to Http Response.
+- Implementing baked-in support for Iron.io "push queues" via `Queue::marshal`. No daemon processes needed!
+- Added `queue:subscribe` command for registering a URL end-point with an Iron.io push queue.
 
 ## Beta 4
 
