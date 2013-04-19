@@ -149,6 +149,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 		if (is_null($value))
 		{
+			$this->assertInstanceOf('Illuminate\View\View', $response);
 			$this->assertArrayHasKey($key, $response->getData());
 		}
 		else
