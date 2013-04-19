@@ -30,6 +30,7 @@
 - Added chainable `header` method to Http Response.
 - Implementing baked-in support for Iron.io "push queues" via `Queue::marshal`. No daemon processes needed!
 - Added `queue:subscribe` command for registering a URL end-point with an Iron.io push queue.
+- Added support for pushing anonymous functions onto the Queue. Wait for me to screencast this! Proceed with caution - black magic involved.
 
 ## Beta 4
 
