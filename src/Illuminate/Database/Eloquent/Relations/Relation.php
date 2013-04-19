@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
 use DateTime;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
