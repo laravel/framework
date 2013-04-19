@@ -40,7 +40,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bound($abstract)
 	{
-		return isset($this[$abstract]);
+		return isset($this[$abstract]) or isset($this->instances[$abstract]);
 	}
 
 	/**
