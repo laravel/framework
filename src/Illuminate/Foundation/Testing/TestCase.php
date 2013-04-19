@@ -149,6 +149,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 		if (is_null($value))
 		{
+			if ( ! method_exists($response, 'getData'))
+			{
+				$this->fail('A view has not yet been loaded.');
+			}
+			
 			$this->assertArrayHasKey($key, $response->getData());
 		}
 		else
