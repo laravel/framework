@@ -26,7 +26,7 @@ interface MigrationRepositoryInterface {
 	public function log($file, $batch);
 
 	/**
-	 * Remove that a migration from the log.
+	 * Remove a migration from the log.
 	 *
 	 * @param  StdClass  $migration
 	 * @return void
