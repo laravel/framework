@@ -231,7 +231,7 @@ class Router {
 	{
 		foreach ($controllers as $uri => $name)
 		{
-			$this->controller($uri, $name, $autoNaming);
+			$this->controller($uri, $name, $autoNamingPrefix);
 		}
 	}
 
