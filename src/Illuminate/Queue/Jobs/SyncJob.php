@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue\Jobs;
 
+use Closure;
 use Illuminate\Container\Container;
 
 class SyncJob extends Job {
@@ -40,7 +41,14 @@ class SyncJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(array('job' => $this->job, 'data' => $this->data));
+		if ($this->job instanceof Closure)
+		{
+			call_user_func($this->job, $this, $this->data);
+		}
+		else
+		{
+			$this->resolveAndFire(array('job' => $this->job, 'data' => $this->data));
+		}
 	}
 
 	/**

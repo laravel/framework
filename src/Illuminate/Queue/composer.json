@@ -24,7 +24,7 @@
             "Illuminate\\Queue": ""
         },
         "classmap": [
-            "Illuminate/Queue/Pheanstalk"
+            "IlluminateQueueClosure.php"
         ]
     },
     "target-dir": "Illuminate/Queue",

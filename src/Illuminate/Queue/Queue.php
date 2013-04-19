@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Queue;
 
+use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Support\SerializableClosure;
 
 abstract class Queue {
 
@@ -30,7 +32,28 @@ abstract class Queue {
 	 */
 	protected function createPayload($job, $data = '')
 	{
-		return json_encode(array('job' => $job, 'data' => $data));
+		if ($job instanceof Closure)
+		{
+			return json_encode($this->createClosurePayload($job, $data));
+		}
+		else
+		{
+			return json_encode(array('job' => $job, 'data' => $data));
+		}
+	}
+
+	/**
+	 * Create a payload string for the given Closure job.
+	 *
+	 * @param  \Closure  $job
+	 * @param  mixed  $data
+	 * @return string
+	 */
+	protected function createClosurePayload($job, $data)
+	{
+		$closure = serialize(new SerializableClosure($job));
+
+		return array('job' => 'IlluminateQueueClosure', 'data' => compact('closure'));
 	}
 
 	/**

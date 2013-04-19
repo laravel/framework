@@ -22,6 +22,16 @@ class QueueSyncJobTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testClosuresCanBeFiredBySyncJob()
+	{
+		unset($_SERVER['__queue.closure']);
+		$job = new Illuminate\Queue\Jobs\SyncJob(new Illuminate\Container\Container, function() { $_SERVER['__queue.closure'] = true; }, 'data');
+		$job->fire();
+
+		$this->assertTrue($_SERVER['__queue.closure']);
+	}
+
+
 	public function testFireResolvesAndFiresJobClassWithCorrectMethod()
 	{
 		$container = m::mock('Illuminate\Container\Container');

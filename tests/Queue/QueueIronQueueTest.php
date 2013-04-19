@@ -18,6 +18,16 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPushProperlyPushesJobOntoIronWithClosures()
+	{
+		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), m::mock('Illuminate\Http\Request'), 'default');
+		$name = 'Foo';
+		$closure = new Illuminate\Support\SerializableClosure($innerClosure = function() use ($name) { return $name; });
+		$iron->shouldReceive('postMessage')->once()->with('default', json_encode(array('job' => 'IlluminateQueueClosure', 'data' => array('closure' => serialize($closure)))));
+		$queue->push($innerClosure);
+	}
+
+
 	public function testDelayedPushProperlyPushesJobOntoIron()
 	{
 		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), m::mock('Illuminate\Http\Request'), 'default');

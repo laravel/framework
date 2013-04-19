@@ -176,6 +176,16 @@ class SerializableClosure implements Serializable {
 	}
 
 	/**
+	 * Get the unserialized Closure instance.
+	 *
+	 * @return \Closure
+	 */
+	public function getClosure()
+	{
+		return $this->closure;
+	}
+
+	/**
 	 * Invoke the contained Closure.
 	 *
 	 * @return mixed

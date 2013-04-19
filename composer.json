@@ -69,6 +69,9 @@
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
+        "classmap": [
+            ["src/Illuminate/Queue/IlluminateQueueClosure.php"]
+        ],
     	"files": [
             "src/Illuminate/Support/helpers.php"
     	],
