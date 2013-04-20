@@ -118,7 +118,7 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		$app = $this->app;
 
-		$this->app->close(function() use ($app)
+		$this->app->finish(function() use ($app)
 		{
 			$app['session']->save();
 		});
