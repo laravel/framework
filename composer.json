@@ -16,6 +16,7 @@
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.1",
         "monolog/monolog": "1.4.*",
+        "nesbot/carbon": "1.*",
         "patchwork/utf8": "1.1.*",
         "predis/predis": "0.8.*",
         "swiftmailer/swiftmailer": "4.3.*",
@@ -30,8 +31,7 @@
         "symfony/http-kernel": "2.3.*",
         "symfony/process": "2.3.*",
         "symfony/routing": "2.3.*",
-        "symfony/translation": "2.3.*",
-        "nesbot/carbon": "1.*"
+        "symfony/translation": "2.3.*"
     },
     "replace": {
         "illuminate/auth": "self.version",

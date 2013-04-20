@@ -87,7 +87,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 */
 	public function save(Model $model)
 	{
-		$model->setAttribute($this->morphType, $this->morphClass);
+		$model->setAttribute($this->getPlainMorphType(), $this->morphClass);
 
 		return parent::save($model);
 	}
@@ -121,7 +121,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 */
 	protected function getForeignAttributesForCreate()
 	{
-		$foreign = array(last(explode('.', $this->foreignKey)) => $this->parent->getKey());
+		$foreign = array($this->getPlainForeignKey() => $this->parent->getKey());
 
 		$foreign[last(explode('.', $this->morphType))] = $this->morphClass;
 
@@ -136,6 +136,16 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	public function getMorphType()
 	{
 		return $this->morphType;
+	}
+
+	/**
+	 * Get the plain morph type name without the table.
+	 *
+	 * @return string
+	 */
+	public function getPlainMorphType()
+	{
+		return last(explode('.', $this->morphType));
 	}
 
 	/**
