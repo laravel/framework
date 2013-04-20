@@ -5,7 +5,9 @@ use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Log\Writer;
 use Illuminate\View\Environment;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
+use Illuminate\Support\SerializableClosure;
 
 class Mailer {
 
@@ -92,8 +94,8 @@ class Mailer {
 	/**
 	 * Send a new message using a view.
 	 *
-	 * @param  string|array    $view
-	 * @param  array           $data
+	 * @param  string|array  $view
+	 * @param  array  $data
 	 * @param  Closure|string  $callback
 	 * @return void
 	 */
@@ -116,6 +118,53 @@ class Mailer {
 		$message = $message->getSwiftMessage();
 
 		return $this->sendSwiftMessage($message);
+	}
+
+	/**
+	 * Queue a new e-mail message for sending.
+	 *
+	 * @param  string|array  $view
+	 * @param  array   $data
+	 * @param  Closure|string  $callback
+	 */
+	public function queue($view, array $data, $callback)
+	{
+		if ($callback instanceof Closure)
+		{
+			$callback = serialize(new SerializableClosure($callback));
+		}
+
+		$this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'callback'));
+	}
+
+	/**
+	 * Handle a queued e-mail message job.
+	 *
+	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  array  $data
+	 * @return void
+	 */
+	public function handleQueuedMessage($job, $data)
+	{
+		$this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
+
+		$job->delete();
+	}
+
+	/**
+	 * Get the true callable for a queued e-mail message.
+	 *
+	 * @param  array  $data
+	 * @return mixed
+	 */
+	protected function getQueuedCallable(array $data)
+	{
+		if (str_contains($data['callback'], 'SerializableClosure'))
+		{
+			return with(unserialize($data['callback']))->getClosure();
+		}
+
+		return $data['callback'];
 	}
 
 	/**
@@ -301,11 +350,26 @@ class Mailer {
 	 * Set the log writer instance.
 	 *
 	 * @param  \Illuminate\Log\Writer  $logger
-	 * @return void
+	 * @return \Illumiante\Mail\Mailer
 	 */
 	public function setLogger(Writer $logger)
 	{
 		$this->logger = $logger;
+
+		return $this;
+	}
+
+	/**
+	 * Set the queue manager instance.
+	 *
+	 * @param  \Illuminate\Queue\QueueManager  $queue
+	 * @return \Illuminate\Mail\Mailer
+	 */
+	public function setQueue(QueueManager $queue)
+	{
+		$this->queue = $queue;
+
+		return $this;
 	}
 
 	/**
