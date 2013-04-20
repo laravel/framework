@@ -2,6 +2,7 @@
 
 use Closure;
 use DateTime;
+use Carbon\Carbon;
 use ArrayAccess;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Connection;
@@ -1674,10 +1675,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$format = $this->getDateFormat();
 
-			return DateTime::createFromFormat($format, $value);
+			return Carbon::createFromFormat($format, $value);
 		}
 
-		return $value;
+		return Carbon::instance($value);
 	}
 
 	/**
