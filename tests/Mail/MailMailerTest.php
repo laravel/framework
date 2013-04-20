@@ -71,6 +71,62 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMailerCanQueueMessagesToItself()
+	{
+		list($view, $swift) = $this->getMocks();
+		$mailer = new Illuminate\Mail\Mailer($view, $swift);
+		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), null);
+
+		$mailer->queue('foo', array(1), 'callable');
+	}
+
+
+	public function testMailerCanQueueMessagesToItselfOnAnotherQueue()
+	{
+		list($view, $swift) = $this->getMocks();
+		$mailer = new Illuminate\Mail\Mailer($view, $swift);
+		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), 'queue');
+
+		$mailer->queueOn('queue', 'foo', array(1), 'callable');
+	}
+
+
+	public function testMailerCanQueueMessagesToItselfWithSerializedClosures()
+	{
+		list($view, $swift) = $this->getMocks();
+		$mailer = new Illuminate\Mail\Mailer($view, $swift);
+		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$serialized = serialize(new Illuminate\Support\SerializableClosure($closure = function() {}));
+		$queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => $serialized), null);
+
+		$mailer->queue('foo', array(1), $closure);
+	}
+
+
+	public function testMailerCanQueueMessagesToItselfLater()
+	{
+		list($view, $swift) = $this->getMocks();
+		$mailer = new Illuminate\Mail\Mailer($view, $swift);
+		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), null);
+
+		$mailer->later(10, 'foo', array(1), 'callable');
+	}
+
+
+	public function testMailerCanQueueMessagesToItselfLaterOnAnotherQueue()
+	{
+		list($view, $swift) = $this->getMocks();
+		$mailer = new Illuminate\Mail\Mailer($view, $swift);
+		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), 'queue');
+
+		$mailer->laterOn('queue', 10, 'foo', array(1), 'callable');
+	}
+
+
 	public function testMessagesCanBeLoggedInsteadOfSent()
 	{
 		$mailer = $this->getMock('Illuminate\Mail\Mailer', array('createMessage'), $this->getMocks());

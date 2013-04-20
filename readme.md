@@ -34,6 +34,7 @@
 - Allow for an array of expressions to be passed to `where` on route, keyed by parameter.
 - Allow the passing of an array to the `appends` method of the Paginator.
 - Added `Html::mailto` and `Html::email` from Laravel 3.
+- Added `Mail::queue`, `Mail::later`, `Mail::queueOn`, and `Mail::laterOn`. Screencast forthcoming.
 
 ## Beta 4
 

@@ -15,6 +15,7 @@
         "swiftmailer/swiftmailer": "4.3.*"
     },
     "require-dev": {
+        "illuminate/queue": "4.0.x",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },
