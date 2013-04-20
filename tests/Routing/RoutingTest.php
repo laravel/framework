@@ -223,18 +223,17 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testAfterAndCloseFiltersAreCalled()
+	public function testAfterFiltersAreCalled()
 	{
 		$_SERVER['__routing.test'] = '';
 		$router = new Router;
 		$router->get('/foo', function() { return 'foo'; });
 		$router->before(function() { return null; });
 		$router->after(function() { $_SERVER['__routing.test'] = 'foo'; });
-		$router->close(function() { $_SERVER['__routing.test'] .= 'bar'; });
 		$request = Request::create('/foo', 'GET');
 		
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
-		$this->assertEquals('foobar', $_SERVER['__routing.test']);
+		$this->assertEquals('foo', $_SERVER['__routing.test']);
 		unset($_SERVER['__routing.test']);
 	}
 
