@@ -43,6 +43,16 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Get the full URL for the current request.
+	 *
+	 * @return string
+	 */
+	public function full()
+	{
+		return $this->request->fullUrl();
+	}
+
+	/**
 	 * Get the current URL for the request.
 	 *
 	 * @return string
