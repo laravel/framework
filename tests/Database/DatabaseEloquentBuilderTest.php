@@ -238,6 +238,21 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testListsMethodIsKeyedByPrimaryKey()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('lists')->once()->with('foo', 'bar')->andReturn(array('2' => 'bar', '5' => 'baz'));
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('getKeyName')->once()->andReturn('bar');
+		$model->shouldReceive('getTable')->once()->andReturn('table');
+		$model->shouldReceive('hasGetMutator')->once()->with('foo')->andReturn(false);
+		$builder->getQuery()->shouldReceive('from')->once()->with('table');
+		$builder->setModel($model);
+		$results = $builder->lists('foo');
+		$this->assertEquals(array('2' => 'bar', '5' => 'baz'), $results);
+	}
+
+
 	public function testQueryPassThru()
 	{
 		$builder = $this->getBuilder();
