@@ -161,7 +161,25 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	public function appends($key, $value)
 	{
+		if (is_array($key)) return $this->appendArray($key);
+
 		return $this->addQuery($key, $value);
+	}
+
+	/**
+	 * Add an array of query string values.
+	 *
+	 * @param  array  $keys
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	protected function appendArray(array $keys)
+	{
+		foreach ($keys as $key => $value)
+		{
+			$this->addQuery($key, $value);
+		}
+
+		return $this;
 	}
 
 	/**
