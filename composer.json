@@ -30,7 +30,8 @@
         "symfony/http-kernel": "2.3.*",
         "symfony/process": "2.3.*",
         "symfony/routing": "2.3.*",
-        "symfony/translation": "2.3.*"
+        "symfony/translation": "2.3.*",
+        "nesbot/carbon": "1.*"
     },
     "replace": {
         "illuminate/auth": "self.version",

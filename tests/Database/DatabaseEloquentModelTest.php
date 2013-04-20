@@ -174,8 +174,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 			'updated_at'	=> '2012-12-05',
 		));
 
-		$this->assertInstanceOf('DateTime', $model->created_at);
-		$this->assertInstanceOf('DateTime', $model->updated_at);
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+		$this->assertInstanceOf('Carbon\Carbon', $model->updated_at);
 	}
 
 
@@ -191,8 +191,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
 		$mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
 		$instance = $model->newInstance($timestamps);
-		$this->assertInstanceOf('DateTime', $instance->updated_at);
-		$this->assertInstanceOf('DateTime', $instance->created_at);
+		$this->assertInstanceOf('Carbon\Carbon', $instance->updated_at);
+		$this->assertInstanceOf('Carbon\Carbon', $instance->created_at);
 	}
 
 
