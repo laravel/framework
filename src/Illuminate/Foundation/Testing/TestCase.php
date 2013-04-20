@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Testing;
 
+use Illuminate\View\View;
 use Illuminate\Auth\UserInterface;
 
 class TestCase extends \PHPUnit_Framework_TestCase {
@@ -146,6 +147,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		if (is_array($key)) return $this->assertViewHasAll($key);
 
 		$response = $this->client->getResponse()->original;
+
+		if ( ! $response instanceof View)
+		{
+			return $this->assertTrue(false, 'The response was not a view.');
+		}
 
 		if (is_null($value))
 		{
