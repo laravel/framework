@@ -472,6 +472,8 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		$response = $this->dispatch($this['request']);
 
+		$this['router']->callCloseFilter($this['request'], $response);
+
 		$response->send();
 
 		$this['router']->callFinishFilter($this['request'], $response);

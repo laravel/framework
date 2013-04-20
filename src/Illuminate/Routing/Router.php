@@ -1180,7 +1180,7 @@ class Router {
 	}
 
 	/**
-	 * Call the "close" and "finish" global filters.
+	 * Call the finish" global filter.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Request   $request
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
@@ -1188,9 +1188,19 @@ class Router {
 	 */
 	public function callFinishFilter(Request $request, SymfonyResponse $response)
 	{
-		$this->callGlobalFilter($request, 'close', array($response));
-
 		$this->callGlobalFilter($request, 'finish', array($response));
+	}
+
+	/**
+	 * Call the "close" global filter.
+	 *
+	 * @param  Symfony\Component\HttpFoundation\Request   $request
+	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @return mixed
+	 */
+	public function callCloseFilter(Request $request, SymfonyResponse $response)
+	{
+		$this->callGlobalFilter($request, 'close', array($response));
 	}
 
 	/**
