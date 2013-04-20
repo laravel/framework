@@ -251,7 +251,7 @@ class Encrypter {
 	 * @param  string  $mode
 	 * @return void
 	 */
-	public function setMode($model)
+	public function setMode($mode)
 	{
 		$this->mode = $mode;
 	}
