@@ -362,7 +362,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected function obfuscate($value)
+	public function obfuscate($value)
 	{
 		$safe = '';
 
