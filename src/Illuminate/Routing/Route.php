@@ -315,7 +315,25 @@ class Route extends BaseRoute {
 	 */
 	public function where($name, $expression)
 	{
+		if (is_array($name)) return $this->setArrayOfWheres($name);
+
 		$this->setRequirement($name, $expression);
+
+		return $this;
+	}
+
+	/**
+	 * Force a given parameters to match the expressions.
+	 *
+	 * @param  array $wheres
+	 * @return \Illuminate\Routing\Route
+	 */
+	protected function setArrayOfWheres(array $wheres)
+	{
+		foreach ($wheres as $name => $expression)
+		{
+			$this->where($name, $expression);
+		}
 
 		return $this;
 	}

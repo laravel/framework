@@ -31,6 +31,7 @@
 - Implementing baked-in support for Iron.io "push queues" via `Queue::marshal`. No daemon processes needed!
 - Added `queue:subscribe` command for registering a URL end-point with an Iron.io push queue.
 - Added support for pushing anonymous functions onto the Queue. Wait for me to screencast this! Proceed with caution - black magic involved.
+- Allow for an array of expressions to be passed to `where` on route, keyed by parameter.
 
 ## Beta 4
 
