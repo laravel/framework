@@ -36,6 +36,7 @@
 - Added `Html::mailto` and `Html::email` from Laravel 3.
 - Added `Mail::queue`, `Mail::later`, `Mail::queueOn`, and `Mail::laterOn`. Screencast forthcoming.
 - Added `URL::full` method as alias into `Request::fullUrl`.
+- Set default encryption mode to `cbc`. `Crypt::setMode` is available if you wish to use previous mode of `ctr`.
 
 ## Beta 4
 

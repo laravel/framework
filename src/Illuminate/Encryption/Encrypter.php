@@ -23,7 +23,7 @@ class Encrypter {
 	 *
 	 * @var string
 	 */
-	protected $mode = 'ctr';
+	protected $mode = 'cbc';
 
 	/**
 	 * The block size of the cipher.
