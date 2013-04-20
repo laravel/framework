@@ -33,6 +33,7 @@
 - Added support for pushing anonymous functions onto the Queue. Wait for me to screencast this! Proceed with caution - black magic involved.
 - Allow for an array of expressions to be passed to `where` on route, keyed by parameter.
 - Allow the passing of an array to the `appends` method of the Paginator.
+- Added `Html::mailto` and `Html::email` from Laravel 3.
 
 ## Beta 4
 

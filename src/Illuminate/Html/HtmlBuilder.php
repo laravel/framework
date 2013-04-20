@@ -225,40 +225,7 @@ class HtmlBuilder {
 	 */
 	public function email($email)
 	{
-		return str_replace('@', '&#64;', static::obfuscate($email));
-	}
-
-	/**
-	 * Obfuscate a string to prevent spam-bots from sniffing it.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function obfuscate($value)
-	{
-		$safe = '';
-
-		foreach (str_split($value) as $letter)
-		{
-			// To properly obfuscate the value, we will randomly convert each
-			// letter to its entity or hexadecimal representation, keeping a
-			// bot from sniffing the randomly obfuscated letters.
-			switch (rand(1, 3))
-			{
-				case 1:
-					$safe .= '&#'.ord($letter).';';
-					break;
-
-				case 2:
-					$safe .= '&#x'.dechex(ord($letter)).';';
-					break;
-
-				case 3:
-					$safe .= $letter;
-			}
-		}
-
-		return $safe;
+		return str_replace('@', '&#64;', $this->obfuscate($email));
 	}
 
 	/**
@@ -387,6 +354,37 @@ class HtmlBuilder {
 		if (is_numeric($key)) $key = $value;
 
 		if ( ! is_null($value)) return $key.'="'.e($value).'"';
+	}
+
+	/**
+	 * Obfuscate a string to prevent spam-bots from sniffing it.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function obfuscate($value)
+	{
+		$safe = '';
+
+		foreach (str_split($value) as $letter)
+		{
+			// To properly obfuscate the value, we will randomly convert each letter to
+			// its entity or hexadecimal representation, keeping a bot from sniffing
+			// the randomly obfuscated letters out of the string on the responses.
+			switch (rand(1, 3))
+			{
+				case 1:
+					$safe .= '&#'.ord($letter).';'; break;
+
+				case 2:
+					$safe .= '&#x'.dechex(ord($letter)).';'; break;
+
+				case 3:
+					$safe .= $letter;
+			}
+		}
+
+		return $safe;
 	}
 
 	/**
