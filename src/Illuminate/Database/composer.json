@@ -12,7 +12,8 @@
         "php": ">=5.3.0",
         "illuminate/container": "4.0.x",
         "illuminate/events": "4.0.x",
-        "illuminate/support": "4.0.x"
+        "illuminate/support": "4.0.x",
+        "nesbot/carbon": "1.*"
     },
     "require-dev": {
         "illuminate/console": "4.0.x",
