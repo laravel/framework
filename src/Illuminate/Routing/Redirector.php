@@ -78,7 +78,7 @@ class Redirector {
 	 */
 	public function guest($path, $status = 302, $headers = array(), $secure = null)
 	{
-		$this->session->put('url.intended', $path);
+		$this->session->put('url.intended', $this->url->full());
 
 		return $this->to($path, $status, $headers, $secure);
 	}
