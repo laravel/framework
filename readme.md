@@ -37,6 +37,7 @@
 - Added `Mail::queue`, `Mail::later`, `Mail::queueOn`, and `Mail::laterOn`. Screencast forthcoming.
 - Added `URL::full` method as alias into `Request::fullUrl`.
 - Set default encryption mode to `cbc`. `Crypt::setMode` is available if you wish to use previous mode of `ctr`.
+- Added `Redirect::guest` and `Redirect::intended` to simplify sending users to intended location.
 
 ## Beta 4
 

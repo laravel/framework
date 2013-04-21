@@ -68,6 +68,38 @@ class Redirector {
 	}
 
 	/**
+	 * Create a new redirect response, while putting the current URL in the session.
+	 *
+	 * @param  string  $path
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @param  bool    $secure
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function guest($path, $status = 302, $headers = array(), $secure = null)
+	{
+		$this->session->put('url.intended', $path);
+
+		return $this->to($path, $status, $headers, $secure);
+	}
+
+	/**
+	 * Create a new redirect response to the previously intended location.
+	 *
+	 * @param  string  $default
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @param  bool    $secure
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function intended($default, $status = 302, $headers = array(), $secure = null)
+	{
+		$path = $this->session->get('url.intended', $default);
+
+		return $this->to($path, $status, $headers, $secure);
+	}
+
+	/**
 	 * Create a new redirect response to the given path.
 	 *
 	 * @param  string  $path
