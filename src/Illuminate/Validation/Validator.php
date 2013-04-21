@@ -962,7 +962,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getInlineMessage($attribute, $lowerRule)
 	{
-		$keys = array($lowerRule, "{$attribute}.{$lowerRule}");
+		$keys = array("{$attribute}.{$lowerRule}", $lowerRule);
 
 		// First we will check for a custom message for an attribute specific rule
 		// message for the fields, then we will check for a general custom line
