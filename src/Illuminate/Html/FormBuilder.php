@@ -176,7 +176,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function label($name, $value=null, $options = array())
+	public function label($name, $value = null, $options = array())
 	{
 		$this->labels[] = $name;
 
