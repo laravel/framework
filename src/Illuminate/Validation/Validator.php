@@ -1537,6 +1537,27 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Set the custom messages for the validator
+	 *
+	 * @param array $messages
+	 * @return void
+	 */
+	public function setCustomMessages($messages)
+	{
+		$this->customMessages = $messages;
+	}
+
+	/**
+	 * Get the custom messages for the validator
+	 *
+	 * @return array
+	 */
+	public function getCustomMessages()
+	{
+		return $this->customMessages;
+	}
+
+	/**
 	 * Get the message container for the validator.
 	 *
 	 * @return \Illuminate\Support\MessageBag
