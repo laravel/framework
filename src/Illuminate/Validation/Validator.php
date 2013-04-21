@@ -1537,6 +1537,16 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Get the custom messages for the validator
+	 *
+	 * @return array
+	 */
+	public function getCustomMessages()
+	{
+		return $this->customMessages;
+	}
+
+	/**
 	 * Set the custom messages for the validator
 	 *
 	 * @param array $messages
@@ -1545,16 +1555,6 @@ class Validator implements MessageProviderInterface {
 	public function setCustomMessages($messages)
 	{
 		$this->customMessages = $messages;
-	}
-
-	/**
-	 * Get the custom messages for the validator
-	 *
-	 * @return array
-	 */
-	public function getCustomMessages()
-	{
-		return $this->customMessages;
 	}
 
 	/**
