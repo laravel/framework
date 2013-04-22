@@ -153,9 +153,9 @@ class FileLoader implements LoaderInterface {
 		// Once we have merged the regular package configuration we need to look for
 		// an environment specific configuration file. If one exists, we will get
 		// the contents and merge them on top of this array of options we have.
-		$path = $this->defaultPath."/{$environment}/".$file;
+		$file = "packages/{$package}/{$environment}/{$group}.php";
 
-		if ($this->files->exists($path))
+		if ($this->files->exists($path = $this->defaultPath.'/'.$file))
 		{
 			$items = array_merge($items, $this->getRequire($path));
 		}
