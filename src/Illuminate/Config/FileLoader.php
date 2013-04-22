@@ -132,13 +132,13 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Apply any cascades to an array of package options.
 	 *
-	 * @param  string  $environment
+	 * @param  string  $env
 	 * @param  string  $package
 	 * @param  string  $group
 	 * @param  array   $items
 	 * @return array
 	 */
-	public function cascadePackage($environment, $package, $group, $items)
+	public function cascadePackage($env, $package, $group, $items)
 	{
 		// First we will look for a configuration file in the packages configuration
 		// folder. If it exists, we will load it and merge it with these original
@@ -153,14 +153,29 @@ class FileLoader implements LoaderInterface {
 		// Once we have merged the regular package configuration we need to look for
 		// an environment specific configuration file. If one exists, we will get
 		// the contents and merge them on top of this array of options we have.
-		$file = "packages/{$package}/{$environment}/{$group}.php";
+		$path = $this->getPackagePath($env, $package, $group);
 
-		if ($this->files->exists($path = $this->defaultPath.'/'.$file))
+		if ($this->files->exists($path))
 		{
 			$items = array_merge($items, $this->getRequire($path));
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Get the package path for an environment and group.
+	 *
+	 * @param  string  $env
+	 * @param  string  $package
+	 * @param  string  $group
+	 * @return string
+	 */
+	protected function getPackagePath($env, $package, $group)
+	{
+		$file = "packages/{$package}/{$env}/{$group}.php";
+
+		return $this->defaultPath.'/'.$file;
 	}
 
 	/**
