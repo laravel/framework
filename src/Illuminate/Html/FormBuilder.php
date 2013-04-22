@@ -184,7 +184,7 @@ class FormBuilder {
 
 		if (is_null($value))
 		{
-			$value = ucfirst(str_replace('_', ' ', $name));
+			$value = ucwords(str_replace('_', ' ', $name));
 		}
 
 		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
