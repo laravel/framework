@@ -373,6 +373,15 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWhereAcceptsArrayOfRequirements()
+	{
+		$router = new Router;
+		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; })->where(['age' => '[0-9]+']);
+		$request = Request::create('/foo/jason/22', 'GET');
+		$this->assertEquals('jason22', $router->dispatch($request)->getContent());
+	}
+
+
 	/**
 	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */

@@ -313,7 +313,7 @@ class Route extends BaseRoute {
 	 * @param  string  $expression
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function where($name, $expression)
+	public function where($name, $expression = null)
 	{
 		if (is_array($name)) return $this->setArrayOfWheres($name);
 
