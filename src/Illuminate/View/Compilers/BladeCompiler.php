@@ -329,10 +329,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = '/(?<!\w)(\s*)@(lang|choice)(\s*\([^\)]*)\)/';
 
-		return preg_replace_callback($pattern, function($matches) {	
-		
+		return preg_replace_callback($pattern, function($matches) 
+		{			
 			$type = strtolower($matches[2]);
-			if( $type == 'lang' )
+			if($type == 'lang')
 			{
 				$type = 'get';
 			}
