@@ -10,6 +10,21 @@ class SqlServerGrammar extends Grammar {
 	 * @var string
 	 */
 	protected $wrapper = '[%s]';
+	
+	/**
+	 * Compile an insert and get ID statement into SQL.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array   $values
+	 * @param  string  $sequence
+	 * @return string
+	 */
+	public function compileInsertGetId(Builder $query, $values, $sequence)
+	{
+		if (is_null($sequence)) $sequence = 'id';
+
+		return $this->compileInsert($query, $values).' select SCOPE_IDENTITY() '.$this->wrap($sequence);
+	}
 
 	/**
 	 * Compile a select query into SQL.
