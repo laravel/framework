@@ -128,11 +128,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function choice($key, $number, $replace = array(), $locale = null)
 	{
-		$locale = $locale ?: $this->locale;
+		$line = $this->get($key, $replace, $locale = $locale ?: $this->locale);
 
-		$line = $this->get($key, $replace, $locale);
+		array_unshift($replace, $number);
 
-		return $this->getSelector()->choose($line, $number, $locale);
+		return $this->makeReplacements($this->getSelector()->choose($line, $number, $locale), $replace);
 	}
 
 	/**

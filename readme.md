@@ -116,6 +116,7 @@
 - Session driver now automatically set to `array` when running Artisan tasks.
 - Added static `unguard` method to Eloquent to disable all mass assignment protection.
 - Added `--seed` option to `migrate` command.
+- Fix bug with replacements not being made on `Lang::choice`.
 
 ## Beta 3
 

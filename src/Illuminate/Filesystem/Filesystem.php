@@ -180,8 +180,7 @@ class Filesystem {
 	}
 
 	/**
-	 * Determine if the given path is writable (the path can be either a 
-	 * directory or a file).
+	 * Determine if the given path is writable.
 	 *
 	 * @param  string  $path
 	 * @return bool
