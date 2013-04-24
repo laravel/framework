@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -40,7 +41,7 @@ class Response {
 	 * @param  string|array  $data
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\JsonResponse
+	 * @return Illuminate\Http\JsonResponse
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
@@ -49,7 +50,7 @@ class Response {
 			$data = $data->toArray();
 		}
 
-		return static::make(json_encode($data), $status, $headers)->header('Content-Type', 'application/json');
+		return new JsonResponse($data, $status, $headers);
 	}
 
 	/**
