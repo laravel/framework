@@ -180,6 +180,18 @@ class Filesystem {
 	}
 
 	/**
+	 * Determine if the given path is writable (the path can be either a 
+	 * directory or a file).
+	 *
+	 * @param  string  $path
+	 * @return bool
+	 */
+	public function isWritable($path)
+	{
+		return is_writable($path);
+	}
+
+	/**
 	 * Determine if the given path is a file.
 	 *
 	 * @param  string  $file
