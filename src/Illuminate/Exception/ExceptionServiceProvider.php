@@ -132,6 +132,8 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			$whoops = new \Whoops\Run;
 
+			$whoops->writeToOutput(false);
+
 			$whoops->allowQuit(false);
 
 			return $whoops->pushHandler($app['whoops.handler']);
@@ -211,9 +213,9 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function displayWhoopsException($exception)
 	{
-		ob_start(); $this->app['whoops']->handleException($exception);
+		$response = $this->app['whoops']->handleException($exception);
 
-		with(new Response(ob_get_clean(), 500))->send();
+		with(new Response($response, 500))->send();
 	}
 
 	/**
