@@ -159,7 +159,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 * @param  string  $value
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function appends($key, $value)
+	public function appends($key, $value = null)
 	{
 		if (is_array($key)) return $this->appendArray($key);
 
