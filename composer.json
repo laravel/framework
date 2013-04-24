@@ -15,7 +15,7 @@
         "doctrine/dbal": "2.4.x",
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.1",
-        "monolog/monolog": "1.4.*",
+        "monolog/monolog": "1.5.*",
         "nesbot/carbon": "1.*",
         "patchwork/utf8": "1.1.*",
         "predis/predis": "0.8.*",
