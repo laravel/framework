@@ -69,7 +69,14 @@ class SubscribeCommand extends Command {
 	{
 		if ($this->option('type')) return $this->option('type');
 
-		return $this->getQueue()->push_type;
+		try
+		{
+			return $this->getQueue()->push_type;
+		}
+		catch (\Exception $e)
+		{
+			return 'multicast';
+		}
 	}
 
 	/**
