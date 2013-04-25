@@ -24,4 +24,9 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
 			$this->assertEquals('foo', Str::SupportStrTest());
 		}
 
+		public function testNonBreakingSpacesAreTrimmed()
+		{
+			$this->assertEquals('', Str::words('  ', 2));
+		}
+
 }
