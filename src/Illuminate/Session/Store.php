@@ -43,7 +43,9 @@ class Store extends SymfonySession {
 	 */
 	public function get($name, $default = null)
 	{
-		return parent::get($name) ?: value($default);
+		$value = parent::get($name);
+
+		return is_null($value) ? value($default) : $value;
 	}
 
 	/**
