@@ -63,7 +63,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 */
 	public function withInput(array $input = null)
 	{
-		$input = $input ?: $this->request->input();
+		$input = $input ? $input : $this->request->input();
 
 		$this->session->flashInput($input);
 
