@@ -37,6 +37,14 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testLargeKeyWithDefaultEncryption()
+    {
+        $encrypter = new Encrypter(str_repeat('a', 133));
+        $cipher = $encrypter->encrypt('something');
+        $this->assertEquals('something', $encrypter->decrypt($cipher));
+    }
+
+
 	protected function getEncrypter()
 	{
 		return new Encrypter(str_repeat('a', 32));

@@ -40,7 +40,7 @@ class Encrypter {
 	 */
 	public function __construct($key)
 	{
-		$this->key = $key;
+		$this->key = md5($key);
 	}
 
 	/**
