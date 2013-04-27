@@ -751,7 +751,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$url = str_replace(array('http://', 'https://', 'ftp://'), '', strtolower($value));
 
-		return checkdnsrr($url);
+		return checkdnsrr($url, 'A');
 	}
 
 	/**
