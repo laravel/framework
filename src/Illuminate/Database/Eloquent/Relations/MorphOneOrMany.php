@@ -50,6 +50,19 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	}
 
 	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query)
+	{
+		$query = parent::getRelationCountQuery($query);
+
+		return $query->where($this->morphType, $this->morphClass);
+	}
+
+	/**
 	 * Set the constraints for an eager load of the relation.
 	 *
 	 * @param  array  $models

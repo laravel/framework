@@ -178,6 +178,39 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Sort the collection using the given Closure.
+	 *
+	 * @param  \Closure  $callback
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function sort(Closure $callback)
+	{
+		$results = array();
+
+		// First we will loop through the items and get the comparator from a callback
+		// function which we were given. Then, we will sort the returned values and
+		// and grab the corresponding values for the sorted keys from this array.
+		foreach ($this->items as $key => $value)
+		{
+			$results[$key] = $callback($value);
+		}
+
+		asort($results);
+
+		// Once we have sorted all of the keys in the array, we will loop through them
+		// and grab the corresponding model so we can set the underlying items list
+		// to the sorted version. Then we'll just return the collection instance.
+		foreach (array_keys($results) as $key)
+		{
+			$results[$key] = $this->items[$key];
+		}
+
+		$this->items = $results;
+
+		return $this;
+	}
+
+	/**
 	 * Reset the keys on the underlying array.
 	 *
 	 * @return \\Illuminate\Support\Collection
