@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Builder {
@@ -321,13 +322,45 @@ class Builder {
 		// that start with the given top relations and adds them to our arrays.
 		foreach ($this->eagerLoad as $name => $constraints)
 		{
-			if (str_contains($name, '.') and starts_with($name, $relation) and $name != $relation)
+			if ($this->isNested($name, $relation))
 			{
 				$nested[substr($name, strlen($relation.'.'))] = $constraints;
 			}
 		}
 
 		return $nested;
+	}
+
+	/**
+	 * Determine if the relationship is nested.
+	 *
+	 * @param  string  $name
+	 * @param  string  $relation
+	 * @return bool
+	 */
+	protected function isNested($name, $relation)
+	{
+		$dots = str_contains($name, '.');
+
+		return $dots and starts_with($name, $relation) and $name != $relation;
+	}
+
+	/**
+	 * Add a relationship count condition to the query.
+	 *
+	 * @param  string  $relation
+	 * @param  int  $count
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function has($relation, $count = 1)
+	{
+		$instance = $this->model->$relation();
+
+		$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+
+		$this->query->mergeBindings($query->getQuery());
+
+		return $this->where(new Expression('('.$query->toSql().')'), '>=', $count);
 	}
 
 	/**
@@ -370,7 +403,7 @@ class Builder {
 			// We need to separate out any nested includes. Which allows the developers
 			// to load deep relationships using "dots" without stating each level of
 			// the relationship with its own key in the array of eager load names.
-			$results = $this->parseNestedRelations($name, $results);
+			$results = $this->parseNested($name, $results);
 
 			$results[$name] = $constraints;
 		}
@@ -385,7 +418,7 @@ class Builder {
 	 * @param  array   $results
 	 * @return array
 	 */
-	protected function parseNestedRelations($name, $results)
+	protected function parseNested($name, $results)
 	{
 		$progress = array();
 

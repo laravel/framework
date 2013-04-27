@@ -39,6 +39,8 @@
 - Set default encryption mode to `cbc`. `Crypt::setMode` is available if you wish to use previous mode of `ctr`.
 - Added `Redirect::guest` and `Redirect::intended` to simplify sending users to intended location.
 - Fixed cookie lifetimes not being updated on each page load.
+- Added `has` method for checking the quantity of related models from a parent query.
+- Added `sort` method to support `Collection` class.
 
 ## Beta 4
 

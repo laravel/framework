@@ -139,4 +139,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array($object1, $object2), $data->merge()->all());
 	}
 
+
+	public function testSort()
+	{
+		$data = new Collection(array('taylor', 'dayle'));
+		$data->sort(function($x) { return $x; });
+
+		$this->assertEquals(array('dayle', 'taylor'), array_values($data->all()));
+	}
+
 }
