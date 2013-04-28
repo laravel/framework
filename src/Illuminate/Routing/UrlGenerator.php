@@ -244,7 +244,11 @@ class UrlGenerator {
 				$getAction = $route->getAction();
 				if (! empty($getAction))
 				{
-					$this->actionMap[$getAction] = $name;
+					// Conserve route priority
+					if (! isset($this->actionMap[$getAction]))
+					{
+						$this->actionMap[$getAction] = $name;
+					}
 				}
 			}
 		}
