@@ -236,24 +236,29 @@ class UrlGenerator {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
-		if (isset($this->actionMap[$action]))
+		// Create action map cache if doesnt exist
+		if (! isset($this->actionMap))
 		{
-			$name = $this->actionMap[$action];
-
-			return $this->route($name, $parameters, $absolute);
+			foreach ($this->routes as $name => $route)
+			{
+				$getAction = $route->getAction();
+				if (! empty($getAction))
+				{
+					$this->actionMap[$getAction] = $name;
+				}
+			}
 		}
 
-		// If haven't already mapped this action to a URI yet, we will need to spin
-		// through all of the routes looking for routes that routes to the given
-		// controller's action, then we will cache them off and build the URL.
-		foreach ($this->routes as $name => $route)
+		// If $action is an existing route
+		if (isset($this->actionMap[$action]))
 		{
-			if ($action == $route->getOption('_uses'))
-			{
-				$this->actionMap[$action] = $name;
-
-				return $this->route($name, $parameters, $absolute);
-			}
+			return $this->route( $this->actionMap[$action], $parameters, $absolute);
+		}
+		else
+		{
+			// Will throw a Symfony \ Component \ Routing \ Exception \ RouteNotFoundException
+			// Unable to generate a URL for the named route "Controller@Method" as such route does not exist.
+			return $this->route($action, $parameters, $absolute);
 		}
 	}
 
