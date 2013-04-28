@@ -8,7 +8,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	/**
 	 * The Amazon SQS instance.
 	 *
-	 * @var Aws\Sqs\SqsClient
+	 * @var \Aws\Sqs\SqsClient
 	 */
 	protected $sqs;
 
@@ -22,7 +22,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new Amazon SQS queue instance.
 	 *
-	 * @param  Aws\Sqs\SqsClient  $sqs
+	 * @param  \Aws\Sqs\SqsClient  $sqs
 	 * @param  string  $default
 	 * @return void
 	 */
@@ -99,7 +99,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	/**
 	 * Get the underlying SQS instance.
 	 *
-	 * @return Aws\Sqs\SqsClient
+	 * @return \Aws\Sqs\SqsClient
 	 */
 	public function getSqs()
 	{

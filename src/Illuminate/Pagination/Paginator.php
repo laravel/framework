@@ -249,7 +249,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Get the pagination environment.
 	 *
-	 * @var \Illuminate\Pagination\Environment
+	 * @return \Illuminate\Pagination\Environment
 	 */
 	public function getEnvironment()
 	{

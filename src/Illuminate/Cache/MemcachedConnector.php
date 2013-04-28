@@ -6,7 +6,7 @@ class MemcachedConnector {
 	 * Create a new Memcached connection.
 	 *
 	 * @param  array  $servers
-	 * @return Memcached
+	 * @return \Memcached
 	 */
 	public function connect(array $servers)
 	{
@@ -31,7 +31,7 @@ class MemcachedConnector {
 	/**
 	 * Get a new Memcached instance.
 	 *
-	 * @return Memcached
+	 * @return \Memcached
 	 */
 	protected function getMemcached()
 	{

@@ -7,7 +7,7 @@ abstract class Compiler {
 	/**
 	 * The Filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 

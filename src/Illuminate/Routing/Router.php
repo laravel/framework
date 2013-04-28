@@ -55,7 +55,7 @@ class Router {
 	/**
 	 * The inversion of control container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
@@ -931,8 +931,8 @@ class Router {
 	/**
 	 * Get the response for a given request.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
@@ -969,7 +969,7 @@ class Router {
 	/**
 	 * Match the given request to a route object.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Illuminate\Routing\Route
 	 */
 	protected function findRoute(Request $request)
@@ -1170,8 +1170,8 @@ class Router {
 	/**
 	 * Call the "after" global filters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	protected function callAfterFilter(Request $request, SymfonyResponse $response)
@@ -1182,8 +1182,8 @@ class Router {
 	/**
 	 * Call the finish" global filter.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	public function callFinishFilter(Request $request, SymfonyResponse $response)
@@ -1194,8 +1194,8 @@ class Router {
 	/**
 	 * Call the "close" global filter.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	public function callCloseFilter(Request $request, SymfonyResponse $response)
@@ -1206,7 +1206,7 @@ class Router {
 	/**
 	 * Call a given global filter with the parameters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $name
 	 * @param  array   $parameters
 	 * @return mixed
@@ -1308,7 +1308,7 @@ class Router {
 	 *
 	 * @param  mixed  $value
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
 	{
@@ -1423,7 +1423,7 @@ class Router {
 	/**
 	 * Retrieve the entire route collection.
 	 * 
-	 * @return Symfony\Component\Routing\RouteCollection
+	 * @return \Symfony\Component\Routing\RouteCollection
 	 */
 	public function getRoutes()
 	{
@@ -1433,7 +1433,7 @@ class Router {
 	/**
 	 * Get the current request being dispatched.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -1484,8 +1484,8 @@ class Router {
 	/**
 	 * Create a new URL matcher instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\Routing\Matcher\UrlMatcher
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\Routing\Matcher\UrlMatcher
 	 */
 	protected function getUrlMatcher(Request $request)
 	{

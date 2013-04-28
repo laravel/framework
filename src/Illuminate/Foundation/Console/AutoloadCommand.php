@@ -79,7 +79,7 @@ class AutoloadCommand extends Command {
 	/**
 	 * Get all of the workbench composer files.
 	 *
-	 * @return Symfony\Component\Finder\Finder
+	 * @return \Symfony\Component\Finder\Finder
 	 */
 	protected function getWorkbenchComposers()
 	{

@@ -115,6 +115,7 @@ abstract class HasOneOrMany extends Relation {
 	 * @param  array   $dictionary
 	 * @param  string  $key
 	 * @param  string  $type
+	 * @return mixed
 	 */
 	protected function getRelationValue(array $dictionary, $key, $type)
 	{

@@ -483,7 +483,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * Handle the given request and get the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
@@ -500,7 +500,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
@@ -592,7 +592,7 @@ class Application extends Container implements HttpKernelInterface {
 	 *
 	 * @param  mixed  $value
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepareResponse($value, Request $request)
 	{

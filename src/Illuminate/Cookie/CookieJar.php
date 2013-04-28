@@ -39,7 +39,7 @@ class CookieJar {
 	/**
 	 * Create a new cookie manager instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
 	 * @return void
 	 */
@@ -107,7 +107,7 @@ class CookieJar {
 	 * @param  string  $domain
 	 * @param  bool    $secure
 	 * @param  bool    $httpOnly
-	 * @return Symfony\Component\HttpFoundation\Cookie
+	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
 	public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
@@ -132,7 +132,7 @@ class CookieJar {
 	 * @param  string  $domain
 	 * @param  bool    $secure
 	 * @param  bool    $httpOnly
-	 * @return Symfony\Component\HttpFoundation\Cookie
+	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
 	public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
@@ -143,7 +143,7 @@ class CookieJar {
 	 * Expire the given cookie.
 	 *
 	 * @param  string  $name
-	 * @return Symfony\Component\HttpFoundation\Cookie
+	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
 	public function forget($name)
 	{
@@ -179,7 +179,7 @@ class CookieJar {
 	/**
 	 * Get the request instance.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{

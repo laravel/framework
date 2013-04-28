@@ -641,6 +641,7 @@ class Builder {
 	 *
 	 * @param  string  $method
 	 * @param  string  $parameters
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function dynamicWhere($method, $parameters)
 	{
