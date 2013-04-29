@@ -19,7 +19,7 @@ class ApcWrapper {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @param  int     $seconds
-	 * @return void
+	 * @return array|bool
 	 */
 	public function put($key, $value, $seconds)
 	{
@@ -31,7 +31,7 @@ class ApcWrapper {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array|bool
 	 */
 	public function increment($key, $value)
 	{
@@ -43,7 +43,7 @@ class ApcWrapper {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array|bool
 	 */
 	public function decrement($key, $value)
 	{
@@ -54,7 +54,7 @@ class ApcWrapper {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return array|bool
 	 */
 	public function delete($key)
 	{

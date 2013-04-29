@@ -129,7 +129,7 @@ class MemcachedStore implements StoreInterface {
 	/**
 	 * Get the underlying Memcached connection.
 	 *
-	 * @return Memcached
+	 * @return \Memcached
 	 */
 	public function getMemcached()
 	{

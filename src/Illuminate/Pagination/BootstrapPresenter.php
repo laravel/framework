@@ -63,6 +63,7 @@ class BootstrapPresenter {
 	 *
 	 * @param  int  $start
 	 * @param  int  $end
+	 * @return string
 	 */
 	public function getPageRange($start, $end)
 	{

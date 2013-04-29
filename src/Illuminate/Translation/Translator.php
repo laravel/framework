@@ -227,7 +227,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get the message selector instance.
 	 *
-	 * @return Symfony\Component\Translation\MessageSelector
+	 * @return \Symfony\Component\Translation\MessageSelector
 	 */
 	public function getSelector()
 	{
@@ -242,7 +242,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Set the message selector instance.
 	 *
-	 * @param  Symfony\Component\Translation\MessageSelector  $selector
+	 * @param  \Symfony\Component\Translation\MessageSelector  $selector
 	 * @return void
 	 */
 	public function setSelector(MessageSelector $selector)

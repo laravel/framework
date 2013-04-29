@@ -9,7 +9,7 @@ class Environment {
 	/**
 	 * The request instance.
 	 *
-	 * @var Symfony\Component\HttpFoundation\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $request;
 
@@ -23,7 +23,7 @@ class Environment {
 	/**
 	 * The translator implementation.
 	 *
-	 * @var Symfony\Component\Translation\TranslatorInterface
+	 * @var \Symfony\Component\Translation\TranslatorInterface
 	 */
 	protected $trans;
 
@@ -65,9 +65,9 @@ class Environment {
 	/**
 	 * Create a new pagination environment.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  \Illuminate\View\Environment  $view
-	 * @param  Symfony\Component\Translation\TranslatorInterface  $trans
+	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
 	 * @return void
 	 */
@@ -233,7 +233,7 @@ class Environment {
 	/**
 	 * Get the active request instance.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -243,7 +243,7 @@ class Environment {
 	/**
 	 * Set the active request instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function setRequest(Request $request)
@@ -275,7 +275,7 @@ class Environment {
 	/**
 	 * Get the translator instance.
 	 *
-	 * @return Symfony\Component\Translation\TranslatorInterface
+	 * @return \Symfony\Component\Translation\TranslatorInterface
 	 */
 	public function getTranslator()
 	{
