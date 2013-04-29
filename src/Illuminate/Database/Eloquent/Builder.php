@@ -116,8 +116,6 @@ class Builder {
 	 */
 	public function lists($column, $key = null)
 	{
-		$key = $key ?: $this->model->getKeyName();
-
 		$results = $this->query->lists($column, $key);
 
 		// If the model has a mutator for the requested column, we will spin through
