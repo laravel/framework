@@ -105,12 +105,15 @@ class Environment {
 	 * Get a evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
-	 * @param  mixed   $data
+	 * @param  array   $data
+	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function make($view, $data = array())
+	public function make($view, $data = array(), $mergeData = array())
 	{
 		$path = $this->finder->find($view);
+
+		$data = array_merge($data, $mergeData);
 
 		return new View($this, $this->getEngineFromPath($path), $view, $path, $data);
 	}
