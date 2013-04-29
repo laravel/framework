@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Routing;
 
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -236,6 +237,9 @@ class UrlGenerator {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
+		// First we'll check to see if we have already rendered a URL for an action
+		// so that we don't have to loop through all of the routes again on each
+		// iteration through the loop. If we have it, we can just return that.
 		if (isset($this->actionMap[$action]))
 		{
 			$name = $this->actionMap[$action];
@@ -255,6 +259,8 @@ class UrlGenerator {
 				return $this->route($name, $parameters, $absolute);
 			}
 		}
+
+		throw new InvalidArgumentException("Unknown action [$action].");
 	}
 
 	/**
