@@ -286,6 +286,8 @@ class UrlGenerator {
 	 */
 	public function isValidUrl($path)
 	{
+		if (starts_with($path, '#')) return true;
+
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
 	}
 
