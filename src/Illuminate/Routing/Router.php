@@ -1250,7 +1250,7 @@ class Router {
 	 * @param  string  $class
 	 * @return void
 	 */
-	public function model($key, $class)
+	public function model($key, $class, Closure $callback = null)
 	{
 		return $this->bind($key, function($value) use ($class)
 		{
@@ -1262,6 +1262,14 @@ class Router {
 			if ( ! is_null($model = with(new $class)->find($value)))
 			{
 				return $model;
+			}
+
+			// If a callback was supplied to the method we will call that to determine
+			// what we should do when the model is not found. This just gives these
+			// developer a little greater flexibility to decide what will happen.
+			if ($callback instanceof Closure)
+			{
+				return call_user_func($callback);
 			}
 
 			throw new NotFoundHttpException;
