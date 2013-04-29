@@ -46,6 +46,7 @@
 - Added ability to pass `Closure` as third parameter to `Route::model` to determine not found behavior.
 - Allow for `Class@method` syntax to be used with `Validator::extend`.
 - Added `@overwrite` Blade directive for forcing a full section overwrite.
+- Added `visible` property to Eloquent that is white-list version of `hidden`.
 
 ## Beta 4
 

@@ -350,6 +350,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testVisibleCreatesArrayWhitelist()
+	{
+		$model = new EloquentModelStub;
+		$model->setVisible(array('name'));
+		$model->name = 'Taylor';
+		$model->age = 26;
+		$array = $model->toArray();
+
+		$this->assertEquals(array('name' => 'Taylor'), $array);
+	}
+
+
 	public function testHiddenCanAlsoExcludeRelationships()
 	{
 		$model = new EloquentModelStub;
