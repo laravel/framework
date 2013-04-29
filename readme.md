@@ -41,6 +41,7 @@
 - Fixed cookie lifetimes not being updated on each page load.
 - Added `has` method for checking the quantity of related models from a parent query.
 - Added `sort` method to support `Collection` class.
+- Reimplemented `keep` and `reflash` for preserving flash data across more than one request.
 
 ## Beta 4
 

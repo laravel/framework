@@ -152,6 +152,46 @@ class Store extends SymfonySession {
 	}
 
 	/**
+	 * Reflash all of the session flash data.
+	 *
+	 * @return void
+	 */
+	public function reflash()
+	{
+		$this->mergeNewFlashes($this->get('flash.old'));
+
+		$this->put('flash.old', array());
+	}
+
+	/**
+	 * Reflash a subset of the current flash data.
+	 *
+	 * @param  array|dynamic  $keys
+	 * @return void
+	 */
+	public function keep($keys = null)
+	{
+		$keys = is_array($keys) ? $keys : func_get_args();
+
+		$this->mergeNewFlashes($keys);
+
+		$this->put('flash.old', array_diff($this->get('flash.old'), $keys));
+	}
+
+	/**
+	 * Merge new flash keys into the new flash array.
+	 *
+	 * @param  array  $keys
+	 * @return void
+	 */
+	protected function mergeNewFlashes(array $keys)
+	{
+		$values = array_unique(array_merge($this->get('flash.new'), $keys));
+
+		$this->put('flash.new', $values);
+	}
+
+	/**
 	 * Remove an item from the session.
 	 *
 	 * @param  string  $key
