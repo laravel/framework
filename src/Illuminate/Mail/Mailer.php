@@ -206,7 +206,7 @@ class Mailer {
 	{
 		$this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
 
-		$job->delete();
+		try { $job->delete(); } catch (\Exception $e) {}
 	}
 
 	/**
