@@ -67,7 +67,7 @@ class Collection extends BaseCollection {
 		// be able to quickly determine it is in the array when asked for it.
 		elseif ($item instanceof Model)
 		{
-			$this->dictionary[$item->getKey()] = true;
+			$this->dictionary[$item->getKey()] = $item;
 		}
 
 		return $this;
