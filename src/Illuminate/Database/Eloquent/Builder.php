@@ -108,6 +108,19 @@ class Builder {
 	}
 
 	/**
+	 * Pluck a single column from the database.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function pluck($column)
+	{
+		$result = $this->first(array($column));
+
+		if ($result) return $result->{$column};
+	}
+
+	/**
 	 * Get an array with the values of a given column.
 	 *
 	 * @param  string  $column
