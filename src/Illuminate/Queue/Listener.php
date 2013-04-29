@@ -54,7 +54,7 @@ class Listener {
 	/**
 	 * Run the given process.
 	 *
-	 * @param  Symfony\Component\Process\Process  $process
+	 * @param  \Symfony\Component\Process\Process  $process
 	 * @param  int  $memory
 	 * @return void
 	 */
@@ -79,7 +79,7 @@ class Listener {
 	 * @param  int     $delay
 	 * @param  int     $memory
 	 * @param  int     $timeout
-	 * @return Symfony\Component\Process\Process
+	 * @return \Symfony\Component\Process\Process
 	 */
 	public function makeProcess($connection, $queue, $delay, $memory, $timeout)
 	{

@@ -12,7 +12,7 @@ class Response {
 	 * @param  string  $content
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public static function make($content = '', $status = 200, array $headers = array())
 	{
@@ -26,7 +26,7 @@ class Response {
 	 * @param  array   $data
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public static function view($view, $data = array(), $status = 200, array $headers = array())
 	{
@@ -41,7 +41,7 @@ class Response {
 	 * @param  string|array  $data
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Illuminate\Http\JsonResponse
+	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
@@ -59,7 +59,7 @@ class Response {
 	 * @param  Closure  $callback
 	 * @param  int      $status
 	 * @param  array    $headers
-	 * @return Symfony\Component\HttpFoundation\StreamedResponse
+	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
 	public static function stream($callback, $status = 200, array $headers = array())
 	{
@@ -72,7 +72,7 @@ class Response {
 	 * @param  SplFileInfo|string  $file
 	 * @param  int  $status
 	 * @param  array  $headers
-	 * @return Symfony\Component\HttpFoundation\BinaryFileResponse
+	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
 	public static function download($file, $name = null, $headers = array())
 	{

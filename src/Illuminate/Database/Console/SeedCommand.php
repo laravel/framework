@@ -58,7 +58,7 @@ class SeedCommand extends Command {
 	/**
 	 * Get a seeder instance from the container.
 	 *
-	 * @return DatabaseSeeder
+	 * @return \Illuminate\Database\Seeder
 	 */
 	protected function getSeeder()
 	{

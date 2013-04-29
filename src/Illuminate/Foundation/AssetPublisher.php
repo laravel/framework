@@ -7,7 +7,7 @@ class AssetPublisher {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -28,7 +28,7 @@ class AssetPublisher {
 	/**
 	 * Create a new asset publisher instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $publishPath
 	 * @return void
 	 */

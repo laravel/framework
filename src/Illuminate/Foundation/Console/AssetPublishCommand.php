@@ -78,7 +78,7 @@ class AssetPublishCommand extends Command {
 	/**
 	 * Get the name of the package being published.
 	 *
-	 * @return string
+	 * @return array
 	 */
 	protected function getPackages()
 	{

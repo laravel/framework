@@ -213,7 +213,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Reset the keys on the underlying array.
 	 *
-	 * @return \\Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function values()
 	{
@@ -226,7 +226,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Fetch a nested element of the collection.
 	 *
 	 * @param  string  $key
-	 * @retunr Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function fetch($key)
 	{

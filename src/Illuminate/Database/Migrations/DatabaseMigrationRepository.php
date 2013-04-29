@@ -78,7 +78,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Remove a migration from the log.
 	 *
-	 * @param  StdClass  $migration
+	 * @param  \StdClass  $migration
 	 * @return void
 	 */
 	public function delete($migration)

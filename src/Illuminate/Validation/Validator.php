@@ -95,7 +95,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Create a new Validator instance.
 	 *
-	 * @param  Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
@@ -1518,7 +1518,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the Translator implementation.
 	 *
-	 * @return Symfony\Component\Translation\TranslatorInterface
+	 * @return \Symfony\Component\Translation\TranslatorInterface
 	 */
 	public function getTranslator()
 	{
@@ -1528,7 +1528,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the Translator implementation.
 	 *
-	 * @param Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @return void
 	 */
 	public function setTranslator(TranslatorInterface $translator)

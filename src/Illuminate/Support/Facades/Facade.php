@@ -35,7 +35,7 @@ abstract class Facade {
 	 * Initiate a mock expectation on the facade.
 	 *
 	 * @param  dynamic
-	 * @return Mockery\Expectation
+	 * @return \Mockery\Expectation
 	 */
 	public static function shouldReceive()
 	{

@@ -29,7 +29,7 @@ class IronJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @param  IronMQ    $iron
 	 * @param  StdClass  $job
 	 * @param  string    $queue
@@ -90,7 +90,7 @@ class IronJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container
+	 * @return \Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{

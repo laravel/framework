@@ -43,7 +43,7 @@ class Factory {
 	/**
 	 * Create a new Validator factory instance.
 	 *
-	 * @param  Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @return void
 	 */
 	public function __construct(TranslatorInterface $translator)
@@ -141,7 +141,7 @@ class Factory {
 	/**
 	 * Get the Translator implementation.
 	 *
-	 * @return Symfony\Component\Translation\TranslatorInterface
+	 * @return \Symfony\Component\Translation\TranslatorInterface
 	 */
 	public function getTranslator()
 	{
