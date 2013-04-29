@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Support\MessageBag;
+use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Translation\TranslatorInterface;
 use Illuminate\Support\Contracts\MessageProviderInterface;
@@ -1400,10 +1401,10 @@ class Validator implements MessageProviderInterface {
 	 * Register a custom validator extension.
 	 *
 	 * @param  string   $rule
-	 * @param  Closure  $extension
+	 * @param  Closure|string  $extension
 	 * @return void
 	 */
-	public function addExtension($rule, Closure $extension)
+	public function addExtension($rule, $extension)
 	{
 		$this->extensions[$rule] = $extension;
 	}
@@ -1588,6 +1589,52 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Set the IoC container instance.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return void
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+	}
+
+	/**
+	 * Call a custom validator extension.
+	 *
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function callExtension($rule, $parameters)
+	{
+		$callback = $this->extensions[$rule];
+
+		if ($callback instanceof Closure)
+		{
+			return call_user_func_array($callback, $parameters);
+		}
+		elseif (is_string($callback))
+		{
+			return $this->callClassBasedExtension($callback, $parameters);
+		}
+	}
+
+	/**
+	 * Call a class baesd validator extension.
+	 *
+	 * @param  string  $callback
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function callClassBasedExtension($callback, $parameters)
+	{
+		list($class, $method) = explode('@', $callback);
+
+		return call_user_func_array(array($this->container->make($class), $method), $parameters);
+	}
+
+	/**
 	 * Handle dynamic calls to class methods.
 	 *
 	 * @param  string  $method
@@ -1600,7 +1647,7 @@ class Validator implements MessageProviderInterface {
 
 		if (isset($this->extensions[$rule]))
 		{
-			return call_user_func_array($this->extensions[$rule], $parameters);
+			return $this->callExtension($rule, $parameters);
 		}
 
 		throw new \BadMethodCallException("Method [$method] does not exist.");

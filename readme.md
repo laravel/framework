@@ -44,6 +44,7 @@
 - Reimplemented `keep` and `reflash` for preserving flash data across more than one request.
 - Fixed bug where flash data was not carried through multiple requests.
 - Added ability to pass `Closure` as third parameter to `Route::model` to determine not found behavior.
+- Allow for `Class@method` syntax to be used with `Validator::extend`.
 
 ## Beta 4
 

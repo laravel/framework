@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Validation;
 
 use Closure;
+use Illuminate\Container\Container;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class Factory {
@@ -17,7 +18,14 @@ class Factory {
 	 *
 	 * @var \Illuminate\Validation\PresenceVerifierInterface
 	 */
-	protected $presenceVerifier;
+	protected $verifier;
+
+	/**
+	 * The IoC container instance.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
 
 	/**
 	 * All of the custom validator extensions.
@@ -44,10 +52,12 @@ class Factory {
 	 * Create a new Validator factory instance.
 	 *
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
-	public function __construct(TranslatorInterface $translator)
+	public function __construct(TranslatorInterface $translator, Container $container = null)
 	{
+		$this->container = $container;
 		$this->translator = $translator;
 	}
 
@@ -61,14 +71,22 @@ class Factory {
 	 */
 	public function make(array $data, array $rules, array $messages = array())
 	{
-		$validator = $this->resolve($data, $rules, $messages);
-
 		// The presence verifier is responsible for checking the unique and exists data
 		// for the validator. It is behind an interface so that multiple versions of
 		// it may be written besides database. We'll inject it into the validator.
-		if ( ! is_null($this->presenceVerifier))
+		$validator = $this->resolve($data, $rules, $messages);
+
+		if ( ! is_null($this->verifier))
 		{
-			$validator->setPresenceVerifier($this->presenceVerifier);
+			$validator->setPresenceVerifier($this->verifier);
+		}
+
+		// Next we'll set the IoC container instance of the validator, which is used to
+		// resolves out class baesd validator extensions. If it's not set then these
+		// types of extensions will not be possible on these validation instances.
+		if ( ! is_null($this->container))
+		{
+			$validator->setContainer($this->container);
 		}
 
 		$validator->addExtensions($this->extensions);
@@ -107,10 +125,10 @@ class Factory {
 	 * Register a custom validator extension.
 	 *
 	 * @param  string  $rule
-	 * @param  Closure  $extension
+	 * @param  Closure|string  $extension
 	 * @return void
 	 */
-	public function extend($rule, Closure $extension)
+	public function extend($rule, $extension)
 	{
 		$this->extensions[$rule] = $extension;
 	}
@@ -155,7 +173,7 @@ class Factory {
 	 */
 	public function getPresenceVerifier()
 	{
-		return $this->presenceVerifier;
+		return $this->verifier;
 	}
 
 	/**
@@ -166,7 +184,7 @@ class Factory {
 	 */
 	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
 	{
-		$this->presenceVerifier = $presenceVerifier;
+		$this->verifier = $presenceVerifier;
 	}
 
 }

@@ -688,6 +688,21 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testClassBasedCustomValidators()
+	{
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
+		$v->setContainer($container = m::mock('Illuminate\Container\Container'));
+		$v->addExtension('foo', 'Foo@bar');
+		$container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+		$foo->shouldReceive('bar')->once()->andReturn(false);
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('foo!', $v->messages()->first('name'));
+	}
+
+
 	public function testCustomImplicitValidators()
 	{
 		$trans = $this->getRealTranslator();
