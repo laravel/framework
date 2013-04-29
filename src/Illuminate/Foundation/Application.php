@@ -273,7 +273,7 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	protected function isMachine($name)
 	{
-		return gethostname() == $name;
+		return str_is($name, gethostname());
 	}
 
 	/**
