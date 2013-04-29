@@ -138,6 +138,8 @@ class Store extends SymfonySession {
 		$this->put($key, $value);
 
 		$this->push('flash.new', $key);
+
+		$this->put('flash.old', array_diff($this->get('flash.old'), array($key)));
 	}
 
 	/**
