@@ -133,7 +133,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 
 		$value = str_shuffle(sha1($email.spl_object_hash($this).microtime(true)));
 
-		return hash_hmac('sha512', $value, $this->hashKey);
+		return hash_hmac('sha1', $value, $this->hashKey);
 	}
 
 	/**
