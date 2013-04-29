@@ -397,13 +397,21 @@ class Environment {
 	/**
 	 * Stop injecting content into a section.
 	 *
+	 * @param  bool  $overwrite
 	 * @return string
 	 */
-	public function stopSection()
+	public function stopSection($overwrite = false)
 	{
 		$last = array_pop($this->sectionStack);
 
-		$this->extendSection($last, ob_get_clean());
+		if ($overwrite)
+		{
+			$this->sections[$last] = ob_get_clean();
+		}
+		else
+		{
+			$this->extendSection($last, ob_get_clean());
+		}
 
 		return $last;
 	}
