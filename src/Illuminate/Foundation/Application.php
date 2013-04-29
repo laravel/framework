@@ -262,6 +262,7 @@ class Application extends Container implements HttpKernelInterface {
 			}
 		}
 
+		if (empty($base)) $base = php_uname('n');
 		return $this->detectWebEnvironment($base, $environments);
 	}
 
