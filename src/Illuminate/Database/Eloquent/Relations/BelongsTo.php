@@ -171,16 +171,16 @@ class BelongsTo extends Relation {
 	}
 
 	/**
-	 * Attach a model instance to the parent model.
+	 * Associate a model instance to the parent model.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Model  $model
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function save(Model $model)
+	public function associate(Model $model)
 	{
 		$this->parent->setAttribute($this->foreignKey, $model->getKey());
 
-		return $this->parent->save() ? $model : false;
+		return $this->parent;
 	}
 
 	/**

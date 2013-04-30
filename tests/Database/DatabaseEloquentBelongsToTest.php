@@ -74,7 +74,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 		return new BelongsTo($builder, $parent, 'foreign_key');
 	}
 
-	public function testSaveMethodSetsForeignKeyOnModel()
+	public function testAssociateMethodSetsForeignKeyOnModel()
 	{
 		$mockOwner = $this->getMock('Illuminate\Database\Eloquent\Model', array('getTable'));
 		$mockOwner->expects($this->atLeastOnce())->method('getTable')->will($this->returnValue('owner_table'));
@@ -82,7 +82,6 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 		$mockBelonger = $this->getMock('Illuminate\Database\Eloquent\Model', array('save', 'getAttribute', 'setAttribute', 'getTable'));
 		$mockBelonger->expects($this->once())->method('getAttribute')->with($this->equalTo('owner_key'))->will($this->returnValue(321));
 		$mockBelonger->expects($this->once())->method('setAttribute')->with($this->equalTo('owner_key'), $this->equalTo(123));
-		$mockBelonger->expects($this->once())->method('save')->will($this->returnValue(true));
 
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$builder->shouldReceive('getModel')->andReturn($mockOwner);
@@ -93,7 +92,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 		$newOwner = m::mock('Illuminate\Database\Eloquent\Model');
 		$newOwner->shouldReceive('getKey')->andReturn(123);
 
-		$relation->save($newOwner);
+		$relation->associate($newOwner);
 	}
 
 }
