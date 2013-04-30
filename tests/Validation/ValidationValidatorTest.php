@@ -194,6 +194,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 	}
 
+
+	public function testRequiredIf()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor'), array('last' => 'required_if:first,taylor'));
+		$this->assertTrue($v->fails());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor', 'last' => 'otwell'), array('last' => 'required_if:first,taylor'));
+		$this->assertTrue($v->passes());
+	}
+
+
 	public function testValidateConfirmed()
 	{
 		$trans = $this->getRealTranslator();
