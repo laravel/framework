@@ -62,4 +62,11 @@ interface StoreInterface {
 	 */
 	public function flush();
 
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix();
+
 }

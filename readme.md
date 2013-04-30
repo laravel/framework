@@ -48,6 +48,7 @@
 - Added `@overwrite` Blade directive for forcing a full section overwrite.
 - Added `visible` property to Eloquent that is white-list version of `hidden`.
 - Using `pluck` on Eloquent queries will now call accessors.
+- Tweaked behavior of Redis sections to remove "forever" keys from storage.
 
 ## Beta 4
 

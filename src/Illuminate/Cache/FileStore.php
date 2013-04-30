@@ -185,4 +185,14 @@ class FileStore implements StoreInterface {
 		return $this->directory;
 	}
 
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return '';
+	}
+
 }
