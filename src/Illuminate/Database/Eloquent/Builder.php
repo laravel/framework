@@ -360,10 +360,11 @@ class Builder {
 	 * Add a relationship count condition to the query.
 	 *
 	 * @param  string  $relation
-	 * @param  int  $count
+	 * @param  string  $operator
+	 * @param  int     $count
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function has($relation, $count = 1)
+	public function has($relation, $operator = '>=', $count = 1)
 	{
 		$instance = $this->model->$relation();
 
@@ -371,7 +372,7 @@ class Builder {
 
 		$this->query->mergeBindings($query->getQuery());
 
-		return $this->where(new Expression('('.$query->toSql().')'), '>=', $count);
+		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count);
 	}
 
 	/**
