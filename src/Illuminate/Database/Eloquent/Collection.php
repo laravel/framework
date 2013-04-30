@@ -110,4 +110,19 @@ class Collection extends BaseCollection {
 		}
 	}
 
+	/**
+	 * Get the array of primary keys
+	 *
+	 * @return array
+	 */
+	public function dictionary()
+	{
+		if(count($this->dictionary) === 0)
+		{
+			$this->buildDictionary();
+		}
+
+		return array_keys($this->dictionary);
+	}
+
 }
