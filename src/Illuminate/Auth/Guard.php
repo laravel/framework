@@ -203,7 +203,7 @@ class Guard {
 		{
 			if ($this->attemptBasic($request, $field)) return;
 		}
-
+		
 		return $this->getBasicResponse();
 	}
 

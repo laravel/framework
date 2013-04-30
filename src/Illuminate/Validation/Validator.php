@@ -1558,7 +1558,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function setCustomMessages(array $messages)
 	{
-		$this->customMessages = $messages;
+		$this->customMessages = array_merge($this->customMessages, $messages);
 	}
 
 	/**
