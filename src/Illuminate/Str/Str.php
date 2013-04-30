@@ -153,7 +153,7 @@ class Str {
 	 */
 	public function camel($value)
 	{
-		return lcfirst($this->studly($value));
+		return lcfirst(self::studly($value));
 	}
 
 	/**
@@ -303,7 +303,7 @@ class Str {
 			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
 		}
 
-		return $this->quickRandom($length);
+		return self::quickRandom($length);
 	}
 
 	/**

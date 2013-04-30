@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
+use Illuminate\Str\Str;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
