@@ -182,12 +182,21 @@ class FormBuilder {
 
 		$options = $this->html->attributes($options);
 
-		if (is_null($value))
-		{
-			$value = ucwords(str_replace('_', ' ', $name));
-		}
+		$value = e($this->formatLabel($name, $value));
 
-		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
+		return '<label for="'.$name.'"'.$options.'>'.$value.'</label>';
+	}
+
+	/**
+	 * Format the label value.
+	 *
+	 * @param  string  $name
+	 * @param  string|null  $value
+	 * @return string
+	 */
+	protected function formatLabel($name, $value)
+	{
+		return $value ?: ucwords(str_replace('_', ' ', $name));
 	}
 
 	/**
