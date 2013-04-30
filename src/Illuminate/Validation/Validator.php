@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Validation;
 
 use Closure;
+use DateTime;
 use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
@@ -854,6 +855,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateDate($attribute, $value)
 	{
+		if ($value instanceof DateTime) return true;
+
 		if (strtotime($value) === false) return false;
 
 		$date = date_parse($value);
