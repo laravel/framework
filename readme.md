@@ -57,6 +57,7 @@
 - Added `associate` method to the `BelongsTo` relationship.
 - Added ability to register connections in the IoC container.
 - Added `Schema::hasColumn` method.
+- Arrays returned from routes / controllers are now turned into JSON.
 
 ## Beta 4
 
