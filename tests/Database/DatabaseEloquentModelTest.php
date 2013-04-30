@@ -104,9 +104,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.updating', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.updated', $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved', $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
 
 		$model->foo = 'bar';
@@ -118,6 +122,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($model->save());
 	}
 
+    public function testSaveIsCancelledIfGlobalSavingEventReturnsFalse()
+    {
+        $model = $this->getMock('EloquentModelStub', array('newQuery'));
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+        $model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(false);
+        $model->exists = true;
+
+        $this->assertFalse($model->save());
+    }
+
 
 	public function testSaveIsCancelledIfSavingEventReturnsFalse()
 	{
@@ -125,11 +141,27 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(false);
 		$model->exists = true;
 
 		$this->assertFalse($model->save());
 	}
+
+    public function testUpdateIsCancelledIfGlobalUpdatingEventReturnsFalse()
+    {
+        $model = $this->getMock('EloquentModelStub', array('newQuery'));
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+        $model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.updating', $model)->andReturn(false);
+        $model->exists = true;
+        $model->foo = 'bar';
+
+        $this->assertFalse($model->save());
+    }
 	
 
 	public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
@@ -138,7 +170,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.updating', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
 		$model->exists = true;
 		$model->foo = 'bar';
@@ -224,9 +258,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.creating', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created', $model);
 		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved', $model);
 		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
 
 		$model->name = 'taylor';
@@ -243,9 +281,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->setIncrementing(false);
 
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.creating', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created', $model);
 		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved', $model);
 		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
 
 		$model->name = 'taylor';
@@ -256,13 +298,30 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testInsertIsCancelledIfGlobalCreatingEventReturnsFalse()
+    {
+        $model = $this->getMock('EloquentModelStub', array('newQuery'));
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+        $model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.creating', $model)->andReturn(false);
+
+        $this->assertFalse($model->save());
+        $this->assertFalse($model->exists);
+    }
+
+
 	public function testInsertIsCancelledIfCreatingEventReturnsFalse()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.creating', $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
 
 		$this->assertFalse($model->save());
