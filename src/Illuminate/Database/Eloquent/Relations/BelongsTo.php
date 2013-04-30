@@ -171,7 +171,7 @@ class BelongsTo extends Relation {
 	}
 
 	/**
-	 * Associate a model instance to the parent model.
+	 * Associate the model instance to the given parent.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Model  $model
 	 * @return \Illuminate\Database\Eloquent\Model
