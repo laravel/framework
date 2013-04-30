@@ -115,7 +115,7 @@ class Collection extends BaseCollection {
 	 *
 	 * @return array
 	 */
-	public function dictionary()
+	public function modelKeys()
 	{
 		if(count($this->dictionary) === 0)
 		{

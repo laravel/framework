@@ -72,7 +72,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 
 		$c = new Collection(array($one, $two, $three));
 
-		$this->assertEquals(array(1,2,3), $c->dictionary());
+		$this->assertEquals(array(1,2,3), $c->modelKeys());
 	}
 
 }
