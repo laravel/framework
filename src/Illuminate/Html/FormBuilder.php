@@ -115,7 +115,7 @@ class FormBuilder {
 
 		// Finally we're ready to create the final form HTML field. We will attribute
 		// format the array of attributes. We will also add on the appendage which
-		// is used to spoof requests for the PUT, PATCH, etc. methods on forms.
+		// is used to spoof requests for this PUT, PATCH, etc. methods on forms.
 		$attributes = array_merge(
 
 			$attributes, array_except($options, $this->reserved)

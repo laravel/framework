@@ -4,6 +4,7 @@ use Closure;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\View\Engines\EngineResolver;
+use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
 
 class Environment {
 
@@ -113,9 +114,20 @@ class Environment {
 	{
 		$path = $this->finder->find($view);
 
-		$data = array_merge($data, $mergeData);
+		$data = array_merge($this->parseData($data), $mergeData);
 
 		return new View($this, $this->getEngineFromPath($path), $view, $path, $data);
+	}
+
+	/**
+	 * Parse the given data into a raw array.
+	 *
+	 * @param  mixed  $data
+	 * @return array
+	 */
+	protected function parseData($data)
+	{
+		return $data instanceof Arrayable ? $data->toArray() : $data;
 	}
 
 	/**
