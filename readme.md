@@ -56,6 +56,7 @@
 - Added `modelKeys` function to the Eloquent collection class.
 - Added `associate` method to the `BelongsTo` relationship.
 - Added ability to register connections in the IoC container.
+- Added `Schema::hasColumn` method.
 
 ## Beta 4
 
