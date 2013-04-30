@@ -176,11 +176,16 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function label($name, $value, $options = array())
+	public function label($name, $value = null, $options = array())
 	{
 		$this->labels[] = $name;
 
 		$options = $this->html->attributes($options);
+
+		if (is_null($value))
+		{
+			$value = ucwords(str_replace('_', ' ', $name));
+		}
 
 		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
 	}
