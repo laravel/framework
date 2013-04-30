@@ -3,59 +3,25 @@
 class Str {
 
 	/**
-	 * The active inflector instances.
+	 * Inflector instance.
 	 *
 	 * @var Illuminate\Str\Inflector
 	 */
-	protected $inflector;
-
-	/**
-	 * The active static inflector instances.
-	 *
-	 * @var Illuminate\Str\Inflector
-	 */
-	protected static $staticInflector;
-
-	/**
-	 * Get a inflector instance.
-	 *
-	 * @return Illuminate\Str\Inflector
-	 */
-	public function inflector()
-	{
-		if (is_null($this->inflector))
-		{
-			return $this->inflector = new Inflector;
-		}
-
-		return $this->inflector;
-	}
+	protected static $inflector;
 
 	/**
 	 * Get a inflector instance for static call.
 	 *
 	 * @return Illuminate\Str\Inflector
 	 */
-	public static function staticInflector()
+	public static function inflector()
 	{
-		if (is_null(static::$staticInflector))
+		if (is_null(static::$inflector))
 		{
-			return static::$staticInflector = new Inflector;
+			return static::$inflector = new Inflector;
 		}
 
-		return static::$staticInflector;
-	}
-
-	/**
-	 * Dynamically pass methods to the string inflector.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
-	public function __call($method, $parameters)
-	{
-		return call_user_func_array(array($this->inflector(), $method), $parameters);
+		return static::$inflector;
 	}
 
 	/**
@@ -67,7 +33,7 @@ class Str {
 	 */
 	public static function __callStatic($method, $parameters)
 	{
-		return call_user_func_array(array(static::staticInflector(), $method), $parameters);
+		return call_user_func_array(array(static::inflector(), $method), $parameters);
 	}
 
 }

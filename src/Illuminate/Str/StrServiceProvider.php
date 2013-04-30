@@ -18,7 +18,7 @@ class StrServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->registerStrr();
+		$this->registerStr();
 	}
 
 	/**
@@ -30,11 +30,11 @@ class StrServiceProvider extends ServiceProvider {
 	{
 		$this->app['str'] = $this->app->share(function($app)
 		{
-			$str = new Str();
-			$str->setLanguage($app['config']['app.locale']);
-			$str->setAsciiMap($app['config']['str.ascii']);
-			$str->setRemoveList($app['config']['str.remove']);
-			return $str;
+			$inflector = new Inflector;
+			$inflector->setLanguage($app['config']['app.locale']);
+			$inflector->setAsciiMap($app['config']['str.ascii']);
+			$inflector->setRemoveList($app['config']['str.remove']);
+			return $inflector;
 		});
 	}
 
