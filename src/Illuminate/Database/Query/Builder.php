@@ -30,11 +30,18 @@ class Builder {
 	protected $processor;
 
 	/**
-	 * The current query value bindings.
+	 * The current query value where bindings.
 	 *
 	 * @var array
 	 */
-	protected $bindings = array();
+	protected $whereBindings = array();
+
+	/**
+	 * The current query value having bindings.
+	 *
+	 * @var array
+	 */
+	protected $havingBindings = array();
 
 	/**
 	 * An aggregate function and column to be run.
@@ -296,7 +303,7 @@ class Builder {
 
 		if ( ! $value instanceof Expression)
 		{
-			$this->bindings[] = $value;
+			$this->whereBindings[] = $value;
 		}
 
 		return $this;
@@ -329,7 +336,7 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'sql', 'boolean');
 
-		$this->bindings = array_merge($this->bindings, $bindings);
+		$this->whereBindings = array_merge($this->whereBindings, $bindings);
 
 		return $this;
 	}
@@ -360,7 +367,7 @@ class Builder {
 
 		$this->wheres[] = compact('column', 'type', 'boolean');
 
-		$this->bindings = array_merge($this->bindings, $values);
+		$this->whereBindings = array_merge($this->whereBindings, $values);
 
 		return $this;
 	}
@@ -518,7 +525,7 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
-		$this->bindings = array_merge($this->bindings, $values);
+		$this->whereBindings = array_merge($this->whereBindings, $values);
 
 		return $this;
 	}
@@ -726,7 +733,7 @@ class Builder {
 
 		$this->havings[] = compact('type', 'column', 'operator', 'value');
 
-		$this->bindings[] = $value;
+		$this->havingBindings[] = $value;
 
 		return $this;
 	}
@@ -745,7 +752,7 @@ class Builder {
 
 		$this->havings[] = compact('type', 'sql', 'boolean');
 
-		$this->bindings = array_merge($this->bindings, $bindings);
+		$this->havingBindings = array_merge($this->havingBindings, $bindings);
 
 		return $this;
 	}
@@ -878,7 +885,7 @@ class Builder {
 			$this->columns = $columns;
 		}
 
-		$results = $this->connection->select($this->toSql(), $this->bindings);
+		$results = $this->connection->select($this->toSql(), $this->getBindings());
 
 		$this->processor->processSelect($this, $results);
 
@@ -1164,7 +1171,7 @@ class Builder {
 	 */
 	public function update(array $values)
 	{
-		$bindings = array_values(array_merge($values, $this->bindings));
+		$bindings = array_values(array_merge($values, $this->whereBindings));
 
 		$sql = $this->grammar->compileUpdate($this, $values);
 
@@ -1214,7 +1221,7 @@ class Builder {
 
 		$sql = $this->grammar->compileDelete($this);
 
-		return $this->connection->delete($sql, $this->bindings);
+		return $this->connection->delete($sql, $this->whereBindings);
 	}
 
 	/**
@@ -1251,7 +1258,7 @@ class Builder {
 	{
 		$this->wheres = array_merge($this->wheres, (array) $wheres);
 
-		$this->bindings = array_values(array_merge($this->bindings, (array) $bindings));
+		$this->whereBindings = array_values(array_merge($this->whereBindings, (array) $bindings));
 	}
 
 	/**
@@ -1261,9 +1268,9 @@ class Builder {
 	 */
 	public function getAndResetWheres()
 	{
-		$values = array($this->wheres, $this->bindings);
+		$values = array($this->wheres, $this->whereBindings);
 
-		list($this->wheres, $this->bindings) = array(null, array());
+		list($this->wheres, $this->whereBindings) = array(null, array());
 
 		return $values;
 	}
@@ -1300,29 +1307,40 @@ class Builder {
 	 */
 	public function getBindings()
 	{
-		return $this->bindings;
+		return array_merge($this->whereBindings, $this->havingBindings);
 	}
 
 	/**
-	 * Set the bindings on the query builder.
+	 * Get the current query value where bindings.
+	 * 
+	 * @return array
+	 */
+	public function getWhereBindings()
+	{
+		return $this->whereBindings;
+	}
+
+	/**
+	 * Set the where bindings on the query builder.
 	 *
 	 * @param  array  $bindings
 	 * @return void
 	 */
-	public function setBindings(array $bindings)
+	public function setWhereBindings(array $bindings)
 	{
-		$this->bindings = $bindings;
+		$this->whereBindings = $bindings;
 	}
 
 	/**
-	 * Merge an array of bindings into our bindings.
+	 * Merge all bindings from another query into our bindings.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return void
 	 */
 	public function mergeBindings(Builder $query)
 	{
-		$this->bindings = array_values(array_merge($this->bindings, $query->bindings));
+		$this->whereBindings = array_values(array_merge($this->whereBindings, $query->whereBindings));
+		$this->havingBindings = array_values(array_merge($this->havingBindings, $query->havingBindings));
 	}
 
 	/**
