@@ -222,21 +222,28 @@ class Application extends Container implements HttpKernelInterface {
 			return $this['env'] = call_user_func($environments);
 		}
 
+		// tmp environments array
+		$envs = array();
+
 		foreach ($environments as $environment => $hosts)
 		{
 			// To determine the current environment, we'll simply iterate through the
 			// possible environments and look for a host that matches this host in
-			// the request's context, then return back that environment's names.
+			// the request's context, then append the environment's name into the tmp array.
 			foreach ((array) $hosts as $host)
 			{
 				if (str_is($host, $base) or $this->isMachine($host))
 				{
-					return $this['env'] = $environment;
+					$envs[] = $environment;
 				}
 			}
 		}
 
-		return $this['env'] = 'production';
+		$this['env'] = empty($envs)
+			? 'production'
+			: implode('|', $envs);
+		
+		return $this['env'];
 	}
 
 	/**
