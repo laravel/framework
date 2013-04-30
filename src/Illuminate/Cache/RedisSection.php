@@ -39,7 +39,10 @@ class RedisSection extends Section {
 	{
 		$forever = $this->getForeverKeys();
 
-		call_user_func_array(array($this->getRedis(), 'del'), $forever);
+		if (count($forever) > 0)
+		{
+			call_user_func_array(array($this->getRedis(), 'del'), $forever);
+		}
 	}
 
 	/**
