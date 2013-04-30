@@ -51,6 +51,7 @@
 - Tweaked behavior of Redis sections to remove "forever" keys from storage.
 - Allow package views to be overriden by the application in `view/packages/vendor/package`, etc.
 - Added `required_if` validation rule.
+- Added `DB::reconnect` method to `DatabaseManager`.
 
 ## Beta 4
 
