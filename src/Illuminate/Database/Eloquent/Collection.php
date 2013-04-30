@@ -117,10 +117,7 @@ class Collection extends BaseCollection {
 	 */
 	public function modelKeys()
 	{
-		if(count($this->dictionary) === 0)
-		{
-			$this->buildDictionary();
-		}
+		if (count($this->dictionary) === 0) $this->buildDictionary();
 
 		return array_keys($this->dictionary);
 	}
