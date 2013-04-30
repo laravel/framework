@@ -139,7 +139,7 @@ class Store extends SymfonySession {
 
 		$this->push('flash.new', $key);
 
-		$this->put('flash.old', array_diff($this->get('flash.old'), array($key)));
+		$this->removeFromOldFlashData(array($key));
 	}
 
 	/**
@@ -177,7 +177,7 @@ class Store extends SymfonySession {
 
 		$this->mergeNewFlashes($keys);
 
-		$this->put('flash.old', array_diff($this->get('flash.old'), $keys));
+		$this->removeFromOldFlashData($keys);
 	}
 
 	/**
@@ -191,6 +191,17 @@ class Store extends SymfonySession {
 		$values = array_unique(array_merge($this->get('flash.new'), $keys));
 
 		$this->put('flash.new', $values);
+	}
+
+	/**
+	 * Remove the given keys from the old flash data.
+	 *
+	 * @param  array  $keys
+	 * @return void
+	 */
+	protected function removeFromOldFlashData(array $keys)
+	{
+		$this->put('flash.old', array_diff($this->get('flash.old', array()), $keys));
 	}
 
 	/**
