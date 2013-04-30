@@ -303,7 +303,7 @@ class Str {
 			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
 		}
 
-		return self::quickRandom($length);
+		return $this->quickRandom($length);
 	}
 
 	/**
