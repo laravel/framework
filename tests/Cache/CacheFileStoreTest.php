@@ -90,7 +90,8 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 	public function testFlushCleansDirectory()
 	{
 		$files = $this->mockFilesystem();
-		$files->expects($this->once())->method('cleanDirectory')->with($this->equalTo(__DIR__));
+		$files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue(array('foo')));
+		$files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'));
 
 		$store = new FileStore($files, __DIR__);
 		$store->flush();
