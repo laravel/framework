@@ -68,7 +68,7 @@ class ApcWrapper {
 	 */
 	public function flush()
 	{
-		apc_clear_cache();
+		apc_clear_cache('user');
 	}
 
 }
