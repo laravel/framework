@@ -1096,9 +1096,16 @@ class Builder {
 		// the aggregate value getting in the way when the grammar builds it.
 		$this->aggregate = null;
 
-		$result = (array) $results[0];
-
-		return $result['aggregate'];
+	        if (isset($results[0]))
+	        {
+	            $result = (array) $results[0];
+	            
+	            return $result['aggregate'];                
+	        }
+	        else 
+	        {
+	            return null;
+	        }
 	}
 
 	/**
