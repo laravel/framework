@@ -53,6 +53,7 @@
 - Added `required_if` validation rule.
 - Added `DB::reconnect` method to `DatabaseManager`.
 - Fix bug causing `increment` calls on model instances to update the whole table.
+- Added `modelKeys` function to the Eloquent collection class.
 
 ## Beta 4
 
