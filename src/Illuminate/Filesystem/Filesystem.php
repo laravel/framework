@@ -236,6 +236,17 @@ class Filesystem {
 	}
 
 	/**
+	 * Get all of the files from the given directory (recursive).
+	 *
+	 * @param  string  $directory
+	 * @return array
+	 */
+	public function allFiles($directory)
+	{
+		return iterator_to_array(Finder::create()->files()->in($directory), false);
+	}
+
+	/**
 	 * Get all of the directories within a given directory.
 	 *
 	 * @param  string  $directory

@@ -161,7 +161,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function map(Closure $callback)
 	{
-		return array_map($callback, $this->items);
+		return new static(array_map($callback, $this->items));
 	}
 
 	/**
@@ -172,9 +172,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function filter(Closure $callback)
 	{
-		$this->items = array_filter($this->items, $callback);
-
-		return $this;
+		return new static(array_filter($this->items, $callback));
 	}
 
 	/**
