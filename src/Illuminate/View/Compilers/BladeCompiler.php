@@ -418,18 +418,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @param  string  $openTag
 	 * @param  string  $closeTag
-	 * @param  bool    $raw
+	 * @param  bool    $escaped
 	 * @return void
 	 */
-	public function setContentTags($openTag, $closeTag, $raw = false)
+	public function setContentTags($openTag, $closeTag, $escaped = false)
 	{
-		$property = ($raw === true) ? 'escapedTags' : 'contentTags';
+		$property = ($escaped === true) ? 'escapedTags' : 'contentTags';
 
 		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
 	}
 
 	/**
-	 * Sets the raw content tags used for the compiler.
+	 * Sets the escaped content tags used for the compiler.
 	 *
 	 * @param  string  $openTag
 	 * @param  string  $closeTag
