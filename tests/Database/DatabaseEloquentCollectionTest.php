@@ -58,4 +58,21 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('results'), $c->all());
 	}
 
+
+	public function testCollectionDictionaryReturnsModelKeys()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getKey')->andReturn(1);
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getKey')->andReturn(2);
+
+		$three = m::mock('Illuminate\Database\Eloquent\Model');
+		$three->shouldReceive('getKey')->andReturn(3);
+
+		$c = new Collection(array($one, $two, $three));
+
+		$this->assertEquals(array(1,2,3), $c->modelKeys());
+	}
+
 }
