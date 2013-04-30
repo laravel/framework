@@ -768,6 +768,50 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Increment a column's value by a given amount.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @return int
+	 */
+	protected function increment($column, $amount = 1)
+	{
+		return $this->incrementOrDecrement($column, $amount, 'increment');
+	}
+
+	/**
+	 * Decrement a column's value by a given amount.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @return int
+	 */
+	protected function decrement($column, $amount = 1)
+	{
+		return $this->incrementOrDecrement($column, $amount, 'decrement');
+	}
+
+	/**
+	 * Run the increment or decrement method on the model.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @param  string  $method
+	 * @return void
+	 */
+	protected function incrementOrDecrement($column, $amount, $method)
+	{
+		$query = $this->newQuery();
+
+		if ( ! $this->exists)
+		{
+			return $query->{$method}($column, $amount);
+		}
+
+		return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+	}
+
+	/**
 	 * Update the model in the database.
 	 *
 	 * @param  array  $attributes
@@ -2017,6 +2061,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __call($method, $parameters)
 	{
+		if (in_array($method, array('increment', 'decrement')))
+		{
+			return call_user_func_array(array($this, $method), $parameters);
+		}
+
 		$query = $this->newQuery();
 
 		return call_user_func_array(array($query, $method), $parameters);

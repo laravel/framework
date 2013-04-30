@@ -52,6 +52,7 @@
 - Allow package views to be overriden by the application in `view/packages/vendor/package`, etc.
 - Added `required_if` validation rule.
 - Added `DB::reconnect` method to `DatabaseManager`.
+- Fix bug causing `increment` calls on model instances to update the whole table.
 
 ## Beta 4
 
