@@ -237,7 +237,7 @@ class Container implements ArrayAccess {
 		}
 		else
 		{
-			$object = $this->make($concrete);
+			$object = $this->make($concrete, $parameters);
 		}
 
 		// If the requested type is registered as a singleton we'll want to cache off
