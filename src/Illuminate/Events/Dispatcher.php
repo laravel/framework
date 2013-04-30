@@ -46,9 +46,30 @@ class Dispatcher {
 	 */
 	public function listen($event, $listener, $priority = 0)
 	{
+		if (str_contains($event, '*'))
+		{
+			return $this->setupWildcardListen($event, $listener, $priority = 0);
+		}
+
 		$this->listeners[$event][$priority][] = $this->makeListener($listener);
 
 		unset($this->sorted[$event]);
+	}
+
+	/**
+	 * Setup a wildcard listener callback.
+	 *
+	 * @param  string  $event
+	 * @param  mixed   $listener
+	 * @param  int     $priority
+	 * @return void
+	 */
+	protected function setupWildcardListen($event, $listener, $priority)
+	{
+		foreach (array_keys($this->listeners) as $key)
+		{
+			if (str_is($event, $key)) $this->listen($key, $listener, $priority);
+		}
 	}
 
 	/**
@@ -147,6 +168,8 @@ class Dispatcher {
 		// we can easily use call_user_func_array on the listeners, passing in the
 		// payload to each of them so that they receive each of these arguments.
 		if ( ! is_array($payload)) $payload = array($payload);
+
+		$payload[] = $event;
 
 		foreach ($this->getListeners($event) as $listener)
 		{

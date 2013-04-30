@@ -59,6 +59,7 @@
 - Added `Schema::hasColumn` method.
 - Arrays returned from routes / controllers are now turned into JSON.
 - Collection `map` and `filter` both return new `Collection` instances now.
+- Added support for wildcard event listeners. For example, `Event::listen('view.*', function() {})`.
 
 ## Beta 4
 

@@ -25,7 +25,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
-		$handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
+		$handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar', 'foo');
 		$d->listen('foo', 'FooHandler@onFooEvent');
 		$d->fire('foo', array('foo', 'bar'));
 	}
@@ -35,7 +35,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
-		$handler->shouldReceive('handle')->once()->with('foo', 'bar');
+		$handler->shouldReceive('handle')->once()->with('foo', 'bar', 'foo');
 		$d->listen('foo', 'FooHandler');
 		$d->fire('foo', array('foo', 'bar'));
 	}
@@ -54,6 +54,19 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(isset($_SERVER['__event.test']));
 		$d->flush('update');
 		$this->assertEquals('taylor', $_SERVER['__event.test']);
+	}
+
+
+	public function testWildcardListeners()
+	{
+		unset($_SERVER['__event.test']);
+		$d = new Dispatcher;
+		$d->listen('foo.bar', function() { $_SERVER['__event.test'] = 'regular'; });
+		$d->listen('foo.*', function() { $_SERVER['__event.test'] = 'wildcard'; });
+		$d->listen('bar.*', function() { $_SERVER['__event.test'] = 'nope'; });
+		$d->fire('foo.bar');
+
+		$this->assertEquals('wildcard', $_SERVER['__event.test']);
 	}
 
 }
