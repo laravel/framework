@@ -62,6 +62,7 @@
 - Added support for wildcard event listeners. For example, `Event::listen('view.*', function() {})`.
 - Fix bug in translator replacements for strings that have the same beginning.
 - Added ability to pull values out of relationships, etc. on FormBuilder object value pulls.
+- Added ability to pass a name array as third parameter to `Route::controller`.
 
 ## Beta 4
 

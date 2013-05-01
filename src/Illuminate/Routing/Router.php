@@ -239,9 +239,10 @@ class Router {
 	 *
 	 * @param  string  $uri
 	 * @param  string  $controller
+	 * @param  array   $names
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function controller($uri, $controller)
+	public function controller($uri, $controller, $names = array())
 	{
 		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
@@ -252,7 +253,17 @@ class Router {
 		{
 			foreach ($routes as $route)
 			{
-				$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
+				$action = array('uses' => $controller.'@'.$method);
+
+				// If a given controller method has been named, we will assign the name to
+				// the controller action array. This provides for a short-cut to method
+				// naming, so you don't have to define an individual route for these.
+				if (isset($names[$method]))
+				{
+					$action['as'] = $names[$method];
+				}
+
+				$this->{$route['verb']}($route['uri'], $action);
 			}
 		}
 
