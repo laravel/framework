@@ -79,7 +79,7 @@ class Str {
 	);
 
 	/**
-	 * Map cache.
+	 * Transliteration map cache.
 	 *
 	 * @var array
 	 */
@@ -93,10 +93,10 @@ class Str {
 	protected static $macros = array();
 
 	/**
-	 * Get ascii map from cache cache.
+	 * Get ascii map from cache.
 	 *
-	 * @param  string  $value
-	 * @return string
+	 * @param  string  $language
+	 * @return array
 	 */
 	private static function map($language = '')
 	{
