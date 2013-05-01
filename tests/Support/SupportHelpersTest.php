@@ -176,4 +176,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', value(function() { return 'foo'; }));
 	}
 
+
+	public function testObjectGet()
+	{
+		$class = new StdClass;
+		$class->name = new StdClass;
+		$class->name->first = 'Taylor';
+
+		$this->assertEquals('Taylor', object_get($class, 'name.first'));
+	}
+
 }

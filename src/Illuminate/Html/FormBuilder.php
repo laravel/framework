@@ -728,7 +728,7 @@ class FormBuilder {
 
 		if (isset($this->model) and isset($this->model[$name]))
 		{
-			return $this->model[$name];
+			return object_get($this->model, $name);
 		}
 	}
 
