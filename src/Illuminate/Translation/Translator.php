@@ -111,7 +111,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		foreach ($replace as $key => $value)
 		{
-			$line = str_replace(':'.$key, $value, $line);
+			$line = str_replace(':'.$key.':', $value, $line);
 		}
 
 		return $line;
