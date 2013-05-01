@@ -79,6 +79,13 @@ class Str {
 	);
 
 	/**
+	 * Map cache.
+	 *
+	 * @var array
+	 */
+	protected static $cache = array();
+
+	/**
 	 * The registered string macros.
 	 *
 	 * @var array
@@ -86,20 +93,24 @@ class Str {
 	protected static $macros = array();
 
 	/**
-	 * Transliterate a UTF-8 value to ASCII.
+	 * Get ascii map from cache cache.
 	 *
 	 * @param  string  $value
 	 * @return string
 	 */
-	public static function ascii($value, $language = '')
+	private static function map($language = '')
 	{
+		if (isset(static::$cache[$language]))
+		{
+			return static::$cache[$language];
+		}
+
 		$ascii = static::$ascii;
 
-		// Remove from temp ascii map language specific characters.
-		// They will be appended later
+		// Remove from temp ascii language specific characters.
 		unset($ascii[$language]);
 
-		// Prepare regex character map
+		// Prepare regex character map.
 		$map = array();
 		foreach ($ascii as $key => $chars)
 		{
@@ -115,7 +126,8 @@ class Str {
 				$map["/$key/"] = $chars;
 			}
 		}
-		// Append language specific map
+
+		// Append language specific map.
 		if (isset(static::$ascii[$language]))
 		{
 			foreach (static::$ascii[$language] as $foreign => $char)
@@ -123,6 +135,19 @@ class Str {
 				$map["/$foreign/"] = $char;
 			}
 		}
+
+		return static::$cache[$language] = $map;
+	}
+
+	/**
+	 * Transliterate a UTF-8 value to ASCII.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function ascii($value, $language = '')
+	{
+		$map = static::map($language);
 
     $value = preg_replace(array_keys($map), array_values($map), $value);
 
@@ -406,6 +431,23 @@ class Str {
 	public static function macro($name, $macro)
 	{
 		static::$macros[$name] = $macro;
+	}
+
+	/**
+	 * Add custom ascii map.
+	 *
+	 * @param  array $ascii
+	 * @return void
+	 */
+	public static function addAscii($ascii)
+	{
+		if (! is_array($ascii))
+		{
+			throw new \InvalidArgumentException("Argument must be an associative array");
+		}
+		// Clear cache.
+		static::$cache = array();
+		static::$ascii[] = $ascii;
 	}
 
 	/**

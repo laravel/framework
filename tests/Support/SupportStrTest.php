@@ -48,4 +48,12 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
 			$this->assertEquals('geistergroesse', Str::ascii('geistergröße', 'de'));
 			$this->assertEquals('geistergroesse', Str::slug('geistergröße', '-', 'de'));
 		}
+
+
+		public function testAsciiExtending()
+		{
+			Str::addAscii(array('ö' => ':token:'));
+			$this->assertEquals('geistergr:token:sse', Str::ascii('geistergröße'));
+			$this->assertEquals('geistergroesse', Str::ascii('geistergröße', 'de'));
+		}
 }
