@@ -219,36 +219,34 @@ if ( ! function_exists('array_get'))
 
 		if (isset($array[$key])) return $array[$key];
 
-		// Will store data if key contains multiple wildcard symbols
+		// Store resulting array if key contains wildcard.
 		$deepArray = array();
 		$keys = explode('.', $key);
 		foreach ($keys as $n => $segment)
 		{
 			if ($segment == '*') {
-				// Get the rest of the keys besides current one
+				// Get the rest of the keys besides current one.
 				$keySlice = array_slice($keys, $n+1);
-				// Generate new dot notation key string
+				// Generate new dot notation key string.
 				$innerKey = implode('.', $keySlice);
-				// Check if array is actually an array -
-				// required when we travelled to the deepest item (or not yet)
 				if (is_array($array))
 				{
 					foreach ($array as $item)
 					{
-						// Empty slice - last segment is "*"
+						// Empty slice - last segment is a wildcard.
 						if (empty($keySlice))
 						{
-							// Last segment is a wildcard. Put item into deppArray which will be returned
-							// containing all of the items of current array
+							// Last segment is a wildcard. Put item into deepArray which will be returned
+							// containing all of the items of the current array.
 							$deepArray[] = $item;
 						}
 						else
 						{
-							// Pass current array item deeper
+							// Pass current array item deeper.
 							$innerItem = array_get($item, $innerKey, $default);
 							if (is_array($innerItem) and count(array_keys($keys, '*')) > 1)
 							{
-								// Multiple wildcards, add each item of inner array to the resulting new array
+								// Multiple wildcards, add each item of inner array to the resulting new array.
 								foreach ($innerItem as $innerItem)
 								{
 									$deepArray[] = $innerItem;
@@ -256,23 +254,23 @@ if ( ! function_exists('array_get'))
 							}
 							else
 							{
-								// Only one wildcard in current keys. Add whole inner array to the resulting array
+								// Only one wildcard in current key string. Add whole inner array to the resulting array.
 								$deepArray[] = $innerItem;
 							}
 						}
 					}
-					// Return new resulting array
+					// Return new resulting array.
 					return $deepArray;
 				}
 				elseif ($n == count($keys)-1)
 				{
-					// This is the last key, so we can simply return whole array
+					// This is the last key, so we can simply return whole array.
 					return $array;
 				}
 				else
 				{
-					// This is not the last key, $arrays is not really an array
-					// so we can't proceede deeper. Return default
+					// This is not the last key and $array is not really an array
+					// so we can't proceed deeper. Return default.
 					return value($default);
 				}
 			}
