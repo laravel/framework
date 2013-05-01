@@ -128,6 +128,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return array_pop($this->items);
 	}
+	
+	/**
+	 * Return a slice of the collection
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function slice($offset, $length = null, $preserve_keys = false)
+	{
+		return new static(array_slice($this->items, $offset, $length, $preserve_keys));
+	}
 
 	/**
 	 * Remove an item from the collection by key.
