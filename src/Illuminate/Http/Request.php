@@ -193,9 +193,13 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function only($keys)
 	{
+		$results = array();
+
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_intersect_key($this->input(), array_flip((array) $keys));
+		foreach ($keys as $key) $results[$key] = $this->get($key);
+
+		return $results;
 	}
 
 	/**
@@ -208,7 +212,11 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_diff_key($this->input(), array_flip((array) $keys));
+		$results = $this->input();
+
+		foreach ($keys as $key) array_forget($results, $key);
+
+		return $results;
 	}
 
 	/**
