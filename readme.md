@@ -40,7 +40,7 @@
 - Added `Redirect::guest` and `Redirect::intended` to simplify sending users to intended location.
 - Fixed cookie lifetimes not being updated on each page load.
 - Added `has` method for checking the quantity of related models from a parent query.
-- Added `sort` method to support `Collection` class.
+- Added `sort` and `sortBy` methods to support `Collection` class.
 - Reimplemented `keep` and `reflash` for preserving flash data across more than one request.
 - Fixed bug where flash data was not carried through multiple requests.
 - Added ability to pass `Closure` as third parameter to `Route::model` to determine not found behavior.
