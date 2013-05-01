@@ -64,6 +64,7 @@
 - Added ability to pull values out of relationships, etc. on FormBuilder object value pulls.
 - Added ability to pass a name array as third parameter to `Route::controller`.
 - Added `replicate` method to Eloquent model.
+- Added `slice` method to `Collection`.
 
 ## Beta 4
 

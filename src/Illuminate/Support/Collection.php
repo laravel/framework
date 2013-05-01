@@ -259,6 +259,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Slice the underlying collection array.
+	 *
+	 * @param  int   $offset
+	 * @param  int   $length
+	 * @param  bool  $preserveKeys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function slice($offset, $length = null, $preserveKeys = false)
+	{
+		return new static(array_slice($this->items, $offset, $length, $preserveKeys));
+	}
+
+	/**
 	 * Determine if the collection is empty or not.
 	 *
 	 * @return bool
