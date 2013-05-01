@@ -207,7 +207,7 @@ class Route extends BaseRoute {
 	public function getParameters()
 	{
 		// If we have already parsed the parameters, we will just return the listing
-		// the we already parsed, as some of these may have been resolved through
+		// that we already parsed as some of these may have been resolved through
 		// a binder that uses a database repository and shouldn't be run again.
 		if (isset($this->parsedParameters))
 		{
