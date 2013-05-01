@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
 abstract class HasOneOrMany extends Relation {
@@ -114,6 +115,7 @@ abstract class HasOneOrMany extends Relation {
 	 * @param  array   $dictionary
 	 * @param  string  $key
 	 * @param  string  $type
+	 * @return mixed
 	 */
 	protected function getRelationValue(array $dictionary, $key, $type)
 	{

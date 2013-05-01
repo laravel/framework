@@ -203,7 +203,7 @@ class Guard {
 		{
 			if ($this->attemptBasic($request, $field)) return;
 		}
-
+		
 		return $this->getBasicResponse();
 	}
 
@@ -251,7 +251,7 @@ class Guard {
 	/**
 	 * Get the response for basic authentication.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	protected function getBasicResponse()
 	{
@@ -338,7 +338,7 @@ class Guard {
 	 * Create a remember me cookie for a given ID.
 	 *
 	 * @param  mixed  $id
-	 * @return Symfony\Component\HttpFoundation\Cookie
+	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
 	protected function createRecaller($id)
 	{

@@ -73,7 +73,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies to a request and method.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */
@@ -95,7 +95,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies based on the "on" rule.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */
@@ -109,7 +109,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies based on the "only" rule.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */
@@ -121,7 +121,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies based on the "except" rule.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */

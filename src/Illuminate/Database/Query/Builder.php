@@ -641,6 +641,7 @@ class Builder {
 	 *
 	 * @param  string  $method
 	 * @param  string  $parameters
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function dynamicWhere($method, $parameters)
 	{
@@ -796,7 +797,7 @@ class Builder {
 	 */
 	public function take($value)
 	{
-		$this->limit = $value;
+		if ($value > 0) $this->limit = $value;
 
 		return $this;
 	}
@@ -1095,9 +1096,12 @@ class Builder {
 		// the aggregate value getting in the way when the grammar builds it.
 		$this->aggregate = null;
 
-		$result = (array) $results[0];
+		if (isset($results[0]))
+		{
+			$result = (array) $results[0];
 
-		return $result['aggregate'];
+			return $result['aggregate'];
+		}
 	}
 
 	/**

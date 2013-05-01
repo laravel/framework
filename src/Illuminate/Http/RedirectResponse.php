@@ -45,7 +45,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Add a cookie to the response.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Cookie  $cookie
+	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function withCookie(Cookie $cookie)

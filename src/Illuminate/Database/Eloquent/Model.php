@@ -90,6 +90,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $hidden = array();
 
 	/**
+	 * The attributes that should be visible in arrays.
+	 *
+	 * @var arrays
+	 */
+	protected $visible = array();
+
+	/**
 	 * The attributes that are mass assignable.
 	 *
 	 * @var array
@@ -761,6 +768,50 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Increment a column's value by a given amount.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @return int
+	 */
+	protected function increment($column, $amount = 1)
+	{
+		return $this->incrementOrDecrement($column, $amount, 'increment');
+	}
+
+	/**
+	 * Decrement a column's value by a given amount.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @return int
+	 */
+	protected function decrement($column, $amount = 1)
+	{
+		return $this->incrementOrDecrement($column, $amount, 'decrement');
+	}
+
+	/**
+	 * Run the increment or decrement method on the model.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @param  string  $method
+	 * @return void
+	 */
+	protected function incrementOrDecrement($column, $amount, $method)
+	{
+		$query = $this->newQuery();
+
+		if ( ! $this->exists)
+		{
+			return $query->{$method}($column, $amount);
+		}
+
+		return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+	}
+
+	/**
 	 * Update the model in the database.
 	 *
 	 * @param  array  $attributes
@@ -1239,6 +1290,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Set the visible attributes for the model.
+	 *
+	 * @param  array  $visible
+	 * @return void
+	 */
+	public function setVisible(array $visible)
+	{
+		$this->visible = $visible;
+	}
+
+	/**
 	 * Get the fillable attributes for the model.
 	 *
 	 * @return array
@@ -1453,6 +1515,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getAccessibleAttributes()
 	{
+		if (count($this->visible) > 0)
+		{
+			return array_intersect_key($this->attributes, array_flip($this->visible));
+		}
+
 		return array_diff_key($this->attributes, array_flip($this->hidden));
 	}
 
@@ -1692,6 +1759,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Clone the model into a new, non-existing instance.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function replicate()
+	{
+		$attributes = array_except($this->attributes, array($this->getKeyName()));
+
+		with($instance = new static)->setRawAttributes($attributes);
+
+		return $instance->setRelations($this->relations);
+	}
+
+	/**
 	 * Get all of the current attributes on the model.
 	 *
 	 * @return array
@@ -1780,6 +1861,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function setRelation($relation, $value)
 	{
 		$this->relations[$relation] = $value;
+	}
+
+	/**
+	 * Set the entire relations array on the model.
+	 *
+	 * @param  array  $relations
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function setRelations(array $relations)
+	{
+		$this->relations = $relations;
+
+		return $this;
 	}
 
 	/**
@@ -1994,6 +2088,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __call($method, $parameters)
 	{
+		if (in_array($method, array('increment', 'decrement')))
+		{
+			return call_user_func_array(array($this, $method), $parameters);
+		}
+
 		$query = $this->newQuery();
 
 		return call_user_func_array(array($query, $method), $parameters);

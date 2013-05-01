@@ -117,7 +117,7 @@ class Section {
 	 * @param  string  $key
 	 * @return string
 	 */
-	protected function sectionItemKey($key)
+	public function sectionItemKey($key)
 	{
 		return $this->name.':'.$this->sectionId().':'.$key;
 	}

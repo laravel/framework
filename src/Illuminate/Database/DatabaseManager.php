@@ -70,6 +70,19 @@ class DatabaseManager implements ConnectionResolverInterface {
 	}
 
 	/**
+	 * Reconnect to the given database.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Database\Connection
+	 */
+	public function reconnect($name = null)
+	{
+		unset($this->connections[$name]);
+
+		return $this->connection($name);
+	}
+
+	/**
 	 * Make the database connection instance.
 	 *
 	 * @param  string  $name

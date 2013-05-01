@@ -194,6 +194,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 	}
 
+
+	public function testRequiredIf()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor'), array('last' => 'required_if:first,taylor'));
+		$this->assertTrue($v->fails());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor', 'last' => 'otwell'), array('last' => 'required_if:first,taylor'));
+		$this->assertTrue($v->passes());
+	}
+
+
 	public function testValidateConfirmed()
 	{
 		$trans = $this->getRealTranslator();
@@ -682,6 +695,21 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
 		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
 		$v->addExtension('foo', function() { return false; });
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('foo!', $v->messages()->first('name'));
+	}
+
+
+	public function testClassBasedCustomValidators()
+	{
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
+		$v->setContainer($container = m::mock('Illuminate\Container\Container'));
+		$v->addExtension('foo', 'Foo@bar');
+		$container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+		$foo->shouldReceive('bar')->once()->andReturn(false);
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('foo!', $v->messages()->first('name'));

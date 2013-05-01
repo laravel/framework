@@ -39,7 +39,7 @@ class RoutesCommand extends Command {
 	/**
 	 * Create a new route command instance.
 	 *
-	 * @param  Symfony\Component\Routing\RouteCollection  $routes
+	 * @param  \Symfony\Component\Routing\RouteCollection  $routes
 	 * @return void
 	 */
 	public function __construct(RouteCollection $routes)
@@ -85,7 +85,7 @@ class RoutesCommand extends Command {
 	 * Get the route information for a given route.
 	 *
 	 * @param  string  $name
-	 * @param  Symfony\Component\Routing\Route  $route
+	 * @param  \Symfony\Component\Routing\Route  $route
 	 * @return array
 	 */
 	protected function getRouteInformation($name, Route $route)

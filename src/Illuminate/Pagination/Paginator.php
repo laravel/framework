@@ -159,7 +159,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 * @param  string  $value
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function appends($key, $value)
+	public function appends($key, $value = null)
 	{
 		if (is_array($key)) return $this->appendArray($key);
 
@@ -249,7 +249,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Get the pagination environment.
 	 *
-	 * @var \Illuminate\Pagination\Environment
+	 * @return \Illuminate\Pagination\Environment
 	 */
 	public function getEnvironment()
 	{

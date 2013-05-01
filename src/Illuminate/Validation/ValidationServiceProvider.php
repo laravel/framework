@@ -22,7 +22,7 @@ class ValidationServiceProvider extends ServiceProvider {
 
 		$this->app['validator'] = $this->app->share(function($app)
 		{
-			$validator = new Factory($app['translator']);
+			$validator = new Factory($app['translator'], $app);
 
 			// The validation presence verifier is responsible for determining the existence
 			// of values in a given data collection, typically a relational database or

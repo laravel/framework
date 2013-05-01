@@ -323,7 +323,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * Create a new HttpKernel client instance.
 	 *
 	 * @param  array  $server
-	 * @return Symfony\Component\HttpKernel\Client
+	 * @return \Symfony\Component\HttpKernel\Client
 	 */
 	protected function createClient(array $server = array())
 	{

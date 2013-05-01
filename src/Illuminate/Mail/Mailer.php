@@ -206,7 +206,7 @@ class Mailer {
 	{
 		$this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
 
-		$job->delete();
+		try { $job->delete(); } catch (\Exception $e) {}
 	}
 
 	/**
@@ -408,7 +408,7 @@ class Mailer {
 	 * Set the log writer instance.
 	 *
 	 * @param  \Illuminate\Log\Writer  $logger
-	 * @return \Illumiante\Mail\Mailer
+	 * @return \Illuminate\Mail\Mailer
 	 */
 	public function setLogger(Writer $logger)
 	{

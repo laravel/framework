@@ -116,12 +116,54 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerCloseEvent()
 	{
+		$this->registerCookieToucher();
+
 		$app = $this->app;
 
 		$this->app->close(function() use ($app)
 		{
 			$app['session']->save();
 		});
+	}
+
+	/**
+	 * Update the session cookie lifetime on each page load.
+	 *
+	 * @return void
+	 */
+	protected function registerCookieToucher()
+	{
+		$me = $this;
+
+		$this->app->close(function() use ($me)
+		{
+			if ( ! headers_sent()) $me->touchSessionCookie();
+		});
+	}
+
+	/**
+	 * Update the session identifier cookie with a new expire time.
+	 *
+	 * @return void
+	 */
+	public function touchSessionCookie()
+	{
+		$config = $this->app['config']['session'];
+
+		$expire = $this->getExpireTime($config);
+
+		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain']);
+	}
+
+	/**
+	 * Get the new session cookie expire time.
+	 *
+	 * @param  array  $config
+	 * @return int
+	 */
+	protected function getExpireTime($config)
+	{
+		return $config['lifetime'] == 0 ? 0 : time() + ($config['lifetime'] * 60);
 	}
 
 }

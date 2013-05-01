@@ -519,6 +519,34 @@ if ( ! function_exists('link_to_action'))
 	}
 }
 
+if ( ! function_exists('object_get'))
+{
+	/**
+	 * Get an item from an object using "dot" notation.
+	 *
+	 * @param  object  $object
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	function object_get($object, $key, $default = null)
+	{
+		if (is_null($key)) return $object;
+		
+		foreach (explode('.', $key) as $segment)
+		{
+			if ( ! is_object($object) or ! isset($object->{$segment}))
+			{
+				return value($default);
+			}
+
+			$object = $object->{$segment};
+		}
+
+		return $object;
+	}
+}
+
 if ( ! function_exists('public_path'))
 {
 	/**

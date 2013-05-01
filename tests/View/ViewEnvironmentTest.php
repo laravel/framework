@@ -18,7 +18,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
 		$env->getFinder()->shouldReceive('addExtension')->once()->with('php');
 		$env->addExtension('php', 'php');
-		$view = $env->make('view', array('data'));
+		$view = $env->make('view', array('foo' => 'bar'), array('baz' => 'boom'));
 
 		$this->assertTrue($engine === $view->getEngine());
 	}

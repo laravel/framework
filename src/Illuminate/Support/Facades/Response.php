@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -11,7 +12,7 @@ class Response {
 	 * @param  string  $content
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public static function make($content = '', $status = 200, array $headers = array())
 	{
@@ -25,7 +26,7 @@ class Response {
 	 * @param  array   $data
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public static function view($view, $data = array(), $status = 200, array $headers = array())
 	{
@@ -40,7 +41,7 @@ class Response {
 	 * @param  string|array  $data
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return Symfony\Component\HttpFoundation\JsonResponse
+	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
@@ -49,7 +50,7 @@ class Response {
 			$data = $data->toArray();
 		}
 
-		return static::make(json_encode($data), $status, $headers)->header('Content-Type', 'application/json');
+		return new JsonResponse($data, $status, $headers);
 	}
 
 	/**
@@ -58,7 +59,7 @@ class Response {
 	 * @param  Closure  $callback
 	 * @param  int      $status
 	 * @param  array    $headers
-	 * @return Symfony\Component\HttpFoundation\StreamedResponse
+	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
 	public static function stream($callback, $status = 200, array $headers = array())
 	{
@@ -71,7 +72,7 @@ class Response {
 	 * @param  SplFileInfo|string  $file
 	 * @param  int  $status
 	 * @param  array  $headers
-	 * @return Symfony\Component\HttpFoundation\BinaryFileResponse
+	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
 	public static function download($file, $name = null, $headers = array())
 	{

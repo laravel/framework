@@ -30,7 +30,7 @@ class Route extends BaseRoute {
 	/**
 	 * Execute the route and return the response.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return mixed
 	 */	
 	public function run(Request $request)
@@ -83,7 +83,7 @@ class Route extends BaseRoute {
 	/**
 	 * Call all of the before filters on the route.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
 	 * @return mixed
 	 */
 	protected function callBeforeFilters(Request $request)
@@ -106,7 +106,7 @@ class Route extends BaseRoute {
 	/**
 	 * Get all of the before filters to run on the route.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return array
 	 */
 	protected function getAllBeforeFilters(Request $request)
@@ -119,8 +119,8 @@ class Route extends BaseRoute {
 	/**
 	 * Call all of the "after" filters for a route.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
 	protected function callAfterFilters(Request $request, $response)
@@ -135,7 +135,7 @@ class Route extends BaseRoute {
 	 * Call a given filter with the parameters.
 	 *
 	 * @param  string  $name
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  array   $params
 	 * @return mixed
 	 */
@@ -207,7 +207,7 @@ class Route extends BaseRoute {
 	public function getParameters()
 	{
 		// If we have already parsed the parameters, we will just return the listing
-		// the we already parsed, as some of these may have been resolved through
+		// that we already parsed as some of these may have been resolved through
 		// a binder that uses a database repository and shouldn't be run again.
 		if (isset($this->parsedParameters))
 		{

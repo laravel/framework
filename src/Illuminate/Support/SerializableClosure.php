@@ -140,7 +140,7 @@ class SerializableClosure implements Serializable {
 	 */
 	protected function getUseIndex()
 	{
-		return stripos($this->getCode(), 'use');
+		return stripos($this->getCode(), ' use (');
 	}
 
 	/**

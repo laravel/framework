@@ -43,7 +43,9 @@ class Store extends SymfonySession {
 	 */
 	public function get($name, $default = null)
 	{
-		return parent::get($name) ?: value($default);
+		$value = parent::get($name);
+
+		return is_null($value) ? value($default) : $value;
 	}
 
 	/**
@@ -136,6 +138,8 @@ class Store extends SymfonySession {
 		$this->put($key, $value);
 
 		$this->push('flash.new', $key);
+
+		$this->removeFromOldFlashData(array($key));
 	}
 
 	/**
@@ -147,6 +151,57 @@ class Store extends SymfonySession {
 	public function flashInput(array $value)
 	{
 		return $this->flash('_old_input', $value);
+	}
+
+	/**
+	 * Reflash all of the session flash data.
+	 *
+	 * @return void
+	 */
+	public function reflash()
+	{
+		$this->mergeNewFlashes($this->get('flash.old'));
+
+		$this->put('flash.old', array());
+	}
+
+	/**
+	 * Reflash a subset of the current flash data.
+	 *
+	 * @param  array|dynamic  $keys
+	 * @return void
+	 */
+	public function keep($keys = null)
+	{
+		$keys = is_array($keys) ? $keys : func_get_args();
+
+		$this->mergeNewFlashes($keys);
+
+		$this->removeFromOldFlashData($keys);
+	}
+
+	/**
+	 * Merge new flash keys into the new flash array.
+	 *
+	 * @param  array  $keys
+	 * @return void
+	 */
+	protected function mergeNewFlashes(array $keys)
+	{
+		$values = array_unique(array_merge($this->get('flash.new'), $keys));
+
+		$this->put('flash.new', $values);
+	}
+
+	/**
+	 * Remove the given keys from the old flash data.
+	 *
+	 * @param  array  $keys
+	 * @return void
+	 */
+	protected function removeFromOldFlashData(array $keys)
+	{
+		$this->put('flash.old', array_diff($this->get('flash.old', array()), $keys));
 	}
 
 	/**

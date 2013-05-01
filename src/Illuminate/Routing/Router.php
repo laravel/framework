@@ -55,7 +55,7 @@ class Router {
 	/**
 	 * The inversion of control container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
@@ -239,9 +239,10 @@ class Router {
 	 *
 	 * @param  string  $uri
 	 * @param  string  $controller
+	 * @param  array   $names
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function controller($uri, $controller)
+	public function controller($uri, $controller, $names = array())
 	{
 		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
@@ -252,7 +253,17 @@ class Router {
 		{
 			foreach ($routes as $route)
 			{
-				$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
+				$action = array('uses' => $controller.'@'.$method);
+
+				// If a given controller method has been named, we will assign the name to
+				// the controller action array. This provides for a short-cut to method
+				// naming, so you don't have to define an individual route for these.
+				if (isset($names[$method]))
+				{
+					$action['as'] = $names[$method];
+				}
+
+				$this->{$route['verb']}($route['uri'], $action);
 			}
 		}
 
@@ -931,8 +942,8 @@ class Router {
 	/**
 	 * Get the response for a given request.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
@@ -969,7 +980,7 @@ class Router {
 	/**
 	 * Match the given request to a route object.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Illuminate\Routing\Route
 	 */
 	protected function findRoute(Request $request)
@@ -1170,8 +1181,8 @@ class Router {
 	/**
 	 * Call the "after" global filters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	protected function callAfterFilter(Request $request, SymfonyResponse $response)
@@ -1182,8 +1193,8 @@ class Router {
 	/**
 	 * Call the finish" global filter.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	public function callFinishFilter(Request $request, SymfonyResponse $response)
@@ -1194,8 +1205,8 @@ class Router {
 	/**
 	 * Call the "close" global filter.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	public function callCloseFilter(Request $request, SymfonyResponse $response)
@@ -1206,7 +1217,7 @@ class Router {
 	/**
 	 * Call a given global filter with the parameters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $name
 	 * @param  array   $parameters
 	 * @return mixed
@@ -1250,9 +1261,9 @@ class Router {
 	 * @param  string  $class
 	 * @return void
 	 */
-	public function model($key, $class)
+	public function model($key, $class, Closure $callback = null)
 	{
-		return $this->bind($key, function($value) use ($class)
+		return $this->bind($key, function($value) use ($class, $callback)
 		{
 			if (is_null($value)) return null;
 
@@ -1262,6 +1273,14 @@ class Router {
 			if ( ! is_null($model = with(new $class)->find($value)))
 			{
 				return $model;
+			}
+
+			// If a callback was supplied to the method we will call that to determine
+			// what we should do when the model is not found. This just gives these
+			// developer a little greater flexibility to decide what will happen.
+			if ($callback instanceof Closure)
+			{
+				return call_user_func($callback);
 			}
 
 			throw new NotFoundHttpException;
@@ -1308,7 +1327,7 @@ class Router {
 	 *
 	 * @param  mixed  $value
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
 	{
@@ -1423,7 +1442,7 @@ class Router {
 	/**
 	 * Retrieve the entire route collection.
 	 * 
-	 * @return Symfony\Component\Routing\RouteCollection
+	 * @return \Symfony\Component\Routing\RouteCollection
 	 */
 	public function getRoutes()
 	{
@@ -1433,7 +1452,7 @@ class Router {
 	/**
 	 * Get the current request being dispatched.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -1484,8 +1503,8 @@ class Router {
 	/**
 	 * Create a new URL matcher instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\Routing\Matcher\UrlMatcher
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\Routing\Matcher\UrlMatcher
 	 */
 	protected function getUrlMatcher(Request $request)
 	{

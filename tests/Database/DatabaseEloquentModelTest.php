@@ -350,6 +350,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testVisibleCreatesArrayWhitelist()
+	{
+		$model = new EloquentModelStub;
+		$model->setVisible(array('name'));
+		$model->name = 'Taylor';
+		$model->age = 26;
+		$array = $model->toArray();
+
+		$this->assertEquals(array('name' => 'Taylor'), $array);
+	}
+
+
 	public function testHiddenCanAlsoExcludeRelationships()
 	{
 		$model = new EloquentModelStub;
@@ -566,6 +578,25 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$class = new EloquentModelStub;
 
 		$this->assertEquals(array('list_items', 'password'), $class->getMutatedAttributes());
+	}
+
+
+	public function testCloneModelMakesAFreshCopyOfTheModel()
+	{
+		$class = new EloquentModelStub;
+		$class->id = 1;
+		$class->exists = true;
+		$class->first = 'taylor';
+		$class->last = 'otwell';
+		$class->setRelation('foo', array('bar'));
+
+		$clone = $class->replicate();
+
+		$this->assertNull($clone->id);
+		$this->assertFalse($clone->exists);
+		$this->assertEquals('taylor', $clone->first);
+		$this->assertEquals('otwell', $clone->last);
+		$this->assertEquals(array('bar'), $clone->foo);
 	}
 
 

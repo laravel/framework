@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Builder {
@@ -32,8 +33,8 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'lists', 'insert', 'insertGetId', 'update', 'delete', 'increment',
-		'decrement', 'pluck', 'count', 'min', 'max', 'avg', 'sum',
+		'toSql', 'lists', 'insert', 'insertGetId', 'update', 'delete', 'increment',
+		'decrement', 'pluck', 'count', 'min', 'max', 'avg', 'sum', 'exists',
 	);
 
 	/**
@@ -107,6 +108,19 @@ class Builder {
 	}
 
 	/**
+	 * Pluck a single column from the database.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function pluck($column)
+	{
+		$result = $this->first(array($column));
+
+		if ($result) return $result->{$column};
+	}
+
+	/**
 	 * Get an array with the values of a given column.
 	 *
 	 * @param  string  $column
@@ -115,8 +129,6 @@ class Builder {
 	 */
 	public function lists($column, $key = null)
 	{
-		$key = $key ?: $this->model->getKeyName();
-
 		$results = $this->query->lists($column, $key);
 
 		// If the model has a mutator for the requested column, we will spin through
@@ -321,13 +333,46 @@ class Builder {
 		// that start with the given top relations and adds them to our arrays.
 		foreach ($this->eagerLoad as $name => $constraints)
 		{
-			if (str_contains($name, '.') and starts_with($name, $relation) and $name != $relation)
+			if ($this->isNested($name, $relation))
 			{
 				$nested[substr($name, strlen($relation.'.'))] = $constraints;
 			}
 		}
 
 		return $nested;
+	}
+
+	/**
+	 * Determine if the relationship is nested.
+	 *
+	 * @param  string  $name
+	 * @param  string  $relation
+	 * @return bool
+	 */
+	protected function isNested($name, $relation)
+	{
+		$dots = str_contains($name, '.');
+
+		return $dots and starts_with($name, $relation) and $name != $relation;
+	}
+
+	/**
+	 * Add a relationship count condition to the query.
+	 *
+	 * @param  string  $relation
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function has($relation, $operator = '>=', $count = 1)
+	{
+		$instance = $this->model->$relation();
+
+		$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+
+		$this->query->mergeBindings($query->getQuery());
+
+		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count);
 	}
 
 	/**
@@ -370,7 +415,7 @@ class Builder {
 			// We need to separate out any nested includes. Which allows the developers
 			// to load deep relationships using "dots" without stating each level of
 			// the relationship with its own key in the array of eager load names.
-			$results = $this->parseNestedRelations($name, $results);
+			$results = $this->parseNested($name, $results);
 
 			$results[$name] = $constraints;
 		}
@@ -385,7 +430,7 @@ class Builder {
 	 * @param  array   $results
 	 * @return array
 	 */
-	protected function parseNestedRelations($name, $results)
+	protected function parseNested($name, $results)
 	{
 		$progress = array();
 

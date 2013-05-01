@@ -4,6 +4,7 @@ use DateTime;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
 abstract class Relation {
@@ -148,6 +149,21 @@ abstract class Relation {
 	}
 
 	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query)
+	{
+		$query->select(new Expression('count(*)'));
+
+		$key = $this->wrap($this->parent->getQualifiedKeyName());
+
+		return $query->where($this->getForeignKey(), '=', new Expression($key));
+	}
+
+	/**
 	 * Get all of the primary keys for an array of models.
 	 *
 	 * @param  array  $models
@@ -220,6 +236,17 @@ abstract class Relation {
 	public function updatedAt()
 	{
 		return $this->parent->getUpdatedAtColumn();
+	}
+
+	/**
+	 * Wrap the given value with the parent query's grammar.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public function wrap($value)
+	{
+		return $this->parent->getQuery()->getGrammar()->wrap($value);
 	}
 
 	/**

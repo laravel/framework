@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Routing;
 
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -10,29 +11,29 @@ class UrlGenerator {
 	/**
 	 * The route collection.
 	 *
-	 * @var Symfony\Component\Routing\RouteCollection
+	 * @var \Symfony\Component\Routing\RouteCollection
 	 */
 	protected $routes;
 
 	/**
 	 * The request instance.
 	 *
-	 * @var Symfony\Component\HttpFoundation\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $request;
 
 	/**
 	 * The Symfony routing URL generator.
 	 *
-	 * @var Symfony\Component\Routing\Generator\UrlGenerator
+	 * @var \Symfony\Component\Routing\Generator\UrlGenerator
 	 */
 	protected $generator;
 
 	/**
 	 * Create a new URL Generator instance.
 	 *
-	 * @param  Symfony\Component\Routing\RouteCollection  $routes
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\Routing\RouteCollection  $routes
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
 	 * @return void
 	 */
 	public function __construct(RouteCollection $routes, Request $request)
@@ -236,6 +237,9 @@ class UrlGenerator {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
+		// First we'll check to see if we have already rendered a URL for an action
+		// so that we don't have to loop through all of the routes again on each
+		// iteration through the loop. If we have it, we can just return that.
 		if (isset($this->actionMap[$action]))
 		{
 			$name = $this->actionMap[$action];
@@ -255,6 +259,8 @@ class UrlGenerator {
 				return $this->route($name, $parameters, $absolute);
 			}
 		}
+
+		throw new InvalidArgumentException("Unknown action [$action].");
 	}
 
 	/**
@@ -280,13 +286,15 @@ class UrlGenerator {
 	 */
 	public function isValidUrl($path)
 	{
+		if (starts_with($path, array('#', '//'))) return true;
+
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
 	}
 
 	/**
 	 * Get the request instance.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -296,7 +304,7 @@ class UrlGenerator {
 	/**
 	 * Set the current request instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function setRequest(Request $request)
@@ -313,7 +321,7 @@ class UrlGenerator {
 	/**
 	 * Get the Symfony URL generator instance.
 	 *
-	 * @return Symfony\Component\Routing\Generator\UrlGenerator
+	 * @return \Symfony\Component\Routing\Generator\UrlGenerator
 	 */
 	public function getGenerator()
 	{
@@ -323,7 +331,7 @@ class UrlGenerator {
 	/**
 	 * Get the Symfony URL generator instance.
 	 *
-	 * @param  Symfony\Component\Routing\Generator\UrlGenerator  $generator
+	 * @param  \Symfony\Component\Routing\Generator\UrlGenerator  $generator
 	 * @return void
 	 */
 	public function setGenerator(SymfonyGenerator $generator)

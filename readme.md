@@ -38,6 +38,33 @@
 - Added `URL::full` method as alias into `Request::fullUrl`.
 - Set default encryption mode to `cbc`. `Crypt::setMode` is available if you wish to use previous mode of `ctr`.
 - Added `Redirect::guest` and `Redirect::intended` to simplify sending users to intended location.
+- Fixed cookie lifetimes not being updated on each page load.
+- Added `has` method for checking the quantity of related models from a parent query.
+- Added `sort` method to support `Collection` class.
+- Reimplemented `keep` and `reflash` for preserving flash data across more than one request.
+- Fixed bug where flash data was not carried through multiple requests.
+- Added ability to pass `Closure` as third parameter to `Route::model` to determine not found behavior.
+- Allow for `Class@method` syntax to be used with `Validator::extend`.
+- Added `@overwrite` Blade directive for forcing a full section overwrite.
+- Added `visible` property to Eloquent that is white-list version of `hidden`.
+- Using `pluck` on Eloquent queries will now call accessors.
+- Tweaked behavior of Redis sections to remove "forever" keys from storage.
+- Allow package views to be overriden by the application in `view/packages/vendor/package`, etc.
+- Added `required_if` validation rule.
+- Added `DB::reconnect` method to `DatabaseManager`.
+- Fix bug causing `increment` calls on model instances to update the whole table.
+- Added `modelKeys` function to the Eloquent collection class.
+- Added `associate` method to the `BelongsTo` relationship.
+- Added ability to register connections in the IoC container.
+- Added `Schema::hasColumn` method.
+- Arrays returned from routes / controllers are now turned into JSON.
+- Collection `map` and `filter` both return new `Collection` instances now.
+- Added support for wildcard event listeners. For example, `Event::listen('view.*', function() {})`.
+- Fix bug in translator replacements for strings that have the same beginning.
+- Added ability to pull values out of relationships, etc. on FormBuilder object value pulls.
+- Added ability to pass a name array as third parameter to `Route::controller`.
+- Added `replicate` method to Eloquent model.
+- Added `slice` method to `Collection`.
 
 ## Beta 4
 
@@ -116,6 +143,7 @@
 - Session driver now automatically set to `array` when running Artisan tasks.
 - Added static `unguard` method to Eloquent to disable all mass assignment protection.
 - Added `--seed` option to `migrate` command.
+- Fix bug with replacements not being made on `Lang::choice`.
 
 ## Beta 3
 

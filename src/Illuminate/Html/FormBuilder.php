@@ -115,7 +115,7 @@ class FormBuilder {
 
 		// Finally we're ready to create the final form HTML field. We will attribute
 		// format the array of attributes. We will also add on the appendage which
-		// is used to spoof requests for the PUT, PATCH, etc. methods on forms.
+		// is used to spoof requests for this PUT, PATCH, etc. methods on forms.
 		$attributes = array_merge(
 
 			$attributes, array_except($options, $this->reserved)
@@ -176,13 +176,27 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function label($name, $value, $options = array())
+	public function label($name, $value = null, $options = array())
 	{
 		$this->labels[] = $name;
 
 		$options = $this->html->attributes($options);
 
-		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
+		$value = e($this->formatLabel($name, $value));
+
+		return '<label for="'.$name.'"'.$options.'>'.$value.'</label>';
+	}
+
+	/**
+	 * Format the label value.
+	 *
+	 * @param  string  $name
+	 * @param  string|null  $value
+	 * @return string
+	 */
+	protected function formatLabel($name, $value)
+	{
+		return $value ?: ucwords(str_replace('_', ' ', $name));
 	}
 
 	/**
@@ -573,7 +587,7 @@ class FormBuilder {
 	 */
 	protected function getMethod($method)
 	{
-		return $method != 'GET' ? 'POST' : $method;
+		return strtoupper($method) != 'GET' ? 'POST' : $method;
 	}
 
 	/**
@@ -714,7 +728,7 @@ class FormBuilder {
 
 		if (isset($this->model) and isset($this->model[$name]))
 		{
-			return $this->model[$name];
+			return object_get($this->model, $name);
 		}
 	}
 
