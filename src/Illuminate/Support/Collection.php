@@ -178,6 +178,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Sort through each item with a callback.
+	 *
+	 * @param  Closure  $callback
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function sort(Closure $callback)
+	{
+		uasort($this->items, $callback);
+
+		return $this;
+	}
+
+	/**
 	 * Reset the keys on the underlying array.
 	 *
 	 * @return \\Illuminate\Support\Collection
