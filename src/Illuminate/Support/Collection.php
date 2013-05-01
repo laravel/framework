@@ -176,12 +176,25 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Sort through each item with a callback.
+	 *
+	 * @param  Closure  $callback
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function sort(Closure $callback)
+	{
+		uasort($this->items, $callback);
+
+		return $this;
+	}
+
+	/**
 	 * Sort the collection using the given Closure.
 	 *
 	 * @param  \Closure  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function sort(Closure $callback)
+	public function sortBy(Closure $callback)
 	{
 		$results = array();
 
@@ -204,19 +217,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		}
 
 		$this->items = $results;
-
-		return $this;
-	}
-
-	/**
-	 * Sort through each item with a callback.
-	 *
-	 * @param  Closure  $callback
-	 * @return \Illuminate\Support\Collection
-	 */
-	public function sort(Closure $callback)
-	{
-		uasort($this->items, $callback);
 
 		return $this;
 	}

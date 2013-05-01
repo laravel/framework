@@ -142,8 +142,24 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testSort()
 	{
+		$data = new Collection(array(5, 3, 1, 2, 4));
+		$data->sort(function($a, $b)
+		{ 
+			if ($a === $b)
+			{
+		        return 0;
+		    }
+		    return ($a < $b) ? -1 : 1;
+		});
+
+		$this->assertEquals(range(1, 5), array_values($data->all()));
+	}
+
+
+	public function testSortBy()
+	{
 		$data = new Collection(array('taylor', 'dayle'));
-		$data->sort(function($x) { return $x; });
+		$data->sortBy(function($x) { return $x; });
 
 		$this->assertEquals(array('dayle', 'taylor'), array_values($data->all()));
 	}
