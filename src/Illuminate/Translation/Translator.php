@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Translation;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -109,12 +110,28 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	protected function makeReplacements($line, $replace)
 	{
+		$replace = $this->sortReplacements($replace);
+
 		foreach ($replace as $key => $value)
 		{
 			$line = str_replace(':'.$key, $value, $line);
 		}
 
 		return $line;
+	}
+
+	/**
+	 * Sort the replacements array.
+	 *
+	 * @param  array  $replace
+	 * @return array
+	 */
+	protected function sortReplacements($replace)
+	{
+		return with(new Collection($replace))->sort(function($r)
+		{
+			return mb_strlen($r) * -1;
+		});
 	}
 
 	/**

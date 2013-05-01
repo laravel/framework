@@ -60,6 +60,7 @@
 - Arrays returned from routes / controllers are now turned into JSON.
 - Collection `map` and `filter` both return new `Collection` instances now.
 - Added support for wildcard event listeners. For example, `Event::listen('view.*', function() {})`.
+- Fix bug in translator replacements for strings that have the same beginning.
 
 ## Beta 4
 
