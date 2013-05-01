@@ -1759,6 +1759,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Clone the model into a new, non-existing instance.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function replicate()
+	{
+		$attributes = array_except($this->attributes, array($this->getKeyName()));
+
+		with($instance = new static)->setRawAttributes($attributes);
+
+		return $instance->setRelations($this->relations);
+	}
+
+	/**
 	 * Get all of the current attributes on the model.
 	 *
 	 * @return array
@@ -1847,6 +1861,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function setRelation($relation, $value)
 	{
 		$this->relations[$relation] = $value;
+	}
+
+	/**
+	 * Set the entire relations array on the model.
+	 *
+	 * @param  array  $relations
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function setRelations(array $relations)
+	{
+		$this->relations = $relations;
+
+		return $this;
 	}
 
 	/**

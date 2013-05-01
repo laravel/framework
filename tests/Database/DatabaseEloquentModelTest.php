@@ -581,6 +581,25 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCloneModelMakesAFreshCopyOfTheModel()
+	{
+		$class = new EloquentModelStub;
+		$class->id = 1;
+		$class->exists = true;
+		$class->first = 'taylor';
+		$class->last = 'otwell';
+		$class->setRelation('foo', array('bar'));
+
+		$clone = $class->replicate();
+
+		$this->assertNull($clone->id);
+		$this->assertFalse($clone->exists);
+		$this->assertEquals('taylor', $clone->first);
+		$this->assertEquals('otwell', $clone->last);
+		$this->assertEquals(array('bar'), $clone->foo);
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
