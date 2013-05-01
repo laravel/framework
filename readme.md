@@ -65,6 +65,7 @@
 - Added ability to pass a name array as third parameter to `Route::controller`.
 - Added `replicate` method to Eloquent model.
 - Added `slice` method to `Collection`.
+- Fixed generation of namespaced resource controllers.
 
 ## Beta 4
 

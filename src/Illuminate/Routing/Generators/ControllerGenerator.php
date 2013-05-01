@@ -49,12 +49,60 @@ class ControllerGenerator {
 	{
 		$stub = $this->addMethods($this->getController($controller), $options);
 
+		$this->writeFile($stub, $controller, $path);
+
+		return false;
+	}
+
+	/**
+	 * Write the completed stub to disk.
+	 *
+	 * @param  string  $stub
+	 * @param  string  $controller
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function writeFile($stub, $controller, $path)
+	{
+		if (str_contains($controller, '\\'))
+		{
+			$this->makeDirectory($controller, $path);
+		}
+
+		$controller = str_replace('\\', DIRECTORY_SEPARATOR, $controller);
+
 		if ( ! $this->files->exists($fullPath = $path."/{$controller}.php"))
 		{
 			return $this->files->put($fullPath, $stub);
 		}
+	}
 
-		return false;
+	/**
+	 * Create the directory for the controller.
+	 *
+	 * @param  string  $controller
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function makeDirectory($controller, $path)
+	{
+		$directory = $this->getDirectory($controller);
+
+		if ( ! $this->files->isDirectory($full = $path.'/'.$directory))
+		{
+			$this->files->makeDirectory($full, 0777, true);
+		}
+	}
+
+	/**
+	 * Get the directory the controller should live in.
+	 *
+	 * @param  string  $controller
+	 * @return string
+	 */
+	protected function getDirectory($controller)
+	{
+		return implode('/', array_slice(explode('\\', $controller), 0, -1));
 	}
 
 	/**
@@ -67,7 +115,35 @@ class ControllerGenerator {
 	{
 		$stub = $this->files->get(__DIR__.'/stubs/controller.php');
 
-		return str_replace('{{class}}', $controller, $stub);
+		// We will explode out the controller name on the naemspace delimiter so we
+		// are able to replace a namespace in this stub file. If no namespace is
+		// provided we'll just clear out the namespace place-holder locations.
+		$segments = explode('\\', $controller);
+
+		$stub = $this->replaceNamespace($segments, $stub);
+
+		return str_replace('{{class}}', last($segments), $stub);
+	}
+
+	/**
+	 * Replace the namespace on the controller.
+	 *
+	 * @param  array   $segments
+	 * @param  string  $stub
+	 * @return string
+	 */
+	protected function replaceNamespace(array $segments, $stub)
+	{
+		if (count($segments) > 1)
+		{
+			$namespace = implode('\\', array_slice($segments, 0, -1));
+
+			return str_replace('{{namespace}}', ' namespace '.$namespace.';', $stub);
+		}
+		else
+		{
+			return str_replace('{{namespace}}', '', $stub);
+		}
 	}
 
 	/**

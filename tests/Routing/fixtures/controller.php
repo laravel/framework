@@ -1,6 +1,6 @@
 <?php
 
-class FooController extends BaseController {
+class FooController extends \BaseController {
 
 	/**
 	 * Display a listing of the resource.
