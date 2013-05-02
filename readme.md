@@ -67,6 +67,7 @@
 - Added `slice` method to `Collection`.
 - Fixed generation of namespaced resource controllers.
 - Send `user` to the password reminder e-mail view.
+- Added support for `union` statements in query builder.
 
 ## Beta 4
 

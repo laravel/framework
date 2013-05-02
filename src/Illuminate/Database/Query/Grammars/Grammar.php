@@ -28,6 +28,7 @@ class Grammar extends BaseGrammar {
 		'orders',
 		'limit',
 		'offset',
+		'unions',
 	);
 
 	/**
@@ -485,6 +486,26 @@ class Grammar extends BaseGrammar {
 	protected function compileOffset(Builder $query, $offset)
 	{
 		return "offset $offset";
+	}
+
+	/**
+	 * Compile the "union" queries attached to the main query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @return string
+	 */
+	protected function compileUnions(Builder $query)
+	{
+		$sql = '';
+
+		foreach ($query->unions as $union)
+		{
+			$joiner = $union['all'] ? 'union all ' : 'union ';
+
+			$sql = $joiner.$union['query']->toSql();
+		}
+
+		return $sql;
 	}
 
 	/**

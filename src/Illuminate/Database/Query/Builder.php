@@ -114,6 +114,13 @@ class Builder {
 	public $offset;
 
 	/**
+	 * The query union statements.
+	 *
+	 * @var array
+	 */
+	public $unions;
+
+	/**
 	 * All of the available clause operators.
 	 *
 	 * @var array
@@ -815,6 +822,31 @@ class Builder {
 	}
 
 	/**
+	 * Add a union statement to the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  bool $all
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function union(Builder $query, $all = false)
+	{
+		$this->unions[] = compact('query', 'all');
+
+		return $this->mergeBindings($query);
+	}
+
+	/**
+	 * Add a union all statement to the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function unionAll(Builder $query)
+	{
+		return $this->union($query, true);
+	}
+
+	/**
 	 * Get the SQL representation of the query.
 	 *
 	 * @return string
@@ -1318,11 +1350,13 @@ class Builder {
 	 * Merge an array of bindings into our bindings.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return void
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function mergeBindings(Builder $query)
 	{
 		$this->bindings = array_values(array_merge($this->bindings, $query->bindings));
+
+		return $this;
 	}
 
 	/**
