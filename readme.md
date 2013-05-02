@@ -66,6 +66,7 @@
 - Added `replicate` method to Eloquent model.
 - Added `slice` method to `Collection`.
 - Fixed generation of namespaced resource controllers.
+- Send `user` to the password reminder e-mail view.
 
 ## Beta 4
 
