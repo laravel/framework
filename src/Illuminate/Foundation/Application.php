@@ -378,8 +378,21 @@ class Application extends Container implements HttpKernelInterface {
 
 			unset($this->deferredServices[$service]);
 
-			if ($this->booted) $instance->boot();
+			$this->setupDeferredBoot($instance);
 		}
+	}
+
+	/**
+	 * Handle the booting of a deferred service provider.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider  $instance
+	 * @return void
+	 */
+	protected function setupDeferredBoot($instance)
+	{
+		if ($this->booted) return $instance->boot();
+
+		$this->booting(function() use ($instance) { $instance->boot(); });
 	}
 
 	/**
