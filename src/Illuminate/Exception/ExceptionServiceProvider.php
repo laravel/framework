@@ -4,9 +4,9 @@ use Closure;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
-use Symfony\Component\HttpKernel\Debug\ExceptionHandler as KernelHandler;
+use Symfony\Component\Debug\ExceptionHandler as KernelHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
 
