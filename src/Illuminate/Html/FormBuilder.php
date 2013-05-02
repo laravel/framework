@@ -667,7 +667,11 @@ class FormBuilder {
 			return $this->url->action($options[0], array_slice($options, 1));
 		}
 
-		return $this->url->action($options);
+		if(is_null($action = $this->url->action($options)) and $this->url->isValidUrl($options)) {
+			$action = $options;
+		}
+
+		return $action;
 	}
 
 	/**

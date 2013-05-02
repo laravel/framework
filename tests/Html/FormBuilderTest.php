@@ -5,6 +5,7 @@ use Illuminate\Html\FormBuilder;
 use Illuminate\Html\HtmlBuilder;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Symfony\Component\Routing\RouteCollection;
 
 class FormBuilderTest extends PHPUnit_Framework_TestCase {
@@ -14,7 +15,8 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->urlGenerator = new UrlGenerator(new RouteCollection, Request::create('/foo', 'GET'));
+		$this->router = new Router;
+		$this->urlGenerator = new UrlGenerator($this->router->getRoutes(), Request::create('/foo', 'GET'));
 		$this->htmlBuilder = new HtmlBuilder($this->urlGenerator);
 		$this->formBuilder =  new FormBuilder($this->htmlBuilder, $this->urlGenerator, '');
 	}
@@ -35,11 +37,17 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$form3 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16'));
 		$form4 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16', 'files' => true));
 
+		$this->router->post('/foo/bar/baz', 'home@index');
+		$form5 = $this->formBuilder->open(array('action' => 'home@index', 'method' => 'POST'));
+
+		$form6 = $this->formBuilder->open(array('action' => 'http://localhost/foo/bar/baz', 'method' => 'GET'));
 
 		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-8">', $form1);
 		$this->assertEquals('<form method="POST" action="http://localhost/foo" accept-charset="UTF-8" class="form" id="id-form">', $form2);
 		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16">', $form3);
 		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16" enctype="multipart/form-data">', $form4);
+		$this->assertEquals('<form method="POST" action="http://localhost/foo/bar/baz" accept-charset="UTF-8">', $form5);
+		$this->assertEquals('<form method="GET" action="http://localhost/foo/bar/baz" accept-charset="UTF-8">', $form6);
 	}
 
 
