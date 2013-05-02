@@ -728,7 +728,25 @@ class FormBuilder {
 
 		if (isset($this->model) and isset($this->model[$name]))
 		{
+			return $this->getModelValueAttribute($name);
+		}
+	}
+
+	/**
+	 * Get the model value that should be assigned to the field.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getModelValueAttribute($name)
+	{
+		if (is_object($this->model))
+		{
 			return object_get($this->model, $name);
+		}
+		elseif (is_array($this->model))
+		{
+			return array_get($this->model, $name);
 		}
 	}
 
