@@ -500,7 +500,16 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function dispatch(Request $request)
 	{
-		return $this['router']->dispatch($this->prepareRequest($request));
+		if ($this->isDownForMaintenance())
+		{
+			$response = $this['events']->until('illuminate.app.down');
+
+			return $this->prepareResponse($response, $this['request']);
+		}
+		else
+		{
+			return $this['router']->dispatch($this->prepareRequest($request));
+		}
 	}
 
 	/**
@@ -520,6 +529,27 @@ class Application extends Container implements HttpKernelInterface {
 		$this['request'] = $request;
 
 		return $this->dispatch($request);
+	}
+
+	/**
+	 * Determine if the application is currently down for maintenance.
+	 *
+	 * @return bool
+	 */
+	public function isDownForMaintenance()
+	{
+		return file_exists($this['path'].'/storage/meta/down');
+	}
+
+	/**
+	 * Register a maintenance mode event listener.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function down(Closure $callback)
+	{
+		$this['events']->listen('illuminate.app.down', $callback);
 	}
 
 	/**

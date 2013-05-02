@@ -69,6 +69,7 @@
 - Send `user` to the password reminder e-mail view.
 - Added support for `union` statements in query builder.
 - Added ability to add more conditions on `exists` validation rule.
+- Added support for maintenance mode via `php artisan down` and `php artisan up`.
 
 ## Beta 4
 
