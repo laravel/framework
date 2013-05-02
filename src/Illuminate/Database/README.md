@@ -23,7 +23,7 @@ $config = array(
 $capsule = new Illuminate\Database\Capsule($config);
 
 // If you want to use the Eloquent ORM...
-$capsule->setupEloquent();
+$capsule->bootEloquent();
 
 // Making A Query Builder Call...
 $capsule->connection()->table('users')->where('id', 1)->first();
