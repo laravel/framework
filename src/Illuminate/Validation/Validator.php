@@ -699,7 +699,7 @@ class Validator implements MessageProviderInterface {
 
 		$expected = (is_array($value)) ? count($value) : 1;
 
-		return $this->getExistCount($table, $column, $value) >= $expected;
+		return $this->getExistCount($table, $column, $value, $parameters) >= $expected;
 	}
 
 	/**
@@ -708,20 +708,43 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $table
 	 * @param  string  $column
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return int
 	 */
-	protected function getExistCount($table, $column, $value)
+	protected function getExistCount($table, $column, $value, $parameters)
 	{
 		$verifier = $this->getPresenceVerifier();
 
+		$extra = $this->getExtraExistConditions($parameters);
+
 		if (is_array($value))
 		{
-			return $verifier->getMultiCount($table, $column, $value);
+			return $verifier->getMultiCount($table, $column, $value, $extra);
 		}
 		else
 		{
-			return $verifier->getCount($table, $column, $value);
+			return $verifier->getCount($table, $column, $value, null, null, $extra);
 		}
+	}
+
+	/**
+	 * Get the extra exist conditions.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function getExtraExistConditions(array $parameters)
+	{
+		$segments = array_values(array_slice($parameters, 2));
+
+		$extra = array();
+
+		for ($i = 0; $i < count($segments); $i = $i + 2)
+		{
+			$extra[$segments[$i]] = $segments[$i + 1];
+		}
+
+		return $extra;
 	}
 
 	/**
