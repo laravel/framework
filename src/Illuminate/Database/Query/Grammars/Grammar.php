@@ -28,6 +28,7 @@ class Grammar extends BaseGrammar {
 		'orders',
 		'limit',
 		'offset',
+		'union',
 	);
 
 	/**
@@ -211,6 +212,28 @@ class Grammar extends BaseGrammar {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Compile the "union" portion of the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @return string
+	 */
+	protected function compileUnion(Builder $query)
+	{
+		$sql = '';
+		foreach ($query->union as $union) {
+			$union_query = $union['select'];
+			$select = $this->compileSelect($union_query);
+			$query->setBindings(array_merge($query->getBindings(), $union_query->getBindings()));
+			$sql .= ' UNION ';
+			if ($union['all']) {
+				$sql .= 'ALL ';
+			}
+			$sql .= $select;
+		}
+		return $sql;
 	}
 
 	/**

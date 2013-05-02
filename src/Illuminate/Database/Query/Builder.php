@@ -113,6 +113,13 @@ class Builder {
 	 */
 	public $offset;
 
+/**
+	 * The number of records to skip.
+	 *
+	 * @var array
+	 */
+	public $union;
+
 	/**
 	 * All of the available clause operators.
 	 *
@@ -167,6 +174,22 @@ class Builder {
 
 		return $this;
 	}
+
+
+	/**
+	 * Generate a union query
+	 *
+	 * @param \Illuminate\Database\Query\Builder
+	 * @param  boolean 	$all determines whether union or union all
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+
+	public function union($select, $all = TRUE)
+	{
+		$this->union[] = array('select' => $select, 'all' => $all);
+		return $this;
+	}
+
 
 	/**
 	 * Force the query to only return distinct results.
