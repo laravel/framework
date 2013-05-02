@@ -19,6 +19,13 @@ class Dispatcher {
 	protected $listeners = array();
 
 	/**
+	 * The wildcard listeners.
+	 *
+	 * @var array
+	 */
+	protected $wildcards = array();
+
+	/**
 	 * The sorted event listeners.
 	 *
 	 * @var array
@@ -66,10 +73,7 @@ class Dispatcher {
 	 */
 	protected function setupWildcardListen($event, $listener, $priority)
 	{
-		foreach (array_keys($this->listeners) as $key)
-		{
-			if (str_is($event, $key)) $this->listen($key, $listener, $priority);
-		}
+		$this->wildcards[$event][] = $listener;
 	}
 
 	/**
@@ -202,12 +206,32 @@ class Dispatcher {
 	 */
 	public function getListeners($eventName)
 	{
+		$wildcards = $this->getWildcardListeners($eventName);
+
 		if ( ! isset($this->sorted[$eventName]))
 		{
 			$this->sortListeners($eventName);
 		}
 
-		return $this->sorted[$eventName];
+		return array_merge($this->sorted[$eventName], $wildcards);
+	}
+
+	/**
+	 * Get the wildcard listeners for the event.
+	 *
+	 * @param  string  $eventName
+	 * @return array
+	 */
+	protected function getWildcardListeners($eventName)
+	{
+		$wildcards = array();
+
+		foreach ($this->wildcards as $key => $listeners)
+		{
+			if (str_is($key, $eventName)) $wildcards = array_merge($wildcards, $listeners);
+		}
+
+		return $wildcards;
 	}
 
 	/**
