@@ -20,11 +20,6 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		$this->setExceptionHandler($app['exception.function']);
 
-		// By registering the error handler with a level of -1, we state that we want
-		// all PHP errors converted into ErrorExceptions and thrown which provides
-		// a very strict development environment but prevents any unseen errors.
-		$app['kernel.error']->register(-1);
-
 		if (isset($app['env']) and $app['env'] != 'testing')
 		{
 			$this->registerShutdownHandler();
@@ -58,11 +53,6 @@ class ExceptionServiceProvider extends ServiceProvider {
 	protected function registerKernelHandlers()
 	{
 		$app = $this->app;
-
-		$app['kernel.error'] = function()
-		{
-			return new ErrorHandler;
-		};
 
 		$this->app['kernel.exception'] = function() use ($app)
 		{
@@ -113,9 +103,11 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 		register_shutdown_function(function() use ($app)
 		{
-			set_exception_handler(array(new StubShutdownHandler($app), 'handle'));
+			if ($error = error_get_last())
+			{
+				$app['exception.function'](new \ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']));
+			}
 
-			$app['kernel.error']->handleFatal();
 		});
 	}
 
