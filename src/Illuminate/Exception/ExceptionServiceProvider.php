@@ -23,7 +23,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 		// By registering the error handler with a level of -1, we state that we want
 		// all PHP errors converted into ErrorExceptions and thrown which provides
 		// a very strict development environment but prevents any unseen errors.
-		$app['kernel.error']->register(-1);
+		$app['kernel.error'] = ErrorHandler::register(-1);
 
 		if (isset($app['env']) and $app['env'] != 'testing')
 		{
@@ -58,11 +58,6 @@ class ExceptionServiceProvider extends ServiceProvider {
 	protected function registerKernelHandlers()
 	{
 		$app = $this->app;
-
-		$app['kernel.error'] = function()
-		{
-			return new ErrorHandler;
-		};
 
 		$this->app['kernel.exception'] = function() use ($app)
 		{
