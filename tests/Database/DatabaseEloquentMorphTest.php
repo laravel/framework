@@ -37,6 +37,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$builder = new EloquentMorphResetBuilderStub;
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('isSoftDeleting')->andReturn(false);
 		$relation = new MorphOne($builder, $parent, 'morph_type', 'morph_id');
 		$relation->where('foo', '=', 'bar');
 		list($wheres, $bindings) = $relation->getAndResetWheres();
@@ -133,7 +134,8 @@ class EloquentMorphResetModelStub extends Illuminate\Database\Eloquent\Model {}
 
 class EloquentMorphResetBuilderStub extends Illuminate\Database\Eloquent\Builder {
 	public function __construct() { $this->query = new EloquentRelationQueryStub; }
-	public function getModel() {}
+	public function getModel() { return new EloquentMorphResetModelStub; }
+	public function isSoftDeleting() { return false; }
 }
 
 

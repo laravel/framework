@@ -139,6 +139,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public $exists = false;
 
 	/**
+	 * Indicates if the model should soft delete.
+	 *
+	 * @var bool
+	 */
+	protected $softDelete = false;
+
+	/**
 	 * Indicates whether attributes are snake cased on arrays.
 	 *
 	 * @var bool
@@ -193,6 +200,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var string
 	 */
 	const UPDATED_AT = 'updated_at';
+
+	/**
+	 * The name of the "deleted at" column.
+	 *
+	 * @var string
+	 */
+	const DELETED_AT = 'deleted_at';
 
 	/**
 	 * Create a new Eloquent model instance.
@@ -656,12 +670,46 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// by the timestamp. Then we will go ahead and delete the model instance.
 			$this->touchOwners();
 
-			$this->newQuery()->where($this->getKeyName(), $this->getKey())->delete();
+			$this->performDeleteOnModel();
 
 			$this->fireModelEvent('deleted', false);
 		}
 	}
-	
+
+	/**
+	 * Perform the actual delete query on this model instance.
+	 *
+	 * @return void
+	 */
+	protected function performDeleteOnModel()
+	{
+		$query = $this->newQuery()->where($this->getKeyName(), $this->getKey());
+
+		if ($this->softDelete)
+		{
+			$query->update(array(static::DELETED_AT => new DateTime));
+		}
+		else
+		{
+			$query->delete();
+		}
+	}
+
+	/**
+	 * Restore a soft-deleted model instance.
+	 *
+	 * @return void
+	 */
+	public function restore()
+	{
+		if ($this->softDelete)
+		{
+			$this->{static::DELETED_AT} = null;
+
+			return $this->save();			
+		}
+	}
+
 	/**
 	 * Register a saving model event with the dispatcher.
 	 *
@@ -835,7 +883,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function save(array $options = array())
 	{
-		$query = $this->newQuery();
+		$query = $this->newQueryWithDeleted();
 
 		// If the "saving" event returns false we'll bail out of the save and return
 		// false, indicating that the save failed. This gives an opportunities to
@@ -1106,6 +1154,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Get the name of the "deleted at" column.
+	 *
+	 * @return string
+	 */
+	public function getDeletedAtColumn()
+	{
+		return static::DELETED_AT;
+	}
+
+	/**
+	 * Get the fully qualified "deleted at" column.
+	 *
+	 * @return string
+	 */
+	public function getQualifiedDeletedAtColumn()
+	{
+		return $this->getTable().'.'.$this->getDeletedAtColumn();
+	}
+
+	/**
 	 * Get a fresh timestamp for the model.
 	 *
 	 * @return mixed
@@ -1118,9 +1186,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a new query builder for the model's table.
 	 *
+	 * @param  bool  $excludeDeleted
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$builder = new Builder($this->newBaseQueryBuilder());
 
@@ -1129,7 +1198,32 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// while it is constructing and executing various queries against it.
 		$builder->setModel($this)->with($this->with);
 
+		if ($excludeDeleted and $this->softDelete)
+		{
+			$builder->whereNull($this->getTable().'.'.static::DELETED_AT);
+		}
+
 		return $builder;
+	}
+
+	/**
+	 * Get a new query builder that includes soft deletes.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function newQueryWithDeleted()
+	{
+		return $this->newQuery(false);
+	}
+
+	/**
+	 * Get a new query builder that includes soft deletes.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public static function withDeleted()
+	{
+		return with(new static)->newQueryWithDeleted();
 	}
 
 	/**
@@ -1218,6 +1312,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function usesTimestamps()
 	{
 		return $this->timestamps;
+	}
+
+	/**
+	 * Determine if the model instance uses soft deletes.
+	 *
+	 * @return bool
+	 */
+	public function isSoftDeleting()
+	{
+		return $this->softDelete;
 	}
 
 	/**

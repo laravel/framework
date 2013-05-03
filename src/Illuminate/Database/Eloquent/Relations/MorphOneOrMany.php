@@ -85,9 +85,9 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	public function getAndResetWheres()
 	{
 		// We actually need to remove two where clauses from polymorphic queries so we
-		// will make an extra call to remove the first where clause here so that we
-		// remove two total where clause from the query leaving only custom ones.
-		$this->removeFirstWhereClause();
+		// will make an extra call to clear the second where clause here so that it
+		// will not get in the way. This parent method will remove the other one.
+		$this->removeSecondWhereClause();
 
 		return parent::getAndResetWheres();
 	}

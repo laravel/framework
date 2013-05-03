@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use DateTime;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -208,6 +209,76 @@ class Builder {
 	}
 
 	/**
+	 * Delete a record from the database.
+	 *
+	 * @return int
+	 */
+	public function delete()
+	{
+		if ($this->model->isSoftDeleting())
+		{
+			$column = $this->model->getDeletedAtColumn();
+
+			return $this->query->update(array($column => new DateTime));
+		}
+		else
+		{
+			return $this->query->delete();
+		}
+	}
+
+	/**
+	 * Restore the soft-deleted model instances.
+	 *
+	 * @return int
+	 */
+	public function restore()
+	{
+		if ($this->model->isSoftDeleting())
+		{
+			$column = $this->model->getDeletedAtColumn();
+
+			return $this->query->update(array($column => null));
+		}
+	}
+
+	/**
+	 * Include the soft deleted models in the results.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function withDeleted()
+	{
+		foreach ($this->query->wheres as $key => $where)
+		{
+			// If the where clause is a soft delete date constraint, we will remove it from
+			// the query and reset the keys on the wheres. This allows this developer to
+			// include deleted model in a relationship result set that is lazy loaded.
+			if ($this->isSoftDeleteConstraint($where))
+			{
+				unset($this->query->wheres[$key]);
+
+				$this->query->wheres = array_values($this->query->wheres);
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Determine if the given where clause is a soft delete constraint.
+	 *
+	 * @param  array  $where
+	 * @return bool
+	 */
+	protected function isSoftDeleteConstraint(array $where)
+	{
+		$column = $this->model->getQualifiedDeletedAtColumn();
+
+		return $where['column'] == $column and $where['type'] == 'Null';
+	}
+
+	/**
 	 * Get the hydrated models without eager loading.
 	 *
 	 * @param  array  $columns
@@ -385,7 +456,9 @@ class Builder {
 	{
 		if (is_string($relations)) $relations = func_get_args();
 
-		$this->eagerLoad = $this->parseRelations($relations);
+		$eagers = $this->parseRelations($relations);
+
+		$this->eagerLoad = array_merge($this->eagerLoad, $eagers);
 
 		return $this;
 	}

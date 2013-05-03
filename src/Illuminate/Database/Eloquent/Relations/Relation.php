@@ -102,6 +102,16 @@ abstract class Relation {
 	}
 
 	/**
+	 * Restore all of the soft deleted related models.
+	 *
+	 * @return int
+	 */
+	public function restore()
+	{
+		return $this->query->withDeleted()->restore();
+	}
+
+	/**
 	 * Run a raw update against the base query.
 	 *
 	 * @param  array  $attributes
@@ -121,7 +131,21 @@ abstract class Relation {
 	 */
 	public function getAndResetWheres()
 	{
-		$this->removeFirstWhereClause();
+		// When a model is "soft deleting", the "deleted at" where clause will be the
+		// first where clause on the relationship query, so we will actually clear
+		// the second where clause as that is the lazy loading relations clause.
+		if ($this->query->getModel()->isSoftDeleting())
+		{
+			$this->removeSecondWhereClause();
+		}
+
+		// When the model isn't soft deleting the where clause added by the lazy load
+		// relation query will be the first where clause on this query, so we will
+		// remove that to make room for the eager load constraints on the query.
+		else
+		{
+			$this->removeFirstWhereClause();
+		}
 
 		return $this->getBaseQuery()->getAndResetWheres();
 	}
@@ -131,21 +155,53 @@ abstract class Relation {
 	 *
 	 * @return void
 	 */
-	public function removeFirstWhereClause()
+	protected function removeFirstWhereClause()
 	{
 		$first = array_shift($this->getBaseQuery()->wheres);
 
-		$bindings = $this->getBaseQuery()->getBindings();
+		return $this->removeWhereBinding($first);
+	}
+
+	/**
+	 * Remove the second where clause from the relationship query.
+	 *
+	 * @return void
+	 */
+	protected function removeSecondWhereClause()
+	{
+		$wheres =& $this->getBaseQuery()->wheres;
+
+		// We'll grab the second where clause off of the set of wheres, and then reset
+		// the where clause keys so there are no gaps in the numeric keys. Then we
+		// remove the binding from the query so it doesn't mess things when run.
+		$second = $wheres[1]; unset($wheres[1]);
+
+		$wheres = array_values($wheres);
+
+		return $this->removeWhereBinding($second);
+	}
+
+	/**
+	 * Remove a where clause from the relationship query.
+	 *
+	 * @param  array  $clause
+	 * @return void
+	 */
+	public function removeWhereBinding($clause)
+	{
+		$query = $this->getBaseQuery();
+
+		$bindings = $query->getBindings();
 
 		// When resetting the relation where clause, we want to shift the first element
 		// off of the bindings, leaving only the constraints that the developers put
 		// as "extra" on the relationships, and not original relation constraints.
-		if (array_key_exists('value', $first))
+		if (array_key_exists('value', $clause))
 		{
 			$bindings = array_slice($bindings, 1);
 		}
 
-		$this->getBaseQuery()->setBindings(array_values($bindings));
+		$query->setBindings(array_values($bindings));
 	}
 
 	/**
