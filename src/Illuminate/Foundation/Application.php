@@ -538,7 +538,7 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function isDownForMaintenance()
 	{
-		return file_exists($this['path'].'/storage/meta/down');
+		return file_exists($this['path.storage'].'/meta/down');
 	}
 
 	/**
