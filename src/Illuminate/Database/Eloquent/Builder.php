@@ -228,6 +228,16 @@ class Builder {
 	}
 
 	/**
+	 * Force a delete on a set of soft deleted models.
+	 *
+	 * @return int
+	 */
+	public function forceDelete()
+	{
+		return $this->query->delete();
+	}
+
+	/**
 	 * Restore the soft-deleted model instances.
 	 *
 	 * @return int
