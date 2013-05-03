@@ -70,6 +70,7 @@
 - Added ability to add more conditions on `exists` validation rule.
 - Added support for maintenance mode via `php artisan down` and `php artisan up`.
 - Added "soft delete" support to Eloquent via new "softDelete" property. `restore` method added to "un-delete".
+- Added `trashed` method to Eloquent model and `trashed` to Eloquent builder.
 
 ## Beta 4
 

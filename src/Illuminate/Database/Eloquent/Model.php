@@ -1219,7 +1219,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if ($excludeDeleted and $this->softDelete)
 		{
-			$builder->whereNull($this->getTable().'.'.static::DELETED_AT);
+			$builder->whereNull($this->getQualifiedDeletedAtColumn());
 		}
 
 		return $builder;
@@ -1240,9 +1240,21 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public static function withDeleted()
+	public static function withTrashed()
 	{
 		return with(new static)->newQueryWithDeleted();
+	}
+
+	/**
+	 * Get a new query builder that only includes soft deletes.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public static function trashed()
+	{
+		$column = $this->getQualifiedDeletedAtColumn();
+
+		return $this->newQueryWithDeleted()->whereNotNull($column);
 	}
 
 	/**

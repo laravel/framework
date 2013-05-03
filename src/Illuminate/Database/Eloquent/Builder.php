@@ -257,7 +257,7 @@ class Builder {
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function withDeleted()
+	public function withTrashed()
 	{
 		$column = $this->model->getQualifiedDeletedAtColumn();
 
@@ -273,6 +273,18 @@ class Builder {
 				$this->query->wheres = array_values($this->query->wheres);
 			}
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Force the result set to only included soft deletes.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function trashed()
+	{
+		$this->query->whereNotNull($this->model->getQualifiedDeletedAtColumn());
 
 		return $this;
 	}

@@ -108,7 +108,7 @@ abstract class Relation {
 	 */
 	public function restore()
 	{
-		return $this->query->withDeleted()->restore();
+		return $this->query->withTrashed()->restore();
 	}
 
 	/**

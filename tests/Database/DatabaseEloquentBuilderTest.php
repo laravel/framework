@@ -88,7 +88,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getQuery()->whereNull('deleted_at');
 		$builder->getQuery()->whereNull('foo_bar');
 
-		$builder->withDeleted();
+		$builder->withTrashed();
 
 		$this->assertEquals(2, count($builder->getQuery()->wheres));
 	}
