@@ -72,6 +72,28 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWithDeletedProperlyRemovesDeletedClause()
+	{
+		$builder = new Illuminate\Database\Eloquent\Builder(new Illuminate\Database\Query\Builder(
+			m::mock('Illuminate\Database\ConnectionInterface'),
+			m::mock('Illuminate\Database\Query\Grammars\Grammar'),
+			m::mock('Illuminate\Database\Query\Processors\Processor')
+		));
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('getTable')->once()->andReturn('');
+		$model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('deleted_at');
+		$builder->setModel($model);
+
+		$builder->getQuery()->whereNull('updated_at');
+		$builder->getQuery()->whereNull('deleted_at');
+		$builder->getQuery()->whereNull('foo_bar');
+
+		$builder->withDeleted();
+
+		$this->assertEquals(2, count($builder->getQuery()->wheres));
+	}
+
+
 	public function testPaginateMethod()
 	{
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get'), $this->getMocks());
