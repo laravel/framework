@@ -1325,6 +1325,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Set the soft deleting property on the model.
+	 *
+	 * @param  bool  $enabled
+	 * @return void
+	 */
+	public function setSoftDeleting($enabled)
+	{
+		$this->softDelete = $enabled;
+	}
+
+	/**
 	 * Get the polymorphic relationship columns.
 	 *
 	 * @param  string  $name

@@ -284,6 +284,32 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDeleteProperlyDeletesModelWhenSoftDeleting()
+	{
+		$model = $this->getMock('Illuminate\Database\Eloquent\Model', array('newQuery', 'updateTimestamps', 'touchOwners'));
+		$model->setSoftDeleting(true);
+		$query = m::mock('stdClass');
+		$query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
+		$query->shouldReceive('update')->once()->with(array('deleted_at' => new DateTime));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('touchOwners');
+		$model->exists = true;
+		$model->id = 1;
+		$model->delete();
+	}
+
+
+	public function testRestoreProperlyRestoresModel()
+	{
+		$model = $this->getMock('Illuminate\Database\Eloquent\Model', array('save'));
+		$model->setSoftDeleting(true);
+		$model->expects($this->once())->method('save');
+		$model->restore();
+
+		$this->assertNull($model->deleted_at);
+	}
+
+
 	public function testNewQueryReturnsEloquentQueryBuilder()
 	{
 		$conn = m::mock('Illuminate\Database\Connection');
