@@ -284,6 +284,8 @@ class Builder {
 	 */
 	public function trashed()
 	{
+		$this->withTrashed();
+
 		$this->query->whereNotNull($this->model->getQualifiedDeletedAtColumn());
 
 		return $this;
