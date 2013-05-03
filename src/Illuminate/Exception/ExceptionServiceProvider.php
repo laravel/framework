@@ -5,8 +5,8 @@ use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Debug\ExceptionHandler;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 
 class ExceptionServiceProvider extends ServiceProvider {
 
@@ -86,6 +86,10 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 					$response->send();
 				}
+
+				// If none of the custom handlers returned a response we will display default
+				// error display for the application, which will either be the Whoops view
+				// or the plain Symfony error page that does not contain errors details.
 				else
 				{
 					$me->displayException($exception);
@@ -102,6 +106,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	public function registerErrorHandler()
 	{
 		list($me, $app) = array($this, $this->app);
+
 		set_error_handler(function($level, $message, $file, $line, $context) use ($me, $app)
 		{
 			$app['exception.function'](new \ErrorException($message, $level, 0, $file, $line));
@@ -139,6 +144,9 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			$whoops = new \Whoops\Run;
 
+			// We need to disable the Whoops outputting. Otherwise Whoops will try to write
+			// stuff out to the screen. By doing this, we'll be able to set the response
+			// status code since Whoops would force us to return out 200 status codes.
 			$whoops->writeToOutput(false);
 
 			$whoops->allowQuit(false);
@@ -212,7 +220,6 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			$this->app['kernel.exception']->handle($exception);
 		}
-		exit;
 	}
 
 	/**
