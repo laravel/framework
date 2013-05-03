@@ -4,9 +4,9 @@ use Closure;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Debug\ExceptionHandler as KernelHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
 
@@ -20,10 +20,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		$this->setExceptionHandler($app['exception.function']);
 
-		// By registering the error handler with a level of -1, we state that we want
-		// all PHP errors converted into ErrorExceptions and thrown which provides
-		// a very strict development environment but prevents any unseen errors.
-		$app['kernel.error'] = ErrorHandler::register(-1);
+		$this->registerErrorHandler();
 
 		if (isset($app['env']) and $app['env'] != 'testing')
 		{
@@ -59,10 +56,10 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		$app = $this->app;
 
-		$this->app['kernel.exception'] = function() use ($app)
+		$app['kernel.exception'] =  $app->share(function() use ($app)
 		{
-			return new KernelHandler($app['config']['app.debug']);
-		};
+			return new ExceptionHandler($app['config']['app.debug']);
+		});
 	}
 
 	/**
@@ -98,6 +95,20 @@ class ExceptionServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the error handler.
+	 *
+	 * @return void
+	 */
+	public function registerErrorHandler()
+	{
+		list($me, $app) = array($this, $this->app);
+		set_error_handler(function($level, $message, $file, $line, $context) use ($me, $app)
+		{
+			$app['exception.function'](new \ErrorException($message, $level, 0, $file, $line));
+		});
+	}
+
+	/**
 	 * Register the shutdown handler Closure.
 	 *
 	 * @return void
@@ -108,9 +119,10 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 		register_shutdown_function(function() use ($app)
 		{
-			set_exception_handler(array(new StubShutdownHandler($app), 'handle'));
-
-			$app['kernel.error']->handleFatal();
+			if ($e = error_get_last())
+			{
+				$app['exception.function'](new FatalErrorException($e['message'], $e['type'], 0, $e['file'], $e['line']));
+			}
 		});
 	}
 
@@ -192,12 +204,15 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	public function displayException($exception)
 	{
-		if ($this->app['config']['app.debug'])
+		if (isset($this->app['whoops']) and $this->app['config']['app.debug'])
 		{
-			return $this->displayWhoopsException($exception);
+			$this->displayWhoopsException($exception);
 		}
-
-		$this->app['kernel.exception']->handle($exception);
+		else
+		{
+			$this->app['kernel.exception']->handle($exception);
+		}
+		exit;
 	}
 
 	/**
