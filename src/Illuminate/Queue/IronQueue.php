@@ -114,7 +114,7 @@ class IronQueue extends Queue implements QueueInterface {
 		$r = $this->request;
 
 		return (object) array(
-			'id' => $r->header('iron-message-id'), 'body' => $r->getContent()
+			'id' => $r->header('iron-message-id'), 'body' => $r->getContent(), 'pushed' => true,
 		);
 	}
 

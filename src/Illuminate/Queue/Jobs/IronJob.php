@@ -63,6 +63,8 @@ class IronJob extends Job {
 	 */
 	public function delete()
 	{
+		if (isset($this->job->pushed)) return;
+
 		$this->iron->deleteMessage($this->queue, $this->job->id);
 	}
 

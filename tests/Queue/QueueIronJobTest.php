@@ -29,6 +29,20 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDeleteNoopsOnPushedQueues()
+	{
+		$job = new Illuminate\Queue\Jobs\IronJob(
+			m::mock('Illuminate\Container\Container'),
+			m::mock('IronMQ'),
+			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60, 'pushed' => true),
+			'default'
+		);
+		$job->getIron()->shouldReceive('deleteMessage')->never();
+
+		$job->delete();
+	}
+
+
 	public function testReleaseProperlyReleasesJobOntoIron()
 	{
 		$job = $this->getJob();
