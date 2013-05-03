@@ -688,7 +688,7 @@ class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
@@ -697,7 +697,7 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($mock);
@@ -708,7 +708,7 @@ class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2))->andReturn($mock);
@@ -718,7 +718,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('with')->once()->with(array('foo', 'bar'))->andReturn('foo');
