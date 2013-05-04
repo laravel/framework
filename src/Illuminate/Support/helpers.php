@@ -259,9 +259,9 @@ if ( ! function_exists('array_pluck'))
 	 */
 	function array_pluck($array, $key)
 	{
-		return array_map(function($v) use ($key)
+		return array_map(function($value) use ($key)
 		{
-			return is_object($v) ? $v->$key : $v[$key];
+			return is_object($value) ? $value->$key : $value[$key];
 
 		}, $array);
 	}
