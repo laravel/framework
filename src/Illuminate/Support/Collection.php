@@ -255,11 +255,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Merge the collection itmes into a single array.
+	 * Collapse the collection items into a single array.
 	 *
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function merge()
+	public function collapse()
 	{
 		$results = array();
 
