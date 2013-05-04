@@ -824,7 +824,7 @@ class Builder {
 	/**
 	 * Add a union statement to the query.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder|\Closure  $query
 	 * @param  bool $all
 	 * @return \Illuminate\Database\Query\Builder
 	 */
@@ -832,10 +832,7 @@ class Builder {
 	{
 		if ($query instanceof Closure)
 		{
-			$callback = $query;
-			$query = $this->newQuery();
-
-			call_user_func($callback, $query);
+			call_user_func($query, $query = $this->newQuery());
 		}
 		
 		$this->unions[] = compact('query', 'all');
@@ -846,7 +843,7 @@ class Builder {
 	/**
 	 * Add a union all statement to the query.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder|\Closure  $query
 	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function unionAll($query)
