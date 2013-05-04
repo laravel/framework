@@ -10,13 +10,14 @@ class Capsule {
 	 * Create a new database capsule instance.
 	 *
 	 * @param  array  $config
+	 * @param  \Illuminate\Events\Dispatcher|null  $dispatcher
 	 * @return void
 	 */
-	public function __construct(array $config)
+	public function __construct(array $config, Dispatcher $dispatcher = null)
 	{
-		$config = $this->parseConfig($config);
+		$this->config = $this->parseConfig($config, $dispatcher);
 
-		$this->manager = new DatabaseManager($config, $this->getFactory());
+		$this->manager = new DatabaseManager($this->config, $this->getFactory());
 	}
 
 	/**
@@ -27,6 +28,8 @@ class Capsule {
 	public function bootEloquent()
 	{
 		Eloquent\Model::setConnectionResolver($this->manager);
+
+		Eloquent\Model::setEventDispatcher($this->config['events']);
 	}
 
 	/**
@@ -55,12 +58,16 @@ class Capsule {
 	 * Prepare the passed configuration for the manager.
 	 *
 	 * @param  array  $config
+	 * @param  \Illuminate\Events\Dispatcher|null  $dispatcher
 	 * @return array
 	 */
-	protected function parseConfig(array $config)
+	protected function parseConfig(array $config, $dispatcher)
 	{
-		$parsed = $this->getEmptyConfig();
+		$parsed = $this->getEmptyConfig($dispatcher);
 
+		// We will build out the "config" array to look like the database manager will
+		// expect it to. This allows us to "trick" the manager to work disconnected
+		// from the rest of the framework. We will also put the dispatcher on it.
 		foreach ($config as $key => $value)
 		{
 			$parsed['config']['database.'.$key] = $value;
@@ -72,11 +79,14 @@ class Capsule {
 	/**
 	 * Get an empty configuration ready for loading.
 	 *
+	 * @param  \Illuminate\Events\Dispatcher|null  $dispatcher
 	 * @return array
 	 */
-	protected function getEmptyConfig()
+	protected function getEmptyConfig($dispatcher)
 	{
-		return array('events' => new Dispatcher, 'config' => array());
+		$dispatcher = $dispatcher ?: new Dispatcher;
+
+		return array('events' => $dispatcher, 'config' => array());
 	}
 
 	/**
