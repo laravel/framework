@@ -725,7 +725,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$this->{static::DELETED_AT} = null;
 
-			return $this->save();			
+			return $this->save();
 		}
 	}
 
