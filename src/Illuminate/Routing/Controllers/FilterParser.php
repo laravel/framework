@@ -43,14 +43,14 @@ class FilterParser {
 	 */
 	protected function filterByClass($filters, $filter)
 	{
-		return array_filter($filters, function($a) use ($filter)
+		return array_filter($filters, function($annotation) use ($filter)
 		{
-			return $a instanceof $filter;
+			return $annotation instanceof $filter;
 		});
 	}
 
 	/**
-	 * Filter the annotations by request and method.
+	 * Filter the annotation instances by request and method.
 	 *
 	 * @param  array  $filters
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
@@ -59,9 +59,9 @@ class FilterParser {
 	 */
 	protected function filter($filters, $request, $method)
 	{
-		$filtered = array_filter($filters, function($a) use ($request, $method)
+		$filtered = array_filter($filters, function($annotation) use ($request, $method)
 		{
-			return $a->applicable($request, $method);
+			return $annotation->applicable($request, $method);
 		});
 
 		return array_values($filtered);
@@ -75,7 +75,7 @@ class FilterParser {
 	 */
 	protected function getNames(array $filters)
 	{
-		return array_map(function($f) { return $f->run; }, $filters);
+		return array_map(function($filter) { return $filter->run; }, $filters);
 	}
 
 }
