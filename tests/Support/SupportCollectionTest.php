@@ -133,6 +133,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMergeArray()
+	{
+		$c = new Collection(array('name' => 'Hello'));
+		$this->assertEquals(array('name' => 'Hello', 'id' => 1), $c->merge(array('id' => 1))->all());
+	}
+
+
+	public function testMergeCollection()
+	{
+		$c = new Collection(array('name' => 'Hello'));
+		$this->assertEquals(array('name' => 'World', 'id' => 1), $c->merge(new Collection(array('name' => 'World', 'id' => 1)))->all());
+	}
+
+
 	public function testCollapse()
 	{
 		$data = new Collection(array(array($object1 = new StdClass), array($object2 = new StdClass)));

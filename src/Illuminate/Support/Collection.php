@@ -272,6 +272,24 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Merge items with the collection items.
+	 *
+	 * @param  \Illuminate\Support\Contracts\ArrayableInterface|array
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function merge($items)
+	{
+		if ($items instanceof ArrayableInterface)
+		{
+			$items = $items->toArray();
+		}
+
+		$results = array_merge($this->items, $items);
+
+		return new Collection($results);
+	}
+
+	/**
 	 * Slice the underlying collection array.
 	 *
 	 * @param  int   $offset
