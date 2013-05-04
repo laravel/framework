@@ -828,8 +828,16 @@ class Builder {
 	 * @param  bool $all
 	 * @return \Illuminate\Database\Query\Builder
 	 */
-	public function union(Builder $query, $all = false)
+	public function union($query, $all = false)
 	{
+		if ($query instanceof Closure)
+		{
+			$callback = $query;
+			$query = $this->newQuery();
+
+			call_user_func($callback, $query);
+		}
+		
 		$this->unions[] = compact('query', 'all');
 
 		return $this->mergeBindings($query);
@@ -841,7 +849,7 @@ class Builder {
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return \Illuminate\Database\Query\Builder
 	 */
-	public function unionAll(Builder $query)
+	public function unionAll($query)
 	{
 		return $this->union($query, true);
 	}
