@@ -16,12 +16,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Contracts\ResponsePreparerInterface;
 use Symfony\Component\HttpKernel\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Application extends Container implements HttpKernelInterface {
+class Application extends Container implements HttpKernelInterface, ResponsePreparerInterface {
 
 	/**
 	 * The Laravel framework version.
@@ -168,12 +169,9 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	public function startExceptionHandling()
 	{
-		$provider = array_first($this->serviceProviders, function($key, $provider)
-		{
-			return $provider instanceof ExceptionServiceProvider;
-		});
+		$this['exception']->register($this->environment());
 
-		$provider->startHandling($this);
+		$this['exception']->setDebug($this['config']['app.debug']);
 	}
 
 	/**
@@ -637,14 +635,13 @@ class Application extends Container implements HttpKernelInterface {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function prepareResponse($value, Request $request)
+	public function prepareResponse($value)
 	{
 		if ( ! $value instanceof SymfonyResponse) $value = new Response($value);
 
-		return $value->prepare($request);
+		return $value->prepare($this['request']);
 	}
 
 	/**

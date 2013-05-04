@@ -6,6 +6,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/ClassLoader.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Container/Container.php',
     $basePath.'/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/HttpKernelInterface.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Contracts/ResponsePreparerInterface.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Application.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Http/Request.php',
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Request.php',
@@ -66,6 +67,9 @@ return array_map('realpath', array(
     $basePath.'/vendor/monolog/monolog/src/Monolog/Handler/RotatingFileHandler.php',
     $basePath.'/vendor/monolog/monolog/src/Monolog/Handler/HandlerInterface.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/App.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Exception/ExceptionDisplayerInterface.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Exception/SymfonyDisplayer.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Exception/WhoopsDisplayer.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Exception/Handler.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/Route.php',
     $basePath.'/vendor/symfony/routing/Symfony/Component/Routing/Route.php',
@@ -91,5 +95,8 @@ return array_map('realpath', array(
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Response.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Http/Response.php',
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/ResponseHeaderBag.php',
-    $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Cookie.php'
+    $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Cookie.php',
+    $basePath.'/vendor/filp/whoops/src/Whoops/Run.php',
+    $basePath.'/vendor/filp/whoops/src/Whoops/Handler/PrettyPageHandler.php',
+    $basePath.'/vendor/filp/whoops/src/Whoops/Handler/JsonResponseHandler.php',
 ));

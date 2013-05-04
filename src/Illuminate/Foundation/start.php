@@ -47,7 +47,7 @@ use Illuminate\Foundation\ProviderRepository;
 |
 */
 
-$app['app'] = $app->share(function($app) { return $app; });
+$app->instance('app', $app);
 
 /*
 |--------------------------------------------------------------------------
@@ -75,8 +75,6 @@ if (isset($unitTesting))
 | framework and we don't want any output leaking back to the user.
 |
 */
-
-if ($env != 'testing') ini_set('display_errors', 'Off');
 
 error_reporting(-1);
 
@@ -114,19 +112,6 @@ $app->bindIf('config.loader', function($app)
 
 /*
 |--------------------------------------------------------------------------
-| Register Application Exception Handling
-|--------------------------------------------------------------------------
-|
-| We will go ahead and register the application exception handling here
-| which will provide a great output of exception details and a stack
-| trace in the case of exceptions while an application is running.
-|
-*/
-
-$app->startExceptionHandling();
-
-/*
-|--------------------------------------------------------------------------
 | Register The Configuration Repository
 |--------------------------------------------------------------------------
 |
@@ -139,6 +124,21 @@ $app->startExceptionHandling();
 $config = new Config($app['config.loader'], $env);
 
 $app->instance('config', $config);
+
+/*
+|--------------------------------------------------------------------------
+| Register Application Exception Handling
+|--------------------------------------------------------------------------
+|
+| We will go ahead and register the application exception handling here
+| which will provide a great output of exception details and a stack
+| trace in the case of exceptions while an application is running.
+|
+*/
+
+$app->startExceptionHandling();
+
+if ($env != 'testing') ini_set('display_errors', 'Off');
 
 /*
 |--------------------------------------------------------------------------

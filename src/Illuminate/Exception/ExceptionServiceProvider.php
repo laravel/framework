@@ -4,32 +4,10 @@ use Closure;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\ExceptionHandler as KernelHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
-
-	/**
-	 * Start the error handling facilities.
-	 *
-	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
-	 */
-	public function startHandling($app)
-	{
-		$this->setExceptionHandler($app['exception.function']);
-
-		// By registering the error handler with a level of -1, we state that we want
-		// all PHP errors converted into ErrorExceptions and thrown which provides
-		// a very strict development environment but prevents any unseen errors.
-		$app['kernel.error'] = ErrorHandler::register(-1);
-
-		if (isset($app['env']) and $app['env'] != 'testing')
-		{
-			$this->registerShutdownHandler();
-		}
-	}
 
 	/**
 	 * Register the service provider.
@@ -38,79 +16,63 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->registerKernelHandlers();
+		$this->registerDisplayers();
 
-		$this->app['exception'] = $this->app->share(function()
+		$this->registerHandler();
+	}
+
+	/**
+	 * Register the exception displayers.
+	 *
+	 * @return void
+	 */
+	protected function registerDisplayers()
+	{
+		$this->registerPlainDisplayer();
+
+		$this->registerDebugDisplayer();
+	}
+
+	/**
+	 * Register the exception handler instance.
+	 *
+	 * @return void
+	 */
+	protected function registerHandler()
+	{
+		$this->app['exception'] = $this->app->share(function($app)
 		{
-			return new Handler;
+			return new Handler($app, $app['exception.plain'], $app['exception.debug']);
 		});
+	}
 
-		$this->registerExceptionHandler();
+	/**
+	 * Register the plain exception displayer.
+	 *
+	 * @return void
+	 */
+	protected function registerPlainDisplayer()
+	{
+		$this->app['exception.plain'] = $this->app->share(function($app)
+		{
+			$handler = new KernelHandler($app['config']['app.debug']);
 
+			return new SymfonyDisplayer($handler);
+		});
+	}
+
+	/**
+	 * Register the Whoops exception displayer.
+	 *
+	 * @return void
+	 */
+	protected function registerDebugDisplayer()
+	{
 		$this->registerWhoops();
-	}
 
-	/**
-	 * Register the HttpKernel error and exception handlers.
-	 *
-	 * @return void
-	 */
-	protected function registerKernelHandlers()
-	{
-		$app = $this->app;
-
-		$this->app['kernel.exception'] = function() use ($app)
+		$this->app['exception.debug'] = $this->app->share(function($app)
 		{
-			return new KernelHandler($app['config']['app.debug']);
-		};
-	}
-
-	/**
-	 * Register the PHP exception handler function.
-	 *
-	 * @return void
-	 */
-	protected function registerExceptionHandler()
-	{
-		list($me, $app) = array($this, $this->app);
-
-		$app['exception.function'] = function() use ($me, $app)
-		{
-			return function($exception) use ($me, $app)
-			{
-				$response = $app['exception']->handle($exception);
-
-				// If one of the custom error handlers returned a response, we will send that
-				// response back to the client after preparing it. This allows a specific
-				// type of exceptions to handled by a Closure giving great flexibility.
-				if ( ! is_null($response))
-				{
-					$response = $app->prepareResponse($response, $app['request']);
-
-					$response->send();
-				}
-				else
-				{
-					$me->displayException($exception);
-				}
-			};
-		};
-	}
-
-	/**
-	 * Register the shutdown handler Closure.
-	 *
-	 * @return void
-	 */
-	protected function registerShutdownHandler()
-	{
-		$app = $this->app;
-
-		register_shutdown_function(function() use ($app)
-		{
-			set_exception_handler(array(new StubShutdownHandler($app), 'handle'));
-
-			$app['kernel.error']->handleFatal();
+			return new WhoopsDisplayer($app['whoops']);
 		});
 	}
 
@@ -125,11 +87,10 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 		$this->app['whoops'] = $this->app->share(function($app)
 		{
-			$whoops = new \Whoops\Run;
-
-			$whoops->writeToOutput(false);
-
-			$whoops->allowQuit(false);
+			// We will instruct Whoops to not exit after it displays the exception as it
+			// will otherwise run out before we can do anything else. We just want to
+			// let the framework go ahead and finish a request on this end instead.
+			with($whoops = new \Whoops\Run)->allowQuit(false);
 
 			return $whoops->pushHandler($app['whoops.handler']);
 		});
@@ -165,7 +126,13 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			with($handler = new PrettyPageHandler)->setEditor('sublime');
 
-			if ( ! is_null($path = $me->resourcePath())) $handler->setResourcesPath($path);
+			// If the resource path exists, we will register the resource path with Whoops
+			// so our custom Laravel branded exception pages will be used when they are
+			// displayed back to the developer. Otherwise, the default pages are run.
+			if ( ! is_null($path = $me->resourcePath()))
+			{
+				$handler->setResourcesPath($path);
+			}
 
 			return $handler;
 		};
@@ -178,52 +145,19 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	public function resourcePath()
 	{
-		if (is_dir($path = $this->app['path.base'].'/vendor/laravel/framework/src/Illuminate/Exception/resources'))
-		{
-			return $path;
-		}
+		if (is_dir($path = $this->getResourcePath())) return $path;
 	}
 
 	/**
-	 * Display the given exception.
+	 * Get the Whoops custom resource path.
 	 *
-	 * @param  \Exception  $exception
-	 * @return void
+	 * @return string
 	 */
-	public function displayException($exception)
+	protected function getResourcePath()
 	{
-		if ($this->app['config']['app.debug'])
-		{
-			return $this->displayWhoopsException($exception);
-		}
+		$base = $this->app['path.base'];
 
-		$this->app['kernel.exception']->handle($exception);
-	}
-
-	/**
-	 * Display a exception using the Whoops library.
-	 *
-	 * @param  \Exception  $exception
-	 * @return void
-	 */
-	protected function displayWhoopsException($exception)
-	{
-		$response = $this->app['whoops']->handleException($exception);
-
-		with(new Response($response, 500))->send();
-	}
-
-	/**
-	 * Set the given Closure as the exception handler.
-	 *
-	 * This function is mainly needed for mocking purposes.
-	 *
-	 * @param  Closure  $handler
-	 * @return mixed
-	 */
-	protected function setExceptionHandler(Closure $handler)
-	{
-		return set_exception_handler($handler);
+		return $base.'/vendor/laravel/framework/src/Illuminate/Exception/resources';
 	}
 
 }
