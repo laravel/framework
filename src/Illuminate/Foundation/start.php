@@ -33,6 +33,7 @@ use Illuminate\Http\Request;
 use Illuminate\Config\FileLoader;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\ProviderRepository;
 
@@ -182,7 +183,9 @@ date_default_timezone_set($config['timezone']);
 |
 */
 
-$app->registerAliasLoader($config['aliases']);
+$aliases = $config['aliases'];
+
+AliasLoader::getInstance($aliases)->register();
 
 /*
 |--------------------------------------------------------------------------

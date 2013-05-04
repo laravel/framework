@@ -150,19 +150,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Register the aliased class loader.
-	 *
-	 * @param  array  $aliases
-	 * @return void
-	 */
-	public function registerAliasLoader(array $aliases)
-	{
-		$loader = AliasLoader::getInstance($aliases);
-
-		$loader->register();
-	}
-
-	/**
 	 * Start the exception handling for the request.
 	 *
 	 * @return void
