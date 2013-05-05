@@ -2,6 +2,19 @@
 
 /*
 |--------------------------------------------------------------------------
+| Set PHP Error Reporting Options
+|--------------------------------------------------------------------------
+|
+| Here we will set the strictest error reporting options, and also turn
+| off PHP's error reporting, since all errors will be handled by the
+| framework and we don't want any output leaking back to the user.
+|
+*/
+
+error_reporting(-1);
+
+/*
+|--------------------------------------------------------------------------
 | Check Extensions
 |--------------------------------------------------------------------------
 |
@@ -30,12 +43,10 @@ if ( ! extension_loaded('mcrypt'))
 */
 
 use Illuminate\Http\Request;
-use Illuminate\Config\FileLoader;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Config\Repository as Config;
-use Illuminate\Foundation\ProviderRepository;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,19 +79,6 @@ if (isset($unitTesting))
 
 /*
 |--------------------------------------------------------------------------
-| Set PHP Error Reporting Options
-|--------------------------------------------------------------------------
-|
-| Here we will set the strictest error reporting options, and also turn
-| off PHP's error reporting, since all errors will be handled by the
-| framework and we don't want any output leaking back to the user.
-|
-*/
-
-error_reporting(-1);
-
-/*
-|--------------------------------------------------------------------------
 | Load The Illuminate Facades
 |--------------------------------------------------------------------------
 |
@@ -96,23 +94,6 @@ Facade::setFacadeApplication($app);
 
 /*
 |--------------------------------------------------------------------------
-| Register The Configuration Loader
-|--------------------------------------------------------------------------
-|
-| The configuration loader is responsible for loading the configuration
-| options for the application. By default we'll use the "file" loader
-| but you are free to use any custom loaders with your application.
-|
-*/
-
-$app->bindIf('config.loader', function($app)
-{
-	return new FileLoader(new Filesystem, $app['path'].'/config');
-
-}, true);
-
-/*
-|--------------------------------------------------------------------------
 | Register The Configuration Repository
 |--------------------------------------------------------------------------
 |
@@ -122,7 +103,7 @@ $app->bindIf('config.loader', function($app)
 |
 */
 
-$config = new Config($app['config.loader'], $env);
+$config = new Config($app->getConfigLoader(), $env);
 
 $app->instance('config', $config);
 
@@ -183,9 +164,7 @@ date_default_timezone_set($config['timezone']);
 |
 */
 
-$aliases = $config['aliases'];
-
-AliasLoader::getInstance($aliases)->register();
+AliasLoader::getInstance($config['aliases'])->register();
 
 /*
 |--------------------------------------------------------------------------
@@ -211,11 +190,9 @@ Request::enableHttpMethodParameterOverride();
 |
 */
 
-$manifestPath = $config['manifest'];
+$providers = $config['providers'];
 
-$services = new ProviderRepository(new Filesystem, $manifestPath);
-
-$services->load($app, $config['providers']);
+$app->getProviderRepository()->load($app, $providers);
 
 /*
 |--------------------------------------------------------------------------
