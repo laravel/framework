@@ -56,15 +56,15 @@ class Filter {
 	{
 		if (isset($values['on']))
 		{
- 			$values['on'] = (array) $values['on'];
-		}
+			$values['on'] = (array) $values['on'];
 
-		// If the "get" method is present in an "on" constraint for the annotation we
-		// will add the "head" method as well, since the "head" method is supposed
-		// to function basically identically to the get methods on the back-end.
-		if (isset($values['on']) and in_array('get', $values['on']))
-		{
-			$values['on'][] = 'head';
+			// If the "get" method is present in an "on" constraint for the annotation we
+			// will add the "head" method as well, since the "head" method is supposed
+			// to function basically identically to the get methods on the back-end.
+			if (in_array('get', $values['on']))
+			{
+				$values['on'][] = 'head';
+			}
 		}
 
 		return $values;
