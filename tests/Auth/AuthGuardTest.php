@@ -52,6 +52,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testAttemptCallsRetrieveByCredentials()
 	{
 		$guard = $this->getGuard();
+		$guard->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('auth.attempt', array(array('foo'), false, true));
 		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(array('foo'));
 		$guard->attempt(array('foo'));
 	}
@@ -61,6 +63,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$guard = $this->getMock('Illuminate\Auth\Guard', array('login'), array($provider, $session, $request));
+		$guard->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('auth.attempt', array(array('foo'), false, true));
 		$user = $this->getMock('Illuminate\Auth\UserInterface');
 		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
 		$guard->getProvider()->shouldReceive('validateCredentials')->with($user, array('foo'))->andReturn(true);
@@ -72,6 +76,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testAttemptReturnsFalseIfUserNotGiven()
 	{
 		$mock = $this->getGuard();
+		$mock->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('auth.attempt', array(array('foo'), false, true));
 		$mock->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn('foo');
 		$this->assertFalse($mock->attempt(array('foo')));
 	}
