@@ -2,6 +2,19 @@
 
 /*
 |--------------------------------------------------------------------------
+| Set PHP Error Reporting Options
+|--------------------------------------------------------------------------
+|
+| Here we will set the strictest error reporting options, and also turn
+| off PHP's error reporting, since all errors will be handled by the
+| framework and we don't want any output leaking back to the user.
+|
+*/
+
+error_reporting(-1);
+
+/*
+|--------------------------------------------------------------------------
 | Check Extensions
 |--------------------------------------------------------------------------
 |
@@ -34,7 +47,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Config\Repository as Config;
-use Illuminate\Foundation\ProviderRepository;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,19 +76,6 @@ if (isset($unitTesting))
 {
 	$app['env'] = $env = $testEnvironment;
 }
-
-/*
-|--------------------------------------------------------------------------
-| Set PHP Error Reporting Options
-|--------------------------------------------------------------------------
-|
-| Here we will set the strictest error reporting options, and also turn
-| off PHP's error reporting, since all errors will be handled by the
-| framework and we don't want any output leaking back to the user.
-|
-*/
-
-error_reporting(-1);
 
 /*
 |--------------------------------------------------------------------------
@@ -165,9 +164,7 @@ date_default_timezone_set($config['timezone']);
 |
 */
 
-$aliases = $config['aliases'];
-
-AliasLoader::getInstance($aliases)->register();
+AliasLoader::getInstance($config['aliases'])->register();
 
 /*
 |--------------------------------------------------------------------------
@@ -193,11 +190,9 @@ Request::enableHttpMethodParameterOverride();
 |
 */
 
-$manifestPath = $config['manifest'];
+$providers = $config['providers'];
 
-$services = new ProviderRepository(new Filesystem, $manifestPath);
-
-$services->load($app, $config['providers']);
+$app->getProviderRepository()->load($app, $providers);
 
 /*
 |--------------------------------------------------------------------------

@@ -11,6 +11,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
+use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -699,6 +700,18 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	public function getConfigLoader()
 	{
 		return new FileLoader(new Filesystem, $this['path'].'/config');
+	}
+
+	/**
+	 * Get the service provider repository instance.
+	 *
+	 * @return \Illuminate\Foundation\ProviderRepository
+	 */
+	public function getProviderRepository()
+	{
+		$manifest = $this['config']['app.manifest'];
+
+		return new ProviderRepository(new Filesystem, $manifest);
 	}
 
 	/**
