@@ -233,7 +233,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 * @param  array   $arguments
 	 * @return string
 	 */
-	protected function detectConsoleEnvironment($base, $environments, array $arguments)
+	protected function detectConsoleEnvironment($base, $environments, $arguments)
 	{
 		foreach ($arguments as $key => $value)
 		{
@@ -520,27 +520,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Determine if the application is currently down for maintenance.
-	 *
-	 * @return bool
-	 */
-	public function isDownForMaintenance()
-	{
-		return file_exists($this['path'].'/storage/meta/down');
-	}
-
-	/**
-	 * Register a maintenance mode event listener.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function down(Closure $callback)
-	{
-		$this['events']->listen('illuminate.app.down', $callback);
-	}
-
-	/**
 	 * Boot the application's service providers.
 	 *
 	 * @return void
@@ -632,18 +611,24 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Set the current application locale.
+	 * Determine if the application is currently down for maintenance.
 	 *
-	 * @param  string  $locale
+	 * @return bool
+	 */
+	public function isDownForMaintenance()
+	{
+		return file_exists($this['path'].'/storage/meta/down');
+	}
+
+	/**
+	 * Register a maintenance mode event listener.
+	 *
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	public function setLocale($locale)
+	public function down(Closure $callback)
 	{
-		$this['config']->set('app.locale', $locale);
-
-		$this['translator']->setLocale($locale);
-
-		$this['events']->fire('locale.changed', array($locale));
+		$this['events']->listen('illuminate.app.down', $callback);
 	}
 
 	/**
@@ -703,6 +688,21 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			return call_user_func($callback, $e);
 		});
+	}
+
+	/**
+	 * Set the current application locale.
+	 *
+	 * @param  string  $locale
+	 * @return void
+	 */
+	public function setLocale($locale)
+	{
+		$this['config']->set('app.locale', $locale);
+
+		$this['translator']->setLocale($locale);
+
+		$this['events']->fire('locale.changed', array($locale));
 	}
 
 	/**
