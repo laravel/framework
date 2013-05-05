@@ -18,6 +18,27 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayGetWithWildcard()
+	{
+		$array = array('users' => array(
+			0 => array(
+				'name' => 'Taylor',
+				'password' => 'abcdef',
+				'friends'  => array('Shawn', 'Dayle')
+			),
+			1 => array(
+				'name' => 'Dayle',
+				'password' => 123456,
+				'friends'  => array('Rommie', 'Jessee')
+			)
+		));
+		$this->assertEquals(array('Taylor', 'Dayle'), array_get($array, 'users.*.name'));
+		$this->assertEquals(array('abcdef', 123456), array_get($array, 'users.*.password'));
+		$this->assertEquals(array(array('Shawn', 'Dayle'), array('Rommie', 'Jessee')), array_get($array, 'users.*.friends'));
+		$this->assertEquals(array('Shawn', 'Dayle', 'Rommie', 'Jessee'), array_get($array, 'users.*.friends.*'));
+	}
+
+
 	public function testArraySet()
 	{
 		$array = array();
