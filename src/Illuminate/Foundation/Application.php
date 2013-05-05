@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
@@ -688,6 +689,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			return call_user_func($callback, $e);
 		});
+	}
+
+	/**
+	 * Get the configuration loader instance.
+	 *
+	 * @return \Illuminate\Config\LoaderInterface
+	 */
+	public function getConfigLoader()
+	{
+		return new FileLoader(new Filesystem, $this['path'].'/config');
 	}
 
 	/**

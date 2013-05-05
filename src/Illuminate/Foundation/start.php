@@ -30,7 +30,6 @@ if ( ! extension_loaded('mcrypt'))
 */
 
 use Illuminate\Http\Request;
-use Illuminate\Config\FileLoader;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
@@ -96,23 +95,6 @@ Facade::setFacadeApplication($app);
 
 /*
 |--------------------------------------------------------------------------
-| Register The Configuration Loader
-|--------------------------------------------------------------------------
-|
-| The configuration loader is responsible for loading the configuration
-| options for the application. By default we'll use the "file" loader
-| but you are free to use any custom loaders with your application.
-|
-*/
-
-$app->bindIf('config.loader', function($app)
-{
-	return new FileLoader(new Filesystem, $app['path'].'/config');
-
-}, true);
-
-/*
-|--------------------------------------------------------------------------
 | Register The Configuration Repository
 |--------------------------------------------------------------------------
 |
@@ -122,7 +104,7 @@ $app->bindIf('config.loader', function($app)
 |
 */
 
-$config = new Config($app['config.loader'], $env);
+$config = new Config($app->getConfigLoader(), $env);
 
 $app->instance('config', $config);
 
