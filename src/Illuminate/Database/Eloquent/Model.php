@@ -1252,9 +1252,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function trashed()
 	{
-		$column = $this->getQualifiedDeletedAtColumn();
+		$instance = new static;
 
-		return $this->newQueryWithDeleted()->whereNotNull($column);
+		$column = $instance->getQualifiedDeletedAtColumn();
+
+		return $instance->newQueryWithDeleted()->whereNotNull($column);
 	}
 
 	/**
