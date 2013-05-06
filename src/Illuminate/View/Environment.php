@@ -248,16 +248,26 @@ class Environment {
 	}
 
 	/**
-	 * Add a piece of shared data to the environment.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
-	public function share($key, $value)
-	{
-		$this->shared[$key] = $value;
-	}
+     * Add an array or a pieces of shared data to the environment.
+     *
+     * @param  mixed  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    public function share($key, $value = '')
+    {
+        if(is_array($key))
+        {
+            foreach($key as $k => $v)
+            {
+                $this->shared[$k] = $v;
+            }
+        }
+        elseif(!empty($value))
+            $this->shared[$key] = $value;
+        else
+            throw new \InvalidArgumentException("Data value for [{$key}] must be cannot be empty.");
+    }
 
 	/**
 	 * Register a view composer event.
