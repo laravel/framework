@@ -72,6 +72,7 @@
 - Added "soft delete" support to Eloquent via new "softDelete" property. `restore` method added to "un-delete".
 - Added `trashed` method to Eloquent model and `trashed` to Eloquent builder.
 - Added `auth.attempt` event and `attempting` method.
+- Allow passing an array to View::share.
 
 ## Beta 4
 
