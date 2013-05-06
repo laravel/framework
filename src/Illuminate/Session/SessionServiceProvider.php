@@ -116,6 +116,11 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerCloseEvent()
 	{
+		if ($this->getDriver() == 'array') return;
+
+		// The cookie toucher is responsbile for updating the expire time on the cookie
+		// so that it is refreshed for each page load. Otherwise it is only set here
+		// once by PHP and never updated on each subsequent page load of the apps.
 		$this->registerCookieToucher();
 
 		$app = $this->app;
@@ -164,6 +169,16 @@ class SessionServiceProvider extends ServiceProvider {
 	protected function getExpireTime($config)
 	{
 		return $config['lifetime'] == 0 ? 0 : time() + ($config['lifetime'] * 60);
+	}
+
+	/**
+	 * Get the session driver name.
+	 *
+	 * @return string
+	 */
+	protected function getDriver()
+	{
+		return $this->app['config']['session.driver'];
 	}
 
 }
