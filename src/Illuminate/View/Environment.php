@@ -248,10 +248,10 @@ class Environment {
 	}
 
 	/**
-     * Add an array or a pieces of shared data to the environment.
+     * Add an array or a piece of shared data to the environment.
      *
      * @param  mixed  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function share($key, $value = '')
