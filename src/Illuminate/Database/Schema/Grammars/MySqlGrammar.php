@@ -387,7 +387,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
-		return 'timestamp default 0';
+		return 'timestamp';
 	}
 
 	/**

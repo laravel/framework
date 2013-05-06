@@ -505,6 +505,16 @@ class Blueprint {
 	}
 
 	/**
+	 * Add a "deleted at" timestamp for the table.
+	 *
+	 * @return void
+	 */
+	public function softDeletes()
+	{
+		$this->timestamp('deleted_at')->nullable();
+	}
+
+	/**
 	 * Create a new binary column on the table.
 	 *
 	 * @param  string  $column
