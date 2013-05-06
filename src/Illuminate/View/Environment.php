@@ -254,9 +254,14 @@ class Environment {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function share($key, $value)
+	public function share($key, $value = null)
 	{
-		$this->shared[$key] = $value;
+		if ( ! is_array($key)) return $this->shared[$key] = $value;
+
+		foreach ($key as $innerKey => $innerValue)
+		{
+			$this->share($innerKey, $innerValue);
+		}
 	}
 
 	/**
