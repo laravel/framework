@@ -545,7 +545,7 @@ class FormBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public static function reset($value, $attributes = array())
+	public function reset($value, $attributes = array())
 	{
 		return $this->input('reset', null, $value, $attributes);
 	}
@@ -563,7 +563,7 @@ class FormBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public static function image($url, $name = null, $attributes = array())
+	public function image($url, $name = null, $attributes = array())
 	{
 		$attributes['src'] = URL::asset($url);
 
