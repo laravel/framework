@@ -84,7 +84,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($file))
 		{
-			$items = array_merge($items, $this->files->getRequire($file));
+			$items = array_replace_recursive($items, $this->files->getRequire($file));
 		}
 
 		return $items;
@@ -207,7 +207,7 @@ class FileLoader implements LoaderInterface {
 	{
 		$this->hints[$namespace] = $hint;
 	}
-	
+
 	/**
 	 * Returns all registered namespaces with the config
 	 * loader.
