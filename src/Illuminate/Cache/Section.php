@@ -42,6 +42,17 @@ class Section {
 	}
 
 	/**
+	 * Check if an item exists in the cache by key
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function has($key)
+	{
+		return ! is_null($this->store->get($this->sectionItemKey($key)));
+	}
+
+	/**
 	 * Store an item in the cache for a given number of minutes.
 	 *
 	 * @param  string  $key
