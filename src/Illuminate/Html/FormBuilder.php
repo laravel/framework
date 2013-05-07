@@ -565,7 +565,7 @@ class FormBuilder {
 	 */
 	public function image($url, $name = null, $attributes = array())
 	{
-		$attributes['src'] = URL::asset($url);
+		$attributes['src'] = $this->url->asset($url);
 
 		return $this->input('image', $name, null, $attributes);
 	}
