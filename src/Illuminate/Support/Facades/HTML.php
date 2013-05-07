@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Support\Facades;
 
-class Html extends Facade {
+class HTML extends Facade {
 
 	/**
 	 * Get the registered name of the component.
