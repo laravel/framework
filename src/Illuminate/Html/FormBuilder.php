@@ -553,11 +553,6 @@ class FormBuilder {
 	/**
 	 * Create a HTML image input element.
 	 *
-	 * <code>
-	 *      // Create an image input element
-	 *      echo Form::image('img/submit.png');
-	 * </code>
-	 *
 	 * @param  string  $url
 	 * @param  string  $name
 	 * @param  array   $attributes
