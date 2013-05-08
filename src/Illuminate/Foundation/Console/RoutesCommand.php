@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class RoutesCommand extends Command {
 
-	/**
+    	/**
 	 * The console command name.
 	 *
 	 * @var string
@@ -105,79 +105,11 @@ class RoutesCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$widths = $this->getCellWidths($routes);
+		$table = $this->getHelperSet()->get('table');
 
-		$this->displayHeadings($widths);
+		$table->setHeaders(array('URI', 'Name', 'Action'))->setRows($routes);
 
-		foreach($routes as $route)
-		{
-			$this->displayRoute($route, $widths);
-		}
-	}
-
-	/**
-	 * Display the route table headings.
-	 *
-	 * @param  array  $widths
-	 * @return void
-	 */
-	protected function displayHeadings(array $widths)
-	{
-		extract($widths);
-
-		$this->comment(str_pad('URI', $uris).str_pad('Name', $names).str_pad('Action', $actions));
-	}
-
-	/**
-	 * Display a route in the route table.
-	 *
-	 * @param  array  $route
-	 * @param  array  $widths
-	 * @return void
-	 */
-	protected function displayRoute(array $route, array $widths)
-	{
-		extract($widths);
-
-		$this->info(
-			str_pad($route['uri'], $uris).str_pad($route['name'], $names).str_pad($route['action'], $actions)
-		);
-	}
-
-	/**
-	 * Get the correct cell spacing per column.
-	 *
-	 * @param  array  $routes
-	 * @return array
-	 */
-	protected function getCellWidths($routes, $padding = 10)
-	{
-		$widths = array();
-
-		foreach($this->getColumns($routes) as $key => $column)
-		{
-			$widths[$key] = max(array_map('strlen', $column)) + $padding;
-		}
-
-		return $widths;
-	}
-
-	/**
-	 * Get the columns for the route table.
-	 *
-	 * @param  array  $routes
-	 * @return array
-	 */
-	protected function getColumns(array $routes)
-	{
-		$columns = array();
-
-		foreach (array('uris', 'actions', 'names') as $key)
-		{
-			$columns[$key] = array_pluck($routes, str_singular($key));
-		}
-
-		return $columns;
+		$table->render($this->getOutput());
 	}
 
 	/**
