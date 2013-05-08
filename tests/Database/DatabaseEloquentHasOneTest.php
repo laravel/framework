@@ -103,7 +103,7 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type('Illuminate\Database\Query\Expression'));
 		$relation->getParent()->shouldReceive('getQuery')->andReturn($parentQuery = m::mock('StdClass'));
 		$parentQuery->shouldReceive('getGrammar')->once()->andReturn($grammar = m::mock('StdClass'));
-		$grammar->shouldReceive('wrap')->once()->with('foo');
+		$grammar->shouldReceive('wrapColumn')->once()->with('foo');
 
 		$relation->getRelationCountQuery($query);
 	}
