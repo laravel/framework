@@ -84,10 +84,22 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($file))
 		{
-			$items = array_replace_recursive($items, $this->files->getRequire($file));
+			$items = $this->mergeEnvironment($items, $file);
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Merge the items in the given file into the items.
+	 *
+	 * @param  array   $items
+	 * @param  string  $file
+	 * @return array
+	 */
+	protected function mergeEnvironment(array $items, $file)
+	{
+		return array_replace_recursive($items, $this->files->getRequire($file));
 	}
 
 	/**
