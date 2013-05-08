@@ -539,6 +539,38 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a HTML reset input element.
+	 *
+	 * @param  string  $value
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function reset($value, $attributes = array())
+	{
+		return $this->input('reset', null, $value, $attributes);
+	}
+
+	/**
+	 * Create a HTML image input element.
+	 *
+	 * <code>
+	 *      // Create an image input element
+	 *      echo Form::image('img/submit.png');
+	 * </code>
+	 *
+	 * @param  string  $url
+	 * @param  string  $name
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function image($url, $name = null, $attributes = array())
+	{
+		$attributes['src'] = $this->url->asset($url);
+
+		return $this->input('image', $name, null, $attributes);
+	}
+
+	/**
 	 * Create a submit button element.
 	 *
 	 * @param  string  $value
