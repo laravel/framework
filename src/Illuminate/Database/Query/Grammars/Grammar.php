@@ -39,6 +39,14 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileSelect(Builder $query)
 	{
+		// If no columns have been specified for the select statement, we will
+		// set them to standard default of retrieving all of the columns on the
+		// table using the "wildcard" column character.
+		if (is_null($query->columns))
+		{
+			$query->columns = array('*');
+		}
+
 		return trim($this->concatenate($this->compileComponents($query)));
 	}
 
