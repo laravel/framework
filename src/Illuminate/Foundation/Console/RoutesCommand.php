@@ -30,11 +30,11 @@ class RoutesCommand extends Command {
 	protected $routes;
 
 	/**
-	 * Only desired route info
+	 * The table helper set.
 	 *
-	 * @var array
+	 * @var \Symfony\Component\Console\Helper\TableHelper
 	 */
-	protected $routesInfo;
+	protected $table;
 
 	/**
 	 * Create a new route command instance.
@@ -56,6 +56,8 @@ class RoutesCommand extends Command {
 	 */
 	public function fire()
 	{
+		$this->table = $this->getHelperSet()->get('table');
+
 		if (count($this->routes) == 0)
 		{
 			return $this->error("Your application doesn't have any routes.");
@@ -105,11 +107,9 @@ class RoutesCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$table = $this->getHelperSet()->get('table');
+		$this->table->setHeaders(array('URI', 'Name', 'Action'))->setRows($routes);
 
-		$table->setHeaders(array('URI', 'Name', 'Action'))->setRows($routes);
-
-		$table->render($this->getOutput());
+		$this->table->render($this->getOutput());
 	}
 
 	/**
