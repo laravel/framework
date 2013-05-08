@@ -38,7 +38,9 @@ class Section {
 	 */
 	public function get($key, $default = null)
 	{
-		return $this->store->get($this->sectionItemKey($key)) ?: value($default);
+		$value = $this->store->get($this->sectionItemKey($key));
+		
+		return ! is_null($value) ? $value : value($default);
 	}
 
 	/**

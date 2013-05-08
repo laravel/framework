@@ -46,7 +46,9 @@ class Repository implements ArrayAccess {
 	 */
 	public function get($key, $default = null)
 	{
-		return $this->store->get($key) ?: value($default);
+		$value = $this->store->get($key);
+		
+		return  ! is_null($value) ? $value : value($default);
 	}
 
 	/**
