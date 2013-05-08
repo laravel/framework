@@ -74,6 +74,7 @@
 - Added `auth.attempt` event and `attempting` method.
 - Allow passing an array to View::share.
 - Added `has` method to cache sections.
+- Allow "dot" notation access into session arrays.
 
 ## Beta 4
 
