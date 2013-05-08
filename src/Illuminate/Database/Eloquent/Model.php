@@ -926,8 +926,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		else
 		{
 			$saved = $this->performInsert($query);
-
-			$this->exists = $saved;
 		}
 
 		if ($saved) $this->finishSave($options);
@@ -1025,6 +1023,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$query->insert($attributes);
 		}
+
+		// We will go ahead and set the exists property to true, so that it is set when
+		// the created event is fired, just in case the developer tries to update it
+		// during the event. This will allow them to do so and run an update here.
+		$this->exists = true;
 
 		$this->fireModelEvent('created', false);
 
