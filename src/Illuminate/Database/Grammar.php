@@ -34,19 +34,6 @@ abstract class Grammar {
 	}
 
 	/**
-	 * Wrap a column in keyword identifiers.
-	 *
-	 * @param  string  $column
-	 * @return string
-	 */
-	public function wrapColumn($column)
-	{
-		if ($this->isExpression($column)) return $this->getValue($column);
-
-		return $this->wrap($column);
-	}
-
-	/**
 	 * Wrap a value in keyword identifiers.
 	 *
 	 * If the optional second parameter is true, all aliases (AS clauses) will

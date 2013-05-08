@@ -477,7 +477,7 @@ class MySqlGrammar extends Grammar {
 	{
 		if ( ! is_null($column->after))
 		{
-			return ' after '.$this->wrapColumn($column->after);
+			return ' after '.$this->wrap($column->after);
 		}
 	}
 

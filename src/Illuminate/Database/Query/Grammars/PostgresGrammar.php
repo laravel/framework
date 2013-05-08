@@ -42,7 +42,7 @@ class PostgresGrammar extends Grammar {
 		// list of the columns that can be added into this update query clauses.
 		foreach ($values as $key => $value)
 		{
-			$columns[] = $this->wrapColumn($key).' = '.$this->parameter($value);
+			$columns[] = $this->wrap($key).' = '.$this->parameter($value);
 		}
 
 		return implode(', ', $columns);
@@ -134,7 +134,7 @@ class PostgresGrammar extends Grammar {
 	{
 		if (is_null($sequence)) $sequence = 'id';
 
-		return $this->compileInsert($query, $values).' returning '.$this->wrapColumn($sequence);
+		return $this->compileInsert($query, $values).' returning '.$this->wrap($sequence);
 	}
 
 	/**

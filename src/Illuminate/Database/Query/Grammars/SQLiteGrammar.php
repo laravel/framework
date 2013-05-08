@@ -17,7 +17,7 @@ class SQLiteGrammar extends Grammar {
 
 		return 'order by '.implode(', ', array_map(function($order) use ($me)
 		{
-			return $me->wrapColumn($order['column']).' collate nocase '.$order['direction'];
+			return $me->wrap($order['column']).' collate nocase '.$order['direction'];
 		}
 		, $orders));
 	}
@@ -58,7 +58,7 @@ class SQLiteGrammar extends Grammar {
 		// then join them all together with select unions to complete the queries.
 		foreach (array_keys($values[0]) as $column)
 		{
-			$columns[] = '? as '.$this->wrapColumn($column);
+			$columns[] = '? as '.$this->wrap($column);
 		}
 
 		$columns = array_fill(0, count($values), implode(', ', $columns));
