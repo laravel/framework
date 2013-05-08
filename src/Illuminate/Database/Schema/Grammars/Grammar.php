@@ -219,16 +219,13 @@ abstract class Grammar extends BaseGrammar {
 	}
 
 	/**
-	 * Wrap a value in keyword identifiers.
-	 *
-	 * @param  string  $value
-	 * @return string
+	 * {@inheritdoc}
 	 */
-	public function wrap($value)
+	public function wrap($value, $prefixAlias = false)
 	{
 		if ($value instanceof Fluent) $value = $value->name;
 
-		return parent::wrap($value);
+		return parent::wrap($value, $prefixAlias);
 	}
 
 	/**
