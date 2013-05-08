@@ -73,6 +73,7 @@
 - Added `trashed` method to Eloquent model and `trashed` to Eloquent builder.
 - Added `auth.attempt` event and `attempting` method.
 - Allow passing an array to View::share.
+- Added `has` method to cache sections.
 
 ## Beta 4
 
