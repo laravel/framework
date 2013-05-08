@@ -75,6 +75,7 @@
 - Allow passing an array to View::share.
 - Added `has` method to cache sections.
 - Allow "dot" notation access into session arrays.
+- Added `smallInteger` to query builder.
 
 ## Beta 4
 

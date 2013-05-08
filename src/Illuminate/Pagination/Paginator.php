@@ -153,17 +153,6 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
-	* Set the base URL in use by the paginator.
-	*
-	* @param  string  $baseUrl
-	* @return void
-	*/
-	public function setBaseUrl($baseUrl)
-	{
-		$this->env->setBaseUrl($baseUrl);
-	}
-
-	/**
 	 * Add a query string value to the paginator.
 	 *
 	 * @param  string  $key
@@ -255,6 +244,17 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getTotal()
 	{
 		return $this->total;
+	}
+
+	/**
+	* Set the base URL in use by the paginator.
+	*
+	* @param  string  $baseUrl
+	* @return void
+	*/
+	public function setBaseUrl($baseUrl)
+	{
+		$this->env->setBaseUrl($baseUrl);
 	}
 
 	/**
