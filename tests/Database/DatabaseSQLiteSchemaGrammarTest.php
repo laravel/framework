@@ -220,7 +220,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null primary key autoincrement', $statements[0]);				
+		$this->assertEquals('alter table "users" add column "foo" integer null primary key autoincrement', $statements[0]);
 	}
 
 
@@ -235,6 +235,17 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingSmallInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->smallInteger('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
+	}
+
+
 	public function testAddingFloat()
 	{
 		$blueprint = new Blueprint('users');
@@ -242,7 +253,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" float null', $statements[0]);		
+		$this->assertEquals('alter table "users" add column "foo" float null', $statements[0]);
 	}
 
 
