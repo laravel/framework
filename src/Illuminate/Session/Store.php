@@ -33,7 +33,7 @@ class Store extends SymfonySession {
 	{
 		foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
 
-		$this->put('flash.old', $this->get('flash.new'));
+		$this->put('flash.old', $this->get('flash.new', array()));
 
 		$this->put('flash.new', array());
 	}
@@ -43,9 +43,7 @@ class Store extends SymfonySession {
 	 */
 	public function get($name, $default = null)
 	{
-		$value = parent::get($name);
-
-		return is_null($value) ? value($default) : $value;
+		return array_get($this->all(), $name, $default);
 	}
 
 	/**
@@ -107,7 +105,11 @@ class Store extends SymfonySession {
 	 */
 	public function put($key, $value)
 	{
-		$this->set($key, $value);
+		$all = $this->all();
+
+		array_set($all, $key, $value);
+
+		$this->replace($all);
 	}
 
 	/**
@@ -212,7 +214,11 @@ class Store extends SymfonySession {
 	 */
 	public function forget($key)
 	{
-		return $this->remove($key);
+		$all = $this->all();
+
+		array_forget($all, $key);
+
+		$this->replace($all);
 	}
 
 	/**
