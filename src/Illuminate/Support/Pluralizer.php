@@ -193,6 +193,8 @@ class Pluralizer {
 		{
 			if (preg_match($pattern = '/'.$pattern.'$/i', $value))
 			{
+				$irregular = static::matchCase($irregular, $value);
+				
 				return preg_replace($pattern, $irregular, $value);
 			}
 		}
@@ -204,9 +206,33 @@ class Pluralizer {
 		{
 			if (preg_match($pattern, $value))
 			{
-				return preg_replace($pattern, $inflected, $value);
+				$inflected = preg_replace($pattern, $inflected, $value);
+
+				return static::matchCase($inflected, $value);
 			}
 		}
+	}
+	
+	/**
+	 * Attempt to match the case on two strings.
+	 *
+	 * @param  string  $value
+	 * @param  string  $comparison
+	 * @return string
+	 */
+	protected static function matchCase($value, $comparison)
+	{
+		$functions = array('mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords');
+
+		foreach ($functions as $function) 
+		{
+			if (call_user_func($function, $comparison) === $comparison)
+			{
+				return call_user_func($function, $value);
+			}
+		}
+
+		return $value;
 	}
 
 }
