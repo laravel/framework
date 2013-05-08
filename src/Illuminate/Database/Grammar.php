@@ -30,16 +30,34 @@ abstract class Grammar {
 	{
 		if ($this->isExpression($table)) return $this->getValue($table);
 
-		return $this->wrap($this->tablePrefix.$table);
+		return $this->wrap($this->tablePrefix.$table, true);
+	}
+
+	/**
+	 * Wrap a column in keyword identifiers.
+	 *
+	 * @param  string  $column
+	 * @return string
+	 */
+	public function wrapColumn($column)
+	{
+		if ($this->isExpression($column)) return $this->getValue($column);
+
+		return $this->wrap($column);
 	}
 
 	/**
 	 * Wrap a value in keyword identifiers.
 	 *
+	 * If the optional second parameter is true, all aliases (AS clauses) will
+	 * be prefixed with the table prefix. This is needed for handling table
+	 * aliases and column aliases differently.
+	 *
 	 * @param  string  $value
+	 * @param  bool    $prefixAlias
 	 * @return string
 	 */
-	public function wrap($value)
+	public function wrap($value, $prefixAlias = false)
 	{
 		if ($this->isExpression($value)) return $this->getValue($value);
 
@@ -49,6 +67,10 @@ abstract class Grammar {
 		if (strpos(strtolower($value), ' as ') !== false)
 		{
 			$segments = explode(' ', $value);
+
+			// If we're handling table names, the table prefix has to be
+			// prepended to aliases, too.
+			if ($prefixAlias) $segments[2] = $this->tablePrefix.$segments[2];
 
 			return $this->wrap($segments[0]).' as '.$this->wrap($segments[2]);
 		}

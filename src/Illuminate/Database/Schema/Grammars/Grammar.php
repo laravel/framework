@@ -118,7 +118,7 @@ abstract class Grammar extends BaseGrammar {
 			// Each of the column types have their own compiler functions which are tasked
 			// with turning the column definition into its SQL format for this platform
 			// used by the connection. The column's modifiers are compiled and added.
-			$sql = $this->wrap($column).' '.$this->getType($column);
+			$sql = $this->wrapColumn($column).' '.$this->getType($column);
 
 			$columns[] = $this->addModifiers($sql, $blueprint, $column);
 		}
