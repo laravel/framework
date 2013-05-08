@@ -224,7 +224,7 @@ class Pluralizer {
 	{
 		$functions = array('mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords');
 
-		foreach ($functions as $function) 
+		foreach ($functions as $function)
 		{
 			if (call_user_func($function, $comparison) === $comparison)
 			{
