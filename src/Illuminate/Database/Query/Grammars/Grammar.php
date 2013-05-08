@@ -149,7 +149,7 @@ class Grammar extends BaseGrammar {
 			// Once we have constructed the clauses, we'll need to take the boolean connector
 			// off of the first clause as it obviously will not be required on that clause
 			// because it leads the rest of the clauses, thus not requiring any boolean.
-			$clauses[0] = preg_replace('/and |or /', '', $clauses[0], 1);
+			$clauses[0] = $this->removeLeadingBoolean($clauses[0]);
 
 			$clauses = implode(' ', $clauses);
 
@@ -636,6 +636,17 @@ class Grammar extends BaseGrammar {
 		{
 			return (string) $value !== '';
 		}));
+	}
+
+	/**
+	 * Remove the leading boolean from a statement.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function removeLeadingBoolean($value)
+	{
+		return preg_replace('/and |or /', '', $value, 1);
 	}
 
 }
