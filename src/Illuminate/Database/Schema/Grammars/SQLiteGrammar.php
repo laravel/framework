@@ -320,6 +320,17 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a small integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSmallInteger(Fluent $column)
+	{
+		return 'integer';
+	}
+
+	/**
 	 * Create the column definition for a float type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
