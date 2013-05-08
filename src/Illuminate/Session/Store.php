@@ -41,6 +41,14 @@ class Store extends SymfonySession {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function has($name)
+	{
+		return ! is_null($this->get($name));
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get($name, $default = null)
 	{
 		return array_get($this->all(), $name, $default);
