@@ -39,6 +39,8 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileSelect(Builder $query)
 	{
+		if (is_null($query->columns)) $query->columns = array('*');
+
 		return trim($this->concatenate($this->compileComponents($query)));
 	}
 
