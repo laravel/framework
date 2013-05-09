@@ -72,6 +72,8 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	protected function setCookie($cookie)
 	{
+		if (headers_sent()) return;
+
 		setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
 	}
 
