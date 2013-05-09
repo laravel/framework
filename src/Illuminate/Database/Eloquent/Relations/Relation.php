@@ -212,7 +212,7 @@ abstract class Relation {
 	{
 		$query->select(new Expression('count(*)'));
 
-		$key = $this->wrap($this->parent->getQualifiedKeyName());
+		$key = $this->wrapColumn($this->parent->getQualifiedKeyName());
 
 		return $query->where($this->getForeignKey(), '=', new Expression($key));
 	}
@@ -298,9 +298,9 @@ abstract class Relation {
 	 * @param  string  $value
 	 * @return string
 	 */
-	public function wrap($value)
+	public function wrapColumn($value)
 	{
-		return $this->parent->getQuery()->getGrammar()->wrap($value);
+		return $this->parent->getQuery()->getGrammar()->wrapColumn($value);
 	}
 
 	/**

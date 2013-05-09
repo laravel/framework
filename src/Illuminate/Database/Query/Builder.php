@@ -1212,7 +1212,7 @@ class Builder {
 	 */
 	public function increment($column, $amount = 1)
 	{
-		$wrapped = $this->grammar->wrap($column);
+		$wrapped = $this->grammar->wrapColumn($column);
 
 		return $this->update(array($column => $this->raw("$wrapped + $amount")));
 	}
@@ -1226,7 +1226,7 @@ class Builder {
 	 */
 	public function decrement($column, $amount = 1)
 	{
-		$wrapped = $this->grammar->wrap($column);
+		$wrapped = $this->grammar->wrapColumn($column);
 
 		return $this->update(array($column => $this->raw("$wrapped - $amount")));
 	}

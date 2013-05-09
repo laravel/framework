@@ -174,9 +174,9 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileJoinConstraint(array $clause)
 	{
-		$first = $this->wrap($clause['first']);
+		$first = $this->wrapColumn($clause['first']);
 
-		$second = $this->wrap($clause['second']);
+		$second = $this->wrapColumn($clause['second']);
 
 		return "{$clause['boolean']} $first {$clause['operator']} $second";
 	}
@@ -241,7 +241,7 @@ class Grammar extends BaseGrammar {
 	{
 		$select = $this->compileSelect($where['query']);
 
-		return $this->wrap($where['column']).' '.$where['operator']." ($select)";
+		return $this->wrapColumn($where['column']).' '.$where['operator']." ($select)";
 	}
 
 	/**
@@ -255,7 +255,7 @@ class Grammar extends BaseGrammar {
 	{
 		$value = $this->parameter($where['value']);
 
-		return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+		return $this->wrapColumn($where['column']).' '.$where['operator'].' '.$value;
 	}
 
 	/**
@@ -267,7 +267,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereBetween(Builder $query, $where)
 	{
-		return $this->wrap($where['column']).' between ? and ?';
+		return $this->wrapColumn($where['column']).' between ? and ?';
 	}
 
 	/**
@@ -305,7 +305,7 @@ class Grammar extends BaseGrammar {
 	{
 		$values = $this->parameterize($where['values']);
 
-		return $this->wrap($where['column']).' in ('.$values.')';
+		return $this->wrapColumn($where['column']).' in ('.$values.')';
 	}
 
 	/**
@@ -319,7 +319,7 @@ class Grammar extends BaseGrammar {
 	{
 		$values = $this->parameterize($where['values']);
 
-		return $this->wrap($where['column']).' not in ('.$values.')';
+		return $this->wrapColumn($where['column']).' not in ('.$values.')';
 	}
 
 	/**
@@ -333,7 +333,7 @@ class Grammar extends BaseGrammar {
 	{
 		$select = $this->compileSelect($where['query']);
 
-		return $this->wrap($where['column']).' in ('.$select.')';
+		return $this->wrapColumn($where['column']).' in ('.$select.')';
 	}
 
 	/**
@@ -347,7 +347,7 @@ class Grammar extends BaseGrammar {
 	{
 		$select = $this->compileSelect($where['query']);
 
-		return $this->wrap($where['column']).' not in ('.$select.')';
+		return $this->wrapColumn($where['column']).' not in ('.$select.')';
 	}
 
 	/**
@@ -359,7 +359,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereNull(Builder $query, $where)
 	{
-		return $this->wrap($where['column']).' is null';
+		return $this->wrapColumn($where['column']).' is null';
 	}
 
 	/**
@@ -371,7 +371,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereNotNull(Builder $query, $where)
 	{
-		return $this->wrap($where['column']).' is not null';
+		return $this->wrapColumn($where['column']).' is not null';
 	}
 
 	/**
@@ -441,7 +441,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileBasicHaving($having)
 	{
-		$column = $this->wrap($having['column']);
+		$column = $this->wrapColumn($having['column']);
 
 		$parameter = $this->parameter($having['value']);
 
@@ -461,7 +461,7 @@ class Grammar extends BaseGrammar {
 
 		return 'order by '.implode(', ', array_map(function($order) use ($me)
 		{
-			return $me->wrap($order['column']).' '.$order['direction'];
+			return $me->wrapColumn($order['column']).' '.$order['direction'];
 		}
 		, $orders));
 	}
@@ -574,7 +574,7 @@ class Grammar extends BaseGrammar {
 
 		foreach ($values as $key => $value)
 		{
-			$columns[] = $this->wrap($key).' = '.$this->parameter($value);
+			$columns[] = $this->wrapColumn($key).' = '.$this->parameter($value);
 		}
 
 		$columns = implode(', ', $columns);
