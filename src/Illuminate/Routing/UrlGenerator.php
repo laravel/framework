@@ -271,7 +271,7 @@ class UrlGenerator {
 	 */
 	protected function getRootUrl($scheme)
 	{
-		$root = $this->request->root();
+		$root = $this->request->getBaseUrl();
 
 		$start = starts_with($root, 'http://') ? 'http://' : 'https://';
 
