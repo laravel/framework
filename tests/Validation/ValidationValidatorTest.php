@@ -400,6 +400,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => '5'), array('foo' => 'Numeric|Min:3'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Array|Min:2'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Min:2'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Array|Min:5'));
+		$this->assertFalse($v->passes());
+
 		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
 		$file->expects($this->any())->method('getSize')->will($this->returnValue(3072));
 		$v = new Validator($trans, array(), array('photo' => 'Min:2'));
@@ -428,6 +437,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('foo' => '22'), array('foo' => 'Numeric|Max:33'));
 		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Array|Max:5'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Max:5'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => array('a', 'b', 'c')), array('foo' => 'Array|Max:2'));
+		$this->assertFalse($v->passes());
 
 		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
 		$file->expects($this->any())->method('getSize')->will($this->returnValue(3072));
