@@ -42,7 +42,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$c = new Collection();
 
 		$this->assertTrue($c->isEmpty());
-	} 
+	}
 
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
@@ -144,7 +144,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$data = new Collection(array(5, 3, 1, 2, 4));
 		$data->sort(function($a, $b)
-		{ 
+		{
 			if ($a === $b)
 			{
 		        return 0;
@@ -162,6 +162,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data->sortBy(function($x) { return $x; });
 
 		$this->assertEquals(array('dayle', 'taylor'), array_values($data->all()));
+	}
+
+
+	public function testReverse()
+	{
+		$data = new Collection(array('zaeed', 'alan'));
+		$data->reverse();
+
+		$this->assertEquals(array('alan', 'zaeed'), array_values($data->all()));
 	}
 
 }

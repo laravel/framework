@@ -222,6 +222,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Reverse items order.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function reverse()
+	{
+		$this->items = array_reverse($this->items);
+
+		return $this;
+	}
+
+	/**
 	 * Reset the keys on the underlying array.
 	 *
 	 * @return \Illuminate\Support\Collection
