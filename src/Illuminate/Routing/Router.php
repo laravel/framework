@@ -597,7 +597,7 @@ class Router {
 	{
 		$segments = explode('.', $resource);
 
-		return $segments[count($segments) - 1];
+		return str_replace('-', '_', $segments[count($segments) - 1]);
 	}
 
 	/**
@@ -1306,7 +1306,7 @@ class Router {
 	 */
 	public function bind($key, $binder)
 	{
-		$this->binders[$key] = $binder;
+		$this->binders[str_replace('-', '_', $key)] = $binder;
 	}
 
 	/**
