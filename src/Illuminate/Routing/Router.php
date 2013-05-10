@@ -532,14 +532,16 @@ class Router {
 		// with slashes. This should create the properly nested resource routes.
 		$nested = implode('/', array_map(function($segment)
 		{
-			return $segment.'/{'.$segment.'}';
+			$wildcard = $this->getResourceWildcard($segment);
+
+			return $segment.'/{'.$wildcard.'}';
 
 		}, $segments = explode('.', $resource)));
 
 		// Once we have built the base URI, we'll remove the wildcard holder for this
 		// base resource name so that the individual route adders can suffix these
 		// paths however they need to, as some do not have any wildcards at all.
-		$last = $segments[count($segments) - 1];
+		$last = $this->getResourceWildcard(last($segments));
 
 		return str_replace('/{'.$last.'}', '', $nested);
 	}
@@ -559,16 +561,23 @@ class Router {
 		// If we have a group stack, we will append the full prefix onto the resource
 		// route name so that we don't override other route with the same name but
 		// a different prefix. We'll then return out the complete action arrays.
-		if (count($this->groupStack) > 0)
-		{
-			$name = $this->getResourcePrefix($resource, $method);
-		}
-		else
-		{
-			$name = $resource.'.'.$method;
-		}
+		$name = $this->getResourceName($resource, $method);
 
 		return array('as' => $name, 'uses' => $controller.'@'.$method);
+	}
+
+	/**
+	 * Get the name for a given resource.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getResourceName($resource, $method)
+	{
+		if (count($this->groupStack) == 0) return $resource.'.'.$method;
+
+		return $this->getResourcePrefix($resource, $method);
 	}
 
 	/**
@@ -597,7 +606,18 @@ class Router {
 	{
 		$segments = explode('.', $resource);
 
-		return str_replace('-', '_', $segments[count($segments) - 1]);
+		return $this->getResourceWildcard($segments[count($segments) - 1]);
+	}
+
+	/**
+	 * Format a resource wildcard parameter.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function getResourceWildcard($value)
+	{
+		return str_replace('-', '_', $value);
 	}
 
 	/**
