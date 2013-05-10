@@ -255,11 +255,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Merge the collection itmes into a single array.
+	 * Collapse the collection items into a single array.
 	 *
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function merge()
+	public function collapse()
 	{
 		$results = array();
 
@@ -267,6 +267,24 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		{
 			$results = array_merge($results, $values);
 		}
+
+		return new Collection($results);
+	}
+
+	/**
+	 * Merge items with the collection items.
+	 *
+	 * @param  \Illuminate\Support\Contracts\ArrayableInterface|array
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function merge($items)
+	{
+		if ($items instanceof ArrayableInterface)
+		{
+			$items = $items->toArray();
+		}
+
+		$results = array_merge($this->items, $items);
 
 		return new Collection($results);
 	}
