@@ -76,6 +76,7 @@
 - Added `has` method to cache sections.
 - Allow "dot" notation access into session arrays.
 - Added `smallInteger` to query builder.
+- Added `dd` and `array_pull` helpers.
 
 ## Beta 4
 
