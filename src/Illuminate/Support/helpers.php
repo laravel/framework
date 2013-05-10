@@ -267,6 +267,25 @@ if ( ! function_exists('array_pluck'))
 	}
 }
 
+if ( ! function_exists('array_pull'))
+{
+	/**
+	 * Get a value from the array, and remove it.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	function array_pull(&$array, $key)
+	{
+		$value = array_get($array, $key);
+
+		array_forget($array, $key);
+
+		return $value;
+	}
+}
+
 if ( ! function_exists('array_set'))
 {
 	/**
