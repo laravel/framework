@@ -5,13 +5,6 @@ use Illuminate\Support\Collection as BaseCollection;
 class Collection extends BaseCollection {
 
 	/**
-	 * A dictionary of available primary keys.
-	 *
-	 * @var array
-	 */
-	protected $dictionary = array();
-
-	/**
 	 * Find a model in the collection by key.
 	 *
 	 * @param  mixed  $key
@@ -20,12 +13,11 @@ class Collection extends BaseCollection {
 	 */
 	public function find($key, $default = null)
 	{
-		if (count($this->dictionary) == 0)
+		return array_first($this->items, function($key, $model) use ($key)
 		{
-			$this->buildDictionary();
-		}
+			return $model->getKey() == $key;
 
-		return array_get($this->dictionary, $key, $default);
+		}, $default);
 	}
 
 	/**
@@ -54,22 +46,6 @@ class Collection extends BaseCollection {
 	{
 		$this->items[] = $item;
 
-		// If the dictionary is empty, we will re-build it upon adding the item so
-		// we can quickly search it from the "contains" method. This dictionary
-		// will give us faster look-up times while searching for given items.
-		if (count($this->dictionary) == 0)
-		{
-			$this->buildDictionary();
-		}
-
-		// If this dictionary has already been initially hydrated, we just need to
-		// add an entry for the added item, which we will do here so that we'll
-		// be able to quickly determine it is in the array when asked for it.
-		elseif ($item instanceof Model)
-		{
-			$this->dictionary[$item->getKey()] = true;
-		}
-
 		return $this;
 	}
 
@@ -81,33 +57,7 @@ class Collection extends BaseCollection {
 	 */
 	public function contains($key)
 	{
-		if (count($this->dictionary) == 0)
-		{
-			$this->buildDictionary();
-		}
-
-		return isset($this->dictionary[$key]);
-	}
-
-	/**
-	 * Build the dictionary of primary keys.
-	 *
-	 * @return void
-	 */
-	protected function buildDictionary()
-	{
-		$this->dictionary = array();
-
-		// By building the dictionary of items by key, we are able to more quickly
-		// access the array and examine it for certain items. This is useful on
-		// the contain method which searches through the list by primary key.
-		foreach ($this->items as $item)
-		{
-			if ($item instanceof Model)
-			{
-				$this->dictionary[$item->getKey()] = $item;
-			}
-		}
+		return ! is_null($this->find($key));
 	}
 
 	/**
@@ -117,9 +67,7 @@ class Collection extends BaseCollection {
 	 */
 	public function modelKeys()
 	{
-		if (count($this->dictionary) === 0) $this->buildDictionary();
-
-		return array_keys($this->dictionary);
+		return array_map(function($m) { return $m->getKey(); }, $this->items);
 	}
 
 }
