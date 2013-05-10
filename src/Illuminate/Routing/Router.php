@@ -253,21 +253,32 @@ class Router {
 		{
 			foreach ($routes as $route)
 			{
-				$action = array('uses' => $controller.'@'.$method);
-
-				// If a given controller method has been named, we will assign the name to
-				// the controller action array. This provides for a short-cut to method
-				// naming, so you don't have to define an individual route for these.
-				if (isset($names[$method]))
-				{
-					$action['as'] = $names[$method];
-				}
-
-				$this->{$route['verb']}($route['uri'], $action);
+				$this->registerInspected($route, $controller, $method, $names);
 			}
 		}
 
 		$this->addFallthroughRoute($controller, $uri);
+	}
+
+	/**
+	 * Register an inspected controller route.
+	 *
+	 * @param  array   $route
+	 * @param  string  $controller
+	 * @param  string  $method
+	 * @param  array   $names
+	 * @return void
+	 */
+	protected function registerInspected($route, $controller, $method, &$names)
+	{
+		$action = array('uses' => $controller.'@'.$method);
+
+		// If a given controller method has been named, we will assign the name to
+		// the controller action array. This provides for a short-cut to method
+		// naming, so you don't have to define an individual route for these.
+		$action['as'] = array_pull($names, $method);
+
+		$this->{$route['verb']}($route['uri'], $action);
 	}
 
 	/**
