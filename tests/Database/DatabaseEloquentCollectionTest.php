@@ -34,6 +34,25 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCollectionMutationAndDictionaryUpdate()
+	{
+		$mockModel = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel->shouldReceive('getKey')->andReturn(1);
+		$c = new Collection(array($mockModel));
+		$mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel2->shouldReceive('getKey')->andReturn(2);
+		$c->add($mockModel2);
+
+		$this->assertTrue($c->contains(1));
+		$this->assertTrue($c->contains(2));
+		$this->assertFalse($c->contains(3));
+		// Remove by index key, not primary key
+		$c->forget(1);
+		$this->assertTrue($c->contains(1));
+		$this->assertFalse($c->contains(2));
+	}
+
+
 	public function testFindMethodFindsModelById()
 	{
 		$mockModel = m::mock('Illuminate\Database\Eloquent\Model');
