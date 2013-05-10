@@ -398,6 +398,8 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
+		if ( ! $column->nullable) return 'timestamp default 0';
+
 		return 'timestamp';
 	}
 
