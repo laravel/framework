@@ -525,18 +525,14 @@ class Router {
 	 */
 	public function getResourceUri($resource)
 	{
-		if ( ! str_contains($resource, '.')) return $resource;
-
 		// To create the nested resource URI, we will simply explode the segments and
 		// create a base URI for each of them, then join all of them back together
 		// with slashes. This should create the properly nested resource routes.
-		$nested = implode('/', array_map(function($segment)
-		{
-			$wildcard = $this->getResourceWildcard($segment);
+		if ( ! str_contains($resource, '.')) return $resource;
 
-			return $segment.'/{'.$wildcard.'}';
+		$segments = explode('.', $resource);
 
-		}, $segments = explode('.', $resource)));
+		$nested = $this->getNestedResourceUri($segments);
 
 		// Once we have built the base URI, we'll remove the wildcard holder for this
 		// base resource name so that the individual route adders can suffix these
@@ -544,6 +540,26 @@ class Router {
 		$last = $this->getResourceWildcard(last($segments));
 
 		return str_replace('/{'.$last.'}', '', $nested);
+	}
+
+	/**
+	 * Get the URI for a nested resource segment array.
+	 *
+	 * @param  array   $segments
+	 * @return string
+	 */
+	protected function getNestedResourceUri(array $segments)
+	{
+		$me = $this;
+
+		// We will spin through the segments and create a place-holder for each of the
+		// resource segments, as well as the resource itself. Then we should get an
+		// entire string for the resource URI that contains all nested resources.
+		return implode('/', array_map(function($s) use ($me)
+		{
+			return $s.'/{'.$this->getResourceWildcard($s).'}';
+
+		}, $segments));
 	}
 
 	/**
@@ -615,7 +631,7 @@ class Router {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected function getResourceWildcard($value)
+	public function getResourceWildcard($value)
 	{
 		return str_replace('-', '_', $value);
 	}
