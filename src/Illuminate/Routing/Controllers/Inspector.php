@@ -42,9 +42,9 @@ class Inspector {
 				// the wildcard place-holders that each "typical" routes would contain.
 				if ($data['plain'] == $prefix.'/index')
 				{
-					$routable[$method->name][] = $this->getIndexData($data, $prefix);
-
 					$routable[$method->name][] = $data;
+
+					$routable[$method->name][] = $this->getIndexData($data, $prefix);
 				}
 
 				// If the routable method is not a special index method, we will just add in
