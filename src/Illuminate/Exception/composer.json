@@ -9,7 +9,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "filp/whoops": "1.0.1",
+        "filp/whoops": "1.0.6",
         "illuminate/support": "4.0.x",
         "symfony/http-foundation": "2.3.x",
         "symfony/http-kernel": "2.3.*"
