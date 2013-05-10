@@ -5,6 +5,13 @@ use Illuminate\Support\Collection as BaseCollection;
 class Collection extends BaseCollection {
 
 	/**
+	 * A cache-hash of items array.
+	 *
+	 * @var string
+	 */
+	protected $hash;
+
+	/**
 	 * A dictionary of available primary keys.
 	 *
 	 * @var array
@@ -20,7 +27,7 @@ class Collection extends BaseCollection {
 	 */
 	public function find($key, $default = null)
 	{
-		if (count($this->dictionary) == 0)
+		if (md5(json_encode($this->items)) != $this->hash)
 		{
 			$this->buildDictionary();
 		}
@@ -57,7 +64,7 @@ class Collection extends BaseCollection {
 		// If the dictionary is empty, we will re-build it upon adding the item so
 		// we can quickly search it from the "contains" method. This dictionary
 		// will give us faster look-up times while searching for given items.
-		if (count($this->dictionary) == 0)
+		if (md5(json_encode($this->items)) != $this->hash)
 		{
 			$this->buildDictionary();
 		}
@@ -81,7 +88,7 @@ class Collection extends BaseCollection {
 	 */
 	public function contains($key)
 	{
-		if (count($this->dictionary) == 0)
+		if (md5(json_encode($this->items)) != $this->hash)
 		{
 			$this->buildDictionary();
 		}
@@ -96,6 +103,8 @@ class Collection extends BaseCollection {
 	 */
 	protected function buildDictionary()
 	{
+		$this->hash = md5(json_encode($this->items));
+
 		$this->dictionary = array();
 
 		// By building the dictionary of items by key, we are able to more quickly
@@ -117,7 +126,7 @@ class Collection extends BaseCollection {
 	 */
 	public function modelKeys()
 	{
-		if (count($this->dictionary) === 0) $this->buildDictionary();
+		if (md5(json_encode($this->items)) != $this->hash) $this->buildDictionary();
 
 		return array_keys($this->dictionary);
 	}
