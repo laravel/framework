@@ -228,9 +228,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function reverse()
 	{
-		$this->items = array_reverse($this->items);
-
-		return $this;
+		return new static(array_reverse($this->items));
 	}
 
 	/**

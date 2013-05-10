@@ -168,9 +168,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testReverse()
 	{
 		$data = new Collection(array('zaeed', 'alan'));
-		$data->reverse();
+		$reversed = $data->reverse();
 
-		$this->assertEquals(array('alan', 'zaeed'), array_values($data->all()));
+		$this->assertEquals(array('alan', 'zaeed'), array_values($reversed->all()));
 	}
 
 }
