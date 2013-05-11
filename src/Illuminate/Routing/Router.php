@@ -557,7 +557,7 @@ class Router {
 		// entire string for the resource URI that contains all nested resources.
 		return implode('/', array_map(function($s) use ($me)
 		{
-			return $s.'/{'.$this->getResourceWildcard($s).'}';
+			return $s.'/{'.$me->getResourceWildcard($s).'}';
 
 		}, $segments));
 	}
