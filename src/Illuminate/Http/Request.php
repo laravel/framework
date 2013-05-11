@@ -30,38 +30,6 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	}
 
 	/**
-	 * Setup the path info for a locale based URI.
-	 *
-	 * @param  array   $locales
-	 * @return string
-	 */
-	public function handleUriLocales(array $locales)
-	{
-		$path = $this->getPathInfo();
-
-		foreach ($locales as $locale)
-		{
-			if (preg_match("#^\/{$locale}(?:$|/)#i", $path))
-			{
-				return $this->removeLocaleFromUri($locale);
-			}
-		}
-	}
-
-	/**
-	 * Remove the given locale from the URI.
-	 *
-	 * @param  string  $locale
-	 * @return string
-	 */
-	protected function removeLocaleFromUri($locale)
-	{
-		$this->pathInfo = '/'.ltrim(substr($this->getPathInfo(), strlen($locale) + 1), '/');
-
-		return $locale;
-	}
-
-	/**
 	 * Get the root URL for the application.
 	 *
 	 * @return string
@@ -225,9 +193,13 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function only($keys)
 	{
+		$results = array();
+
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_intersect_key($this->input(), array_flip((array) $keys));
+		foreach ($keys as $key) $results[$key] = $this->get($key);
+
+		return $results;
 	}
 
 	/**
@@ -240,7 +212,11 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_diff_key($this->input(), array_flip((array) $keys));
+		$results = $this->input();
+
+		foreach ($keys as $key) array_forget($results, $key);
+
+		return $results;
 	}
 
 	/**
@@ -272,7 +248,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return Symfony\Component\HttpFoundation\File\UploadedFile
+	 * @return \Symfony\Component\HttpFoundation\File\UploadedFile
 	 */
 	public function file($key = null, $default = null)
 	{
@@ -440,7 +416,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	/**
 	 * Get the input source for the request.
 	 *
-	 * @return Symfony\Component\HttpFoundation\ParameterBag
+	 * @return \Symfony\Component\HttpFoundation\ParameterBag
 	 */
 	protected function getInputSource()
 	{

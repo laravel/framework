@@ -50,6 +50,19 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	}
 
 	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query)
+	{
+		$query = parent::getRelationCountQuery($query);
+
+		return $query->where($this->morphType, $this->morphClass);
+	}
+
+	/**
 	 * Set the constraints for an eager load of the relation.
 	 *
 	 * @param  array  $models
@@ -72,9 +85,9 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	public function getAndResetWheres()
 	{
 		// We actually need to remove two where clauses from polymorphic queries so we
-		// will make an extra call to remove the first where clause here so that we
-		// remove two total where clause from the query leaving only custom ones.
-		$this->removeFirstWhereClause();
+		// will make an extra call to clear the second where clause here so that it
+		// will not get in the way. This parent method will remove the other one.
+		$this->removeSecondWhereClause();
 
 		return parent::getAndResetWheres();
 	}
@@ -87,7 +100,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 */
 	public function save(Model $model)
 	{
-		$model->setAttribute($this->morphType, $this->morphClass);
+		$model->setAttribute($this->getPlainMorphType(), $this->morphClass);
 
 		return parent::save($model);
 	}
@@ -100,20 +113,32 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 */
 	public function create(array $attributes)
 	{
-		$foreign = array($this->foreignKey => $this->parent->getKey());
+		$foreign = $this->getForeignAttributesForCreate();
 
 		// When saving a polymorphic relationship, we need to set not only the foreign
 		// key, but also the foreign key type, which is typically the class name of
 		// the parent model. This makes the polymorphic item unique in the table.
-		$foreign[$this->morphType] = $this->morphClass;
+		$attributes = array_merge($attributes, $foreign);
 
-		$instance = $this->related->newInstance();
-
-		$instance->setRawAttributes(array_merge($attributes, $foreign));
+		$instance = $this->related->newInstance($attributes);
 
 		$instance->save();
 
 		return $instance;
+	}
+
+	/**
+	 * Get the foreign ID and type for creating a related model.
+	 *
+	 * @return array
+	 */
+	protected function getForeignAttributesForCreate()
+	{
+		$foreign = array($this->getPlainForeignKey() => $this->parent->getKey());
+
+		$foreign[last(explode('.', $this->morphType))] = $this->morphClass;
+
+		return $foreign;
 	}
 
 	/**
@@ -124,6 +149,16 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	public function getMorphType()
 	{
 		return $this->morphType;
+	}
+
+	/**
+	 * Get the plain morph type name without the table.
+	 *
+	 * @return string
+	 */
+	public function getPlainMorphType()
+	{
+		return last(explode('.', $this->morphType));
 	}
 
 	/**

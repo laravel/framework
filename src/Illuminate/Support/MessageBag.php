@@ -19,7 +19,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 *
 	 * @var string
 	 */
-	protected $format = '<span class="help-inline">:message</span>';
+	protected $format = ':message';
 
 	/**
 	 * Create a new message bag instance.

@@ -26,7 +26,7 @@ if ( ! function_exists('app'))
 	 */
 	function app($make = null)
 	{
-		if ($make !== null)
+		if ( ! is_null($make))
 		{
 			return app()->make($make);
 		}
@@ -259,11 +259,30 @@ if ( ! function_exists('array_pluck'))
 	 */
 	function array_pluck($array, $key)
 	{
-		return array_map(function($v) use ($key)
+		return array_map(function($value) use ($key)
 		{
-			return is_object($v) ? $v->$key : $v[$key];
+			return is_object($value) ? $value->$key : $value[$key];
 
 		}, $array);
+	}
+}
+
+if ( ! function_exists('array_pull'))
+{
+	/**
+	 * Get a value from the array, and remove it.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	function array_pull(&$array, $key)
+	{
+		$value = array_get($array, $key);
+
+		array_forget($array, $key);
+
+		return $value;
 	}
 }
 
@@ -315,9 +334,7 @@ if ( ! function_exists('asset'))
 	 */
 	function asset($path, $secure = null)
 	{
-		$app = app();
-
-		return $app['url']->asset($path, $secure);
+		return app('url')->asset($path, $secure);
 	}
 }
 
@@ -373,16 +390,30 @@ if ( ! function_exists('csrf_token'))
 	 */
 	function csrf_token()
 	{
-		$app = app();
+		$session = app('session');
 
-		if (isset($app['session']))
+		if (isset($session))
 		{
-			return $app['session']->getToken();
+			return $session->getToken();
 		}
 		else
 		{
 			throw new RuntimeException("Application session store not set.");
 		}
+	}
+}
+
+if ( ! function_exists('dd'))
+{
+	/**
+	 * Dump the passed variables and end the script.
+	 *
+	 * @param  dynamic  mixed
+	 * @return void
+	 */
+	function dd()
+	{
+		array_map(function($x) { var_dump($x); }, func_get_args()); die;
 	}
 }
 
@@ -442,9 +473,21 @@ if ( ! function_exists('link_to'))
 	 */
 	function link_to($url, $title = null, $attributes = array(), $secure = null)
 	{
-		$app = app();
+		return app('html')->link($url, $title, $attributes, $secure);
+	}
+}
 
-		return $app['html']->link($url, $title, $attributes, $secure);
+if ( ! function_exists('last'))
+{
+	/**
+	 * Get the last element from an array.
+	 *
+	 * @param  array  $array
+	 * @return mixed
+	 */
+	function last($array)
+	{
+		return end($array);
 	}
 }
 
@@ -461,9 +504,7 @@ if ( ! function_exists('link_to_asset'))
 	 */
 	function link_to_asset($url, $title = null, $attributes = array(), $secure = null)
 	{
-		$app = app();
-
-		return $app['html']->linkAsset($url, $title, $attributes, $secure);
+		return app('html')->linkAsset($url, $title, $attributes, $secure);
 	}
 }
 
@@ -480,9 +521,7 @@ if ( ! function_exists('link_to_route'))
 	 */
 	function link_to_route($name, $title = null, $parameters = array(), $attributes = array())
 	{
-		$app = app();
-
-		return $app['html']->linkRoute($name, $title, $parameters, $attributes);
+		return app('html')->linkRoute($name, $title, $parameters, $attributes);
 	}
 }
 
@@ -499,9 +538,35 @@ if ( ! function_exists('link_to_action'))
 	 */
 	function link_to_action($action, $title = null, $parameters = array(), $attributes = array())
 	{
-		$app = app();
+		return app('html')->linkAction($action, $title, $parameters, $attributes);
+	}
+}
 
-		return $app['html']->linkAction($action, $title, $parameters, $attributes);
+if ( ! function_exists('object_get'))
+{
+	/**
+	 * Get an item from an object using "dot" notation.
+	 *
+	 * @param  object  $object
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	function object_get($object, $key, $default = null)
+	{
+		if (is_null($key)) return $object;
+		
+		foreach (explode('.', $key) as $segment)
+		{
+			if ( ! is_object($object) or ! isset($object->{$segment}))
+			{
+				return value($default);
+			}
+
+			$object = $object->{$segment};
+		}
+
+		return $object;
 	}
 }
 
@@ -530,9 +595,7 @@ if ( ! function_exists('route'))
 	 */
 	function route($route, $parameters = array(), $absolute = true)
 	{
-		$app = app();
-
-		return $app['url']->route($route, $parameters, $absolute);
+		return app('url')->route($route, $parameters, $absolute);
 	}
 }
 
@@ -725,9 +788,7 @@ if ( ! function_exists('trans'))
 	 */
 	function trans($id, $parameters = array(), $domain = 'messages', $locale = null)
 	{
-		$app = app();
-
-		return $app['translator']->trans($id, $parameters, $domain, $locale);
+		return app('translator')->trans($id, $parameters, $domain, $locale);
 	}
 }
 
@@ -745,9 +806,7 @@ if ( ! function_exists('trans_choice'))
 	 */
 	function trans_choice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
 	{
-		$app = app();
-
-		return $app['translator']->transChoice($id, $number, $parameters, $domain, $locale);
+		return app('translator')->transChoice($id, $number, $parameters, $domain, $locale);
 	}
 }
 
@@ -763,9 +822,7 @@ if ( ! function_exists('url'))
 	 */
 	function url($path = null, $parameters = array(), $secure = null)
 	{
-		$app = app();
-
-		return $app['url']->to($path, $parameters, $secure);
+		return app('url')->to($path, $parameters, $secure);
 	}
 }
 

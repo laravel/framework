@@ -48,6 +48,20 @@ class Builder {
 	}
 
 	/**
+	 * Determine if the given table has a given column.
+	 *
+	 * @param  string  $table
+	 * @param  string  $column
+	 * @return bool
+	 */
+	public function hasColumn($table, $column)
+	{
+		$schema = $this->connection->getDoctrineSchemaManager();
+
+		return in_array($column, array_keys($schema->listTableColumns($table)));
+	}
+
+	/**
 	 * Modify a table on the schema.
 	 *
 	 * @param  string   $table

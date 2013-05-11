@@ -56,15 +56,15 @@ class Filter {
 	{
 		if (isset($values['on']))
 		{
- 			$values['on'] = (array) $values['on'];
-		}
+			$values['on'] = (array) $values['on'];
 
-		// If the "get" method is present in an "on" constraint for the annotation we
-		// will add the "head" method as well, since the "head" method is supposed
-		// to function basically identically to the get methods on the back-end.
-		if (isset($values['on']) and in_array('get', $values['on']))
-		{
-			$values['on'][] = 'head';
+			// If the "get" method is present in an "on" constraint for the annotation we
+			// will add the "head" method as well, since the "head" method is supposed
+			// to function basically identically to the get methods on the back-end.
+			if (in_array('get', $values['on']))
+			{
+				$values['on'][] = 'head';
+			}
 		}
 
 		return $values;
@@ -73,7 +73,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies to a request and method.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */
@@ -95,7 +95,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies based on the "on" rule.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */
@@ -109,7 +109,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies based on the "only" rule.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */
@@ -121,7 +121,7 @@ class Filter {
 	/**
 	 * Determine if the filter applies based on the "except" rule.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */

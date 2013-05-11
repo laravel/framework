@@ -68,15 +68,13 @@ class Message {
 	/**
 	 * Add a recipient to the message.
 	 *
-	 * @param  string  $address
+	 * @param  string|array  $address
 	 * @param  string  $name
 	 * @return \Illuminate\Mail\Message
 	 */
 	public function to($address, $name = null)
 	{
-		$this->swift->addTo($address, $name);
-
-		return $this;
+		return $this->addAddresses($address, $name, 'To');
 	}
 
 	/**
@@ -88,9 +86,7 @@ class Message {
 	 */
 	public function cc($address, $name = null)
 	{
-		$this->swift->addCc($address, $name);
-
-		return $this;
+		return $this->addAddresses($address, $name, 'Cc');
 	}
 
 	/**
@@ -102,9 +98,7 @@ class Message {
 	 */
 	public function bcc($address, $name = null)
 	{
-		$this->swift->addBcc($address, $name);
-
-		return $this;
+		return $this->addAddresses($address, $name, 'Bcc');
 	}
 
 	/**
@@ -116,7 +110,26 @@ class Message {
 	 */
 	public function replyTo($address, $name = null)
 	{
-		$this->swift->addReplyTo($address, $name);
+		return $this->addAddresses($address, $name, 'ReplyTo');
+	}
+
+	/**
+	 * Add a recipient to the message.
+	 *
+	 * @param  string|array  $address
+	 * @param  string  $name
+	 * @return \Illuminate\Mail\Message
+	 */
+	protected function addAddresses($address, $name, $type)
+	{
+		if (is_array($address))
+		{
+			$this->swift->{"set{$type}"}($address, $name);
+		}
+		else
+		{
+			$this->swift->{"add{$type}"}($address, $name);
+		}
 
 		return $this;
 	}

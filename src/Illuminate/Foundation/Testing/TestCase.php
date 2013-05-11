@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Testing;
 
+use Illuminate\View\View;
 use Illuminate\Auth\UserInterface;
 
 class TestCase extends \PHPUnit_Framework_TestCase {
@@ -127,7 +128,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function assertResponseOk()
 	{
-		return $this->assertTrue($this->client->getResponse()->isOk());
+		$response = $this->client->getResponse();
+
+		$actual = $response->getStatusCode();
+
+		return $this->assertTrue($response->isOk(), 'Expected status code 200, got ' .$actual);
 	}
 
 	/**
@@ -142,6 +147,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		if (is_array($key)) return $this->assertViewHasAll($key);
 
 		$response = $this->client->getResponse()->original;
+
+		if ( ! $response instanceof View)
+		{
+			return $this->assertTrue(false, 'The response was not a view.');
+		}
 
 		if (is_null($value))
 		{
@@ -260,12 +270,30 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Assert that the session has errors bound.
-	 *
+	 * 
+	 * @param  string|array  $bindings
+	 * @param  mixed  $format
 	 * @return void
 	 */
-	public function assertSessionHasErrors()
+	public function assertSessionHasErrors($bindings = array(), $format = null)
 	{
-		return $this->assertSessionHas('errors');
+		$this->assertSessionHas('errors');
+
+		$bindings = (array)$bindings;
+
+		$errors = $this->app['session']->get('errors');
+
+		foreach ($bindings as $key => $value)
+		{
+			if (is_int($key))
+			{
+				$this->assertTrue($errors->has($value));
+			}
+			else
+			{
+				$this->assertContains($value, $errors->get($key, $format));
+			}
+		}
 	}
 
 	/**
@@ -295,7 +323,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * Create a new HttpKernel client instance.
 	 *
 	 * @param  array  $server
-	 * @return Symfony\Component\HttpKernel\Client
+	 * @return \Symfony\Component\HttpKernel\Client
 	 */
 	protected function createClient(array $server = array())
 	{

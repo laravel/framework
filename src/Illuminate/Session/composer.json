@@ -11,11 +11,9 @@
         "php": ">=5.3.0",
         "illuminate/cache": "4.0.x",
         "illuminate/cookie": "4.0.x",
-        "illuminate/database": "4.0.x",
         "illuminate/encryption": "4.0.x",
-        "illuminate/filesystem": "4.0.x",
         "illuminate/support": "4.0.x",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/http-foundation": "2.3.*"
     },
     "require-dev": {
         "illuminate/console": "4.0.x",

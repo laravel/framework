@@ -5,6 +5,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
+use Symfony\Component\HttpFoundation\Response;
 
 class Guard {
 
@@ -35,6 +36,13 @@ class Guard {
 	 * @var \Illuminate\Cookie\CookieJar
 	 */
 	protected $cookie;
+
+	/**
+	 * The request instance.
+	 *
+	 * @var \Symfony\Component\HttpFoundation\Request
+	 */
+	protected $request;
 
 	/**
 	 * The cookies queued by the guards.
@@ -152,7 +160,7 @@ class Guard {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function stateless(array $credentials = array())
+	public function once(array $credentials = array())
 	{
 		if ($this->validate($credentials))
 		{
@@ -176,6 +184,83 @@ class Guard {
 	}
 
 	/**
+	 * Attempt to authenticate using HTTP Basic Auth.
+	 *
+	 * @param  string  $field
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @return \Symfony\Component\HttpFoundation\Response|null
+	 */
+	public function basic($field = 'email', Request $request = null)
+	{
+		if ($this->check()) return;
+
+		$request = $request ?: $this->getRequest();
+
+		// If a username is set on the HTTP basic request, we will return out without
+		// interrupting the request lifecycle. Otherwise, we'll need to generate a
+		// request indicating that the given credentials were invalid for login.
+		if ($request->getUser())
+		{
+			if ($this->attemptBasic($request, $field)) return;
+		}
+		
+		return $this->getBasicResponse();
+	}
+
+	/**
+	 * Perform a stateless HTTP Basic login attempt.
+	 *
+	 * @param  string  $field
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @return \Symfony\Component\HttpFoundation\Response|null
+	 */
+	public function onceBasic($field = 'email', Request $request = null)
+	{
+		$request = $request ?: $this->getRequest();
+
+		if ( ! $this->once($this->getBasicCredentials($request, $field)))
+		{
+			return $this->getBasicResponse();
+		}
+	}
+
+	/**
+	 * Attempt to authenticate using basic authentication.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  string  $field
+	 * @return bool
+	 */
+	protected function attemptBasic(Request $request, $field)
+	{
+		return $this->attempt($this->getBasicCredentials($request, $field));
+	}
+
+	/**
+	 * Get the credential array for a HTTP Basic request.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  string  $field
+	 * @return array
+	 */
+	protected function getBasicCredentials(Request $request, $field)
+	{
+		return array($field => $request->getUser(), 'password' => $request->getPassword());
+	}
+
+	/**
+	 * Get the response for basic authentication.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	protected function getBasicResponse()
+	{
+		$headers = array('WWW-Authenticate' => 'Basic');
+
+		return new Response('Invalid credentials.', 401, $headers);
+	}
+
+	/**
 	 * Attempt to authenticate a user using the given credentials.
 	 *
 	 * @param  array  $credentials
@@ -185,6 +270,8 @@ class Guard {
 	 */
 	public function attempt(array $credentials = array(), $remember = false, $login = true)
 	{
+		$this->fireAttemptEvent($credentials, $remember, $login);
+
 		$user = $this->provider->retrieveByCredentials($credentials);
 
 		// If an implementation of UserInterface was returned, we'll ask the provider
@@ -201,6 +288,38 @@ class Guard {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Fire the attempt event with the arguments.
+	 *
+	 * @param  array  $credentials
+	 * @param  bool   $remember
+	 * @param  bool   $login
+	 * @return void
+	 */
+	protected function fireAttemptEvent(array $credentials, $remember, $login)
+	{
+		if ($this->events)
+		{
+			$payload = array_values(compact('credentials', 'remember', 'login'));
+
+			$this->events->fire('auth.attempt', $payload);
+		}
+	}
+
+	/**
+	 * Register an authentication attempt event listener.
+	 *
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function attempting($callback)
+	{
+		if ($this->events)
+		{
+			$this->events->listen('auth.attempt', $callback);
+		}
 	}
 
 	/**
@@ -253,7 +372,7 @@ class Guard {
 	 * Create a remember me cookie for a given ID.
 	 *
 	 * @param  mixed  $id
-	 * @return Symfony\Component\HttpFoundation\Cookie
+	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
 	protected function createRecaller($id)
 	{
@@ -291,6 +410,16 @@ class Guard {
 		$recaller = $this->getRecallerName();
 
 		$this->queuedCookies[] = $this->getCookieJar()->forget($recaller);
+	}
+
+	/**
+	 * Get the cookies queued by the guard.
+	 *
+	 * @return array
+	 */
+	public function getQueuedCookies()
+	{
+		return $this->queuedCookies;
 	}
 
 	/**
@@ -350,16 +479,6 @@ class Guard {
 	}
 
 	/**
-	 * Get the cookies queued by the guard.
-	 *
-	 * @return array
-	 */
-	public function getQueuedCookies()
-	{
-		return $this->queuedCookies;
-	}
-
-	/**
 	 * Get the user provider used by the guard.
 	 *
 	 * @return \Illuminate\Auth\UserProviderInterface
@@ -390,6 +509,29 @@ class Guard {
 		$this->user = $user;
 
 		$this->loggedOut = false;
+	}
+
+	/**
+	 * Get the current request instance.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request ?: Request::createFromGlobals();
+	}
+
+	/**
+	 * Set the current request instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request
+	 * @return \Illuminate\Auth\Guard
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
+
+		return $this;
 	}
 
 	/**

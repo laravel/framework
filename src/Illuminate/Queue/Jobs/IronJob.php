@@ -6,13 +6,6 @@ use Illuminate\Container\Container;
 class IronJob extends Job {
 
 	/**
-	 * The IoC container instance.
-	 *
-	 * @var \Illuminate\Container
-	 */
-	protected $container;
-
-	/**
 	 * The IronMQ instance.
 	 *
 	 * @var IronMQ
@@ -36,7 +29,7 @@ class IronJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @param  IronMQ    $iron
 	 * @param  StdClass  $job
 	 * @param  string    $queue
@@ -60,14 +53,7 @@ class IronJob extends Job {
 	 */
 	public function fire()
 	{
-		// Once we have the message payload, we can create the given class and fire
-		// it off with the given data. The data is in the messages serialized so
-		// we will unserialize it and pass into the jobs in its original form.
-		$payload = json_decode($this->job->body, true);
-
-		$this->instance = $this->container->make($payload['job']);
-
-		$this->instance->fire($this, $payload['data']);
+		$this->resolveAndFire(json_decode($this->job->body, true));
 	}
 
 	/**
@@ -77,6 +63,8 @@ class IronJob extends Job {
 	 */
 	public function delete()
 	{
+		if (isset($this->job->pushed)) return;
+
 		$this->iron->deleteMessage($this->queue, $this->job->id);
 	}
 
@@ -104,7 +92,7 @@ class IronJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container
+	 * @return \Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{

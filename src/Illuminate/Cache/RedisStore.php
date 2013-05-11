@@ -122,6 +122,17 @@ class RedisStore implements StoreInterface {
 	}
 
 	/**
+	 * Begin executing a new section operation.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Cache\Section
+	 */
+	public function section($name)
+	{
+		return new RedisSection($this, $name);
+	}
+
+	/**
 	 * Get the Redis database instance.
 	 *
 	 * @return \Illuminate\Redis\Database
@@ -129,6 +140,16 @@ class RedisStore implements StoreInterface {
 	public function getRedis()
 	{
 		return $this->redis;
+	}
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return $this->prefix;
 	}
 
 }

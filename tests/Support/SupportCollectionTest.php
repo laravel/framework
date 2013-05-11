@@ -42,14 +42,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$c = new Collection();
 
 		$this->assertTrue($c->isEmpty());
-	} 
+	}
 
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
-		$item1 = m::mock('stdClass');
+		$item1 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
 		$item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-		$item2 = m::mock('stdClass');
+		$item2 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
 		$item2->shouldReceive('toArray')->once()->andReturn('bar.array');
 		$c = new Collection(array($item1, $item2));
 		$results = $c->toArray();
@@ -86,6 +86,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(isset($c['name']));
 		unset($c['name']);
 		$this->assertFalse(isset($c['name']));
+		$c[] = 'jason';
+		$this->assertEquals('jason', $c[0]);
 	}
 
 
@@ -131,10 +133,58 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testMerge()
+	public function testMergeArray()
+	{
+		$c = new Collection(array('name' => 'Hello'));
+		$this->assertEquals(array('name' => 'Hello', 'id' => 1), $c->merge(array('id' => 1))->all());
+	}
+
+
+	public function testMergeCollection()
+	{
+		$c = new Collection(array('name' => 'Hello'));
+		$this->assertEquals(array('name' => 'World', 'id' => 1), $c->merge(new Collection(array('name' => 'World', 'id' => 1)))->all());
+	}
+
+
+	public function testCollapse()
 	{
 		$data = new Collection(array(array($object1 = new StdClass), array($object2 = new StdClass)));
-		$this->assertEquals(array($object1, $object2), $data->merge()->all());
+		$this->assertEquals(array($object1, $object2), $data->collapse()->all());
+	}
+
+
+	public function testSort()
+	{
+		$data = new Collection(array(5, 3, 1, 2, 4));
+		$data->sort(function($a, $b)
+		{
+			if ($a === $b)
+			{
+		        return 0;
+		    }
+		    return ($a < $b) ? -1 : 1;
+		});
+
+		$this->assertEquals(range(1, 5), array_values($data->all()));
+	}
+
+
+	public function testSortBy()
+	{
+		$data = new Collection(array('taylor', 'dayle'));
+		$data->sortBy(function($x) { return $x; });
+
+		$this->assertEquals(array('dayle', 'taylor'), array_values($data->all()));
+	}
+
+
+	public function testReverse()
+	{
+		$data = new Collection(array('zaeed', 'alan'));
+		$reversed = $data->reverse();
+
+		$this->assertEquals(array('alan', 'zaeed'), array_values($reversed->all()));
 	}
 
 }

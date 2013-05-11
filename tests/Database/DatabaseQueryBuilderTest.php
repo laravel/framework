@@ -133,6 +133,26 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUnions()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->where('id', '=', 1);
+		$builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
+		$this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ?', $builder->toSql());
+		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+	}
+
+
+	public function testUnionAlls()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->where('id', '=', 1);
+		$builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
+		$this->assertEquals('select * from "users" where "id" = ? union all select * from "users" where "id" = ?', $builder->toSql());
+		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+	}
+
+
 	public function testSubSelectWhereIns()
 	{
 		$builder = $this->getBuilder();
@@ -513,6 +533,33 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', array('foo', 'bar', 1))->andReturn(1);
 		$result = $builder->from('users')->where('id', '=', 1)->update(array('email' => 'foo', 'name' => 'bar'));
+		$this->assertEquals(1, $result);
+	}
+
+
+	public function testUpdateMethodWithJoins()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" set "email" = ?, "name" = ? where "users"."id" = ?', array('foo', 'bar', 1))->andReturn(1);
+		$result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(array('email' => 'foo', 'name' => 'bar'));
+		$this->assertEquals(1, $result);
+	}
+
+
+	public function testUpdateMethodWithoutJoinsOnPostgres()
+	{
+		$builder = $this->getPostgresBuilder();
+		$builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', array('foo', 'bar', 1))->andReturn(1);
+		$result = $builder->from('users')->where('id', '=', 1)->update(array('email' => 'foo', 'name' => 'bar'));
+		$this->assertEquals(1, $result);
+	}
+
+
+	public function testUpdateMethodWithJoinsOnPostgres()
+	{
+		$builder = $this->getPostgresBuilder();
+		$builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"', array('foo', 'bar', 1))->andReturn(1);
+		$result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(array('email' => 'foo', 'name' => 'bar'));
 		$this->assertEquals(1, $result);
 	}
 

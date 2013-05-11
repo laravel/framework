@@ -3,6 +3,7 @@
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
 class BelongsToMany extends Relation {
@@ -167,9 +168,22 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query)
+	{
+		$this->setJoin($query);
+
+		return parent::getRelationCountQuery($query);
+	}
+
+	/**
 	 * Set the select clause for the relation query.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Relation\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
 	{
@@ -206,10 +220,13 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the join clause for the relation query.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Relation\BelongsToMany
+	 * @param  \Illuminate\Database\Eloquent\Builder|null
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
-	protected function setJoin()
+	protected function setJoin($query = null)
 	{
+		$query = $query ?: $this->query;
+
 		// We need to join to the intermediate table on the related model's primary
 		// key column with the intermediate table's foreign key for the related
 		// model instance. Then we can set the "where" for the parent models.
@@ -217,7 +234,7 @@ class BelongsToMany extends Relation {
 
 		$key = $baseTable.'.'.$this->related->getKeyName();
 
-		$this->query->join($this->table, $key, '=', $this->getOtherKey());
+		$query->join($this->table, $key, '=', $this->getOtherKey());
 
 		return $this;
 	}
@@ -225,7 +242,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the where clause for the relation query.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Relation\BelongsToMany
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function setWhere()
 	{

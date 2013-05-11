@@ -7,7 +7,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -35,7 +35,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Create a new file configuration loader.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $defaultPath
 	 * @return void
 	 */
@@ -84,10 +84,22 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($file))
 		{
-			$items = array_merge($items, $this->files->getRequire($file));
+			$items = $this->mergeEnvironment($items, $file);
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Merge the items in the given file into the items.
+	 *
+	 * @param  array   $items
+	 * @param  string  $file
+	 * @return array
+	 */
+	protected function mergeEnvironment(array $items, $file)
+	{
+		return array_replace_recursive($items, $this->files->getRequire($file));
 	}
 
 	/**
@@ -132,13 +144,13 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Apply any cascades to an array of package options.
 	 *
-	 * @param  string  $environment
+	 * @param  string  $env
 	 * @param  string  $package
 	 * @param  string  $group
 	 * @param  array   $items
 	 * @return array
 	 */
-	public function cascadePackage($environment, $package, $group, $items)
+	public function cascadePackage($env, $package, $group, $items)
 	{
 		// First we will look for a configuration file in the packages configuration
 		// folder. If it exists, we will load it and merge it with these original
@@ -153,7 +165,7 @@ class FileLoader implements LoaderInterface {
 		// Once we have merged the regular package configuration we need to look for
 		// an environment specific configuration file. If one exists, we will get
 		// the contents and merge them on top of this array of options we have.
-		$path = $this->defaultPath."/{$environment}/".$file;
+		$path = $this->getPackagePath($env, $package, $group);
 
 		if ($this->files->exists($path))
 		{
@@ -161,6 +173,21 @@ class FileLoader implements LoaderInterface {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Get the package path for an environment and group.
+	 *
+	 * @param  string  $env
+	 * @param  string  $package
+	 * @param  string  $group
+	 * @return string
+	 */
+	protected function getPackagePath($env, $package, $group)
+	{
+		$file = "packages/{$package}/{$env}/{$group}.php";
+
+		return $this->defaultPath.'/'.$file;
 	}
 
 	/**
@@ -192,7 +219,7 @@ class FileLoader implements LoaderInterface {
 	{
 		$this->hints[$namespace] = $hint;
 	}
-	
+
 	/**
 	 * Returns all registered namespaces with the config
 	 * loader.
@@ -218,7 +245,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Get the Filesystem instance.
 	 *
-	 * @return \Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{

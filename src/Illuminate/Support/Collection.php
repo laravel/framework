@@ -15,7 +15,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 *
 	 * @var array
 	 */
-	protected $items;
+	protected $items = array();
 
 	/**
 	 * Create a new collection.
@@ -29,6 +29,34 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Determine if an item exists in the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @return bool
+	 */
+	public function has($key)
+	{
+		return array_key_exists($key, $this->items);
+	}
+
+	/**
+	 * Get an item from the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @param  mixed  $default
+	 * @return mixed
+	 */
+	public function get($key, $default = null)
+	{
+		if (array_key_exists($key, $this->items))
+		{
+			return $this->items[$key];
+		}
+
+		return value($default);
+	}
+
+	/**
 	 * Get all of the items in the collection.
 	 *
 	 * @return array
@@ -36,6 +64,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function all()
 	{
 		return $this->items;
+	}
+
+	/**
+	 * Put an item in the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function put($key, $value)
+	{
+		$this->items[$key] = $value;
 	}
 
 	/**
@@ -69,6 +109,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Push an item onto the beginning of the collection.
+	 *
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function push($value)
+	{
+		array_unshift($this->items, $value);
+	}
+
+	/**
 	 * Get and remove the last item from the collection.
 	 *
 	 * @return mixed|null
@@ -76,6 +127,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function pop()
 	{
 		return array_pop($this->items);
+	}
+
+	/**
+	 * Remove an item from the collection by key.
+	 *
+	 * @param  mixed  $key
+	 * @return void
+	 */
+	public function forget($key)
+	{
+		unset($this->items[$key]);
 	}
 
 	/**
@@ -99,7 +161,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function map(Closure $callback)
 	{
-		return array_map($callback, $this->items);
+		return new static(array_map($callback, $this->items));
 	}
 
 	/**
@@ -110,15 +172,69 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function filter(Closure $callback)
 	{
-		$this->items = array_filter($this->items, $callback);
+		return new static(array_filter($this->items, $callback));
+	}
+
+	/**
+	 * Sort through each item with a callback.
+	 *
+	 * @param  Closure  $callback
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function sort(Closure $callback)
+	{
+		uasort($this->items, $callback);
 
 		return $this;
 	}
 
 	/**
+	 * Sort the collection using the given Closure.
+	 *
+	 * @param  \Closure  $callback
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function sortBy(Closure $callback)
+	{
+		$results = array();
+
+		// First we will loop through the items and get the comparator from a callback
+		// function which we were given. Then, we will sort the returned values and
+		// and grab the corresponding values for the sorted keys from this array.
+		foreach ($this->items as $key => $value)
+		{
+			$results[$key] = $callback($value);
+		}
+
+		asort($results);
+
+		// Once we have sorted all of the keys in the array, we will loop through them
+		// and grab the corresponding model so we can set the underlying items list
+		// to the sorted version. Then we'll just return the collection instance.
+		foreach (array_keys($results) as $key)
+		{
+			$results[$key] = $this->items[$key];
+		}
+
+		$this->items = $results;
+
+		return $this;
+	}
+
+	/**
+	 * Reverse items order.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function reverse()
+	{
+		return new static(array_reverse($this->items));
+	}
+
+	/**
 	 * Reset the keys on the underlying array.
 	 *
-	 * @return \\Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function values()
 	{
@@ -131,7 +247,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Fetch a nested element of the collection.
 	 *
 	 * @param  string  $key
-	 * @retunr Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function fetch($key)
 	{
@@ -149,11 +265,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Merge the collection itmes into a single array.
+	 * Collapse the collection items into a single array.
 	 *
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function merge()
+	public function collapse()
 	{
 		$results = array();
 
@@ -163,6 +279,37 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		}
 
 		return new Collection($results);
+	}
+
+	/**
+	 * Merge items with the collection items.
+	 *
+	 * @param  \Illuminate\Support\Contracts\ArrayableInterface|array
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function merge($items)
+	{
+		if ($items instanceof ArrayableInterface)
+		{
+			$items = $items->toArray();
+		}
+
+		$results = array_merge($this->items, $items);
+
+		return new Collection($results);
+	}
+
+	/**
+	 * Slice the underlying collection array.
+	 *
+	 * @param  int   $offset
+	 * @param  int   $length
+	 * @param  bool  $preserveKeys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function slice($offset, $length = null, $preserveKeys = false)
+	{
+		return new static(array_slice($this->items, $offset, $length, $preserveKeys));
 	}
 
 	/**
@@ -184,7 +331,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return array_map(function($value)
 		{
-			return $value->toArray();
+			return $value instanceof ArrayableInterface ? $value->toArray() : $value;
 
 		}, $this->items);
 	}
@@ -251,7 +398,14 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function offsetSet($key, $value)
 	{
-		$this->items[$key] = $value;
+		if (is_null($key))
+		{
+			$this->items[] = $value;
+		}
+		else
+		{
+			$this->items[$key] = $value;
+		}
 	}
 
 	/**

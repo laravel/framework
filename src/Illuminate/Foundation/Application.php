@@ -5,22 +5,26 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
+use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Contracts\ResponsePreparerInterface;
 use Symfony\Component\HttpKernel\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Application extends Container implements HttpKernelInterface {
+class Application extends Container implements HttpKernelInterface, ResponsePreparerInterface {
 
 	/**
 	 * The Laravel framework version.
@@ -102,11 +106,23 @@ class Application extends Container implements HttpKernelInterface {
 	 * Create the request for the application.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Htto\Request
+	 * @return \Illuminate\Http\Request
 	 */
 	protected function createRequest(Request $request = null)
 	{
 		return $request ?: Request::createFromGlobals();
+	}
+
+	/**
+	 * Set the application request for the console environment.
+	 *
+	 * @return void
+	 */
+	public function setRequestForConsoleEnvironment()
+	{
+		$url = $this['config']->get('app.url', 'http://localhost');
+
+		$this['request'] = Request::create($url, 'GET', array(), array(), array(), $_SERVER);
 	}
 
 	/**
@@ -136,31 +152,15 @@ class Application extends Container implements HttpKernelInterface {
 	}
 
 	/**
-	 * Register the aliased class loader.
-	 *
-	 * @param  array  $aliases
-	 * @return void
-	 */
-	public function registerAliasLoader(array $aliases)
-	{
-		$loader = AliasLoader::getInstance($aliases);
-
-		$loader->register();
-	}
-
-	/**
 	 * Start the exception handling for the request.
 	 *
 	 * @return void
 	 */
 	public function startExceptionHandling()
 	{
-		$provider = array_first($this->serviceProviders, function($key, $provider)
-		{
-			return $provider instanceof ExceptionServiceProvider;
-		});
+		$this['exception']->register($this->environment());
 
-		$provider->startHandling($this);
+		$this['exception']->setDebug($this['config']['app.debug']);
 	}
 
 	/**
@@ -235,7 +235,7 @@ class Application extends Container implements HttpKernelInterface {
 	 * @param  array   $arguments
 	 * @return string
 	 */
-	protected function detectConsoleEnvironment($base, $environments, array $arguments)
+	protected function detectConsoleEnvironment($base, $environments, $arguments)
 	{
 		foreach ($arguments as $key => $value)
 		{
@@ -261,7 +261,7 @@ class Application extends Container implements HttpKernelInterface {
 	 */
 	protected function isMachine($name)
 	{
-		return gethostname() == $name;
+		return str_is($name, gethostname());
 	}
 
 	/**
@@ -366,8 +366,21 @@ class Application extends Container implements HttpKernelInterface {
 
 			unset($this->deferredServices[$service]);
 
-			if ($this->booted) $instance->boot();
+			$this->setupDeferredBoot($instance);
 		}
+	}
+
+	/**
+	 * Handle the booting of a deferred service provider.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider  $instance
+	 * @return void
+	 */
+	protected function setupDeferredBoot($instance)
+	{
+		if ($this->booted) return $instance->boot();
+
+		$this->booting(function() use ($instance) { $instance->boot(); });
 	}
 
 	/**
@@ -460,6 +473,8 @@ class Application extends Container implements HttpKernelInterface {
 	{
 		$response = $this->dispatch($this['request']);
 
+		$this['router']->callCloseFilter($this['request'], $response);
+
 		$response->send();
 
 		$this['router']->callFinishFilter($this['request'], $response);
@@ -469,11 +484,20 @@ class Application extends Container implements HttpKernelInterface {
 	 * Handle the given request and get the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
-		return $this['router']->dispatch($this->prepareRequest($request));
+		if ($this->isDownForMaintenance())
+		{
+			$response = $this['events']->until('illuminate.app.down');
+
+			return $this->prepareResponse($response, $request);
+		}
+		else
+		{
+			return $this['router']->dispatch($this->prepareRequest($request));
+		}
 	}
 
 	/**
@@ -486,11 +510,13 @@ class Application extends Container implements HttpKernelInterface {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
 		$this['request'] = $request;
+
+		Facade::clearResolvedInstance('request');
 
 		return $this->dispatch($request);
 	}
@@ -577,29 +603,34 @@ class Application extends Container implements HttpKernelInterface {
 	 * Prepare the given value as a Response object.
 	 *
 	 * @param  mixed  $value
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function prepareResponse($value, Request $request)
+	public function prepareResponse($value)
 	{
 		if ( ! $value instanceof SymfonyResponse) $value = new Response($value);
 
-		return $value->prepare($request);
+		return $value->prepare($this['request']);
 	}
 
 	/**
-	 * Set the current application locale.
+	 * Determine if the application is currently down for maintenance.
 	 *
-	 * @param  string  $locale
+	 * @return bool
+	 */
+	public function isDownForMaintenance()
+	{
+		return file_exists($this['path'].'/storage/meta/down');
+	}
+
+	/**
+	 * Register a maintenance mode event listener.
+	 *
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	public function setLocale($locale)
+	public function down(Closure $callback)
 	{
-		$this['config']->set('app.locale', $locale);
-
-		$this['translator']->setLocale($locale);
-
-		$this['events']->fire('locale.changed', array($locale));
+		$this['events']->listen('illuminate.app.down', $callback);
 	}
 
 	/**
@@ -659,6 +690,43 @@ class Application extends Container implements HttpKernelInterface {
 		{
 			return call_user_func($callback, $e);
 		});
+	}
+
+	/**
+	 * Get the configuration loader instance.
+	 *
+	 * @return \Illuminate\Config\LoaderInterface
+	 */
+	public function getConfigLoader()
+	{
+		return new FileLoader(new Filesystem, $this['path'].'/config');
+	}
+
+	/**
+	 * Get the service provider repository instance.
+	 *
+	 * @return \Illuminate\Foundation\ProviderRepository
+	 */
+	public function getProviderRepository()
+	{
+		$manifest = $this['config']['app.manifest'];
+
+		return new ProviderRepository(new Filesystem, $manifest);
+	}
+
+	/**
+	 * Set the current application locale.
+	 *
+	 * @param  string  $locale
+	 * @return void
+	 */
+	public function setLocale($locale)
+	{
+		$this['config']->set('app.locale', $locale);
+
+		$this['translator']->setLocale($locale);
+
+		$this['events']->fire('locale.changed', array($locale));
 	}
 
 	/**

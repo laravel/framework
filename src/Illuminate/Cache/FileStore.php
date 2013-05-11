@@ -5,7 +5,7 @@ class FileStore implements StoreInterface {
 	/**
 	 * The Illuminate Filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesytem
 	 */
 	protected $files;
 
@@ -19,7 +19,7 @@ class FileStore implements StoreInterface {
 	/**
 	 * Create a new file cache store instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesytem  $files
 	 * @param  string                 $directory
 	 * @return void
 	 */
@@ -47,14 +47,12 @@ class FileStore implements StoreInterface {
 			return null;
 		}
 
-		$contents = $this->files->get($path);
-
-		$expiration = substr($contents, 0, 10);
+		$expire = substr($contents = $this->files->get($path), 0, 10);
 
 		// If the current time is greater than expiration timestamps we will delete
 		// the file and return null. This helps clean up the old files and keeps
 		// this directory much cleaner for us as old files aren't hanging out.
-		if (time() >= $expiration)
+		if (time() >= $expire)
 		{
 			return $this->forget($key);
 		}
@@ -74,7 +72,14 @@ class FileStore implements StoreInterface {
 	{
 		$value = $this->expiration($minutes).serialize($value);
 
-		$this->files->put($this->path($key), $value);
+		$path = $this->path($key);
+
+		if ( ! $this->files->isDirectory($directory = dirname($path)))
+		{
+			$this->files->makeDirectory($directory, 0777, true);
+		}
+
+		$this->files->put($path, $value);
 	}
 
 	/**
@@ -131,9 +136,9 @@ class FileStore implements StoreInterface {
 	 */
 	public function flush()
 	{
-		foreach ($this->files->files($this->directory) as $file)
+		foreach ($this->files->directories($this->directory) as $directory)
 		{
-			$this->files->delete($file);
+			$this->files->deleteDirectory($directory);
 		}
 	}
 
@@ -145,7 +150,9 @@ class FileStore implements StoreInterface {
 	 */
 	protected function path($key)
 	{
-		return $this->directory.'/'.md5($key);
+		$parts = array_slice(str_split($hash = md5($key), 2), 0, 2);
+
+		return $this->directory.'/'.join('/', $parts).'/'.$hash;
 	}
 
 	/**
@@ -164,7 +171,7 @@ class FileStore implements StoreInterface {
 	/**
 	 * Get the Filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{
@@ -179,6 +186,16 @@ class FileStore implements StoreInterface {
 	public function getDirectory()
 	{
 		return $this->directory;
+	}
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return '';
 	}
 
 }

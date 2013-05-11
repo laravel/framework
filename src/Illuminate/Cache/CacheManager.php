@@ -67,7 +67,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createRedisDriver()
 	{
-		$redis = $this->app['redis']->connection();
+		$redis = $this->app['redis'];
 
 		return $this->repository(new RedisStore($redis, $this->app['config']['cache.prefix']));
 	}

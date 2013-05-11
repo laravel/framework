@@ -11,9 +11,49 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBasicReturnsNullOnValidAttempt()
+	{
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$guard = m::mock('Illuminate\Auth\Guard[check,attempt]', array($provider, $session));
+		$guard->shouldReceive('check')->once()->andReturn(false);
+		$guard->shouldReceive('attempt')->once()->with(array('email' => 'foo@bar.com', 'password' => 'secret'))->andReturn(true);
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+
+		$guard->basic('email', $request);
+	}
+
+
+	public function testBasicReturnsNullWhenAlreadyLoggedIn()
+	{
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$guard = m::mock('Illuminate\Auth\Guard[check]', array($provider, $session));
+		$guard->shouldReceive('check')->once()->andReturn(true);
+		$guard->shouldReceive('attempt')->never();
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+
+		$guard->basic('email', $request);
+	}
+
+
+	public function testBasicReturnsResponseOnFailure()
+	{
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$guard = m::mock('Illuminate\Auth\Guard[check,attempt]', array($provider, $session));
+		$guard->shouldReceive('check')->once()->andReturn(false);
+		$guard->shouldReceive('attempt')->once()->with(array('email' => 'foo@bar.com', 'password' => 'secret'))->andReturn(false);
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+		$response = $guard->basic('email', $request);
+
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals(401, $response->getStatusCode());
+	}
+
+
 	public function testAttemptCallsRetrieveByCredentials()
 	{
 		$guard = $this->getGuard();
+		$guard->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('auth.attempt', array(array('foo'), false, true));
 		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(array('foo'));
 		$guard->attempt(array('foo'));
 	}
@@ -23,6 +63,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$guard = $this->getMock('Illuminate\Auth\Guard', array('login'), array($provider, $session, $request));
+		$guard->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('auth.attempt', array(array('foo'), false, true));
 		$user = $this->getMock('Illuminate\Auth\UserInterface');
 		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
 		$guard->getProvider()->shouldReceive('validateCredentials')->with($user, array('foo'))->andReturn(true);
@@ -34,6 +76,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testAttemptReturnsFalseIfUserNotGiven()
 	{
 		$mock = $this->getGuard();
+		$mock->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('auth.attempt', array(array('foo'), false, true));
 		$mock->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn('foo');
 		$this->assertFalse($mock->attempt(array('foo')));
 	}

@@ -16,7 +16,7 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	{
 		$relation = $this->getRelation();
 		$mockModel = $this->getMock('Illuminate\Database\Eloquent\Model', array('save'));
-		$mockModel->expects($this->once())->method('save');
+		$mockModel->expects($this->once())->method('save')->will($this->returnValue(true));
 		$result = $relation->save($mockModel);
 
 		$attributes = $result->getAttributes();
@@ -91,6 +91,21 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $models[0]->foo->foreign_key);
 		$this->assertEquals(2, $models[1]->foo->foreign_key);
 		$this->assertNull($models[2]->foo);
+	}
+
+
+	public function testRelationCountQueryCanBeBuilt()
+	{
+		$relation = $this->getRelation();
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'));
+		$relation->getParent()->shouldReceive('getQualifiedKeyName')->andReturn('foo');
+		$query->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type('Illuminate\Database\Query\Expression'));
+		$relation->getParent()->shouldReceive('getQuery')->andReturn($parentQuery = m::mock('StdClass'));
+		$parentQuery->shouldReceive('getGrammar')->once()->andReturn($grammar = m::mock('StdClass'));
+		$grammar->shouldReceive('wrap')->once()->with('foo');
+
+		$relation->getRelationCountQuery($query);
 	}
 
 

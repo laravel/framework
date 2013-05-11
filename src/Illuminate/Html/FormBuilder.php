@@ -63,6 +63,13 @@ class FormBuilder {
 	protected $reserved = array('method', 'url', 'route', 'action', 'files');
 
 	/**
+	 * The form methods that should be spoofed, in uppercase.
+	 * 
+	 * @var array
+	 */
+	protected $spoofedMethods = array('DELETE', 'PATCH', 'PUT');
+
+	/**
 	 * Create a new form builder instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
@@ -89,15 +96,15 @@ class FormBuilder {
 
 		// We need to extract the proper method from the attributes. If the method is
 		// something other than GET or POST we'll use POST since we will spoof the
-		// actual method since forms don't support PUT or DELETE as native HTML.
+		// actual method since forms don't support the reserved methods in HTML.
 		$attributes['method'] = $this->getMethod($method);
 
 		$attributes['action'] = $this->getAction($options);
 
 		$attributes['accept-charset'] = 'UTF-8';
 
-		// If the method is PUT or DELETE, we will need to add a spoofer hidden field
-		// that will instruct this Symfony request to pretend that the method is a
+		// If the method is PUT, PATCH or DELETE we will need to add a spoofer hidden
+		// field that will instruct the Symfony request to pretend the method is a
 		// different method than it actually is, for convenience from the forms.
 		$append = $this->getAppendage($method);
 
@@ -108,7 +115,7 @@ class FormBuilder {
 
 		// Finally we're ready to create the final form HTML field. We will attribute
 		// format the array of attributes. We will also add on the appendage which
-		// is used to spoof the requests for PUT and DELETE requests to the app.
+		// is used to spoof requests for this PUT, PATCH, etc. methods on forms.
 		$attributes = array_merge(
 
 			$attributes, array_except($options, $this->reserved)
@@ -169,13 +176,27 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function label($name, $value, $options = array())
+	public function label($name, $value = null, $options = array())
 	{
 		$this->labels[] = $name;
 
 		$options = $this->html->attributes($options);
 
-		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
+		$value = e($this->formatLabel($name, $value));
+
+		return '<label for="'.$name.'"'.$options.'>'.$value.'</label>';
+	}
+
+	/**
+	 * Format the label value.
+	 *
+	 * @param  string  $name
+	 * @param  string|null  $value
+	 * @return string
+	 */
+	protected function formatLabel($name, $value)
+	{
+		return $value ?: ucwords(str_replace('_', ' ', $name));
 	}
 
 	/**
@@ -284,7 +305,7 @@ class FormBuilder {
 	 */
 	public function textarea($name, $value = null, $options = array())
 	{
-		$options['name'] = $name;
+		if ( ! isset($options['name'])) $options['name'] = $name;
 
 		// Next we will look for the rows and cols attributes, as each of these are put
 		// on the textarea element definition. If they are not present, we will just
@@ -518,6 +539,33 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a HTML reset input element.
+	 *
+	 * @param  string  $value
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function reset($value, $attributes = array())
+	{
+		return $this->input('reset', null, $value, $attributes);
+	}
+
+	/**
+	 * Create a HTML image input element.
+	 *
+	 * @param  string  $url
+	 * @param  string  $name
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function image($url, $name = null, $attributes = array())
+	{
+		$attributes['src'] = $this->url->asset($url);
+
+		return $this->input('image', $name, null, $attributes);
+	}
+
+	/**
 	 * Create a submit button element.
 	 *
 	 * @param  string  $value
@@ -543,7 +591,7 @@ class FormBuilder {
 			$options['type'] = 'button';
 		}
 		
-		return '<button'.$this->html->attributes($options).'>'.e($value).'</button>';
+		return '<button'.$this->html->attributes($options).'>'.$value.'</button>';
 	}
 
 	/**
@@ -566,7 +614,7 @@ class FormBuilder {
 	 */
 	protected function getMethod($method)
 	{
-		return $method != 'GET' ? 'POST' : $method;
+		return strtoupper($method) != 'GET' ? 'POST' : $method;
 	}
 
 	/**
@@ -659,7 +707,7 @@ class FormBuilder {
 	{
 		$method = strtoupper($method);
 
-		if ($method == 'PUT' or $method == 'DELETE')
+		if (in_array($method, $this->spoofedMethods))
 		{
 			return $this->hidden('_method', $method);
 		}
@@ -707,7 +755,25 @@ class FormBuilder {
 
 		if (isset($this->model) and isset($this->model[$name]))
 		{
-			return $this->model[$name];
+			return $this->getModelValueAttribute($name);
+		}
+	}
+
+	/**
+	 * Get the model value that should be assigned to the field.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getModelValueAttribute($name)
+	{
+		if (is_object($this->model))
+		{
+			return object_get($this->model, $name);
+		}
+		elseif (is_array($this->model))
+		{
+			return array_get($this->model, $name);
 		}
 	}
 

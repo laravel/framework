@@ -174,8 +174,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 			'updated_at'	=> '2012-12-05',
 		));
 
-		$this->assertInstanceOf('DateTime', $model->created_at);
-		$this->assertInstanceOf('DateTime', $model->updated_at);
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+		$this->assertInstanceOf('Carbon\Carbon', $model->updated_at);
 	}
 
 
@@ -191,8 +191,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
 		$mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
 		$instance = $model->newInstance($timestamps);
-		$this->assertInstanceOf('DateTime', $instance->updated_at);
-		$this->assertInstanceOf('DateTime', $instance->created_at);
+		$this->assertInstanceOf('Carbon\Carbon', $instance->updated_at);
+		$this->assertInstanceOf('Carbon\Carbon', $instance->created_at);
 	}
 
 
@@ -284,6 +284,32 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDeleteProperlyDeletesModelWhenSoftDeleting()
+	{
+		$model = $this->getMock('Illuminate\Database\Eloquent\Model', array('newQuery', 'updateTimestamps', 'touchOwners'));
+		$model->setSoftDeleting(true);
+		$query = m::mock('stdClass');
+		$query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
+		$query->shouldReceive('update')->once()->with(array('deleted_at' => new DateTime));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('touchOwners');
+		$model->exists = true;
+		$model->id = 1;
+		$model->delete();
+	}
+
+
+	public function testRestoreProperlyRestoresModel()
+	{
+		$model = $this->getMock('Illuminate\Database\Eloquent\Model', array('save'));
+		$model->setSoftDeleting(true);
+		$model->expects($this->once())->method('save');
+		$model->restore();
+
+		$this->assertNull($model->deleted_at);
+	}
+
+
 	public function testNewQueryReturnsEloquentQueryBuilder()
 	{
 		$conn = m::mock('Illuminate\Database\Connection');
@@ -347,6 +373,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
 		$this->assertFalse(isset($array['password']));
+	}
+
+
+	public function testVisibleCreatesArrayWhitelist()
+	{
+		$model = new EloquentModelStub;
+		$model->setVisible(array('name'));
+		$model->name = 'Taylor';
+		$model->age = 26;
+		$array = $model->toArray();
+
+		$this->assertEquals(array('name' => 'Taylor'), $array);
 	}
 
 
@@ -569,6 +607,25 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCloneModelMakesAFreshCopyOfTheModel()
+	{
+		$class = new EloquentModelStub;
+		$class->id = 1;
+		$class->exists = true;
+		$class->first = 'taylor';
+		$class->last = 'otwell';
+		$class->setRelation('foo', array('bar'));
+
+		$clone = $class->replicate();
+
+		$this->assertNull($clone->id);
+		$this->assertFalse($clone->exists);
+		$this->assertEquals('taylor', $clone->first);
+		$this->assertEquals('otwell', $clone->last);
+		$this->assertEquals(array('bar'), $clone->foo);
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -623,7 +680,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'save_stub';
 	protected $guarded = array();
-	public function save() { $_SERVER['__eloquent.saved'] = true; }
+	public function save(array $options = array()) { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{
 		$this->incrementing = $value;
@@ -631,7 +688,7 @@ class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
@@ -640,7 +697,7 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($mock);
@@ -651,7 +708,7 @@ class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2))->andReturn($mock);
@@ -661,7 +718,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('with')->once()->with(array('foo', 'bar'))->andReturn('foo');

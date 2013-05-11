@@ -114,6 +114,13 @@ class Builder {
 	public $offset;
 
 	/**
+	 * The query union statements.
+	 *
+	 * @var array
+	 */
+	public $unions;
+
+	/**
 	 * All of the available clause operators.
 	 *
 	 * @var array
@@ -641,6 +648,7 @@ class Builder {
 	 *
 	 * @param  string  $method
 	 * @param  string  $parameters
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function dynamicWhere($method, $parameters)
 	{
@@ -796,7 +804,7 @@ class Builder {
 	 */
 	public function take($value)
 	{
-		$this->limit = $value;
+		if ($value > 0) $this->limit = $value;
 
 		return $this;
 	}
@@ -811,6 +819,31 @@ class Builder {
 	public function forPage($page, $perPage = 15)
 	{
 		return $this->skip(($page - 1) * $perPage)->take($perPage);
+	}
+
+	/**
+	 * Add a union statement to the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  bool $all
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function union(Builder $query, $all = false)
+	{
+		$this->unions[] = compact('query', 'all');
+
+		return $this->mergeBindings($query);
+	}
+
+	/**
+	 * Add a union all statement to the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function unionAll(Builder $query)
+	{
+		return $this->union($query, true);
 	}
 
 	/**
@@ -1095,9 +1128,12 @@ class Builder {
 		// the aggregate value getting in the way when the grammar builds it.
 		$this->aggregate = null;
 
-		$result = (array) $results[0];
+		if (isset($results[0]))
+		{
+			$result = (array) $results[0];
 
-		return $result['aggregate'];
+			return $result['aggregate'];
+		}
 	}
 
 	/**
@@ -1314,11 +1350,13 @@ class Builder {
 	 * Merge an array of bindings into our bindings.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return void
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function mergeBindings(Builder $query)
 	{
 		$this->bindings = array_values(array_merge($this->bindings, $query->bindings));
+
+		return $this;
 	}
 
 	/**

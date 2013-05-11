@@ -35,7 +35,7 @@ abstract class Facade {
 	 * Initiate a mock expectation on the facade.
 	 *
 	 * @param  dynamic
-	 * @return Mockery\Expectation
+	 * @return \Mockery\Expectation
 	 */
 	public static function shouldReceive()
 	{
@@ -113,6 +113,17 @@ abstract class Facade {
 		}
 
 		return static::$resolvedInstance[$name] = static::$app[$name];
+	}
+
+	/**
+	 * Clear a resolved facade instance.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public static function clearResolvedInstance($name)
+	{
+		unset(static::$resolvedInstance[$name]);
 	}
 
 	/**

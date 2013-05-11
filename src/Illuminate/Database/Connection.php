@@ -94,7 +94,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The database connection configuration options.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $config = array();
 
@@ -537,6 +537,42 @@ class Connection implements ConnectionInterface {
 	protected function getElapsedTime($start)
 	{
 		return number_format((microtime(true) - $start) * 1000, 2);
+	}
+
+	/**
+	 * Get a Doctrine Schema Column instance.
+	 *
+	 * @param  string  $table
+	 * @param  string  $column
+	 * @return \Doctrine\DBAL\Schema\Column
+	 */
+	public function getDoctrineColumn($table, $column)
+	{
+		$schema = $this->getDoctrineSchemaManager();
+
+		return $schema->listTableDetails($table)->getColumn($column);
+	}
+
+	/**
+	 * Get the Doctrine DBAL schema manager for the connection.
+	 *
+	 * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+	 */
+	public function getDoctrineSchemaManager()
+	{
+		return $this->getDoctrineDriver()->getSchemaManager($this->getDoctrineConnection());
+	}
+
+	/**
+	 * Get the Doctrine DBAL database connection instance.
+	 *
+	 * @return \Doctrine\DBAL\Connection
+	 */
+	public function getDoctrineConnection()
+	{
+		$driver = $this->getDoctrineDriver();
+
+		return new \Doctrine\DBAL\Connection(array('pdo' => $this->pdo), $driver);
 	}
 
 	/**

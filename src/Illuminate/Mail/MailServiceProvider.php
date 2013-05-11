@@ -30,7 +30,7 @@ class MailServiceProvider extends ServiceProvider {
 			// for maximum testability on said classes instead of passing Closures.
 			$mailer = new Mailer($app['view'], $app['swift.mailer']);
 
-			$mailer->setLogger($app['log']);
+			$mailer->setLogger($app['log'])->setQueue($app['queue']);
 
 			$mailer->setContainer($app);
 

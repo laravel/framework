@@ -98,6 +98,13 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testEnvironmentAccess()
+	{
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
+		$this->assertInstanceOf('Illuminate\Pagination\Environment', $p->getEnvironment());
+	}
+
+
 	public function testPaginatorIsCountable()
 	{
 		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);

@@ -3,6 +3,7 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
+use Illuminate\Queue\Console\SubscribeCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
@@ -29,6 +30,8 @@ class QueueServiceProvider extends ServiceProvider {
 		$this->registerWorker();
 
 		$this->registerListener();
+
+		$this->registerSubscriber();
 	}
 
 	/**
@@ -118,6 +121,23 @@ class QueueServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the push queue subscribe command.
+	 *
+	 * @return void
+	 */
+	protected function registerSubscriber()
+	{
+		$app = $this->app;
+
+		$app['command.queue.subscribe'] = $app->share(function($app)
+		{
+			return new SubscribeCommand;
+		});
+
+		$this->commands('command.queue.subscribe');
+	}
+
+	/**
 	 * Register the connectors on the queue manager.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
@@ -181,9 +201,11 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerIronConnector($manager)
 	{
-		$manager->addConnector('iron', function()
+		$app = $this->app;
+
+		$manager->addConnector('iron', function() use ($app)
 		{
-			return new IronConnector;
+			return new IronConnector($app['request']);
 		});
 	}
 
@@ -194,7 +216,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('queue', 'queue.worker', 'queue.listener', 'command.queue.work', 'command.queue.listen');
+		return array('queue', 'queue.worker', 'queue.listener', 'command.queue.work', 'command.queue.listen', 'command.queue.subscribe');
 	}
 
 }

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class RoutesCommand extends Command {
 
-	/**
+    	/**
 	 * The console command name.
 	 *
 	 * @var string
@@ -30,16 +30,16 @@ class RoutesCommand extends Command {
 	protected $routes;
 
 	/**
-	 * Only desired route info
+	 * The table helper set.
 	 *
-	 * @var array
+	 * @var \Symfony\Component\Console\Helper\TableHelper
 	 */
-	protected $routesInfo;
+	protected $table;
 
 	/**
 	 * Create a new route command instance.
 	 *
-	 * @param  Symfony\Component\Routing\RouteCollection  $routes
+	 * @param  \Symfony\Component\Routing\RouteCollection  $routes
 	 * @return void
 	 */
 	public function __construct(RouteCollection $routes)
@@ -56,6 +56,8 @@ class RoutesCommand extends Command {
 	 */
 	public function fire()
 	{
+		$this->table = $this->getHelperSet()->get('table');
+
 		if (count($this->routes) == 0)
 		{
 			return $this->error("Your application doesn't have any routes.");
@@ -85,7 +87,7 @@ class RoutesCommand extends Command {
 	 * Get the route information for a given route.
 	 *
 	 * @param  string  $name
-	 * @param  Symfony\Component\Routing\Route  $route
+	 * @param  \Symfony\Component\Routing\Route  $route
 	 * @return array
 	 */
 	protected function getRouteInformation($name, Route $route)
@@ -105,79 +107,9 @@ class RoutesCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$widths = $this->getCellWidths($routes);
+		$this->table->setHeaders(array('URI', 'Name', 'Action'))->setRows($routes);
 
-		$this->displayHeadings($widths);
-
-		foreach($routes as $route)
-		{
-			$this->displayRoute($route, $widths);
-		}
-	}
-
-	/**
-	 * Display the route table headings.
-	 *
-	 * @param  array  $widths
-	 * @return void
-	 */
-	protected function displayHeadings(array $widths)
-	{
-		extract($widths);
-
-		$this->comment(str_pad('URI', $uris).str_pad('Name', $names).str_pad('Action', $actions));
-	}
-
-	/**
-	 * Display a route in the route table.
-	 *
-	 * @param  array  $route
-	 * @param  array  $widths
-	 * @return void
-	 */
-	protected function displayRoute(array $route, array $widths)
-	{
-		extract($widths);
-
-		$this->info(
-			str_pad($route['uri'], $uris).str_pad($route['name'], $names).str_pad($route['action'], $actions)
-		);
-	}
-
-	/**
-	 * Get the correct cell spacing per column.
-	 *
-	 * @param  array  $routes
-	 * @return array
-	 */
-	protected function getCellWidths($routes, $padding = 10)
-	{
-		$widths = array();
-
-		foreach($this->getColumns($routes) as $key => $column)
-		{
-			$widths[$key] = max(array_map('strlen', $column)) + $padding;
-		}
-
-		return $widths;
-	}
-
-	/**
-	 * Get the columns for the route table.
-	 *
-	 * @param  array  $routes
-	 * @return array
-	 */
-	protected function getColumns(array $routes)
-	{
-		$columns = array();
-
-		foreach (array('uris', 'actions', 'names') as $key)
-		{
-			$columns[$key] = array_pluck($routes, str_singular($key));
-		}
-
-		return $columns;
+		$this->table->render($this->getOutput());
 	}
 
 	/**

@@ -29,6 +29,13 @@ class Blueprint {
 	protected $commands = array();
 
 	/**
+	 * The storage engine that should be used for the table.
+	 *
+	 * @var string
+	 */
+	public $engine;
+
+	/**
 	 * Create a new schema blueprint.
 	 *
 	 * @param  string   $table
@@ -191,20 +198,21 @@ class Blueprint {
 	 */
 	public function dropColumn($columns)
 	{
-		$columns = (array) $columns;
+		$columns = is_array($columns) ? $columns : (array) func_get_args();
 
 		return $this->addCommand('dropColumn', compact('columns'));
 	}
 
 	/**
-	 * Indicate that the given columns should be dropped.
+	 * Indicate that the given columns should be renamed.
 	 *
-	 * @param  dynamic
+	 * @param  string  $from
+	 * @param  string  $to
 	 * @return \Illuminate\Support\Fluent
 	 */
-	public function dropColumns()
+	public function renameColumn($from, $to)
 	{
-		return $this->dropColumn(func_get_args());
+		return $this->addCommand('renameColumn', compact('from', 'to'));
 	}
 
 	/**
@@ -258,7 +266,7 @@ class Blueprint {
 	 */
 	public function dropTimestamps()
 	{
-		$this->dropColumns('created_at', 'updated_at');
+		$this->dropColumn('created_at', 'updated_at');
 	}
 
 	/**
@@ -379,6 +387,17 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new small integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function smallInteger($column)
+	{
+		return $this->addColumn('smallInteger', $column);
+	}
+
+	/**
 	 * Create a new unsigned integer column on the table.
 	 *
 	 * @param  string  $column
@@ -494,6 +513,16 @@ class Blueprint {
 		$this->timestamp('created_at');
 
 		$this->timestamp('updated_at');
+	}
+
+	/**
+	 * Add a "deleted at" timestamp for the table.
+	 *
+	 * @return void
+	 */
+	public function softDeletes()
+	{
+		$this->timestamp('deleted_at')->nullable();
 	}
 
 	/**

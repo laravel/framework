@@ -20,7 +20,7 @@ class RedisServiceProvider extends ServiceProvider {
 	{
 		$this->app['redis'] = $this->app->share(function($app)
 		{
-			return new RedisManager($app);
+			return new Database($app['config']['database.redis']);
 		});
 	}
 

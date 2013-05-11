@@ -1,32 +1,13 @@
 <?php namespace Illuminate\Exception;
 
 use Closure;
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
-use Symfony\Component\HttpKernel\Debug\ExceptionHandler as KernelHandler;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Debug\ExceptionHandler as KernelHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
-
-	/**
-	 * Start the error handling facilities.
-	 *
-	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
-	 */
-	public function startHandling($app)
-	{
-		$this->setExceptionHandler($app['exception.function']);
-
-		// By registering the error handler with a level of -1, we state that we want
-		// all PHP errors converted into ErrorExceptions and thrown which provides
-		// a very strict development environment but prevents any unseen errors.
-		$app['kernel.error']->register(-1);
-
-		if (isset($app['env']) and $app['env'] != 'testing')
-		{
-			$this->registerShutdownHandler();
-		}
-	}
 
 	/**
 	 * Register the service provider.
@@ -35,96 +16,148 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->registerKernelHandlers();
+		$this->registerDisplayers();
 
-		$this->app['exception'] = $this->app->share(function()
+		$this->registerHandler();
+	}
+
+	/**
+	 * Register the exception displayers.
+	 *
+	 * @return void
+	 */
+	protected function registerDisplayers()
+	{
+		$this->registerPlainDisplayer();
+
+		$this->registerDebugDisplayer();
+	}
+
+	/**
+	 * Register the exception handler instance.
+	 *
+	 * @return void
+	 */
+	protected function registerHandler()
+	{
+		$this->app['exception'] = $this->app->share(function($app)
 		{
-			return new Handler;
+			return new Handler($app, $app['exception.plain'], $app['exception.debug']);
 		});
-
-		$this->registerExceptionHandler();
 	}
 
 	/**
-	 * Register the HttpKernel error and exception handlers.
+	 * Register the plain exception displayer.
 	 *
 	 * @return void
 	 */
-	protected function registerKernelHandlers()
+	protected function registerPlainDisplayer()
 	{
-		$app = $this->app;
-
-		$app['kernel.error'] = function()
+		$this->app['exception.plain'] = $this->app->share(function($app)
 		{
-			return new ErrorHandler;
-		};
+			$handler = new KernelHandler($app['config']['app.debug']);
 
-		$this->app['kernel.exception'] = function() use ($app)
-		{
-			return new KernelHandler($app['config']['app.debug']);
-		};
+			return new SymfonyDisplayer($handler);
+		});
 	}
 
 	/**
-	 * Register the PHP exception handler function.
+	 * Register the Whoops exception displayer.
 	 *
 	 * @return void
 	 */
-	protected function registerExceptionHandler()
+	protected function registerDebugDisplayer()
 	{
-		$app = $this->app;
+		$this->registerWhoops();
 
-		$app['exception.function'] = function() use ($app)
+		$this->app['exception.debug'] = $this->app->share(function($app)
 		{
-			return function($exception) use ($app)
+			return new WhoopsDisplayer($app['whoops']);
+		});
+	}
+
+	/**
+	 * Register the Whoops error display service.
+	 *
+	 * @return void
+	 */
+	protected function registerWhoops()
+	{
+		$this->registerWhoopsHandler();
+
+		$this->app['whoops'] = $this->app->share(function($app)
+		{
+			// We will instruct Whoops to not exit after it displays the exception as it
+			// will otherwise run out before we can do anything else. We just want to
+			// let the framework go ahead and finish a request on this end instead.
+			with($whoops = new \Whoops\Run)->allowQuit(false);
+
+			return $whoops->pushHandler($app['whoops.handler']);
+		});
+	}
+
+	/**
+	 * Register the Whoops handler for the request.
+	 *
+	 * @return void
+	 */
+	protected function registerWhoopsHandler()
+	{
+		if ($this->app['request']->ajax() or $this->app->runningInConsole())
+		{
+			$this->app['whoops.handler'] = function() { return new JsonResponseHandler; };
+		}
+		else
+		{
+			$this->registerPrettyWhoopsHandler();
+		}
+	}
+
+	/**
+	 * Register the "pretty" Whoops handler.
+	 *
+	 * @return void
+	 */
+	protected function registerPrettyWhoopsHandler()
+	{
+		$me = $this;
+		
+		$this->app['whoops.handler'] = function() use ($me)
+		{
+			with($handler = new PrettyPageHandler)->setEditor('sublime');
+
+			// If the resource path exists, we will register the resource path with Whoops
+			// so our custom Laravel branded exception pages will be used when they are
+			// displayed back to the developer. Otherwise, the default pages are run.
+			if ( ! is_null($path = $me->resourcePath()))
 			{
-				$response = $app['exception']->handle($exception);
+				$handler->setResourcesPath($path);
+			}
 
-				// If one of the custom error handlers returned a response, we will send that
-				// response back to the client after preparing it. This allows a specific
-				// type of exceptions to handled by a Closure giving great flexibility.
-				if ( ! is_null($response))
-				{
-					$response = $app->prepareResponse($response, $app['request']);
-
-					$response->send();
-				}
-				else
-				{
-					$app['kernel.exception']->handle($exception);
-				}
-			};
+			return $handler;
 		};
 	}
 
 	/**
-	 * Register the shutdown handler Closure.
+	 * Get the resource path for Whoops.
 	 *
-	 * @return void
+	 * @return string
 	 */
-	protected function registerShutdownHandler()
+	public function resourcePath()
 	{
-		$app = $this->app;
-
-		register_shutdown_function(function() use ($app)
-		{
-			set_exception_handler(array(new StubShutdownHandler($app), 'handle'));
-
-			$app['kernel.error']->handleFatal();
-		});
+		if (is_dir($path = $this->getResourcePath())) return $path;
 	}
 
 	/**
-	 * Set the given Closure as the exception handler.
+	 * Get the Whoops custom resource path.
 	 *
-	 * This function is mainly needed for mocking purposes.
-	 *
-	 * @param  Closure  $handler
-	 * @return mixed
+	 * @return string
 	 */
-	protected function setExceptionHandler(Closure $handler)
+	protected function getResourcePath()
 	{
-		return set_exception_handler($handler);
+		$base = $this->app['path.base'];
+
+		return $base.'/vendor/laravel/framework/src/Illuminate/Exception/resources';
 	}
 
 }

@@ -37,7 +37,7 @@ class Artisan {
 	 *
 	 * @param  string  $command
 	 * @param  array   $parameters
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return void
 	 */
 	public function call($command, array $parameters = array(), OutputInterface $output = null)

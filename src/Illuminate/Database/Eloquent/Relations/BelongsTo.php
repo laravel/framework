@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
+use LogicException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -53,6 +54,17 @@ class BelongsTo extends Relation {
 		$table = $this->related->getTable();
 
 		$this->query->where($table.'.'.$key, '=', $this->parent->{$this->foreignKey});
+	}
+
+	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query)
+	{
+		throw new LogicException('Has method invalid on "belongsTo" relations.');
 	}
 
 	/**
@@ -156,6 +168,19 @@ class BelongsTo extends Relation {
 		}
 
 		return $models;
+	}
+
+	/**
+	 * Associate the model instance to the given parent.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function associate(Model $model)
+	{
+		$this->parent->setAttribute($this->foreignKey, $model->getKey());
+
+		return $this->parent;
 	}
 
 	/**

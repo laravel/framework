@@ -1,8 +1,6 @@
 <?php namespace Illuminate\Events;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class Subscriber implements EventSubscriberInterface {
+class Subscriber {
 
 	/**
 	 * Get the events listened to by the subscriber.

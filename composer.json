@@ -10,23 +10,28 @@
         }
     ],
     "require": {
-        "php": ">=5.3.7",
+        "php": ">=5.3.0",
         "classpreloader/classpreloader": "1.0.*",
+        "doctrine/dbal": "2.4.x",
         "ircmaxell/password-compat": "1.0.*",
-        "monolog/monolog": "1.4.*",
-        "patchwork/utf8": "1.0.*",
-        "swiftmailer/swiftmailer": "4.3.*",
-        "symfony/browser-kit": "2.2.*",
-        "symfony/console": "2.2.*",
-        "symfony/css-selector": "2.2.*",
-        "symfony/dom-crawler": "2.2.*",
-        "symfony/event-dispatcher": "2.2.*",
-        "symfony/finder": "2.2.*",
-        "symfony/http-foundation": "2.2.*",
-        "symfony/http-kernel": "2.2.*",
-        "symfony/process": "2.2.*",
-        "symfony/routing": "2.2.*",
-        "symfony/translation": "2.2.*"
+        "filp/whoops": "1.0.6",
+        "monolog/monolog": "1.5.*",
+        "nesbot/carbon": "1.*",
+        "patchwork/utf8": "1.1.*",
+        "predis/predis": "0.8.*",
+        "swiftmailer/swiftmailer": "5.0.*",
+        "symfony/browser-kit": "2.3.*",
+        "symfony/console": "2.3.*",
+        "symfony/css-selector": "2.3.*",
+        "symfony/debug": "2.3.*",
+        "symfony/dom-crawler": "2.3.*",
+        "symfony/event-dispatcher": "2.3.*",
+        "symfony/finder": "2.3.*",
+        "symfony/http-foundation": "2.3.*",
+        "symfony/http-kernel": "2.3.*",
+        "symfony/process": "2.3.*",
+        "symfony/routing": "2.3.*",
+        "symfony/translation": "2.3.*"
     },
     "replace": {
         "illuminate/auth": "self.version",
@@ -43,6 +48,7 @@
         "illuminate/foundation": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
+        "illuminate/html": "self.version",
         "illuminate/log": "self.version",
         "illuminate/mail": "self.version",
         "illuminate/pagination": "self.version",
@@ -64,6 +70,9 @@
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
+        "classmap": [
+            ["src/Illuminate/Queue/IlluminateQueueClosure.php"]
+        ],
     	"files": [
             "src/Illuminate/Support/helpers.php"
     	],

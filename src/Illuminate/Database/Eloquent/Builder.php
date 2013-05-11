@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use DateTime;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Builder {
@@ -32,8 +34,8 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'lists', 'insert', 'insertGetId', 'update', 'delete', 'increment',
-		'decrement', 'pluck', 'count', 'min', 'max', 'avg', 'sum',
+		'toSql', 'lists', 'insert', 'insertGetId', 'update', 'delete', 'increment',
+		'decrement', 'pluck', 'count', 'min', 'max', 'avg', 'sum', 'exists',
 	);
 
 	/**
@@ -104,6 +106,19 @@ class Builder {
 		}
 
 		return $this->model->newCollection($models);
+	}
+
+	/**
+	 * Pluck a single column from the database.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function pluck($column)
+	{
+		$result = $this->first(array($column));
+
+		if ($result) return $result->{$column};
 	}
 
 	/**
@@ -191,6 +206,101 @@ class Builder {
 		$this->query->forPage($page, $perPage);
 
 		return $paginator->make($this->get($columns)->all(), $total, $perPage);
+	}
+
+	/**
+	 * Delete a record from the database.
+	 *
+	 * @return int
+	 */
+	public function delete()
+	{
+		if ($this->model->isSoftDeleting())
+		{
+			$column = $this->model->getDeletedAtColumn();
+
+			return $this->query->update(array($column => new DateTime));
+		}
+		else
+		{
+			return $this->query->delete();
+		}
+	}
+
+	/**
+	 * Force a delete on a set of soft deleted models.
+	 *
+	 * @return int
+	 */
+	public function forceDelete()
+	{
+		return $this->query->delete();
+	}
+
+	/**
+	 * Restore the soft-deleted model instances.
+	 *
+	 * @return int
+	 */
+	public function restore()
+	{
+		if ($this->model->isSoftDeleting())
+		{
+			$column = $this->model->getDeletedAtColumn();
+
+			return $this->query->update(array($column => null));
+		}
+	}
+
+	/**
+	 * Include the soft deleted models in the results.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function withTrashed()
+	{
+		$column = $this->model->getQualifiedDeletedAtColumn();
+
+		foreach ($this->query->wheres as $key => $where)
+		{
+			// If the where clause is a soft delete date constraint, we will remove it from
+			// the query and reset the keys on the wheres. This allows this developer to
+			// include deleted model in a relationship result set that is lazy loaded.
+			if ($this->isSoftDeleteConstraint($where, $column))
+			{
+				unset($this->query->wheres[$key]);
+
+				$this->query->wheres = array_values($this->query->wheres);
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Force the result set to only included soft deletes.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function trashed()
+	{
+		$this->withTrashed();
+
+		$this->query->whereNotNull($this->model->getQualifiedDeletedAtColumn());
+
+		return $this;
+	}
+
+	/**
+	 * Determine if the given where clause is a soft delete constraint.
+	 *
+	 * @param  array   $where
+	 * @param  string  $column
+	 * @return bool
+	 */
+	protected function isSoftDeleteConstraint(array $where, $column)
+	{
+		return $where['column'] == $column and $where['type'] == 'Null';
 	}
 
 	/**
@@ -319,13 +429,46 @@ class Builder {
 		// that start with the given top relations and adds them to our arrays.
 		foreach ($this->eagerLoad as $name => $constraints)
 		{
-			if (str_contains($name, '.') and starts_with($name, $relation) and $name != $relation)
+			if ($this->isNested($name, $relation))
 			{
 				$nested[substr($name, strlen($relation.'.'))] = $constraints;
 			}
 		}
 
 		return $nested;
+	}
+
+	/**
+	 * Determine if the relationship is nested.
+	 *
+	 * @param  string  $name
+	 * @param  string  $relation
+	 * @return bool
+	 */
+	protected function isNested($name, $relation)
+	{
+		$dots = str_contains($name, '.');
+
+		return $dots and starts_with($name, $relation) and $name != $relation;
+	}
+
+	/**
+	 * Add a relationship count condition to the query.
+	 *
+	 * @param  string  $relation
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function has($relation, $operator = '>=', $count = 1)
+	{
+		$instance = $this->model->$relation();
+
+		$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+
+		$this->query->mergeBindings($query->getQuery());
+
+		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count);
 	}
 
 	/**
@@ -338,7 +481,9 @@ class Builder {
 	{
 		if (is_string($relations)) $relations = func_get_args();
 
-		$this->eagerLoad = $this->parseRelations($relations);
+		$eagers = $this->parseRelations($relations);
+
+		$this->eagerLoad = array_merge($this->eagerLoad, $eagers);
 
 		return $this;
 	}
@@ -368,7 +513,7 @@ class Builder {
 			// We need to separate out any nested includes. Which allows the developers
 			// to load deep relationships using "dots" without stating each level of
 			// the relationship with its own key in the array of eager load names.
-			$results = $this->parseNestedRelations($name, $results);
+			$results = $this->parseNested($name, $results);
 
 			$results[$name] = $constraints;
 		}
@@ -383,7 +528,7 @@ class Builder {
 	 * @param  array   $results
 	 * @return array
 	 */
-	protected function parseNestedRelations($name, $results)
+	protected function parseNested($name, $results)
 	{
 		$progress = array();
 

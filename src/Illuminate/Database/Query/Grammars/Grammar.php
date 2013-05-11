@@ -28,6 +28,7 @@ class Grammar extends BaseGrammar {
 		'orders',
 		'limit',
 		'offset',
+		'unions',
 	);
 
 	/**
@@ -38,6 +39,8 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileSelect(Builder $query)
 	{
+		if (is_null($query->columns)) $query->columns = array('*');
+
 		return trim($this->concatenate($this->compileComponents($query)));
 	}
 
@@ -148,7 +151,7 @@ class Grammar extends BaseGrammar {
 			// Once we have constructed the clauses, we'll need to take the boolean connector
 			// off of the first clause as it obviously will not be required on that clause
 			// because it leads the rest of the clauses, thus not requiring any boolean.
-			$clauses[0] = preg_replace('/and |or /', '', $clauses[0], 1);
+			$clauses[0] = $this->removeLeadingBoolean($clauses[0]);
 
 			$clauses = implode(' ', $clauses);
 
@@ -488,6 +491,26 @@ class Grammar extends BaseGrammar {
 	}
 
 	/**
+	 * Compile the "union" queries attached to the main query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @return string
+	 */
+	protected function compileUnions(Builder $query)
+	{
+		$sql = '';
+
+		foreach ($query->unions as $union)
+		{
+			$joiner = $union['all'] ? 'union all ' : 'union ';
+
+			$sql = $joiner.$union['query']->toSql();
+		}
+
+		return $sql;
+	}
+
+	/**
 	 * Compile an insert statement into SQL.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
@@ -556,12 +579,24 @@ class Grammar extends BaseGrammar {
 
 		$columns = implode(', ', $columns);
 
+		// If the query has any "join" clauses, we will setup the joins on the builder
+		// and compile them so we can attach them to this update, as update queries
+		// can get join statements to attach to other tables when they're needed.
+		if (isset($query->joins))
+		{
+			$joins = ' '.$this->compileJoins($query, $query->joins);
+		}
+		else
+		{
+			$joins = '';
+		}
+
 		// Of course, update queries may also be constrained by where clauses so we'll
 		// need to compile the where clauses and attach it to the query so only the
 		// intended records are updated by the SQL statements we generate to run.
 		$where = $this->compileWheres($query);
 
-		return trim("update $table set $columns $where");
+		return trim("update {$table}{$joins} set $columns $where");
 	}
 
 	/**
@@ -603,6 +638,17 @@ class Grammar extends BaseGrammar {
 		{
 			return (string) $value !== '';
 		}));
+	}
+
+	/**
+	 * Remove the leading boolean from a statement.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function removeLeadingBoolean($value)
+	{
+		return preg_replace('/and |or /', '', $value, 1);
 	}
 
 }

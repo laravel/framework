@@ -1,6 +1,6 @@
-<?php
+<?php{{namespace}}
 
-class {{class}} extends BaseController {
+class {{class}} extends \BaseController {
 
 {{methods}}
 

@@ -44,7 +44,17 @@ class MySqlGrammar extends Grammar {
 
 		$sql = 'create table '.$this->wrapTable($blueprint)." ($columns)";
 
-		return $this->compileCreateEncoding($sql, $connection);
+		// Once we have the primary SQL, we can add the encoding option to the SQL for
+		// the table.  Then, we can check if a storage engine has been supplied for
+		// the table. If so, we will add the engine declaration to the SQL query.
+		$sql = $this->compileCreateEncoding($sql, $connection);
+
+		if (isset($blueprint->engine))
+		{
+			$sql .= ' engine = '.$blueprint->engine;
+		}
+
+		return $sql;
 	}
 
 	/**
@@ -293,6 +303,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a small integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSmallInteger(Fluent $column)
+	{
+		return 'smallint';
+	}
+
+	/**
 	 * Create the column definition for a float type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -322,7 +343,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeBoolean(Fluent $column)
 	{
-		return 'tinyint';
+		return 'tinyint(1)';
 	}
 
 	/**
@@ -377,7 +398,9 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
-		return 'timestamp default 0';
+		if ( ! $column->nullable) return 'timestamp default 0';
+
+		return 'timestamp';
 	}
 
 	/**
@@ -400,10 +423,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyUnsigned(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->unsigned)
-		{
-			return ' unsigned';
-		}
+		if ($column->unsigned) return ' unsigned';
 	}
 
 	/**

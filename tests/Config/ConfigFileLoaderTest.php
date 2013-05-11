@@ -80,8 +80,8 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 		$loader = $this->getLoader();
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/packages/dayle/rees/group.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/packages/dayle/rees/group.php')->andReturn(array('bar' => 'baz'));
-		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/local/packages/dayle/rees/group.php')->andReturn(true);
-		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/packages/dayle/rees/group.php')->andReturn(array('foo' => 'boom'));
+		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/packages/dayle/rees/local/group.php')->andReturn(true);
+		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/packages/dayle/rees/local/group.php')->andReturn(array('foo' => 'boom'));
 		$items = $loader->cascadePackage('local', 'dayle/rees', 'group', array('foo' => 'bar'));
 
 		$this->assertEquals(array('foo' => 'boom', 'bar' => 'baz'), $items);

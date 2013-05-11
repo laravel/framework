@@ -2,6 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\OptimizeCommand;
+use Illuminate\Foundation\Console\ClearCompiledCommand;
 
 class OptimizeServiceProvider extends ServiceProvider {
 
@@ -19,12 +20,37 @@ class OptimizeServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->registerOptimizeCommand();
+
+		$this->registerClearCompiledCommand();
+
+		$this->commands('command.optimize', 'command.clear-compiled');
+	}
+
+	/**
+	 * Register the optimize command.
+	 *
+	 * @return void
+	 */
+	protected function registerOptimizeCommand()
+	{
 		$this->app['command.optimize'] = $this->app->share(function($app)
 		{
 			return new OptimizeCommand($app['composer']);
 		});
+	}
 
-		$this->commands('command.optimize');
+	/**
+	 * Register the compiled file remover command.
+	 *
+	 * @return void
+	 */
+	protected function registerClearCompiledCommand()
+	{
+		$this->app['command.clear-compiled'] = $this->app->share(function()
+		{
+			return new ClearCompiledCommand;
+		});
 	}
 
 	/**
@@ -34,7 +60,7 @@ class OptimizeServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.optimize');
+		return array('command.optimize', 'command.clear-compiled');
 	}
 
 }

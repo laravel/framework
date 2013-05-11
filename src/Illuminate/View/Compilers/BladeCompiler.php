@@ -34,6 +34,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'Language',
 		'SectionStart',
 		'SectionStop',
+		'SectionOverwrite',
 	);
 
 	/**
@@ -171,7 +172,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		return $this->compileEscapedEchos($this->compileRegularEchos($value));
+		return $this->compileRegularEchos($this->compileEscapedEchos($value));
 	}
 
 	/**
@@ -182,9 +183,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
+		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
 
-		return preg_replace($pattern, '<?php echo e($1); ?>', $value);
+		return preg_replace($pattern, '<?php echo $1; ?>', $value);
 	}
 
 	/**
@@ -195,9 +196,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
+		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
 
-		return preg_replace($pattern, '<?php echo $1; ?>', $value);
+		return preg_replace($pattern, '<?php echo e($1); ?>', $value);
 	}
 
 	/**
@@ -329,11 +330,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('lang');
 
-		$value = preg_replace($pattern, '$1<?php echo Lang::get$2; ?>', $value);
+		$value = preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::get$2; ?>', $value);
 
 		$pattern = $this->createMatcher('choice');
 
-		return preg_replace($pattern, '$1<?php echo Lang::choice$2; ?>', $value);
+		return preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::choice$2; ?>', $value);
 	}
 
 	/**
@@ -359,7 +360,24 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createPlainMatcher('stop');
 
+		$value = preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
+
+		$pattern = $this->createPlainMatcher('endsection');
+
 		return preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
+	}
+
+	/**
+	 * Compile Blade section stop statements into valid PHP.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileSectionOverwrite($value)
+	{
+		$pattern = $this->createPlainMatcher('overwrite');
+
+		return preg_replace($pattern, '$1<?php $__env->stopSection(true); ?>$2', $value);
 	}
 
 	/**
@@ -400,18 +418,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @param  string  $openTag
 	 * @param  string  $closeTag
-	 * @param  bool    $raw
+	 * @param  bool    $escaped
 	 * @return void
 	 */
-	public function setContentTags($openTag, $closeTag, $raw = false)
+	public function setContentTags($openTag, $closeTag, $escaped = false)
 	{
-		$property = ($raw === true) ? 'escapedTags' : 'contentTags';
+		$property = ($escaped === true) ? 'escapedTags' : 'contentTags';
 
 		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
 	}
 
 	/**
-	 * Sets the raw content tags used for the compiler.
+	 * Sets the escaped content tags used for the compiler.
 	 *
 	 * @param  string  $openTag
 	 * @param  string  $closeTag

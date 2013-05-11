@@ -159,9 +159,27 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 * @param  string  $value
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function appends($key, $value)
+	public function appends($key, $value = null)
 	{
+		if (is_array($key)) return $this->appendArray($key);
+
 		return $this->addQuery($key, $value);
+	}
+
+	/**
+	 * Add an array of query string values.
+	 *
+	 * @param  array  $keys
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	protected function appendArray(array $keys)
+	{
+		foreach ($keys as $key => $value)
+		{
+			$this->addQuery($key, $value);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -226,6 +244,27 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getTotal()
 	{
 		return $this->total;
+	}
+
+	/**
+	* Set the base URL in use by the paginator.
+	*
+	* @param  string  $baseUrl
+	* @return void
+	*/
+	public function setBaseUrl($baseUrl)
+	{
+		$this->env->setBaseUrl($baseUrl);
+	}
+
+	/**
+	 * Get the pagination environment.
+	 *
+	 * @return \Illuminate\Pagination\Environment
+	 */
+	public function getEnvironment()
+	{
+		return $this->env;
 	}
 
 	/**

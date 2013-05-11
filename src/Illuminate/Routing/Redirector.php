@@ -31,6 +31,17 @@ class Redirector {
 	}
 
 	/**
+	 * Create a new redirect response to the "home" route.
+	 *
+	 * @param  int  $status
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function home($status = 302)
+	{
+		return $this->to($this->generator->route('home'), $status);
+	}
+
+	/**
 	 * Create a new redirect response to the previous location.
 	 *
 	 * @param  int    $status
@@ -54,6 +65,40 @@ class Redirector {
 	public function refresh($status = 302, $headers = array())
 	{
 		return $this->to($this->generator->getRequest()->path(), $status, $headers);
+	}
+
+	/**
+	 * Create a new redirect response, while putting the current URL in the session.
+	 *
+	 * @param  string  $path
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @param  bool    $secure
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function guest($path, $status = 302, $headers = array(), $secure = null)
+	{
+		$this->session->put('url.intended', $this->generator->full());
+
+		return $this->to($path, $status, $headers, $secure);
+	}
+
+	/**
+	 * Create a new redirect response to the previously intended location.
+	 *
+	 * @param  string  $default
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @param  bool    $secure
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function intended($default, $status = 302, $headers = array(), $secure = null)
+	{
+		$path = $this->session->get('url.intended', $default);
+
+		$this->session->forget('url.intended');
+
+		return $this->to($path, $status, $headers, $secure);
 	}
 
 	/**

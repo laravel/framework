@@ -10,6 +10,13 @@ abstract class Job {
 	protected $instance;
 
 	/**
+	 * The IoC container instance.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
+
+	/**
 	 * Fire the job.
 	 *
 	 * @return void
@@ -37,6 +44,45 @@ abstract class Job {
 	 * @return int
 	 */
 	abstract public function attempts();
+
+	/**
+	 * Resolve and fire the job handler method.
+	 *
+	 * @param  array  $payload
+	 * @return void
+	 */
+	protected function resolveAndFire(array $payload)
+	{
+		list($class, $method) = $this->parseJob($payload['job']);
+
+		$this->instance = $this->resolve($class);
+
+		$this->instance->{$method}($this, $payload['data']);
+	}
+
+	/**
+	 * Resolve the given job handler.
+	 *
+	 * @param  string  $class
+	 * @return mixed
+	 */
+	protected function resolve($class)
+	{
+		return $this->container->make($class);
+	}
+
+	/**
+	 * Parse the job declaration into class and method.
+	 *
+	 * @param  string  $job
+	 * @return array
+	 */
+	protected function parseJob($job)
+	{
+		$segments = explode('@', $job);
+
+		return count($segments) > 1 ? $segments : array($segments[0], 'fire');
+	}
 
 	/**
 	 * Determine if job should be auto-deleted.

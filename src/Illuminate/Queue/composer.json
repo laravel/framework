@@ -10,8 +10,9 @@
         "php": ">=5.3.0",
         "illuminate/console": "4.0.x",
         "illuminate/container": "4.0.x",
+        "illuminate/http": "4.0.x",
         "illuminate/support": "4.0.x",
-        "symfony/process": "2.2.*"
+        "symfony/process": "2.3.*"
     },
     "require-dev": {
         "aws/aws-sdk-php": "2.1.*",
@@ -23,7 +24,7 @@
             "Illuminate\\Queue": ""
         },
         "classmap": [
-            "Illuminate/Queue/Pheanstalk"
+            "IlluminateQueueClosure.php"
         ]
     },
     "target-dir": "Illuminate/Queue",

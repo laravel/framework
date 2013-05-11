@@ -223,18 +223,17 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testAfterAndCloseFiltersAreCalled()
+	public function testAfterFiltersAreCalled()
 	{
 		$_SERVER['__routing.test'] = '';
 		$router = new Router;
 		$router->get('/foo', function() { return 'foo'; });
 		$router->before(function() { return null; });
 		$router->after(function() { $_SERVER['__routing.test'] = 'foo'; });
-		$router->close(function() { $_SERVER['__routing.test'] .= 'bar'; });
 		$request = Request::create('/foo', 'GET');
 		
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
-		$this->assertEquals('foobar', $_SERVER['__routing.test']);
+		$this->assertEquals('foo', $_SERVER['__routing.test']);
 		unset($_SERVER['__routing.test']);
 	}
 
@@ -374,6 +373,15 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWhereAcceptsArrayOfRequirements()
+	{
+		$router = new Router;
+		$router->get('/foo/{name}/{age}', function($name, $age) { return $name.$age; })->where(array('age' => '[0-9]+'));
+		$request = Request::create('/foo/jason/22', 'GET');
+		$this->assertEquals('jason22', $router->dispatch($request)->getContent());
+	}
+
+
 	/**
 	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
@@ -503,11 +511,11 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 				array('verb' => 'get', 'uri' => 'foo'),
 			)
 		));
-		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo('FooController@getFoo'));
+		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array('as' => 'someName', 'uses' => 'FooController@getFoo')));
 		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
 		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
 
-		$router->controller('prefix', 'FooController');
+		$router->controller('prefix', 'FooController', array('getFoo' => 'someName'));
 	}
 
 

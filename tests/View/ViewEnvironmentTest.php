@@ -18,7 +18,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
 		$env->getFinder()->shouldReceive('addExtension')->once()->with('php');
 		$env->addExtension('php', 'php');
-		$view = $env->make('view', array('data'));
+		$view = $env->make('view', array('foo' => 'bar'), array('baz' => 'boom'));
 
 		$this->assertTrue($engine === $view->getEngine());
 	}
@@ -57,6 +57,29 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('empty', $env->renderEach('view', array(), 'iterator', 'foo'));
 	}
+
+
+    public function testAddANamedViews()
+    {
+        $env = $this->getEnvironment();
+        $env->name('bar', 'foo');
+
+        $this->assertEquals(array('foo' => 'bar'), $env->getNames());
+    }
+
+
+    public function testMakeAViewFromNamedView()
+    {
+        $env = $this->getEnvironment();
+        $env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
+        $env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
+        $env->getFinder()->shouldReceive('addExtension')->once()->with('php');
+        $env->addExtension('php', 'php');
+        $env->name('view', 'foo');
+        $view = $env->of('foo', array('data'));
+
+        $this->assertTrue($engine === $view->getEngine());
+    }
 
 
 	public function testRawStringsMayBeReturnedFromRenderEach()

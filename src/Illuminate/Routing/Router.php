@@ -55,7 +55,7 @@ class Router {
 	/**
 	 * The inversion of control container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
@@ -239,9 +239,10 @@ class Router {
 	 *
 	 * @param  string  $uri
 	 * @param  string  $controller
+	 * @param  array   $names
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function controller($uri, $controller)
+	public function controller($uri, $controller, $names = array())
 	{
 		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
@@ -252,11 +253,32 @@ class Router {
 		{
 			foreach ($routes as $route)
 			{
-				$this->{$route['verb']}($route['uri'], $controller.'@'.$method);
+				$this->registerInspected($route, $controller, $method, $names);
 			}
 		}
 
 		$this->addFallthroughRoute($controller, $uri);
+	}
+
+	/**
+	 * Register an inspected controller route.
+	 *
+	 * @param  array   $route
+	 * @param  string  $controller
+	 * @param  string  $method
+	 * @param  array   $names
+	 * @return void
+	 */
+	protected function registerInspected($route, $controller, $method, &$names)
+	{
+		$action = array('uses' => $controller.'@'.$method);
+
+		// If a given controller method has been named, we will assign the name to
+		// the controller action array. This provides for a short-cut to method
+		// naming, so you don't have to define an individual route for these.
+		$action['as'] = array_pull($names, $method);
+
+		$this->{$route['verb']}($route['uri'], $action);
 	}
 
 	/**
@@ -503,23 +525,41 @@ class Router {
 	 */
 	public function getResourceUri($resource)
 	{
-		if ( ! str_contains($resource, '.')) return $resource;
-
 		// To create the nested resource URI, we will simply explode the segments and
 		// create a base URI for each of them, then join all of them back together
 		// with slashes. This should create the properly nested resource routes.
-		$nested = implode('/', array_map(function($segment)
-		{
-			return $segment.'/{'.$segment.'}';
+		if ( ! str_contains($resource, '.')) return $resource;
 
-		}, $segments = explode('.', $resource)));
+		$segments = explode('.', $resource);
+
+		$nested = $this->getNestedResourceUri($segments);
 
 		// Once we have built the base URI, we'll remove the wildcard holder for this
 		// base resource name so that the individual route adders can suffix these
 		// paths however they need to, as some do not have any wildcards at all.
-		$last = $segments[count($segments) - 1];
+		$last = $this->getResourceWildcard(last($segments));
 
 		return str_replace('/{'.$last.'}', '', $nested);
+	}
+
+	/**
+	 * Get the URI for a nested resource segment array.
+	 *
+	 * @param  array   $segments
+	 * @return string
+	 */
+	protected function getNestedResourceUri(array $segments)
+	{
+		$me = $this;
+
+		// We will spin through the segments and create a place-holder for each of the
+		// resource segments, as well as the resource itself. Then we should get an
+		// entire string for the resource URI that contains all nested resources.
+		return implode('/', array_map(function($s) use ($me)
+		{
+			return $s.'/{'.$me->getResourceWildcard($s).'}';
+
+		}, $segments));
 	}
 
 	/**
@@ -537,16 +577,23 @@ class Router {
 		// If we have a group stack, we will append the full prefix onto the resource
 		// route name so that we don't override other route with the same name but
 		// a different prefix. We'll then return out the complete action arrays.
-		if (count($this->groupStack) > 0)
-		{
-			$name = $this->getResourcePrefix($resource, $method);
-		}
-		else
-		{
-			$name = $resource.'.'.$method;
-		}
+		$name = $this->getResourceName($resource, $method);
 
 		return array('as' => $name, 'uses' => $controller.'@'.$method);
+	}
+
+	/**
+	 * Get the name for a given resource.
+	 *
+	 * @param  string  $resource
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getResourceName($resource, $method)
+	{
+		if (count($this->groupStack) == 0) return $resource.'.'.$method;
+
+		return $this->getResourcePrefix($resource, $method);
 	}
 
 	/**
@@ -575,7 +622,18 @@ class Router {
 	{
 		$segments = explode('.', $resource);
 
-		return $segments[count($segments) - 1];
+		return $this->getResourceWildcard($segments[count($segments) - 1]);
+	}
+
+	/**
+	 * Format a resource wildcard parameter.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public function getResourceWildcard($value)
+	{
+		return str_replace('-', '_', $value);
 	}
 
 	/**
@@ -931,8 +989,8 @@ class Router {
 	/**
 	 * Get the response for a given request.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function dispatch(Request $request)
 	{
@@ -969,7 +1027,7 @@ class Router {
 	/**
 	 * Match the given request to a route object.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Illuminate\Routing\Route
 	 */
 	protected function findRoute(Request $request)
@@ -1170,33 +1228,43 @@ class Router {
 	/**
 	 * Call the "after" global filters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	protected function callAfterFilter(Request $request, SymfonyResponse $response)
 	{
 		$this->callGlobalFilter($request, 'after', array($response));
-
-		$this->callGlobalFilter($request, 'close', array($response));
 	}
 
 	/**
-	 * Call the "finish" global filter.
+	 * Call the finish" global filter.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request   $request
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	public function callFinishFilter(Request $request, SymfonyResponse $response)
 	{
-		return $this->callGlobalFilter($request, 'finish', array($response));
+		$this->callGlobalFilter($request, 'finish', array($response));
+	}
+
+	/**
+	 * Call the "close" global filter.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @return mixed
+	 */
+	public function callCloseFilter(Request $request, SymfonyResponse $response)
+	{
+		$this->callGlobalFilter($request, 'close', array($response));
 	}
 
 	/**
 	 * Call a given global filter with the parameters.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $name
 	 * @param  array   $parameters
 	 * @return mixed
@@ -1240,9 +1308,9 @@ class Router {
 	 * @param  string  $class
 	 * @return void
 	 */
-	public function model($key, $class)
+	public function model($key, $class, Closure $callback = null)
 	{
-		return $this->bind($key, function($value) use ($class)
+		return $this->bind($key, function($value) use ($class, $callback)
 		{
 			if (is_null($value)) return null;
 
@@ -1252,6 +1320,14 @@ class Router {
 			if ( ! is_null($model = with(new $class)->find($value)))
 			{
 				return $model;
+			}
+
+			// If a callback was supplied to the method we will call that to determine
+			// what we should do when the model is not found. This just gives these
+			// developer a little greater flexibility to decide what will happen.
+			if ($callback instanceof Closure)
+			{
+				return call_user_func($callback);
 			}
 
 			throw new NotFoundHttpException;
@@ -1266,7 +1342,7 @@ class Router {
 	 */
 	public function bind($key, $binder)
 	{
-		$this->binders[$key] = $binder;
+		$this->binders[str_replace('-', '_', $key)] = $binder;
 	}
 
 	/**
@@ -1298,7 +1374,7 @@ class Router {
 	 *
 	 * @param  mixed  $value
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
 	{
@@ -1364,7 +1440,9 @@ class Router {
 	 */
 	public function currentRouteAction()
 	{
-		return $this->currentRoute->getOption('_uses');
+		$currentRoute = $this->currentRoute;
+
+		if ( ! is_null($currentRoute)) return $currentRoute->getOption('_uses');
 	}
 
 	/**
@@ -1411,7 +1489,7 @@ class Router {
 	/**
 	 * Retrieve the entire route collection.
 	 * 
-	 * @return Symfony\Component\Routing\RouteCollection
+	 * @return \Symfony\Component\Routing\RouteCollection
 	 */
 	public function getRoutes()
 	{
@@ -1421,7 +1499,7 @@ class Router {
 	/**
 	 * Get the current request being dispatched.
 	 *
-	 * @return Symfony\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getRequest()
 	{
@@ -1472,8 +1550,8 @@ class Router {
 	/**
 	 * Create a new URL matcher instance.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
-	 * @return Symfony\Component\Routing\Matcher\UrlMatcher
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\Routing\Matcher\UrlMatcher
 	 */
 	protected function getUrlMatcher(Request $request)
 	{
