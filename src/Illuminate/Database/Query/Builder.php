@@ -824,12 +824,17 @@ class Builder {
 	/**
 	 * Add a union statement to the query.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder|\Closure  $query
 	 * @param  bool $all
 	 * @return \Illuminate\Database\Query\Builder
 	 */
-	public function union(Builder $query, $all = false)
+	public function union($query, $all = false)
 	{
+		if ($query instanceof Closure)
+		{
+			call_user_func($query, $query = $this->newQuery());
+		}
+		
 		$this->unions[] = compact('query', 'all');
 
 		return $this->mergeBindings($query);
@@ -838,10 +843,10 @@ class Builder {
 	/**
 	 * Add a union all statement to the query.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  \Illuminate\Database\Query\Builder|\Closure  $query
 	 * @return \Illuminate\Database\Query\Builder
 	 */
-	public function unionAll(Builder $query)
+	public function unionAll($query)
 	{
 		return $this->union($query, true);
 	}
