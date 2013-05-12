@@ -79,6 +79,7 @@
 - Added `smallInteger` to query builder.
 - Added `dd` and `array_pull` helpers.
 - Fix bug that caused plualizer to not respect casing.
+- Fix attribute handling bug in validation messages like `required_if`, etc.
 
 ## Beta 4
 
