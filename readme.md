@@ -78,6 +78,7 @@
 - Allow "dot" notation access into session arrays.
 - Added `smallInteger` to query builder.
 - Added `dd` and `array_pull` helpers.
+- Fix bug that caused plualizer to not respect casing.
 
 ## Beta 4
 
