@@ -81,6 +81,7 @@
 - Fix bug that caused plualizer to not respect casing.
 - Fix attribute handling bug in validation messages like `required_if`, etc.
 - Include CSRF tokens by default in every non-GET form.
+- `updated_at` model timestamps are now automatically handled for ad-hoc queries.
 
 ## Beta 4
 

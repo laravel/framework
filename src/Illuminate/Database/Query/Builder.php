@@ -1213,13 +1213,16 @@ class Builder {
 	 *
 	 * @param  string  $column
 	 * @param  int     $amount
+	 * @param  array   $extra
 	 * @return int
 	 */
-	public function increment($column, $amount = 1)
+	public function increment($column, $amount = 1, array $extra = array())
 	{
 		$wrapped = $this->grammar->wrap($column);
 
-		return $this->update(array($column => $this->raw("$wrapped + $amount")));
+		$columns = array_merge(array($column => $this->raw("$wrapped + $amount")), $extra);
+
+		return $this->update($columns);
 	}
 
 	/**
@@ -1227,13 +1230,16 @@ class Builder {
 	 *
 	 * @param  string  $column
 	 * @param  int     $amount
+	 * @param  array   $extra
 	 * @return int
 	 */
-	public function decrement($column, $amount = 1)
+	public function decrement($column, $amount = 1, array $extra = array())
 	{
 		$wrapped = $this->grammar->wrap($column);
 
-		return $this->update(array($column => $this->raw("$wrapped - $amount")));
+		$columns = array_merge(array($column => $this->raw("$wrapped - $amount")), $extra);
+
+		return $this->update($columns);
 	}
 
 	/**
