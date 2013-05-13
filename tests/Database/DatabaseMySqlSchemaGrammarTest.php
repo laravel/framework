@@ -51,7 +51,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$grammar->setTablePrefix('prefix_');
 
 		$conn = $this->getConnection();
-		$conn->shouldReceive('getConfig')->andReturn(null);		
+		$conn->shouldReceive('getConfig')->andReturn(null);
 
 		$statements = $blueprint->toSql($conn, $grammar);
 
@@ -228,6 +228,17 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingBigIncrementingID()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->bigIncrements('id');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
+	}
+
+
 	public function testAddingColumnAfterAnotherColumn()
 	{
 		$blueprint = new Blueprint('users');
@@ -235,7 +246,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);	
+		$this->assertEquals('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);
 	}
 
 
@@ -282,6 +293,24 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingBigInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->bigInteger('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` bigint not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->bigInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` bigint not null auto_increment primary key', $statements[0]);
+	}
+
+
 	public function testAddingInteger()
 	{
 		$blueprint = new Blueprint('users');
@@ -296,9 +325,30 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table `users` add `foo` int not null auto_increment primary key', $statements[0]);				
+		$this->assertEquals('alter table `users` add `foo` int not null auto_increment primary key', $statements[0]);
 	}
 
+
+	public function testAddingMediumInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->mediumInteger('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` mediumint not null', $statements[0]);
+	}
+
+
+	public function testAddingSmallInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->smallInteger('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` smallint not null', $statements[0]);
+	}
 
 	public function testAddingTinyInteger()
 	{

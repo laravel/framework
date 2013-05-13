@@ -20,6 +20,13 @@ class PostgresGrammar extends Grammar {
 	protected $modifiers = array('Increment', 'Nullable', 'Default');
 
 	/**
+	 * The possible column serials
+	 *
+	 * @var array
+	 */
+	protected $serial = array('bigInteger', 'integer');
+
+	/**
 	 * Compile the query to determine if a table exists.
 	 *
 	 * @return string
@@ -234,6 +241,17 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a big integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeBigInteger(Fluent $column)
+	{
+		return $column->autoIncrement ? 'bigserial' : 'bigint';
+	}
+
+	/**
 	 * Create the column definition for a integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -242,6 +260,17 @@ class PostgresGrammar extends Grammar {
 	protected function typeInteger(Fluent $column)
 	{
 		return $column->autoIncrement ? 'serial' : 'integer';
+	}
+
+	/**
+	 * Create the column definition for a medium integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumInteger(Fluent $column)
+	{
+		return 'integer';
 	}
 
 	/**
@@ -401,7 +430,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) and $column->autoIncrement)
 		{
 			return ' primary key';
 		}

@@ -20,6 +20,13 @@ class SqlServerGrammar extends Grammar {
 	protected $modifiers = array('Increment', 'Nullable', 'Default');
 
 	/**
+	 * The possible column serials
+	 *
+	 * @var array
+	 */
+	protected $serial = array('bigInteger', 'integer');
+
+	/**
 	 * Compile the query to determine if a table exists.
 	 *
 	 * @return string
@@ -230,12 +237,34 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a big integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeBigInteger(Fluent $column)
+	{
+		return 'bigint';
+	}
+
+	/**
 	 * Create the column definition for a integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
 	protected function typeInteger(Fluent $column)
+	{
+		return 'int';
+	}
+
+	/**
+	 * Create the column definition for a medium integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumInteger(Fluent $column)
 	{
 		return 'int';
 	}
@@ -397,7 +426,7 @@ class SqlServerGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) and $column->autoIncrement)
 		{
 			return ' identity primary key';
 		}
