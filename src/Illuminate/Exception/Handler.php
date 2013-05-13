@@ -153,6 +153,10 @@ class Handler {
 
 			$response->send();
 		}
+
+		// If no response was sent by this custom exception handler, we will call the
+		// default exception displayer for the current application context and let
+		// it show the exception to the user / developer based on the situation.
 		else
 		{
 			$this->displayException($exception);
