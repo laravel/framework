@@ -257,6 +257,8 @@ class Builder {
 	 */
 	protected function addUpdatedAtColumn(array $values)
 	{
+		if ( ! $this->model->usesTimestamps()) return $values;
+
 		$column = $this->model->getUpdatedAtColumn();
 
 		return array_add($values, $column, new DateTime);
