@@ -80,6 +80,7 @@
 - Added `dd` and `array_pull` helpers.
 - Fix bug that caused plualizer to not respect casing.
 - Fix attribute handling bug in validation messages like `required_if`, etc.
+- Include CSRF tokens by default in every non-GET form.
 
 ## Beta 4
 
