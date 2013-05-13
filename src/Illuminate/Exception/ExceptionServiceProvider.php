@@ -103,7 +103,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerWhoopsHandler()
 	{
-		if ($this->app['request']->ajax() or $this->app->runningInConsole())
+		if ($this->shouldReturnJson())
 		{
 			$this->app['whoops.handler'] = function() { return new JsonResponseHandler; };
 		}
@@ -111,6 +111,18 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			$this->registerPrettyWhoopsHandler();
 		}
+	}
+
+	/**
+	 * Determine if the error provider should return JSON.
+	 *
+	 * @return bool
+	 */
+	protected function shouldReturnJson()
+	{
+		$definitely = $this->app['request']->ajax() or $this->app->runningInConsole();
+
+		return $definitely or $this->app['request']->wantsJson();
 	}
 
 	/**

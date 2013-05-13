@@ -436,6 +436,18 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	}
 
 	/**
+	 * Determine if the current request is asking for JSON in return.
+	 *
+	 * @return bool
+	 */
+	public function wantsJson()
+	{
+		$acceptable = $this->getAcceptableContentTypes();
+
+		return isset($acceptable[0]) and $acceptable[0] == 'application/json';
+	}
+
+	/**
 	 * Get the Illuminate session store implementation.
 	 *
 	 * @return \Illuminate\Session\Store
