@@ -1139,7 +1139,7 @@ class Router {
 	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public function addFilter($name, $callback)
+	public function filter($name, $callback)
 	{
 		$this->filters[$name] = $callback;
 	}
@@ -1191,13 +1191,16 @@ class Router {
 	 *
 	 * @param  string  $pattern
 	 * @param  string|array  $names
+	 * @param  array|null  $methods
 	 * @return void
 	 */
-	public function matchFilter($pattern, $names)
+	public function when($pattern, $names, $methods = null)
 	{
 		foreach ((array) $names as $name)
 		{
-			$this->patternFilters[$pattern][] = $name;
+			if ( ! is_null($methods)) $methods = array_change_key_case((array) $methods);
+
+			$this->patternFilters[$pattern][] = compact('name', 'methods');
 		}
 	}
 
@@ -1209,20 +1212,49 @@ class Router {
 	 */
 	public function findPatternFilters(Request $request)
 	{
-		$filters = array();
+		$results = array();
 
-		foreach ($this->patternFilters as $pattern => $values)
+		foreach ($this->patternFilters as $pattern => $filters)
 		{
 			// To find the pattern middlewares for a request, we just need to check the
 			// registered patterns against the path info for the current request to
 			// the application, and if it matches we'll merge in the middlewares.
 			if (str_is('/'.$pattern, $request->getPathInfo()))
 			{
-				$filters = array_merge($filters, $values);
+				$merge = $this->filterPatternsByMethod($request, $filters);
+
+				$results = array_merge($results, $merge);
 			}
 		}
 
-		return $filters;
+		return $results;
+	}
+
+	/**
+	 * Filter pattern filters that don't apply to the request verb.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  array  $filters
+	 * @return array
+	 */
+	protected function filterPatternsByMethod(Request $request, $filters)
+	{
+		$results = array();
+
+		$method = strtolower($request->getMethod());
+
+		// The idea here is to check and see if the pattern filter applies to this HTTP
+		// request based on the request methods. Pattern filters might be limited by
+		// the request verb to make it simply to assign to the given verb at once.
+		foreach ($filters as $filter)
+		{
+			if (is_null($filter['methods']) or in_array($method, $filter['methods']))
+			{
+				$results[] = $filter['name'];
+			}
+		}
+
+		return $results;
 	}
 
 	/**
