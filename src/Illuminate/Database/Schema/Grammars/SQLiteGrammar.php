@@ -25,7 +25,7 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $serial = array('bigInteger', 'integer');
+	protected $serials = array('bigInteger', 'integer');
 
 	/**
 	 * Compile the query to determine if a table exists.
