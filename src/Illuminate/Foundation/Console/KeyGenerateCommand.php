@@ -42,18 +42,13 @@ class KeyGenerateCommand extends Command {
 	{
 		$contents = $this->files->get($path = $this->laravel['path'].'/config/app.php');
 
-		$contents = str_replace('YourSecretKey!!!', $key = $this->getRandomKey(), $contents, $count);
+		$key = $this->getRandomKey();
 
-		if ($count == 0)
-		{
-			$this->comment('Application key has already been set.');
-		}
-		else
-		{
-			$this->files->put($path, $contents);
+		$contents = str_replace($this->laravel['config']['app.key'], $key, $contents);;
 
-			$this->info("Application key [$key] set successfully.");
-		}
+		$this->files->put($path, $contents);
+
+		$this->info("Application key [$key] set successfully.");
 	}
 
 	/**
