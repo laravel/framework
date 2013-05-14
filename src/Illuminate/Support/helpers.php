@@ -219,6 +219,37 @@ if ( ! function_exists('array_get'))
 
 		if (isset($array[$key])) return $array[$key];
 
+		foreach (explode('.', $key) as $segment)
+		{
+			if ( ! is_array($array) or ! array_key_exists($segment, $array))
+			{
+				return value($default);
+			}
+
+			$array = $array[$segment];
+		}
+
+		return $array;
+	}
+}
+
+
+if ( ! function_exists('array_select'))
+{
+	/**
+	 * Get an item from an array using "dot" notation and "wildcards".
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	function array_select($array, $key, $default = null)
+	{
+		if (is_null($key)) return $array;
+
+		if (isset($array[$key])) return $array[$key];
+
 		// Store resulting array if key contains wildcard.
 		$deepArray = array();
 		$keys = explode('.', $key);
@@ -243,7 +274,7 @@ if ( ! function_exists('array_get'))
 						else
 						{
 							// Pass current array item deeper.
-							$innerItem = array_get($item, $innerKey, $default);
+							$innerItem = array_select($item, $innerKey, $default);
 							if (is_array($innerItem) and count(array_keys($keys, '*')) > 1)
 							{
 								// Multiple wildcards, add each item of inner array to the resulting new array.
@@ -285,6 +316,8 @@ if ( ! function_exists('array_get'))
 		return $array;
 	}
 }
+
+
 
 if ( ! function_exists('array_only'))
 {
