@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirect;
 
 class Application extends Container implements HttpKernelInterface, ResponsePreparerInterface {
 
@@ -122,7 +123,29 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		$url = $this['config']->get('app.url', 'http://localhost');
 
-		$this['request'] = Request::create($url, 'GET', array(), array(), array(), $_SERVER);
+		$this->instance('request', Request::create($url, 'GET', array(), array(), array(), $_SERVER));
+	}
+
+	/**
+	 * Redirect the request if it has a trailing slash.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+	 */
+	public function redirectIfTrailingSlash()
+	{
+		if ($this->runningInConsole()) return;
+
+		// Here we will check if the request path ends in a single trailing slash and
+		// redirect it using a 301 response code if it does which avoids duplicate
+		// content in this application while still providing a solid experience.
+		$path = $this['request']->getPathInfo();
+
+		if (ends_with($path, '/') and ! ends_with($path, '//'))
+		{
+			with(new SymfonyRedirect($this['request']->fullUrl(), 301))->send();
+
+			exit;			
+		}
 	}
 
 	/**
