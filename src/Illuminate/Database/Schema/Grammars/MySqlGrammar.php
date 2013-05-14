@@ -21,6 +21,13 @@ class MySqlGrammar extends Grammar {
 	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After');
 
 	/**
+	 * The possible column serials
+	 *
+	 * @var array
+	 */
+	protected $serials = array('bigInteger', 'integer');
+
+	/**
 	 * Compile the query to determine if a table exists.
 	 *
 	 * @return string
@@ -281,6 +288,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a big integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeBigInteger(Fluent $column)
+	{
+		return 'bigint';
+	}
+
+	/**
 	 * Create the column definition for a integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -289,6 +307,17 @@ class MySqlGrammar extends Grammar {
 	protected function typeInteger(Fluent $column)
 	{
 		return 'int';
+	}
+
+	/**
+	 * Create the column definition for a medium integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumInteger(Fluent $column)
+	{
+		return 'mediumint';
 	}
 
 	/**
@@ -462,7 +491,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) and $column->autoIncrement)
 		{
 			return ' auto_increment primary key';
 		}
