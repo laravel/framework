@@ -83,7 +83,7 @@ class Listener {
 	 */
 	public function makeProcess($connection, $queue, $delay, $memory, $timeout)
 	{
-		$string = 'php artisan queue:work %s --queue=%s --delay=%s --memory=%s --sleep';
+		$string = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep';
 
 		// If the environment is set, we will append it to the command string so the
 		// workers will run under the specified environment. Otherwise, they will
