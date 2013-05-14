@@ -140,7 +140,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		// content in this application while still providing a solid experience.
 		$path = $this['request']->getPathInfo();
 
-		if (ends_with($path, '/') and ! ends_with($path, '//'))
+		if ($path != '/' and ends_with($path, '/') and ! ends_with($path, '//'))
 		{
 			with(new SymfonyRedirect($this['request']->fullUrl(), 301))->send();
 
