@@ -178,13 +178,7 @@ class Pluralizer {
 	 */
 	protected static function inflect($value, $source, $irregular)
 	{
-		// If the word hasn't been cached, we'll check the list of words that are in
-		// this list of uncountable word forms. This will be a quick search since
-		// we will just hit the arrays directly for values without expressions.
-		if (in_array(strtolower($value), static::$uncountable))
-		{
-			return $value;
-		}
+		if (static::uncountable($value)) return $value;
 
 		// Next, we will check the "irregular" patterns which contain words that are
 		// not easily summarized in regular expression rules, like "children" and
@@ -193,6 +187,8 @@ class Pluralizer {
 		{
 			if (preg_match($pattern = '/'.$pattern.'$/i', $value))
 			{
+				$irregular = static::matchCase($irregular, $value);
+				
 				return preg_replace($pattern, $irregular, $value);
 			}
 		}
@@ -204,9 +200,44 @@ class Pluralizer {
 		{
 			if (preg_match($pattern, $value))
 			{
-				return preg_replace($pattern, $inflected, $value);
+				$inflected = preg_replace($pattern, $inflected, $value);
+
+				return static::matchCase($inflected, $value);
 			}
 		}
+	}
+
+	/**
+	 * Determine if the given value is uncountable.
+	 *
+	 * @param  string  $value
+	 * @return bool
+	 */
+	protected static function uncountable($value)
+	{
+		return in_array(strtolower($value), static::$uncountable);
+	}
+
+	/**
+	 * Attempt to match the case on two strings.
+	 *
+	 * @param  string  $value
+	 * @param  string  $comparison
+	 * @return string
+	 */
+	protected static function matchCase($value, $comparison)
+	{
+		$functions = array('mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords');
+
+		foreach ($functions as $function)
+		{
+			if (call_user_func($function, $comparison) === $comparison)
+			{
+				return call_user_func($function, $value);
+			}
+		}
+
+		return $value;
 	}
 
 }

@@ -78,6 +78,12 @@
 - Allow "dot" notation access into session arrays.
 - Added `smallInteger` to query builder.
 - Added `dd` and `array_pull` helpers.
+- Fix bug that caused pluralizer to not respect casing.
+- Fix attribute handling bug in validation messages like `required_if`, etc.
+- Include CSRF tokens by default in every non-GET form.
+- `updated_at` model timestamps are now automatically handled for ad-hoc queries.
+- Allow pattern filters to be specified with an HTTP verb constraint.
+- Added `bigint` and `mediumint` on schema builder
 
 ## Beta 4
 

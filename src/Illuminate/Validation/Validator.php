@@ -1087,6 +1087,27 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Transform an array of attributes to their displayable form.
+	 *
+	 * @param  array  $values
+	 * @return array
+	 */
+	protected function getAttributeList(array $values)
+	{
+		$attributes = array();
+
+		// For each attribute in the list we will simply get its displayable form as
+		// this is convenient when replacing lists of parameters like some of the
+		// replacement functions do when formatting out the validation message.
+		foreach ($values as $key => $value)
+		{
+			$attributes[$key] = $this->getAttribute($value);
+		}
+
+		return $attributes;
+	}
+
+	/**
 	 * Get the displayable name of the attribute.
 	 *
 	 * @param  string  $attribute
@@ -1258,6 +1279,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
 	{
+		$parameters = $this->getAttributeList($parameters);
+
 		return str_replace(':values', implode(' / ', $parameters), $message);
 	}
 
@@ -1272,6 +1295,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
 	{
+		$parameters = $this->getAttributeList($parameters);
+
 		return str_replace(':values', implode(' / ', $parameters), $message);
 	}
 
@@ -1286,6 +1311,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
 	{
+		$parameters[0] = $this->getAttribute($parameters[0]);
+
 		return str_replace(array(':other', ':value'), $parameters, $message);
 	}
 

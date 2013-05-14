@@ -253,8 +253,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = new Router;
 		$router->get('/foo', array('before' => 'filter|filter-2', function() { return 'foo'; }));
-		$router->addFilter('filter', function() { return 'filtered!'; });
-		$router->addFilter('filter-2', function() { return null; });
+		$router->filter('filter', function() { return 'filtered!'; });
+		$router->filter('filter-2', function() { return null; });
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('filtered!', $router->dispatch($request)->getContent());
 	}
@@ -265,7 +265,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		unset($_SERVER['__before.args']);
 		$router = new Router;
 		$route = $router->get('/foo', array('before' => 'filter', function() { return 'foo'; }));
-		$router->addFilter('filter', function() { $_SERVER['__before.args'] = func_get_args(); });
+		$router->filter('filter', function() { $_SERVER['__before.args'] = func_get_args(); });
 		$request = Request::create('/foo', 'GET');
 
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
@@ -280,7 +280,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		unset($_SERVER['__before.args']);
 		$router = new Router;
 		$route = $router->get('/foo', array('before' => 'filter:dayle,rees', function() { return 'foo'; }));
-		$router->addFilter('filter', function() { $_SERVER['__before.args'] = func_get_args(); });
+		$router->filter('filter', function() { $_SERVER['__before.args'] = func_get_args(); });
 		$request = Request::create('/foo', 'GET');
 
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
@@ -296,10 +296,28 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = new Router;
 		$router->get('/foo', function() { return 'bar'; });
-		$router->matchFilter('bar*', 'something');
-		$router->matchFilter('f*', 'filter');
-		$router->addFilter('filter', function() { return 'filtered!'; });
-		$router->addFilter('something', function() { return 'something'; });
+		$router->when('bar*', 'something');
+		$router->when('f*', 'filter');
+		$router->filter('filter', function() { return 'filtered!'; });
+		$router->filter('something', function() { return 'something'; });
+		$request = Request::create('/foo', 'GET');
+		$this->assertEquals('filtered!', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testPatternFiltersCanBeAppliedPerHttpVerb()
+	{
+		$router = new Router;
+		$router->get('/foo', function() { return 'bar'; });
+		$router->when('f*', 'filter', array('post', 'put', 'delete'));
+		$router->filter('filter', function() { return 'filtered!'; });
+		$request = Request::create('/foo', 'GET');
+		$this->assertEquals('bar', $router->dispatch($request)->getContent());
+
+		$router = new Router;
+		$router->get('/foo', function() { return 'bar'; });
+		$router->when('f*', 'filter', array('get'));
+		$router->filter('filter', function() { return 'filtered!'; });
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('filtered!', $router->dispatch($request)->getContent());
 	}
@@ -309,7 +327,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = new Router;
 		$_SERVER['__filter.after'] = false;
-		$router->addFilter('filter', function() { return $_SERVER['__filter.after'] = true; });
+		$router->filter('filter', function() { return $_SERVER['__filter.after'] = true; });
 		$router->get('/foo', array('after' => 'filter', function() { return 'foo'; }));
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
@@ -323,8 +341,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 		$router = new Router;
 		$_SERVER['__filter.before'] = false;
 		$_SERVER['__filter.after'] = false;
-		$router->addFilter('before-filter', function() { $_SERVER['__filter.before'] = true; return 'foo'; });
-		$router->addFilter('after-filter', function() { $_SERVER['__filter.after'] = true; });
+		$router->filter('before-filter', function() { $_SERVER['__filter.before'] = true; return 'foo'; });
+		$router->filter('after-filter', function() { $_SERVER['__filter.after'] = true; });
 		$router->get('/foo', array('before' => 'before-filter', 'after' => 'after-filter', function() { return 'bar'; }));
 		$request = Request::create('/foo', 'GET');
 		$this->assertEquals('foo', $router->dispatch($request)->getContent());
@@ -339,7 +357,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = new Router;
 		$_SERVER['__filter.after'] = false;
-		$router->addFilter('filter', function() { return $_SERVER['__after.args'] = func_get_args(); });
+		$router->filter('filter', function() { return $_SERVER['__after.args'] = func_get_args(); });
 		$route = $router->get('/foo', array('after' => 'filter:dayle,rees', function() { return 'foo'; }));
 		$request = Request::create('/foo', 'GET');
 
@@ -363,8 +381,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 			return 'hello world';
 		}));
 		$router->before(function() { $_SERVER['__filter.test'] = true; });
-		$router->addFilter('route-before', function() { $_SERVER['__filter.test'] = true; });
-		$router->matchFilter('foo', 'route-before');
+		$router->filter('route-before', function() { $_SERVER['__filter.test'] = true; });
+		$router->when('foo', 'route-before');
 		$router->after(function() { $_SERVER['__filter.test'] = true; });
 
 		$request = Request::create('/foo', 'GET');
@@ -451,7 +469,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	public function testStringFilterAreResolvedOutOfTheContainer()
 	{
 		$router = new Router($container = m::mock('Illuminate\Container\Container'));
-		$router->addFilter('foo', 'FooFilter');
+		$router->filter('foo', 'FooFilter');
 		$container->shouldReceive('make')->once()->with('FooFilter')->andReturn('bar');
 
 		$this->assertEquals(array('bar', 'filter'), $router->getFilter('foo'));
@@ -461,7 +479,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	public function testStringFilterAreResolvedOutOfTheContainerWithCustomMethods()
 	{
 		$router = new Router($container = m::mock('Illuminate\Container\Container'));
-		$router->addFilter('foo', 'FooFilter@something');
+		$router->filter('foo', 'FooFilter@something');
 		$container->shouldReceive('make')->once()->with('FooFilter')->andReturn('bar');
 
 		$this->assertEquals(array('bar', 'something'), $router->getFilter('foo'));

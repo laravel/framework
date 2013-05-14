@@ -166,8 +166,8 @@ class SessionManager extends Manager {
 
 		return array(
 			'cookie_domain' => $config['domain'], 'cookie_lifetime' => $config['lifetime'] * 60,
-			'cookie_path' => $config['path'], 'gc_divisor' => $config['lottery'][1],
-			'gc_probability' => $config['lottery'][0], 'name' => $config['cookie'],
+			'cookie_path' => $config['path'], 'cookie_httponly' => '1', 'name' => $config['cookie'],
+			'gc_divisor' => $config['lottery'][1], 'gc_probability' => $config['lottery'][0],
 		);
 	}
 

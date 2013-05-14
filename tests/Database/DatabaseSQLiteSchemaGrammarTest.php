@@ -170,6 +170,17 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingBigIncrementingID()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->bigIncrements('id');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "id" integer null primary key autoincrement', $statements[0]);
+	}
+
+
 	public function testAddingString()
 	{
 		$blueprint = new Blueprint('users');
@@ -206,6 +217,24 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingBigInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->bigInteger('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->bigInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" integer null primary key autoincrement', $statements[0]);
+	}
+
+
 	public function testAddingInteger()
 	{
 		$blueprint = new Blueprint('users');
@@ -221,6 +250,17 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" add column "foo" integer null primary key autoincrement', $statements[0]);
+	}
+
+
+	public function testAddingMediumInteger()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->mediumInteger('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
 	}
 
 

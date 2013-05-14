@@ -48,6 +48,24 @@ if ( ! function_exists('app_path'))
 	}
 }
 
+if ( ! function_exists('array_add'))
+{
+	/**
+	 * Add an element to an array if it doesn't exist.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return array
+	 */
+	function array_add($array, $key, $value)
+	{
+		if ( ! isset($array[$key])) $array[$key] = $value;
+
+		return $array;
+	}
+}
+
 if ( ! function_exists('array_divide'))
 {
 	/**

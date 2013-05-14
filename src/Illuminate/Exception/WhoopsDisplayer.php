@@ -23,6 +23,8 @@ class WhoopsDisplayer implements ExceptionDisplayerInterface {
 	 */
 	public function display(Exception $exception)
 	{
+		header('HTTP/1.1 500 Internal Server Error');
+
 		$this->whoops->handleException($exception);
 	}
 

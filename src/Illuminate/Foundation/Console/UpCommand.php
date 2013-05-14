@@ -16,7 +16,7 @@ class UpCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = "Bring the application out of maintenace mode";
+	protected $description = "Bring the application out of maintenance mode";
 
 	/**
 	 * Execute the console command.
@@ -25,7 +25,7 @@ class UpCommand extends Command {
 	 */
 	public function fire()
 	{
-		@unlink($this->laravel['path'].'/storage/meta/down');
+		@unlink($this->laravel['path.storage'].'/meta/down');
 
 		$this->info('Application is now live.');
 	}
