@@ -122,7 +122,7 @@ class Connection implements ConnectionInterface {
 
 		// We need to initialize a query grammar and the query post processors
 		// which are both very important parts of the database abstractions
-		// so will initialize them to their default value to get started.
+		// so we initialize these to their default values while starting.
 		$this->useDefaultQueryGrammar();
 
 		$this->useDefaultPostProcessor();
