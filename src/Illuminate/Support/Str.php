@@ -134,7 +134,7 @@ class Str {
 	 */
 	public static function words($value, $words = 100, $end = '...')
 	{
-		if (trim($value) == '') return '';
+		if (trim($value, chr(0xC2).chr(0xA0).' ') == '') return '';
 
 		preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
