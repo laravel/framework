@@ -63,6 +63,8 @@ class Container implements ArrayAccess {
 			$this->alias($abstract, $alias);
 		}
 
+		unset($this->instances[$abstract]);
+
 		// If no concrete type was given, we will simply set the concrete type to
 		// the abstract. This allows concrete types to be registered as shared
 		// without being made state their classes in both of the parameters.

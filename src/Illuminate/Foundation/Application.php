@@ -537,7 +537,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
-		$this['request'] = $request;
+		$this->instance('request', $request);
 
 		Facade::clearResolvedInstance('request');
 
