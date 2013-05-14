@@ -660,9 +660,11 @@ class Validator implements MessageProviderInterface {
 		// data store like Redis, etc. We will use it to determine uniqueness.
 		$verifier = $this->getPresenceVerifier();
 
+		$extra = $this->getExtraConditions($parameters, 4);
+
 		return $verifier->getCount(
 
-			$table, $column, $value, $id, $idColumn
+			$table, $column, $value, $id, $idColumn, $extra
 
 		) == 0;
 	}
@@ -715,7 +717,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$verifier = $this->getPresenceVerifier();
 
-		$extra = $this->getExtraExistConditions($parameters);
+		$extra = $this->getExtraConditions($parameters, 2);
 
 		if (is_array($value))
 		{
@@ -728,14 +730,14 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Get the extra exist conditions.
+	 * Get the extra conditions for exists and unique rules.
 	 *
 	 * @param  array  $parameters
 	 * @return array
 	 */
-	protected function getExtraExistConditions(array $parameters)
+	protected function getExtraConditions(array $parameters, $slice)
 	{
-		$segments = array_values(array_slice($parameters, 2));
+		$segments = array_values(array_slice($parameters, $slice));
 
 		$extra = array();
 
