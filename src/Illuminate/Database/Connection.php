@@ -506,7 +506,7 @@ class Connection implements ConnectionInterface {
 	{
 		if (isset($this->events))
 		{
-			$this->events->fire('illuminate.query', array($query, $bindings, $time));
+			$this->events->fire('illuminate.query', array($query, $bindings, $time, $this->getName()));
 		}
 
 		if ( ! $this->loggingQueries) return;
