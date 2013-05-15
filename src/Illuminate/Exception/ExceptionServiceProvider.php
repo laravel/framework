@@ -120,7 +120,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function shouldReturnJson()
 	{
-		$definitely = $this->app['request']->ajax() or $this->app->runningInConsole();
+		$definitely = ($this->app['request']->ajax() or $this->app->runningInConsole());
 
 		return $definitely or $this->app['request']->wantsJson();
 	}
