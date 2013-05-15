@@ -154,6 +154,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testReset()
+	{
+		$data = new Collection(array(1, 2, 3, 4, 5));
+		$this->assertEquals(array(), $data->reset()->all());
+	}
+
+
 	public function testSort()
 	{
 		$data = new Collection(array(5, 3, 1, 2, 4));
