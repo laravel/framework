@@ -614,7 +614,9 @@ class FormBuilder {
 	 */
 	protected function getMethod($method)
 	{
-		return strtoupper($method) != 'GET' ? 'POST' : $method;
+		$method = strtoupper($method);
+
+		return $method != 'GET' ? 'POST' : $method;
 	}
 
 	/**
