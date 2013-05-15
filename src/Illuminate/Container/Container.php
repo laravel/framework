@@ -99,7 +99,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bindIf($abstract, $concrete = null, $shared = false)
 	{
-		if ( ! isset($this[$abstract]))
+		if ( ! $this->bound($abstract))
 		{
 			$this->bind($abstract, $concrete, $shared);
 		}
