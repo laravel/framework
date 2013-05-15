@@ -198,14 +198,14 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Prompt the user for input but hide the answer from the console.
 	 *
 	 * @param  string  $question
-	 * @param  string  $default
+	 * @param  bool    $fallabck
 	 * @return string
 	 */
-	public function secret($question, $default = null)
+	public function secret($question, $fallback = true)
 	{
 		$dialog = $this->getHelperSet()->get('dialog');
 
-		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $default);
+		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $fallback);
 	}
 
 	/**
