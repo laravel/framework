@@ -106,7 +106,7 @@ class FormBuilder {
 		// If the method is PUT, PATCH or DELETE we will need to add a spoofer hidden
 		// field that will instruct the Symfony request to pretend the method is a
 		// different method than it actually is, for convenience from the forms.
-		$append = $this->getAppendage($method);
+		$append = $this->getAppendage($attributes['method']);
 
 		if (isset($options['files']) and $options['files'])
 		{
