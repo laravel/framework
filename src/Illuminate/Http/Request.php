@@ -56,7 +56,9 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function fullUrl()
 	{
-		return rtrim($this->getUri(), '/');
+		$query = $this->getQueryString();
+
+		return $query ? $this->url().'?'.$query : $this->url();
 	}
 
 	/**
