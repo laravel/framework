@@ -83,7 +83,8 @@
 - Include CSRF tokens by default in every non-GET form.
 - `updated_at` model timestamps are now automatically handled for ad-hoc queries.
 - Allow pattern filters to be specified with an HTTP verb constraint.
-- Added `bigint` and `mediumint` on schema builder
+- Added `bigInteger` and `mediumInteger` on schema builder.
+- Fix bug causing Eloquent to override user specified timestamps on `save`.
 
 ## Beta 4
 
