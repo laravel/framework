@@ -64,7 +64,7 @@ class FormBuilder {
 
 	/**
 	 * The form methods that should be spoofed, in uppercase.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $spoofedMethods = array('DELETE', 'PATCH', 'PUT');
@@ -106,7 +106,7 @@ class FormBuilder {
 		// If the method is PUT, PATCH or DELETE we will need to add a spoofer hidden
 		// field that will instruct the Symfony request to pretend the method is a
 		// different method than it actually is, for convenience from the forms.
-		$append = $this->getAppendage($attributes['method']);
+		$append = $this->getAppendage($method);
 
 		if (isset($options['files']) and $options['files'])
 		{
@@ -590,7 +590,7 @@ class FormBuilder {
 		{
 			$options['type'] = 'button';
 		}
-		
+
 		return '<button'.$this->html->attributes($options).'>'.$value.'</button>';
 	}
 
