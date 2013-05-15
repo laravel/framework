@@ -49,7 +49,18 @@ class AutoloadCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->call('optimize');
+		$this->info('Generating optimized class loader...');
+
+		$this->composer->dumpOptimized();
+
+		if ($this->laravel['config']['app.debug'] === false)
+		{
+			$this->call('optimize');
+		}
+		else
+		{
+			$this->call('clear-compiled');
+		}
 
 		foreach ($this->findWorkbenches() as $workbench)
 		{
@@ -87,7 +98,7 @@ class AutoloadCommand extends Command {
 
 		if ( ! is_dir($workbench)) return array();
 
-		return Finder::create()->files()->in($workbench)->name('composer.json')->depth('< 3');		
+		return Finder::create()->files()->in($workbench)->name('composer.json')->depth('< 3');
 	}
 
 }
