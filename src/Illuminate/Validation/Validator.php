@@ -827,15 +827,7 @@ class Validator implements MessageProviderInterface {
 		// The Symfony File class should do a decent job of guessing the extension
 		// based on the true MIME type so we'll just loop through the array of
 		// extensions and compare it to the guessed extension of the files.
-		foreach ($parameters as $extension)
-		{
-			if ($value->guessExtension() == $extension)
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return in_array($value->guessExtension(), $parameters);
 	}
 
 	/**
