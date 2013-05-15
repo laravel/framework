@@ -31,6 +31,13 @@ class OptimizeCommand extends Command {
 	protected $composer;
 
 	/**
+	 * The output path for the compiled class.
+	 *
+	 * @var string
+	 */
+	protected $outputPath;
+
+	/**
 	 * Create a new optimize command instance.
 	 *
 	 * @param  \Illuminate\Foundation\Composer  $composer
@@ -54,6 +61,14 @@ class OptimizeCommand extends Command {
 
 		$this->composer->dumpOptimized();
 
+		$this->outputPath = $this->laravel['path.base'].'/bootstrap/compiled.php';
+
+		if ($this->laravel['config']['compile']['run'] === false)
+		{
+			@unlink($this->outputPath);
+			return;
+		}
+
 		$this->info('Compiling common classes...');
 
 		$this->compileClasses();
@@ -68,9 +83,7 @@ class OptimizeCommand extends Command {
 	{
 		$this->registerClassPreloaderCommand();
 
-		$outputPath = $this->laravel['path.base'].'/bootstrap/compiled.php';
-
-		$this->callSilent('compile', array('--output' => $outputPath, '--config' => implode(',', $this->getClassFiles())));
+		$this->callSilent('compile', array('--output' => $this->outputPath, '--config' => implode(',', $this->getClassFiles())));
 	}
 
 	/**
@@ -84,7 +97,7 @@ class OptimizeCommand extends Command {
 
 		$core = require __DIR__.'/Optimize/config.php';
 
-		return array_merge($core, $this->laravel['config']['compile']);
+		return array_merge($core, $this->laravel['config']['compile']['classes']);
 	}
 
 	/**
