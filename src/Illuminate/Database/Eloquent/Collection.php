@@ -69,5 +69,15 @@ class Collection extends BaseCollection {
 	{
 		return array_map(function($m) { return $m->getKey(); }, $this->items);
 	}
+	
+	/**
+	 * Get an array of property values
+	 * 
+	 * @return array
+	 */
+	public function modelValues($key)
+	{
+		return array_map(function($m) use ($key) { return $m->$key; }, $this->items);
+	}
 
 }
