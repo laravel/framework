@@ -1125,9 +1125,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function updateTimestamps()
 	{
-		$this->setUpdatedAt($time = $this->freshTimestamp());
+		if ( ! $this->isDirty(static::UPDATED_AT))
+		{
+			$this->setUpdatedAt($time = $this->freshTimestamp());
+		}
 
-		if ( ! $this->exists)
+		if ( ! $this->exists and ! $this->isDirty(static::CREATED_AT))
 		{
 			$this->setCreatedAt($time);
 		}
@@ -1971,6 +1974,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$this->original = $this->attributes;
 
 		return $this;
+	}
+
+	/**
+	 * Determine if a given attribute is dirty.
+	 *
+	 * @param  string  $attribute
+	 * @return bool
+	 */
+	public function isDirty($attribute)
+	{
+		return array_key_exists($attribute, $this->getDirty());
 	}
 
 	/**

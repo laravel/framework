@@ -119,6 +119,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUpdateProcessDoesntOverrideTimestamps()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('id' => 1, 'created_at' => 'foo', 'updated_at' => 'bar'));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until');
+		$events->shouldReceive('fire');
+
+		$model->syncOriginal();
+		$model->id = 1;
+		$model->created_at = 'foo';
+		$model->updated_at = 'bar';
+		$model->exists = true;
+		$this->assertTrue($model->save());
+	}
+
+
 	public function testSaveIsCancelledIfSavingEventReturnsFalse()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
