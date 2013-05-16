@@ -261,7 +261,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function flatten()
 	{
-		return array_flatten($this->items);
+		return new static(array_flatten($this->items));
 	}
 
 	/**
