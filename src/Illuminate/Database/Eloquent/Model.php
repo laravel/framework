@@ -111,13 +111,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $guarded = array('*');
 
 	/**
-	 * The date fields for the model.clear
-	 *
-	 * @var array
-	 */
-	protected $dates = array();
-
-	/**
 	 * The relationships that should be touched on save.
 	 *
 	 * @var array
@@ -1842,7 +1835,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the attribute is listed as a date, we will convert it to a DateTime
 		// instance on retrieval, which makes it quite convenient to work with
 		// date fields without having to create a mutator for each property.
-		elseif (in_array($key, $this->dates))
+		elseif (in_array($key, $this->getDates()))
 		{
 			if ($value) return $this->asDateTime($value);
 		}
@@ -1909,7 +1902,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If an attribute is listed as a "date", we'll convert it from a DateTime
 		// instance into a form proper for storage on the database tables using
 		// the connection grammar's date format. We will auto set the values.
-		elseif (in_array($key, $this->dates))
+		elseif (in_array($key, $this->getDates()))
 		{
 			if ($value)
 			{
@@ -1929,6 +1922,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function hasSetMutator($key)
 	{
 		return method_exists($this, 'set'.studly_case($key).'Attribute');
+	}
+
+	/**
+	 * Get the attributes that should be converted to dates.
+	 *
+	 * @return array
+	 */
+	public function getDates()
+	{
+		return array(static::CREATED_AT, static::UPDATED_AT, static::DELETED_AT);
 	}
 
 	/**

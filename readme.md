@@ -87,6 +87,7 @@
 - Fix bug causing Eloquent to override user specified timestamps on `save`.
 - Added `observe` method to Eloquent models to allow for registering observer classes.
 - Added `forget` method to event dispatcher to allow all listeners for an event to be removed.
+- `created_at`, `updated_at` and `deleted_at` are now Carbonized by default.
 
 ## Beta 4
 

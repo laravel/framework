@@ -26,12 +26,13 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 	public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
 		$parent->shouldReceive('getConnectionName')->andReturn('connection');
-		$pivot = new Pivot($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
+		$parent->shouldReceive('getDates')->andReturn(array());
+		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
 		$this->assertTrue($pivot->timestamps);
 
-		$pivot = new Pivot($parent, array('foo' => 'bar'), 'table');
+		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar'), 'table');
 		$this->assertFalse($pivot->timestamps);
 	}
 
@@ -70,3 +71,10 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 
 class DatabaseEloquentPivotTestModelStub extends Illuminate\Database\Eloquent\Model {}
+
+class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot {
+	public function getDates()
+	{
+		return array();
+	}
+}

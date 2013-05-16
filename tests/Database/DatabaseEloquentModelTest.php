@@ -702,6 +702,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return $this->belongsTo('EloquentModelSaveStub', 'foo');
 	}
+	public function getDates()
+	{
+		return array();
+	}
 }
 
 class EloquentModelCamelStub extends EloquentModelStub {
@@ -709,7 +713,10 @@ class EloquentModelCamelStub extends EloquentModelStub {
 }
 
 class EloquentDateModelStub extends EloquentModelStub {
-	protected $dates = array('created_at', 'updated_at');
+	public function getDates()
+	{
+		return array('created_at', 'updated_at');
+	}
 }
 
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
