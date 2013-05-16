@@ -2134,12 +2134,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Resolve a connection instance by name.
+	 * Resolve a connection instance.
 	 *
 	 * @param  string  $connection
 	 * @return \Illuminate\Database\Connection
 	 */
-	public static function resolveConnection($connection)
+	public static function resolveConnection($connection = null)
 	{
 		return static::$resolver->connection($connection);
 	}
