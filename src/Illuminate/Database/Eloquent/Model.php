@@ -1125,9 +1125,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function updateTimestamps()
 	{
+		$time = $this->freshTimestamp();
+
 		if ( ! $this->isDirty(static::UPDATED_AT))
 		{
-			$this->setUpdatedAt($time = $this->freshTimestamp());
+			$this->setUpdatedAt($this->freshTimestamp());
 		}
 
 		if ( ! $this->exists and ! $this->isDirty(static::CREATED_AT))
