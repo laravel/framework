@@ -756,7 +756,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		static::registerModelEvent('saving', $callback);
 	}
-	
+
 	/**
 	 * Register a saved model event with the dispatcher.
 	 *
@@ -767,7 +767,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		static::registerModelEvent('saved', $callback);
 	}
-	
+
 	/**
 	 * Register an updating model event with the dispatcher.
 	 *
@@ -938,7 +938,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $this->newQuery()->update($attributes);
 		}
 
-		return $this->fill($attributes)->save();	
+		return $this->fill($attributes)->save();
 	}
 
 	/**
@@ -1176,7 +1176,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if ( ! $this->isDirty(static::UPDATED_AT))
 		{
-			$this->setUpdatedAt($this->freshTimestamp());
+			$this->setUpdatedAt($time);
 		}
 
 		if ( ! $this->exists and ! $this->isDirty(static::CREATED_AT))
@@ -2063,7 +2063,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			}
 		}
 
-		return $dirty;	
+		return $dirty;
 	}
 
 	/**
