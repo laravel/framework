@@ -1319,7 +1319,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceSame($message, $attribute, $rule, $parameters)
 	{
-		return str_replace(':other', $parameters[0], $message);
+		return str_replace(':other', $this->getAttribute($parameters[0]), $message);
 	}
 
 	/**
@@ -1333,7 +1333,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceDifferent($message, $attribute, $rule, $parameters)
 	{
-		return str_replace(':other', $parameters[0], $message);
+		return str_replace(':other', $this->getAttribute($parameters[0]), $message);
 	}
 
 	/**
