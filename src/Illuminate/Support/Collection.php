@@ -251,7 +251,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function fetch($key)
 	{
-		return new static(array_fetch($this, $key));
+		return new static(array_fetch($this->items, $key));
 	}
 
 	/**
