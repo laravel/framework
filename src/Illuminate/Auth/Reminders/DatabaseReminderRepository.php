@@ -95,7 +95,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 */
 	protected function reminderExpired($reminder)
 	{
-		$createdPlusHour = strtotime($reminder->created_at) + 216000;
+		$createdPlusHour = strtotime($reminder->created_at) + 3600;
 
 		return $createdPlusHour < $this->getCurrentTime();
 	}
