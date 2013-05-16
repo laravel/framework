@@ -85,6 +85,8 @@
 - Allow pattern filters to be specified with an HTTP verb constraint.
 - Added `bigInteger` and `mediumInteger` on schema builder.
 - Fix bug causing Eloquent to override user specified timestamps on `save`.
+- Added `observe` method to Eloquent models to allow for registering observer classes.
+- Added `forget` method to event dispatcher to allow all listeners for an event to be removed.
 
 ## Beta 4
 

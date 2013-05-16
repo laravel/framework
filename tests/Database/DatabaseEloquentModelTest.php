@@ -646,6 +646,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelObserversCanBeAttachedToModels()
+	{
+		EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('listen')->once()->with('eloquent.creating: EloquentModelStub', 'EloquentTestObserverStub@creating');
+		$events->shouldReceive('listen')->once()->with('eloquent.saved: EloquentModelStub', 'EloquentTestObserverStub@saved');
+		$events->shouldReceive('forget');
+		EloquentModelStub::observe(new EloquentTestObserverStub);
+		EloquentModelStub::flushEventListeners();
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -656,6 +667,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 }
 
+class EloquentTestObserverStub {
+	public function creating() {}
+	public function saved() {}
+}
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
 	protected $guarded = array();

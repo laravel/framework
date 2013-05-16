@@ -301,4 +301,17 @@ class Dispatcher {
 		};
 	}
 
+	/**
+	 * Remove a set of listeners from the dispatcher.
+	 *
+	 * @param  string  $event
+	 * @return void
+	 */
+	public function forget($event)
+	{
+		unset($this->listeners[$event]);
+
+		unset($this->sorted[$event]);
+	}
+
 }

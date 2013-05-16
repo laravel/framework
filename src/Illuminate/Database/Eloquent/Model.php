@@ -252,6 +252,30 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Register an observer with the Model.
+	 *
+	 * @param  object  $class
+	 * @return void
+	 */
+	public static function observe($class)
+	{
+		$instance = new static;
+
+		$className = get_class($class);
+
+		// WHen registering a model observer, we will spin through the possible events
+		// and determine if this observer has that method. If it does, we will hook
+		// it into the model's event system, making it convenient to watch these.
+		foreach ($instance->getObservableEvents() as $event)
+		{
+			if (method_exists($class, $event))
+			{
+				static::registerModelEvent($event, $className.'@'.$event);
+			}
+		}
+	}
+
+	/**
 	 * Fill the model with an array of attributes.
 	 *
 	 * @param  array  $attributes
@@ -818,6 +842,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Remove all of the event listeners for the model.
+	 *
+	 * @return void
+	 */
+	public static function flushEventListeners()
+	{
+		if ( ! isset(static::$dispatcher)) return;
+
+		$instance = new static;
+
+		foreach ($instance->getObservableEvents() as $event)
+		{
+			static::$dispatcher->forget("eloquent.{$event}: ".get_called_class());
+		}
+	}
+
+	/**
 	 * Register a model event with the dispatcher.
 	 *
 	 * @param  string   $event
@@ -832,6 +873,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
 		}
+	}
+
+	/**
+	 * Get the observable event names.
+	 *
+	 * @return array
+	 */
+	public function getObservableEvents()
+	{
+		return array(
+			'creating', 'created', 'updating', 'updated',
+			'deleting', 'deleted', 'saving', 'saved'
+		);
 	}
 
 	/**
