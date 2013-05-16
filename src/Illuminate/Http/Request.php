@@ -199,9 +199,9 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		foreach ($keys as $key) $results[$key] = $this->get($key);
+		$input = $this->input();
 
-		return $results;
+		return array_only($input, $keys);
 	}
 
 	/**
