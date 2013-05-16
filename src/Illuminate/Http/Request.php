@@ -195,8 +195,6 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function only($keys)
 	{
-		$results = array();
-
 		$keys = is_array($keys) ? $keys : func_get_args();
 
 		$input = $this->input();
