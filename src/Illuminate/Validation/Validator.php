@@ -209,14 +209,35 @@ class Validator implements MessageProviderInterface {
 		// that the attribute is required, rules are not run for missing values.
 		$value = $this->getValue($attribute);
 
-		$validatable = $this->isValidatable($rule, $attribute, $value);
-
 		$method = "validate{$rule}";
 
-		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+		// Preg Match checksw if asterisk is a wildcard, not part of an attribute name.
+		// Possible wildcard positions: *.foo | foo.*.bar | foo.*
+		if (is_array($value) and preg_match('/(^|\.)\*(\.|$)/', $attribute))
 		{
-			$this->addError($attribute, $rule, $parameters);
+			// Required to test items even if array is empty.
+			$value = empty($value) ? array(null) : $value;
+
+			foreach ($value as $item)
+			{
+				$validatable = $this->isValidatable($rule, $attribute, $item);
+
+				if ($validatable and ! $this->$method($attribute, $item, $parameters, $this))
+				{
+					$this->addError($attribute, $rule, $parameters);
+				}
+			}
 		}
+		else
+		{
+			$validatable = $this->isValidatable($rule, $attribute, $value);
+
+			if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
+			{
+				$this->addError($attribute, $rule, $parameters);
+			}
+		}
+
 	}
 
 	/**
@@ -227,11 +248,11 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getValue($attribute)
 	{
-		if ( ! is_null($value = array_get($this->data, $attribute)))
+		if ( ! is_null($value = array_select($this->data, $attribute)))
 		{
 			return $value;
 		}
-		elseif ( ! is_null($value = array_get($this->files, $attribute)))
+		elseif ( ! is_null($value = array_select($this->files, $attribute)))
 		{
 			return $value;
 		}
@@ -292,6 +313,10 @@ class Validator implements MessageProviderInterface {
 			return false;
 		}
 		elseif (is_string($value) and trim($value) === '')
+		{
+			return false;
+		}
+		elseif (is_array($value) and empty($value))
 		{
 			return false;
 		}
@@ -375,7 +400,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateRequiredIf($attribute, $value, $parameters)
 	{
-		if ($parameters[1] == array_get($this->data, $parameters[0]))
+		if ($parameters[1] == $this->getValue($parameters[0]))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
@@ -591,7 +616,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$hasNumeric = $this->hasRule($attribute, $this->numericRules);
 
-		// This method will determine if the attribute is a number, string, or file and
+		// This method will determine if the attribute is a number, string, array or file and
 		// return the proper size accordingly. If it is a number, then number itself
 		// is the size. If it is a file, we take kilobytes, and for a string the
 		// entire length of the string will be considered the attribute size.

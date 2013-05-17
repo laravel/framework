@@ -216,12 +216,95 @@ if ( ! function_exists('array_get'))
 	function array_get($array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
-		
+
 		if (isset($array[$key])) return $array[$key];
 
 		foreach (explode('.', $key) as $segment)
 		{
 			if ( ! is_array($array) or ! array_key_exists($segment, $array))
+			{
+				return value($default);
+			}
+
+			$array = $array[$segment];
+		}
+
+		return $array;
+	}
+}
+
+if ( ! function_exists('array_select'))
+{
+	/**
+	 * Get an item from an array using "dot" notation and "wildcards".
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	function array_select($array, $key, $default = null)
+	{
+		if (is_null($key)) return $array;
+
+		if (isset($array[$key])) return $array[$key];
+
+		// Store resulting array if key contains wildcard.
+		$deepArray = array();
+		$keys = explode('.', $key);
+		foreach ($keys as $n => $segment)
+		{
+			if ($segment == '*') {
+				// Get the rest of the keys besides current one.
+				$keySlice = array_slice($keys, $n+1);
+				// Generate new dot notation key string.
+				$innerKey = implode('.', $keySlice);
+				if (is_array($array))
+				{
+					foreach ($array as $item)
+					{
+						// Empty slice - last segment is a wildcard.
+						if (empty($keySlice))
+						{
+							// Last segment is a wildcard. Put item into deepArray which will be returned
+							// containing all of the items of the current array.
+							$deepArray[] = $item;
+						}
+						else
+						{
+							// Pass current array item deeper.
+							$innerItem = array_select($item, $innerKey, $default);
+							if (is_array($innerItem) and count(array_keys($keys, '*')) > 1)
+							{
+								// Multiple wildcards, add each item of inner array to the resulting new array.
+								foreach ($innerItem as $innerItem)
+								{
+									$deepArray[] = $innerItem;
+								}
+							}
+							else
+							{
+								// Only one wildcard in current key string. Add whole inner array to the resulting array.
+								$deepArray[] = $innerItem;
+							}
+						}
+					}
+					// Return new resulting array.
+					return $deepArray;
+				}
+				elseif ($n == count($keys)-1)
+				{
+					// This is the last key, so we can simply return whole array.
+					return $array;
+				}
+				else
+				{
+					// This is not the last key and $array is not really an array
+					// so we can't proceed deeper. Return default.
+					return value($default);
+				}
+			}
+			elseif ( ! is_array($array) or ! array_key_exists($segment, $array))
 			{
 				return value($default);
 			}
@@ -522,7 +605,7 @@ if ( ! function_exists('object_get'))
 	function object_get($object, $key, $default = null)
 	{
 		if (is_null($key)) return $object;
-		
+
 		foreach (explode('.', $key) as $segment)
 		{
 			if ( ! is_object($object) or ! isset($object->{$segment}))
