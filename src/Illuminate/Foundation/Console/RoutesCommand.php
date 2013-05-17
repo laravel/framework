@@ -96,7 +96,7 @@ class RoutesCommand extends Command {
 
 		$action = $route->getAction() ?: 'Closure';
 
-		return array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action);
+		return array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action, 'before' => $this->getBeforeFilters($route), 'after' => $this->getAfterFilters($route));
 	}
 
 	/**
@@ -107,7 +107,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$this->table->setHeaders(array('URI', 'Name', 'Action'))->setRows($routes);
+		$this->table->setHeaders(array('URI', 'Name', 'Action', 'Filters Before', 'Filters After'))->setRows($routes);
 
 		$this->table->render($this->getOutput());
 	}
@@ -121,6 +121,28 @@ class RoutesCommand extends Command {
 	protected function getRouteName($name)
 	{
 		return str_contains($name, ' ') ? '' : $name;
+	}
+
+	/**
+	 * Get before filters
+	 *
+	 * @param  Route  $route
+	 * @return string
+	 */
+	protected function getBeforeFilters($route)
+	{
+		return implode(', ',$route->getBeforeFilters());
+	}
+
+	/**
+	 * Get after filters
+	 *
+	 * @param  Route  $route
+	 * @return string
+	 */
+	protected function getAfterFilters($route)
+	{
+		return implode(', ',$route->getAfterFilters());
 	}
 
 }
