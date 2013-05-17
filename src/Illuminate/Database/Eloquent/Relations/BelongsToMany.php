@@ -752,7 +752,9 @@ class BelongsToMany extends Relation {
 	 */
 	public function withPivot($columns)
 	{
-		$this->pivotColumns = is_array($columns) ? $columns : func_get_args();
+		$columns = is_array($columns) ? $columns : func_get_args();
+
+		$this->pivotColumns = array_merge($this->pivotColumns, $columns);
 
 		return $this;
 	}
