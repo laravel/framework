@@ -84,7 +84,7 @@ class Capsule {
 	 */
 	protected function getEmptyConfig($dispatcher)
 	{
-		$dispatcher = $dispatcher ?: new Dispatcher;
+		$dispatcher = $dispatcher ?: new Dispatcher(new Container);
 
 		return array('events' => $dispatcher, 'config' => array());
 	}
