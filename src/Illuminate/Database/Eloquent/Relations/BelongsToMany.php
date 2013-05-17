@@ -766,11 +766,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function withTimestamps()
 	{
-		$columns = array($this->createdAt(), $this->updatedAt());
-
-		$this->pivotColumns = array_merge($this->pivotColumns, $columns);
-
-		return $this;
+		return $this->withPivot($this->createdAt(), $this->updatedAt());
 	}
 
 	/**
