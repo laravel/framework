@@ -92,6 +92,16 @@ class SqsJob extends Job {
 	}
 
 	/**
+	 * Get the job identifier.
+	 *
+	 * @return string
+	 */
+	public function getJobId()
+	{
+		return $this->job['MessageId'];
+	}
+
+	/**
 	 * Get the IoC container instance.
 	 *
 	 * @return \Illuminate\Container

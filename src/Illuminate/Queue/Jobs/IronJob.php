@@ -90,6 +90,16 @@ class IronJob extends Job {
 	}
 
 	/**
+	 * Get the job identifier.
+	 *
+	 * @return string
+	 */
+	public function getJobId()
+	{
+		return $this->job->id;
+	}
+
+	/**
 	 * Get the IoC container instance.
 	 *
 	 * @return \Illuminate\Container\Container
