@@ -360,11 +360,7 @@ class Route extends BaseRoute {
 	 */
 	public function before()
 	{
-		$current = $this->getBeforeFilters();
-
-		$before = array_unique(array_merge($current, func_get_args()));
-
-		$this->setOption('_before', $before);
+		$this->setBeforeFilters(func_get_args());
 
 		return $this;
 	}
@@ -377,11 +373,7 @@ class Route extends BaseRoute {
 	 */
 	public function after()
 	{
-		$current = $this->getAfterFilters();
-
-		$after = array_unique(array_merge($current, func_get_args()));
-
-		$this->setOption('_after', $after);
+		$this->setAfterFilters(func_get_args());
 
 		return $this;
 	}
@@ -416,7 +408,7 @@ class Route extends BaseRoute {
 	{
 		$filters = is_string($value) ? explode('|', $value) : (array) $value;
 
-		$this->setOption('_before', $filters);
+		$this->setOption('_before', array_merge($this->getBeforeFilters(), $filters));
 	}
 
 	/**
@@ -439,7 +431,7 @@ class Route extends BaseRoute {
 	{
 		$filters = is_string($value) ? explode('|', $value) : (array) $value;
 
-		$this->setOption('_after', $filters);
+		$this->setOption('_after', array_merge($this->getAfterFilters(), $filters));
 	}
 
 	/**
