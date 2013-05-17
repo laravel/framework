@@ -63,7 +63,19 @@ class RoutesCommand extends Command {
 			return $this->error("Your application doesn't have any routes.");
 		}
 
-		$this->displayRoutes($this->getRoutes());
+		$this->displayRoutes($this->getRoutes($this->option('with-filters')), $this->option('with-filters'));
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('with-filters', 'f', InputOption::VALUE_NONE, 'Also display before and after route filters.', null),
+		);
 	}
 
 	/**
@@ -71,13 +83,13 @@ class RoutesCommand extends Command {
 	 *
 	 * @return array
 	 */
-	protected function getRoutes()
+	protected function getRoutes($withFilters)
 	{
 		$results = array();
 
 		foreach($this->routes as $name => $route)
 		{
-			$results[] = $this->getRouteInformation($name, $route);
+			$results[] = $this->getRouteInformation($name, $route, $withFilters);
 		}
 
 		return $results;
@@ -90,13 +102,13 @@ class RoutesCommand extends Command {
 	 * @param  \Symfony\Component\Routing\Route  $route
 	 * @return array
 	 */
-	protected function getRouteInformation($name, Route $route)
+	protected function getRouteInformation($name, Route $route, $withFilters)
 	{
 		$uri = head($route->getMethods()).' '.$route->getPath();
 
 		$action = $route->getAction() ?: 'Closure';
 
-		return array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action);
+		return array_merge(array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action), ($withFilters ? array('before' => $this->getBeforeFilters($route), 'after' => $this->getAfterFilters($route)) : array()));
 	}
 
 	/**
@@ -105,9 +117,9 @@ class RoutesCommand extends Command {
 	 * @param  array  $routes
 	 * @return void
 	 */
-	protected function displayRoutes(array $routes)
+	protected function displayRoutes(array $routes, $withFilters)
 	{
-		$this->table->setHeaders(array('URI', 'Name', 'Action'))->setRows($routes);
+		$this->table->setHeaders(array_merge(array('URI', 'Name', 'Action'), ($withFilters ? array('Filters Before', 'Filters After') : array())))->setRows($routes);
 
 		$this->table->render($this->getOutput());
 	}
@@ -121,6 +133,28 @@ class RoutesCommand extends Command {
 	protected function getRouteName($name)
 	{
 		return str_contains($name, ' ') ? '' : $name;
+	}
+
+	/**
+	 * Get before filters
+	 *
+	 * @param  Route  $route
+	 * @return string
+	 */
+	protected function getBeforeFilters($route)
+	{
+		return implode(', ',$route->getBeforeFilters());
+	}
+
+	/**
+	 * Get after filters
+	 *
+	 * @param  Route  $route
+	 * @return string
+	 */
+	protected function getAfterFilters($route)
+	{
+		return implode(', ',$route->getAfterFilters());
 	}
 
 }
