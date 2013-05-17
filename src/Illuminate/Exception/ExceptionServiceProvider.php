@@ -72,7 +72,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 		$this->app['exception.debug'] = $this->app->share(function($app)
 		{
-			return new WhoopsDisplayer($app['whoops']);
+			return new WhoopsDisplayer($app['whoops'], $app->runningInConsole());
 		});
 	}
 
