@@ -251,7 +251,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function fetch($key)
 	{
-		return new Collection(array_fetch($this, $key));
+		return new static(array_fetch($this->items, $key));
 	}
 
 	/**
@@ -261,7 +261,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function flatten()
 	{
-		return array_flatten($this->items);
+		return new static(array_flatten($this->items));
 	}
 
 	/**
@@ -278,7 +278,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 			$results = array_merge($results, $values);
 		}
 
-		return new Collection($results);
+		return new static($results);
 	}
 
 	/**
@@ -300,7 +300,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		$results = array_merge($this->items, $items);
 
-		return new Collection($results);
+		return new static($results);
 	}
 
 	/**
