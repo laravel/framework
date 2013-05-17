@@ -63,19 +63,7 @@ class RoutesCommand extends Command {
 			return $this->error("Your application doesn't have any routes.");
 		}
 
-		$this->displayRoutes($this->getRoutes($this->option('with-filters')), $this->option('with-filters'));
-	}
-
-	/**
-	 * Get the console command options.
-	 *
-	 * @return array
-	 */
-	protected function getOptions()
-	{
-		return array(
-			array('with-filters', 'f', InputOption::VALUE_NONE, 'Also display before and after route filters.', null),
-		);
+		$this->displayRoutes($this->getRoutes());
 	}
 
 	/**
@@ -83,13 +71,13 @@ class RoutesCommand extends Command {
 	 *
 	 * @return array
 	 */
-	protected function getRoutes($withFilters)
+	protected function getRoutes()
 	{
 		$results = array();
 
 		foreach($this->routes as $name => $route)
 		{
-			$results[] = $this->getRouteInformation($name, $route, $withFilters);
+			$results[] = $this->getRouteInformation($name, $route);
 		}
 
 		return $results;
@@ -102,13 +90,13 @@ class RoutesCommand extends Command {
 	 * @param  \Symfony\Component\Routing\Route  $route
 	 * @return array
 	 */
-	protected function getRouteInformation($name, Route $route, $withFilters)
+	protected function getRouteInformation($name, Route $route)
 	{
 		$uri = head($route->getMethods()).' '.$route->getPath();
 
 		$action = $route->getAction() ?: 'Closure';
 
-		return array_merge(array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action), ($withFilters ? array('before' => $this->getBeforeFilters($route), 'after' => $this->getAfterFilters($route)) : array()));
+		return array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action, 'before' => $this->getBeforeFilters($route), 'after' => $this->getAfterFilters($route));
 	}
 
 	/**
@@ -117,9 +105,9 @@ class RoutesCommand extends Command {
 	 * @param  array  $routes
 	 * @return void
 	 */
-	protected function displayRoutes(array $routes, $withFilters)
+	protected function displayRoutes(array $routes)
 	{
-		$this->table->setHeaders(array_merge(array('URI', 'Name', 'Action'), ($withFilters ? array('Filters Before', 'Filters After') : array())))->setRows($routes);
+		$this->table->setHeaders(array('URI', 'Name', 'Action', 'Filters Before', 'Filters After'))->setRows($routes);
 
 		$this->table->render($this->getOutput());
 	}
