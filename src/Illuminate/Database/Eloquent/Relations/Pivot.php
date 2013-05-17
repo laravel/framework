@@ -43,10 +43,12 @@ class Pivot extends Model {
 	 */
 	public function __construct(Model $parent, $attributes, $table, $exists = false)
 	{
+		parent::__construct();
+
 		// The pivot model is a "dynamic" model since we will set the tables dynamically
 		// for the instance. This allows it work for any intermediate tables for the
 		// many to many relationship that are defined by this developer's classes.
-		parent::__construct($attributes);
+		$this->setRawAttributes($attributes);
 
 		$this->setTable($table);
 
