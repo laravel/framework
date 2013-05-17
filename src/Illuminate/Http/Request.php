@@ -295,7 +295,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return mixed
 	 */
 	public function old($key = null, $default = null)
 	{
