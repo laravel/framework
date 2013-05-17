@@ -18,6 +18,27 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArraySelect()
+	{
+		$array = array('users' => array(
+			0 => array(
+				'name' => 'Taylor',
+				'password' => 'abcdef',
+				'friends'  => array('Shawn', 'Dayle')
+			),
+			1 => array(
+				'name' => 'Dayle',
+				'password' => 123456,
+				'friends'  => array('Rommie', 'Jessee')
+			)
+		));
+		$this->assertEquals(array('Taylor', 'Dayle'), array_select($array, 'users.*.name'));
+		$this->assertEquals(array('abcdef', 123456), array_select($array, 'users.*.password'));
+		$this->assertEquals(array(array('Shawn', 'Dayle'), array('Rommie', 'Jessee')), array_select($array, 'users.*.friends'));
+		$this->assertEquals(array('Shawn', 'Dayle', 'Rommie', 'Jessee'), array_select($array, 'users.*.friends.*'));
+	}
+
+
 	public function testArraySet()
 	{
 		$array = array();
