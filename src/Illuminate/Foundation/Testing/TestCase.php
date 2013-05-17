@@ -206,24 +206,26 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * Assert whether the client was redirected to a given route.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToRoute($name, $with = array())
+	public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->route($name), $with);
+		$this->assertRedirectedTo($this->app['url']->route($name, $parameters), $with);
 	}
 
 	/**
 	 * Assert whether the client was redirected to a given action.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToAction($name, $with = array())
+	public function assertRedirectedToAction($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->action($name), $with);
+		$this->assertRedirectedTo($this->app['url']->action($name, $parameters), $with);
 	}
 
 	/**
