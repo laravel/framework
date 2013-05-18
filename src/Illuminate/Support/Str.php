@@ -138,12 +138,12 @@ class Str {
 
 		if (!isset($matches[0]))
 		{
-			return '';
+			return $value;
 		}
 
 		if (strlen($value) == strlen($matches[0]))
 		{
-			$end = '';
+			return $value;
 		}
 
 		return rtrim($matches[0]).$end;
