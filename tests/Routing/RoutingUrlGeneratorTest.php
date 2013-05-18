@@ -120,6 +120,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUrlGeneratorUsesCurrentSchemeIfNoneSpecified()
+	{
+		$router = new Router;
+		$router->get('/', ['as' => 'home', function() {}]);
+		$request = Request::create('https://dayle.com');
+		$gen = new UrlGenerator($router->getRoutes(), $request);
+
+		$this->assertEquals('https://dayle.com/', $gen->route('home'));
+	}
+
+
 	protected function getGenerator()
 	{
 		$router = new Router;
@@ -130,7 +141,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$router->get('foo/{boom?}/{breeze?}', array('as' => 'foo.breeze', function() {}));
 		$router->get('/boom/baz/{name}', array('uses' => 'FooController@fooAction'));
 
-		return new UrlGenerator($router->getRoutes(), Request::create('/'), 'assets.com');
+		return new UrlGenerator($router->getRoutes(), Request::create('/'));
 	}
 
 }
