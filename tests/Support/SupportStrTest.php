@@ -18,6 +18,13 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
 	}
 
 
+	public function testBehaviorWithLeadingAndTrailingSpaces()
+	{
+		$this->assertEquals(' Taylor Otwell', Str::words(' Taylor Otwell ', 3));
+		$this->assertEquals(' Taylor...', Str::words(' Taylor Otwell ', 1));
+	}
+
+
 	public function testStringWithoutWordsDoesntProduceError()
 	{
 		$nbsp = chr(0xC2).chr(0xA0);
