@@ -43,7 +43,7 @@ class CommandMakeCommand extends Command {
 	{
 		$path = $this->getPath();
 
-		$stub = $this->files->get(__DIR__.'/stubs/command.php');
+		$stub = $this->files->get(__DIR__.'/stubs/command.stub');
 
 		// We'll grab the class name to determine the file name. Since applications are
 		// typically using the PSR-0 standards we can safely assume the classes name

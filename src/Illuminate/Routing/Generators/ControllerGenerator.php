@@ -113,7 +113,7 @@ class ControllerGenerator {
 	 */
 	protected function getController($controller)
 	{
-		$stub = $this->files->get(__DIR__.'/stubs/controller.php');
+		$stub = $this->files->get(__DIR__.'/stubs/controller.stub');
 
 		// We will explode out the controller name on the naemspace delimiter so we
 		// are able to replace a namespace in this stub file. If no namespace is
@@ -180,7 +180,7 @@ class ControllerGenerator {
 		// an array we will return this list of methods so they can be joined up.
 		foreach ($this->getMethods($options) as $method)
 		{
-			$stubs[] = $this->files->get(__DIR__."/stubs/{$method}.php");
+			$stubs[] = $this->files->get(__DIR__."/stubs/{$method}.stub");
 		}
 
 		return $stubs;

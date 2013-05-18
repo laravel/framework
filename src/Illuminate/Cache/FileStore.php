@@ -72,14 +72,23 @@ class FileStore implements StoreInterface {
 	{
 		$value = $this->expiration($minutes).serialize($value);
 
-		$path = $this->path($key);
+		$this->createCacheDirectory($path = $this->path($key));
 
+		$this->files->put($path, $value);
+	}
+
+	/**
+	 * Create the file cache directory if necessary.
+	 *
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function createCacheDirectory($path)
+	{
 		if ( ! $this->files->isDirectory($directory = dirname($path)))
 		{
 			$this->files->makeDirectory($directory, 0777, true);
 		}
-
-		$this->files->put($path, $value);
 	}
 
 	/**
