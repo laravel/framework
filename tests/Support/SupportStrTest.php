@@ -18,6 +18,14 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
 	}
 
 
+	public function testStringWithoutWordsDoesntProduceError()
+	{
+		$nbsp = chr(0xC2).chr(0xA0);
+		$this->assertEquals('', Str::words(' '));
+		$this->assertEquals('', Str::words($nbsp));
+	}
+
+
 	public function testStringMacros()
 	{
 		Illuminate\Support\Str::macro(__CLASS__, function() { return 'foo'; });
