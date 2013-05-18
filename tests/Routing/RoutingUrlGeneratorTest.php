@@ -123,7 +123,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	public function testUrlGeneratorUsesCurrentSchemeIfNoneSpecified()
 	{
 		$router = new Router;
-		$router->get('/', ['as' => 'home', function() {}]);
+		$router->get('/', array('as' => 'home', function() {}));
 		$request = Request::create('https://dayle.com');
 		$gen = new UrlGenerator($router->getRoutes(), $request);
 
