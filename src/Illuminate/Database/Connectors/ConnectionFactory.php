@@ -36,13 +36,23 @@ class ConnectionFactory {
 	 */
 	public function make(array $config, $name = null)
 	{
-		if ( ! isset($config['prefix'])) $config['prefix'] = '';
+		$config = $this->parseConfig($config, $name);
 
 		$pdo = $this->createConnector($config)->connect($config);
 
-		$config['name'] = $name;
-
 		return $this->createConnection($config['driver'], $pdo, $config['database'], $config['prefix'], $config);
+	}
+
+	/**
+	 * Parse and prepare the database configuration.
+	 *
+	 * @param  array   $config
+	 * @param  string  $name
+	 * @return array
+	 */
+	protected function parseConfig(array $config, $name)
+	{
+		return array_add(array_add($config, 'prefix', ''), 'name', $name);
 	}
 
 	/**
