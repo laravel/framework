@@ -136,15 +136,9 @@ class Str {
 	{
 		preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-		if (!isset($matches[0]))
-		{
-			return $value;
-		}
+		if ( ! isset($matches[0])) return $value;
 
-		if (strlen($value) == strlen($matches[0]))
-		{
-			return $value;
-		}
+		if (strlen($value) == strlen($matches[0])) return $value;
 
 		return rtrim($matches[0]).$end;
 	}
