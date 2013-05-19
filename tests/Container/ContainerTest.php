@@ -193,6 +193,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor', $instance->default);
 	}
 
+	public function testDefaultParametersCanBePassedWhenResolving()
+	{
+		$container = new Container;
+		$parameter1 = new ContainerConcreteStub;
+		$parameter2 = 'dayle';
+		$instance = $container->make('ContainerDefaultValueStub', array($parameter1, $parameter2));
+		
+		$this->assertTrue($parameter1 === $instance->stub);
+		$this->assertEquals('dayle', $instance->default);
+	}
 
 	public function testResolvingCallbacksAreCalled()
 	{

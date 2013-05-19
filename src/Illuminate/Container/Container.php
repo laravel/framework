@@ -315,12 +315,10 @@ class Container implements ArrayAccess {
 			return new $concrete;
 		}
 
-		$parameters = $constructor->getParameters();
-
 		// Once we have all the constructor's parameters we can create each of the
 		// dependency instances and then use the reflection instances to make a
 		// new instance of this class, injecting the created dependencies in.
-		$dependencies = $this->getDependencies($parameters);
+		$dependencies = $this->getDependencies($constructor->getParameters(), $parameters);
 
 		return $reflector->newInstanceArgs($dependencies);
 	}
@@ -329,9 +327,10 @@ class Container implements ArrayAccess {
 	 * Resolve all of the dependencies from the ReflectionParameters.
 	 *
 	 * @param  array  $parameters
+	 * @param  array  $arguments that might have been passed into the make
 	 * @return array
 	 */
-	protected function getDependencies($parameters)
+	protected function getDependencies($parameters, $arguments)
 	{
 		$dependencies = array();
 
@@ -339,10 +338,16 @@ class Container implements ArrayAccess {
 		{
 			$dependency = $parameter->getClass();
 
+			// If arguments were passed to the class then we will use those 
+			// instead of trying to auto-resolve them through the container.
+			if (count($arguments) > 0)
+			{
+				$dependencies[] = array_shift($arguments);
+			}
 			// If the class is null, it means the dependency is a string or some other
 			// primitive type which we can not resolve since it is not a class and
 			// we'll just bomb out with an error since we have no-where to go.
-			if (is_null($dependency))
+			elseif (is_null($dependency))
 			{
 				$dependencies[] = $this->resolveNonClass($parameter);
 			}
