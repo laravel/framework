@@ -75,6 +75,20 @@ class Builder {
 	}
 
 	/**
+	 * Find a model by its primary key or throw an exception.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|Collection
+	 */
+	public function findOrFail($id, $columns = array('*'))
+	{
+		if ( ! is_null($model = $this->find($id, $columns))) return $model;
+
+		throw new ModelNotFoundException;
+	}
+
+	/**
 	 * Execute the query and get the first result or throw an exception.
 	 *
 	 * @param  array   $columns
