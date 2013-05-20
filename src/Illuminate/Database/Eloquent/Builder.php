@@ -64,17 +64,6 @@ class Builder {
 	}
 
 	/**
-	 * Execute the query and get the first result.
-	 *
-	 * @param  array   $columns
-	 * @return array
-	 */
-	public function first($columns = array('*'))
-	{
-		return $this->take(1)->get($columns)->first();
-	}
-
-	/**
 	 * Find a model by its primary key or throw an exception.
 	 *
 	 * @param  mixed  $id
@@ -86,6 +75,17 @@ class Builder {
 		if ( ! is_null($model = $this->find($id, $columns))) return $model;
 
 		throw new ModelNotFoundException;
+	}
+
+	/**
+	 * Execute the query and get the first result.
+	 *
+	 * @param  array   $columns
+	 * @return array
+	 */
+	public function first($columns = array('*'))
+	{
+		return $this->take(1)->get($columns)->first();
 	}
 
 	/**
