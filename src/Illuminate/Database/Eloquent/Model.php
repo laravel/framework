@@ -689,6 +689,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			$this->performDeleteOnModel();
 
+			$this->exists = false;
+
 			// Once the model has been deleted, we will fire off the deleted event so that
 			// the developers may hook into post-delete operations. We will then return
 			// a boolean true as the delete is presumably successful on the database.
