@@ -863,7 +863,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlphaDash($attribute, $value)
 	{
-		return preg_match('/^([-a-z0-9_-])+$/i', $value);
+		return preg_match('/^([a-z0-9_-])+$/i', $value);
 	}
 
 	/**
