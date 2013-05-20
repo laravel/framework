@@ -170,7 +170,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function all()
 	{
-		return array_merge($this->input(), $this->files->all());
+		return $this->input() + $this->files->all();
 	}
 
 	/**
@@ -182,7 +182,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function input($key = null, $default = null)
 	{
-		$input = array_merge($this->getInputSource()->all(), $this->query->all());
+		$input = $this->getInputSource()->all() + $this->query->all();
 
 		return array_get($input, $key, $default);
 	}
@@ -199,7 +199,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 
 		$input = array_only($this->input(), $keys);
 
-		return array_merge(array_fill_keys($keys, null), $input);
+		return $input + array_fill_keys($keys, null);
 	}
 
 	/**
