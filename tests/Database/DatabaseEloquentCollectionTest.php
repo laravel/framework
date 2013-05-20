@@ -74,5 +74,53 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(array(1,2,3), $c->modelKeys());
 	}
+    
+    public function testCollectionDictionaryReturnsModelValues()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $one->shouldReceive('getAttribute')->andReturn('1');
+
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $two->shouldReceive('getAttribute')->andReturn('2');
+
+        $three = m::mock('Illuminate\Database\Eloquent\Model');
+        $three->shouldReceive('getAttribute')->andReturn('3');
+
+        $c = new Collection(array($one, $two, $three));
+
+        $this->assertEquals(array('1','2','3'), $c->modelValues('thing'));
+    }
+    
+    public function testCollectionDictionaryReturnsArraysOfModelValuesWithMultipleArguments()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $one->shouldReceive('getAttribute')->andReturn('1');
+
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $two->shouldReceive('getAttribute')->andReturn('2');
+
+        $three = m::mock('Illuminate\Database\Eloquent\Model');
+        $three->shouldReceive('getAttribute')->andReturn('3');
+
+        $c = new Collection(array($one, $two, $three));
+
+        $this->assertEquals(array(array('1','1'),array('2','2'),array('3','3')), $c->modelValues('thing', 'otherthing'));
+    }
+    
+    public function testCollectionDictionaryReturnsArraysOfModelValuesWithSingleArrayArgument()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $one->shouldReceive('getAttribute')->andReturn('1');
+
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $two->shouldReceive('getAttribute')->andReturn('2');
+
+        $three = m::mock('Illuminate\Database\Eloquent\Model');
+        $three->shouldReceive('getAttribute')->andReturn('3');
+
+        $c = new Collection(array($one, $two, $three));
+
+        $this->assertEquals(array(array('1','1'),array('2','2'),array('3','3')), $c->modelValues(array('thing', 'otherthing')));
+    }
 
 }

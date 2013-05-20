@@ -69,5 +69,33 @@ class Collection extends BaseCollection {
 	{
 		return array_map(function($m) { return $m->getKey(); }, $this->items);
 	}
+	
+	/**
+	 * Get an array of property values
+     * 
+     * @param String|Array a model attribute, or list
+	 * 
+     * @example $usernames = $users->modelValues('usernames');
+     * @example $fullnames = $users->modelValues('firstname', 'surname');
+     * @example $fullnames = $users->modelValues(array('firstname', 'surname'));
+     * 
+	 * @return array
+	 */
+	public function modelValues($key)
+	{
+        $args = func_get_args();
+        if ( count($args) > 1 ) {
+            $key = $args;
+        }
+		return array_map(function($m) use ($key) {
+            if ( is_array($key) ) {
+                return array_map(function($k) use($m) {
+                    return $m->$k;
+                }, $key);
+            } else {
+                return $m->$key;
+            }
+        }, $this->items);
+	}
 
 }
