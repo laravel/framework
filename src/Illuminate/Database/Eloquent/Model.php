@@ -419,7 +419,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if (is_string($relations)) $relations = func_get_args();
 
-		$query = $this->newQuery()->wi@th($relations);
+		$query = $this->newQuery()->with($relations);
 
 		$query->eagerLoadRelations(array($this));
 	}
