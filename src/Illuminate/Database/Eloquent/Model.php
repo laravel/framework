@@ -412,7 +412,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Eager load relations on the model.
 	 *
-	 * @param  array  $relations
+	 * @param  array|string  $relations
 	 * @return void
 	 */
 	public function load($relations)
@@ -427,7 +427,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Being querying a model with eager loading.
 	 *
-	 * @param  array  $relations
+	 * @param  array|string  $relations
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public static function with($relations)
