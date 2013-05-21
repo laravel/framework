@@ -412,12 +412,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Eager load relations on the model.
 	 *
-	 * @param  dynamic  string
+	 * @param  array  $relations
 	 * @return void
 	 */
-	public function load()
+	public function load($relations)
 	{
-		$query = $this->newQuery()->with(func_get_args());
+		if (is_string($relations)) $relations = func_get_args();
+
+		$query = $this->newQuery()->wi@th($relations);
 
 		$query->eagerLoadRelations(array($this));
 	}
