@@ -484,14 +484,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function belongsTo($related, $foreignKey = null)
 	{
+		list(, $caller) = debug_backtrace(false);
+
 		// If no foreign key was supplied, we can use a backtrace to guess the proper
 		// foreign key name by using the name of the relationship function, which
 		// when combined with an "_id" should conventionally match the columns.
+		$relation = $caller['function'];
+
 		if (is_null($foreignKey))
 		{
-			list(, $caller) = debug_backtrace(false);
-
-			$foreignKey = snake_case($caller['function']).'_id';
+			$foreignKey = snake_case($relation).'_id';
 		}
 
 		// Once we have the foreign key names, we'll just create a new Eloquent query
@@ -501,7 +503,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$query = $instance->newQuery();
 
-		return new BelongsTo($query, $this, $foreignKey);
+		return new BelongsTo($query, $this, $foreignKey, $relation);
 	}
 
 	/**
@@ -2091,11 +2093,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $relation
 	 * @param  mixed   $value
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function setRelation($relation, $value)
 	{
 		$this->relations[$relation] = $value;
+
+		return $this;
 	}
 
 	/**
