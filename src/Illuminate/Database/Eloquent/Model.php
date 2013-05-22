@@ -1951,8 +1951,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  DateTime  $value
 	 * @return string
 	 */
-	protected function fromDateTime(DateTime $value)
+	protected function fromDateTime($value)
 	{
+		// If a timestamp has come through, we will create a
+		// DateTime object from the timestamp
+		if (is_numeric($value))
+		{
+			$value = new DateTime("@{$value}");
+		}
+
+		// Otherwise, we'll create a DateTime object which
+		// can be converted to the correct format
+		elseif (is_string($value))
+		{
+			$value = new DateTime($value);
+		}
+
 		return $value->format($this->getDateFormat());
 	}
 
