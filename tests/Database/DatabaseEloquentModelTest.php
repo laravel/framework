@@ -228,6 +228,16 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testTimestampsWillNotCreateFromInvalidStringFormats()
+	{
+		$model = new EloquentDateModelStub;
+		$model->created_at = 'invalid-format';
+	}
+
+
 	public function testDateTimeAttributesReturnNullIfSetToNull()
 	{
 		$timestamps = array(
