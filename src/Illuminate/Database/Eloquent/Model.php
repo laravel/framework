@@ -749,7 +749,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function isTrashed()
 	{
-		return $this->softDelete and $this->{static::DELETED_AT} != null;
+		return $this->softDelete and ! is_null($this->{static::DELETED_AT});
 	}
 
 	/**
