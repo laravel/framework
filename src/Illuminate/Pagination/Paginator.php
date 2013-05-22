@@ -101,7 +101,9 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 		$this->from = ($this->getCurrentPage() - 1) * $this->getPerPage() + 1;
 
 		$this->to = $this->currentPage * $this->perPage;
-		if ($this->to > $this->total) {
+		
+		if ($this->to > $this->total)
+		{
 			$this->to = $this->total;
 		}
 
