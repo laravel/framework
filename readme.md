@@ -89,6 +89,7 @@
 - Added `forget` method to event dispatcher to allow all listeners for an event to be removed.
 - `created_at`, `updated_at` and `deleted_at` are now Carbonized by default.
 - Added `getJobId` for all queue drivers.
+- Added `assertResponseStatus` method to base test case.
 
 ## Beta 4
 
