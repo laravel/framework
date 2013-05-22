@@ -18,7 +18,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
 		$this->assertFalse($v->passes());
-		$this->assertEquals(array('foo' => array('Same' => array('baz'))), $v->getFailedRules());
+		$this->assertEquals(array('foo' => array('Same' => array('baz'))), $v->failed());
 	}
 
 
@@ -28,7 +28,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans->shouldReceive('trans')->never();
 		$v = new Validator($trans, array('foo' => 'taylor'), array('name' => 'Confirmed'));
 		$this->assertTrue($v->passes());
-		$this->assertEmpty($v->getFailedRules());
+		$this->assertEmpty($v->failed());
 	}
 
 

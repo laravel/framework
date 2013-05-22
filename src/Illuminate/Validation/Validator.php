@@ -25,6 +25,13 @@ class Validator implements MessageProviderInterface {
 	protected $presenceVerifier;
 
 	/**
+	 * The failed validation rules.
+	 *
+	 * @var array
+	 */
+	protected $failedRules = array();
+
+	/**
 	 * The message bag instance.
 	 *
 	 * @var \Illuminate\Support\MessageBag
@@ -93,13 +100,6 @@ class Validator implements MessageProviderInterface {
 	 * @var array
 	 */
 	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted');
-	
-	/**
-	 * The failed validation rules.
-	 *
-	 * @var array
-	 */
-	protected $failedRules = array();
 
 	/**
 	 * Create a new Validator instance.
@@ -215,32 +215,8 @@ class Validator implements MessageProviderInterface {
 
 		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
 		{
-			$this->addFailedRules($attribute, $rule, $parameters);
-			$this->addError($attribute, $rule, $parameters);
+			$this->addFailure($attribute, $rule, $parameters);
 		}
-	}
-
-	/**
-	 * Add an failed rules to the collection.
-	 *
-	 * @param  string  $attribute
-	 * @param  string  $rule
-	 * @param  array   $parameters
-	 * @return void
-	 */
-	protected function addFailedRules($attribute, $rule, $parameters)
-	{
-		$this->failedRules[$attribute][$rule] = $parameters;
-	}
-
-	/**
-	 * Get the failed validation rules
-	 *
-	 * @return array
-	 */
-	public function getFailedRules()
-	{
-		return $this->failedRules;
 	}
 
 	/**
@@ -283,6 +259,21 @@ class Validator implements MessageProviderInterface {
 	protected function isImplicit($rule)
 	{
 		return in_array($rule, $this->implicitRules);
+	}
+
+	/**
+	 * Add a failed rule and error message to the collection.
+	 *
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return void
+	 */
+	protected function addFailure($attribute, $rule, $parameters)
+	{
+		$this->addError($attribute, $rule, $parameters);
+
+		$this->failedRules[$attribute][$rule] = $parameters;
 	}
 
 	/**
@@ -1664,6 +1655,16 @@ class Validator implements MessageProviderInterface {
 	public function setCustomMessages(array $messages)
 	{
 		$this->customMessages = array_merge($this->customMessages, $messages);
+	}
+
+	/**
+	 * Get the failed validation rules.
+	 *
+	 * @return array
+	 */
+	public function failed()
+	{
+		return $this->failedRules;
 	}
 
 	/**
