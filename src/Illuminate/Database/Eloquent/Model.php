@@ -1953,21 +1953,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function fromDateTime($value)
 	{
-		// If a timestamp has come through, we will create a
-		// DateTime object from the timestamp
+		$format = $this->getDateFormat();
+
+		// If a timestamp has come through we will create
+		// a carbon instance from the timestamp.
 		if (is_numeric($value))
 		{
-			$value = new DateTime("@{$value}");
+			$value = Carbon::createFromTimestampUTC($value);
 		}
 
-		// Otherwise, we'll create a DateTime object which
-		// can be converted to the correct format
-		elseif (is_string($value))
+		// Otherwise, we'll create a Carbon object based
+		// on the format for our model.
+		elseif ( ! $value instanceof DateTime)
 		{
-			$value = new DateTime($value);
+			$value = Carbon::createFromFormat($format, $value);
 		}
 
-		return $value->format($this->getDateFormat());
+		return $value->format($format);
 	}
 
 	/**
