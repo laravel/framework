@@ -57,7 +57,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	protected $from;
 
 	/**
-	 * The index for the last item on the page
+	 * The index for the last item on the page.
 	 * 
 	 * @var int
 	 */
@@ -248,7 +248,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
-	 * Get the index for the first item on the page
+	 * Get the index for the first item on the page.
 	 * 
 	 * @return int
 	 */
@@ -258,7 +258,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
-	 * Get the index for the last item on the page
+	 * Get the index for the last item on the page.
 	 * 
 	 * @return int
 	 */
