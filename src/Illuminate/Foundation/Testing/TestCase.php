@@ -136,6 +136,17 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the client response has a given code.
+	 *
+	 * @param  int  $code
+	 * @return void
+	 */
+	public function assertResponseStatus($code)
+	{
+		return $this->assertEquals($code, $this->client->getResponse()->getStatusCode());
+	}
+
+	/**
 	 * Assert that the response view has a given piece of bound data.
 	 *
 	 * @param  string|array  $key
