@@ -90,6 +90,7 @@
 - `created_at`, `updated_at` and `deleted_at` are now Carbonized by default.
 - Added `getJobId` for all queue drivers.
 - Added `assertResponseStatus` method to base test case.
+- Added `failed` method to Validator to get the failed rules.
 
 ## Beta 4
 
