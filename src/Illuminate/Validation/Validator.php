@@ -102,6 +102,13 @@ class Validator implements MessageProviderInterface {
 	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted');
 
 	/**
+	 * The non iterable validation rules.
+	 *
+	 * @var array
+	 */
+	protected $nonIterableRules = array('Exists');
+
+	/**
 	 * Create a new Validator instance.
 	 *
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
@@ -211,9 +218,7 @@ class Validator implements MessageProviderInterface {
 
 		$method = "validate{$rule}";
 
-		// Preg Match checksw if asterisk is a wildcard, not part of an attribute name.
-		// Possible wildcard positions: *.foo | foo.*.bar | foo.*
-		if (is_array($value) and preg_match('/(^|\.)\*(\.|$)/', $attribute))
+		if ($this->isIterable($attribute, $value))
 		{
 			// Required to test items even if array is empty.
 			$value = empty($value) ? array(null) : $value;
@@ -238,6 +243,24 @@ class Validator implements MessageProviderInterface {
 			}
 		}
 
+	}
+
+	protected function isIterable($attribute, $rule)
+	{
+		$value = $this->getValue($attribute);
+
+		// Preg Match checksw if asterisk is a wildcard, not part of an attribute name.
+		// Possible wildcard positions: *.foo | foo.*.bar | foo.*
+		if (is_array($value) and preg_match('/(^|\.)\*(\.|$)/', $attribute))
+		{
+			// Do not iterate over value if rule is one of nonIterableRules (namely, Exists or any Extended).
+			if (in_array($rule, $this->nonIterableRules))
+				return false;
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -1504,6 +1527,7 @@ class Validator implements MessageProviderInterface {
 		foreach ($extensions as $rule => $extension)
 		{
 			$this->implicitRules[] = studly_case($rule);
+			$this->nonIterableRules[] = studly_case($rule);
 		}
 	}
 
@@ -1531,6 +1555,7 @@ class Validator implements MessageProviderInterface {
 		$this->addExtension($rule, $extension);
 
 		$this->implicitRules[] = studly_case($rule);
+		$this->nonIterableRules[] = studly_case($rule);
 	}
 
 	/**
