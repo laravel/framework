@@ -1300,6 +1300,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		return $this->newQuery(false);
 	}
+ 
+ 	/**
+ 	 * Determine if the model instance has been soft-deleted.
+ 	 *
+ 	 * @return bool
+ 	 */
+	public function trashed()
+	{
+		return $this->softDelete and ! is_null($this->{static::DELETED_AT});
+	}
 
 	/**
 	 * Get a new query builder that includes soft deletes.

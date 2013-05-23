@@ -92,6 +92,7 @@
 - Added `assertResponseStatus` method to base test case.
 - Added `failed` method to Validator to get the failed rules.
 - Rename `trashed` query methods to `onlyTrashed`.
+- Added new `trashed` method to Eloquent model to determine if model has been soft deleted.
 
 ## Beta 4
 
