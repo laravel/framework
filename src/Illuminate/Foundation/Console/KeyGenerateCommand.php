@@ -44,7 +44,7 @@ class KeyGenerateCommand extends Command {
 
 		$key = $this->getRandomKey();
 
-		$contents = str_replace($this->laravel['config']['app.key'], $key, $contents);
+    $contents = preg_replace("/['\"]key['\"].*=>.*,/", "'key' => '$key',", $contents);
 
 		$this->files->put($path, $contents);
 
