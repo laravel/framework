@@ -743,6 +743,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Test if a a soft-deleted model instance is deleted/trashed.
+	 *
+	 * @return boolean
+	 */
+	public function trashed()
+	{
+		return $this->softDelete and ! is_null($this->{static::DELETED_AT});
+	}
+
+	/**
 	 * Restore a soft-deleted model instance.
 	 *
 	 * @return void
