@@ -91,6 +91,7 @@
 - Added `getJobId` for all queue drivers.
 - Added `assertResponseStatus` method to base test case.
 - Added `failed` method to Validator to get the failed rules.
+- Rename `trashed` query methods to `onlyTrashed`.
 
 ## Beta 4
 

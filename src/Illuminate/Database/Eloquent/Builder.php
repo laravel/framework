@@ -352,7 +352,7 @@ class Builder {
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function trashed()
+	public function onlyTrashed()
 	{
 		$this->withTrashed();
 

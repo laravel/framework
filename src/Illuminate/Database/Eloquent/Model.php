@@ -1316,7 +1316,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public static function trashed()
+	public static function onlyTrashed()
 	{
 		$instance = new static;
 
