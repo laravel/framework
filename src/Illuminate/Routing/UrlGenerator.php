@@ -329,7 +329,7 @@ class UrlGenerator {
 	}
 
 	/**
-	 * Get the Symfony URL generator instance.
+	 * Set the Symfony URL generator instance.
 	 *
 	 * @param  \Symfony\Component\Routing\Generator\UrlGenerator  $generator
 	 * @return void
