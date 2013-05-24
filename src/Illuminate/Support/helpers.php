@@ -455,7 +455,7 @@ if ( ! function_exists('ends_with'))
 	 * Determine if a given string ends with a given needle.
 	 *
 	 * @param string $haystack
-	 * @param string $needle
+	 * @param string|array $needle
 	 * @return bool
 	 */
 	function ends_with($haystack, $needle)
@@ -670,9 +670,9 @@ if ( ! function_exists('starts_with'))
 	 * @param  string|array  $needle
 	 * @return bool
 	 */
-	function starts_with($haystack, $needles)
+	function starts_with($haystack, $needle)
 	{
-		return Illuminate\Support\Str::startsWith($haystack, $needles);
+		return Illuminate\Support\Str::startsWith($haystack, $needle);
 	}
 }
 

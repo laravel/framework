@@ -52,12 +52,17 @@ class Str {
 	 * Determine if a given string ends with a given needle.
 	 *
 	 * @param string $haystack
-	 * @param string $needle
+	 * @param string|array $needles
 	 * @return bool
 	 */
-	public static function endsWith($haystack, $needle)
+	public static function endsWith($haystack, $needles)
 	{
-		return $needle == substr($haystack, strlen($haystack) - strlen($needle));
+		foreach ((array) $needles as $needle)
+		{
+			if ($needle == substr($haystack, strlen($haystack) - strlen($needle))) return true;
+		}
+
+		return false;
 	}
 
 	/**
