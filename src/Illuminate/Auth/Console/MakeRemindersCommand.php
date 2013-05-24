@@ -53,6 +53,8 @@ class MakeRemindersCommand extends Command {
 		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/reminders.stub'));
 
 		$this->info('Migration created successfully!');
+
+		$this->call('dump-autoload');
 	}
 
 	/**
