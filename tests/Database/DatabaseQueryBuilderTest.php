@@ -366,6 +366,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCacheReturnsCachedResults()
+	{
+		$connection = m::mock('Illuminate\Database\ConnectionInterface');
+		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
+		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('cache', 'get'), array($connection, $grammar, $processor));
+		$builder->expects($this->once())->method('cache')->with(30)->will($this->returnValue($builder));
+		$builder->expects($this->once())->method('get')->with()->will($this->returnValue(array('foo')));
+		$this->assertEquals(array('foo'), $builder->cache(30)->get());
+	}
+
+
 	public function testPaginateCorrectlyCreatesPaginatorInstance()
 	{
 		$connection = m::mock('Illuminate\Database\ConnectionInterface');
