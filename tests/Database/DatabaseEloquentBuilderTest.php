@@ -72,6 +72,28 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWithDeletedProperlyRemovesDeletedClause()
+	{
+		$builder = new Illuminate\Database\Eloquent\Builder(new Illuminate\Database\Query\Builder(
+			m::mock('Illuminate\Database\ConnectionInterface'),
+			m::mock('Illuminate\Database\Query\Grammars\Grammar'),
+			m::mock('Illuminate\Database\Query\Processors\Processor')
+		));
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('getTable')->once()->andReturn('');
+		$model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('deleted_at');
+		$builder->setModel($model);
+
+		$builder->getQuery()->whereNull('updated_at');
+		$builder->getQuery()->whereNull('deleted_at');
+		$builder->getQuery()->whereNull('foo_bar');
+
+		$builder->withTrashed();
+
+		$this->assertEquals(2, count($builder->getQuery()->wheres));
+	}
+
+
 	public function testPaginateMethod()
 	{
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get'), $this->getMocks());
@@ -235,21 +257,6 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Closure', $eagers['orders']);
 		$this->assertNull($eagers['orders']());
 		$this->assertEquals('foo', $eagers['orders.lines']());
-	}
-
-
-	public function testListsMethodIsKeyedByPrimaryKey()
-	{
-		$builder = $this->getBuilder();
-		$builder->getQuery()->shouldReceive('lists')->once()->with('foo', 'bar')->andReturn(array('2' => 'bar', '5' => 'baz'));
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
-		$model->shouldReceive('getKeyName')->once()->andReturn('bar');
-		$model->shouldReceive('getTable')->once()->andReturn('table');
-		$model->shouldReceive('hasGetMutator')->once()->with('foo')->andReturn(false);
-		$builder->getQuery()->shouldReceive('from')->once()->with('table');
-		$builder->setModel($model);
-		$results = $builder->lists('foo');
-		$this->assertEquals(array('2' => 'bar', '5' => 'baz'), $results);
 	}
 
 

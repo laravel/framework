@@ -92,11 +92,11 @@ class Encrypter {
 		// We'll go ahead and remove the PKCS7 padding from the encrypted value before
 		// we decrypt it. Once we have the de-padded value, we will grab the vector
 		// and decrypt the data, passing back the unserialized from of the value.
-		$value = $this->stripPadding(base64_decode($payload['value']));
+		$value = base64_decode($payload['value']);
 
 		$iv = base64_decode($payload['iv']);
 
-		return unserialize(rtrim($this->mcryptDecrypt($value, $iv)));
+		return unserialize($this->stripPadding($this->mcryptDecrypt($value, $iv)));
 	}
 
 	/**
@@ -171,7 +171,7 @@ class Encrypter {
 	{
 		$pad = ord($value[($len = strlen($value)) - 1]);
 
-		return $this->paddingIsValid($pad, $value) ? substr($value, 0, -$pad) : $value;
+		return $this->paddingIsValid($pad, $value) ? substr($value, 0, strlen($value) - $pad) : $value;
 	}
 
 	/**
@@ -183,7 +183,9 @@ class Encrypter {
 	 */
 	protected function paddingIsValid($pad, $value)
 	{
-		return $pad and $pad <= $this->block and preg_match('/'.chr($pad).'{'.$pad.'}$/', $value);
+		$beforePad = strlen($value) - $pad;
+
+		return substr($value, $beforePad) == str_repeat(substr($value, -1), $pad);
 	}
 
 	/**

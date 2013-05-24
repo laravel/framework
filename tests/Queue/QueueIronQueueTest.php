@@ -52,7 +52,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('createPushedIronJob'), array($iron = m::mock('IronMQ'), $request = m::mock('Illuminate\Http\Request'), 'default'));
 		$request->shouldReceive('header')->once()->with('iron-message-id')->andReturn('message-id');
 		$request->shouldReceive('getContent')->once()->andReturn(json_encode(array('foo' => 'bar')));
-		$job = (object) array('id' => 'message-id', 'body' => json_encode(array('foo' => 'bar')));
+		$job = (object) array('id' => 'message-id', 'body' => json_encode(array('foo' => 'bar')), 'pushed' => true);
 		$queue->expects($this->once())->method('createPushedIronJob')->with($this->equalTo($job))->will($this->returnValue($mockIronJob = m::mock('StdClass')));
 		$mockIronJob->shouldReceive('fire')->once();
 

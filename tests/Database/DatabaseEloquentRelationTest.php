@@ -38,17 +38,19 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 		$relation = new HasOne($builder, $parent, 'foreign_key');
 		$related->shouldReceive('getTable')->andReturn('table');
 		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		$builder->shouldReceive('update')->once()->with(array('table.updated_at' => new DateTime));
+		$builder->shouldReceive('update')->once()->with(array('updated_at' => new DateTime));
 
 		$relation->touch();
 	}
 
 }
 
+class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model {}
+
 
 class EloquentRelationResetStub extends Illuminate\Database\Eloquent\Builder {
 	public function __construct() { $this->query = new EloquentRelationQueryStub; }
-	public function getModel() {}
+	public function getModel() { return new EloquentRelationResetModelStub; }
 }
 
 

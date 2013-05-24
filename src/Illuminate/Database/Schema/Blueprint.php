@@ -329,7 +329,7 @@ class Blueprint {
 	}
 
 	/**
-	 * Create a new auto-incrementing column on the table.
+	 * Create a new auto-incrementing integer column on the table.
 	 *
 	 * @param  string  $column
 	 * @return \Illuminate\Support\Fluent
@@ -337,6 +337,17 @@ class Blueprint {
 	public function increments($column)
 	{
 		return $this->unsignedInteger($column, true);
+	}
+
+	/**
+	 * Create a new auto-incrementing big integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function bigIncrements($column)
+	{
+		return $this->unsignedBigInteger($column, true);
 	}
 
 	/**
@@ -376,6 +387,30 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new big integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function bigInteger($column, $autoIncrement = false, $unsigned = false)
+	{
+		return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
+	}
+
+	/**
+	 * Create a new medium integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function mediumInteger($column)
+	{
+		return $this->addColumn('mediumInteger', $column);
+	}
+
+	/**
 	 * Create a new tiny integer column on the table.
 	 *
 	 * @param  string  $column
@@ -384,6 +419,17 @@ class Blueprint {
 	public function tinyInteger($column)
 	{
 		return $this->addColumn('tinyInteger', $column);
+	}
+
+	/**
+	 * Create a new small integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function smallInteger($column)
+	{
+		return $this->addColumn('smallInteger', $column);
 	}
 
 	/**
@@ -397,6 +443,19 @@ class Blueprint {
 	public function unsignedInteger($column, $autoIncrement = false)
 	{
 		return $this->integer($column, $autoIncrement, true);
+	}
+
+	/**
+	 * Create a new unsigned big integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function unsignedBigInteger($column, $autoIncrement = false)
+	{
+		return $this->bigInteger($column, $autoIncrement, true);
 	}
 
 	/**
@@ -502,6 +561,16 @@ class Blueprint {
 		$this->timestamp('created_at');
 
 		$this->timestamp('updated_at');
+	}
+
+	/**
+	 * Add a "deleted at" timestamp for the table.
+	 *
+	 * @return void
+	 */
+	public function softDeletes()
+	{
+		$this->timestamp('deleted_at')->nullable();
 	}
 
 	/**

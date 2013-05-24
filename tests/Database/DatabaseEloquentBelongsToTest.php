@@ -62,7 +62,21 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	protected function getRelation()
+	public function testAssociateMethodSetsForeignKeyOnModel()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+		$relation = $this->getRelation($parent);
+		$associate = m::mock('Illuminate\Database\Eloquent\Model');
+		$associate->shouldReceive('getKey')->once()->andReturn(1);
+		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
+		$parent->shouldReceive('setRelation')->once()->with('relation', $associate);
+
+		$relation->associate($associate);
+	}
+
+
+	protected function getRelation($parent = null)
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
@@ -70,8 +84,8 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 		$related->shouldReceive('getKeyName')->andReturn('id');
 		$related->shouldReceive('getTable')->andReturn('relation');
 		$builder->shouldReceive('getModel')->andReturn($related);
-		$parent = new EloquentBelongsToModelStub;
-		return new BelongsTo($builder, $parent, 'foreign_key');
+		$parent = $parent ?: new EloquentBelongsToModelStub;
+		return new BelongsTo($builder, $parent, 'foreign_key', 'relation');
 	}
 
 }

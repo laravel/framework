@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Cache;
 
+use Closure;
+
 class Section {
 
 	/**
@@ -30,6 +32,17 @@ class Section {
 	}
 
 	/**
+	 * Determine if an item exists in the cache.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function has($key)
+	{
+		return ! is_null($this->get($key));
+	}
+
+	/**
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key
@@ -38,7 +51,9 @@ class Section {
 	 */
 	public function get($key, $default = null)
 	{
-		return $this->store->get($this->sectionItemKey($key)) ?: value($default);
+		$value = $this->store->get($this->sectionItemKey($key));
+
+		return ! is_null($value) ? $value : value($default);
 	}
 
 	/**
@@ -112,12 +127,63 @@ class Section {
 	}
 
 	/**
+	 * Get an item from the cache, or store the default value.
+	 *
+	 * @param  string   $key
+	 * @param  int      $minutes
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function remember($key, $minutes, Closure $callback)
+	{
+		// If the item exists in the cache we will just return this immediately
+		// otherwise we will execute the given Closure and cache the result
+		// of that execution for the given number of minutes in storage.
+		if ($this->has($key)) return $this->get($key);
+
+		$this->put($key, $value = $callback(), $minutes);
+
+		return $value;
+	}
+
+	/**
+	 * Get an item from the cache, or store the default value forever.
+	 *
+	 * @param  string   $key
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function sear($key, Closure $callback)
+	{
+		return $this->rememberForever($key, $callback);
+	}
+
+	/**
+	 * Get an item from the cache, or store the default value forever.
+	 *
+	 * @param  string   $key
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function rememberForever($key, Closure $callback)
+	{
+		// If the item exists in the cache we will just return this immediately
+		// otherwise we will execute the given Closure and cache the result
+		// of that execution for the given number of minutes. It's easy.
+		if ($this->has($key)) return $this->get($key);
+
+		$this->forever($key, $value = $callback());
+
+		return $value;
+	}
+
+	/**
 	 * Get a fully qualfied section item key.
 	 *
 	 * @param  string  $key
 	 * @return string
 	 */
-	protected function sectionItemKey($key)
+	public function sectionItemKey($key)
 	{
 		return $this->name.':'.$this->sectionId().':'.$key;
 	}

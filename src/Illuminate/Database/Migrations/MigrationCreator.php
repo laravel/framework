@@ -8,7 +8,7 @@ class MigrationCreator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -22,7 +22,7 @@ class MigrationCreator {
 	/**
 	 * Create a new migration creator instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)
@@ -65,7 +65,7 @@ class MigrationCreator {
 	{
 		if (is_null($table))
 		{
-			return $this->files->get($this->getStubPath().'/blank.php');
+			return $this->files->get($this->getStubPath().'/blank.stub');
 		}
 
 		// We also have stubs for creating new tables and modifying existing tables
@@ -73,7 +73,7 @@ class MigrationCreator {
 		// or modifying existing tables. We'll grab the appropriate stub here.
 		else
 		{
-			$stub = $create ? 'create.php' : 'update.php';
+			$stub = $create ? 'create.stub' : 'update.stub';
 
 			return $this->files->get($this->getStubPath()."/{$stub}");
 		}
@@ -161,7 +161,7 @@ class MigrationCreator {
 	/**
 	 * Get the filesystem instance.
 	 *
-	 * @return \Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{

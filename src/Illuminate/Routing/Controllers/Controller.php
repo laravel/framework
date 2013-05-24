@@ -97,7 +97,7 @@ class Controller {
 	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  string  $method
 	 * @param  array   $parameters
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function callAction(Container $container, Router $router, $method, $parameters)
 	{
@@ -144,7 +144,7 @@ class Controller {
 	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  string  $method
 	 * @param  mixed   $response
-	 * @return Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	protected function processResponse($router, $method, $response)
 	{
@@ -191,7 +191,7 @@ class Controller {
 	/**
 	 * Get the before filters for the controller.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return array
 	 */
@@ -207,7 +207,7 @@ class Controller {
 	 *
 	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  string  $method
-	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
 	protected function callAfterFilters($router, $method, $response)
@@ -230,7 +230,7 @@ class Controller {
 	/**
 	 * Get the after filters for the controller.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $method
 	 * @return array
 	 */
@@ -246,7 +246,7 @@ class Controller {
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  string  $filter
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  array  $parameters
 	 * @return mixed
 	 */

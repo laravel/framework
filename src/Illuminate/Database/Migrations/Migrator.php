@@ -19,7 +19,7 @@ class Migrator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -49,7 +49,7 @@ class Migrator {
 	 *
 	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(MigrationRepositoryInterface $repository,
@@ -180,7 +180,7 @@ class Migrator {
 	/**
 	 * Run "down" a migration instance.
 	 *
-	 * @param  StdClass  $migration
+	 * @param  \StdClass  $migration
 	 * @param  bool  $pretend
 	 * @return void
 	 */
@@ -373,7 +373,7 @@ class Migrator {
 	/**
 	 * Get the file system instance.
 	 *
-	 * @return \Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{

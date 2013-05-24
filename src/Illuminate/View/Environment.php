@@ -4,6 +4,7 @@ use Closure;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\View\Engines\EngineResolver;
+use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
 
 class Environment {
 
@@ -105,14 +106,28 @@ class Environment {
 	 * Get a evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
-	 * @param  mixed   $data
+	 * @param  array   $data
+	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function make($view, $data = array())
+	public function make($view, $data = array(), $mergeData = array())
 	{
 		$path = $this->finder->find($view);
 
+		$data = array_merge($mergeData, $this->parseData($data));
+
 		return new View($this, $this->getEngineFromPath($path), $view, $path, $data);
+	}
+
+	/**
+	 * Parse the given data into a raw array.
+	 *
+	 * @param  mixed  $data
+	 * @return array
+	 */
+	protected function parseData($data)
+	{
+		return $data instanceof Arrayable ? $data->toArray() : $data;
 	}
 
 	/**
@@ -239,9 +254,14 @@ class Environment {
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function share($key, $value)
+	public function share($key, $value = null)
 	{
-		$this->shared[$key] = $value;
+		if ( ! is_array($key)) return $this->shared[$key] = $value;
+
+		foreach ($key as $innerKey => $innerValue)
+		{
+			$this->share($innerKey, $innerValue);
+		}
 	}
 
 	/**
@@ -394,13 +414,21 @@ class Environment {
 	/**
 	 * Stop injecting content into a section.
 	 *
+	 * @param  bool  $overwrite
 	 * @return string
 	 */
-	public function stopSection()
+	public function stopSection($overwrite = false)
 	{
 		$last = array_pop($this->sectionStack);
 
-		$this->extendSection($last, ob_get_clean());
+		if ($overwrite)
+		{
+			$this->sections[$last] = ob_get_clean();
+		}
+		else
+		{
+			$this->extendSection($last, ob_get_clean());
+		}
 
 		return $last;
 	}

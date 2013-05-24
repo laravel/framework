@@ -4,6 +4,7 @@ use Swift_Mailer;
 use Illuminate\Support\ServiceProvider;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
+use Swift_SendmailTransport as SendmailTransport;
 
 class MailServiceProvider extends ServiceProvider {
 
@@ -81,6 +82,9 @@ class MailServiceProvider extends ServiceProvider {
 			case 'smtp':
 				return $this->registerSmtpTransport($config);
 
+			case 'sendmail':
+				return $this->registerSendmailTransport($config);
+
 			case 'mail':
 				return $this->registerMailTransport($config);
 
@@ -122,6 +126,20 @@ class MailServiceProvider extends ServiceProvider {
 			}
 
 			return $transport;
+		});
+	}
+
+	/**
+	 * Register the Sendmail Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerSendmailTransport($config)
+	{
+		$this->app['swift.transport'] = $this->app->share(function($app) use ($config)
+		{
+			return SendmailTransport::newInstance($config['sendmail']);
 		});
 	}
 

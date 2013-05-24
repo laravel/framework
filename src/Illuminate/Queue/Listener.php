@@ -54,7 +54,7 @@ class Listener {
 	/**
 	 * Run the given process.
 	 *
-	 * @param  Symfony\Component\Process\Process  $process
+	 * @param  \Symfony\Component\Process\Process  $process
 	 * @param  int  $memory
 	 * @return void
 	 */
@@ -79,11 +79,11 @@ class Listener {
 	 * @param  int     $delay
 	 * @param  int     $memory
 	 * @param  int     $timeout
-	 * @return Symfony\Component\Process\Process
+	 * @return \Symfony\Component\Process\Process
 	 */
 	public function makeProcess($connection, $queue, $delay, $memory, $timeout)
 	{
-		$string = 'php artisan queue:work %s --queue=%s --delay=%s --memory=%s --sleep';
+		$string = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep';
 
 		// If the environment is set, we will append it to the command string so the
 		// workers will run under the specified environment. Otherwise, they will

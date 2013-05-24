@@ -129,7 +129,7 @@ class RedisStore implements StoreInterface {
 	 */
 	public function section($name)
 	{
-		return new Section($this, $name);
+		return new RedisSection($this, $name);
 	}
 
 	/**
@@ -140,6 +140,16 @@ class RedisStore implements StoreInterface {
 	public function getRedis()
 	{
 		return $this->redis;
+	}
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return $this->prefix;
 	}
 
 }

@@ -1,7 +1,9 @@
 <?php namespace Illuminate\Validation;
 
 use Closure;
+use DateTime;
 use Illuminate\Support\MessageBag;
+use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Translation\TranslatorInterface;
 use Illuminate\Support\Contracts\MessageProviderInterface;
@@ -21,6 +23,13 @@ class Validator implements MessageProviderInterface {
 	 * @var \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	protected $presenceVerifier;
+
+	/**
+	 * The failed validation rules.
+	 *
+	 * @var array
+	 */
+	protected $failedRules = array();
 
 	/**
 	 * The message bag instance.
@@ -90,12 +99,12 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @var array
 	 */
-	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'Accepted');
+	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted');
 
 	/**
 	 * Create a new Validator instance.
 	 *
-	 * @param  Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
@@ -206,7 +215,7 @@ class Validator implements MessageProviderInterface {
 
 		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
 		{
-			$this->addError($attribute, $rule, $parameters);
+			$this->addFailure($attribute, $rule, $parameters);
 		}
 	}
 
@@ -250,6 +259,21 @@ class Validator implements MessageProviderInterface {
 	protected function isImplicit($rule)
 	{
 		return in_array($rule, $this->implicitRules);
+	}
+
+	/**
+	 * Add a failed rule and error message to the collection.
+	 *
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return void
+	 */
+	protected function addFailure($attribute, $rule, $parameters)
+	{
+		$this->addError($attribute, $rule, $parameters);
+
+		$this->failedRules[$attribute][$rule] = $parameters;
 	}
 
 	/**
@@ -349,6 +373,24 @@ class Validator implements MessageProviderInterface {
 	protected function validateRequiredWithout($attribute, $value, $parameters)
 	{
 		if ($this->anyFailingRequired($parameters))
+		{
+			return $this->validateRequired($attribute, $value);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate that an attribute exists when another attribute has a given value.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredIf($attribute, $value, $parameters)
+	{
+		if ($parameters[1] == array_get($this->data, $parameters[0]))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
@@ -679,7 +721,7 @@ class Validator implements MessageProviderInterface {
 
 		$expected = (is_array($value)) ? count($value) : 1;
 
-		return $this->getExistCount($table, $column, $value) >= $expected;
+		return $this->getExistCount($table, $column, $value, $parameters) >= $expected;
 	}
 
 	/**
@@ -688,20 +730,43 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $table
 	 * @param  string  $column
 	 * @param  mixed   $value
+	 * @param  array   $parameters
 	 * @return int
 	 */
-	protected function getExistCount($table, $column, $value)
+	protected function getExistCount($table, $column, $value, $parameters)
 	{
 		$verifier = $this->getPresenceVerifier();
 
+		$extra = $this->getExtraExistConditions($parameters);
+
 		if (is_array($value))
 		{
-			return $verifier->getMultiCount($table, $column, $value);
+			return $verifier->getMultiCount($table, $column, $value, $extra);
 		}
 		else
 		{
-			return $verifier->getCount($table, $column, $value);
+			return $verifier->getCount($table, $column, $value, null, null, $extra);
 		}
+	}
+
+	/**
+	 * Get the extra exist conditions.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function getExtraExistConditions(array $parameters)
+	{
+		$segments = array_values(array_slice($parameters, 2));
+
+		$extra = array();
+
+		for ($i = 0; $i < count($segments); $i = $i + 2)
+		{
+			$extra[$segments[$i]] = $segments[$i + 1];
+		}
+
+		return $extra;
 	}
 
 	/**
@@ -784,15 +849,7 @@ class Validator implements MessageProviderInterface {
 		// The Symfony File class should do a decent job of guessing the extension
 		// based on the true MIME type so we'll just loop through the array of
 		// extensions and compare it to the guessed extension of the files.
-		foreach ($parameters as $extension)
-		{
-			if ($value->guessExtension() == $extension)
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return in_array($value->guessExtension(), $parameters);
 	}
 
 	/**
@@ -828,7 +885,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlphaDash($attribute, $value)
 	{
-		return preg_match('/^([-a-z0-9_-])+$/i', $value);
+		return preg_match('/^([a-z0-9_-])+$/i', $value);
 	}
 
 	/**
@@ -853,6 +910,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateDate($attribute, $value)
 	{
+		if ($value instanceof DateTime) return true;
+
 		if (strtotime($value) === false) return false;
 
 		$date = date_parse($value);
@@ -962,7 +1021,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getInlineMessage($attribute, $lowerRule)
 	{
-		$keys = array($lowerRule, "{$attribute}.{$lowerRule}");
+		$keys = array("{$attribute}.{$lowerRule}", $lowerRule);
 
 		// First we will check for a custom message for an attribute specific rule
 		// message for the fields, then we will check for a general custom line
@@ -1039,6 +1098,27 @@ class Validator implements MessageProviderInterface {
 		}
 
 		return $message;
+	}
+
+	/**
+	 * Transform an array of attributes to their displayable form.
+	 *
+	 * @param  array  $values
+	 * @return array
+	 */
+	protected function getAttributeList(array $values)
+	{
+		$attributes = array();
+
+		// For each attribute in the list we will simply get its displayable form as
+		// this is convenient when replacing lists of parameters like some of the
+		// replacement functions do when formatting out the validation message.
+		foreach ($values as $key => $value)
+		{
+			$attributes[$key] = $this->getAttribute($value);
+		}
+
+		return $attributes;
 	}
 
 	/**
@@ -1213,6 +1293,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
 	{
+		$parameters = $this->getAttributeList($parameters);
+
 		return str_replace(':values', implode(' / ', $parameters), $message);
 	}
 
@@ -1227,7 +1309,25 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
 	{
+		$parameters = $this->getAttributeList($parameters);
+
 		return str_replace(':values', implode(' / ', $parameters), $message);
+	}
+
+	/**
+	 * Replace all place-holders for the required_if rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
+	{
+		$parameters[0] = $this->getAttribute($parameters[0]);
+
+		return str_replace(array(':other', ':value'), $parameters, $message);
 	}
 
 	/**
@@ -1241,7 +1341,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceSame($message, $attribute, $rule, $parameters)
 	{
-		return str_replace(':other', $parameters[0], $message);
+		return str_replace(':other', $this->getAttribute($parameters[0]), $message);
 	}
 
 	/**
@@ -1255,7 +1355,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceDifferent($message, $attribute, $rule, $parameters)
 	{
-		return str_replace(':other', $parameters[0], $message);
+		return str_replace(':other', $this->getAttribute($parameters[0]), $message);
 	}
 
 	/**
@@ -1400,10 +1500,10 @@ class Validator implements MessageProviderInterface {
 	 * Register a custom validator extension.
 	 *
 	 * @param  string   $rule
-	 * @param  Closure  $extension
+	 * @param  Closure|string  $extension
 	 * @return void
 	 */
-	public function addExtension($rule, Closure $extension)
+	public function addExtension($rule, $extension)
 	{
 		$this->extensions[$rule] = $extension;
 	}
@@ -1518,7 +1618,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the Translator implementation.
 	 *
-	 * @return Symfony\Component\Translation\TranslatorInterface
+	 * @return \Symfony\Component\Translation\TranslatorInterface
 	 */
 	public function getTranslator()
 	{
@@ -1528,7 +1628,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the Translator implementation.
 	 *
-	 * @param Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @return void
 	 */
 	public function setTranslator(TranslatorInterface $translator)
@@ -1554,7 +1654,17 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function setCustomMessages(array $messages)
 	{
-		$this->customMessages = $messages;
+		$this->customMessages = array_merge($this->customMessages, $messages);
+	}
+
+	/**
+	 * Get the failed validation rules.
+	 *
+	 * @return array
+	 */
+	public function failed()
+	{
+		return $this->failedRules;
 	}
 
 	/**
@@ -1588,6 +1698,52 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Set the IoC container instance.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return void
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+	}
+
+	/**
+	 * Call a custom validator extension.
+	 *
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function callExtension($rule, $parameters)
+	{
+		$callback = $this->extensions[$rule];
+
+		if ($callback instanceof Closure)
+		{
+			return call_user_func_array($callback, $parameters);
+		}
+		elseif (is_string($callback))
+		{
+			return $this->callClassBasedExtension($callback, $parameters);
+		}
+	}
+
+	/**
+	 * Call a class baesd validator extension.
+	 *
+	 * @param  string  $callback
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function callClassBasedExtension($callback, $parameters)
+	{
+		list($class, $method) = explode('@', $callback);
+
+		return call_user_func_array(array($this->container->make($class), $method), $parameters);
+	}
+
+	/**
 	 * Handle dynamic calls to class methods.
 	 *
 	 * @param  string  $method
@@ -1600,7 +1756,7 @@ class Validator implements MessageProviderInterface {
 
 		if (isset($this->extensions[$rule]))
 		{
-			return call_user_func_array($this->extensions[$rule], $parameters);
+			return $this->callExtension($rule, $parameters);
 		}
 
 		throw new \BadMethodCallException("Method [$method] does not exist.");

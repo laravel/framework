@@ -1,12 +1,31 @@
 <?php namespace Illuminate\Database\Connectors;
 
 use PDO;
+use Illuminate\Container\Container;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SqlServerConnection;
 
 class ConnectionFactory {
+
+	/**
+	 * The IoC container instance.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
+
+	/**
+	 * Create a new connection factory instance.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return void
+	 */
+	public function __construct(Container $container)
+	{
+		$this->container = $container;
+	}
 
 	/**
 	 * Establish a PDO connection based on the configuration.
@@ -17,16 +36,23 @@ class ConnectionFactory {
 	 */
 	public function make(array $config, $name = null)
 	{
-		if ( ! isset($config['prefix']))
-		{
-			$config['prefix'] = '';
-		}
+		$config = $this->parseConfig($config, $name);
 
 		$pdo = $this->createConnector($config)->connect($config);
 
-		$config['name'] = $name;
-
 		return $this->createConnection($config['driver'], $pdo, $config['database'], $config['prefix'], $config);
+	}
+
+	/**
+	 * Parse and prepare the database configuration.
+	 *
+	 * @param  array   $config
+	 * @param  string  $name
+	 * @return array
+	 */
+	protected function parseConfig(array $config, $name)
+	{
+		return array_add(array_add($config, 'prefix', ''), 'name', $name);
 	}
 
 	/**
@@ -66,25 +92,30 @@ class ConnectionFactory {
 	 * @param  string  $driver
 	 * @param  PDO     $connection
 	 * @param  string  $database
-	 * @param  string  $tablePrefix
-	 * @param  string  $name
+	 * @param  string  $prefix
+	 * @param  array   $config
 	 * @return \Illuminate\Database\Connection
 	 */
-	protected function createConnection($driver, PDO $connection, $database, $tablePrefix = '', $name = null)
+	protected function createConnection($driver, PDO $connection, $database, $prefix = '', $config = null)
 	{
+		if ($this->container->bound($key = "db.connection.{$driver}"))
+		{
+			return $this->container->make($key, array($connection, $database, $prefix, $config));
+		}
+
 		switch ($driver)
 		{
 			case 'mysql':
-				return new MySqlConnection($connection, $database, $tablePrefix, $name);
+				return new MySqlConnection($connection, $database, $prefix, $config);
 
 			case 'pgsql':
-				return new PostgresConnection($connection, $database, $tablePrefix, $name);
+				return new PostgresConnection($connection, $database, $prefix, $config);
 
 			case 'sqlite':
-				return new SQLiteConnection($connection, $database, $tablePrefix, $name);
+				return new SQLiteConnection($connection, $database, $prefix, $config);
 
 			case 'sqlsrv':
-				return new SqlServerConnection($connection, $database, $tablePrefix, $name);
+				return new SqlServerConnection($connection, $database, $prefix, $config);
 		}
 
 		throw new \InvalidArgumentException("Unsupported driver [$driver]");

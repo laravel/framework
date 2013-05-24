@@ -129,7 +129,7 @@ class Connection implements ConnectionInterface {
 
 		// We need to initialize a query grammar and the query post processors
 		// which are both very important parts of the database abstractions
-		// so will initialize them to their default value to get started.
+		// so we initialize these to their default values while starting.
 		$this->useDefaultQueryGrammar();
 
 		$this->useDefaultPostProcessor();
@@ -513,7 +513,7 @@ class Connection implements ConnectionInterface {
 	{
 		if (isset($this->events))
 		{
-			$this->events->fire('illuminate.query', array($query, $bindings, $time));
+			$this->events->fire('illuminate.query', array($query, $bindings, $time, $this->getName()));
 		}
 
 		if ( ! $this->loggingQueries) return;

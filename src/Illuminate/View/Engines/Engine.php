@@ -22,7 +22,7 @@ abstract class Engine {
 	/**
 	 * Get the last view that was rendered.
 	 *
-	 * @var string
+	 * @return string
 	 */
 	public function getLastRendered()
 	{

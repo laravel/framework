@@ -2,6 +2,19 @@
 
 /*
 |--------------------------------------------------------------------------
+| Set PHP Error Reporting Options
+|--------------------------------------------------------------------------
+|
+| Here we will set the strictest error reporting options, and also turn
+| off PHP's error reporting, since all errors will be handled by the
+| framework and we don't want any output leaking back to the user.
+|
+*/
+
+error_reporting(-1);
+
+/*
+|--------------------------------------------------------------------------
 | Check Extensions
 |--------------------------------------------------------------------------
 |
@@ -30,11 +43,10 @@ if ( ! extension_loaded('mcrypt'))
 */
 
 use Illuminate\Http\Request;
-use Illuminate\Config\FileLoader;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Config\Repository as Config;
-use Illuminate\Foundation\ProviderRepository;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +59,7 @@ use Illuminate\Foundation\ProviderRepository;
 |
 */
 
-$app['app'] = $app->share(function($app) { return $app; });
+$app->instance('app', $app);
 
 /*
 |--------------------------------------------------------------------------
@@ -67,21 +79,6 @@ if (isset($unitTesting))
 
 /*
 |--------------------------------------------------------------------------
-| Set PHP Error Reporting Options
-|--------------------------------------------------------------------------
-|
-| Here we will set the strictest error reporting options, and also turn
-| off PHP's error reporting, since all errors will be handled by the
-| framework and we don't want any output leaking back to the user.
-|
-*/
-
-if ($env != 'testing') ini_set('display_errors', 'Off');
-
-error_reporting(-1);
-
-/*
-|--------------------------------------------------------------------------
 | Load The Illuminate Facades
 |--------------------------------------------------------------------------
 |
@@ -97,20 +94,18 @@ Facade::setFacadeApplication($app);
 
 /*
 |--------------------------------------------------------------------------
-| Register The Configuration Loader
+| Register The Configuration Repository
 |--------------------------------------------------------------------------
 |
-| The configuration loader is responsible for loading the configuration
-| options for the application. By default we'll use the "file" loader
-| but you are free to use any custom loaders with your application.
+| The configuration repository is used to lazily load in the options for
+| this application from the configuration files. The files are easily
+| separated by their concerns so they do not become really crowded.
 |
 */
 
-$app->bindIf('config.loader', function($app)
-{
-	return new FileLoader(new Filesystem, $app['path'].'/config');
+$config = new Config($app->getConfigLoader(), $env);
 
-}, true);
+$app->instance('config', $config);
 
 /*
 |--------------------------------------------------------------------------
@@ -125,20 +120,7 @@ $app->bindIf('config.loader', function($app)
 
 $app->startExceptionHandling();
 
-/*
-|--------------------------------------------------------------------------
-| Register The Configuration Repository
-|--------------------------------------------------------------------------
-|
-| The configuration repository is used to lazily load in the options for
-| this application from the configuration files. The files are easily
-| separated by their concerns so they do not become really crowded.
-|
-*/
-
-$config = new Config($app['config.loader'], $env);
-
-$app->instance('config', $config);
+if ($env != 'testing') ini_set('display_errors', 'Off');
 
 /*
 |--------------------------------------------------------------------------
@@ -182,7 +164,7 @@ date_default_timezone_set($config['timezone']);
 |
 */
 
-$app->registerAliasLoader($config['aliases']);
+AliasLoader::getInstance($config['aliases'])->register();
 
 /*
 |--------------------------------------------------------------------------
@@ -208,11 +190,9 @@ Request::enableHttpMethodParameterOverride();
 |
 */
 
-$manifestPath = $config['manifest'];
+$providers = $config['providers'];
 
-$services = new ProviderRepository(new Filesystem, $manifestPath);
-
-$services->load($app, $config['providers']);
+$app->getProviderRepository()->load($app, $providers);
 
 /*
 |--------------------------------------------------------------------------

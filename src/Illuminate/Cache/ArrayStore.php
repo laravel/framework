@@ -108,4 +108,14 @@ class ArrayStore implements StoreInterface {
 		return new Section($this, $name);
 	}
 
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return '';
+	}
+
 }

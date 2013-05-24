@@ -7,7 +7,7 @@ class ProviderRepository {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -21,7 +21,7 @@ class ProviderRepository {
 	/**
 	 * Create a new service repository instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $manifestPath
 	 * @return void
 	 */
@@ -195,7 +195,7 @@ class ProviderRepository {
 	/**
 	 * Get the filesystem instance.
 	 *
-	 * @return \Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{

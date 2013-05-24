@@ -83,8 +83,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Run the console command.
 	 *
-	 * @param  Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return integer
 	 */
 	public function run(InputInterface $input, OutputInterface $output)
@@ -99,8 +99,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Execute the console command.
 	 *
-	 * @param  Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return mixed
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -198,14 +198,14 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Prompt the user for input but hide the answer from the console.
 	 *
 	 * @param  string  $question
-	 * @param  string  $default
+	 * @param  bool    $fallabck
 	 * @return string
 	 */
-	public function secret($question, $default = null)
+	public function secret($question, $fallback = true)
 	{
 		$dialog = $this->getHelperSet()->get('dialog');
 
-		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $default);
+		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $fallback);
 	}
 
 	/**
@@ -286,7 +286,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Get the output implementation.
 	 *
-	 * @return Symfony\Component\Console\Output\OutputInterface
+	 * @return \Symfony\Component\Console\Output\OutputInterface
 	 */
 	public function getOutput()
 	{

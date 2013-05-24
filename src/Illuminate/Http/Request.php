@@ -56,7 +56,9 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function fullUrl()
 	{
-		return rtrim($this->getUri(), '/');
+		$query = $this->getQueryString();
+
+		return $query ? $this->url().'?'.$query : $this->url();
 	}
 
 	/**
@@ -168,7 +170,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function all()
 	{
-		return array_merge($this->input(), $this->files->all());
+		return $this->input() + $this->files->all();
 	}
 
 	/**
@@ -180,7 +182,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function input($key = null, $default = null)
 	{
-		$input = array_merge($this->getInputSource()->all(), $this->query->all());
+		$input = $this->getInputSource()->all() + $this->query->all();
 
 		return array_get($input, $key, $default);
 	}
@@ -195,7 +197,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_intersect_key($this->input(), array_flip((array) $keys));
+		return array_only($this->input(), $keys) + array_fill_keys($keys, null);
 	}
 
 	/**
@@ -208,7 +210,11 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_diff_key($this->input(), array_flip((array) $keys));
+		$results = $this->input();
+
+		foreach ($keys as $key) array_forget($results, $key);
+
+		return $results;
 	}
 
 	/**
@@ -240,7 +246,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return Symfony\Component\HttpFoundation\File\UploadedFile
+	 * @return \Symfony\Component\HttpFoundation\File\UploadedFile
 	 */
 	public function file($key = null, $default = null)
 	{
@@ -287,7 +293,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return mixed
 	 */
 	public function old($key = null, $default = null)
 	{
@@ -408,7 +414,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	/**
 	 * Get the input source for the request.
 	 *
-	 * @return Symfony\Component\HttpFoundation\ParameterBag
+	 * @return \Symfony\Component\HttpFoundation\ParameterBag
 	 */
 	protected function getInputSource()
 	{
@@ -425,6 +431,18 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	public function isJson()
 	{
 		return str_contains($this->server->get('CONTENT_TYPE'), '/json');
+	}
+
+	/**
+	 * Determine if the current request is asking for JSON in return.
+	 *
+	 * @return bool
+	 */
+	public function wantsJson()
+	{
+		$acceptable = $this->getAcceptableContentTypes();
+
+		return isset($acceptable[0]) and $acceptable[0] == 'application/json';
 	}
 
 	/**

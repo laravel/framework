@@ -66,6 +66,8 @@ class Container implements ArrayAccess {
 		// If no concrete type was given, we will simply set the concrete type to
 		// the abstract. This allows concrete types to be registered as shared
 		// without being made state their classes in both of the parameters.
+		unset($this->instances[$abstract]);
+
 		if (is_null($concrete))
 		{
 			$concrete = $abstract;
@@ -97,7 +99,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bindIf($abstract, $concrete = null, $shared = false)
 	{
-		if ( ! isset($this[$abstract]))
+		if ( ! $this->bound($abstract))
 		{
 			$this->bind($abstract, $concrete, $shared);
 		}
@@ -237,7 +239,7 @@ class Container implements ArrayAccess {
 		}
 		else
 		{
-			$object = $this->make($concrete);
+			$object = $this->make($concrete, $parameters);
 		}
 
 		// If the requested type is registered as a singleton we'll want to cache off

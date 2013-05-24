@@ -77,6 +77,16 @@ abstract class ServiceProvider {
 			$this->app['translator']->addNamespace($namespace, $lang);
 		}
 
+		// Next, we will see if the application view folder contains a folder for the
+		// package and namespace. If it does, we'll give that folder precedence on
+		// the loader list for the views so the package views can be overridden.
+		$appView = $this->getAppViewPath($package, $namespace);
+
+		if ($this->app['files']->isDirectory($appView))
+		{
+			$this->app['view']->addNamespace($namespace, $appView);
+		}
+
 		// Finally we will register the view namespace so that we can access each of
 		// the views available in this package. We use a standard convention when
 		// registering the paths to every package's views and other components.
@@ -166,6 +176,18 @@ abstract class ServiceProvider {
 		{
 			$artisan->resolveCommands($commands);
 		});
+	}
+
+	/**
+	 * Get the application package view path.
+	 *
+	 * @param  string  $package
+	 * @param  string  $namespace
+	 * @return string
+	 */
+	protected function getAppViewPath($package, $namespace)
+	{
+		return $this->app['path']."/views/packages/{$package}/{$namespace}";
 	}
 
 	/**

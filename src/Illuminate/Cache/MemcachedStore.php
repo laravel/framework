@@ -129,11 +129,21 @@ class MemcachedStore implements StoreInterface {
 	/**
 	 * Get the underlying Memcached connection.
 	 *
-	 * @return Memcached
+	 * @return \Memcached
 	 */
 	public function getMemcached()
 	{
 		return $this->memcached;
+	}
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return $this->prefix;
 	}
 
 }

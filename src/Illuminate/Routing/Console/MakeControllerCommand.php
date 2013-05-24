@@ -76,14 +76,12 @@ class MakeControllerCommand extends Command {
 
 		$options = $this->getBuildOptions();
 
-		if ( ! $this->generator->make($controller, $path, $options))
-		{
-			$this->error('Controller already exists!');
-		}
-		else
-		{
-			$this->info('Controller created successfully!');
-		}
+		// Finally, we're ready to generate the actual controller file on disk and let
+		// the developer start using it. The controller will be stored in the right
+		// place based on the naemspace of this controller specified by commands.
+		$this->generator->make($controller, $path, $options);
+
+		$this->info('Controller created successfully!');
 	}
 
 	/**

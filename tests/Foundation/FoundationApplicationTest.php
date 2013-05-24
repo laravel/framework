@@ -98,45 +98,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testExceptionHandlingSendsResponseFromCustomHandler()
-	{
-		$app = $this->getMock('Illuminate\Foundation\Application', array('prepareResponse'));
-		$response = m::mock('stdClass');
-		$response->shouldReceive('send')->once();
-		$app['request'] = Request::create('/foo', 'GET');
-		$app->expects($this->once())->method('prepareResponse')->with($this->equalTo('foo'), $this->equalTo($app['request']))->will($this->returnValue($response));
-		$exception = new Exception;
-		$errorHandler = m::mock('stdClass');
-		$exceptionHandler = m::mock('stdClass');
-		$exceptionHandler->shouldReceive('handle')->once()->with($exception)->andReturn('foo');
-		$kernelHandler = m::mock('stdClass');
-		$kernelHandler->shouldReceive('handle')->never();
-		$app['kernel.exception'] = $kernelHandler;
-		$app['kernel.error'] = $errorHandler;
-		$app['exception'] = $exceptionHandler;
-		$handler = $app['exception.function'];
-		$handler($exception);
-	}
-
-
-	public function testNoResponseFromCustomHandlerCallsKernelExceptionHandler()
-	{
-		$app = new Application;
-		$app['config'] = array('app.debug' => false);
-		$exception = new Exception;
-		$errorHandler = m::mock('stdClass');
-		$exceptionHandler = m::mock('stdClass');
-		$exceptionHandler->shouldReceive('handle')->once()->with($exception)->andReturn(null);
-		$kernelHandler = m::mock('stdClass');
-		$kernelHandler->shouldReceive('handle')->once()->with($exception);
-		$app['kernel.exception'] = $kernelHandler;
-		$app['kernel.error'] = $errorHandler;
-		$app['exception'] = $exceptionHandler;
-		$handler = $app['exception.function'];
-		$handler($exception);
-	}
-
-
 	public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
 	{
 		$app = new Application;
@@ -166,7 +127,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 
 class ApplicationCustomExceptionHandlerStub extends Illuminate\Foundation\Application {
 
-	public function prepareResponse($value, Illuminate\Http\Request $request)
+	public function prepareResponse($value)
 	{
 		$response = m::mock('Symfony\Component\HttpFoundation\Response');
 		$response->shouldReceive('send')->once();

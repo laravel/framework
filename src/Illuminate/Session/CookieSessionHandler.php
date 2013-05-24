@@ -14,7 +14,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	/**
 	 * Create a new cookie driven handler instance.
 	 *
-	 * @param  Illuminate\Cookie\CookieJar  $cookie
+	 * @param  \Illuminate\Cookie\CookieJar  $cookie
 	 * @param  int  $minutes
 	 * @return void
 	 */
@@ -72,6 +72,8 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	protected function setCookie($cookie)
 	{
+		if (headers_sent()) return;
+
 		setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
 	}
 

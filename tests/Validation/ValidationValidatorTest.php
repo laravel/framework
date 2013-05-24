@@ -13,6 +13,25 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasFailedValidationRules()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
+		$this->assertFalse($v->passes());
+		$this->assertEquals(array('foo' => array('Same' => array('baz'))), $v->failed());
+	}
+
+
+	public function testHasNotFailedValidationRules()
+	{
+		$trans = $this->getTranslator();
+		$trans->shouldReceive('trans')->never();
+		$v = new Validator($trans, array('foo' => 'taylor'), array('name' => 'Confirmed'));
+		$this->assertTrue($v->passes());
+		$this->assertEmpty($v->failed());
+	}
+
+
 	public function testInValidatableRulesReturnsValid()
 	{
 		$trans = $this->getTranslator();
@@ -193,6 +212,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('file' => $file, 'foo' => $foo), array('foo' => 'required_without:file'));
 		$this->assertFalse($v->passes());
 	}
+
+
+	public function testRequiredIf()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor'), array('last' => 'required_if:first,taylor'));
+		$this->assertTrue($v->fails());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor', 'last' => 'otwell'), array('last' => 'required_if:first,taylor'));
+		$this->assertTrue($v->passes());
+	}
+
 
 	public function testValidateConfirmed()
 	{
@@ -504,19 +536,26 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users'));
 		$mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-		$mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo')->andReturn(true);
+		$mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array())->andReturn(true);
 		$v->setPresenceVerifier($mock);
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users,email,account_id,1,name,taylor'));
+		$mock4 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock4->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array('account_id' => 1, 'name' => 'taylor'))->andReturn(true);
+		$v->setPresenceVerifier($mock4);
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users,email_addr'));
 		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-		$mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo')->andReturn(false);
+		$mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, null, array())->andReturn(false);
 		$v->setPresenceVerifier($mock2);
 		$this->assertFalse($v->passes());
 
 		$v = new Validator($trans, array('email' => array('foo')), array('email' => 'Exists:users,email_addr'));
 		$mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-		$mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', array('foo'))->andReturn(false);
+		$mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', array('foo'), array())->andReturn(false);
 		$v->setPresenceVerifier($mock3);
 		$this->assertFalse($v->passes());
 	}
@@ -682,6 +721,21 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
 		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
 		$v->addExtension('foo', function() { return false; });
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('foo!', $v->messages()->first('name'));
+	}
+
+
+	public function testClassBasedCustomValidators()
+	{
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
+		$v->setContainer($container = m::mock('Illuminate\Container\Container'));
+		$v->addExtension('foo', 'Foo@bar');
+		$container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+		$foo->shouldReceive('bar')->once()->andReturn(false);
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('foo!', $v->messages()->first('name'));

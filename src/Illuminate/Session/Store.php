@@ -33,7 +33,7 @@ class Store extends SymfonySession {
 	{
 		foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
 
-		$this->put('flash.old', $this->get('flash.new'));
+		$this->put('flash.old', $this->get('flash.new', array()));
 
 		$this->put('flash.new', array());
 	}
@@ -41,9 +41,17 @@ class Store extends SymfonySession {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function has($name)
+	{
+		return ! is_null($this->get($name));
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get($name, $default = null)
 	{
-		return parent::get($name) ?: value($default);
+		return array_get($this->all(), $name, $default);
 	}
 
 	/**
@@ -105,7 +113,11 @@ class Store extends SymfonySession {
 	 */
 	public function put($key, $value)
 	{
-		$this->set($key, $value);
+		$all = $this->all();
+
+		array_set($all, $key, $value);
+
+		$this->replace($all);
 	}
 
 	/**
@@ -136,6 +148,8 @@ class Store extends SymfonySession {
 		$this->put($key, $value);
 
 		$this->push('flash.new', $key);
+
+		$this->removeFromOldFlashData(array($key));
 	}
 
 	/**
@@ -150,6 +164,57 @@ class Store extends SymfonySession {
 	}
 
 	/**
+	 * Reflash all of the session flash data.
+	 *
+	 * @return void
+	 */
+	public function reflash()
+	{
+		$this->mergeNewFlashes($this->get('flash.old'));
+
+		$this->put('flash.old', array());
+	}
+
+	/**
+	 * Reflash a subset of the current flash data.
+	 *
+	 * @param  array|dynamic  $keys
+	 * @return void
+	 */
+	public function keep($keys = null)
+	{
+		$keys = is_array($keys) ? $keys : func_get_args();
+
+		$this->mergeNewFlashes($keys);
+
+		$this->removeFromOldFlashData($keys);
+	}
+
+	/**
+	 * Merge new flash keys into the new flash array.
+	 *
+	 * @param  array  $keys
+	 * @return void
+	 */
+	protected function mergeNewFlashes(array $keys)
+	{
+		$values = array_unique(array_merge($this->get('flash.new'), $keys));
+
+		$this->put('flash.new', $values);
+	}
+
+	/**
+	 * Remove the given keys from the old flash data.
+	 *
+	 * @param  array  $keys
+	 * @return void
+	 */
+	protected function removeFromOldFlashData(array $keys)
+	{
+		$this->put('flash.old', array_diff($this->get('flash.old', array()), $keys));
+	}
+
+	/**
 	 * Remove an item from the session.
 	 *
 	 * @param  string  $key
@@ -157,7 +222,11 @@ class Store extends SymfonySession {
 	 */
 	public function forget($key)
 	{
-		return $this->remove($key);
+		$all = $this->all();
+
+		array_forget($all, $key);
+
+		$this->replace($all);
 	}
 
 	/**

@@ -128,21 +128,27 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testStartsWith()
 	{
 		$this->assertTrue(starts_with('jason', 'jas'));
+		$this->assertTrue(starts_with('jason', array('jas')));
 		$this->assertFalse(starts_with('jason', 'day'));
+		$this->assertFalse(starts_with('jason', array('day')));
 	}
 
 
 	public function testEndsWith()
 	{
 		$this->assertTrue(ends_with('jason', 'on'));
+		$this->assertTrue(ends_with('jason', array('on')));
 		$this->assertFalse(ends_with('jason', 'no'));
+		$this->assertFalse(ends_with('jason', array('no')));
 	}
 
 
 	public function testStrContains()
 	{
 		$this->assertTrue(str_contains('taylor', 'ylo'));
+		$this->assertTrue(str_contains('taylor', array('ylo')));
 		$this->assertFalse(str_contains('taylor', 'xxx'));
+		$this->assertFalse(str_contains('taylor', array('xxx')));
 	}
 
 
@@ -174,6 +180,16 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals('foo', value('foo'));
 		$this->assertEquals('foo', value(function() { return 'foo'; }));
+	}
+
+
+	public function testObjectGet()
+	{
+		$class = new StdClass;
+		$class->name = new StdClass;
+		$class->name->first = 'Taylor';
+
+		$this->assertEquals('Taylor', object_get($class, 'name.first'));
 	}
 
 }

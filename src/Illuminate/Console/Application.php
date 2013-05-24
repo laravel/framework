@@ -46,8 +46,8 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Add a command to the console.
 	 *
-	 * @param  Symfony\Component\Console\Command\Command  $command
-	 * @return Symfony\Component\Console\Command\Command
+	 * @param  \Symfony\Component\Console\Command\Command  $command
+	 * @return \Symfony\Component\Console\Command\Command
 	 */
 	public function add(SymfonyCommand $command)
 	{
@@ -62,8 +62,8 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Add the command to the parent instance.
 	 *
-	 * @param  Symfony\Component\Console\Command  $command
-	 * @return Symfony\Component\Console\Command
+	 * @param  \Symfony\Component\Console\Command  $command
+	 * @return \Symfony\Component\Console\Command
 	 */
 	protected function addToParent($command)
 	{
@@ -100,7 +100,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Get the default input definitions for the applications.
 	 *
-	 * @return Symfony\Component\Console\Input\InputDefinition
+	 * @return \Symfony\Component\Console\Input\InputDefinition
 	 */
 	protected function getDefaultInputDefinition()
 	{
@@ -114,7 +114,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Get the global environment option for the definition.
 	 *
-	 * @return Symfony\Component\Console\Input\InputOption
+	 * @return \Symfony\Component\Console\Input\InputOption
 	 */
 	protected function getEnvironmentOption()
 	{
@@ -127,7 +127,7 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Render the given exception.
 	 *
 	 * @param  Exception  $e
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return void
 	 */
 	public function renderException($e, $output)

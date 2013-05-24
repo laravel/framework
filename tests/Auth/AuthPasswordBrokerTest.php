@@ -64,11 +64,11 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		unset($_SERVER['__auth.reminder']);
 		$broker = $this->getBroker($mocks = $this->getMocks());
 		$callback = function($message, $user) { $_SERVER['__auth.reminder'] = true; };
-		$mocks['mailer']->shouldReceive('send')->once()->with('reminderView', array('token' => 'token'), m::type('Closure'))->andReturnUsing(function($view, $data, $callback)
+		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
+		$mocks['mailer']->shouldReceive('send')->once()->with('reminderView', array('token' => 'token', 'user' => $user), m::type('Closure'))->andReturnUsing(function($view, $data, $callback)
 		{
 			return $callback;
 		});
-		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->once()->andReturn('email');
 		$message = m::mock('StdClass');
 		$message->shouldReceive('to')->once()->with('email');

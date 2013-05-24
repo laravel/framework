@@ -136,6 +136,17 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the client response has a given code.
+	 *
+	 * @param  int  $code
+	 * @return void
+	 */
+	public function assertResponseStatus($code)
+	{
+		return $this->assertEquals($code, $this->client->getResponse()->getStatusCode());
+	}
+
+	/**
 	 * Assert that the response view has a given piece of bound data.
 	 *
 	 * @param  string|array  $key
@@ -206,24 +217,26 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * Assert whether the client was redirected to a given route.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToRoute($name, $with = array())
+	public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->route($name), $with);
+		$this->assertRedirectedTo($this->app['url']->route($name, $parameters), $with);
 	}
 
 	/**
 	 * Assert whether the client was redirected to a given action.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToAction($name, $with = array())
+	public function assertRedirectedToAction($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->action($name), $with);
+		$this->assertRedirectedTo($this->app['url']->action($name, $parameters), $with);
 	}
 
 	/**
@@ -323,7 +336,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * Create a new HttpKernel client instance.
 	 *
 	 * @param  array  $server
-	 * @return Symfony\Component\HttpKernel\Client
+	 * @return \Symfony\Component\HttpKernel\Client
 	 */
 	protected function createClient(array $server = array())
 	{

@@ -64,7 +64,7 @@ class FormBuilder {
 
 	/**
 	 * The form methods that should be spoofed, in uppercase.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $spoofedMethods = array('DELETE', 'PATCH', 'PUT');
@@ -115,7 +115,7 @@ class FormBuilder {
 
 		// Finally we're ready to create the final form HTML field. We will attribute
 		// format the array of attributes. We will also add on the appendage which
-		// is used to spoof requests for the PUT, PATCH, etc. methods on forms.
+		// is used to spoof requests for this PUT, PATCH, etc. methods on forms.
 		$attributes = array_merge(
 
 			$attributes, array_except($options, $this->reserved)
@@ -176,13 +176,27 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function label($name, $value, $options = array())
+	public function label($name, $value = null, $options = array())
 	{
 		$this->labels[] = $name;
 
 		$options = $this->html->attributes($options);
 
-		return '<label for="'.$name.'"'.$options.'>'.e($value).'</label>';
+		$value = e($this->formatLabel($name, $value));
+
+		return '<label for="'.$name.'"'.$options.'>'.$value.'</label>';
+	}
+
+	/**
+	 * Format the label value.
+	 *
+	 * @param  string  $name
+	 * @param  string|null  $value
+	 * @return string
+	 */
+	protected function formatLabel($name, $value)
+	{
+		return $value ?: ucwords(str_replace('_', ' ', $name));
 	}
 
 	/**
@@ -291,7 +305,7 @@ class FormBuilder {
 	 */
 	public function textarea($name, $value = null, $options = array())
 	{
-		$options['name'] = $name;
+		if ( ! isset($options['name'])) $options['name'] = $name;
 
 		// Next we will look for the rows and cols attributes, as each of these are put
 		// on the textarea element definition. If they are not present, we will just
@@ -525,6 +539,33 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a HTML reset input element.
+	 *
+	 * @param  string  $value
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function reset($value, $attributes = array())
+	{
+		return $this->input('reset', null, $value, $attributes);
+	}
+
+	/**
+	 * Create a HTML image input element.
+	 *
+	 * @param  string  $url
+	 * @param  string  $name
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public function image($url, $name = null, $attributes = array())
+	{
+		$attributes['src'] = $this->url->asset($url);
+
+		return $this->input('image', $name, null, $attributes);
+	}
+
+	/**
 	 * Create a submit button element.
 	 *
 	 * @param  string  $value
@@ -549,7 +590,7 @@ class FormBuilder {
 		{
 			$options['type'] = 'button';
 		}
-		
+
 		return '<button'.$this->html->attributes($options).'>'.$value.'</button>';
 	}
 
@@ -573,6 +614,8 @@ class FormBuilder {
 	 */
 	protected function getMethod($method)
 	{
+		$method = strtoupper($method);
+
 		return $method != 'GET' ? 'POST' : $method;
 	}
 
@@ -664,14 +707,25 @@ class FormBuilder {
 	 */
 	protected function getAppendage($method)
 	{
-		$method = strtoupper($method);
+		list($method, $appendage) = array(strtoupper($method), '');
 
+		// If the HTTP method is in this list of spoofed methods, we will attach the
+		// method spoofer hidden input to the form. This allows us to use regular
+		// form to initiate PUT and DELETE requests in addition to the typical.
 		if (in_array($method, $this->spoofedMethods))
 		{
-			return $this->hidden('_method', $method);
+			$appendage .= $this->hidden('_method', $method);
 		}
 
-		return '';
+		// If the method is something other than GET we will go ahead and attach the
+		// CSRF token to the form, as this can't hurt and is convenient to simply
+		// always have available on every form the developers creates for them.
+		if ($method != 'GET')
+		{
+			$appendage .= $this->token();
+		}
+
+		return $appendage;
 	}
 
 	/**
@@ -714,7 +768,25 @@ class FormBuilder {
 
 		if (isset($this->model) and isset($this->model[$name]))
 		{
-			return $this->model[$name];
+			return $this->getModelValueAttribute($name);
+		}
+	}
+
+	/**
+	 * Get the model value that should be assigned to the field.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getModelValueAttribute($name)
+	{
+		if (is_object($this->model))
+		{
+			return object_get($this->model, $name);
+		}
+		elseif (is_array($this->model))
+		{
+			return array_get($this->model, $name);
 		}
 	}
 

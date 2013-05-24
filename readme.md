@@ -20,8 +20,7 @@
 - Added `url` option to configuration for use by the Artisan CLI.
 - `dropColumn` now supports dynamic argument lists.
 - Pass `route` and `request` to Closure based controller before filters.
-- Added `Auth::basicStateless` method for easier API integration with basic auth.
-- Renamed `Auth::stateless` and `Auth::basicStateless` to `Auth::once` and `Auth::onceBasic`.
+- Added `Auth::onceBasic` method for easier API integration with basic auth.
 - Added named view implementation which was in Laravel 3.
 - Migrated entire session back-end to Symfony HttpFoundation Session. New `native` driver. All drivers are available and work the same. New sessions will not be backwards compatible after updating.
 - Renamed `Session::getToken` to `Session::token`.
@@ -38,6 +37,63 @@
 - Added `URL::full` method as alias into `Request::fullUrl`.
 - Set default encryption mode to `cbc`. `Crypt::setMode` is available if you wish to use previous mode of `ctr`.
 - Added `Redirect::guest` and `Redirect::intended` to simplify sending users to intended location.
+- Fixed cookie lifetimes not being updated on each page load.
+- Added `has` method for checking the quantity of related models from a parent query.
+- Added `sort` and `sortBy` methods to support `Collection` class.
+- Reimplemented `keep` and `reflash` for preserving flash data across more than one request.
+- Fixed bug where flash data was not carried through multiple requests.
+- Added ability to pass `Closure` as third parameter to `Route::model` to determine not found behavior.
+- Allow for `Class@method` syntax to be used with `Validator::extend`.
+- Added `@overwrite` Blade directive for forcing a full section overwrite.
+- Added `visible` property to Eloquent that is white-list version of `hidden`.
+- Using `pluck` on Eloquent queries will now call accessors.
+- Tweaked behavior of Redis sections to remove "forever" keys from storage.
+- Allow package views to be overriden by the application in `view/packages/vendor/package`, etc.
+- Added `required_if` validation rule.
+- Added `DB::reconnect` method to `DatabaseManager`.
+- Fix bug causing `increment` calls on model instances to update the whole table.
+- Added `modelKeys` function to the Eloquent collection class.
+- Added `associate` method to the `BelongsTo` relationship.
+- Added ability to register connections in the IoC container.
+- Added `Schema::hasColumn` method.
+- Arrays returned from routes / controllers are now turned into JSON.
+- Collection `map` and `filter` both return new `Collection` instances now.
+- Added support for wildcard event listeners. For example, `Event::listen('view.*', function() {})`.
+- Fix bug in translator replacements for strings that have the same beginning.
+- Added ability to pull values out of relationships, etc. on FormBuilder object value pulls.
+- Added ability to pass a name array as third parameter to `Route::controller`.
+- Added `replicate` method to Eloquent model.
+- Added `slice` method to `Collection`.
+- Fixed generation of namespaced resource controllers.
+- Send `user` to the password reminder e-mail view.
+- Added support for `union` statements in query builder.
+- Added ability to add more conditions on `exists` validation rule.
+- Added support for maintenance mode via `php artisan down` and `php artisan up`.
+- Added "soft delete" support to Eloquent via new "softDelete" property. `restore` method added to "un-delete".
+- Added `trashed` method to Eloquent model and `trashed` to Eloquent builder.
+- Renamed `merge` method to `collapse` and added new `merge` method in `Collection`.
+- Added `auth.attempt` event and `attempting` method.
+- Allow passing an array to View::share.
+- Added `has` method to cache sections.
+- Allow "dot" notation access into session arrays.
+- Added `smallInteger` to query builder.
+- Added `dd` and `array_pull` helpers.
+- Fix bug that caused pluralizer to not respect casing.
+- Fix attribute handling bug in validation messages like `required_if`, etc.
+- Include CSRF tokens by default in every non-GET form.
+- `updated_at` model timestamps are now automatically handled for ad-hoc queries.
+- Allow pattern filters to be specified with an HTTP verb constraint.
+- Added `bigInteger` and `mediumInteger` on schema builder.
+- Fix bug causing Eloquent to override user specified timestamps on `save`.
+- Added `observe` method to Eloquent models to allow for registering observer classes.
+- Added `forget` method to event dispatcher to allow all listeners for an event to be removed.
+- `created_at`, `updated_at` and `deleted_at` are now Carbonized by default.
+- Added `getJobId` for all queue drivers.
+- Added `assertResponseStatus` method to base test case.
+- Added `failed` method to Validator to get the failed rules.
+- Rename `trashed` query methods to `onlyTrashed`.
+- Added new `trashed` method to Eloquent model to determine if model has been soft deleted.
+- Added `sendmail` driver option for e-mail service.
 
 ## Beta 4
 
@@ -116,6 +172,7 @@
 - Session driver now automatically set to `array` when running Artisan tasks.
 - Added static `unguard` method to Eloquent to disable all mass assignment protection.
 - Added `--seed` option to `migrate` command.
+- Fix bug with replacements not being made on `Lang::choice`.
 
 ## Beta 3
 

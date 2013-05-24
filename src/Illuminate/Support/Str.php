@@ -52,12 +52,17 @@ class Str {
 	 * Determine if a given string ends with a given needle.
 	 *
 	 * @param string $haystack
-	 * @param string $needle
+	 * @param string|array $needles
 	 * @return bool
 	 */
-	public static function endsWith($haystack, $needle)
+	public static function endsWith($haystack, $needles)
 	{
-		return $needle == substr($haystack, strlen($haystack) - strlen($needle));
+		foreach ((array) $needles as $needle)
+		{
+			if ($needle == substr($haystack, strlen($haystack) - strlen($needle))) return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -81,6 +86,8 @@ class Str {
 	 */
 	public static function is($pattern, $value)
 	{
+		if ($pattern == $value) return true;
+
 		// Asterisks are translated into zero-or-more regular expression wildcards
 		// to make it convenient to check if the strings starts with the given
 		// pattern such as "library/*", making any string check convenient.
@@ -132,14 +139,11 @@ class Str {
 	 */
 	public static function words($value, $words = 100, $end = '...')
 	{
-		if (trim($value) == '') return '';
-
 		preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-		if (strlen($value) == strlen($matches[0]))
-		{
-			$end = '';
-		}
+		if ( ! isset($matches[0])) return $value;
+
+		if (strlen($value) == strlen($matches[0])) return $value;
 
 		return rtrim($matches[0]).$end;
 	}

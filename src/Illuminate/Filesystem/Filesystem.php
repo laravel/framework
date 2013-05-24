@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Filesystem;
 
 use FilesystemIterator;
+use Symfony\Component\Finder\Finder;
 
 class FileNotFoundException extends \Exception {}
 
@@ -165,7 +166,7 @@ class Filesystem {
 	 */
 	public function lastModified($path)
 	{
-		return filemtime($path);
+		return filemtime(realpath($path));
 	}
 
 	/**
@@ -177,6 +178,17 @@ class Filesystem {
 	public function isDirectory($directory)
 	{
 		return is_dir($directory);
+	}
+
+	/**
+	 * Determine if the given path is writable.
+	 *
+	 * @param  string  $path
+	 * @return bool
+	 */
+	public function isWritable($path)
+	{
+		return is_writable($path);
 	}
 
 	/**
@@ -221,6 +233,35 @@ class Filesystem {
 		{
 			return filetype($file) == 'file';
 		});
+	}
+
+	/**
+	 * Get all of the files from the given directory (recursive).
+	 *
+	 * @param  string  $directory
+	 * @return array
+	 */
+	public function allFiles($directory)
+	{
+		return iterator_to_array(Finder::create()->files()->in($directory), false);
+	}
+
+	/**
+	 * Get all of the directories within a given directory.
+	 *
+	 * @param  string  $directory
+	 * @return array
+	 */
+	public function directories($directory)
+	{
+		$directories = array();
+
+		foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir)
+		{
+			$directories[] = $dir->getRealPath();
+		}
+
+		return $directories;
 	}
 
 	/**
