@@ -37,6 +37,27 @@ class Builder {
 	protected $bindings = array();
 
 	/**
+	 * Whether we are caching the current query.
+	 *
+	 * @var bool
+	 */
+	protected $caching = false;
+
+	/**
+	 * The cache key we will use in this query.
+	 *
+	 * @var string
+	 */
+	protected $cacheKey;
+
+	/**
+	 * The default cache time, in minutes.
+	 *
+	 * @var int
+	 */
+	protected $cacheMinutes = 10;
+
+	/**
 	 * An aggregate function and column to be run.
 	 *
 	 * @var array
@@ -900,6 +921,45 @@ class Builder {
 	}
 
 	/**
+	 * Cache the query results for a given period of time.
+	 *
+	 * @param  int  $minutes
+	 * @param  int  $key
+	 * @return Illuminate\Database\Query\Builder
+	 */
+	public function cache($minutes = null, $key = null)
+	{
+		if (isset($minutes))
+		{
+			$this->cacheMinutes = (int) $minutes;
+		}
+
+		if (isset($key))
+		{
+			$this->cacheKey = $key;
+		}
+
+		$this->caching = true;
+
+		return $this;
+	}
+
+	/**
+	 * Return the cache key for the query builder instance.
+	 *
+	 * @return string
+	 */
+	protected function getCacheKey($sql)
+	{
+		if ( ! isset($this->cacheKey))
+		{
+			$this->cacheKey = md5(get_class($this).$this->connection->getName().$sql.serialize($this->bindings));
+		}
+
+		return $this->cacheKey;
+	}
+
+	/**
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns
@@ -915,8 +975,44 @@ class Builder {
 			$this->columns = $columns;
 		}
 
-		$results = $this->connection->select($this->toSql(), $this->bindings);
+		return $this->processCache($this->toSql());
+	}
 
+	/**
+	 * Processes caching for the given SQL query and
+	 * will return cached results if required.
+	 *
+	 * @param  string  $sql
+	 * @return array
+	 */
+	protected function processCache($sql)
+	{
+		if ( ! $this->caching or ( ! $cache = $this->connection->getCacheManager()))
+		{
+			return $this->getResults($sql);
+		}
+
+		$cacheKey = $this->getCacheKey($sql);
+
+		if ( ! $cache->has($cacheKey))
+		{
+			$cache->put($cacheKey, $results = $this->getResults($sql), $this->cacheMinutes);
+
+			return $results;
+		}
+
+		return $cache->get($cacheKey);
+	}
+
+	/**
+	 * Queries the database against the given SQL and returns processed results.
+	 *
+	 * @param  string  $sql
+	 * @return array
+	 */
+	protected function getResults($sql)
+	{
+		$results = $this->connection->select($sql, $this->bindings);
 		$this->processor->processSelect($this, $results);
 
 		return $results;
