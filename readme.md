@@ -94,6 +94,7 @@
 - Rename `trashed` query methods to `onlyTrashed`.
 - Added new `trashed` method to Eloquent model to determine if model has been soft deleted.
 - Added `sendmail` driver option for e-mail service.
+- Added new `cache` functionality to fluent and Eloquent queries.
 
 ## Beta 4
 

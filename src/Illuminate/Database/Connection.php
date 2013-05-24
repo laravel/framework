@@ -3,6 +3,7 @@
 use PDO;
 use Closure;
 use DateTime;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Database\Query\Processors\Processor;
 
 class Connection implements ConnectionInterface {
@@ -48,6 +49,13 @@ class Connection implements ConnectionInterface {
 	 * @var \Illuminate\Pagination\Paginator
 	 */
 	protected $paginator;
+
+	/**
+	 * The cache manager instance.
+	 *
+	 * @var \Illuminate\Cache\CacheManger
+	 */
+	protected $cache;
 
 	/**
 	 * The default fetch mode of the connection.
@@ -724,6 +732,27 @@ class Connection implements ConnectionInterface {
 	public function setPaginator($paginator)
 	{
 		$this->paginator = $paginator;
+	}
+
+	/**
+	 * Get the cache manager instance.
+	 *
+	 * @return \Illuminate\Cache\CacheManager
+	 */
+	public function getCacheManager()
+	{
+		return $this->cache;
+	}
+
+	/**
+	 * Set the cache manager instance on the connection.
+	 *
+	 * @param  \Illuminate\Cache\CacheManager  $cache
+	 * @return void
+	 */
+	public function setCacheManager(CacheManager $cache)
+	{
+		$this->cache = $cache;
 	}
 
 	/**
