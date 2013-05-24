@@ -13,10 +13,10 @@
         "illuminate/container": "4.0.x",
         "illuminate/events": "4.0.x",
         "illuminate/support": "4.0.x",
-        "illuminate/cache": "4.0.x",
         "nesbot/carbon": "1.*"
     },
     "require-dev": {
+        "illuminate/cache": "4.0.x",
         "illuminate/console": "4.0.x",
         "illuminate/filesystem": "4.0.x",
         "illuminate/pagination": "4.0.x",
