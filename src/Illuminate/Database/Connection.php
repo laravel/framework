@@ -50,6 +50,13 @@ class Connection implements ConnectionInterface {
 	protected $paginator;
 
 	/**
+	 * The cache manager instance.
+	 *
+	 * @var \Illuminate\Cache\CacheManager
+	 */
+	protected $cacheManager;
+
+	/**
 	 * The default fetch mode of the connection.
 	 *
 	 * @var int
@@ -491,7 +498,7 @@ class Connection implements ConnectionInterface {
 
 		$message = $e->getMessage()." (SQL: {$query}) (Bindings: {$bindings})";
 
-		throw new \Exception($message, 0);	
+		throw new \Exception($message, 0);
 	}
 
 	/**
@@ -724,6 +731,32 @@ class Connection implements ConnectionInterface {
 	public function setPaginator($paginator)
 	{
 		$this->paginator = $paginator;
+	}
+
+	/**
+	 * Get the cache manager environment instance.
+	 *
+	 * @return \Illuminate\Cache\Manager
+	 */
+	public function getCacheManager()
+	{
+		if ($this->cacheManager instanceof Closure)
+		{
+			$this->cacheManager = call_user_func($this->cacheManager);
+		}
+
+		return $this->cacheManager;
+	}
+
+	/**
+	 * Set the cache manager environment instance.
+	 *
+	 * @param  \Illuminate\Cache\Manager|Closure  $cacheManager
+	 * @return void
+	 */
+	public function setCacheManager($cacheManager)
+	{
+		$this->cacheManager = $cacheManager;
 	}
 
 	/**
