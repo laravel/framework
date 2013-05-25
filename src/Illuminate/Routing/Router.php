@@ -6,7 +6,6 @@ use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Illuminate\Routing\Controllers\Inspector;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -247,6 +246,8 @@ class Router {
 	public function controller($uri, $controller, $names = array())
 	{
 		$me = $this;
+
+		$this->routes->mapBase($controller, $uri);
 
 		$this->any($this->getControllerUri($uri), function() use ($me, $controller)
 		{
@@ -718,9 +719,9 @@ class Router {
 		// Once we have created the route, we will add them to our route collection
 		// which contains all the other routes and is used to match on incoming
 		// URL and their appropriate route destination and on URL generation.
-		$this->setAttributes($route, $action, $optional);
-
 		$name = $this->getName($method, $pattern, $action);
+
+		$this->setAttributes($route, $action, $optional, $name);
 
 		$this->routes->add($name, $route);
 
@@ -824,11 +825,12 @@ class Router {
 	 * Set the attributes and requirements on the route.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
-	 * @param  array  $action
-	 * @param  array  $optional
+	 * @param  array   $action
+	 * @param  array   $optional
+	 * @param  string  $name
 	 * @return void
 	 */
-	protected function setAttributes(Route $route, $action, $optional)
+	protected function setAttributes(Route $route, $action, $optional, $name)
 	{
 		// First we will set the requirement for the HTTP schemes. Some routes may
 		// only respond to requests using the HTTPS scheme, while others might
@@ -862,6 +864,8 @@ class Router {
 		if (isset($action['uses']))
 		{
 			$route->setOption('_uses', $action['uses']);
+
+			$this->routes->mapAction($action['uses'], $name);
 		}
 
 		if (isset($action['domain']))

@@ -3,7 +3,7 @@
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCollection as SymfonyCollection;
 use Symfony\Component\Routing\Generator\UrlGenerator as SymfonyGenerator;
 
 class UrlGenerator {
@@ -36,7 +36,7 @@ class UrlGenerator {
 	 * @param  \Symfony\Component\HttpFoundation\Request   $request
 	 * @return void
 	 */
-	public function __construct(RouteCollection $routes, Request $request)
+	public function __construct(SymfonyCollection $routes, Request $request)
 	{
 		$this->routes = $routes;
 
@@ -237,27 +237,20 @@ class UrlGenerator {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
-		// First we'll check to see if we have already rendered a URL for an action
-		// so that we don't have to loop through all of the routes again on each
-		// iteration through the loop. If we have it, we can just return that.
-		if (isset($this->actionMap[$action]))
-		{
-			$name = $this->actionMap[$action];
-
-			return $this->route($name, $parameters, $absolute);
-		}
-
 		// If haven't already mapped this action to a URI yet, we will need to spin
 		// through all of the routes looking for routes that routes to the given
 		// controller's action, then we will cache them off and build the URL.
-		foreach ($this->routes as $name => $route)
+		if ($name = $this->routes->getMapped($action))
 		{
-			if ($action == $route->getOption('_uses'))
-			{
-				$this->actionMap[$action] = $name;
+			return $this->route($name, $parameters, $absolute);
+		}
 
-				return $this->route($name, $parameters, $absolute);
-			}
+		// If the action is not mapped explicitly, we will try to recreate this URL
+		// using just conventions by getting the base URL that is registered for
+		// the controller, and then use this regular "to" method to finish up.
+		if ($base = $this->routes->getMappedBase($action))
+		{
+			return $this->to($base, $parameters);
 		}
 
 		throw new InvalidArgumentException("Unknown action [$action].");

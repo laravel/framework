@@ -522,18 +522,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testControllerMethodProperlyRegistersRoutes()
 	{
-		$router = $this->getMock('Illuminate\Routing\Router', array('get', 'any'), array(new Illuminate\Container\Container));
-		$router->setInspector($inspector = m::mock('Illuminate\Routing\Controllers\Inspector'));
-		$inspector->shouldReceive('getRoutable')->once()->with('FooController', 'prefix')->andReturn(array(
-			'getFoo' => array(
-				array('verb' => 'get', 'uri' => 'foo'),
-			)
-		));
-		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array('as' => 'someName', 'uses' => 'FooController@getFoo')));
-		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
-		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
+		$router = new Router;
+		$container = m::mock('Illuminate\Container\Container');
+		$controller = m::mock('stdClass');
+		$controller->shouldReceive('callAction')->once()->with($container, $router, 'getMethod', array('taylor', 'otwell'))->andReturn('foo');
+		$container->shouldReceive('make')->once()->with('FooController')->andReturn($controller);
+		$router->setContainer($container);
+		$request = Request::create('/foo/method/taylor/otwell', 'GET');
+		$router->controller('foo', 'FooController');
 
-		$router->controller('prefix', 'FooController', array('getFoo' => 'someName'));
+		$this->assertEquals('foo', $router->dispatch($request)->getContent());
 	}
 
 
