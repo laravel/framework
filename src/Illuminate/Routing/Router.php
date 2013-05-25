@@ -238,7 +238,9 @@ class Router {
 	{
 		$me = $this;
 
-		$this->routes->mapBase($controller, $uri);
+		$this->routes->mapBase(
+			$controller, $uri, $this->getFromGroupStack('domain')
+		);
 
 		$this->any($this->getControllerUri($uri), function() use ($me, $controller)
 		{
@@ -651,6 +653,22 @@ class Router {
 		else
 		{
 			$this->groupStack[] = $attributes;
+		}
+	}
+
+	/**
+	 * Get a key from the latest group stack.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	protected function getFromGroupStack($key)
+	{
+		if (count($this->groupStack) > 0)
+		{
+			$stack = $this->groupStack[count($this->groupStack) - 1];
+
+			return isset($stack[$key]) ? $stack[$key] : null;
 		}
 	}
 

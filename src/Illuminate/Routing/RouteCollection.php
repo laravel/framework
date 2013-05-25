@@ -35,11 +35,12 @@ class RouteCollection extends SymfonyCollection {
 	 *
 	 * @param  string  $controller
 	 * @param  string  $uri
+	 * @param  string  $domain
 	 * @return void
 	 */
-	public function mapBase($controller, $uri)
+	public function mapBase($controller, $uri, $domain = null)
 	{
-		$this->actionBases[$controller] = $uri;
+		$this->actionBases[$controller] = compact('uri', 'domain');
 	}
 
 	/**
@@ -68,7 +69,9 @@ class RouteCollection extends SymfonyCollection {
 
 		if (isset($this->actionBases[$controller]))
 		{
-			return $this->actionBases[$controller].'/'.$this->getActionMethod($method);
+			$base = $this->actionBases[$controller];
+
+			return array('domain' => $base['domain'], 'uri' => $base['uri'].'/'.$this->getActionMethod($method));
 		}
 	}
 

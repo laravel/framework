@@ -250,10 +250,79 @@ class UrlGenerator {
 		// the controller, and then use this regular "to" method to finish up.
 		if ($base = $this->routes->getMappedBase($action))
 		{
-			return $this->to($base, $parameters);
+			return $this->wildcardAction($base, $parameters);
 		}
 
 		throw new InvalidArgumentException("Unknown action [$action].");
+	}
+
+	/**
+	 * Get the URL to a wildcard controller action.
+	 *
+	 * @param  array   $base
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function wildcardAction(array $base, $parameters)
+	{
+		if (is_null($base['domain'])) return $this->to($base['uri'], $parameters);
+
+		return $this->to($this->formatDomainAction($base, $parameters));
+	}
+
+	/**
+	 * Format a domained wildcard action URI.
+	 *
+	 * @param  array   $base
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function formatDomainAction(array $base, $parameters)
+	{
+		$url = $this->getDomainBase($base['domain'], $base['uri']);
+
+		// If the action is not mapped explicitly, we will try to recreate this URL
+		// using just conventions by getting the base URL that is registered for
+		// the controller, and then use this regular "to" method to finish up.
+		$url = $this->replaceDomainWilds($url, $parameters);
+
+		return trim($url.'/'.implode('/', $parameters), '/');
+	}
+
+	/**
+	 * Get the base URL for a domain wildcard controller.
+	 *
+	 * @param  string  $domain
+	 * @param  string  $uri
+	 * @return string
+	 */
+	protected function getDomainBase($domain, $uri)
+	{
+		$port = $this->getPort() == '80' ? '' : ':'.$this->getPort();
+
+		return $this->request->getScheme().'://'.$domain.$port.'/'.$uri;
+	}
+
+	/**
+	 * Replace the domain wildcards on the given URL string.
+	 *
+	 * @param  string  $url
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceDomainWilds($url, &$parameters)
+	{
+		// We will make the replacements for parameters on any wildcards that are in
+		// a segment wrapper. When we actually make a replacement, we will remove
+		// the parameter from the parameter array so it isn't added on endings.
+		foreach ($parameters as $key => $value)
+		{
+			$url = preg_replace('/\{(.*)\}/', $value, $url, -1, $count);
+
+			if ($count > 0) unset($parameters[$key]);
+		}
+
+		return $url;
 	}
 
 	/**
@@ -282,6 +351,16 @@ class UrlGenerator {
 		if (starts_with($path, array('#', '//'))) return true;
 
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
+	}
+
+	/**
+	 * Get the port from the current request instance.
+	 *
+	 * @return string
+	 */
+	public function getPort()
+	{
+		return $this->request->getPort();
 	}
 
 	/**
