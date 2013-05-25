@@ -55,6 +55,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Router.php',
     $basePath.'/vendor/symfony/routing/Symfony/Component/Routing/RouteCollection.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RouteCollection.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Workbench/WorkbenchServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php',

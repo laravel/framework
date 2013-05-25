@@ -232,10 +232,9 @@ class Router {
 	 *
 	 * @param  string  $uri
 	 * @param  string  $controller
-	 * @param  array   $names
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function controller($uri, $controller, $names = array())
+	public function controller($uri, $controller)
 	{
 		$me = $this;
 
