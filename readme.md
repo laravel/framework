@@ -97,6 +97,7 @@
 - Added new `cache` functionality to fluent and Eloquent queries.
 - Vastly simplified RESTful controller routing, which will increase performance significantly for large applications. However, named controller routes must be specified as separate routes now, as they were in Laravel 3.
 - Cleaned up how dates are converted from Carbon and DateTime instances. More intelligent conversion from strings to handle UNIX timestamps.
+- Added `softDeletes` helper to the migrator.
 
 ## Beta 4
 
