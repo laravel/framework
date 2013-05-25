@@ -213,6 +213,21 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($payload, $data);
 	}
 
+	public function testJSONEmulatingPHPBuiltInServer()
+	{
+		$payload = array('name' => 'taylor');
+		$content = json_encode($payload);
+		// The built in PHP 5.4 webserver incorrectly provides HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH,
+		// rather than CONTENT_TYPE and CONTENT_LENGTH
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json', 'HTTP_CONTENT_LENGTH' => strlen($content)), $content);
+		$this->assertTrue($request->isJson());
+		$data = $request->json()->all();
+		$this->assertEquals($payload, $data);
+
+		$data = $request->all();
+		$this->assertEquals($payload, $data);
+	}
+
 
 
 	public function testAllInputReturnsInputAndFiles()

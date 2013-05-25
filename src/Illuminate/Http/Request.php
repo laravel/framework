@@ -430,7 +430,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function isJson()
 	{
-		return str_contains($this->server->get('CONTENT_TYPE'), '/json');
+		return str_contains($this->header('CONTENT_TYPE'), '/json');
 	}
 
 	/**
