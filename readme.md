@@ -95,6 +95,7 @@
 - Added new `trashed` method to Eloquent model to determine if model has been soft deleted.
 - Added `sendmail` driver option for e-mail service.
 - Added new `cache` functionality to fluent and Eloquent queries.
+- Vastly simplified RESTful controller routing, which will increase performance significantly for large applications. However, named controller routes must be specified as separate routes now, as they were in Laravel 3.
 
 ## Beta 4
 
