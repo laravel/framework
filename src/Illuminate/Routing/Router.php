@@ -106,7 +106,9 @@ class Router {
 	 *
 	 * @var array
 	 */
-	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+	protected $resourceDefaults = array(
+		'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+	);
 
 	/**
 	 * Create a new router instance.
@@ -244,55 +246,43 @@ class Router {
 	 */
 	public function controller($uri, $controller, $names = array())
 	{
-		$routable = $this->getInspector()->getRoutable($controller, $uri);
+		$me = $this;
 
-		// When a controller is routed using this method, we use Reflection to parse
-		// out all of the routable methods for the controller, then register each
-		// route explicitly for the developers, so reverse routing is possible.
-		foreach ($routable as $method => $routes)
+		$this->any($this->getControllerUri($uri), function() use ($me, $controller)
 		{
-			foreach ($routes as $route)
-			{
-				$this->registerInspected($route, $controller, $method, $names);
-			}
-		}
+			// For RESTful controllers we just need to build out the action string based on
+			// the current request. Then, we can just remove the "method" parameter from
+			// the route instance and call the typical controller Closure for routing.
+			$action = $me->getActionForRequest($controller);
 
-		$this->addFallthroughRoute($controller, $uri);
+			$me->getCurrentRoute()->removeParameter('method');
+
+			return call_user_func($me->createControllerCallback($action));
+		});
 	}
 
 	/**
-	 * Register an inspected controller route.
+	 * Get the base RESTful controller URI.
 	 *
-	 * @param  array   $route
-	 * @param  string  $controller
-	 * @param  string  $method
-	 * @param  array   $names
-	 * @return void
-	 */
-	protected function registerInspected($route, $controller, $method, &$names)
-	{
-		$action = array('uses' => $controller.'@'.$method);
-
-		// If a given controller method has been named, we will assign the name to
-		// the controller action array. This provides for a short-cut to method
-		// naming, so you don't have to define an individual route for these.
-		$action['as'] = array_pull($names, $method);
-
-		$this->{$route['verb']}($route['uri'], $action);
-	}
-
-	/**
-	 * Add a fallthrough route for a controller.
-	 *
-	 * @param  string  $controller
 	 * @param  string  $uri
-	 * @return void
+	 * @return string
 	 */
-	protected function addFallthroughRoute($controller, $uri)
+	protected function getControllerUri($uri)
 	{
-		$missing = $this->any($uri.'/{_missing}', $controller.'@missingMethod');
+		return $uri.'/{method?}/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
+	}
 
-		$missing->where('_missing', '(.*)');
+	/**
+	 * Get the controller action identifier for the request.
+	 *
+	 * @param  string  $controller
+	 * @return string
+	 */
+	protected function getActionForRequest($controller)
+	{
+		$method = $this->getCurrentRoute()->getParameter('method') ?: 'index';
+
+		return $controller.'@'.$this->getCurrentVerb().studly_case($method);
 	}
 
 	/**
@@ -960,7 +950,7 @@ class Router {
 	 * @param  string   $attribute
 	 * @return Closure
 	 */
-	protected function createControllerCallback($attribute)
+	public function createControllerCallback($attribute)
 	{
 		$ioc = $this->container;
 
@@ -1536,6 +1526,16 @@ class Router {
 	public function getRequest()
 	{
 		return $this->currentRequest;
+	}
+
+	/**
+	 * Get the HTTP verb for the current request.
+	 *
+	 * @return string
+	 */
+	public function getCurrentVerb()
+	{
+		return strtolower($this->getRequest()->getMethod());
 	}
 
 	/**

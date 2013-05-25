@@ -306,6 +306,13 @@ class Route extends BaseRoute {
 		return $this->compile()->getVariables();
 	}
 
+	public function removeParameter($key)
+	{
+		$this->getParameters();
+
+		unset($this->parsedParameters[$key]);
+	}
+
 	/**
 	 * Force a given parameter to match a regular expression.
 	 *
