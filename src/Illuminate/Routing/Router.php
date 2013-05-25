@@ -270,7 +270,7 @@ class Router {
 	 * @param  string  $controller
 	 * @return string
 	 */
-	protected function getActionForRequest($controller)
+	public function getActionForRequest($controller)
 	{
 		$method = $this->getCurrentRoute()->getParameter('method') ?: 'index';
 
