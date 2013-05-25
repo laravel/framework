@@ -5,6 +5,8 @@ use Illuminate\Http\Response;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
+use Illuminate\Routing\Controllers\Inspector;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -58,6 +60,13 @@ class Router {
 	protected $container;
 
 	/**
+	 * The controller inspector instance.
+	 *
+	 * @var \Illuminate\Routing\Controllers\Inspector
+	 */
+	protected $inspector;
+
+	/**
 	 * The global parameter patterns.
 	 *
 	 * @var array
@@ -97,9 +106,7 @@ class Router {
 	 *
 	 * @var array
 	 */
-	protected $resourceDefaults = array(
-		'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
-	);
+	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
 
 	/**
 	 * Create a new router instance.
@@ -232,51 +239,60 @@ class Router {
 	 *
 	 * @param  string  $uri
 	 * @param  string  $controller
+	 * @param  array   $names
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function controller($uri, $controller)
+	public function controller($uri, $controller, $names = array())
 	{
-		$me = $this;
+		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
-		$this->routes->mapBase(
-			$controller, $uri, $this->getFromGroupStack('domain')
-		);
-
-		$this->any($this->getControllerUri($uri), function() use ($me, $controller)
+		// When a controller is routed using this method, we use Reflection to parse
+		// out all of the routable methods for the controller, then register each
+		// route explicitly for the developers, so reverse routing is possible.
+		foreach ($routable as $method => $routes)
 		{
-			// For RESTful controllers we just need to build out the action string based on
-			// the current request. Then, we can just remove the "method" parameter from
-			// the route instance and call the typical controller Closure for routing.
-			$action = $me->getActionForRequest($controller);
+			foreach ($routes as $route)
+			{
+				$this->registerInspected($route, $controller, $method, $names);
+			}
+		}
 
-			$me->getCurrentRoute()->removeParameter('method');
-
-			return call_user_func($me->createControllerCallback($action));
-		});
+		$this->addFallthroughRoute($controller, $uri);
 	}
 
 	/**
-	 * Get the base RESTful controller URI.
+	 * Register an inspected controller route.
 	 *
-	 * @param  string  $uri
-	 * @return string
+	 * @param  array   $route
+	 * @param  string  $controller
+	 * @param  string  $method
+	 * @param  array   $names
+	 * @return void
 	 */
-	protected function getControllerUri($uri)
+	protected function registerInspected($route, $controller, $method, &$names)
 	{
-		return $uri.'/{method?}/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
+		$action = array('uses' => $controller.'@'.$method);
+
+		// If a given controller method has been named, we will assign the name to
+		// the controller action array. This provides for a short-cut to method
+		// naming, so you don't have to define an individual route for these.
+		$action['as'] = array_pull($names, $method);
+
+		$this->{$route['verb']}($route['uri'], $action);
 	}
 
 	/**
-	 * Get the controller action identifier for the request.
+	 * Add a fallthrough route for a controller.
 	 *
 	 * @param  string  $controller
-	 * @return string
+	 * @param  string  $uri
+	 * @return void
 	 */
-	public function getActionForRequest($controller)
+	protected function addFallthroughRoute($controller, $uri)
 	{
-		$method = $this->getCurrentRoute()->getParameter('method') ?: 'index';
+		$missing = $this->any($uri.'/{_missing}', $controller.'@missingMethod');
 
-		return $controller.'@'.$this->getCurrentVerb().studly_case($method);
+		$missing->where('_missing', '(.*)');
 	}
 
 	/**
@@ -657,22 +673,6 @@ class Router {
 	}
 
 	/**
-	 * Get a key from the latest group stack.
-	 *
-	 * @param  string  $key
-	 * @return mixed
-	 */
-	protected function getFromGroupStack($key)
-	{
-		if (count($this->groupStack) > 0)
-		{
-			$stack = $this->groupStack[count($this->groupStack) - 1];
-
-			return isset($stack[$key]) ? $stack[$key] : null;
-		}
-	}
-
-	/**
 	 * Create a new route instance.
 	 *
 	 * @param  string  $method
@@ -728,9 +728,9 @@ class Router {
 		// Once we have created the route, we will add them to our route collection
 		// which contains all the other routes and is used to match on incoming
 		// URL and their appropriate route destination and on URL generation.
-		$name = $this->getName($method, $pattern, $action);
+		$this->setAttributes($route, $action, $optional);
 
-		$this->setAttributes($route, $action, $optional, $name);
+		$name = $this->getName($method, $pattern, $action);
 
 		$this->routes->add($name, $route);
 
@@ -834,12 +834,11 @@ class Router {
 	 * Set the attributes and requirements on the route.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
-	 * @param  array   $action
-	 * @param  array   $optional
-	 * @param  string  $name
+	 * @param  array  $action
+	 * @param  array  $optional
 	 * @return void
 	 */
-	protected function setAttributes(Route $route, $action, $optional, $name)
+	protected function setAttributes(Route $route, $action, $optional)
 	{
 		// First we will set the requirement for the HTTP schemes. Some routes may
 		// only respond to requests using the HTTPS scheme, while others might
@@ -873,8 +872,6 @@ class Router {
 		if (isset($action['uses']))
 		{
 			$route->setOption('_uses', $action['uses']);
-
-			$this->routes->mapAction($action['uses'], $name);
 		}
 
 		if (isset($action['domain']))
@@ -963,7 +960,7 @@ class Router {
 	 * @param  string   $attribute
 	 * @return Closure
 	 */
-	public function createControllerCallback($attribute)
+	protected function createControllerCallback($attribute)
 	{
 		$ioc = $this->container;
 
@@ -1542,16 +1539,6 @@ class Router {
 	}
 
 	/**
-	 * Get the HTTP verb for the current request.
-	 *
-	 * @return string
-	 */
-	public function getCurrentVerb()
-	{
-		return strtolower($this->getRequest()->getMethod());
-	}
-
-	/**
 	 * Get the current route being executed.
 	 *
 	 * @return \Illuminate\Routing\Route
@@ -1605,6 +1592,27 @@ class Router {
 		$context->fromRequest($request);
 
 		return new UrlMatcher($this->routes, $context);
+	}
+
+	/**
+	 * Get the controller inspector instance.
+	 *
+	 * @return \Illuminate\Routing\Controllers\Inspector
+	 */
+	public function getInspector()
+	{
+		return $this->inspector ?: new Controllers\Inspector;
+	}
+
+	/**
+	 * Set the controller inspector instance.
+	 *
+	 * @param  \Illuminate\Routing\Controllers\Inspector  $inspector
+	 * @return void
+	 */
+	public function setInspector(Inspector $inspector)
+	{
+		$this->inspector = $inspector;
 	}
 
 	/**
