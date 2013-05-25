@@ -150,7 +150,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertFalse($model->save());
 	}
-	
+
 
 	public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
 	{
@@ -213,6 +213,28 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$instance = $model->newInstance($timestamps);
 		$this->assertInstanceOf('Carbon\Carbon', $instance->updated_at);
 		$this->assertInstanceOf('Carbon\Carbon', $instance->created_at);
+	}
+
+
+	public function testTimestampsAreCreatedFromStringsAndIntegers()
+	{
+		$model = new EloquentDateModelStub;
+		$model->created_at = '2013-05-22 00:00:00';
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+
+		$model = new EloquentDateModelStub;
+		$model->created_at = time();
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+	}
+
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testTimestampsWillNotCreateFromInvalidStringFormats()
+	{
+		$model = new EloquentDateModelStub;
+		$model->created_at = 'invalid-format';
 	}
 
 
@@ -448,7 +470,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->list_items = array(1, 2, 3);
 		$array = $model->toArray();
 
-		$this->assertEquals(array(1, 2, 3), $array['list_items']);	
+		$this->assertEquals(array(1, 2, 3), $array['list_items']);
 	}
 
 
