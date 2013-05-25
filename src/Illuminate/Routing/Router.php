@@ -5,7 +5,6 @@ use Illuminate\Http\Response;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
-use Illuminate\Routing\Controllers\Inspector;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -57,13 +56,6 @@ class Router {
 	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
-
-	/**
-	 * The controller inspector instance.
-	 *
-	 * @var \Illuminate\Routing\Controllers\Inspector
-	 */
-	protected $inspector;
 
 	/**
 	 * The global parameter patterns.
@@ -1596,27 +1588,6 @@ class Router {
 		$context->fromRequest($request);
 
 		return new UrlMatcher($this->routes, $context);
-	}
-
-	/**
-	 * Get the controller inspector instance.
-	 *
-	 * @return \Illuminate\Routing\Controllers\Inspector
-	 */
-	public function getInspector()
-	{
-		return $this->inspector ?: new Controllers\Inspector;
-	}
-
-	/**
-	 * Set the controller inspector instance.
-	 *
-	 * @param  \Illuminate\Routing\Controllers\Inspector  $inspector
-	 * @return void
-	 */
-	public function setInspector(Inspector $inspector)
-	{
-		$this->inspector = $inspector;
 	}
 
 	/**
