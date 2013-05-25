@@ -1958,12 +1958,46 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Convert a DateTime to a storable string.
 	 *
-	 * @param  DateTime  $value
+	 * @param  DateTime|int  $value
 	 * @return string
 	 */
-	protected function fromDateTime(DateTime $value)
+	protected function fromDateTime($value)
 	{
-		return $value->format($this->getDateFormat());
+		$format = $this->getDateFormat();
+
+		// If the value is already a DateTime instance, we will just skip the rest of
+		// these checks since they will be a waste of time, and hinder performance
+		// when checking the field. We will just return the DateTime right away.
+		if ($value instanceof DateTime)
+		{
+			//
+		}
+
+		// If the value is totally numeric, we will assume it is a UNIX timestamp and
+		// format the date as such. Once we have the date in DateTime form we will
+		// format it according to the proper format for the database connection.
+		elseif (is_numeric($value))
+		{
+			$value = Carbon::createFromTimestamp($value);
+		}
+
+		// If the value is in simple year, month, day format, we will format it using
+		// that setup. This is for simple "date" fields which do not have hours on
+		// the field. This conveniently picks up those dates and format correct.
+		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
+		{
+			$value = Carbon::createFromFormat('Y-m-d', $value);
+		}
+
+		// If this value is some other type of string, we'll create the DateTime with
+		// the format used by the database connection. Once we get the instance we
+		// can return back the finally formatted DateTime instances to the devs.
+		elseif ( ! $value instanceof DateTime)
+		{
+			$value = Carbon::createFromFormat($format, $value);
+		}
+
+		return $value->format($format);
 	}
 
 	/**
@@ -1974,7 +2008,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function asDateTime($value)
 	{
-		if ( ! $value instanceof DateTime)
+		// If this value is an integer, we will assume it is a UNIX timestamp's value
+		// and format a Carbon object from this timestamp. This allows flexibility
+		// when defining your date fields as they might be UNIX timestamps here.
+		if (is_numeric($value))
+		{
+			return Carbon::createFromTimestamp($value);
+		}
+
+		// If the value is in simply year, month, day format, we will instantiate the
+		// Carbon instances from that fomrat. Again, this provides for simple date
+		// fields on the database, while still supporting Carbonized conversion.
+		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
+		{
+			return Carbon::createFromFormat('Y-m-d', $value);
+		}
+
+		// Finally, we will just assume this date is in the format used by default on
+		// the database connection and use that format to create the Carbon object
+		// that is returned back out to the developers after we convert it here.
+		elseif ( ! $value instanceof DateTime)
 		{
 			$format = $this->getDateFormat();
 
