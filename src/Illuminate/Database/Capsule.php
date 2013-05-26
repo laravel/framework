@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database;
 
+use Illuminate\Cache\CacheManager;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connectors\ConnectionFactory;
@@ -11,11 +12,12 @@ class Capsule {
 	 *
 	 * @param  array  $config
 	 * @param  \Illuminate\Events\Dispatcher|null  $dispatcher
+	 * @param  \Illuminate\Cache\CacheManager|null  $cache
 	 * @return void
 	 */
-	public function __construct(array $config, Dispatcher $dispatcher = null)
+	public function __construct(array $config, Dispatcher $dispatcher = null, CacheManager $cache = null)
 	{
-		$this->config = $this->parseConfig($config, $dispatcher);
+		$this->config = $this->parseConfig($config, $dispatcher, $cache);
 
 		$this->manager = new DatabaseManager($this->config, $this->getFactory());
 	}
@@ -59,11 +61,12 @@ class Capsule {
 	 *
 	 * @param  array  $config
 	 * @param  \Illuminate\Events\Dispatcher|null  $dispatcher
+	 * @param  \Illuminate\Cache\CacheManager|null  $cache
 	 * @return array
 	 */
-	protected function parseConfig(array $config, $dispatcher)
+	protected function parseConfig(array $config, $dispatcher, $cache)
 	{
-		$parsed = $this->getEmptyConfig($dispatcher);
+		$parsed = $this->getEmptyConfig($dispatcher, $cache);
 
 		// We will build out the "config" array to look like the database manager will
 		// expect it to. This allows us to "trick" the manager to work disconnected
@@ -80,13 +83,19 @@ class Capsule {
 	 * Get an empty configuration ready for loading.
 	 *
 	 * @param  \Illuminate\Events\Dispatcher|null  $dispatcher
+	 * @param  \Illuminate\Cache\CacheManager|null  $cache
 	 * @return array
 	 */
-	protected function getEmptyConfig($dispatcher)
+	protected function getEmptyConfig($dispatcher, $cache)
 	{
 		$dispatcher = $dispatcher ?: new Dispatcher(new Container);
+		$cache = $cache ?: new CacheManager(new Container);
 
-		return array('events' => $dispatcher, 'config' => array());
+		return array(
+			'events' => $dispatcher,
+			'config' => array(),
+			'cache' => $cache,
+		);
 	}
 
 	/**
