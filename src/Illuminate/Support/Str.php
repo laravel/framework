@@ -119,6 +119,17 @@ class Str {
 	}
 
 	/**
+	 * Return the length of the given string.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function length($value)
+	{
+		return mb_strlen($value);
+	}
+
+	/**
 	 * Convert the given string to lower-case.
 	 *
 	 * @param  string  $value
