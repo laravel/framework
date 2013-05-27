@@ -1004,6 +1004,16 @@ class Builder {
 	}
 
 	/**
+	 * Return cache life time in minutes
+	 *
+	 * @return int
+	 */
+	public function getCacheMinutes()
+	{
+		return $this->cacheMinutes;
+	}
+
+	/**
 	 * Generate the unique cache key for the query.
 	 *
 	 * @return string

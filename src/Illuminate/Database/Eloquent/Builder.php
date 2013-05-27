@@ -455,7 +455,7 @@ class Builder {
 
 		// Attach cache information to relation query.
 		// Key is skipped because will generate cache conflicts, when passed.
-		list($key, $minutes) = $this->getQuery()->getCacheInfo();
+		$minutes = $this->getQuery()->getCacheMinutes();
 
 		if( ! is_null($minutes)) $relation->getQuery()->remember($minutes);
 
