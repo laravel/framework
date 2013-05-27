@@ -3,6 +3,7 @@
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Cache\CacheManager;
 
 class Capsule {
 
@@ -85,8 +86,9 @@ class Capsule {
 	protected function getEmptyConfig($dispatcher)
 	{
 		$dispatcher = $dispatcher ?: new Dispatcher(new Container);
+		$cache = new CacheManager;
 
-		return array('events' => $dispatcher, 'config' => array());
+		return array('events' => $dispatcher, 'config' => array(), 'cache'=>$cache);
 	}
 
 	/**
