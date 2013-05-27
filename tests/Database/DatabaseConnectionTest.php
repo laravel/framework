@@ -203,6 +203,18 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResolvingCacheThroughClosure()
+	{
+		$connection = $this->getMockConnection();
+		$cache  = m::mock('Illuminate\Cache\CacheManager');
+		$connection->setCacheManager(function() use ($cache)
+		{
+			return $cache;
+		});
+		$this->assertEquals($cache, $connection->getCacheManager());
+	}
+
+
 	protected function getMockConnection($methods = array(), $pdo = null)
 	{
 		$pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
