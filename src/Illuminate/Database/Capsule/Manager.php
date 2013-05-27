@@ -3,12 +3,20 @@
 use PDO;
 use Illuminate\Support\Fluent;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Container\Container;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 class Manager {
+
+	/**
+	 * The current globally used instance.
+	 *
+	 * @var \Illuminate\Database\Capsule\Manager
+	 */
+	protected static $instance;
 
 	/**
 	 * Create a new database capsule manager.
@@ -66,6 +74,51 @@ class Manager {
 	}
 
 	/**
+	 * Get a connection instance from the global manager.
+	 *
+	 * @param  string  $connection
+	 * @return \Illuminate\Database\Connection
+	 */
+	public static function connection($connection = null)
+	{
+		return static::$instance->getConnection($connection);
+	}
+
+	/**
+	 * Get a fluent query builder instance.
+	 *
+	 * @param  string  $table
+	 * @param  string  $connection
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public static function table($table, $connection = null)
+	{
+		return static::$instance->connection($connection)->table($table);
+	}
+
+	/**
+	 * Get a schema builder instance.
+	 *
+	 * @param  string  $connection
+	 * @return \Illuminate\Database\Schema\Builder
+	 */
+	public static function schema($connection = null)
+	{
+		return static::$instance->connection($connection)->getSchemaBuilder();
+	}
+
+	/**
+	 * Get a registered connection instance.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Database\Connection
+	 */
+	public function getConnection($name = null)
+	{
+		return $this->manager->connection($name);
+	}
+
+	/**
 	 * Register a connection with the manager.
 	 *
 	 * @param  array   $config
@@ -74,7 +127,11 @@ class Manager {
 	 */
 	public function addConnection(array $config, $name = 'default')
 	{
-		$this->container['config']['database.connections'][$name] = $config;
+		$connections = $this->container['config']['database.connections'];
+
+		$connections[$name] = $config;
+
+		$this->container['config']['database.connections'] = $connections;
 	}
 
 	/**
@@ -93,6 +150,16 @@ class Manager {
 		{
 			Eloquent::setEventDispatcher($dispatcher);
 		}
+	}
+
+	/**
+	 * Make this capsule instance available globally.
+	 *
+	 * @return void
+	 */
+	public function setAsGlobal()
+	{
+		static::$instance = $this;
 	}
 
 	/**
@@ -117,6 +184,30 @@ class Manager {
 	public function setEventDispatcher(Dispatcher $dispatcher)
 	{
 		$this->container->instance('events', $dispatcher);
+	}
+
+	/**
+	 * Get the current cache manager instance.
+	 *
+	 * @return \Illuminate\Cache\Manager
+	 */
+	public function getCacheManager()
+	{
+		if ($this->container->bound('cache'))
+		{
+			return $this->container['cache'];
+		}
+	}
+
+	/**
+	 * Set the cache manager to bse used by connections.
+	 *
+	 * @param  \Illuminate\Cache\CacheManager  $cache
+	 * @return void
+	 */
+	public function setCacheManager(CacheManager $cache)
+	{
+		$this->container->instance('cache', $cache);
 	}
 
 	/**

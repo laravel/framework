@@ -110,12 +110,18 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		$connection->setFetchMode($this->app['config']['database.fetch']);
 
-		$connection->setEventDispatcher($this->app['events']);
+		if ($this->app->bound('events'))
+		{
+			$connection->setEventDispatcher($this->app['events']);
+		}
 
 		// The database connection can also utilize a cache manager instance when cache
 		// functionality is used on queries, which provides an expressive interface
 		// to caching both fluent queries and Eloquent queries that are executed.
-		$connection->setCacheManager($this->app['cache']);
+		if ($this->app->bound('cache'))
+		{
+			$connection->setCacheManager($this->app['cache']);
+		}
 
 		$app = $this->app;
 
