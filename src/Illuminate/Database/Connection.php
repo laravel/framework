@@ -726,7 +726,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the pagination environment instance.
 	 *
-	 * @param  \Illuminate\Pagination\Environment|Closure  $paginator
+	 * @param  \Illuminate\Pagination\Environment|\Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)
@@ -752,7 +752,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the cache manager instance on the connection.
 	 *
-	 * @param  \Illuminate\Cache\CacheManager|Closure  $cache
+	 * @param  \Illuminate\Cache\CacheManager|\Closure  $cache
 	 * @return void
 	 */
 	public function setCacheManager($cache)
