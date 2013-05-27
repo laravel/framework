@@ -50,6 +50,20 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	protected $lastPage;
 
 	/**
+	 * The index for the first item on the page.
+	 * 
+	 * @var int
+	 */
+	protected $from;
+
+	/**
+	 * The index for the last item on the page.
+	 * 
+	 * @var int
+	 */
+	protected $to;
+
+	/**
 	 * All of the additional query string values.
 	 *
 	 * @var array
@@ -74,7 +88,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
-	 * Setup the pagination context (current and last page).
+	 * Setup the pagination context (current, last page, from and to).
 	 *
 	 * @return \Illuminate\Pagination\Paginator
 	 */
@@ -83,6 +97,15 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 		$this->lastPage = ceil($this->total / $this->perPage);
 
 		$this->currentPage = $this->calculateCurrentPage($this->lastPage);
+
+		$this->from = ($this->currentPage - 1) * $this->perPage + 1;
+
+		$this->to = $this->currentPage * $this->perPage;
+		
+		if ($this->to > $this->total)
+		{
+			$this->to = $this->total;
+		}
 
 		return $this;
 	}
@@ -224,6 +247,26 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getPerPage()
 	{
 		return $this->perPage;
+	}
+
+	/**
+	 * Get the index for the first item on the page.
+	 * 
+	 * @return int
+	 */
+	public function getFrom()
+	{
+		return $this->from;
+	}
+
+	/**
+	 * Get the index for the last item on the page.
+	 * 
+	 * @return int
+	 */
+	public function getTo()
+	{
+		return $this->to;
 	}
 
 	/**
