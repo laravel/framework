@@ -122,7 +122,7 @@ class Str {
 	 * Return the length of the given string.
 	 *
 	 * @param  string  $value
-	 * @return string
+	 * @return int
 	 */
 	public static function length($value)
 	{
