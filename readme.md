@@ -98,6 +98,7 @@
 - Vastly simplified RESTful controller routing, which will increase performance significantly for large applications. However, named controller routes must be specified as separate routes now, as they were in Laravel 3.
 - Cleaned up how dates are converted from Carbon and DateTime instances. More intelligent conversion from strings to handle UNIX timestamps.
 - Added `softDeletes` helper to the migrator.
+- Added `push` method which saves the model and all of its relations.
 
 ## Beta 4
 

@@ -29,6 +29,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Create a new collection instance if the value isn't one already.
+	 *
+	 * @param  mixed  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public static function make($items)
+	{
+		if ($items instanceof Collection) return $items;
+
+		return new static($items);
+	}
+
+	/**
 	 * Determine if an item exists in the collection by key.
 	 *
 	 * @param  mixed  $key

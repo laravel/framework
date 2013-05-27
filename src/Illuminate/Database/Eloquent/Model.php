@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use ArrayAccess;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Contracts\JsonableInterface;
@@ -950,6 +951,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return $this->fill($attributes)->save();
+	}
+
+	/**
+	 * Save the model and all of its relationships.
+	 *
+	 * @return bool
+	 */
+	public function push()
+	{
+		if ( ! $this->save()) return false;
+
+		// To sync all of the relationships to the database, we will simply spin through
+		// the relationships and save each model via this "push" method, which allows
+		// us to recurse into all of these nested relations for the model instance.
+		foreach ($this->relations as $models)
+		{
+			foreach (Collection::make($models) as $model)
+			{
+				if ( ! $model->push()) return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
