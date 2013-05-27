@@ -210,7 +210,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
     $relation_query->shouldReceive('remember')->once()->with(5);
 
 		$relation = m::mock('StdClass');
-		$relation->shouldReceive('getAndResetWheres')->once()->andReturn(array());
+		$relation->shouldReceive('getAndResetWheres')->once()->andReturn(array(array('wheres'), array('bindings')));
 		$relation->shouldReceive('addEagerConstraints')->once();
 		$relation->shouldReceive('mergeWheres')->once();
 		$relation->shouldReceive('initRelation')->once();
