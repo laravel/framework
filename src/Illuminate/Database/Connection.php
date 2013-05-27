@@ -499,7 +499,7 @@ class Connection implements ConnectionInterface {
 
 		$message = $e->getMessage()." (SQL: {$query}) (Bindings: {$bindings})";
 
-		throw new \Exception($message, 0);	
+		throw new \Exception($message, 0);
 	}
 
 	/**
@@ -726,7 +726,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the pagination environment instance.
 	 *
-	 * @param  \Illuminate\Pagination\Environment|Closure  $paginator
+	 * @param  \Illuminate\Pagination\Environment|\Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)
@@ -741,16 +741,21 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getCacheManager()
 	{
+		if ($this->cache instanceof Closure)
+		{
+			$this->cache = call_user_func($this->cache);
+		}
+
 		return $this->cache;
 	}
 
 	/**
 	 * Set the cache manager instance on the connection.
 	 *
-	 * @param  \Illuminate\Cache\CacheManager  $cache
+	 * @param  \Illuminate\Cache\CacheManager|\Closure  $cache
 	 * @return void
 	 */
-	public function setCacheManager(CacheManager $cache)
+	public function setCacheManager($cache)
 	{
 		$this->cache = $cache;
 	}
