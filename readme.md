@@ -99,6 +99,7 @@
 - Cleaned up how dates are converted from Carbon and DateTime instances. More intelligent conversion from strings to handle UNIX timestamps.
 - Added `softDeletes` helper to the migrator.
 - Added `push` method which saves the model and all of its relations.
+- Added `getFrom` and `getTo` to `Paginator` for easily getting the range of items shown.
 
 ## Beta 4
 
