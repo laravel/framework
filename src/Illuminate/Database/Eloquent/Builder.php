@@ -34,8 +34,8 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'toSql', 'lists', 'insert', 'insertGetId', 'update', 'delete', 'increment',
-		'decrement', 'pluck', 'count', 'min', 'max', 'avg', 'sum', 'exists',
+		'toSql', 'lists', 'insert', 'insertGetId', 'pluck',
+		'count', 'min', 'max', 'avg', 'sum', 'exists',
 	);
 
 	/**
@@ -61,6 +61,20 @@ class Builder {
 		$this->query->where($this->model->getKeyName(), '=', $id);
 
 		return $this->first($columns);
+	}
+
+	/**
+	 * Find a model by its primary key or throw an exception.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|Collection
+	 */
+	public function findOrFail($id, $columns = array('*'))
+	{
+		if ( ! is_null($model = $this->find($id, $columns))) return $model;
+
+		throw new ModelNotFoundException;
 	}
 
 	/**
@@ -338,7 +352,7 @@ class Builder {
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function trashed()
+	public function onlyTrashed()
 	{
 		$this->withTrashed();
 

@@ -166,7 +166,7 @@ class Filesystem {
 	 */
 	public function lastModified($path)
 	{
-		return filemtime($path);
+		return filemtime(realpath($path));
 	}
 
 	/**

@@ -13,6 +13,25 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasFailedValidationRules()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
+		$this->assertFalse($v->passes());
+		$this->assertEquals(array('foo' => array('Same' => array('baz'))), $v->failed());
+	}
+
+
+	public function testHasNotFailedValidationRules()
+	{
+		$trans = $this->getTranslator();
+		$trans->shouldReceive('trans')->never();
+		$v = new Validator($trans, array('foo' => 'taylor'), array('name' => 'Confirmed'));
+		$this->assertTrue($v->passes());
+		$this->assertEmpty($v->failed());
+	}
+
+
 	public function testInValidatableRulesReturnsValid()
 	{
 		$trans = $this->getTranslator();

@@ -50,6 +50,20 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	protected $lastPage;
 
 	/**
+	 * The number of the first item in this range.
+	 *
+	 * @var int
+	 */
+	protected $from;
+
+	/**
+	 * The number of the last item in this range.
+	 *
+	 * @var int
+	 */
+	protected $to;
+
+	/**
 	 * All of the additional query string values.
 	 *
 	 * @var array
@@ -80,11 +94,35 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	public function setupPaginationContext()
 	{
+		$this->calculateCurrentAndLastPages();
+
+		$this->calculateItemRanges();
+
+		return $this;
+	}
+
+	/**
+	 * Calculate the current and last pages for this instance.
+	 *
+	 * @return void
+	 */
+	protected function calculateCurrentAndLastPages()
+	{
 		$this->lastPage = ceil($this->total / $this->perPage);
 
 		$this->currentPage = $this->calculateCurrentPage($this->lastPage);
+	}
 
-		return $this;
+	/**
+	 * Calculate the first and last item number for this instance.
+	 *
+	 * @return void
+	 */
+	protected function calculateItemRanges()
+	{
+		$this->from = ($this->currentPage - 1) * $this->perPage + 1;
+
+		$this->to = $this->currentPage * $this->perPage;
 	}
 
 	/**
@@ -214,6 +252,26 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getLastPage()
 	{
 		return $this->lastPage;
+	}
+
+	/**
+	 * Get the number of the first item on the paginator.
+	 *
+	 * @return int
+	 */
+	public function getFrom()
+	{
+		return $this->from;
+	}
+
+	/**
+	 * Get the number of the last item on the paginator.
+	 *
+	 * @return int
+	 */
+	public function getTo()
+	{
+		return $this->to;
 	}
 
 	/**

@@ -97,6 +97,7 @@ class RoutesCommand extends Command {
 		$action = $route->getAction() ?: 'Closure';
 
 		return array(
+			'host'   => $route->getHost(),
 			'uri'    => $uri,
 			'name'   => $this->getRouteName($name),
 			'action' => $action,
@@ -112,7 +113,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$headers = array('URI', 'Name', 'Action', 'Before Filters', 'After Filters');
+		$headers = array('Domain', 'URI', 'Name', 'Action', 'Before Filters', 'After Filters');
 
 		$this->table->setHeaders($headers)->setRows($routes);
 

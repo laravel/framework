@@ -199,10 +199,8 @@ class Guard {
 		// If a username is set on the HTTP basic request, we will return out without
 		// interrupting the request lifecycle. Otherwise, we'll need to generate a
 		// request indicating that the given credentials were invalid for login.
-		if ($request->getUser())
-		{
-			if ($this->attemptBasic($request, $field)) return;
-		}
+		if ($this->attemptBasic($request, $field)) return;
+
 		
 		return $this->getBasicResponse();
 	}
@@ -233,6 +231,8 @@ class Guard {
 	 */
 	protected function attemptBasic(Request $request, $field)
 	{
+		if ( ! $request->getUser()) return false;
+
 		return $this->attempt($this->getBasicCredentials($request, $field));
 	}
 

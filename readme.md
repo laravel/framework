@@ -89,6 +89,17 @@
 - Added `forget` method to event dispatcher to allow all listeners for an event to be removed.
 - `created_at`, `updated_at` and `deleted_at` are now Carbonized by default.
 - Added `getJobId` for all queue drivers.
+- Added `assertResponseStatus` method to base test case.
+- Added `failed` method to Validator to get the failed rules.
+- Rename `trashed` query methods to `onlyTrashed`.
+- Added new `trashed` method to Eloquent model to determine if model has been soft deleted.
+- Added `sendmail` driver option for e-mail service.
+- Added new `cache` functionality to fluent and Eloquent queries.
+- Vastly simplified RESTful controller routing, which will increase performance significantly for large applications. However, named controller routes must be specified as separate routes now, as they were in Laravel 3.
+- Cleaned up how dates are converted from Carbon and DateTime instances. More intelligent conversion from strings to handle UNIX timestamps.
+- Added `softDeletes` helper to the migrator.
+- Added `push` method which saves the model and all of its relations.
+- Added `getFrom` and `getTo` to `Paginator` for easily getting the range of items shown.
 
 ## Beta 4
 

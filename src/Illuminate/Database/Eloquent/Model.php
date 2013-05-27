@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use ArrayAccess;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Contracts\JsonableInterface;
@@ -412,12 +413,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Eager load relations on the model.
 	 *
-	 * @param  dynamic  string
+	 * @param  array|string  $relations
 	 * @return void
 	 */
-	public function load()
+	public function load($relations)
 	{
-		$query = $this->newQuery()->with(func_get_args());
+		if (is_string($relations)) $relations = func_get_args();
+
+		$query = $this->newQuery()->with($relations);
 
 		$query->eagerLoadRelations(array($this));
 	}
@@ -425,7 +428,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Being querying a model with eager loading.
 	 *
-	 * @param  array  $relations
+	 * @param  array|string  $relations
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public static function with($relations)
@@ -482,14 +485,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function belongsTo($related, $foreignKey = null)
 	{
+		list(, $caller) = debug_backtrace(false);
+
 		// If no foreign key was supplied, we can use a backtrace to guess the proper
 		// foreign key name by using the name of the relationship function, which
 		// when combined with an "_id" should conventionally match the columns.
+		$relation = $caller['function'];
+
 		if (is_null($foreignKey))
 		{
-			list(, $caller) = debug_backtrace(false);
-
-			$foreignKey = snake_case($caller['function']).'_id';
+			$foreignKey = snake_case($relation).'_id';
 		}
 
 		// Once we have the foreign key names, we'll just create a new Eloquent query
@@ -499,7 +504,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$query = $instance->newQuery();
 
-		return new BelongsTo($query, $this, $foreignKey);
+		return new BelongsTo($query, $this, $foreignKey, $relation);
 	}
 
 	/**
@@ -688,6 +693,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->touchOwners();
 
 			$this->performDeleteOnModel();
+
+			$this->exists = false;
 
 			// Once the model has been deleted, we will fire off the deleted event so that
 			// the developers may hook into post-delete operations. We will then return
@@ -944,6 +951,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return $this->fill($attributes)->save();
+	}
+
+	/**
+	 * Save the model and all of its relationships.
+	 *
+	 * @return bool
+	 */
+	public function push()
+	{
+		if ( ! $this->save()) return false;
+
+		// To sync all of the relationships to the database, we will simply spin through
+		// the relationships and save each model via this "push" method, which allows
+		// us to recurse into all of these nested relations for the model instance.
+		foreach ($this->relations as $models)
+		{
+			foreach (Collection::make($models) as $model)
+			{
+				if ( ! $model->push()) return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1294,6 +1324,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		return $this->newQuery(false);
 	}
+ 
+ 	/**
+ 	 * Determine if the model instance has been soft-deleted.
+ 	 *
+ 	 * @return bool
+ 	 */
+	public function trashed()
+	{
+		return $this->softDelete and ! is_null($this->{static::DELETED_AT});
+	}
 
 	/**
 	 * Get a new query builder that includes soft deletes.
@@ -1310,7 +1350,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public static function trashed()
+	public static function onlyTrashed()
 	{
 		$instance = new static;
 
@@ -1942,12 +1982,46 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Convert a DateTime to a storable string.
 	 *
-	 * @param  DateTime  $value
+	 * @param  DateTime|int  $value
 	 * @return string
 	 */
-	protected function fromDateTime(DateTime $value)
+	protected function fromDateTime($value)
 	{
-		return $value->format($this->getDateFormat());
+		$format = $this->getDateFormat();
+
+		// If the value is already a DateTime instance, we will just skip the rest of
+		// these checks since they will be a waste of time, and hinder performance
+		// when checking the field. We will just return the DateTime right away.
+		if ($value instanceof DateTime)
+		{
+			//
+		}
+
+		// If the value is totally numeric, we will assume it is a UNIX timestamp and
+		// format the date as such. Once we have the date in DateTime form we will
+		// format it according to the proper format for the database connection.
+		elseif (is_numeric($value))
+		{
+			$value = Carbon::createFromTimestamp($value);
+		}
+
+		// If the value is in simple year, month, day format, we will format it using
+		// that setup. This is for simple "date" fields which do not have hours on
+		// the field. This conveniently picks up those dates and format correct.
+		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
+		{
+			$value = Carbon::createFromFormat('Y-m-d', $value);
+		}
+
+		// If this value is some other type of string, we'll create the DateTime with
+		// the format used by the database connection. Once we get the instance we
+		// can return back the finally formatted DateTime instances to the devs.
+		elseif ( ! $value instanceof DateTime)
+		{
+			$value = Carbon::createFromFormat($format, $value);
+		}
+
+		return $value->format($format);
 	}
 
 	/**
@@ -1958,7 +2032,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function asDateTime($value)
 	{
-		if ( ! $value instanceof DateTime)
+		// If this value is an integer, we will assume it is a UNIX timestamp's value
+		// and format a Carbon object from this timestamp. This allows flexibility
+		// when defining your date fields as they might be UNIX timestamps here.
+		if (is_numeric($value))
+		{
+			return Carbon::createFromTimestamp($value);
+		}
+
+		// If the value is in simply year, month, day format, we will instantiate the
+		// Carbon instances from that fomrat. Again, this provides for simple date
+		// fields on the database, while still supporting Carbonized conversion.
+		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
+		{
+			return Carbon::createFromFormat('Y-m-d', $value);
+		}
+
+		// Finally, we will just assume this date is in the format used by default on
+		// the database connection and use that format to create the Carbon object
+		// that is returned back out to the developers after we convert it here.
+		elseif ( ! $value instanceof DateTime)
 		{
 			$format = $this->getDateFormat();
 
@@ -2087,11 +2180,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $relation
 	 * @param  mixed   $value
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function setRelation($relation, $value)
 	{
 		$this->relations[$relation] = $value;
+
+		return $this;
 	}
 
 	/**

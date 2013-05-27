@@ -15,15 +15,24 @@ class BelongsTo extends Relation {
 	protected $foreignKey;
 
 	/**
+	 * The name of the relationship.
+	 *
+	 * @var string
+	 */
+	protected $relation;
+
+	/**
 	 * Create a new has many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $foreignKey
+	 * @param  string  $relation
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $parent, $foreignKey)
+	public function __construct(Builder $query, Model $parent, $foreignKey, $relation)
 	{
+		$this->relation = $relation;
 		$this->foreignKey = $foreignKey;
 
 		parent::__construct($query, $parent);
@@ -180,7 +189,7 @@ class BelongsTo extends Relation {
 	{
 		$this->parent->setAttribute($this->foreignKey, $model->getKey());
 
-		return $this->parent;
+		return $this->parent->setRelation($this->relation, $model);
 	}
 
 	/**

@@ -170,7 +170,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function all()
 	{
-		return array_merge($this->input(), $this->files->all());
+		return $this->input() + $this->files->all();
 	}
 
 	/**
@@ -182,7 +182,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function input($key = null, $default = null)
 	{
-		$input = array_merge($this->getInputSource()->all(), $this->query->all());
+		$input = $this->getInputSource()->all() + $this->query->all();
 
 		return array_get($input, $key, $default);
 	}
@@ -197,9 +197,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		$input = $this->input();
-
-		return array_only($input, $keys);
+		return array_only($this->input(), $keys) + array_fill_keys($keys, null);
 	}
 
 	/**
@@ -432,7 +430,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function isJson()
 	{
-		return str_contains($this->server->get('CONTENT_TYPE'), '/json');
+		return str_contains($this->header('CONTENT_TYPE'), '/json');
 	}
 
 	/**

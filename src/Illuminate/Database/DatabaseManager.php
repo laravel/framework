@@ -112,11 +112,16 @@ class DatabaseManager implements ConnectionResolverInterface {
 
 		$connection->setEventDispatcher($this->app['events']);
 
+		// The database connection can also utilize a cache manager instance when cache
+		// functionality is used on queries, which provides an expressive interface
+		// to caching both fluent queries and Eloquent queries that are executed.
+		$connection->setCacheManager($this->app['cache']);
+
+		$app = $this->app;
+
 		// We will setup a Closure to resolve the paginator instance on the connection
 		// since the Paginator isn't sued on every request and needs quite a few of
 		// our dependencies. It'll be more efficient to lazily resolve instances.
-		$app = $this->app;
-
 		$connection->setPaginator(function() use ($app)
 		{
 			return $app['paginator'];

@@ -156,11 +156,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function bindInstallPaths(array $paths)
 	{
-		$this->instance('path', $paths['app']);
+		$this->instance('path', realpath($paths['app']));
 
 		foreach (array_except($paths, array('app')) as $key => $value)
 		{
-			$this->instance("path.{$key}", $value);
+			$this->instance("path.{$key}", realpath($value));
 		}
 	}
 

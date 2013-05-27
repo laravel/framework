@@ -50,11 +50,11 @@ class OptimizeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->info('Generating optimized class loader...');
+		$this->info('Generating optimized class loader');
 
 		$this->composer->dumpOptimized();
 
-		$this->info('Compiling common classes...');
+		$this->info('Compiling common classes');
 
 		$this->compileClasses();
 	}

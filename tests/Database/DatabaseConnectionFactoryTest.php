@@ -19,7 +19,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 		$factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', array('createConnector', 'createConnection'), array($container = m::mock('Illuminate\Container\Container')));
 		$container->shouldReceive('bound')->andReturn(false);
 		$connector = m::mock('stdClass');
-		$config = array('driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database');
+		$config = array('driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database', 'name' => 'foo');
 		$pdo = new DatabaseConnectionFactoryPDOStub;
 		$connector->shouldReceive('connect')->once()->with($config)->andReturn($pdo);
 		$factory->expects($this->once())->method('createConnector')->with($config)->will($this->returnValue($connector));
@@ -37,7 +37,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 		$factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', array('createConnector'), array($container = m::mock('Illuminate\Container\Container')));
 		$container->shouldReceive('bound')->andReturn(true);
 		$connector = m::mock('stdClass');
-		$config = array('driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database');
+		$config = array('driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database', 'name' => 'foo');
 		$pdo = new DatabaseConnectionFactoryPDOStub;
 		$connector->shouldReceive('connect')->once()->with($config)->andReturn($pdo);
 		$passedConfig = array_merge($config, array('name' => 'foo'));

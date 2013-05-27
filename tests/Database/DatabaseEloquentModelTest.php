@@ -199,6 +199,20 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
+	{
+		$model = $this->getMock('EloquentDateModelStub', array('getDateFormat'));
+		$model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
+		$model->setRawAttributes(array(
+			'created_at'	=> '2012-12-04',
+			'updated_at'	=> time(),
+		));
+
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+		$this->assertInstanceOf('Carbon\Carbon', $model->updated_at);
+	}
+
+
 	public function testTimestampsAreReturnedAsObjectsOnCreate()
 	{
 		$timestamps = array(
@@ -233,6 +247,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($instance->created_at);
 	}
 
+
+	public function testTimestampsAreCreatedFromStringsAndIntegers()
+	{
+		$model = new EloquentDateModelStub;
+		$model->created_at = '2013-05-22 00:00:00';
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+
+		$model = new EloquentDateModelStub;
+		$model->created_at = time();
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+
+		$model = new EloquentDateModelStub;
+		$model->created_at = '2012-01-01';
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+	}
 
 
 	public function testInsertProcess()
