@@ -9,14 +9,14 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/cache": "4.0.x",
-        "illuminate/cookie": "4.0.x",
-        "illuminate/encryption": "4.0.x",
-        "illuminate/support": "4.0.x",
+        "illuminate/cache": "4.1.x",
+        "illuminate/cookie": "4.1.x",
+        "illuminate/encryption": "4.1.x",
+        "illuminate/support": "4.1.x",
         "symfony/http-foundation": "2.3.*"
     },
     "require-dev": {
-        "illuminate/console": "4.0.x",
+        "illuminate/console": "4.1.x",
         "mockery/mockery": ">=0.7.2",
         "phpunit/phpunit": "3.7.*"
     },

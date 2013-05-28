@@ -9,9 +9,9 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/http": "4.0.x",
-        "illuminate/session": "4.0.x",
-        "illuminate/support": "4.0.x"
+        "illuminate/http": "4.1.x",
+        "illuminate/session": "4.1.x",
+        "illuminate/support": "4.1.x"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",
