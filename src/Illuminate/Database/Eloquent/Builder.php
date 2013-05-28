@@ -469,7 +469,8 @@ class Builder {
 	 */
 	public function getRelation($relation)
 	{
-		$query = $this->getModel()->$relation();
+		$method = ltrim(strrchr($relation, '\\'), '\\') ?: $relation;
+		$query = $this->getModel()->$method();
 
 		// If there are nested relationships set on the query, we will put those onto
 		// the query instances so that they can be handled after this relationship
