@@ -421,9 +421,12 @@ class Builder {
 		// Once we have let the Closure do its things, we can gather the bindings on
 		// the nested query builder and merge them into these bindings since they
 		// need to get extracted out of the children and assigned to the array.
-		$this->wheres[] = compact('type', 'query', 'boolean');
+		if (count($query->wheres))
+		{
+			$this->wheres[] = compact('type', 'query', 'boolean');
 
-		$this->mergeBindings($query);
+			$this->mergeBindings($query);
+		}
 
 		return $this;
 	}
