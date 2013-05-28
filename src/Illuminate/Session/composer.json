@@ -1,6 +1,6 @@
 {
     "name": "illuminate/session",
-    "description": "A tidy, simple session library.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

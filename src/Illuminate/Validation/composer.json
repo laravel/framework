@@ -1,6 +1,6 @@
 {
     "name": "illuminate/validation",
-    "description": "An amazingly simple validation library for PHP.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

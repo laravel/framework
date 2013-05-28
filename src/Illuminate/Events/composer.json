@@ -1,6 +1,6 @@
 {
     "name": "illuminate/events",
-    "description": "A simple, powerful events system.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

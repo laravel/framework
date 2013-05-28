@@ -1,6 +1,6 @@
 {
     "name": "illuminate/support",
-    "description": "Various utilities and support functions.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

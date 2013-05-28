@@ -1,5 +1,6 @@
 {
     "name": "illuminate/translation",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

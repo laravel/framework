@@ -1,6 +1,6 @@
 {
     "name": "illuminate/pagination",
-    "keywords": ["laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

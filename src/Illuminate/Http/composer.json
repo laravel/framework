@@ -1,6 +1,6 @@
 {
     "name": "illuminate/http",
-    "keywords": ["laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

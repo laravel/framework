@@ -1,5 +1,6 @@
 {
     "name": "illuminate/cache",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

@@ -1,5 +1,6 @@
 {
     "name": "illuminate/queue",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

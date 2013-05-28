@@ -1,6 +1,6 @@
 {
     "name": "illuminate/filesystem",
-    "description": "A filesystem abstraction library.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

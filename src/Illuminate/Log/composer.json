@@ -1,5 +1,6 @@
 {
     "name": "illuminate/log",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

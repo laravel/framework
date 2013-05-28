@@ -1,7 +1,6 @@
 {
     "name": "illuminate/hashing",
-    "description": "A password hashing library.",
-    "keywords": ["hashing", "password", "bcrypt"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

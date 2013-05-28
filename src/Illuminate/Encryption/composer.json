@@ -1,6 +1,6 @@
 {
     "name": "illuminate/encryption",
-    "description": "A simple wrapper around the mcrypt library.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

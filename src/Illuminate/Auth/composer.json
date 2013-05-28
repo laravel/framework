@@ -1,5 +1,6 @@
 {
     "name": "illuminate/auth",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

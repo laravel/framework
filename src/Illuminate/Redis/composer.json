@@ -1,6 +1,6 @@
 {
     "name": "illuminate/redis",
-    "keywords": ["laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",

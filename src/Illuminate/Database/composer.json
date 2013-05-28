@@ -1,6 +1,6 @@
 {
     "name": "illuminate/database",
-    "description": "An elegant database abstraction library.",
+    "license": "MIT",
     "keywords": ["laravel", "database", "sql", "orm"],
     "authors": [
         {

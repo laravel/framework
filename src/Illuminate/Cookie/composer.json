@@ -1,6 +1,6 @@
 {
     "name": "illuminate/cookie",
-    "description": "A cookie creation utility.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
