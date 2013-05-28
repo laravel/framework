@@ -1047,7 +1047,7 @@ class Builder {
 		// otherwise we can just give these values back without a specific key.
 		$results = new Collection($this->get($columns));
 
-		$values = $results->fetch($column)->all();
+		$values = $results->fetch($columns[0])->all();
 
 		// If a key was specified and we have results, we will go ahead and combine
 		// the values with the keys of all of the records so that the values can
@@ -1071,7 +1071,17 @@ class Builder {
 	 */
 	protected function getListSelect($column, $key)
 	{
-		return is_null($key) ? array($column) : array($column, $key);
+		$select = is_null($key) ? array($column) : array($column, $key);
+
+		// If the selected column contains a "dot", we will remove it so that the list
+		// operation can run normally. Specifying the table is not needed, since we
+		// really want the names of the columns as it is in this resulting array.
+		if (($dot = strpos($select[0], '.')) !== false)
+		{
+			$select[0] = substr($select[0], $dot + 1);
+		}
+
+		return $select;
 	}
 
 	/**
