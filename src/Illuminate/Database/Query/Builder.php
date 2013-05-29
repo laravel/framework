@@ -1264,6 +1264,10 @@ class Builder {
 		// the aggregate value getting in the way when the grammar builds it.
 		$this->aggregate = null;
 
+		if(count($this->groups) > 0 && count($this->joins) > 0 && count($results) > 1) {
+			return count($results);
+		}
+
 		if (isset($results[0]))
 		{
 			$result = (array) $results[0];
