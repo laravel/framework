@@ -326,25 +326,30 @@ class Router {
 		{
 			$this->{'addResource'.ucfirst($method)}($resource, $base, $controller);
 		}
-		
-                // generate some additional routes
-                if (isset($options['also_member'])) {
-                        foreach($options['also_member'] as $method) {
-                                $verb = 'GET';
-                                if (is_array($method))
-                                        list($verb,$method) = $method;
-                                $this->addResourceMemberRoute($verb, $method, $resource, $base, $controller);
-                        }
-                }
-                if (isset($options['also'])) {
+
+		// generate some additional routes
+		if (isset($options['also_member'])) {	
+			foreach($options['also_member'] as $method) {
+				$verb = 'GET';
+				if (is_array($method)) 
+				{
+					$verb = $method[0];
+					$method = $method[1];
+				}
+				$this->addResourceMemberRoute($verb, $method, $resource, $base, $controller);
+			}
+		}
+		if (isset($options['also'])) {
                         foreach($options['also'] as $method) {
                                 $verb = 'GET';
                                 if (is_array($method))
-                                        list($verb,$method) = $method;
+                                {
+                                        $verb = $method[0];
+                                        $method = $method[1];
+                                }
                                 $this->addResourceRoute($verb, $method, $resource, $base, $controller);
                         }
-                }
-
+		}
 	}
 
 	/**
@@ -401,20 +406,20 @@ class Router {
 		return $defaults;
 	}
 
-        /**
-         * Add custom resource route with member
+	/**
+	 * Add custom resource route with member
          * @param string $verb
-         * @param string $method
-         * @param string $name
+	 * @param string $method
+	 * @param string $name
          * @param  string  $base
          * @param  string  $controller
          * @return void
          */
-        protected function addResourceMemberRoute($verb, $method, $name, $base, $controller)
-        {
+        protected function addResourceMemberRoute($verb, $method, $name, $base, $controller) 
+	{
                 $uri = $this->getResourceUri($name).'/{'.$base.'}';
                 return $this->{strtolower($verb)}($uri, $this->getResourceAction($name, $controller, $method));
-        }
+	}
 
         /**
          * Add custom resource route without member
@@ -426,11 +431,10 @@ class Router {
          * @return void
          */
         protected function addResourceRoute($verb, $method, $name, $base, $controller)
-        {
+	{
                 $action = $this->getResourceAction($name, $controller, $method);
                 return $this->{strtolower($verb)}($this->getResourceUri($name), $action);
-        }
-
+	}
 
 	/**
 	 * Add the index method for a resourceful route.
