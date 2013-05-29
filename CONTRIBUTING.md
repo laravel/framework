@@ -1,0 +1,1 @@
+If you would like to contribute to Laravel, please see the "[Contributing to Laravel](//laravel.com/docs/contributing "Laravel documentation: "Contributing to Laravel"")" section of the official docs.
