@@ -417,7 +417,7 @@ class Router {
          */
         protected function addResourceMemberRoute($verb, $method, $name, $base, $controller) 
 	{
-                $uri = $this->getResourceUri($name).'/{'.$base.'}';
+                $uri = $this->getResourceUri($name).'/{'.$base.'}/' . strtolower($method);
                 return $this->{strtolower($verb)}($uri, $this->getResourceAction($name, $controller, $method));
 	}
 
