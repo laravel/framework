@@ -365,6 +365,23 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Get the collection of items in a key=>value array
+	 * 
+	 * @param string $key
+	 * @param string $value
+	 * @return array
+	 */
+	public function toKeyValue($key, $value)
+	{
+		$keyvalue = array();
+		foreach($this as $item)
+		{
+			$keyvalue[$item->$key] = $item->$value;
+		}
+		return $keyvalue;
+	}
+	
+	/**
 	 * Get an iterator for the items.
 	 *
 	 * @return ArrayIterator
