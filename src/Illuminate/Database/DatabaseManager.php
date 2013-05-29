@@ -118,12 +118,12 @@ class DatabaseManager implements ConnectionResolverInterface {
 		// The database connection can also utilize a cache manager instance when cache
 		// functionality is used on queries, which provides an expressive interface
 		// to caching both fluent queries and Eloquent queries that are executed.
-		$connection->setCacheManager(function()
-		{
-			return $this->app['cache'];
-		});
-
 		$app = $this->app;
+
+		$connection->setCacheManager(function() use ($app)
+		{
+			return $app['cache'];
+		});
 
 		// We will setup a Closure to resolve the paginator instance on the connection
 		// since the Paginator isn't sued on every request and needs quite a few of
