@@ -271,11 +271,11 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getValue($attribute)
 	{
-		if ( ! is_null($value = array_select($this->data, $attribute)))
+		if ( ! is_null($value = array_get($this->data, $attribute)))
 		{
 			return $value;
 		}
-		elseif ( ! is_null($value = array_select($this->files, $attribute)))
+		elseif ( ! is_null($value = array_get($this->files, $attribute)))
 		{
 			return $value;
 		}
