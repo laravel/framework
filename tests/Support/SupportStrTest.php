@@ -39,6 +39,22 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIs()
+	{
+		$this->assertTrue(Str::is('*.dev', 'localhost.dev'));
+		$this->assertTrue(Str::is('a', 'a'));
+		$this->assertTrue(Str::is('/', '/'));
+		$this->assertTrue(Str::is('*dev*', 'localhost.dev'));
+		$this->assertTrue(Str::is('foo?bar', 'foo?bar'));
+		$this->assertFalse(Str::is('*something', 'foobar'));
+		$this->assertFalse(Str::is('foo', 'bar'));
+		$this->assertFalse(Str::is('foo.*', 'foobar'));
+		$this->assertFalse(Str::is('foo.ar', 'foobar'));
+		$this->assertFalse(Str::is('foo?bar', 'foobar'));
+		$this->assertFalse(Str::is('foo?bar', 'fobar'));
+	}
+
+
 	public function testStartsWith()
 	{
 		$this->assertTrue(Str::startsWith('jason', 'jas'));
