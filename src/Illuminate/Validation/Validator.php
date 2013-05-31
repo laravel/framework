@@ -1674,6 +1674,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function messages()
 	{
+		if ( ! $this->messages) $this->passes();
+		
 		return $this->messages;
 	}
 
@@ -1684,6 +1686,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function errors()
 	{
+		if ( ! $this->messages) $this->passes();
+		
 		return $this->messages;
 	}
 
