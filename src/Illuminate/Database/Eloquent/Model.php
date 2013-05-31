@@ -352,7 +352,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $connection
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public static function on($connection)
+	public static function on($connection = null)
 	{
 		// First we will just create a fresh instance of this model, and then we can
 		// set the connection on the model so that it is be used for the queries
