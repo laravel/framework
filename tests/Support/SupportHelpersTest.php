@@ -120,8 +120,13 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(str_is('a', 'a'));
 		$this->assertTrue(str_is('/', '/'));
 		$this->assertTrue(str_is('*dev*', 'localhost.dev'));
+		$this->assertTrue(str_is('foo?bar', 'foo?bar'));
 		$this->assertFalse(str_is('*something', 'foobar'));
 		$this->assertFalse(str_is('foo', 'bar'));
+		$this->assertFalse(str_is('foo.*', 'foobar'));
+		$this->assertFalse(str_is('foo.ar', 'foobar'));
+		$this->assertFalse(str_is('foo?bar', 'foobar'));
+		$this->assertFalse(str_is('foo?bar', 'fobar'));
 	}
 
 
