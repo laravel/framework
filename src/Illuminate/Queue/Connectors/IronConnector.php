@@ -3,8 +3,16 @@
 use IronMQ;
 use Illuminate\Http\Request;
 use Illuminate\Queue\IronQueue;
+use Illuminate\Encryption\Encrypter;
 
 class IronConnector implements ConnectorInterface {
+
+	/**
+	 * The encrypter instance.
+	 *
+	 * @var \Illuminate\Encryption\Encrypter
+	 */
+	protected $crypt;
 
 	/**
 	 * The current request instance.
@@ -16,11 +24,13 @@ class IronConnector implements ConnectorInterface {
 	/**
 	 * Create a new Iron connector instance.
 	 *
+	 * @param  \Illuminate\Encryption\Encrypter  $crypt
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
-	public function __construct(Request $request)
+	public function __construct(Encrypter $crypt, Request $request)
 	{
+		$this->crypt = $crypt;
 		$this->request = $request;
 	}
 
@@ -34,7 +44,7 @@ class IronConnector implements ConnectorInterface {
 	{
 		$ironConfig = array('token' => $config['token'], 'project_id' => $config['project']);
 
-		return new IronQueue(new IronMQ($ironConfig), $this->request, $config['queue']);
+		return new IronQueue(new IronMQ($ironConfig), $this->crypt, $this->request, $config['queue']);
 	}
 
 }
