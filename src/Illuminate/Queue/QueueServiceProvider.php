@@ -205,7 +205,7 @@ class QueueServiceProvider extends ServiceProvider {
 
 		$manager->addConnector('iron', function() use ($app)
 		{
-			return new IronConnector($app['request']);
+			return new IronConnector($app['encrypter'], $app['request']);
 		});
 	}
 
