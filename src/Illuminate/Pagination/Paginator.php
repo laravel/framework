@@ -81,9 +81,9 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	public function __construct(Environment $env, array $items, $total, $perPage)
 	{
-		$this->env     = $env;
-		$this->total   = $total;
-		$this->items   = $items;
+		$this->env = $env;
+		$this->total = $total;
+		$this->items = $items;
 		$this->perPage = $perPage;
 	}
 
