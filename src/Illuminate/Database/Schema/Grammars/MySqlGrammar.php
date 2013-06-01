@@ -306,7 +306,8 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeInteger(Fluent $column)
 	{
-		return 'int';
+		$length = isset($column->length) ? $column->length : 11;
+		return "int({$column->length})";
 	}
 
 	/**
@@ -428,6 +429,8 @@ class MySqlGrammar extends Grammar {
 	protected function typeTimestamp(Fluent $column)
 	{
 		if ( ! $column->nullable) return 'timestamp default 0';
+
+		if( $column->auto ) return 'timestamp default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP';
 
 		return 'timestamp';
 	}
