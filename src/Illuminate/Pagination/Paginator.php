@@ -81,9 +81,9 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	public function __construct(Environment $env, array $items, $total, $perPage)
 	{
-		$this->env = $env;
-		$this->total = $total;
-		$this->items = $items;
+		$this->env     = $env;
+		$this->total   = $total;
+		$this->items   = $items;
 		$this->perPage = $perPage;
 	}
 
@@ -120,7 +120,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	protected function calculateItemRanges()
 	{
-		$this->from = ($this->currentPage - 1) * $this->perPage + 1;
+		$this->from = $this->total ? ($this->currentPage - 1) * $this->perPage + 1 : 0;
 
 		$this->to = min($this->total, $this->currentPage * $this->perPage);
 	}
