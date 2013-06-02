@@ -528,9 +528,10 @@ class Builder {
 	 * @param  string  $relation
 	 * @param  string  $operator
 	 * @param  int     $count
+	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function has($relation, $operator = '>=', $count = 1)
+	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and')
 	{
 		$instance = $this->model->$relation();
 
@@ -538,7 +539,20 @@ class Builder {
 
 		$this->query->mergeBindings($query->getQuery());
 
-		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count);
+		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count, $boolean);
+	}
+
+	/**
+	 * Add a relationship count condition to the query with an "or".
+	 *
+	 * @param  string  $relation
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function orHas($relation, $operator = '>=', $count = 1)
+	{
+		return $this->has($relation, $operator, $count, 'or');
 	}
 
 	/**
