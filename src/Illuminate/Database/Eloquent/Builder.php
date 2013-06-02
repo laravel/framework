@@ -530,7 +530,7 @@ class Builder {
 	 * @param  int     $count
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function has($relation, $operator = '>=', $count = 1)
+	public function has($relation, $operator = '>=', $count = 1, $type = 'and')
 	{
 		$instance = $this->model->$relation();
 
@@ -538,7 +538,7 @@ class Builder {
 
 		$this->query->mergeBindings($query->getQuery());
 
-		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count);
+		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count, $type);
 	}
 
 	/**
