@@ -138,7 +138,7 @@ class Encrypter {
 	/**
 	 * Create a MAC for the given value.
 	 *
-	 * @param  stirng  $iv
+	 * @param  string  $iv
 	 * @param  string  $value
 	 * @return string  
 	 */
