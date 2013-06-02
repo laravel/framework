@@ -273,9 +273,9 @@ class Router {
 	{
 		$action = array('uses' => $controller.'@'.$method);
 
-		// If a given controller method has been named, we will assign the name to
-		// the controller action array. This provides for a short-cut to method
-		// naming, so you don't have to define an individual route for these.
+		// If a given controller method has been named, we will assign the name to the
+		// controller action array, which provides for a short-cut to method naming
+		// so you don't have to define an individual route for these controllers.
 		$action['as'] = array_pull($names, $method);
 
 		$this->{$route['verb']}($route['uri'], $action);
