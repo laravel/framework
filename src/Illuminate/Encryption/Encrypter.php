@@ -58,9 +58,7 @@ class Encrypter {
 		// Once we have the encrypted value we will go ahead base64_encode the input
 		// vector and create the MAC for the encrypted value so we can verify its
 		// authenticity. Then, we'll JSON encode the data in a "payload" array.
-		$iv = base64_encode($iv);
-
-		$mac = $this->hash($value);
+		$mac = $this->hash($iv = base64_encode($iv), $value);
 
 		return base64_encode(json_encode(compact('iv', 'value', 'mac')));
 	}
@@ -126,12 +124,12 @@ class Encrypter {
 		// to decrypt the given value. We'll also check the MAC for this encryption.
 		if ( ! $payload or $this->invalidPayload($payload))
 		{
-			throw new DecryptException("Invalid data passed to encrypter.");
+			throw new DecryptException("Invalid data.");
 		}
 
-		if ($payload['mac'] != $this->hash($payload['value']))
+		if ($payload['mac'] !== $this->hash($payload['iv'], $payload['value']))
 		{
-			throw new DecryptException("MAC for payload is invalid.");
+			throw new DecryptException("MAC is invalid.");
 		}
 
 		return $payload;
@@ -140,12 +138,13 @@ class Encrypter {
 	/**
 	 * Create a MAC for the given value.
 	 *
+	 * @param  stirng  $iv
 	 * @param  string  $value
 	 * @return string  
 	 */
-	protected function hash($value)
+	protected function hash($iv, $value)
 	{
-		return hash_hmac('sha256', $value, $this->key);
+		return hash_hmac('sha256', $iv.$value, $this->key);
 	}
 
 	/**
