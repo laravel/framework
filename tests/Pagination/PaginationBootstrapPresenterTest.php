@@ -34,7 +34,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 		$presenter->setCurrentPage(1);
 		$content = $presenter->getPageRange(1, 2);
 
-		$this->assertEquals('<li class="active"><a href="#">1</a></li><li><a href="http://foo.com?page=2">2</a></li>', $content);
+		$this->assertEquals('<li class="active"><span>1</span></li><li><a href="http://foo.com?page=2">2</a></li>', $content);
 	}
 
 
@@ -83,8 +83,8 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 	public function testPreviousLinkCanBeRendered()
 	{
 		$output = $this->getPresenter()->getPrevious();
-		
-		$this->assertEquals('<li class="disabled"><a href="#">&laquo;</a></li>', $output);
+
+		$this->assertEquals('<li class="disabled"><span>&laquo;</span></li>', $output);
 
 		$presenter = $this->getPresenter();
 		$presenter->setCurrentPage(2);
@@ -100,7 +100,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 		$presenter->setCurrentPage(2);
 		$output = $presenter->getNext();
 
-		$this->assertEquals('<li class="disabled"><a href="#">&raquo;</a></li>', $output);
+		$this->assertEquals('<li class="disabled"><span>&raquo;</span></li>', $output);
 
 		$presenter = $this->getPresenter();
 		$presenter->setCurrentPage(1);
@@ -115,7 +115,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 		$presenter = $this->getPresenter();
 		$output = $presenter->getStart();
 
-		$this->assertEquals('<li class="active"><a href="#">1</a></li><li><a href="http://foo.com?page=2">2</a></li><li class="disabled"><a href="#">...</a></li>', $output);
+		$this->assertEquals('<li class="active"><span>1</span></li><li><a href="http://foo.com?page=2">2</a></li><li class="disabled"><span>...</span></li>', $output);
 	}
 
 
@@ -124,7 +124,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 		$presenter = $this->getPresenter();
 		$output = $presenter->getFinish();
 
-		$this->assertEquals('<li class="disabled"><a href="#">...</a></li><li class="active"><a href="#">1</a></li><li><a href="http://foo.com?page=2">2</a></li>', $output);
+		$this->assertEquals('<li class="disabled"><span>...</span></li><li class="active"><span>1</span></li><li><a href="http://foo.com?page=2">2</a></li>', $output);
 	}
 
 
