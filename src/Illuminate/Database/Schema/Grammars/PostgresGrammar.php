@@ -296,7 +296,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeEnum(Fluent $column)
 	{
-		return 'varchar(255)';
+		return 'varchar(255) CHECK('.$column->name.' = \'' . implode( '\' OR '.$column->name.' = \'', $column->allowed ) . '\')';
 	}
 
 	/**
