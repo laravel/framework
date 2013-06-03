@@ -153,6 +153,19 @@ class Manager {
 	}
 
 	/**
+	 * Set the fetch mode for the database connections.
+	 *
+	 * @param  int  $fetchMode
+	 * @return \Illuminate\Database\Capsule\Manager
+	 */
+	public function setFetchMode($fetchMode)
+	{
+		$this->container['config']['database.fetch'] = $fetchMode;
+
+		return $this;
+	}
+
+	/**
 	 * Make this capsule instance available globally.
 	 *
 	 * @return void
