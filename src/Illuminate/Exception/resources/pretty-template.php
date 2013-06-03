@@ -97,7 +97,7 @@
                       <?php extract($comment) ?>
                       <div class="frame-comment" id="comment-<?php echo $i . '-' . $commentNo ?>">
                         <span class="frame-comment-context"><?php echo $e($context) ?></span>
-                        <?php echo $e($comment) ?>
+                        <?php echo $e($comment, true) ?>
                       </div>
                     <?php endforeach ?>
                   </div>
