@@ -365,7 +365,7 @@ if ( ! function_exists('base_path'))
 	 */
 	function base_path()
 	{
-		return app()->make('path.base');
+		return app('path.base');
 	}
 }
 
