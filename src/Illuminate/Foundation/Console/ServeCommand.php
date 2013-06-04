@@ -41,11 +41,12 @@ class ServeCommand extends Command {
 		passthru("php -S {$host}:{$port} -t \"{$public}\" server.php");
 	}
 
-	/**
-	 * Check the current PHP version is >= 5.4.
-	 *
-	 * @return void
-	 */
+    /**
+     * Check the current PHP version is >= 5.4.
+     *
+     * @throws \Exception
+     * @return void
+     */
 	protected function checkPhpVersion()
 	{
 		if (version_compare(PHP_VERSION, '5.4.0', '<'))

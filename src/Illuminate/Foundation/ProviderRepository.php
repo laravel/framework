@@ -18,27 +18,26 @@ class ProviderRepository {
 	 */
 	protected $manifestPath;
 
-	/**
-	 * Create a new service repository instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string  $manifestPath
-	 * @return void
-	 */
+    /**
+     * Create a new service repository instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @param  string $manifestPath
+     * @return \Illuminate\Foundation\ProviderRepository
+     */
 	public function __construct(Filesystem $files, $manifestPath)
 	{
 		$this->files = $files;
 		$this->manifestPath = $manifestPath;
 	}
 
-	/**
-	 * Register the application service providers.
-	 *
-	 * @param  \Illuminate\Foundation\Application  $app
-	 * @param  array  $providers
-	 * @param  string  $path
-	 * @return void
-	 */
+    /**
+     * Register the application service providers.
+     *
+     * @param  \Illuminate\Foundation\Application $app
+     * @param  array $providers
+     * @return void
+     */
 	public function load(Application $app, array $providers)
 	{
 		$manifest = $this->loadManifest();

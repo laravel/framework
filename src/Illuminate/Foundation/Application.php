@@ -83,12 +83,12 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	protected $deferredServices = array();
 
-	/**
-	 * Create a new Illuminate application instance.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
-	 */
+    /**
+     * Create a new Illuminate application instance.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Foundation\Application
+     */
 	public function __construct(Request $request = null)
 	{
 		$this['request'] = $this->createRequest($request);
@@ -593,11 +593,12 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		$this->bootedCallbacks[] = $callback;
 	}
 
-	/**
-	 * Call the booting callbacks for the application.
-	 *
-	 * @return void
-	 */
+    /**
+     * Call the booting callbacks for the application.
+     *
+     * @param array $callbacks
+     * @return void
+     */
 	protected function fireAppCallbacks(array $callbacks)
 	{
 		foreach ($callbacks as $callback)
@@ -656,14 +657,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		$this['events']->listen('illuminate.app.down', $callback);
 	}
 
-	/**
-	 * Throw an HttpException with the given data.
-	 *
-	 * @param  int     $code
-	 * @param  string  $message
-	 * @param  array   $headers
-	 * @return void
-	 */
+    /**
+     * Throw an HttpException with the given data.
+     *
+     * @param  int $code
+     * @param  string $message
+     * @param  array $headers
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return void
+     */
 	public function abort($code, $message = '', array $headers = array())
 	{
 		if ($code == 404)

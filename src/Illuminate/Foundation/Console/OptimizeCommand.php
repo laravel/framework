@@ -30,12 +30,12 @@ class OptimizeCommand extends Command {
 	 */
 	protected $composer;
 
-	/**
-	 * Create a new optimize command instance.
-	 *
-	 * @param  \Illuminate\Foundation\Composer  $composer
-	 * @return void
-	 */
+    /**
+     * Create a new optimize command instance.
+     *
+     * @param  \Illuminate\Foundation\Composer $composer
+     * @return \Illuminate\Foundation\Console\OptimizeCommand
+     */
 	public function __construct(Composer $composer)
 	{
 		parent::__construct();

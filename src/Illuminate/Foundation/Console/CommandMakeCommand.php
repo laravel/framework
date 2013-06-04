@@ -21,12 +21,12 @@ class CommandMakeCommand extends Command {
 	 */
 	protected $description = "Create a new Artisan command";
 
-	/**
-	 * Create a new command creator command.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
+    /**
+     * Create a new command creator command.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @return \Illuminate\Foundation\Console\CommandMakeCommand
+     */
 	public function __construct(Filesystem $files)
 	{
 		parent::__construct();

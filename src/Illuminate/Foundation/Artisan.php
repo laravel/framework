@@ -21,12 +21,12 @@ class Artisan {
 	 */
 	protected $artisan;
 
-	/**
-	 * Create a new Artisan command runner instance.
-	 *
-	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
-	 */
+    /**
+     * Create a new Artisan command runner instance.
+     *
+     * @param  \Illuminate\Foundation\Application $app
+     * @return \Illuminate\Foundation\Artisan
+     */
 	public function __construct(Application $app)
 	{
 		$this->app = $app;
@@ -38,7 +38,7 @@ class Artisan {
 	 * @param  string  $command
 	 * @param  array   $parameters
 	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-	 * @return void
+	 * @return mixed
 	 */
 	public function call($command, array $parameters = array(), OutputInterface $output = null)
 	{

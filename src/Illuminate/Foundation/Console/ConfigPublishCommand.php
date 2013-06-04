@@ -28,12 +28,12 @@ class ConfigPublishCommand extends Command {
 	 */
 	protected $config;
 
-	/**
-	 * Create a new configuration publish command instance.
-	 *
-	 * @param  \Illuminate\Foundation\ConfigPublisher  $config
-	 * @return void
-	 */
+    /**
+     * Create a new configuration publish command instance.
+     *
+     * @param  \Illuminate\Foundation\ConfigPublisher $config
+     * @return \Illuminate\Foundation\Console\ConfigPublishCommand
+     */
 	public function __construct(ConfigPublisher $config)
 	{
 		parent::__construct();

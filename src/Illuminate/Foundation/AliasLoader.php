@@ -23,12 +23,12 @@ class AliasLoader {
 	 */
 	protected static $instance;
 
-	/**
-	 * Create a new class alias loader instance.
-	 *
-	 * @param  array  $aliases
-	 * @return void
-	 */
+    /**
+     * Create a new class alias loader instance.
+     *
+     * @param  array $aliases
+     * @return \Illuminate\Foundation\AliasLoader
+     */
 	public function __construct(array $aliases = array())
 	{
 		$this->aliases = $aliases;
@@ -55,7 +55,7 @@ class AliasLoader {
 	 * Load a class alias if it is registered.
 	 *
 	 * @param  string  $alias
-	 * @return void
+	 * @return bool|void
 	 */
 	public function load($alias)
 	{

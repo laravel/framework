@@ -25,13 +25,13 @@ class ConfigPublisher {
 	 */
 	protected $packagePath;
 
-	/**
-	 * Create a new configuration publisher instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string  $publishPath
-	 * @return void
-	 */
+    /**
+     * Create a new configuration publisher instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @param  string $publishPath
+     * @return \Illuminate\Foundation\ConfigPublisher
+     */
 	public function __construct(Filesystem $files, $publishPath)
 	{
 		$this->files = $files;
@@ -43,7 +43,7 @@ class ConfigPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $source
-	 * @return void
+	 * @return bool
 	 */
 	public function publish($package, $source)
 	{
@@ -59,7 +59,7 @@ class ConfigPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $packagePath
-	 * @return void
+	 * @return bool
 	 */
 	public function publishPackage($package, $packagePath = null)
 	{
@@ -75,14 +75,15 @@ class ConfigPublisher {
 		return $this->publish($package, $source);
 	}
 
-	/**
-	 * Get the source configuration directory to publish.
-	 *
-	 * @param  string  $package
-	 * @param  string  $name
-	 * @param  string  $packagePath
-	 * @return string
-	 */
+    /**
+     * Get the source configuration directory to publish.
+     *
+     * @param  string $package
+     * @param  string $name
+     * @param  string $packagePath
+     * @throws \InvalidArgumentException
+     * @return string
+     */
 	protected function getSource($package, $name, $packagePath)
 	{
 		$source = $packagePath."/{$package}/src/config";
