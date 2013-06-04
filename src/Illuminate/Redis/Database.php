@@ -9,12 +9,12 @@ class Database {
 	 */
 	protected $clients;
 
-	/**
-	 * Create a new Redis connection instance.
-	 *
-	 * @param  array  $servers
-	 * @return void
-	 */
+    /**
+     * Create a new Redis connection instance.
+     *
+     * @param  array $servers
+     * @return \Illuminate\Redis\Database
+     */
 	public function __construct(array $servers = array())
 	{
 		if (isset($servers['cluster']) and $servers['cluster'])
