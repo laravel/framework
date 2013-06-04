@@ -12,12 +12,12 @@ class Fluent implements ArrayAccess {
 	 */
 	protected $attributes = array();
 
-	/**
-	 * Create a new fluent container instance.
-	 *
-	 * @param  array  $attributes
-	 * @return void
-	 */
+    /**
+     * Create a new fluent container instance.
+     *
+     * @param  array $attributes
+     * @return \Illuminate\Support\Fluent
+     */
 	public function __construct($attributes = array())
 	{
 		foreach ($attributes as $key => $value)
@@ -139,7 +139,7 @@ class Fluent implements ArrayAccess {
 	 * Dynamically check if an attribute is set.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function __isset($key)
 	{

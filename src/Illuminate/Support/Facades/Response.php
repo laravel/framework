@@ -70,7 +70,7 @@ class Response {
 	 * Create a new file download response.
 	 *
 	 * @param  SplFileInfo|string  $file
-	 * @param  int  $status
+	 * @param  string  $name
 	 * @param  array  $headers
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */

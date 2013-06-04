@@ -21,12 +21,12 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 */
 	protected $format = ':message';
 
-	/**
-	 * Create a new message bag instance.
-	 *
-	 * @param  array  $messages
-	 * @return void
-	 */
+    /**
+     * Create a new message bag instance.
+     *
+     * @param  array $messages
+     * @return \Illuminate\Support\MessageBag
+     */
 	public function __construct(array $messages = array())
 	{
 		foreach ($messages as $key => $value)
