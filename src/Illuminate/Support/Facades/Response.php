@@ -39,8 +39,8 @@ class Response {
 	 * Return a new JSON response from the application.
 	 *
 	 * @param  string|array  $data
-	 * @param  int     $status
-	 * @param  array   $headers
+	 * @param  int    $status
+	 * @param  array  $headers
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
@@ -70,8 +70,8 @@ class Response {
 	 * Create a new file download response.
 	 *
 	 * @param  SplFileInfo|string  $file
-	 * @param  string              $name
-	 * @param  array               $headers
+	 * @param  string  $name
+	 * @param  array   $headers
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
 	public static function download($file, $name = null, array $headers = array())
