@@ -26,12 +26,12 @@ class ControllerGenerator {
 		'destroy'
 	);
 
-	/**
-	 * Create a new controller generator instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
+    /**
+     * Create a new controller generator instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @return \Illuminate\Routing\Generators\ControllerGenerator
+     */
 	public function __construct(Filesystem $files)
 	{
 		$this->files = $files;
@@ -43,7 +43,7 @@ class ControllerGenerator {
 	 * @param  string  $controller
 	 * @param  string  $path
 	 * @param  array   $options
-	 * @return void
+	 * @return bool
 	 */
 	public function make($controller, $path, array $options = array())
 	{

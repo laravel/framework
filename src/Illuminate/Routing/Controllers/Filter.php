@@ -32,12 +32,12 @@ class Filter {
 	 */
 	public $except;
 
-	/**
-	 * Create a new annotation instance.
-	 *
-	 * @param  array  $values
-	 * @return void
-	 */
+    /**
+     * Create a new annotation instance.
+     *
+     * @param  array $values
+     * @return \Illuminate\Routing\Controllers\Filter
+     */
 	public function __construct(array $values)
 	{
 		foreach ($this->prepareValues($values) as $key => $value)
@@ -50,7 +50,7 @@ class Filter {
 	 * Prepare the values for setting.
 	 *
 	 * @param  array  $values
-	 * @return void
+	 * @return mixed
 	 */
 	protected function prepareValues($values)
 	{

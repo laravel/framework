@@ -74,12 +74,13 @@ class Inspector {
 		return $method->isPublic() and starts_with($method->name, $this->verbs);
 	}
 
-	/**
-	 * Get the method data for a given method.
-	 *
-	 * @param  ReflectionMethod  $method
-	 * @return array
-	 */
+    /**
+     * Get the method data for a given method.
+     *
+     * @param  ReflectionMethod $method
+     * @param  string $prefix
+     * @return array
+     */
 	public function getMethodData(ReflectionMethod $method, $prefix)
 	{
 		$verb = $this->getVerb($name = $method->name);

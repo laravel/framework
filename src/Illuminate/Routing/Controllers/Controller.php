@@ -279,24 +279,25 @@ class Controller {
 		return $this->filters;
 	}
 
-	/**
-	 * Handle calls to missing methods on the controller.
-	 *
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
+    /**
+     * Handle calls to missing methods on the controller.
+     *
+     * @param  array $parameters
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
 	public function missingMethod($parameters)
 	{
 		throw new NotFoundHttpException;
 	}
 
-	/**
-	 * Handle calls to missing methods on the controller.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
+    /**
+     * Handle calls to missing methods on the controller.
+     *
+     * @param  string $method
+     * @param $parameters
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @param  array $parameters
+     */
 	public function __call($method, $parameters)
 	{
 		throw new NotFoundHttpException;
