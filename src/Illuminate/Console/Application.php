@@ -74,7 +74,7 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Add a command, resolving through the application.
 	 *
 	 * @param  string  $command
-	 * @return void
+	 * @return \Symfony\Component\Console\Command
 	 */
 	public function resolve($command)
 	{

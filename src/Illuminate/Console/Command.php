@@ -42,11 +42,11 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	protected $description;
 
-	/**
-	 * Create a new console command instance.
-	 *
-	 * @return void
-	 */
+    /**
+     * Create a new console command instance.
+     *
+     * @return \Illuminate\Console\Command
+     */
 	public function __construct()
 	{
 		parent::__construct($this->name);
@@ -198,7 +198,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Prompt the user for input but hide the answer from the console.
 	 *
 	 * @param  string  $question
-	 * @param  bool    $fallabck
+	 * @param  bool    $fallback
 	 * @return string
 	 */
 	public function secret($question, $fallback = true)
