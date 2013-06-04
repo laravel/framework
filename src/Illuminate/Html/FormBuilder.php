@@ -451,7 +451,7 @@ class FormBuilder {
 		$months = array();
 		foreach (range(1, 12) as $month)
 		{
-			$months[$month] = date('F', mktime(0, 0, 0, $month));
+			$months[$month] = strftime('%B', mktime(0, 0, 0, $month));
 		}
 
 		return $this->select($name, $months, $selected, $options);
