@@ -16,13 +16,13 @@ class MemcachedStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-	/**
-	 * Create a new Memcached store.
-	 *
-	 * @param  Memcached  $memcached
-	 * @param  string     $prefix
-	 * @return void
-	 */
+    /**
+     * Create a new Memcached store.
+     *
+     * @param  Memcached $memcached
+     * @param  string $prefix
+     * @return \Illuminate\Cache\MemcachedStore
+     */
 	public function __construct(Memcached $memcached, $prefix = '')
 	{
 		$this->prefix = $prefix.':';
@@ -63,7 +63,7 @@ class MemcachedStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return int
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -75,7 +75,7 @@ class MemcachedStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return int
 	 */
 	public function decrement($key, $value = 1)
 	{

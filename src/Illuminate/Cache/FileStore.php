@@ -16,13 +16,13 @@ class FileStore implements StoreInterface {
 	 */
 	protected $directory;
 
-	/**
-	 * Create a new file cache store instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesytem  $files
-	 * @param  string                 $directory
-	 * @return void
-	 */
+    /**
+     * Create a new file cache store instance.
+     *
+     * @param \Illuminate\Filesystem\Filesystem $files
+     * @param  string $directory
+     * @return \Illuminate\Cache\FileStore
+     */
 	public function __construct(Filesystem $files, $directory)
 	{
 		$this->files = $files;
@@ -91,25 +91,27 @@ class FileStore implements StoreInterface {
 		}
 	}
 
-	/**
-	 * Increment the value of an item in the cache.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
+    /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string $key
+     * @param  mixed $value
+     * @throws \LogicException
+     * @return void
+     */
 	public function increment($key, $value = 1)
 	{
 		throw new \LogicException("Increment operations not supported by this driver.");
 	}
 
-	/**
-	 * Increment the value of an item in the cache.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
+    /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string $key
+     * @param  mixed $value
+     * @throws \LogicException
+     * @return void
+     */
 	public function decrement($key, $value = 1)
 	{
 		throw new \LogicException("Increment operations not supported by this driver.");

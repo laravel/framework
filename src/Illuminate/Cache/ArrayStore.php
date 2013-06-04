@@ -41,7 +41,7 @@ class ArrayStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -55,7 +55,7 @@ class ArrayStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function decrement($key, $value = 1)
 	{

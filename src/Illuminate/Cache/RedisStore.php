@@ -18,13 +18,13 @@ class RedisStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-	/**
-	 * Create a new APC store.
-	 *
-	 * @param  \Illuminate\Redis\Database  $redis
-	 * @param  string                     $prefix
-	 * @return void
-	 */
+    /**
+     * Create a new APC store.
+     *
+     * @param  \Illuminate\Redis\Database $redis
+     * @param  string $prefix
+     * @return \Illuminate\Cache\RedisStore
+     */
 	public function __construct(Redis $redis, $prefix = '')
 	{
 		$this->redis = $redis;
@@ -67,7 +67,7 @@ class RedisStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -79,7 +79,7 @@ class RedisStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function decrement($key, $value = 1)
 	{

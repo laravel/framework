@@ -9,12 +9,12 @@ class WinCacheStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-	/**
-	 * Create a new WinCache store.
-	 *
-	 * @param  string     $prefix
-	 * @return void
-	 */
+    /**
+     * Create a new WinCache store.
+     *
+     * @param  string $prefix
+     * @return \Illuminate\Cache\WinCacheStore
+     */
 	public function __construct($prefix = '')
 	{
 		$this->prefix = $prefix;
@@ -54,7 +54,7 @@ class WinCacheStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -66,7 +66,7 @@ class WinCacheStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function decrement($key, $value = 1)
 	{
