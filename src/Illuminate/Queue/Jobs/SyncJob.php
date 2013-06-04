@@ -19,14 +19,14 @@ class SyncJob extends Job {
 	 */
 	protected $data;
 
-	/**
-	 * Create a new job instance.
-	 *
-	 * @param  \Illuminate\Container  $container
-	 * @param  string  $job
-	 * @param  string  $data
-	 * @return void
-	 */
+    /**
+     * Create a new job instance.
+     *
+     * @param \Illuminate\Container\Container $container
+     * @param  string $job
+     * @param  string $data
+     * @return \Illuminate\Queue\Jobs\SyncJob
+     */
 	public function __construct(Container $container, $job, $data = '')
 	{
 		$this->job = $job;

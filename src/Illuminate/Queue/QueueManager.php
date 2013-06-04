@@ -18,12 +18,12 @@ class QueueManager {
 	 */
 	protected $connections = array();
 
-	/**
-	 * Create a new queue manager instance.
-	 *
-	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
-	 */
+    /**
+     * Create a new queue manager instance.
+     *
+     * @param  \Illuminate\Foundation\Application $app
+     * @return \Illuminate\Queue\QueueManager
+     */
 	public function __construct($app)
 	{
 		$this->app = $app;
@@ -65,12 +65,13 @@ class QueueManager {
 		return $this->getConnector($config['driver'])->connect($config);
 	}
 
-	/**
-	 * Get the connector for a given driver.
-	 *
-	 * @param  string  $driver
-	 * @return \Illuminate\Queue\Connectors\ConnectorInterface
-	 */
+    /**
+     * Get the connector for a given driver.
+     *
+     * @param  string $driver
+     * @throws \InvalidArgumentException
+     * @return \Illuminate\Queue\Connectors\ConnectorInterface
+     */
 	protected function getConnector($driver)
 	{
 		if (isset($this->connectors[$driver]))

@@ -20,13 +20,13 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 */
 	protected $default;
 
-	/**
-	 * Create a new Beanstalkd queue instance.
-	 *
-	 * @param  Pheanstalk  $pheanstalk
-	 * @param  string  $default
-	 * @return void
-	 */
+    /**
+     * Create a new Beanstalkd queue instance.
+     *
+     * @param  Pheanstalk $pheanstalk
+     * @param  string $default
+     * @return \Illuminate\Queue\BeanstalkdQueue
+     */
 	public function __construct(Pheanstalk $pheanstalk, $default)
 	{
 		$this->default = $default;

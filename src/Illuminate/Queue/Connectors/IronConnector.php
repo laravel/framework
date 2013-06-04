@@ -13,12 +13,12 @@ class IronConnector implements ConnectorInterface {
 	 */
 	protected $request;
 
-	/**
-	 * Create a new Iron connector instance.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
-	 */
+    /**
+     * Create a new Iron connector instance.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Queue\Connectors\IronConnector
+     */
 	public function __construct(Request $request)
 	{
 		$this->request = $request;

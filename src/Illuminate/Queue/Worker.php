@@ -11,12 +11,12 @@ class Worker {
 	 */
 	protected $manager;
 
-	/**
-	 * Create a new queue worker.
-	 *
-	 * @param  \Illuminate\Queue\QueueManager  $manager
-	 * @return void
-	 */
+    /**
+     * Create a new queue worker.
+     *
+     * @param  \Illuminate\Queue\QueueManager $manager
+     * @return \Illuminate\Queue\Worker
+     */
 	public function __construct(QueueManager $manager)
 	{
 		$this->manager = $manager;
@@ -51,13 +51,14 @@ class Worker {
 		}
 	}
 
-	/**
-	 * Process a given job from the queue.
-	 *
-	 * @param  \Illuminate\Queue\Jobs\Job  $job
-	 * @param  int  $delay
-	 * @return void
-	 */
+    /**
+     * Process a given job from the queue.
+     *
+     * @param  \Illuminate\Queue\Jobs\Job $job
+     * @param  int $delay
+     * @throws \Exception
+     * @return void
+     */
 	public function process(Job $job, $delay)
 	{
 		try

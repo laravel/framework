@@ -19,13 +19,13 @@ class SqsQueue extends Queue implements QueueInterface {
 	 */
 	protected $default;
 
-	/**
-	 * Create a new Amazon SQS queue instance.
-	 *
-	 * @param  \Aws\Sqs\SqsClient  $sqs
-	 * @param  string  $default
-	 * @return void
-	 */
+    /**
+     * Create a new Amazon SQS queue instance.
+     *
+     * @param  \Aws\Sqs\SqsClient $sqs
+     * @param  string $default
+     * @return \Illuminate\Queue\SqsQueue
+     */
 	public function __construct(SqsClient $sqs, $default)
 	{
 		$this->sqs = $sqs;

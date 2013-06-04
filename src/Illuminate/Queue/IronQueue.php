@@ -28,14 +28,14 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	protected $default;
 
-	/**
-	 * Create a new IronMQ queue instance.
-	 *
-	 * @param  \IronMQ  $iron
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  string  $default
-	 * @return void
-	 */
+    /**
+     * Create a new IronMQ queue instance.
+     *
+     * @param  \IronMQ $iron
+     * @param  \Illuminate\Http\Request $request
+     * @param  string $default
+     * @return \Illuminate\Queue\IronQueue
+     */
 	public function __construct(IronMQ $iron, Request $request, $default)
 	{
 		$this->iron = $iron;
