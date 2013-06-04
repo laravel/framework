@@ -489,6 +489,17 @@ class Guard {
 	}
 
 	/**
+	 * Set the user provider used by the guard.
+	 *
+	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
+	 * @return void
+	 */
+	public function setProvider(UserProviderInterface $provider)
+	{
+		$this->provider = $provider;
+	}
+
+	/**
 	 * Return the currently cached user of the application.
 	 *
 	 * @return \Illuminate\Auth\UserInterface|null
