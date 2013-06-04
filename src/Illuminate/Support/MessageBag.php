@@ -99,7 +99,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 */
 	public function first($key = null, $format = null)
 	{
-		$messages = $this->get($key, $format);
+		$messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
 		return (count($messages) > 0) ? $messages[0] : '';
 	}
