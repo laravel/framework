@@ -223,6 +223,22 @@ class Str {
 	}
 
 	/**
+	 * Convert the given string to title case
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function title($value)
+	{
+		if (MB_STRING)
+		{
+			return mb_convert_case($value, MB_CASE_TITLE, static::encoding());
+		}
+
+		return ucwords(strtolower($value));
+	}
+
+	/**
 	 * Get the singular form of an English word.
 	 *
 	 * @param  string  $value
