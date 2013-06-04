@@ -69,7 +69,7 @@ class Environment {
 	 * @param  \Illuminate\View\Environment  $view
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
-	 * @return void
+	 * @return \Illuminate\Pagination\Environment
 	 */
 	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageName = 'page')
 	{
@@ -240,12 +240,12 @@ class Environment {
 		return $this->request;
 	}
 
-	/**
-	 * Set the active request instance.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return void
-	 */
+    /**
+     * Set the active request instance.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return void
+     */
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;

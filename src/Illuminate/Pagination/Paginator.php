@@ -70,15 +70,15 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	protected $query = array();
 
-	/**
-	 * Create a new Paginator instance.
-	 *
-	 * @param  \Illuminate\Pagination\Environment  $env
-	 * @param  array  $items
-	 * @param  int    $total
-	 * @param  int    $perPage
-	 * @return void
-	 */
+    /**
+     * Create a new Paginator instance.
+     *
+     * @param  \Illuminate\Pagination\Environment $env
+     * @param  array $items
+     * @param  int $total
+     * @param  int $perPage
+     * @return \Illuminate\Pagination\Paginator
+     */
 	public function __construct(Environment $env, array $items, $total, $perPage)
 	{
 		$this->env = $env;

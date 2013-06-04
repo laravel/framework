@@ -23,12 +23,12 @@ class BootstrapPresenter {
 	 */
 	protected $lastPage;
 
-	/**
-	 * Create a new Bootstrap presenter instance.
-	 *
-	 * @param  \Illuminate\Pagination\Paginator  $paginator
-	 * @return void
-	 */
+    /**
+     * Create a new Bootstrap presenter instance.
+     *
+     * @param  \Illuminate\Pagination\Paginator $paginator
+     * @return \Illuminate\Pagination\BootstrapPresenter
+     */
 	public function __construct(Paginator $paginator)
 	{
 		$this->paginator = $paginator;
