@@ -223,7 +223,7 @@ class Blueprint {
 	 */
 	public function dropPrimary($index = null)
 	{
-		return $this->dropIndexCommand('dropPrimary', $index);
+		return $this->dropIndexCommand('dropPrimary', 'primary', $index);
 	}
 
 	/**
@@ -234,7 +234,7 @@ class Blueprint {
 	 */
 	public function dropUnique($index)
 	{
-		return $this->dropIndexCommand('dropUnique', $index);
+		return $this->dropIndexCommand('dropUnique', 'unique', $index);
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Blueprint {
 	 */
 	public function dropIndex($index)
 	{
-		return $this->dropIndexCommand('dropIndex', $index);
+		return $this->dropIndexCommand('dropIndex', 'index', $index);
 	}
 
 	/**
@@ -256,7 +256,7 @@ class Blueprint {
 	 */
 	public function dropForeign($index)
 	{
-		return $this->dropIndexCommand('dropForeign', $index);
+		return $this->dropIndexCommand('dropForeign', 'foreign', $index);
 	}
 
 	/**
@@ -587,11 +587,12 @@ class Blueprint {
 	/**
 	 * Create a new drop index command on the blueprint.
 	 *
-	 * @param  string        $type
+	 * @param  string  $command
+	 * @param  string  $type
 	 * @param  string|array  $index
 	 * @return \Illuminate\Support\Fluent
 	 */
-	protected function dropIndexCommand($type, $index)
+	protected function dropIndexCommand($command, $type, $index)
 	{
 		$columns = array();
 
@@ -602,10 +603,10 @@ class Blueprint {
 		{
 			$columns = $index;
 
-			$index = null;
+			$index = $this->createIndexName($type, $columns);
 		}
 
-		return $this->indexCommand($type, $columns, $index);
+		return $this->indexCommand($command, $columns, $index);
 	}
 
 	/**
