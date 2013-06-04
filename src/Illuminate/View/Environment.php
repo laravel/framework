@@ -85,14 +85,14 @@ class Environment {
 	 */
 	protected $renderCount = 0;
 
-	/**
-	 * Create a new view environment instance.
-	 *
-	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
-	 * @param  \Illuminate\View\ViewFinderInterface  $finder
-	 * @param  \Illuminate\Events\Dispatcher  $events
-	 * @return void
-	 */
+    /**
+     * Create a new view environment instance.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver $engines
+     * @param  \Illuminate\View\ViewFinderInterface $finder
+     * @param  \Illuminate\Events\Dispatcher $events
+     * @return \Illuminate\View\Environment
+     */
 	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
 	{
 		$this->finder = $finder;

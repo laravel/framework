@@ -32,14 +32,14 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	protected $extensions = array('blade.php', 'php');
 
-	/**
-	 * Create a new file view loader instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  array  $paths
-	 * @param  array  $extensions
-	 * @return void
-	 */
+    /**
+     * Create a new file view loader instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @param  array $paths
+     * @param  array $extensions
+     * @return \Illuminate\View\FileViewFinder
+     */
 	public function __construct(Filesystem $files, array $paths, array $extensions = null)
 	{
 		$this->files = $files;
@@ -77,12 +77,13 @@ class FileViewFinder implements ViewFinderInterface {
 		return $this->findInPaths($view, $this->hints[$namespace]);
 	}
 
-	/**
-	 * Get the segments of a template with a named path.
-	 *
-	 * @param  string  $name
-	 * @return array
-	 */
+    /**
+     * Get the segments of a template with a named path.
+     *
+     * @param  string $name
+     * @throws \InvalidArgumentException
+     * @return array
+     */
 	protected function getNamespaceSegments($name)
 	{
 		$segments = explode('::', $name);
@@ -100,13 +101,14 @@ class FileViewFinder implements ViewFinderInterface {
 		return $segments;
 	}
 
-	/**
-	 * Find the given view in the list of paths.
-	 *
-	 * @param  string  $name
-	 * @param  array   $paths
-	 * @return string
-	 */
+    /**
+     * Find the given view in the list of paths.
+     *
+     * @param  string $name
+     * @param  array $paths
+     * @throws \InvalidArgumentException
+     * @return string
+     */
 	protected function findInPaths($name, $paths)
 	{
 		foreach ((array) $paths as $path)

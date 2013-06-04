@@ -18,13 +18,13 @@ abstract class Compiler {
 	 */
 	protected $cachePath;
 
-	/**
-	 * Create a new compiler instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string  $cachePath
-	 * @return void
-	 */
+    /**
+     * Create a new compiler instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @param  string $cachePath
+     * @return \Illuminate\View\Compilers\Compiler
+     */
 	public function __construct(Filesystem $files, $cachePath)
 	{
 		$this->files = $files;

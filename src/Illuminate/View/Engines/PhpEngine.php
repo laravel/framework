@@ -45,12 +45,13 @@ class PhpEngine implements EngineInterface {
 		return ob_get_clean();
 	}
 
-	/**
-	 * Handle a view exception.
-	 *
-	 * @param  Exception  $e
-	 * @return void
-	 */
+    /**
+     * Handle a view exception.
+     *
+     * @param  Exception $e
+     * @throws \Illuminate\View\Exception
+     * @return void
+     */
 	protected function handleViewException($e)
 	{
 		ob_get_clean(); throw $e;
