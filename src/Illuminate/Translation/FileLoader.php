@@ -29,13 +29,13 @@ class FileLoader implements LoaderInterface {
 	 * Create a new file loader instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string                             $path
+	 * @param  string  $path
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $path)
 	{
-		$this->files = $files;
 		$this->path = $path;
+		$this->files = $files;
 	}
 
 	/**
