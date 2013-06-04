@@ -679,7 +679,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Delete the model from the database.
 	 *
-	 * @return void
+	 * @return bool|null
 	 */
 	public function delete()
 	{
@@ -746,7 +746,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Restore a soft-deleted model instance.
 	 *
-	 * @return void
+	 * @return bool|null
 	 */
 	public function restore()
 	{
@@ -923,7 +923,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $column
 	 * @param  int     $amount
 	 * @param  string  $method
-	 * @return void
+	 * @return int
 	 */
 	protected function incrementOrDecrement($column, $amount, $method)
 	{
@@ -1285,7 +1285,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a fresh timestamp for the model.
 	 *
-	 * @return mixed
+	 * @return DateTime
 	 */
 	public function freshTimestamp()
 	{
@@ -2112,8 +2112,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get the model's original attribute values.
 	 *
-	 * @param  string|null  $key
-	 * @param  mixed  $default
+	 * @param  string  $key
+	 * @param  mixed   $default
 	 * @return array
 	 */
 	public function getOriginal($key = null, $default = null)
@@ -2278,7 +2278,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
 	public static function setEventDispatcher(Dispatcher $dispatcher)
