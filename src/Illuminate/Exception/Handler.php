@@ -51,14 +51,15 @@ class Handler {
 	 */
 	protected $handled = array();
 
-	/**
-	 * Create a new error handler instance.
-	 *
-	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface  $responsePreparer
-	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
-	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
-	 * @return void
-	 */
+    /**
+     * Create a new error handler instance.
+     *
+     * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface $responsePreparer
+     * @param  \Illuminate\Exception\ExceptionDisplayerInterface $plainDisplayer
+     * @param  \Illuminate\Exception\ExceptionDisplayerInterface $debugDisplayer
+     * @param bool $debug
+     * @return \Illuminate\Exception\Handler
+     */
 	public function __construct(ResponsePreparerInterface $responsePreparer,
                                 ExceptionDisplayerInterface $plainDisplayer,
                                 ExceptionDisplayerInterface $debugDisplayer,
@@ -305,12 +306,12 @@ class Handler {
 		return ! $expected->getClass() or $expected->getClass()->isInstance($exception);
 	}
 
-	/**
-	 * Format an exception thrown by a handler.
-	 *
-	 * @param  Exception  $e
-	 * @return string
-	 */
+    /**
+     * Format an exception thrown by a handler.
+     *
+     * @param \Exception $e
+     * @return string
+     */
 	protected function formatException(\Exception $e)
 	{
 		$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
