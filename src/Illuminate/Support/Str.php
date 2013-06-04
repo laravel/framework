@@ -223,7 +223,7 @@ class Str {
 	}
 
 	/**
-	 * Convert the given string to title case
+	 * Convert the given string to title case.
 	 *
 	 * @param  string  $value
 	 * @return string
