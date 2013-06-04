@@ -330,6 +330,17 @@ class Handler {
 	}
 
 	/**
+	 * Register an application error handler at the bottom of the stack.
+	 *
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function pushError(Closure $callback)
+	{
+		$this->handlers[] = $callback;
+	}
+
+	/**
 	 * Prepare the given response.
 	 *
 	 * @param  mixed  $response
