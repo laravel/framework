@@ -35,13 +35,13 @@ class Blueprint {
 	 */
 	public $engine;
 
-	/**
-	 * Create a new schema blueprint.
-	 *
-	 * @param  string   $table
-	 * @param  Closure  $callback
-	 * @return void
-	 */
+    /**
+     * Create a new schema blueprint.
+     *
+     * @param  string $table
+     * @param  Closure $callback
+     * @return \Illuminate\Database\Schema\Blueprint
+     */
 	public function __construct($table, Closure $callback = null)
 	{
 		$this->table = $table;
@@ -432,14 +432,13 @@ class Blueprint {
 		return $this->addColumn('smallInteger', $column);
 	}
 
-	/**
-	 * Create a new unsigned integer column on the table.
-	 *
-	 * @param  string  $column
-	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
-	 * @return \Illuminate\Support\Fluent
-	 */
+    /**
+     * Create a new unsigned integer column on the table.
+     *
+     * @param  string $column
+     * @param  bool $autoIncrement
+     * @return \Illuminate\Support\Fluent
+     */
 	public function unsignedInteger($column, $autoIncrement = false)
 	{
 		return $this->integer($column, $autoIncrement, true);
@@ -450,7 +449,6 @@ class Blueprint {
 	 *
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedBigInteger($column, $autoIncrement = false)

@@ -32,15 +32,15 @@ class Pivot extends Model {
 	 */
 	protected $guarded = array();
 
-	/**
-	 * Create a new pivot model instance.
-	 *
-	 * @param  \Illuminate\Database\Eloquent\Model  $parent
-	 * @param  array   $attributes
-	 * @param  string  $table
-	 * @param  bool    $exists
-	 * @return void
-	 */
+    /**
+     * Create a new pivot model instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $parent
+     * @param  array $attributes
+     * @param  string $table
+     * @param  bool $exists
+     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     */
 	public function __construct(Model $parent, $attributes, $table, $exists = false)
 	{
 		parent::__construct();

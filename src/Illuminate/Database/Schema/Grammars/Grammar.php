@@ -147,12 +147,13 @@ abstract class Grammar extends BaseGrammar {
 		return $sql;
 	}
 
-	/**
-	 * Get the primary key command if it exists on the blueprint.
-	 *
-	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @return \Illuminate\Support\Fluent|null
-	 */
+    /**
+     * Get the primary key command if it exists on the blueprint.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param  string $name
+     * @return \Illuminate\Support\Fluent|null
+     */
 	protected function getCommandByName(Blueprint $blueprint, $name)
 	{
 		$commands = $this->getCommandsByName($blueprint, $name);

@@ -62,7 +62,7 @@ class Seeder {
 	 * Set the IoC container instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
+	 * @return \Illuminate\Database\Seeder
 	 */
 	public function setContainer(Container $container)
 	{
@@ -75,7 +75,7 @@ class Seeder {
 	 * Set the console command instance.
 	 *
 	 * @param  \Illuminate\Console\Command  $command
-	 * @return void
+	 * @return \Illuminate\Database\Seeder
 	 */
 	public function setCommand(Command $command)
 	{

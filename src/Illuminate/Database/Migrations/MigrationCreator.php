@@ -19,12 +19,12 @@ class MigrationCreator {
 	 */
 	protected $postCreate = array();
 
-	/**
-	 * Create a new migration creator instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
+    /**
+     * Create a new migration creator instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @return \Illuminate\Database\Migrations\MigrationCreator
+     */
 	public function __construct(Filesystem $files)
 	{
 		$this->files = $files;
@@ -55,12 +55,13 @@ class MigrationCreator {
 		return $path;
 	}
 
-	/**
-	 * Get the migration stub file.
-	 *
-	 * @param  string  $table
-	 * @return void
-	 */
+    /**
+     * Get the migration stub file.
+     *
+     * @param  string $table
+     * @param  bool $create
+     * @return string
+     */
 	protected function getStub($table, $create)
 	{
 		if (is_null($table))

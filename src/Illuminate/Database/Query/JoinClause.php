@@ -23,13 +23,13 @@ class JoinClause {
 	 */
 	public $clauses = array();
 
-	/**
-	 * Create a new join clause instance.
-	 *
-	 * @param  string  $type
-	 * @param  string  $table
-	 * @return void
-	 */
+    /**
+     * Create a new join clause instance.
+     *
+     * @param  string $type
+     * @param  string $table
+     * @return \Illuminate\Database\Query\JoinClause
+     */
 	public function __construct($type, $table)
 	{
 		$this->type = $type;

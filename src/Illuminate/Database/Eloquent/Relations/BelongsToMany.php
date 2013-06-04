@@ -43,17 +43,17 @@ class BelongsToMany extends Relation {
 	 */
 	protected $pivotColumns = array();
 
-	/**
-	 * Create a new has many relationship instance.
-	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder  $query
-	 * @param  \Illuminate\Database\Eloquent\Model  $parent
-	 * @param  string  $table
-	 * @param  string  $foreignKey
-	 * @param  string  $otherKey
-	 * @param  string  $relationName
-	 * @return void
-	 */
+    /**
+     * Create a new has many relationship instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Model $parent
+     * @param  string $table
+     * @param  string $foreignKey
+     * @param  string $otherKey
+     * @param  string $relationName
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
 	public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = null)
 	{
 		$this->table = $table;
@@ -180,11 +180,12 @@ class BelongsToMany extends Relation {
 		return parent::getRelationCountQuery($query);
 	}
 
-	/**
-	 * Set the select clause for the relation query.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-	 */
+    /**
+     * Set the select clause for the relation query.
+     *
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
 	protected function getSelectColumns(array $columns = array('*'))
 	{
 		if ($columns == array('*'))
@@ -269,7 +270,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array   $models
 	 * @param  string  $relation
-	 * @return void
+	 * @return array
 	 */
 	public function initRelation(array $models, $relation)
 	{
@@ -431,8 +432,8 @@ class BelongsToMany extends Relation {
 	/**
 	 * Create an array of new instances of the related models.
 	 *
-	 * @param  array  $attributes
-	 * @param  array  $joining
+	 * @param  array  $records
+	 * @param  array  $joinings
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function createMany(array $records, array $joinings = array())
@@ -540,12 +541,13 @@ class BelongsToMany extends Relation {
 		if ($touch) $this->touchIfTouching();
 	}
 
-	/**
-	 * Create an array of records to insert into the pivot table.
-	 *
-	 * @param  array  $ids
-	 * @return void
-	 */
+    /**
+     * Create an array of records to insert into the pivot table.
+     *
+     * @param  array $ids
+     * @param  array $attributes
+     * @return array
+     */
 	protected function createAttachRecords($ids, array $attributes)
 	{
 		$records = array();

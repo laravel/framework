@@ -136,12 +136,13 @@ class DatabaseManager implements ConnectionResolverInterface {
 		return $connection;
 	}
 
-	/**
-	 * Get the configuration for a connection.
-	 *
-	 * @param  string  $name
-	 * @return array
-	 */
+    /**
+     * Get the configuration for a connection.
+     *
+     * @param  string $name
+     * @throws \InvalidArgumentException
+     * @return array
+     */
 	protected function getConfig($name)
 	{
 		$name = $name ?: $this->getDefaultConnection();

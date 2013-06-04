@@ -33,13 +33,13 @@ class MigrateCommand extends BaseCommand {
 	 */
 	protected $packagePath;
 
-	/**
-	 * Create a new migration command instance.
-	 *
-	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-	 * @param  string  $packagePath
-	 * @return void
-	 */
+    /**
+     * Create a new migration command instance.
+     *
+     * @param  \Illuminate\Database\Migrations\Migrator $migrator
+     * @param  string $packagePath
+     * @return \Illuminate\Database\Console\Migrations\MigrateCommand
+     */
 	public function __construct(Migrator $migrator, $packagePath)
 	{
 		parent::__construct();

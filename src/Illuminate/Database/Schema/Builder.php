@@ -20,12 +20,12 @@ class Builder {
 	 */
 	protected $grammar;
 
-	/**
-	 * Create a new database Schema manager.
-	 *
-	 * @param  \Illuminate\Database\Connection  $connection
-	 * @return void
-	 */
+    /**
+     * Create a new database Schema manager.
+     *
+     * @param  \Illuminate\Database\Connection $connection
+     * @return \Illuminate\Database\Schema\Builder
+     */
 	public function __construct(Connection $connection)
 	{
 		$this->connection = $connection;

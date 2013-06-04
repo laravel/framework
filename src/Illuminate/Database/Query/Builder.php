@@ -144,14 +144,14 @@ class Builder {
 		'like', 'not like', 'between', 'ilike',
 	);
 
-	/**
-	 * Create a new query builder instance.
-	 *
-	 * @param  \Illuminate\Database\ConnectionInterface  $connection
-	 * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
-	 * @param  \Illuminate\Database\Query\Processors\Processor  $processor
-	 * @return void
-	 */
+    /**
+     * Create a new query builder instance.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface $connection
+     * @param  \Illuminate\Database\Query\Grammars\Grammar $grammar
+     * @param  \Illuminate\Database\Query\Processors\Processor $processor
+     * @return \Illuminate\Database\Query\Builder
+     */
 	public function __construct(ConnectionInterface $connection,
                                 Grammar $grammar,
                                 Processor $processor)
@@ -499,7 +499,7 @@ class Builder {
 	/**
 	 * Add a where not exists clause to the query.
 	 *
-	 * @param  Closure  $calback
+	 * @param  Closure  $callback
 	 * @param  string   $boolean
 	 * @return \Illuminate\Database\Query\Builder
 	 */
@@ -511,7 +511,7 @@ class Builder {
 	/**
 	 * Add a where not exists clause to the query.
 	 *
-	 * @param  Closure  $calback
+	 * @param  Closure  $callback
 	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function orWhereNotExists(Closure $callback)
@@ -726,7 +726,6 @@ class Builder {
 	/**
 	 * Add a "group by" clause to the query.
 	 *
-	 * @param  dynamic  $columns
 	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function groupBy()
@@ -1531,13 +1530,14 @@ class Builder {
 		return $this->grammar;
 	}
 
-	/**
-	 * Handle dynamic method calls into the method.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
+    /**
+     * Handle dynamic method calls into the method.
+     *
+     * @param  string $method
+     * @param  array $parameters
+     * @throws \BadMethodCallException
+     * @return mixed
+     */
 	public function __call($method, $parameters)
 	{
 		if (starts_with($method, 'where'))

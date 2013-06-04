@@ -63,7 +63,7 @@ class Collection extends BaseCollection {
 	/**
 	 * Get an array with the values of a given key.
 	 *
-	 * @param  string  $column
+	 * @param  string  $value
 	 * @param  string  $key
 	 * @return array
 	 */

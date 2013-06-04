@@ -19,15 +19,15 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 */
 	protected $morphClass;
 
-	/**
-	 * Create a new has many relationship instance.
-	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder  $query
-	 * @param  \Illuminate\Database\Eloquent\Model  $parent
-	 * @param  string  $type
-	 * @param  string  $id
-	 * @return void
-	 */
+    /**
+     * Create a new has many relationship instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Model $parent
+     * @param  string $type
+     * @param  string $id
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOneOrMany
+     */
 	public function __construct(Builder $query, Model $parent, $type, $id)
 	{
 		$this->morphType = $type;

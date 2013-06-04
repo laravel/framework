@@ -9,12 +9,12 @@ class Expression {
 	 */
 	protected $value;
 
-	/**
-	 * Create a new raw query expression.
-	 *
-	 * @param  mixed  $value
-	 * @return void
-	 */
+    /**
+     * Create a new raw query expression.
+     *
+     * @param  mixed $value
+     * @return \Illuminate\Database\Query\Expression
+     */
 	public function __construct($value)
 	{
 		$this->value = $value;

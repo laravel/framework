@@ -18,12 +18,12 @@ class Manager {
 	 */
 	protected static $instance;
 
-	/**
-	 * Create a new database capsule manager.
-	 *
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
-	 */
+    /**
+     * Create a new database capsule manager.
+     *
+     * @param  \Illuminate\Container\Container $container
+     * @return \Illuminate\Database\Capsule\Manager
+     */
 	public function __construct(Container $container = null)
 	{
 		$this->setupContainer($container);

@@ -27,12 +27,12 @@ class RollbackCommand extends Command {
 	 */
 	protected $migrator;
 
-	/**
-	 * Create a new migration rollback command instance.
-	 *
-	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-	 * @return void
-	 */
+    /**
+     * Create a new migration rollback command instance.
+     *
+     * @param  \Illuminate\Database\Migrations\Migrator $migrator
+     * @return \Illuminate\Database\Console\Migrations\RollbackCommand
+     */
 	public function __construct(Migrator $migrator)
 	{
 		parent::__construct();
