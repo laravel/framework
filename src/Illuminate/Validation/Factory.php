@@ -48,13 +48,13 @@ class Factory {
 	 */
 	protected $resolver;
 
-	/**
-	 * Create a new Validator factory instance.
-	 *
-	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
-	 */
+    /**
+     * Create a new Validator factory instance.
+     *
+     * @param  \Symfony\Component\Translation\TranslatorInterface $translator
+     * @param  \Illuminate\Container\Container $container
+     * @return \Illuminate\Validation\Factory
+     */
 	public function __construct(TranslatorInterface $translator, Container $container = null)
 	{
 		$this->container = $container;

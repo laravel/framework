@@ -101,15 +101,15 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted');
 
-	/**
-	 * Create a new Validator instance.
-	 *
-	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
-	 * @param  array  $data
-	 * @param  array  $rules
-	 * @param  array  $messages
-	 * @return void
-	 */
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  \Symfony\Component\Translation\TranslatorInterface $translator
+     * @param  array $data
+     * @param  array $rules
+     * @param  array $messages
+     * @return \Illuminate\Validation\Validator
+     */
 	public function __construct(TranslatorInterface $translator, $data, $rules, $messages = array())
 	{
 		$this->translator = $translator;
@@ -437,7 +437,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $attribute
 	 * @param  mixed   $value
 	 * @param  array   $parameters
-	 * @return void
+	 * @return bool
 	 */
 	protected function validateSame($attribute, $value, $parameters)
 	{
@@ -1589,11 +1589,12 @@ class Validator implements MessageProviderInterface {
 		return $this;
 	}
 
-	/**
-	 * Get the Presence Verifier implementation.
-	 *
-	 * @return \Illuminate\Validation\PresenceVerifierInterface
-	 */
+    /**
+     * Get the Presence Verifier implementation.
+     *
+     * @throws \RuntimeException
+     * @return \Illuminate\Validation\PresenceVerifierInterface
+     */
 	public function getPresenceVerifier()
 	{
 		if ( ! isset($this->presenceVerifier))
@@ -1743,13 +1744,14 @@ class Validator implements MessageProviderInterface {
 		return call_user_func_array(array($this->container->make($class), $method), $parameters);
 	}
 
-	/**
-	 * Handle dynamic calls to class methods.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
+    /**
+     * Handle dynamic calls to class methods.
+     *
+     * @param  string $method
+     * @param  array $parameters
+     * @throws \BadMethodCallException
+     * @return mixed
+     */
 	public function __call($method, $parameters)
 	{
 		$rule = snake_case(substr($method, 8));

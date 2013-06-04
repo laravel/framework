@@ -18,12 +18,12 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 */
 	protected $connection = null;
 
-	/**
-	 * Create a new database presence verifier.
-	 *
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $db
-	 * @return void
-	 */
+    /**
+     * Create a new database presence verifier.
+     *
+     * @param  \Illuminate\Database\ConnectionResolverInterface $db
+     * @return \Illuminate\Validation\DatabasePresenceVerifier
+     */
 	public function __construct(ConnectionResolverInterface $db)
 	{
 		$this->db = $db;
