@@ -105,7 +105,10 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		if ($this->shouldReturnJson())
 		{
-			$this->app['whoops.handler'] = function() { return new JsonResponseHandler; };
+			$this->app['whoops.handler'] = $this->app->share(function()
+			{
+					return new JsonResponseHandler;
+			});
 		}
 		else
 		{
@@ -134,7 +137,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		$me = $this;
 		
-		$this->app['whoops.handler'] = function() use ($me)
+		$this->app['whoops.handler'] = $this->app->share(function() use ($me)
 		{
 			with($handler = new PrettyPageHandler)->setEditor('sublime');
 
@@ -147,7 +150,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 			}
 
 			return $handler;
-		};
+		});
 	}
 
 	/**
