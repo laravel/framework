@@ -230,6 +230,11 @@ class Str {
 	 */
 	public static function title($value)
 	{
+		if (function_exists('mb_get_info'))
+		{
+			return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
+		}
+
 		return ucwords(strtolower($value));
 	}
 
