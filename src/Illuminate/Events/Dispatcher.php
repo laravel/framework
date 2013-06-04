@@ -32,12 +32,12 @@ class Dispatcher {
 	 */
 	protected $sorted = array();
 
-	/**
-	 * Create a new event dispatcher instance.
-	 *
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
-	 */
+    /**
+     * Create a new event dispatcher instance.
+     *
+     * @param  \Illuminate\Container\Container $container
+     * @return \Illuminate\Events\Dispatcher
+     */
 	public function __construct(Container $container = null)
 	{
 		$this->container = $container;
@@ -162,7 +162,7 @@ class Dispatcher {
 	 * @param  string  $event
 	 * @param  mixed   $payload
 	 * @param  boolean $halt
-	 * @return void
+	 * @return mixed
 	 */
 	public function fire($event, $payload = array(), $halt = false)
 	{
@@ -259,7 +259,7 @@ class Dispatcher {
 	 * Register an event listener with the dispatcher.
 	 *
 	 * @param  mixed   $listener
-	 * @return void
+	 * @return Closure
 	 */
 	public function makeListener($listener)
 	{
