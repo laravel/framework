@@ -38,13 +38,13 @@ class Writer {
 	 */
 	protected $dispatcher;
 
-	/**
-	 * Create a new log writer instance.
-	 *
-	 * @param  \Monolog\Logger  $monolog
-	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
-	 * @return void
-	 */
+    /**
+     * Create a new log writer instance.
+     *
+     * @param  \Monolog\Logger $monolog
+     * @param  \Illuminate\Events\Dispatcher $dispatcher
+     * @return \Illuminate\Log\Writer
+     */
 	public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
 	{
 		$this->monolog = $monolog;
@@ -84,12 +84,13 @@ class Writer {
 		$this->monolog->pushHandler(new RotatingFileHandler($path, $days, $level));
 	}
 
-	/**
-	 * Parse the string level into a Monolog constant.
-	 *
-	 * @param  string  $level
-	 * @return int
-	 */
+    /**
+     * Parse the string level into a Monolog constant.
+     *
+     * @param  string $level
+     * @throws \InvalidArgumentException
+     * @return int
+     */
 	protected function parseLevel($level)
 	{
 		switch ($level)
@@ -133,13 +134,14 @@ class Writer {
 		return $this->monolog;
 	}
 
-	/**
-	 * Register a new callback handler for when
-	 * a log event is triggered.
-	 *
-	 * @param  Closure  $callback
-	 * @return void
-	 */
+    /**
+     * Register a new callback handler for when
+     * a log event is triggered.
+     *
+     * @param  Closure $callback
+     * @throws \RuntimeException
+     * @return void
+     */
 	public function listen(Closure $callback)
 	{
 		if ( ! isset($this->dispatcher))
@@ -175,7 +177,8 @@ class Writer {
 	 * Fires a log event.
 	 *
 	 * @param  string  $level
-	 * @param  array   $parameters
+     * @param  string  $message
+	 * @param  array   $context
 	 * @return void
 	 */
 	protected function fireLogEvent($level, $message, array $context = array())
@@ -189,13 +192,14 @@ class Writer {
 		}
 	}
 
-	/**
-	 * Dynamically handle error additions.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
+    /**
+     * Dynamically handle error additions.
+     *
+     * @param  string $method
+     * @param  array $parameters
+     * @throws \BadMethodCallException
+     * @return mixed
+     */
 	public function __call($method, $parameters)
 	{
 		if (in_array($method, $this->levels))
