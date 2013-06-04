@@ -35,12 +35,12 @@ class PackageCreator {
 		'ServiceProvider',
 	);
 
-	/**
-	 * Create a new package creator instance.
-	 *
-	 * @param  \Illuminate\Filesystem  $files
-	 * @return void
-	 */
+    /**
+     * Create a new package creator instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @return \Illuminate\Workbench\PackageCreator
+     */
 	public function __construct(Filesystem $files)
 	{
 		$this->files = $files;
@@ -74,7 +74,7 @@ class PackageCreator {
 	 *
 	 * @param  Package  $package
 	 * @param  string   $path
-	 * @return void
+	 * @return string
 	 */
 	public function createWithResources(Package $package, $path)
 	{
@@ -92,13 +92,14 @@ class PackageCreator {
 		return $plain ? $this->basicBlocks : $this->blocks;
 	}
 
-	/**
-	 * Write the support files to the package root.
-	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
-	 * @return void
-	 */
+    /**
+     * Write the support files to the package root.
+     *
+     * @param  \Illuminate\Workbench\Package $package
+     * @param  string $directory
+     * @param  bool $plain
+     * @return void
+     */
 	public function writeSupportFiles(Package $package, $directory, $plain)
 	{
 		foreach (array('PhpUnit', 'Travis', 'Composer', 'Ignore') as $file)
@@ -135,13 +136,14 @@ class PackageCreator {
 		$this->files->copy($stub, $directory.'/.travis.yml');
 	}
 
-	/**
-	 * Write the Composer.json stub file.
-	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
-	 * @return void
-	 */
+    /**
+     * Write the Composer.json stub file.
+     *
+     * @param  \Illuminate\Workbench\Package $package
+     * @param  string $directory
+     * @param  bool $plain
+     * @return void
+     */
 	protected function writeComposerFile(Package $package, $directory, $plain)
 	{
 		$stub = $this->getComposerStub($plain);
@@ -164,13 +166,14 @@ class PackageCreator {
 		return $this->files->get(__DIR__.'/stubs/composer.json');
 	}
 
-	/**
-	 * Write the stub .gitignore file for the package.
-	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
-	 * @return void
-	 */
+    /**
+     * Write the stub .gitignore file for the package.
+     *
+     * @param  \Illuminate\Workbench\Package $package
+     * @param  string $directory
+     * @param  bool $plain
+     * @return void
+     */
 	public function writeIgnoreFile(Package $package, $directory, $plain)
 	{
 		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');	
@@ -211,13 +214,14 @@ class PackageCreator {
 		$this->files->put($path.'/.gitkeep', '');
 	}
 
-	/**
-	 * Create the public directory for the package.
-	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
-	 * @return void
-	 */
+    /**
+     * Create the public directory for the package.
+     *
+     * @param  \Illuminate\Workbench\Package $package
+     * @param  string $directory
+     * @param  bool $plain
+     * @return void
+     */
 	public function writePublicDirectory(Package $package, $directory, $plain)
 	{
 		if ($plain) return;
@@ -241,13 +245,14 @@ class PackageCreator {
 		$this->files->put($directory.'/tests/.gitkeep', '');
 	}
 
-	/**
-	 * Write the stub ServiceProvider for the package.
-	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
-	 * @return void
-	 */
+    /**
+     * Write the stub ServiceProvider for the package.
+     *
+     * @param  \Illuminate\Workbench\Package $package
+     * @param  string $directory
+     * @param  bool $plain
+     * @return void
+     */
 	public function writeServiceProvider(Package $package, $directory, $plain)
 	{
 		// Once we have the service provider stub, we will need to format it and make
@@ -344,13 +349,14 @@ class PackageCreator {
 		return $stub;
 	}
 
-	/**
-	 * Create a workbench directory for the package.
-	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $path
-	 * @return string
-	 */
+    /**
+     * Create a workbench directory for the package.
+     *
+     * @param  \Illuminate\Workbench\Package $package
+     * @param  string $path
+     * @throws \InvalidArgumentException
+     * @return string
+     */
 	protected function createDirectory(Package $package, $path)
 	{
 		$fullPath = $path.'/'.$package->getFullName();

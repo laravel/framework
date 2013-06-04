@@ -29,12 +29,12 @@ class WorkbenchMakeCommand extends Command {
 	 */
 	protected $creator;
 
-	/**
-	 * Create a new make workbench command instance.
-	 *
-	 * @param  \Illuminate\Workbench\PackageCreator  $creator
-	 * @return void
-	 */
+    /**
+     * Create a new make workbench command instance.
+     *
+     * @param  \Illuminate\Workbench\PackageCreator $creator
+     * @return \Illuminate\Workbench\Console\WorkbenchMakeCommand
+     */
 	public function __construct(PackageCreator $creator)
 	{
 		parent::__construct();

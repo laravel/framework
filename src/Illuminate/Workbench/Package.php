@@ -44,15 +44,15 @@ class Package {
 	 */
 	public $email;
 
-	/**
-	 * Create a new package instance.
-	 *
-	 * @param  string  $vendor
-	 * @param  string  $name
-	 * @param  string  $author
-	 * @param  string  $email
-	 * @return void
-	 */
+    /**
+     * Create a new package instance.
+     *
+     * @param  string $vendor
+     * @param  string $name
+     * @param  string $author
+     * @param  string $email
+     * @return \Illuminate\Workbench\Package
+     */
 	public function __construct($vendor, $name, $author, $email)
 	{
 		$this->name = $name;
