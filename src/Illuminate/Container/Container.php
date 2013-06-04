@@ -141,13 +141,14 @@ class Container implements ArrayAccess {
 		};
 	}
 
-	/**
-	 * "Extend" an abstract type in the container.
-	 *
-	 * @param  string   $abstract
-	 * @param  Closure  $closure
-	 * @return void
-	 */
+    /**
+     * "Extend" an abstract type in the container.
+     *
+     * @param  string $abstract
+     * @param  Closure $closure
+     * @throws \InvalidArgumentException
+     * @return void
+     */
 	public function extend($abstract, Closure $closure)
 	{
 		if ( ! isset($this->bindings[$abstract]))
@@ -276,13 +277,14 @@ class Container implements ArrayAccess {
 		}
 	}
 
-	/**
-	 * Instantiate a concrete instance of the given type.
-	 *
-	 * @param  string  $concrete
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
+    /**
+     * Instantiate a concrete instance of the given type.
+     *
+     * @param  string $concrete
+     * @param  array $parameters
+     * @throws BindingResolutionException
+     * @return mixed
+     */
 	public function build($concrete, $parameters = array())
 	{
 		// If the concrete type is actually a Closure, we will just execute it and
@@ -355,12 +357,13 @@ class Container implements ArrayAccess {
 		return (array) $dependencies;
 	}
 
-	/**
-	 * Resolve a non-class hinted dependency.
-	 *
-	 * @param  ReflectionParameter  $parameter
-	 * @return mixed
-	 */
+    /**
+     * Resolve a non-class hinted dependency.
+     *
+     * @param  ReflectionParameter $parameter
+     * @throws BindingResolutionException
+     * @return mixed
+     */
 	protected function resolveNonClass(ReflectionParameter $parameter)
 	{
 		if ($parameter->isDefaultValueAvailable())
