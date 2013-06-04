@@ -74,7 +74,7 @@ class Response {
 	 * @param  array  $headers
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
-	public static function download($file, $name = null, $headers = array())
+	public static function download($file, $name = null, array $headers = array())
 	{
 		$response = new BinaryFileResponse($file, 200, $headers, true, 'attachment');
 
