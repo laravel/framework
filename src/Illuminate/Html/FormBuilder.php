@@ -69,14 +69,14 @@ class FormBuilder {
 	 */
 	protected $spoofedMethods = array('DELETE', 'PATCH', 'PUT');
 
-	/**
-	 * Create a new form builder instance.
-	 *
-	 * @param  \Illuminate\Routing\UrlGenerator  $url
-	 * @param  \Illuminate\Html\HtmlBuilder  $html
-	 * @param  string  $csrfToken
-	 * @return void
-	 */
+    /**
+     * Create a new form builder instance.
+     *
+     * @param  \Illuminate\Html\HtmlBuilder $html
+     * @param  \Illuminate\Routing\UrlGenerator $url
+     * @param  string $csrfToken
+     * @return \Illuminate\Html\FormBuilder
+     */
 	public function __construct(HtmlBuilder $html, UrlGenerator $url, $csrfToken)
 	{
 		$this->url = $url;
@@ -529,7 +529,7 @@ class FormBuilder {
 	 * @param  string  $type
 	 * @param  string  $name
 	 * @param  mixed   $value
-	 * @return void
+	 * @return bool
 	 */
 	protected function getCheckedState($type, $name, $value)
 	{
@@ -813,13 +813,14 @@ class FormBuilder {
 		return $this;
 	}
 
-	/**
-	 * Dynamically handle calls to the form builder.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
+    /**
+     * Dynamically handle calls to the form builder.
+     *
+     * @param  string $method
+     * @param  array $parameters
+     * @throws \BadMethodCallException
+     * @return mixed
+     */
 	public function __call($method, $parameters)
 	{
 		if (isset($this->macros[$method]))
