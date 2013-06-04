@@ -28,12 +28,12 @@ class MakeTableCommand extends Command {
 	 */
 	protected $files;
 
-	/**
-	 * Create a new session table command instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
+    /**
+     * Create a new session table command instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @return \Illuminate\Session\Console\MakeTableCommand
+     */
 	public function __construct(Filesystem $files)
 	{
 		parent::__construct();

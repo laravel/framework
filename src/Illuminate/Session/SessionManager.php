@@ -80,11 +80,12 @@ class SessionManager extends Manager {
 		return $this->app['db']->connection($connection);
 	}
 
-	/**
-	 * Get the database session options.
-	 *
-	 * @return array
-	 */
+    /**
+     * Get the database session options.
+     *
+     * @param string $table
+     * @return array
+     */
 	protected function getDatabaseOptions($table)
 	{
 		return array('db_table' => $table, 'db_id_col' => 'id', 'db_data_col' => 'payload', 'db_time_col' => 'last_activity');
@@ -130,11 +131,12 @@ class SessionManager extends Manager {
 		return $this->createCacheBased('redis');
 	}
 
-	/**
-	 * Create an instance of a cache driven driver.
-	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
-	 */
+    /**
+     * Create an instance of a cache driven driver.
+     *
+     * @param $driver
+     * @return \Illuminate\Session\CacheDrivenStore
+     */
 	protected function createCacheBased($driver)
 	{
 		$minutes = $this->app['config']['session.lifetime'];
