@@ -65,13 +65,13 @@ class Guard {
 	 */
 	protected $loggedOut = false;
 
-	/**
-	 * Create a new authentication guard.
-	 *
-	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
-	 * @param  \Illuminate\Session\Store  $session
-	 * @return void
-	 */
+    /**
+     * Create a new authentication guard.
+     *
+     * @param  \Illuminate\Auth\UserProviderInterface $provider
+     * @param  \Illuminate\Session\Store $session
+     * @return \Illuminate\Auth\Guard
+     */
 	public function __construct(UserProviderInterface $provider,
                                 SessionStore $session)
 	{
@@ -422,11 +422,12 @@ class Guard {
 		return $this->queuedCookies;
 	}
 
-	/**
-	 * Get the cookie creator instance used by the guard.
-	 *
-	 * @return \Illuminate\Cookie\CookieJar
-	 */
+    /**
+     * Get the cookie creator instance used by the guard.
+     *
+     * @throws \RuntimeException
+     * @return \Illuminate\Cookie\CookieJar
+     */
 	public function getCookieJar()
 	{
 		if ( ! isset($this->cookie))

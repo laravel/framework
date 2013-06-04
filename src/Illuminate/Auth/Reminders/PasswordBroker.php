@@ -42,16 +42,16 @@ class PasswordBroker {
 	 */
 	protected $reminderView;
 
-	/**
-	 * Create a new password broker instance.
-	 *
-	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
-	 * @param  \Illuminate\Auth\UserProviderInterface  $users
-	 * @param  \Illuminate\Routing\Redirector  $redirect
-	 * @param  \Illuminate\Mail\Mailer  $mailer
-	 * @param  string  $reminderView
-	 * @return void
-	 */
+    /**
+     * Create a new password broker instance.
+     *
+     * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface $reminders
+     * @param  \Illuminate\Auth\UserProviderInterface $users
+     * @param  \Illuminate\Routing\Redirector $redirect
+     * @param  \Illuminate\Mail\Mailer $mailer
+     * @param  string $reminderView
+     * @return \Illuminate\Auth\Reminders\PasswordBroker
+     */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
                                 Redirector $redirect,
@@ -100,7 +100,7 @@ class PasswordBroker {
 	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string   $token
 	 * @param  Closure  $callback
-	 * @return void
+	 * @return int
 	 */
 	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null)
 	{
@@ -148,13 +148,13 @@ class PasswordBroker {
 		return $response;
 	}
 
-	/**
-	 * Validate a password reset for the given credentials.
-	 *
-	 * @param  array  $credenitals
-	 * @return \Illuminate\Auth\RemindableInterface
-	 */
-	protected function validateReset(array $credentials)
+    /**
+     * Validate a password reset for the given credentials.
+     *
+     * @param array $credentials
+     * @return RemindableInterface|\Illuminate\Http\RedirectResponse
+     */
+    protected function validateReset(array $credentials)
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
@@ -201,12 +201,13 @@ class PasswordBroker {
 		return $this->redirect->refresh()->with('error', true)->with('reason', $reason);
 	}
 
-	/**
-	 * Get the user for the given credentials.
-	 *
-	 * @param  array  $credentials
-	 * @return \Illuminate\Auth\Reminders\RemindableInterface
-	 */
+    /**
+     * Get the user for the given credentials.
+     *
+     * @param  array $credentials
+     * @throws \UnexpectedValueException
+     * @return \Illuminate\Auth\Reminders\RemindableInterface
+     */
 	public function getUser(array $credentials)
 	{
 		$user = $this->users->retrieveByCredentials($credentials);

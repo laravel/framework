@@ -9,12 +9,12 @@ class GenericUser implements UserInterface {
 	 */
 	protected $attributes;
 
-	/**
-	 * Create a new generic User object.
-	 *
-	 * @param  array  $attributes
-	 * @return void
-	 */
+    /**
+     * Create a new generic User object.
+     *
+     * @param  array $attributes
+     * @return \Illuminate\Auth\GenericUser
+     */
 	public function __construct(array $attributes)
 	{
 		$this->attributes = $attributes;
@@ -63,21 +63,23 @@ class GenericUser implements UserInterface {
 		$this->attributes[$key] = $value;
 	}
 
-	/**
-	 * Dynamically check if a value is set on the user.
-	 *
-	 * @return bool
-	 */
+    /**
+     * Dynamically check if a value is set on the user.
+     *
+     * @param $key
+     * @return bool
+     */
 	public function __isset($key)
 	{
 		return isset($this->attributes[$key]);
 	}
 
-	/**
-	 * Dynamically unset a value on the user.
-	 *
-	 * @return bool
-	 */
+    /**
+     * Dynamically unset a value on the user.
+     *
+     * @param $key
+     * @return bool
+     */
 	public function __unset($key)
 	{
 		unset($this->attributes[$key]);

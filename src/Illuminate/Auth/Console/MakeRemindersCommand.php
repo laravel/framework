@@ -28,12 +28,12 @@ class MakeRemindersCommand extends Command {
 	 */
 	protected $files;
 
-	/**
-	 * Create a new reminder table command instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
+    /**
+     * Create a new reminder table command instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @return \Illuminate\Auth\Console\MakeRemindersCommand
+     */
 	public function __construct(Filesystem $files)
 	{
 		parent::__construct();
