@@ -693,12 +693,23 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Register an application error handler.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function error(Closure $callback)
 	{
 		$this['exception']->error($callback);
+	}
+
+	/**
+	 * Register an error handler at the bottom of the stack.
+	 *
+	 * @param  \Closure  $closure
+	 * @return void
+	 */
+	public function pushError(Closure $closure)
+	{
+		$this['exception']->pushError($callback);
 	}
 
 	/**
