@@ -17,7 +17,6 @@ class Message {
      * Create a new message instance.
      *
      * @param  Swift_Message $swift
-     * @return \Illuminate\Mail\Message
      */
 	public function __construct($swift)
 	{

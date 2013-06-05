@@ -77,7 +77,6 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
      * @param  array $items
      * @param  int $total
      * @param  int $perPage
-     * @return \Illuminate\Pagination\Paginator
      */
 	public function __construct(Environment $env, array $items, $total, $perPage)
 	{

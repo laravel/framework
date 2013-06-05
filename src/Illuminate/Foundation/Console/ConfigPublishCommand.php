@@ -32,7 +32,6 @@ class ConfigPublishCommand extends Command {
      * Create a new configuration publish command instance.
      *
      * @param  \Illuminate\Foundation\ConfigPublisher $config
-     * @return \Illuminate\Foundation\Console\ConfigPublishCommand
      */
 	public function __construct(ConfigPublisher $config)
 	{

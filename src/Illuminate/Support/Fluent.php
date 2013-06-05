@@ -16,7 +16,6 @@ class Fluent implements ArrayAccess {
      * Create a new fluent container instance.
      *
      * @param  array $attributes
-     * @return \Illuminate\Support\Fluent
      */
 	public function __construct($attributes = array())
 	{

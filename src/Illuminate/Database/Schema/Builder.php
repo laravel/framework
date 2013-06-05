@@ -24,7 +24,6 @@ class Builder {
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection $connection
-     * @return \Illuminate\Database\Schema\Builder
      */
 	public function __construct(Connection $connection)
 	{

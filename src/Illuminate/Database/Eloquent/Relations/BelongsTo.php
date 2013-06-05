@@ -28,7 +28,6 @@ class BelongsTo extends Relation {
      * @param  \Illuminate\Database\Eloquent\Model $parent
      * @param  string $foreignKey
      * @param  string $relation
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
 	public function __construct(Builder $query, Model $parent, $foreignKey, $relation)
 	{

@@ -31,7 +31,6 @@ class ResetCommand extends Command {
      * Create a new migration rollback command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator $migrator
-     * @return \Illuminate\Database\Console\Migrations\ResetCommand
      */
 	public function __construct(Migrator $migrator)
 	{

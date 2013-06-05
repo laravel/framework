@@ -23,7 +23,6 @@ abstract class Compiler {
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
      * @param  string $cachePath
-     * @return \Illuminate\View\Compilers\Compiler
      */
 	public function __construct(Filesystem $files, $cachePath)
 	{

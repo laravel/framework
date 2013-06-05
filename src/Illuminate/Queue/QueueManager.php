@@ -22,7 +22,6 @@ class QueueManager {
      * Create a new queue manager instance.
      *
      * @param  \Illuminate\Foundation\Application $app
-     * @return \Illuminate\Queue\QueueManager
      */
 	public function __construct($app)
 	{

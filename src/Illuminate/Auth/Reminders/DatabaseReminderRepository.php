@@ -32,7 +32,6 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
      * @var \Illuminate\Database\Connection $connection
      * @param string $table
      * @param string $hashKey
-     * @return \Illuminate\Auth\Reminders\DatabaseReminderRepository
      */
 	public function __construct(Connection $connection, $table, $hashKey)
 	{

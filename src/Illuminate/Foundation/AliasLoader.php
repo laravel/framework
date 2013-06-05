@@ -27,7 +27,6 @@ class AliasLoader {
      * Create a new class alias loader instance.
      *
      * @param  array $aliases
-     * @return \Illuminate\Foundation\AliasLoader
      */
 	public function __construct(array $aliases = array())
 	{

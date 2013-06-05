@@ -21,7 +21,6 @@ class MemcachedStore implements StoreInterface {
      *
      * @param  Memcached $memcached
      * @param  string $prefix
-     * @return \Illuminate\Cache\MemcachedStore
      */
 	public function __construct(Memcached $memcached, $prefix = '')
 	{

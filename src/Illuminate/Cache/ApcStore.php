@@ -21,7 +21,6 @@ class ApcStore implements StoreInterface {
      *
      * @param  \Illuminate\Cache\ApcWrapper $apc
      * @param  string $prefix
-     * @return \Illuminate\Cache\ApcStore
      */
 	public function __construct(ApcWrapper $apc, $prefix = '')
 	{

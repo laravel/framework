@@ -112,7 +112,6 @@ class Router {
      * Create a new router instance.
      *
      * @param  \Illuminate\Container\Container $container
-     * @return \Illuminate\Routing\Router
      */
 	public function __construct(Container $container = null)
 	{

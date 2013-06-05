@@ -13,7 +13,6 @@ class BcryptHasher implements HasherInterface {
      * Create a new Bcrypt hasher instance.
      *
      * @throws \RuntimeException
-     * @return \Illuminate\Hashing\BcryptHasher
      */
 	public function __construct()
 	{

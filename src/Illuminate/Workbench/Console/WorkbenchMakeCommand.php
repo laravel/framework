@@ -33,7 +33,6 @@ class WorkbenchMakeCommand extends Command {
      * Create a new make workbench command instance.
      *
      * @param  \Illuminate\Workbench\PackageCreator $creator
-     * @return \Illuminate\Workbench\Console\WorkbenchMakeCommand
      */
 	public function __construct(PackageCreator $creator)
 	{

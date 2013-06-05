@@ -46,7 +46,6 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
      *
      * @param  \Illuminate\Config\LoaderInterface $loader
      * @param  string $environment
-     * @return \Illuminate\Config\Repository
      */
 	public function __construct(LoaderInterface $loader, $environment)
 	{

@@ -23,7 +23,6 @@ class Listener {
      *
      * @param  string $commandPath
      * @param  string $environment
-     * @return \Illuminate\Queue\Listener
      */
 	public function __construct($commandPath, $environment = null)
 	{

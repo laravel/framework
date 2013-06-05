@@ -22,7 +22,6 @@ abstract class ServiceProvider {
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Foundation\Application $app
-     * @return \Illuminate\Support\ServiceProvider
      */
 	public function __construct($app)
 	{

@@ -36,7 +36,6 @@ class Encrypter {
      * Create a new encrypter instance.
      *
      * @param  string $key
-     * @return \Illuminate\Encryption\Encrypter
      */
 	public function __construct($key)
 	{

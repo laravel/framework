@@ -24,7 +24,6 @@ class KeyGenerateCommand extends Command {
      * Create a new key generator command.
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @return \Illuminate\Foundation\Console\KeyGenerateCommand
      */
 	public function __construct(Filesystem $files)
 	{

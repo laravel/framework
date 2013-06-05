@@ -51,7 +51,6 @@ class Package {
      * @param  string $name
      * @param  string $author
      * @param  string $email
-     * @return \Illuminate\Workbench\Package
      */
 	public function __construct($vendor, $name, $author, $email)
 	{

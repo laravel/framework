@@ -23,7 +23,6 @@ class MigrationCreator {
      * Create a new migration creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @return \Illuminate\Database\Migrations\MigrationCreator
      */
 	public function __construct(Filesystem $files)
 	{

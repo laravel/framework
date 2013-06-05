@@ -38,7 +38,6 @@ class SerializableClosure implements Serializable {
      * Create a new serializable Closure instance.
      *
      * @param  \Closure $closure
-     * @return \Illuminate\Support\SerializableClosure
      */
 	public function __construct(Closure $closure)
 	{

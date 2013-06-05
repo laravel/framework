@@ -36,7 +36,6 @@ class Filter {
      * Create a new annotation instance.
      *
      * @param  array $values
-     * @return \Illuminate\Routing\Controllers\Filter
      */
 	public function __construct(array $values)
 	{

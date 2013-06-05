@@ -39,7 +39,6 @@ class PackageCreator {
      * Create a new package creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @return \Illuminate\Workbench\PackageCreator
      */
 	public function __construct(Filesystem $files)
 	{

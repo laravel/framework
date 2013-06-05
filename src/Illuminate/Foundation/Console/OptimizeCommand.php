@@ -34,7 +34,6 @@ class OptimizeCommand extends Command {
      * Create a new optimize command instance.
      *
      * @param  \Illuminate\Foundation\Composer $composer
-     * @return \Illuminate\Foundation\Console\OptimizeCommand
      */
 	public function __construct(Composer $composer)
 	{

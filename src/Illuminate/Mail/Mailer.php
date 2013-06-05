@@ -58,7 +58,6 @@ class Mailer {
      *
      * @param  \Illuminate\View\Environment $views
      * @param  Swift_Mailer $swift
-     * @return \Illuminate\Mail\Mailer
      */
 	public function __construct(Environment $views, Swift_Mailer $swift)
 	{

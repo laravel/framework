@@ -52,7 +52,6 @@ class BelongsToMany extends Relation {
      * @param  string $foreignKey
      * @param  string $otherKey
      * @param  string $relationName
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
 	public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = null)
 	{

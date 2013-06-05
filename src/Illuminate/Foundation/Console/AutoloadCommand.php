@@ -33,7 +33,6 @@ class AutoloadCommand extends Command {
      * Create a new optimize command instance.
      *
      * @param  \Illuminate\Foundation\Composer $composer
-     * @return \Illuminate\Foundation\Console\AutoloadCommand
      */
 	public function __construct(Composer $composer)
 	{

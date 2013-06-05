@@ -20,7 +20,6 @@ class ConnectionResolver implements ConnectionResolverInterface {
      * Create a new connection resolver instance.
      *
      * @param  array $connections
-     * @return \Illuminate\Database\ConnectionResolver
      */
 	public function __construct(array $connections = array())
 	{

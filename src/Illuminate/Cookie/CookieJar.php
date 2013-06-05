@@ -41,7 +41,6 @@ class CookieJar {
      *
      * @param  \Symfony\Component\HttpFoundation\Request $request
      * @param  \Illuminate\Encryption\Encrypter $encrypter
-     * @return \Illuminate\Cookie\CookieJar
      */
 	public function __construct(Request $request, Encrypter $encrypter)
 	{

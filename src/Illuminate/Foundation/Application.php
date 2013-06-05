@@ -87,7 +87,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
      * Create a new Illuminate application instance.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Foundation\Application
      */
 	public function __construct(Request $request = null)
 	{

@@ -32,7 +32,6 @@ class MakeTableCommand extends Command {
      * Create a new session table command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @return \Illuminate\Session\Console\MakeTableCommand
      */
 	public function __construct(Filesystem $files)
 	{

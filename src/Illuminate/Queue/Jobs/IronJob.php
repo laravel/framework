@@ -33,7 +33,6 @@ class IronJob extends Job {
      * @param  IronMQ $iron
      * @param  StdClass $job
      * @param  string $queue
-     * @return \Illuminate\Queue\Jobs\IronJob
      */
 	public function __construct(Container $container,
                                 IronMQ $iron,

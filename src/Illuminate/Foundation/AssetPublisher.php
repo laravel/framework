@@ -30,7 +30,6 @@ class AssetPublisher {
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
      * @param  string $publishPath
-     * @return \Illuminate\Foundation\AssetPublisher
      */
 	public function __construct(Filesystem $files, $publishPath)
 	{

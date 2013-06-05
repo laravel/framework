@@ -40,7 +40,6 @@ class RoutesCommand extends Command {
      * Create a new route command instance.
      *
      * @param  \Symfony\Component\Routing\RouteCollection $routes
-     * @return \Illuminate\Foundation\Console\RoutesCommand
      */
 	public function __construct(RouteCollection $routes)
 	{

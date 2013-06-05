@@ -21,7 +21,6 @@ class FileStore implements StoreInterface {
      *
      * @param \Illuminate\Filesystem\Filesystem $files
      * @param  string $directory
-     * @return \Illuminate\Cache\FileStore
      */
 	public function __construct(Filesystem $files, $directory)
 	{

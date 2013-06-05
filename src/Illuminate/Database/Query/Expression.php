@@ -13,7 +13,6 @@ class Expression {
      * Create a new raw query expression.
      *
      * @param  mixed $value
-     * @return \Illuminate\Database\Query\Expression
      */
 	public function __construct($value)
 	{

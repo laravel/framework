@@ -32,7 +32,6 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
      * @param $table
-     * @return \Illuminate\Database\Migrations\DatabaseMigrationRepository
      */
 	public function __construct(Resolver $resolver, $table)
 	{

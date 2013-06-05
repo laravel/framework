@@ -17,7 +17,6 @@ class IronConnector implements ConnectorInterface {
      * Create a new Iron connector instance.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Queue\Connectors\IronConnector
      */
 	public function __construct(Request $request)
 	{

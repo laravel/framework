@@ -15,7 +15,6 @@ class Worker {
      * Create a new queue worker.
      *
      * @param  \Illuminate\Queue\QueueManager $manager
-     * @return \Illuminate\Queue\Worker
      */
 	public function __construct(QueueManager $manager)
 	{

@@ -30,7 +30,6 @@ class ControllerGenerator {
      * Create a new controller generator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @return \Illuminate\Routing\Generators\ControllerGenerator
      */
 	public function __construct(Filesystem $files)
 	{

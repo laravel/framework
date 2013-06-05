@@ -43,7 +43,6 @@ class Writer {
      *
      * @param  \Monolog\Logger $monolog
      * @param  \Illuminate\Events\Dispatcher $dispatcher
-     * @return \Illuminate\Log\Writer
      */
 	public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
 	{

@@ -34,7 +34,6 @@ class IronQueue extends Queue implements QueueInterface {
      * @param  \IronMQ $iron
      * @param  \Illuminate\Http\Request $request
      * @param  string $default
-     * @return \Illuminate\Queue\IronQueue
      */
 	public function __construct(IronMQ $iron, Request $request, $default)
 	{

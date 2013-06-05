@@ -30,7 +30,6 @@ class FileLoader implements LoaderInterface {
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
      * @param $path
-     * @return \Illuminate\Translation\FileLoader
      */
 	public function __construct(Filesystem $files, $path)
 	{

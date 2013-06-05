@@ -33,7 +33,6 @@ class AssetPublishCommand extends Command {
      * Create a new asset publish command instance.
      *
      * @param  \Illuminate\Foundation\AssetPublisher $assets
-     * @return \Illuminate\Foundation\Console\AssetPublishCommand
      */
 	public function __construct(AssetPublisher $assets)
 	{

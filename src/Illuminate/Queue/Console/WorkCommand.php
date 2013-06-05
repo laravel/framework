@@ -32,7 +32,6 @@ class WorkCommand extends Command {
      * Create a new queue listen command.
      *
      * @param  \Illuminate\Queue\Worker $worker
-     * @return \Illuminate\Queue\Console\WorkCommand
      */
 	public function __construct(Worker $worker)
 	{

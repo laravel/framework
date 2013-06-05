@@ -40,7 +40,6 @@ class DatabaseStore implements StoreInterface {
      * @param  \Illuminate\Encryption\Encrypter $encrypter
      * @param  string $table
      * @param  string $prefix
-     * @return \Illuminate\Cache\DatabaseStore
      */
 	public function __construct(Connection $connection, Encrypter $encrypter, $table, $prefix = '')
 	{

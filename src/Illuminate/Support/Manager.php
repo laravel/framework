@@ -29,7 +29,6 @@ abstract class Manager {
      * Create a new manager instance.
      *
      * @param  \Illuminate\Foundation\Application $app
-     * @return \Illuminate\Support\Manager
      */
 	public function __construct($app)
 	{

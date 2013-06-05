@@ -13,7 +13,6 @@ class GenericUser implements UserInterface {
      * Create a new generic User object.
      *
      * @param  array $attributes
-     * @return \Illuminate\Auth\GenericUser
      */
 	public function __construct(array $attributes)
 	{

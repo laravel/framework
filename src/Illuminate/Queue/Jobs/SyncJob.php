@@ -25,7 +25,6 @@ class SyncJob extends Job {
      * @param \Illuminate\Container\Container $container
      * @param  string $job
      * @param  string $data
-     * @return \Illuminate\Queue\Jobs\SyncJob
      */
 	public function __construct(Container $container, $job, $data = '')
 	{

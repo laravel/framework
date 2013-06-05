@@ -40,7 +40,6 @@ class MakeCommand extends BaseCommand {
      *
      * @param  \Illuminate\Database\Migrations\MigrationCreator $creator
      * @param  string $packagePath
-     * @return \Illuminate\Database\Console\Migrations\MakeCommand
      */
 	public function __construct(MigrationCreator $creator, $packagePath)
 	{

@@ -39,7 +39,6 @@ class Pivot extends Model {
      * @param  array $attributes
      * @param  string $table
      * @param  bool $exists
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
 	public function __construct(Model $parent, $attributes, $table, $exists = false)
 	{

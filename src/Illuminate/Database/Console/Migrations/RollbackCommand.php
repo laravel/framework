@@ -31,7 +31,6 @@ class RollbackCommand extends Command {
      * Create a new migration rollback command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator $migrator
-     * @return \Illuminate\Database\Console\Migrations\RollbackCommand
      */
 	public function __construct(Migrator $migrator)
 	{

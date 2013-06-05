@@ -16,7 +16,6 @@ class SymfonyDisplayer implements ExceptionDisplayerInterface {
      * Create a new Symfony exception displayer.
      *
      * @param  \Symfony\Component\Debug\ExceptionHandler $symfony
-     * @return \Illuminate\Exception\SymfonyDisplayer
      */
 	public function __construct(ExceptionHandler $symfony)
 	{

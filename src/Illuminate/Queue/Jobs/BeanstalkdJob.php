@@ -26,7 +26,6 @@ class BeanstalkdJob extends Job {
      * @param \Illuminate\Container\Container $container
      * @param  Pheanstalk $pheanstalk
      * @param  Pheanstalk_Job $job
-     * @return \Illuminate\Queue\Jobs\BeanstalkdJob
      */
 	public function __construct(Container $container,
                                 Pheanstalk $pheanstalk,

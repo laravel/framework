@@ -75,7 +75,6 @@ class FormBuilder {
      * @param  \Illuminate\Html\HtmlBuilder $html
      * @param  \Illuminate\Routing\UrlGenerator $url
      * @param  string $csrfToken
-     * @return \Illuminate\Html\FormBuilder
      */
 	public function __construct(HtmlBuilder $html, UrlGenerator $url, $csrfToken)
 	{

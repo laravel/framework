@@ -30,7 +30,6 @@ class ConfigPublisher {
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
      * @param  string $publishPath
-     * @return \Illuminate\Foundation\ConfigPublisher
      */
 	public function __construct(Filesystem $files, $publishPath)
 	{

@@ -24,7 +24,6 @@ class Composer {
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
      * @param  string $workingPath
-     * @return \Illuminate\Foundation\Composer
      */
 	public function __construct(Filesystem $files, $workingPath = null)
 	{

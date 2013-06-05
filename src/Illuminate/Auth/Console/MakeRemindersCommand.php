@@ -32,7 +32,6 @@ class MakeRemindersCommand extends Command {
      * Create a new reminder table command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @return \Illuminate\Auth\Console\MakeRemindersCommand
      */
 	public function __construct(Filesystem $files)
 	{
