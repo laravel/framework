@@ -363,6 +363,22 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Concatenate values of a given key as a string.
+	 *
+	 * @param  string  $value
+	 * @param  string  $glue
+	 * @return string
+	 */
+	public function implode($value, $glue = null)
+	{
+		$values = $this->lists($value);
+
+		if (is_null($glue)) return implode($values);
+
+		return implode($glue, $values);
+	}
+
+	/**
 	 * Determine if the collection is empty or not.
 	 *
 	 * @return bool
