@@ -354,6 +354,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 			else
 			{
 				$itemKey = is_object($item) ? $item->{$key} : $item[$key];
+
 				$results[$itemKey] = $itemValue;
 			}
 		}
