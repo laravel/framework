@@ -1085,6 +1085,20 @@ class Builder {
 	}
 
 	/**
+	 * Concatenate values of a given column as a string.
+	 *
+	 * @param  string  $column
+	 * @param  string  $glue
+	 * @return string
+	 */
+	public function implode($column, $glue = null)
+	{
+		if (is_null($glue)) return implode($this->lists($column));
+
+		return implode($glue, $this->lists($column));
+	}
+
+	/**
 	 * Get a paginator for the "select" statement.
 	 *
 	 * @param  int    $perPage
