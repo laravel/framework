@@ -217,7 +217,7 @@ class FormBuilder {
 		// in the model instance if one is set. Otherwise we will just use empty.
 		$id = $this->getIdAttribute($name, $options);
 
-		if ( ! in_array($type, array('file', 'radio')))
+		if ( ! in_array($type, array('checkbox', 'file', 'radio')))
 		{
 			$value = $this->getValueAttribute($name, $value);
 		}
