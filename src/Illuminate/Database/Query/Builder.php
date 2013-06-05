@@ -1063,22 +1063,6 @@ class Builder {
 	}
 
 	/**
-	 * Concatenate values of a given column as a string.
-	 *
-	 * @param  string  $column
-	 * @param  string  $glue
-	 * @return string
-	 */
-	public function implode($column, $glue = null)
-	{
-		$values = $this->lists($column);
-
-		if (is_null($glue)) return implode($values);
-
-		return implode($glue, $values);
-	}
-
-	/**
 	 * Get the columns that should be used in a list array.
 	 *
 	 * @param  string  $column
@@ -1098,6 +1082,20 @@ class Builder {
 		}
 
 		return $select;
+	}
+
+	/**
+	 * Concatenate values of a given column as a string.
+	 *
+	 * @param  string  $column
+	 * @param  string  $glue
+	 * @return string
+	 */
+	public function implode($column, $glue = null)
+	{
+		if (is_null($glue)) return implode($this->lists($column));
+
+		return implode($glue, $this->lists($column));
 	}
 
 	/**
