@@ -1763,8 +1763,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getAccessibleAttributes()
 	{
-		// First merge the real attributes with any custom accessors
-		$attributes = array_merge( array_fill_keys($this->getMutatedAttributes(), null), $this->attributes );
+		$attributes = array_merge(array_fill_keys($this->getMutatedAttributes(), null), $this->attributes);
 
 		if (count($this->visible) > 0)
 		{
