@@ -413,6 +413,30 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testImplode()
+	{
+		// Test without glue.
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('foo' => 'bar'), array('foo' => 'baz')));
+		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function($query, $results)
+		{
+			return $results;
+		});
+		$results = $builder->from('users')->where('id', '=', 1)->implode('foo');
+		$this->assertEquals('barbaz', $results);
+
+		// Test with glue.
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('foo' => 'bar'), array('foo' => 'baz')));
+		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function($query, $results)
+		{
+			return $results;
+		});
+		$results = $builder->from('users')->where('id', '=', 1)->implode('foo', ',');
+		$this->assertEquals('bar,baz', $results);
+	}
+
+
 	public function testPaginateCorrectlyCreatesPaginatorInstance()
 	{
 		$connection = m::mock('Illuminate\Database\ConnectionInterface');
