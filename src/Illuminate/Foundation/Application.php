@@ -144,7 +144,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			with(new SymfonyRedirect($this['request']->fullUrl(), 301))->send();
 
-			exit;			
+			exit;
 		}
 	}
 
@@ -296,7 +296,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		return php_sapi_name() == 'cli';
 	}
-	
+
 	/**
 	 * Determine if we are running unit tests.
 	 *
@@ -704,10 +704,10 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Register an error handler at the bottom of the stack.
 	 *
-	 * @param  \Closure  $closure
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	public function pushError(Closure $closure)
+	public function pushError(Closure $callback)
 	{
 		$this['exception']->pushError($callback);
 	}
