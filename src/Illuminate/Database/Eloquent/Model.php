@@ -1324,7 +1324,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		return $this->newQuery(false);
 	}
- 
+
  	/**
  	 * Determine if the model instance has been soft-deleted.
  	 *
@@ -1763,12 +1763,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getAccessibleAttributes()
 	{
+		$attributes = array_merge(array_fill_keys($this->getMutatedAttributes(), null), $this->attributes);
+
 		if (count($this->visible) > 0)
 		{
-			return array_intersect_key($this->attributes, array_flip($this->visible));
+			return array_intersect_key($attributes, array_flip($this->visible));
 		}
 
-		return array_diff_key($this->attributes, array_flip($this->hidden));
+		return array_diff_key($attributes, array_flip($this->hidden));
 	}
 
 	/**
