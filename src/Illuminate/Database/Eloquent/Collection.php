@@ -61,35 +61,6 @@ class Collection extends BaseCollection {
 	}
 
 	/**
-	 * Get an array with the values of a given key.
-	 *
-	 * @param  string  $column
-	 * @param  string  $key
-	 * @return array
-	 */
-	public function lists($value, $key = null)
-	{
-		$results = array();
-
-		foreach ($this->items as $item)
-		{
-			// If the key is "null", we will just append the value to the array and keep
-			// looping. Otherwise we will key the array using the value of the key we
-			// received from the developer. Then we'll return the final array form.
-			if (is_null($key))
-			{
-				$results[] = $item->{$value};
-			}
-			else
-			{
-				$results[$item->{$key}] = $item->{$value};
-			}
-		}
-
-		return $results;
-	}
-
-	/**
 	 * Get the array of primary keys
 	 *
 	 * @return array
