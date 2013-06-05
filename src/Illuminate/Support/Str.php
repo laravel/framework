@@ -172,6 +172,17 @@ class Str {
 	{
 		return Pluralizer::plural($value, $count);
 	}
+	
+	/**
+	 * Get the possessive form of an English word.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function possessive($value)
+	{
+		return $value."'".($value[strlen($value) - 1] != 's' ? 's' : '');
+	}
 
 	/**
 	 * Generate a more truly "random" alpha-numeric string.
