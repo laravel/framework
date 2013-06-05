@@ -871,6 +871,8 @@ class Connection implements ConnectionInterface {
 	public function setTablePrefix($prefix)
 	{
 		$this->tablePrefix = $prefix;
+
+		$this->getQueryGrammar()->setTablePrefix($prefix);
 	}
 
 	/**
