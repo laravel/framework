@@ -125,7 +125,7 @@ abstract class ServiceProvider {
 	 */
 	protected function getClassChain(ReflectionClass $reflect)
 	{
-		$lastName = null;
+		$classes = array();
 
 		// This loop essentially walks the inheritance chain of the classes starting
 		// at the most "childish" class and walks back up to this class. Once we
