@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Artisan;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Console\ChangesCommand;
 
 class ArtisanServiceProvider extends ServiceProvider {
 
@@ -23,6 +24,13 @@ class ArtisanServiceProvider extends ServiceProvider {
 		{
 			return new Artisan($app);
 		});
+
+		$this->app['command.changes'] = $this->app->share(function($app)
+		{
+			return new ChangesCommand;
+		});
+
+		$this->commands('command.changes');
 	}
 
 	/**
@@ -32,7 +40,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('artisan');
+		return array('artisan', 'command.changes');
 	}
 
 }
