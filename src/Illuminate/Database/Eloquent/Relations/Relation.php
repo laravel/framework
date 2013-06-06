@@ -95,8 +95,9 @@ abstract class Relation {
 	public function touch()
 	{
 		$column = $this->getRelated()->getUpdatedAtColumn();
+		$time = $this->getRelated()->freshTimestamp();
 
-		$this->rawUpdate(array($column => new DateTime));
+		$this->rawUpdate(array($column => $time));
 	}
 
 	/**
