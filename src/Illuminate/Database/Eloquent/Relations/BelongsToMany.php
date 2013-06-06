@@ -343,7 +343,7 @@ class BelongsToMany extends Relation {
 	{
 		$key = $this->getRelated()->getKeyName();
 
-		$columns = array($this->getRelatedUpdated() => new DateTime);
+		$columns = $this->getRelatedFreshUpdate();
 
 		// If we actually have IDs for the relation, we will run the query to update all
 		// the related model's timestamps, to make sure these all reflect the changes
@@ -829,9 +829,9 @@ class BelongsToMany extends Relation {
 	 *
 	 * @return string
 	 */
-	public function getRelatedUpdated()
+	public function getRelatedFreshUpdate()
 	{
-		return $this->getRelated()->getUpdatedAtColumn();
+		return array($this->related->getUpdatedAtColumn() => $this->related->freshTimestamp());
 	}
 
 	/**
