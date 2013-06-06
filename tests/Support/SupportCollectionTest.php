@@ -203,4 +203,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo,bar', $data->implode('email', ','));
 	}
 
+
+	public function testMakeMethod()
+	{
+		$collection = Collection::make('foo');
+		$this->assertEquals(array('foo'), $collection->all());
+	}
+
 }
