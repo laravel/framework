@@ -36,6 +36,8 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public static function make($items)
 	{
+		if (is_null($items)) return new static;
+
 		if ($items instanceof Collection) return $items;
 
 		return new static(is_array($items) ? $items : array($items));
