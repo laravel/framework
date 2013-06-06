@@ -40,7 +40,7 @@ Once the Capsule instance has been registered. You may use it like so:
 **Using The Query Builder**
 
 ```
-$users = Capsule::table('users')->where('votes', '>' 100)->get();
+$users = Capsule::table('users')->where('votes', '>', 100)->get();
 ```
 
 **Using The Schema Builder**
