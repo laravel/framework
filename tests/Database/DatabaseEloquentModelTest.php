@@ -442,7 +442,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelStub;
 		$model->name = 'Taylor';
 		$model->setRelation('foo', array('bar'));
-		$model->setHidden(array('foo'));
+		$model->setHidden(array('foo', 'list_items', 'password'));
 		$array = $model->toArray();
 
 		$this->assertEquals(array('name' => 'Taylor'), $array);
