@@ -144,7 +144,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 			return $lastPage > 0 ? $lastPage : 1;
 		}
 
-		return $this->isValidPageNumber($page) ? $page : 1;
+		return $this->isValidPageNumber($page) ? (int) $page : 1;
 	}
 
 	/**
