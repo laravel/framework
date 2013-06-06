@@ -38,7 +38,8 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 		$relation = new HasOne($builder, $parent, 'foreign_key');
 		$related->shouldReceive('getTable')->andReturn('table');
 		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		$builder->shouldReceive('update')->once()->with(array('updated_at' => new DateTime));
+		$related->shouldReceive('freshTimestamp')->andReturn(100);
+		$builder->shouldReceive('update')->once()->with(array('updated_at' => 100));
 
 		$relation->touch();
 	}
