@@ -267,12 +267,13 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	{
 		$relation = $this->getRelation();
 		$relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+		$relation->getRelated()->shouldReceive('freshTimestamp')->andReturn(100);
 		$relation->getRelated()->shouldReceive('getQualifiedKeyName')->andReturn('table.id');
 		$relation->getQuery()->shouldReceive('select')->once()->with('table.id')->andReturn($relation->getQuery());
 		$relation->getQuery()->shouldReceive('lists')->once()->with('id')->andReturn(array(1, 2, 3));
 		$relation->getRelated()->shouldReceive('newQuery')->once()->andReturn($query = m::mock('StdClass'));
 		$query->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($query);
-		$query->shouldReceive('update')->once()->with(array('updated_at' => new DateTime));
+		$query->shouldReceive('update')->once()->with(array('updated_at' => 100));
 
 		$relation->touch();
 	}
