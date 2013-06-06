@@ -27,6 +27,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	{
 		$relation = $this->getRelation();
 		$relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
+		$relation->getRelated()->shouldReceive('getUpdatedAtColumn')->once()->andReturn('updated_at');
 		$relation->getRelated()->shouldReceive('freshTimestamp')->once()->andReturn(100);
 		$relation->getQuery()->shouldReceive('update')->once()->with(array('foo' => 'bar', 'updated_at' => 100))->andReturn('results');
 
