@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
-use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -343,7 +342,7 @@ class BelongsToMany extends Relation {
 	{
 		$key = $this->getRelated()->getKeyName();
 
-		$columns = array($this->getRelatedUpdated() => new DateTime);
+		$columns = $this->getRelatedUpdated();
 
 		// If we actually have IDs for the relation, we will run the query to update all
 		// the related model's timestamps, to make sure these all reflect the changes
@@ -709,7 +708,7 @@ class BelongsToMany extends Relation {
 	 * @return void
 	 */
 	public function touchIfTouching()
-	{ 
+	{
 	 	if ($this->touchingParent()) $this->getParent()->touch();
 
 	 	if ($this->getParent()->touches($this->relationName)) $this->touch();
@@ -822,16 +821,6 @@ class BelongsToMany extends Relation {
 	public function withTimestamps()
 	{
 		return $this->withPivot($this->createdAt(), $this->updatedAt());
-	}
-
-	/**
-	 * Get the related model's updated at column name.
-	 *
-	 * @return string
-	 */
-	public function getRelatedUpdated()
-	{
-		return $this->getRelated()->getUpdatedAtColumn();
 	}
 
 	/**

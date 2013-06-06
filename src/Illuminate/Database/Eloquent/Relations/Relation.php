@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
-use DateTime;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -94,10 +92,7 @@ abstract class Relation {
 	 */
 	public function touch()
 	{
-		$column = $this->getRelated()->getUpdatedAtColumn();
-		$time = $this->getRelated()->freshTimestamp();
-
-		$this->rawUpdate(array($column => $time));
+		$this->rawUpdate($this->getRelatedUpdated());
 	}
 
 	/**
@@ -133,7 +128,7 @@ abstract class Relation {
 		// When a model is "soft deleting", the "deleted at" where clause will be the
 		// first where clause on the relationship query, so we will actually clear
 		// the second where clause as that is the lazy loading relations clause.
-		if ($this->query->getModel()->isSoftDeleting())
+		if ($this->related->isSoftDeleting())
 		{
 			$this->removeSecondWhereClause();
 		}
@@ -271,6 +266,19 @@ abstract class Relation {
 	public function getRelated()
 	{
 		return $this->related;
+	}
+
+	/**
+	 * Get the related model's updated at column with current timestamp.
+	 *
+	 * @return array
+	 */
+	public function getRelatedUpdated()
+	{
+		$column = $this->related->getUpdatedAtColumn();
+		$time = $this->related->freshTimestamp();
+
+		return array($column => $time);
 	}
 
 	/**
