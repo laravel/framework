@@ -1,0 +1,8 @@
+{
+	"4.1.x": [
+		{"message": "Added implode method to query builder and Colletion class.", "backport": "4.0.x"},
+		{"message": "Fixed bug that caused Model->push method to fail.", "backport": "4.0.x"},
+		{"message": "Allow attributes that have accessors but are not in DB to show up in toArray results.", "backport": "4.0.x"},
+		{"message": "Make session cookie HttpOnly by default.", "backport": "4.0.x"}
+	]
+}
