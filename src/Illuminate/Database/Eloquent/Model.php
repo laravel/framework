@@ -1628,9 +1628,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the key is in the "fillable" array, we can of course assume tha it is
 		// a fillable attribute. Otherwise, we will check the guarded array when
 		// we need to determine if the attribute is black-listed on the model.
-		if ($this->isGuarded($key)) return false;
-
 		if (in_array($key, $this->fillable)) return true;
+
+		if ($this->isGuarded($key)) return false;
 
 		return empty($this->fillable) and ! starts_with($key, '_');
 	}
