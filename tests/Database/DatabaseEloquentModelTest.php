@@ -150,7 +150,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertFalse($model->save());
 	}
-	
+
 
 	public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
 	{
@@ -477,7 +477,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->list_items = array(1, 2, 3);
 		$array = $model->toArray();
 
-		$this->assertEquals(array(1, 2, 3), $array['list_items']);	
+		$this->assertEquals(array(1, 2, 3), $array['list_items']);
 	}
 
 
@@ -518,6 +518,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->fill(array('name' => 'foo', 'age' => 'bar', 'foo' => 'bar'));
 		$this->assertFalse(isset($model->name));
 		$this->assertFalse(isset($model->age));
+		$this->assertEquals('bar', $model->foo);
+	}
+
+
+	public function testFillableOverridesGuarded()
+	{
+		$model = new EloquentModelStub;
+		$model->guard(array('name', 'age'));
+		$model->fillable(array('age', 'foo'));
+		$model->fill(array('name' => 'foo', 'age' => 'bar', 'foo' => 'bar'));
+		$this->assertFalse(isset($model->name));
+		$this->assertEquals('bar', $model->age);
 		$this->assertEquals('bar', $model->foo);
 	}
 
