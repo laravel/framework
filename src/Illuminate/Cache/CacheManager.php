@@ -11,7 +11,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createApcDriver()
 	{
-		return $this->repository(new ApcStore(new ApcWrapper));
+		return $this->repository(new ApcStore(new ApcWrapper), $this->app['config']['cache.prefix']);
 	}
 
 	/**
