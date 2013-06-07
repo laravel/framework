@@ -153,6 +153,22 @@ if ( ! function_exists('array_fetch'))
 	}
 }
 
+if ( ! function_exists('object_fetch'))
+{
+	/**
+	 * Fetch a flattened array from a items object.
+	 *
+	 * @param  object  $object
+	 * @param  string  $attr
+	 * @return array
+	 */
+	function object_fetch($object, $attr)
+	{
+        $results = array_map(function($obj)use(&$attr){return $obj->$attr; }, $object);
+		return $results;
+	}
+}
+
 if ( ! function_exists('array_first'))
 {
 	/**
