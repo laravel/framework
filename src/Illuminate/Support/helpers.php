@@ -234,7 +234,7 @@ if ( ! function_exists('array_get'))
 	function array_get($array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
-		
+
 		if (isset($array[$key])) return $array[$key];
 
 		foreach (explode('.', $key) as $segment)
@@ -431,7 +431,10 @@ if ( ! function_exists('dd'))
 	 */
 	function dd()
 	{
-		array_map(function($x) { var_dump($x); }, func_get_args()); die;
+		echo '<pre>';
+		array_map(function($x) { var_dump($x); }, func_get_args());
+		echo '</pre>';
+		die;
 	}
 }
 
@@ -573,7 +576,7 @@ if ( ! function_exists('object_get'))
 	function object_get($object, $key, $default = null)
 	{
 		if (is_null($key)) return $object;
-		
+
 		foreach (explode('.', $key) as $segment)
 		{
 			if ( ! is_object($object) or ! isset($object->{$segment}))
