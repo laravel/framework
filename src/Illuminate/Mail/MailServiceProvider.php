@@ -45,6 +45,12 @@ class MailServiceProvider extends ServiceProvider {
 				$mailer->alwaysFrom($from['address'], $from['name']);
 			}
 
+			// set the pretend flag			
+			$pretend = $app['config']['mail.pretend'];
+			if ( $pretend !== null ) {
+				$mailer->pretend($pretend);
+			}
+
 			return $mailer;
 		});
 	}
