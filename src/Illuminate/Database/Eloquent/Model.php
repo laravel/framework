@@ -2178,6 +2178,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Returns all loaded relations for the instance.
+	 * 
+	 * @return array All loaded relations
+	 */
+	public function getRelations()
+	{
+		return $this->relations;
+	}
+
+	/**
 	 * Set the specific relationship in the model.
 	 *
 	 * @param  string  $relation
