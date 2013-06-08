@@ -286,7 +286,7 @@ class UrlGenerator {
 	 */
 	public function isValidUrl($path)
 	{
-		if (starts_with($path, array('#', '//'))) return true;
+		if (starts_with($path, array('#', '//', 'mailto:', 'tel:'))) return true;
 
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
 	}
