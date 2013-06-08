@@ -184,6 +184,22 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFormCheckboxIsRefilledFromSession()
+	{
+		$mock = m::mock('Illuminate\Session\Store');
+		$mock->shouldReceive('hasOldInput')->once()->with('foo')->andReturn(true);
+		$mock->shouldReceive('getOldInput')->once()->with('foo')->andReturn('1');
+		$mock->shouldReceive('hasOldInput')->once()->with('bar')->andReturn(false);
+		$this->formBuilder->setSessionStore($mock);
+
+		$form1 = $this->formBuilder->checkbox('foo');
+		$form2 = $this->formBuilder->checkbox('bar', 1, true);
+
+		$this->assertEquals('<input checked="checked" name="foo" type="checkbox" value="1">', $form1);
+		$this->assertEquals('<input name="bar" type="checkbox" value="1">', $form2);
+	}
+
+
 	public function testFormRadio()
 	{
 		$form1 = $this->formBuilder->input('radio', 'foo');
@@ -198,6 +214,23 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFormRadioIsRefilledFromSession()
+	{
+		$mock = m::mock('Illuminate\Session\Store');
+		$mock->shouldReceive('hasOldInput')->once()->with('foo')->andReturn(true);
+		$mock->shouldReceive('getOldInput')->once()->with('foo')->andReturn('a');
+		$mock->shouldReceive('hasOldInput')->once()->with('bar')->andReturn(true);
+		$mock->shouldReceive('getOldInput')->once()->with('bar')->andReturn('a');
+		$this->formBuilder->setSessionStore($mock);
+
+		$form1 = $this->formBuilder->radio('foo', 'a');
+		$form2 = $this->formBuilder->radio('bar', 'b', true);
+
+		$this->assertEquals('<input checked="checked" name="foo" type="radio" value="a">', $form1);
+		$this->assertEquals('<input name="bar" type="radio" value="b">', $form2);
+	}
+
+
 	public function testFormSubmit()
 	{
 		$form1 = $this->formBuilder->submit('foo');
@@ -208,7 +241,6 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-
 	public function testFormButton()
 	{
 		$form1 = $this->formBuilder->button('foo');
@@ -217,4 +249,5 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<button type="button">foo</button>', $form1);
 		$this->assertEquals('<button class="span2" type="button">foo</button>', $form2);
 	}
+
 }
