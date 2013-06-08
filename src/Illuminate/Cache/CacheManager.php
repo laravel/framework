@@ -11,7 +11,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createApcDriver()
 	{
-		return $this->repository(new ApcStore(new ApcWrapper));
+		return $this->repository(new ApcStore(new ApcWrapper, $this->getPrefix()));
 	}
 
 	/**
@@ -47,7 +47,7 @@ class CacheManager extends Manager {
 
 		$memcached = $this->app['memcached.connector']->connect($servers);
 
-		return $this->repository(new MemcachedStore($memcached, $this->app['config']['cache.prefix']));
+		return $this->repository(new MemcachedStore($memcached, $this->getPrefix()));
 	}
 
 	/**
@@ -57,7 +57,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createWincacheDriver()
 	{
-		return $this->repository(new WinCacheStore($this->app['config']['cache.prefix']));
+		return $this->repository(new WinCacheStore($this->getPrefix()));
 	}
 
 	/**
@@ -69,7 +69,7 @@ class CacheManager extends Manager {
 	{
 		$redis = $this->app['redis'];
 
-		return $this->repository(new RedisStore($redis, $this->app['config']['cache.prefix']));
+		return $this->repository(new RedisStore($redis, $this->getPrefix()));
 	}
 
 	/**
@@ -88,7 +88,7 @@ class CacheManager extends Manager {
 		// is being used by multiple applications although this is very unlikely.
 		$table = $this->app['config']['cache.table'];
 
-		$prefix = $this->app['config']['cache.prefix'];
+		$prefix = $this->getPrefix();
 
 		return $this->repository(new DatabaseStore($connection, $encrypter, $table, $prefix));
 	}
@@ -103,6 +103,16 @@ class CacheManager extends Manager {
 		$connection = $this->app['config']['cache.connection'];
 
 		return $this->app['db']->connection($connection);
+	}
+
+	/**
+	 * Get the cache "prefix" value.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return $this->app['config']['cache.prefix'];
 	}
 
 	/**
