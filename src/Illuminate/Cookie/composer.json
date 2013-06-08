@@ -9,8 +9,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/encryption": "4.0.x",
-        "illuminate/support": "4.0.x",
+        "illuminate/encryption": "4.1.x",
+        "illuminate/support": "4.1.x",
         "symfony/http-foundation": "2.3.*"
     },
     "require-dev": {
@@ -25,7 +25,7 @@
     "target-dir": "Illuminate/Cookie",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     },
     "minimum-stability": "dev"
