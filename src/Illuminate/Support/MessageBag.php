@@ -229,7 +229,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 */
 	public function isEmpty()
 	{
-		return $this->any();
+		return ! $this->any();
 	}
 
 	/**
