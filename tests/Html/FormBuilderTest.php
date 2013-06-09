@@ -70,6 +70,17 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input class="span2" name="foobar" type="date">', $form3);
 	}
 
+	public function testPasswordsNotFilled()
+	{
+		$session = m::mock('Illuminate\Session\Store');
+		$session->shouldReceive('hasOldInput')->with('password')->andReturn(true);
+		$session->shouldReceive('getOldInput')->with('password')->andReturn('mypass');
+		$this->formBuilder->setSessionStore($session);
+
+		$form1 = $this->formBuilder->password('password');
+
+		$this->assertEquals('<input name="password" type="password" value="">', $form1);
+	}
 
 	public function testFormText()
 	{
@@ -144,7 +155,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testSelect()
 	{
 		$select = $this->formBuilder->select(
-			'size', 
+			'size',
 			array('L' => 'Large', 'S' => 'Small')
 		);
 		$this->assertEquals($select, '<select name="size"><option value="L">Large</option><option value="S">Small</option></select>');
@@ -153,7 +164,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$select = $this->formBuilder->select(
 			'size',
-			 array('L' => 'Large', 'S' => 'Small'), 
+			 array('L' => 'Large', 'S' => 'Small'),
 			 'L'
 		);
 		$this->assertEquals($select, '<select name="size"><option value="L" selected="selected">Large</option><option value="S">Small</option></select>');
@@ -161,8 +172,8 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 
 		$select = $this->formBuilder->select(
-			'size', 
-			array('L' => 'Large', 'S' => 'Small'), 
+			'size',
+			array('L' => 'Large', 'S' => 'Small'),
 			null,
 			array('class' => 'class-name', 'id' => 'select-id')
 		);
