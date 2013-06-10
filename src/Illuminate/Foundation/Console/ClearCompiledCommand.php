@@ -28,6 +28,8 @@ class ClearCompiledCommand extends Command {
 	public function fire()
 	{
 		@unlink($this->laravel['path.base'].'/bootstrap/compiled.php');
+
+		@unlink($this->laravel['path.storage'].'/meta/services.json');
 	}
 
 }
