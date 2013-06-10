@@ -11,12 +11,12 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	protected $cookie;
 
-    /**
-     * Create a new cookie driven handler instance.
-     *
-     * @param  \Illuminate\Cookie\CookieJar $cookie
-     * @param  int $minutes
-     */
+	/**
+	 * Create a new cookie driven handler instance.
+	 *
+	 * @param  \Illuminate\Cookie\CookieJar $cookie
+	 * @param  int $minutes
+	 */
 	public function __construct(CookieJar $cookie, $minutes)
 	{
 		$this->cookie = $cookie;

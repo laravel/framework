@@ -35,12 +35,12 @@ class MakeCommand extends BaseCommand {
 	 */
 	protected $packagePath;
 
-    /**
-     * Create a new migration install command instance.
-     *
-     * @param  \Illuminate\Database\Migrations\MigrationCreator $creator
-     * @param  string $packagePath
-     */
+	/**
+	 * Create a new migration install command instance.
+	 *
+	 * @param  \Illuminate\Database\Migrations\MigrationCreator $creator
+	 * @param  string $packagePath
+	 */
 	public function __construct(MigrationCreator $creator, $packagePath)
 	{
 		parent::__construct();

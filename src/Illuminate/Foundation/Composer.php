@@ -19,12 +19,12 @@ class Composer {
 	 */
 	protected $workingPath;
 
-    /**
-     * Create a new Composer manager instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     * @param  string $workingPath
-     */
+	/**
+	 * Create a new Composer manager instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 * @param  string $workingPath
+	 */
 	public function __construct(Filesystem $files, $workingPath = null)
 	{
 		$this->files = $files;

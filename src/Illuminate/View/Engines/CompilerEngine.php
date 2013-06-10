@@ -11,23 +11,23 @@ class CompilerEngine extends PhpEngine {
 	 */
 	protected $compiler;
 
-    /**
-     * Create a new Blade view engine instance.
-     *
-     * @param  \Illuminate\View\Compilers\CompilerInterface $compiler
-     */
+	/**
+	 * Create a new Blade view engine instance.
+	 *
+	 * @param  \Illuminate\View\Compilers\CompilerInterface $compiler
+	 */
 	public function __construct(CompilerInterface $compiler)
 	{
 		$this->compiler = $compiler;
 	}
 
-    /**
-     * Get the evaluated contents of the view.
-     *
-     * @param  string $path
-     * @param  array $data
-     * @return string
-     */
+	/**
+	 * Get the evaluated contents of the view.
+	 *
+	 * @param  string $path
+	 * @param  array $data
+	 * @return string
+	 */
 	public function get($path, array $data = array())
 	{
 		// If this given view has expired, which means it has simply been edited since

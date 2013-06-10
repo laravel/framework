@@ -9,11 +9,11 @@ class BcryptHasher implements HasherInterface {
 	 */
 	protected $rounds = 8;
 
-    /**
-     * Create a new Bcrypt hasher instance.
-     *
-     * @throws \RuntimeException
-     */
+	/**
+	 * Create a new Bcrypt hasher instance.
+	 *
+	 * @throws \RuntimeException
+	 */
 	public function __construct()
 	{
 		if (version_compare(PHP_VERSION, '5.3.7') < 0)

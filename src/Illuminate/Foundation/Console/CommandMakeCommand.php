@@ -21,11 +21,11 @@ class CommandMakeCommand extends Command {
 	 */
 	protected $description = "Create a new Artisan command";
 
-    /**
-     * Create a new command creator command.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     */
+	/**
+	 * Create a new command creator command.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 */
 	public function __construct(Filesystem $files)
 	{
 		parent::__construct();

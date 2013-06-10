@@ -21,14 +21,14 @@ class BelongsTo extends Relation {
 	 */
 	protected $relation;
 
-    /**
-     * Create a new has many relationship instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  \Illuminate\Database\Eloquent\Model $parent
-     * @param  string $foreignKey
-     * @param  string $relation
-     */
+	/**
+	 * Create a new has many relationship instance.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder $query
+	 * @param  \Illuminate\Database\Eloquent\Model $parent
+	 * @param  string $foreignKey
+	 * @param  string $relation
+	 */
 	public function __construct(Builder $query, Model $parent, $foreignKey, $relation)
 	{
 		$this->relation = $relation;
@@ -64,13 +64,13 @@ class BelongsTo extends Relation {
 		$this->query->where($table.'.'.$key, '=', $this->parent->{$this->foreignKey});
 	}
 
-    /**
-     * Add the constraints for a relationship count query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @throws \LogicException
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
+	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder $query
+	 * @throws \LogicException
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
 	public function getRelationCountQuery(Builder $query)
 	{
 		throw new LogicException('Has method invalid on "belongsTo" relations.');

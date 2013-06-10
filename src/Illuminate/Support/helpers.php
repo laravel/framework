@@ -2,14 +2,14 @@
 
 if ( ! function_exists('action'))
 {
-    /**
-     * Generate a URL to a controller action.
-     *
-     * @param  string $name
-     * @param  array $parameters
-     * @param  bool $absolute
-     * @return string
-     */
+	/**
+	 * Generate a URL to a controller action.
+	 *
+	 * @param  string $name
+	 * @param  array $parameters
+	 * @param  bool $absolute
+	 * @return string
+	 */
 	function action($name, $parameters = array(), $absolute = true)
 	{
 		return app('url')->action($name, $parameters, $absolute);
@@ -401,12 +401,12 @@ if ( ! function_exists('class_basename'))
 
 if ( ! function_exists('csrf_token'))
 {
-    /**
-     * Get the CSRF token value.
-     *
-     * @throws RuntimeException
-     * @return string
-     */
+	/**
+	 * Get the CSRF token value.
+	 *
+	 * @throws RuntimeException
+	 * @return string
+	 */
 	function csrf_token()
 	{
 		$session = app('session');
@@ -604,14 +604,14 @@ if ( ! function_exists('public_path'))
 
 if ( ! function_exists('route'))
 {
-    /**
-     * Generate a URL to a named route.
-     *
-     * @param  string $route
-     * @param  array $parameters
-     * @param  bool $absolute
-     * @return string
-     */
+	/**
+	 * Generate a URL to a named route.
+	 *
+	 * @param  string $route
+	 * @param  array $parameters
+	 * @param  bool $absolute
+	 * @return string
+	 */
 	function route($route, $parameters = array(), $absolute = true)
 	{
 		return app('url')->route($route, $parameters, $absolute);

@@ -12,11 +12,11 @@ class Fluent implements ArrayAccess {
 	 */
 	protected $attributes = array();
 
-    /**
-     * Create a new fluent container instance.
-     *
-     * @param  array $attributes
-     */
+	/**
+	 * Create a new fluent container instance.
+	 *
+	 * @param  array $attributes
+	 */
 	public function __construct($attributes = array())
 	{
 		foreach ($attributes as $key => $value)

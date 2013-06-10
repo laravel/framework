@@ -28,11 +28,11 @@ class ListenCommand extends Command {
 	 */
 	protected $listener;
 
-    /**
-     * Create a new queue listen command.
-     *
-     * @param  \Illuminate\Queue\Listener $listener
-     */
+	/**
+	 * Create a new queue listen command.
+	 *
+	 * @param  \Illuminate\Queue\Listener $listener
+	 */
 	public function __construct(Listener $listener)
 	{
 		parent::__construct();

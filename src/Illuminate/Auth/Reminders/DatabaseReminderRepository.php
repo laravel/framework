@@ -26,13 +26,13 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 */
 	protected $hashKey;
 
-    /**
-     * Create a new reminder repository instance.
-     *
-     * @var \Illuminate\Database\Connection $connection
-     * @param string $table
-     * @param string $hashKey
-     */
+	/**
+	 * Create a new reminder repository instance.
+	 *
+	 * @var \Illuminate\Database\Connection $connection
+	 * @param string $table
+	 * @param string $hashKey
+	 */
 	public function __construct(Connection $connection, $table, $hashKey)
 	{
 		$this->table = $table;

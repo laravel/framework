@@ -69,13 +69,13 @@ class MailServiceProvider extends ServiceProvider {
 		});
 	}
 
-    /**
-     * Register the Swift Transport instance.
-     *
-     * @param  array $config
-     * @throws \InvalidArgumentException
-     * @return void
-     */
+	/**
+	 * Register the Swift Transport instance.
+	 *
+	 * @param  array $config
+	 * @throws \InvalidArgumentException
+	 * @return void
+	 */
 	protected function registerSwiftTransport($config)
 	{
 		switch ($config['driver'])

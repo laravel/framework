@@ -18,12 +18,12 @@ class Section {
 	 */
 	protected $name;
 
-    /**
-     * Create a new section instance.
-     *
-     * @param  \Illuminate\Cache\StoreInterface $store
-     * @param  string $name
-     */
+	/**
+	 * Create a new section instance.
+	 *
+	 * @param  \Illuminate\Cache\StoreInterface $store
+	 * @param  string $name
+	 */
 	public function __construct(StoreInterface $store, $name)
 	{
 		$this->name = $name;

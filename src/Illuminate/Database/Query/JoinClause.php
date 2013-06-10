@@ -23,12 +23,12 @@ class JoinClause {
 	 */
 	public $clauses = array();
 
-    /**
-     * Create a new join clause instance.
-     *
-     * @param  string $type
-     * @param  string $table
-     */
+	/**
+	 * Create a new join clause instance.
+	 *
+	 * @param  string $type
+	 * @param  string $table
+	 */
 	public function __construct($type, $table)
 	{
 		$this->type = $type;

@@ -106,14 +106,14 @@ class Connection implements ConnectionInterface {
 	 */
 	protected $config = array();
 
-    /**
-     * Create a new database connection instance.
-     *
-     * @param  PDO $pdo
-     * @param  string $database
-     * @param  string $tablePrefix
-     * @param  array $config
-     */
+	/**
+	 * Create a new database connection instance.
+	 *
+	 * @param  PDO $pdo
+	 * @param  string $database
+	 * @param  string $tablePrefix
+	 * @param  array $config
+	 */
 	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = array())
 	{
 		$this->pdo = $pdo;
@@ -391,13 +391,13 @@ class Connection implements ConnectionInterface {
 		return $bindings;
 	}
 
-    /**
-     * Execute a Closure within a transaction.
-     *
-     * @param  Closure $callback
-     * @throws \Exception
-     * @return mixed
-     */
+	/**
+	 * Execute a Closure within a transaction.
+	 *
+	 * @param  Closure $callback
+	 * @throws \Exception
+	 * @return mixed
+	 */
 	public function transaction(Closure $callback)
 	{
 		$this->pdo->beginTransaction();
@@ -485,15 +485,15 @@ class Connection implements ConnectionInterface {
 		return $result;
 	}
 
-    /**
-     * Handle an exception that occurred during a query.
-     *
-     * @param \Exception|\Illuminate\Database\Exception $e
-     * @param  string $query
-     * @param  array $bindings
-     * @throws \Exception
-     * @return void
-     */
+	/**
+	 * Handle an exception that occurred during a query.
+	 *
+	 * @param \Exception|\Illuminate\Database\Exception $e
+	 * @param  string $query
+	 * @param  array $bindings
+	 * @throws \Exception
+	 * @return void
+	 */
 	protected function handleQueryException(\Exception $e, $query, $bindings)
 	{
 		$bindings = var_export($bindings, true);

@@ -2,13 +2,13 @@
 
 class SqlServerConnection extends Connection {
 
-    /**
-     * Execute a Closure within a transaction.
-     *
-     * @param  Closure $callback
-     * @throws \Exception
-     * @return mixed
-     */
+	/**
+	 * Execute a Closure within a transaction.
+	 *
+	 * @param  Closure $callback
+	 * @throws \Exception
+	 * @return mixed
+	 */
 	public function transaction(Closure $callback)
 	{
 		$this->pdo->exec('BEGIN TRAN');

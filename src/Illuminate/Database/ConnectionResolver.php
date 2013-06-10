@@ -16,11 +16,11 @@ class ConnectionResolver implements ConnectionResolverInterface {
 	 */
 	protected $default;
 
-    /**
-     * Create a new connection resolver instance.
-     *
-     * @param  array $connections
-     */
+	/**
+	 * Create a new connection resolver instance.
+	 *
+	 * @param  array $connections
+	 */
 	public function __construct(array $connections = array())
 	{
 		foreach ($connections as $name => $connection)

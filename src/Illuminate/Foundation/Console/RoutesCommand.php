@@ -36,11 +36,11 @@ class RoutesCommand extends Command {
 	 */
 	protected $table;
 
-    /**
-     * Create a new route command instance.
-     *
-     * @param  \Symfony\Component\Routing\RouteCollection $routes
-     */
+	/**
+	 * Create a new route command instance.
+	 *
+	 * @param  \Symfony\Component\Routing\RouteCollection $routes
+	 */
 	public function __construct(RouteCollection $routes)
 	{
 		parent::__construct();

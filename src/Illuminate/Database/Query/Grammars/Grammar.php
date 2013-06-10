@@ -599,12 +599,12 @@ class Grammar extends BaseGrammar {
 		return trim("update {$table}{$joins} set $columns $where");
 	}
 
-    /**
-     * Compile a delete statement into SQL.
-     *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @return string
-     */
+	/**
+	 * Compile a delete statement into SQL.
+	 *
+	 * @param \Illuminate\Database\Query\Builder $query
+	 * @return string
+	 */
 	public function compileDelete(Builder $query)
 	{
 		$table = $this->wrapTable($query->from);

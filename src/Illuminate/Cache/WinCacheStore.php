@@ -9,11 +9,11 @@ class WinCacheStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-    /**
-     * Create a new WinCache store.
-     *
-     * @param  string $prefix
-     */
+	/**
+	 * Create a new WinCache store.
+	 *
+	 * @param  string $prefix
+	 */
 	public function __construct($prefix = '')
 	{
 		$this->prefix = $prefix;

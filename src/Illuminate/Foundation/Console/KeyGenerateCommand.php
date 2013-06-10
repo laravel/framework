@@ -20,11 +20,11 @@ class KeyGenerateCommand extends Command {
 	 */
 	protected $description = "Set the application key";
 
-    /**
-     * Create a new key generator command.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     */
+	/**
+	 * Create a new key generator command.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 */
 	public function __construct(Filesystem $files)
 	{
 		parent::__construct();

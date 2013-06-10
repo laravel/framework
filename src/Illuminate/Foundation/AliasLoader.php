@@ -23,11 +23,11 @@ class AliasLoader {
 	 */
 	protected static $instance;
 
-    /**
-     * Create a new class alias loader instance.
-     *
-     * @param  array $aliases
-     */
+	/**
+	 * Create a new class alias loader instance.
+	 *
+	 * @param  array $aliases
+	 */
 	public function __construct(array $aliases = array())
 	{
 		$this->aliases = $aliases;

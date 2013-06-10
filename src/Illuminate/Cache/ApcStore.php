@@ -16,12 +16,12 @@ class ApcStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-    /**
-     * Create a new APC store.
-     *
-     * @param  \Illuminate\Cache\ApcWrapper $apc
-     * @param  string $prefix
-     */
+	/**
+	 * Create a new APC store.
+	 *
+	 * @param  \Illuminate\Cache\ApcWrapper $apc
+	 * @param  string $prefix
+	 */
 	public function __construct(ApcWrapper $apc, $prefix = '')
 	{
 		$this->apc = $apc;

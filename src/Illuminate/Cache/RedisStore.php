@@ -18,12 +18,12 @@ class RedisStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-    /**
-     * Create a new APC store.
-     *
-     * @param  \Illuminate\Redis\Database $redis
-     * @param  string $prefix
-     */
+	/**
+	 * Create a new APC store.
+	 *
+	 * @param  \Illuminate\Redis\Database $redis
+	 * @param  string $prefix
+	 */
 	public function __construct(Redis $redis, $prefix = '')
 	{
 		$this->redis = $redis;

@@ -29,12 +29,12 @@ class SubscribeCommand extends Command {
 	 */
 	protected $meta;
 
-    /**
-     * Execute the console command.
-     *
-     * @throws \RuntimeException
-     * @return void
-     */
+	/**
+	 * Execute the console command.
+	 *
+	 * @throws \RuntimeException
+	 * @return void
+	 */
 	public function fire()
 	{
 		$iron = $this->laravel['queue']->connection();

@@ -18,12 +18,12 @@ class EloquentUserProvider implements UserProviderInterface {
 	 */
 	protected $model;
 
-    /**
-     * Create a new database user provider.
-     *
-     * @param  \Illuminate\Hashing\HasherInterface $hasher
-     * @param  string $model
-     */
+	/**
+	 * Create a new database user provider.
+	 *
+	 * @param  \Illuminate\Hashing\HasherInterface $hasher
+	 * @param  string $model
+	 */
 	public function __construct(HasherInterface $hasher, $model)
 	{
 		$this->model = $model;

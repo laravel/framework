@@ -44,13 +44,13 @@ class Migrator {
 	 */
 	protected $notes = array();
 
-    /**
-     * Create a new migrator instance.
-     *
-     * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface $repository
-     * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     */
+	/**
+	 * Create a new migrator instance.
+	 *
+	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface $repository
+	 * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 */
 	public function __construct(MigrationRepositoryInterface $repository,
 								Resolver $resolver,
                                 Filesystem $files)
@@ -236,25 +236,25 @@ class Migrator {
 		return $files;
 	}
 
-    /**
-     * Require in all the migration files in a given path.
-     *
-     * @param  string $path
-     * @param  array $files
-     * @return void
-     */
+	/**
+	 * Require in all the migration files in a given path.
+	 *
+	 * @param  string $path
+	 * @param  array $files
+	 * @return void
+	 */
 	public function requireFiles($path, array $files)
 	{
 		foreach ($files as $file) $this->files->requireOnce($path.'/'.$file.'.php');
 	}
 
-    /**
-     * Pretend to run the migrations.
-     *
-     * @param  object $migration
-     * @param  string $method
-     * @return void
-     */
+	/**
+	 * Pretend to run the migrations.
+	 *
+	 * @param  object $migration
+	 * @param  string $method
+	 * @return void
+	 */
 	protected function pretendToRun($migration, $method)
 	{
 		foreach ($this->getQueries($migration, $method) as $query)

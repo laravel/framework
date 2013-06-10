@@ -18,12 +18,12 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	 */
 	protected $minutes;
 
-    /**
-     * Create a new cache driven handler instance.
-     *
-     * @param \Illuminate\Cache\Repository $cache
-     * @param  int $minutes
-     */
+	/**
+	 * Create a new cache driven handler instance.
+	 *
+	 * @param \Illuminate\Cache\Repository $cache
+	 * @param  int $minutes
+	 */
 	public function __construct(Repository $cache, $minutes)
 	{
 		$this->cache = $cache;

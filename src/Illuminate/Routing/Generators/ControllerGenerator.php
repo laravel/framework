@@ -26,11 +26,11 @@ class ControllerGenerator {
 		'destroy'
 	);
 
-    /**
-     * Create a new controller generator instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     */
+	/**
+	 * Create a new controller generator instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 */
 	public function __construct(Filesystem $files)
 	{
 		$this->files = $files;

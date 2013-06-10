@@ -28,12 +28,12 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	protected $loaded = array();
 
-    /**
-     * Create a new translator instance.
-     *
-     * @param  \Illuminate\Translation\LoaderInterface $loader
-     * @param  string $locale
-     */
+	/**
+	 * Create a new translator instance.
+	 *
+	 * @param  \Illuminate\Translation\LoaderInterface $loader
+	 * @param  string $locale
+	 */
 	public function __construct(LoaderInterface $loader, $locale)
 	{
 		$this->loader = $loader;

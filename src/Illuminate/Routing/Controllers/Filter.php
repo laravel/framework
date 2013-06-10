@@ -32,11 +32,11 @@ class Filter {
 	 */
 	public $except;
 
-    /**
-     * Create a new annotation instance.
-     *
-     * @param  array $values
-     */
+	/**
+	 * Create a new annotation instance.
+	 *
+	 * @param  array $values
+	 */
 	public function __construct(array $values)
 	{
 		foreach ($this->prepareValues($values) as $key => $value)

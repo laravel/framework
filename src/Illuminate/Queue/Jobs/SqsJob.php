@@ -26,14 +26,14 @@ class SqsJob extends Job {
 	 */
 	protected $job;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param  \Illuminate\Container\Container $container
-     * @param  \Aws\Sqs\SqsClient $sqs
-     * @param  string $queue
-     * @param  array $job
-     */
+	/**
+	 * Create a new job instance.
+	 *
+	 * @param  \Illuminate\Container\Container $container
+	 * @param  \Aws\Sqs\SqsClient $sqs
+	 * @param  string $queue
+	 * @param  array $job
+	 */
 	public function __construct(Container $container,
                                 SqsClient $sqs,
                                 $queue,

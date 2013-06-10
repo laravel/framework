@@ -18,11 +18,11 @@ abstract class ServiceProvider {
 	 */
 	protected $defer = false;
 
-    /**
-     * Create a new service provider instance.
-     *
-     * @param  \Illuminate\Foundation\Application $app
-     */
+	/**
+	 * Create a new service provider instance.
+	 *
+	 * @param  \Illuminate\Foundation\Application $app
+	 */
 	public function __construct($app)
 	{
 		$this->app = $app;

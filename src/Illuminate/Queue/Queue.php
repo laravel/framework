@@ -13,11 +13,11 @@ abstract class Queue {
 	 */
 	protected $container;
 
-    /**
-     * Marshal a push queue request and fire the job.
-     *
-     * @throws \RuntimeException
-     */
+	/**
+	 * Marshal a push queue request and fire the job.
+	 *
+	 * @throws \RuntimeException
+	 */
 	public function marshal()
 	{
 		throw new \RuntimeException("Push queues only supported by Iron.");
@@ -56,11 +56,11 @@ abstract class Queue {
 		return array('job' => 'IlluminateQueueClosure', 'data' => compact('closure'));
 	}
 
-    /**
-     * Set the IoC container instance.
-     *
-     * @param \Illuminate\Container\Container $container
-     */
+	/**
+	 * Set the IoC container instance.
+	 *
+	 * @param \Illuminate\Container\Container $container
+	 */
 	public function setContainer(Container $container)
 	{
 		$this->container = $container;

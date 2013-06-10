@@ -171,13 +171,13 @@ class Str {
 		return Pluralizer::plural($value, $count);
 	}
 
-    /**
-     * Generate a more truly "random" alpha-numeric string.
-     *
-     * @param  int $length
-     * @throws \RuntimeException
-     * @return string
-     */
+	/**
+	 * Generate a more truly "random" alpha-numeric string.
+	 *
+	 * @param  int $length
+	 * @throws \RuntimeException
+	 * @return string
+	 */
 	public static function random($length = 16)
 	{
 		if (function_exists('openssl_random_pseudo_bytes'))
@@ -313,14 +313,14 @@ class Str {
 		static::$macros[$name] = $macro;
 	}
 
-    /**
-     * Dynamically handle calls to the string class.
-     *
-     * @param  string $method
-     * @param  array $parameters
-     * @throws \BadMethodCallException
-     * @return mixed
-     */
+	/**
+	 * Dynamically handle calls to the string class.
+	 *
+	 * @param  string $method
+	 * @param  array $parameters
+	 * @throws \BadMethodCallException
+	 * @return mixed
+	 */
 	public static function __callStatic($method, $parameters)
 	{
 		if (isset(static::$macros[$method]))

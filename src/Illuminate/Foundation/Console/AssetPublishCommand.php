@@ -29,11 +29,11 @@ class AssetPublishCommand extends Command {
 	 */
 	protected $assets;
 
-    /**
-     * Create a new asset publish command instance.
-     *
-     * @param  \Illuminate\Foundation\AssetPublisher $assets
-     */
+	/**
+	 * Create a new asset publish command instance.
+	 *
+	 * @param  \Illuminate\Foundation\AssetPublisher $assets
+	 */
 	public function __construct(AssetPublisher $assets)
 	{
 		parent::__construct();

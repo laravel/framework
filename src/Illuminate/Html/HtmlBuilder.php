@@ -18,11 +18,11 @@ class HtmlBuilder {
 	 */
 	protected $macros;
 
-    /**
-     * Create a new HTML builder instance.
-     *
-     * @param  \Illuminate\Routing\UrlGenerator $url
-     */
+	/**
+	 * Create a new HTML builder instance.
+	 *
+	 * @param  \Illuminate\Routing\UrlGenerator $url
+	 */
 	public function __construct(UrlGenerator $url = null)
 	{
 		$this->url = $url;
@@ -386,14 +386,14 @@ class HtmlBuilder {
 		return $safe;
 	}
 
-    /**
-     * Dynamically handle calls to the html class.
-     *
-     * @param  string $method
-     * @param  array $parameters
-     * @throws \BadMethodCallException
-     * @return mixed
-     */
+	/**
+	 * Dynamically handle calls to the html class.
+	 *
+	 * @param  string $method
+	 * @param  array $parameters
+	 * @throws \BadMethodCallException
+	 * @return mixed
+	 */
 	public function __call($method, $parameters)
 	{
 		if (isset($this->macros[$method]))

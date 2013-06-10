@@ -34,12 +34,12 @@ class ClearCommand extends Command {
 	 */
 	protected $files;
 
-    /**
-     * Create a new cache clear command instance.
-     *
-     * @param  \Illuminate\Cache\CacheManager $cache
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     */
+	/**
+	 * Create a new cache clear command instance.
+	 *
+	 * @param  \Illuminate\Cache\CacheManager $cache
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 */
 	public function __construct(CacheManager $cache, Filesystem $files)
 	{
 		parent::__construct();

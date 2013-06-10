@@ -36,12 +36,12 @@ class CookieJar {
 	 */
 	protected $domain = null;
 
-    /**
-     * Create a new cookie manager instance.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request $request
-     * @param  \Illuminate\Encryption\Encrypter $encrypter
-     */
+	/**
+	 * Create a new cookie manager instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request $request
+	 * @param  \Illuminate\Encryption\Encrypter $encrypter
+	 */
 	public function __construct(Request $request, Encrypter $encrypter)
 	{
 		$this->request = $request;
@@ -161,13 +161,13 @@ class CookieJar {
 		return array($path ?: $this->path, $domain ?: $this->domain);
 	}
 
-    /**
-     * Set the default path and domain for the jar.
-     *
-     * @param  string $path
-     * @param  string $domain
-     * @return \Illuminate\Cookie\CookieJar
-     */
+	/**
+	 * Set the default path and domain for the jar.
+	 *
+	 * @param  string $path
+	 * @param  string $domain
+	 * @return \Illuminate\Cookie\CookieJar
+	 */
 	public function setDefaultPathAndDomain($path, $domain)
 	{
 		list($this->path, $this->domain) = array($path, $domain);

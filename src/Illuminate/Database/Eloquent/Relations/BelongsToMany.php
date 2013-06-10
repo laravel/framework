@@ -43,16 +43,16 @@ class BelongsToMany extends Relation {
 	 */
 	protected $pivotColumns = array();
 
-    /**
-     * Create a new has many relationship instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  \Illuminate\Database\Eloquent\Model $parent
-     * @param  string $table
-     * @param  string $foreignKey
-     * @param  string $otherKey
-     * @param  string $relationName
-     */
+	/**
+	 * Create a new has many relationship instance.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder $query
+	 * @param  \Illuminate\Database\Eloquent\Model $parent
+	 * @param  string $table
+	 * @param  string $foreignKey
+	 * @param  string $otherKey
+	 * @param  string $relationName
+	 */
 	public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = null)
 	{
 		$this->table = $table;
@@ -179,12 +179,12 @@ class BelongsToMany extends Relation {
 		return parent::getRelationCountQuery($query);
 	}
 
-    /**
-     * Set the select clause for the relation query.
-     *
-     * @param array $columns
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
+	/**
+	 * Set the select clause for the relation query.
+	 *
+	 * @param array $columns
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
 	protected function getSelectColumns(array $columns = array('*'))
 	{
 		if ($columns == array('*'))
@@ -540,13 +540,13 @@ class BelongsToMany extends Relation {
 		if ($touch) $this->touchIfTouching();
 	}
 
-    /**
-     * Create an array of records to insert into the pivot table.
-     *
-     * @param  array $ids
-     * @param  array $attributes
-     * @return array
-     */
+	/**
+	 * Create an array of records to insert into the pivot table.
+	 *
+	 * @param  array $ids
+	 * @param  array $attributes
+	 * @return array
+	 */
 	protected function createAttachRecords($ids, array $attributes)
 	{
 		$records = array();

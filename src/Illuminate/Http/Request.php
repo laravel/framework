@@ -445,12 +445,12 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		return isset($acceptable[0]) and $acceptable[0] == 'application/json';
 	}
 
-    /**
-     * Get the Illuminate session store implementation.
-     *
-     * @throws \RuntimeException
-     * @return \Illuminate\Session\Store
-     */
+	/**
+	 * Get the Illuminate session store implementation.
+	 *
+	 * @throws \RuntimeException
+	 * @return \Illuminate\Session\Store
+	 */
 	public function getSessionStore()
 	{
 		if ( ! isset($this->sessionStore))

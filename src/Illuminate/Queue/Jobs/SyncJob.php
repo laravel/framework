@@ -19,13 +19,13 @@ class SyncJob extends Job {
 	 */
 	protected $data;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param \Illuminate\Container\Container $container
-     * @param  string $job
-     * @param  string $data
-     */
+	/**
+	 * Create a new job instance.
+	 *
+	 * @param \Illuminate\Container\Container $container
+	 * @param  string $job
+	 * @param  string $data
+	 */
 	public function __construct(Container $container, $job, $data = '')
 	{
 		$this->job = $job;

@@ -17,11 +17,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	protected $items = array();
 
-    /**
-     * Create a new collection.
-     *
-     * @param  array $items
-     */
+	/**
+	 * Create a new collection.
+	 *
+	 * @param  array $items
+	 */
 	public function __construct(array $items = array())
 	{
 		$this->items = $items;

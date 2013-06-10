@@ -16,11 +16,11 @@ class ConnectionFactory {
 	 */
 	protected $container;
 
-    /**
-     * Create a new connection factory instance.
-     *
-     * @param  \Illuminate\Container\Container $container
-     */
+	/**
+	 * Create a new connection factory instance.
+	 *
+	 * @param  \Illuminate\Container\Container $container
+	 */
 	public function __construct(Container $container)
 	{
 		$this->container = $container;
@@ -54,13 +54,13 @@ class ConnectionFactory {
 		return array_add(array_add($config, 'prefix', ''), 'name', $name);
 	}
 
-    /**
-     * Create a connector instance based on the configuration.
-     *
-     * @param  array $config
-     * @throws \InvalidArgumentException
-     * @return \Illuminate\Database\Connectors\ConnectorInterface
-     */
+	/**
+	 * Create a connector instance based on the configuration.
+	 *
+	 * @param  array $config
+	 * @throws \InvalidArgumentException
+	 * @return \Illuminate\Database\Connectors\ConnectorInterface
+	 */
 	public function createConnector(array $config)
 	{
 		if ( ! isset($config['driver']))
@@ -86,17 +86,17 @@ class ConnectionFactory {
 		throw new \InvalidArgumentException("Unsupported driver [{$config['driver']}]");
 	}
 
-    /**
-     * Create a new connection instance.
-     *
-     * @param  string $driver
-     * @param  PDO $connection
-     * @param  string $database
-     * @param  string $prefix
-     * @param  array $config
-     * @throws \InvalidArgumentException
-     * @return \Illuminate\Database\Connection
-     */
+	/**
+	 * Create a new connection instance.
+	 *
+	 * @param  string $driver
+	 * @param  PDO $connection
+	 * @param  string $database
+	 * @param  string $prefix
+	 * @param  array $config
+	 * @throws \InvalidArgumentException
+	 * @return \Illuminate\Database\Connection
+	 */
 	protected function createConnection($driver, PDO $connection, $database, $prefix = '', $config = null)
 	{
 		if ($this->container->bound($key = "db.connection.{$driver}"))

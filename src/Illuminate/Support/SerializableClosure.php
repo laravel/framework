@@ -34,11 +34,11 @@ class SerializableClosure implements Serializable {
 	 */
 	protected $code;
 
-    /**
-     * Create a new serializable Closure instance.
-     *
-     * @param  \Closure $closure
-     */
+	/**
+	 * Create a new serializable Closure instance.
+	 *
+	 * @param  \Closure $closure
+	 */
 	public function __construct(Closure $closure)
 	{
 		$this->closure = $closure;

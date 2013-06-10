@@ -144,13 +144,13 @@ class Builder {
 		'like', 'not like', 'between', 'ilike',
 	);
 
-    /**
-     * Create a new query builder instance.
-     *
-     * @param  \Illuminate\Database\ConnectionInterface $connection
-     * @param  \Illuminate\Database\Query\Grammars\Grammar $grammar
-     * @param  \Illuminate\Database\Query\Processors\Processor $processor
-     */
+	/**
+	 * Create a new query builder instance.
+	 *
+	 * @param  \Illuminate\Database\ConnectionInterface $connection
+	 * @param  \Illuminate\Database\Query\Grammars\Grammar $grammar
+	 * @param  \Illuminate\Database\Query\Processors\Processor $processor
+	 */
 	public function __construct(ConnectionInterface $connection,
                                 Grammar $grammar,
                                 Processor $processor)
@@ -1529,14 +1529,14 @@ class Builder {
 		return $this->grammar;
 	}
 
-    /**
-     * Handle dynamic method calls into the method.
-     *
-     * @param  string $method
-     * @param  array $parameters
-     * @throws \BadMethodCallException
-     * @return mixed
-     */
+	/**
+	 * Handle dynamic method calls into the method.
+	 *
+	 * @param  string $method
+	 * @param  array $parameters
+	 * @throws \BadMethodCallException
+	 * @return mixed
+	 */
 	public function __call($method, $parameters)
 	{
 		if (starts_with($method, 'where'))

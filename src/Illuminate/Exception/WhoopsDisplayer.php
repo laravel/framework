@@ -19,12 +19,12 @@ class WhoopsDisplayer implements ExceptionDisplayerInterface {
 	 */
 	protected $runningInConsole;
 
-    /**
-     * Create a new Whoops exception displayer.
-     *
-     * @param  \Whoops\Run $whoops
-     * @param  bool $runningInConsole
-     */
+	/**
+	 * Create a new Whoops exception displayer.
+	 *
+	 * @param  \Whoops\Run $whoops
+	 * @param  bool $runningInConsole
+	 */
 	public function __construct(Run $whoops, $runningInConsole)
 	{
 		$this->whoops = $whoops;

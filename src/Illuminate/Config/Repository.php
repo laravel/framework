@@ -41,12 +41,12 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 */
 	protected $afterLoad = array();
 
-    /**
-     * Create a new configuration repository.
-     *
-     * @param  \Illuminate\Config\LoaderInterface $loader
-     * @param  string $environment
-     */
+	/**
+	 * Create a new configuration repository.
+	 *
+	 * @param  \Illuminate\Config\LoaderInterface $loader
+	 * @param  string $environment
+	 */
 	public function __construct(LoaderInterface $loader, $environment)
 	{
 		$this->loader = $loader;
@@ -197,14 +197,14 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 		return parent::parseNamespacedSegments($key);
 	}
 
-    /**
-     * Parse the segments of a package namespace.
-     *
-     * @param  string $key
-     * @param  string $namespace
-     * @param  string $item
-     * @return array
-     */
+	/**
+	 * Parse the segments of a package namespace.
+	 *
+	 * @param  string $key
+	 * @param  string $namespace
+	 * @param  string $item
+	 * @return array
+	 */
 	protected function parsePackageSegments($key, $namespace, $item)
 	{
 		$itemSegments = explode('.', $item);

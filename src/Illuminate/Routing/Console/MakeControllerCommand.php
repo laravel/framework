@@ -35,12 +35,12 @@ class MakeControllerCommand extends Command {
 	 */
 	protected $path;
 
-    /**
-     * Create a new make controller command instance.
-     *
-     * @param  \Illuminate\Routing\Generators\ControllerGenerator $generator
-     * @param  string $path
-     */
+	/**
+	 * Create a new make controller command instance.
+	 *
+	 * @param  \Illuminate\Routing\Generators\ControllerGenerator $generator
+	 * @param  string $path
+	 */
 	public function __construct(ControllerGenerator $generator, $path)
 	{
 		parent::__construct();

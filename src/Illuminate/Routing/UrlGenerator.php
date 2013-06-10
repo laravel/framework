@@ -29,12 +29,12 @@ class UrlGenerator {
 	 */
 	protected $generator;
 
-    /**
-     * Create a new URL Generator instance.
-     *
-     * @param  \Symfony\Component\Routing\RouteCollection $routes
-     * @param  \Symfony\Component\HttpFoundation\Request $request
-     */
+	/**
+	 * Create a new URL Generator instance.
+	 *
+	 * @param  \Symfony\Component\Routing\RouteCollection $routes
+	 * @param  \Symfony\Component\HttpFoundation\Request $request
+	 */
 	public function __construct(RouteCollection $routes, Request $request)
 	{
 		$this->routes = $routes;
@@ -226,15 +226,15 @@ class UrlGenerator {
 		return array_combine($keys, $params);
 	}
 
-    /**
-     * Get the URL to a controller action.
-     *
-     * @param  string $action
-     * @param  mixed $parameters
-     * @param  bool $absolute
-     * @throws \InvalidArgumentException
-     * @return string
-     */
+	/**
+	 * Get the URL to a controller action.
+	 *
+	 * @param  string $action
+	 * @param  mixed $parameters
+	 * @param  bool $absolute
+	 * @throws \InvalidArgumentException
+	 * @return string
+	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
 		// First we'll check to see if we have already rendered a URL for an action

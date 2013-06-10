@@ -33,14 +33,14 @@ class DatabaseStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-    /**
-     * Create a new database store.
-     *
-     * @param  \Illuminate\Database\Connection $connection
-     * @param  \Illuminate\Encryption\Encrypter $encrypter
-     * @param  string $table
-     * @param  string $prefix
-     */
+	/**
+	 * Create a new database store.
+	 *
+	 * @param  \Illuminate\Database\Connection $connection
+	 * @param  \Illuminate\Encryption\Encrypter $encrypter
+	 * @param  string $table
+	 * @param  string $prefix
+	 */
 	public function __construct(Connection $connection, Encrypter $encrypter, $table, $prefix = '')
 	{
 		$this->table = $table;
@@ -106,27 +106,27 @@ class DatabaseStore implements StoreInterface {
 		}
 	}
 
-    /**
-     * Increment the value of an item in the cache.
-     *
-     * @param  string $key
-     * @param  mixed $value
-     * @throws \LogicException
-     * @return void
-     */
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string $key
+	 * @param  mixed $value
+	 * @throws \LogicException
+	 * @return void
+	 */
 	public function increment($key, $value = 1)
 	{
 		throw new \LogicException("Increment operations not supported by this driver.");
 	}
 
-    /**
-     * Increment the value of an item in the cache.
-     *
-     * @param  string $key
-     * @param  mixed $value
-     * @throws \LogicException
-     * @return void
-     */
+	/**
+	 * Increment the value of an item in the cache.
+	 *
+	 * @param  string $key
+	 * @param  mixed $value
+	 * @throws \LogicException
+	 * @return void
+	 */
 	public function decrement($key, $value = 1)
 	{
 		throw new \LogicException("Increment operations not supported by this driver.");

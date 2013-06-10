@@ -33,12 +33,12 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	protected $extensions = array();
 
-    /**
-     * Create a new database manager instance.
-     *
-     * @param  \Illuminate\Foundation\Application $app
-     * @param  \Illuminate\Database\Connectors\ConnectionFactory $factory
-     */
+	/**
+	 * Create a new database manager instance.
+	 *
+	 * @param  \Illuminate\Foundation\Application $app
+	 * @param  \Illuminate\Database\Connectors\ConnectionFactory $factory
+	 */
 	public function __construct($app, ConnectionFactory $factory)
 	{
 		$this->app = $app;
@@ -135,13 +135,13 @@ class DatabaseManager implements ConnectionResolverInterface {
 		return $connection;
 	}
 
-    /**
-     * Get the configuration for a connection.
-     *
-     * @param  string $name
-     * @throws \InvalidArgumentException
-     * @return array
-     */
+	/**
+	 * Get the configuration for a connection.
+	 *
+	 * @param  string $name
+	 * @throws \InvalidArgumentException
+	 * @return array
+	 */
 	protected function getConfig($name)
 	{
 		$name = $name ?: $this->getDefaultConnection();

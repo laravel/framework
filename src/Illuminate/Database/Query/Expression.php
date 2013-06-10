@@ -9,11 +9,11 @@ class Expression {
 	 */
 	protected $value;
 
-    /**
-     * Create a new raw query expression.
-     *
-     * @param  mixed $value
-     */
+	/**
+	 * Create a new raw query expression.
+	 *
+	 * @param  mixed $value
+	 */
 	public function __construct($value)
 	{
 		$this->value = $value;

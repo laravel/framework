@@ -28,11 +28,11 @@ class SeedCommand extends Command {
 	 */
 	protected $resolver;
 
-    /**
-     * Create a new database seed command instance.
-     *
-     * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
-     */
+	/**
+	 * Create a new database seed command instance.
+	 *
+	 * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
+	 */
 	public function __construct(Resolver $resolver)
 	{
 		parent::__construct();

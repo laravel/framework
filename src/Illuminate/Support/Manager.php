@@ -25,11 +25,11 @@ abstract class Manager {
 	 */
 	protected $drivers = array();
 
-    /**
-     * Create a new manager instance.
-     *
-     * @param  \Illuminate\Foundation\Application $app
-     */
+	/**
+	 * Create a new manager instance.
+	 *
+	 * @param  \Illuminate\Foundation\Application $app
+	 */
 	public function __construct($app)
 	{
 		$this->app = $app;
@@ -56,13 +56,13 @@ abstract class Manager {
 		return $this->drivers[$driver];
 	}
 
-    /**
-     * Create a new driver instance.
-     *
-     * @param  string $driver
-     * @throws \InvalidArgumentException
-     * @return mixed
-     */
+	/**
+	 * Create a new driver instance.
+	 *
+	 * @param  string $driver
+	 * @throws \InvalidArgumentException
+	 * @return mixed
+	 */
 	protected function createDriver($driver)
 	{
 		$method = 'create'.ucfirst($driver).'Driver';

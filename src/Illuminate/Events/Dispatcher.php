@@ -32,11 +32,11 @@ class Dispatcher {
 	 */
 	protected $sorted = array();
 
-    /**
-     * Create a new event dispatcher instance.
-     *
-     * @param  \Illuminate\Container\Container $container
-     */
+	/**
+	 * Create a new event dispatcher instance.
+	 *
+	 * @param  \Illuminate\Container\Container $container
+	 */
 	public function __construct(Container $container = null)
 	{
 		$this->container = $container;

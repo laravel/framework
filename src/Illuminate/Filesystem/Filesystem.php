@@ -18,13 +18,13 @@ class Filesystem {
 		return file_exists($path);
 	}
 
-    /**
-     * Get the contents of a file.
-     *
-     * @param  string $path
-     * @throws FileNotFoundException
-     * @return string
-     */
+	/**
+	 * Get the contents of a file.
+	 *
+	 * @param  string $path
+	 * @throws FileNotFoundException
+	 * @return string
+	 */
 	public function get($path)
 	{
 		if ($this->isFile($path)) return file_get_contents($path);
@@ -43,13 +43,13 @@ class Filesystem {
 		return file_get_contents($path);
 	}
 
-    /**
-     * Get the returned value of a file.
-     *
-     * @param  string $path
-     * @throws FileNotFoundException
-     * @return mixed
-     */
+	/**
+	 * Get the returned value of a file.
+	 *
+	 * @param  string $path
+	 * @throws FileNotFoundException
+	 * @return mixed
+	 */
 	public function getRequire($path)
 	{
 		if ($this->isFile($path)) return require $path;

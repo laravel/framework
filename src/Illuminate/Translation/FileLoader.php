@@ -25,26 +25,26 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected $hints = array();
 
-    /**
-     * Create a new file loader instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     * @param $path
-     */
+	/**
+	 * Create a new file loader instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 * @param $path
+	 */
 	public function __construct(Filesystem $files, $path)
 	{
 		$this->path = $path;
 		$this->files = $files;
 	}
 
-    /**
-     * Load the messages for the given locale.
-     *
-     * @param  string $locale
-     * @param string $group
-     * @param string $namespace
-     * @return array
-     */
+	/**
+	 * Load the messages for the given locale.
+	 *
+	 * @param  string $locale
+	 * @param string $group
+	 * @param string $namespace
+	 * @return array
+	 */
 	public function load($locale, $group, $namespace = null)
 	{
 		if (is_null($namespace) or $namespace == '*')

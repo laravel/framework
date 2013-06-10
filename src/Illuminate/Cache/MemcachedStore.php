@@ -16,12 +16,12 @@ class MemcachedStore implements StoreInterface {
 	 */
 	protected $prefix;
 
-    /**
-     * Create a new Memcached store.
-     *
-     * @param  Memcached $memcached
-     * @param  string $prefix
-     */
+	/**
+	 * Create a new Memcached store.
+	 *
+	 * @param  Memcached $memcached
+	 * @param  string $prefix
+	 */
 	public function __construct(Memcached $memcached, $prefix = '')
 	{
 		$this->prefix = $prefix.':';

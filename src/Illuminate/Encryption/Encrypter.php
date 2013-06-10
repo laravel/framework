@@ -32,11 +32,11 @@ class Encrypter {
 	 */
 	protected $block = 32;
 
-    /**
-     * Create a new encrypter instance.
-     *
-     * @param  string $key
-     */
+	/**
+	 * Create a new encrypter instance.
+	 *
+	 * @param  string $key
+	 */
 	public function __construct($key)
 	{
 		$this->key = $key;
@@ -110,13 +110,13 @@ class Encrypter {
 		return mcrypt_decrypt($this->cipher, $this->key, $value, $this->mode, $iv);
 	}
 
-    /**
-     * Get the JSON array from the given payload.
-     *
-     * @param  string $payload
-     * @throws DecryptException
-     * @return array
-     */
+	/**
+	 * Get the JSON array from the given payload.
+	 *
+	 * @param  string $payload
+	 * @throws DecryptException
+	 * @return array
+	 */
 	protected function getJsonPayload($payload)
 	{
 		$payload = json_decode(base64_decode($payload), true);

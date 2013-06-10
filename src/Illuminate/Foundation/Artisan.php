@@ -21,11 +21,11 @@ class Artisan {
 	 */
 	protected $artisan;
 
-    /**
-     * Create a new Artisan command runner instance.
-     *
-     * @param  \Illuminate\Foundation\Application $app
-     */
+	/**
+	 * Create a new Artisan command runner instance.
+	 *
+	 * @param  \Illuminate\Foundation\Application $app
+	 */
 	public function __construct(Application $app)
 	{
 		$this->app = $app;

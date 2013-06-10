@@ -42,9 +42,9 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	protected $description;
 
-    /**
-     * Create a new console command instance.
-     */
+	/**
+	 * Create a new console command instance.
+	 */
 	public function __construct()
 	{
 		parent::__construct($this->name);

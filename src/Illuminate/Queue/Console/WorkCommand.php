@@ -28,11 +28,11 @@ class WorkCommand extends Command {
 	 */
 	protected $worker;
 
-    /**
-     * Create a new queue listen command.
-     *
-     * @param  \Illuminate\Queue\Worker $worker
-     */
+	/**
+	 * Create a new queue listen command.
+	 *
+	 * @param  \Illuminate\Queue\Worker $worker
+	 */
 	public function __construct(Worker $worker)
 	{
 		parent::__construct();

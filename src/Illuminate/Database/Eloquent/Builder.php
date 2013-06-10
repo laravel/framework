@@ -38,11 +38,11 @@ class Builder {
 		'count', 'min', 'max', 'avg', 'sum', 'exists',
 	);
 
-    /**
-     * Create a new Eloquent query builder instance.
-     *
-     * @param  \Illuminate\Database\Query\Builder $query
-     */
+	/**
+	 * Create a new Eloquent query builder instance.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder $query
+	 */
 	public function __construct(QueryBuilder $query)
 	{
 		$this->query = $query;
@@ -62,14 +62,14 @@ class Builder {
 		return $this->first($columns);
 	}
 
-    /**
-     * Find a model by its primary key or throw an exception.
-     *
-     * @param  mixed $id
-     * @param  array $columns
-     * @throws ModelNotFoundException
-     * @return \Illuminate\Database\Eloquent\Model|Collection
-     */
+	/**
+	 * Find a model by its primary key or throw an exception.
+	 *
+	 * @param  mixed $id
+	 * @param  array $columns
+	 * @throws ModelNotFoundException
+	 * @return \Illuminate\Database\Eloquent\Model|Collection
+	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
 		if ( ! is_null($model = $this->find($id, $columns))) return $model;
@@ -88,13 +88,13 @@ class Builder {
 		return $this->take(1)->get($columns)->first();
 	}
 
-    /**
-     * Execute the query and get the first result or throw an exception.
-     *
-     * @param  array $columns
-     * @throws ModelNotFoundException
-     * @return array
-     */
+	/**
+	 * Execute the query and get the first result or throw an exception.
+	 *
+	 * @param  array $columns
+	 * @throws ModelNotFoundException
+	 * @return array
+	 */
 	public function firstOrFail($columns = array('*'))
 	{
 		if ( ! is_null($model = $this->first($columns))) return $model;
@@ -426,14 +426,14 @@ class Builder {
 		return $models;
 	}
 
-    /**
-     * Eagerly load the relationship on a set of models.
-     *
-     * @param  array $models
-     * @param  string $name
-     * @param  Closure $constraints
-     * @return array
-     */
+	/**
+	 * Eagerly load the relationship on a set of models.
+	 *
+	 * @param  array $models
+	 * @param  string $name
+	 * @param  Closure $constraints
+	 * @return array
+	 */
 	protected function loadRelation(array $models, $name, Closure $constraints)
 	{
 		// First we will "back up" the existing where conditions on the query so we can

@@ -14,13 +14,13 @@ abstract class HasOneOrMany extends Relation {
 	 */
 	protected $foreignKey;
 
-    /**
-     * Create a new has many relationship instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  \Illuminate\Database\Eloquent\Model $parent
-     * @param  string $foreignKey
-     */
+	/**
+	 * Create a new has many relationship instance.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder $query
+	 * @param  \Illuminate\Database\Eloquent\Model $parent
+	 * @param  string $foreignKey
+	 */
 	public function __construct(Builder $query, Model $parent, $foreignKey)
 	{
 		$this->foreignKey = $foreignKey;

@@ -42,15 +42,15 @@ class View implements ArrayAccess, Renderable {
 	 */
 	protected $path;
 
-    /**
-     * Create a new view instance.
-     *
-     * @param  \Illuminate\View\Environment $environment
-     * @param  \Illuminate\View\Engines\EngineInterface $engine
-     * @param  string $view
-     * @param  string $path
-     * @param  array $data
-     */
+	/**
+	 * Create a new view instance.
+	 *
+	 * @param  \Illuminate\View\Environment $environment
+	 * @param  \Illuminate\View\Engines\EngineInterface $engine
+	 * @param  string $view
+	 * @param  string $path
+	 * @param  array $data
+	 */
 	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array())
 	{
 		$this->view = $view;
@@ -259,12 +259,12 @@ class View implements ArrayAccess, Renderable {
 		unset($this->data[$key]);
 	}
 
-    /**
-     * Get a piece of data from the view.
-     *
-     * @param mixed $key
-     * @return mixed
-     */
+	/**
+	 * Get a piece of data from the view.
+	 *
+	 * @param mixed $key
+	 * @return mixed
+	 */
 	public function __get($key)
 	{
 		return $this->data[$key];

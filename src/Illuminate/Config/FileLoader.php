@@ -32,12 +32,12 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected $exists = array();
 
-    /**
-     * Create a new file configuration loader.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     * @param  string $defaultPath
-     */
+	/**
+	 * Create a new file configuration loader.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 * @param  string $defaultPath
+	 */
 	public function __construct(Filesystem $files, $defaultPath)
 	{
 		$this->files = $files;

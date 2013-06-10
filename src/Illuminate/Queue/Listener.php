@@ -18,12 +18,12 @@ class Listener {
 	 */
 	protected $environment;
 
-    /**
-     * Create a new queue listener.
-     *
-     * @param  string $commandPath
-     * @param  string $environment
-     */
+	/**
+	 * Create a new queue listener.
+	 *
+	 * @param  string $commandPath
+	 * @param  string $environment
+	 */
 	public function __construct($commandPath, $environment = null)
 	{
 		$this->commandPath = $commandPath;

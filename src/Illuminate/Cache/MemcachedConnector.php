@@ -2,13 +2,13 @@
 
 class MemcachedConnector {
 
-    /**
-     * Create a new Memcached connection.
-     *
-     * @param  array $servers
-     * @throws \RuntimeException
-     * @return \Memcached
-     */
+	/**
+	 * Create a new Memcached connection.
+	 *
+	 * @param  array $servers
+	 * @throws \RuntimeException
+	 * @return \Memcached
+	 */
 	public function connect(array $servers)
 	{
 		$memcached = $this->getMemcached();

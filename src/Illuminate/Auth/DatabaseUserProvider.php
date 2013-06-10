@@ -26,13 +26,13 @@ class DatabaseUserProvider implements UserProviderInterface {
 	 */
 	protected $table;
 
-    /**
-     * Create a new database user provider.
-     *
-     * @param  \Illuminate\Database\Connection $conn
-     * @param  \Illuminate\Hashing\HasherInterface $hasher
-     * @param  string $table
-     */
+	/**
+	 * Create a new database user provider.
+	 *
+	 * @param  \Illuminate\Database\Connection $conn
+	 * @param  \Illuminate\Hashing\HasherInterface $hasher
+	 * @param  string $table
+	 */
 	public function __construct(Connection $conn, HasherInterface $hasher, $table)
 	{
 		$this->conn = $conn;

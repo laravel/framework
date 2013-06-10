@@ -202,11 +202,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	const DELETED_AT = 'deleted_at';
 
-    /**
-     * Create a new Eloquent model instance.
-     *
-     * @param  array $attributes
-     */
+	/**
+	 * Create a new Eloquent model instance.
+	 *
+	 * @param  array $attributes
+	 */
 	public function __construct(array $attributes = array())
 	{
 		if ( ! isset(static::$booted[get_class($this)]))
@@ -268,13 +268,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 	}
 
-    /**
-     * Fill the model with an array of attributes.
-     *
-     * @param  array $attributes
-     * @throws MassAssignmentException
-     * @return \Illuminate\Database\Eloquent\Model
-     */
+	/**
+	 * Fill the model with an array of attributes.
+	 *
+	 * @param  array $attributes
+	 * @throws MassAssignmentException
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
 	public function fill(array $attributes)
 	{
 		foreach ($attributes as $key => $value)
@@ -396,14 +396,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		return $instance->newQuery()->find($id, $columns);
 	}
 
-    /**
-     * Find a model by its primary key or throw an exception.
-     *
-     * @param  mixed $id
-     * @param  array $columns
-     * @throws ModelNotFoundException
-     * @return \Illuminate\Database\Eloquent\Model|Collection
-     */
+	/**
+	 * Find a model by its primary key or throw an exception.
+	 *
+	 * @param  mixed $id
+	 * @param  array $columns
+	 * @throws ModelNotFoundException
+	 * @return \Illuminate\Database\Eloquent\Model|Collection
+	 */
 	public static function findOrFail($id, $columns = array('*'))
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
@@ -1016,12 +1016,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		return $saved;
 	}
 
-    /**
-     * Finish processing on a successful save operation.
-     *
-     * @param array $options
-     * @return void
-     */
+	/**
+	 * Finish processing on a successful save operation.
+	 *
+	 * @param array $options
+	 * @return void
+	 */
 	protected function finishSave(array $options)
 	{
 		$this->syncOriginal();

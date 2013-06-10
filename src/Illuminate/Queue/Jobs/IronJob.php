@@ -26,14 +26,14 @@ class IronJob extends Job {
 	 */
 	protected $queue;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param  \Illuminate\Container\Container $container
-     * @param  IronMQ $iron
-     * @param  StdClass $job
-     * @param  string $queue
-     */
+	/**
+	 * Create a new job instance.
+	 *
+	 * @param  \Illuminate\Container\Container $container
+	 * @param  IronMQ $iron
+	 * @param  StdClass $job
+	 * @param  string $queue
+	 */
 	public function __construct(Container $container,
                                 IronMQ $iron,
                                 $job,
@@ -78,12 +78,12 @@ class IronJob extends Job {
 		$this->iron->releaseMessage($this->queue, $this->job->id, $delay);
 	}
 
-    /**
-     * Get the number of times the job has been attempted.
-     *
-     * @throws \LogicException
-     * @return int
-     */
+	/**
+	 * Get the number of times the job has been attempted.
+	 *
+	 * @throws \LogicException
+	 * @return int
+	 */
 	public function attempts()
 	{
 		throw new \LogicException("This driver doesn't support attempt counting.");

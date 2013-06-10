@@ -2,14 +2,14 @@
 
 class Starter {
 
-    /**
-     * Load the workbench vendor auto-load files.
-     *
-     * @param  string $path
-     * @param  \Symfony\Component\Finder\Finder $finder
-     * @param  \Illuminate\Filesystem $files
-     * @return void
-     */
+	/**
+	 * Load the workbench vendor auto-load files.
+	 *
+	 * @param  string $path
+	 * @param  \Symfony\Component\Finder\Finder $finder
+	 * @param  \Illuminate\Filesystem $files
+	 * @return void
+	 */
 	public static function start($path, $finder = null, $files = null)
 	{
 		$finder = $finder ?: new \Symfony\Component\Finder\Finder;

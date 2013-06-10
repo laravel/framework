@@ -13,11 +13,11 @@ class Message {
 	 */
 	protected $swift;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param  Swift_Message $swift
-     */
+	/**
+	 * Create a new message instance.
+	 *
+	 * @param  Swift_Message $swift
+	 */
 	public function __construct($swift)
 	{
 		$this->swift = $swift;
@@ -112,14 +112,14 @@ class Message {
 		return $this->addAddresses($address, $name, 'ReplyTo');
 	}
 
-    /**
-     * Add a recipient to the message.
-     *
-     * @param  string|array $address
-     * @param  string $name
-     * @param  string $type
-     * @return \Illuminate\Mail\Message
-     */
+	/**
+	 * Add a recipient to the message.
+	 *
+	 * @param  string|array $address
+	 * @param  string $name
+	 * @param  string $type
+	 * @return \Illuminate\Mail\Message
+	 */
 	protected function addAddresses($address, $name, $type)
 	{
 		if (is_array($address))

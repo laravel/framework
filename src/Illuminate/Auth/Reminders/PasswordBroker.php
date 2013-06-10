@@ -42,15 +42,15 @@ class PasswordBroker {
 	 */
 	protected $reminderView;
 
-    /**
-     * Create a new password broker instance.
-     *
-     * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface $reminders
-     * @param  \Illuminate\Auth\UserProviderInterface $users
-     * @param  \Illuminate\Routing\Redirector $redirect
-     * @param  \Illuminate\Mail\Mailer $mailer
-     * @param  string $reminderView
-     */
+	/**
+	 * Create a new password broker instance.
+	 *
+	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface $reminders
+	 * @param  \Illuminate\Auth\UserProviderInterface $users
+	 * @param  \Illuminate\Routing\Redirector $redirect
+	 * @param  \Illuminate\Mail\Mailer $mailer
+	 * @param  string $reminderView
+	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
                                 Redirector $redirect,
@@ -147,12 +147,12 @@ class PasswordBroker {
 		return $response;
 	}
 
-    /**
-     * Validate a password reset for the given credentials.
-     *
-     * @param array $credentials
-     * @return RemindableInterface|\Illuminate\Http\RedirectResponse
-     */
+	/**
+	 * Validate a password reset for the given credentials.
+	 *
+	 * @param array $credentials
+	 * @return RemindableInterface|\Illuminate\Http\RedirectResponse
+	 */
     protected function validateReset(array $credentials)
 	{
 		if (is_null($user = $this->getUser($credentials)))
@@ -200,13 +200,13 @@ class PasswordBroker {
 		return $this->redirect->refresh()->with('error', true)->with('reason', $reason);
 	}
 
-    /**
-     * Get the user for the given credentials.
-     *
-     * @param  array $credentials
-     * @throws \UnexpectedValueException
-     * @return \Illuminate\Auth\Reminders\RemindableInterface
-     */
+	/**
+	 * Get the user for the given credentials.
+	 *
+	 * @param  array $credentials
+	 * @throws \UnexpectedValueException
+	 * @return \Illuminate\Auth\Reminders\RemindableInterface
+	 */
 	public function getUser(array $credentials)
 	{
 		$user = $this->users->retrieveByCredentials($credentials);

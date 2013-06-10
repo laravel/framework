@@ -53,12 +53,12 @@ class Mailer {
 	 */
 	protected $pretending = false;
 
-    /**
-     * Create a new Mailer instance.
-     *
-     * @param  \Illuminate\View\Environment $views
-     * @param  Swift_Mailer $swift
-     */
+	/**
+	 * Create a new Mailer instance.
+	 *
+	 * @param  \Illuminate\View\Environment $views
+	 * @param  Swift_Mailer $swift
+	 */
 	public function __construct(Environment $views, Swift_Mailer $swift)
 	{
 		$this->views = $views;
@@ -246,13 +246,13 @@ class Mailer {
 		}
 	}
 
-    /**
-     * Parse the given view name or array.
-     *
-     * @param  string|array $view
-     * @throws \InvalidArgumentException
-     * @return array
-     */
+	/**
+	 * Parse the given view name or array.
+	 *
+	 * @param  string|array $view
+	 * @throws \InvalidArgumentException
+	 * @return array
+	 */
 	protected function parseView($view)
 	{
 		if (is_string($view)) return array($view, null);
@@ -309,14 +309,14 @@ class Mailer {
 		$this->logger->info("Pretending to mail message to: {$emails}");
 	}
 
-    /**
-     * Call the provided message builder.
-     *
-     * @param  Closure|string $callback
-     * @param  \Illuminate\Mail\Message $message
-     * @throws \InvalidArgumentException
-     * @return mixed
-     */
+	/**
+	 * Call the provided message builder.
+	 *
+	 * @param  Closure|string $callback
+	 * @param  \Illuminate\Mail\Message $message
+	 * @throws \InvalidArgumentException
+	 * @return mixed
+	 */
 	protected function callMessageBuilder($callback, $message)
 	{
 		if ($callback instanceof Closure)

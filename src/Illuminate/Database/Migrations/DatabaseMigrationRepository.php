@@ -27,12 +27,12 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 */
 	protected $connection;
 
-    /**
-     * Create a new database migration repository instance.
-     *
-     * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
-     * @param $table
-     */
+	/**
+	 * Create a new database migration repository instance.
+	 *
+	 * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
+	 * @param $table
+	 */
 	public function __construct(Resolver $resolver, $table)
 	{
 		$this->table = $table;

@@ -25,26 +25,26 @@ class AssetPublisher {
 	 */
 	protected $packagePath;
 
-    /**
-     * Create a new asset publisher instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem $files
-     * @param  string $publishPath
-     */
+	/**
+	 * Create a new asset publisher instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 * @param  string $publishPath
+	 */
 	public function __construct(Filesystem $files, $publishPath)
 	{
 		$this->files = $files;
 		$this->publishPath = $publishPath;
 	}
 
-    /**
-     * Copy all assets from a given path to the publish path.
-     *
-     * @param  string $name
-     * @param  string $source
-     * @throws \RuntimeException
-     * @return bool
-     */
+	/**
+	 * Copy all assets from a given path to the publish path.
+	 *
+	 * @param  string $name
+	 * @param  string $source
+	 * @throws \RuntimeException
+	 * @return bool
+	 */
 	public function publish($name, $source)
 	{
 		$destination = $this->publishPath."/packages/{$name}";

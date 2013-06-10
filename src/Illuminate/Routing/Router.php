@@ -108,11 +108,11 @@ class Router {
 	 */
 	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
 
-    /**
-     * Create a new router instance.
-     *
-     * @param  \Illuminate\Container\Container $container
-     */
+	/**
+	 * Create a new router instance.
+	 *
+	 * @param  \Illuminate\Container\Container $container
+	 */
 	public function __construct(Container $container = null)
 	{
 		$this->container = $container;
@@ -736,13 +736,13 @@ class Router {
 		return $route;
 	}
 
-    /**
-     * Parse the given route action into array form.
-     *
-     * @param  mixed $action
-     * @throws \InvalidArgumentException
-     * @return array
-     */
+	/**
+	 * Parse the given route action into array form.
+	 *
+	 * @param  mixed $action
+	 * @throws \InvalidArgumentException
+	 * @return array
+	 */
 	protected function parseAction($action)
 	{
 		// If the action is just a Closure we'll stick it in an array and just send
@@ -1333,14 +1333,14 @@ class Router {
 		$this->patterns[$key] = $pattern;
 	}
 
-    /**
-     * Register a model binder for a wildcard.
-     *
-     * @param  string $key
-     * @param  string $class
-     * @param  Closure $callback
-     * @return void
-     */
+	/**
+	 * Register a model binder for a wildcard.
+	 *
+	 * @param  string $key
+	 * @param  string $class
+	 * @param  Closure $callback
+	 * @return void
+	 */
 	public function model($key, $class, Closure $callback = null)
 	{
 		return $this->bind($key, function($value) use ($class, $callback)
@@ -1416,14 +1416,14 @@ class Router {
 		return $value->prepare($request);
 	}
 
-    /**
-     * Convert routing exception to HttpKernel version.
-     *
-     * @param \Exception $e
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @return void
-     */
+	/**
+	 * Convert routing exception to HttpKernel version.
+	 *
+	 * @param \Exception $e
+	 * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 * @return void
+	 */
 	protected function handleRoutingException(\Exception $e)
 	{
 		if ($e instanceof ResourceNotFoundException)
