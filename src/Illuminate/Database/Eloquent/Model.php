@@ -1741,7 +1741,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function attributesToArray()
 	{
-		$attributes = $this->getAccessibleAttributes();
+		$attributes = $this->getArrayableAttributes();
 
 		// We want to spin through all the mutated attributes for this model and call
 		// the mutator for the attribute. We cache off every mutated attributes so
@@ -1757,20 +1757,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get an attribute array of all accessible attributes.
+	 * Get an attribute array of all arrayable attributes.
 	 *
 	 * @return array
 	 */
-	protected function getAccessibleAttributes()
+	protected function getArrayableAttributes()
 	{
-		$attributes = array_merge(array_fill_keys($this->getMutatedAttributes(), null), $this->attributes);
-
 		if (count($this->visible) > 0)
 		{
-			return array_intersect_key($attributes, array_flip($this->visible));
+			return array_intersect_key($this->attributes, array_flip($this->visible));
 		}
 
-		return array_diff_key($attributes, array_flip($this->hidden));
+		return array_diff_key($this->attributes, array_flip($this->hidden));
 	}
 
 	/**
