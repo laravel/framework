@@ -253,7 +253,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function html5date($name, $value = null, $options = array())
+	public function date($name, $value = null, $options = array())
 	{
 		return $this->input('date', $name, $value, $options);
 	}
