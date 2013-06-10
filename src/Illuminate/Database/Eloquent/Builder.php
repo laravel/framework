@@ -275,7 +275,7 @@ class Builder {
 
 		$column = $this->model->getUpdatedAtColumn();
 
-		return array_add($values, $column, new DateTime);
+		return array_add($values, $column, $this->model->freshTimestamp());
 	}
 
 	/**
@@ -289,7 +289,7 @@ class Builder {
 		{
 			$column = $this->model->getDeletedAtColumn();
 
-			return $this->query->update(array($column => new DateTime));
+			return $this->query->update(array($column => $this->model->freshTimestamp()));
 		}
 		else
 		{
