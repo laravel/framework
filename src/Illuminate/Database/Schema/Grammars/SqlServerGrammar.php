@@ -336,6 +336,17 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a enum type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSet(Fluent $column)
+	{
+		return 'nvarchar(255)';
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column

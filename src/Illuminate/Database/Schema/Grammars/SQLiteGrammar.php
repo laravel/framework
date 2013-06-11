@@ -404,6 +404,17 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a set type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSet(Fluent $column)
+	{
+		return 'varchar';
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
