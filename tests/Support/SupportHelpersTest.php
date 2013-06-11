@@ -197,4 +197,20 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Taylor', object_get($class, 'name.first'));
 	}
 
+
+	public function testArraySort()
+	{
+		$array = array(
+			array('name' => 'baz'),
+			array('name' => 'foo'),
+			array('name' => 'bar'),
+		);
+
+		$this->assertEquals(array(
+			array('name' => 'bar'),
+			array('name' => 'baz'),
+			array('name' => 'foo')),
+		array_values(array_sort($array, function($v) { return $v['name']; })));
+	}
+
 }
