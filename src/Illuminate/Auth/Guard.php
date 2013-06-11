@@ -302,7 +302,7 @@ class Guard {
 	{
 		if ($this->events)
 		{
-			$payload = array_values(compact('credentials', 'remember', 'login'));
+			$payload = array($credentials, $remember, $login);
 
 			$this->events->fire('auth.attempt', $payload);
 		}
