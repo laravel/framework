@@ -153,6 +153,38 @@ if ( ! function_exists('array_fetch'))
 	}
 }
 
+if ( ! function_exists('array_sort'))
+{
+	/**
+	 * Sort a multidimensional array by a column value.
+	 *
+	 * @param  array   $array
+	 * @param  string  $column
+	 * @param  string  $order
+	 * @return array
+	 */
+	function array_sort($array, $column, $order = 'asc')
+	{
+		$keys = array();
+		
+		foreach ($array as $key => $value)
+		{
+			$keys[$key] = $value[$column];
+		}
+		
+		switch ($order) 
+		{
+		    case 'asc':
+		        array_multisort($keys, SORT_ASC, $array);
+		        break;
+		    case 'desc':
+		        array_multisort($keys, SORT_DESC, $array);
+		}
+
+		return $array;
+	}
+}
+
 if ( ! function_exists('array_first'))
 {
 	/**

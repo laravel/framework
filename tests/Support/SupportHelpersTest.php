@@ -107,6 +107,45 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(array('#foo', '#bar'), array('#baz')), array_fetch($data, 'comments.tags'));
 	}
 
+	public function testArraySort()
+	{
+		$data = array(
+			array(
+				'name' => 'baz'
+			),
+			array(
+				'name' => 'foo'
+			),
+			array(
+				'name' => 'bar'
+			)						
+		);	
+		
+		$this->assertEquals(array(
+			array(
+				'name' => 'bar'
+			),
+			array(
+				'name' => 'baz'
+			),
+			array(
+				'name' => 'foo'
+			)			
+		), array_sort($data, 'name'));
+
+		$this->assertEquals(array(
+			array(
+				'name' => 'foo'
+			),
+			array(
+				'name' => 'baz'
+			),
+			array(
+				'name' => 'bar'
+			)			
+		), array_sort($data, 'name', 'desc'));
+	}
+
 
 	public function testArrayFlatten()
 	{
