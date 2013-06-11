@@ -287,14 +287,24 @@ class Builder {
 	{
 		if ($this->model->isSoftDeleting())
 		{
-			$column = $this->model->getDeletedAtColumn();
-
-			return $this->query->update(array($column => $this->model->freshTimestamp()));
+			return $this->softDelete();
 		}
 		else
 		{
 			return $this->query->delete();
 		}
+	}
+
+	/**
+	 * Soft delete the record in the database.
+	 *
+	 * @return int
+	 */
+	protected function softDelete()
+	{
+		$column = $this->model->getDeletedAtColumn();
+
+		return $this->update(array($column => $this->model->freshTimestamp()));
 	}
 
 	/**
@@ -318,7 +328,7 @@ class Builder {
 		{
 			$column = $this->model->getDeletedAtColumn();
 
-			return $this->query->update(array($column => null));
+			return $this->update(array($column => null));
 		}
 	}
 
