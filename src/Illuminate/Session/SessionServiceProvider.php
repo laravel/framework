@@ -79,9 +79,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSessionEvents()
 	{
-		$app = $this->app;
-
-		$config = $app['config']['session'];
+		$config = $this->app['config']['session'];
 
 		// The session needs to be started and closed, so we will register a before
 		// and after events to do all stuff for us. This will manage the loading
@@ -101,9 +99,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerBootingEvent()
 	{
-		$app = $this->app;
-
-		$this->app->booting(function($app) use ($app)
+		$this->app->booting(function($app)
 		{
 			$app['session']->start();
 		});
