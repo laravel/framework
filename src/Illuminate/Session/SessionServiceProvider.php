@@ -103,7 +103,7 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		$app = $this->app;
 
-		$this->app->booting(function($app) use ($app)
+		$this->app->booting(function($app)
 		{
 			$app['session']->start();
 		});
