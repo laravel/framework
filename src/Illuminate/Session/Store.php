@@ -107,15 +107,21 @@ class Store extends SymfonySession {
 	/**
 	 * Put a key / value pair in the session.
 	 *
-	 * @param  string  $key
+	 * @param  string|array  $key|$mixed
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function put($key, $value)
+	public function put($key, $value = '')
 	{
 		$all = $this->all();
 
-		array_set($all, $key, $value);
+		if(is_array($key)) {
+			foreach($key as $key => $value) {
+				array_set($all, $key, $value);
+			}
+		} else {
+			array_set($all, $key, $value);
+		}
 
 		$this->replace($all);
 	}
