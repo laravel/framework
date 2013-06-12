@@ -544,7 +544,7 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function getElapsedTime($start)
 	{
-		return number_format((microtime(true) - $start) * 1000, 2);
+		return round((microtime(true) - $start) * 1000, 2);
 	}
 
 	/**
