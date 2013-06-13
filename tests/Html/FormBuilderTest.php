@@ -221,6 +221,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input class="span2" type="submit" value="foo">', $form2);
 	}
 
+
 	public function testFormButton()
 	{
 		$form1 = $this->formBuilder->button('foo');
