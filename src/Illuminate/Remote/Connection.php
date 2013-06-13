@@ -15,6 +15,13 @@ class Connection implements ConnectionInterface {
 	protected $gateway;
 
 	/**
+	 * The name of the connection.
+	 *
+	 * @var string
+	 */
+	protected $name;
+
+	/**
 	 * The host name of the server.
 	 *
 	 * @var string
@@ -45,14 +52,16 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Create a new SSH connection instance.
 	 *
+	 * @param  string  $name
 	 * @param  string  $host
 	 * @param  string  $username
 	 * @param  array   $auth
 	 * @param  \Illuminate\Remote\GatewayInterface
 	 * @param  
 	 */
-	public function __construct($host, $username, array $auth, GatewayInterface $gateway = null)
+	public function __construct($name, $host, $username, array $auth, GatewayInterface $gateway = null)
 	{
+		$this->name = $name;
 		$this->host = $host;
 		$this->username = $username;
 		$this->gateway = $gateway ?: new SecLibGateway($host, $auth, new Filesystem);
@@ -95,7 +104,9 @@ class Connection implements ConnectionInterface {
 	 */
 	public function display($line)
 	{
-		$lead = '<comment>['.$this->username.'@'.$this->host.']</comment>';
+		$server = $this->username.'@'.$this->host;
+
+		$lead = '<comment>['.$server.']</comment> <info>('.$this->name.')</info>';
 
 		$this->getOutput()->writeln($lead.' '.$line);
 	}
