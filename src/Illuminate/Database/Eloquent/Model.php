@@ -375,6 +375,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * A sematic helper to generate a new query builder.
+	 * 
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public static function query()
+	{
+		$instance = new static;
+
+		return $instance->newQuery();
+	}
+
+	/**
 	 * Get all of the models from the database.
 	 *
 	 * @param  array  $columns
