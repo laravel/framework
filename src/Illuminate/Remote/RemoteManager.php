@@ -33,7 +33,25 @@ class RemoteManager {
 	/**
 	 * Get a remote connection instance.
 	 *
-	 * @param  string  $name
+	 * @param  string|array|dynamic  $name
+	 * @return \Illuminate\Remote\Connection
+	 */
+	public function into($name)
+	{
+		if (is_string($name) or is_array($name))
+		{
+			return $this->connection($name);
+		}
+		else
+		{
+			return $this->connection(func_get_args());
+		}
+	}
+
+	/**
+	 * Get a remote connection instance.
+	 *
+	 * @param  string|array  $name
 	 * @return \Illuminate\Remote\Connection
 	 */
 	public function connection($name = null)
