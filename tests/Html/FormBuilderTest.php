@@ -19,6 +19,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->formBuilder =  new FormBuilder($this->htmlBuilder, $this->urlGenerator, '');
 	}
 
+
 	/**
 	 * Destroy the test environment.
 	 */
@@ -221,7 +222,6 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-
 	public function testFormButton()
 	{
 		$form1 = $this->formBuilder->button('foo');
@@ -229,5 +229,21 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<button type="button">foo</button>', $form1);
 		$this->assertEquals('<button class="span2" type="button">foo</button>', $form2);
+	}
+
+
+	public function testResetInput()
+	{
+		$resetInput = $this->formBuilder->reset('foo');
+		$this->assertEquals('<input type="reset" value="foo">', $resetInput);
+	}
+
+
+	public function testImageInput()
+	{
+		$url = 'http://laravel.com/';
+		$image = $this->formBuilder->image($url);
+
+		$this->assertEquals('<input src="'. $url .'" type="image">', $image);
 	}
 }
