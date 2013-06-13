@@ -538,7 +538,10 @@ class BelongsToMany extends Relation {
 	 */
 	protected function updateExistingPivot($id, array $attributes, $touch)
 	{
-		$attributes = $this->setTimestampsOnAttach($attributes, true);
+		if (in_array($this->updatedAt(), $this->pivotColumns))
+		{
+			$attributes = $this->setTimestampsOnAttach($attributes, true);
+		}
 
 		$this->newPivotStatementForId($id)->update($attributes);
 
