@@ -453,9 +453,10 @@ class BelongsToMany extends Relation {
 	 * Sync the intermediate tables with a list of IDs.
 	 *
 	 * @param  array  $ids
+	 * @param  bool   $detach
 	 * @return void
 	 */
-	public function sync(array $ids)
+	public function sync(array $ids, $detach = true)
 	{
 		// First we need to attach any of the associated models that are not currently
 		// in this joining table. We'll spin through the given IDs, checking to see
@@ -464,14 +465,17 @@ class BelongsToMany extends Relation {
 
 		$records = $this->formatSyncList($ids);
 
-		$detach = array_diff($current, array_keys($records));
-
-		// Next, we will take the differences of the currents and given IDs and detach
-		// all of the entities that exist in the "current" array but are not in the
-		// the array of the IDs given to the method which will complete the sync.
-		if (count($detach) > 0)
+		if($detach)
 		{
-			$this->detach($detach);
+			$detach = array_diff($current, array_keys($records));
+
+			// Next, we will take the differences of the currents and given IDs and detach
+			// all of the entities that exist in the "current" array but are not in the
+			// the array of the IDs given to the method which will complete the sync.
+			if (count($detach) > 0)
+			{
+				$this->detach($detach);
+			}
 		}
 
 		// Now we are finally ready to attach the new records. Note that we'll disable
@@ -538,7 +542,11 @@ class BelongsToMany extends Relation {
 	 */
 	protected function updateExistingPivot($id, array $attributes, $touch)
 	{
-		$attributes = $this->setTimestampsOnAttach($attributes, true);
+
+		if(in_array($this->updatedAt(), $this->pivotColumns))
+		{
+			$attributes = $this->setTimestampsOnAttach($attributes, true);
+		}
 
 		$this->newPivotStatementForId($id)->update($attributes);
 
@@ -709,7 +717,7 @@ class BelongsToMany extends Relation {
 	 * @return void
 	 */
 	public function touchIfTouching()
-	{ 
+	{
 	 	if ($this->touchingParent()) $this->getParent()->touch();
 
 	 	if ($this->getParent()->touches($this->relationName)) $this->touch();
