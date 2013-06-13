@@ -347,6 +347,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Begin querying the model.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public static function query()
+	{
+		return with(new static)->newQuery();
+	}
+
+	/**
 	 * Begin querying the model on a given connection.
 	 *
 	 * @param  string  $connection
