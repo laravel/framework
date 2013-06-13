@@ -64,7 +64,7 @@ class RemoteManager {
 	{
 		if ( ! isset($this->connections[$name]))
 		{
-			$this->connections[$name] = $this->makeConnection($this->getConfig($name));
+			$this->connections[$name] = $this->makeConnection($name, $this->getConfig($name));
 		}
 
 		return $this->connections[$name];
@@ -73,14 +73,15 @@ class RemoteManager {
 	/**
 	 * Make a new connection instance.
 	 *
+	 * @param  string  $name
 	 * @param  array   $config
 	 * @return \Illuminate\Remote\Connection
 	 */
-	protected function makeConnection(array $config)
+	protected function makeConnection($name, array $config)
 	{
 		$this->setOutput($connection = new Connection(
 
-			$config['host'], $config['username'], $this->getAuth($config)
+			$name, $config['host'], $config['username'], $this->getAuth($config)
 
 		));
 
