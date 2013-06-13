@@ -18,6 +18,7 @@ git subsplit publish --no-tags src/Illuminate/Mail:git@github.com:illuminate/mai
 git subsplit publish --no-tags src/Illuminate/Pagination:git@github.com:illuminate/pagination.git
 git subsplit publish --no-tags src/Illuminate/Queue:git@github.com:illuminate/queue.git
 git subsplit publish --no-tags src/Illuminate/Redis:git@github.com:illuminate/redis.git
+git subsplit publish --no-tags src/Illuminate/Remote:git@github.com:illuminate/remote.git
 git subsplit publish --no-tags src/Illuminate/Routing:git@github.com:illuminate/routing.git
 git subsplit publish --no-tags src/Illuminate/Session:git@github.com:illuminate/session.git
 git subsplit publish --no-tags src/Illuminate/Support:git@github.com:illuminate/support.git
