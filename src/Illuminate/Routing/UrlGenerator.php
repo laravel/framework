@@ -230,7 +230,7 @@ class UrlGenerator {
 
 			$params += array_values($extra_parameters);
 
-                }
+		}
 
 		return array_combine($keys, $params);
 	}
