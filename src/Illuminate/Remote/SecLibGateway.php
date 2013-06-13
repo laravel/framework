@@ -93,23 +93,33 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	protected function getAuthForLogin()
 	{
-		// If a plain password was set on the auth credentials, we will just return
-		// that as it can be used to connect to the server. This will be used if
-		// there is no RSA key and it gets specified in the credentail arrays.
-		if (isset($this->auth['password']))
-		{
-			return $this->auth['password'];
-		}
-
 		// If a "key" was specified in the auth credentials, we will load it into a
 		// secure RSA key instance, which will be used to connect to the servers
 		// in place of a password, and avoids the develoepr specifying a pass.
-		elseif (isset($this->auth['key']))
+		if ($this->hasRsaKey())
 		{
 			return $this->loadRsaKey($this->auth['key']);
 		}
 
+		// If a plain password was set on the auth credentials, we will just return
+		// that as it can be used to connect to the server. This will be used if
+		// there is no RSA key and it gets specified in the credentail arrays.
+		elseif (isset($this->auth['password']))
+		{
+			return $this->auth['password'];
+		}
+
 		throw new \InvalidArgumentException('Password / key is required.');
+	}
+
+	/**
+	 * Determine if an RSA key is configured.
+	 *
+	 * @return bool
+	 */
+	protected function hasRsaKey()
+	{
+		return (isset($this->auth['key']) and trim($this->auth['key']) != '');
 	}
 
 	/**
