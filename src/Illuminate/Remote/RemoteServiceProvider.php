@@ -18,7 +18,7 @@ class RemoteServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->share('remote', function($app)
+		$this->app['remote'] = $this->app->share(function($app)
 		{
 			return new RemoteManager($app);
 		});
