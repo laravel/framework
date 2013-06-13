@@ -1,9 +1,9 @@
 {
-	"4.1.x": [
-		{"message": "Added implode method to query builder and Colletion class.", "backport": "4.0.x"},
-		{"message": "Fixed bug that caused Model->push method to fail.", "backport": "4.0.x"},
-		{"message": "Make session cookie HttpOnly by default.", "backport": "4.0.x"},
-		{"message": "Added mail.pretend configuration option.", "backport": "4.0.x"},
-		{"message": "Query elapsed time is now reported as float instead of string.", "backport": "4.0.x"}
+	"4.0.x": [
+		{"message": "Added implode method to query builder and Colletion class.", "backport": null},
+		{"message": "Fixed bug that caused Model->push method to fail.", "backport": null},
+		{"message": "Make session cookie HttpOnly by default.", "backport": null},
+		{"message": "Added mail.pretend configuration option.", "backport": null},
+		{"message": "Query elapsed time is now reported as float instead of string.", "backport": null}
 	]
 }
