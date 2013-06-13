@@ -166,7 +166,7 @@ class Filesystem {
 	 */
 	public function lastModified($path)
 	{
-		return filemtime(realpath($path));
+		return filemtime($path);
 	}
 
 	/**
@@ -258,7 +258,7 @@ class Filesystem {
 
 		foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir)
 		{
-			$directories[] = $dir->getRealPath();
+			$directories[] = $dir->getPathname();
 		}
 
 		return $directories;
@@ -310,7 +310,7 @@ class Filesystem {
 
 			if ($item->isDir())
 			{
-				$path = $item->getRealPath();
+				$path = $item->getPathname();
 
 				if ( ! $this->copyDirectory($path, $target, $options)) return false;
 			}
@@ -320,7 +320,7 @@ class Filesystem {
 			// and return false, so the developer is aware that the copy process failed.
 			else
 			{
-				if ( ! $this->copy($item->getRealPath(), $target)) return false;
+				if ( ! $this->copy($item->getPathname(), $target)) return false;
 			}
 		}
 
@@ -349,7 +349,7 @@ class Filesystem {
 			// keep iterating through each file until the directory is cleaned.
 			if ($item->isDir())
 			{
-				$this->deleteDirectory($item->getRealPath());
+				$this->deleteDirectory($item->getPathname());
 			}
 
 			// If the item is just a file, we can go ahead and delete it since we're
@@ -357,7 +357,7 @@ class Filesystem {
 			// and calling directories recursively, so we delete the real path.
 			else
 			{
-				$this->delete($item->getRealPath());
+				$this->delete($item->getPathname());
 			}
 		}
 
