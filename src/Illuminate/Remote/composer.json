@@ -1,0 +1,27 @@
+{
+    "name": "illuminate/remote",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x",
+        "phpseclib/phpseclib": "0.3.x"
+    },
+    "autoload": {
+        "psr-0": {
+            "Illuminate\\Remote": "src/"
+        }
+    },
+    "target-dir": "Illuminate/Remote",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}
