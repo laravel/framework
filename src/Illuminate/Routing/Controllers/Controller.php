@@ -287,7 +287,7 @@ class Controller {
 	 */
 	public function missingMethod($parameters)
 	{
-		throw new NotFoundHttpException;
+		throw new NotFoundHttpException("controller action not found: " . implode(', ', $parameters));
 	}
 
 	/**
@@ -299,7 +299,7 @@ class Controller {
 	 */
 	public function __call($method, $parameters)
 	{
-		throw new NotFoundHttpException;
+		throw new NotFoundHttpException('controller method not found: ' . $method);
 	}
 
 }
