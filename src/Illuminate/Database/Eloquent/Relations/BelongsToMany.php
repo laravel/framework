@@ -453,9 +453,10 @@ class BelongsToMany extends Relation {
 	 * Sync the intermediate tables with a list of IDs.
 	 *
 	 * @param  array  $ids
+	 * @param  bool   $detaching
 	 * @return void
 	 */
-	public function sync(array $ids)
+	public function sync(array $ids, $detaching = true)
 	{
 		// First we need to attach any of the associated models that are not currently
 		// in this joining table. We'll spin through the given IDs, checking to see
@@ -469,7 +470,7 @@ class BelongsToMany extends Relation {
 		// Next, we will take the differences of the currents and given IDs and detach
 		// all of the entities that exist in the "current" array but are not in the
 		// the array of the IDs given to the method which will complete the sync.
-		if (count($detach) > 0)
+		if ($detaching and count($detach) > 0)
 		{
 			$this->detach($detach);
 		}
@@ -517,6 +518,9 @@ class BelongsToMany extends Relation {
 	{
 		foreach ($records as $id => $attributes)
 		{
+			// If the ID is not in the list of existing pivot IDs, we will insert a new pivot
+			// record, otherwise, we will just update this existing record on this joining
+			// table, so that the developers will easily update these records pain free.
 			if ( ! in_array($id, $current))
 			{
 				$this->attach($id, $attributes, $touch);
