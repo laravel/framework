@@ -306,6 +306,17 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Set the items being paginated.
+	 *
+	 * @param  mixed  $items
+	 * @return void
+	 */
+	public function setItems($items)
+	{
+		$this->items = $items;
+	}
+
+	/**
 	 * Get the total number of items in the collection.
 	 *
 	 * @return int
