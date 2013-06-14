@@ -95,9 +95,9 @@ class BelongsToMany extends Relation {
 	 */
 	public function get($columns = array('*'))
 	{
-		// If we actually found models we will also eager load any relationships that
-		// have been specified as needing to be eager loaded. This will solve the
-		// n + 1 query problem for the developer and also increase performance.
+		// First we'll add the proper select columns onto the query so it is run with
+		// the proper columns. Then, we will get the results and hydrate out pivot
+		// models with the result of those columns as a separate model relation.
 		$select = $this->getSelectColumns($columns);
 
 		$models = $this->query->addSelect($select)->getModels();
@@ -116,6 +116,27 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Get a paginator for the "select" statement.
+	 *
+	 * @param  int    $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	public function paginate($perPage = null, $columns = array('*'))
+	{
+		$this->query->addSelect($this->getSelectColumns($columns));
+
+		// When paginating results, we need to add the pivot columns to the query and
+		// then hydrate into the pivot objects once the results have been gathered
+		// from the database since this isn't performed by the Eloquent builder.
+		$pager = $this->query->paginate($perPage, $columns);
+
+		$this->hydratePivotRelation($pager->getItems());
+
+		return $pager;
+	}
+
+	/**
 	 * Hydrate the pivot table relationship on the models.
 	 *
 	 * @param  array  $models
@@ -128,9 +149,7 @@ class BelongsToMany extends Relation {
 		// will set the attributes, table, and connections on so it they be used.
 		foreach ($models as $model)
 		{
-			$values = $this->cleanPivotAttributes($model);
-
-			$pivot = $this->newExistingPivot($values);
+			$pivot = $this->newExistingPivot($this->cleanPivotAttributes($model));
 
 			$model->setRelation('pivot', $pivot);
 		}
