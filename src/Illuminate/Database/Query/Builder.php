@@ -974,6 +974,8 @@ class Builder {
 	 */
 	public function getCached($columns = array('*'))
 	{
+		if (is_null($this->columns)) $this->columns = $columns;
+
 		list($key, $minutes) = $this->getCacheInfo();
 
 		// If the query is requested ot be cached, we will cache it using a unique key
