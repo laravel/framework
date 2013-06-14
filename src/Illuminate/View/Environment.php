@@ -458,11 +458,12 @@ class Environment {
 	 * Get the string contents of a section.
 	 *
 	 * @param  string  $section
+	 * @param  string  $default
 	 * @return string
 	 */
-	public function yieldContent($section)
+	public function yieldContent($section, $default = '')
 	{
-		return isset($this->sections[$section]) ? $this->sections[$section] : '';
+		return isset($this->sections[$section]) ? $this->sections[$section] : $default;
 	}
 
 	/**
