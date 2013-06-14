@@ -34,7 +34,7 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 		$job = new Illuminate\Queue\Jobs\IronJob(
 			m::mock('Illuminate\Container\Container'),
 			m::mock('IronMQ'),
-			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60, 'pushed' => true),
+			(object) array('id' => 1, 'body' => serialize(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60, 'pushed' => true),
 			'default'
 		);
 		$job->getIron()->shouldReceive('deleteMessage')->never();
@@ -57,7 +57,7 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 		return new Illuminate\Queue\Jobs\IronJob(
 			m::mock('Illuminate\Container\Container'),
 			m::mock('IronMQ'),
-			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60),
+			(object) array('id' => 1, 'body' => serialize(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60),
 			'default'
 		);
 	}

@@ -53,7 +53,7 @@ class SqsJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job['Body'], true));
+		$this->resolveAndFire(unserialize($this->job['Body']));
 	}
 
 	/**

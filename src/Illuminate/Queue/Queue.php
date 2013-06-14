@@ -34,11 +34,11 @@ abstract class Queue {
 	{
 		if ($job instanceof Closure)
 		{
-			return json_encode($this->createClosurePayload($job, $data));
+			return serialize($this->createClosurePayload($job));
 		}
 		else
 		{
-			return json_encode(array('job' => $job, 'data' => $data));
+			return serialize(array('job' => $job, 'data' => $data));
 		}
 	}
 
@@ -49,11 +49,9 @@ abstract class Queue {
 	 * @param  mixed  $data
 	 * @return string
 	 */
-	protected function createClosurePayload($job, $data)
+	protected function createClosurePayload($job)
 	{
-		$closure = serialize(new SerializableClosure($job));
-
-		return array('job' => 'IlluminateQueueClosure', 'data' => compact('closure'));
+		return array('job' => 'IlluminateQueueClosure', 'data' => new SerializableClosure($job));
 	}
 
 	/**
