@@ -228,7 +228,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		// to the sorted version. Then we'll just return the collection instance.
 		foreach (array_keys($results) as $key)
 		{
-			$results[$key] = $this->items[$key];
+			$sortedResults[] = $this->items[$key];
 		}
 
 		$this->items = $results;
