@@ -37,4 +37,34 @@ class MultiConnection implements ConnectionInterface {
 		}
 	}
 
+	/**
+	 * Upload a local file to the server.
+	 *
+	 * @param  string  $local
+	 * @param  string  $remote
+	 * @return void
+	 */
+	public function put($local, $remote)
+	{
+		foreach ($this->connections as $connection)
+		{
+			$connection->put($local, $remote);
+		}
+	}
+
+	/**
+	 * Upload a string to to the given file on the server.
+	 *
+	 * @param  string  $remote
+	 * @param  string  $contents
+	 * @return void
+	 */
+	public function putString($remote, $contents)
+	{
+		foreach ($this->connections as $connection)
+		{
+			$connection->putString($remote, $contents);
+		}
+	}
+
 }

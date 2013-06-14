@@ -39,7 +39,7 @@ class SecLibGateway implements GatewayInterface {
 		$this->host = $host;
 		$this->auth = $auth;
 		$this->files = $files;
-		$this->connection = new Net_SSH2($this->host);
+		$this->connection = new Net_SFTP($this->host);
 	}
 
 	/**
@@ -72,6 +72,30 @@ class SecLibGateway implements GatewayInterface {
 	public function run($command)
 	{
 		$this->connection->exec($command, false);
+	}
+
+	/**
+	 * Upload a local file to the server.
+	 *
+	 * @param  string  $local
+	 * @param  string  $remote
+	 * @return void
+	 */
+	public function put($local, $remote)
+	{
+		$this->connection->put($remote, $local, NET_SFTP_LOCAL_FILE);
+	}
+
+	/**
+	 * Upload a string to to the given file on the server.
+	 *
+	 * @param  string  $remote
+	 * @param  string  $contents
+	 * @return void
+	 */
+	public function putString($remote, $contents)
+	{
+		$this->connection->put($remote, $contents);
 	}
 
 	/**

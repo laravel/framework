@@ -34,7 +34,7 @@ class RemoteManager {
 	 * Get a remote connection instance.
 	 *
 	 * @param  string|array|dynamic  $name
-	 * @return \Illuminate\Remote\Connection
+	 * @return \Illuminate\Remote\ConnectionInterface
 	 */
 	public function into($name)
 	{
@@ -52,13 +52,24 @@ class RemoteManager {
 	 * Get a remote connection instance.
 	 *
 	 * @param  string|array  $name
-	 * @return \Illuminate\Remote\Connection
+	 * @return \Illuminate\Remote\ConnectionInterface
 	 */
 	public function connection($name = null)
 	{
 		if (is_array($name)) return $this->multiple($name);
 
 		return $this->resolve($name ?: $this->getDefaultConnection());
+	}
+
+	/**
+	 * Get a connection group instance by name.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Remote\ConnectionInterface
+	 */
+	public function group($name)
+	{
+		return $this->connection($this->app['config']['remote.groups.'.$name]);
 	}
 
 	/**
