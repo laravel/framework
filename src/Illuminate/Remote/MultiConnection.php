@@ -31,7 +31,7 @@ class MultiConnection implements ConnectionInterface {
 	 */
 	public function define($task, $commands)
 	{
-		foreach ($this->connections as $conection)
+		foreach ($this->connections as $connection)
 		{
 			$connection->define($task, $commands);
 		}
