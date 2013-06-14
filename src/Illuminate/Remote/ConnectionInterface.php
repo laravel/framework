@@ -5,6 +5,24 @@ use Closure;
 interface ConnectionInterface {
 
 	/**
+	 * Define a set of commands as a task.
+	 *
+	 * @param  string  $task
+	 * @param  string|array  $commands
+	 * @return void
+	 */
+	public function define($task, $commands);
+
+	/**
+	 * Run a task against the connection.
+	 *
+	 * @param  string  $task
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function task($task, Closure $callback = null);
+
+	/**
 	 * Run a set of commands against the connection.
 	 *
 	 * @param  string|array  $commands
