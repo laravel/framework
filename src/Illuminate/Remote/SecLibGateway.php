@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Remote;
 
-use Net_SSH2;
+use Net_SFTP;
 use Crypt_RSA;
 use Illuminate\Filesystem\Filesystem;
 
