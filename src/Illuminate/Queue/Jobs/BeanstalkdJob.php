@@ -44,7 +44,7 @@ class BeanstalkdJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job->getData(), true));
+		$this->resolveAndFire(unserialize($this->job->getData()));
 	}
 
 	/**
