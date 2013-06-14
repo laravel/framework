@@ -224,7 +224,7 @@ class UrlGenerator {
 			$params += array_fill(count($params), $difference, null);
 		} else {
 			
-			$extra_parameters = array_slice($params,count($keys));
+			$extra_parameters = array_slice($params, count($keys));
 
 			$keys += array_keys($extra_parameters);
 
