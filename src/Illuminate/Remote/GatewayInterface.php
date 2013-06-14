@@ -26,6 +26,24 @@ interface GatewayInterface {
 	public function run($comamnd);
 
 	/**
+	 * Upload a local file to the server.
+	 *
+	 * @param  string  $local
+	 * @param  string  $remote
+	 * @return void
+	 */
+	public function put($local, $remote);
+
+	/**
+	 * Upload a string to to the given file on the server.
+	 *
+	 * @param  string  $remote
+	 * @param  string  $contents
+	 * @return void
+	 */
+	public function putString($remote, $contents);
+
+	/**
 	 * Get the next line of output from the server.
 	 *
 	 * @return string|null

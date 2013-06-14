@@ -43,6 +43,13 @@ class Connection implements ConnectionInterface {
 	protected $auth;
 
 	/**
+	 * All of the defined tasks.
+	 *
+	 * @var array
+	 */
+	protected $tasks = array();
+
+	/**
 	 * The output implementation for the connection.
 	 *
 	 * @var \Symfony\Component\Console\Output\OutputInterface
@@ -65,6 +72,33 @@ class Connection implements ConnectionInterface {
 		$this->host = $host;
 		$this->username = $username;
 		$this->gateway = $gateway ?: new SecLibGateway($host, $auth, new Filesystem);
+	}
+
+	/**
+	 * Define a set of commands as a task.
+	 *
+	 * @param  string  $task
+	 * @param  string|array  $commands
+	 * @return void
+	 */
+	public function define($task, $commands)
+	{
+		$this->tasks[$task] = $commands;
+	}
+
+	/**
+	 * Run a task against the connection.
+	 *
+	 * @param  string  $task
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function task($task, Closure $callback = null)
+	{
+		if (isset($this->tasks[$task]))
+		{
+			return $this->run($this->tasks[$task], $callback);
+		}
 	}
 
 	/**
@@ -94,6 +128,30 @@ class Connection implements ConnectionInterface {
 
 			call_user_func($callback, $line, $this);
 		}
+	}
+
+	/**
+	 * Upload a local file to the server.
+	 *
+	 * @param  string  $local
+	 * @param  string  $remote
+	 * @return void
+	 */
+	public function put($local, $remote)
+	{
+		$this->getGateway()->put($local, $remote);
+	}
+
+	/**
+	 * Upload a string to to the given file on the server.
+	 *
+	 * @param  string  $remote
+	 * @param  string  $contents
+	 * @return void
+	 */
+	public function putString($remote, $contents)
+	{
+		$this->getGateway()->putString($remote, $contents);
 	}
 
 	/**
