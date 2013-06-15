@@ -64,6 +64,11 @@ class ControllerGenerator {
 	 */
 	protected function writeFile($stub, $controller, $path)
 	{
+		if (str_contains($path, 'workbench'))
+		{
+			$this->makeDirectory($controller, $path, true);
+		}
+
 		if (str_contains($controller, '\\'))
 		{
 			$this->makeDirectory($controller, $path);
@@ -82,10 +87,19 @@ class ControllerGenerator {
 	 *
 	 * @param  string  $controller
 	 * @param  string  $path
+	 * @param  boolean $prep_bench
 	 * @return void
 	 */
-	protected function makeDirectory($controller, $path)
+	protected function makeDirectory($controller, $path, $prep_bench = false)
 	{
+		// If the controller is being created in a workbench, first of all
+		// we need to make sure the bench's src/controllers dir exists
+		if ($prep_bench && ! $this->files->isDirectory($path))
+		{
+			$this->files->makeDirectory($path, 0777, true);
+			return;
+		}
+
 		$directory = $this->getDirectory($controller);
 
 		if ( ! $this->files->isDirectory($full = $path.'/'.$directory))
