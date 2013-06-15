@@ -580,7 +580,9 @@ class Connection implements ConnectionInterface {
 	{
 		$driver = $this->getDoctrineDriver();
 
-		return new \Doctrine\DBAL\Connection(array('pdo' => $this->pdo), $driver);
+		$data = array('pdo' => $this->pdo, 'dbname' => $this->getConfig('database'));
+
+		return new \Doctrine\DBAL\Connection($data, $driver);
 	}
 
 	/**
