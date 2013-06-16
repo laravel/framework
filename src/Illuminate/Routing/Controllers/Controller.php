@@ -282,12 +282,12 @@ class Controller {
 	/**
 	 * Handle calls to missing methods on the controller.
 	 *
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public function missingMethod($parameters)
 	{
-		throw new NotFoundHttpException;
+		throw new NotFoundHttpException("Controller method not found.");
 	}
 
 	/**
@@ -299,7 +299,7 @@ class Controller {
 	 */
 	public function __call($method, $parameters)
 	{
-		throw new NotFoundHttpException;
+		return $this->missingMethod($parameters);
 	}
 
 }
