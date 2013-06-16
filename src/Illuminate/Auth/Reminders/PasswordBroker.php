@@ -50,7 +50,7 @@ class PasswordBroker {
 	 * @param  \Illuminate\Routing\Redirector  $redirect
 	 * @param  \Illuminate\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
-	 * @return void
+	 * @return \Illuminate\Auth\Reminders\PasswordBroker
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
@@ -100,7 +100,7 @@ class PasswordBroker {
 	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string   $token
 	 * @param  Closure  $callback
-	 * @return void
+	 * @return integer
 	 */
 	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null)
 	{
@@ -151,8 +151,9 @@ class PasswordBroker {
 	/**
 	 * Validate a password reset for the given credentials.
 	 *
-	 * @param  array  $credenitals
-	 * @return \Illuminate\Auth\RemindableInterface
+	 * @param array $credentials
+	 * @internal param array $credenitals
+	 * @return \Illuminate\Auth\Reminders\RemindableInterface
 	 */
 	protected function validateReset(array $credentials)
 	{
@@ -205,6 +206,7 @@ class PasswordBroker {
 	 * Get the user for the given credentials.
 	 *
 	 * @param  array  $credentials
+	 * @throws \UnexpectedValueException
 	 * @return \Illuminate\Auth\Reminders\RemindableInterface
 	 */
 	public function getUser(array $credentials)

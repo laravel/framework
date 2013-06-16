@@ -23,7 +23,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 *
 	 * @param  \Illuminate\Hashing\HasherInterface  $hasher
 	 * @param  string  $model
-	 * @return void
+	 * @return \Illuminate\Auth\EloquentUserProvider
 	 */
 	public function __construct(HasherInterface $hasher, $model)
 	{
