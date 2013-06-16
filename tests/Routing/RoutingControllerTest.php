@@ -122,6 +122,43 @@ class RoutingControllerTest extends PHPUnit_Framework_TestCase {
 		unset($_SERVER['__controller.after']);
 	}
 
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testMissingMethod()
+	{
+		$controller = new BasicControllerStub;
+		$container = new Illuminate\Container\Container;
+		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
+		$container['filter.parser']->shouldReceive('parse')->andReturn(array());
+		$router = m::mock('Illuminate\Routing\Router');
+		$router->shouldReceive('getRequest')->andReturn(m::mock('Symfony\Component\HttpFoundation\Request'));
+		$router->shouldReceive('getCurrentRoute')->andReturn(m::mock('Illuminate\Routing\Route'));
+		$router->shouldReceive('prepare')->never()->andReturnUsing(function($response, $request) { return new Response($response); });
+
+		// Call a method that doesn't exists.
+		$controller->callAction($container, $router, 'thisMethodDoesntExists', array('foo'));
+	}
+
+
+	public function testMissingMethodReplacement()
+	{
+		$controller = new MissingMethodControllerStub;
+		$container = new Illuminate\Container\Container;
+		$container['filter.parser'] = $container->share(function() { return m::mock('StdClass'); });
+		$container['filter.parser']->shouldReceive('parse')->andReturn(array());
+		$router = m::mock('Illuminate\Routing\Router');
+		$router->shouldReceive('getRequest')->andReturn(m::mock('Symfony\Component\HttpFoundation\Request'));
+		$router->shouldReceive('getCurrentRoute')->andReturn(m::mock('Illuminate\Routing\Route'));
+		$router->shouldReceive('prepare')->once()->andReturnUsing(function($response, $request) { return new Response($response); });
+
+		// Call a method that doesn't exists.
+		$response = $controller->callAction($container, $router, 'thisMethodDoesntExists', array('foo'));
+		$this->assertEquals('Missing method!', $response->getContent());
+	}
+
+
 }
 
 class BasicControllerStub extends Illuminate\Routing\Controllers\Controller {
@@ -140,4 +177,11 @@ class LayoutControllerStub extends Illuminate\Routing\Controllers\Controller {
 	{
 		$this->layout = 'Layout';
 	}
+}
+
+class MissingMethodControllerStub extends Illuminate\Routing\Controllers\Controller {
+	public function missingMethod($parameters)
+	{
+	    return 'Missing method!';
+	} 
 }
