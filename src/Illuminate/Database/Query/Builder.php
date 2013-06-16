@@ -724,6 +724,20 @@ class Builder {
 	}
 
 	/**
+	 * Ignores an operation on a list of values for a given column.
+	 *
+	 * @param  mixed   $values
+	 * @param  string  $column
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function ignore($values, $column = 'id')
+	{
+		$values = $values instanceof Closure ? $values : (array) $values;
+
+		return $this->whereNotIn($column, $values);
+	}
+
+	/**
 	 * Add a "group by" clause to the query.
 	 *
 	 * @param  dynamic  $columns
