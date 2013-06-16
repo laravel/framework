@@ -508,7 +508,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Format the sync list so that is is keyed by ID.
+	 * Format the sync list so that it is keyed by ID.
 	 *
 	 * @param  array  $records
 	 * @return array
@@ -557,7 +557,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Update an existing pivot reord on the table.
+	 * Update an existing pivot record on the table.
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $attributes
