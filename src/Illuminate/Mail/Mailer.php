@@ -97,7 +97,7 @@ class Mailer {
 	 * @param  string|array  $view
 	 * @param  array  $data
 	 * @param  Closure|string  $callback
-	 * @return void
+	 * @return integer
 	 */
 	public function send($view, array $data, $callback)
 	{
@@ -282,7 +282,7 @@ class Mailer {
 	 * Send a Swift Message instance.
 	 *
 	 * @param  Swift_Message  $message
-	 * @return void
+	 * @return integer|void
 	 */
 	protected function sendSwiftMessage($message)
 	{

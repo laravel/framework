@@ -70,7 +70,7 @@ class Guard {
 	 *
 	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
 	 * @param  \Illuminate\Session\Store  $session
-	 * @return void
+	 * @return \Illuminate\Auth\Guard
 	 */
 	public function __construct(UserProviderInterface $provider,
                                 SessionStore $session)
@@ -365,7 +365,9 @@ class Guard {
 	{
 		$this->session->put($this->getName(), $id);
 
-		return $this->login($this->user(), $remember);
+		$this->login($this->user(), $remember);
+
+		return $this->user;
 	}
 
 	/**
@@ -425,6 +427,7 @@ class Guard {
 	/**
 	 * Get the cookie creator instance used by the guard.
 	 *
+	 * @throws \RuntimeException
 	 * @return \Illuminate\Cookie\CookieJar
 	 */
 	public function getCookieJar()
