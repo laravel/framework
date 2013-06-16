@@ -773,7 +773,7 @@ class BelongsToMany extends Relation {
 	 */
 	protected function newPivotQuery()
 	{
-		$query = $this->query->getQuery()->newQuery()->from($this->table);
+		$query = $this->newPivotStatement();
 
 		return $query->where($this->foreignKey, $this->parent->getKey());
 	}
