@@ -54,7 +54,7 @@ class Builder {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model|null
 	 */
 	public function find($id, $columns = array('*'))
 	{
@@ -68,7 +68,7 @@ class Builder {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|Collection
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
@@ -80,8 +80,8 @@ class Builder {
 	/**
 	 * Execute the query and get the first result.
 	 *
-	 * @param  array   $columns
-	 * @return array
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|null
 	 */
 	public function first($columns = array('*'))
 	{
@@ -91,8 +91,8 @@ class Builder {
 	/**
 	 * Execute the query and get the first result or throw an exception.
 	 *
-	 * @param  array   $columns
-	 * @return array
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
