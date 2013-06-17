@@ -119,6 +119,33 @@ class Mailer {
 
 		return $this->sendSwiftMessage($message);
 	}
+	
+	
+	/**
+	 * Send a new message using precompiled html/text parts.
+	 *
+	 * @param  string|array  $view
+	 * @param  array  $data
+	 * @param  Closure|string  $callback
+	 * @return void
+	 */
+	public function sendRaw($content,$callback){
+		
+		// First we need to parse the view, which could either be a string or an array
+		// containing both an HTML and plain text versions of the view which should
+		// be used when sending an e-mail. We will extract both of them out here.
+		list($content, $plain) = $this->parseView($content);
+
+		$message = $this->createMessage();
+
+		$this->callMessageBuilder($callback, $message);
+
+		$message->setBody($content, 'text/html');
+
+		$plain and $message->addPart($plain, 'text/plain');
+
+		return $this->sendSwiftMessage($message->getSwiftMessage());
+	}
 
 	/**
 	 * Queue a new e-mail message for sending.
