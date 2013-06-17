@@ -154,6 +154,25 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBasicIgnore()
+	{
+		$builder = $this->getBuilder();
+			$builder->select('*')->from('users')->ignore(array(1, 2, 3));
+		$this->assertEquals('select * from "users" where "id" not in (?, ?, ?)', $builder->toSql());
+		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->ignore(array('taylor', 'dayle'), 'name');
+		$this->assertEquals('select * from "users" where "name" not in (?, ?)', $builder->toSql());
+		$this->assertEquals(array(0 => 'taylor', 1 => 'dayle'), $builder->getBindings());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->ignore('taylor', 'name');
+		$this->assertEquals('select * from "users" where "name" not in (?)', $builder->toSql());
+		$this->assertEquals(array(0 => 'taylor'), $builder->getBindings());
+	}
+
+
 	public function testUnions()
 	{
 		$builder = $this->getBuilder();
