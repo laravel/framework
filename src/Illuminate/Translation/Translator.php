@@ -19,7 +19,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 *
 	 * @var string
 	 */
-	protected $default;
+	protected $locale;
 
 	/**
 	 * The array of loaded translation groups.
