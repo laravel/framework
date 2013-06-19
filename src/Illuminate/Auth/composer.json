@@ -9,6 +9,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
+        "illuminate/config": "4.1.x",
         "illuminate/cookie": "4.1.x",
         "illuminate/encryption": "4.1.x",
         "illuminate/events": "4.1.x",
