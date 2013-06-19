@@ -162,6 +162,18 @@ class Str {
 	}
 
 	/**
+	 * Parse a Class@method style callback into class and method.
+	 *
+	 * @param  string  $callback
+	 * @param  string  $default
+	 * @return array
+	 */
+	public static function parseCallback($callback, $default)
+	{
+		return static::contains($callback, '@') ? explode('@', $callback, 2) : array($callback, $default);
+	}
+
+	/**
 	 * Get the plural form of an English word.
 	 *
 	 * @param  string  $value
