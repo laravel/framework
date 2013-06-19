@@ -81,7 +81,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRepo()
 	{
-		return new Illuminate\Auth\Reminders\DatabaseReminderRepository(m::mock('Illuminate\Database\Connection'), 'table', 'key');
+		return new Illuminate\Auth\Reminders\DatabaseReminderRepository(m::mock('Illuminate\Database\Connection'), 'table', 'key', 3600);
 	}
 
 }
