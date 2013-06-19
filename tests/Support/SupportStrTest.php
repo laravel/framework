@@ -65,4 +65,11 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(Str::contains('taylor', array('xxx')));
 	}
 
+
+	public function testParseCallback()
+	{
+		$this->assertEquals(array('Class', 'method'), Str::parseCallback('Class@method', 'foo'));
+		$this->assertEquals(array('Class', 'foo'), Str::parseCallback('Class', 'foo'));
+	}
+
 }
