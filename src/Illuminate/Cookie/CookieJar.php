@@ -120,6 +120,11 @@ class CookieJar {
 
 		$value = $this->encrypter->encrypt($value);
 
+		if ( ! headers_sent())
+		{
+			setcookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
+		}
+
 		return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
 	}
 
