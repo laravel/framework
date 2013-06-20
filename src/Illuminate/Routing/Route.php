@@ -406,7 +406,16 @@ class Route extends BaseRoute {
 	 */
 	public function setBeforeFilters($value)
 	{
-		$filters = is_string($value) ? explode('|', $value) : (array) $value;
+		$filters = array();
+		$filterStrings = (array) $value;
+
+		foreach ($filterStrings as $filterString)
+		{
+			foreach (explode('|', $filterString) as $filter)
+			{
+				$filters[] = $filter;
+			}
+		}
 
 		$this->setOption('_before', array_merge($this->getBeforeFilters(), $filters));
 	}
