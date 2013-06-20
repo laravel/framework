@@ -66,6 +66,30 @@ if ( ! function_exists('array_add'))
 	}
 }
 
+if ( ! function_exists('array_build'))
+{
+	/**
+	 * Build a new array using a callback.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	function array_build($array, Closure $callback)
+	{
+		$results = array();
+
+		foreach ($array as $key => $value)
+		{
+			list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
+
+			$results[$innerKey] = $innerValue;
+		}
+
+		return $results;
+	}
+}
+
 if ( ! function_exists('array_divide'))
 {
 	/**
