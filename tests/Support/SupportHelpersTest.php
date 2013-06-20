@@ -2,6 +2,15 @@
 
 class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
+	public function testArrayBuild()
+	{
+		$this->assertEquals(array('foo' => 'bar'), array_build(array('foo' => 'bar'), function($key, $value)
+		{
+			return array($key, $value);
+		}));
+	}
+
+
 	public function testArrayDot()
 	{
 		$array = array_dot(array('name' => 'taylor', 'languages' => array('php' => true)));
