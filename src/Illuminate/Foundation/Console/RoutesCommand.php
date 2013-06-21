@@ -23,7 +23,7 @@ class RoutesCommand extends Command {
 	protected $description = 'List all registered routes';
 
 	/**
-	 * An array o fall registered routes.
+	 * An array of all registered routes.
 	 *
 	 * @var array
 	 */
