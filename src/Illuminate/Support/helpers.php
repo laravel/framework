@@ -548,6 +548,22 @@ if ( ! function_exists('last'))
 	}
 }
 
+if ( ! function_exists('last_key'))
+{
+	/**
+	 * Get the last key from an array.
+	 *
+	 * @param  array  $array
+	 * @return mixed
+	 */
+	function last_key($array)
+	{
+		end($array);
+
+		return key($array);
+	}
+}
+
 if ( ! function_exists('link_to_asset'))
 {
 	/**

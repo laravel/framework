@@ -123,6 +123,13 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testLastKey()
+	{
+		$array = array('foo' => 'taylor', 'bar' => 'dayle', 'baz' => 'shawn');
+		$this->assertEquals('baz', last_key($array));
+	}
+
+
 	public function testStrIs()
 	{
 		$this->assertTrue(str_is('*.dev', 'localhost.dev'));
