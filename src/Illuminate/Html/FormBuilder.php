@@ -284,6 +284,19 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a HTML date input element.
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function date($name, $value = null, $options = array())
+	{
+		return $this->input('date', $name, $value, $options);
+	}
+	
+	/**
 	 * Create a file input field.
 	 *
 	 * @param  string  $name
