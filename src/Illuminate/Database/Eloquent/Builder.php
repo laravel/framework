@@ -54,7 +54,7 @@ class Builder {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|null
+	 * @return \Illuminate\Database\Eloquent\Model|static|null
 	 */
 	public function find($id, $columns = array('*'))
 	{
@@ -68,7 +68,7 @@ class Builder {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model|static
 	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
@@ -81,7 +81,7 @@ class Builder {
 	 * Execute the query and get the first result.
 	 *
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|null
+	 * @return \Illuminate\Database\Eloquent\Model|static|null
 	 */
 	public function first($columns = array('*'))
 	{
@@ -92,7 +92,7 @@ class Builder {
 	 * Execute the query and get the first result or throw an exception.
 	 *
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model|static
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
@@ -105,7 +105,7 @@ class Builder {
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */
 	public function get($columns = array('*'))
 	{
@@ -335,7 +335,7 @@ class Builder {
 	/**
 	 * Include the soft deleted models in the results.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function withTrashed()
 	{
@@ -360,7 +360,7 @@ class Builder {
 	/**
 	 * Force the result set to only included soft deletes.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function onlyTrashed()
 	{
@@ -387,7 +387,7 @@ class Builder {
 	 * Get the hydrated models without eager loading.
 	 *
 	 * @param  array  $columns
-	 * @return array
+	 * @return array|static[]
 	 */
 	public function getModels($columns = array('*'))
 	{
@@ -438,9 +438,9 @@ class Builder {
 	/**
 	 * Eagerly load the relationship on a set of models.
 	 *
-	 * @param  string   $relation
 	 * @param  array    $models
-	 * @param  Closure  $constraints
+	 * @param  string   $name
+	 * @param  \Closure $constraints
 	 * @return array
 	 */
 	protected function loadRelation(array $models, $name, Closure $constraints)
@@ -539,7 +539,7 @@ class Builder {
 	 * @param  string  $operator
 	 * @param  int     $count
 	 * @param  string  $boolean
-	 * @return \Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and')
 	{
@@ -558,7 +558,7 @@ class Builder {
 	 * @param  string  $relation
 	 * @param  string  $operator
 	 * @param  int     $count
-	 * @return \Illuminate\Database\Eloquent\Builder
+	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function orHas($relation, $operator = '>=', $count = 1)
 	{
@@ -568,8 +568,8 @@ class Builder {
 	/**
 	 * Set the relationships that should be eager loaded.
 	 *
-	 * @param  dynamic  $relation
-	 * @return \Illuminate\Database\Eloquent\Builder
+	 * @param  dynamic  $relations
+	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function with($relations)
 	{
@@ -645,7 +645,7 @@ class Builder {
 	/**
 	 * Get the underlying query builder instance.
 	 *
-	 * @return \Illuminate\Database\Query\Builder
+	 * @return \Illuminate\Database\Query\Builder|static
 	 */
 	public function getQuery()
 	{
