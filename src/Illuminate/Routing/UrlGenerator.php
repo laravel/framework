@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Generator\UrlGenerator as SymfonyGenerator;
+use Illuminate\Support\Facades\Config;
 
 class UrlGenerator {
 
@@ -136,7 +137,8 @@ class UrlGenerator {
 	 */
 	protected function removeIndex($root)
 	{
-		$i = 'index.php';
+		// index.php added as a fallback for legacy purposes
+		$i = Config::get('app.index', 'index.php');
 
 		return str_contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
 	}
