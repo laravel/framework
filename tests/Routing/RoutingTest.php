@@ -260,6 +260,21 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBeforeFiltersCanBeNestedInGroups()
+	{
+		$router = new Router;
+		$router->group(array('before' => 'foo|bar'), function() use ($router)
+		{
+			$router->get('foo', function() {});
+			$router->get('bar', array('before' => 'nestedFoo|nestedBaz', function() {}));
+		});
+		$routes = array_values($router->getRoutes()->getIterator()->getArrayCopy());
+
+		$this->assertEquals(array('foo', 'bar'), $routes[0]->getOption('_before'));
+		$this->assertEquals(array('foo', 'bar', 'nestedFoo', 'nestedBaz'), $routes[1]->getOption('_before'));
+	}
+
+
 	public function testBeforeFiltersArePassedRouteAndRequest()
 	{
 		unset($_SERVER['__before.args']);
