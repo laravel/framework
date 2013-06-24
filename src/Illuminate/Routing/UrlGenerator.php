@@ -136,7 +136,8 @@ class UrlGenerator {
 	 */
 	protected function removeIndex($root)
 	{
-		$i = 'index.php';
+		// index.php added as a fallback for legacy purposes
+		$i = Config::get('app.index', 'index.php');
 
 		return str_contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
 	}
