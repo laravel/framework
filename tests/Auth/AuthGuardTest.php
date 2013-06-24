@@ -153,7 +153,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$mock = $this->getGuard();
 		$mock->getSession()->shouldReceive('get')->once()->andReturn(1);
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$mock->getProvider()->shouldReceive('retrieveByID')->once()->with(1)->andReturn($user);
+		$mock->getProvider()->shouldReceive('retrieveById')->once()->with(1)->andReturn($user);
 		$this->assertEquals($user, $mock->user());
 		$this->assertEquals($user, $mock->getUser());
 	}
@@ -212,7 +212,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$guard = $this->getMock('Illuminate\Auth\Guard', array('login', 'user'), array($provider, $session, $request));
 		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 10);
-		$guard->expects($this->once())->method('user')->will($this->returnValue($user = m::mock('Illuminate\Auth\UserInterface')));
+		$guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user = m::mock('Illuminate\Auth\UserInterface'));
 		$guard->expects($this->once())->method('login')->with($this->equalTo($user), $this->equalTo(false))->will($this->returnValue($user));
 
 		$this->assertEquals($user, $guard->loginUsingId(10));
@@ -230,7 +230,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$cookie->shouldReceive('get')->once()->with($guard->getRecallerName())->andReturn('recaller');
 		$guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$guard->getProvider()->shouldReceive('retrieveByID')->once()->with('recaller')->andReturn($user);
+		$guard->getProvider()->shouldReceive('retrieveById')->once()->with('recaller')->andReturn($user);
 		$this->assertEquals($user, $guard->user());
 	}
 

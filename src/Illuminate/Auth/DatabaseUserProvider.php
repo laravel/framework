@@ -47,7 +47,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	 * @param  mixed  $identifier
 	 * @return \Illuminate\Auth\UserInterface|null
 	 */
-	public function retrieveByID($identifier)
+	public function retrieveById($identifier)
 	{
 		$user = $this->conn->table($this->table)->find($identifier);
 

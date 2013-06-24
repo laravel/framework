@@ -406,7 +406,7 @@ class Route extends BaseRoute {
 	 */
 	public function setBeforeFilters($value)
 	{
-		$filters = is_string($value) ? explode('|', $value) : (array) $value;
+		$filters = $this->parseFilterValue($value);
 
 		$this->setOption('_before', array_merge($this->getBeforeFilters(), $filters));
 	}
@@ -429,9 +429,27 @@ class Route extends BaseRoute {
 	 */
 	public function setAfterFilters($value)
 	{
-		$filters = is_string($value) ? explode('|', $value) : (array) $value;
+		$filters = $this->parseFilterValue($value);
 
 		$this->setOption('_after', array_merge($this->getAfterFilters(), $filters));
+	}
+
+	/**
+	 * Parse the given filters for setting.
+	 *
+	 * @param  array|string  $value
+	 * @return array
+	 */
+	protected function parseFilterValue($value)
+	{
+		$results = array();
+
+		foreach ((array) $value as $filters)
+		{
+			$results = array_merge($results, explode('|', $filters));
+		}
+
+		return $results;
 	}
 
 	/**
