@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Generator\UrlGenerator as SymfonyGenerator;
+use Illuminate\Support\Facades\Config;
 
 class UrlGenerator {
 
