@@ -169,7 +169,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = null, $columns = array('*'))
+	public function paginate($perPage = null, $columns = array('*'), $countColumn = '*')
 	{
 		$perPage = $perPage ?: $this->model->getPerPage();
 
@@ -181,7 +181,7 @@ class Builder {
 		}
 		else
 		{
-			return $this->ungroupedPaginate($paginator, $perPage, $columns);
+			return $this->ungroupedPaginate($paginator, $perPage, $columns, $countColumn);
 		}
 	}
 
@@ -208,9 +208,9 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
+	protected function ungroupedPaginate($paginator, $perPage, $columns, $countColumn)
 	{
-		$total = $this->query->getPaginationCount();
+		$total = $this->query->getPaginationCount($countColumn);
 
 		// Once we have the paginator we need to set the limit and offset values for
 		// the query so we can get the properly paginated items. Once we have an
