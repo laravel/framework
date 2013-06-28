@@ -1,5 +1,11 @@
 <?php namespace Illuminate\Database;
 
+use Closure;
+use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
+use Illuminate\Database\Query\Processors\SqlServerProcessor;
+use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
+
 class SqlServerConnection extends Connection {
 
 	/**
@@ -38,41 +44,41 @@ class SqlServerConnection extends Connection {
 	/**
 	 * Get the default query grammar instance.
 	 *
-	 * @return \Illuminate\Database\Query\Grammars\Grammars\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\SqlServerGrammar
 	 */
 	protected function getDefaultQueryGrammar()
 	{
-		return $this->withTablePrefix(new Query\Grammars\SqlServerGrammar);
+		return $this->withTablePrefix(new QueryGrammar);
 	}
 
 	/**
 	 * Get the default schema grammar instance.
 	 *
-	 * @return \Illuminate\Database\Schema\Grammars\Grammar
+	 * @return \Illuminate\Database\Schema\Grammars\SqlServerGrammar
 	 */
 	protected function getDefaultSchemaGrammar()
 	{
-		return $this->withTablePrefix(new Schema\Grammars\SqlServerGrammar);
-	}
-
-	/**
-	 * Get the Doctrine DBAL Driver.
-	 *
-	 * @return \Doctrine\DBAL\Driver
-	 */
-	protected function getDoctrineDriver()
-	{
-		return new \Doctrine\DBAL\Driver\PDOSqlsrv\Driver;
+		return $this->withTablePrefix(new SchemaGrammar);
 	}
 
 	/**
 	 * Get the default post processor instance.
 	 *
-	 * @return \Illuminate\Database\Query\Processors\Processor
+	 * @return \Illuminate\Database\Query\Processors\SqlServerProcessor
 	 */
 	protected function getDefaultPostProcessor()
 	{
-		return new Query\Processors\SqlServerProcessor;
+		return new SqlServerProcessor;
+	}
+
+	/**
+	 * Get the Doctrine DBAL Driver.
+	 *
+	 * @return \Doctrine\DBAL\Driver\PDOSqlsrv\Driver
+	 */
+	protected function getDoctrineDriver()
+	{
+		return new DoctrineDriver;
 	}
 
 }

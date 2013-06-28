@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache; use Memcached;
+<?php namespace Illuminate\Cache;
+
+use Memcached;
 
 class MemcachedStore implements StoreInterface {
 

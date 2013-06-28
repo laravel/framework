@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Redis;
 
+use Predis\Client;
+
 class Database {
 
 	/**
@@ -37,7 +39,7 @@ class Database {
 	{
 		$servers = array_except($servers, array('cluster'));
 
-		return array('default' => new \Predis\Client(array_values($servers)));
+		return array('default' => new Client(array_values($servers)));
 	}
 
 	/**
@@ -52,7 +54,7 @@ class Database {
 
 		foreach ($servers as $key => $server)
 		{
-			$clients[$key] = new \Predis\Client($server);
+			$clients[$key] = new Client($server);
 		}
 
 		return $clients;
