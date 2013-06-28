@@ -517,6 +517,34 @@ if ( ! function_exists('head'))
 	}
 }
 
+if ( ! function_exists('is_false'))
+{
+	/**
+	 * Determine if a variable is false.
+	 *
+	 * @param  mixed  $value
+	 * @return bool
+	 */
+	function is_false($value)
+	{
+		return $value === false;
+	}
+}
+
+if ( ! function_exists('is_true'))
+{
+	/**
+	 * Determine if a variable is true.
+	 *
+	 * @param  mixed  $value
+	 * @return bool
+	 */
+	function is_true($value)
+	{
+		return $value === true;
+	}
+}
+
 if ( ! function_exists('link_to'))
 {
 	/**

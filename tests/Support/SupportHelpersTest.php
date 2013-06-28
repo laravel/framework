@@ -123,6 +123,18 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIsTrue()
+	{
+		$this->assertEquals(true, is_true(true));
+	}
+
+
+	public function testIsFalse()
+	{
+		$this->assertEquals(true, is_false(false));
+	}
+
+
 	public function testStrIs()
 	{
 		$this->assertTrue(str_is('*.dev', 'localhost.dev'));
