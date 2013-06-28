@@ -1,4 +1,9 @@
-<?php namespace Illuminate\Container; use Closure, ArrayAccess, ReflectionParameter;
+<?php namespace Illuminate\Container;
+
+use Closure;
+use ArrayAccess;
+use ReflectionClass;
+use ReflectionParameter;
 
 class BindingResolutionException extends \Exception {}
 
@@ -293,7 +298,7 @@ class Container implements ArrayAccess {
 			return $concrete($this, $parameters);
 		}
 
-		$reflector = new \ReflectionClass($concrete);
+		$reflector = new ReflectionClass($concrete);
 
 		// If the type is not instantiable, the developer is attempting to resolve
 		// an abstract type such as an Interface of Abstract Class and there is

@@ -22,7 +22,7 @@ class RedisStore implements StoreInterface {
 	 * Create a new APC store.
 	 *
 	 * @param  \Illuminate\Redis\Database  $redis
-	 * @param  string                     $prefix
+	 * @param  string  $prefix
 	 * @return void
 	 */
 	public function __construct(Redis $redis, $prefix = '')
@@ -125,7 +125,7 @@ class RedisStore implements StoreInterface {
 	 * Begin executing a new section operation.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
+	 * @return \Illuminate\Cache\RedisSection
 	 */
 	public function section($name)
 	{

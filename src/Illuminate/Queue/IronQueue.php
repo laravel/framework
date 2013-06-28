@@ -110,7 +110,7 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Marshal a push queue request and fire the job.
 	 *
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function marshal()
 	{
@@ -122,7 +122,7 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Marshal out the pushed job and payload.
 	 *
-	 * @return StdClass
+	 * @return object
 	 */
 	protected function marshalPushedJob()
 	{
@@ -138,7 +138,7 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new IronJob for a pushed job.
 	 *
-	 * @param  \StdClass  $job
+	 * @param  object  $job
 	 * @return \Illuminate\Queue\Jobs\IronJob
 	 */
 	protected function createPushedIronJob($job)
