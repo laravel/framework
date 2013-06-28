@@ -30,6 +30,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foobar.com/dayle/rees', $gen->to(null, array('dayle', 'rees')));
 		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('/something', array('dayle', 'rees')));
 		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('something', array('dayle', 'rees')));
+
+		$object = new stdClass;
+		$object->id = 3;
+		$this->assertEquals('http://foobar.com/stdclass/3', $gen->to($object));
 	}
 
 
