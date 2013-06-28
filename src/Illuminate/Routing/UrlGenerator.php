@@ -83,6 +83,13 @@ class UrlGenerator {
 	 */
 	public function to($path, $parameters = array(), $secure = null)
 	{
+		// If the given path is an object, we build a string path based on resource
+		// controllers conventions
+		if (is_object($path))
+		{
+			$path = strtolower(get_class($path)).'/'.$path->id;
+		}
+
 		if ($this->isValidUrl($path)) return $path;
 
 		$scheme = $this->getScheme($secure);
