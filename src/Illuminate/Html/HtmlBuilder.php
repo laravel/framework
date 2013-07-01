@@ -371,7 +371,10 @@ class HtmlBuilder {
 			// To properly obfuscate the value, we will randomly convert each letter to
 			// its entity or hexadecimal representation, keeping a bot from sniffing
 			// the randomly obfuscated letters out of the string on the responses.
-			switch (rand(1, 3))
+			$rand = rand(1, 3);
+			if(ord($letter) > 128) $rand = 3;
+			
+			switch ($rand)
 			{
 				case 1:
 					$safe .= '&#'.ord($letter).';'; break;
