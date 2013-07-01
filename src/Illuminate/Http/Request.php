@@ -481,4 +481,14 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		return isset($this->sessionStore);
 	}
 
+	/**
+	 * Return the remote IP address.
+	 *
+	 * @return string
+	 */
+	public function remoteIP()
+	{
+		return $_SERVER['REMOTE_ADDR'];
+	}
+
 }
