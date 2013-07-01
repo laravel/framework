@@ -159,4 +159,14 @@ class SecLibGateway implements GatewayInterface {
 		return $key;
 	}
 
+	/**
+	 * Get the exit status of the last command.
+	 *
+	 * @return int|bool
+	 */
+	public function status()
+	{
+		return $this->connection->getExitStatus();
+	}
+
 }

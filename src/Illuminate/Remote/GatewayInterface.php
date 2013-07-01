@@ -50,4 +50,11 @@ interface GatewayInterface {
 	 */
 	public function nextLine();
 
+	/**
+	 * Get the exit status of the last command.
+	 *
+	 * @return int|bool
+	 */
+	public function status();
+
 }
