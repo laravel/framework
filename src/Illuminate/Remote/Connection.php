@@ -196,6 +196,16 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Get the exit status of the last command.
+	 *
+	 * @return int|bool
+	 */
+	public function status()
+	{
+		return $this->gateway->status();
+	}
+
+	/**
 	 * Get the gateway implementation.
 	 *
 	 * @return \Illuminate\Remote\GatewayInterface
