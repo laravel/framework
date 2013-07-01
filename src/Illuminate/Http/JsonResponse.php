@@ -15,7 +15,7 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 	/**
 	 * Get the json_decoded data from the response
 	 *
-	 * @return \StdClass
+	 * @return mixed
 	 */
 	public function getData()
 	{
