@@ -2051,7 +2051,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		// If the value is in simply year-month-day format, we will create a
-		// Carbon object from that fomrat. Again, this provides for simple date
+		// Carbon object from that format. Again, this provides for simple date
 		// fields in the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value))
 		{
