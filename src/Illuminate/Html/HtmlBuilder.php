@@ -266,12 +266,14 @@ class HtmlBuilder {
 
 		if (count($list) == 0) return $html;
 
+		$escape = array_pull($attributes, 'escape');
+		$escape = null === $escape ? true : $escape ;
 		// Essentially we will just spin through the list and build the list of the HTML
 		// elements from the array. We will also handled nested lists in case that is
 		// present in the array. Then we will build out the final listing elements.
 		foreach ($list as $key => $value)
 		{
-			$html .= $this->listingElement($key, $type, $value);
+			$html .= $this->listingElement($key, $type, $value, $escape);
 		}
 
 		$attributes = $this->attributes($attributes);
@@ -287,7 +289,7 @@ class HtmlBuilder {
 	 * @param  string  $value
 	 * @return string
 	 */
-	protected function listingElement($key, $type, $value)
+	protected function listingElement($key, $type, $value, $escape = true)
 	{
 		if (is_array($value))
 		{
@@ -295,7 +297,7 @@ class HtmlBuilder {
 		}
 		else
 		{
-			return '<li>'.e($value).'</li>';
+			return '<li>'.( $escape ? e($value) : $value ).'</li>';
 		}
 	}
 

@@ -14,7 +14,7 @@ class MySqlBuilder extends Builder {
 
 		$database = $this->connection->getDatabaseName();
 
-		return count($this->connection->select($sql, array($database, $table))) > 0;
+		return count($this->connection->select($sql, array($database, $this->connection->getTablePrefix() . $table))) > 0;
 	}
 
 }
