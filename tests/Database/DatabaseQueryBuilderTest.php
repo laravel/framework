@@ -363,6 +363,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testJoinWithTableAlias()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users as u')->join('contacts as c', function($j)
+		{
+			$j->on('u.id', '=', 'c.id');
+		});
+		$this->assertEquals('select * from "users" as "u" inner join "contacts" as "c" on "u"."id" = "c"."id"', $builder->toSql());
+	}
+
+
 	public function testRawExpressionsInSelect()
 	{
 		$builder = $this->getBuilder();
