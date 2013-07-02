@@ -42,7 +42,7 @@ class Str {
 	{
 		foreach ((array) $needle as $n)
 		{
-			if (strpos($haystack, $n) !== false) return true;
+			if (mb_strpos($haystack, $n) !== false) return true;
 		}
 
 		return false;
@@ -59,7 +59,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle == substr($haystack, strlen($haystack) - strlen($needle))) return true;
+			if ($needle == mb_substr($haystack, mb_strlen($haystack) - mb_strlen($needle))) return true;
 		}
 
 		return false;
@@ -156,7 +156,7 @@ class Str {
 
 		if ( ! isset($matches[0])) return $value;
 
-		if (strlen($value) == strlen($matches[0])) return $value;
+		if (mb_strlen($value) == mb_strlen($matches[0])) return $value;
 
 		return rtrim($matches[0]).$end;
 	}
@@ -202,7 +202,7 @@ class Str {
 				throw new \RuntimeException('Unable to generate random string.');
 			}
 
-			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+			return mb_substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
 		}
 
 		return static::quickRandom($length);
@@ -292,7 +292,7 @@ class Str {
 	{
 		$replace = '$1'.$delimiter.'$2';
 
-		return ctype_lower($value) ? $value : strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
+		return ctype_lower($value) ? $value : mb_strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
 	}
 
 	/**
@@ -306,7 +306,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if (strpos($haystack, $needle) === 0) return true;
+			if (mb_strpos($haystack, $needle) === 0) return true;
 		}
 
 		return false;
