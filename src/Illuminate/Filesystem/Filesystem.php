@@ -59,7 +59,7 @@ class Filesystem {
 	 * Require the given file once.
 	 *
 	 * @param  string  $file
-	 * @return void
+	 * @return mixed
 	 */
 	public function requireOnce($file)
 	{
