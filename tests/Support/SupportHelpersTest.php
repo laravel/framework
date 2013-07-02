@@ -20,9 +20,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
 	public function testArrayGet()
 	{
-		$array = array('names' => array('developer' => 'taylor'));
-		$this->assertEquals('taylor', array_get($array, 'names.developer'));
+		$array = array('names' => array('developer' => array('name' => 'taylor')));
+		$this->assertEquals('taylor', array_get($array, 'names.developer.name'));
+		$this->assertEquals('taylor', array_get($array, 'names[developer][name]'));
 		$this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', 'dayle'));
+		$this->assertEquals('dayle', array_get($array, 'names[otherDeveloper][name]', 'dayle'));
 		$this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', function() { return 'dayle'; }));
 	}
 
