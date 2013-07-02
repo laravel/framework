@@ -374,6 +374,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testJoinWithTableAliasWithPrefix()
+	{
+		$builder = $this->getBuilder();
+		$builder->getGrammar()->setTablePrefix('prefix_');
+		$builder->select('*')->from('users as u')->join('contacts as c', function($j)
+		{
+			$j->on('u.id', '=', 'c.id');
+		});
+		$this->assertEquals('select * from "prefix_users" as "prefix_u" inner join "prefix_contacts" as "prefix_c" on "prefix_u"."id" = "prefix_c"."id"', $builder->toSql());
+	}
+
+
 	public function testRawExpressionsInSelect()
 	{
 		$builder = $this->getBuilder();
