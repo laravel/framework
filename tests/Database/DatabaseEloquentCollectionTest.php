@@ -75,4 +75,12 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(1,2,3), $c->modelKeys());
 	}
 
+
+	public function testLists()
+	{
+		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), (object) array('name' => 'dayle', 'email' => 'bar')));
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name'));
+		$this->assertEquals(array('foo', 'bar'), $data->lists('email'));
+	}
+
 }

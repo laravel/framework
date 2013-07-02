@@ -499,7 +499,7 @@ class Connection implements ConnectionInterface {
 
 		$message = $e->getMessage()." (SQL: {$query}) (Bindings: {$bindings})";
 
-		throw new \Exception($message, 0);	
+		throw new \Exception($message);
 	}
 
 	/**
@@ -544,7 +544,7 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function getElapsedTime($start)
 	{
-		return number_format((microtime(true) - $start) * 1000, 2);
+		return round((microtime(true) - $start) * 1000, 2);
 	}
 
 	/**
@@ -580,7 +580,9 @@ class Connection implements ConnectionInterface {
 	{
 		$driver = $this->getDoctrineDriver();
 
-		return new \Doctrine\DBAL\Connection(array('pdo' => $this->pdo), $driver);
+		$data = array('pdo' => $this->pdo, 'dbname' => $this->getConfig('database'));
+
+		return new \Doctrine\DBAL\Connection($data, $driver);
 	}
 
 	/**
@@ -726,7 +728,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the pagination environment instance.
 	 *
-	 * @param  \Illuminate\Pagination\Environment|Closure  $paginator
+	 * @param  \Illuminate\Pagination\Environment|\Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)
@@ -741,16 +743,21 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getCacheManager()
 	{
+		if ($this->cache instanceof Closure)
+		{
+			$this->cache = call_user_func($this->cache);
+		}
+
 		return $this->cache;
 	}
 
 	/**
 	 * Set the cache manager instance on the connection.
 	 *
-	 * @param  \Illuminate\Cache\CacheManager  $cache
+	 * @param  \Illuminate\Cache\CacheManager|\Closure  $cache
 	 * @return void
 	 */
-	public function setCacheManager(CacheManager $cache)
+	public function setCacheManager($cache)
 	{
 		$this->cache = $cache;
 	}
@@ -866,6 +873,8 @@ class Connection implements ConnectionInterface {
 	public function setTablePrefix($prefix)
 	{
 		$this->tablePrefix = $prefix;
+
+		$this->getQueryGrammar()->setTablePrefix($prefix);
 	}
 
 	/**

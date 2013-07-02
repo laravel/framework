@@ -88,7 +88,7 @@ class SqsJob extends Job {
 	 */
 	public function attempts()
 	{
-		return 1;
+		return (int) $this->job['Attributes']['ApproximateReceiveCount'];
 	}
 
 	/**

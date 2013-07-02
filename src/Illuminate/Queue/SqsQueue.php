@@ -77,7 +77,9 @@ class SqsQueue extends Queue implements QueueInterface {
 	{
 		$queue = $this->getQueue($queue);
 
-		$response = $this->sqs->receiveMessage(array('QueueUrl' => $queue));
+		$response = $this->sqs->receiveMessage(
+			array('QueueUrl' => $queue, 'AttributeNames' => array('ApproximateReceiveCount'))
+		);
 
 		if (count($response['Messages']) > 0)
 		{

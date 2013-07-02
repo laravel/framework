@@ -177,7 +177,6 @@ class ViewServiceProvider extends ServiceProvider {
 		{
 			return $app['session']->has('errors');
 		}
-
 	}
 
 }

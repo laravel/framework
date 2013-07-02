@@ -260,6 +260,21 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBeforeFiltersCanBeNestedInGroups()
+	{
+		$router = new Router;
+		$router->group(array('before' => 'foo|bar'), function() use ($router)
+		{
+			$router->get('foo', function() {});
+			$router->get('bar', array('before' => 'nestedFoo|nestedBaz', function() {}));
+		});
+		$routes = array_values($router->getRoutes()->getIterator()->getArrayCopy());
+
+		$this->assertEquals(array('foo', 'bar'), $routes[0]->getOption('_before'));
+		$this->assertEquals(array('foo', 'bar', 'nestedFoo', 'nestedBaz'), $routes[1]->getOption('_before'));
+	}
+
+
 	public function testBeforeFiltersArePassedRouteAndRequest()
 	{
 		unset($_SERVER['__before.args']);
@@ -522,16 +537,18 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
 	public function testControllerMethodProperlyRegistersRoutes()
 	{
-		$router = new Router;
-		$container = m::mock('Illuminate\Container\Container');
-		$controller = m::mock('stdClass');
-		$controller->shouldReceive('callAction')->once()->with($container, $router, 'getMethod', array('taylor', 'otwell'))->andReturn('foo');
-		$container->shouldReceive('make')->once()->with('FooController')->andReturn($controller);
-		$router->setContainer($container);
-		$request = Request::create('/foo/method/taylor/otwell', 'GET');
-		$router->controller('foo', 'FooController');
+		$router = $this->getMock('Illuminate\Routing\Router', array('get', 'any'), array(new Illuminate\Container\Container));
+		$router->setInspector($inspector = m::mock('Illuminate\Routing\Controllers\Inspector'));
+		$inspector->shouldReceive('getRoutable')->once()->with('FooController', 'prefix')->andReturn(array(
+			'getFoo' => array(
+				array('verb' => 'get', 'uri' => 'foo'),
+			)
+		));
+		$router->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array('as' => 'someName', 'uses' => 'FooController@getFoo')));
+		$router->expects($this->once())->method('any')->with($this->equalTo('prefix/{_missing}'), $this->equalTo('FooController@missingMethod'))->will($this->returnValue($missingRoute = m::mock('StdClass')));
+		$missingRoute->shouldReceive('where')->once()->with('_missing', '(.*)');
 
-		$this->assertEquals('foo', $router->dispatch($request)->getContent());
+		$router->controller('prefix', 'FooController', array('getFoo' => 'someName'));
 	}
 
 

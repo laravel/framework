@@ -37,4 +37,19 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('users_foo_index', $commands[0]->index);
 	}
 
+
+	public function testDropIndexDefaultNames() 
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->dropUnique(array('foo', 'bar'));
+		$commands = $blueprint->getCommands();
+		$this->assertEquals('users_foo_bar_unique', $commands[0]->index);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->dropIndex(array('foo'));
+		$commands = $blueprint->getCommands();
+		$this->assertEquals('users_foo_index', $commands[0]->index);
+	}
+
+
 }
