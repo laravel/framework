@@ -200,6 +200,34 @@ class Route extends BaseRoute {
 	}
 
 	/**
+	 * Get a parameter by name from the route.
+	 * This method does not evaluate all of the parameters beforehand, allowing
+	 * parameter access in another parameter's binder.
+	 *
+	 * @param  string  $name
+	 * @param  mixed   $default
+	 * @return string
+	 */
+	public function getSingleParameter($name, $default = null)
+	{
+		// If the parameter has already been parsed, return that
+		if (isset($this->parsedParameters) &&
+			array_key_exists($name, $this->parsedParameters)) {
+			return $this->parsedParameters[$name];
+		}
+
+		// Check that the parameter exists or has a binder
+		if (array_key_exists($name, $this->parameters) ||
+			$this->router->hasBinder($name)) {
+			return $this->resolveParameter($name) ?: $default;
+		} else {
+			return $default;
+		}
+
+		return $this->resolveParameter($name) ?: $default;
+	}
+
+	/**
 	 * Get the parameters to the callback.
 	 *
 	 * @return array
