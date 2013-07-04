@@ -1555,7 +1555,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function hide($toHide)
 	{
-		$toHide = (array) $toHide;
+		$toHide = is_array($toHide) ? $toHide : func_get_args();
 		$this->hidden = array_merge($this->hidden, $toHide);
 		$this->visible = array_diff($this->visible, $toHide);
 	}
@@ -1589,7 +1589,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function show($toShow)
 	{
-		$toShow = (array) $toShow;
+		$toShow = is_array($toShow) ? $toShow : func_get_args();
 		$this->visible = array_merge($this->visible, $toShow);
 		$this->hidden = array_diff($this->hidden, $toShow);
 	}
