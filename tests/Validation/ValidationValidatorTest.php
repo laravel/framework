@@ -718,6 +718,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		
 		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2000-01-01'), array('start' => 'After:2000-01-01', 'ends' => 'After:start'));
 		$this->assertTrue($v->fails());
+		
+		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2013-01-01'), array('start' => 'Before:ends', 'ends' => 'After:start'));
+		$this->assertTrue($v->passes());
+		
+		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2000-01-01'), array('start' => 'Before:ends', 'ends' => 'After:start'));
+		$this->assertTrue($v->fails());
 	}
 
 
