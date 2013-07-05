@@ -390,7 +390,7 @@ class Guard {
 
 		if (isset($this->events))
 		{
-			$this->events->fire('auth.logout', array($this->user));
+			$this->events->fire('auth.logout', array($this->user()));
 		}
 
 		$this->user = null;
