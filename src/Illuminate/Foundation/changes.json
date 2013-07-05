@@ -7,5 +7,6 @@
 		{"message": "Query elapsed time is now reported as float instead of string.", "backport": null},
 		{"message": "Added Model::query method for generating an empty query builder.", "backport": null},
 		{"message": "The @yield Blade directive now accepts a default value as the second argument.", "backport": null}
+		{"message": "Fixed bug causing null to be passed to auth.logout event.", "backport": null}
 	]
 }
