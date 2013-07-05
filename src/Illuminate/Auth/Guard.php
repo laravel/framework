@@ -386,6 +386,7 @@ class Guard {
 	 */
 	public function logout()
 	{
+		$this->user();
 		$this->clearUserDataFromStorage();
 
 		if (isset($this->events))
