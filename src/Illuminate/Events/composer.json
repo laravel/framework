@@ -9,8 +9,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/container": "4.0.x",
-        "illuminate/support": "4.0.x"
+        "illuminate/container": "4.1.x",
+        "illuminate/support": "4.1.x"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",
@@ -24,7 +24,7 @@
     "target-dir": "Illuminate/Events",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     },
     "minimum-stability": "dev"
