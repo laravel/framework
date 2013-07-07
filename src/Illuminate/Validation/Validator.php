@@ -828,7 +828,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateImage($attribute, $value)
 	{
-		return $this->validateMimes($attribute, $value, array('jpeg', 'png', 'gif', 'bmp'));
+		return $this->validateMimes($attribute, $value, array('image/jpeg', 'image/gif', 'image/png', 'image/bmp', 'image/x-bmp'));
 	}
 
 	/**
