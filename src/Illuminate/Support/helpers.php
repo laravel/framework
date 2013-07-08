@@ -259,7 +259,14 @@ if ( ! function_exists('array_get'))
 	{
 		if (is_null($key)) return $array;
 		
-		if (isset($array[$key])) return $array[$key];
+		if ((count($array) > 0) && preg_match_all("/(.*?)\[(.*?)\]/", $key, $matches))
+		{
+			$subarray = $array[$matches[1][0]]; // Matches initial key part outside brackets
+			foreach ($matches[2] as $subkey)
+				$subarray = @$subarray[$subkey];
+				
+			return $subarray ? $subarray : value($default);
+		}
 
 		foreach (explode('.', $key) as $segment)
 		{
