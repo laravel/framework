@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Database;
 
+use Closure;
+
 class SqlServerConnection extends Connection {
 
 	/**
