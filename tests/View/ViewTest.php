@@ -21,6 +21,17 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayCanBeAppendedToViaViewDataAccessors()
+	{
+		$view = new View(m::mock('Illuminate\View\Environment'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view->foo = array();
+		$view->foo[] = 'bar';
+		$view['baz'] = array();
+		$view['baz'][] = 'boom';
+		$this->assertEquals(array('foo' => array('bar'), 'baz' => array('boom')), $view->getData());
+	}
+
+
 	public function testRenderProperlyRendersView()
 	{
 		$view = $this->getView();
