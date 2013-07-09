@@ -51,7 +51,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 
 		foreach ($extra as $key => $extraValue)
 		{
-			$query->where($key, $extraValue);
+			$query->where($key, $extraValue == 'NULL' ? null : $extraValue);
 		}
 
 		return $query->count();
@@ -72,7 +72,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 
 		foreach ($extra as $key => $extraValue)
 		{
-			$query->where($key, $extraValue);
+			$query->where($key, $extraValue == 'NULL' ? null : $extraValue);
 		}
 
 		return $query->count();

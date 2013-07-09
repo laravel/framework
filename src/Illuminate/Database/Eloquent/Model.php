@@ -745,7 +745,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if ($this->softDelete)
 		{
-			$query->update(array(static::DELETED_AT => $this->freshTimestamp()));
+			$this->{static::DELETED_AT} = $time = $this->freshTimestamp();
+
+			$query->update(array(static::DELETED_AT => $time));
 		}
 		else
 		{

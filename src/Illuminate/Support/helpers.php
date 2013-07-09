@@ -90,6 +90,21 @@ if ( ! function_exists('array_build'))
 	}
 }
 
+if ( ! function_exists('array_column'))
+{
+	/**
+	 * Pluck an array of values from an array.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return array
+	 */
+	function array_column($array, $key)
+	{
+		return array_pluck($array, $key);
+	}
+}
+
 if ( ! function_exists('array_divide'))
 {
 	/**
