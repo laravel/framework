@@ -232,7 +232,7 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	public function offsetGet($key)
+	public function &offsetGet($key)
 	{
 		return $this->data[$key];
 	}
@@ -265,7 +265,7 @@ class View implements ArrayAccess, Renderable {
 	 *
 	 * @return mixed
 	 */
-	public function __get($key)
+	public function &__get($key)
 	{
 		return $this->data[$key];
 	}
