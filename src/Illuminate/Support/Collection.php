@@ -332,6 +332,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Splice portion of the underlying collection array.
+	 *
+	 * @param  int    $offset
+	 * @param  int    $length
+	 * @param  mixed  $replacement
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function splice($offset, $length = 0, $replacement = array())
+	{
+		array_splice($this->items, $offset, $length, $replacement);
+	}
+
+	/**
 	 * Get an array with the values of a given key.
 	 *
 	 * @param  string  $value
