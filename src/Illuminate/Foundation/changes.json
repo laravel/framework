@@ -2,7 +2,8 @@
 	"4.1.x": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
 		{"message": "Allow before and after validation rules to reference other fields.", "backport": null},
-		{"message": "When access view data via __get, it is now returned by reference.", "backport": null}
+		{"message": "When access view data via __get, it is now returned by reference.", "backport": null},
+		{"message": "Added splice method to Collection class.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
