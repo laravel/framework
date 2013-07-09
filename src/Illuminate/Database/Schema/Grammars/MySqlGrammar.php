@@ -284,7 +284,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeText(Fluent $column)
 	{
-		return 'text';
+		return 'longtext';
 	}
 
 	/**
