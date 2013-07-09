@@ -228,7 +228,6 @@ class View implements ArrayAccess, Renderable {
 
 	/**
 	 * Get a piece of bound data to the view.
-	 * (Returned by reference so that `$view['arr'][] = 1` is possible)
 	 *
 	 * @param  string  $key
 	 * @return mixed
@@ -263,7 +262,6 @@ class View implements ArrayAccess, Renderable {
 
 	/**
 	 * Get a piece of data from the view.
-	 * (Returned by reference so that `$view->arr[] = 1` is possible)
 	 *
 	 * @return mixed
 	 */
