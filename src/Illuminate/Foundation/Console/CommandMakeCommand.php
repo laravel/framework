@@ -63,7 +63,9 @@ class CommandMakeCommand extends Command {
 	 */
 	protected function formatStub($stub)
 	{
-		$stub = str_replace('{{class}}', $this->input->getArgument('name'), $stub);
+		$name = $this->input->getArgument('name');
+
+		$stub = str_replace('{{class}}', $name, $stub);
 
 		if ( ! is_null($namespace = $this->input->getOption('namespace')))
 		{
@@ -73,6 +75,21 @@ class CommandMakeCommand extends Command {
 		{
 			$stub = str_replace('{{namespace}}', '', $stub);
 		}
+
+		// Split the command name to words based on camelisation ( CamelCase => ['Camel', 'Case'] )
+		$parts = preg_split('/(?=[A-Z])/', $name, -1, PREG_SPLIT_NO_EMPTY);
+
+		// Make all parts lowercase
+		$parts = array_map('strtolower', $parts);
+
+		// Remove the 'command' part if present
+		$parts = array_filter($parts, function($part)
+		{
+			return $part != 'command' ? true : false;
+		});
+
+		// Put the command name into the stub
+		$stub = str_replace('{{command}}', implode(':', $parts), $stub);
 
 		return $stub;
 	}
