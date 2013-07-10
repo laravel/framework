@@ -1550,6 +1550,30 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Hide one or many fields.
+	 * 
+	 * @param  mixed|array $toHide A value or array of values to hide.
+	 * @return void
+	 */
+	public function hide($toHide)
+	{
+		$toHide = is_array($toHide) ? $toHide : func_get_args();
+		$this->hidden = array_merge($this->hidden, $toHide);
+		$this->visible = array_diff($this->visible, $toHide);
+		return $this;
+	}
+
+	/**
+	 * Get the visible attributes for the model.
+	 * 
+	 * @return array
+	 */
+	public function getVisible()
+	{
+		return $this->visible;
+	}
+
+	/**
 	 * Set the visible attributes for the model.
 	 *
 	 * @param  array  $visible
@@ -1558,6 +1582,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function setVisible(array $visible)
 	{
 		$this->visible = $visible;
+	}
+
+	/**
+	 * Reveals one or many fields.
+	 * 
+	 * @param  mixed|array $toShow A value or array of values to show.
+	 * @return void
+	 */
+	public function show($toShow)
+	{
+		$toShow = is_array($toShow) ? $toShow : func_get_args();
+		$this->visible = array_merge($this->visible, $toShow);
+		$this->hidden = array_diff($this->hidden, $toShow);
+		return $this;
 	}
 
 	/**
