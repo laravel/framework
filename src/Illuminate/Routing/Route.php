@@ -211,7 +211,7 @@ class Route extends BaseRoute {
 		// a binder that uses a database repository and shouldn't be run again.
 		if (isset($this->parsedParameters))
 		{
-			return $this->parsedParameters;
+			return $this->parameters;
 		}
 
 		$variables = $this->compile()->getVariables();
@@ -219,14 +219,14 @@ class Route extends BaseRoute {
 		// To get the parameter array, we need to spin the names of the variables on
 		// the compiled route and match them to the parameters that we got when a
 		// route is matched by the router, as routes instances don't have them.
-		$parameters = array();
-
 		foreach ($variables as $variable)
 		{
-			$parameters[$variable] = $this->resolveParameter($variable);
+			$this->parameters[$variable] = $this->resolveParameter($variable);
 		}
 
-		return $this->parsedParameters = $parameters;
+		$this->parsedParameters = true;
+
+		return $this->parameters;
 	}
 
 	/**
