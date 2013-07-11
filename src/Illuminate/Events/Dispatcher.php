@@ -73,7 +73,7 @@ class Dispatcher {
 	 */
 	protected function setupWildcardListen($event, $listener, $priority)
 	{
-		$this->wildcards[$event][] = $listener;
+		$this->wildcards[$event][] = $this->makeListener($listener);
 	}
 
 	/**
