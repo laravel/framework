@@ -766,7 +766,7 @@ class FormBuilder {
 
 		if ( ! is_null($value)) return $value;
 
-		if (isset($this->model) and isset($this->model[$name]))
+		if (isset($this->model))
 		{
 			return $this->getModelValueAttribute($name);
 		}
