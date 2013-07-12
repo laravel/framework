@@ -61,7 +61,7 @@ class Artisan {
 	 *
 	 * @return \Illuminate\Console\Application
 	 */
-	protected function getArtisan()
+	public function getArtisan()
 	{
 		if ( ! is_null($this->artisan)) return $this->artisan;
 
