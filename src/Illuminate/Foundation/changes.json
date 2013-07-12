@@ -9,6 +9,7 @@
 		{"message": "The @yield Blade directive now accepts a default value as the second argument.", "backport": null},
 		{"message": "Fixed bug causing null to be passed to auth.logout event.", "backport": null},
 		{"message": "Added polyfill for array_column forward compatibility.", "backport": null},
-		{"message": "Passing NULL to validator exists rule as extra condition will do where null check.", "backport": null}
+		{"message": "Passing NULL to validator exists rule as extra condition will do where null check.", "backport": null},
+		{"message": "Auth::extend Closures should only return UserProviderInterface implementations.", "backport": null},
 	]
 }
