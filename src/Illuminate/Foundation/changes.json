@@ -11,5 +11,6 @@
 		{"message": "Added polyfill for array_column forward compatibility.", "backport": null},
 		{"message": "Passing NULL to validator exists rule as extra condition will do where null check.", "backport": null},
 		{"message": "Auth::extend Closures should only return UserProviderInterface implementations.", "backport": null},
+		{"message": "Make it easier to extend the Request class.", "backport": null}
 	]
 }
