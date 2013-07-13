@@ -8,9 +8,10 @@ interface QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return void
 	 */
-	public function push($job, $data = '', $queue = null);
+	public function push($job, $data = '', $queue = null, $options = array());
 
 	/**
 	 * Push a new job onto the queue after a delay.
