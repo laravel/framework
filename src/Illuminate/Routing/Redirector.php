@@ -20,6 +20,13 @@ class Redirector {
 	protected $session;
 
 	/**
+	 * The Redirect response instance.
+	 *
+	 * @var \Illuminate\Http\RedirectResponse
+	 */
+	protected $redirectResponse;
+
+	/**
 	 * Create a new Redirector instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $generator
@@ -172,16 +179,16 @@ class Redirector {
 	 */
 	protected function createRedirect($path, $status, $headers)
 	{
-		$redirect = new RedirectResponse($path, $status, $headers);
+		$this->redirectResponse = new RedirectResponse($path, $status, $headers);
 
 		if (isset($this->session))
 		{
-			$redirect->setSession($this->session);
+			$this->redirectResponse->setSession($this->session);
 		}
 
-		$redirect->setRequest($this->generator->getRequest());
+		$this->redirectResponse->setRequest($this->generator->getRequest());
 
-		return $redirect;
+		return $this->redirectResponse;
 	}
 
 	/**
@@ -203,6 +210,16 @@ class Redirector {
 	public function setSession(SessionStore $session)
 	{
 		$this->session = $session;
+	}
+
+	/**
+	 * Get the target URL
+	 *
+	 * @return string target URL
+	 */
+	public function getTargetUrl()
+	{
+		return isset($this->redirectResponse) ? $this->redirectResponse->getTargetUrl() : NULL;
 	}
 
 }
