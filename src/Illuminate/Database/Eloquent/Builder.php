@@ -739,11 +739,7 @@ class Builder {
 	 */
 	public function __clone()
 	{
-		foreach($this as $key => $val) {
-			if (is_object($val)) {
-				$this->{$key} = clone $val;
-			} 
-		}
+		$this->query = clone $this->query;
 	}
 
 }
