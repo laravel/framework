@@ -50,7 +50,13 @@ class MakeRemindersCommand extends Command {
 	{
 		$fullPath = $this->createBaseMigration();
 
-		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/reminders.stub'));
+		$contents = str_replace(
+			'password_reminders',
+			$this->laravel['config']['auth']['reminder']['table'],
+			$this->files->get(__DIR__.'/stubs/reminders.stub');
+		);
+
+		$this->files->put($fullPath, $contents);
 
 		$this->info('Migration created successfully!');
 
