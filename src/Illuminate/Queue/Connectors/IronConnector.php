@@ -46,7 +46,10 @@ class IronConnector implements ConnectorInterface {
 
 		if (isset($config['host'])) $ironConfig['host'] = $config['host'];
 
-		return new IronQueue(new IronMQ($ironConfig), $this->crypt, $this->request, $config['queue']);
+		$instance = new IronMQ($ironConfig);
+		if (isset($config['ssl_verifypeer'])) $instance->ssl_verifypeer = $config['ssl_verifypeer'];
+
+		return new IronQueue($instance, $this->crypt, $this->request, $config['queue']);
 	}
 
 }
