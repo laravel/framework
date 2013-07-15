@@ -12,6 +12,12 @@ class SqlServerConnection extends Connection {
 	 */
 	public function transaction(Closure $callback)
 	{
+		// Microsoft SQL Server driver for pdo (pdo_sqlsrv, driver name sqlsrv)
+		// correctly supports PDO transactions, and will throw an error if you
+		// don't use them. As a result, if using this driver we'd rather use the 
+		// generic PDO transaction implementation.
+		if ($this->getDriverName() == 'sqlsrv') return parent::transaction($callback);
+
 		$this->pdo->exec('BEGIN TRAN');
 
 		// We'll simply execute the given callback within a try / catch block
