@@ -288,6 +288,8 @@ class UrlGenerator {
 	{
 		if (starts_with($path, array('#', '//', 'mailto:', 'tel:'))) return true;
 
+		if (preg_match('/^[a-z]+:\/\//i', $path)) return true;
+
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
 	}
 
