@@ -398,12 +398,38 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$instance = new static;
 
-		if (is_array($id))
-		{
-			return $instance->newQuery()->whereIn($instance->getKeyName(), $id)->get($columns);
-		}
+		$key = $instance->getKeyName();
 
-		return $instance->newQuery()->find($id, $columns);
+		if (is_array($key))
+		{
+			$query = $instance->newQuery();
+
+			if (is_array(current($id)))
+			{
+				foreach($key as $pk)
+				{
+					$query->whereIn($pk, array_pluck($id, $pk));
+				}
+			}
+			else
+			{
+				foreach($key as $pk)
+				{
+					$query->where($pk, $id[$pk]);
+				}
+			}
+
+			return $query->get($columns);
+		}
+		else
+		{
+			if (is_array($id))
+			{
+				return $instance->newQuery()->whereIn($instance->getKeyName(), $id)->get($columns);
+			}
+
+			return $instance->newQuery()->find($id, $columns);
+		}
 	}
 
 	/**
@@ -678,9 +704,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// We will actually pull the models from the database table and call delete on
 		// each of them individually so that their events get fired properly with a
 		// correct set of attributes in case the developers wants to check these.
-		$key = $instance->getKeyName();
-
-		foreach ($instance->whereIn($key, $ids)->get() as $model)
+		foreach ($instance->find($ids) as $model)
 		{
 			$model->delete();
 		}
@@ -741,7 +765,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function performDeleteOnModel()
 	{
-		$query = $this->newQuery()->where($this->getKeyName(), $this->getKey());
+		$query = $this->setKeysForSaveQuery($this->newQuery());
 
 		if ($this->softDelete)
 		{
@@ -879,7 +903,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a model event with the dispatcher.
 	 *
 	 * @param  string   $event
-	 * @param  \Closure|string  $callback
+	 * @param  Closure|string  $callback
 	 * @return void
 	 */
 	protected static function registerModelEvent($event, $callback)
@@ -946,7 +970,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $query->{$method}($column, $amount);
 		}
 
-		return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+		$this->setKeysForSaveQuery($query);
+
+		return $query->{$method}($column, $amount);
 	}
 
 	/**
@@ -1195,7 +1221,21 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function setKeysForSaveQuery($query)
 	{
-		$query->where($this->getKeyName(), '=', $this->getKey());
+		$keyName = $this->getKeyName();
+		$keyValue = $this->getKey();
+
+		if (!is_array($keyName))
+		{
+			$query->where($keyName, $keyValue);
+		}
+		else
+		{
+			$totalKeys = sizeof($keyName);
+			for($k = 0; $k < $totalKeys; $k++)
+			{
+				$query->where($keyName[$k], $keyValue[$k]);
+			}
+		}
 
 		return $query;
 	}
@@ -1337,11 +1377,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		return $this->newQuery(false);
 	}
 
- 	/**
- 	 * Determine if the model instance has been soft-deleted.
- 	 *
- 	 * @return bool
- 	 */
+	/**
+	 * Determine if the model instance has been soft-deleted.
+	 *
+	 * @return bool
+	 */
 	public function trashed()
 	{
 		return $this->softDelete and ! is_null($this->{static::DELETED_AT});
@@ -1420,19 +1460,34 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get the value of the model's primary key.
+	 * Get the value of the model's primary key, accounting for compound keys.
 	 *
 	 * @return mixed
 	 */
 	public function getKey()
 	{
-		return $this->getAttribute($this->getKeyName());
+		$key = $this->getKeyName();
+
+		if (!is_array($key))
+		{
+			return $this->getAttribute($key);
+		}
+		else
+		{
+			$keyValues = [];
+			foreach ($key as $pk)
+			{
+				$keyValues[] = $this->getAttribute($pk);
+			}
+
+			return $keyValues;
+		}
 	}
 
 	/**
-	 * Get the primary key for the model.
+	 * Get the primary key for the model; if the key is compound, returns an array of key names.
 	 *
-	 * @return string
+	 * @return string|array
 	 */
 	public function getKeyName()
 	{
@@ -1440,13 +1495,30 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get the table qualified key name.
+	 * Get the table qualified key name; if the key is compound, returns an array of key names.
 	 *
-	 * @return string
+	 * @return string|array
 	 */
 	public function getQualifiedKeyName()
 	{
-		return $this->getTable().'.'.$this->getKeyName();
+		$table = $this->getTable();
+		$key = $this->getKeyName();
+
+		if(is_array($key))
+		{
+			$names = array();
+
+			foreach($key as $pk)
+			{
+				$names[] = "$table.$pk";
+			}
+
+			return $names;
+		}
+		else
+		{
+			return "$table.$key";
+		}
 	}
 
 	/**
@@ -2090,7 +2162,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function replicate()
 	{
-		$attributes = array_except($this->attributes, array($this->getKeyName()));
+		$keyName = $this->getKeyName();
+		$attributes = array_except($this->attributes, (is_array($keyName)? $keyName : array($keyName)));
 
 		with($instance = new static)->setRawAttributes($attributes);
 
