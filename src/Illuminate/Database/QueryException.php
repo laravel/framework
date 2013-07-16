@@ -11,7 +11,9 @@ class QueryException extends \PDOException {
         $this->sql       = $sql;
         $this->bindings  = $bindings;
         $this->errorInfo = $previous->errorInfo;
-        parent::__construct($message, $code, $previous);
+        $this->message   = $message;
+        $this->code      = $code;
+        $this->previous  = $previous;
     }
 
     public function getSql()
