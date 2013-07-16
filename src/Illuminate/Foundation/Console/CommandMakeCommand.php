@@ -49,10 +49,18 @@ class CommandMakeCommand extends Command {
 		// typically using the PSR-0 standards we can safely assume the classes name
 		// will correspond to what the actual file should be stored as on storage.
 		$file = $path.'/'.$this->input->getArgument('name').'.php';
+		
+		// Make sure we don't replace an already existing command
+		if ($this->files->exists($file))
+		{
+			$this->error('Command already exists!');
+		}
+		else
+		{
+			$this->files->put($file, $this->formatStub($stub));
 
-		$this->files->put($file, $this->formatStub($stub));
-
-		$this->info('Command created successfully.');
+			$this->info('Command created successfully.');
+		}
 	}
 
 	/**
