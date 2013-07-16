@@ -572,5 +572,13 @@ class Guard {
 	{
 		return 'remember_'.md5(get_class($this));
 	}
+	
+	/*
+	 * Clear the cache to force Guard to reload the user from the database
+	 */
+	public function flush()
+	{
+		$this->user = null;
+	}
 
 }
