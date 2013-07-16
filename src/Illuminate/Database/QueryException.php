@@ -6,10 +6,11 @@ class QueryException extends \PDOException {
 
     protected $sql = '';
 
-    public function __construct($sql, array $bindings, $message = '', $code = 0, \Exception $previous = null)
+    public function __construct($sql, array $bindings, $message = '', $code = 0, \PDOException $previous = null)
     {
-        $this->sql = $sql;
-        $this->bindings = $bindings;
+        $this->sql       = $sql;
+        $this->bindings  = $bindings;
+        $this->errorInfo = $previous->errorInfo;
         parent::__construct($message, $code, $previous);
     }
 
