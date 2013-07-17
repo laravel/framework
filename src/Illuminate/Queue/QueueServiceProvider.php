@@ -8,6 +8,7 @@ use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
+use Illuminate\Queue\Connectors\AzureConnector;
 
 class QueueServiceProvider extends ServiceProvider {
 
@@ -145,7 +146,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function registerConnectors($manager)
 	{
-		foreach (array('Sync', 'Beanstalkd', 'Sqs', 'Iron') as $connector)
+		foreach (array('Sync', 'Beanstalkd', 'Sqs', 'Iron', 'Azure') as $connector)
 		{
 			$this->{"register{$connector}Connector"}($manager);
 		}
@@ -206,6 +207,20 @@ class QueueServiceProvider extends ServiceProvider {
 		$manager->addConnector('iron', function() use ($app)
 		{
 			return new IronConnector($app['encrypter'], $app['request']);
+		});
+	}
+
+	/**
+	 * Register the Microsoft Azure queue connector.
+	 *
+	 * @param  \Illuminate\Queue\QueueManager  $manager
+	 * @return void
+	 */
+	protected function registerAzureConnector($manager)
+	{
+		$manager->addConnector('azure', function()
+		{
+			return new AzureConnector;
 		});
 	}
 
