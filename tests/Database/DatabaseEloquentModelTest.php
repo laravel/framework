@@ -99,7 +99,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('where')->once()->with('id', 1);
 		$query->shouldReceive('update')->once()->with(array('id' => 1, 'name' => 'taylor'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
@@ -123,7 +123,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('where')->once()->with('id', 1);
 		$query->shouldReceive('update')->once()->with(array('id' => 1, 'created_at' => 'foo', 'updated_at' => 'bar'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
@@ -172,7 +172,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps', 'fireModelEvent'));
 		$model->timestamps = false;
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('where')->once()->with('id', 1);
 		$query->shouldReceive('update')->once()->with(array('id' => 1, 'name' => 'taylor'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->never())->method('updateTimestamps');

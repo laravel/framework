@@ -1474,7 +1474,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 		else
 		{
-			$keyValues = [];
+			$keyValues = array();
 			foreach ($key as $pk)
 			{
 				$keyValues[] = $this->getAttribute($pk);
