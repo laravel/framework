@@ -5,7 +5,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	/**
 	 * Establish a database connection.
 	 *
-	 * @param  array  $options
+	 * @param  array  $config
 	 * @return PDO
 	 */
 	public function connect(array $config)

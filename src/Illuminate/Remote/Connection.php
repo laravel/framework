@@ -110,7 +110,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function run($commands, Closure $callback = null)
 	{
-		// First, we will intitilize the SSH gateway, and then format the commands so
+		// First, we will initialize the SSH gateway, and then format the commands so
 		// they can be run. Once we have the commands formatted and the server is
 		// ready to go we will just fire off these commands against the server.
 		$gateway = $this->getGateway();

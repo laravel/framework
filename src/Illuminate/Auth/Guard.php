@@ -110,7 +110,7 @@ class Guard {
 
 		// If we have already retrieved the user for the current request we can just
 		// return it back immediately. We do not want to pull the user data every
-		// request into the method becaue that would tremendously slow the app.
+		// request into the method because that would tremendously slow the app.
 		if ( ! is_null($this->user))
 		{
 			return $this->user;

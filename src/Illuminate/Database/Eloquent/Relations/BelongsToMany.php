@@ -455,8 +455,8 @@ class BelongsToMany extends Relation {
 	/**
 	 * Create an array of new instances of the related models.
 	 *
-	 * @param  array  $attributes
-	 * @param  array  $joining
+	 * @param  array  $records
+	 * @param  array  $joinings
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function createMany(array $records, array $joinings = array())
