@@ -189,7 +189,7 @@ class Section {
 	}
 
 	/**
-	 * Reset the section, returning a new section key
+	 * Reset the section, returning a new section identifier
 	 *
 	 * @return string
 	 */
