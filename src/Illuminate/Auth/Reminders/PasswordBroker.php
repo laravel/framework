@@ -151,7 +151,7 @@ class PasswordBroker {
 	/**
 	 * Validate a password reset for the given credentials.
 	 *
-	 * @param  array  $credenitals
+	 * @param  array  $credentials
 	 * @return \Illuminate\Auth\RemindableInterface
 	 */
 	protected function validateReset(array $credentials)
