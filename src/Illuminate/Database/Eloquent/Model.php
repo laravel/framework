@@ -1195,7 +1195,15 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function setKeysForSaveQuery($query)
 	{
-		$query->where($this->getKeyName(), '=', $this->getKey());
+		$keyName = $this->getKeyName();
+		if (is_array($keyName)) {
+			foreach ($keyName as $fieldName) {
+				$query->where($fieldName, '=', $this->getAttribute($fieldName));
+			}
+		}
+		else {
+			$query->where($this->getKeyName(), '=', $this->getKey());
+		}
 
 		return $query;
 	}
