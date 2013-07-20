@@ -204,6 +204,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTake()
+	{
+		$data = new Collection(array('taylor', 'dayle', 'shawn'));
+		$data = $data->take(2);
+		$this->assertEquals(array('taylor', 'dayle'), $data->all());
+	}
+
+
+	public function testTakeLast()
+	{
+		$data = new Collection(array('taylor', 'dayle', 'shawn'));
+		$data = $data->takeLast(2);
+		$this->assertEquals(array('dayle', 'shawn'), $data->all());
+	}
+
+
 	public function testMakeMethod()
 	{
 		$collection = Collection::make('foo');
