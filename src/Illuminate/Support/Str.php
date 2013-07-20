@@ -49,6 +49,18 @@ class Str {
 	}
 
 	/**
+	 * Determines parsing to plural or singular depending on the amount passed.
+	 *
+	 * @param  int     $amount
+	 * @param  string  $word
+	 * @return string
+	 */
+	public static function count($amount, $word)
+	{
+		return $amount === 1 ? static::singular($word) : static::plural($word);
+	}
+
+	/**
 	 * Determine if a given string ends with a given needle.
 	 *
 	 * @param string $haystack
