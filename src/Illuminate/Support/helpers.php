@@ -758,6 +758,21 @@ if ( ! function_exists('str_contains'))
 	}
 }
 
+if ( ! function_exists('str_count'))
+{
+	/**
+	 * Determine if a given string contains a given sub-string.
+	 *
+	 * @param  int     $amount
+	 * @param  string  $word
+	 * @return string
+	 */
+	function str_count($amount, $word)
+	{
+		return Illuminate\Support\Str::count($amount, $word);
+	}
+}
+
 if ( ! function_exists('str_finish'))
 {
 	/**

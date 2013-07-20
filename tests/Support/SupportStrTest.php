@@ -71,6 +71,19 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testStrCount()
+	{
+		$amount = 1;
+		$word = Str::count($amount, 'posts');
+		$this->assertEquals('post', $word);
+
+		$amount = 5;
+		$word = Str::count($amount, 'posts');
+		$this->assertEquals('posts', $word);
+	}
+
+
+
 	public function testParseCallback()
 	{
 		$this->assertEquals(array('Class', 'method'), Str::parseCallback('Class@method', 'foo'));
