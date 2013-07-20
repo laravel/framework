@@ -1,16 +1,16 @@
 {
 	"4.0.x": [
-		{"message": "Added implode method to query builder and Colletion class.", "backport": null},
-		{"message": "Fixed bug that caused Model->push method to fail.", "backport": null},
-		{"message": "Make session cookie HttpOnly by default.", "backport": null},
-		{"message": "Added mail.pretend configuration option.", "backport": null},
-		{"message": "Query elapsed time is now reported as float instead of string.", "backport": null},
-		{"message": "Added Model::query method for generating an empty query builder.", "backport": null},
-		{"message": "The @yield Blade directive now accepts a default value as the second argument.", "backport": null},
-		{"message": "Fixed bug causing null to be passed to auth.logout event.", "backport": null},
-		{"message": "Added polyfill for array_column forward compatibility.", "backport": null},
-		{"message": "Passing NULL to validator exists rule as extra condition will do where null check.", "backport": null},
-		{"message": "Auth::extend Closures should only return UserProviderInterface implementations.", "backport": null},
-		{"message": "Make it easier to extend the Request class.", "backport": null}
+		{"message": "Added implode method to query builder and Colletion class."},
+		{"message": "Fixed bug that caused Model->push method to fail."},
+		{"message": "Make session cookie HttpOnly by default."},
+		{"message": "Added mail.pretend configuration option."},
+		{"message": "Query elapsed time is now reported as float instead of string."},
+		{"message": "Added Model::query method for generating an empty query builder."},
+		{"message": "The @yield Blade directive now accepts a default value as the second argument."},
+		{"message": "Fixed bug causing null to be passed to auth.logout event."},
+		{"message": "Added polyfill for array_column forward compatibility."},
+		{"message": "Passing NULL to validator exists rule as extra condition will do where null check."},
+		{"message": "Auth::extend Closures should only return UserProviderInterface implementations."},
+		{"message": "Make it easier to extend the Request class."}
 	]
 }
