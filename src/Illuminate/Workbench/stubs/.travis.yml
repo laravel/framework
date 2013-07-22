@@ -6,6 +6,6 @@ php:
   - 5.5
 
 before_script:
-  - composer.phar install --dev
+  - composer install --dev
 
 script: phpunit
