@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache; use Illuminate\Filesystem\Filesystem;
+<?php namespace Illuminate\Cache;
+
+use Illuminate\Filesystem\Filesystem;
 
 class FileStore implements StoreInterface {
 
