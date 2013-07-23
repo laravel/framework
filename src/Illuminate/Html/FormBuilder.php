@@ -225,7 +225,14 @@ class FormBuilder {
 		// Once we have the type, value, and ID we can marge them into the rest of the
 		// attributes array so we can convert them into their HTML attribute format
 		// when creating the HTML element. Then, we will return the entire input.
-		$merge = compact('type', 'value', 'id');
+		$merge = compact('value', 'id');
+
+		// allow the user to override the form type
+		// this permits 'email', 'date' input types etc
+		if (empty($options['type']))
+		{
+			$merge['type'] = $type;
+		}
 
 		$options = array_merge($options, $merge);
 
