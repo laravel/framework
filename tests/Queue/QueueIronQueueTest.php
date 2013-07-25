@@ -14,7 +14,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), m::mock('Illuminate\Http\Request'), 'default');
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'foo', 'data' => array(1, 2, 3))))->andReturn('encrypted');
-		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted');
+		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array());
 		$queue->push('foo', array(1, 2, 3));
 	}
 
@@ -25,7 +25,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$name = 'Foo';
 		$closure = new Illuminate\Support\SerializableClosure($innerClosure = function() use ($name) { return $name; });
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'IlluminateQueueClosure', 'data' => array('closure' => serialize($closure)))))->andReturn('encrypted');
-		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted');
+		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array());
 		$queue->push($innerClosure);
 	}
 
@@ -42,7 +42,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	public function testPopProperlyPopsJobOffOfIron()
 	{
 		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), m::mock('Illuminate\Http\Request'), 'default');
-		$queue->setContainer(m::mock('Illuminate\Container\Container'));		
+		$queue->setContainer(m::mock('Illuminate\Container\Container'));
 		$iron->shouldReceive('getMessage')->once()->with('default')->andReturn($job = m::mock('IronMQ_Message'));
 		$job->body = 'foo';
 		$crypt->shouldReceive('decrypt')->once()->with('foo')->andReturn('foo');
