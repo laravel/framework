@@ -77,4 +77,12 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('Class', 'foo'), Str::parseCallback('Class', 'foo'));
 	}
 
+	public function testSlug()
+	{
+		$this->assertEquals('hello-world', Str::slug('hello world'));
+		$this->assertEquals('hello-world', Str::slug('hello-world'));
+		$this->assertEquals('hello-world', Str::slug('hello_world'));
+		$this->assertEquals('hello_world', Str::slug('hello_world', '_'));
+	}
+
 }
