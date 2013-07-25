@@ -1,16 +1,12 @@
 {
-    "name": "shrimpwagon/laravel-framework",
-    "description": "The Laravel Framework (shrimpwagon).",
+    "name": "laravel/framework",
+    "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylorotwell@gmail.com"
-        },
-        {
-            "name": "Shawn Welch",
-            "email": "shrimpwagon@yahoo.com"
         }
     ],
     "require": {
