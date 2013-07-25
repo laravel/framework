@@ -125,7 +125,7 @@ abstract class ServiceProvider {
 	 */
 	protected function getClassChain(ReflectionClass $reflect)
 	{
-		$lastName = null;
+		$classes = array();
 
 		// This loop essentially walks the inheritance chain of the classes starting
 		// at the most "childish" class and walks back up to this class. Once we
@@ -160,12 +160,12 @@ abstract class ServiceProvider {
 	/**
 	 * Register the package's custom Artisan commands.
 	 *
-	 * @param  dynamic  string
+	 * @param  array  $commands
 	 * @return void
 	 */
-	public function commands()
+	public function commands($commands)
 	{
-		$commands = func_get_args();
+		$commands = is_array($commands) ? $commands : func_get_args();
 
 		// To register the commands with Artisan, we will grab each of the arguments
 		// passed into the method and listen for Artisan "start" event which will

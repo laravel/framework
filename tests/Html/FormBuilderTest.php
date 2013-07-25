@@ -19,6 +19,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->formBuilder =  new FormBuilder($this->htmlBuilder, $this->urlGenerator, '');
 	}
 
+
 	/**
 	 * Destroy the test environment.
 	 */
@@ -68,6 +69,19 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input name="foo" type="text">', $form1);
 		$this->assertEquals('<input name="foo" type="text" value="foobar">', $form2);
 		$this->assertEquals('<input class="span2" name="foobar" type="date">', $form3);
+	}
+
+
+	public function testPasswordsNotFilled()
+	{
+		$session = m::mock('Illuminate\Session\Store');
+		$session->shouldReceive('hasOldInput')->with('password')->andReturn(true);
+		$session->shouldReceive('getOldInput')->with('password')->andReturn('mypass');
+		$this->formBuilder->setSessionStore($session);
+
+		$form1 = $this->formBuilder->password('password');
+
+		$this->assertEquals('<input name="password" type="password" value="">', $form1);
 	}
 
 
@@ -144,7 +158,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testSelect()
 	{
 		$select = $this->formBuilder->select(
-			'size', 
+			'size',
 			array('L' => 'Large', 'S' => 'Small')
 		);
 		$this->assertEquals($select, '<select name="size"><option value="L">Large</option><option value="S">Small</option></select>');
@@ -153,7 +167,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$select = $this->formBuilder->select(
 			'size',
-			 array('L' => 'Large', 'S' => 'Small'), 
+			 array('L' => 'Large', 'S' => 'Small'),
 			 'L'
 		);
 		$this->assertEquals($select, '<select name="size"><option value="L" selected="selected">Large</option><option value="S">Small</option></select>');
@@ -161,8 +175,8 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 
 		$select = $this->formBuilder->select(
-			'size', 
-			array('L' => 'Large', 'S' => 'Small'), 
+			'size',
+			array('L' => 'Large', 'S' => 'Small'),
 			null,
 			array('class' => 'class-name', 'id' => 'select-id')
 		);
@@ -208,7 +222,6 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-
 	public function testFormButton()
 	{
 		$form1 = $this->formBuilder->button('foo');
@@ -216,5 +229,21 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<button type="button">foo</button>', $form1);
 		$this->assertEquals('<button class="span2" type="button">foo</button>', $form2);
+	}
+
+
+	public function testResetInput()
+	{
+		$resetInput = $this->formBuilder->reset('foo');
+		$this->assertEquals('<input type="reset" value="foo">', $resetInput);
+	}
+
+
+	public function testImageInput()
+	{
+		$url = 'http://laravel.com/';
+		$image = $this->formBuilder->image($url);
+
+		$this->assertEquals('<input src="'. $url .'" type="image">', $image);
 	}
 }

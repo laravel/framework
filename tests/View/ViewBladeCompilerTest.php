@@ -74,6 +74,19 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testReversedEchosAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setEscapedContentTags('{{', '}}');
+		$compiler->setContentTags('{{{', '}}}');
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name}}'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{$name}}}'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ $name }}}'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ 
+			$name
+		}}}'));
+	}
+
 	public function testExtendsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -189,6 +202,7 @@ breeze
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$this->assertEquals('<?php echo $__env->yieldContent(\'foo\'); ?>', $compiler->compileString('@yield(\'foo\')'));
+		$this->assertEquals('<?php echo $__env->yieldContent(\'foo\', \'bar\'); ?>', $compiler->compileString('@yield(\'foo\', \'bar\')'));
 		$this->assertEquals('<?php echo $__env->yieldContent(name(foo)); ?>', $compiler->compileString('@yield(name(foo))'));
 	}
 

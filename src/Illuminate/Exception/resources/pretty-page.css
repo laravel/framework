@@ -9,6 +9,7 @@ body {
 }
   a {
     text-decoration: none;
+    color: #FE8A59;
   }
 
 .container{
@@ -17,6 +18,8 @@ body {
     position: fixed;
     margin: 0;
     padding: 0;
+    left: 0;
+    top: 0;
 }
 
 .branding {
@@ -93,8 +96,13 @@ header {
       background: #F0E5DF;
     }
 
-    .frame-class, .frame-function {
+    .frame-class, .frame-function, .frame-index {
       font-weight: bold;
+    }
+
+    .frame-index {
+      font-size: 11px;
+      color: #BDBDBD;
     }
 
     .frame-class {
@@ -285,6 +293,10 @@ pre.prettyprint, code.prettyprint {
 
   pre.prettyprint a, code.prettyprint a {
     text-decoration:none;
+  }
+
+  .linenums li {
+    color: #A5A5A5;
   }
 
   .linenums li.current{

@@ -10,19 +10,6 @@ class BcryptHasher implements HasherInterface {
 	protected $rounds = 8;
 
 	/**
-	 * Create a new Bcrypt hasher instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		if (version_compare(PHP_VERSION, '5.3.7') < 0)
-		{
-			throw new \RuntimeException("Bcrypt hashing requires PHP 5.3.7");
-		}
-	}
-
-	/**
 	 * Hash the given value.
 	 *
 	 * @param  string  $value
@@ -33,7 +20,14 @@ class BcryptHasher implements HasherInterface {
 	{
 		$cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
 
-		return password_hash($value, PASSWORD_BCRYPT, array('cost' => $cost));
+		$hash = password_hash($value, PASSWORD_BCRYPT, array('cost' => $cost));
+
+		if ($hash === false)
+		{
+			throw new \RuntimeException("Bcrypt hashing not supported.");
+		}
+
+		return $hash;
 	}
 
 	/**

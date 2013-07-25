@@ -37,7 +37,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 * @param  mixed  $identifier
 	 * @return \Illuminate\Auth\UserInterface|null
 	 */
-	public function retrieveByID($identifier)
+	public function retrieveById($identifier)
 	{
 		return $this->createModel()->newQuery()->find($identifier);
 	}

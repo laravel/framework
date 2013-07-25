@@ -60,7 +60,7 @@ class Store extends SymfonySession {
 	 * @param  string  $key
 	 * @return bool
 	 */
-	public function hasOldInput($key)
+	public function hasOldInput($key = null)
 	{
 		return ! is_null($this->getOldInput($key));
 	}

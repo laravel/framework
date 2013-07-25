@@ -94,8 +94,8 @@ class Environment {
 	 * Get a new paginator instance.
 	 *
 	 * @param  array  $items
-	 * @param  int    $perPage
 	 * @param  int    $total
+	 * @param  int    $perPage
 	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function make(array $items, $total, $perPage)
