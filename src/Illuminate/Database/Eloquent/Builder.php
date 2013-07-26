@@ -543,13 +543,33 @@ class Builder {
 	 */
 	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and')
 	{
-		$instance = $this->model->$relation();
+		if (is_string($relation)) $relation = (array) $relation;
 
-		$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+		foreach ($relation as $name => $constraints)
+		{
+			// As with the eager relations, if "relation" value is numeric, assume that
+			// no constraints have been specified and create an empty Closure so we can 
+			// treat all the same.
+			if (is_numeric($name))
+			{
+				$f = function() {};
 
-		$this->query->mergeBindings($query->getQuery());
+				list($name, $constraints) = array($constraints, $f);
+			}
 
-		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count, $boolean);
+			$instance = $this->model->$name();
+
+			$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+
+			// Apply constraint to the relation count query
+			call_user_func($constraints, $query);
+
+			$this->query->mergeBindings($query->getQuery());
+
+			$this->where(new Expression('('.$query->toSql().')'), $operator, $count, $boolean);
+		}
+
+		return $this;
 	}
 
 	/**
