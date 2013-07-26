@@ -332,6 +332,9 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			$provider = $this->resolveProviderClass($provider);
 		}
+		if (! $provider instanceof \Illuminate\Support\ServiceProvider){
+			throw new \Exception('Service must be extending \Illuminate\Support\ServiceProvider ');
+		}
 
 		$provider->register();
 
