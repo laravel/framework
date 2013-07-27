@@ -7,9 +7,11 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('children', str_plural('child'));
 		$this->assertEquals('tests', str_plural('test'));
 		$this->assertEquals('deer', str_plural('deer'));
+		$this->assertEquals('freshmen', str_plural('freshman'));
 		$this->assertEquals('child', str_singular('children'));
 		$this->assertEquals('test', str_singular('tests'));
 		$this->assertEquals('deer', str_singular('deer'));
+		$this->assertEquals('freshman', str_singular('freshmen'));
 	}
 
 	public function testCaseSensitiveUsage()
@@ -21,12 +23,18 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('tests', str_plural('test'));
 		$this->assertEquals('Deer', str_plural('Deer'));
 		$this->assertEquals('DEER', str_plural('DEER'));
+		$this->assertEquals('Freshmen', str_plural('Freshman'));
+		$this->assertEquals('FRESHMEN', str_plural('FRESHMAN'));
+		$this->assertEquals('FreshMen', str_plural('FreshMan'));
 		$this->assertEquals('Child', str_singular('Children'));
 		$this->assertEquals('CHILD', str_singular('CHILDREN'));
 		$this->assertEquals('Test', str_singular('Tests'));
 		$this->assertEquals('TEST', str_singular('TESTS'));
 		$this->assertEquals('Deer', str_singular('Deer'));
 		$this->assertEquals('DEER', str_singular('DEER'));
+		$this->assertEquals('Freshman', str_singular('Freshmen'));
+		$this->assertEquals('FRESHMAN', str_singular('FRESHMEN'));
+		$this->assertEquals('FreshMan', str_singular('FreshMen'));
 	}
 
 }
