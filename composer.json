@@ -68,6 +68,7 @@
         "iron-io/iron_mq": "1.4.4",
         "pda/pheanstalk": "2.0.*",
         "mockery/mockery": "0.7.2",
+        "league/phpunit-coverage-listener": "~1.0",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
