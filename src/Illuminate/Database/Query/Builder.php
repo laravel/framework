@@ -121,6 +121,13 @@ class Builder {
 	public $unions;
 
 	/**
+	 * The query lock, value indicates whether the lock is being used for an update.
+	 *
+	 * @var bool
+	 */
+	public $lock;
+
+	/**
 	 * The key that should be used when caching the query.
 	 *
 	 * @var string
@@ -866,6 +873,19 @@ class Builder {
 	public function unionAll($query)
 	{
 		return $this->union($query, true);
+	}
+
+	/**
+	 * Lock selected rows in the table.
+	 *
+	 * @param  bool  $update
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function lock($update = true)
+	{
+		$this->lock = $update;
+
+		return $this;
 	}
 
 	/**

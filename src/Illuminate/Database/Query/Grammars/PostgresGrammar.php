@@ -148,4 +148,16 @@ class PostgresGrammar extends Grammar {
 		return array('truncate '.$this->wrapTable($query->from).' restart identity' => array());
 	}
 
+	/**
+	 * Compile the lock for this query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  bool  $update
+	 * @return string
+	 */
+	public function compileLock(Builder $query, $update)
+	{
+		return $update ? 'for update' : 'for share';
+	}
+
 }

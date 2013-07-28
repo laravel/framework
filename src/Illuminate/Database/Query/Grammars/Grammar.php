@@ -29,6 +29,7 @@ class Grammar extends BaseGrammar {
 		'limit',
 		'offset',
 		'unions',
+		'lock',
 	);
 
 	/**
@@ -624,6 +625,18 @@ class Grammar extends BaseGrammar {
 	public function compileTruncate(Builder $query)
 	{
 		return array('truncate '.$this->wrapTable($query->from) => array());
+	}
+
+	/**
+	 * Compile the lock for this query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  bool  $update
+	 * @return string
+	 */
+	public function compileLock(Builder $query, $update)
+	{
+		throw new \Exception('Row locking is not supported for this database type.');
 	}
 
 	/**

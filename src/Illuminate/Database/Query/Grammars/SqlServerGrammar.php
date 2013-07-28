@@ -57,6 +57,25 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Compile the "from" portion of the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  string  $table
+	 * @return string
+	 */
+	protected function compileFrom(Builder $query, $table)
+	{
+		$from = parent::from($query, $table);
+
+		if( ! is_null($query->lock))
+		{
+			$from .= ' with(rowlock,' . ($query->lock ? 'updlock,' : '') . 'holdlock)';
+		}
+
+		return $from;
+	}
+
+	/**
 	 * Create a full ANSI offset clause for the query.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
@@ -173,6 +192,18 @@ class SqlServerGrammar extends Grammar {
 	public function compileTruncate(Builder $query)
 	{
 		return array('truncate table '.$this->wrapTable($query->from) => array());
+	}
+
+	/**
+	 * Compile the lock for this query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  bool  $update
+	 * @return string
+	 */
+	public function compileLock(Builder $query, $update)
+	{
+		return '';
 	}
 
 	/**
