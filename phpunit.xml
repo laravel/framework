@@ -39,7 +39,7 @@
                       <object class="League\PHPUnitCoverageListener\Hook\Travis"/>
                     </element>
                     <element key="repo_token">
-                        <string>Q4IBQ0tJvJX1Fq16tUScKughDuooUIFpC</string>
+                        <string></string>
                     </element>
                     <element key="target_url">
                         <string>https://coveralls.io/api/v1/jobs</string>
