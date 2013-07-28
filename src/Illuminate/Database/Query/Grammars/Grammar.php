@@ -636,7 +636,7 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileLock(Builder $query, $update)
 	{
-		throw new \Exception('Row locking is not supported for this database type.');
+		throw new \RuntimeException('Row locking is not supported for this database type.');
 	}
 
 	/**
