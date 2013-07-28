@@ -24,4 +24,31 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="League\PHPUnitCoverageListener\Listener">
+            <arguments>
+                <array>
+                    <element key="namespace">
+                        <string>Illuminate</string>
+                    </element>
+                    <element key="printer">
+                      <object class="League\PHPUnitCoverageListener\Printer\StdOut"/>
+                    </element>
+                    <element key="hook">
+                      <object class="League\PHPUnitCoverageListener\Hook\Travis"/>
+                    </element>
+                    <element key="repo_token">
+                        <string>Q4IBQ0tJvJX1Fq16tUScKughDuooUIFpC</string>
+                    </element>
+                    <element key="target_url">
+                        <string>https://coveralls.io/api/v1/jobs</string>
+                    </element>
+                    <element key="coverage_dir">
+                        <string>/tmp/illuminate</string>
+                    </element>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>
 </phpunit>
