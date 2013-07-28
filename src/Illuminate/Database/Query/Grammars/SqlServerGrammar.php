@@ -65,7 +65,7 @@ class SqlServerGrammar extends Grammar {
 	 */
 	protected function compileFrom(Builder $query, $table)
 	{
-		$from = parent::from($query, $table);
+		$from = parent::compileFrom($query, $table);
 
 		if( ! is_null($query->lock))
 		{
