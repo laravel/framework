@@ -47,7 +47,7 @@ class MailServiceProvider extends ServiceProvider {
 
 			// Here we will determine if the mailer should be in "pretend" mode for this
 			// environment, which will simply write out e-mail to the logs instead of
-			// sending it over the web, which is useful for local dev enviornments.
+			// sending it over the web, which is useful for local dev environments.
 			$pretend = $app['config']->get('mail.pretend', false);
 
 			$mailer->pretend($pretend);

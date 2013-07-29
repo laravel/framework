@@ -23,7 +23,7 @@ interface GatewayInterface {
 	 * @param  string  $command
 	 * @return void
 	 */
-	public function run($comamnd);
+	public function run($command);
 
 	/**
 	 * Upload a local file to the server.

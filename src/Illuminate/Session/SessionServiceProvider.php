@@ -114,7 +114,7 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		if ($this->getDriver() == 'array') return;
 
-		// The cookie toucher is responsbile for updating the expire time on the cookie
+		// The cookie toucher is responsible for updating the expire time on the cookie
 		// so that it is refreshed for each page load. Otherwise it is only set here
 		// once by PHP and never updated on each subsequent page load of the apps.
 		$this->registerCookieToucher();
