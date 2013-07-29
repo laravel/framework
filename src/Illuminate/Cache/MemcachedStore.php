@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache; use Memcached;
+<?php namespace Illuminate\Cache;
+
+use Memcached;
 
 class MemcachedStore implements StoreInterface {
 
@@ -129,7 +131,7 @@ class MemcachedStore implements StoreInterface {
 	/**
 	 * Get the underlying Memcached connection.
 	 *
-	 * @return \Memcached
+	 * @return Memcached
 	 */
 	public function getMemcached()
 	{
