@@ -50,7 +50,7 @@ class MakeRemindersCommand extends Command {
 	{
 		$fullPath = $this->createBaseMigration();
 
-		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/reminders.stub'));
+		$this->files->put($fullPath, $this->getMigrationStub());
 
 		$this->info('Migration created successfully!');
 
@@ -69,6 +69,28 @@ class MakeRemindersCommand extends Command {
 		$path = $this->laravel['path'].'/database/migrations';
 
 		return $this->laravel['migration.creator']->create($name, $path);
+	}
+
+	/**
+	 * Get the contents of the reminder migration stub.
+	 *
+	 * @return string
+	 */
+	protected function getMigrationStub()
+	{
+		$stub = $this->files->get(__DIR__.'/stubs/reminders.stub');
+
+		return str_replace('password_reminders', $this->getTable(), $stub);
+	}
+
+	/**
+	 * Get the password reminder table name.
+	 *
+	 * @return string
+	 */
+	protected function getTable()
+	{
+		return $this->laravel['config']->get('auth.reminder.table');
 	}
 
 }
