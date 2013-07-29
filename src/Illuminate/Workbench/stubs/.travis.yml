@@ -6,7 +6,6 @@ php:
   - 5.5
 
 before_script:
-  - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev
+  - composer install --dev
 
 script: phpunit
