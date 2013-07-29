@@ -1775,12 +1775,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getArrayableAttributes()
 	{
-		if (count($this->visible) > 0)
-		{
-			return array_intersect_key($this->attributes, array_flip($this->visible));
-		}
-
-		return array_diff_key($this->attributes, array_flip($this->hidden));
+		return $this->getArrayableItems($this->attributes);
 	}
 
 	/**
@@ -1792,7 +1787,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$attributes = array();
 
-		foreach ($this->relations as $key => $value)
+		foreach ($this->getArrayableRelations() as $key => $value)
 		{
 			if (in_array($key, $this->hidden)) continue;
 
@@ -1830,6 +1825,32 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return $attributes;
+	}
+
+	/**
+	 * Get an attribute array of all arrayable relations.
+	 *
+	 * @return array
+	 */
+	protected function getArrayableRelations()
+	{
+		return $this->getArrayableItems($this->relations);
+	}
+
+	/**
+	 * Get an attribute array of all arrayable values.
+	 *
+	 * @param  array  $values
+	 * @return array
+	 */
+	protected function getArrayableItems(array $values)
+	{
+		if (count($this->visible) > 0)
+		{
+			return array_intersect_key($values, array_flip($this->visible));
+		}
+
+		return array_diff_key($values, array_flip($this->hidden));	
 	}
 
 	/**
