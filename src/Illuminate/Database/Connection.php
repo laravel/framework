@@ -495,11 +495,7 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function handleQueryException(\Exception $e, $query, $bindings)
 	{
-		$bindings = var_export($bindings, true);
-
-		$message = $e->getMessage()." (SQL: {$query}) (Bindings: {$bindings})";
-
-		throw new \Exception($message);
+		throw new QueryException($query, $bindings, $e->getMessage(), $e->getCode(), $e);
 	}
 
 	/**
