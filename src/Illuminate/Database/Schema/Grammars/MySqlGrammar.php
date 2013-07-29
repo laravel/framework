@@ -288,6 +288,28 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a medium text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumText(Fluent $column)
+	{
+		return 'mediumtext';
+	}
+
+	/**
+	 * Create the column definition for a long text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeLongText(Fluent $column)
+	{
+		return 'longtext';
+	}
+
+	/**
 	 * Create the column definition for a big integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
