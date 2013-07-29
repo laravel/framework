@@ -49,10 +49,18 @@ class CommandMakeCommand extends Command {
 		// typically using the PSR-0 standards we can safely assume the classes name
 		// will correspond to what the actual file should be stored as on storage.
 		$file = $path.'/'.$this->input->getArgument('name').'.php';
+		
+		// Make sure we don't replace an already existing command
+		if ($this->files->exists($file))
+		{
+			$this->error('Command already exists!');
+		}
+		else
+		{
+			$this->files->put($file, $this->formatStub($stub));
 
-		$this->files->put($file, $this->formatStub($stub));
-
-		$this->info('Command created successfully.');
+			$this->info('Command created successfully.');
+		}
 	}
 
 	/**
@@ -63,7 +71,9 @@ class CommandMakeCommand extends Command {
 	 */
 	protected function formatStub($stub)
 	{
-		$stub = str_replace('{{class}}', $this->input->getArgument('name'), $stub);
+		$name = $this->input->getArgument('name');
+
+		$stub = str_replace('{{class}}', $name, $stub);
 
 		if ( ! is_null($namespace = $this->input->getOption('namespace')))
 		{
@@ -73,6 +83,21 @@ class CommandMakeCommand extends Command {
 		{
 			$stub = str_replace('{{namespace}}', '', $stub);
 		}
+
+		// Split the command name to words based on camelisation ( CamelCase => ['Camel', 'Case'] )
+		$parts = preg_split('/(?=[A-Z])/', $name, -1, PREG_SPLIT_NO_EMPTY);
+
+		// Make all parts lowercase
+		$parts = array_map('strtolower', $parts);
+
+		// Remove the 'command' part if present
+		$parts = array_filter($parts, function($part)
+		{
+			return $part != 'command' ? true : false;
+		});
+
+		// Put the command name into the stub
+		$stub = str_replace('{{command}}', implode(':', $parts), $stub);
 
 		return $stub;
 	}
