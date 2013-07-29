@@ -50,9 +50,28 @@ class CommandMakeCommand extends Command {
 		// will correspond to what the actual file should be stored as on storage.
 		$file = $path.'/'.$this->input->getArgument('name').'.php';
 
-		$this->files->put($file, $this->formatStub($stub));
+		$this->writeCommand($file, $stub);
+	}
 
-		$this->info('Command created successfully.');
+	/**
+	 * Write the finished command file to disk.
+	 *
+	 * @param  string  $file
+	 * @param  string  $stub
+	 * @return void
+	 */
+	protected function writeCommand($file, $stub)
+	{
+		if ( ! file_exists($file))
+		{
+			$this->files->put($file, $this->formatStub($stub));
+
+			$this->info('Command created successfully.');
+		}
+		else
+		{
+			$this->error('Command already exists!');
+		}
 	}
 
 	/**
