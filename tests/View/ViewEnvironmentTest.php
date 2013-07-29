@@ -13,14 +13,21 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 
 	public function testMakeCreatesNewViewInstanceWithProperPathAndEngine()
 	{
+		unset($_SERVER['__test.view']);
+
 		$env = $this->getEnvironment();
 		$env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
 		$env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
 		$env->getFinder()->shouldReceive('addExtension')->once()->with('php');
+		$env->setDispatcher(new Illuminate\Events\Dispatcher);
+		$env->creator('view', function($view) { $_SERVER['__test.view'] = $view; });
 		$env->addExtension('php', 'php');
 		$view = $env->make('view', array('foo' => 'bar'), array('baz' => 'boom'));
 
 		$this->assertTrue($engine === $view->getEngine());
+		$this->assertTrue($_SERVER['__test.view'] === $view);
+
+		unset($_SERVER['__test.view']);
 	}
 
 
@@ -74,6 +81,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
         $env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
         $env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
         $env->getFinder()->shouldReceive('addExtension')->once()->with('php');
+		$env->getDispatcher()->shouldReceive('fire');
         $env->addExtension('php', 'php');
         $env->name('view', 'foo');
         $view = $env->of('foo', array('data'));
@@ -98,6 +106,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$environment->getEngineResolver()->shouldReceive('register')->once()->with('bar', $resolver);
 		$environment->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.foo');
 		$environment->getEngineResolver()->shouldReceive('resolve')->once()->with('bar')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
+		$environment->getDispatcher()->shouldReceive('fire');
 
 		$environment->addExtension('foo', 'bar', $resolver);
 
