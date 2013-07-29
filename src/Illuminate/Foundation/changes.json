@@ -13,6 +13,7 @@
 		{"message": "Auth::extend Closures should only return UserProviderInterface implementations.", "backport": null},
 		{"message": "Make it easier to extend the Request class.", "backport": null},
 		{"message": "Transparent support for APCu cache via 'apc' driver.", "backport": null},
-		{"message": "Add morphs short-cut for adding polymorphic schema columns.", "backport": null}
+		{"message": "Add morphs short-cut for adding polymorphic schema columns.", "backport": null},
+		{"message": "Namespaces are now excluded from guessed model names.", "backport": null}
 	]
 }

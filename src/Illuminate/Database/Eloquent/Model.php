@@ -1405,7 +1405,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if (isset($this->table)) return $this->table;
 
-		return str_replace('\\', '', snake_case(str_plural(get_class($this))));
+		return str_replace('\\', '', snake_case(str_plural(class_basename($this))));
 	}
 
 	/**
