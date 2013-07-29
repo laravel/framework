@@ -585,6 +585,19 @@ class Blueprint {
 	}
 
 	/**
+	 * Add the proper columns for a polymorphic table.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function morphs($name)
+	{
+		$this->integer("{$name}_id");
+
+		$this->string("{$name}_type");
+	}
+
+	/**
 	 * Create a new drop index command on the blueprint.
 	 *
 	 * @param  string  $command
