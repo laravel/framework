@@ -60,7 +60,7 @@ class ChangesCommand extends Command {
 	{
 		$message = '<comment>-></comment> <info>'.$change['message'].'</info>';
 
-		if ( ! is_null($change['backport']))
+		if (array_key_exists('backport', $change) && ! is_null($change['backport']))
 		{
 			$message .= ' <comment>(Backported to '.$change['backport'].')</comment>';
 		}
