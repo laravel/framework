@@ -56,9 +56,11 @@ class Builder {
 	 */
 	public function hasColumn($table, $column)
 	{
-		$schema = $this->connection->getDoctrineSchemaManager();
-
-		return in_array($column, array_keys($schema->listTableColumns($table)));
+	    $schema = $this->connection->getDoctrineSchemaManager();
+	
+	    $columns = array_keys($schema->listTableColumns($table));
+	
+	    return in_array($column, $columns) OR in_array("`{$column}`", $columns) ? TRUE : FALSE;
 	}
 
 	/**
