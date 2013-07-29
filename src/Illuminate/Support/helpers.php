@@ -180,7 +180,7 @@ if ( ! function_exists('array_fetch'))
 
 			foreach ($array as $value)
 			{
-				$value = (array) $value;
+				$value = ($value instanceof Illuminate\Support\Contracts\ArrayableInterface) ? $value->toArray() : (array) $value;
 
 				$results[] = $value[$segment];
 			}
