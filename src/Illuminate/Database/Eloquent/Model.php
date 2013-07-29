@@ -1814,7 +1814,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			// If the relationships snake-casing is enabled, we will snake case this
 			// key so that the relation attribute is snake cased in this returned
-			// array to the developer, making this consisntent with attributes.
+			// array to the developer, making this consistent with attributes.
 			if (static::$snakeAttributes)
 			{
 				$key = snake_case($key);
@@ -2053,7 +2053,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		// If the value is in simply year, month, day format, we will instantiate the
-		// Carbon instances from that fomrat. Again, this provides for simple date
+		// Carbon instances from that format. Again, this provides for simple date
 		// fields on the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{

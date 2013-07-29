@@ -111,7 +111,7 @@ class SubscribeCommand extends Command {
 	}
 
 	/**
-	 * Get the queue inforamtion from Iron.io.
+	 * Get the queue information from Iron.io.
 	 *
 	 * @return \StdClass
 	 */
