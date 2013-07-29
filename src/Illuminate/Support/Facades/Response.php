@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -45,7 +46,11 @@ class Response {
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
-		if ($data instanceof ArrayableInterface)
+		if ($data instanceof JsonableInterface)
+		{
+			$data = $data->toJson();
+		}
+		elseif ($data instanceof ArrayableInterface)
 		{
 			$data = $data->toArray();
 		}
