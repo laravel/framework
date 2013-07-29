@@ -143,7 +143,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	protected function createPushedIronJob($job)
 	{
-		return new IronJob($this->container, $this->iron, $job, $this->default);
+		return new IronJob($this->container, $this->iron, $job, $this->default, true);
 	}
 
 	/**
