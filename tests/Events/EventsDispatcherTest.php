@@ -34,9 +34,10 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testContainerResolutionOfEventHandlersWithDefaultMethods()
 	{
 		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
-		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
-		$handler->shouldReceive('handle')->once()->with('foo', 'bar', 'foo');
+		$container->shouldReceive('make')->twice()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
+		$handler->shouldReceive('handle')->twice()->with('foo', 'bar', 'foo');
 		$d->listen('foo', 'FooHandler');
+		$d->listen('fo*', 'FooHandler');
 		$d->fire('foo', array('foo', 'bar'));
 	}
 
