@@ -76,7 +76,7 @@ class ReminderServiceProvider extends ServiceProvider {
 
 			$key = $app['config']['app.key'];
 
-			$expire = $app['config']->get('auth.reminder.expire', 3600);
+			$expire = $app['config']->get('auth.reminder.expire', 60);
 
 			return new DbRepository($connection, $table, $key, $expire);
 		});
