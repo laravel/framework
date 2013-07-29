@@ -299,7 +299,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Merge items with the collection items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function merge($items)

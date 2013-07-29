@@ -1405,7 +1405,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if (isset($this->table)) return $this->table;
 
-		return str_replace('\\', '', snake_case(str_plural(get_class($this))));
+		return str_replace('\\', '', snake_case(str_plural(class_basename($this))));
 	}
 
 	/**
@@ -1775,12 +1775,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getArrayableAttributes()
 	{
-		if (count($this->visible) > 0)
-		{
-			return array_intersect_key($this->attributes, array_flip($this->visible));
-		}
-
-		return array_diff_key($this->attributes, array_flip($this->hidden));
+		return $this->getArrayableItems($this->attributes);
 	}
 
 	/**
@@ -1792,7 +1787,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$attributes = array();
 
-		foreach ($this->relations as $key => $value)
+		foreach ($this->getArrayableRelations() as $key => $value)
 		{
 			if (in_array($key, $this->hidden)) continue;
 
@@ -1830,6 +1825,32 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return $attributes;
+	}
+
+	/**
+	 * Get an attribute array of all arrayable relations.
+	 *
+	 * @return array
+	 */
+	protected function getArrayableRelations()
+	{
+		return $this->getArrayableItems($this->relations);
+	}
+
+	/**
+	 * Get an attribute array of all arrayable values.
+	 *
+	 * @param  array  $values
+	 * @return array
+	 */
+	protected function getArrayableItems(array $values)
+	{
+		if (count($this->visible) > 0)
+		{
+			return array_intersect_key($values, array_flip($this->visible));
+		}
+
+		return array_diff_key($values, array_flip($this->hidden));	
 	}
 
 	/**
@@ -2248,11 +2269,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the connection associated with the model.
 	 *
 	 * @param  string  $name
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function setConnection($name)
 	{
 		$this->connection = $name;
+
+		return $this;
 	}
 
 	/**

@@ -61,6 +61,17 @@ class Collection extends BaseCollection {
 	}
 
 	/**
+	 * Fetch a nested element of the collection.
+	 *
+	 * @param  string  $key
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function fetch($key)
+	{
+		return new static(array_fetch($this->toArray(), $key));
+	}
+
+	/**
 	 * Get the array of primary keys
 	 *
 	 * @return array

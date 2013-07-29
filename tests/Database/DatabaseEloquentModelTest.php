@@ -656,7 +656,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
 		$namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
-		$this->assertEquals('foo_bar_eloquent_model_namespaced_stubs', $namespacedModel->getTable());
+		$this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
 	}
 
 
