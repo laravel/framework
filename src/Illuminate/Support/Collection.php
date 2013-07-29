@@ -319,28 +319,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Take the first amount of elements from the collection array.
-	 *
-	 * @param  int  $limit
-	 * @return \Illuminate\Support\Collection
-	 */
-	public function take($limit)
-	{
-		return $this->slice(0, $limit);
-	}
-
-	/**
-	 * Take the last amount of elements from the collection array.
-	 *
-	 * @param  int  $limit
-	 * @return \Illuminate\Support\Collection
-	 */
-	public function takeLast($limit)
-	{
-		return $this->slice(-$limit, $limit);
-	}
-
-	/**
 	 * Slice the underlying collection array.
 	 *
 	 * @param  int   $offset
@@ -351,6 +329,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function slice($offset, $length = null, $preserveKeys = false)
 	{
 		return new static(array_slice($this->items, $offset, $length, $preserveKeys));
+	}
+
+	/**
+	 * Take the first or last {$limit} items.
+	 *
+	 * @param  int  $limit
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function take($limit = null)
+	{
+		if ($limit < 0) return $this->slice($limit, abs($limit));
+
+		return $this->slice(0, $limit);
 	}
 
 	/**
