@@ -46,11 +46,7 @@ class Response {
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array())
 	{
-		if ($data instanceof JsonableInterface)
-		{
-			$data = $data->toJson();
-		}
-		elseif ($data instanceof ArrayableInterface)
+		if ($data instanceof ArrayableInterface)
 		{
 			$data = $data->toArray();
 		}
