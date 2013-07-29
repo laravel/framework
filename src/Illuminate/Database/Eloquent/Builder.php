@@ -732,4 +732,14 @@ class Builder {
 		return in_array($method, $this->passthru) ? $result : $this;
 	}
 
+	/**
+	 * Clone the query into a new, non-existing instance.
+	 *
+	 * @return \Illuminate\Database\Query
+	 */
+	public function __clone()
+	{
+		$this->query = clone $this->query;
+	}
+
 }
