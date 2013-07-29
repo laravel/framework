@@ -369,6 +369,19 @@ class Guard {
 	}
 
 	/**
+	 * Log the given user ID into the application without sessions or cookies.
+	 *
+	 * @param  mixed  $id
+	 * @return bool
+	 */
+	public function onceUsingId($id)
+	{
+		$this->setUser($this->provider->retrieveById($id));
+
+		return $this->user instanceof UserInterface;
+	}
+
+	/**
 	 * Create a remember me cookie for a given ID.
 	 *
 	 * @param  mixed  $id
