@@ -196,6 +196,7 @@ class Section {
 	protected function reset()
 	{
 		$this->store->forever($this->sectionKey(), $id = uniqid());
+
 		return $id;
 	}
 
