@@ -2269,11 +2269,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the connection associated with the model.
 	 *
 	 * @param  string  $name
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function setConnection($name)
 	{
 		$this->connection = $name;
+
+		return $this;
 	}
 
 	/**
