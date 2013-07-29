@@ -374,6 +374,28 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new medium text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function mediumText($column)
+	{
+		return $this->addColumn('mediumText', $column);
+	}
+
+	/**
+	 * Create a new long text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function longText($column)
+	{
+		return $this->addColumn('longText', $column);
+	}
+
+	/**
 	 * Create a new integer column on the table.
 	 *
 	 * @param  string  $column
