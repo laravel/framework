@@ -16,6 +16,7 @@
 		{"message": "Add morphs short-cut for adding polymorphic schema columns.", "backport": null},
 		{"message": "Namespaces are now excluded from guessed model names.", "backport": null},
 		{"message": "Added new --command option to command:make Artisan command.", "backport": null},
-		{"message": "Added mediumText and longText to schema builder.", "backport": null}
+		{"message": "Added mediumText and longText to schema builder.", "backport": null},
+		{"message": "Added support for macros on the Response class.", "backport": null}
 	]
 }
