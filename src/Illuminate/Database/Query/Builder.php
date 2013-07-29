@@ -801,6 +801,28 @@ class Builder {
 	}
 
 	/**
+	 * Add an "order by" clause for a timestamp to the query.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function latest($column = 'created_at')
+	{
+		return $this->orderBy($column, 'desc');
+	}
+
+	/**
+	 * Add an "order by" clause for a timestamp to the query.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function oldest($column = 'created_at')
+	{
+		return $this->orderBy($column, 'asc');
+	}
+
+	/**
 	 * Set the "offset" value of the query.
 	 *
 	 * @param  int  $value
