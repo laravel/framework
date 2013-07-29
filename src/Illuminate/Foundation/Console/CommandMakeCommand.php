@@ -65,16 +65,30 @@ class CommandMakeCommand extends Command {
 	{
 		$stub = str_replace('{{class}}', $this->input->getArgument('name'), $stub);
 
+		if ( ! is_null($this->option('command')))
+		{
+			$stub = str_replace('command:name', $this->option('command'), $stub);
+		}
+
+		return $this->addNamespace($stub);
+	}
+
+	/**
+	 * Add the proper namespace to the command.
+	 *
+	 * @param  string  $stub
+	 * @return string
+	 */
+	protected function addNamespace($stub)
+	{
 		if ( ! is_null($namespace = $this->input->getOption('namespace')))
 		{
-			$stub = str_replace('{{namespace}}', ' namespace '.$namespace.';', $stub);
+			return str_replace('{{namespace}}', ' namespace '.$namespace.';', $stub);
 		}
 		else
 		{
-			$stub = str_replace('{{namespace}}', '', $stub);
+			return str_replace('{{namespace}}', '', $stub);
 		}
-
-		return $stub;
 	}
 
 	/**
@@ -116,6 +130,8 @@ class CommandMakeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', null),
+
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path where the command should be stored.', null),
 
 			array('namespace', null, InputOption::VALUE_OPTIONAL, 'The command namespace.', null),
