@@ -410,6 +410,58 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a select range field.
+	 *
+	 * @param  string  $name
+	 * @param  string  $begin
+	 * @param  string  $end
+	 * @param  string  $selected
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function selectRange($name, $begin, $end, $selected = null, $options = array())
+	{
+		$range = array_combine($range = range($begin, $end), $range);
+
+		return $this->select($name, $range, $selected, $options);
+	}
+
+	/**
+	 * Create a select year field.
+	 *
+	 * @param  string  $name
+	 * @param  string  $begin
+	 * @param  string  $end
+	 * @param  string  $selected
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function selectYear()
+	{
+		return call_user_func_array(array($this, 'selectRange'), func_get_args());
+	}
+
+	/**
+	 * Create a select month field.
+	 *
+	 * @param  string  $name
+	 * @param  string  $selected
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function selectMonth($name, $selected = null, $options = array())
+	{
+		$months = array();
+
+		foreach (range(1, 12) as $month)
+		{
+			$months[$month] = strftime('%B', mktime(0, 0, 0, $month));
+		}
+
+		return $this->select($name, $months, $selected, $options);
+	}
+
+	/**
 	 * Get the select option for the given value.
 	 *
 	 * @param  string  $display
