@@ -25,6 +25,7 @@
 		{"message": "Added support for where conditions on unique validation rule.", "backport": null},
 		{"message": "Restore method on Eloquent models now fires restoring and restored events.", "backport": null},
 		{"message": "Fixed re-population of radio buttons and checkboxes in FormBuilder.", "backport": null},
-		{"message": "Postgres ENUMs are now more truly implemented using 'check' constraints.", "backport": null}
+		{"message": "Postgres ENUMs are now more truly implemented using 'check' constraints.", "backport": null},
+		{"message": "Added selectMonth and selectYear to FormBuilder.", "backport": null}
 	]
 }
