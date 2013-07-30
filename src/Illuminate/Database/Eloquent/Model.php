@@ -1886,7 +1886,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (method_exists($this, $camelKey))
 		{
-			$relations = $this->$camelKey()->getResults();
+			$relations = $this->$camelKey()->get();
 
 			return $this->relations[$key] = $relations;
 		}

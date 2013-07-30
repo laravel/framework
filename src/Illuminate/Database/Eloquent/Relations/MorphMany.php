@@ -9,7 +9,7 @@ class MorphMany extends MorphOneOrMany {
 	 *
 	 * @return mixed
 	 */
-	public function getResults()
+	public function get()
 	{
 		return $this->query->get();
 	}
