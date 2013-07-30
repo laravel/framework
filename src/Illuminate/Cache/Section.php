@@ -7,7 +7,7 @@ class Section {
 	/**
 	 * The cache store implementation.
 	 *
-	 * \Illuminate\Cache\StoreInterface  $store
+	 * @var \Illuminate\Cache\StoreInterface
 	 */
 	protected $store;
 

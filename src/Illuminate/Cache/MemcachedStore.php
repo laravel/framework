@@ -1,11 +1,13 @@
-<?php namespace Illuminate\Cache; use Memcached;
+<?php namespace Illuminate\Cache;
+
+use Memcached;
 
 class MemcachedStore implements StoreInterface {
 
 	/**
 	 * The Memcached instance.
 	 *
-	 * @var Memcached
+	 * @var \Memcached
 	 */
 	protected $memcached;
 
@@ -19,7 +21,7 @@ class MemcachedStore implements StoreInterface {
 	/**
 	 * Create a new Memcached store.
 	 *
-	 * @param  Memcached  $memcached
+	 * @param  \Memcached  $memcached
 	 * @param  string     $prefix
 	 * @return void
 	 */
