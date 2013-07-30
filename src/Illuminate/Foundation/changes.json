@@ -19,6 +19,7 @@
 		{"message": "Added mediumText and longText to schema builder.", "backport": null},
 		{"message": "Added support for macros on the Response class.", "backport": null},
 		{"message": "Added support for view creators in addition to composers.", "backport": null},
-		{"message": "Allow App::down to be bypassed if the event returns null.", "backport": null}
+		{"message": "Allow App::down to be bypassed if the event returns null.", "backport": null},
+		{"message": "Added Request::format function to get human-readable expected Response format.", "backport": null}
 	]
 }
