@@ -153,7 +153,7 @@ class SessionServiceProvider extends ServiceProvider {
 
 		$expire = $this->getExpireTime($config);
 
-		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], false, true);
+		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], isset($config['secure']) ? $config['secure'] : false, true);
 	}
 
 	/**
