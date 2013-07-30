@@ -21,6 +21,7 @@
 		{"message": "Added support for view creators in addition to composers.", "backport": null},
 		{"message": "Allow App::down to be bypassed if the event returns null.", "backport": null},
 		{"message": "Added Request::format function to get human-readable expected Response format.", "backport": null},
-		{"message": "Allow array sizes to be checked by validator.", "backport": null}
+		{"message": "Allow array sizes to be checked by validator.", "backport": null},
+		{"message": "Added support for where conditions on unique validation rule.", "backport": null}
 	]
 }
