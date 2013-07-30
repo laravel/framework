@@ -186,6 +186,11 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFormCheckbox()
 	{
+		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+		$session->shouldReceive('getOldInput')->with('foo')->andReturn(null);
+		$session->shouldReceive('getOldInput')->andReturn(array());
+		$session->shouldReceive('hasOldInput')->andReturn(false);
+
 		$form1 = $this->formBuilder->input('checkbox', 'foo');
 		$form2 = $this->formBuilder->checkbox('foo');
 		$form3 = $this->formBuilder->checkbox('foo', 'foobar', true);
