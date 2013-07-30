@@ -70,6 +70,13 @@ class FormBuilder {
 	protected $spoofedMethods = array('DELETE', 'PATCH', 'PUT');
 
 	/**
+	 * The types of inputs to not fill values on by default.
+	 *
+	 * @var array
+	 */
+	protected $skipValueTypes = array('file', 'password', 'checkbox', 'radio');
+
+	/**
 	 * Create a new form builder instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
@@ -217,7 +224,7 @@ class FormBuilder {
 		// in the model instance if one is set. Otherwise we will just use empty.
 		$id = $this->getIdAttribute($name, $options);
 
-		if ($type != 'file' and $type != 'password')
+		if ( ! in_array($type, $this->skipValueTypes))
 		{
 			$value = $this->getValueAttribute($name, $value);
 		}
@@ -516,7 +523,7 @@ class FormBuilder {
 	 */
 	protected function checkable($type, $name, $value, $checked, $options)
 	{
-		if (is_null($checked)) $checked = $this->getCheckedState($type, $name, $value);
+		$checked = $this->getCheckedState($type, $name, $value, $checked);
 
 		if ($checked) $options['checked'] = 'checked';
 
@@ -529,11 +536,52 @@ class FormBuilder {
 	 * @param  string  $type
 	 * @param  string  $name
 	 * @param  mixed   $value
+	 * @param  bool    $checked
 	 * @return void
 	 */
-	protected function getCheckedState($type, $name, $value)
+	protected function getCheckedState($type, $name, $value, $checked)
 	{
-		if ($type == 'checkbox') return (bool) $this->getValueAttribute($name);
+		switch ($type)
+		{
+			case 'checkbox':
+				return $this->getCheckboxCheckedState($name, $checked);
+
+			case 'radio':
+				return $this->getRadioCheckedState($name, $value, $checked);
+
+			default:
+				return $this->getValueAttribute($name) == $value;
+		}
+	}
+
+	/**
+	 * Get the check state for a checkbox input.
+	 *
+	 * @param  string  $name
+	 * @param  mixed  $value
+	 * @param  bool  $checked
+	 * @return bool
+	 */
+	protected function getCheckboxCheckedState($name, $checked)
+	{
+		if ( ! $this->oldInputIsEmpty() and is_null($this->old($name))) return false;
+
+		if (is_null($this->old($name))) return $checked;
+
+		return (bool) $this->getValueAttribute($name);
+	}
+
+	/**
+	 * Get the check state for a radio input.
+	 *
+	 * @param  string  $name
+	 * @param  mixed  $value
+	 * @param  bool  $checked
+	 * @return bool
+	 */
+	protected function getRadioCheckedState($name, $value, $checked)
+	{
+		if (is_null($this->old($name))) return $checked;
 
 		return $this->getValueAttribute($name) == $value;
 	}
@@ -788,6 +836,30 @@ class FormBuilder {
 		{
 			return array_get($this->model, $name);
 		}
+	}
+
+	/**
+	 * Get a value from the session's old input.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	public function old($name)
+	{
+		if (isset($this->session))
+		{
+			return $this->session->getOldInput($name);
+		}
+	}
+
+	/**
+	 * Determine if the old input is empty.
+	 *
+	 * @return bool
+	 */
+	public function oldInputIsEmpty()
+	{
+		return (isset($this->session) and count($this->session->getOldInput()) == 0);
 	}
 
 	/**
