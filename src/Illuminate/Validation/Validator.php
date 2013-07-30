@@ -691,6 +691,8 @@ class Validator implements MessageProviderInterface {
 		if (isset($parameters[2]))
 		{
 			list($idColumn, $id) = $this->getUniqueIds($parameters);
+
+			if (strtolower($id) == 'null') $id = null;
 		}
 
 		// The presence verifier is responsible for counting rows within this store
@@ -698,9 +700,11 @@ class Validator implements MessageProviderInterface {
 		// data store like Redis, etc. We will use it to determine uniqueness.
 		$verifier = $this->getPresenceVerifier();
 
+		$extra = $this->getUniqueExtra($parameters);
+
 		return $verifier->getCount(
 
-			$table, $column, $value, $id, $idColumn
+			$table, $column, $value, $id, $idColumn, $extra
 
 		) == 0;
 	}
@@ -716,6 +720,24 @@ class Validator implements MessageProviderInterface {
 		$idColumn = isset($parameters[3]) ? $parameters[3] : 'id';
 
 		return array($idColumn, $parameters[2]);
+	}
+
+	/**
+	 * Get the extra conditions for a unique rule.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function getUniqueExtra($parameters)
+	{
+		if (isset($parameters[4]))
+		{
+			return $this->getExtraConditions(array_slice($parameters, 4));
+		}
+		else
+		{
+			return array();
+		}
 	}
 
 	/**
@@ -773,8 +795,17 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getExtraExistConditions(array $parameters)
 	{
-		$segments = array_values(array_slice($parameters, 2));
+		return $this->getExtraConditions(array_values(array_slice($parameters, 2)));
+	}
 
+	/**
+	 * Get the extra conditions for a unique / exists rule.
+	 *
+	 * @param  array  $segments
+	 * @return array
+	 */
+	protected function getExtraConditions(array $segments)
+	{
 		$extra = array();
 
 		for ($i = 0; $i < count($segments); $i = $i + 2)
@@ -782,7 +813,7 @@ class Validator implements MessageProviderInterface {
 			$extra[$segments[$i]] = $segments[$i + 1];
 		}
 
-		return $extra;
+		return $extra;	
 	}
 
 	/**
