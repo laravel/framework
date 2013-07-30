@@ -478,6 +478,18 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Validate that an attribute is an array.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateArray($attribute, $value)
+	{
+		return is_array($value);
+	}
+
+	/**
 	 * Validate that an attribute is numeric.
 	 *
 	 * @param  string  $attribute
@@ -601,6 +613,10 @@ class Validator implements MessageProviderInterface {
 		if (is_numeric($value) and $hasNumeric)
 		{
 			return $this->data[$attribute];
+		}
+		elseif (is_array($value))
+		{
+			return count($value);
 		}
 		elseif ($value instanceof File)
 		{
@@ -1070,6 +1086,10 @@ class Validator implements MessageProviderInterface {
 		if ($this->hasRule($attribute, $this->numericRules))
 		{
 			return 'numeric';
+		}
+		elseif ($this->hasRule($attribute, array('Array')))
+		{
+			return 'array';
 		}
 		elseif (array_key_exists($attribute, $this->files))
 		{
