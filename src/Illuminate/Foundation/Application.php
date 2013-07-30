@@ -524,12 +524,10 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			$response = $this['events']->until('illuminate.app.down');
 
-			return $this->prepareResponse($response, $request);
+			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
-		else
-		{
-			return $this['router']->dispatch($this->prepareRequest($request));
-		}
+		
+		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
 	/**
