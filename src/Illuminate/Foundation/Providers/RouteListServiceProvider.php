@@ -21,7 +21,7 @@ class RouteListServiceProvider extends ServiceProvider {
 	{
 		$this->app['command.routes'] = $this->app->share(function($app)
 		{
-			return new RoutesCommand($app['router']->getRoutes());
+			return new RoutesCommand($app['router']);
 		});
 
 		$this->commands('command.routes');
