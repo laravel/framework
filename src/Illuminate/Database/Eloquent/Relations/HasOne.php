@@ -9,7 +9,7 @@ class HasOne extends HasOneOrMany {
 	 *
 	 * @return mixed
 	 */
-	public function getResults()
+	public function get()
 	{
 		return $this->query->first();
 	}
