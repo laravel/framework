@@ -185,6 +185,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('getRelation'), $this->getMocks());
 		$builder->setEagerLoads(array('orders' => function($query) { $_SERVER['__eloquent.constrain'] = $query; }));
+    $builder->getQuery()->shouldReceive('getCacheMinutes')->andReturn(null);
 		$relation = m::mock('stdClass');
 		$relation->shouldReceive('getAndResetWheres')->once()->andReturn(array(array('wheres'), array('bindings')));
 		$relation->shouldReceive('addEagerConstraints')->once()->with(array('models'));
@@ -199,6 +200,30 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($relation, $_SERVER['__eloquent.constrain']);
 		unset($_SERVER['__eloquent.constrain']);
 	}
+
+
+  public function testGetRelationsWithCaching()
+  {
+    $builder_query = m::mock('Illuminate\Database\Query\Builder', array('getCacheMinutes'));
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('getRelation'), array($builder_query));
+    $relation_query = m::mock('StdClass');
+    $relation_query->shouldReceive('remember')->once()->with(5);
+
+		$relation = m::mock('StdClass');
+		$relation->shouldReceive('getAndResetWheres')->once()->andReturn(array(array('wheres'), array('bindings')));
+		$relation->shouldReceive('addEagerConstraints')->once();
+		$relation->shouldReceive('mergeWheres')->once();
+		$relation->shouldReceive('initRelation')->once();
+		$relation->shouldReceive('get')->once();
+		$relation->shouldReceive('match')->once();
+    $relation->shouldReceive('getQuery')->once()->andReturn($relation_query);
+
+		$builder->expects($this->once())->method('getRelation')->with($this->equalTo('orders'))->will($this->returnValue($relation));
+    $builder->getQuery()->shouldReceive('getCacheMinutes')->once()->andReturn(5);
+    $builder->setEagerLoads(array('orders' => function($query) {}));
+
+    $builder->eagerLoadRelations(array('orders'));
+  }
 
 
 	public function testGetRelationProperlySetsNestedRelationships()

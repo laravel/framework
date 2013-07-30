@@ -463,6 +463,12 @@ class Builder {
 
 		$models = $relation->initRelation($models, $name);
 
+		// Attach cache information to relation query.
+		// Key is skipped because will generate cache conflicts, when passed.
+		$minutes = $this->getQuery()->getCacheMinutes();
+
+		if( ! is_null($minutes)) $relation->getQuery()->remember($minutes);
+
 		// Once we have the results, we just match those back up to their parent models
 		// using the relationship instance. Then we just return the finished arrays
 		// of models which have been eagerly hydrated and are readied for return.
