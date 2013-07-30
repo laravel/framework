@@ -43,7 +43,7 @@ class BelongsTo extends Relation {
 	 *
 	 * @return mixed
 	 */
-	public function get()
+	public function getResults()
 	{
 		return $this->query->first();
 	}
@@ -200,7 +200,7 @@ class BelongsTo extends Relation {
 	 */
 	public function update(array $attributes)
 	{
-		$instance = $this->get();
+		$instance = $this->getResults();
 
 		return $instance->fill($attributes)->save();
 	}

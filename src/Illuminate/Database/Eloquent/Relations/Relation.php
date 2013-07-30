@@ -85,7 +85,7 @@ abstract class Relation {
 	 *
 	 * @return mixed
 	 */
-	abstract public function get();
+	abstract public function getResults();
 
 	/**
 	 * Touch all of the related models for the relationship.
