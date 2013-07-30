@@ -23,6 +23,7 @@
 		{"message": "Added Request::format function to get human-readable expected Response format.", "backport": null},
 		{"message": "Allow array sizes to be checked by validator.", "backport": null},
 		{"message": "Added support for where conditions on unique validation rule.", "backport": null},
-		{"message": "Restore method on Eloquent models now fires restoring and restored events.", "backport": null}
+		{"message": "Restore method on Eloquent models now fires restoring and restored events.", "backport": null},
+		{"message": "Fixed re-population of radio buttons and checkboxes in FormBuilder.", "backport": null}
 	]
 }
