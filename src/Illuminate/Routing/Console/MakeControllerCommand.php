@@ -98,6 +98,13 @@ class MakeControllerCommand extends Command {
 			return $this->laravel['path.base'].'/'.$this->input->getOption('path');
 		}
 
+		$bench = $this->input->getOption('bench');
+		if ( ! is_null($bench))
+		{
+			$path = "/workbench/{$bench}/src/controllers";
+			return $this->laravel['path.base'].$path;
+		}
+
 		return $this->path;
 	}
 
@@ -149,6 +156,8 @@ class MakeControllerCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
+			
 			array('only', null, InputOption::VALUE_OPTIONAL, 'The methods that should be included'),
 
 			array('except', null, InputOption::VALUE_OPTIONAL, 'The methods that should be excluded'),
