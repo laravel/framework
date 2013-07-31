@@ -27,22 +27,32 @@ class IronJob extends Job {
 	protected $queue;
 
 	/**
+	 * Indicates if the message was a push message.
+	 *
+	 * @var bool
+	 */
+	protected $pushed = false;
+
+	/**
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
 	 * @param  IronMQ  $iron
 	 * @param  object  $job
 	 * @param  string  $queue
+	 * @param  bool    $pushed
 	 * @return void
 	 */
 	public function __construct(Container $container,
                                 IronMQ $iron,
                                 $job,
-                                $queue)
+                                $queue,
+                                $pushed = false)
 	{
 		$this->job = $job;
 		$this->iron = $iron;
 		$this->queue = $queue;
+		$this->pushed = $pushed;
 		$this->container = $container;
 	}
 
@@ -76,7 +86,14 @@ class IronJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
-		$this->iron->releaseMessage($this->queue, $this->job->id, $delay);
+		if ( ! $this->pushed)
+		{
+			$this->iron->releaseMessage($this->queue, $this->job->id, $delay);
+		}
+		else
+		{
+			throw new \LogicException("Pushed jobs may not be released.");
+		}
 	}
 
 	/**

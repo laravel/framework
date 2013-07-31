@@ -1311,11 +1311,22 @@ class Builder {
 			$values = array($values);
 		}
 
-		$bindings = array();
+		// Since every insert gets treated like a batch insert, we will make sure the
+		// bindings are structured in a way that is convenient for building these
+		// inserts statements by verifying the elements are actually an array.
+		else
+		{
+			foreach ($values as $key => $value)
+			{
+				ksort($value); $values[$key] = $value;
+			}
+		}
 
 		// We'll treat every insert like a batch insert so we can easily insert each
 		// of the records into the database consistently. This will make it much
 		// easier on the grammars to just handle one type of record insertion.
+		$bindings = array();
+
 		foreach ($values as $record)
 		{
 			$bindings = array_merge($bindings, array_values($record));

@@ -374,6 +374,28 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new medium text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function mediumText($column)
+	{
+		return $this->addColumn('mediumText', $column);
+	}
+
+	/**
+	 * Create a new long text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function longText($column)
+	{
+		return $this->addColumn('longText', $column);
+	}
+
+	/**
 	 * Create a new integer column on the table.
 	 *
 	 * @param  string  $column
@@ -582,6 +604,19 @@ class Blueprint {
 	public function binary($column)
 	{
 		return $this->addColumn('binary', $column);
+	}
+
+	/**
+	 * Add the proper columns for a polymorphic table.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function morphs($name)
+	{
+		$this->integer("{$name}_id");
+
+		$this->string("{$name}_type");
 	}
 
 	/**

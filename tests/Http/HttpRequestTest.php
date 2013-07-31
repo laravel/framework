@@ -247,4 +247,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('boom', $request->old('foo', 'bar'));
 	}
 
+
+	public function testFormatReturnsAcceptableFormat()
+	{
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
+		$this->assertEquals('json', $request->format());
+
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/atom+xml'));
+		$this->assertEquals('atom', $request->format());
+	}
+
 }

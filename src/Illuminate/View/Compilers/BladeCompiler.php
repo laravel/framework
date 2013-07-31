@@ -172,6 +172,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
+		$difference = strlen($this->contentTags[0]) - strlen($this->escapedTags[0]);
+		
+		if ($difference > 0)
+		{
+			return $this->compileEscapedEchos($this->compileRegularEchos($value));
+		}
+
 		return $this->compileRegularEchos($this->compileEscapedEchos($value));
 	}
 

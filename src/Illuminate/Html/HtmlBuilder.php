@@ -123,7 +123,7 @@ class HtmlBuilder {
 	{
 		$url = $this->url->to($url, array(), $secure);
 
-		$title = $title ?: $url;
+		if (is_null($title) or $title === false) $title = $url;
 
 		return '<a href="'.$url.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
