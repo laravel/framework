@@ -1310,6 +1310,18 @@ class Builder {
 		{
 			$values = array($values);
 		}
+		else
+		{
+			// Since we do a batch insert, the order of the fields is based on the
+			// order of the first record. Make sure the fields are in the same order
+			// for every record we want to insert. Otherwise, values could happen
+			// to be inserted into the wrong fields.
+			foreach($values as $index => $record)
+			{
+				ksort($record);
+				$values[$index] = $record;
+			}
+		}
 
 		$bindings = array();
 
