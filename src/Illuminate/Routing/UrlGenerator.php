@@ -222,6 +222,12 @@ class UrlGenerator {
 			$difference = count($keys) - count($params);
 
 			$params += array_fill(count($params), $difference, null);
+		} else {
+			$extra_parameters = array_slice($params, count($keys));
+
+			$keys += array_keys($extra_parameters);
+
+			$params += array_values($extra_parameters);
 		}
 
 		return array_combine($keys, $params);
