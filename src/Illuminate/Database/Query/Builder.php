@@ -1322,11 +1322,11 @@ class Builder {
 			}
 		}
 
-		$bindings = array();
-
 		// We'll treat every insert like a batch insert so we can easily insert each
 		// of the records into the database consistently. This will make it much
 		// easier on the grammars to just handle one type of record insertion.
+		$bindings = array();
+
 		foreach ($values as $record)
 		{
 			$bindings = array_merge($bindings, array_values($record));
