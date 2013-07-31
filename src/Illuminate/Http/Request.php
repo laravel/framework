@@ -446,6 +446,21 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	}
 
 	/**
+	 * Get the data format expected in the response.
+	 *
+	 * @return string
+	 */
+	public function format($default = 'html')
+	{
+		foreach ($this->getAcceptableContentTypes() as $type)
+		{
+			if ($format = $this->getFormat($type)) return $format;
+		}
+
+		return $default;
+	}
+
+	/**
 	 * Get the Illuminate session store implementation.
 	 *
 	 * @return \Illuminate\Session\Store
