@@ -25,6 +25,14 @@
 		{"message": "Added new --command option to command:make Artisan command.", "backport": null},
 		{"message": "Added mediumText and longText to schema builder.", "backport": null},
 		{"message": "Added support for macros on the Response class.", "backport": null},
-		{"message": "Added support for view creators in addition to composers.", "backport": null}
+		{"message": "Added support for view creators in addition to composers.", "backport": null},
+		{"message": "Allow App::down to be bypassed if the event returns null.", "backport": null},
+		{"message": "Added Request::format function to get human-readable expected Response format.", "backport": null},
+		{"message": "Allow array sizes to be checked by validator.", "backport": null},
+		{"message": "Added support for where conditions on unique validation rule.", "backport": null},
+		{"message": "Restore method on Eloquent models now fires restoring and restored events.", "backport": null},
+		{"message": "Fixed re-population of radio buttons and checkboxes in FormBuilder.", "backport": null},
+		{"message": "Postgres ENUMs are now more truly implemented using 'check' constraints.", "backport": null},
+		{"message": "Added selectMonth and selectYear to FormBuilder.", "backport": null}
 	]
 }
