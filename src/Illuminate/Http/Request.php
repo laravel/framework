@@ -158,7 +158,10 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 			return true;
 		}
 
-		if (is_array($this->input($key))) return true;
+		if (is_bool($this->input($key)) or is_array($this->input($key)))
+		{
+			return true;
+		}
 
 		return trim((string) $this->input($key)) !== '';
 	}
@@ -443,6 +446,21 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		$acceptable = $this->getAcceptableContentTypes();
 
 		return isset($acceptable[0]) and $acceptable[0] == 'application/json';
+	}
+
+	/**
+	 * Get the data format expected in the response.
+	 *
+	 * @return string
+	 */
+	public function format($default = 'html')
+	{
+		foreach ($this->getAcceptableContentTypes() as $type)
+		{
+			if ($format = $this->getFormat($type)) return $format;
+		}
+
+		return $default;
 	}
 
 	/**

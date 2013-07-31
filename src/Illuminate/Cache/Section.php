@@ -7,7 +7,7 @@ class Section {
 	/**
 	 * The cache store implementation.
 	 *
-	 * \Illuminate\Cache\StoreInterface  $store
+	 * @var \Illuminate\Cache\StoreInterface
 	 */
 	protected $store;
 
@@ -123,7 +123,7 @@ class Section {
 	 */
 	public function flush()
 	{
-		$this->store->increment($this->sectionKey());
+		$this->reset();
 	}
 
 	/**
@@ -189,6 +189,18 @@ class Section {
 	}
 
 	/**
+	 * Reset the section, returning a new section identifier
+	 *
+	 * @return string
+	 */
+	protected function reset()
+	{
+		$this->store->forever($this->sectionKey(), $id = uniqid());
+
+		return $id;
+	}
+
+	/**
 	 * Get the unique section identifier.
 	 *
 	 * @return string
@@ -199,7 +211,7 @@ class Section {
 
 		if (is_null($id))
 		{
-			$this->store->forever($this->sectionKey(), $id = rand(1, 10000));
+			$id = $this->reset();
 		}
 
 		return $id;

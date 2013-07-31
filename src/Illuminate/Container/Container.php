@@ -353,7 +353,7 @@ class Container implements ArrayAccess {
 			}
 			else
 			{
-				$dependencies[] = $this->make($dependency->name);
+				$dependencies[] = $this->resolveClass($parameter);
 			}
 		}
 
@@ -377,6 +377,35 @@ class Container implements ArrayAccess {
 			$message = "Unresolvable dependency resolving [$parameter].";
 
 			throw new BindingResolutionException($message);
+		}
+	}
+
+	/**
+	 * Resolve a class based dependency from the container.
+	 *
+	 * @param  \ReflectionParameter  $parameter
+	 * @return mixed
+	 */
+	protected function resolveClass(ReflectionParameter $parameter)
+	{
+		try
+		{
+			return $this->make($parameter->getClass()->name);
+		}
+
+		// If we can not resolve the class instance, we will check to see if the value
+		// is optional, and if it is we will return the optional parameter value as
+		// the value of the dependency, similarly to how we do this with scalars.
+		catch (BindingResolutionException $e)
+		{
+			if ($parameter->isOptional())
+			{
+				return $parameter->getDefaultValue();
+			}
+			else
+			{
+				throw $e;
+			}
 		}
 	}
 
