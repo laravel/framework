@@ -340,15 +340,29 @@ class Container implements ArrayAccess {
 			$dependency = $parameter->getClass();
 
 			// If the class is null, it means the dependency is a string or some other
-			// primitive type which we can not resolve since it is not a class and
-			// we'll just bomb out with an error since we have no-where to go.
+			// primitive type which we can not resolve since it is not a class, so
+			// check if there is a default value as a last resort.
 			if (is_null($dependency))
 			{
 				$dependencies[] = $this->resolveNonClass($parameter);
 			}
 			else
 			{
-				$dependencies[] = $this->make($dependency->name);
+				try
+				{
+					$dependencies[] = $this->make($dependency->name);
+				}
+				catch (BindingResolutionException $exception)
+				{
+					if ($parameter->isOptional())
+					{
+						$dependencies[] = $parameter->getDefaultValue();
+					}
+					else
+					{
+						throw $exception;
+					}
+				}
 			}
 		}
 
