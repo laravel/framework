@@ -6,6 +6,7 @@ use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Database\DB2Connection;
 
 class ConnectionFactory {
 
@@ -81,6 +82,9 @@ class ConnectionFactory {
 
 			case 'sqlsrv':
 				return new SqlServerConnector;
+
+			case 'db2':
+				return new DB2Connector;
 		}
 
 		throw new \InvalidArgumentException("Unsupported driver [{$config['driver']}]");
@@ -116,6 +120,9 @@ class ConnectionFactory {
 
 			case 'sqlsrv':
 				return new SqlServerConnection($connection, $database, $prefix, $config);
+
+			case 'db2':
+				return new DB2Connection($connection, $database, $prefix, $config);
 		}
 
 		throw new \InvalidArgumentException("Unsupported driver [$driver]");
