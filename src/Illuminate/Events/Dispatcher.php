@@ -40,6 +40,7 @@ class Dispatcher {
 	 */
 	public function __construct(Container $container = null)
 	{
+		if ($container === null) $container = new Container;
 		$this->container = $container;
 	}
 
