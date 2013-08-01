@@ -56,7 +56,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
 	{
@@ -66,7 +66,7 @@ class SqsQueue extends Queue implements QueueInterface {
 
 			'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, 'DelaySeconds' => $delay,
 
-		));
+		))->MessageId;
 	}
 
 	/**

@@ -55,7 +55,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
 	{
@@ -63,7 +63,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 
 		$pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
 
-		$pheanstalk->put($payload, Pheanstalk::DEFAULT_PRIORITY, $delay);
+		return $pheanstalk->put($payload, Pheanstalk::DEFAULT_PRIORITY, $delay);
 	}
 
 	/**

@@ -19,7 +19,7 @@ interface QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null);
 
