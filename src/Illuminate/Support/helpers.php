@@ -273,7 +273,7 @@ if ( ! function_exists('array_get'))
 	function array_get($array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
-		
+
 		if (isset($array[$key])) return $array[$key];
 
 		foreach (explode('.', $key) as $segment)
@@ -406,7 +406,12 @@ if ( ! function_exists('asset'))
 	 */
 	function asset($path, $secure = null)
 	{
-		return app('url')->asset($path, $secure);
+		$configName = is_null($secure) ? "assetPath" : "secureAssetPath";
+		$configAssetPath = app('config')->get("app.{$configName}");
+
+		$assetPath = is_null($configAssetPath) ? '' : rtrim($configAssetPath, '/').'/';
+
+		return app('url')->asset($assetPath . $path, $secure);
 	}
 }
 
@@ -627,7 +632,7 @@ if ( ! function_exists('object_get'))
 	function object_get($object, $key, $default = null)
 	{
 		if (is_null($key)) return $object;
-		
+
 		foreach (explode('.', $key) as $segment)
 		{
 			if ( ! is_object($object) or ! isset($object->{$segment}))
