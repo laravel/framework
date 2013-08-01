@@ -59,13 +59,13 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
 		$payload = $this->createPayload($job, $data);
 
-		$this->iron->postMessage($this->getQueue($queue), $payload);
+		return $this->iron->postMessage($this->getQueue($queue), $payload)->id;
 	}
 
 	/**
