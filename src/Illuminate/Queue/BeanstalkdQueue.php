@@ -39,13 +39,13 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
 		$payload = $this->createPayload($job, $data);
 
-		$this->pheanstalk->useTube($this->getQueue($queue))->put($payload);
+		return $this->pheanstalk->useTube($this->getQueue($queue))->put($payload);
 	}
 
 	/**

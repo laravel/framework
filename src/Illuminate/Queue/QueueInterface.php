@@ -8,7 +8,7 @@ interface QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function push($job, $data = '', $queue = null);
 

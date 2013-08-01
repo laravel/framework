@@ -38,13 +38,15 @@ class SqsQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
 		$payload = $this->createPayload($job, $data);
 
-		return $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
+		$response = $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
+
+		return $response->MessageId;
 	}
 
 	/**
