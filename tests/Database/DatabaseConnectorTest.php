@@ -123,7 +123,12 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 	{
 		extract($config);
 
-		$port = isset($config['port']) ? ','.$port : '';
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {             // Windows
+			$port = isset($config['port']) ? ','.$port : '';
+		}
+		else {                                                        // *nix
+			$port = isset($config['port']) ? ':'.$port : '';
+		}
 
 		if (in_array('dblib', PDO::getAvailableDrivers()))
 		{
