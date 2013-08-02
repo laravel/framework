@@ -46,7 +46,7 @@ class SqsQueue extends Queue implements QueueInterface {
 
 		$response = $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
 
-		return $response->MessageId;
+		return $response->get('MessageId');
 	}
 
 	/**
@@ -66,7 +66,7 @@ class SqsQueue extends Queue implements QueueInterface {
 
 			'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, 'DelaySeconds' => $delay,
 
-		))->MessageId;
+		))->get('MessageId');
 	}
 
 	/**
