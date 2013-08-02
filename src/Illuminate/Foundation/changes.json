@@ -28,6 +28,7 @@
 		{"message": "Postgres ENUMs are now more truly implemented using 'check' constraints.", "backport": null},
 		{"message": "Added selectMonth and selectYear to FormBuilder.", "backport": null},
 		{"message": "Fix container resolution of default values for non-scalar dependencies.", "backport": null},
-		{"message": "Allow optional path to be specified with calling _path helpers.", "backport": null}
+		{"message": "Allow optional path to be specified with calling _path helpers.", "backport": null},
+		{"message": "Emulate nested transactions in the database connection layer.", "backport": null}
 	]
 }
