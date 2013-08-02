@@ -297,6 +297,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Remove all items from the collection
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function reset()
+	{
+		$this->items = array();
+
+		return $this;
+	}
+
+	/**
 	 * Merge items with the collection items.
 	 *
 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
