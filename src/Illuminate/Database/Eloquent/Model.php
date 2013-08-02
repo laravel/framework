@@ -1642,6 +1642,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function unguard()
 	{
 		static::$unguarded = true;
+
+		return $this;
 	}
 
 	/**
@@ -1652,6 +1654,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function reguard()
 	{
 		static::$unguarded = false;
+
+		return $this;
 	}
 
 	/**
@@ -1663,6 +1667,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function setUnguardState($state)
 	{
 		static::$unguarded = $state;
+
+		return $this;
 	}
 
 	/**
