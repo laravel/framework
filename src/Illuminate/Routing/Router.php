@@ -273,9 +273,9 @@ class Router {
 	{
 		$action = array('uses' => $controller.'@'.$method);
 
-		// If a given controller method has been named, we will assign the name to
-		// the controller action array. This provides for a short-cut to method
-		// naming, so you don't have to define an individual route for these.
+		// If a given controller method has been named, we will assign the name to the
+		// controller action array, which provides for a short-cut to method naming
+		// so you don't have to define an individual route for these controllers.
 		$action['as'] = array_pull($names, $method);
 
 		$this->{$route['verb']}($route['uri'], $action);
@@ -1207,10 +1207,11 @@ class Router {
 	/**
 	 * Find the patterned filters matching a request.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  string  $method
+	 * @param  string  $path
 	 * @return array
 	 */
-	public function findPatternFilters(Request $request)
+	public function findPatternFilters($method, $path)
 	{
 		$results = array();
 
@@ -1219,9 +1220,9 @@ class Router {
 			// To find the pattern middlewares for a request, we just need to check the
 			// registered patterns against the path info for the current request to
 			// the application, and if it matches we'll merge in the middlewares.
-			if (str_is('/'.$pattern, $request->getPathInfo()))
+			if (str_is('/'.$pattern, $path))
 			{
-				$merge = $this->filterPatternsByMethod($request, $filters);
+				$merge = $this->filterPatternsByMethod($method, $filters);
 
 				$results = array_merge($results, $merge);
 			}
@@ -1233,15 +1234,15 @@ class Router {
 	/**
 	 * Filter pattern filters that don't apply to the request verb.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  string  $method
 	 * @param  array  $filters
 	 * @return array
 	 */
-	protected function filterPatternsByMethod(Request $request, $filters)
+	protected function filterPatternsByMethod($method, $filters)
 	{
 		$results = array();
 
-		$method = strtolower($request->getMethod());
+		$method = strtolower($method);
 
 		// The idea here is to check and see if the pattern filter applies to this HTTP
 		// request based on the request methods. Pattern filters might be limited by

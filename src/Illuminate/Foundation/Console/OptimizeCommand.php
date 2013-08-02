@@ -50,13 +50,20 @@ class OptimizeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->info('Generating optimized class loader...');
+		$this->info('Generating optimized class loader');
 
 		$this->composer->dumpOptimized();
 
-		$this->info('Compiling common classes...');
+		if ($this->option('force') or ! $this->laravel['config']['app.debug'])
+		{
+			$this->info('Compiling common classes');
 
-		$this->compileClasses();
+			$this->compileClasses();
+		}
+		else
+		{
+			$this->call('clear-compiled');
+		}
 	}
 
 	/**
@@ -70,7 +77,11 @@ class OptimizeCommand extends Command {
 
 		$outputPath = $this->laravel['path.base'].'/bootstrap/compiled.php';
 
-		$this->callSilent('compile', array('--output' => $outputPath, '--config' => implode(',', $this->getClassFiles())));
+		$this->callSilent('compile', array(
+			'--config' => implode(',', $this->getClassFiles()),
+			'--output' => $outputPath,
+			'--strip_comments' => 1,
+		));
 	}
 
 	/**
@@ -95,6 +106,18 @@ class OptimizeCommand extends Command {
 	protected function registerClassPreloaderCommand()
 	{
 		$this->laravel['artisan']->add(new PreCompileCommand);
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
+		);
 	}
 
 }

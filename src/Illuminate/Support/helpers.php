@@ -66,6 +66,45 @@ if ( ! function_exists('array_add'))
 	}
 }
 
+if ( ! function_exists('array_build'))
+{
+	/**
+	 * Build a new array using a callback.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	function array_build($array, Closure $callback)
+	{
+		$results = array();
+
+		foreach ($array as $key => $value)
+		{
+			list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
+
+			$results[$innerKey] = $innerValue;
+		}
+
+		return $results;
+	}
+}
+
+if ( ! function_exists('array_column'))
+{
+	/**
+	 * Pluck an array of values from an array.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return array
+	 */
+	function array_column($array, $key)
+	{
+		return array_pluck($array, $key);
+	}
+}
+
 if ( ! function_exists('array_divide'))
 {
 	/**
@@ -341,6 +380,21 @@ if ( ! function_exists('array_set'))
 	}
 }
 
+if ( ! function_exists('array_sort'))
+{
+	/**
+	 * Sort the array using the given Closure.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	function array_sort($array, Closure $callback)
+	{
+		return Illuminate\Support\Collection::make($array)->sortBy($callback)->all();
+	}
+}
+
 if ( ! function_exists('asset'))
 {
 	/**
@@ -365,7 +419,7 @@ if ( ! function_exists('base_path'))
 	 */
 	function base_path()
 	{
-		return app()->make('path.base');
+		return app('path.base');
 	}
 }
 
@@ -455,7 +509,7 @@ if ( ! function_exists('ends_with'))
 	 * Determine if a given string ends with a given needle.
 	 *
 	 * @param string $haystack
-	 * @param string $needle
+	 * @param string|array $needle
 	 * @return bool
 	 */
 	function ends_with($haystack, $needle)
@@ -670,9 +724,9 @@ if ( ! function_exists('starts_with'))
 	 * @param  string|array  $needle
 	 * @return bool
 	 */
-	function starts_with($haystack, $needles)
+	function starts_with($haystack, $needle)
 	{
-		return Illuminate\Support\Str::startsWith($haystack, $needles);
+		return Illuminate\Support\Str::startsWith($haystack, $needle);
 	}
 }
 

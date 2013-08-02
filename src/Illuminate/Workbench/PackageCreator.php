@@ -300,11 +300,11 @@ class PackageCreator {
 	{
 		if ($plain)
 		{
-			return $this->files->get(__DIR__.'/stubs/plain.provider.php');
+			return $this->files->get(__DIR__.'/stubs/plain.provider.stub');
 		}
 		else
 		{
-			return $this->files->get(__DIR__.'/stubs/provider.php');
+			return $this->files->get(__DIR__.'/stubs/provider.stub');
 		}
 	}
 

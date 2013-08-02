@@ -119,6 +119,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUpdateProcessDoesntOverrideTimestamps()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('id' => 1, 'created_at' => 'foo', 'updated_at' => 'bar'));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until');
+		$events->shouldReceive('fire');
+
+		$model->syncOriginal();
+		$model->id = 1;
+		$model->created_at = 'foo';
+		$model->updated_at = 'bar';
+		$model->exists = true;
+		$this->assertTrue($model->save());
+	}
+
+
 	public function testSaveIsCancelledIfSavingEventReturnsFalse()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
@@ -130,7 +150,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertFalse($model->save());
 	}
-	
+
 
 	public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
 	{
@@ -179,6 +199,20 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
+	{
+		$model = $this->getMock('EloquentDateModelStub', array('getDateFormat'));
+		$model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
+		$model->setRawAttributes(array(
+			'created_at'	=> '2012-12-04',
+			'updated_at'	=> time(),
+		));
+
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+		$this->assertInstanceOf('Carbon\Carbon', $model->updated_at);
+	}
+
+
 	public function testTimestampsAreReturnedAsObjectsOnCreate()
 	{
 		$timestamps = array(
@@ -213,6 +247,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($instance->created_at);
 	}
 
+
+	public function testTimestampsAreCreatedFromStringsAndIntegers()
+	{
+		$model = new EloquentDateModelStub;
+		$model->created_at = '2013-05-22 00:00:00';
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+
+		$model = new EloquentDateModelStub;
+		$model->created_at = time();
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+
+		$model = new EloquentDateModelStub;
+		$model->created_at = '2012-01-01';
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+	}
 
 
 	public function testInsertProcess()
@@ -393,7 +442,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelStub;
 		$model->name = 'Taylor';
 		$model->setRelation('foo', array('bar'));
-		$model->setHidden(array('foo'));
+		$model->setHidden(array('foo', 'list_items', 'password'));
 		$array = $model->toArray();
 
 		$this->assertEquals(array('name' => 'Taylor'), $array);
@@ -428,7 +477,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->list_items = array(1, 2, 3);
 		$array = $model->toArray();
 
-		$this->assertEquals(array(1, 2, 3), $array['list_items']);	
+		$this->assertEquals(array(1, 2, 3), $array['list_items']);
 	}
 
 
@@ -469,6 +518,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->fill(array('name' => 'foo', 'age' => 'bar', 'foo' => 'bar'));
 		$this->assertFalse(isset($model->name));
 		$this->assertFalse(isset($model->age));
+		$this->assertEquals('bar', $model->foo);
+	}
+
+
+	public function testFillableOverridesGuarded()
+	{
+		$model = new EloquentModelStub;
+		$model->guard(array('name', 'age'));
+		$model->fillable(array('age', 'foo'));
+		$model->fill(array('name' => 'foo', 'age' => 'bar', 'foo' => 'bar'));
+		$this->assertFalse(isset($model->name));
+		$this->assertEquals('bar', $model->age);
 		$this->assertEquals('bar', $model->foo);
 	}
 
@@ -595,7 +656,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
 		$namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
-		$this->assertEquals('foo_bar_eloquent_model_namespaced_stubs', $namespacedModel->getTable());
+		$this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
 	}
 
 
@@ -626,6 +687,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelObserversCanBeAttachedToModels()
+	{
+		EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('listen')->once()->with('eloquent.creating: EloquentModelStub', 'EloquentTestObserverStub@creating');
+		$events->shouldReceive('listen')->once()->with('eloquent.saved: EloquentModelStub', 'EloquentTestObserverStub@saved');
+		$events->shouldReceive('forget');
+		EloquentModelStub::observe(new EloquentTestObserverStub);
+		EloquentModelStub::flushEventListeners();
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -636,6 +708,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 }
 
+class EloquentTestObserverStub {
+	public function creating() {}
+	public function saved() {}
+}
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
 	protected $guarded = array();
@@ -667,6 +743,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return $this->belongsTo('EloquentModelSaveStub', 'foo');
 	}
+	public function getDates()
+	{
+		return array();
+	}
 }
 
 class EloquentModelCamelStub extends EloquentModelStub {
@@ -674,7 +754,10 @@ class EloquentModelCamelStub extends EloquentModelStub {
 }
 
 class EloquentDateModelStub extends EloquentModelStub {
-	protected $dates = array('created_at', 'updated_at');
+	public function getDates()
+	{
+		return array('created_at', 'updated_at');
+	}
 }
 
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {

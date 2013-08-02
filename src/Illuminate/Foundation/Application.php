@@ -32,7 +32,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.0.0';
+	const VERSION = '4.0.5';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -84,6 +84,13 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	protected $deferredServices = array();
 
 	/**
+	 * The request class used by the application.
+	 *
+	 * @var string
+	 */
+	protected static $requestClass = 'Illuminate\Http\Request';
+
+	/**
 	 * Create a new Illuminate application instance.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
@@ -111,7 +118,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	protected function createRequest(Request $request = null)
 	{
-		return $request ?: Request::createFromGlobals();
+		return $request ?: static::onRequest('createFromGlobals');
 	}
 
 	/**
@@ -123,7 +130,9 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		$url = $this['config']->get('app.url', 'http://localhost');
 
-		$this->instance('request', Request::create($url, 'GET', array(), array(), array(), $_SERVER));
+		$parameters = array($url, 'GET', array(), array(), array(), $_SERVER);
+
+		$this->instance('request', static::onRequest('create', $parameters));
 	}
 
 	/**
@@ -144,7 +153,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			with(new SymfonyRedirect($this['request']->fullUrl(), 301))->send();
 
-			exit;			
+			exit;
 		}
 	}
 
@@ -156,11 +165,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function bindInstallPaths(array $paths)
 	{
-		$this->instance('path', $paths['app']);
+		$this->instance('path', realpath($paths['app']));
 
 		foreach (array_except($paths, array('app')) as $key => $value)
 		{
-			$this->instance("path.{$key}", $value);
+			$this->instance("path.{$key}", realpath($value));
 		}
 	}
 
@@ -296,7 +305,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		return php_sapi_name() == 'cli';
 	}
-	
+
 	/**
 	 * Determine if we are running unit tests.
 	 *
@@ -515,12 +524,10 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			$response = $this['events']->until('illuminate.app.down');
 
-			return $this->prepareResponse($response, $request);
+			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
-		else
-		{
-			return $this['router']->dispatch($this->prepareRequest($request));
-		}
+		
+		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
 	/**
@@ -693,12 +700,23 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Register an application error handler.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function error(Closure $callback)
 	{
 		$this['exception']->error($callback);
+	}
+
+	/**
+	 * Register an error handler at the bottom of the stack.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function pushError(Closure $callback)
+	{
+		$this['exception']->pushError($callback);
 	}
 
 	/**
@@ -771,6 +789,31 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	public function setDeferredServices(array $services)
 	{
 		$this->deferredServices = $services;
+	}
+
+	/**
+	 * Get or set the request class for the application.
+	 *
+	 * @param  string  $class
+	 * @return string
+	 */
+	public static function requestClass($class = null)
+	{
+		if ( ! is_null($class)) static::$requestClass = $class;
+
+		return static::$requestClass;
+	}
+
+	/**
+	 * Call a method on the default request class.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public static function onRequest($method, $parameters = array())
+	{
+		return forward_static_call_array(array(static::requestClass(), $method), $parameters);
 	}
 
 	/**

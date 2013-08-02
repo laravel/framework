@@ -1,38 +1,67 @@
 ## Illuminate Database
 
-### Usage Outside Of Laravel 4
+The Illuminate Database component is a full database toolkit for PHP, providing an expressive query builder, ActiveRecord style ORM, and schema builder. It currently supports MySQL, Postgres, SQL Server, and SQLite. It also serves as the database layer of the Laravel PHP framework.
+
+### Usage Instructions
+
+First, create a new "Capsule" manager instance. Capsule aims to make configuring the library for usage outside of the Laravel framework as easy as possible.
 
 ```
-$config = array(
-	'fetch' => PDO::FETCH_CLASS,
-	'default' => 'mysql',
-	'connections' => array(
-		'mysql' => array(
-			'driver'    => 'mysql',
-			'host'      => 'localhost',
-			'database'  => 'laravel',
-			'username'  => 'root',
-			'password'  => 'password',
-			'charset'   => 'utf8',
-			'collation' => 'utf8_unicode_ci',
-			'prefix'    => '',
-		),
-	),
-);
+use Illuminate\Database\Capsule\Manager as Capsule;
 
-$capsule = new Illuminate\Database\Capsule($config);
+$capsule = new Capsule;
 
-// If you want to use the Eloquent ORM...
+$capsule->addConnection([
+	'driver'    => 'mysql',
+	'host'      => 'localhost',
+	'database'  => 'database',
+	'username'  => 'root',
+	'password'  => 'password',
+	'charset'   => 'utf8',
+	'collation' => 'utf8_unicode_ci',
+	'prefix'    => '',
+]);
+
+// Set the event dispatcher used by Eloquent models... (optional)
+use Illuminate\Events\Dispatcher;
+use Illuminate\Container\Container;
+$capsule->setEventDispatcher(new Dispatcher(new Container));
+
+// Set the cache manager instance used by connections... (optional)
+$capsule->setCacheManager(...);
+
+// Make this Capsule instance available globally via static methods... (optional)
+$capsule->setAsGlobal();
+
+// Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
+```
 
-// Making A Query Builder Call...
-$capsule->connection()->table('users')->where('id', 1)->first();
+Once the Capsule instance has been registered. You may use it like so:
 
-// Making A Schema Builder Call...
-$capsule->connection()->schema()->create('users', function($t)
+**Using The Query Builder**
+
+```
+$users = Capsule::table('users')->where('votes', '>', 100)->get();
+```
+
+**Using The Schema Builder**
+
+```
+Capsule::schema()->create('users', function($table)
 {
-	$t->increments('id');
-	$t->string('email');
-	$t->timestamps();
+	$table->increments('id');
+	$table->string('email')->unique();
+	$table->timestamps();
 });
 ```
+
+**Using The Eloquent ORM**
+
+```
+class User extends Illuminate\Database\Eloquent\Model {}
+
+$users = User::where('votes', '>', 1)->get();
+```
+
+For further documentation on using the various database facilities this library provides, consult the [Laravel framework documentation](http://laravel.com/docs).

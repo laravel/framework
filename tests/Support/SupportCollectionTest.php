@@ -129,7 +129,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testFlatten()
 	{
 		$c = new Collection(array(array('#foo', '#bar'), array('#baz')));
-		$this->assertEquals(array('#foo', '#bar', '#baz'), $c->flatten());
+		$this->assertEquals(array('#foo', '#bar', '#baz'), $c->flatten()->all());
 	}
 
 
@@ -192,6 +192,44 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$reversed = $data->reverse();
 
 		$this->assertEquals(array('alan', 'zaeed'), array_values($reversed->all()));
+	}
+
+
+	public function testListsWithArrayAndObjectValues()
+	{
+		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name'));
+		$this->assertEquals(array('foo', 'bar'), $data->lists('email'));
+	}
+
+
+	public function testImplode()
+	{
+		$data = new Collection(array(array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
+		$this->assertEquals('foobar', $data->implode('email'));
+		$this->assertEquals('foo,bar', $data->implode('email', ','));
+	}
+
+
+	public function testMakeMethod()
+	{
+		$collection = Collection::make('foo');
+		$this->assertEquals(array('foo'), $collection->all());
+	}
+
+	public function testSplice()
+	{
+		$data = new Collection(array('foo', 'baz'));
+		$data->splice(1, 0, 'bar');
+		$this->assertEquals(array('foo', 'bar', 'baz'), array_values($data->all()));
+
+		$data = new Collection(array('foo', 'baz'));
+		$data->splice(1, 1);
+		$this->assertEquals(array('foo'), array_values($data->all()));
+
+		$data = new Collection(array('foo', 'baz'));
+		$data->splice(1, 1, 'bar');
+		$this->assertEquals(array('foo', 'bar'), array_values($data->all()));
 	}
 
 }

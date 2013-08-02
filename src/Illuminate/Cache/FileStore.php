@@ -1,11 +1,13 @@
-<?php namespace Illuminate\Cache; use Illuminate\Filesystem\Filesystem;
+<?php namespace Illuminate\Cache;
+
+use Illuminate\Filesystem\Filesystem;
 
 class FileStore implements StoreInterface {
 
 	/**
 	 * The Illuminate Filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesytem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -19,8 +21,8 @@ class FileStore implements StoreInterface {
 	/**
 	 * Create a new file cache store instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesytem  $files
-	 * @param  string                 $directory
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  string  $directory
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $directory)
@@ -72,14 +74,23 @@ class FileStore implements StoreInterface {
 	{
 		$value = $this->expiration($minutes).serialize($value);
 
-		$path = $this->path($key);
+		$this->createCacheDirectory($path = $this->path($key));
 
+		$this->files->put($path, $value);
+	}
+
+	/**
+	 * Create the file cache directory if necessary.
+	 *
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function createCacheDirectory($path)
+	{
 		if ( ! $this->files->isDirectory($directory = dirname($path)))
 		{
 			$this->files->makeDirectory($directory, 0777, true);
 		}
-
-		$this->files->put($path, $value);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 {
     "name": "illuminate/support",
-    "description": "Various utilities and support functions.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -26,7 +26,7 @@
     "target-dir": "Illuminate/Support",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     },
     "minimum-stability": "dev"

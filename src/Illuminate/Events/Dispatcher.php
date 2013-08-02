@@ -73,7 +73,7 @@ class Dispatcher {
 	 */
 	protected function setupWildcardListen($event, $listener, $priority)
 	{
-		$this->wildcards[$event][] = $listener;
+		$this->wildcards[$event][] = $this->makeListener($listener);
 	}
 
 	/**
@@ -161,8 +161,8 @@ class Dispatcher {
 	 *
 	 * @param  string  $event
 	 * @param  mixed   $payload
-	 * @param  boolean $halt
-	 * @return void
+	 * @param  bool    $halt
+	 * @return array|null
 	 */
 	public function fire($event, $payload = array(), $halt = false)
 	{
@@ -187,7 +187,7 @@ class Dispatcher {
 				return $response;
 			}
 
-			// If a boolean false is returned from a listener, we will stop propogating
+			// If a boolean false is returned from a listener, we will stop propagating
 			// the event to any further listeners down in the chain, else we keep on
 			// looping through the listeners and firing every one in our sequence.
 			if ($response === false) break;
@@ -259,7 +259,7 @@ class Dispatcher {
 	 * Register an event listener with the dispatcher.
 	 *
 	 * @param  mixed   $listener
-	 * @return void
+	 * @return mixed
 	 */
 	public function makeListener($listener)
 	{
@@ -299,6 +299,19 @@ class Dispatcher {
 
 			return call_user_func_array($callable, $data);
 		};
+	}
+
+	/**
+	 * Remove a set of listeners from the dispatcher.
+	 *
+	 * @param  string  $event
+	 * @return void
+	 */
+	public function forget($event)
+	{
+		unset($this->listeners[$event]);
+
+		unset($this->sorted[$event]);
 	}
 
 }

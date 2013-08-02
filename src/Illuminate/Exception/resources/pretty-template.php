@@ -26,7 +26,8 @@
                    for that particular frame */ ?>
           <?php foreach($v->frames as $i => $frame): ?>
             <div class="frame <?php echo ($i == 0 ? 'active' : '') ?>" id="frame-line-<?php echo $i ?>">
-                <div class="frame-method-info">
+    <div class="frame-method-info">
+      <span class="frame-index"><?php echo (count($v->frames) - $i - 1) ?>.</span>
                   <span class="frame-class"><?php echo $e($frame->getClass() ?: '') ?></span>
                   <span class="frame-function"><?php echo $e($frame->getFunction() ?: '') ?></span>
                 </div>
@@ -81,7 +82,8 @@
                     if($line !== null):
 
                     // the $line is 1-indexed, we nab -1 where needed to account for this
-                    $range = $frame->getFileLines($line - 8, 10);
+        $range = $frame->getFileLines($line - 8, 10);
+        $range = array_map(function($line){ return empty($line) ? ' ' : $line;}, $range);
                     $start = key($range) + 1;
                     $code  = join("\n", $range);
                   ?>
@@ -97,7 +99,7 @@
                       <?php extract($comment) ?>
                       <div class="frame-comment" id="comment-<?php echo $i . '-' . $commentNo ?>">
                         <span class="frame-comment-context"><?php echo $e($context) ?></span>
-                        <?php echo $e($comment) ?>
+                        <?php echo $e($comment, true) ?>
                       </div>
                     <?php endforeach ?>
                   </div>

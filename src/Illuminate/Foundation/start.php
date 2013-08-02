@@ -26,7 +26,7 @@ error_reporting(-1);
 
 if ( ! extension_loaded('mcrypt'))
 {
-	die('Laravel requires the Mcrypt PHP extension.'.PHP_EOL);
+	echo 'Laravel requires the Mcrypt PHP extension.'.PHP_EOL;
 
 	exit(1);
 }
@@ -248,4 +248,7 @@ if (file_exists($path)) require $path;
 |
 */
 
-require $app['path'].'/routes.php';
+if (file_exists($path = $app['path'].'/routes.php'))
+{
+	require $path;
+}

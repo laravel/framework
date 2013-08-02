@@ -22,6 +22,17 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPaginationContextSetsUpRangeCorrectly()
+	{
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
+		$env->shouldReceive('getCurrentPage')->once()->andReturn(1);
+		$p->setupPaginationContext();
+
+		$this->assertEquals(1, $p->getFrom());
+		$this->assertEquals(2, $p->getTo());
+	}
+
+
 	public function testPaginationContextHandlesHugeCurrentPage()
 	{
 		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);

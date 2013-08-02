@@ -223,7 +223,7 @@ class Blueprint {
 	 */
 	public function dropPrimary($index = null)
 	{
-		return $this->dropIndexCommand('dropPrimary', $index);
+		return $this->dropIndexCommand('dropPrimary', 'primary', $index);
 	}
 
 	/**
@@ -234,7 +234,7 @@ class Blueprint {
 	 */
 	public function dropUnique($index)
 	{
-		return $this->dropIndexCommand('dropUnique', $index);
+		return $this->dropIndexCommand('dropUnique', 'unique', $index);
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Blueprint {
 	 */
 	public function dropIndex($index)
 	{
-		return $this->dropIndexCommand('dropIndex', $index);
+		return $this->dropIndexCommand('dropIndex', 'index', $index);
 	}
 
 	/**
@@ -256,7 +256,7 @@ class Blueprint {
 	 */
 	public function dropForeign($index)
 	{
-		return $this->dropIndexCommand('dropForeign', $index);
+		return $this->dropIndexCommand('dropForeign', 'foreign', $index);
 	}
 
 	/**
@@ -374,6 +374,28 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new medium text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function mediumText($column)
+	{
+		return $this->addColumn('mediumText', $column);
+	}
+
+	/**
+	 * Create a new long text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function longText($column)
+	{
+		return $this->addColumn('longText', $column);
+	}
+
+	/**
 	 * Create a new integer column on the table.
 	 *
 	 * @param  string  $column
@@ -437,7 +459,6 @@ class Blueprint {
 	 *
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedInteger($column, $autoIncrement = false)
@@ -450,7 +471,6 @@ class Blueprint {
 	 *
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedBigInteger($column, $autoIncrement = false)
@@ -585,13 +605,27 @@ class Blueprint {
 	}
 
 	/**
+	 * Add the proper columns for a polymorphic table.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function morphs($name)
+	{
+		$this->integer("{$name}_id");
+
+		$this->string("{$name}_type");
+	}
+
+	/**
 	 * Create a new drop index command on the blueprint.
 	 *
-	 * @param  string        $type
+	 * @param  string  $command
+	 * @param  string  $type
 	 * @param  string|array  $index
 	 * @return \Illuminate\Support\Fluent
 	 */
-	protected function dropIndexCommand($type, $index)
+	protected function dropIndexCommand($command, $type, $index)
 	{
 		$columns = array();
 
@@ -602,10 +636,10 @@ class Blueprint {
 		{
 			$columns = $index;
 
-			$index = null;
+			$index = $this->createIndexName($type, $columns);
 		}
 
-		return $this->indexCommand($type, $columns, $index);
+		return $this->indexCommand($command, $columns, $index);
 	}
 
 	/**

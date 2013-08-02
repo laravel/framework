@@ -4,6 +4,7 @@ use Countable;
 use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
+use Illuminate\Support\Collection;
 
 class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 
@@ -50,6 +51,20 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	protected $lastPage;
 
 	/**
+	 * The number of the first item in this range.
+	 *
+	 * @var int
+	 */
+	protected $from;
+
+	/**
+	 * The number of the last item in this range.
+	 *
+	 * @var int
+	 */
+	protected $to;
+
+	/**
 	 * All of the additional query string values.
 	 *
 	 * @var array
@@ -80,11 +95,35 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	public function setupPaginationContext()
 	{
+		$this->calculateCurrentAndLastPages();
+
+		$this->calculateItemRanges();
+
+		return $this;
+	}
+
+	/**
+	 * Calculate the current and last pages for this instance.
+	 *
+	 * @return void
+	 */
+	protected function calculateCurrentAndLastPages()
+	{
 		$this->lastPage = ceil($this->total / $this->perPage);
 
 		$this->currentPage = $this->calculateCurrentPage($this->lastPage);
+	}
 
-		return $this;
+	/**
+	 * Calculate the first and last item number for this instance.
+	 *
+	 * @return void
+	 */
+	protected function calculateItemRanges()
+	{
+		$this->from = $this->total ? ($this->currentPage - 1) * $this->perPage + 1 : 0;
+
+		$this->to = min($this->total, $this->currentPage * $this->perPage);
 	}
 
 	/**
@@ -105,7 +144,7 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 			return $lastPage > 0 ? $lastPage : 1;
 		}
 
-		return $this->isValidPageNumber($page) ? $page : 1;
+		return $this->isValidPageNumber($page) ? (int) $page : 1;
 	}
 
 	/**
@@ -217,6 +256,26 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Get the number of the first item on the paginator.
+	 *
+	 * @return int
+	 */
+	public function getFrom()
+	{
+		return $this->from;
+	}
+
+	/**
+	 * Get the number of the last item on the paginator.
+	 *
+	 * @return int
+	 */
+	public function getTo()
+	{
+		return $this->to;
+	}
+
+	/**
 	 * Get the number of items to be displayed per page.
 	 *
 	 * @return int
@@ -227,6 +286,16 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Get a collection instance containing the items.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function getCollection()
+	{
+		return new Collection($this->items);
+	}
+
+	/**
 	 * Get the items being paginated.
 	 *
 	 * @return array
@@ -234,6 +303,17 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function getItems()
 	{
 		return $this->items;
+	}
+
+	/**
+	 * Set the items being paginated.
+	 *
+	 * @param  mixed  $items
+	 * @return void
+	 */
+	public function setItems($items)
+	{
+		$this->items = $items;
 	}
 
 	/**

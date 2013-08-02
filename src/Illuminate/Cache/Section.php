@@ -1,11 +1,13 @@
 <?php namespace Illuminate\Cache;
 
+use Closure;
+
 class Section {
 
 	/**
 	 * The cache store implementation.
 	 *
-	 * \Illuminate\Cache\StoreInterface  $store
+	 * @var \Illuminate\Cache\StoreInterface
 	 */
 	protected $store;
 
@@ -50,7 +52,7 @@ class Section {
 	public function get($key, $default = null)
 	{
 		$value = $this->store->get($this->sectionItemKey($key));
-		
+
 		return ! is_null($value) ? $value : value($default);
 	}
 
@@ -121,11 +123,62 @@ class Section {
 	 */
 	public function flush()
 	{
-		$this->store->increment($this->sectionKey());
+		$this->reset();
 	}
 
 	/**
-	 * Get a fully qualfied section item key.
+	 * Get an item from the cache, or store the default value.
+	 *
+	 * @param  string   $key
+	 * @param  int      $minutes
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function remember($key, $minutes, Closure $callback)
+	{
+		// If the item exists in the cache we will just return this immediately
+		// otherwise we will execute the given Closure and cache the result
+		// of that execution for the given number of minutes in storage.
+		if ($this->has($key)) return $this->get($key);
+
+		$this->put($key, $value = $callback(), $minutes);
+
+		return $value;
+	}
+
+	/**
+	 * Get an item from the cache, or store the default value forever.
+	 *
+	 * @param  string   $key
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function sear($key, Closure $callback)
+	{
+		return $this->rememberForever($key, $callback);
+	}
+
+	/**
+	 * Get an item from the cache, or store the default value forever.
+	 *
+	 * @param  string   $key
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function rememberForever($key, Closure $callback)
+	{
+		// If the item exists in the cache we will just return this immediately
+		// otherwise we will execute the given Closure and cache the result
+		// of that execution for the given number of minutes. It's easy.
+		if ($this->has($key)) return $this->get($key);
+
+		$this->forever($key, $value = $callback());
+
+		return $value;
+	}
+
+	/**
+	 * Get a fully qualified section item key.
 	 *
 	 * @param  string  $key
 	 * @return string
@@ -133,6 +186,18 @@ class Section {
 	public function sectionItemKey($key)
 	{
 		return $this->name.':'.$this->sectionId().':'.$key;
+	}
+
+	/**
+	 * Reset the section, returning a new section identifier
+	 *
+	 * @return string
+	 */
+	protected function reset()
+	{
+		$this->store->forever($this->sectionKey(), $id = uniqid());
+
+		return $id;
 	}
 
 	/**
@@ -146,7 +211,7 @@ class Section {
 
 		if (is_null($id))
 		{
-			$this->store->forever($this->sectionKey(), $id = rand(1, 10000));
+			$id = $this->reset();
 		}
 
 		return $id;

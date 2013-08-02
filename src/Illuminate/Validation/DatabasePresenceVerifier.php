@@ -44,14 +44,14 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	{
 		$query = $this->table($collection)->where($column, '=', $value);
 
-		if ( ! is_null($excludeId))
+		if ( ! is_null($excludeId) and $excludeId != 'NULL')
 		{
 			$query->where($idColumn ?: 'id', '<>', $excludeId);
 		}
 
 		foreach ($extra as $key => $extraValue)
 		{
-			$query->where($key, $extraValue);
+			$query->where($key, $extraValue == 'NULL' ? null : $extraValue);
 		}
 
 		return $query->count();
@@ -72,7 +72,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 
 		foreach ($extra as $key => $extraValue)
 		{
-			$query->where($key, $extraValue);
+			$query->where($key, $extraValue == 'NULL' ? null : $extraValue);
 		}
 
 		return $query->count();

@@ -177,7 +177,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$connection = $this->getMockConnection();
 		$connection->logQuery('foo', array(), time());
 		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-		$events->shouldReceive('fire')->once()->with('illuminate.query', array('foo', array(), null));
+		$events->shouldReceive('fire')->once()->with('illuminate.query', array('foo', array(), null, null));
 		$connection->logQuery('foo', array(), null);
 	}
 
@@ -200,6 +200,30 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$schema = $connection->getSchemaBuilder();
 		$this->assertInstanceOf('Illuminate\Database\Schema\Builder', $schema);
 		$this->assertTrue($connection === $schema->getConnection());
+	}
+
+
+	public function testResolvingPaginatorThroughClosure()
+	{
+		$connection = $this->getMockConnection();
+		$paginator  = m::mock('Illuminate\Pagination\Environment');
+		$connection->setPaginator(function() use ($paginator)
+		{
+			return $paginator;
+		});
+		$this->assertEquals($paginator, $connection->getPaginator());
+	}
+
+
+	public function testResolvingCacheThroughClosure()
+	{
+		$connection = $this->getMockConnection();
+		$cache  = m::mock('Illuminate\Cache\CacheManager');
+		$connection->setCacheManager(function() use ($cache)
+		{
+			return $cache;
+		});
+		$this->assertEquals($cache, $connection->getCacheManager());
 	}
 
 

@@ -1,6 +1,6 @@
 {
     "name": "illuminate/http",
-    "keywords": ["laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,8 +8,8 @@
         }
     ],
     "require": {
-        "illuminate/session": "4.0.x",
-        "illuminate/support": "4.0.x",
+        "illuminate/session": "4.1.x",
+        "illuminate/support": "4.1.x",
         "symfony/http-foundation": "2.3.*"
     },
     "require-dev": {
@@ -24,7 +24,7 @@
     "target-dir": "Illuminate/Http",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     },
     "minimum-stability": "dev"

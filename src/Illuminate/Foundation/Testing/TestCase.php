@@ -96,7 +96,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function action($method, $action, $wildcards = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
-		$uri = $this->app['url']->action($action, $wildcards, false);
+		$uri = $this->app['url']->action($action, $wildcards, true);
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
@@ -116,7 +116,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
-		$uri = $this->app['url']->route($name, $routeParameters, false);
+		$uri = $this->app['url']->route($name, $routeParameters, true);
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
@@ -133,6 +133,17 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		$actual = $response->getStatusCode();
 
 		return $this->assertTrue($response->isOk(), 'Expected status code 200, got ' .$actual);
+	}
+
+	/**
+	 * Assert that the client response has a given code.
+	 *
+	 * @param  int  $code
+	 * @return void
+	 */
+	public function assertResponseStatus($code)
+	{
+		return $this->assertEquals($code, $this->client->getResponse()->getStatusCode());
 	}
 
 	/**
@@ -206,24 +217,26 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * Assert whether the client was redirected to a given route.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToRoute($name, $with = array())
+	public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->route($name), $with);
+		$this->assertRedirectedTo($this->app['url']->route($name, $parameters), $with);
 	}
 
 	/**
 	 * Assert whether the client was redirected to a given action.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToAction($name, $with = array())
+	public function assertRedirectedToAction($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->action($name), $with);
+		$this->assertRedirectedTo($this->app['url']->action($name, $parameters), $with);
 	}
 
 	/**

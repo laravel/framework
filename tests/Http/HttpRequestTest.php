@@ -56,6 +56,9 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('http://foo.com/foo/bar?name=taylor', 'GET');
 		$this->assertEquals('http://foo.com/foo/bar?name=taylor', $request->fullUrl());
+
+		$request = Request::create('https://foo.com', 'GET');
+		$this->assertEquals('https://foo.com', $request->fullUrl());
 	}
 
 
@@ -210,6 +213,21 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($payload, $data);
 	}
 
+	public function testJSONEmulatingPHPBuiltInServer()
+	{
+		$payload = array('name' => 'taylor');
+		$content = json_encode($payload);
+		// The built in PHP 5.4 webserver incorrectly provides HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH,
+		// rather than CONTENT_TYPE and CONTENT_LENGTH
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json', 'HTTP_CONTENT_LENGTH' => strlen($content)), $content);
+		$this->assertTrue($request->isJson());
+		$data = $request->json()->all();
+		$this->assertEquals($payload, $data);
+
+		$data = $request->all();
+		$this->assertEquals($payload, $data);
+	}
+
 
 
 	public function testAllInputReturnsInputAndFiles()
@@ -227,6 +245,16 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
 		$request->setSessionStore($session);
 		$this->assertEquals('boom', $request->old('foo', 'bar'));
+	}
+
+
+	public function testFormatReturnsAcceptableFormat()
+	{
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
+		$this->assertEquals('json', $request->format());
+
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/atom+xml'));
+		$this->assertEquals('atom', $request->format());
 	}
 
 }

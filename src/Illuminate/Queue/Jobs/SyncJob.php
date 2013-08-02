@@ -82,4 +82,14 @@ class SyncJob extends Job {
 		return 1;
 	}
 
+	/**
+	 * Get the job identifier.
+	 *
+	 * @return string
+	 */
+	public function getJobId()
+	{
+		return '';
+	}
+
 }

@@ -88,7 +88,17 @@ class SqsJob extends Job {
 	 */
 	public function attempts()
 	{
-		return 1;
+		return (int) $this->job['Attributes']['ApproximateReceiveCount'];
+	}
+
+	/**
+	 * Get the job identifier.
+	 *
+	 * @return string
+	 */
+	public function getJobId()
+	{
+		return $this->job['MessageId'];
 	}
 
 	/**

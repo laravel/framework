@@ -108,8 +108,8 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testSqlServerConnectCallsCreateConnectionWithProperArguments()
 	{
-		$dsn = 'sqlsrv:Server=foo,111;Database=bar';
 		$config = array('host' => 'foo', 'database' => 'bar', 'port' => 111);
+		$dsn = $this->getDsn($config);
 		$connector = $this->getMock('Illuminate\Database\Connectors\SqlServerConnector', array('createConnection', 'getOptions'));
 		$connection = m::mock('stdClass');
 		$connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(array('options')));
@@ -117,6 +117,22 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$result = $connector->connect($config);
 
 		$this->assertTrue($result === $connection);
+	}
+
+	protected function getDsn(array $config)
+	{
+		extract($config);
+
+		$port = isset($config['port']) ? ','.$port : '';
+
+		if (in_array('dblib', PDO::getAvailableDrivers()))
+		{
+			return "dblib:host={$host}{$port};dbname={$database}";
+		}
+		else
+		{
+			return "sqlsrv:Server={$host}{$port};Database={$database}";
+		}
 	}
 
 }

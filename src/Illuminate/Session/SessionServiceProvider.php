@@ -79,9 +79,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSessionEvents()
 	{
-		$app = $this->app;
-
-		$config = $app['config']['session'];
+		$config = $this->app['config']['session'];
 
 		// The session needs to be started and closed, so we will register a before
 		// and after events to do all stuff for us. This will manage the loading
@@ -101,9 +99,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerBootingEvent()
 	{
-		$app = $this->app;
-
-		$this->app->booting(function($app) use ($app)
+		$this->app->booting(function($app)
 		{
 			$app['session']->start();
 		});
@@ -118,7 +114,7 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		if ($this->getDriver() == 'array') return;
 
-		// The cookie toucher is responsbile for updating the expire time on the cookie
+		// The cookie toucher is responsible for updating the expire time on the cookie
 		// so that it is refreshed for each page load. Otherwise it is only set here
 		// once by PHP and never updated on each subsequent page load of the apps.
 		$this->registerCookieToucher();
@@ -157,7 +153,7 @@ class SessionServiceProvider extends ServiceProvider {
 
 		$expire = $this->getExpireTime($config);
 
-		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain']);
+		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], false, true);
 	}
 
 	/**

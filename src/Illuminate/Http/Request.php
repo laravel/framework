@@ -56,7 +56,9 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function fullUrl()
 	{
-		return rtrim($this->getUri(), '/');
+		$query = $this->getQueryString();
+
+		return $query ? $this->url().'?'.$query : $this->url();
 	}
 
 	/**
@@ -168,7 +170,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function all()
 	{
-		return array_merge($this->input(), $this->files->all());
+		return $this->input() + $this->files->all();
 	}
 
 	/**
@@ -180,7 +182,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function input($key = null, $default = null)
 	{
-		$input = array_merge($this->getInputSource()->all(), $this->query->all());
+		$input = $this->getInputSource()->all() + $this->query->all();
 
 		return array_get($input, $key, $default);
 	}
@@ -193,13 +195,9 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function only($keys)
 	{
-		$results = array();
-
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		foreach ($keys as $key) $results[$key] = $this->get($key);
-
-		return $results;
+		return array_only($this->input(), $keys) + array_fill_keys($keys, null);
 	}
 
 	/**
@@ -295,7 +293,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return mixed
 	 */
 	public function old($key = null, $default = null)
 	{
@@ -432,7 +430,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function isJson()
 	{
-		return str_contains($this->server->get('CONTENT_TYPE'), '/json');
+		return str_contains($this->header('CONTENT_TYPE'), '/json');
 	}
 
 	/**
@@ -445,6 +443,21 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		$acceptable = $this->getAcceptableContentTypes();
 
 		return isset($acceptable[0]) and $acceptable[0] == 'application/json';
+	}
+
+	/**
+	 * Get the data format expected in the response.
+	 *
+	 * @return string
+	 */
+	public function format($default = 'html')
+	{
+		foreach ($this->getAcceptableContentTypes() as $type)
+		{
+			if ($format = $this->getFormat($type)) return $format;
+		}
+
+		return $default;
 	}
 
 	/**

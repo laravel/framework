@@ -59,7 +59,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
 		$query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
-		$date = date('Y-m-d H:i:s', time() - 200000);
+		$date = date('Y-m-d H:i:s', time() - 600);
 		$query->shouldReceive('first')->andReturn((object) array('created_at' => $date));
 		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');

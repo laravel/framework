@@ -33,8 +33,8 @@ abstract class Relation {
 	/**
 	 * Create a new relation instance.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
-	 * @param  \Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent)
@@ -96,7 +96,7 @@ abstract class Relation {
 	{
 		$column = $this->getRelated()->getUpdatedAtColumn();
 
-		$this->rawUpdate(array($column => new DateTime));
+		$this->rawUpdate(array($column => $this->getRelated()->freshTimestamp()));
 	}
 
 	/**
@@ -290,6 +290,16 @@ abstract class Relation {
 	public function updatedAt()
 	{
 		return $this->parent->getUpdatedAtColumn();
+	}
+
+	/**
+	 * Get the name of the related model's "updated at" column.
+	 *
+	 * @return string
+	 */
+	public function relatedUpdatedAt()
+	{
+		return $this->related->getUpdatedAtColumn();
 	}
 
 	/**

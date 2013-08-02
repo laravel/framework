@@ -50,7 +50,7 @@ class MakeTableCommand extends Command {
 	{
 		$fullPath = $this->createBaseMigration();
 
-		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/database.php'));
+		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/database.stub'));
 
 		$this->info('Migration created successfully!');
 	}
