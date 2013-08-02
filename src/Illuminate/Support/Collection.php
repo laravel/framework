@@ -521,8 +521,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 	
 	/**
-	 * Dynamically retrieve associative values from the collection
+	 * Dynamically retrieve associative values from the collection.
 	 *
+	 * @param  string $key  
 	 * @return mixed
 	 */
 	public function __get($key)
@@ -531,13 +532,15 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 	
 	/**
-	 * Dynamically set associative values on the collection
+	 * Dynamically set associative values on the collection.
 	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function __set($key, $item)
+	public function __set($key, $value)
 	{
-		$this->put($key, $item);
+		$this->put($key, $value);
 	}
 
 }
