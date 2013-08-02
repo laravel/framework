@@ -1914,7 +1914,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// here because there is no need to query within the relations twice.
 		if (array_key_exists($key, $this->relations))
 		{
-			return $this->relations[$key];
+			return $this->getRelation($key);
 		}
 
 		// If the "attribute" exists as a method on the model, we will just assume
@@ -1926,7 +1926,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$relations = $this->$camelKey()->getResults();
 
-			return $this->relations[$key] = $relations;
+			return $this->setRelation($key, $relations);
 		}
 	}
 
