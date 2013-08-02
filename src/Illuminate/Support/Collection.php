@@ -519,5 +519,25 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return $this->toJson();
 	}
+	
+	/**
+	 * Dynamically retrieve associative values from the collection
+	 *
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		return $this->get($key);
+	}
+	
+	/**
+	 * Dynamically set associative values on the collection
+	 *
+	 * @return void
+	 */
+	public function __set($key, $item)
+	{
+		$this->put($key, $item);
+	}
 
 }
