@@ -169,6 +169,8 @@ abstract class Relation {
 	{
 		$wheres =& $this->getBaseQuery()->wheres;
 
+		if (count($wheres) < 2) return;
+
 		// We'll grab the second where clause off of the set of wheres, and then reset
 		// the where clause keys so there are no gaps in the numeric keys. Then we
 		// remove the binding from the query so it doesn't mess things when run.
