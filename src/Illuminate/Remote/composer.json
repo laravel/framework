@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Illuminate\\Remote": "src/"
+            "Illuminate\\Remote": ""
         }
     },
     "target-dir": "Illuminate/Remote",
