@@ -206,6 +206,8 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function setFragment($fragment)
 	{
 		$this->fragment = $fragment;
+
+        return $this;
 	}
 
 	/**
