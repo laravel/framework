@@ -71,6 +71,13 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	 */
 	protected $query = array();
 
+    /**
+     * A fragment to add at the end of all urls
+     *
+     * @var string
+     */
+    protected $fragment;
+
 	/**
 	 * Create a new Paginator instance.
 	 *
@@ -188,7 +195,31 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 			$parameters = array_merge($parameters, $this->query);
 		}
 
-		return $this->env->getCurrentUrl().'?'.http_build_query($parameters, null, '&');
+		return $this->env->getCurrentUrl().'?'.http_build_query($parameters, null, '&') . $this->getFragment();
+	}
+
+    /**
+     * Set the fragment to add at the end of each URL's
+     *
+     * @param $fragment
+     */
+	public function setFragment($fragment)
+	{
+		$this->fragment = $fragment;
+	}
+
+	/**
+	 * Get the fragment with a # if it exists
+	 *
+	 * @return string
+	 */
+	public function getFragment()
+	{
+		if ($this->fragment) {
+			return '#' . $this->fragment;
+		}
+
+		return '';
 	}
 
 	/**
