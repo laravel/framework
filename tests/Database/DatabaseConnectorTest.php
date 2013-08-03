@@ -123,12 +123,8 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 	{
 		extract($config);
 
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {             // Windows
-			$port = isset($config['port']) ? ','.$port : '';
-		}
-		else {                                                        // *nix
-			$port = isset($config['port']) ? ':'.$port : '';
-		}
+		// If host OS is Windows, use a comma in the DSN. For *nix, use a colon
+		$port = (strtoupper(substr(PHP_OS, 0, 3))) === 'WIN' ? ',' . $port : ':' . $port;
 
 		if (in_array('dblib', PDO::getAvailableDrivers()))
 		{
