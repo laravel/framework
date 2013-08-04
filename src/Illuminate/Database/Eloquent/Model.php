@@ -126,6 +126,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $with = array();
 
 	/**
+	 * Fields that should be retrieved as Carbon objects.
+	 *
+	 * @var array
+	 */
+	protected $dateTimeFields = array();
+
+	/**
 	 * Indicates if the model exists.
 	 *
 	 * @var bool
@@ -2047,7 +2054,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getDates()
 	{
-		return array(static::CREATED_AT, static::UPDATED_AT, static::DELETED_AT);
+		return array_merge($this->dateTimeFields, array(static::CREATED_AT, static::UPDATED_AT, static::DELETED_AT));
 	}
 
 	/**
