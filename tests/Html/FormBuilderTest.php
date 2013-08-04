@@ -189,7 +189,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$select1 = $this->formBuilder->selectYear('year', 2000, 2020);
 		$select2 = $this->formBuilder->selectYear('year', 2000, 2020, null, array('id' => 'foo'));
 		$select3 = $this->formBuilder->selectYear('year', 2000, 2020, '2000');
-		$select4 = $this->formBuilder->selectYear('year', 2000, 2020, null, array(), array('' => 'Choose a Year'));
+		$select4 = $this->formBuilder->selectYear('year', 2000, 2020, null, array('_prepend' => array('' => 'Choose a Year')));
 
 		$this->assertContains('<select name="year"><option value="2000">2000</option><option value="2001">2001</option>', $select1);
 		$this->assertContains('<select id="foo" name="year"><option value="2000">2000</option><option value="2001">2001</option>', $select2);
@@ -212,7 +212,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$month1 = $this->formBuilder->selectMonth('month');
 		$month2 = $this->formBuilder->selectMonth('month', '1');
 		$month3 = $this->formBuilder->selectMonth('month', null, array('id' => 'foo'));
-		$month4 = $this->formBuilder->selectMonth('month', null, array(), array('' => 'Choose a Month'));
+		$month4 = $this->formBuilder->selectMonth('month', null, array('_prepend' => array('' => 'Choose a Year')));
 
 		$this->assertContains('<select name="month"><option value="1">January</option><option value="2">February</option>', $month1);
 		$this->assertContains('<select name="month"><option value="1" selected="selected">January</option>', $month2);

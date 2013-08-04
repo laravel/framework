@@ -389,6 +389,13 @@ class FormBuilder {
 
 		$options['name'] = $name;
 
+		// Split the _prepend option out of the options array, if it exists.
+		if (isset($options['_prepend'])) 
+		{
+			$list = $options['_prepend'] + $list;
+			unset($options['_prepend']);
+		}
+
 		// We will simply loop through the options and build an HTML value for each of
 		// them until we have an array of HTML declarations. Then we will join them
 		// all together into one single HTML element that can be put on the form.
@@ -417,12 +424,11 @@ class FormBuilder {
 	 * @param  string  $end
 	 * @param  string  $selected
 	 * @param  array   $options
-	 * @param  array   $prepend
 	 * @return string
 	 */
-	public function selectRange($name, $begin, $end, $selected = null, $options = array(), $prepend = array())
+	public function selectRange($name, $begin, $end, $selected = null, $options = array())
 	{
-		$range = $prepend + array_combine($range = range($begin, $end), $range);
+		$range = array_combine($range = range($begin, $end), $range);
 
 		return $this->select($name, $range, $selected, $options);
 	}
@@ -435,7 +441,6 @@ class FormBuilder {
 	 * @param  string  $end
 	 * @param  string  $selected
 	 * @param  array   $options
-	 * @param  array   $prepend
 	 * @return string
 	 */
 	public function selectYear()
@@ -449,12 +454,11 @@ class FormBuilder {
 	 * @param  string  $name
 	 * @param  string  $selected
 	 * @param  array   $options
-	 * @param  array   $prepend
 	 * @return string
 	 */
-	public function selectMonth($name, $selected = null, $options = array(), $prepend = array())
+	public function selectMonth($name, $selected = null, $options = array())
 	{
-		$months = $prepend;
+		$months = array();
 
 		foreach (range(1, 12) as $month)
 		{
