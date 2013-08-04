@@ -212,7 +212,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$month1 = $this->formBuilder->selectMonth('month');
 		$month2 = $this->formBuilder->selectMonth('month', '1');
 		$month3 = $this->formBuilder->selectMonth('month', null, array('id' => 'foo'));
-		$month4 = $this->formBuilder->selectMonth('month', null, array('_prepend' => array('' => 'Choose a Year')));
+		$month4 = $this->formBuilder->selectMonth('month', null, array('_prepend' => array('' => 'Choose a Month')));
 
 		$this->assertContains('<select name="month"><option value="1">January</option><option value="2">February</option>', $month1);
 		$this->assertContains('<select name="month"><option value="1" selected="selected">January</option>', $month2);
