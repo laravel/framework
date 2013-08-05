@@ -747,7 +747,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$this->{static::DELETED_AT} = $time = $this->freshTimestamp();
 
-			$query->update(array(static::DELETED_AT => $time));
+			$query->update(array(static::DELETED_AT => $this->fromDateTime($time)));
 		}
 		else
 		{
@@ -1340,6 +1340,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function freshTimestamp()
 	{
 		return new DateTime;
+	}
+
+	/**
+	 * Get a fresh timestamp for the model.
+	 *
+	 * @return DateTime
+	 */
+	public function freshTimestampString()
+	{
+		return $this->fromDateTime($this->freshTimestamp());
 	}
 
 	/**
@@ -2056,7 +2066,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  DateTime|int  $value
 	 * @return string
 	 */
-	protected function fromDateTime($value)
+	public function fromDateTime($value)
 	{
 		$format = $this->getDateFormat();
 

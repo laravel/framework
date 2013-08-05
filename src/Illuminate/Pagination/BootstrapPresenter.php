@@ -136,9 +136,7 @@ class BootstrapPresenter {
 	 */
 	public function getAdjacentRange()
 	{
-		$start = $this->currentPage - 3;
-
-		return $this->getPageRange($start, $this->currentPage + 3);
+		return $this->getPageRange($this->currentPage - 3, $this->currentPage + 3);
 	}
 
 	/**

@@ -455,7 +455,7 @@ class FormBuilder {
 
 		foreach (range(1, 12) as $month)
 		{
-			$months[$month] = strftime('%B', mktime(0, 0, 0, $month));
+			$months[$month] = strftime('%B', mktime(0, 0, 0, $month, 1));
 		}
 
 		return $this->select($name, $months, $selected, $options);
@@ -618,7 +618,7 @@ class FormBuilder {
 	{
 		if ( ! $this->oldInputIsEmpty() and is_null($this->old($name))) return false;
 
-		if (is_null($this->old($name))) return $checked;
+		if ($this->missingOldAndModel($name)) return $checked;
 
 		return (bool) $this->getValueAttribute($name);
 	}
@@ -633,9 +633,20 @@ class FormBuilder {
 	 */
 	protected function getRadioCheckedState($name, $value, $checked)
 	{
-		if (is_null($this->old($name))) return $checked;
+		if ($this->missingOldAndModel($name)) return $checked;
 
 		return $this->getValueAttribute($name) == $value;
+	}
+
+	/**
+	 * Determine if old input or model input exists for a key.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	protected function missingOldAndModel($name)
+	{
+		return (is_null($this->old($name)) and is_null($this->getModelValueAttribute($name)));
 	}
 
 	/**
