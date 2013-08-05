@@ -339,7 +339,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->setSoftDeleting(true);
 		$query = m::mock('stdClass');
 		$query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
-		$query->shouldReceive('update')->once()->with(array('deleted_at' => new DateTime));
+		$query->shouldReceive('update')->once()->with(array('deleted_at' => $model->fromDateTime(new DateTime)));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('touchOwners');
 		$model->exists = true;

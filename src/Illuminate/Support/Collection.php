@@ -345,6 +345,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Take the first or last {$limit} items.
+	 *
+	 * @param  int  $limit
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function take($limit = null)
+	{
+		if ($limit < 0) return $this->slice($limit, abs($limit));
+
+		return $this->slice(0, $limit);
+	}
+
+	/**
 	 * Get an array with the values of a given key.
 	 *
 	 * @param  string  $value

@@ -40,11 +40,12 @@ if ( ! function_exists('app_path'))
 	/**
 	 * Get the path to the application folder.
 	 *
+	 * @param   string  $path
 	 * @return  string
 	 */
-	function app_path()
+	function app_path($path = '')
 	{
-		return app('path');
+		return app('path').($path ? '/'.$path : $path);
 	}
 }
 
@@ -87,21 +88,6 @@ if ( ! function_exists('array_build'))
 		}
 
 		return $results;
-	}
-}
-
-if ( ! function_exists('array_column'))
-{
-	/**
-	 * Pluck an array of values from an array.
-	 *
-	 * @param  array   $array
-	 * @param  string  $key
-	 * @return array
-	 */
-	function array_column($array, $key)
-	{
-		return array_pluck($array, $key);
 	}
 }
 
@@ -417,9 +403,9 @@ if ( ! function_exists('base_path'))
 	 *
 	 * @return string
 	 */
-	function base_path()
+	function base_path($path = '')
 	{
-		return app('path.base');
+		return app()->make('path.base').($path ? '/'.$path : $path);
 	}
 }
 
@@ -649,9 +635,9 @@ if ( ! function_exists('public_path'))
 	 *
 	 * @return string
 	 */
-	function public_path()
+	function public_path($path = '')
 	{
-		return app()->make('path.public');
+		return app()->make('path.public').($path ? '/'.$path : $path);
 	}
 }
 
@@ -737,9 +723,9 @@ if ( ! function_exists('storage_path'))
 	 *
 	 * @return  string
 	 */
-	function storage_path()
+	function storage_path($path = '')
 	{
-		return app('path.storage');
+		return app('path.storage').($path ? '/'.$path : $path);
 	}
 }
 
