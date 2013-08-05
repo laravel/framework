@@ -1,5 +1,4 @@
--/vendor
--composer.phar
--composer.lock
--.DS_Store
-src/Illuminate/Database/.DS_Store
+/vendor
+composer.phar
+composer.lock
+.DS_Store
