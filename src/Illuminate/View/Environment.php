@@ -629,6 +629,16 @@ class Environment {
 	}
 
 	/**
+	 * Set the view finder instance.
+	 *
+	 * @return void
+	 */
+	public function setFinder(ViewFinderInterface $finder)
+	{
+		$this->finder = $finder;
+	}
+
+	/**
 	 * Get the event dispatcher instance.
 	 *
 	 * @return \Illuminate\Events\Dispatcher
