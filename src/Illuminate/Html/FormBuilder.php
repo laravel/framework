@@ -392,8 +392,7 @@ class FormBuilder {
 		// Split the _prepend option out of the options array, if it exists.
 		if (isset($options['_prepend'])) 
 		{
-			$list = $options['_prepend'] + $list;
-			unset($options['_prepend']);
+			$list = array_pull($options, '_prepend') + $list;
 		}
 
 		// We will simply loop through the options and build an HTML value for each of
