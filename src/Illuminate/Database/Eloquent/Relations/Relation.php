@@ -132,7 +132,7 @@ abstract class Relation {
 		// When a model is "soft deleting", the "deleted at" where clause will be the
 		// first where clause on the relationship query, so we will actually clear
 		// the second where clause as that is the lazy loading relations clause.
-		if ($this->query->getModel()->isSoftDeleting())
+		if ($this->hasSoftDeleteClause())
 		{
 			$this->removeSecondWhereClause();
 		}
@@ -146,6 +146,18 @@ abstract class Relation {
 		}
 
 		return $this->getBaseQuery()->getAndResetWheres();
+	}
+
+	/**
+	 * Determine if the base query has a soft delete clause.
+	 *
+	 * @return  bool
+	 */
+	protected function hasSoftDeleteClause()
+	{
+		$deleting = $this->query->getModel()->isSoftDeleting();
+
+		return ($deleting and count($this->getBaseQuery()->wheres) >= 2);
 	}
 
 	/**
@@ -168,6 +180,8 @@ abstract class Relation {
 	protected function removeSecondWhereClause()
 	{
 		$wheres =& $this->getBaseQuery()->wheres;
+
+		if (count($wheres) < 2) return;
 
 		// We'll grab the second where clause off of the set of wheres, and then reset
 		// the where clause keys so there are no gaps in the numeric keys. Then we
