@@ -830,7 +830,7 @@ class Builder {
 	 */
 	public function skip($value)
 	{
-		$this->offset = $value;
+		if ($value > 0)  $this->offset = $value;
 
 		return $this;
 	}
