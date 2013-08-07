@@ -112,7 +112,6 @@ class Router {
 	 * Create a new router instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(Container $container = null)
 	{
@@ -586,7 +585,7 @@ class Router {
 	 * Get the name for a given resource.
 	 *
 	 * @param  string  $resource
-	 * @param  string  $name
+	 * @param  string  $method
 	 * @return string
 	 */
 	protected function getResourceName($resource, $method)
@@ -1340,6 +1339,7 @@ class Router {
 	 *
 	 * @param  string  $key
 	 * @param  string  $class
+	 * @param  Closure $callback
 	 * @return void
 	 */
 	public function model($key, $class, Closure $callback = null)

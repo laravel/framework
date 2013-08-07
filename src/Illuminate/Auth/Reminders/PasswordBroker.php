@@ -50,7 +50,6 @@ class PasswordBroker {
 	 * @param  \Illuminate\Routing\Redirector  $redirect
 	 * @param  \Illuminate\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
-	 * @return void
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,

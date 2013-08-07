@@ -23,7 +23,6 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $directory
-	 * @return void
 	 */
 	public function __construct(Filesystem $files, $directory)
 	{

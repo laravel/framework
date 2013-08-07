@@ -25,7 +25,6 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  Pheanstalk  $pheanstalk
 	 * @param  string  $default
-	 * @return void
 	 */
 	public function __construct(Pheanstalk $pheanstalk, $default)
 	{

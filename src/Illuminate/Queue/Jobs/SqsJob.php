@@ -33,7 +33,6 @@ class SqsJob extends Job {
 	 * @param  \Aws\Sqs\SqsClient  $sqs
 	 * @param  string  $queue
 	 * @param  array   $job
-	 * @return void
 	 */
 	public function __construct(Container $container,
                                 SqsClient $sqs,

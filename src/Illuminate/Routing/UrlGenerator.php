@@ -34,7 +34,6 @@ class UrlGenerator {
 	 *
 	 * @param  \Symfony\Component\Routing\RouteCollection  $routes
 	 * @param  \Symfony\Component\HttpFoundation\Request   $request
-	 * @return void
 	 */
 	public function __construct(RouteCollection $routes, Request $request)
 	{

@@ -23,10 +23,9 @@ class BeanstalkdJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @param  Pheanstalk  $pheanstalk
 	 * @param  Pheanstalk_Job  $job
-	 * @return void
 	 */
 	public function __construct(Container $container,
                                 Pheanstalk $pheanstalk,

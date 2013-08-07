@@ -38,7 +38,6 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  array  $paths
 	 * @param  array  $extensions
-	 * @return void
 	 */
 	public function __construct(Filesystem $files, array $paths, array $extensions = null)
 	{

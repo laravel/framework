@@ -70,7 +70,6 @@ class Guard {
 	 *
 	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
 	 * @param  \Illuminate\Session\Store  $session
-	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
                                 SessionStore $session)

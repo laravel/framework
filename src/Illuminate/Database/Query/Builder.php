@@ -150,7 +150,6 @@ class Builder {
 	 * @param  \Illuminate\Database\ConnectionInterface  $connection
 	 * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
 	 * @param  \Illuminate\Database\Query\Processors\Processor  $processor
-	 * @return void
 	 */
 	public function __construct(ConnectionInterface $connection,
                                 Grammar $grammar,

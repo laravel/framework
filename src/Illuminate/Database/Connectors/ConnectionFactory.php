@@ -20,7 +20,6 @@ class ConnectionFactory {
 	 * Create a new connection factory instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(Container $container)
 	{

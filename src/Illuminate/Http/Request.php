@@ -451,6 +451,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	/**
 	 * Get the data format expected in the response.
 	 *
+	 * @param  string  $default
 	 * @return string
 	 */
 	public function format($default = 'html')

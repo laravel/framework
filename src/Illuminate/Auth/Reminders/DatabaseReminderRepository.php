@@ -39,8 +39,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 * @param  \Illuminate\Database\Connection  $connection
 	 * @param  string  $table
 	 * @param  string  $hashKey
-	 * @param  int  $expires 
-	 * @return void
+	 * @param  int  $expires
 	 */
 	public function __construct(Connection $connection, $table, $hashKey, $expires = 60)
 	{
@@ -53,7 +52,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new reminder record and token.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @return string
 	 */
 	public function create(RemindableInterface $user)
@@ -85,7 +84,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Determine if a reminder record exists and is valid.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string  $token
 	 * @return bool
 	 */
@@ -135,7 +134,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new token for the user.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @return string
 	 */
 	public function createNewToken(RemindableInterface $user)

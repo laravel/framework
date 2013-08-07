@@ -23,7 +23,6 @@ class MigrationCreator {
 	 * Create a new migration creator instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
 	 */
 	public function __construct(Filesystem $files)
 	{
@@ -59,6 +58,7 @@ class MigrationCreator {
 	 * Get the migration stub file.
 	 *
 	 * @param  string  $table
+	 * @param  bool    $create
 	 * @return void
 	 */
 	protected function getStub($table, $create)

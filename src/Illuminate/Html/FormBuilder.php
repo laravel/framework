@@ -82,7 +82,6 @@ class FormBuilder {
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
 	 * @param  \Illuminate\Html\HtmlBuilder  $html
 	 * @param  string  $csrfToken
-	 * @return void
 	 */
 	public function __construct(HtmlBuilder $html, UrlGenerator $url, $csrfToken)
 	{
@@ -610,7 +609,6 @@ class FormBuilder {
 	 * Get the check state for a checkbox input.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $value
 	 * @param  bool  $checked
 	 * @return bool
 	 */

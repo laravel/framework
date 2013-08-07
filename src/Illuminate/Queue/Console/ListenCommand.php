@@ -32,7 +32,6 @@ class ListenCommand extends Command {
 	 * Create a new queue listen command.
 	 *
 	 * @param  \Illuminate\Queue\Listener  $listener
-	 * @return void
 	 */
 	public function __construct(Listener $listener)
 	{

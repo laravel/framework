@@ -42,7 +42,6 @@ class Builder {
 	 * Create a new Eloquent query builder instance.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return void
 	 */
 	public function __construct(QueryBuilder $query)
 	{

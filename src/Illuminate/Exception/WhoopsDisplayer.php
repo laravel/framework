@@ -24,7 +24,6 @@ class WhoopsDisplayer implements ExceptionDisplayerInterface {
 	 *
 	 * @param  \Whoops\Run  $whoops
 	 * @param  bool  $runningInConsole
-	 * @return void
 	 */
 	public function __construct(Run $whoops, $runningInConsole)
 	{

@@ -13,7 +13,6 @@ class Database {
 	 * Create a new Redis connection instance.
 	 *
 	 * @param  array  $servers
-	 * @return void
 	 */
 	public function __construct(array $servers = array())
 	{

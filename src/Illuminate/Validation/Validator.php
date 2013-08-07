@@ -108,7 +108,6 @@ class Validator implements MessageProviderInterface {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
-	 * @return void
 	 */
 	public function __construct(TranslatorInterface $translator, $data, $rules, $messages = array())
 	{

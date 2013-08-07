@@ -23,7 +23,6 @@ class RemoteManager {
 	 * Create a new remote manager instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
 	 */
 	public function __construct($app)
 	{

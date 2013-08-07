@@ -206,7 +206,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Create a new Eloquent model instance.
 	 *
 	 * @param  array  $attributes
-	 * @return void
 	 */
 	public function __construct(array $attributes = array())
 	{
@@ -1070,6 +1069,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Finish processing on a successful save operation.
 	 *
+	 * @param  array  $options
 	 * @return void
 	 */
 	protected function finishSave(array $options)

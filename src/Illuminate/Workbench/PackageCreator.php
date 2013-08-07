@@ -38,8 +38,7 @@ class PackageCreator {
 	/**
 	 * Create a new package creator instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
-	 * @return void
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 */
 	public function __construct(Filesystem $files)
 	{
@@ -97,6 +96,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	public function writeSupportFiles(Package $package, $directory, $plain)
@@ -140,6 +140,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool  $plain
 	 * @return void
 	 */
 	protected function writeComposerFile(Package $package, $directory, $plain)
@@ -169,6 +170,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool  $plain
 	 * @return void
 	 */
 	public function writeIgnoreFile(Package $package, $directory, $plain)
@@ -216,6 +218,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	public function writePublicDirectory(Package $package, $directory, $plain)
@@ -246,6 +249,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	public function writeServiceProvider(Package $package, $directory, $plain)
