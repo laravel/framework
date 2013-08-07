@@ -25,10 +25,10 @@ class RedisStore implements StoreInterface {
 	 * @param  string                     $prefix
 	 * @return void
 	 */
-	public function __construct(Redis $redis, $prefix = '')
+	public function __construct(Redis $redis, $prefix = null)
 	{
 		$this->redis = $redis;
-		$this->prefix = $prefix.':';
+		$this->prefix = is_null($prefix) ? null : $prefix.':';
 	}
 
 	/**
