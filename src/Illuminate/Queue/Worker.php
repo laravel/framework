@@ -57,6 +57,7 @@ class Worker {
 	 * @param  \Illuminate\Queue\Jobs\Job  $job
 	 * @param  int  $delay
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function process(Job $job, $delay)
 	{

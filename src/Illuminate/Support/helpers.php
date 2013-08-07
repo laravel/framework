@@ -445,6 +445,7 @@ if ( ! function_exists('csrf_token'))
 	 * Get the CSRF token value.
 	 *
 	 * @return string
+	 * @throws RuntimeException
 	 */
 	function csrf_token()
 	{

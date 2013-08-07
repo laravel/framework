@@ -15,6 +15,7 @@ class BcryptHasher implements HasherInterface {
 	 * @param  string  $value
 	 * @param  array   $options
 	 * @return string
+	 * @throws \RuntimeException
 	 */
 	public function make($value, array $options = array())
 	{

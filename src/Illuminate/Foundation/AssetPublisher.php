@@ -44,6 +44,7 @@ class AssetPublisher {
 	 * @param  string  $name
 	 * @param  string  $source
 	 * @return bool
+	 * @throws \RuntimeException
 	 */
 	public function publish($name, $source)
 	{

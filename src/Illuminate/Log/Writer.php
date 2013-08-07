@@ -89,6 +89,7 @@ class Writer {
 	 *
 	 * @param  string  $level
 	 * @return int
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseLevel($level)
 	{
@@ -139,6 +140,7 @@ class Writer {
 	 *
 	 * @param  Closure  $callback
 	 * @return void
+	 * @throws \RuntimeException
 	 */
 	public function listen(Closure $callback)
 	{
@@ -195,6 +197,7 @@ class Writer {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{

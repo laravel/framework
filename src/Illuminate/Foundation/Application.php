@@ -670,6 +670,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 * @param  string  $message
 	 * @param  array   $headers
 	 * @return void
+	 * @throws NotFoundHttpException|HttpException
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{

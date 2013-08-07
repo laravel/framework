@@ -742,6 +742,7 @@ class Router {
 	 *
 	 * @param  mixed  $action
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseAction($action)
 	{
@@ -1419,8 +1420,9 @@ class Router {
 	/**
 	 * Convert routing exception to HttpKernel version.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return void
+	 * @throws NotFoundHttpException|MethodNotAllowedHttpException
 	 */
 	protected function handleRoutingException(\Exception $e)
 	{

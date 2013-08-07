@@ -70,6 +70,7 @@ class BelongsTo extends Relation {
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @return \Illuminate\Database\Eloquent\Builder
+	 * @throws LogicException
 	 */
 	public function getRelationCountQuery(Builder $query)
 	{

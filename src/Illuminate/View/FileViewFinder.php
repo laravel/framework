@@ -82,6 +82,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getNamespaceSegments($name)
 	{
@@ -106,6 +107,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @param  string  $name
 	 * @param  array   $paths
 	 * @return string
+	 * @throws \InvalidArgumentException
 	 */
 	protected function findInPaths($name, $paths)
 	{

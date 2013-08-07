@@ -234,6 +234,7 @@ class UrlGenerator {
 	 * @param  mixed   $parameters
 	 * @param  bool    $absolute
 	 * @return string
+	 * @throws InvalidArgumentException
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{

@@ -467,6 +467,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 * Get the Illuminate session store implementation.
 	 *
 	 * @return \Illuminate\Session\Store
+	 * @throws \RuntimeException
 	 */
 	public function getSessionStore()
 	{

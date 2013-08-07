@@ -404,6 +404,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @param  Closure  $callback
 	 * @return mixed
+	 * @throws \Exception
 	 */
 	public function transaction(Closure $callback)
 	{
@@ -541,10 +542,11 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Handle an exception that occurred during a query.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @param  string     $query
 	 * @param  array      $bindings
 	 * @return void
+	 * @throws \Exception
 	 */
 	protected function handleQueryException(\Exception $e, $query, $bindings)
 	{

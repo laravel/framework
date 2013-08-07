@@ -83,6 +83,7 @@ class IronJob extends Job {
 	 *
 	 * @param  int   $delay
 	 * @return void
+	 * @throws \LogicException
 	 */
 	public function release($delay = 0)
 	{
@@ -100,6 +101,7 @@ class IronJob extends Job {
 	 * Get the number of times the job has been attempted.
 	 *
 	 * @return int
+	 * @throws \LogicException
 	 */
 	public function attempts()
 	{
