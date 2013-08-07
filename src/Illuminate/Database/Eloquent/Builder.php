@@ -215,9 +215,9 @@ class Builder {
 		// Once we have the paginator we need to set the limit and offset values for
 		// the query so we can get the properly paginated items. Once we have an
 		// array of items we can create the paginator instances for the items.
-		$last_page = ceil($total / $perPage);
+		$lastPage = ceil($total / $perPage);
 
-		$page = min($paginator->getCurrentPage(), $last_page);
+		$page = min($paginator->getCurrentPage(), $lastPage);
 
 		$this->query->forPage($page, $perPage);
 
