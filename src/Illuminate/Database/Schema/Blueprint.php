@@ -40,7 +40,6 @@ class Blueprint {
 	 *
 	 * @param  string   $table
 	 * @param  Closure  $callback
-	 * @return void
 	 */
 	public function __construct($table, Closure $callback = null)
 	{
@@ -459,7 +458,6 @@ class Blueprint {
 	 *
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedInteger($column, $autoIncrement = false)
@@ -472,7 +470,6 @@ class Blueprint {
 	 *
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedBigInteger($column, $autoIncrement = false)

@@ -22,10 +22,9 @@ class SyncJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @param  string  $job
 	 * @param  string  $data
-	 * @return void
 	 */
 	public function __construct(Container $container, $job, $data = '')
 	{

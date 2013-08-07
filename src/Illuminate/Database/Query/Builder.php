@@ -150,7 +150,6 @@ class Builder {
 	 * @param  \Illuminate\Database\ConnectionInterface  $connection
 	 * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
 	 * @param  \Illuminate\Database\Query\Processors\Processor  $processor
-	 * @return void
 	 */
 	public function __construct(ConnectionInterface $connection,
                                 Grammar $grammar,
@@ -798,6 +797,28 @@ class Builder {
 		$this->orders[] = compact('column', 'direction');
 
 		return $this;
+	}
+
+	/**
+	 * Add an "order by" clause for a timestamp to the query.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function latest($column = 'created_at')
+	{
+		return $this->orderBy($column, 'desc');
+	}
+
+	/**
+	 * Add an "order by" clause for a timestamp to the query.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function oldest($column = 'created_at')
+	{
+		return $this->orderBy($column, 'asc');
 	}
 
 	/**
@@ -1571,6 +1592,7 @@ class Builder {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{

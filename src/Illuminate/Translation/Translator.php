@@ -33,7 +33,6 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 *
 	 * @param  \Illuminate\Translation\LoaderInterface  $loader
 	 * @param  string  $locale
-	 * @return void
 	 */
 	public function __construct(LoaderInterface $loader, $locale)
 	{

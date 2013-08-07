@@ -147,6 +147,7 @@ class Container implements ArrayAccess {
 	 * @param  string   $abstract
 	 * @param  Closure  $closure
 	 * @return void
+	 * @throws \InvalidArgumentException
 	 */
 	public function extend($abstract, Closure $closure)
 	{
@@ -282,6 +283,7 @@ class Container implements ArrayAccess {
 	 * @param  string  $concrete
 	 * @param  array   $parameters
 	 * @return mixed
+	 * @throws \ReflectionClass|BindingResolutionException
 	 */
 	public function build($concrete, $parameters = array())
 	{
@@ -360,6 +362,7 @@ class Container implements ArrayAccess {
 	 *
 	 * @param  ReflectionParameter  $parameter
 	 * @return mixed
+	 * @throws BindingResolutionException
 	 */
 	protected function resolveNonClass(ReflectionParameter $parameter)
 	{
@@ -380,6 +383,7 @@ class Container implements ArrayAccess {
 	 *
 	 * @param  \ReflectionParameter  $parameter
 	 * @return mixed
+	 * @throws BindingResolutionException
 	 */
 	protected function resolveClass(ReflectionParameter $parameter)
 	{

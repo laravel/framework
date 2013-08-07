@@ -11,8 +11,6 @@ class ApcWrapper {
 
 	/**
 	 * Create a new APC wrapper instance.
-	 *
-	 * @return void
 	 */
 	public function __construct()
 	{
@@ -56,7 +54,7 @@ class ApcWrapper {
 	}
 
 	/**
-	 * Decremenet the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value

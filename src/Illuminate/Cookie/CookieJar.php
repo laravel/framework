@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CookieJar {
 
-	/*
+	/**
 	 * The current request instance.
 	 *
-	 * @var Symfony\Component\HttpFoundation\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $request;
 
@@ -41,7 +41,6 @@ class CookieJar {
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
-	 * @return void
 	 */
 	public function __construct(Request $request, Encrypter $encrypter)
 	{
@@ -167,7 +166,7 @@ class CookieJar {
 	 *
 	 * @param  string  $path
 	 * @param  string  $domain
-	 * @return void
+	 * @return self
 	 */
 	public function setDefaultPathAndDomain($path, $domain)
 	{

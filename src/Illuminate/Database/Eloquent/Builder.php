@@ -42,7 +42,6 @@ class Builder {
 	 * Create a new Eloquent query builder instance.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return void
 	 */
 	public function __construct(QueryBuilder $query)
 	{
@@ -69,6 +68,7 @@ class Builder {
 	 * @param  mixed  $id
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @throws ModelNotFoundException
 	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
@@ -93,6 +93,7 @@ class Builder {
 	 *
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @throws ModelNotFoundException
 	 */
 	public function firstOrFail($columns = array('*'))
 	{

@@ -23,7 +23,6 @@ class Section {
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
 	 * @param  string  $name
-	 * @return void
 	 */
 	public function __construct(StoreInterface $store, $name)
 	{
@@ -178,7 +177,7 @@ class Section {
 	}
 
 	/**
-	 * Get a fully qualfied section item key.
+	 * Get a fully qualified section item key.
 	 *
 	 * @param  string  $key
 	 * @return string

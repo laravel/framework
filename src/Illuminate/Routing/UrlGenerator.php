@@ -34,7 +34,6 @@ class UrlGenerator {
 	 *
 	 * @param  \Symfony\Component\Routing\RouteCollection  $routes
 	 * @param  \Symfony\Component\HttpFoundation\Request   $request
-	 * @return void
 	 */
 	public function __construct(RouteCollection $routes, Request $request)
 	{
@@ -234,6 +233,7 @@ class UrlGenerator {
 	 * @param  mixed   $parameters
 	 * @param  bool    $absolute
 	 * @return string
+	 * @throws InvalidArgumentException
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{

@@ -57,7 +57,7 @@ class Handler {
 	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface  $responsePreparer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
-	 * @return void
+	 * @param  bool  $debug
 	 */
 	public function __construct(ResponsePreparerInterface $responsePreparer,
                                 ExceptionDisplayerInterface $plainDisplayer,
@@ -308,7 +308,7 @@ class Handler {
 	/**
 	 * Format an exception thrown by a handler.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return string
 	 */
 	protected function formatException(\Exception $e)

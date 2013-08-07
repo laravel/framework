@@ -70,7 +70,6 @@ class Guard {
 	 *
 	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
 	 * @param  \Illuminate\Session\Store  $session
-	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
                                 SessionStore $session)
@@ -110,7 +109,7 @@ class Guard {
 
 		// If we have already retrieved the user for the current request we can just
 		// return it back immediately. We do not want to pull the user data every
-		// request into the method becaue that would tremendously slow the app.
+		// request into the method because that would tremendously slow an app.
 		if ( ! is_null($this->user))
 		{
 			return $this->user;
@@ -447,6 +446,7 @@ class Guard {
 	 * Get the cookie creator instance used by the guard.
 	 *
 	 * @return \Illuminate\Cookie\CookieJar
+	 * @throws \RuntimeException
 	 */
 	public function getCookieJar()
 	{

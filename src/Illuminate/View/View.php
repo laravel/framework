@@ -50,7 +50,6 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $view
 	 * @param  string  $path
 	 * @param  array   $data
-	 * @return void
 	 */
 	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array())
 	{
@@ -232,7 +231,7 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	public function offsetGet($key)
+	public function &offsetGet($key)
 	{
 		return $this->data[$key];
 	}
@@ -263,9 +262,10 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Get a piece of data from the view.
 	 *
+	 * @param  string  $key
 	 * @return mixed
 	 */
-	public function __get($key)
+	public function &__get($key)
 	{
 		return $this->data[$key];
 	}

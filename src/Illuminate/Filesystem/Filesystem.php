@@ -23,6 +23,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @return string
+	 * @throws FileNotFoundException
 	 */
 	public function get($path)
 	{
@@ -47,6 +48,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @return mixed
+	 * @throws FileNotFoundException
 	 */
 	public function getRequire($path)
 	{
@@ -59,7 +61,7 @@ class Filesystem {
 	 * Require the given file once.
 	 *
 	 * @param  string  $file
-	 * @return void
+	 * @return mixed
 	 */
 	public function requireOnce($file)
 	{
@@ -106,7 +108,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function move($path, $target)
 	{
@@ -118,7 +120,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function copy($path, $target)
 	{
@@ -283,7 +285,7 @@ class Filesystem {
 	 * @param  string  $directory
 	 * @param  string  $destination
 	 * @param  int     $options
-	 * @return void
+	 * @return bool
 	 */
 	public function copyDirectory($directory, $destination, $options = null)
 	{

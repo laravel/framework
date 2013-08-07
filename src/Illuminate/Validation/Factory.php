@@ -9,7 +9,7 @@ class Factory {
 	/**
 	 * The Translator implementation.
 	 *
-	 * @var Symfony\Component\Translator\TranslatorInterface
+	 * @var \Symfony\Component\Translator\TranslatorInterface
 	 */
 	protected $translator;
 
@@ -53,7 +53,6 @@ class Factory {
 	 *
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(TranslatorInterface $translator, Container $container = null)
 	{

@@ -23,7 +23,6 @@ class RedisStore implements StoreInterface {
 	 *
 	 * @param  \Illuminate\Redis\Database  $redis
 	 * @param  string                     $prefix
-	 * @return void
 	 */
 	public function __construct(Redis $redis, $prefix = '')
 	{

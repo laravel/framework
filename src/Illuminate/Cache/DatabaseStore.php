@@ -40,7 +40,6 @@ class DatabaseStore implements StoreInterface {
 	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
 	 * @param  string  $table
 	 * @param  string  $prefix
-	 * @return void
 	 */
 	public function __construct(Connection $connection, Encrypter $encrypter, $table, $prefix = '')
 	{
@@ -113,6 +112,7 @@ class DatabaseStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 * @throws \LogicException
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -125,6 +125,7 @@ class DatabaseStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 * @throws \LogicException
 	 */
 	public function decrement($key, $value = 1)
 	{

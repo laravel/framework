@@ -52,7 +52,6 @@ class BelongsToMany extends Relation {
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  string  $relationName
-	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = null)
 	{
@@ -207,6 +206,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the select clause for the relation query.
 	 *
+	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
@@ -455,8 +455,8 @@ class BelongsToMany extends Relation {
 	/**
 	 * Create an array of new instances of the related models.
 	 *
-	 * @param  array  $attributes
-	 * @param  array  $joining
+	 * @param  array  $records
+	 * @param  array  $joinings
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function createMany(array $records, array $joinings = array())
@@ -599,6 +599,7 @@ class BelongsToMany extends Relation {
 	 * Create an array of records to insert into the pivot table.
 	 *
 	 * @param  array  $ids
+	 * @param  array  $attributes
 	 * @return void
 	 */
 	protected function createAttachRecords($ids, array $attributes)

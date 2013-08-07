@@ -15,7 +15,6 @@ class CompilerEngine extends PhpEngine {
 	 * Create a new Blade view engine instance.
 	 *
 	 * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
-	 * @return void
 	 */
 	public function __construct(CompilerInterface $compiler)
 	{
@@ -25,8 +24,7 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * Get the evaluated contents of the view.
 	 *
-	 * @param  \Illuminate\View\Environment  $environment
-	 * @param  string  $view
+	 * @param  string  $path
 	 * @param  array   $data
 	 * @return string
 	 */

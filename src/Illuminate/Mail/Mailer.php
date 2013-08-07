@@ -58,7 +58,6 @@ class Mailer {
 	 *
 	 * @param  \Illuminate\View\Environment  $views
 	 * @param  Swift_Mailer  $swift
-	 * @return void
 	 */
 	public function __construct(Environment $views, Swift_Mailer $swift)
 	{
@@ -252,6 +251,7 @@ class Mailer {
 	 *
 	 * @param  string|array  $view
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseView($view)
 	{
@@ -315,6 +315,7 @@ class Mailer {
 	 * @param  Closure|string  $callback
 	 * @param  \Illuminate\Mail\Message  $message
 	 * @return void
+	 * @throws \InvalidArgumentException
 	 */
 	protected function callMessageBuilder($callback, $message)
 	{

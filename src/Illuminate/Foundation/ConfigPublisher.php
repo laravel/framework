@@ -30,7 +30,6 @@ class ConfigPublisher {
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $publishPath
-	 * @return void
 	 */
 	public function __construct(Filesystem $files, $publishPath)
 	{
@@ -82,6 +81,7 @@ class ConfigPublisher {
 	 * @param  string  $name
 	 * @param  string  $packagePath
 	 * @return string
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getSource($package, $name, $packagePath)
 	{

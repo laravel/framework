@@ -21,7 +21,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Create a new collection.
 	 *
 	 * @param  array  $items
-	 * @return void
 	 */
 	public function __construct(array $items = array())
 	{
@@ -329,6 +328,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function slice($offset, $length = null, $preserveKeys = false)
 	{
 		return new static(array_slice($this->items, $offset, $length, $preserveKeys));
+	}
+
+	/**
+	 * Splice portion of the underlying collection array.
+	 *
+	 * @param  int    $offset
+	 * @param  int    $length
+	 * @param  mixed  $replacement
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function splice($offset, $length = 0, $replacement = array())
+	{
+		array_splice($this->items, $offset, $length, $replacement);
 	}
 
 	/**

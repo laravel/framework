@@ -27,7 +27,6 @@ class BootstrapPresenter {
 	 * Create a new Bootstrap presenter instance.
 	 *
 	 * @param  \Illuminate\Pagination\Paginator  $paginator
-	 * @return void
 	 */
 	public function __construct(Paginator $paginator)
 	{

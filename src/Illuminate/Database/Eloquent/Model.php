@@ -206,7 +206,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Create a new Eloquent model instance.
 	 *
 	 * @param  array  $attributes
-	 * @return void
 	 */
 	public function __construct(array $attributes = array())
 	{
@@ -274,6 +273,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  array  $attributes
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @throws MassAssignmentException
 	 */
 	public function fill(array $attributes)
 	{
@@ -412,6 +412,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  mixed  $id
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 * @throws ModelNotFoundException
 	 */
 	public static function findOrFail($id, $columns = array('*'))
 	{
@@ -1068,6 +1069,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Finish processing on a successful save operation.
 	 *
+	 * @param  array  $options
 	 * @return void
 	 */
 	protected function finishSave(array $options)
@@ -1857,7 +1859,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			// If the relationships snake-casing is enabled, we will snake case this
 			// key so that the relation attribute is snake cased in this returned
-			// array to the developer, making this consisntent with attributes.
+			// array to the developers, making this consistent with attributes.
 			if (static::$snakeAttributes)
 			{
 				$key = snake_case($key);
@@ -2122,7 +2124,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		// If the value is in simply year, month, day format, we will instantiate the
-		// Carbon instances from that fomrat. Again, this provides for simple date
+		// Carbon instances from that format. Again, this provides for simple date
 		// fields on the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{

@@ -22,7 +22,6 @@ class HtmlBuilder {
 	 * Create a new HTML builder instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
-	 * @return void
 	 */
 	public function __construct(UrlGenerator $url = null)
 	{
@@ -393,6 +392,7 @@ class HtmlBuilder {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{

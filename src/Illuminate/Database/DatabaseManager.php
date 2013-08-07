@@ -38,7 +38,6 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
-	 * @return void
 	 */
 	public function __construct($app, ConnectionFactory $factory)
 	{
@@ -141,6 +140,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getConfig($name)
 	{
