@@ -1799,7 +1799,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Call a class baesd validator extension.
+	 * Call a class based validator extension.
 	 *
 	 * @param  string  $callback
 	 * @param  array   $parameters
