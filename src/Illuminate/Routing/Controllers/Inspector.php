@@ -78,6 +78,7 @@ class Inspector {
 	 * Get the method data for a given method.
 	 *
 	 * @param  ReflectionMethod  $method
+	 * @param  string  $prefix
 	 * @return array
 	 */
 	public function getMethodData(ReflectionMethod $method, $prefix)

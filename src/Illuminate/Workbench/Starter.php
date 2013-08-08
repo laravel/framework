@@ -6,6 +6,7 @@ class Starter {
 	 * Load the workbench vendor auto-load files.
 	 *
 	 * @param  string  $path
+	 * @param  \Symfony\Component\Finder  $finder
 	 * @param  \Illuminate\Filesystem  $files
 	 * @return void
 	 */

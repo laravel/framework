@@ -91,7 +91,6 @@ class Environment {
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
 	 * @param  \Illuminate\View\ViewFinderInterface  $finder
 	 * @param  \Illuminate\Events\Dispatcher  $events
-	 * @return void
 	 */
 	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
 	{

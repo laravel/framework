@@ -15,7 +15,6 @@ class MultiConnection implements ConnectionInterface {
 	 * The array of connections.
 	 *
 	 * @param  array  $connections
-	 * @return void
 	 */
 	public function __construct(array $connections)
 	{

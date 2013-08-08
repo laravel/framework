@@ -32,7 +32,7 @@ class SecLibGateway implements GatewayInterface {
 	 *
 	 * @param  string  $host
 	 * @param  array   $auth
-	 * @return void
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 */
 	public function __construct($host, array $auth, Filesystem $files)
 	{
@@ -114,6 +114,7 @@ class SecLibGateway implements GatewayInterface {
 	 * Get the authentication object for login.
 	 *
 	 * @return \Crypt_RSA|string
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getAuthForLogin()
 	{

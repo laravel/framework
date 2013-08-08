@@ -28,7 +28,6 @@ class JoinClause {
 	 *
 	 * @param  string  $type
 	 * @param  string  $table
-	 * @return void
 	 */
 	public function __construct($type, $table)
 	{

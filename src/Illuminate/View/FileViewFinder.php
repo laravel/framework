@@ -38,7 +38,6 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  array  $paths
 	 * @param  array  $extensions
-	 * @return void
 	 */
 	public function __construct(Filesystem $files, array $paths, array $extensions = null)
 	{
@@ -82,6 +81,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getNamespaceSegments($name)
 	{
@@ -106,6 +106,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @param  string  $name
 	 * @param  array   $paths
 	 * @return string
+	 * @throws \InvalidArgumentException
 	 */
 	protected function findInPaths($name, $paths)
 	{

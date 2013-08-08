@@ -15,7 +15,6 @@ class Worker {
 	 * Create a new queue worker.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
-	 * @return void
 	 */
 	public function __construct(QueueManager $manager)
 	{
@@ -57,6 +56,7 @@ class Worker {
 	 * @param  \Illuminate\Queue\Jobs\Job  $job
 	 * @param  int  $delay
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function process(Job $job, $delay)
 	{

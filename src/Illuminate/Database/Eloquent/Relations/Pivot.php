@@ -39,7 +39,6 @@ class Pivot extends Model {
 	 * @param  array   $attributes
 	 * @param  string  $table
 	 * @param  bool    $exists
-	 * @return void
 	 */
 	public function __construct(Model $parent, $attributes, $table, $exists = false)
 	{

@@ -108,7 +108,6 @@ class Validator implements MessageProviderInterface {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
-	 * @return void
 	 */
 	public function __construct(TranslatorInterface $translator, $data, $rules, $messages = array())
 	{
@@ -1658,6 +1657,7 @@ class Validator implements MessageProviderInterface {
 	 * Get the Presence Verifier implementation.
 	 *
 	 * @return \Illuminate\Validation\PresenceVerifierInterface
+	 * @throws \RuntimeException
 	 */
 	public function getPresenceVerifier()
 	{
@@ -1799,7 +1799,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Call a class baesd validator extension.
+	 * Call a class based validator extension.
 	 *
 	 * @param  string  $callback
 	 * @param  array   $parameters
@@ -1818,6 +1818,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{

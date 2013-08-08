@@ -69,7 +69,6 @@ class Environment {
 	 * @param  \Illuminate\View\Environment  $view
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
-	 * @return void
 	 */
 	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageName = 'page')
 	{

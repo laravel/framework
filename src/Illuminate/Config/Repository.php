@@ -46,7 +46,6 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 *
 	 * @param  \Illuminate\Config\LoaderInterface  $loader
 	 * @param  string  $environment
-	 * @return void
 	 */
 	public function __construct(LoaderInterface $loader, $environment)
 	{
@@ -132,7 +131,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Load the configuration group for the key.
 	 *
-	 * @param  string  $key
+	 * @param  string  $group
 	 * @param  string  $namespace
 	 * @param  string  $collection
 	 * @return void
@@ -201,6 +200,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Parse the segments of a package namespace.
 	 *
+	 * @param  string  $key
 	 * @param  string  $namespace
 	 * @param  string  $item
 	 * @return array

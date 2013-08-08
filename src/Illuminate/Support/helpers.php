@@ -6,7 +6,7 @@ if ( ! function_exists('action'))
 	 * Generate a URL to a controller action.
 	 *
 	 * @param  string  $name
-	 * @param  string  $parameters
+	 * @param  array   $parameters
 	 * @param  bool    $absolute
 	 * @return string
 	 */
@@ -401,6 +401,7 @@ if ( ! function_exists('base_path'))
 	/**
 	 * Get the path to the base of the install.
 	 *
+	 * @param  string  $path
 	 * @return string
 	 */
 	function base_path($path = '')
@@ -445,6 +446,7 @@ if ( ! function_exists('csrf_token'))
 	 * Get the CSRF token value.
 	 *
 	 * @return string
+	 * @throws RuntimeException
 	 */
 	function csrf_token()
 	{
@@ -633,6 +635,7 @@ if ( ! function_exists('public_path'))
 	/**
 	 * Get the path to the public folder.
 	 *
+	 * @param  string  $path
 	 * @return string
 	 */
 	function public_path($path = '')
@@ -647,7 +650,7 @@ if ( ! function_exists('route'))
 	 * Generate a URL to a named route.
 	 *
 	 * @param  string  $route
-	 * @param  string  $parameters
+	 * @param  array   $parameters
 	 * @param  bool    $absolute
 	 * @return string
 	 */
@@ -721,6 +724,7 @@ if ( ! function_exists('storage_path'))
 	/**
 	 * Get the path to the storage folder.
 	 *
+	 * @param   string  $path
 	 * @return  string
 	 */
 	function storage_path($path = '')

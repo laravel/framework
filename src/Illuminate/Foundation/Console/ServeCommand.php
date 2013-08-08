@@ -45,6 +45,7 @@ class ServeCommand extends Command {
 	 * Check the current PHP version is >= 5.4.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	protected function checkPhpVersion()
 	{

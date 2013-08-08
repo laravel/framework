@@ -13,7 +13,6 @@ class WinCacheStore implements StoreInterface {
 	 * Create a new WinCache store.
 	 *
 	 * @param  string     $prefix
-	 * @return void
 	 */
 	public function __construct($prefix = '')
 	{

@@ -284,6 +284,7 @@ class Controller {
 	 *
 	 * @param  array  $parameters
 	 * @return mixed
+	 * @throws NotFoundHttpException
 	 */
 	public function missingMethod($parameters)
 	{

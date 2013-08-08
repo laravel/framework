@@ -22,7 +22,6 @@ class QueueManager {
 	 * Create a new queue manager instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
 	 */
 	public function __construct($app)
 	{
@@ -70,6 +69,7 @@ class QueueManager {
 	 *
 	 * @param  string  $driver
 	 * @return \Illuminate\Queue\Connectors\ConnectorInterface
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getConnector($driver)
 	{

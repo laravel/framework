@@ -26,7 +26,6 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $type
 	 * @param  string  $id
-	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent, $type, $id)
 	{

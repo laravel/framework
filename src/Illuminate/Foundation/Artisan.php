@@ -25,7 +25,6 @@ class Artisan {
 	 * Create a new Artisan command runner instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
 	 */
 	public function __construct(Application $app)
 	{

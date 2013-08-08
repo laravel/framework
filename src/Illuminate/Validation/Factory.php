@@ -53,7 +53,6 @@ class Factory {
 	 *
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(TranslatorInterface $translator, Container $container = null)
 	{

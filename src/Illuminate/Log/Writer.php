@@ -43,7 +43,6 @@ class Writer {
 	 *
 	 * @param  \Monolog\Logger  $monolog
 	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
-	 * @return void
 	 */
 	public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
 	{
@@ -89,6 +88,7 @@ class Writer {
 	 *
 	 * @param  string  $level
 	 * @return int
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseLevel($level)
 	{
@@ -139,6 +139,7 @@ class Writer {
 	 *
 	 * @param  Closure  $callback
 	 * @return void
+	 * @throws \RuntimeException
 	 */
 	public function listen(Closure $callback)
 	{
@@ -175,7 +176,8 @@ class Writer {
 	 * Fires a log event.
 	 *
 	 * @param  string  $level
-	 * @param  array   $parameters
+	 * @param  string  $message
+	 * @param  array   $context
 	 * @return void
 	 */
 	protected function fireLogEvent($level, $message, array $context = array())
@@ -195,6 +197,7 @@ class Writer {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{

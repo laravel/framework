@@ -112,7 +112,6 @@ class Router {
 	 * Create a new router instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(Container $container = null)
 	{
@@ -586,7 +585,7 @@ class Router {
 	 * Get the name for a given resource.
 	 *
 	 * @param  string  $resource
-	 * @param  string  $name
+	 * @param  string  $method
 	 * @return string
 	 */
 	protected function getResourceName($resource, $method)
@@ -742,6 +741,7 @@ class Router {
 	 *
 	 * @param  mixed  $action
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseAction($action)
 	{
@@ -1339,6 +1339,7 @@ class Router {
 	 *
 	 * @param  string  $key
 	 * @param  string  $class
+	 * @param  Closure $callback
 	 * @return void
 	 */
 	public function model($key, $class, Closure $callback = null)
@@ -1419,8 +1420,9 @@ class Router {
 	/**
 	 * Convert routing exception to HttpKernel version.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return void
+	 * @throws NotFoundHttpException|MethodNotAllowedHttpException
 	 */
 	protected function handleRoutingException(\Exception $e)
 	{

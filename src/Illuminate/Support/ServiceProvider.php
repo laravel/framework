@@ -22,7 +22,6 @@ abstract class ServiceProvider {
 	 * Create a new service provider instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
 	 */
 	public function __construct($app)
 	{
@@ -120,7 +119,7 @@ abstract class ServiceProvider {
 	/**
 	 * Get a class from the ReflectionClass inheritance chain.
 	 *
-	 * @param  ReflectionClass  $reflection
+	 * @param  ReflectionClass  $reflect
 	 * @return array
 	 */
 	protected function getClassChain(ReflectionClass $reflect)

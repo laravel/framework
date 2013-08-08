@@ -94,7 +94,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 * Create a new Illuminate application instance.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
 	 */
 	public function __construct(Request $request = null)
 	{
@@ -603,6 +602,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Call the booting callbacks for the application.
 	 *
+	 * @param  array  $callbacks
 	 * @return void
 	 */
 	protected function fireAppCallbacks(array $callbacks)
@@ -670,6 +670,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 * @param  string  $message
 	 * @param  array   $headers
 	 * @return void
+	 * @throws NotFoundHttpException|HttpException
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{

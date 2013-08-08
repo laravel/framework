@@ -23,6 +23,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @return string
+	 * @throws FileNotFoundException
 	 */
 	public function get($path)
 	{
@@ -47,6 +48,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @return mixed
+	 * @throws FileNotFoundException
 	 */
 	public function getRequire($path)
 	{

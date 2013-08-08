@@ -29,7 +29,6 @@ abstract class Manager {
 	 * Create a new manager instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
 	 */
 	public function __construct($app)
 	{
@@ -62,6 +61,7 @@ abstract class Manager {
 	 *
 	 * @param  string  $driver
 	 * @return mixed
+	 * @throws \InvalidArgumentException
 	 */
 	protected function createDriver($driver)
 	{

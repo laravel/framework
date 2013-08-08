@@ -36,7 +36,6 @@ class Encrypter {
 	 * Create a new encrypter instance.
 	 *
 	 * @param  string  $key
-	 * @return void
 	 */
 	public function __construct($key)
 	{
@@ -114,6 +113,7 @@ class Encrypter {
 	 *
 	 * @param  string  $payload
 	 * @return array
+	 * @throws DecryptException
 	 */
 	protected function getJsonPayload($payload)
 	{

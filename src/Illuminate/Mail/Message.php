@@ -17,7 +17,6 @@ class Message {
 	 * Create a new message instance.
 	 *
 	 * @param  Swift_Message  $swift
-	 * @return void
 	 */
 	public function __construct($swift)
 	{
@@ -118,6 +117,7 @@ class Message {
 	 *
 	 * @param  string|array  $address
 	 * @param  string  $name
+	 * @param  string  $type
 	 * @return \Illuminate\Mail\Message
 	 */
 	protected function addAddresses($address, $name, $type)

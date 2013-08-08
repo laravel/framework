@@ -83,6 +83,7 @@ class SessionManager extends Manager {
 	/**
 	 * Get the database session options.
 	 *
+	 * @param  string  $table
 	 * @return array
 	 */
 	protected function getDatabaseOptions($table)
@@ -133,6 +134,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of a cache driven driver.
 	 *
+	 * @param  string  $driver
 	 * @return \Illuminate\Session\CacheDrivenStore
 	 */
 	protected function createCacheBased($driver)
