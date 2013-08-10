@@ -10,13 +10,22 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testHasGroupIndicatesIfConfigGroupExists()
-	{
-		$config = $this->getRepository();
-		$config->getLoader()->shouldReceive('exists')->once()->with('group', 'namespace')->andReturn(false);
-		$this->assertFalse($config->hasGroup('namespace::group'));
-	}
+    public function testHasGroupIndicatesIfConfigGroupExists()
+    {
+        $config = $this->getRepository();
+        $config->getLoader()->shouldReceive('exists')->once()->with('group', 'namespace')->andReturn(false);
+        $this->assertFalse($config->hasGroup('namespace::group'));
+    }
 
+    public function testHasOnTrueReturnsTrue()
+    {
+        $config = $this->getRepository();
+        $options = $this->getDummyOptions();
+        $config->getLoader()->shouldReceive('load')->once()->with('production', 'app', null)->andReturn($options);
+
+        $this->assertTrue($config->has('app.bing'));
+        $this->assertEquals(true,$config->get('app.bing'));
+    }
 
 	public function testGetReturnsBasicItems()
 	{
@@ -128,7 +137,7 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	protected function getDummyOptions()
 	{
-		return array('foo' => 'bar', 'baz' => array('boom' => 'breeze'));
+		return array('foo' => 'bar', 'baz' => array('boom' => 'breeze'), 'bing' => true);
 	}
 
 }
