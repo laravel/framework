@@ -25,9 +25,9 @@ class MemcachedStore implements StoreInterface {
 	 * @param  string     $prefix
 	 * @return void
 	 */
-	public function __construct(Memcached $memcached, $prefix = '')
+	public function __construct(Memcached $memcached, $prefix = null)
 	{
-		$this->prefix = $prefix.':';
+		$this->prefix = is_null($prefix) ? null : $prefix.':';
 		$this->memcached = $memcached;
 	}
 
