@@ -637,6 +637,69 @@ class Router {
 	}
 
 	/**
+	 * Redirect requests to an outdated path to a new path.
+	 * @param  string  $oldUri
+	 * @param  string  $newUri
+	 * @param  integer $statusCode
+	 * @param  array   $headers
+	 * @param  mixed   $secure
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function redirect($oldUri, $newUri, $statusCode = 301, $headers = array(), $secure = null)
+	{
+		$redirector = $this->container->make('redirect');
+
+		return $this->get($oldUri, function() use($redirector, $newUri, $statusCode, $headers, $secure) {
+			return $redirector->to($newUri, $statusCode, $headers, $secure);
+		});
+	}
+
+	/**
+	 * Redirect requests to an outdated secure path to a new secure path.
+	 * @param  string  $oldUri
+	 * @param  string  $newUri
+	 * @param  integer $statusCode
+	 * @param  array   $headers
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function redirectSecure($oldUri, $newUri, $statusCode = 301, $headers = array())
+	{
+		return $this->redirect($oldUri, $newUri, $statusCode, $headers, true);
+	}
+
+	/**
+	 * Redirect requests to an outdated path to a named route.
+	 * @param  string  $oldUri
+	 * @param  string  $route
+	 * @param  integer $statusCode
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function redirectRoute($oldUri, $route, $parameters = array(), $statusCode = 301, $headers = array())
+	{
+		$redirector = $this->container->make('redirect');
+
+		return $this->get($oldUri, function() use($redirector, $route, $parameters, $statusCode, $headers) {
+			return $redirector->route($route, $parameters, $statusCode, $headers);
+		});
+	}
+
+	/**
+	 * Redirect requests to an outdated path to a controller action.
+	 * @param  string  $oldUri
+	 * @param  string  $action
+	 * @param  integer $statusCode
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function redirectAction($oldUri, $action, $parameters = array(), $statusCode = 301, $headers = array())
+	{
+		$redirector = $this->container->make('redirect');
+
+		return $this->get($oldUri, function() use($redirector, $action, $parameters, $statusCode, $headers) {
+			return $redirector->action($action, $parameters, $statusCode, $headers);
+		});
+	}
+
+	/**
 	 * Create a route group with shared attributes.
 	 *
 	 * @param  array    $attributes

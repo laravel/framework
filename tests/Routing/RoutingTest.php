@@ -208,6 +208,99 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUriRedirection()
+	{
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('to')->with('/foo', 301, array(), null)->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirect('/old-foo', '/foo');
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('to')->with('/foo', 302, array(), null)->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirect('/old-foo', '/foo', 302);
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('to')->with('/foo', 301, array(), true)->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirectSecure('/old-foo', '/foo');
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testNamedRouteRedirection()
+	{
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('route')->with('foo', array(), 301, array())->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirectRoute('/old-foo', 'foo');
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('route')->with('foo', 'bar', 301, array())->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirectRoute('/old-foo', 'foo', 'bar');
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('route')->with('foo', array(), 302, array())->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirectRoute('/old-foo', 'foo', array(), 302);
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+	}
+
+
+	public function testActionRedirection()
+	{
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('action')->with('FooController@bar', array(), 301, array())->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirectAction('/old-foo', 'FooController@bar');
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('action')->with('FooController@bar', 'bar', 301, array())->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirectAction('/old-foo', 'FooController@bar', 'bar');
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+
+		$redirector = m::mock('Illuminate\Routing\Redirector');
+		$redirector->shouldReceive('action')->with('FooController@bar', array(), 302, array())->once()->andReturn('baz');
+		$container = m::mock('Illuminate\Container\Container');
+		$container->shouldReceive('make')->with('redirect')->once()->andReturn($redirector);
+		$router = new Router($container);
+		$router->redirectAction('/old-foo', 'FooController@bar', array(), 302);
+		$request = Request::create('/old-foo', 'GET');
+		$this->assertEquals('baz', $router->dispatch($request)->getContent());
+	}
+
+
 	public function testGlobalBeforeFiltersHaltRequestCycle()
 	{
 		$router = new Router;
