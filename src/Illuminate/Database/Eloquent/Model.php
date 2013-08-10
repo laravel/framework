@@ -1866,7 +1866,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// If the relation value has been set, we will set it on this attributes
 			// list for returning. If it was not arrayable or null, we'll not set
 			// the value on the array because it is some type of invalid value.
-			if (isset($relation))
+			if (isset($relation) or is_null($value))
 			{
 				$attributes[$key] = $relation;
 			}
