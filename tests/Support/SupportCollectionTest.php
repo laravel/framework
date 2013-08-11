@@ -161,9 +161,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		{
 			if ($a === $b)
 			{
-		        return 0;
-		    }
-		    return ($a < $b) ? -1 : 1;
+				return 0;
+			}
+			return ($a < $b) ? -1 : 1;
 		});
 
 		$this->assertEquals(range(1, 5), array_values($data->all()));
@@ -247,6 +247,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data = new Collection(array('foo', 'baz'));
 		$data->splice(1, 1, 'bar');
 		$this->assertEquals(array('foo', 'bar'), array_values($data->all()));
+	}
+
+	public function testMap()
+	{
+		$data = new Collection(array(1 => 'foo', 2 => 'bar'));
+		$data = $data->map(function($value, $key) {
+			return $key;
+		});
+
+		$this->assertEquals(array(1, 2), $data->all());
 	}
 
 }
