@@ -39,6 +39,8 @@ class RedisStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
+		$key = $this->convertNamespace($key);
+		
 		if ( ! is_null($value = $this->redis->get($this->prefix.$key)))
 		{
 			return is_numeric($value) ? $value : unserialize($value);
@@ -55,6 +57,8 @@ class RedisStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
+		$key = $this->convertNamespace($key);
+		
 		$value = is_numeric($value) ? $value : serialize($value);
 
 		$this->redis->set($this->prefix.$key, $value);
@@ -71,6 +75,8 @@ class RedisStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
+		$key = $this->convertNamespace($key);
+		
 		return $this->redis->incrby($this->prefix.$key, $value);
 	}
 
@@ -83,6 +89,8 @@ class RedisStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
+		$key = $this->convertNamespace($key);
+		
 		return $this->redis->decrby($this->prefix.$key, $value);
 	}
 
@@ -95,6 +103,8 @@ class RedisStore implements StoreInterface {
 	 */
 	public function forever($key, $value)
 	{
+		$key = $this->convertNamespace($key);
+		
 		$value = is_numeric($value) ? $value : serialize($value);
 
 		$this->redis->set($this->prefix.$key, $value);
@@ -108,6 +118,8 @@ class RedisStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
+		$key = $this->convertNamespace($key);
+		
 		$this->redis->del($this->prefix.$key);
 	}
 
@@ -150,6 +162,17 @@ class RedisStore implements StoreInterface {
 	public function getPrefix()
 	{
 		return $this->prefix;
+	}
+	
+	/**
+	 * Converts backslashes "\" to ":" for namespacing.
+	 * 
+	 * @param  string  $key
+	 * @return string
+	 */
+	public function convertNamespace($key)
+	{
+		return str_replace('\\', ':', $key);
 	}
 
 }
