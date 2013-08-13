@@ -84,6 +84,12 @@ class DatabaseManager implements ConnectionResolverInterface {
 			return call_user_func($this->extensions[$name], $config);
 		}
 
+		$driver = $config['driver'];
+		if (isset($this->extensions[$driver]))
+		{
+			return call_user_func($this->extensions[$driver], $config);
+		}
+
 		return $this->factory->make($config);
 	}
 
