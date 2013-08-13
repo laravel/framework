@@ -16,6 +16,7 @@ use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Contracts\ResponsePreparerInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirect;
 
-class Application extends Container implements HttpKernelInterface, ResponsePreparerInterface {
+class Application extends Container implements HttpKernelInterface, TerminableInterface, ResponsePreparerInterface {
 
 	/**
 	 * The Laravel framework version.
@@ -488,12 +489,21 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		if (is_null($callback))
 		{
-			$this->fireAppCallbacks($this->shutdownCallbacks);
+			// do nothing... this is now handled by run()
+			// empty shutdown() is just kept for BC
 		}
 		else
 		{
 			$this->shutdownCallbacks[] = $callback;
 		}
+	}
+
+	public function terminate(SymfonyRequest $request, SymfonyResponse $response)
+	{
+		$laravelRequest = $this->createLaravelRequest($request);
+
+		$this['router']->callFinishFilter($laravelRequest, $response);
+		$this->fireAppCallbacks($this->shutdownCallbacks);
 	}
 
 	/**
@@ -503,13 +513,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function run()
 	{
-		$response = $this->dispatch($this['request']);
-
-		$this['router']->callCloseFilter($this['request'], $response);
-
+		$request = Request::createFromGlobals();
+		$response = $this->handle($request);
 		$response->send();
 
-		$this['router']->callFinishFilter($this['request'], $response);
+		$this->terminate($request, $response);
 	}
 
 	/**
@@ -526,8 +534,23 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
-		
+
 		return $this['router']->dispatch($this->prepareRequest($request));
+	}
+
+	private function createLaravelRequest(SymfonyRequest $request)
+	{
+		$laravelRequest = new Request();
+		$laravelRequest = $laravelRequest->duplicate(
+			$request->query->all(),
+			$request->request->all(),
+			$request->attributes->all(),
+			$request->cookies->all(),
+			$request->files->all(),
+			$request->server->all()
+		);
+
+		return new $laravelRequest;
 	}
 
 	/**
@@ -544,11 +567,15 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
-		$this->instance('request', $request);
+		$laravelRequest = $this->createLaravelRequest($request);
 
+		$this->instance('request', $laravelRequest);
 		Facade::clearResolvedInstance('request');
 
-		return $this->dispatch($request);
+		$response = $this->dispatch($this['request']);
+		$this['router']->callCloseFilter($this['request'], $response);
+
+		return $response;
 	}
 
 	/**
