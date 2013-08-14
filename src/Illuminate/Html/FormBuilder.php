@@ -788,7 +788,12 @@ class FormBuilder {
 	{
 		if (is_array($options))
 		{
-			return $this->url->route($options[0], array_slice($options, 1));
+			$args = array_slice($options, 1);
+			if (isset($args[0])) {
+				$args = $args[0];
+			}
+			
+			return $this->url->route($options[0], $args);
 		}
 
 		return $this->url->route($options);
