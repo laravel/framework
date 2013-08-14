@@ -995,7 +995,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function update(array $attributes = array())
 	{
-		if ($this->exists)
+		if ( ! $this->exists)
 		{
 			return $this->newQuery()->update($attributes);
 		}
