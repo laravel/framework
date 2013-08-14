@@ -244,4 +244,16 @@ class Manager {
 		$this->container = $container;
 	}
 
+	/**
+	 * Dynamically pass methods to the default connection.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public static function __callStatic($method, $parameters)
+	{
+		return call_user_func_array(array(static::connection(), $method), $parameters);
+	}
+
 }
