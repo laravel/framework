@@ -190,7 +190,9 @@ class Mailer {
 	 */
 	protected function buildQueueCallable($callback)
 	{
-		if ( ! $callback instanceof Closure) return $callback;
+		if ( ! $callback instanceof Closure) {
+			 return $callback;
+		}
 
 		return serialize(new SerializableClosure($callback));
 	}
@@ -202,7 +204,7 @@ class Mailer {
 	 * @param  array  $data
 	 * @return void
 	 */
-	public function handleQueuedMessage($job, $data)
+	public function handleQueuedMessage($job, array $data)
 	{
 		$this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
 
@@ -234,7 +236,7 @@ class Mailer {
 	 * @param  array   $data
 	 * @return void
 	 */
-	protected function addContent($message, $view, $plain, $data)
+	protected function addContent($message, $view, $plain, array $data)
 	{
 		if (isset($view))
 		{
@@ -255,7 +257,9 @@ class Mailer {
 	 */
 	protected function parseView($view)
 	{
-		if (is_string($view)) return array($view, null);
+		if (is_string($view)) {
+			return array($view, null);
+		}
 
 		// If the given view is an array with numeric keys, we will just assume that
 		// both a "pretty" and "plain" view were provided, so we will return this
@@ -357,7 +361,7 @@ class Mailer {
 	 * @param  array   $data
 	 * @return \Illuminate\View\View
 	 */
-	protected function getView($view, $data)
+	protected function getView($view, array $data)
 	{
 		return $this->views->make($view, $data)->render();
 	}
