@@ -828,11 +828,22 @@ class Builder {
 	 * @param  int  $value
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function skip($value)
+	public function offset($value)
 	{
 		$this->offset = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Alias to set the "offset" value of the query.
+	 *
+	 * @param  int  $value
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function skip($value)
+	{
+		return $this->offset($value);
 	}
 
 	/**
@@ -841,11 +852,22 @@ class Builder {
 	 * @param  int  $value
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function take($value)
+	public function limit($value)
 	{
 		if ($value > 0) $this->limit = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Alias to set the "limit" value of the query.
+	 *
+	 * @param  int  $value
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function take($value)
+	{
+		return $this->limit($value);
 	}
 
 	/**
@@ -873,7 +895,7 @@ class Builder {
 		{
 			call_user_func($query, $query = $this->newQuery());
 		}
-		
+
 		$this->unions[] = compact('query', 'all');
 
 		return $this->mergeBindings($query);
