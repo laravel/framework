@@ -1791,7 +1791,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$attributes = $this->attributesToArray();
 
-		return array_merge($attributes, $this->relationsToArray());
+		return array_merge($this->relationsToArray(), $attributes);
 	}
 
 	/**
