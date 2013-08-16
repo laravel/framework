@@ -93,12 +93,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The attributes that should be visible in arrays.
 	 *
-	 * @var arrays
+	 * @var array
 	 */
 	protected $visible = array();
 
 	/**
 	 * The accessors to append to the model's array form.
+	 * 
+	 * @var array
 	 */
 	protected $appends = array();
 
