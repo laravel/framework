@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
+use Closure;
 use DateTime;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -31,10 +32,17 @@ abstract class Relation {
 	protected $related;
 
 	/**
+	 * Indicates if the relation is adding constraints.
+	 *
+	 * @var bool
+	 */
+	protected static $constraints = true;
+
+	/**
 	 * Create a new relation instance.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
-	 * @param  \Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent)
@@ -121,102 +129,6 @@ abstract class Relation {
 	}
 
 	/**
-	 * Remove the original where clause set by the relationship.
-	 *
-	 * The remaining constraints on the query will be reset and returned.
-	 *
-	 * @return array
-	 */
-	public function getAndResetWheres()
-	{
-		// When a model is "soft deleting", the "deleted at" where clause will be the
-		// first where clause on the relationship query, so we will actually clear
-		// the second where clause as that is the lazy loading relations clause.
-		if ($this->hasSoftDeleteClause())
-		{
-			$this->removeSecondWhereClause();
-		}
-
-		// When the model isn't soft deleting the where clause added by the lazy load
-		// relation query will be the first where clause on this query, so we will
-		// remove that to make room for the eager load constraints on the query.
-		else
-		{
-			$this->removeFirstWhereClause();
-		}
-
-		return $this->getBaseQuery()->getAndResetWheres();
-	}
-
-	/**
-	 * Determine if the base query has a soft delete clause.
-	 *
-	 * @return  bool
-	 */
-	protected function hasSoftDeleteClause()
-	{
-		$deleting = $this->query->getModel()->isSoftDeleting();
-
-		return ($deleting and count($this->getBaseQuery()->wheres) >= 2);
-	}
-
-	/**
-	 * Remove the first where clause from the relationship query.
-	 *
-	 * @return void
-	 */
-	protected function removeFirstWhereClause()
-	{
-		$first = array_shift($this->getBaseQuery()->wheres);
-
-		return $this->removeWhereBinding($first);
-	}
-
-	/**
-	 * Remove the second where clause from the relationship query.
-	 *
-	 * @return void
-	 */
-	protected function removeSecondWhereClause()
-	{
-		$wheres =& $this->getBaseQuery()->wheres;
-
-		if (count($wheres) < 2) return;
-
-		// We'll grab the second where clause off of the set of wheres, and then reset
-		// the where clause keys so there are no gaps in the numeric keys. Then we
-		// remove the binding from the query so it doesn't mess things when run.
-		$second = $wheres[1]; unset($wheres[1]);
-
-		$wheres = array_values($wheres);
-
-		return $this->removeWhereBinding($second);
-	}
-
-	/**
-	 * Remove a where clause from the relationship query.
-	 *
-	 * @param  array  $clause
-	 * @return void
-	 */
-	public function removeWhereBinding($clause)
-	{
-		$query = $this->getBaseQuery();
-
-		$bindings = $query->getBindings();
-
-		// When resetting the relation where clause, we want to shift the first element
-		// off of the bindings, leaving only the constraints that the developers put
-		// as "extra" on the relationships, and not original relation constraints.
-		if (array_key_exists('value', $clause))
-		{
-			$bindings = array_slice($bindings, 1);
-		}
-
-		$query->setBindings(array_values($bindings));
-	}
-
-	/**
 	 * Add the constraints for a relationship count query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -229,6 +141,26 @@ abstract class Relation {
 		$key = $this->wrap($this->parent->getQualifiedKeyName());
 
 		return $query->where($this->getForeignKey(), '=', new Expression($key));
+	}
+
+	/**
+	 * Run a callback with constrains disabled on the relation.
+	 *
+	 * @param  \Closure  $callback
+	 * @return mixed
+	 */
+	public static function noConstraints(Closure $callback)
+	{
+		static::$constraints = false;
+
+		// When resetting the relation where clause, we want to shift the first element
+		// off of the bindings, leaving only the constraints that the developers put
+		// as "extra" on the relationships, and not original relation constraints.
+		$results = call_user_func($callback);
+
+		static::$constraints = true;
+
+		return $results;
 	}
 
 	/**
