@@ -186,9 +186,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('getRelation'), $this->getMocks());
 		$builder->setEagerLoads(array('orders' => function($query) { $_SERVER['__eloquent.constrain'] = $query; }));
 		$relation = m::mock('stdClass');
-		$relation->shouldReceive('getAndResetWheres')->once()->andReturn(array(array('wheres'), array('bindings')));
 		$relation->shouldReceive('addEagerConstraints')->once()->with(array('models'));
-		$relation->shouldReceive('mergeWheres')->once()->with(array('wheres'), array('bindings'));
 		$relation->shouldReceive('initRelation')->once()->with(array('models'), 'orders')->andReturn(array('models'));
 		$relation->shouldReceive('get')->once()->andReturn(array('results'));
 		$relation->shouldReceive('match')->once()->with(array('models'), array('results'), 'orders')->andReturn(array('models.matched'));
