@@ -1157,7 +1157,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$message = str_replace(':attribute', $this->getAttribute($attribute), $message);
 
-		if (method_exists($this, $replacer = "replace{$rule}"))
+		if (method_exists($this, $replacer = "replace{$rule}") || is_callable(array($this, $replacer)))
 		{
 			$message = $this->$replacer($message, $attribute, $rule, $parameters);
 		}
