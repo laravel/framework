@@ -498,5 +498,15 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	{
 		return isset($this->sessionStore);
 	}
+	
+	/**
+	 * Returns the raw HTTP request information from php://stdin
+	 * 
+	 * @return string
+	 */
+	public function raw()
+	{
+		return file_get_contents('php://stdin');
+	}
 
 }
