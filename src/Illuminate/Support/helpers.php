@@ -339,7 +339,7 @@ if ( ! function_exists('array_set'))
 	 * @param  array   $array
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array
 	 */
 	function array_set(&$array, $key, $value)
 	{
@@ -363,6 +363,8 @@ if ( ! function_exists('array_set'))
 		}
 
 		$array[array_shift($keys)] = $value;
+
+		return $array;
 	}
 }
 
