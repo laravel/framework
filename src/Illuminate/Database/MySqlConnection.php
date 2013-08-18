@@ -3,6 +3,23 @@
 class MySqlConnection extends Connection {
 
 	/**
+	 * Get the Doctrine DBAL database connection instance.
+	 *
+	 * @return \Doctrine\DBAL\Connection
+	 */
+	public function getDoctrineConnection()
+	{
+		$connection = parent::getDoctrineConnection();
+
+		// Since schema builder explicitely support enum type, 
+		// then we need to ensure Doctrine to map the MySQL enum type to a Doctrine type.
+		// @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/cookbook/mysql-enums.html
+		$connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+
+		return $connection;
+	}
+
+	/**
 	 * Get a schema builder instance for the connection.
 	 *
 	 * @return \Illuminate\Database\Schema\Builder
