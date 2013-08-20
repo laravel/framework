@@ -46,6 +46,9 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($c->isSecure());
 		$this->assertEquals('/domain', $c->getDomain());
 		$this->assertEquals('/path', $c->getPath());
+
+		$c2 = $cookie->makePlain('color2', 'red');
+		$this->assertEquals('red', $c2->getValue());
 	}
 
 
@@ -54,7 +57,9 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$cookie = $this->getCreator();
 		$value = $cookie->getEncrypter()->encrypt('bar');
 		$cookie->getRequest()->cookies->set('foo', $value);
+		$cookie->getRequest()->cookies->set('color', 'red');
 		$this->assertEquals('bar', $cookie->get('foo'));
+		$this->assertEquals('red', $cookie->getPlain('color'));
         $this->assertEquals('zee', $cookie->get('someOtherFoo', 'zee'));
         
 		$cookie = $this->getCreator();
