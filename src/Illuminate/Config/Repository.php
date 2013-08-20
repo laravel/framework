@@ -64,7 +64,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	{
 		$default = microtime(true);
 
-		return $this->get($key, $default) != $default;
+		return $this->get($key, $default) !== $default;
 	}
 
 	/**
@@ -324,7 +324,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	{
 		return $this->loader;
 	}
-	
+
 	/**
 	 * Set the loader implementation.
 	 *
