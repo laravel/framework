@@ -77,6 +77,8 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function reconnect($name = null)
 	{
+		$name = $name ?: $this->getDefaultConnection();
+
 		unset($this->connections[$name]);
 
 		return $this->connection($name);
