@@ -630,6 +630,26 @@ if ( ! function_exists('object_get'))
 	}
 }
 
+if ( ! function_exists('preg_replace_array'))
+{
+	/**
+	 * Replace a given pattern with each value in the array in sequentially.
+	 *
+	 * @param  string  $pattern
+	 * @param  array   $replacements
+	 * @param  string  $subject
+	 * @return string
+	 */
+	function preg_replace_array($pattern, array $replacements, $subject)
+	{
+		return preg_replace_callback($pattern, function($match) use (&$replacements)
+		{
+			return array_shift($replacements);
+
+		}, $subject);
+	}
+}
+
 if ( ! function_exists('public_path'))
 {
 	/**
