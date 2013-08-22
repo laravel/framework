@@ -640,7 +640,7 @@ if ( ! function_exists('preg_replace_array'))
 	 * @param  string  $subject
 	 * @return string
 	 */
-	function preg_replace_array($pattern, array $replacements, $subject)
+	function preg_replace_sub($pattern, &$replacements, $subject)
 	{
 		return preg_replace_callback($pattern, function($match) use (&$replacements)
 		{
