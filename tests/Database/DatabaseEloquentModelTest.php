@@ -426,6 +426,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(null, $array['group']);
 		$this->assertEquals(array(), $array['multi']);
 		$this->assertFalse(isset($array['password']));
+
+		$model->setAppends(array('appendable'));
+		$array = $model->toArray();
+		$this->assertEquals('appended', $array['appendable']);
 	}
 
 
@@ -668,7 +672,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$class = new EloquentModelStub;
 
-		$this->assertEquals(array('list_items', 'password'), $class->getMutatedAttributes());
+		$this->assertEquals(array('list_items', 'password', 'appendable'), $class->getMutatedAttributes());
 	}
 
 
@@ -750,6 +754,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	public function getDates()
 	{
 		return array();
+	}
+	public function getAppendableAttribute()
+	{
+		return 'appended';
 	}
 }
 

@@ -1507,20 +1507,6 @@ class Builder {
 	}
 
 	/**
-	 * Get a copy of the where clauses and bindings in an array.
-	 *
-	 * @return array
-	 */
-	public function getAndResetWheres()
-	{
-		$values = array($this->wheres, $this->bindings);
-
-		list($this->wheres, $this->bindings) = array(null, array());
-
-		return $values;
-	}
-
-	/**
 	 * Remove all of the expressions from a list of bindings.
 	 *
 	 * @param  array  $bindings
