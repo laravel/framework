@@ -34,6 +34,8 @@ class Collection extends BaseCollection {
 
 			$this->items = $query->eagerLoadRelations($this->items);
 		}
+
+		return $this;
 	}
 
 	/**

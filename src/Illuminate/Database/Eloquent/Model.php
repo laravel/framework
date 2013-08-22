@@ -440,6 +440,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$query = $this->newQuery()->with($relations);
 
 		$query->eagerLoadRelations(array($this));
+
+		return $this;
 	}
 
 	/**
