@@ -630,7 +630,7 @@ if ( ! function_exists('object_get'))
 	}
 }
 
-if ( ! function_exists('preg_replace_array'))
+if ( ! function_exists('preg_replace_sub'))
 {
 	/**
 	 * Replace a given pattern with each value in the array in sequentially.
