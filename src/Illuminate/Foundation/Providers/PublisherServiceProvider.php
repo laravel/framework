@@ -114,7 +114,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerViewPublisher()
 	{
-		$this->registerConfigPublishCommand();
+		$this->registerViewPublishCommand();
 
 		$this->app['view.publisher'] = $this->app->share(function($app)
 		{
@@ -140,7 +140,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->app['command.view.publish'] = $this->app->share(function($app)
 		{
-			return new ConfigPublishCommand($app['view.publisher']);
+			return new ViewPublishCommand($app['view.publisher']);
 		});
 	}
 
