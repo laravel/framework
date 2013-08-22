@@ -185,7 +185,7 @@ class PasswordBroker {
 
 		$confirm = $this->getConfirmedPassword();
 
-		return $password and strlen($password) >= 6 and $password == $confirm;
+		return $password and $password == $confirm;
 	}
 
 	/**
