@@ -88,6 +88,13 @@ class Router implements RouteFiltererInterface {
 	protected $groupStack = array();
 
 	/**
+	 * All of the verbs supported by the router.
+	 *
+	 * @var array
+	 */
+	public static $verbs = array('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS');
+
+	/**
 	 * Create a new Router instance.
 	 *
 	 * @param  \Illuminate\Events\Dispatcher  $events
