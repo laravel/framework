@@ -1,336 +1,681 @@
 <?php namespace Illuminate\Routing;
 
-use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Route as BaseRoute;
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Matching\UriValidator;
+use Illuminate\Routing\Matching\HostValidator;
+use Illuminate\Routing\Matching\MethodValidator;
+use Illuminate\Routing\Matching\SchemeValidator;
 
-class Route extends BaseRoute {
+class Route {
 
 	/**
-	 * The router instance.
+	 * The URI pattern the route responds to.
 	 *
-	 * @var  \Illuminate\Routing\Router
+	 * @var string
 	 */
-	protected $router;
+	protected $uri;
 
 	/**
-	 * The matching parameter array.
+	 * The HTTP methods the route responds to.
+	 *
+	 * @var array
+	 */
+	protected $methods;
+
+	/**
+	 * The route action array.
+	 *
+	 * @var array
+	 */
+	protected $action;
+
+	/**
+	 * The default values for the route.
+	 *
+	 * @var array
+	 */
+	protected $defaults = array();
+
+	/**
+	 * The regular expression requirements.
+	 *
+	 * @var array
+	 */
+	protected $wheres = array();
+
+	/**
+	 * The array of matched parameters.
 	 *
 	 * @var array
 	 */
 	protected $parameters;
 
 	/**
-	 * The parsed parameter array.
+	 * The parameter names for the route.
+	 *
+	 * @var array|null
+	 */
+	protected $parameterNames;
+
+	/**
+	 * The regular expression for a wildcard.
+	 *
+	 * @var string
+	 */
+	protected static $wildcard = '([a-zA-Z0-9\.\-_%=]+)';
+
+	/**
+	 * The regular expression for an optional wildcard.
+	 *
+	 * @var string
+	 */
+	protected static $optional = '(?:/([a-zA-Z0-9\.\-_%=]+)';
+
+	/**
+	 * The validators used by the routes.
 	 *
 	 * @var array
 	 */
-	protected $parsedParameters;
+	protected static $validators;
 
 	/**
-	 * Execute the route and return the response.
+	 * Create a new Route instance.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return mixed
-	 */	
-	public function run(Request $request)
-	{
-		$this->parsedParameters = null;
-
-		// We will only call the router callable if no "before" middlewares returned
-		// a response. If they do, we will consider that the response to requests
-		// so that the request "lifecycle" will be easily halted for filtering.
-		$response = $this->callBeforeFilters($request);
-
-		if ( ! isset($response))
-		{
-			$response = $this->callCallable();
-		}
-
-		// If the response is from a filter we want to note that so that we can skip
-		// the "after" filters which should only run when the route method is run
-		// for the incoming request. Otherwise only app level filters will run.
-		else
-		{
-			$fromFilter = true;
-		}
-
-		$response = $this->router->prepare($response, $request);
-
-		// Once we have the "prepared" response, we will iterate through every after
-		// filter and call each of them with the request and the response so they
-		// can perform any final work that needs to be done after a route call.
-		if ( ! isset($fromFilter))
-		{
-			$this->callAfterFilters($request, $response);
-		}
-
-		return $response;
-	}
-
-	/**
-	 * Call the callable Closure attached to the route.
-	 *
-	 * @return mixed
-	 */
-	protected function callCallable()
-	{
-		$variables = array_values($this->getParametersWithoutDefaults());
-
-		return call_user_func_array($this->getOption('_call'), $variables);
-	}
-
-	/**
-	 * Call all of the before filters on the route.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request   $request
-	 * @return mixed
-	 */
-	protected function callBeforeFilters(Request $request)
-	{
-		$before = $this->getAllBeforeFilters($request);
-
-		$response = null;
-
-		// Once we have each middlewares, we will simply iterate through them and call
-		// each one of them with the request. We will set the response variable to
-		// whatever it may return so that it may override the request processes.
-		foreach ($before as $filter)
-		{
-			$response = $this->callFilter($filter, $request);
-
-			if ( ! is_null($response)) return $response;
-		}
-	}
-
-	/**
-	 * Get all of the before filters to run on the route.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return array
-	 */
-	protected function getAllBeforeFilters(Request $request)
-	{
-		$before = $this->getBeforeFilters();
-
-		$patterns = $this->router->findPatternFilters($request->getMethod(), $request->getPathInfo());
-
-		return array_merge($before, $patterns);	
-	}
-
-	/**
-	 * Call all of the "after" filters for a route.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @param  array   $methods
+	 * @param  string  $uri
+	 * @param  \Closure|array  $action
 	 * @return void
 	 */
-	protected function callAfterFilters(Request $request, $response)
+	public function __construct($methods, $uri, $action)
 	{
-		foreach ($this->getAfterFilters() as $filter)
+		$this->uri = $uri;
+		$this->methods = (array) $methods;
+		$this->action = $this->parseAction($action);
+
+		if (isset($this->action['prefix']))
 		{
-			$this->callFilter($filter, $request, array($response));
+			$this->prefix($this->action['prefix']);
 		}
 	}
 
 	/**
-	 * Call a given filter with the parameters.
+	 * Run the route action and return the response.
 	 *
-	 * @param  string  $name
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  array   $params
 	 * @return mixed
 	 */
-	public function callFilter($name, Request $request, array $params = array())
+	public function run()
 	{
-		if ( ! $this->router->filtersEnabled()) return;
+		$parameters = array_filter($this->parameters());
 
-		$merge = array($this->router->getCurrentRoute(), $request);
-
-		$params = array_merge($merge, $params);
-
-		// Next we will parse the filter name to extract out any parameters and adding
-		// any parameters specified in a filter name to the end of the lists of our
-		// parameters, since the ones at the beginning are typically very static.
-		list($name, $params) = $this->parseFilter($name, $params);
-
-		if ( ! is_null($callable = $this->router->getFilter($name)))
-		{
-			return call_user_func_array($callable, $params);
-		}
+		return call_user_func_array($this->action['uses'], $parameters);
 	}
 
 	/**
-	 * Parse a filter name and add any parameters to the array.
+	 * Determine if the route matches given request.
 	 *
-	 * @param  string  $name
-	 * @param  array   $parameters
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return bool
+	 */
+	public function matches(Request $request)
+	{
+		foreach ($this->getValidators() as $validator)
+		{
+			if ( ! $validator->matches($this, $request)) return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get the "before" filters for the route.
+	 *
 	 * @return array
 	 */
-	protected function parseFilter($name, $parameters = array())
+	public function beforeFilters()
 	{
-		if (str_contains($name, ':'))
-		{
-			// If the filter name contains a colon, we will assume that the developer
-			// is passing along some parameters with the name, and we will explode
-			// out the name and paramters, merging the parameters onto the list.
-			$segments = explode(':', $name);
+		if ( ! isset($this->action['before'])) return array();
 
-			$name = $segments[0];
-
-			// We will merge the arguments specified in the filter name into the list
-			// of existing parameters. We'll send them at the end since any values
-			// at the front are usually static such as request, response, route.
-			$arguments = explode(',', $segments[1]);
-
-			$parameters = array_merge($parameters, $arguments);
-		}
-
-		return array($name, $parameters);
+		return $this->parseFilters($this->action['before']);
 	}
 
 	/**
-	 * Get a parameter by name from the route.
+	 * Get the "after" filters for the route.
+	 *
+	 * @return array
+	 */
+	public function afterFilters()
+	{
+		if ( ! isset($this->action['after'])) return array();
+
+		return $this->parseFilters($this->action['after']);
+	}
+
+	/**
+	 * Parse the given filter string.
+	 *
+	 * @param  string  $filters
+	 * @return array
+	 */
+	public static function parseFilters($filters)
+	{
+		return array_build(static::explodeFilters($filters), function($key, $value)
+		{
+			return Route::parseFilter($value);
+		});
+	}
+
+	/**
+	 * Turn the filters into an array if they aren't already.
+	 *
+	 * @param  array|string  $filters
+	 * @return array
+	 */
+	protected static function explodeFilters($filters)
+	{
+		if (is_array($filters)) return static::explodeArrayFilters($filters);
+
+		return explode('|', $filters);
+	}
+
+	/**
+	 * Flatten out an array of filter declarations.
+	 *
+	 * @param  array  $filters
+	 * @return array
+	 */
+	protected static function explodeArrayFilters(array $filters)
+	{
+		$results = array();
+
+		foreach ($filters as $filter)
+		{
+			$results = array_merge($results, explode('|', $filter));
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Parse the given filter into name and parameters.
+	 *
+	 * @param  string  $filter
+	 * @return array
+	 */
+	public static function parseFilter($filter)
+	{
+		if ( ! str_contains($filter, ':')) return array($filter, array());
+
+		return static::parseParameterFilter($filter);
+	}
+
+	/**
+	 * Parse a filter with parameters.
+	 *
+	 * @param  string  $filter
+	 * @return array
+	 */
+	protected static function parseParameterFilter($filter)
+	{
+		list($name, $parameters) = explode(':', $filter, 2);
+
+		return array($name, explode(',', $parameters));
+	}
+
+	/**
+	 * Get a given parameter from the route.
 	 *
 	 * @param  string  $name
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return string
 	 */
-	public function getParameter($name, $default = null)
+	public function parameter($name, $default = null)
 	{
-		return array_get($this->getParameters(), $name, $default);
+		return array_get($this->parameters(), $name) ?: $default;
 	}
 
 	/**
-	 * Get the parameters to the callback.
+	 * Set a parameter to the given value.
+	 *
+	 * @param  string  $name
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function setParameter($name, $value)
+	{
+		$this->parameters();
+
+		$this->parameters[$name] = $value;
+	}
+
+	/**
+	 * Get the key / value list of parameters for the route.
 	 *
 	 * @return array
 	 */
-	public function getParameters()
+	public function parameters()
 	{
-		// If we have already parsed the parameters, we will just return the listing
-		// that we already parsed as some of these may have been resolved through
-		// a binder that uses a database repository and shouldn't be run again.
-		if (isset($this->parsedParameters))
-		{
-			return $this->parsedParameters;
-		}
+		if (isset($this->parameters)) return $this->parameters;
 
-		$variables = $this->compile()->getVariables();
-
-		// To get the parameter array, we need to spin the names of the variables on
-		// the compiled route and match them to the parameters that we got when a
-		// route is matched by the router, as routes instances don't have them.
-		$parameters = array();
-
-		foreach ($variables as $variable)
-		{
-			$parameters[$variable] = $this->resolveParameter($variable);
-		}
-
-		return $this->parsedParameters = $parameters;
+		throw new \LogicException("Route is not bound.");
 	}
 
 	/**
-	 * Resolve a parameter value for the route.
-	 *
-	 * @param  string  $key
-	 * @return mixed
-	 */
-	protected function resolveParameter($key)
-	{
-		$value = $this->parameters[$key];
-
-		// If the parameter has a binder, we will call the binder to resolve the real
-		// value for the parameters. The binders could make a database call to get
-		// a User object for example or may transform the input in some fashion.
-		if ($this->router->hasBinder($key))
-		{
-			return $this->router->performBinding($key, $value, $this);
-		}
-
-		return $value;
-	}
-
-	/**
-	 * Get the route parameters without missing defaults.
+	 * Get the key / value list of parameters without null values.
 	 *
 	 * @return array
 	 */
-	public function getParametersWithoutDefaults()
+	public function parametersWithoutNulls()
 	{
-		$parameters = $this->getParameters();
+        return array_filter($this->parameters(), function($p) { return ! is_null($p); });
+	}
 
-		foreach ($parameters as $key => $value)
+	/**
+	 * Get all of the parameter names for the route.
+	 *
+	 * @return array
+	 */
+	public function parameterNames()
+	{
+		if (isset($this->parameterNames)) return $this->parameterNames;
+
+		return $this->parameterNames = $this->compileParameterNames();
+	}
+
+	/**
+	 * Get the parameter names for the route.
+	 *
+	 * @return array
+	 */
+	protected function compileParameterNames()
+	{
+		preg_match_all('/\{(.*?)\}/', $this->domain().$this->uri, $matches);
+
+		return array_map(function($m) { return trim($m, '?'); }, $matches[1]);
+	}
+
+	/**
+	 * Bind the route to a given request for execution.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function bind(Request $request)
+	{
+		$this->bindParameters($request);
+
+		return $this;
+	}
+
+	/**
+	 * Extract the parameter list from the request.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return array
+	 */
+	public function bindParameters(Request $request)
+	{
+		preg_match($this->fullMatchExpression(), $this->fullMatchPath($request), $matches);
+
+		$parameters = $this->combineMatchesWithKeys(array_slice($matches, 1));
+
+		return $this->parameters = $this->replaceDefaults($parameters);
+	}
+
+	/**
+	 * Combine a set of parameter matches with the route's keys.
+	 *
+	 * @param  array  $matches
+	 * @return array
+	 */
+	protected function combineMatchesWithKeys(array $matches)
+	{
+		return array_combine($this->parameterNames(), $this->padMatches($matches));
+	}
+
+	/**
+	 * Pad an array to the number of keys.
+	 *
+	 * @param  array  $matches
+	 * @return array
+	 */
+	protected function padMatches(array $matches)
+	{
+		return array_pad($matches, count($this->parameterNames()), null);
+	}
+
+	/**
+	 * Replace null parameters with their defaults.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function replaceDefaults(array $parameters)
+	{
+		foreach ($parameters as $key => &$value)
 		{
-			// When calling functions using call_user_func_array, we don't want to write
-			// over any existing default parameters, so we will remove every optional
-			// parameter from the list that did not get a specified value on route.
-			if ($this->isMissingDefault($key, $value))
-			{
-				unset($parameters[$key]);
-			}
+			$value = $value ?: array_get($this->defaults, $key);
 		}
 
 		return $parameters;
 	}
 
 	/**
-	 * Determine if a route parameter is really a missing default.
+	 * Get the full match expression for the route.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return bool
+	 * @return string
 	 */
-	protected function isMissingDefault($key, $value)
+	protected function fullMatchExpression()
 	{
-		return $this->isOptional($key) and is_null($value);
+		$value = trim($this->hostExpression(false).'/'.$this->uriExpression(false), '/');
+
+		return $this->delimit($value ?: '/');
 	}
 
 	/**
-	 * Determine if a given key is optional.
+	 * Get the full match path for the request.
 	 *
-	 * @param  string  $key
-	 * @return bool
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return string
 	 */
-	public function isOptional($key)
+	protected function fullMatchPath($request)
 	{
-		return array_key_exists($key, $this->getDefaults());
+		if (isset($this->action['domain']))
+		{
+			return trim($request->getHost().'/'.$request->path(), '/');			
+		}
+		else
+		{
+			return $request->path();
+		}
 	}
 
 	/**
-	 * Get the keys of the variables on the route.
+	 * Get the regular expression for the host.
+	 *
+	 * @param  bool  $delimit
+	 * @return string|null
+	 */
+	public function hostExpression($delimit = true)
+	{
+		if ( ! isset($this->action['domain'])) return;
+
+		return $this->compileString($this->action['domain'], $delimit, $this->wheres);
+	}
+
+	/**
+	 * Get the regular expression for the URI.
+	 *
+	 * @param  bool  $delimit
+	 * @return string|null
+	 */
+	public function uriExpression($delimit = true)
+	{
+		return $this->compileString($this->uri, $delimit, $this->wheres);
+	}
+
+	/**
+	 * Compile the given route string as a regular expression.
+	 *
+	 * @param  string  $value
+	 * @param  bool  $delimit
+	 * @param  array  $wheres
+	 * @return string
+	 */
+	public static function compileString($value, $delimit = true, array $wheres = array())
+	{
+		$value = static::compileOptional(static::compileParameters($value, $wheres), $wheres);
+
+		return $delimit ? static::delimit($value) : $value;
+	}
+
+	/**
+	 * Compile the wildcards for a given string.
+	 *
+	 * @param  string  $value
+	 * @param  array  $wheres
+	 * @return string
+	 */
+	protected static function compileParameters($value, array $wheres = array())
+	{
+		$value = static::compileWhereParameters($value, $wheres);
+
+		return preg_replace('/\{(.*?)[^?]\}/', static::$wildcard, $value);
+	}
+
+	/**
+	 * Compile the defined "where" parameters.
+	 *
+	 * @param  string  $value
+	 * @param  array  $wheres
+	 * @return string
+	 */
+	protected static function compileWhereParameters($value, array $wheres)
+	{
+		foreach ($wheres as $key => $pattern)
+		{
+			$value = str_replace('{'.$key.'}', '('.$pattern.')', $value);
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Compile the optional wildcards for a given string.
+	 *
+	 * @param  string  $value
+	 * @param  array  $wheres
+	 * @return string
+	 */
+	protected static function compileOptional($value, $wheres = array())
+	{
+		list($value, $custom) = static::compileWhereOptional($value, $wheres);
+
+		return static::compileStandardOptional($value, $custom);
+	}
+
+	/**
+	 * Compile the standard optional wildcards for a given string.
+	 *
+	 * @param  string  $value
+	 * @param  int  $custom
+	 * @return string
+	 */
+	protected static function compileStandardOptional($value, $custom = 0)
+	{
+		$value = preg_replace('/\/\{(.*?)\?\}/', static::$optional, $value, -1, $count);
+
+		return $count + $custom > 0 ? $value .= str_repeat(')?', $count + $custom) : $value;
+	}
+
+	/**
+	 * Compile the defined optional "where" parameters.
+	 *
+	 * @param  string  $value
+	 * @param  array  $wheres
+	 * @param  int  $total
+	 * @return string
+	 */
+	protected static function compileWhereOptional($value, $wheres, $total = 0)
+	{
+		foreach ($wheres as $key => $pattern)
+		{
+			$pattern = "(?:/({$pattern})";
+
+			// Here we will need to replace the optional parameters while keeping track of the
+			// count we are replacing. This will let us properly close this finished regular
+			// expressions with the proper number of parenthesis so that it is valid code.
+			$value = str_replace('/{'.$key.'?}', $pattern, $value, $count);
+
+			$total = $total + $count;
+		}
+
+		return array($value, $total);
+	}
+
+	/**
+	 * Delimit a regular expression.
+	 *
+	 * @param   string  $value
+	 * @return  string
+	 */
+	protected static function delimit($value)
+	{
+		return trim($value) == '' ? null : '#^'.$value.'$#u';
+	}
+
+	/**
+	 * Parse the route action into a standard array.
+	 *
+	 * @param  \Closure|array  $action
+	 * @return array
+	 */
+	protected function parseAction($action)
+	{
+		// If the action is already a Closure instance, we will just set that instance
+		// as the "uses" property, because there is nothing else we need to do when
+		// it is available. Otherwise we will need to find it in the action list.
+		if ($action instanceof Closure)
+		{
+			return array('uses' => $action);
+		}
+
+		// If no "uses" property has been set, we will dig through the array to find a
+		// Closure instance within this list. We will set the first Closure we come
+		// across into the "uses" property that will get fired off by this route.
+		elseif ( ! isset($action['uses']))
+		{
+			$action['uses'] = $this->findClosure($action);
+		}
+
+		return $action;
+	}
+
+	/**
+	 * Find the Closure in an action array.
+	 *
+	 * @param  array  $action
+	 * @return \Closure
+	 */
+	protected function findClosure(array $action)
+	{
+		return array_first($action, function($key, $value)
+		{
+			return $value instanceof Closure;
+		});
+	}
+
+	/**
+	 * Get the route validators for the instance.
 	 *
 	 * @return array
 	 */
-	public function getParameterKeys()
+	public static function getValidators()
 	{
-		return $this->compile()->getVariables();
+		if (isset(static::$validators)) return static::$validators;
+
+		// To match the route, we will use a chain of responsibility pattern with the
+		// validator implementations. We will spin through each one making sure it
+		// passes and then we will know if the route as a whole matches request.
+		return static::$validators = array(
+			new MethodValidator, new SchemeValidator,
+			new HostValidator, new UriValidator,
+		);
 	}
 
 	/**
-	 * Force a given parameter to match a regular expression.
+	 * Add before filters to the route.
 	 *
-	 * @param  string  $name
-	 * @param  string  $expression
+	 * @param  string  $filters
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function where($name, $expression = null)
+	public function before($filters)
 	{
-		if (is_array($name)) return $this->setArrayOfWheres($name);
+		return $this->addFilters('before', $filters);
+	}
 
-		$this->setRequirement($name, $expression);
+	/**
+	 * Add after filters to the route.
+	 *
+	 * @param  string  $filters
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function after($filters)
+	{
+		return $this->addFilters('after', $filters);
+	}
+
+	/**
+	 * Add the given filters to the route by type.
+	 *
+	 * @param  string  $type
+	 * @param  string  $filters
+	 * @return \Illuminate\Routing\Route
+	 */
+	protected function addFilters($type, $filters)
+	{
+		if (isset($this->action[$type]))
+		{
+			$this->action[$type] .= '|'.$filters;
+		}
+		else
+		{
+			$this->action[$type] = $filters;
+		}
 
 		return $this;
 	}
 
 	/**
-	 * Force a given parameters to match the expressions.
+	 * Set a default value for the route.
 	 *
-	 * @param  array $wheres
+	 * @param  string  $key
+	 * @param  mixed  $value
 	 * @return \Illuminate\Routing\Route
 	 */
-	protected function setArrayOfWheres(array $wheres)
+	public function defaults($key, $value)
+	{
+		$this->defaults[$key] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Set a regular expression requirement on the route.
+	 *
+	 * @param  array|string  $name
+	 * @param  string  $expression
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function where($name, $expression = null)
+	{
+		foreach ($this->parseWhere($name, $expression) as $name => $expression)
+		{
+			$this->wheres[$name] = $expression;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Parse arguments to the where method into an array.
+	 *
+	 * @param  array|string  $name
+	 * @param  string  $expression
+	 * @return \Illuminate\Routing\Route
+	 */
+	protected function parseWhere($name, $expression)
+	{
+		return is_array($name) ? $name : array($name => $expression);
+	}
+
+	/**
+	 * Set a list of regular expression requirements on the route.
+	 *
+	 * @param  array  $wheres
+	 * @return \Illuminate\Routing\Route
+	 */
+	protected function whereArray(array $wheres)
 	{
 		foreach ($wheres as $name => $expression)
 		{
@@ -341,139 +686,77 @@ class Route extends BaseRoute {
 	}
 
 	/**
-	 * Set the default value for a parameter.
+	 * Add a prefix to the route URI.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  string  $prefix
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function defaults($key, $value)
+	public function prefix($prefix)
 	{
-		$this->setDefault($key, $value);
+		$this->uri = trim($prefix, '/').'/'.trim($this->uri, '/');
 
 		return $this;
 	}
 
 	/**
-	 * Set the before filters on the route.
-	 *
-	 * @param  dynamic
-	 * @return \Illuminate\Routing\Route
-	 */
-	public function before()
-	{
-		$this->setBeforeFilters(func_get_args());
-
-		return $this;
-	}
-
-	/**
-	 * Set the after filters on the route.
-	 *
-	 * @param  dynamic
-	 * @return \Illuminate\Routing\Route
-	 */
-	public function after()
-	{
-		$this->setAfterFilters(func_get_args());
-
-		return $this;
-	}
-
-	/**
-	 * Get the name of the action (if any) used by the route.
+	 * Get the URI associated with the route.
 	 *
 	 * @return string
 	 */
+	public function uri()
+	{
+		return $this->uri;
+	}
+
+	/**
+	 * Get the HTTP verbs the route responds to.
+	 *
+	 * @return array
+	 */
+	public function methods()
+	{
+		return $this->methods;
+	}
+
+	/**
+	 * Determine if the route only responds to HTTPS requests.
+	 *
+	 * @return bool
+	 */
+	public function secure()
+	{
+		return in_array('https', $this->action);
+	}
+
+	/**
+	 * Get the domain defined for the route.
+	 *
+	 * @return string|null
+	 */
+	public function domain()
+	{
+		return array_get($this->action, 'domain');
+	}
+
+	/**
+	 * Get the action array for the route.
+	 *
+	 * @return array
+	 */
 	public function getAction()
 	{
-		return $this->getOption('_uses');
+		return $this->action;
 	}
 
 	/**
-	 * Get the before filters on the route.
+	 * Set the action array for the route.
 	 *
-	 * @return array
-	 */
-	public function getBeforeFilters()
-	{
-		return $this->getOption('_before') ?: array();
-	}
-
-	/**
-	 * Set the before filters on the route.
-	 *
-	 * @param  string  $value
-	 * @return void
-	 */
-	public function setBeforeFilters($value)
-	{
-		$filters = $this->parseFilterValue($value);
-
-		$this->setOption('_before', array_merge($this->getBeforeFilters(), $filters));
-	}
-
-	/**
-	 * Get the after filters on the route.
-	 *
-	 * @return array
-	 */
-	public function getAfterFilters()
-	{
-		return $this->getOption('_after') ?: array();
-	}
-
-	/**
-	 * Set the after filters on the route.
-	 *
-	 * @param  string  $value
-	 * @return void
-	 */
-	public function setAfterFilters($value)
-	{
-		$filters = $this->parseFilterValue($value);
-
-		$this->setOption('_after', array_merge($this->getAfterFilters(), $filters));
-	}
-
-	/**
-	 * Parse the given filters for setting.
-	 *
-	 * @param  array|string  $value
-	 * @return array
-	 */
-	protected function parseFilterValue($value)
-	{
-		$results = array();
-
-		foreach ((array) $value as $filters)
-		{
-			$results = array_merge($results, explode('|', $filters));
-		}
-
-		return $results;
-	}
-
-	/**
-	 * Set the matching parameter array on the route.
-	 *
-	 * @param  array  $parameters
-	 * @return void
-	 */
-	public function setParameters($parameters)
-	{
-		$this->parameters = $parameters;
-	}
-
-	/**
-	 * Set the Router instance on the route.
-	 *
-	 * @param  \Illuminate\Routing\Router  $router
+	 * @param  array  $action
 	 * @return \Illuminate\Routing\Route
 	 */
-	public function setRouter(Router $router)
+	public function setAction(array $action)
 	{
-		$this->router = $router;
+		$this->action = $action;
 
 		return $this;
 	}
