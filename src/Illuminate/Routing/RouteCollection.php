@@ -103,7 +103,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function checkForAlternateVerbs($request)
 	{
-		$others = array_diff(Router::VERBS, array($request->getMethod()));
+		$others = array_diff(Router::$verbs, array($request->getMethod()));
 
 		// Here we will spin through all verbs except for the current request verb and
 		// check to see if any routes respond to them. If they do, we will return a
