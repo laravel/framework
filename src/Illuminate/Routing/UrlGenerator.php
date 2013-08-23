@@ -1,17 +1,15 @@
 <?php namespace Illuminate\Routing;
 
 use InvalidArgumentException;
+use Illuminate\Routing\RouteCollection;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Generator\UrlGenerator as SymfonyGenerator;
 
 class UrlGenerator {
 
 	/**
 	 * The route collection.
 	 *
-	 * @var \Symfony\Component\Routing\RouteCollection
+	 * @var \Illuminate\Routing\RouteCollection
 	 */
 	protected $routes;
 
@@ -23,16 +21,9 @@ class UrlGenerator {
 	protected $request;
 
 	/**
-	 * The Symfony routing URL generator.
-	 *
-	 * @var \Symfony\Component\Routing\Generator\UrlGenerator
-	 */
-	protected $generator;
-
-	/**
 	 * Create a new URL Generator instance.
 	 *
-	 * @param  \Symfony\Component\Routing\RouteCollection  $routes
+	 * @param  \Illuminate\Routing\RouteCollection  $routes
 	 * @param  \Symfony\Component\HttpFoundation\Request   $request
 	 * @return void
 	 */
@@ -77,24 +68,27 @@ class UrlGenerator {
 	 * Generate a absolute URL to the given path.
 	 *
 	 * @param  string  $path
-	 * @param  mixed   $parameters
-	 * @param  bool    $secure
+	 * @param  mixed  $extra
+	 * @param  bool  $secure
 	 * @return string
 	 */
-	public function to($path, $parameters = array(), $secure = null)
+	public function to($path, $extra = array(), $secure = null)
 	{
+		// First we will check if the URL is already a valid URL. If it is we will not
+		// try to generate a new one but will simply return the URL as is, which is
+		// convenient since developers do not always have to check if it's valid.
 		if ($this->isValidUrl($path)) return $path;
 
 		$scheme = $this->getScheme($secure);
 
+		$tail = implode('/', (array) $extra);
+
 		// Once we have the scheme we will compile the "tail" by collapsing the values
 		// into a single string delimited by slashes. This just makes it convenient
 		// for passing the array of parameters to this URL as a list of segments.
-		$tail = implode('/', (array) $parameters);
-
 		$root = $this->getRootUrl($scheme);
 
-		return trim($root.'/'.trim($path.'/'.$tail, '/'), '/');
+		return $this->trimUrl($root, $path, $tail);
 	}
 
 	/**
@@ -175,56 +169,106 @@ class UrlGenerator {
 	 *
 	 * @param  string  $name
 	 * @param  mixed   $parameters
-	 * @param  bool    $absolute
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
-	public function route($name, $parameters = array(), $absolute = true)
+	public function route($name, $parameters = array(), $route = null)
 	{
-		$route = $this->routes->get($name);
+		$route = $route ?: $this->routes->getByName($name);
 
-		$parameters = (array) $parameters;
-
-		if (isset($route) and $this->usingQuickParameters($parameters))
+		if ( ! is_null($route))
 		{
-			$parameters = $this->buildParameterList($route, $parameters);
+			return $this->toRoute($route, $parameters);
 		}
-
-		return $this->generator->generate($name, $parameters, $absolute);
+		else
+		{
+			throw new InvalidArgumentException("Route [{$name}] not defined.");
+		}
 	}
 
 	/**
-	 * Determine if we're short circuiting the parameter list.
-	 *
-	 * @param  array  $parameters
-	 * @return bool
-	 */
-	protected function usingQuickParameters(array $parameters)
-	{
-		return count($parameters) > 0 and is_numeric(head(array_keys($parameters)));
-	}
-
-	/**
-	 * Build the parameter list for short circuit parameters.
+	 * Get the URL for a given route instance.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
-	 * @param  array  $params
-	 * @return array
+	 * @param  mixed  $parameters
+	 * @return string
 	 */
-	protected function buildParameterList($route, array $params)
+	protected function toRoute($route, $parameters)
 	{
-		$keys = $route->getParameterKeys();
+		$domain = $this->getRouteDomain($route, $parameters);
 
-		// If the number of keys is less than the number of parameters on a route
-		// we'll fill out the parameter arrays with empty bindings on the rest
-		// of the spots until they are equal so we can run an array combine.
-		if (count($params) < count($keys))
+		$path = preg_replace_sub('/\{.*?\}/', $parameters, $route->uri());
+
+		return $this->trimUrl($this->getRouteRoot($route, $domain), $path);
+	}
+
+	/**
+	 * Get the formatted domain for a given route.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function getRouteDomain($route, &$parameters)
+	{
+		return $route->domain() ? $this->formatDomain($route, $parameters) : null;
+	}
+
+	/**
+	 * Format the domain and port for the route and request.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function formatDomain($route, &$parameters)
+	{
+		return $this->addPortToDomain(preg_replace_sub(
+
+			'/\{.*?\}/', $parameters, $this->getDomainAndScheme($route)
+
+		));
+	}
+
+	/**
+	 * Get the domain and schee for the route.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return string
+	 */
+	protected function getDomainAndScheme($route)
+	{
+		return $this->getScheme($route->secure()).$route->domain();
+	}
+
+	/**
+	 * Add the port to the domain if necessary.
+	 *
+	 * @param  string  $domain
+	 * @return string
+	 */
+	protected function addPortToDomain($domain)
+	{
+		if ($this->request->getPort() == '80')
 		{
-			$difference = count($keys) - count($params);
-
-			$params += array_fill(count($params), $difference, null);
+			return $domain;
 		}
+		else
+		{
+			return $domain .= ':'.$this->request->getPort();
+		}
+	}
 
-		return array_combine($keys, $params);
+	/**
+	 * Get the root of the route URL.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @param  string  $domain
+	 * @return string
+	 */
+	protected function getRouteRoot($route, $domain)
+	{
+		return $this->getRootUrl($this->getScheme($route->secure()), $domain);
 	}
 
 	/**
@@ -237,41 +281,19 @@ class UrlGenerator {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
-		// First we'll check to see if we have already rendered a URL for an action
-		// so that we don't have to loop through all of the routes again on each
-		// iteration through the loop. If we have it, we can just return that.
-		if (isset($this->actionMap[$action]))
-		{
-			$name = $this->actionMap[$action];
-
-			return $this->route($name, $parameters, $absolute);
-		}
-
-		// If haven't already mapped this action to a URI yet, we will need to spin
-		// through all of the routes looking for routes that routes to the given
-		// controller's action, then we will cache them off and build the URL.
-		foreach ($this->routes as $name => $route)
-		{
-			if ($action == $route->getOption('_uses'))
-			{
-				$this->actionMap[$action] = $name;
-
-				return $this->route($name, $parameters, $absolute);
-			}
-		}
-
-		throw new InvalidArgumentException("Unknown action [$action].");
+		return $this->route($action, $parameters, $this->routes->getByAction($action));
 	}
 
 	/**
 	 * Get the base URL for the request.
 	 *
 	 * @param  string  $scheme
+	 * @param  string  $root
 	 * @return string
 	 */
-	protected function getRootUrl($scheme)
+	protected function getRootUrl($scheme, $root = null)
 	{
-		$root = $this->request->root();
+		$root = $root ?: $this->request->root();
 
 		$start = starts_with($root, 'http://') ? 'http://' : 'https://';
 
@@ -289,6 +311,19 @@ class UrlGenerator {
 		if (starts_with($path, array('#', '//', 'mailto:', 'tel:'))) return true;
 
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
+	}
+
+	/**
+	 * Format the given URL segments into a single URL.
+	 *
+	 * @param  string  $root
+	 * @param  string  $path
+	 * @param  string  $tail
+	 * @return string
+	 */
+	protected function trimUrl($root, $path, $tail = '')
+	{
+		return trim($root.'/'.trim($path.'/'.$tail, '/'), '/');
 	}
 
 	/**
@@ -310,33 +345,6 @@ class UrlGenerator {
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;
-
-		$context = new RequestContext;
-
-		$context->fromRequest($this->request);
-
-		$this->generator = new SymfonyGenerator($this->routes, $context);
-	}
-
-	/**
-	 * Get the Symfony URL generator instance.
-	 *
-	 * @return \Symfony\Component\Routing\Generator\UrlGenerator
-	 */
-	public function getGenerator()
-	{
-		return $this->generator;
-	}
-
-	/**
-	 * Set the Symfony URL generator instance.
-	 *
-	 * @param  \Symfony\Component\Routing\Generator\UrlGenerator  $generator
-	 * @return void
-	 */
-	public function setGenerator(SymfonyGenerator $generator)
-	{
-		$this->generator = $generator;
 	}
 
 }

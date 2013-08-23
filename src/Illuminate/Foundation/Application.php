@@ -56,6 +56,20 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	protected $bootedCallbacks = array();
 
 	/**
+	 * The array of close callbacks.
+	 *
+	 * @var array
+	 */
+	protected $closeCallbacks = array();
+
+	/**
+	 * The array of finish callbacks.
+	 *
+	 * @var array
+	 */
+	protected $finishCallBacks = array();
+
+	/**
 	 * The array of shutdown callbacks.
 	 *
 	 * @var array
@@ -464,7 +478,22 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function close($callback)
 	{
-		return $this['router']->close($callback);
+		$this->closeCallbacks[] = $callback;
+	}
+
+	/**
+	 * Call the "close" callbacks assigned to the application.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Response  $response
+	 * @return void
+	 */
+	public function callCloseCallbacks(Request $request, Response $response)
+	{
+		foreach ($this->closeCallbacks as $callback)
+		{
+			call_user_func($callback, $request, $response);
+		}
 	}
 
 	/**
@@ -475,7 +504,22 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function finish($callback)
 	{
-		$this['router']->finish($callback);
+		$this->finishCallBacks[] = $callback;
+	}
+
+	/**
+	 * Call the "finish" callbacks assigned to the application.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Response  $response
+	 * @return void
+	 */
+	public function callFinishCallbacks(Request $request, Response $response)
+	{
+		foreach ($this->finishCallBacks as $callback)
+		{
+			call_user_func($callback, $request, $response);
+		}
 	}
 
 	/**
@@ -505,11 +549,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		$response = $this->dispatch($this['request']);
 
-		$this['router']->callCloseFilter($this['request'], $response);
+		$this->callCloseCallbacks($this['request'], $response);
 
 		$response->send();
 
-		$this['router']->callFinishFilter($this['request'], $response);
+		$this->callFinishCallbacks($this['request'], $response);
 	}
 
 	/**
