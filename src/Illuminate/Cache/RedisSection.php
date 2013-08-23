@@ -11,7 +11,7 @@ class RedisSection extends Section {
 	 */
 	public function forever($key, $value)
 	{
-		$this->getRedis()->lpush($this->foreverKey(), $key);
+		$this->store->connection()->lpush($this->foreverKey(), $key);
 
 		$this->store->forever($this->sectionItemKey($key), $value);
 	}
@@ -25,7 +25,7 @@ class RedisSection extends Section {
 	{
 		$this->deleteForeverKeys();
 
-		$this->getRedis()->del($this->foreverKey());
+		$this->store->connection()->del($this->foreverKey());
 
 		$this->store->increment($this->sectionKey());
 	}
@@ -41,7 +41,7 @@ class RedisSection extends Section {
 
 		if (count($forever) > 0)
 		{
-			call_user_func_array(array($this->getRedis(), 'del'), $forever);
+			call_user_func_array(array($this->store->connection(), 'del'), $forever);
 		}
 	}
 
@@ -58,17 +58,7 @@ class RedisSection extends Section {
 		{
 			return $me->getPrefix().$me->sectionItemKey($x);
 
-		}, array_unique($this->getRedis()->lrange($this->foreverKey(), 0, -1)));
-	}
-
-	/**
-	 * Get the underlying Redis instance.
-	 *
-	 * @return \Illuminate\Redis\Database
-	 */
-	protected function getRedis()
-	{
-		return $this->store->getRedis();
+		}, array_unique($this->store->connection()->lrange($this->foreverKey(), 0, -1)));
 	}
 
 	/**
