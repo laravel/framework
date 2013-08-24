@@ -305,9 +305,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 			$this[$key] = $value;
 		}
 
-		$this->serviceProviders[] = $provider;
-
-		$this->loadedProviders[get_class($provider)] = true;
+		$this->markAsRegistered($provider);
 	}
 
 	/**
@@ -322,21 +320,34 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
+	 * Mark the given provider as registered.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider
+	 * @return void
+	 */
+	protected function markAsRegistered($provider)
+	{
+		$this->serviceProviders[] = $provider;
+
+		$this->loadedProviders[get_class($provider)] = true;
+	}
+
+	/**
 	 * Load and boot all of the remaining deferred providers.
 	 *
 	 * @return void
 	 */
 	public function loadDeferredProviders()
 	{
+		$me = $this;
+
 		// We will simply spin through each of the deferred providers and register each
 		// one and boot them if the application has booted. This should make each of
 		// the remaining services available to this application for immediate use.
-		foreach (array_unique($this->deferredServices) as $provider)
+		array_walk($this->deferredServices, function($p) use ($me)
 		{
-			$this->register($instance = new $provider($this));
-
-			if ($this->booted) $instance->boot();
-		}
+			$this->registerDeferredProvider($p);
+		});
 
 		$this->deferredServices = array();
 	}
@@ -356,12 +367,27 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		// of deferred services, since it will already be loaded on subsequent.
 		if ( ! isset($this->loadedProviders[$provider]))
 		{
-			$this->register($instance = new $provider($this));
-
-			unset($this->deferredServices[$service]);
-
-			$this->setupDeferredBoot($instance);
+			$this->registerDeferredProvider($provider, $service);
 		}
+	}
+
+	/**
+	 * Register a deffered provider and service.
+	 *
+	 * @param  string  $provider
+	 * @param  string  $service
+	 * @return void
+	 */
+	protected function registerDeferredProvider($provider, $service = null)
+	{
+		$this->register($instance = new $provider($this));
+
+		// Once the provider that provides the deferred service has been registered we
+		// will remove it from our local list of the deferred services with related
+		// providers so that this container does not try to resolve it out again.
+		if ($service) unset($this->deferredServices[$service]);
+
+		$this->setupDeferredBoot($instance);
 	}
 
 	/**
@@ -552,19 +578,23 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		if ($this->booted) return;
 
-		// To boot the application we will simply spin through each service provider
-		// and call the boot method, which will give them a chance to override on
-		// something that was registered by another provider when it registers.
-		foreach ($this->serviceProviders as $provider)
-		{
-			$provider->boot();
-		}
+		array_walk($this->serviceProviders, function($p) { $p->boot(); });
 
-		$this->fireAppCallbacks($this->bootingCallbacks);
+		$this->bootApplication();
+	}
 
+	/**
+	 * Boot the application and fire app callbacks.
+	 *
+	 * @return void
+	 */
+	protected function bootApplication()
+	{
 		// Once the application has booted we will also fire some "booted" callbacks
 		// for any listeners that need to do work after this initial booting gets
 		// finished. This is useful when ordering the boot-up processes we run.
+		$this->fireAppCallbacks($this->bootingCallbacks);
+
 		$this->booted = true;
 
 		$this->fireAppCallbacks($this->bootedCallbacks);
