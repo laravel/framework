@@ -136,20 +136,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Set the application request for the console environment.
-	 *
-	 * @return void
-	 */
-	public function setRequestForConsoleEnvironment()
-	{
-		$url = $this['config']->get('app.url', 'http://localhost');
-
-		$parameters = array($url, 'GET', array(), array(), array(), $_SERVER);
-
-		$this->instance('request', static::onRequest('create', $parameters));
-	}
-
-	/**
 	 * Redirect the request if it has a trailing slash.
 	 *
 	 * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
@@ -824,6 +810,20 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		if ( ! is_null($class)) static::$requestClass = $class;
 
 		return static::$requestClass;
+	}
+
+	/**
+	 * Set the application request for the console environment.
+	 *
+	 * @return void
+	 */
+	public function setRequestForConsoleEnvironment()
+	{
+		$url = $this['config']->get('app.url', 'http://localhost');
+
+		$parameters = array($url, 'GET', array(), array(), array(), $_SERVER);
+
+		$this->instance('request', static::onRequest('create', $parameters));
 	}
 
 	/**
