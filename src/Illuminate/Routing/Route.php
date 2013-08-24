@@ -173,7 +173,7 @@ class Route extends BaseRoute {
 		{
 			// If the filter name contains a colon, we will assume that the developer
 			// is passing along some parameters with the name, and we will explode
-			// out the name and paramters, merging the parameters onto the list.
+			// out the name and parameters, merging the parameters onto the list.
 			$segments = explode(':', $name);
 
 			$name = $segments[0];
