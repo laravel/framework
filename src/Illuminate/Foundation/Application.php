@@ -163,12 +163,33 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		// content in this application while still providing a solid experience.
 		$path = $this['request']->getPathInfo();
 
-		if ($path != '/' and ends_with($path, '/') and ! ends_with($path, '//'))
+		if ($this->hasTrailingSlash($path))
 		{
-			with(new SymfonyRedirect($this['request']->fullUrl(), 301))->send();
-
-			exit;
+			$this->redirectWithoutSlash();
 		}
+	}
+
+	/**
+	 * Determine if the given path has a trailing slash.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	protected function hasTrailingSlash($path)
+	{
+		return ($path != '/' and ends_with($path, '/') and ! ends_with($path, '//'));
+	}
+
+	/**
+	 * Send a redirect response without the trailing slash.
+	 *
+	 * @return void
+	 */
+	protected function redirectWithoutSlash()
+	{
+		with(new SymfonyRedirect($this['request']->fullUrl(), 301))->send();
+
+		exit;
 	}
 
 	/**
@@ -181,6 +202,9 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		$this->instance('path', realpath($paths['app']));
 
+		// Here we will bind the install paths into the container as strings that can be
+		// accessed from any point in the system. Each path key is prefixed with path
+		// so that they have the consistent naming convention inside the container.
 		foreach (array_except($paths, array('app')) as $key => $value)
 		{
 			$this->instance("path.{$key}", realpath($value));
