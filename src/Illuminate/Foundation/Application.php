@@ -227,87 +227,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function detectEnvironment($environments)
 	{
-		$base = $this['request']->getHost();
+		$this['env'] = with(new EnvironmentDetector($this['request']))->detect(
 
-		$arguments = $this['request']->server->get('argv');
+			$environments, $this->runningInConsole()
 
-		if ($this->runningInConsole())
-		{
-			return $this->detectConsoleEnvironment($base, $environments, $arguments);
-		}
-
-		return $this->detectWebEnvironment($base, $environments);
-	}
-
-	/**
-	 * Set the application environment for a web request.
-	 *
-	 * @param  string  $base
-	 * @param  array|string  $environments
-	 * @return string
-	 */
-	protected function detectWebEnvironment($base, $environments)
-	{
-		// If the given environment is just a Closure, we will defer the environment
-		// detection to the Closure the developer has provided, which allows them
-		// to totally control the web environment detection if they require to.
-		if ($environments instanceof Closure)
-		{
-			return $this['env'] = call_user_func($environments);
-		}
-
-		foreach ($environments as $environment => $hosts)
-		{
-			// To determine the current environment, we'll simply iterate through the
-			// possible environments and look for a host that matches this host in
-			// the request's context, then return back that environment's names.
-			foreach ((array) $hosts as $host)
-			{
-				if (str_is($host, $base) or $this->isMachine($host))
-				{
-					return $this['env'] = $environment;
-				}
-			}
-		}
-
-		return $this['env'] = 'production';
-	}
-
-	/**
-	 * Set the application environment from command-line arguments.
-	 *
-	 * @param  string  $base
-	 * @param  mixed   $environments
-	 * @param  array   $arguments
-	 * @return string
-	 */
-	protected function detectConsoleEnvironment($base, $environments, $arguments)
-	{
-		foreach ($arguments as $key => $value)
-		{
-			// For the console environment, we'll just look for an argument that starts
-			// with "--env" then assume that it is setting the environment for every
-			// operation being performed, and we'll use that environment's config.
-			if (starts_with($value, '--env='))
-			{
-				$segments = array_slice(explode('=', $value), 1);
-
-				return $this['env'] = head($segments);
-			}
-		}
-
-		return $this->detectWebEnvironment($base, $environments);
-	}
-
-	/**
-	 * Determine if the name matches the machine name.
-	 *
-	 * @param  string  $name
-	 * @return bool
-	 */
-	protected function isMachine($name)
-	{
-		return str_is($name, gethostname());
+		);
 	}
 
 	/**
