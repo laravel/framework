@@ -442,21 +442,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Call the "close" callbacks assigned to the application.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Http\Response  $response
-	 * @return void
-	 */
-	public function callCloseCallbacks(Request $request, Response $response)
-	{
-		foreach ($this->closeCallbacks as $callback)
-		{
-			call_user_func($callback, $request, $response);
-		}
-	}
-
-	/**
 	 * Register a "finish" application filter.
 	 *
 	 * @param  Closure|string  $callback
@@ -465,21 +450,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	public function finish($callback)
 	{
 		$this->finishCallBacks[] = $callback;
-	}
-
-	/**
-	 * Call the "finish" callbacks assigned to the application.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Http\Response  $response
-	 * @return void
-	 */
-	public function callFinishCallbacks(Request $request, Response $response)
-	{
-		foreach ($this->finishCallBacks as $callback)
-		{
-			call_user_func($callback, $request, $response);
-		}
 	}
 
 	/**
@@ -498,61 +468,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			$this->shutdownCallbacks[] = $callback;
 		}
-	}
-
-	/**
-	 * Handles the given request and delivers the response.
-	 *
-	 * @return void
-	 */
-	public function run()
-	{
-		$response = $this->dispatch($this['request']);
-
-		$this->callCloseCallbacks($this['request'], $response);
-
-		$response->send();
-
-		$this->callFinishCallbacks($this['request'], $response);
-	}
-
-	/**
-	 * Handle the given request and get the response.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	public function dispatch(Request $request)
-	{
-		if ($this->isDownForMaintenance())
-		{
-			$response = $this['events']->until('illuminate.app.down');
-
-			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
-		}
-		
-		return $this['router']->dispatch($this->prepareRequest($request));
-	}
-
-	/**
-	 * Handle the given request and get the response.
-	 *
-	 * Provides compatibility with BrowserKit functional testing.
-	 *
-	 * @implements HttpKernelInterface::handle
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  int   $type
-	 * @param  bool  $catch
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
-	{
-		$this->instance('request', $request);
-
-		Facade::clearResolvedInstance('request');
-
-		return $this->dispatch($request);
 	}
 
 	/**
@@ -606,6 +521,114 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	public function booted($callback)
 	{
 		$this->bootedCallbacks[] = $callback;
+	}
+
+	/**
+	 * Handles the given request and delivers the response.
+	 *
+	 * @return void
+	 */
+	public function run()
+	{
+		$response = $this->dispatch($this['request']);
+
+		$this->terminate($this['request'], $response);
+	}
+
+	/**
+	 * Handle the given request and get the response.
+	 *
+	 * Provides compatibility with BrowserKit functional testing.
+	 *
+	 * @implements HttpKernelInterface::handle
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  int   $type
+	 * @param  bool  $catch
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+	{
+		$this->refreshRequest($request = Request::createFromBase($request));
+
+		return $this->dispatch($request);
+	}
+
+	/**
+	 * Handle the given request and get the response.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function dispatch(Request $request)
+	{
+		if ($this->isDownForMaintenance())
+		{
+			$response = $this['events']->until('illuminate.app.down');
+
+			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
+		}
+		
+		return $this['router']->dispatch($this->prepareRequest($request));
+	}
+
+	/**
+	 * Terminate the request and send the response to the browser.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @return void
+	 */
+	public function terminate(SymfonyRequest $request, SymfonyResponse $response)
+	{
+		$this->callCloseCallbacks($request, $response);
+
+		$response->send();
+
+		$this->callFinishCallbacks($request, $response);
+	}
+
+	/**
+	 * Refresh the bound request instance in the container.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return void
+	 */
+	protected function refreshRequest(Request $request)
+	{
+		$this->instance('request', $request);
+
+		Facade::clearResolvedInstance('request');
+	}
+
+	/**
+	 * Call the "close" callbacks assigned to the application.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Response  $response
+	 * @return void
+	 */
+	public function callCloseCallbacks(Request $request, Response $response)
+	{
+		foreach ($this->closeCallbacks as $callback)
+		{
+			call_user_func($callback, $request, $response);
+		}
+	}
+
+	/**
+	 * Call the "finish" callbacks assigned to the application.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Response  $response
+	 * @return void
+	 */
+	public function callFinishCallbacks(Request $request, Response $response)
+	{
+		foreach ($this->finishCallBacks as $callback)
+		{
+			call_user_func($callback, $request, $response);
+		}
 	}
 
 	/**
