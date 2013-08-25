@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Countable;
+use ArrayIterator;
 use IteratorAggregate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -179,13 +180,30 @@ class RouteCollection implements Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Get all of the routes in the collection.
+	 *
+	 * @return array
+	 */
+	public function getRoutes()
+	{
+		return $this->routes;
+	}
+
+	/**
 	 * Get an iterator for the items.
 	 *
 	 * @return ArrayIterator
 	 */
 	public function getIterator()
 	{
-		return new ArrayIterator($this->routes);
+		$routes = array();
+		
+		foreach ($this->routes as $method => $inner)
+		{
+			$routes += $inner;
+		}
+
+		return new ArrayIterator($routes);
 	}
 
 	/**

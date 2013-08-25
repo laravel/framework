@@ -739,6 +739,26 @@ class Route {
 	}
 
 	/**
+	 * Get the name of the route instance.
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return array_get($this->action, 'as');
+	}
+
+	/**
+	 * Get the action name for the route.
+	 *
+	 * @return string
+	 */
+	public function getActionName()
+	{
+		return array_get($this->action, 'controller', 'Closure');
+	}
+
+	/**
 	 * Get the action array for the route.
 	 *
 	 * @return array

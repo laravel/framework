@@ -1003,7 +1003,7 @@ class Router implements RouteFiltererInterface {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return array
 	 */
-	protected function findPatternFilters($request)
+	public function findPatternFilters($request)
 	{
 		$results = array();
 
