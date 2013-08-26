@@ -59,7 +59,7 @@ class CookieTest extends PHPUnit_Framework_TestCase {
         
 		$cookie = $this->getCreator();
 		$value = $cookie->getEncrypter()->encrypt('bar');
-		$value .= '111';
+		$value = str_shuffle($value);
 		$cookie->getRequest()->cookies->set('foo', $value);
 		$this->assertNull($cookie->get('foo'));
 	}
