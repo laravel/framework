@@ -2,8 +2,9 @@
 
 use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class Request extends \Symfony\Component\HttpFoundation\Request {
+class Request extends SymfonyRequest {
 
 	/**
 	 * The decoded JSON content for the request.
@@ -461,6 +462,24 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 		}
 
 		return $default;
+	}
+
+	/**
+	 * Create an Illuminate request from a Symfony instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Illuminate\Http\Request
+	 */
+	public static function createFromBase(SymfonyRequest $request)
+	{
+		if ($request instanceof static) return $request;
+
+		return with($self = new static)->duplicate(
+
+			$request->query->all(), $request->request->all(), $request->attributes->all(),
+
+			$request->cookies->all(), $request->files->all(), $request->server->all()
+		);
 	}
 
 	/**
