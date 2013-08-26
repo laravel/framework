@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation;
 
+use Closure;
 use Illuminate\Http\Request;
 
 class EnvironmentDetector {
@@ -29,7 +30,7 @@ class EnvironmentDetector {
 	 * @param  bool  $inConsole
 	 * @return string
 	 */
-	public function detect($environments, $inConsole)
+	public function detect($environments, $inConsole = false)
 	{
 		if ($inConsole)
 		{
