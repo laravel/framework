@@ -330,6 +330,8 @@ class Route {
 	 */
 	protected function combineMatchesWithKeys(array $matches)
 	{
+		if (count($this->parameterNames()) == 0) return array();
+
 		return array_combine($this->parameterNames(), $this->padMatches($matches));
 	}
 
