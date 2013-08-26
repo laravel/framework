@@ -127,12 +127,23 @@ class Encrypter {
 			throw new DecryptException("Invalid data.");
 		}
 
-		if ($payload['mac'] !== $this->hash($payload['iv'], $payload['value']))
+		if ( ! $this->validMac($payload))
 		{
 			throw new DecryptException("MAC is invalid.");
 		}
 
 		return $payload;
+	}
+
+	/**
+	 * Determine if the MAC for the given payload is valid.
+	 *
+	 * @param  array  $payload
+	 * @return bool
+	 */
+	protected function validMac(array $payload)
+	{
+		return ($payload['mac'] == $this->hash($payload['iv'], $payload['value']));
 	}
 
 	/**
