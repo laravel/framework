@@ -43,7 +43,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		parent::setWhere();
 
-		$this->query->where($this->morphType, get_class($this->parent));
+		$this->query->where($this->table.'.'.$this->morphType, get_class($this->parent));
 
 		return $this;
 	}
@@ -58,7 +58,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		parent::addEagerConstraints($models);
 
-		$this->query->where($this->morphType, get_class($this->parent));
+		$this->query->where($this->table.'.'.$this->morphType, get_class($this->parent));
 	}
 
 	/**
@@ -82,19 +82,9 @@ class MorphToMany extends BelongsToMany {
 	 */
 	protected function newPivotQuery()
 	{
-		$query = $this->newPivotStatement();
+		$query = parent::newPivotQuery();
 
-		return $query->where($this->foreignKey, $this->parent->getKey());
-	}
-
-	/**
-	 * Get a new plain query builder for the pivot table.
-	 *
-	 * @return \Illuminate\Database\Query\Builder
-	 */
-	public function newPivotStatement()
-	{
-		return parent::newPivotStatement()->where($this->morphType, get_class($this->parent));
+		return $query->where($this->morphType, get_class($this->parent));
 	}
 
 	/**
