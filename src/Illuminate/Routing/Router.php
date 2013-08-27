@@ -636,12 +636,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Create a new route instance.
 	 *
-	 * @param  array|string  $method
+	 * @param  array|string  $methods
 	 * @param  string  $uri
 	 * @param  mixed   $action
 	 * @return \Illuminate\Routing\Route
 	 */
-	protected function createRoute($method, $uri, $action)
+	protected function createRoute($methods, $uri, $action)
 	{
 		// If the route is routing to a controller we will parse the route action into
 		// an acceptable array format before registering it and creating this route
@@ -652,7 +652,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		}
 
 		$route = with(new Route(
-			$method, $uri = $this->prefix($uri), $action)
+			$methods, $uri = $this->prefix($uri), $action)
 	);
 
 		$route->where($this->patterns);
@@ -1100,7 +1100,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		foreach ($route->beforeFilters() as $filter => $parameters)
 		{
 			$response = $this->callRouteFilter($filter, $parameters, $route, $request);
-			
+
 			if ( ! is_null($response)) return $response;
 		}
 	}
@@ -1129,7 +1129,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Illuminate\Http\Response|null $response
-	 * @return mixed  
+	 * @return mixed
 	 */
 	public function callRouteFilter($filter, $parameters, $route, $request, $response = null)
 	{
