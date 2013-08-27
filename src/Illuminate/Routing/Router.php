@@ -6,9 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Router implements RouteFiltererInterface {
+class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 	/**
 	 * The event dispatcher instance.
@@ -1221,6 +1223,17 @@ class Router implements RouteFiltererInterface {
 	public function setControllerDispatcher(ControllerDispatcher $dispatcher)
 	{
 		$this->controllerDispatcher = $dispatcher;
+	}
+
+	/**
+	 * Get the response for a given request.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+	{
+		return $this->dispatch(Request::createFromBase($request));
 	}
 
 }
