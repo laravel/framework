@@ -657,7 +657,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// appropriate query constraint and entirely manages the hydrations.
 		$query = $instance->newQuery();
 
-		$table = $table ?: str_plural($table);
+		$table = $table ?: str_plural($name);
 
 		return new MorphToMany($query, $this, $name, $table, $foreignKey, $otherKey, $caller['function']);
 	}
