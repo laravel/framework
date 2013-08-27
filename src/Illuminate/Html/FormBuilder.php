@@ -620,11 +620,9 @@ class FormBuilder {
 
 		if ($this->missingOldAndModel($name)) return $checked;
 
-		$valueAttribute = $this->getValueAttribute($name);
+		$posted = $this->getValueAttribute($name);
 
-		if (is_array($valueAttribute)) return in_array($value, $valueAttribute);
-
-		return (bool) $valueAttribute;
+		return is_array($posted) ? in_array($value, $posted) : (bool) $posted;
 	}
 
 	/**
