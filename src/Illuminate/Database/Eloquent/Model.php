@@ -659,7 +659,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (is_null($table))
 		{
-			$table = $this->joiningTable($related);
+			$table = $this->joiningTable($name);
 		}
 
 		return new MorphToMany($query, $this, $name, $table, $foreignKey, $otherKey, $caller['function']);
