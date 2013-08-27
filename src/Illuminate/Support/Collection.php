@@ -386,7 +386,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	protected function getListValue($item, $key)
 	{
-		return is_object($item) ? object_get($item, $key) : $item[$key];
+		return is_object($item) ? $item->{$key} : $item[$key];
 	}
 
 	/**
