@@ -45,16 +45,27 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function add(Route $route)
 	{
+		$this->addToCollections($route);
+
+		$this->addLookups($route);
+
+		return $route;
+	}
+
+	/**
+	 * Add the given route to the arrays of routes.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return void
+	 */
+	protected function addToCollections($route)
+	{
 		foreach ($route->methods() as $method)
 		{
 			$this->routes[$method][] = $route;
 		}
 
 		$this->allRoutes[] = $route;
-
-		$this->addLookups($route);
-
-		return $route;
 	}
 
 	/**
