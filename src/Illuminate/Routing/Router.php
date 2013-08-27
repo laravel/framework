@@ -630,7 +630,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addRoute($methods, $uri, $action)
 	{
-		return $this->routes->add($this->createRoute('GET', $uri, $action));
+		return $this->routes->add($this->createRoute($methods, $uri, $action));
 	}
 
 	/**
