@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
@@ -626,6 +627,37 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$query = $instance->newQuery();
 
 		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $caller['function']);
+	}
+
+	/**
+	 * Define a many-to-many relationship.
+	 *
+	 * @param  string  $related
+	 * @param  string  $name
+	 * @param  string  $table
+	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+	 */
+	public function morphToMany($related, $name, $table, $foreignKey = null, $otherKey = null)
+	{
+		$caller = $this->getBelongsToManyCaller();
+
+		// First, we'll need to determine the foreign key and "other key" for the
+		// relationship. Once we have determined the keys we'll make the query
+		// instances as well as the relationship instances we need for this.
+		$foreignKey = $foreignKey ?: $name.'_id';
+
+		$instance = new $related;
+
+		$otherKey = $otherKey ?: $instance->getForeignKey();
+
+		// Now we're ready to create a new query builder for the related model and
+		// the relationship instances for the relation. The relations will set
+		// appropriate query constraint and entirely manages the hydrations.
+		$query = $instance->newQuery();
+
+		return new MorphToMany($query, $this, $name, $table, $foreignKey, $otherKey, $caller['function']);
 	}
 
 	/**

@@ -625,7 +625,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function callFinishCallbacks(Request $request, Response $response)
 	{
-		foreach ($this->finishCallBacks as $callback)
+		foreach ($this->finishCallbacks as $callback)
 		{
 			call_user_func($callback, $request, $response);
 		}
