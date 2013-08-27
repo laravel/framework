@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Collection;
 class MorphToMany extends BelongsToMany {
 
 	/**
-	 * The name of the polymorphic type.
+	 * The type of the polymorphic relation.
 	 *
 	 * @var string
 	 */
-	protected $name;
+	protected $morphType;
 
 	/**
 	 * Create a new has many relationship instance.
@@ -29,7 +29,7 @@ class MorphToMany extends BelongsToMany {
 	 */
 	public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null)
 	{
-		$this->name = $name;
+		$this->morphType = $name.'_type';
 
 		parent::__construct($query, $parent, $table, $foreignKey, $otherKey, $relationName);
 	}
@@ -43,7 +43,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		parent::setWhere();
 
-		$this->query->where($this->name.'_type', get_class($this->parent));
+		$this->query->where($this->morphType, get_class($this->parent));
 
 		return $this;
 	}
@@ -58,7 +58,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		parent::addEagerConstraints($models);
 
-		$this->query->where($this->name.'_type', get_class($this->parent));
+		$this->query->where($this->morphType, get_class($this->parent));
 	}
 
 	/**
@@ -72,7 +72,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		$record = parent::createAttachRecord($id, $timed);
 
-		return array_add($record, $this->name.'_type', get_class($this->parent));
+		return array_add($record, $this->morphType, get_class($this->parent));
 	}
 
 	/**
@@ -94,7 +94,7 @@ class MorphToMany extends BelongsToMany {
 	 */
 	public function newPivotStatement()
 	{
-		return parent::newPivotStatement()->where($this->name.'_type', get_class($this->parent));
+		return parent::newPivotStatement()->where($this->morphType, get_class($this->parent));
 	}
 
 	/**
@@ -110,7 +110,7 @@ class MorphToMany extends BelongsToMany {
 
 		$pivot->setPivotKeys($this->foreignKey, $this->otherKey);
 
-		$pivot->setMorphType($this->name.'_type');
+		$pivot->setMorphType($this->morphType);
 
 		return $pivot;
 	}

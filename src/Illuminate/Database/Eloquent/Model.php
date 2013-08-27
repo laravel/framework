@@ -639,7 +639,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $otherKey
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
 	 */
-	public function morphToMany($related, $name, $table, $foreignKey = null, $otherKey = null)
+	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
 	{
 		$caller = $this->getBelongsToManyCaller();
 
@@ -656,6 +656,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// the relationship instances for the relation. The relations will set
 		// appropriate query constraint and entirely manages the hydrations.
 		$query = $instance->newQuery();
+
+		$table = $table ?: str_plural($table);
 
 		return new MorphToMany($query, $this, $name, $table, $foreignKey, $otherKey, $caller['function']);
 	}
