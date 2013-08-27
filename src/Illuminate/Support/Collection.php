@@ -180,6 +180,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Reduce the items to a value.
+	 *
+	 * @param  Closure  $callback
+	 * @return mixed
+	 */
+	public function reduce(Closure $callback, $initial=null)
+	{
+		return array_reduce($this->items, $callback, $initial);
+	}
+
+	/**
 	 * Run a filter over each of the items.
 	 *
 	 * @param  Closure  $callback
