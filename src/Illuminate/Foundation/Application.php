@@ -67,7 +67,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 *
 	 * @var array
 	 */
-	protected $finishCallBacks = array();
+	protected $finishCallbacks = array();
 
 	/**
 	 * The array of shutdown callbacks.
