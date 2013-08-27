@@ -618,7 +618,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// are transformed to snake case from their default CamelCase also.
 		if (is_null($table))
 		{
-			$table = $this->joiningTable($related);
+			$table = $this->joiningBelongsTable($related);
 		}
 
 		// Now we're ready to create a new query builder for the related model and
@@ -659,7 +659,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (is_null($table))
 		{
-			$table = $this->joiningTable($name);
+			$table = $this->joiningMorphTable($related);
 		}
 
 		return new MorphToMany($query, $this, $name, $table, $foreignKey, $otherKey, $caller['function']);
@@ -688,7 +688,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $related
 	 * @return string
 	 */
-	public function joiningTable($related)
+	public function joiningBelongsTable($related)
 	{
 		// The joining table name, by convention, is simply the snake cased models
 		// sorted alphabetically and concatenated with an underscore, so we can
@@ -696,6 +696,31 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$base = snake_case(class_basename($this));
 
 		$related = snake_case(class_basename($related));
+
+		$models = array($related, $base);
+
+		// Now that we have the model names in an array we can just sort them and
+		// use the implode function to join them together with an underscores,
+		// which is typically used by convention within the database system.
+		sort($models);
+
+		return strtolower(implode('_', $models));
+	}
+
+	/**
+	 * Get the joining table name for a many-to-many relation.
+	 *
+	 * @param  string  $related
+	 * @return string
+	 */
+	public function joiningMorphTable($related)
+	{
+		// The joining table name, by convention, is simply the snake cased models
+		// sorted alphabetically and concatenated with an underscore, so we can
+		// just sort the models and join them together to get the table name.
+		$base = snake_case(class_basename($this));
+
+		$related = snake_case($related);
 
 		$models = array($related, $base);
 
