@@ -4,7 +4,8 @@
 		{"message": "Allow before and after validation rules to reference other fields.", "backport": null},
 		{"message": "When access view data via __get, it is now returned by reference.", "backport": null},
 		{"message": "Added splice method to Collection class.", "backport": null},
-		{"message": "Added newest and oldest methods to query builder for timestamp short-hand queries.", "backport": null}
+		{"message": "Added newest and oldest methods to query builder for timestamp short-hand queries.", "backport": null},
+		{"message": "Rebuild the routing layer for speed and efficiency.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
