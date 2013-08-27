@@ -10,6 +10,20 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class RouteCollection implements Countable, IteratorAggregate {
 
 	/**
+	 * An array of the routes keyed by method.
+	 *
+	 * @var array
+	 */
+	protected $routes = array();
+
+	/**
+	 * An flattened array of all of the routes.
+	 *
+	 * @var array
+	 */
+	protected $allRoutes = array();
+
+	/**
 	 * A look-up table of routes by their names.
 	 *
 	 * @var array
@@ -35,6 +49,8 @@ class RouteCollection implements Countable, IteratorAggregate {
 		{
 			$this->routes[$method][] = $route;
 		}
+
+		$this->allRoutes[] = $route;
 
 		$this->addLookups($route);
 
@@ -152,9 +168,20 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function get($method = null)
 	{
-		if (is_null($method)) return array_flatten($this->routes);
+		if (is_null($method)) return $this->allRoutes;
 
 		return array_get($this->routes, $method, array());
+	}
+
+	/**
+	 * Deterine if the route collection contains a given named route.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function hasNamedRoute($name)
+	{
+		return ! is_null($this->getByName($name));
 	}
 
 	/**
@@ -186,7 +213,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function getRoutes()
 	{
-		return $this->routes;
+		return $this->allRoutes;
 	}
 
 	/**
@@ -196,14 +223,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function getIterator()
 	{
-		$routes = array();
-		
-		foreach ($this->routes as $method => $inner)
-		{
-			$routes += $inner;
-		}
-
-		return new ArrayIterator($routes);
+		return new ArrayIterator($this->allRoutes);
 	}
 
 	/**
@@ -213,7 +233,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function count()
 	{
-		return count($this->routes);
+		return count($this->allRoutes);
 	}
 
 }

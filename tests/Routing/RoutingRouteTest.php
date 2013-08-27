@@ -327,6 +327,53 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResourceRouting()
+	{
+		$router = $this->getRouter();
+		$router->resource('foo', 'FooController');
+		$routes = $router->getRoutes();
+		$this->assertEquals(8, count($routes));
+
+		$router = $this->getRouter();
+		$router->resource('foo', 'FooController', array('only' => array('show', 'destroy')));
+		$routes = $router->getRoutes();
+
+		$this->assertEquals(2, count($routes));
+
+		$router = $this->getRouter();
+		$router->resource('foo', 'FooController', array('except' => array('show', 'destroy')));
+		$routes = $router->getRoutes();
+
+		$this->assertEquals(6, count($routes));
+	}
+
+
+	public function testResourceRouteNaming()
+	{
+		$router = $this->getRouter();
+		$router->resource('foo', 'FooController');
+
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.index'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.show'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.create'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.store'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.edit'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.update'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.destroy'));
+
+		$router = $this->getRouter();
+		$router->resource('foo.bar', 'FooController');
+
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.create'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.store'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+	}
+
+
 	protected function getRouter()
 	{
 		return new Router(new Illuminate\Events\Dispatcher);
