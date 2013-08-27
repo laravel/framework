@@ -651,7 +651,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			$action = $this->getControllerAction($action);
 		}
 
-		$route = with(new Route($method, $uri, $action));
+		$route = with(new Route(
+			$method, $uri = $this->prefix($uri), $action)
+	);
 
 		$route->where($this->patterns);
 
@@ -664,6 +666,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		}
 
 		return $route;
+	}
+
+	/**
+	 * Prefix the given URI with the last prefix.
+	 *
+	 * @param  string  $uri
+	 * @return string
+	 */
+	protected function prefix($uri)
+	{
+		return trim($this->getLastGroupPrefix().'/'.$uri, '/') ?: '/';
 	}
 
 	/**
