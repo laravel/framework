@@ -97,6 +97,13 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	public static $verbs = array('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS');
 
 	/**
+	 * The default actions for a resourceful controller.
+	 *
+	 * @var array
+	 */
+	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+
+	/**
 	 * Create a new Router instance.
 	 *
 	 * @param  \Illuminate\Events\Dispatcher  $events
