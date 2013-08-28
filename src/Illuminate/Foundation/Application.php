@@ -451,7 +451,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function finish($callback)
 	{
-		$this->finishCallBacks[] = $callback;
+		$this->finishCallbacks[] = $callback;
 	}
 
 	/**
