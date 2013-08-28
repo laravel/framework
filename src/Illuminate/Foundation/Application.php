@@ -242,6 +242,8 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 			$environments, $this->runningInConsole()
 
 		);
+
+		return $this['env'];
 	}
 
 	/**
@@ -568,7 +570,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
-		
+
 		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
