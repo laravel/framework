@@ -5,6 +5,12 @@ use Illuminate\Support\Collection;
 
 class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
+	public static function setUpBeforeClass()
+	{
+		require_once __DIR__.'/stubs/eloquent/Model.php';
+	}
+
+
 	public function testFirstReturnsFirstItemInCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
@@ -247,6 +253,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data = new Collection(array('foo', 'baz'));
 		$data->splice(1, 1, 'bar');
 		$this->assertEquals(array('foo', 'bar'), array_values($data->all()));
+	}
+
+	public function testGetListValueWithAccessors()
+	{
+		$model    = new Eloquent(array('some' => 'foo'));
+		$modelTwo = new Eloquent(array('some' => 'bar'));
+		$data     = new Collection(array($model, $modelTwo));
+
+		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
 	}
 
 }
