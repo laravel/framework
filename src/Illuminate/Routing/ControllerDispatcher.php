@@ -171,7 +171,7 @@ class ControllerDispatcher {
     {
         if ( ! isset($filter['options']['only'])) return false;
 
-        return ! in_array($method, $filter['options']['only']);
+        return ! in_array($method, (array) $filter['options']['only']);
     }
 
     /**
@@ -185,7 +185,7 @@ class ControllerDispatcher {
     {
         if ( ! isset($filter['options']['except'])) return false;
 
-        return in_array($method, $filter['options']['except']);
+        return in_array($method, (array) $filter['options']['except']);
     }
 
     /**
