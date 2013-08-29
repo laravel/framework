@@ -195,7 +195,9 @@ class ControllerDispatcher {
      */
     protected function filterFailsOn($filter, $request, $method)
     {
-        $on = array_get($filter, 'options.on', array());
+        $on = array_get($filter, 'options.on', null);
+
+        if (is_null($on)) return false;
 
         // If the "on" is a string, we will explode it on the pipe so you can set any
         // amount of methods on the filter constraints and it will still work like
