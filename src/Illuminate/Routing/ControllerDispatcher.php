@@ -156,6 +156,8 @@ class ControllerDispatcher {
                 return false;
             }
         }
+
+        return true;
     }
 
     /**
