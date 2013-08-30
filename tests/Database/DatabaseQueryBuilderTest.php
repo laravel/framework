@@ -772,6 +772,25 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
 		$this->assertEquals('select * from "foo" where "bar" = ? for update', $builder->toSql());
 		$this->assertEquals(array('baz'), $builder->getBindings());
+
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
+		$this->assertEquals('select * from "foo" where "bar" = ? lock in share mode', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+	}
+
+
+	public function testPostgresLock()
+	{
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
+		$this->assertEquals('select * from "foo" where "bar" = ? for update', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
+		$this->assertEquals('select * from "foo" where "bar" = ? for share', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
 	}
 
 
