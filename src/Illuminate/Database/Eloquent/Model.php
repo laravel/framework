@@ -584,6 +584,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$instance = new $related;
 
+		// Here we will gather up the morph type and ID for the relationship so that we
+		// can properly query the intermediate table of a relation. Finally, we will
+		// get the table and create the relationship instances for the developers.
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
 		$table = $instance->getTable();
