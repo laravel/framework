@@ -766,6 +766,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMySqlLock()
+	{
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
+		$this->assertEquals('select * from "foo" where "bar" = ? for update', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+	}
+
+
 	protected function getBuilder()
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
