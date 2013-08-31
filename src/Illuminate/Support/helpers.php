@@ -930,6 +930,8 @@ if ( ! function_exists('with'))
 	 */
 	function with($object)
 	{
+		if (is_string($object)) return new $object;
+
 		return $object;
 	}
 }
