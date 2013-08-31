@@ -190,6 +190,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $mutatorCache = array();
 
 	/**
+	 * The many to many relationship methods.
+	 *
+	 * @var array
+	 */
+	public static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
+
+	/**
 	 * The name of the "created at" column.
 	 *
 	 * @var string
@@ -647,18 +654,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$caller = $this->getBelongsToManyCaller();
 
-		// First, we'll need to determine the foreign key and "other key" for the
-		// relationship. Once we have determined the keys we'll make the query
-		// instances as well as the relationship instances we need for this.
+		// First, we will need to determine the foreign key and "other key" for the
+		// relationship. Once we have determined the keys we will make the query
+		// instances, as well as the relationship instances we need for these.
 		$foreignKey = $foreignKey ?: $name.'_id';
 
 		$instance = new $related;
 
 		$otherKey = $otherKey ?: $instance->getForeignKey();
 
-		// Now we're ready to create a new query builder for the related model and
-		// the relationship instances for the relation. The relations will set
-		// appropriate query constraint and entirely manages the hydrations.
+		// Now we're ready to create a new query builder for this related model and
+		// the relationship instances for this relation. This relations will set
+		// appropriate query constraints then entirely manages the hydrations.
 		$query = $instance->newQuery();
 
 		$table = $table ?: str_plural($name);
@@ -684,6 +691,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
+		// For the inverse of the polymorphic many-to-many relations, we will change
+		// the way we determine the foreign and other keys, as it is the opposite
+		// of the morph-to-many method since we're figuring out these inverses.
 		$otherKey = $otherKey ?: $name.'_id';
 
 		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
@@ -702,9 +712,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$caller = $trace['function'];
 
-			$manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
-
-			return ( ! in_array($caller, $manyMethods) and $caller != $self);
+			return ( ! in_array($caller, Model::$manyMethods) and $caller != $self);
 		});
 	}
 
