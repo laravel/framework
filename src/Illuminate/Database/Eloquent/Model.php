@@ -640,9 +640,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
+	 * @param  bool  $inverse
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
 	 */
-	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
+	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
 	{
 		$caller = $this->getBelongsToManyCaller();
 
@@ -662,7 +663,30 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$table = $table ?: str_plural($name);
 
-		return new MorphToMany($query, $this, $name, $table, $foreignKey, $otherKey, $caller['function']);
+		return new MorphToMany(
+			$query, $this, $name, $table, $foreignKey,
+			$otherKey, $caller['function'], $inverse
+		);
+	}
+
+	/**
+	 * Define a many-to-many relationship.
+	 *
+	 * @param  string  $related
+	 * @param  string  $name
+	 * @param  string  $table
+	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
+	 * @param  string  $morphClass
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+	 */
+	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
+	{
+		$foreignKey = $foreignKey ?: $this->getForeignKey();
+
+		$otherKey = $otherKey ?: $name.'_id';
+
+		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
 	}
 
 	/**
@@ -678,7 +702,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$caller = $trace['function'];
 
-			return $caller != 'belongsToMany' and $caller != $self;
+			$manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
+
+			return ( ! in_array($caller, $manyMethods) and $caller != $self);
 		});
 	}
 

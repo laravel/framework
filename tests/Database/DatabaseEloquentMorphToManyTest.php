@@ -99,7 +99,7 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
 		$builder->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($parent));
 
-		return array($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'relation_name');
+		return array($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'relation_name', false);
 	}
 
 }
