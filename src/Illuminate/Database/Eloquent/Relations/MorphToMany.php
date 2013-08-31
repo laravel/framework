@@ -16,6 +16,22 @@ class MorphToMany extends BelongsToMany {
 	protected $morphType;
 
 	/**
+	 * The class name of the morph type constraint.
+	 *
+	 * @var string
+	 */
+	protected $morphClass;
+
+	/**
+	 * Indicates if we are connecting the inverse of the relation.
+	 *
+	 * This primarily affects the morphClass constraint.
+	 *
+	 * @var bool
+	 */
+	protected $inverse;
+
+	/**
 	 * Create a new has many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -25,11 +41,14 @@ class MorphToMany extends BelongsToMany {
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  string  $relationName
+	 * @param  bool  $inverse
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null)
+	public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null, $inverse = false)
 	{
+		$this->inverse = $inverse;
 		$this->morphType = $name.'_type';
+		$this->morphClass = $inverse ? get_class($query->getModel()) : get_class($parent);
 
 		parent::__construct($query, $parent, $table, $foreignKey, $otherKey, $relationName);
 	}
@@ -43,7 +62,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		parent::setWhere();
 
-		$this->query->where($this->table.'.'.$this->morphType, get_class($this->parent));
+		$this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
 
 		return $this;
 	}
@@ -58,7 +77,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		parent::addEagerConstraints($models);
 
-		$this->query->where($this->table.'.'.$this->morphType, get_class($this->parent));
+		$this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
 	}
 
 	/**
@@ -72,7 +91,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		$record = parent::createAttachRecord($id, $timed);
 
-		return array_add($record, $this->morphType, get_class($this->parent));
+		return array_add($record, $this->morphType, $this->morphClass);
 	}
 
 	/**
@@ -84,7 +103,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		$query = parent::newPivotQuery();
 
-		return $query->where($this->morphType, get_class($this->parent));
+		return $query->where($this->morphType, $this->morphClass);
 	}
 
 	/**
