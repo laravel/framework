@@ -67,7 +67,8 @@ abstract class Queue {
 	{
 		if ($delay instanceof DateTime)
 		{
-			return $delay->getTimestamp() - now();
+			$seconds = $delay->getTimestamp() - now();
+			return max(0, $seconds);
 		}
 
 		return intval($delay);
