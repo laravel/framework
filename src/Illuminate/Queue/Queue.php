@@ -2,7 +2,6 @@
 
 use Closure;
 use DateTime;
-use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
 
@@ -68,7 +67,7 @@ abstract class Queue {
 	{
 		if ($delay instanceof DateTime)
 		{
-			return Carbon::instance($delay)->diffInSeconds();
+			return $delay->getTimestamp() - now();
 		}
 
 		return intval($delay);
