@@ -334,7 +334,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		// the remaining services available to this application for immediate use.
 		array_walk($this->deferredServices, function($p) use ($me)
 		{
-			$this->registerDeferredProvider($p);
+			$me->registerDeferredProvider($p);
 		});
 
 		$this->deferredServices = array();
