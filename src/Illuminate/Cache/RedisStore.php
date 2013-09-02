@@ -36,8 +36,8 @@ class RedisStore implements StoreInterface {
 	public function __construct(Redis $redis, $prefix = '', $connection = 'default')
 	{
 		$this->redis = $redis;
-		$this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
 		$this->connection = $connection;
+		$this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
 	}
 
 	/**
