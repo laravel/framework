@@ -230,6 +230,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
+	 * Determine if application is in local environment.
+	 *
+	 * @return bool
+	 */
+	public function isLocal()
+	{
+		return $this['env'] == 'local';
+	}
+
+	/**
 	 * Detect the application's current environment.
 	 *
 	 * @param  array|string  $environments
