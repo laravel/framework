@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
@@ -190,13 +189,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $mutatorCache = array();
 
 	/**
-	 * The many to many relationship methods.
-	 *
-	 * @var array
-	 */
-	public static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
-
-	/**
 	 * The name of the "created at" column.
 	 *
 	 * @var string
@@ -284,7 +276,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 	}
 
-/**
+	/**
 	 * Fill the model with an array of attributes.
 	 *
 	 * @param  array  $attributes
@@ -304,7 +296,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
     /**
-     * Assigns all keys in the attributes array.
+     * Fills the model using all data in the attributes array
      *
      * @param array $attributes
      * @throws MassAssignmentException
@@ -327,25 +319,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     }
 
     /**
-     * Only looks at keys in fillable and assigns them based on values in the attributes array.
+     * Fills the model using only data from the fillable array.
      *
      * @param array $attributes
      * @throws MassAssignmentException
      */
     private function fillWithFillable(array $attributes)
     {
-        foreach ($this->fillable as $key => $value)
+        foreach ($this->fillable as $value)
 		{
             $value = $this->removeTableFromKey($value);
-            if(!isset($attributes[$value])) continue;
-
-            if($this->isFillable($key))
+            if(isset($attributes[$value]))
             {
-                    $this->setAttribute($value, $attributes[$value]);
-            }
-            elseif($this->totallyGuarded())
-            {
-                throw new MassAssignmentException($value);
+                if($this->isFillable($value))
+                {
+                        $this->setAttribute($value, $attributes[$value]);
+                }
+                elseif($this->totallyGuarded())
+                {
+                    throw new MassAssignmentException($value);
+                }
             }
 		}
     }
@@ -630,9 +623,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$instance = new $related;
 
-		// Here we will gather up the morph type and ID for the relationship so that we
-		// can properly query the intermediate table of a relation. Finally, we will
-		// get the table and create the relationship instances for the developers.
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
 		$table = $instance->getTable();
@@ -679,66 +669,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Define a many-to-many relationship.
-	 *
-	 * @param  string  $related
-	 * @param  string  $name
-	 * @param  string  $table
-	 * @param  string  $foreignKey
-	 * @param  string  $otherKey
-	 * @param  bool  $inverse
-	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
-	 */
-	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
-	{
-		$caller = $this->getBelongsToManyCaller();
-
-		// First, we will need to determine the foreign key and "other key" for the
-		// relationship. Once we have determined the keys we will make the query
-		// instances, as well as the relationship instances we need for these.
-		$foreignKey = $foreignKey ?: $name.'_id';
-
-		$instance = new $related;
-
-		$otherKey = $otherKey ?: $instance->getForeignKey();
-
-		// Now we're ready to create a new query builder for this related model and
-		// the relationship instances for this relation. This relations will set
-		// appropriate query constraints then entirely manages the hydrations.
-		$query = $instance->newQuery();
-
-		$table = $table ?: str_plural($name);
-
-		return new MorphToMany(
-			$query, $this, $name, $table, $foreignKey,
-			$otherKey, $caller['function'], $inverse
-		);
-	}
-
-	/**
-	 * Define a many-to-many relationship.
-	 *
-	 * @param  string  $related
-	 * @param  string  $name
-	 * @param  string  $table
-	 * @param  string  $foreignKey
-	 * @param  string  $otherKey
-	 * @param  string  $morphClass
-	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
-	 */
-	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
-	{
-		$foreignKey = $foreignKey ?: $this->getForeignKey();
-
-		// For the inverse of the polymorphic many-to-many relations, we will change
-		// the way we determine the foreign and other keys, as it is the opposite
-		// of the morph-to-many method since we're figuring out these inverses.
-		$otherKey = $otherKey ?: $name.'_id';
-
-		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
-	}
-
-	/**
 	 * Get the relationship name of the belongs to many.
 	 *
 	 * @return  string
@@ -751,7 +681,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$caller = $trace['function'];
 
-			return ( ! in_array($caller, Model::$manyMethods) and $caller != $self);
+			return $caller != 'belongsToMany' and $caller != $self;
 		});
 	}
 
@@ -1995,7 +1925,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			// If the relationships snake-casing is enabled, we will snake case this
 			// key so that the relation attribute is snake cased in this returned
-			// array to the developers, making this consistent with attributes.
+			// array to the developer, making this consisntent with attributes.
 			if (static::$snakeAttributes)
 			{
 				$key = snake_case($key);
@@ -2260,7 +2190,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		// If the value is in simply year, month, day format, we will instantiate the
-		// Carbon instances from that format. Again, this provides for simple date
+		// Carbon instances from that fomrat. Again, this provides for simple date
 		// fields on the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{
