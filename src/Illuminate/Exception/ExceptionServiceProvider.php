@@ -170,9 +170,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function getResourcePath()
 	{
-		$base = $this->app['path.base'];
-
-		return $base.'/vendor/laravel/framework/src/Illuminate/Exception/resources';
+		return __DIR__.'/resources';
 	}
 
 }
