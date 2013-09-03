@@ -414,6 +414,17 @@ class Environment {
 	{
 		$this->events->fire('creating: '.$view->getName(), array($view));
 	}
+	
+	/**
+	 * Call the rendered event for a given view.
+	 *
+	 * @param  \Illuminate\View\View  $view
+	 * @return void
+	 */
+	public function callRendered(View $view)
+	{
+		$this->events->fire('rendered: '.$view->getName(), array($view));
+	}
 
 	/**
 	 * Start injecting content into a section.
