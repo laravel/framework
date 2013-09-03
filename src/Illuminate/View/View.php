@@ -79,6 +79,8 @@ class View implements ArrayAccess, Renderable {
 		$env->callComposer($this);
 
 		$contents = trim($this->getContents());
+		
+		$env->callRendered($this);
 
 		// Once we've finished rendering the view, we'll decrement the render count
 		// then if we are at the bottom of the stack we'll flush out sections as
