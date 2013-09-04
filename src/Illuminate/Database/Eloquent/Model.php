@@ -276,7 +276,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 	}
 
-   /**
+	/**
 	 * Fill the model with an array of attributes.
 	 *
 	 * @param  array $attributes
