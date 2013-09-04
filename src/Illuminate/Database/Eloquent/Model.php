@@ -99,7 +99,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * The accessors to append to the model's array form.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $appends = array();
@@ -1926,7 +1926,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return array_intersect_key($values, array_flip($this->visible));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));	
+		return array_diff_key($values, array_flip($this->hidden));
 	}
 
 	/**
@@ -2154,7 +2154,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// fields on the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{
-			return Carbon::createFromFormat('Y-m-d', $value);
+			return Carbon::createFromFormat('Y-m-d', $value)->setTime(0, 0, 0);
 		}
 
 		// Finally, we will just assume this date is in the format used by default on
@@ -2275,7 +2275,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * Get all the loaded relations for the instance.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getRelations()
