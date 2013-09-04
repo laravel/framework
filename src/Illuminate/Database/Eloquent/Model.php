@@ -276,72 +276,75 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 	}
 
-	/**
+   /**
 	 * Fill the model with an array of attributes.
 	 *
-	 * @param  array  $attributes
+	 * @param  array $attributes
 	 * @return \Illuminate\Database\Eloquent\Model|static
 	 */
 	public function fill(array $attributes)
 	{
-        // The developers may choose to place some attributes in the "fillable"
-        // array, which means only those attributes may be set through mass
-        // assignment to the model, and all others will just be ignored.
-		if(empty($this->fillable))
-            $this->fillWithAttributes($attributes);
-        else
-            $this->fillWithFillable($attributes);
-
-        return $this;
+		// The developers may choose to place some attributes in the "fillable"
+		// array, which means only those attributes may be set through mass
+		// assignment to the model, and all others will just be ignored.
+		if (empty($this->fillable))
+		{
+			$this->fillWithAttributes($attributes);
+		}
+		else
+		{
+			$this->fillWithFillable($attributes);
+		}
+		
+		return $this;
 	}
-
-    /**
-     * Fills the model using all data in the attributes array
-     *
-     * @param array $attributes
-     * @throws MassAssignmentException
-     */
-    private function fillWithAttributes(array $attributes)
-    {
-        foreach($attributes as $key => $value)
-        {
-            $key = $this->removeTableFromKey($key);
-
-            if ($this->isFillable($key))
+	
+	/**
+	 * Fills the model using all data in the given attributes array
+	 *
+	 * @param array $attributes
+	 * @throws MassAssignmentException
+	 */
+	public function fillWithAttributes(array $attributes)
+	{
+		foreach ($attributes as $key => $value)
+		{
+			$key = $this->removeTableFromKey($key);
+	
+			if ($this->isFillable($key))
 			{
 				$this->setAttribute($key, $value);
-			}
-            elseif ($this->totallyGuarded())
-            {
+			} 
+			elseif ($this->totallyGuarded())
+			{
 				throw new MassAssignmentException($key);
-            }
-        }
-    }
-
-    /**
-     * Fills the model using only data from the fillable array.
-     *
-     * @param array $attributes
-     * @throws MassAssignmentException
-     */
-    private function fillWithFillable(array $attributes)
-    {
-        foreach ($this->fillable as $value)
-		{
-            $value = $this->removeTableFromKey($value);
-            if(isset($attributes[$value]))
-            {
-                if($this->isFillable($value))
-                {
-                        $this->setAttribute($value, $attributes[$value]);
-                }
-                elseif($this->totallyGuarded())
-                {
-                    throw new MassAssignmentException($value);
-                }
-            }
+			}
 		}
-    }
+	}
+	
+	/**
+	 * Fills the model using only data with keys from the fillable array.
+	 *
+	 * @param array $attributes
+	 * @throws MassAssignmentException
+	 */
+	public function fillWithFillable(array $attributes)
+	{
+		foreach ($this->fillable as $value)
+		{
+			$value = $this->removeTableFromKey($value);
+			if (isset($attributes[$value]))
+			{
+				if ($this->isFillable($value))
+				{
+					$this->setAttribute($value, $attributes[$value]);
+				} else if ($this->totallyGuarded())
+				{
+					throw new MassAssignmentException($value);
+				}
+			}
+		}
+	}
 
 
 	/**
