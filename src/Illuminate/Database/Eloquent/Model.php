@@ -2152,7 +2152,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the value is in simply year, month, day format, we will instantiate the
 		// Carbon instances from that fomrat. Again, this provides for simple date
 		// fields on the database, while still supporting Carbonized conversion.
-		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
+		elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value))
 		{
 			return Carbon::createFromFormat('Y-m-d', $value)->setTime(0, 0, 0);
 		}
