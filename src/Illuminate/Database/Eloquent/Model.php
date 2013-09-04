@@ -330,17 +330,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function fillWithFillable(array $attributes)
 	{
-		foreach ($this->fillable as $value)
+		foreach ($this->fillable as $key)
 		{
-			$value = $this->removeTableFromKey($value);
-			if (isset($attributes[$value]))
+			$key = $this->removeTableFromKey($key);
+			if (isset($attributes[$key]))
 			{
-				if ($this->isFillable($value))
+				if ($this->isFillable($key))
 				{
-					$this->setAttribute($value, $attributes[$value]);
+					$this->setAttribute($key, $attributes[$key]);
 				} else if ($this->totallyGuarded())
 				{
-					throw new MassAssignmentException($value);
+					throw new MassAssignmentException($key);
 				}
 			}
 		}
