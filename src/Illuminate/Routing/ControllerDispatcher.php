@@ -156,6 +156,8 @@ class ControllerDispatcher {
                 return false;
             }
         }
+
+        return true;
     }
 
     /**
@@ -169,11 +171,11 @@ class ControllerDispatcher {
     {
         if ( ! isset($filter['options']['only'])) return false;
 
-        return ! in_array($method, $filter['options']['only']);
+        return ! in_array($method, (array) $filter['options']['only']);
     }
 
     /**
-     * Determine if the filter fails the "only" cosntraint.
+     * Determine if the filter fails the "except" cosntraint.
      *
      * @param  array  $filter
      * @param  \Illuminate\Http\Request  $request
@@ -183,11 +185,11 @@ class ControllerDispatcher {
     {
         if ( ! isset($filter['options']['except'])) return false;
 
-        return in_array($method, $filter['options']['except']);
+        return in_array($method, (array) $filter['options']['except']);
     }
 
     /**
-     * Determine if the filter fails the "only" cosntraint.
+     * Determine if the filter fails the "on" cosntraint.
      *
      * @param  array  $filter
      * @param  \Illuminate\Http\Request  $request
@@ -195,7 +197,9 @@ class ControllerDispatcher {
      */
     protected function filterFailsOn($filter, $request, $method)
     {
-        $on = array_get($filter, 'options.on', array());
+        $on = array_get($filter, 'options.on', null);
+
+        if (is_null($on)) return false;
 
         // If the "on" is a string, we will explode it on the pipe so you can set any
         // amount of methods on the filter constraints and it will still work like

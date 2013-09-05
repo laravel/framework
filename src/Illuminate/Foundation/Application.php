@@ -342,10 +342,10 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		// We will simply spin through each of the deferred providers and register each
 		// one and boot them if the application has booted. This should make each of
 		// the remaining services available to this application for immediate use.
-		array_walk($this->deferredServices, function($p) use ($me)
+		foreach ($this->deferredServices as $provider)
 		{
-			$this->registerDeferredProvider($p);
-		});
+			$this->registerDeferredProvider($provider);
+		}
 
 		$this->deferredServices = array();
 	}
@@ -461,7 +461,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function finish($callback)
 	{
-		$this->finishCallBacks[] = $callback;
+		$this->finishCallbacks[] = $callback;
 	}
 
 	/**
