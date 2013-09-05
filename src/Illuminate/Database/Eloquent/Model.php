@@ -1340,6 +1340,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Get the fully qualified "updated at" column.
+	 *
+	 * @return string
+	 */
+	public function getQualifiedUpdatedAtColumn()
+	{
+		return $this->getTable().'.'.$this->getUpdatedAtColumn();
+	}
+
+	/**
 	 * Get a fresh timestamp for the model.
 	 *
 	 * @return DateTime
