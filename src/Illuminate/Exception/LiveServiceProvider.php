@@ -18,27 +18,63 @@ class LiveServiceProvider extends ServiceProvider {
 		}
 	}
 
+	/**
+	 * Register the live debugger events.
+	 *
+	 * @return void
+	 */
 	protected function registerEvents()
 	{
 		$monolog = $this->app['log']->getMonolog();
 
+		foreach (array('Request', 'Events', 'Database') as $event)
+		{
+			$this->{"register{$event}Logger"}($monolog);
+		}
+	}
+
+	/**
+	 * Register the request logger event.
+	 *
+	 * @param  \Monolog\Logger  $monolog
+	 * @return void
+	 */
+	protected function registerRequestLogger($monolog)
+	{
+		$this->app->before(function($request) use ($monolog)
+		{
+			$monolog->addInfo(strtoupper($request->getMethod()).' '.$request->path());
+		});
+	}
+
+	/**
+	 * Register the wildcard event listener.
+	 *
+	 * @param  \Monolog\Logger  $monolog
+	 * @return void
+	 */
+	protected function registerEventsLogger($monolog)
+	{
+		$this->app['events']->listen('*', function() use ($monolog)
+		{
+			if (($event = last(func_get_args())) != 'illuminate.query')
+			{
+				$monolog->addInfo('Event fired: '.$event);
+			}
+		});
+	}
+
+	/**
+	 * Register the database query listener.
+	 *
+	 * @param  \Monolog\Logger  $monolog
+	 * @return void
+	 */
+	protected function registerDatabaseLogger($monolog)
+	{
 		$this->app['events']->listen('illuminate.query', function($sql, $bindings, $time) use ($monolog)
 		{
 			$monolog->addInfo($sql);
-		});
-
-		$this->app->before(function($request) use ($monolog)
-		{
-			$monolog->addInfo('Incoming request: '.$request->method().' '.$request->path());
-		});
-
-		$this->app['events']->listen('*', function() use ($monolog)
-		{
-			$event = last(func_get_args());
-			if ($event != 'illuminate.query')
-			{
-				$monolog->addInfo('Event fired: '.last(func_get_args()));
-			}
 		});
 	}
 
