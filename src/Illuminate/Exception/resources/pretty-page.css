@@ -51,7 +51,7 @@ header {
   }
     .exc-title-primary { color: #ED591A; }
     .exc-message {
-      font-size: 32px;
+      font-size: 16px;
       margin: 5px 0;
       word-wrap: break-word;
     }
