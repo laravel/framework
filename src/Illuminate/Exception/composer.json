@@ -15,6 +15,7 @@
         "symfony/http-kernel": "2.3.*"
     },
     "require-dev": {
+        "monolog/monolog": "1.6.x",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },
