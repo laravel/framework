@@ -65,6 +65,16 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Get the base URL for the current request.
+	 *
+	 * @return string
+	 */
+	public function base($secure = null)
+	{
+		return $this->to(null, array(), $secure);
+	}
+
+	/**
 	 * Generate a absolute URL to the given path.
 	 *
 	 * @param  string  $path
