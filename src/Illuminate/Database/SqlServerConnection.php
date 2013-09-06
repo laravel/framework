@@ -58,16 +58,6 @@ class SqlServerConnection extends Connection {
 	}
 
 	/**
-	 * Get the Doctrine DBAL Driver.
-	 *
-	 * @return \Doctrine\DBAL\Driver
-	 */
-	protected function getDoctrineDriver()
-	{
-		return new \Doctrine\DBAL\Driver\PDOSqlsrv\Driver;
-	}
-
-	/**
 	 * Get the default post processor instance.
 	 *
 	 * @return \Illuminate\Database\Query\Processors\Processor

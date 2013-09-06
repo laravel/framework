@@ -58,26 +58,6 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testDropColumn()
-	{
-		$connection = m::mock('Illuminate\Database\Connection');
-		$connection->shouldReceive('getDoctrineSchemaManager')->once()->andReturn($schema = m::mock('Doctrine\DBAL\Schema\SqliteSchemaManager'));
-
-		$grammar = $this->getMock('Illuminate\Database\Schema\Grammars\SQLiteGrammar', array('getDoctrineTableDiff'));
-		$grammar->expects($this->once())->method('getDoctrineTableDiff')->will($this->returnValue($diff = (object) array('removedColumns' => array())));
-
-		$connection->shouldReceive('getDoctrineColumn')->once()->with('users', 'foo')->andReturn('bar');
-
-		$schema->shouldReceive('getDatabasePlatform')->once()->andReturn($platform = m::mock('StdClass'));
-		$platform->shouldReceive('getAlterTableSQL')->once()->andReturnUsing(function($diff) { return $diff; });
-
-		$blueprint = new Blueprint('users');
-		$blueprint->dropColumn('foo');
-
-		$this->assertEquals(array('removedColumns' => array('foo' => 'bar')), $blueprint->toSql($connection, $grammar));
-	}
-
-
 	public function testDropUnique()
 	{
 		$blueprint = new Blueprint('users');

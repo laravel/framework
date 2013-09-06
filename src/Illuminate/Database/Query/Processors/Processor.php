@@ -34,4 +34,15 @@ class Processor {
 		return is_numeric($id) ? (int) $id : $id;
 	}
 
+	/**
+	 * Process the results of a column listing query.
+	 *
+	 * @param  array  $results
+	 * @return array
+	 */
+	public function processColumnListing($results)
+	{
+		return $results;
+	}
+
 }
