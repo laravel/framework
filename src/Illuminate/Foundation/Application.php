@@ -277,11 +277,25 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Register a service provider with the application.
+	 * Register a service provider and setup its boot event.
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
 	 * @return void
+	 */
+	public function augment($provider, $options = array())
+	{
+		$provider = $this->register($provider, $options);
+
+		$this->setupDeferredBoot($provider);
+	}
+
+	/**
+	 * Register a service provider with the application.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
+	 * @param  array  $options
+	 * @return \Illuminate\Support\ServiceProvider
 	 */
 	public function register($provider, $options = array())
 	{
@@ -304,6 +318,8 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		}
 
 		$this->markAsRegistered($provider);
+
+		return $provider;
 	}
 
 	/**
