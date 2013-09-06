@@ -212,7 +212,7 @@ class Blueprint {
 	 */
 	public function renameColumn($from, $to)
 	{
-		return $this->addCommand('renameColumn', compact('from', 'to'));
+		throw new \BadMethodCallException("Column renaming has been deprecated.");
 	}
 
 	/**
