@@ -8,7 +8,7 @@
 		{"message": "Rebuild the routing layer for speed and efficiency.", "backport": null},
 		{"message": "Added morphToMany relation for polymorphic many-to-many relations.", "backport": null},
 		{"message": "Deprecated column renaming. Deprecated dropping SQLite columns.", "backport": null},
-		{"message": "Added live debug consol via 'debug' Artisan command.", "backport": null}
+		{"message": "Added live debug console via 'debug' Artisan command.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
