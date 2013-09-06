@@ -241,7 +241,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
 	{
-		throw new \RuntimeException("Dropping columns not supported on SQLite");
+		throw new \BadMethodCallException("SQLite column dropping has been deprecated.");
 	}
 
 	/**
