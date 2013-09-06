@@ -12,7 +12,6 @@
     "require": {
         "php": ">=5.3.0",
         "classpreloader/classpreloader": "1.0.*",
-        "doctrine/dbal": "2.4.x",
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.7",
         "monolog/monolog": "1.6.*",
@@ -26,12 +25,10 @@
         "symfony/css-selector": "2.3.*",
         "symfony/debug": "2.3.*",
         "symfony/dom-crawler": "2.3.*",
-        "symfony/event-dispatcher": "2.3.*",
         "symfony/finder": "2.3.*",
         "symfony/http-foundation": "2.3.*",
         "symfony/http-kernel": "2.3.*",
         "symfony/process": "2.3.*",
-        "symfony/routing": "2.3.*",
         "symfony/translation": "2.3.*"
     },
     "replace": {

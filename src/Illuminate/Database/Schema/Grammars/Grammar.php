@@ -12,58 +12,6 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 abstract class Grammar extends BaseGrammar {
 
 	/**
-	 * Compile a rename column command.
-	 *
-	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
-	 * @param  \Illuminate\Database\Connection  $connection
-	 * @return array
-	 */
-	public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
-	{
-		$schema = $connection->getDoctrineSchemaManager();
-
-		$column = $connection->getDoctrineColumn($blueprint->getTable(), $command->from);
-
-		$tableDiff = $this->getRenamedDiff($blueprint, $command, $column, $schema);
-
-		return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
-	}
-
-	/**
-	 * Get a new column instance with the new column name.
-	 *
-	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
-	 * @param  \Doctrine\DBAL\Schema\Column  $column
-	 * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-	 * @return \Doctrine\DBAL\Schema\TableDiff
-	 */
-	protected function getRenamedDiff(Blueprint $blueprint, Fluent $command, Column $column, SchemaManager $schema)
-	{
-		$tableDiff = $this->getDoctrineTableDiff($blueprint, $schema);
-
-		return $this->setRenamedColumns($tableDiff, $command, $column);
-	}
-
-	/**
-	 * Set the renamed columns on the table diff.
-	 *
-	 * @param  \Doctrine\DBAL\Schema\TableDiff  $tableDiff
-	 * @param  \Illuminate\Support\Fluent  $command
-	 * @param  \Doctrine\DBAL\Schema\Column  $column
-	 * @return \Doctrine\DBAL\Schema\TableDiff
-	 */
-	protected function setRenamedColumns(TableDiff $tableDiff, Fluent $command, Column $column)
-	{
-		$newColumn = new Column($command->to, $column->getType(), $column->toArray());
-
-		$tableDiff->renamedColumns = array($command->from => $newColumn);
-
-		return $tableDiff;
-	}
-
-	/**
 	 * Compile a foreign key command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -244,22 +192,6 @@ abstract class Grammar extends BaseGrammar {
 		if (is_bool($value)) return "'".intval($value)."'";
 
 		return "'".strval($value)."'";
-	}
-
-	/**
-	 * Create an empty Doctrine DBAL TableDiff from the Blueprint.
-	 *
-	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-	 * @return \Doctrine\DBAL\Schema\TableDiff
-	 */
-	protected function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
-	{
-		$tableDiff = new TableDiff($blueprint->getTable());
-
-		$tableDiff->fromTable = $schema->listTableDetails($blueprint->getTable());
-
-		return $tableDiff;
 	}
 
 }

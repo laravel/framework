@@ -28,13 +28,24 @@ class MySqlGrammar extends Grammar {
 	protected $serials = array('bigInteger', 'integer');
 
 	/**
-	 * Compile the query to determine if a table exists.
+	 * Compile the query to determine the list of tables.
 	 *
 	 * @return string
 	 */
 	public function compileTableExists()
 	{
 		return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
+	}
+
+	/**
+	 * Compile the query to determine the list of columns.
+	 *
+	 * @param  string  $table
+	 * @return string
+	 */
+	public function compileColumnExists($table)
+	{
+		return "select column_name from information_schema.columns where table_name = '$table'";
 	}
 
 	/**

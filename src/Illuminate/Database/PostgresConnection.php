@@ -32,14 +32,4 @@ class PostgresConnection extends Connection {
 		return new Query\Processors\PostgresProcessor;
 	}
 
-	/**
-	 * Get the Doctrine DBAL Driver.
-	 *
-	 * @return \Doctrine\DBAL\Driver
-	 */
-	protected function getDoctrineDriver()
-	{
-		return new \Doctrine\DBAL\Driver\PDOPgSql\Driver;
-	}
-
 }
