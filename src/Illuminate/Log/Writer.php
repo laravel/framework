@@ -56,6 +56,23 @@ class Writer {
 	}
 
 	/**
+	 * Call Monolog with the given method and parameters.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	protected function callMonolog($method, $parameters)
+	{
+		if (is_array($parameters[0]))
+		{
+			$parameters[0] = json_encode($parameters[0]);
+		}
+
+		return call_user_func_array(array($this->monolog, $method), $parameters);
+	}
+
+	/**
 	 * Register a file log handler.
 	 *
 	 * @param  string  $path
@@ -124,16 +141,6 @@ class Writer {
 	}
 
 	/**
-	 * Get the underlying Monolog instance.
-	 *
-	 * @return \Monolog\Logger
-	 */
-	public function getMonolog()
-	{
-		return $this->monolog;
-	}
-
-	/**
 	 * Register a new callback handler for when
 	 * a log event is triggered.
 	 *
@@ -148,6 +155,16 @@ class Writer {
 		}
 
 		$this->dispatcher->listen('illuminate.log', $callback);
+	}
+
+	/**
+	 * Get the underlying Monolog instance.
+	 *
+	 * @return \Monolog\Logger
+	 */
+	public function getMonolog()
+	{
+		return $this->monolog;
 	}
 
 	/**
@@ -204,7 +221,7 @@ class Writer {
 
 			$method = 'add'.ucfirst($method);
 
-			return call_user_func_array(array($this->monolog, $method), $parameters);
+			return $this->callMonolog($method, $parameters);
 		}
 
 		throw new \BadMethodCallException("Method [$method] does not exist.");

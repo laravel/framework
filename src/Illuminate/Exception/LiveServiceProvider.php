@@ -6,16 +6,30 @@ use Illuminate\Support\ServiceProvider;
 class LiveServiceProvider extends ServiceProvider {
 
 	/**
+	 * Indicates if loading of the provider is deferred.
+	 *
+	 * @var bool
+	 */
+	protected $defer = true;
+
+	/**
 	 * Register the service provider.
 	 *
 	 * @return void
 	 */
 	public function register()
 	{
-		if ($this->registerMonologHandler())
-		{
-			$this->registerEvents();
-		}
+		$this->registerCommand();
+	}
+
+	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		if ($this->registerMonologHandler()) $this->registerEvents();
 	}
 
 	/**
@@ -27,10 +41,25 @@ class LiveServiceProvider extends ServiceProvider {
 	{
 		$monolog = $this->app['log']->getMonolog();
 
-		foreach (array('Request', 'Events', 'Database') as $event)
+		foreach (array('Request', 'Database') as $event)
 		{
 			$this->{"register{$event}Logger"}($monolog);
 		}
+	}
+
+	/**
+	 * Register the live debugger console command.
+	 *
+	 * @return void
+	 */
+	protected function registerCommand()
+	{
+		$this->app['command.debug'] = $this->app->share(function($app)
+		{
+			return new Console\DebugCommand;
+		});
+
+		$this->commands('command.debug');
 	}
 
 	/**
@@ -43,24 +72,7 @@ class LiveServiceProvider extends ServiceProvider {
 	{
 		$this->app->before(function($request) use ($monolog)
 		{
-			$monolog->addInfo(strtoupper($request->getMethod()).' '.$request->path());
-		});
-	}
-
-	/**
-	 * Register the wildcard event listener.
-	 *
-	 * @param  \Monolog\Logger  $monolog
-	 * @return void
-	 */
-	protected function registerEventsLogger($monolog)
-	{
-		$this->app['events']->listen('*', function() use ($monolog)
-		{
-			if (($event = last(func_get_args())) != 'illuminate.query')
-			{
-				$monolog->addInfo('Event fired: '.$event);
-			}
+			$monolog->addInfo('<info>'.strtolower($request->getMethod()).' '.$request->path().'</info>');
 		});
 	}
 
@@ -74,7 +86,9 @@ class LiveServiceProvider extends ServiceProvider {
 	{
 		$this->app['events']->listen('illuminate.query', function($sql, $bindings, $time) use ($monolog)
 		{
-			$monolog->addInfo($sql);
+			$sql = str_replace_array('\?', $bindings, $sql);
+
+			$monolog->addInfo('<comment>'.$sql.' ['.$time.'ms]</comment>');
 		});
 	}
 
@@ -85,6 +99,8 @@ class LiveServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMonologHandler()
 	{
+		$this->addSocketHandler();
+
 		return $this->establishConnection($this->app['log']->getMonolog());
 	}
 
@@ -97,7 +113,7 @@ class LiveServiceProvider extends ServiceProvider {
 	{
 		$monolog = $this->app['log']->getMonolog();
 
-		$monolog->pushHandler(new SocketHandler('tcp://127.0.0.1:8337'));		
+		$monolog->pushHandler(new SocketHandler('tcp://127.0.0.1:8337'));
 	}
 
 	/**
@@ -110,7 +126,7 @@ class LiveServiceProvider extends ServiceProvider {
 	{
 		try
 		{
-			$monolog->addInfo('Live debugger connecting...');
+			$monolog->addInfo('Debug client connecting...');
 		}
 		catch (\Exception $e)
 		{
@@ -120,6 +136,16 @@ class LiveServiceProvider extends ServiceProvider {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get the services provided by the provider.
+	 *
+	 * @return array
+	 */
+	public function provides()
+	{
+		return array('command.debug');
 	}
 
 }
