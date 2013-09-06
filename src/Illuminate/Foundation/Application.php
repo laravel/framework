@@ -220,6 +220,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
+	 * Attach the live debugger provider.
+	 *
+	 * @return void
+	 */
+	public function attachDebugger()
+	{
+		$this->augment('Illuminate\Exception\LiveServiceProvider');
+	}
+
+	/**
 	 * Get the current application environment.
 	 *
 	 * @return string
