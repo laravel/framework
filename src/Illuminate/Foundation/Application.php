@@ -642,11 +642,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Call the "close" callbacks assigned to the application.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Http\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
-	public function callCloseCallbacks(Request $request, Response $response)
+	public function callCloseCallbacks(SymfonyRequest $request, SymfonyResponse $response)
 	{
 		foreach ($this->closeCallbacks as $callback)
 		{
@@ -657,11 +657,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Call the "finish" callbacks assigned to the application.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Http\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
-	public function callFinishCallbacks(Request $request, Response $response)
+	public function callFinishCallbacks(SymfonyRequest $request, SymfonyResponse $response)
 	{
 		foreach ($this->finishCallbacks as $callback)
 		{
