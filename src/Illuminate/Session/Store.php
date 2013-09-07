@@ -198,7 +198,7 @@ class Store extends SymfonySession {
 	 */
 	protected function mergeNewFlashes(array $keys)
 	{
-		$values = array_unique(array_merge($this->get('flash.new'), $keys));
+		$values = array_unique(array_merge($this->get('flash.new', array()), $keys));
 
 		$this->put('flash.new', $values);
 	}
