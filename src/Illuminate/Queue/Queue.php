@@ -25,6 +25,22 @@ abstract class Queue {
 	}
 
 	/**
+	 * Push a new an array of jobs onto the queue.
+	 *
+	 * @param  array  $jobs
+	 * @param  mixed  $data
+	 * @param  string  $queue
+	 * @return mixed
+	 */
+	public function bulk(array $jobs, $data = '', $queue = null)
+	{
+		foreach ($jobs as $job)
+		{
+			$this->push($job, $data, $queue);
+		}
+	}
+
+	/**
 	 * Create a payload string from the given job and data.
 	 *
 	 * @param  string  $job
