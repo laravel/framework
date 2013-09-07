@@ -241,7 +241,18 @@ class SQLiteGrammar extends Grammar {
 	 */
 	public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
 	{
-		throw new \BadMethodCallException("SQLite column dropping has been deprecated.");
+		$schema = $connection->getDoctrineSchemaManager();
+
+		$tableDiff = $this->getDoctrineTableDiff($blueprint, $schema);
+
+		foreach ($command->columns as $name)
+		{
+			$column = $connection->getDoctrineColumn($blueprint->getTable(), $name);
+
+			$tableDiff->removedColumns[$name] = $column;
+		}
+
+		return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
 	}
 
 	/**
