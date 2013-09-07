@@ -42,6 +42,7 @@
 		{"message": "Allow optional path to be specified with calling _path helpers.", "backport": null},
 		{"message": "Emulate nested transactions in the database connection layer.", "backport": null},
 		{"message": "Added new appends property to Eloquent for adding ot arrays and JSON.", "backport": null},
-		{"message": "Allow connection to be configurable when using Redis based sessions.", "backport": null}
+		{"message": "Allow connection to be configurable when using Redis based sessions.", "backport": null},
+		{"message": "Allow passing DateTime objects to Queue::later.", "backport": null}
 	]
 }
