@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Queue;
 
 use Closure;
+use DateTime;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
 
@@ -54,6 +55,23 @@ abstract class Queue {
 		$closure = serialize(new SerializableClosure($job));
 
 		return array('job' => 'IlluminateQueueClosure', 'data' => compact('closure'));
+	}
+
+	/**
+	 * Calculate the number of seconds from a DateTime object.
+	 *
+	 * @param  \DateTime|int  $delay
+	 * @return int
+	 */
+	protected function calculateSeconds($delay)
+	{
+		if ($delay instanceof DateTime)
+		{
+			$seconds = $delay->getTimestamp() - time();
+			return max(0, $seconds);
+		}
+
+		return intval($delay);
 	}
 
 	/**
