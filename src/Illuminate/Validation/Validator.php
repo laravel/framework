@@ -908,7 +908,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlpha($attribute, $value)
 	{
-		return preg_match('/^([a-z])+$/i', $value);
+		return preg_match('/^([\\p{L}\\p{Mn}])+$/iu', $value);
 	}
 
 	/**
@@ -920,7 +920,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlphaNum($attribute, $value)
 	{
-		return preg_match('/^([a-z0-9])+$/i', $value);
+		return preg_match('/^([\\p{L}\\p{Mn}]|[0-9])+$/iu', $value);
 	}
 
 	/**
@@ -932,7 +932,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlphaDash($attribute, $value)
 	{
-		return preg_match('/^([a-z0-9_-])+$/i', $value);
+		return preg_match('/^([\\p{L}\\p{Mn}]|[0-9_-])+$/iu', $value);
 	}
 
 	/**
