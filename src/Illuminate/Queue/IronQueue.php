@@ -77,7 +77,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $queue
 	 * @return mixed
 	 */
-public function later($delay, $job, $data = '', $queue = null)
+	public function later($delay, $job, $data = '', $queue = null)
 	{
 		$delay = $this->getSeconds($delay);
 
