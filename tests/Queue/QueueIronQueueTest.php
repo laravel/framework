@@ -14,7 +14,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), m::mock('Illuminate\Http\Request'), 'default');
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'foo', 'data' => array(1, 2, 3))))->andReturn('encrypted');
-		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted')->andReturn((object) array('id' => 1));
+		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array('delay' => 0))->andReturn((object) array('id' => 1));
 		$queue->push('foo', array(1, 2, 3));
 	}
 
@@ -25,7 +25,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$name = 'Foo';
 		$closure = new Illuminate\Support\SerializableClosure($innerClosure = function() use ($name) { return $name; });
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'IlluminateQueueClosure', 'data' => array('closure' => serialize($closure)))))->andReturn('encrypted');
-		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted')->andReturn((object) array('id' => 1));
+		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array('delay' => 0))->andReturn((object) array('id' => 1));
 		$queue->push($innerClosure);
 	}
 
