@@ -78,6 +78,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $original = array();
 
 	/**
+	 * The model attribute's default values.
+	 *
+	 * @var array
+	 */
+	protected $defaults = array();
+
+	/**
 	 * The loaded relationships for the model.
 	 *
 	 * @var array
@@ -238,6 +245,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			static::$booted[get_class($this)] = true;
 		}
+
+		$this->setRawAttributes($this->defaults, true);
 
 		$this->fill($attributes);
 	}
