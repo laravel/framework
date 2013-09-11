@@ -77,7 +77,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $queue
 	 * @return mixed
 	 */
-public function later($delay, $job, $data = '', $queue = null)
+	public function later($delay, $job, $data = '', $queue = null)
 	{
 		$delay = $this->getSeconds($delay);
 
@@ -116,7 +116,7 @@ public function later($delay, $job, $data = '', $queue = null)
 	 */
 	public function marshal()
 	{
-		$this->createPushedIronJob($this->marshalPushedJob())->fire();
+		$this->createPushedIronJob($this->marshalPushedJob(), $this->getQueuePushed())->fire();
 
 		return new Response('OK');
 	}
@@ -141,11 +141,12 @@ public function later($delay, $job, $data = '', $queue = null)
 	 * Create a new IronJob for a pushed job.
 	 *
 	 * @param  \StdClass  $job
+	 * @param  string     $queue
 	 * @return \Illuminate\Queue\Jobs\IronJob
 	 */
-	protected function createPushedIronJob($job)
+	protected function createPushedIronJob($job, $queue)
 	{
-		return new IronJob($this->container, $this->iron, $job, $this->default, true);
+		return new IronJob($this->container, $this->iron, $job, $queue, true);
 	}
 
 	/**
@@ -169,6 +170,23 @@ public function later($delay, $job, $data = '', $queue = null)
 	public function getQueue($queue)
 	{
 		return $queue ?: $this->default;
+	}
+
+	/**
+	 * Get the queue for a pushed job.
+	 *
+	 * @return string
+	 */
+	protected function getQueuePushed()
+	{
+		// We want to parse the URL and get the queue that this message was pushed from. The URL
+		// is in the format https://{mq-host}/1/projects/{project-id}/queues/{queue-name}...
+		// but all we care about is the queue name, so that's what we'll get here.
+		$url = parse_url($this->request->header('Iron-Subscriber-Message-Url'));
+
+		$fragments = explode('/', $url['path']);
+
+		return array_get($fragments, 5, $this->default);
 	}
 
 	/**

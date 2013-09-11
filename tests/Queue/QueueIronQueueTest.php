@@ -53,7 +53,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	public function testPopProperlyPopsJobOffOfIron()
 	{
 		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), m::mock('Illuminate\Http\Request'), 'default');
-		$queue->setContainer(m::mock('Illuminate\Container\Container'));		
+		$queue->setContainer(m::mock('Illuminate\Container\Container'));
 		$iron->shouldReceive('getMessage')->once()->with('default')->andReturn($job = m::mock('IronMQ_Message'));
 		$job->body = 'foo';
 		$crypt->shouldReceive('decrypt')->once()->with('foo')->andReturn('foo');
@@ -67,10 +67,11 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('createPushedIronJob'), array($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), $request = m::mock('Illuminate\Http\Request'), 'default'));
 		$request->shouldReceive('header')->once()->with('iron-message-id')->andReturn('message-id');
+		$request->shouldReceive('header')->once()->with('Iron-Subscriber-Message-Url')->andReturn('https://foo-host.com/1/projects/foo-id/queues/test-queue/other-foo');
 		$request->shouldReceive('getContent')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
 		$crypt->shouldReceive('decrypt')->once()->with($content)->andReturn($content);
 		$job = (object) array('id' => 'message-id', 'body' => json_encode(array('foo' => 'bar')), 'pushed' => true);
-		$queue->expects($this->once())->method('createPushedIronJob')->with($this->equalTo($job))->will($this->returnValue($mockIronJob = m::mock('StdClass')));
+		$queue->expects($this->once())->method('createPushedIronJob')->with($this->equalTo($job), 'test-queue')->will($this->returnValue($mockIronJob = m::mock('StdClass')));
 		$mockIronJob->shouldReceive('fire')->once();
 
 		$response = $queue->marshal();
