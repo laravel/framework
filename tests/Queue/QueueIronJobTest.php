@@ -52,13 +52,43 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	protected function getJob()
+	public function testReleaseProperlyCreatesNewJobOnPushedQueues()
 	{
+		$job = $this->getJob(true);
+		$payload = $job->getIronJob()->body;
+
+		$job->getContainer()->shouldReceive('make')->once()->with('queue')->andReturn($QueueManager = m::mock('Illuminate\Queue\QueueManager'));
+		$QueueManager->shouldReceive('connection')->once()->with('iron')->andReturn($IronQueue = m::mock('Illuminate\Queue\IronQueue'));
+		$IronQueue->shouldReceive('later')->once()->with(5, $payload['job'], $payload['data'], 'default', 2);
+
+		$job->release(5);
+	}
+
+
+	public function testAttemptsReturnsAttemptFromPayloadOnPushedQueues()
+	{
+		$job = $this->getJob(true, 8);
+		$payload = $job->getIronJob()->body;
+
+		$this->assertEquals(8, $job->attempts());
+	}
+
+
+	protected function getJob($pushed = false, $attempt = null)
+	{
+		$body = array('job' => 'foo', 'data' => array('data'));
+
+		if( ! is_null($attempt))
+		{
+			$body['attempt'] = $attempt;
+		}
+
 		return new Illuminate\Queue\Jobs\IronJob(
 			m::mock('Illuminate\Container\Container'),
 			m::mock('IronMQ'),
-			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60),
-			'default'
+			(object) array('id' => 1, 'body' => json_encode($body), 'timeout' => 60),
+			'default',
+			$pushed
 		);
 	}
 

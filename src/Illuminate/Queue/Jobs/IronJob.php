@@ -54,6 +54,8 @@ class IronJob extends Job {
 		$this->queue = $queue;
 		$this->pushed = $pushed;
 		$this->container = $container;
+
+		$this->job->body = json_decode($this->job->body, true);
 	}
 
 	/**
@@ -63,7 +65,7 @@ class IronJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job->body, true));
+		$this->resolveAndFire($this->job->body);
 	}
 
 	/**
@@ -92,7 +94,18 @@ class IronJob extends Job {
 		}
 		else
 		{
-			throw new \LogicException("Pushed jobs may not be released.");
+			// Since a pushed job cannot be released back onto the queue,
+			// we'll instead create a new job to push onto the queue,
+			// and we'll increment the last attempt count by one.
+			$payload = $this->job->body;
+
+			$attempt = array_get($payload, 'attempt', 1) + 1;
+
+			$this->container->make('queue')->connection('iron')->later(
+
+				$delay, $payload['job'], $payload['data'], $this->queue, $attempt
+
+			);
 		}
 	}
 
@@ -103,7 +116,14 @@ class IronJob extends Job {
 	 */
 	public function attempts()
 	{
-		throw new \LogicException("This driver doesn't support attempt counting.");
+		if ($this->pushed)
+		{
+			return array_get($this->job->body, 'attempt', 1);
+		}
+		else
+		{
+			throw new \LogicException("This driver doesn't support attempt counting.");
+		}
 	}
 
 	/**
