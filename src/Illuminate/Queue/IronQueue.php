@@ -59,11 +59,12 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  integer $attempt
 	 * @return mixed
 	 */
-	public function push($job, $data = '', $queue = null)
+	public function push($job, $data = '', $queue = null, $attempt = null)
 	{
-		return $this->later(0, $job, $data, $queue);
+		return $this->later(0, $job, $data, $queue, $attempt);
 	}
 
 	/**
@@ -71,15 +72,16 @@ class IronQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
-	 * @param  mixed  data
+	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  integer $attempt
 	 * @return mixed
 	 */
-	public function later($delay, $job, $data = '', $queue = null)
+	public function later($delay, $job, $data = '', $queue = null, $attempt = null)
 	{
 		$delay = $this->getSeconds($delay);
 
-		$payload = $this->createPayload($job, $data);
+		$payload = $this->createPayload($job, $data, $attempt);
 
 		return $this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'))->id;
 	}
@@ -154,9 +156,9 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  mixed   $data
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $attempt = null)
 	{
-		return $this->crypt->encrypt(parent::createPayload($job, $data));
+		return $this->crypt->encrypt(parent::createPayload($job, $data, $attempt));
 	}
 
 	/**

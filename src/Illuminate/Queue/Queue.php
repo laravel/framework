@@ -43,20 +43,28 @@ abstract class Queue {
 	/**
 	 * Create a payload string from the given job and data.
 	 *
-	 * @param  string  $job
-	 * @param  mixed   $data
+	 * @param  string   $job
+	 * @param  mixed    $data
+	 * @param  integer  $attempt
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $attempt = null)
 	{
 		if ($job instanceof Closure)
 		{
-			return json_encode($this->createClosurePayload($job, $data));
+			$payload = $this->createClosurePayload($job, $data);
 		}
 		else
 		{
-			return json_encode(array('job' => $job, 'data' => $data));
+			$payload = compact('job', 'data');
 		}
+
+		if ( ! is_null($attempt))
+		{
+			$payload['attempt'] = max(1, $attempt);
+		}
+
+		return json_encode($payload);
 	}
 
 	/**
