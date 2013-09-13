@@ -32,7 +32,7 @@ class HtmlBuilder {
 	/**
 	 * Register a custom HTML macro.
 	 *
-	 * @param  string    $name
+	 * @param  string   $name
 	 * @param  callable  $macro
 	 * @return void
 	 */
@@ -72,7 +72,7 @@ class HtmlBuilder {
 	 */
 	public function script($url, $attributes = array())
 	{
-		$attributes['src'] = $this->url->asset($url);
+		$attributes['src'] = $this->url->asset($this->appendMTime($url));
 
 		return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
 	}
@@ -90,7 +90,7 @@ class HtmlBuilder {
 
 		$attributes = $attributes + $defaults;
 
-		$attributes['href'] = $this->url->asset($url);
+		$attributes['href'] = $this->url->asset($this->appendMTime($url));
 
 		return '<link'.$this->attributes($attributes).'>'.PHP_EOL;
 	}
@@ -107,7 +107,7 @@ class HtmlBuilder {
 	{
 		$attributes['alt'] = $alt;
 
-		return '<img src="'.$this->url->asset($url).'"'.$this->attributes($attributes).'>';
+		return '<img src="'.$this->url->asset($this->appendMTime($url)).'"'.$this->attributes($attributes).'>';
 	}
 
 	/**
@@ -116,7 +116,7 @@ class HtmlBuilder {
 	 * @param  string  $url
 	 * @param  string  $title
 	 * @param  array   $attributes
-	 * @param  bool    $secure
+	 * @param  bool $secure
 	 * @return string
 	 */
 	public function link($url, $title = null, $attributes = array(), $secure = null)
@@ -127,7 +127,7 @@ class HtmlBuilder {
 
 		return '<a href="'.$url.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
-	
+
 	/**
 	 * Generate a HTTPS HTML link.
 	 *
@@ -147,7 +147,7 @@ class HtmlBuilder {
 	 * @param  string  $url
 	 * @param  string  $title
 	 * @param  array   $attributes
-	 * @param  bool    $secure
+	 * @param  bool $secure
 	 * @return string
 	 */
 	public function linkAsset($url, $title = null, $attributes = array(), $secure = null)
@@ -200,7 +200,7 @@ class HtmlBuilder {
 
 	/**
 	 * Generate a HTML link to an email address.
-	 * 
+	 *
 	 * @param  string  $email
 	 * @param  string  $title
 	 * @param  array   $attributes
@@ -209,14 +209,14 @@ class HtmlBuilder {
 	public function mailto($email, $title = null, $attributes = array())
 	{
 		$email = $this->email($email);
-		
+
 		$title = $title ?: $email;
-		
+
 		$email = $this->obfuscate('mailto:') . $email;
-		
+
 		return '<a href="'.$email.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
-	
+
 	/**
 	 * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
 	 *
@@ -282,7 +282,7 @@ class HtmlBuilder {
 	/**
 	 * Create the HTML for a listing element.
 	 *
-	 * @param  mixed    $key
+	 * @param  mixed	$key
 	 * @param  string  $type
 	 * @param  string  $value
 	 * @return string
@@ -302,7 +302,7 @@ class HtmlBuilder {
 	/**
 	 * Create the HTML for a nested listing attribute.
 	 *
-	 * @param  mixed    $key
+	 * @param  mixed	$key
 	 * @param  string  $type
 	 * @param  string  $value
 	 * @return string
@@ -354,6 +354,21 @@ class HtmlBuilder {
 		if (is_numeric($key)) $key = $value;
 
 		if ( ! is_null($value)) return $key.'="'.e($value).'"';
+	}
+
+	/**
+	 * Append mtime to file
+	 *
+	 * @param   string  $url
+	 * @return  string
+	 */
+	public function appendMTime($url)
+	{
+		if (file_exists(public_path() . '/' . $url))
+		{
+			return $url . '?mtime=' . filemtime(public_path() . '/' . $url);
+		}
+		return $url;
 	}
 
 	/**
