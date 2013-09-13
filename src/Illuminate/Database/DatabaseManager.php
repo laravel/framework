@@ -88,13 +88,13 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 * Disconnect from the given database.
 	 *
 	 * @param  string  $name
-	 * @return boolean
+	 * @return void
 	 */
 	public function disconnect($name = null)
 	{
 		$name = $name ?: $this->getDefaultConnection();
 
-		return unset($this->connections[$name]);
+		unset($this->connections[$name]);
 	}
 
 	/**
