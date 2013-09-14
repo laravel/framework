@@ -1198,7 +1198,7 @@ class Router {
 	{
 		foreach ((array) $names as $name)
 		{
-			if ( ! is_null($methods)) $methods = array_change_key_case((array) $methods);
+			if ( ! is_null($methods)) $methods = array_map('strtolower', (array) $methods);
 
 			$this->patternFilters[$pattern][] = compact('name', 'methods');
 		}
