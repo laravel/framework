@@ -20,7 +20,7 @@ class Router {
 	/**
 	 * The route collection instance.
 	 *
-	 * @var Symfony\Component\Routing\RouteCollection
+	 * @var \Symfony\Component\Routing\RouteCollection
 	 */
 	protected $routes;
 
@@ -83,7 +83,7 @@ class Router {
 	/**
 	 * The current request being dispatched.
 	 *
-	 * @var Symfony\Component\HttpFoundation\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $currentRequest;
 
@@ -342,7 +342,7 @@ class Router {
 
 		$me = $this;
 
-		return $this->group(array('prefix' => $prefix), function() use ($me, $resource, $controller, $options)
+		$this->group(array('prefix' => $prefix), function() use ($me, $resource, $controller, $options)
 		{
 			$me->resource($resource, $controller, $options);
 		});
@@ -388,7 +388,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addResourceIndex($name, $base, $controller)
 	{
@@ -403,7 +403,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addResourceCreate($name, $base, $controller)
 	{
@@ -418,7 +418,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addResourceStore($name, $base, $controller)
 	{
@@ -433,7 +433,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addResourceShow($name, $base, $controller)
 	{
@@ -448,7 +448,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addResourceEdit($name, $base, $controller)
 	{
@@ -463,7 +463,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addResourceUpdate($name, $base, $controller)
 	{
@@ -478,7 +478,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addPutResourceUpdate($name, $base, $controller)
 	{
@@ -493,13 +493,13 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addPatchResourceUpdate($name, $base, $controller)
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
-		$this->patch($uri, $controller.'@update');
+		return $this->patch($uri, $controller.'@update');
 	}
 
 	/**
@@ -508,7 +508,7 @@ class Router {
 	 * @param  string  $name
 	 * @param  string  $base
 	 * @param  string  $controller
-	 * @return void
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addResourceDestroy($name, $base, $controller)
 	{
@@ -572,8 +572,6 @@ class Router {
 	 */
 	protected function getResourceAction($resource, $controller, $method)
 	{
-		$name = $resource.'.'.$method;
-
 		// If we have a group stack, we will append the full prefix onto the resource
 		// route name so that we don't override other route with the same name but
 		// a different prefix. We'll then return out the complete action arrays.
@@ -586,7 +584,7 @@ class Router {
 	 * Get the name for a given resource.
 	 *
 	 * @param  string  $resource
-	 * @param  string  $name
+	 * @param  string  $method
 	 * @return string
 	 */
 	protected function getResourceName($resource, $method)
@@ -689,7 +687,7 @@ class Router {
 		{
 			$action = $this->parseAction($action);
 		}
-		
+
 		$groupCount = count($this->groupStack);
 
 		// If there are attributes being grouped across routes we will merge those
@@ -1122,8 +1120,8 @@ class Router {
 			return function() use ($callback, $container)
 			{
 				$callable = array($container->make($callback), 'filter');
-				
-				return call_user_func_array($callable, func_get_args());			
+
+				return call_user_func_array($callable, func_get_args());
 			};
 		}
 		else
@@ -1334,16 +1332,18 @@ class Router {
 		$this->patterns[$key] = $pattern;
 	}
 
+
 	/**
 	 * Register a model binder for a wildcard.
 	 *
-	 * @param  string  $key
-	 * @param  string  $class
+	 * @param  string    $key
+	 * @param  string    $class
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public function model($key, $class, Closure $callback = null)
 	{
-		return $this->bind($key, function($value) use ($class, $callback)
+		$this->bind($key, function($value) use ($class, $callback)
 		{
 			if (is_null($value)) return null;
 
@@ -1372,6 +1372,7 @@ class Router {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $binder
+	 * @return void
 	 */
 	public function bind($key, $binder)
 	{
@@ -1402,11 +1403,12 @@ class Router {
 		return call_user_func($this->binders[$key], $value, $route);
 	}
 
+
 	/**
 	 * Prepare the given value as a Response object.
 	 *
-	 * @param  mixed  $value
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  mixed $value
+	 * @param  \Symfony\Component\HttpFoundation\Request $request
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function prepare($value, Request $request)
@@ -1419,7 +1421,7 @@ class Router {
 	/**
 	 * Convert routing exception to HttpKernel version.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return void
 	 */
 	protected function handleRoutingException(\Exception $e)
@@ -1462,8 +1464,8 @@ class Router {
 	public function currentRouteNamed($name)
 	{
 		$route = $this->routes->get($name);
-		
-		return ! is_null($route) and $route === $this->currentRoute;	
+
+		return ! is_null($route) and $route === $this->currentRoute;
 	}
 
 	/**
@@ -1521,7 +1523,7 @@ class Router {
 
 	/**
 	 * Retrieve the entire route collection.
-	 * 
+	 *
 	 * @return \Symfony\Component\Routing\RouteCollection
 	 */
 	public function getRoutes()
