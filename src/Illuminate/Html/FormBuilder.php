@@ -622,7 +622,27 @@ class FormBuilder {
 
 		$posted = $this->getValueAttribute($name);
 
+		$posted =  ($posted instanceof \Illuminate\Database\Eloquent\Collection ? $this->checkRelationship($posted, $value) : $posted);
+
 		return is_array($posted) ? in_array($value, $posted) : (bool) $posted;
+	}
+
+	/**
+	 * Cycle through the Eloquent Collection to see if any relationship models
+	 * include the given input value as the model ID.
+	 *
+	 * @param \Illuminate\Database\Eloquent\Collection $collection
+	 * @param string $value
+	 * @return bool
+	 */
+	protected function checkRelationship($collection, $value)
+	{
+		foreach ($collection as $relation)
+		{
+			if ($relation->id == $value) return true;
+		}
+
+		return false;
 	}
 
 	/**
