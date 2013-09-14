@@ -275,7 +275,7 @@ class Dispatcher {
 	 * Create a class based listener using the IoC container.
 	 *
 	 * @param  mixed    $listener
-	 * @return Closure
+	 * @return \Closure
 	 */
 	public function createClassListener($listener)
 	{
