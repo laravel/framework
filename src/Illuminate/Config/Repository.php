@@ -132,7 +132,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Load the configuration group for the key.
 	 *
-	 * @param  string  $key
+	 * @param  string  $group
 	 * @param  string  $namespace
 	 * @param  string  $collection
 	 * @return void
@@ -201,6 +201,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Parse the segments of a package namespace.
 	 *
+	 * @param  string  $key
 	 * @param  string  $namespace
 	 * @param  string  $item
 	 * @return array
@@ -270,7 +271,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 * Register an after load callback for a given namespace.
 	 *
 	 * @param  string   $namespace
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function afterLoading($namespace, Closure $callback)
@@ -301,7 +302,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 */
 	public function addNamespace($namespace, $hint)
 	{
-		return $this->loader->addNamespace($namespace, $hint);
+		$this->loader->addNamespace($namespace, $hint);
 	}
 
 	/**
@@ -381,7 +382,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 * Get a configuration option.
 	 *
 	 * @param  string  $key
-	 * @return bool
+	 * @return mixed
 	 */
 	public function offsetGet($key)
 	{
@@ -392,7 +393,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 * Set a configuration option.
 	 *
 	 * @param  string  $key
-	 * @param  string  $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function offsetSet($key, $value)
