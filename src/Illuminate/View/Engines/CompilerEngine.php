@@ -25,8 +25,7 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * Get the evaluated contents of the view.
 	 *
-	 * @param  \Illuminate\View\Environment  $environment
-	 * @param  string  $view
+	 * @param  string  $path
 	 * @param  array   $data
 	 * @return string
 	 */

@@ -178,7 +178,7 @@ class Section {
 	}
 
 	/**
-	 * Get a fully qualfied section item key.
+	 * Get a fully qualified section item key.
 	 *
 	 * @param  string  $key
 	 * @return string

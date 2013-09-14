@@ -67,11 +67,11 @@ class MakeControllerCommand extends Command {
 	 */
 	protected function generateController()
 	{
-		$controller = $this->input->getArgument('name');
-
 		// Once we have the controller and resource that we are going to be generating
 		// we will grab the path and options. We allow the developers to include or
 		// exclude given methods from the resourceful controllers we're building.
+		$controller = $this->input->getArgument('name');
+
 		$path = $this->getPath();
 
 		$options = $this->getBuildOptions();

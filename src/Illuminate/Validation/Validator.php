@@ -13,7 +13,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * The Translator implementation.
 	 *
-	 * @var Symfony\Component\Translation\TranslatorInterface
+	 * @var \Symfony\Component\Translation\TranslatorInterface
 	 */
 	protected $translator;
 
@@ -991,7 +991,14 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateBefore($attribute, $value, $parameters)
 	{
-		return strtotime($value) < strtotime($parameters[0]);
+		if ( ! ($date = strtotime($parameters[0])))
+		{
+			return strtotime($value) < strtotime($this->getValue($parameters[0]));
+		}
+		else
+		{
+			return strtotime($value) < $date;
+		}
 	}
 
 	/**
@@ -1004,7 +1011,14 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAfter($attribute, $value, $parameters)
 	{
-		return strtotime($value) > strtotime($parameters[0]);
+		if ( ! ($date = strtotime($parameters[0])))
+		{
+			return strtotime($value) > strtotime($this->getValue($parameters[0]));
+		}
+		else
+		{
+			return strtotime($value) > $date;
+		}
 	}
 
 	/**
@@ -1725,6 +1739,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function messages()
 	{
+		if ( ! $this->messages) $this->passes();
+		
 		return $this->messages;
 	}
 
@@ -1735,6 +1751,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function errors()
 	{
+		if ( ! $this->messages) $this->passes();
+		
 		return $this->messages;
 	}
 

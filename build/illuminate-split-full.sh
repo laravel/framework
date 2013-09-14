@@ -18,6 +18,7 @@ git subsplit publish src/Illuminate/Mail:git@github.com:illuminate/mail.git
 git subsplit publish src/Illuminate/Pagination:git@github.com:illuminate/pagination.git
 git subsplit publish src/Illuminate/Queue:git@github.com:illuminate/queue.git
 git subsplit publish src/Illuminate/Redis:git@github.com:illuminate/redis.git
+git subsplit publish src/Illuminate/Remote:git@github.com:illuminate/remote.git
 git subsplit publish src/Illuminate/Routing:git@github.com:illuminate/routing.git
 git subsplit publish src/Illuminate/Session:git@github.com:illuminate/session.git
 git subsplit publish src/Illuminate/Support:git@github.com:illuminate/support.git

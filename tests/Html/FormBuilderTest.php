@@ -1,11 +1,11 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Http\Request;
 use Illuminate\Html\FormBuilder;
 use Illuminate\Html\HtmlBuilder;
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Http\Request;
-use Symfony\Component\Routing\RouteCollection;
+use Illuminate\Routing\RouteCollection;
 
 class FormBuilderTest extends PHPUnit_Framework_TestCase {
 

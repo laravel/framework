@@ -235,6 +235,17 @@ class Str {
 	}
 
 	/**
+	 * Convert the given string to title case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function title($value)
+	{
+		return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
+	}
+
+	/**
 	 * Get the singular form of an English word.
 	 *
 	 * @param  string  $value
@@ -256,13 +267,13 @@ class Str {
 	{
 		$title = static::ascii($title);
 
-		// Remove all characters that are not the separator, letters, numbers, or whitespace.
-		$title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
-
 		// Convert all dashes/undescores into separator
 		$flip = $separator == '-' ? '_' : '-';
 
 		$title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
+
+		// Remove all characters that are not the separator, letters, numbers, or whitespace.
+		$title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
 
 		// Replace all separator characters and whitespace by a single separator
 		$title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);

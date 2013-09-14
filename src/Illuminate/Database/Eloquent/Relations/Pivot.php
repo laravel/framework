@@ -84,11 +84,21 @@ class Pivot extends Model {
 	 */
 	public function delete()
 	{
+		return $this->getDeleteQuery()->delete();
+	}
+
+	/**
+	 * Get the query builder for a delete operation on the pivot.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	protected function getDeleteQuery()
+	{
 		$foreign = $this->getAttribute($this->foreignKey);
 
 		$query = $this->newQuery()->where($this->foreignKey, $foreign);
 
-		return $query->where($this->otherKey, $this->getAttribute($this->otherKey))->delete();
+		return $query->where($this->otherKey, $this->getAttribute($this->otherKey));	
 	}
 
 	/**

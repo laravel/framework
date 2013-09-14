@@ -1,147 +1,120 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 
 class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
-	public function tearDown()
+	public function testBasicGeneration()
 	{
-		m::close();
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$this->assertEquals('http://www.foo.com/foo/bar', $url->to('foo/bar'));
+		$this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar', array(), true));
+		$this->assertEquals('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', array('baz', 'boom'), true));
+
+		/**
+		 * Test HTTPS request URL geneation...
+		 */
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('https://www.foo.com/')
+		);
+
+		$this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar'));
+
+		/**
+		 * Test asset URL generation...
+		 */
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/index.php/')
+		);
+
+		$this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
+		$this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
+	}	
+
+
+	public function testBasicRouteGeneration()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		/**
+		 * Named Routes
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'foo'));
+		$routes->add($route);
+
+		/**
+		 * Parameters...
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz}/breeze/{boom}', array('as' => 'bar'));
+		$routes->add($route);
+
+		/**
+		 * HTTPS...
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'baz', 'https'));
+		$routes->add($route);
+
+		/**
+		 * Controller Route Route
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('controller' => 'foo@bar'));
+		$routes->add($route);
+
+		$this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
+		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell', $url->route('bar', array('taylor', 'otwell')));
+		$this->assertEquals('https://www.foo.com/foo/bar', $url->route('baz'));
+		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
 	}
 
 
-	public function testBasicUrlGeneration()
+	public function testRoutesWithDomains()
 	{
-		$gen = $this->getGenerator();
-		$gen->setRequest(Request::create('http://foobar.com/foo/bar', 'GET'));
+			$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
 
-		$this->assertEquals('http://foobar.com', $gen->to('/'));
-		$this->assertEquals('http://foobar.com/something', $gen->to('/something'));
-		$this->assertEquals('http://foobar.com/something', $gen->to('something'));
-		
-		$this->assertEquals('https://foobar.com', $gen->secure('/'));
-		$this->assertEquals('https://foobar.com/something', $gen->secure('/something'));
-		$this->assertEquals('https://foobar.com/something', $gen->secure('something'));
-		
-		$this->assertEquals('http://foobar.com/dayle/rees', $gen->to('/', array('dayle', 'rees')));
-		$this->assertEquals('http://foobar.com/dayle/rees', $gen->to(null, array('dayle', 'rees')));
-		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('/something', array('dayle', 'rees')));
-		$this->assertEquals('http://foobar.com/something/dayle/rees', $gen->to('something', array('dayle', 'rees')));
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'foo', 'domain' => 'sub.foo.com'));
+		$routes->add($route);
+
+		/**
+		 * Wildcards & Domains...
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz}', array('as' => 'bar', 'domain' => 'sub.{foo}.com'));
+		$routes->add($route);
+
+		$this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
+		$this->assertEquals('http://sub.taylor.com/foo/bar/otwell', $url->route('bar', array('taylor', 'otwell')));
 	}
 
 
-	public function testUrlGenerationUsesCurrentProtocol()
+	public function testRoutesWithDomainsAndPorts()
 	{
-		$gen = $this->getGenerator();
-		$gen->setRequest(Request::create('https://foobar.com/foo/bar', 'GET'));
+			$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com:8080/')
+		);
 
-		$this->assertEquals('https://foobar.com/something', $gen->to('something'));
-		$this->assertEquals('http://foobar.com/something', $gen->to('something', array(), false));
-	}
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'foo', 'domain' => 'sub.foo.com'));
+		$routes->add($route);
 
+		/**
+		 * Wildcards & Domains...
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz}', array('as' => 'bar', 'domain' => 'sub.{foo}.com'));
+		$routes->add($route);
 
-	public function testAssetUrlGeneration()
-	{
-		$gen = $this->getGenerator();
-		$gen->setRequest(Request::create('http://foobar.com/index.php/foo/bar', 'GET'));
-
-		$this->assertEquals('http://foobar.com/', $gen->asset('/'));
-		$this->assertEquals('http://foobar.com/something', $gen->asset('something'));
-		$this->assertEquals('https://foobar.com/something', $gen->secureAsset('something'));
-	}
-
-
-	public function testRouteUrlGeneration()
-	{
-		$gen = $this->getGenerator();
-		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.bar', array('name' => 'taylor'), true);
-		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
-		$gen->setGenerator($symfonyGen);
-
-		$gen->route('foo.bar', array('name' => 'taylor'));
-	}
-
-
-	public function testRouteUrlGenerationWithOptional()
-	{
-		$gen = $this->getGenerator();
-		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.boom', array(), true);
-		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
-		$gen->setGenerator($symfonyGen);
-
-		$gen->route('foo.boom', array());
-	}
-
-
-	public function testRouteParametersCanBeShortCircuited()
-	{
-		$gen = $this->getGenerator();
-		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.baz', array('name' => 'taylor', 'age' => 25), true);
-		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
-		$gen->setGenerator($symfonyGen);
-
-		$gen->route('foo.baz', array('taylor', 25));	
-	}
-
-
-	public function testRouteParametersCanBeShortCircuitedWithOptionals()
-	{
-		$gen = $this->getGenerator();
-		$symfonyGen = m::mock('Symfony\Component\Routing\Generator\UrlGenerator');
-		$symfonyGen->shouldReceive('generate')->once()->with('foo.breeze', array('boom' => 'bar', 'breeze' => null), true);
-		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
-		$gen->setGenerator($symfonyGen);
-
-		$gen->route('foo.breeze', array('bar'));	
-	}
-
-
-
-	public function testRoutesToControllerAreGenerated()
-	{
-		$gen = $this->getGenerator();
-		$gen->setRequest(Request::create('http://foobar.com', 'GET'));
-		$this->assertEquals('http://foobar.com/boom/baz/taylor', $gen->action('FooController@fooAction', array('name' => 'taylor')));
-		$this->assertEquals('http://foobar.com/boom/baz/taylor', $gen->action('FooController@fooAction', array('name' => 'taylor')));
-	}
-
-
-	public function testWellFormedUrlIsReturnedUnchanged()
-	{
-		$gen = $this->getGenerator();
-
-		$this->assertEquals('http://google.com', $gen->to('http://google.com'));
-	}
-
-
-	public function testUrlGeneratorUsesCurrentSchemeIfNoneSpecified()
-	{
-		$router = new Router;
-		$router->get('/', array('as' => 'home', function() {}));
-		$request = Request::create('https://dayle.com');
-		$gen = new UrlGenerator($router->getRoutes(), $request);
-
-		$this->assertEquals('https://dayle.com/', $gen->route('home'));
-	}
-
-
-	protected function getGenerator()
-	{
-		$router = new Router;
-
-		$router->get('foo/bar/{name}', array('as' => 'foo.bar', function() {}));
-		$router->get('foo/bar/{name}/baz/{age}', array('as' => 'foo.baz', function() {}));
-		$router->get('foo/{boom?}', array('as' => 'foo.boom', function() {}));
-		$router->get('foo/{boom?}/{breeze?}', array('as' => 'foo.breeze', function() {}));
-		$router->get('/boom/baz/{name}', array('uses' => 'FooController@fooAction'));
-
-		return new UrlGenerator($router->getRoutes(), Request::create('/'));
+		$this->assertEquals('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
+		$this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', array('taylor', 'otwell')));
 	}
 
 }
