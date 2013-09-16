@@ -276,6 +276,11 @@ class Builder {
 	 */
 	public function where($column, $operator = null, $value = null, $boolean = 'and')
 	{
+		if ($this->invalidOperatorAndValue($operator, $value))
+		{
+			throw new \InvalidArgumentException("Value must be provided.");
+		}
+
 		// If the columns is actually a Closure instance, we will assume the developer
 		// wants to begin a nested where statement which is wrapped in parenthesis.
 		// We'll add that Closure to the query then return back out immediately.
@@ -334,6 +339,20 @@ class Builder {
 	public function orWhere($column, $operator = null, $value = null)
 	{
 		return $this->where($column, $operator, $value, 'or');
+	}
+
+	/**
+	 * Determine if the given operator and value combination is legal.
+	 *
+	 * @param  string  $operator
+	 * @param  mxied  $value
+	 * @return bool
+	 */
+	protected function invalidOperatorAndValue($operator, $value)
+	{
+		$isOperator = in_array($operator, $this->operators);
+
+		return ($isOperator and $operator != '=' and is_null($value));
 	}
 
 	/**
