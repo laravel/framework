@@ -16,7 +16,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->getStore();
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-		$table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+		$table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
 		$table->shouldReceive('first')->once()->andReturn(null);
 
 		$this->assertNull($store->get('foo'));
@@ -28,7 +28,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('forget'), $this->getMocks());
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-		$table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+		$table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
 		$table->shouldReceive('first')->once()->andReturn((object) array('expiration' => 1));
 		$store->expects($this->once())->method('forget')->with($this->equalTo('foo'))->will($this->returnValue(null));
 
@@ -41,7 +41,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->getStore();
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-		$table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+		$table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
 		$table->shouldReceive('first')->once()->andReturn((object) array('value' => 'bar', 'expiration' => 999999999999999));
 		$store->getEncrypter()->shouldReceive('decrypt')->once()->with('bar')->andReturn('bar');
 
@@ -73,7 +73,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 		{
 			throw new Exception;			
 		});
-		$table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+		$table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
 		$table->shouldReceive('update')->once()->with(array('value' => 'bar', 'expiration' => 61));
 
 		$store->put('foo', 'bar', 1);	
@@ -93,7 +93,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->getStore();
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-		$table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+		$table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
 		$table->shouldReceive('delete')->once();
 
 		$store->forget('foo');
