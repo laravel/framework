@@ -23,14 +23,16 @@ class Collection extends BaseCollection {
 	/**
 	 * Load a set of relationships onto the collection.
 	 *
-	 * @param  dynamic  string
+	 * @param  dynamic  $relations
 	 * @return void
 	 */
-	public function load()
+	public function load($relations)
 	{
 		if (count($this->items) > 0)
 		{
-			$query = $this->first()->newQuery()->with(func_get_args());
+			if (is_string($relations)) $relations = func_get_args();
+
+			$query = $this->first()->newQuery()->with($relations);
 
 			$this->items = $query->eagerLoadRelations($this->items);
 		}
