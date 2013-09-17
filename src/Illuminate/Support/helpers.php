@@ -339,7 +339,7 @@ if ( ! function_exists('array_set'))
 	 * @param  array   $array
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array
 	 */
 	function array_set(&$array, $key, $value)
 	{
@@ -363,6 +363,8 @@ if ( ! function_exists('array_set'))
 		}
 
 		$array[array_shift($keys)] = $value;
+
+		return $array;
 	}
 }
 
@@ -625,6 +627,26 @@ if ( ! function_exists('object_get'))
 		}
 
 		return $object;
+	}
+}
+
+if ( ! function_exists('preg_replace_sub'))
+{
+	/**
+	 * Replace a given pattern with each value in the array in sequentially.
+	 *
+	 * @param  string  $pattern
+	 * @param  array   $replacements
+	 * @param  string  $subject
+	 * @return string
+	 */
+	function preg_replace_sub($pattern, &$replacements, $subject)
+	{
+		return preg_replace_callback($pattern, function($match) use (&$replacements)
+		{
+			return array_shift($replacements);
+
+		}, $subject);
 	}
 }
 

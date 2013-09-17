@@ -127,7 +127,11 @@ class SessionManager extends Manager {
 	 */
 	protected function createRedisDriver()
 	{
-		return $this->createCacheBased('redis');
+		$handler = $this->createCacheHandler('redis');
+
+		$handler->getCache()->getStore()->setConnection($this->app['config']['session.connection']);
+
+		return $this->buildSession($handler);
 	}
 
 	/**
@@ -137,11 +141,20 @@ class SessionManager extends Manager {
 	 */
 	protected function createCacheBased($driver)
 	{
+		return $this->buildSession($this->createCacheHandler($driver));
+	}
+
+	/**
+	 * Create the cache based session handler instance.
+	 *
+	 * @param  string  $driver
+	 * @return \Illuminate\Session\CacheBasedSessionHandler
+	 */
+	protected function createCacheHandler($driver)
+	{
 		$minutes = $this->app['config']['session.lifetime'];
 
-		$handler = new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
-
-		return $this->buildSession($handler);
+		return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);		
 	}
 
 	/**

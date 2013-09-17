@@ -188,7 +188,9 @@ class BelongsToMany extends Relation {
 	 */
 	public function addConstraints()
 	{
-		$this->setJoin()->setWhere();
+		$this->setJoin();
+
+		if (static::$constraints) $this->setWhere();
 	}
 
 	/**

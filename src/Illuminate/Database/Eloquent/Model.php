@@ -93,9 +93,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The attributes that should be visible in arrays.
 	 *
-	 * @var arrays
+	 * @var array
 	 */
 	protected $visible = array();
+
+	/**
+	 * The accessors to append to the model's array form.
+	 * 
+	 * @var array
+	 */
+	protected $appends = array();
 
 	/**
 	 * The attributes that are mass assignable.
@@ -110,6 +117,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var array
 	 */
 	protected $guarded = array('*');
+
+	/**
+	 * The attributes that should be mutated to dates.
+	 *
+	 * @var array
+	 */
+	protected $dates = array();
 
 	/**
 	 * The relationships that should be touched on save.
@@ -1609,6 +1623,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Set the accessors to append to model arrays.
+	 *
+	 * @param  array  $appends
+	 * @return void
+	 */
+	public function setAppends(array $appends)
+	{
+		$this->appends = $appends;
+	}
+
+	/**
 	 * Get the fillable attributes for the model.
 	 *
 	 * @return array
@@ -1810,7 +1835,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			if ( ! array_key_exists($key, $attributes)) continue;
 
-			$attributes[$key] = $this->mutateAttribute($key, $attributes[$key]);
+			$attributes[$key] = $this->mutateAttribute(
+				$key, $attributes[$key]
+			);
+		}
+
+		// Here we will grab all of the appended, calculated attributes to this model
+		// as these attributes are not really in the attributes array, but are run
+		// when we need to array or JSON the model for convenience to the coder.
+		foreach ($this->appends as $key)
+		{
+			$attributes[$key] = $this->mutateAttribute($key, null);
 		}
 
 		return $attributes;
@@ -1866,7 +1901,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// If the relation value has been set, we will set it on this attributes
 			// list for returning. If it was not arrayable or null, we'll not set
 			// the value on the array because it is some type of invalid value.
-			if (isset($relation))
+			if (isset($relation) or is_null($value))
 			{
 				$attributes[$key] = $relation;
 			}
@@ -2057,7 +2092,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getDates()
 	{
-		return array(static::CREATED_AT, static::UPDATED_AT, static::DELETED_AT);
+		$defaults = array(static::CREATED_AT, static::UPDATED_AT, static::DELETED_AT);
+
+		return array_merge($this->dates, $defaults);
 	}
 
 	/**
