@@ -2120,7 +2120,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// format it according to the proper format for the database connection.
 		elseif (is_numeric($value))
 		{
-			$value = Carbon::createFromTimestamp($value);
+			$value = Carbon::createFromTimestamp($value)->setTime(0, 0, 0);
 		}
 
 		// If the value is in simple year, month, day format, we will format it using
