@@ -1420,11 +1420,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a fresh timestamp for the model.
 	 *
-	 * @return DateTime
+	 * @return Carbon
 	 */
 	public function freshTimestamp()
 	{
-		return new DateTime;
+		return new Carbon;
 	}
 
 	/**

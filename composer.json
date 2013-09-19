@@ -12,6 +12,10 @@
     "require": {
         "php": ">=5.3.0",
         "classpreloader/classpreloader": "1.0.*",
+<<<<<<< HEAD
+=======
+        "doctrine/dbal": "2.4.*",
+>>>>>>> origin/4.0
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.7",
         "monolog/monolog": "1.6.*",
