@@ -143,7 +143,7 @@ class Encrypter {
 	 */
 	protected function validMac(array $payload)
 	{
-		return ($payload['mac'] == $this->hash($payload['iv'], $payload['value']));
+		return ($payload['mac'] === $this->hash($payload['iv'], $payload['value']));
 	}
 
 	/**
