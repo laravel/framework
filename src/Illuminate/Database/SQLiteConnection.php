@@ -32,4 +32,14 @@ class SQLiteConnection extends Connection {
 		return new Query\Processors\SQLiteProcessor;
 	}
 
+	/**
+	 * Get the Doctrine DBAL driver.
+	 *
+	 * @return \Doctrine\DBAL\Driver
+	 */
+	protected function getDoctrineDriver()
+	{
+		return new \Doctrine\DBAL\Driver\PDOSqlite\Driver;
+	}
+
 }
