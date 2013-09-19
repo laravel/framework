@@ -44,4 +44,14 @@ class MySqlConnection extends Connection {
 		return new Query\Processors\MySqlProcessor;
 	}
 
+	/**
+	 * Get the Doctrine DBAL driver.
+	 *
+	 * @return \Doctrine\DBAL\Driver
+	 */
+	protected function getDoctrineDriver()
+	{
+		return new \Doctrine\DBAL\Driver\PDOMySql\Driver;
+	}
+
 }

@@ -12,10 +12,6 @@
     "require": {
         "php": ">=5.3.0",
         "classpreloader/classpreloader": "1.0.*",
-<<<<<<< HEAD
-=======
-        "doctrine/dbal": "2.4.*",
->>>>>>> origin/4.0
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.7",
         "monolog/monolog": "1.6.*",
@@ -23,7 +19,6 @@
         "patchwork/utf8": "1.1.*",
         "phpseclib/phpseclib": "0.3.x",
         "predis/predis": "0.8.*",
-        "react/socket": "0.3.*",
         "swiftmailer/swiftmailer": "5.0.*",
         "symfony/browser-kit": "2.3.*",
         "symfony/console": "2.3.*",
@@ -87,6 +82,10 @@
         "branch-alias": {
             "dev-master": "4.1-dev"
         }
+    },
+    "suggest": {
+        "doctrine/dbal": "Allow renaming columns and dropping SQLite columns.",
+        "react/socket": "Allow live debugging using 'debug' Artisan command."
     },
     "minimum-stability": "dev"
 }
