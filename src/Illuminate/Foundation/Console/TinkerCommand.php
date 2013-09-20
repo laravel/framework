@@ -25,6 +25,37 @@ class TinkerCommand extends Command {
 	 */
 	public function fire()
 	{
+		if ($this->supportsBoris())
+		{
+			$this->runBorisShell();
+		}
+		else
+		{
+			$this->comment('Full REPL not supported. Falling back to simple shell.');
+
+			$this->runPlainShell();
+		}
+	}
+
+	/**
+	 * Run the Boris REPL with the current context.
+	 *
+	 * @return void
+	 */
+	protected function runBorisShell()
+	{
+		with(new \Boris\Boris('laravel> '))->start();
+
+		return;
+	}
+
+	/**
+	 * Run the plain Artisan tinker shell.
+	 *
+	 * @return void
+	 */
+	protected function runPlainShell()
+	{
 		$input = $this->prompt();
 
 		while ($input != 'quit')
@@ -64,6 +95,16 @@ class TinkerCommand extends Command {
 		$dialog = $this->getHelperSet()->get('dialog');
 
 		return $dialog->ask($this->output, "<info>></info>", null);
+	}
+
+	/**
+	 * Determine if the current environment supports Boris.
+	 *
+	 * @return bool
+	 */
+	protected function supportsBoris()
+	{
+		return (extension_loaded('readline') and extension_loaded('posix'));
 	}
 
 }
