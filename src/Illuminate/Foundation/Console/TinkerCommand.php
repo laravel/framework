@@ -44,7 +44,7 @@ class TinkerCommand extends Command {
 	 */
 	protected function runBorisShell()
 	{
-		with(new \Boris\Boris('laravel> '))->start();
+		with(new \Boris\Boris('> '))->start();
 
 		return;
 	}
