@@ -59,10 +59,29 @@ class Builder {
 	 */
 	public function find($id, $columns = array('*'))
 	{
+		if (is_array($id))
+		{
+		    return $this->findMany($id, $columns);
+		}
+
 		$this->query->where($this->model->getKeyName(), '=', $id);
 
 		return $this->first($columns);
 	}
+
+	/**
+	 * Find a model by its primary key.
+	 *
+	 * @param  array  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 */
+	public function findMany($id, $columns = array('*'))
+	{
+		$this->query->whereIn($this->model->getKeyName(), $id);
+
+    	return $this->get($columns);
+    }
 
 	/**
 	 * Find a model by its primary key or throw an exception.
