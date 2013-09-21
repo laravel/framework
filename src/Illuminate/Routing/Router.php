@@ -8,6 +8,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Router implements HttpKernelInterface, RouteFiltererInterface {
@@ -1146,7 +1147,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function prepareResponse($response)
 	{
-		if ( ! $response instanceof Response)
+		if ( ! $response instanceof SymfonyResponse)
 		{
 			$response = new Response($response);
 		}
