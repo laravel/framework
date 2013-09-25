@@ -7,6 +7,7 @@ use Illuminate\Queue\Console\SubscribeCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
+use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 
 class QueueServiceProvider extends ServiceProvider {
@@ -145,7 +146,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function registerConnectors($manager)
 	{
-		foreach (array('Sync', 'Beanstalkd', 'Sqs', 'Iron') as $connector)
+		foreach (array('Sync', 'Beanstalkd', 'Redis', 'Sqs', 'Iron') as $connector)
 		{
 			$this->{"register{$connector}Connector"}($manager);
 		}
@@ -176,6 +177,22 @@ class QueueServiceProvider extends ServiceProvider {
 		$manager->addConnector('beanstalkd', function()
 		{
 			return new BeanstalkdConnector;
+		});
+	}
+
+	/**
+	 * Register the Redis queue connector.
+	 *
+	 * @param  \Illuminate\Queue\QueueManager  $manager
+	 * @return void
+	 */
+	protected function registerRedisConnector($manager)
+	{
+		$app = $this->app;
+
+		$manager->addConnector('redis', function() use ($app)
+		{
+			return new RedisConnector($app['redis']);
 		});
 	}
 
