@@ -34,5 +34,8 @@
             "dev-master": "4.1-dev"
         }
     },
+    "suggest": {
+        "illuminate/redis": "Allows use of the Redis queue driver."
+    },
     "minimum-stability": "dev"
 }
