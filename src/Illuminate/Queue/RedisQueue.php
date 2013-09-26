@@ -139,7 +139,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  string  $queue
 	 * @return void
 	 */
-	protected function migrateExpiredJobs($from, $to)
+	public function migrateExpiredJobs($from, $to)
 	{
 		$jobs = $this->getExpiredJobs($from, $time = $this->getTime());
 
@@ -186,7 +186,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$payload = parent::createPayload($job, $data);
 
-		$payload = $this->setMeta($payload, 'id', str_random(20));
+		$payload = $this->setMeta($payload, 'id', $this->getRandomId());
 
 		return $this->setMeta($payload, 'attempts', 1);
 	}
@@ -204,6 +204,16 @@ class RedisQueue extends Queue implements QueueInterface {
 		$payload = json_decode($payload, true);
 
 		return json_encode(array_set($payload, $key, $attempts));
+	}
+
+	/**
+	 * Get a random ID string.
+	 *
+	 * @return string
+	 */
+	protected function getRandomId()
+	{
+		return str_random(20);
 	}
 
 	/**

@@ -30,7 +30,7 @@ class RedisJob extends Job {
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container  $container
-	 * @param  \Illuminate\Redis\Queue  $queue
+	 * @param  \Illuminate\Redis\Queue  $redis
 	 * @param  string  $job
 	 * @param  string  $queue
 	 * @return void
