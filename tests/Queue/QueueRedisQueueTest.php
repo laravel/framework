@@ -10,24 +10,24 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPushProperlyPushesJobOntoBeanstalkd()
+	public function testPushProperlyPushesJobOntoRedis()
 	{
 		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getRandomId'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
 		$queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
-		$redis->shouldReceive('rpush')->once()->with('default', json_encode(array('job' => 'foo', 'data' => array('data'), 'id' => 'foo', 'attempts' => 1)));
+		$redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(array('job' => 'foo', 'data' => array('data'), 'id' => 'foo', 'attempts' => 1)));
 
 		$queue->push('foo', array('data'));
 	}
 
 
-	public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
+	public function testDelayedPushProperlyPushesJobOntoRedis()
 	{
 		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'getRandomId'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
 		$queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
 
 		$redis->shouldReceive('zadd')->once()->with(
-			'default:delayed',
+			'queues:default:delayed',
 			2,
 			json_encode(array('job' => 'foo', 'data' => array('data'), 'id' => 'foo', 'attempts' => 1))
 		);
@@ -36,14 +36,14 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPopProperlyPopsJobOffOfBeanstalkd()
+	public function testPopProperlyPopsJobOffOfRedis()
 	{
 		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'migrateAllExpiredJobs'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
 		$queue->setContainer(m::mock('Illuminate\Container\Container'));
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-		$queue->expects($this->once())->method('migrateAllExpiredJobs')->with($this->equalTo('default'));
-		$redis->shouldReceive('lpop')->once()->with('default')->andReturn('foo');
-		$redis->shouldReceive('zadd')->once()->with('default:reserved', 61, 'foo');
+		$queue->expects($this->once())->method('migrateAllExpiredJobs')->with($this->equalTo('queues:default'));
+		$redis->shouldReceive('lpop')->once()->with('queues:default')->andReturn('foo');
+		$redis->shouldReceive('zadd')->once()->with('queues:default:reserved', 61, 'foo');
 
 		$result = $queue->pop();
 
@@ -55,7 +55,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-		$redis->shouldReceive('zadd')->once()->with('default:delayed', 2, json_encode(array('attempts' => 2)));
+		$redis->shouldReceive('zadd')->once()->with('queues:default:delayed', 2, json_encode(array('attempts' => 2)));
 
 		$queue->release('default', json_encode(array('attempts' => 1)), 1, 2);
 	}
