@@ -34,7 +34,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  string  $connection
 	 * @return void
 	 */
-	public function __construct(Database $redis, $default, $connection = null)
+	public function __construct(Database $redis, $default = 'default', $connection = null)
 	{
 		$this->redis = $redis;
 		$this->default = $default;
@@ -224,7 +224,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	protected function getQueue($queue)
 	{
-		return $queue ?: $this->default;
+		return 'queues:'.($queue ?: $this->default);
 	}
 
 	/**
