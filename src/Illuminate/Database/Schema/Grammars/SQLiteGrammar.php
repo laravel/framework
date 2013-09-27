@@ -489,7 +489,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function modifyNullable(Blueprint $blueprint, Fluent $column)
 	{
-		return ' null';
+		return $column->nullable ? ' null' : ' not null';
 	}
 
 	/**
