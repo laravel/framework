@@ -14,6 +14,8 @@ class UriValidator implements ValidatorInterface {
 	 */
 	public function matches(Route $route, Request $request)
 	{
+		//dd($route->uriExpression());
+		//return dd(preg_match('#^(\/)$|^(?:([a-zA-Z0-9\.\-_%=]+))?$#u', 'foo/bar'));
 		return preg_match($route->uriExpression(), $request->path());
 	}
 
