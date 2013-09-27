@@ -128,9 +128,7 @@ class Handler {
 	{
 		if (error_reporting() & $level)
 		{
-			$e = new ErrorException($message, $level, 0, $file, $line);
-
-			$this->handleException($e);
+			throw new ErrorException($message, $level, 0, $file, $line);
 		}
 	}
 
