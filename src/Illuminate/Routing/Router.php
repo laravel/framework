@@ -654,7 +654,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		$route = with(new Route(
 			$methods, $uri = $this->prefix($uri), $action)
-	);
+		);
 
 		$route->where($this->patterns);
 

@@ -73,6 +73,13 @@ class Route {
 	protected static $optional = '(?:/([a-zA-Z0-9\.\-_%=]+)';
 
 	/**
+	 * The regular expression for a leading optional wildcard.
+	 *
+	 * @var string
+	 */
+	protected static $leadingOptional = '\/$|^(?:([a-zA-Z0-9\.\-_%=]+)';
+
+	/**
 	 * The validators used by the routes.
 	 *
 	 * @var array
@@ -487,7 +494,11 @@ class Route {
 	{
 		$value = preg_replace('/\/\{(.*?)\?\}/', static::$optional, $value, -1, $count);
 
-		return $count + $custom > 0 ? $value .= str_repeat(')?', $count + $custom) : $value;
+		$value = preg_replace('/^(\{(.*?)\?\})/', static::$leadingOptional, $value, -1, $leading);
+
+		$total = $leading + $count + $custom;
+
+		return $total > 0 ? $value .= str_repeat(')?', $total) : $value;
 	}
 
 	/**

@@ -29,6 +29,32 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router = $this->getRouter();
 		$router->get('foo/{name}/boom/{age?}/{location?}', function($name, $age = 25, $location = 'AR') { return $name.$age.$location; });
 		$this->assertEquals('taylor30AR', $router->dispatch(Request::create('foo/taylor/boom/30', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('{bar}/{baz?}', function($name, $age = 25) { return $name.$age; });
+		$this->assertEquals('taylor25', $router->dispatch(Request::create('taylor', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('{baz?}', function($age = 25) { return $age; });
+		$this->assertEquals('25', $router->dispatch(Request::create('/', 'GET'))->getContent());
+		$this->assertEquals('30', $router->dispatch(Request::create('30', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('{foo?}/{baz?}', function($name = 'taylor', $age = 25) { return $name.$age; });
+		$this->assertEquals('taylor25', $router->dispatch(Request::create('/', 'GET'))->getContent());
+		$this->assertEquals('fred25', $router->dispatch(Request::create('fred', 'GET'))->getContent());
+		$this->assertEquals('fred30', $router->dispatch(Request::create('fred/30', 'GET'))->getContent());
+	}
+
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testRoutesDontMatchNonMatchingPathsWithLeadingOptionals()
+	{
+		$router = $this->getRouter();
+		$router->get('{baz?}', function($age = 25) { return $age; });
+		$this->assertEquals('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());;		
 	}
 
 
