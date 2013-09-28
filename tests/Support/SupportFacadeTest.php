@@ -7,12 +7,12 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	public function setUp()
 	{
 		Illuminate\Support\Facades\Facade::clearResolvedInstances();
+		FacadeStub::setFacadeApplication(null);
 	}
 
 
 	public function tearDown()
 	{
-		FacadeStub::setFacadeApplication(null);
 		m::close();
 	}
 
