@@ -5,7 +5,7 @@ class BindingResolutionException extends \Exception {}
 class Container implements ArrayAccess {
 
 	/**
-	 * An array of the tyeps that have been resolved.
+	 * An array of the types that have been resolved.
 	 *
 	 * @var array
 	 */
