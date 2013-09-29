@@ -66,11 +66,13 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function find($name)
 	{
-		if (isset($this->found[$name])) {
+		if (isset($this->found[$name])) 
+		{
 			return $this->found[$name];
 		}
 		
-		if (strpos($name, '::') !== false) {
+		if (strpos($name, '::') !== false) 
+		{
 			return $this->found[$name] = $this->findNamedPathView($name);
 		}
 
