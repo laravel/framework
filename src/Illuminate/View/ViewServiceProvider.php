@@ -148,7 +148,7 @@ class ViewServiceProvider extends ServiceProvider {
 			// without having to bind. An empty bag is set when there aren't errors.
 			if ($me->sessionHasErrors($app))
 			{
-				$errors = $app['session']->get('errors');
+				$errors = $app['session.store']->get('errors');
 
 				$app['view']->share('errors', $errors);
 			}
@@ -173,9 +173,9 @@ class ViewServiceProvider extends ServiceProvider {
 	{
 		$config = $app['config']['session'];
 
-		if (isset($app['session']) and ! is_null($config['driver']))
+		if (isset($app['session.store']) and ! is_null($config['driver']))
 		{
-			return $app['session']->has('errors');
+			return $app['session.store']->has('errors');
 		}
 	}
 
