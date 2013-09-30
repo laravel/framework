@@ -18,6 +18,11 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->with('foo', 'bar');
 		$view->with(array('baz' => 'boom'));
 		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
+
+
+		$view = new View(m::mock('Illuminate\View\Environment'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view->withFoo('bar')->withBaz('boom');
+		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
 	}
 
 
