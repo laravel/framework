@@ -104,7 +104,7 @@ abstract class Relation {
 	{
 		$column = $this->getRelated()->getUpdatedAtColumn();
 
-		$this->rawUpdate(array($column => $this->getRelated()->freshTimestamp()));
+		$this->rawUpdate(array($column => $this->getRelated()->freshTimestampString()));
 	}
 
 	/**
