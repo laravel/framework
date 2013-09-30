@@ -329,6 +329,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 
 		$this->markAsRegistered($provider);
 
+		// If the application has already booted, we will call this boot method on
+		// the provider class so it has an opportunity to do its boot logic and
+		// will be ready for any usage by the developer's application logics.
+		if ($this->booted) $provider->boot();
+
 		return $provider;
 	}
 

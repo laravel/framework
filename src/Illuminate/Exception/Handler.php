@@ -284,7 +284,7 @@ class Handler {
 	{
 		$reflection = new ReflectionFunction($handler);
 
-		return $reflection->getNumberOfParameters() == 0 or $this->hints($reflection, $exception);
+		return $reflection->getNumberOfParameters() == 0 || $this->hints($reflection, $exception);
 	}
 
 	/**
