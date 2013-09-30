@@ -154,6 +154,17 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testComposersAreProperlyRegisteredWithPriority()
+	{
+		$env = $this->getEnvironment();
+		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 1);
+		$callback = $env->composer('foo', function() { return 'bar'; }, 1);
+		$callback = $callback[0];
+
+		$this->assertEquals('bar', $callback());
+	}
+
+
 	public function testClassCallbacks()
 	{
 		$env = $this->getEnvironment();
