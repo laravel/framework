@@ -37,6 +37,7 @@
 		{"message": "Added 'dates' property to Eloquent model for convenient setting of date columns.", "backport": null},
 		{"message": "Added 'chunk' method to query builder and Eloquent for doing work on large result sets.", "backport": null},
 		{"message": "Facades are now mockable without an application root.", "backport": null},
-		{"message": "Data may now be dynamically bound to views via magic methods.", "backport": null}
+		{"message": "Data may now be dynamically bound to views via magic methods.", "backport": null},
+		{"message": "Added support for XCache cache driver.", "backport": null}
 	]
 }
