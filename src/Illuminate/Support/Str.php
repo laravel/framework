@@ -235,6 +235,17 @@ class Str {
 	}
 
 	/**
+	 * Convert the given string to title case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public static function title($value)
+	{
+		return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
+	}
+
+	/**
 	 * Get the singular form of an English word.
 	 *
 	 * @param  string  $value
