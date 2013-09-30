@@ -292,13 +292,13 @@ class Environment {
 	 * @param  \Closure|string  $callback
 	 * @return array
 	 */
-	public function composer($views, $callback)
+	public function composer($views, $callback, $priority = null)
 	{
 		$composers = array();
 
 		foreach ((array) $views as $view)
 		{
-			$composers[] = $this->addViewEvent($view, $callback);
+			$composers[] = $this->addViewEvent($view, $callback, 'composing: ', $priority);
 		}
 
 		return $composers;
@@ -312,17 +312,17 @@ class Environment {
 	 * @param  string  $prefix
 	 * @return Closure
 	 */
-	protected function addViewEvent($view, $callback, $prefix = 'composing: ')
+	protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
 	{
 		if ($callback instanceof Closure)
 		{
-			$this->events->listen($prefix.$view, $callback);
+			$this->addEventListener($prefix.$view, $callback, $priority);
 
 			return $callback;
 		}
 		elseif (is_string($callback))
 		{
-			return $this->addClassEvent($view, $callback, $prefix);
+			return $this->addClassEvent($view, $callback, $prefix, $priority);
 		}
 	}
 
@@ -334,7 +334,7 @@ class Environment {
 	 * @param  string   $prefix
 	 * @return \Closure
 	 */
-	protected function addClassEvent($view, $class, $prefix)
+	protected function addClassEvent($view, $class, $prefix, $priority = null)
 	{
 		$name = $prefix.$view;
 
@@ -343,9 +343,28 @@ class Environment {
 		// on the instance. This allows for convenient, testable view composers.
 		$callback = $this->buildClassEventCallback($class, $prefix);
 
-		$this->events->listen($name, $callback);
+		$this->addEventListener($name, $callback, $priority);
 
 		return $callback;
+	}
+
+	/**
+	 * Add a listener to the event dispatcher.
+	 *
+	 * @param string   $name
+	 * @param \Closure $callback
+	 * @param integer  $priority
+	 */
+	protected function addEventListener($name, $callback, $priority = null)
+	{
+		if (is_null($priority))
+		{
+			$this->events->listen($name, $callback);
+		}
+		else
+		{
+			$this->events->listen($name, $callback, $priority);
+		}
 	}
 
 	/**
