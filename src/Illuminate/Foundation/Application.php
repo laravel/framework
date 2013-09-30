@@ -366,17 +366,14 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function loadDeferredProviders()
 	{
+		// We will simply spin through each of the deferred providers and register each
+		// one and boot them if the application has booted. This should make each of
+		// the remaining services available to this application for immediate use.
 		foreach (array_unique($this->deferredServices) as $provider)
 		{
-			// We will simply spin through each of the deferred providers and register each
-			// one and boot them if the application has booted. This should make each of
-			// the remaining services available to this application for immediate use.
-			if ( ! isset($this->loadedProviders[$provider]))
-			{
-				$this->register($instance = new $provider($this));
+			$this->register($instance = new $provider($this));
 
-				if ($this->booted) $instance->boot();
-			}
+			if ($this->booted) $instance->boot();
 		}
 
 		$this->deferredServices = array();
