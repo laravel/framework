@@ -44,7 +44,7 @@ class AuthManager extends Manager {
 	 *
 	 * @return \Illuminate\Auth\Guard
 	 */
-	protected function createDatabaseDriver()
+	public function createDatabaseDriver()
 	{
 		$provider = $this->createDatabaseProvider();
 
