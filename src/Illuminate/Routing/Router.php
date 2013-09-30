@@ -1165,7 +1165,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$this->disableFilters();
 
-		call_user_func($callback0);
+		call_user_func($callback);
 
 		$this->enableFilters();
 	}
