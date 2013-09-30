@@ -806,8 +806,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2))->andReturn($mock);
-		$mock->shouldReceive('get')->once()->with(array('*'))->andReturn('foo');
+		$mock->shouldReceive('find')->once()->with(array(1, 2), array('*'))->andReturn('foo');
 		return $mock;
 	}
 }
