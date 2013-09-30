@@ -96,6 +96,22 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFiltersCanBeDisabled()
+	{
+		$router = $this->getRouter();
+		$router->disableFilters();
+		$router->get('foo/bar', function() { return 'hello'; });
+		$router->before(function() { return 'foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->disableFilters();
+		$router->get('foo/bar', array('before' => 'foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+	}
+
+
 	public function testGlobalAfterFilters()
 	{
 		unset($_SERVER['__filter.after']);
