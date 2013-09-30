@@ -375,7 +375,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		// the remaining services available to this application for immediate use.
 		foreach ($this->deferredServices as $provider)
 		{
-			$this->registerDeferredProvider($provider);
+			$this->loadDeferredProvider($provider);
 		}
 
 		$this->deferredServices = array();
