@@ -621,9 +621,9 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function prepareRequest(Request $request)
 	{
-		if (isset($this['session']))
+		if (isset($this['session.store']))
 		{
-			$request->setSessionStore($this['session']);
+			$request->setSessionStore($this['session.store']);
 		}
 
 		return $request;
