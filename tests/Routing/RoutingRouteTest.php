@@ -62,7 +62,28 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = $this->getRouter();
 		$router->get('foo', 'RouteTestControllerDispatchStub@foo');
-		$this->assertEquals('bar', $router->dispatch(Request::create('foo', 'GET'))->getContent());		
+		$this->assertEquals('bar', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->filter('foo', function()
+		{
+			return 'filter';
+		});
+		$router->get('bar', 'RouteTestControllerDispatchStub@bar');
+		$this->assertEquals('filter', $router->dispatch(Request::create('bar', 'GET'))->getContent());
+
+
+		/**
+		 * Test filters disabled...
+		 */
+		$router = $this->getRouter();
+		$router->filter('foo', function()
+		{
+			return 'filter';
+		});
+		$router->disableFilters();
+		$router->get('bar', 'RouteTestControllerDispatchStub@bar');
+		$this->assertEquals('baz', $router->dispatch(Request::create('bar', 'GET'))->getContent());
 	}
 
 
@@ -431,9 +452,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 
 class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
+	public function __construct()
+	{
+		$this->beforeFilter('foo', array('only' => 'bar'));
+	}
 	public function foo()
 	{
 		return 'bar';
+	}
+	public function bar()
+	{
+		return 'baz';
 	}
 }
 
