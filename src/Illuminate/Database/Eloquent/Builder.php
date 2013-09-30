@@ -80,7 +80,7 @@ class Builder {
 	{
 		$this->query->whereIn($this->model->getKeyName(), $id);
 
-    	return $this->get($columns);
+		return $this->get($columns);
     }
 
 	/**
