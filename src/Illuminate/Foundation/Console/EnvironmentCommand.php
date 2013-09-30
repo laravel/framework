@@ -2,7 +2,7 @@
 
 use Illuminate\Console\Command;
 
-class ChangesCommand extends Command {
+class EnvironmentCommand extends Command {
 
 	/**
 	 * The console command name.
@@ -25,7 +25,7 @@ class ChangesCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->line('<info>Current application environment:</info> <comment>'.$this->app['env'].'</comment>');
+		$this->line('<info>Current application environment:</info> <comment>'.$this->laravel['env'].'</comment>');
 	}
 
 }
