@@ -1588,11 +1588,13 @@ class Builder {
 	 * Set the bindings on the query builder.
 	 *
 	 * @param  array  $bindings
-	 * @return void
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function setBindings(array $bindings)
 	{
 		$this->bindings = $bindings;
+
+		return $this;
 	}
 
 	/**

@@ -420,11 +420,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$instance = new static;
 
-		if (is_array($id))
-		{
-			return $instance->newQuery()->whereIn($instance->getKeyName(), $id)->get($columns);
-		}
-
 		return $instance->newQuery()->find($id, $columns);
 	}
 
