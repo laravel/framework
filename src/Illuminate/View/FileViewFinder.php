@@ -31,6 +31,13 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @var array
 	 */
 	protected $extensions = array('blade.php', 'php');
+	
+	/**
+	 * The array of already found view files.
+	 * 
+	 * @var array
+	 */
+	protected $found = array();
 
 	/**
 	 * Create a new file view loader instance.
@@ -59,9 +66,17 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function find($name)
 	{
-		if (strpos($name, '::') !== false) return $this->findNamedPathView($name);
+		if (isset($this->found[$name])) 
+		{
+			return $this->found[$name];
+		}
+		
+		if (strpos($name, '::') !== false) 
+		{
+			return $this->found[$name] = $this->findNamedPathView($name);
+		}
 
-		return $this->findInPaths($name, $this->paths);
+		return $this->found[$name] = $this->findInPaths($name, $this->paths);
 	}
 
 	/**
