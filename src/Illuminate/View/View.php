@@ -305,6 +305,23 @@ class View implements ArrayAccess, Renderable {
 	}
 
 	/**
+	 * Dynamically bind parameters to the view.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return \Illuminate\View\View
+	 */
+	public function __call($method, $parameters)
+	{
+		if (starts_with($method, 'with'))
+		{
+			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
+		}
+
+		throw new \BadMethodCallException("Method [$method] does not exist on view.");
+	}
+
+	/**
 	 * Get the string contents of the view.
 	 *
 	 * @return string
