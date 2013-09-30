@@ -583,9 +583,30 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public static function mergeGroup($new, $old)
 	{
+		$new['namespace'] = static::formatUsesPrefix($new, $old);
+
 		$new['prefix'] = static::formatGroupPrefix($new, $old);
 
-		return array_merge_recursive(array_except($old, array('prefix', 'domain')), $new);
+		return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'domain')), $new);
+	}
+
+	/**
+	 * Format the uses prefix for the new group attributes.
+	 *
+	 * @param  array  $new
+	 * @param  array  $old
+	 * @return string
+	 */
+	protected static function formatUsesPrefix($new, $old)
+	{
+		if (isset($new['namespace']))
+		{
+			return trim(array_get($old, 'namespace'), '\\').'\\'.trim($new['namespace'], '\\');
+		}
+		else
+		{
+			return array_get($old, 'namespace');
+		}
 	}
 
 	/**
@@ -716,9 +737,22 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if (is_string($action)) $action = array('uses' => $action);
 
+		// Here we'll get an instance of this controller dispatcher and hand it off to
+		// the Closure so it will be used to resolve the class instances out of our
+		// IoC container instance and call the appropriate methods on the class.
+		if (count($this->groupStack) > 0)
+		{
+			$action['uses'] = $this->prependGroupUses($action['uses']);
+		}
+
+		// Here we'll get an instance of this controller dispatcher and hand it off to
+		// the Closure so it will be used to resolve the class instances out of our
+		// IoC container instance and call the appropriate methods on the class.
 		$action['controller'] = $action['uses'];
 
-		return array_set($action, 'uses', $this->getClassClosure($action['uses']));
+		$closure = $this->getClassClosure($action['uses']);
+
+		return array_set($action, 'uses', $closure);
 	}
 
 	/**
@@ -749,6 +783,19 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 			return $d->dispatch($route, $request, $class, $method);
 		};
+	}
+
+	/**
+	 * Prepend the last group uses onto the use clause.
+	 *
+	 * @param  string  $uses
+	 * @return string
+	 */
+	protected function prependGroupUses($uses)
+	{
+		$group = last($this->groupStack);
+
+		return isset($group['namespace']) ? $group['namespace'].'\\'.$uses : $uses;
 	}
 
 	/**
