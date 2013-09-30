@@ -347,10 +347,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	public function testGroupMerging()
 	{
 		$old = array('prefix' => 'foo/bar/');
-		$this->assertEquals(array('prefix' => 'foo/bar/baz'), Router::mergeGroup(array('prefix' => 'baz'), $old));
+		$this->assertEquals(array('prefix' => 'foo/bar/baz', 'namespace' => null), Router::mergeGroup(array('prefix' => 'baz'), $old));
 
 		$old = array('domain' => 'foo');
-		$this->assertEquals(array('domain' => 'baz', 'prefix' => null), Router::mergeGroup(array('domain' => 'baz'), $old));
+		$this->assertEquals(array('domain' => 'baz', 'prefix' => null, 'namespace' => null), Router::mergeGroup(array('domain' => 'baz'), $old));
 	}
 
 
@@ -393,6 +393,34 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->filter('bar', function() {});
 		$router->filter('baz', function() { return 'foo!'; });
 		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+	}
+
+
+	public function testMergingControllerUses()
+	{
+		$router = $this->getRouter();
+		$router->group(array('namespace' => 'Namespace'), function() use ($router)
+		{
+			$router->get('foo/bar', 'Controller');
+		});
+		$routes = $router->getRoutes()->getRoutes();
+		$action = $routes[0]->getAction();
+
+		$this->assertEquals('Namespace\\Controller', $action['controller']);
+
+
+		$router = $this->getRouter();
+		$router->group(array('namespace' => 'Namespace'), function() use ($router)
+		{
+			$router->group(array('namespace' => 'Nested'), function() use ($router)
+			{
+				$router->get('foo/bar', 'Controller');
+			});
+		});
+		$routes = $router->getRoutes()->getRoutes();
+		$action = $routes[0]->getAction();
+
+		$this->assertEquals('Namespace\\Nested\\Controller', $action['controller']);
 	}
 
 
