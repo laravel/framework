@@ -208,6 +208,16 @@ class DatabaseManager implements ConnectionResolverInterface {
 	}
 
 	/**
+	 * Return all of the created connections.
+	 *
+	 * @return array
+	 */
+	public function getConnections()
+	{
+		return $this->connections;
+	}
+
+	/**
 	 * Dynamically pass methods to the default connection.
 	 *
 	 * @param  string  $method
