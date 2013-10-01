@@ -53,6 +53,7 @@
 		{"message": "Added support for XCache cache driver.", "backport": null},
 		{"message": "Added 'env' command to get current environment.", "backport": null},
 		{"message": "Added new --path and --name options to 'routes' Artisan command.", "backport": null},
-		{"message": "Implement JSONable and Arrayable interfaces on Pagintor.", "backport": null}
+		{"message": "Implement JSONable and Arrayable interfaces on Pagintor.", "backport": null},
+		{"message": "Foreign characters now supported in validation 'alpha' rules.", "backport": null}
 	]
 }
