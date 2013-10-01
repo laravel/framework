@@ -134,18 +134,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $touches = array();
 
 	/**
+	 * User exposed observable events
+	 *
+	 * @var array
+	 */
+	protected $observables = array();
+
+	/**
 	 * The relations to eager load on every query.
 	 *
 	 * @var array
 	 */
 	protected $with = array();
-
-	/**
-	 * User customizable observable events
-	 *
-	 * @var array
-	 */
-	protected $customObservables = array();
 
 	/**
 	 * Indicates if the model exists.
@@ -1029,7 +1029,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 				'deleting', 'deleted', 'saving', 'saved',
 				'restoring', 'restored',
 			),
-			$this->customObservables;
+			$this->observables
 		);
 	}
 
