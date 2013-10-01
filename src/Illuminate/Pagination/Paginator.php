@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 
-class Paginator implements ArrayAccess, Countable, IteratorAggregate, JsonableInterface, ArrayableInterface {
+class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorAggregate, JsonableInterface {
 
 	/**
 	 * The pagination environment.
@@ -429,9 +429,13 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate, JsonableIn
 	 *
 	 * @return array
 	 */
-	public function toArray();
+	public function toArray()
 	{
-		return $this->getCollection()->toArray();
+		return array(
+			'total' => $this->total, 'per_page' => $this->perPage, 
+			'current_page' => $this->currentPage, 'last_page' => $this->lastPage,
+			'from' => $this->from, 'to' => $this->to, 'data' => $this->getCollection()->toArray(),
+		);
 	}
 
 	/**
@@ -440,9 +444,9 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate, JsonableIn
 	 * @param  int  $options
 	 * @return string
 	 */
-	public function toJson($options = 0);
+	public function toJson($options = 0)
 	{
-		return $this->getCollection()->toJson($options);
+		return json_encode($this->toArray(), $options);
 	}
 
 }
