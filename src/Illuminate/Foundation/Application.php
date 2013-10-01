@@ -226,7 +226,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function attachDebugger()
 	{
-		$this->augment('Illuminate\Exception\LiveServiceProvider');
+		$this->register('Illuminate\Exception\LiveServiceProvider');
 	}
 
 	/**
@@ -284,20 +284,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	public function runningUnitTests()
 	{
 		return $this['env'] == 'testing';
-	}
-
-	/**
-	 * Register a service provider and setup its boot event.
-	 *
-	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
-	 * @param  array  $options
-	 * @return void
-	 */
-	public function augment($provider, $options = array())
-	{
-		$provider = $this->register($provider, $options);
-
-		$this->setupDeferredBoot($provider);
 	}
 
 	/**
@@ -407,7 +393,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 * @param  string  $service
 	 * @return void
 	 */
-	protected function registerDeferredProvider($provider, $service = null)
+	public function registerDeferredProvider($provider, $service = null)
 	{
 		$this->register($instance = new $provider($this));
 
@@ -416,20 +402,13 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		// providers so that this container does not try to resolve it out again.
 		if ($service) unset($this->deferredServices[$service]);
 
-		$this->setupDeferredBoot($instance);
-	}
-
-	/**
-	 * Handle the booting of a deferred service provider.
-	 *
-	 * @param  \Illuminate\Support\ServiceProvider  $instance
-	 * @return void
-	 */
-	protected function setupDeferredBoot($instance)
-	{
-		if ($this->booted) return $instance->boot();
-
-		$this->booting(function() use ($instance) { $instance->boot(); });
+		if ( ! $this->booted)
+		{
+			$this->booting(function() use ($instance)
+			{
+				$instance->boot();
+			});
+		}
 	}
 
 	/**
