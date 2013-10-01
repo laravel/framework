@@ -4,7 +4,6 @@ use Illuminate\Support\Manager;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 
 class SessionManager extends Manager {
@@ -45,7 +44,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the native session driver.
 	 *
-	 * @return \Illuminate\Session\Session
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createNativeDriver()
 	{
@@ -80,9 +79,11 @@ class SessionManager extends Manager {
 		return $this->app['db']->connection($connection);
 	}
 
+
 	/**
 	 * Get the database session options.
 	 *
+	 * @param  string $table
 	 * @return array
 	 */
 	protected function getDatabaseOptions($table)
@@ -93,7 +94,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the APC session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createApcDriver()
 	{
@@ -103,7 +104,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Memcached session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createMemcachedDriver()
 	{
@@ -113,7 +114,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Wincache session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createWincacheDriver()
 	{
@@ -123,7 +124,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Redis session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createRedisDriver()
 	{
@@ -134,10 +135,12 @@ class SessionManager extends Manager {
 		return $this->buildSession($handler);
 	}
 
+
 	/**
 	 * Create an instance of a cache driven driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @param  string  $driver
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createCacheBased($driver)
 	{
@@ -154,7 +157,7 @@ class SessionManager extends Manager {
 	{
 		$minutes = $this->app['config']['session.lifetime'];
 
-		return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);		
+		return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
 	}
 
 	/**

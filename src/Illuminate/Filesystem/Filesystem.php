@@ -127,7 +127,7 @@ class Filesystem {
 
 	/**
 	 * Extract the file extension from a file path.
-	 * 
+	 *
 	 * @param  string  $path
 	 * @return string
 	 */
@@ -372,7 +372,7 @@ class Filesystem {
 	 */
 	public function cleanDirectory($directory)
 	{
-		return $this->deleteDirectory($directory, true);
+		$this->deleteDirectory($directory, true);
 	}
 
 }
