@@ -4,7 +4,7 @@
 
 <?php if ($paginator->getLastPage() > 1): ?>
 	<div class="pagination">
-		<ul>
+		<ul class="pagination">
 			<?php echo $presenter->render(); ?>
 		</ul>
 	</div>
