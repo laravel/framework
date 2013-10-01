@@ -5,8 +5,10 @@ use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\ArrayableInterface;
 
-class Paginator implements ArrayAccess, Countable, IteratorAggregate {
+class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorAggregate, JsonableInterface {
 
 	/**
 	 * The pagination environment.
@@ -420,6 +422,31 @@ class Paginator implements ArrayAccess, Countable, IteratorAggregate {
 	public function offsetUnset($key)
 	{
 		unset($this->items[$key]);
+	}
+
+	/**
+	 * Get the instance as an array.
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return array(
+			'total' => $this->total, 'per_page' => $this->perPage, 
+			'current_page' => $this->currentPage, 'last_page' => $this->lastPage,
+			'from' => $this->from, 'to' => $this->to, 'data' => $this->getCollection()->toArray(),
+		);
+	}
+
+	/**
+	 * Convert the object to its JSON representation.
+	 *
+	 * @param  int  $options
+	 * @return string
+	 */
+	public function toJson($options = 0)
+	{
+		return json_encode($this->toArray(), $options);
 	}
 
 }
