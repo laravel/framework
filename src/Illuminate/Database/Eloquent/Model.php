@@ -100,7 +100,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * The accessors to append to the model's array form.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $appends = array();
@@ -139,6 +139,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var array
 	 */
 	protected $with = array();
+
+	/**
+	 * User customizable observable events
+	 *
+	 * @var array
+	 */
+	protected $customObservables = array();
 
 	/**
 	 * Indicates if the model exists.
@@ -1016,10 +1023,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getObservableEvents()
 	{
-		return array(
-			'creating', 'created', 'updating', 'updated',
-			'deleting', 'deleted', 'saving', 'saved',
-			'restoring', 'restored',
+		return array_merge(
+			array(
+				'creating', 'created', 'updating', 'updated',
+				'deleting', 'deleted', 'saving', 'saved',
+				'restoring', 'restored',
+			),
+			$this->customObservables;
 		);
 	}
 
@@ -1999,7 +2009,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return array_intersect_key($values, array_flip($this->visible));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));	
+		return array_diff_key($values, array_flip($this->hidden));
 	}
 
 	/**
@@ -2350,7 +2360,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * Get all the loaded relations for the instance.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getRelations()
