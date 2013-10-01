@@ -113,7 +113,7 @@ class Route {
 	 */
 	public function run()
 	{
-		$parameters = array_filter($this->parameters());
+		$parameters = array_filter($this->parameters(), function($p) { return isset($p); });
 
 		return call_user_func_array($this->action['uses'], $parameters);
 	}
@@ -363,7 +363,7 @@ class Route {
 	{
 		foreach ($parameters as $key => &$value)
 		{
-			$value = $value ?: array_get($this->defaults, $key);
+			$value = isset($value) ? $value : array_get($this->defaults, $key);
 		}
 
 		return $parameters;
