@@ -39,6 +39,7 @@
 		{"message": "Facades are now mockable without an application root.", "backport": null},
 		{"message": "Data may now be dynamically bound to views via magic methods.", "backport": null},
 		{"message": "Added support for XCache cache driver.", "backport": null},
-		{"message": "Added 'env' command to get current environment.", "backport": null}
+		{"message": "Added 'env' command to get current environment.", "backport": null},
+		{"message": "Added new --path and --name options to 'routes' Artisan command.", "backport": null}
 	]
 }
