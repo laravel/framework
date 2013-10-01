@@ -293,7 +293,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function fill(array $attributes)
 	{
-		foreach ($attributes as $key => $value)
+		foreach ($this->fillableFromArray($attributes) as $key => $value)
 		{
 			$key = $this->removeTableFromKey($key);
 
@@ -311,6 +311,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get the fillable attributes of a given array.
+	 *
+	 * @param  array  $attributes
+	 * @return array
+	 */
+	protected function fillableFromArray(array $attributes)
+	{
+		if (count($this->fillable) > 0)
+		{
+			return array_intersect_key($attributes, array_flip($this->fillable));
+		}
+
+		return $attributes;
 	}
 
 	/**
