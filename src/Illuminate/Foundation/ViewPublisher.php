@@ -65,12 +65,7 @@ class ViewPublisher {
 	{
 		list($vendor, $name) = explode('/', $package);
 
-		// First we will figure out the source of the package's views location
-		// which we do by convention. Once we have that we will move the files over
-		// to the "main" views directory for this particular application.
-		$path = $packagePath ?: $this->packagePath;
-
-		$source = $this->getSource($package, $name, $path);
+		$source = $this->getSource($package, $name, $packagePath ?: $this->packagePath);
 
 		return $this->publish($package, $source);
 	}
