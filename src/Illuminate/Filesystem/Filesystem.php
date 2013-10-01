@@ -106,7 +106,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function move($path, $target)
 	{
@@ -118,7 +118,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function copy($path, $target)
 	{
@@ -127,7 +127,7 @@ class Filesystem {
 
 	/**
 	 * Extract the file extension from a file path.
-	 * 
+	 *
 	 * @param  string  $path
 	 * @return string
 	 */
@@ -283,7 +283,7 @@ class Filesystem {
 	 * @param  string  $directory
 	 * @param  string  $destination
 	 * @param  int     $options
-	 * @return void
+	 * @return bool
 	 */
 	public function copyDirectory($directory, $destination, $options = null)
 	{
@@ -372,7 +372,7 @@ class Filesystem {
 	 */
 	public function cleanDirectory($directory)
 	{
-		return $this->deleteDirectory($directory, true);
+		$this->deleteDirectory($directory, true);
 	}
 
 }
