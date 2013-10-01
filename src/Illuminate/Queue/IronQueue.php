@@ -59,13 +59,12 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  integer $attempt
 	 * @return mixed
 	 */
-	public function push($job, $data = '', $queue = null)
+	public function push($job, $data = '', $queue = null, $attempt = null)
 	{
-		$payload = $this->createPayload($job, $data);
-
-		return $this->iron->postMessage($this->getQueue($queue), $payload)->id;
+		return $this->later(0, $job, $data, $queue, $attempt);
 	}
 
 	/**
@@ -73,15 +72,16 @@ class IronQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
-	 * @param  mixed  data
+	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  integer $attempt
 	 * @return mixed
 	 */
-public function later($delay, $job, $data = '', $queue = null)
+	public function later($delay, $job, $data = '', $queue = null, $attempt = null)
 	{
 		$delay = $this->getSeconds($delay);
 
-		$payload = $this->createPayload($job, $data);
+		$payload = $this->createPayload($job, $data, $attempt);
 
 		return $this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'))->id;
 	}
@@ -116,7 +116,7 @@ public function later($delay, $job, $data = '', $queue = null)
 	 */
 	public function marshal()
 	{
-		$this->createPushedIronJob($this->marshalPushedJob())->fire();
+		$this->createPushedIronJob($this->marshalPushedJob(), $this->getQueuePushed())->fire();
 
 		return new Response('OK');
 	}
@@ -141,11 +141,12 @@ public function later($delay, $job, $data = '', $queue = null)
 	 * Create a new IronJob for a pushed job.
 	 *
 	 * @param  \StdClass  $job
+	 * @param  string     $queue
 	 * @return \Illuminate\Queue\Jobs\IronJob
 	 */
-	protected function createPushedIronJob($job)
+	protected function createPushedIronJob($job, $queue)
 	{
-		return new IronJob($this->container, $this->iron, $job, $this->default, true);
+		return new IronJob($this->container, $this->iron, $job, $queue, true);
 	}
 
 	/**
@@ -155,9 +156,9 @@ public function later($delay, $job, $data = '', $queue = null)
 	 * @param  mixed   $data
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $attempt = null)
 	{
-		return $this->crypt->encrypt(parent::createPayload($job, $data));
+		return $this->crypt->encrypt(parent::createPayload($job, $data, $attempt));
 	}
 
 	/**
@@ -169,6 +170,23 @@ public function later($delay, $job, $data = '', $queue = null)
 	public function getQueue($queue)
 	{
 		return $queue ?: $this->default;
+	}
+
+	/**
+	 * Get the queue for a pushed job.
+	 *
+	 * @return string
+	 */
+	protected function getQueuePushed()
+	{
+		// We want to parse the URL and get the queue that this message was pushed from. The URL
+		// is in the format https://{mq-host}/1/projects/{project-id}/queues/{queue-name}...
+		// but all we care about is the queue name, so that's what we'll get here.
+		$url = parse_url($this->request->header('Iron-Subscriber-Message-Url'));
+
+		$fragments = explode('/', $url['path']);
+
+		return array_get($fragments, 5, $this->default);
 	}
 
 	/**
