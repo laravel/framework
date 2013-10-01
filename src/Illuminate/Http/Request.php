@@ -234,6 +234,18 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Retrieve a request item from the request.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return string
+	 */
+	public function request($key = null, $default = null)
+	{
+		return $this->retrieveItem('request', $key, $default);
+	}
+
+	/**
 	 * Retrieve a cookie from the request.
 	 *
 	 * @param  string  $key
