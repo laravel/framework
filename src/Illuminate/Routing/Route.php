@@ -463,7 +463,7 @@ class Route {
 	{
 		foreach ($wheres as $key => $pattern)
 		{
-			$value = str_replace('{'.$key.'}', '('.$pattern.')', $value);
+			$value = str_replace('{'.$key.'}', $pattern, $value);
 		}
 
 		return $value;
