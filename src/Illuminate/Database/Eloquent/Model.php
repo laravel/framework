@@ -246,6 +246,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			static::$booted[get_class($this)] = true;
 		}
 
+		$this->syncOriginal();
+
 		$this->fill($attributes);
 	}
 
