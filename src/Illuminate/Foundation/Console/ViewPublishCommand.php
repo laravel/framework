@@ -1,44 +1,44 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\ConfigPublisher;
+use Illuminate\Foundation\ViewPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ConfigPublishCommand extends Command {
+class ViewPublishCommand extends Command {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'config:publish';
+	protected $name = 'view:publish';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = "Publish a package's configuration to the application";
+	protected $description = "Publish a package's views to the application";
 
 	/**
-	 * The config publisher instance.
+	 * The view publisher instance.
 	 *
-	 * @var \Illuminate\Foundation\ConfigPublisher
+	 * @var \Illuminate\Foundation\ViewPublisher
 	 */
-	protected $config;
+	protected $view;
 
 	/**
-	 * Create a new configuration publish command instance.
+	 * Create a new view publish command instance.
 	 *
-	 * @param  \Illuminate\Foundation\ConfigPublisher  $config
+	 * @param  \Illuminate\Foundation\ViewPublisher  $view
 	 * @return void
 	 */
-	public function __construct(ConfigPublisher $config)
+	public function __construct(ViewPublisher $view)
 	{
 		parent::__construct();
 
-		$this->config = $config;
+		$this->view = $view;
 	}
 
 	/**
@@ -52,14 +52,14 @@ class ConfigPublishCommand extends Command {
 
 		if ( ! is_null($path = $this->getPath()))
 		{
-			$this->config->publish($package, $path);
+			$this->view->publish($package, $path);
 		}
 		else
 		{
-			$this->config->publishPackage($package);
+			$this->view->publishPackage($package);
 		}
 
-		$this->output->writeln('<info>Configuration published for package:</info> '.$package);
+		$this->output->writeln('<info>Views published for package:</info> '.$package);
 	}
 
 	/**
@@ -97,7 +97,7 @@ class ConfigPublishCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the configuration files.', null),
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the view files.', null),
 		);
 	}
 
