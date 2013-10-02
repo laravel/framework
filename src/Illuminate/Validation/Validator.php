@@ -1557,7 +1557,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->addExtensions($extensions);
 
-		foreach ($extensions as $rule => $extension)
+		foreach ($this->extensions as $rule => $extension)
 		{
 			$this->implicitRules[] = studly_case($rule);
 		}
