@@ -520,14 +520,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $foreignKey
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function belongsTo($related, $foreignKey = null)
+	public function belongsTo($related, $foreignKey = null, $relation = null)
 	{
-		list(, $caller) = debug_backtrace(false);
+		if(is_null($relation))
+		{
+			list(, $caller) = debug_backtrace(false);
 
-		// If no foreign key was supplied, we can use a backtrace to guess the proper
-		// foreign key name by using the name of the relationship function, which
-		// when combined with an "_id" should conventionally match the columns.
-		$relation = $caller['function'];
+			// If no foreign key was supplied, we can use a backtrace to guess the proper
+			// foreign key name by using the name of the relationship function, which
+			// when combined with an "_id" should conventionally match the columns.
+			$relation = $caller['function'];
+		}
 
 		if (is_null($foreignKey))
 		{
