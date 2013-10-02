@@ -89,6 +89,18 @@ class Filesystem {
 	{
 		return file_put_contents($path, $data, FILE_APPEND);
 	}
+	
+	/**
+	 * Prepend to a file.
+	 *
+	 * @param  string  $path
+	 * @param  string  $data
+	 * @return int
+	 */
+         public function prepend($path, $data)
+         {
+         	return file_put_contents($path, $data.$this->get($path));
+         }
 
 	/**
 	 * Delete the file at a given path.
