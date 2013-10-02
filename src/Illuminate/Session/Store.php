@@ -160,7 +160,7 @@ class Store extends SymfonySession {
 	 */
 	public function flashInput(array $value)
 	{
-		return $this->flash('_old_input', $value);
+		$this->flash('_old_input', $value);
 	}
 
 	/**
@@ -198,7 +198,7 @@ class Store extends SymfonySession {
 	 */
 	protected function mergeNewFlashes(array $keys)
 	{
-		$values = array_unique(array_merge($this->get('flash.new'), $keys));
+		$values = array_unique(array_merge($this->get('flash.new', array()), $keys));
 
 		$this->put('flash.new', $values);
 	}
@@ -236,7 +236,7 @@ class Store extends SymfonySession {
 	 */
 	public function flush()
 	{
-		return $this->clear();
+		$this->clear();
 	}
 
 	/**

@@ -22,7 +22,7 @@ class Starter {
 		// the appropriate classes and file used by the given workbench package.
 		$files = $files ?: new Filesystem;
 
-		$autoloads = $finder->in($path)->files()->name('autoload.php')->depth('<= 3');
+		$autoloads = $finder->in($path)->files()->name('autoload.php')->depth('<= 3')->followLinks();
 
 		foreach ($autoloads as $file)
 		{

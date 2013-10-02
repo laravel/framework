@@ -78,7 +78,7 @@ class View implements ArrayAccess, Renderable {
 
 		$env->callComposer($this);
 
-		$contents = trim($this->getContents());
+		$contents = $this->getContents();
 
 		// Once we've finished rendering the view, we'll decrement the render count
 		// then if we are at the bottom of the stack we'll flush out sections as
@@ -302,6 +302,23 @@ class View implements ArrayAccess, Renderable {
 	public function __unset($key)
 	{
 		unset($this->data[$key]);
+	}
+
+	/**
+	 * Dynamically bind parameters to the view.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return \Illuminate\View\View
+	 */
+	public function __call($method, $parameters)
+	{
+		if (starts_with($method, 'with'))
+		{
+			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
+		}
+
+		throw new \BadMethodCallException("Method [$method] does not exist on view.");
 	}
 
 	/**

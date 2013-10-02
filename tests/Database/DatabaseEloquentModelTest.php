@@ -414,6 +414,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
 		)));
 		$model->setRelation('partner', new EloquentModelStub(array('name' => 'abby')));
+		$model->setRelation('group', null);
+		$model->setRelation('multi', new Illuminate\Database\Eloquent\Collection);
 		$array = $model->toArray();
 
 		$this->assertTrue(is_array($array));
@@ -421,7 +423,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $array['names'][0]['bar']);
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
+		$this->assertEquals(null, $array['group']);
+		$this->assertEquals(array(), $array['multi']);
 		$this->assertFalse(isset($array['password']));
+
+		$model->setAppends(array('appendable'));
+		$array = $model->toArray();
+		$this->assertEquals('appended', $array['appendable']);
 	}
 
 
@@ -664,7 +672,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$class = new EloquentModelStub;
 
-		$this->assertEquals(array('list_items', 'password'), $class->getMutatedAttributes());
+		$this->assertEquals(array('list_items', 'password', 'appendable'), $class->getMutatedAttributes());
 	}
 
 
@@ -747,6 +755,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return array();
 	}
+	public function getAppendableAttribute()
+	{
+		return 'appended';
+	}
 }
 
 class EloquentModelCamelStub extends EloquentModelStub {
@@ -794,8 +806,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2))->andReturn($mock);
-		$mock->shouldReceive('get')->once()->with(array('*'))->andReturn('foo');
+		$mock->shouldReceive('find')->once()->with(array(1, 2), array('*'))->andReturn('foo');
 		return $mock;
 	}
 }

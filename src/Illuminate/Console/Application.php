@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Console;
 
-use Illuminate\Container\Container;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
@@ -62,10 +61,10 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Add the command to the parent instance.
 	 *
-	 * @param  \Symfony\Component\Console\Command  $command
-	 * @return \Symfony\Component\Console\Command
+	 * @param  \Symfony\Component\Console\Command\Command  $command
+	 * @return \Symfony\Component\Console\Command\Command
 	 */
-	protected function addToParent($command)
+	protected function addToParent(SymfonyCommand $command)
 	{
 		return parent::add($command);
 	}
@@ -74,7 +73,7 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Add a command, resolving through the application.
 	 *
 	 * @param  string  $command
-	 * @return void
+	 * @return \Symfony\Component\Console\Command\Command
 	 */
 	public function resolve($command)
 	{
@@ -126,7 +125,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Render the given exception.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return void
 	 */
@@ -140,7 +139,7 @@ class Application extends \Symfony\Component\Console\Application {
 			$this->exceptionHandler->handleConsole($e);
 		}
 
-		return parent::renderException($e, $output);
+		parent::renderException($e, $output);
 	}
 
 	/**

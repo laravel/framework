@@ -93,9 +93,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The attributes that should be visible in arrays.
 	 *
-	 * @var arrays
+	 * @var array
 	 */
 	protected $visible = array();
+
+	/**
+	 * The accessors to append to the model's array form.
+	 * 
+	 * @var array
+	 */
+	protected $appends = array();
 
 	/**
 	 * The attributes that are mass assignable.
@@ -110,6 +117,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var array
 	 */
 	protected $guarded = array('*');
+
+	/**
+	 * The attributes that should be mutated to dates.
+	 *
+	 * @var array
+	 */
+	protected $dates = array();
 
 	/**
 	 * The relationships that should be touched on save.
@@ -212,10 +226,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ( ! isset(static::$booted[get_class($this)]))
 		{
-			static::boot();
-
 			static::$booted[get_class($this)] = true;
+
+			static::boot();
 		}
+
+		$this->syncOriginal();
 
 		$this->fill($attributes);
 	}
@@ -277,7 +293,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function fill(array $attributes)
 	{
-		foreach ($attributes as $key => $value)
+		foreach ($this->fillableFromArray($attributes) as $key => $value)
 		{
 			$key = $this->removeTableFromKey($key);
 
@@ -295,6 +311,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get the fillable attributes of a given array.
+	 *
+	 * @param  array  $attributes
+	 * @return array
+	 */
+	protected function fillableFromArray(array $attributes)
+	{
+		if (count($this->fillable) > 0)
+		{
+			return array_intersect_key($attributes, array_flip($this->fillable));
+		}
+
+		return $attributes;
 	}
 
 	/**
@@ -344,6 +376,56 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$model->save();
 
 		return $model;
+	}
+
+	/**
+	 * Get the first record matching the attributes or create it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function firstOrCreate(array $attributes)
+	{
+		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		{
+			return $instance;
+		}
+
+		return static::create($attributes);
+	}
+
+	/**
+	 * Get the first record matching the attributes or instantiate it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function firstOrNew(array $attributes)
+	{
+		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		{
+			return $instance;
+		}
+
+		return new static($attributes);
+	}
+
+	/**
+	 * Get the first model for the given attributes.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model|null
+	 */
+	protected static function firstByAttributes($attributes)
+	{
+		$query = static::query();
+
+		foreach ($attributes as $key => $value)
+		{
+			$query->where($key, $value);
+		}
+
+		return $query->first() ?: null;
 	}
 
 	/**
@@ -398,11 +480,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$instance = new static;
 
-		if (is_array($id))
-		{
-			return $instance->newQuery()->whereIn($instance->getKeyName(), $id)->get($columns);
-		}
-
 		return $instance->newQuery()->find($id, $columns);
 	}
 
@@ -424,7 +501,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function load($relations)
 	{
@@ -433,6 +510,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$query = $this->newQuery()->with($relations);
 
 		$query->eagerLoadRelations(array($this));
+
+		return $this;
 	}
 
 	/**
@@ -1335,11 +1414,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a fresh timestamp for the model.
 	 *
-	 * @return DateTime
+	 * @return Carbon
 	 */
 	public function freshTimestamp()
 	{
-		return new DateTime;
+		return new Carbon;
 	}
 
 	/**
@@ -1609,6 +1688,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Set the accessors to append to model arrays.
+	 *
+	 * @param  array  $appends
+	 * @return void
+	 */
+	public function setAppends(array $appends)
+	{
+		$this->appends = $appends;
+	}
+
+	/**
 	 * Get the fillable attributes for the model.
 	 *
 	 * @return array
@@ -1685,7 +1775,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if (static::$unguarded) return true;
 
-		// If the key is in the "fillable" array, we can of course assume tha it is
+		// If the key is in the "fillable" array, we can of course assume that it's
 		// a fillable attribute. Otherwise, we will check the guarded array when
 		// we need to determine if the attribute is black-listed on the model.
 		if (in_array($key, $this->fillable)) return true;
@@ -1810,7 +1900,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			if ( ! array_key_exists($key, $attributes)) continue;
 
-			$attributes[$key] = $this->mutateAttribute($key, $attributes[$key]);
+			$attributes[$key] = $this->mutateAttribute(
+				$key, $attributes[$key]
+			);
+		}
+
+		// Here we will grab all of the appended, calculated attributes to this model
+		// as these attributes are not really in the attributes array, but are run
+		// when we need to array or JSON the model for convenience to the coder.
+		foreach ($this->appends as $key)
+		{
+			$attributes[$key] = $this->mutateAttribute($key, null);
 		}
 
 		return $attributes;
@@ -1857,7 +1957,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			// If the relationships snake-casing is enabled, we will snake case this
 			// key so that the relation attribute is snake cased in this returned
-			// array to the developer, making this consisntent with attributes.
+			// array to the developers, making this consistent with attributes.
 			if (static::$snakeAttributes)
 			{
 				$key = snake_case($key);
@@ -1866,7 +1966,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// If the relation value has been set, we will set it on this attributes
 			// list for returning. If it was not arrayable or null, we'll not set
 			// the value on the array because it is some type of invalid value.
-			if (isset($relation))
+			if (isset($relation) or is_null($value))
 			{
 				$attributes[$key] = $relation;
 			}
@@ -2057,7 +2157,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getDates()
 	{
-		return array(static::CREATED_AT, static::UPDATED_AT, static::DELETED_AT);
+		$defaults = array(static::CREATED_AT, static::UPDATED_AT, static::DELETED_AT);
+
+		return array_merge($this->dates, $defaults);
 	}
 
 	/**
@@ -2482,7 +2584,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __isset($key)
 	{
-		return isset($this->attributes[$key]) or isset($this->relations[$key]);
+		return ((isset($this->attributes[$key]) or isset($this->relations[$key])) or
+			    ($this->hasGetMutator($key) and ! is_null($this->getAttributeValue($key))));
 	}
 
 	/**

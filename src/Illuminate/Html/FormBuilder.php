@@ -291,6 +291,19 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a url input field.
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function url($name, $value = null, $options = array())
+	{
+		return $this->input('url', $name, $value, $options);
+	}
+
+	/**
 	 * Create a file input field.
 	 *
 	 * @param  string  $name
@@ -596,7 +609,7 @@ class FormBuilder {
 		switch ($type)
 		{
 			case 'checkbox':
-				return $this->getCheckboxCheckedState($name, $checked);
+				return $this->getCheckboxCheckedState($name, $value, $checked);
 
 			case 'radio':
 				return $this->getRadioCheckedState($name, $value, $checked);
@@ -614,13 +627,15 @@ class FormBuilder {
 	 * @param  bool  $checked
 	 * @return bool
 	 */
-	protected function getCheckboxCheckedState($name, $checked)
+	protected function getCheckboxCheckedState($name, $value, $checked)
 	{
 		if ( ! $this->oldInputIsEmpty() and is_null($this->old($name))) return false;
 
 		if ($this->missingOldAndModel($name)) return $checked;
 
-		return (bool) $this->getValueAttribute($name);
+		$posted = $this->getValueAttribute($name);
+
+		return is_array($posted) ? in_array($value, $posted) : (bool) $posted;
 	}
 
 	/**
@@ -870,14 +885,14 @@ class FormBuilder {
 	{
 		if (is_null($name)) return $value;
 
-		if (isset($this->session) and $this->session->hasOldInput($name))
+		if ( ! is_null($this->old($name)))
 		{
-			return $this->session->getOldInput($name);
+			return $this->old($name);
 		}
 
 		if ( ! is_null($value)) return $value;
 
-		if (isset($this->model) and isset($this->model[$name]))
+		if (isset($this->model))
 		{
 			return $this->getModelValueAttribute($name);
 		}
@@ -893,11 +908,11 @@ class FormBuilder {
 	{
 		if (is_object($this->model))
 		{
-			return object_get($this->model, $name);
+			return object_get($this->model, $this->transformKey($name));
 		}
 		elseif (is_array($this->model))
 		{
-			return array_get($this->model, $name);
+			return array_get($this->model, $this->transformKey($name));
 		}
 	}
 
@@ -911,7 +926,7 @@ class FormBuilder {
 	{
 		if (isset($this->session))
 		{
-			return $this->session->getOldInput($name);
+			return $this->session->getOldInput($this->transformKey($name));
 		}
 	}
 
@@ -923,6 +938,17 @@ class FormBuilder {
 	public function oldInputIsEmpty()
 	{
 		return (isset($this->session) and count($this->session->getOldInput()) == 0);
+	}
+
+	/**
+	 * Transform key from array to dot syntax.
+	 *
+	 * @param  string  $key
+	 * @return string
+	 */
+	protected function transformKey($key)
+	{
+		return str_replace(array('.', '[]', '[', ']'), array('_', '', '.', ''), $key);
 	}
 
 	/**

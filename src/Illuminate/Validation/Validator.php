@@ -202,6 +202,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validate($attribute, $rule)
 	{
+		if (trim($rule) == '') return;
+
 		list($rule, $parameters) = $this->parseRule($rule);
 
 		// We will get the value for the given attribute from the array of data and then
@@ -474,7 +476,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$acceptable = array('yes', 'on', 1);
 
-		return $this->validateRequired($attribute, $value) and in_array($value, $acceptable);
+		return ($this->validateRequired($attribute, $value) and in_array($value, $acceptable));
 	}
 
 	/**
@@ -612,7 +614,7 @@ class Validator implements MessageProviderInterface {
 		// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) and $hasNumeric)
 		{
-			return $this->data[$attribute];
+			return array_get($this->data, $attribute);
 		}
 		elseif (is_array($value))
 		{
@@ -908,7 +910,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlpha($attribute, $value)
 	{
-		return preg_match('/^([a-z])+$/i', $value);
+		return preg_match('/^\pL+$/u', $value);
 	}
 
 	/**
@@ -920,7 +922,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlphaNum($attribute, $value)
 	{
-		return preg_match('/^([a-z0-9])+$/i', $value);
+		return preg_match('/^[\pL\pN]+$/u', $value);
 	}
 
 	/**
@@ -932,7 +934,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAlphaDash($attribute, $value)
 	{
-		return preg_match('/^([a-z0-9_-])+$/i', $value);
+		return preg_match('/^[\pL\pN_-]+$/u', $value);
 	}
 
 	/**

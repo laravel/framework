@@ -1,6 +1,6 @@
 {
 	"4.0.x": [
-		{"message": "Added implode method to query builder and Colletion class.", "backport": null},
+		{"message": "Added implode method to query builder and Collection class.", "backport": null},
 		{"message": "Fixed bug that caused Model->push method to fail.", "backport": null},
 		{"message": "Make session cookie HttpOnly by default.", "backport": null},
 		{"message": "Added mail.pretend configuration option.", "backport": null},
@@ -29,6 +29,26 @@
 		{"message": "Added selectMonth and selectYear to FormBuilder.", "backport": null},
 		{"message": "Fix container resolution of default values for non-scalar dependencies.", "backport": null},
 		{"message": "Allow optional path to be specified with calling _path helpers.", "backport": null},
-		{"message": "Emulate nested transactions in the database connection layer.", "backport": null}
+		{"message": "Emulate nested transactions in the database connection layer.", "backport": null},
+		{"message": "Added new appends property to Eloquent for adding ot arrays and JSON.", "backport": null},
+		{"message": "Allow connection to be configurable when using Redis based sessions.", "backport": null},
+		{"message": "Allow passing DateTime objects to Queue::later.", "backport": null},
+		{"message": "Added Queue::bulk method for pushing several jobs out at once.", "backport": null},
+		{"message": "Added 'dates' property to Eloquent model for convenient setting of date columns.", "backport": null},
+		{"message": "Added 'chunk' method to query builder and Eloquent for doing work on large result sets.", "backport": null},
+		{"message": "Facades are now mockable without an application root.", "backport": null},
+		{"message": "Data may now be dynamically bound to views via magic methods.", "backport": null},
+		{"message": "Added support for XCache cache driver.", "backport": null},
+		{"message": "Added 'env' command to get current environment.", "backport": null},
+		{"message": "Added new --path and --name options to 'routes' Artisan command.", "backport": null},
+		{"message": "Implement JSONable and Arrayable interfaces on Paginator.", "backport": null},
+		{"message": "Foreign characters now supported in validation 'alpha' rules.", "backport": null},
+		{"message": "Added 'prepend' method to Filesystem.", "backport": null},
+		{"message": "Added 'reduce' collection to Collection, and 'min' and 'max' to Eloquent Collection.", "backport": null},
+		{"message": "Added 'firstOrCreate' and 'firstOrNew' methods to Eloquent model.", "backport": null},
+		{"message": "Added Redirect::away method to always redirect to external URL with no validation.", "backport": null},
+		{"message": "Added 'double' method to Schema builder.", "backport": null},
+		{"message": "Pass keys to 'map' method on Collection.", "backport": null},
+		{"message": "Added 'orderByRaw' method to query builder.", "backport": null}
 	]
 }

@@ -71,14 +71,16 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Push a new job onto the queue after a delay.
 	 *
-	 * @param  int     $delay
+	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
-	 * @param  mixed   $data
+	 * @param  mixed  data
 	 * @param  string  $queue
 	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
 	{
+		$delay = $this->getSeconds($delay);
+
 		$payload = $this->createPayload($job, $data);
 
 		return $this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'))->id;

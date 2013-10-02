@@ -1,15 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-use Memcached;
-
-class MemcachedStore implements StoreInterface {
-
-	/**
-	 * The Memcached instance.
-	 *
-	 * @var \Memcached
-	 */
-	protected $memcached;
+class XCacheStore implements StoreInterface {
 
 	/**
 	 * A string that should be prepended to keys.
@@ -19,16 +10,14 @@ class MemcachedStore implements StoreInterface {
 	protected $prefix;
 
 	/**
-	 * Create a new Memcached store.
+	 * Create a new WinCache store.
 	 *
-	 * @param  \Memcached  $memcached
 	 * @param  string     $prefix
 	 * @return void
 	 */
-	public function __construct(Memcached $memcached, $prefix = '')
+	public function __construct($prefix = '')
 	{
-		$this->memcached = $memcached;
-		$this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
+		$this->prefix = $prefix;
 	}
 
 	/**
@@ -39,9 +28,9 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		$value = $this->memcached->get($this->prefix.$key);
+		$value = xcache_get($this->prefix.$key);
 
-		if ($this->memcached->getResultCode() == 0)
+		if (isset($value))
 		{
 			return $value;
 		}
@@ -57,7 +46,7 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$this->memcached->set($this->prefix.$key, $value, $minutes * 60);
+		xcache_set($this->prefix.$key, $value, $minutes * 60);
 	}
 
 	/**
@@ -69,7 +58,7 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		return $this->memcached->increment($this->prefix.$key, $value);
+		return xcache_inc($this->prefix.$key, $value);
 	}
 
 	/**
@@ -81,7 +70,7 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return $this->memcached->decrement($this->prefix.$key, $value);
+		return xcache_dec($this->prefix.$key, $value);
 	}
 
 	/**
@@ -104,7 +93,7 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->memcached->delete($this->prefix.$key);
+		xcache_unset($this->prefix.$key);
 	}
 
 	/**
@@ -114,7 +103,7 @@ class MemcachedStore implements StoreInterface {
 	 */
 	public function flush()
 	{
-		$this->memcached->flush();
+		xcache_clear_cache(XC_TYPE_VAR);
 	}
 
 	/**
@@ -126,16 +115,6 @@ class MemcachedStore implements StoreInterface {
 	public function section($name)
 	{
 		return new Section($this, $name);
-	}
-
-	/**
-	 * Get the underlying Memcached connection.
-	 *
-	 * @return \Memcached
-	 */
-	public function getMemcached()
-	{
-		return $this->memcached;
 	}
 
 	/**

@@ -80,7 +80,10 @@ class Repository implements ArrayAccess {
 		// If the item exists in the cache we will just return this immediately
 		// otherwise we will execute the given Closure and cache the result
 		// of that execution for the given number of minutes in storage.
-		if ($this->has($key)) return $this->get($key);
+		if ( ! is_null($value = $this->get($key)))
+		{
+			return $value;
+		}
 
 		$this->put($key, $value = $callback(), $minutes);
 

@@ -461,6 +461,8 @@ class Grammar extends BaseGrammar {
 
 		return 'order by '.implode(', ', array_map(function($order) use ($me)
 		{
+			if (isset($order['sql'])) return $order['sql'];
+
 			return $me->wrap($order['column']).' '.$order['direction'];
 		}
 		, $orders));
