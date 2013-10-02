@@ -253,7 +253,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request {
 	 */
 	public function file($key = null, $default = null)
 	{
-		return $this->retrieveItem('files', $key, $default);
+		return array_get($this->files->all(), $key, $default);
 	}
 
 	/**
