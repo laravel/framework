@@ -118,6 +118,19 @@ class Redirector {
 	}
 
 	/**
+	 * Create a new redirect response to an external URL (no validation).
+	 *
+	 * @param  string  $path
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function away($path, $status = 302, $headers = array())
+	{
+		return $this->createRedirect($path, $status, $headers);
+	}
+
+	/**
 	 * Create a new redirect response to the given HTTPS path.
 	 *
 	 * @param  string  $path

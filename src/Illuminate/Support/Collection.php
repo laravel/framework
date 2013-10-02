@@ -199,7 +199,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function map(Closure $callback)
 	{
-		return new static(array_map($callback, $this->items));
+		return new static(array_map($callback, $this->items, array_keys($this->items)));
 	}
 
 	/**
