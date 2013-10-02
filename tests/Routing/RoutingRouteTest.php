@@ -468,6 +468,15 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+
+		$router = $this->getRouter();
+		$router->resource('foo', 'FooController', array('names' => array(
+			'index' => 'foo',
+			'show' => 'bar',
+		)));
+
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
 	}
 
 
