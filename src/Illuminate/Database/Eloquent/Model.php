@@ -379,6 +379,56 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Get the first record matching the attributes or create it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function firstOrCreate(array $attributes)
+	{
+		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		{
+			return $instance;
+		}
+
+		return static::create($attributes);
+	}
+
+	/**
+	 * Get the first record matching the attributes or instantiate it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function firstOrNew(array $attributes)
+	{
+		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		{
+			return $instance;
+		}
+
+		return new static($attributes);
+	}
+
+	/**
+	 * Get the first model for the given attributes.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model|null
+	 */
+	protected static function firstByAttributes($attributes)
+	{
+		$query = static::query();
+
+		foreach ($attributes as $key => $value)
+		{
+			$query->where($key, $value);
+		}
+
+		return $query->first() ?: null;
+	}
+
+	/**
 	 * Begin querying the model.
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder|static
