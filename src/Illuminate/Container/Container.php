@@ -328,7 +328,7 @@ class Container implements ArrayAccess {
 		// so the developer can keep using the same objects instance every time.
 		if (isset($this->instances[$abstract]))
 		{
-			return $this->instances[$abstract];	
+			return $this->instances[$abstract];
 		}
 
 		$concrete = $this->getConcrete($abstract);
@@ -632,6 +632,8 @@ class Container implements ArrayAccess {
 	public function offsetUnset($key)
 	{
 		unset($this->bindings[$key]);
+
+		unset($this->instances[$key]);
 	}
 
 }
