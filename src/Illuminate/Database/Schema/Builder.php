@@ -58,6 +58,8 @@ class Builder {
 	{
 		$schema = $this->connection->getDoctrineSchemaManager();
 
+		$table = $this->connection->getTablePrefix().$table;
+
 		return in_array($column, array_keys($schema->listTableColumns($table)));
 	}
 
