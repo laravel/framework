@@ -649,7 +649,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
-		$relation = $model->belongsToMany('EloquentModelSaveStub', 'table', 'foreign', 'other');
+		$relation = $model->belongsToMany('EloquentModelSaveStub', 'table', 'foreign', 'other', 'eloquentModelSaveStub');
 		$this->assertEquals('table.foreign', $relation->getForeignKey());
 		$this->assertEquals('table.other', $relation->getOtherKey());
 		$this->assertTrue($relation->getParent() === $model);
