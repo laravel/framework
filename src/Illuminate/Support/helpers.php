@@ -7,12 +7,11 @@ if ( ! function_exists('action'))
 	 *
 	 * @param  string  $name
 	 * @param  string  $parameters
-	 * @param  bool    $absolute
 	 * @return string
 	 */
-	function action($name, $parameters = array(), $absolute = true)
+	function action($name, $parameters = array())
 	{
-		return app('url')->action($name, $parameters, $absolute);
+		return app('url')->action($name, $parameters);
 	}
 }
 
@@ -688,12 +687,11 @@ if ( ! function_exists('route'))
 	 *
 	 * @param  string  $route
 	 * @param  string  $parameters
-	 * @param  bool    $absolute
 	 * @return string
 	 */
-	function route($route, $parameters = array(), $absolute = true)
+	function route($route, $parameters = array())
 	{
-		return app('url')->route($route, $parameters, $absolute);
+		return app('url')->route($route, $parameters);
 	}
 }
 
