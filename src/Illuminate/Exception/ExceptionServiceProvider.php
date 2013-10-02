@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Exception;
 
 use Closure;
+use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
@@ -90,7 +91,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 			// We will instruct Whoops to not exit after it displays the exception as it
 			// will otherwise run out before we can do anything else. We just want to
 			// let the framework go ahead and finish a request on this end instead.
-			with($whoops = new \Whoops\Run)->allowQuit(false);
+			with($whoops = new Run)->allowQuit(false);
 
 			return $whoops->pushHandler($app['whoops.handler']);
 		});
