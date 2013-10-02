@@ -398,7 +398,7 @@ class Builder {
 	{
 		$type = 'between';
 
-		$this->wheres[] = compact('column', 'type', 'boolean');
+		$this->wheres[] = compact('column', 'type', 'values', 'boolean');
 
 		$this->bindings = array_merge($this->bindings, $values);
 
