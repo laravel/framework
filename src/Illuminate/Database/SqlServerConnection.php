@@ -12,6 +12,11 @@ class SqlServerConnection extends Connection {
 	 */
 	public function transaction(Closure $callback)
 	{
+		if ($this->getDriverName() == 'sqlsrv')
+		{
+			return parent::transaction($callback);
+		}
+
 		$this->pdo->exec('BEGIN TRAN');
 
 		// We'll simply execute the given callback within a try / catch block
