@@ -14,6 +14,13 @@ class SecLibGateway implements GatewayInterface {
 	protected $host;
 
 	/**
+	 * The SSH port on the server.
+	 *
+	 * @var int
+	 */
+	protected $port = 22;
+
+	/**
 	 * The authentication credential set.
 	 *
 	 * @var array
@@ -36,10 +43,31 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function __construct($host, array $auth, Filesystem $files)
 	{
-		$this->host = $host;
 		$this->auth = $auth;
 		$this->files = $files;
-		$this->connection = new Net_SFTP($this->host);
+		$this->setHostAndPort($host);
+
+		$this->connection = new Net_SFTP($this->host, $this->port);
+	}
+
+	/**
+	 * Set the host and port from a full host string.
+	 *
+	 * @param  string  $host
+	 * @return void
+	 */
+	protected function setHostAndPort($host)
+	{
+		if ( ! str_contains($host, ':'))
+		{
+			$this->host = $host;
+		}
+		else
+		{
+			list($this->host, $this->post) = explode($host, ':');
+
+			$this->port = (int) $this->port;
+		}
 	}
 
 	/**
