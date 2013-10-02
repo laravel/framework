@@ -79,6 +79,25 @@ class Filesystem {
 	}
 
 	/**
+	 * Prepend to a file.
+	 *
+	 * @param  string  $path
+	 * @param  string  $data
+	 * @return int
+	 */
+	public function prepend($path, $data)
+	{
+		if ($this->exists($path))
+		{
+			return $this->put($path, $data.$this->get($path));			
+		}
+		else
+		{
+			return $this->put($data);
+		}
+	}
+
+	/**
 	 * Append to a file.
 	 *
 	 * @param  string  $path
