@@ -9,7 +9,8 @@
 		{"message": "Added morphToMany relation for polymorphic many-to-many relations.", "backport": null},
 		{"message": "Deprecated column renaming. Deprecated dropping SQLite columns.", "backport": null},
 		{"message": "Added live debug console via 'debug' Artisan command.", "backport": null},
-		{"message": "Make Boris available from Tinker command when available.", "backport": null}
+		{"message": "Make Boris available from Tinker command when available.", "backport": null},
+		{"message": "Allow route names to be specified on resources.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
