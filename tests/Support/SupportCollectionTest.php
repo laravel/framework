@@ -249,4 +249,28 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), array_values($data->all()));
 	}
 
+	public function testMap()
+	{
+		$data = new Collection(array('foo', 'bar', 'baz'));
+		$mapped = $data->map(function($value) {
+			return ucfirst($value);
+		});
+		$this->assertEquals(array('Foo', 'Bar', 'Baz'), array_values($mapped->all()));
+	}
+
+	public function testReduce()
+	{
+		$data = new Collection(array(123, 456, 789));
+		$sum = $data->reduce(function(&$result, $value) {
+			return ($result += $value);
+		});
+		$this->assertEquals(1368, $sum);
+
+		$data = new Collection(array(123, 456));
+		$sum = $data->reduce(function(&$result, $value) {
+			return ($result += $value);
+		}, 789);
+		$this->assertEquals(1368, $sum);
+	}
+
 }
