@@ -311,9 +311,14 @@ class Handler {
 	 */
 	protected function formatException(\Exception $e)
 	{
-		$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
+		if ($this->debug)
+		{
+			$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
 
-		return 'Error in exception handler: '.$location;
+			return 'Error in exception handler: '.$location;
+		}
+
+		return 'Error in exception handler.';
 	}
 
 	/**
