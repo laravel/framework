@@ -46,6 +46,7 @@
 		{"message": "Added 'prepend' method to Filesystem.", "backport": null},
 		{"message": "Added 'reduce' collection to Collection, and 'min' and 'max' to Eloquent Collection.", "backport": null},
 		{"message": "Added 'firstOrCreate' and 'firstOrNew' methods to Eloquent model.", "backport": null},
-		{"message": "Added Redirect::away method to always redirect to external URL with no validation.", "backport": null}
+		{"message": "Added Redirect::away method to always redirect to external URL with no validation.", "backport": null},
+		{"message": "Added 'double' method to Schema builder.", "backport": null}
 	]
 }
