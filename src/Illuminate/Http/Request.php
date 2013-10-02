@@ -254,7 +254,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function file($key = null, $default = null)
 	{
-		return $this->retrieveItem('files', $key, $default);
+		return array_get($this->files->all(), $key, $default);
 	}
 
 	/**
@@ -265,7 +265,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function hasFile($key)
 	{
-		return $this->files->has($key) and ! is_null($this->file($key));
+		return ! is_null($this->file($key));
 	}
 
 	/**
