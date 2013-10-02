@@ -820,6 +820,24 @@ class Builder {
 	}
 
 	/**
+	 * Add a raw "order by" clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array  $bindings
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function orderByRaw($sql, $bindings = array())
+	{
+		$type = 'raw';
+
+		$this->orders[] = compact('type', 'sql');
+
+		$this->bindings = array_merge($this->bindings, $bindings);
+
+		return $this;
+	}
+
+	/**
 	 * Set the "offset" value of the query.
 	 *
 	 * @param  int  $value
