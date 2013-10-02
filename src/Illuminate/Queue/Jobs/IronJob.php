@@ -38,9 +38,9 @@ class IronJob extends Job {
 	 *
 	 * @param  \Illuminate\Container\Container  $container
 	 * @param  IronMQ  $iron
-	 * @param  StdClass  $job
+	 * @param  object  $job
 	 * @param  string  $queue
-	 * @param  bool  $pushed
+	 * @param  bool    $pushed
 	 * @return void
 	 */
 	public function __construct(Container $container,

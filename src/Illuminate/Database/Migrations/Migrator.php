@@ -87,8 +87,8 @@ class Migrator {
 	/**
 	 * Run an array of migrations.
 	 *
-	 * @param  array   $migrations
-	 * @param  bool    $pretend
+	 * @param  array  $migrations
+	 * @param  bool   $pretend
 	 * @return void
 	 */
 	public function runMigrationList($migrations, $pretend = false)
@@ -147,7 +147,7 @@ class Migrator {
 	/**
 	 * Rollback the last migration operation.
 	 *
-	 * @param  bool   $pretend
+	 * @param  bool  $pretend
 	 * @return int
 	 */
 	public function rollback($pretend = false)
@@ -180,8 +180,8 @@ class Migrator {
 	/**
 	 * Run "down" a migration instance.
 	 *
-	 * @param  \StdClass  $migration
-	 * @param  bool  $pretend
+	 * @param  object  $migration
+	 * @param  bool    $pretend
 	 * @return void
 	 */
 	protected function runDown($migration, $pretend)

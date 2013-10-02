@@ -134,7 +134,7 @@ class RedisStore implements StoreInterface {
 	 * Begin executing a new section operation.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
+	 * @return \Illuminate\Cache\RedisSection
 	 */
 	public function section($name)
 	{
