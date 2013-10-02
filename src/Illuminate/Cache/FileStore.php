@@ -94,9 +94,13 @@ class FileStore implements StoreInterface {
 	 */
 	protected function createCacheDirectory($path)
 	{
-		if ( ! $this->files->isDirectory($directory = dirname($path)))
+		try
 		{
-			$this->files->makeDirectory($directory, 0777, true);
+			$this->files->makeDirectory(dirname($path), 0777, true);
+		}
+		catch (\Exception $e)
+		{
+			//
 		}
 	}
 
