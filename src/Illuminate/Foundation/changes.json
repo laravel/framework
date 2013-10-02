@@ -55,7 +55,10 @@
 		{"message": "Added support for XCache cache driver.", "backport": null},
 		{"message": "Added 'env' command to get current environment.", "backport": null},
 		{"message": "Added new --path and --name options to 'routes' Artisan command.", "backport": null},
-		{"message": "Implement JSONable and Arrayable interfaces on Pagintor.", "backport": null},
-		{"message": "Foreign characters now supported in validation 'alpha' rules.", "backport": null}
+		{"message": "Implement JSONable and Arrayable interfaces on Paginator.", "backport": null},
+		{"message": "Foreign characters now supported in validation 'alpha' rules.", "backport": null},
+		{"message": "Added 'prepend' method to Filesystem.", "backport": null},
+		{"message": "Added 'reduce' collection to Collection, and 'min' and 'max' to Eloquent Collection.", "backport": null},
+		{"message": "Added 'firstOrCreate' and 'firstOrNew' methods to Eloquent model.", "backport": null}
 	]
 }

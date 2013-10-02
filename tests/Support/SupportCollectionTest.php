@@ -249,4 +249,38 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), array_values($data->all()));
 	}
 
+	public function testGetListValueWithAccessors()
+	{
+		$model    = new TestAccessorEloquentTestStub(array('some' => 'foo'));
+		$modelTwo = new TestAccessorEloquentTestStub(array('some' => 'bar'));
+		$data     = new Collection(array($model, $modelTwo));
+
+		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
+	}
+
+}
+
+class TestAccessorEloquentTestStub
+{
+	protected $attributes = array();
+
+	public function __construct($attributes)
+	{
+		$this->attributes = $attributes;
+	}
+
+	public function __get($attribute)
+	{
+		$accessor = 'get' .lcfirst($attribute). 'Attribute';
+		if (method_exists($this, $accessor)) {
+			return $this->$accessor();
+		}
+
+		return $this->$attribute;
+	}
+
+	public function getSomeAttribute()
+	{
+		return $this->attributes['some'];
+	}
 }
