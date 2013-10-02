@@ -1,4 +1,7 @@
-<?php namespace Illuminate\Cache; use Closure, ArrayAccess;
+<?php namespace Illuminate\Cache;
+
+use Closure;
+use ArrayAccess;
 
 class Repository implements ArrayAccess {
 
