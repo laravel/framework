@@ -841,6 +841,24 @@ class Builder {
 		return $this->orderBy($column, 'asc');
 	}
 
+	/*
+	 * Add a raw "order by" clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array  $bindings
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function orderByRaw($sql, $bindings = array())
+	{
+		$type = 'raw';
+
+		$this->orders[] = compact('type', 'sql');
+
+		$this->bindings = array_merge($this->bindings, $bindings);
+
+		return $this;
+	}
+
 	/**
 	 * Set the "offset" value of the query.
 	 *
@@ -1258,7 +1276,7 @@ class Builder {
 		// Once we have the total number of records to be paginated, we can grab the
 		// current page and the result array. Then we are ready to create a brand
 		// new Paginator instances for the results which will create the links.
-		$page = $paginator->getCurrentPage();
+		$page = $paginator->getCurrentPage($total);
 
 		$results = $this->forPage($page, $perPage)->get($columns);
 

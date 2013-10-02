@@ -64,6 +64,7 @@
 		{"message": "Added 'firstOrCreate' and 'firstOrNew' methods to Eloquent model.", "backport": null},
 		{"message": "Added Redirect::away method to always redirect to external URL with no validation.", "backport": null},
 		{"message": "Added 'double' method to Schema builder.", "backport": null},
-		{"message": "Pass keys to 'map' method on Collection.", "backport": null}
+		{"message": "Pass keys to 'map' method on Collection.", "backport": null},
+		{"message": "Added 'orderByRaw' method to query builder.", "backport": null}
 	]
 }

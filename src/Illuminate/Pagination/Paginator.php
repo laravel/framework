@@ -240,11 +240,19 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	/**
 	 * Get the current page for the request.
 	 *
+	 * @param  int|null  $total
 	 * @return int
 	 */
-	public function getCurrentPage()
+	public function getCurrentPage($total = null)
 	{
-		return $this->currentPage;
+		if (is_null($total))
+		{
+			return $this->currentPage;
+		}
+		else
+		{
+			return min($this->currentPage, ceil($total / $this->perPage));
+		}
 	}
 
 	/**
