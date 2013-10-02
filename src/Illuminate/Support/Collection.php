@@ -167,6 +167,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Reduce the collection to a single value.
+	 *
+	 * @param  callable  $callback
+	 * @param  mixed  $initial
+	 * @return mixed
+	 */
+	public function reduce($callback, $initial = null)
+	{
+		return array_reduce($this->items, $callback, $initial);
+	}
+
+	/**
 	 * Execute a callback over each item.
 	 *
 	 * @param  Closure  $callback
