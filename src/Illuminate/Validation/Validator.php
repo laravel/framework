@@ -476,7 +476,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$acceptable = array('yes', 'on', 1);
 
-		return $this->validateRequired($attribute, $value) and in_array($value, $acceptable);
+		return ($this->validateRequired($attribute, $value) and in_array($value, $acceptable));
 	}
 
 	/**
