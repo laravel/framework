@@ -529,6 +529,7 @@ class Container implements ArrayAccess {
 	public function offsetUnset($key)
 	{
 		unset($this->bindings[$key]);
+
 		unset($this->instances[$key]);
 	}
 
