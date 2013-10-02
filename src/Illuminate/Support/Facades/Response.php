@@ -42,7 +42,7 @@ class Response {
 	{
 		$app = Facade::getFacadeApplication();
 
-		return new IlluminateResponse($app['view']->make($view, $data), $status, $headers);
+		return static::make($app['view']->make($view, $data), $status, $headers);
 	}
 
 	/**
