@@ -201,7 +201,6 @@ class Guard {
 		// request indicating that the given credentials were invalid for login.
 		if ($this->attemptBasic($request, $field)) return;
 
-		
 		return $this->getBasicResponse();
 	}
 

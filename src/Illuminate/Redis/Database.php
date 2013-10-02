@@ -68,7 +68,7 @@ class Database {
 	 */
 	public function connection($name = 'default')
 	{
-		return $this->clients[$name];
+		return $this->clients[$name ?: 'default'];
 	}
 
 	/**

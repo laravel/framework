@@ -3,6 +3,7 @@
 use Closure;
 use DateTime;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Builder {
@@ -58,10 +59,29 @@ class Builder {
 	 */
 	public function find($id, $columns = array('*'))
 	{
+		if (is_array($id))
+		{
+		    return $this->findMany($id, $columns);
+		}
+
 		$this->query->where($this->model->getKeyName(), '=', $id);
 
 		return $this->first($columns);
 	}
+
+	/**
+	 * Find a model by its primary key.
+	 *
+	 * @param  array  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 */
+	public function findMany($id, $columns = array('*'))
+	{
+		$this->query->whereIn($this->model->getKeyName(), $id);
+
+		return $this->get($columns);
+    }
 
 	/**
 	 * Find a model by its primary key or throw an exception.
@@ -133,6 +153,30 @@ class Builder {
 		$result = $this->first(array($column));
 
 		if ($result) return $result->{$column};
+	}
+
+	/**
+	 * Chunk the results of the query.
+	 *
+	 * @param  int  $count
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function chunk($count, $callback)
+	{
+		$results = $this->forPage($page = 1, $count)->get();
+
+		while (count($results) > 0)
+		{
+			// On each chunk result set, we will pass them to the callback and then let the
+			// developer take care of everything within the callback, which allows us to
+			// keep the memory low for spinning through large result sets for working.
+			call_user_func($callback, $results);
+
+			$page++;
+
+			$results = $this->forPage($page, $count)->get();
+		}
 	}
 
 	/**
@@ -215,7 +259,7 @@ class Builder {
 		// Once we have the paginator we need to set the limit and offset values for
 		// the query so we can get the properly paginated items. Once we have an
 		// array of items we can create the paginator instances for the items.
-		$page = $paginator->getCurrentPage();
+		$page = $paginator->getCurrentPage($total);
 
 		$this->query->forPage($page, $perPage);
 
@@ -450,14 +494,7 @@ class Builder {
 		// query back to it in order that any where conditions might be specified.
 		$relation = $this->getRelation($name);
 
-		list($wheres, $bindings) = $relation->getAndResetWheres();
-
 		$relation->addEagerConstraints($models);
-
-		// We allow the developers to specify constraints on eager loads and we'll just
-		// call the constraints Closure, passing along the query so they will simply
-		// do all they need to the queries, and even may specify non-where things.
-		$relation->mergeWheres($wheres, $bindings);
 
 		call_user_func($constraints, $relation);
 
@@ -479,13 +516,21 @@ class Builder {
 	 */
 	public function getRelation($relation)
 	{
-		$query = $this->getModel()->$relation();
+		$me = $this;
+
+		// We want to run a relationship query without any constrains so that we will
+		// not have to remove these where clauses manually which gets really hacky
+		// and is error prone while we remove the developer's own where clauses.
+		$query = Relation::noConstraints(function() use ($me, $relation)
+		{
+			return $me->getModel()->$relation();			
+		});
+
+		$nested = $this->nestedRelations($relation);
 
 		// If there are nested relationships set on the query, we will put those onto
 		// the query instances so that they can be handled after this relationship
 		// is loaded. In this way they will all trickle down as they are loaded.
-		$nested = $this->nestedRelations($relation);
-
 		if (count($nested) > 0)
 		{
 			$query->getQuery()->with($nested);

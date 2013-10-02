@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Http;
 
+use ArrayObject;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\RenderableInterface;
@@ -93,7 +94,9 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 */
 	protected function shouldBeJson($content)
 	{
-		return $content instanceof JsonableInterface or is_array($content);
+		return ($content instanceof JsonableInterface or
+			    $content instanceof ArrayObject or
+			    is_array($content));
 	}
 
 	/**
