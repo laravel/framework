@@ -79,7 +79,9 @@ class Composer {
 	 */
 	protected function getProcess()
 	{
-		return new Process('', $this->workingPath);
+		$process = new Process('', $this->workingPath);
+		$process->setTimeout(null);
+		return $process;
 	}
 
 	/**
