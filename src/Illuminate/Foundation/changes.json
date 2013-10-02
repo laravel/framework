@@ -43,6 +43,7 @@
 		{"message": "Added new --path and --name options to 'routes' Artisan command.", "backport": null},
 		{"message": "Implement JSONable and Arrayable interfaces on Paginator.", "backport": null},
 		{"message": "Foreign characters now supported in validation 'alpha' rules.", "backport": null},
-		{"message": "Added 'prepend' method to Filesystem.", "backport": null}
+		{"message": "Added 'prepend' method to Filesystem.", "backport": null},
+		{"message": "Added 'reduce' collection to Collection, and 'min' and 'max' to Eloquent Collection.", "backport": null}
 	]
 }

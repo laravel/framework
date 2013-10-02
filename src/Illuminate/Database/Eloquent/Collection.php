@@ -74,6 +74,34 @@ class Collection extends BaseCollection {
 	}
 
 	/**
+	 * Get the max value of a given key.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function max($key)
+	{
+		return $this->reduce(function($result, $item) use ($key)
+		{
+			return (is_null($result) or $item->{$key} > $result) ? $item->{$key} : $result;
+		});
+	}
+
+	/**
+	 * Get the min value of a given key.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function min($key)
+	{
+		return $this->reduce(function($result, $item) use ($key)
+		{
+			return (is_null($result) or $item->{$key} < $result) ? $item->{$key} : $result;
+		});
+	}
+
+	/**
 	 * Get the array of primary keys
 	 *
 	 * @return array
