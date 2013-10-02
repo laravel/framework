@@ -24,7 +24,7 @@ class Collection extends BaseCollection {
 	 * Load a set of relationships onto the collection.
 	 *
 	 * @param  dynamic  $relations
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function load($relations)
 	{
@@ -36,6 +36,8 @@ class Collection extends BaseCollection {
 
 			$this->items = $query->eagerLoadRelations($this->items);
 		}
+
+		return $this;
 	}
 
 	/**
