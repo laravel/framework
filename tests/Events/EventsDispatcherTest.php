@@ -25,7 +25,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
-		$handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar', 'foo');
+		$handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
 		$d->listen('foo', 'FooHandler@onFooEvent');
 		$d->fire('foo', array('foo', 'bar'));
 	}
@@ -35,7 +35,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
-		$handler->shouldReceive('handle')->once()->with('foo', 'bar', 'foo');
+		$handler->shouldReceive('handle')->once()->with('foo', 'bar');
 		$d->listen('foo', 'FooHandler');
 		$d->fire('foo', array('foo', 'bar'));
 	}
@@ -79,6 +79,18 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 		$d->fire('foo');
 
 		$this->assertFalse(isset($_SERVER['__event.test']));
+	}
+
+
+	public function testFiringReturnsCurrentlyFiredEvent()
+	{
+		unset($_SERVER['__event.test']);
+		$d = new Dispatcher;
+		$d->listen('foo', function() use ($d) { $_SERVER['__event.test'] = $d->firing(); $d->fire('bar'); });
+		$d->listen('bar', function() use ($d) { $_SERVER['__event.test'] = $d->firing(); });
+		$d->fire('foo');
+
+		$this->assertEquals('bar', $_SERVER['__event.test']);
 	}
 
 }

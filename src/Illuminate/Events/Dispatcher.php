@@ -33,6 +33,13 @@ class Dispatcher {
 	protected $sorted = array();
 
 	/**
+	 * The event firing stack.
+	 *
+	 * @var array
+	 */
+	protected $firing = array();
+
+	/**
 	 * Create a new event dispatcher instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
@@ -156,6 +163,16 @@ class Dispatcher {
 	}
 
 	/**
+	 * Get the event that is currently firing.
+	 *
+	 * @return string
+	 */
+	public function firing()
+	{
+		return last($this->firing);
+	}
+
+	/**
 	 * Fire an event and call the listeners.
 	 *
 	 * @param  string  $event
@@ -172,7 +189,7 @@ class Dispatcher {
 		// payload to each of them so that they receive each of these arguments.
 		if ( ! is_array($payload)) $payload = array($payload);
 
-		$payload[] = $event;
+		$this->firing[] = $event;
 
 		foreach ($this->getListeners($event) as $listener)
 		{
@@ -183,6 +200,8 @@ class Dispatcher {
 			// listeners. Otherwise we will add the response on the response list.
 			if ( ! is_null($response) and $halt)
 			{
+				array_pop($this->firing);
+
 				return $response;
 			}
 
@@ -193,6 +212,8 @@ class Dispatcher {
 
 			$responses[] = $response;
 		}
+
+		array_pop($this->firing);
 
 		return $halt ? null : $responses;
 	}
