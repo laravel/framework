@@ -357,7 +357,7 @@ class Filesystem {
 	 */
 	public function deleteDirectory($directory, $preserve = false)
 	{
-		if ( ! $this->isDirectory($directory)) return;
+		if ( ! $this->isDirectory($directory)) return false;
 
 		$items = new FilesystemIterator($directory);
 
@@ -381,6 +381,8 @@ class Filesystem {
 		}
 
 		if ( ! $preserve) @rmdir($directory);
+		
+		return true;
 	}
 
 	/**
@@ -391,7 +393,9 @@ class Filesystem {
 	 */
 	public function cleanDirectory($directory)
 	{
-		$this->deleteDirectory($directory, true);
+		if ( ! $this->isDirectory($directory)) return false;
+		
+		return $this->deleteDirectory($directory, true);
 	}
 
 }
