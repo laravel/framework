@@ -52,6 +52,7 @@
 		{"message": "Added 'orderByRaw' method to query builder.", "backport": null},
 		{"message": "Added --bench option to controller:make Artisan command.", "backport": null},
 		{"message": "Moved newPivot method into model for custom Pivot model instances.", "backport": null},
-		{"message": "Added 'shared' method to View to pull a single shared item out.", "backport": null}
+		{"message": "Added 'shared' method to View to pull a single shared item out.", "backport": null},
+		{"message": "Added assertHasOldInput test assertion.", "backport": null}
 	]
 }
