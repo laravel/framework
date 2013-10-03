@@ -354,8 +354,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function loadDeferredProviders()
 	{
-		$me = $this;
-
 		// We will simply spin through each of the deferred providers and register each
 		// one and boot them if the application has booted. This should make each of
 		// the remaining services available to this application for immediate use.
