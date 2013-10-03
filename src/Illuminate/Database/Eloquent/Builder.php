@@ -482,9 +482,9 @@ class Builder {
 	/**
 	 * Eagerly load the relationship on a set of models.
 	 *
-	 * @param  array    $models
-	 * @param  string   $name
-	 * @param  \Closure $constraints
+	 * @param  array     $models
+	 * @param  string    $name
+	 * @param  \Closure  $constraints
 	 * @return array
 	 */
 	protected function loadRelation(array $models, $name, Closure $constraints)
