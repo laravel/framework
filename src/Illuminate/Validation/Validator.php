@@ -172,7 +172,13 @@ class Validator implements MessageProviderInterface {
 	{
 		$payload = new Fluent(array_merge($this->data, $this->files));
 
-		if (call_user_func($callback, $payload)) $this->mergeRules($attribute, $rules);
+		if (call_user_func($callback, $payload))
+		{
+			foreach ((array) $attribute as $key)
+			{
+				$this->mergeRules($key, $rules);
+			}
+		}
 	}
 
 	/**
