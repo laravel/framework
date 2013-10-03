@@ -353,7 +353,7 @@ class Filesystem {
 	 *
 	 * @param  string  $directory
 	 * @param  bool    $preserve
-	 * @return void
+	 * @return bool
 	 */
 	public function deleteDirectory($directory, $preserve = false)
 	{
@@ -389,11 +389,10 @@ class Filesystem {
 	 * Empty the specified directory of all files and folders.
 	 *
 	 * @param  string  $directory
-	 * @return void
+	 * @return bool
 	 */
 	public function cleanDirectory($directory)
 	{
-		
 		return $this->deleteDirectory($directory, true);
 	}
 
