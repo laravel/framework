@@ -80,12 +80,27 @@ class FileLoader implements LoaderInterface {
 		// Finally we're ready to check for the environment specific configuration
 		// file which will be merged on top of the main arrays so that they get
 		// precedence over them if we are currently in an environments setup.
-		$file = "{$path}/{$environment}/{$group}.php";
-
-		if ($this->files->exists($file))
-		{
-			$items = $this->mergeEnvironment($items, $file);
-		}
+		
+		// This will load with respect to nested directories in the environment.
+		// For example: config/dev/admin/app.php
+		// will try to load files in the following order:
+		
+		// config/dev/app.php
+		// config/dev/admin/app.php
+		
+	        $environment_parts = explode('/', $environment);
+	        $complete_path = '';
+	        
+	        foreach($environment_parts as $section)
+	        {
+	            $complete_path .= $section."/";
+	            $file = "{$path}/{$complete_path}{$group}.php";
+	            
+	            if ($this->files->exists($file)) 
+	            {
+	                $items = $this->mergeEnvironment($items, $file);
+	            }
+	        }
 
 		return $items;
 	}
