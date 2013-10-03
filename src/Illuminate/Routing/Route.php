@@ -63,21 +63,21 @@ class Route {
 	 *
 	 * @var string
 	 */
-	protected static $wildcard = '([a-zA-Z0-9\.\-_%=]+)';
+	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\-_%=]+))';
 
 	/**
 	 * The regular expression for an optional wildcard.
 	 *
 	 * @var string
 	 */
-	protected static $optional = '(?:/([a-zA-Z0-9\.\-_%=]+)';
+	protected static $optional = '(?:/(?P<$1>([a-zA-Z0-9\.\-_%=]+))';
 
 	/**
 	 * The regular expression for a leading optional wildcard.
 	 *
 	 * @var string
 	 */
-	protected static $leadingOptional = '\/$|^(?:([a-zA-Z0-9\.\-_%=]+)';
+	protected static $leadingOptional = '(\/$|^(?:(?P<$2>([a-zA-Z0-9\.\-_%=]+)))';
 
 	/**
 	 * The validators used by the routes.
@@ -339,7 +339,7 @@ class Route {
 	{
 		if (count($this->parameterNames()) == 0) return array();
 
-		return array_combine($this->parameterNames(), $this->padMatches($matches));
+		return array_filter(array_intersect_key($matches, array_flip($this->parameterNames())));
 	}
 
 	/**
@@ -449,7 +449,7 @@ class Route {
 	{
 		$value = static::compileWhereParameters($value, $wheres);
 
-		return preg_replace('/\{(.*?)[^?]\}/', static::$wildcard, $value);
+		return preg_replace('/\{((.*?)[^?])\}/', static::$wildcard, $value);
 	}
 
 	/**
@@ -463,7 +463,7 @@ class Route {
 	{
 		foreach ($wheres as $key => $pattern)
 		{
-			$value = str_replace('{'.$key.'}', $pattern, $value);
+			$value = str_replace('{'.$key.'}', '(?P<'.$key.'>('.$pattern.'))', $value);
 		}
 
 		return $value;
