@@ -1425,7 +1425,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a fresh timestamp for the model.
 	 *
-	 * @return DateTime
+	 * @return string
 	 */
 	public function freshTimestampString()
 	{
