@@ -393,7 +393,6 @@ class Filesystem {
 	 */
 	public function cleanDirectory($directory)
 	{
-		if ( ! $this->isDirectory($directory)) return false;
 		
 		return $this->deleteDirectory($directory, true);
 	}
