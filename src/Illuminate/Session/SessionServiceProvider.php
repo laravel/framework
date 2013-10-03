@@ -5,6 +5,13 @@ use Illuminate\Support\ServiceProvider;
 class SessionServiceProvider extends ServiceProvider {
 
 	/**
+	 * The default options for session cookies.
+	 *
+	 * @var array
+	 */
+	protected $cookieDefaults = array('secure' => false, 'http_only' => true);
+
+	/**
 	 * Bootstrap the application events.
 	 *
 	 * @return void
@@ -149,11 +156,11 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	public function touchSessionCookie()
 	{
-		$config = $this->app['config']['session'];
+		$config = array_merge($this->cookieDefaults, $this->app['config']['session']);
 
 		$expire = $this->getExpireTime($config);
 
-		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], false, true);
+		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], $config['secure'], $config['http_only']);
 	}
 
 	/**
