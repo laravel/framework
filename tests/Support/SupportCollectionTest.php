@@ -106,6 +106,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCachingIterator()
+	{
+		$c = new Collection(array('foo'));
+		$this->assertInstanceOf('CachingIterator', $c->getCachingIterator());
+	}
+
+
 	public function testFilter()
 	{
 		$c = new Collection(array(array('id' => 1, 'name' => 'Hello'), array('id' => 2, 'name' => 'World')));
