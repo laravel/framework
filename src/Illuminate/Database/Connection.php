@@ -526,7 +526,7 @@ class Connection implements ConnectionInterface {
 		// lot more helpful to the developer instead of just the database's errors.
 		catch (\Exception $e)
 		{
-			$this->handleQueryException($e, $query, $bindings);
+			throw new QueryException($query, $bindings, $e);
 		}
 
 		// Once we have run the query we will calculate the time that it took to run and
@@ -537,23 +537,6 @@ class Connection implements ConnectionInterface {
 		$this->logQuery($query, $bindings, $time);
 
 		return $result;
-	}
-
-	/**
-	 * Handle an exception that occurred during a query.
-	 *
-	 * @param  Exception  $e
-	 * @param  string     $query
-	 * @param  array      $bindings
-	 * @return void
-	 */
-	protected function handleQueryException(\Exception $e, $query, $bindings)
-	{
-		$bindings = var_export($bindings, true);
-
-		$message = $e->getMessage()." (SQL: {$query}) (Bindings: {$bindings})";
-
-		throw new \Exception($message, 0, $e);
 	}
 
 	/**
