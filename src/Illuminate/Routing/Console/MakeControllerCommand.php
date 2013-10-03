@@ -67,11 +67,11 @@ class MakeControllerCommand extends Command {
 	 */
 	protected function generateController()
 	{
-		$controller = $this->input->getArgument('name');
-
 		// Once we have the controller and resource that we are going to be generating
 		// we will grab the path and options. We allow the developers to include or
 		// exclude given methods from the resourceful controllers we're building.
+		$controller = $this->input->getArgument('name');
+
 		$path = $this->getPath();
 
 		$options = $this->getBuildOptions();
@@ -95,8 +95,30 @@ class MakeControllerCommand extends Command {
 		{
 			return $this->laravel['path.base'].'/'.$this->input->getOption('path');
 		}
+		elseif ($bench = $this->input->getOption('bench'))
+		{
+			return $this->getWorkbenchPath($bench);
+		}
 
 		return $this->path;
+	}
+
+	/**
+	 * Get the workbench path for the controller.
+	 *
+	 * @param  string  $bench
+	 * @return string
+	 */
+	protected function getWorkbenchPath($bench)
+	{
+		$path = $this->laravel['path.base'].'/workbench/'.$bench.'/src/controllers';
+
+		if ( ! $this->laravel['files']->isDirectory($path))
+		{
+			$this->laravel['files']->makeDirectory($path);
+		}
+
+		return $path;
 	}
 
 	/**
@@ -147,6 +169,8 @@ class MakeControllerCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('bench', null, InputOption::VALUE_OPTIONAL, 'The workbench the controller belongs to'),
+
 			array('only', null, InputOption::VALUE_OPTIONAL, 'The methods that should be included'),
 
 			array('except', null, InputOption::VALUE_OPTIONAL, 'The methods that should be excluded'),
