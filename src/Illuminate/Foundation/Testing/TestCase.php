@@ -310,6 +310,16 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the session has old input.
+	 *
+	 * @return void
+	 */
+	public function assertHasOldInput()
+	{
+		$this->assertSessionHas('_old_input');
+	}
+
+	/**
 	 * Set the currently logged in user for the application.
 	 *
 	 * @param  \Illuminate\Auth\UserInterface  $user
