@@ -14,7 +14,8 @@
 		{"message": "Collection `push` now appends. New `prepend` method on collections.", "backport": null},
 		{"message": "Use environment for log file name.", "backport": null},
 		{"message": "Use 'bit' as storage type for boolean on SQL Server.", "backport": null},
-		{"message": "Added new 'firing' method to event dispatcher, deprecated passing of event as last parameter.", "backport": null}
+		{"message": "Added new 'firing' method to event dispatcher, deprecated passing of event as last parameter.", "backport": null},
+		{"message": "Added QueryExcpetion with better formatted error messages.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
