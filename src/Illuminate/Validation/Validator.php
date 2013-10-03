@@ -2,6 +2,7 @@
 
 use Closure;
 use DateTime;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
@@ -158,6 +159,43 @@ class Validator implements MessageProviderInterface {
 		}
 
 		return $rules;
+	}
+
+	/**
+	 * Add conditions to a given field based on a Closure.
+	 *
+	 * @param  string  $attribute
+	 * @param  string|array  $rules
+	 * @param  callable  $callback
+	 * @param  
+	 */
+	public function sometimes($attribute, $rules, $callback)
+	{
+		$payload = new Fluent(array_merge($this->data, $this->files));
+
+		if (call_user_func($callback, $payload))
+		{
+			foreach ((array) $attribute as $key)
+			{
+				$this->mergeRules($key, $rules);
+			}
+		}
+	}
+
+	/**
+	 * Merge additional rules into a given attribute.
+	 *
+	 * @param  string  $attribute
+	 * @param  string|array  $rules
+	 * @return void
+	 */
+	protected function mergeRules($attribute, $rules)
+	{
+		$current = array_get($this->rules, $attribute, array());
+
+		$merge = head($this->explodeRules(array($rules)));
+
+		$this->rules[$attribute] = array_merge($current, $merge);
 	}
 
 	/**
@@ -445,7 +483,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value == $this->data[$other];
+		return (isset($this->data[$other]) and $value == $this->data[$other]);
 	}
 
 	/**

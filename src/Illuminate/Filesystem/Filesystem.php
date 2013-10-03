@@ -353,11 +353,11 @@ class Filesystem {
 	 *
 	 * @param  string  $directory
 	 * @param  bool    $preserve
-	 * @return void
+	 * @return bool
 	 */
 	public function deleteDirectory($directory, $preserve = false)
 	{
-		if ( ! $this->isDirectory($directory)) return;
+		if ( ! $this->isDirectory($directory)) return false;
 
 		$items = new FilesystemIterator($directory);
 
@@ -381,17 +381,19 @@ class Filesystem {
 		}
 
 		if ( ! $preserve) @rmdir($directory);
+		
+		return true;
 	}
 
 	/**
 	 * Empty the specified directory of all files and folders.
 	 *
 	 * @param  string  $directory
-	 * @return void
+	 * @return bool
 	 */
 	public function cleanDirectory($directory)
 	{
-		$this->deleteDirectory($directory, true);
+		return $this->deleteDirectory($directory, true);
 	}
 
 }

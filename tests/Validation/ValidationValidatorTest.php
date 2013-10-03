@@ -757,6 +757,30 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSoemtimesAddingRules()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', 'Confirmed', function($i) { return $i->x == 'foo'; });
+		$this->assertEquals(array('x' => array('Required', 'Confirmed')), $v->getRules());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', 'Confirmed', function($i) { return $i->x == 'bar'; });
+		$this->assertEquals(array('x' => array('Required')), $v->getRules());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', 'Foo|Bar', function($i) { return $i->x == 'foo'; });
+		$this->assertEquals(array('x' => array('Required', 'Foo', 'Bar')), $v->getRules());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', array('Foo', 'Bar:Baz'), function($i) { return $i->x == 'foo'; });
+		$this->assertEquals(array('x' => array('Required', 'Foo', 'Bar:Baz')), $v->getRules());
+	}
+
+
 	public function testCustomValidators()
 	{
 		$trans = $this->getRealTranslator();
