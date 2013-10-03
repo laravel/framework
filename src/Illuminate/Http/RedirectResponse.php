@@ -169,4 +169,21 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 		$this->session = $session;
 	}
 
+	/**
+	 * Dynamically bind flash data in the session.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return void
+	 */
+	public function __call($method, $parameters)
+	{
+		if (starts_with($method, 'with'))
+		{
+			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
+		}
+
+		throw new \BadMethodCallException("Method [$method] does not exist on Redirect.");
+	}
+
 }
