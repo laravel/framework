@@ -170,7 +170,7 @@ class Store extends SymfonySession {
 	 */
 	public function reflash()
 	{
-		$this->mergeNewFlashes($this->get('flash.old'));
+		$this->mergeNewFlashes($this->get('flash.old', array()));
 
 		$this->put('flash.old', array());
 	}
