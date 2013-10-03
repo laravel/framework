@@ -445,7 +445,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) and $value == $this->data[$other];
+		return (isset($this->data[$other]) and $value == $this->data[$other]);
 	}
 
 	/**
