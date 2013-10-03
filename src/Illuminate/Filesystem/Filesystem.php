@@ -381,6 +381,8 @@ class Filesystem {
 		}
 
 		if ( ! $preserve) @rmdir($directory);
+		
+		return true;
 	}
 
 	/**
