@@ -185,11 +185,14 @@ class Pluralizer {
 		// "teeth", both of which cannot get inflected using our typical rules.
 		foreach ($irregular as $irregular => $pattern)
 		{
-			if (preg_match($pattern = '/'.$pattern.'$/i', $value))
+			if (preg_match($fullPattern = '/'.$pattern.'$/i', $value))
 			{
-				$irregular = static::matchCase($irregular, $value);
+				// We only need to math the case of the irregular part of the value
+				$valuePart = substr($value, -strlen($pattern));
 				
-				return preg_replace($pattern, $irregular, $value);
+				$irregular = static::matchCase($irregular, $valuePart);
+				
+				return preg_replace($fullPattern, $irregular, $value);
 			}
 		}
 
