@@ -61,6 +61,25 @@ class CookieJar {
 	}
 
 	/**
+	 * Get the plain value of the given cookie (no decryption).
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	public function getPlain($key, $default = null)
+	{
+		$value = $this->request->cookies->get($key);
+
+		if ( ! is_null($value))
+		{
+			return $value;
+		}
+
+		return $default instanceof Closure ? $default() : $default;
+	}
+
+	/**
 	 * Get the value of the given cookie.
 	 *
 	 * @param  string  $key
@@ -69,7 +88,7 @@ class CookieJar {
 	 */
 	public function get($key, $default = null)
 	{
-		$value = $this->request->cookies->get($key);
+		$value = $this->getPlain($key);
 
 		if ( ! is_null($value))
 		{
@@ -98,6 +117,30 @@ class CookieJar {
 	}
 
 	/**
+	 * Create a new raw cookie instance (no encryption).
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  int     $minutes
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @param  bool    $secure
+	 * @param  bool    $httpOnly
+	 * @return \Symfony\Component\HttpFoundation\Cookie
+	 */
+	public function makePlain($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
+	{
+		list($path, $domain) = $this->getPathAndDomain($path, $domain);
+
+		// Once we calculate the time we can encrypt the message. All cookies will be
+		// encrypted using the Illuminate encryption component and will have a MAC
+		// assigned to them by the encrypter to make sure they remain authentic.
+		$time = ($minutes == 0) ? 0 : time() + ($minutes * 60);
+
+		return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
+	}
+
+	/**
 	 * Create a new cookie instance.
 	 *
 	 * @param  string  $name
@@ -111,16 +154,9 @@ class CookieJar {
 	 */
 	public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
-		list($path, $domain) = $this->getPathAndDomain($path, $domain);
-
-		// Once we calculate the time we can encrypt the message. All cookies will be
-		// encrypted using the Illuminate encryption component and will have a MAC
-		// assigned to them by the encrypter to make sure they remain authentic.
-		$time = ($minutes == 0) ? 0 : time() + ($minutes * 60);
-
 		$value = $this->encrypter->encrypt($value);
 
-		return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
+		return $this->makePlain($name, $value, $minutes, $path, $domain, $secure, $httpOnly);
 	}
 
 	/**
