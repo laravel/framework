@@ -877,7 +877,28 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateImage($attribute, $value)
 	{
-		return $this->validateMimes($attribute, $value, array('jpeg', 'png', 'gif', 'bmp'));
+		return $this->validateMimes($attribute, $value, array('image/jpeg', 'image/gif', 'image/png', 'image/bmp', 'image/x-bmp'));
+	}
+
+	/**
+	 * Validate the extension of an uploaded file against a set of extensions.
+	 *
+	 * @param  string  $attribute
+	 * @param  array   $value
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function validateExtension($attribute, $value, $parameters)
+	{
+		if ( ! $value instanceof File or $value->getPath() == '')
+		{
+			return true;
+		}
+
+		// The Symfony File class should do a decent job of guessing the extension
+		// based on the true MIME type so we'll just loop through the array of
+		// extensions and compare it to the guessed extension of the files.
+		return in_array($value->guessExtension(), $parameters);
 	}
 
 	/**
@@ -895,10 +916,7 @@ class Validator implements MessageProviderInterface {
 			return true;
 		}
 
-		// The Symfony File class should do a decent job of guessing the extension
-		// based on the true MIME type so we'll just loop through the array of
-		// extensions and compare it to the guessed extension of the files.
-		return in_array($value->guessExtension(), $parameters);
+		return in_array($value->getMimeType(), $parameters);
 	}
 
 	/**

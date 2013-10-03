@@ -641,34 +641,54 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	public function testValidateImage()
 	{
 		$trans = $this->getRealTranslator();
-		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('guessExtension'), array(__FILE__, false));
-		$file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getMimeType'), array(__FILE__, false));
+		$file->expects($this->any())->method('getMimeType')->will($this->returnValue('application/x-php'));
 		$v = new Validator($trans, array(), array('x' => 'Image'));
 		$v->setFiles(array('x' => $file));
 		$this->assertFalse($v->passes());
 
 		$v = new Validator($trans, array(), array('x' => 'Image'));
+		$file2 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getMimeType'), array(__FILE__, false));
+		$file2->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
+		$v->setFiles(array('x' => $file2));
+		$this->assertTrue($v->passes());
+
+		$file3 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getMimeType'), array(__FILE__, false));
+		$file3->expects($this->any())->method('getMimeType')->will($this->returnValue('image/gif'));
+		$v->setFiles(array('x' => $file3));
+		$this->assertTrue($v->passes());
+
+		$file4 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getMimeType'), array(__FILE__, false));
+		$file4->expects($this->any())->method('getMimeType')->will($this->returnValue('image/bmp'));
+		$v->setFiles(array('x' => $file4));
+		$this->assertTrue($v->passes());
+
+		$file5 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getMimeType'), array(__FILE__, false));
+		$file5->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
+		$v->setFiles(array('x' => $file5));
+		$this->assertTrue($v->passes());
+	}
+    
+	public function testValidateExtension()
+	{
+		$trans = $this->getRealTranslator();
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('guessExtension'), array(__FILE__, false));
+		$file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+		$v = new Validator($trans, array(), array('x' => 'Extension:php'));
+		$v->setFiles(array('x' => $file));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array(), array('x' => 'Extension:xlsx'));
 		$file2 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('guessExtension'), array(__FILE__, false));
-		$file2->expects($this->any())->method('guessExtension')->will($this->returnValue('jpeg'));
+		$file2->expects($this->any())->method('guessExtension')->will($this->returnValue('xlsx'));
 		$v->setFiles(array('x' => $file2));
 		$this->assertTrue($v->passes());
 
 		$file3 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('guessExtension'), array(__FILE__, false));
 		$file3->expects($this->any())->method('guessExtension')->will($this->returnValue('gif'));
 		$v->setFiles(array('x' => $file3));
-		$this->assertTrue($v->passes());
-
-		$file4 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('guessExtension'), array(__FILE__, false));
-		$file4->expects($this->any())->method('guessExtension')->will($this->returnValue('bmp'));
-		$v->setFiles(array('x' => $file4));
-		$this->assertTrue($v->passes());
-
-		$file5 = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('guessExtension'), array(__FILE__, false));
-		$file5->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
-		$v->setFiles(array('x' => $file5));
-		$this->assertTrue($v->passes());
+		$this->assertFalse($v->passes());
 	}
-
 
 	public function testValidateAlpha()
 	{
