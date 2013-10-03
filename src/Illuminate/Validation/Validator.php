@@ -166,6 +166,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  string|array  $rules
+	 * @param  callable  $callback
 	 * @param  
 	 */
 	public function sometimes($attribute, $rules, $callback)
