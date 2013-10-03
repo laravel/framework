@@ -96,6 +96,15 @@ class MakeControllerCommand extends Command {
 			return $this->laravel['path.base'].'/'.$this->input->getOption('path');
 		}
 
+		$bench = $this->input->getOption('bench');
+
+		if ( ! is_null($bench))
+		{
+			$path = "/workbench/{$bench}/src/controllers";
+
+			return $this->laravel['path.base'].$path;
+		}
+
 		return $this->path;
 	}
 
@@ -150,6 +159,8 @@ class MakeControllerCommand extends Command {
 			array('only', null, InputOption::VALUE_OPTIONAL, 'The methods that should be included'),
 
 			array('except', null, InputOption::VALUE_OPTIONAL, 'The methods that should be excluded'),
+
+			array('bench', null, InputOption::VALUE_OPTIONAL, 'The workbench the controller belongs to'),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'Where to place the controller'),
 		);
