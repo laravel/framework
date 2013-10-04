@@ -15,7 +15,7 @@
 		{"message": "Use environment for log file name.", "backport": null},
 		{"message": "Use 'bit' as storage type for boolean on SQL Server.", "backport": null},
 		{"message": "Added new 'firing' method to event dispatcher, deprecated passing of event as last parameter.", "backport": null},
-		{"message": "Added QueryExcpetion with better formatted error messages.", "backport": null}
+		{"message": "Added QueryException with better formatted error messages.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
@@ -48,7 +48,7 @@
 		{"message": "Fix container resolution of default values for non-scalar dependencies.", "backport": null},
 		{"message": "Allow optional path to be specified with calling _path helpers.", "backport": null},
 		{"message": "Emulate nested transactions in the database connection layer.", "backport": null},
-		{"message": "Added new appends property to Eloquent for adding ot arrays and JSON.", "backport": null},
+		{"message": "Added new appends property to Eloquent for adding to arrays and JSON.", "backport": null},
 		{"message": "Allow connection to be configurable when using Redis based sessions.", "backport": null},
 		{"message": "Allow passing DateTime objects to Queue::later.", "backport": null},
 		{"message": "Added Queue::bulk method for pushing several jobs out at once.", "backport": null},
