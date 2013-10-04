@@ -49,7 +49,7 @@ class SQLiteGrammar extends Grammar {
 			return parent::compileInsert($query, reset($values));
 		}
 
-		$names = $this->columnize(array_keys(reset($values));
+		$names = $this->columnize(array_keys(reset($values)));
 
 		$columns = array();
 
