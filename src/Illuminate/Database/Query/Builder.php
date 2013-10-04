@@ -100,6 +100,12 @@ class Builder {
 	public $orders;
 
 	/**
+	* The ordering for the query by field
+	*
+	* @var array
+	*/
+	public $orderbyfield;
+	/**
 	 * The maximum number of records to return.
 	 *
 	 * @var int
@@ -818,6 +824,20 @@ class Builder {
 
 		return $this;
 	}
+	
+	    /**
+	* Add an "order by field" clause to the query.
+	*
+	* @param string $column
+	* @param string $values
+	* @return \Illuminate\Database\Query\Builder|static
+	*/
+	public function orderByField($column, $values)
+	{
+	        $this->orderbyfield[] = compact('column', 'values');
+	
+	        return $this;
+	    }
 
 	/**
 	 * Add an "order by" clause for a timestamp to the query.
