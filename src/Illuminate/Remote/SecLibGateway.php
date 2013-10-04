@@ -64,7 +64,7 @@ class SecLibGateway implements GatewayInterface {
 		}
 		else
 		{
-			list($this->host, $this->post) = explode(':', $host);
+			list($this->host, $this->port) = explode(':', $host);
 
 			$this->port = (int) $this->port;
 		}
