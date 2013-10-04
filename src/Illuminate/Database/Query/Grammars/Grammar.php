@@ -29,6 +29,7 @@ class Grammar extends BaseGrammar {
 		'limit',
 		'offset',
 		'unions',
+		'orderbyfield'
 	);
 
 	/**
@@ -464,6 +465,26 @@ class Grammar extends BaseGrammar {
 			if (isset($order['sql'])) return $order['sql'];
 
 			return $me->wrap($order['column']).' '.$order['direction'];
+		}
+		, $orders));
+	}
+	
+	/**
+	* Compile the "order by field" portions of the query.
+	*
+	* @param  \Illuminate\Database\Query\Builder  $query
+	* @param  array  $orders
+	* @return string
+	*/
+	protected function compileOrderbyfield(Builder $query, $orders)
+	{
+		$me = $this;
+
+		return 'order by field ('.implode(', ', array_map(function($order) use ($me)
+		{
+			$quoted = "'".implode("','", $order['values'])."'";
+
+			return $me->wrap($order['column']).",".$quoted.")" ;
 		}
 		, $orders));
 	}
