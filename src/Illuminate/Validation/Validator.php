@@ -1666,7 +1666,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function setRules(array $rules)
 	{
-		$this->rules = $rules;
+		$this->rules = $this->explodeRules($rules);
 		return $this;
 	}
 
