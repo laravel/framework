@@ -1657,6 +1657,18 @@ class Validator implements MessageProviderInterface {
 	{
 		return $this->rules;
 	}
+	
+	/**
+	 * Set the validation rules.
+	 * 
+	 * @param  array $rules
+	 * @return \Illuminate\Validation\Validator
+	 */
+	public function setRules(array $rules)
+	{
+		$this->rules = $this->explodeRules($rules);
+		return $this;
+	}
 
 	/**
 	 * Set the custom attributes on the validator.
