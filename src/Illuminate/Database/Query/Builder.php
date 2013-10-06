@@ -274,7 +274,7 @@ class Builder {
 	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function where($column, $operator = null, $value = null, $boolean = 'and')
+	public function where($column, $operator = null, $value = null, $boolean = 'and', $forceOperator = false)
 	{
 		if ($this->invalidOperatorAndValue($operator, $value))
 		{
@@ -292,7 +292,7 @@ class Builder {
 		// If the given operator is not found in the list of valid operators we will
 		// assume that the developer is just short-cutting the '=' operators and
 		// we will set the operators to '=' and set the values appropriately.
-		if ( ! in_array(strtolower($operator), $this->operators, true))
+		if ( ! in_array(strtolower($operator), $this->operators, true) && ! $forceOperator)
 		{
 			list($value, $operator) = array($operator, '=');
 		}
