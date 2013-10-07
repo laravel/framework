@@ -70,12 +70,6 @@
         "mockery/mockery": "0.8.0",
         "phpunit/phpunit": "3.7.*"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/laravel/boris"
-        }
-    ],
     "autoload": {
         "classmap": [
             ["src/Illuminate/Queue/IlluminateQueueClosure.php"]
