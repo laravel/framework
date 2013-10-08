@@ -771,6 +771,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
+	 * Gets the current application locale.
+	 *
+	 * @return string
+	 */
+	public function getLocale()
+	{
+		return $this['config']->get('app.locale');
+	}
+
+	/**
 	 * Get the service providers that have been loaded.
 	 *
 	 * @return array
