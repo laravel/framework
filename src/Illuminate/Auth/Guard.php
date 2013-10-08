@@ -96,7 +96,7 @@ class Guard {
 	 */
 	public function guest()
 	{
-		return is_null($this->user());
+		return ! $this->check();
 	}
 
 	/**
