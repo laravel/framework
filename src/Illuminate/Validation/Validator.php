@@ -167,7 +167,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $attribute
 	 * @param  string|array  $rules
 	 * @param  callable  $callback
-	 * @param  
+	 * @return void
 	 */
 	public function sometimes($attribute, $rules, $callback)
 	{
@@ -1604,7 +1604,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Register a custom validator extension.
 	 *
-	 * @param  string   $rule
+	 * @param  string  $rule
 	 * @param  Closure|string  $extension
 	 * @return void
 	 */
@@ -1746,7 +1746,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the Translator implementation.
 	 *
-	 * @param \Symfony\Component\Translation\TranslatorInterface  $translator
+	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
 	 * @return void
 	 */
 	public function setTranslator(TranslatorInterface $translator)
@@ -1767,7 +1767,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the custom messages for the validator
 	 *
-	 * @param array $messages
+	 * @param  array  $messages
 	 * @return void
 	 */
 	public function setCustomMessages(array $messages)
