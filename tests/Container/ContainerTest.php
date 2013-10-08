@@ -104,6 +104,15 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('wow', $container->make('zing'));
 	}
 
+	public function testBound()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$this->assertTrue($container->bound('foo'));
+		$container->alias('foo', 'baz');
+		$this->assertTrue($container->bound('baz'));
+	}
+
 
 	public function testShareMethod()
 	{

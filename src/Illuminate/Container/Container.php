@@ -59,6 +59,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bound($abstract)
 	{
+		$abstract = $this->getAlias($abstract);
 		return isset($this[$abstract]) or isset($this->instances[$abstract]);
 	}
 
