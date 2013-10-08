@@ -136,8 +136,8 @@ class Factory {
 	/**
 	 * Register a custom implicit validator extension.
 	 *
-	 * @param  string  $rule
-	 * @param  Closure $extension
+	 * @param  string   $rule
+	 * @param  Closure  $extension
 	 * @return void
 	 */
 	public function extendImplicit($rule, Closure $extension)
