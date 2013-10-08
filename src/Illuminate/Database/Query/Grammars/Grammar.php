@@ -477,7 +477,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileLimit(Builder $query, $limit)
 	{
-		return "limit $limit";
+		return 'limit '.(int) $limit;
 	}
 
 	/**
@@ -489,7 +489,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileOffset(Builder $query, $offset)
 	{
-		return "offset $offset";
+		return 'offset '.(int) $offset;
 	}
 
 	/**
