@@ -10,7 +10,7 @@
     "require": {
         "illuminate/filesystem": "4.1.x",
         "illuminate/support": "4.1.x",
-        "symfony/finder": "2.3.*"
+        "symfony/finder": "2.4.*"
     },
     "require-dev": {
         "illuminate/console": "4.1.x",

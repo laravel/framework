@@ -13,7 +13,7 @@
         "illuminate/cookie": "4.1.x",
         "illuminate/encryption": "4.1.x",
         "illuminate/support": "4.1.x",
-        "symfony/http-foundation": "2.3.*"
+        "symfony/http-foundation": "2.4.*"
     },
     "require-dev": {
         "illuminate/console": "4.1.x",
