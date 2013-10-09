@@ -88,6 +88,11 @@ class Container implements ArrayAccess {
 		// without being forced to state their classes in both of the parameter.
 		unset($this->instances[$abstract]);
 
+		if ($this->isAlias($abstract))
+		{
+			$this->dropAlias($abstract);
+		}
+
 		if (is_null($concrete))
 		{
 			$concrete = $abstract;
@@ -275,6 +280,31 @@ class Container implements ArrayAccess {
 	protected function extractAlias(array $definition)
 	{
 		return array(key($definition), current($definition));
+	}
+
+	/**
+	 * Identifies if the value is an alias within the container.
+	 *
+	 * @param  string $alias
+	 * @return boolan
+	 */
+	public function isAlias($alias)
+	{
+		return isset($this->aliases[$alias]);
+	}
+
+	/**
+	 * Removes the alias from the container
+	 *
+	 * @param string $alias
+	 * @return void
+	 */
+	public function dropAlias($alias)
+	{
+		if ($this->isAlias($alias))
+		{
+			unset($this->aliases[$alias]);
+		}
 	}
 
 	/**

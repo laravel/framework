@@ -104,13 +104,53 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('wow', $container->make('zing'));
 	}
 
-	public function testBound()
+	public function testIsAlias()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$container->alias('foo', 'baz');
+		$this->assertFalse($container->isAlias('foo'));
+		$this->assertTrue($container->isAlias('baz'));
+	}
+
+	public function testDropAlias()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$container->alias('foo', 'baz');
+		
+		$this->assertTrue($container->isAlias('baz'));
+
+		$container->dropAlias('baz');
+
+		$this->assertFalse($container->isAlias('baz'));
+		$this->assertFalse($container->bound('baz'));
+	}
+
+	public function testBoundAliases()
 	{
 		$container = new Container;
 		$container['foo'] = 'bar';
 		$this->assertTrue($container->bound('foo'));
 		$container->alias('foo', 'baz');
 		$this->assertTrue($container->bound('baz'));
+	}
+
+	public function testBoundAliasCanBeOverridden()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$container->alias('foo', 'baz');
+
+		$this->assertEquals($container['baz'], $container['foo']);
+		$this->assertFalse($container->offsetExists('baz'));
+
+		$container['baz'] = 'boom';
+
+		$this->assertTrue($container->offsetExists('baz'));
+		$this->assertNotEquals($container['baz'], $container['foo']);
+
+		$this->assertEquals('boom', $container['baz']);
 	}
 
 
