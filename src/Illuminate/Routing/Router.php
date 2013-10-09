@@ -1252,6 +1252,18 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Get a route parameter for the current route.
+	 *
+	 * @param  string  $key
+	 * @param  string  $default
+	 * @return mixed
+	 */
+	public function input($key, $default = null)
+	{
+		return $this->current()->parameter($key, $default);
+	}
+
+	/**
 	 * Get the currently dispatched route instance.
 	 *
 	 * @return \Illuminate\Routing\Route
