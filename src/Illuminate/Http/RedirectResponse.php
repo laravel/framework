@@ -22,6 +22,21 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	protected $session;
 
 	/**
+	 * Set a header on the Response.
+	 *
+	 * @param  string  $key
+	 * @param  string  $value
+	 * @param  bool  $replace
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function header($key, $value, $replace = true)
+	{
+		$this->headers->set($key, $value, $replace);
+
+		return $this;
+	}
+
+	/**
 	 * Flash a piece of data to the session.
 	 *
 	 * @param  string  $key
@@ -152,6 +167,23 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	public function setSession(SessionStore $session)
 	{
 		$this->session = $session;
+	}
+
+	/**
+	 * Dynamically bind flash data in the session.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return void
+	 */
+	public function __call($method, $parameters)
+	{
+		if (starts_with($method, 'with'))
+		{
+			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
+		}
+
+		throw new \BadMethodCallException("Method [$method] does not exist on Redirect.");
 	}
 
 }

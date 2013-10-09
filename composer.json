@@ -15,6 +15,7 @@
         "doctrine/dbal": "2.4.*",
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.7",
+        "jeremeamia/superclosure": "1.0.*",
         "monolog/monolog": "1.6.*",
         "nesbot/carbon": "1.*",
         "patchwork/utf8": "1.1.*",
@@ -66,7 +67,7 @@
         "aws/aws-sdk-php": "2.2.*",
         "iron-io/iron_mq": "1.4.4",
         "pda/pheanstalk": "2.0.*",
-        "mockery/mockery": "0.7.2",
+        "mockery/mockery": "0.8.0",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {

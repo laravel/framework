@@ -79,9 +79,22 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		$name = $name ?: $this->getDefaultConnection();
 
-		unset($this->connections[$name]);
+		$this->disconnect($name);
 
 		return $this->connection($name);
+	}
+	
+	/**
+	 * Disconnect from the given database.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function disconnect($name = null)
+	{
+		$name = $name ?: $this->getDefaultConnection();
+
+		unset($this->connections[$name]);
 	}
 
 	/**
@@ -205,6 +218,16 @@ class DatabaseManager implements ConnectionResolverInterface {
 	public function extend($name, $resolver)
 	{
 		$this->extensions[$name] = $resolver;
+	}
+
+	/**
+	 * Return all of the created connections.
+	 *
+	 * @return array
+	 */
+	public function getConnections()
+	{
+		return $this->connections;
 	}
 
 	/**

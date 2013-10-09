@@ -59,10 +59,29 @@ class Builder {
 	 */
 	public function find($id, $columns = array('*'))
 	{
+		if (is_array($id))
+		{
+		    return $this->findMany($id, $columns);
+		}
+
 		$this->query->where($this->model->getKeyName(), '=', $id);
 
 		return $this->first($columns);
 	}
+
+	/**
+	 * Find a model by its primary key.
+	 *
+	 * @param  array  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 */
+	public function findMany($id, $columns = array('*'))
+	{
+		$this->query->whereIn($this->model->getKeyName(), $id);
+
+		return $this->get($columns);
+    }
 
 	/**
 	 * Find a model by its primary key or throw an exception.
@@ -134,6 +153,30 @@ class Builder {
 		$result = $this->first(array($column));
 
 		if ($result) return $result->{$column};
+	}
+
+	/**
+	 * Chunk the results of the query.
+	 *
+	 * @param  int  $count
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function chunk($count, $callback)
+	{
+		$results = $this->forPage($page = 1, $count)->get();
+
+		while (count($results) > 0)
+		{
+			// On each chunk result set, we will pass them to the callback and then let the
+			// developer take care of everything within the callback, which allows us to
+			// keep the memory low for spinning through large result sets for working.
+			call_user_func($callback, $results);
+
+			$page++;
+
+			$results = $this->forPage($page, $count)->get();
+		}
 	}
 
 	/**
@@ -216,7 +259,7 @@ class Builder {
 		// Once we have the paginator we need to set the limit and offset values for
 		// the query so we can get the properly paginated items. Once we have an
 		// array of items we can create the paginator instances for the items.
-		$page = $paginator->getCurrentPage();
+		$page = $paginator->getCurrentPage($total);
 
 		$this->query->forPage($page, $perPage);
 
@@ -439,9 +482,9 @@ class Builder {
 	/**
 	 * Eagerly load the relationship on a set of models.
 	 *
-	 * @param  array    $models
-	 * @param  string   $name
-	 * @param  \Closure $constraints
+	 * @param  array     $models
+	 * @param  string    $name
+	 * @param  \Closure  $constraints
 	 * @return array
 	 */
 	protected function loadRelation(array $models, $name, Closure $constraints)

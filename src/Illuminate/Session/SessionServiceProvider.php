@@ -5,6 +5,13 @@ use Illuminate\Support\ServiceProvider;
 class SessionServiceProvider extends ServiceProvider {
 
 	/**
+	 * The default options for session cookies.
+	 *
+	 * @var array
+	 */
+	protected $cookieDefaults = array('secure' => false, 'http_only' => true);
+
+	/**
 	 * Bootstrap the application events.
 	 *
 	 * @return void
@@ -48,7 +55,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSessionManager()
 	{
-		$this->app['session.manager'] = $this->app->share(function($app)
+		$this->app['session'] = $this->app->share(function($app)
 		{
 			return new SessionManager($app);
 		});
@@ -61,12 +68,12 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSessionDriver()
 	{
-		$this->app['session'] = $this->app->share(function($app)
+		$this->app['session.store'] = $this->app->share(function($app)
 		{
 			// First, we will create the session manager which is responsible for the
 			// creation of the various session drivers when they are needed by the
 			// application instance, and will resolve them on a lazy load basis.
-			$manager = $app['session.manager'];
+			$manager = $app['session'];
 
 			return $manager->driver();
 		});
@@ -101,7 +108,7 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		$this->app->booting(function($app)
 		{
-			$app['session']->start();
+			$app['session.store']->start();
 		});
 	}
 
@@ -123,7 +130,7 @@ class SessionServiceProvider extends ServiceProvider {
 
 		$this->app->close(function() use ($app)
 		{
-			$app['session']->save();
+			$app['session.store']->save();
 		});
 	}
 
@@ -149,11 +156,11 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	public function touchSessionCookie()
 	{
-		$config = $this->app['config']['session'];
+		$config = array_merge($this->cookieDefaults, $this->app['config']['session']);
 
 		$expire = $this->getExpireTime($config);
 
-		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], false, true);
+		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], $config['secure'], $config['http_only']);
 	}
 
 	/**

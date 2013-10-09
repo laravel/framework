@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use Illuminate\Support\Contracts\ResponsePreparerInterface;
-use Symfony\Component\HttpKernel\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -32,7 +32,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.0.7';
+	const VERSION = '4.0.8';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -621,9 +621,9 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function prepareRequest(Request $request)
 	{
-		if (isset($this['session']))
+		if (isset($this['session.store']))
 		{
-			$request->setSessionStore($this['session']);
+			$request->setSessionStore($this['session.store']);
 		}
 
 		return $request;
@@ -753,6 +753,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		$manifest = $this['config']['app.manifest'];
 
 		return new ProviderRepository(new Filesystem, $manifest);
+	}
+
+	/**
+	 * Get the current application locale.
+	 *
+	 * @return string
+	 */
+	public function getLocale()
+	{
+		return $this['config']->get('app.locale');
 	}
 
 	/**

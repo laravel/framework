@@ -106,6 +106,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCachingIterator()
+	{
+		$c = new Collection(array('foo'));
+		$this->assertInstanceOf('CachingIterator', $c->getCachingIterator());
+	}
+
+
 	public function testFilter()
 	{
 		$c = new Collection(array(array('id' => 1, 'name' => 'Hello'), array('id' => 2, 'name' => 'World')));
@@ -234,4 +241,39 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo'), $collection->all());
 	}
 
+
+	public function testGetListValueWithAccessors()
+	{
+		$model    = new TestAccessorEloquentTestStub(array('some' => 'foo'));
+		$modelTwo = new TestAccessorEloquentTestStub(array('some' => 'bar'));
+		$data     = new Collection(array($model, $modelTwo));
+
+		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
+	}
+
+}
+
+class TestAccessorEloquentTestStub
+{
+	protected $attributes = array();
+
+	public function __construct($attributes)
+	{
+		$this->attributes = $attributes;
+	}
+
+	public function __get($attribute)
+	{
+		$accessor = 'get' .lcfirst($attribute). 'Attribute';
+		if (method_exists($this, $accessor)) {
+			return $this->$accessor();
+		}
+
+		return $this->$attribute;
+	}
+
+	public function getSomeAttribute()
+	{
+		return $this->attributes['some'];
+	}
 }

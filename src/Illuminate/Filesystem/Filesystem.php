@@ -79,6 +79,25 @@ class Filesystem {
 	}
 
 	/**
+	 * Prepend to a file.
+	 *
+	 * @param  string  $path
+	 * @param  string  $data
+	 * @return int
+	 */
+	public function prepend($path, $data)
+	{
+		if ($this->exists($path))
+		{
+			return $this->put($path, $data.$this->get($path));			
+		}
+		else
+		{
+			return $this->put($data);
+		}
+	}
+
+	/**
 	 * Append to a file.
 	 *
 	 * @param  string  $path
@@ -106,7 +125,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function move($path, $target)
 	{
@@ -118,7 +137,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function copy($path, $target)
 	{
@@ -127,7 +146,7 @@ class Filesystem {
 
 	/**
 	 * Extract the file extension from a file path.
-	 * 
+	 *
 	 * @param  string  $path
 	 * @return string
 	 */
@@ -283,7 +302,7 @@ class Filesystem {
 	 * @param  string  $directory
 	 * @param  string  $destination
 	 * @param  int     $options
-	 * @return void
+	 * @return bool
 	 */
 	public function copyDirectory($directory, $destination, $options = null)
 	{
@@ -334,11 +353,11 @@ class Filesystem {
 	 *
 	 * @param  string  $directory
 	 * @param  bool    $preserve
-	 * @return void
+	 * @return bool
 	 */
 	public function deleteDirectory($directory, $preserve = false)
 	{
-		if ( ! $this->isDirectory($directory)) return;
+		if ( ! $this->isDirectory($directory)) return false;
 
 		$items = new FilesystemIterator($directory);
 
@@ -362,13 +381,15 @@ class Filesystem {
 		}
 
 		if ( ! $preserve) @rmdir($directory);
+		
+		return true;
 	}
 
 	/**
 	 * Empty the specified directory of all files and folders.
 	 *
 	 * @param  string  $directory
-	 * @return void
+	 * @return bool
 	 */
 	public function cleanDirectory($directory)
 	{

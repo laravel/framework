@@ -305,6 +305,17 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingDouble()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->double('foo', 15, 2);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add "foo" float not null', $statements[0]);
+	}
+
+
 	public function testAddingDecimal()
 	{
 		$blueprint = new Blueprint('users');
