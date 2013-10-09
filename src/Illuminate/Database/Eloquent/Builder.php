@@ -591,6 +591,12 @@ class Builder {
 		$instance = $this->model->$relation();
 
 		$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+		
+		// If we actually found eager load of this relation so call it.
+		if (isset($this->eagerLoad[$relation]) && is_callable($this->eagerLoad[$relation]))
+		{
+			call_user_func($this->eagerLoad[$relation], $query);
+		}
 
 		$this->query->mergeBindings($query->getQuery());
 
