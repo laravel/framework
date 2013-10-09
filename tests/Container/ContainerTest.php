@@ -21,6 +21,15 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Taylor', $container->make('name'));
 	}
 
+	public function testBindIfDoesRegisterIfAliasAlreadyRegistered()
+	{
+		$container = new Container;
+		$container->bind(array('name', 'developer'), function() { return 'Taylor'; });
+		$container->bindIf('developer', function() { return 'Dayle'; });
+
+		$this->assertEquals('Dayle', $container->make('developer'));
+	}
+
 
 	public function testSharedClosureResolution()
 	{
@@ -134,6 +143,24 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($container->bound('foo'));
 		$container->alias('foo', 'baz');
 		$this->assertTrue($container->bound('baz'));
+	}
+
+	public function testInstanceAliasCanBeOverridden()
+	{
+		$class1 = new StdClass;
+		$class2 = new StdClass;
+
+		$container = new Container;
+		$container->instance(array('foo' => 'bar'), $class1);
+
+		$this->assertTrue($container->bound('foo'));
+		$this->assertTrue($container->bound('bar'));
+
+		$this->assertSame($container->make('bar'), $container->make('foo'));
+
+		$container->instance('bar', $class2);
+
+		$this->assertNotSame($container->make('bar'), $container->make('foo'));
 	}
 
 	public function testBoundAliasCanBeOverridden()

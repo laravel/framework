@@ -88,6 +88,8 @@ class Container implements ArrayAccess {
 		// without being forced to state their classes in both of the parameter.
 		unset($this->instances[$abstract]);
 
+		// Just in case an $abstract was previously defined as an alias, we need to
+		// remove the alias from the container.
 		if ($this->isAlias($abstract))
 		{
 			$this->dropAlias($abstract);
@@ -244,6 +246,13 @@ class Container implements ArrayAccess {
 			list($abstract, $alias) = $this->extractAlias($abstract);
 
 			$this->alias($abstract, $alias);
+		}
+
+		// Just in case an $abstract was previously defined as an alias, we need to
+		// remove the alias from the container.
+		if ($this->isAlias($abstract))
+		{
+			$this->dropAlias($abstract);
 		}
 
 		// We'll check to determine if this type has been bound before, and if it has
