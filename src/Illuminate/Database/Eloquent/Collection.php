@@ -76,6 +76,17 @@ class Collection extends BaseCollection {
 	}
 
 	/**
+     * Fetch a nested element of the collection as array.
+     *
+     * @param  string  $key
+     * @return array
+     */
+    public function collect($key)
+    {
+        return array_fetch($this->toArray(), $key);
+    }
+
+	/**
 	 * Get the max value of a given key.
 	 *
 	 * @param  string  $key
