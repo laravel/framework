@@ -322,7 +322,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function fillableFromArray(array $attributes)
 	{
-		if (count($this->fillable) > 0)
+		if (count($this->fillable) > 0 && static::$unguarded === false)
 		{
 			return array_intersect_key($attributes, array_flip($this->fillable));
 		}
