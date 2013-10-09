@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class MorphPivot extends Pivot {
 
@@ -10,7 +11,7 @@ class MorphPivot extends Pivot {
 	 * @param  \Illuminate\Database\Eloquent\Builder
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	protected function setKeysForSaveQuery($query)
+	protected function setKeysForSaveQuery(Builder $query)
 	{
 		$query->where($this->morphType, $this->getAttribute($this->morphType));
 
