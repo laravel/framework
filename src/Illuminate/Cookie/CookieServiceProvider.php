@@ -11,6 +11,7 @@ class CookieServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+
 		$this->app['cookie.defaults'] = $this->cookieDefaults();
 
 		// The Illuminate cookie creator is just a convenient way to make cookies
@@ -22,7 +23,19 @@ class CookieServiceProvider extends ServiceProvider {
 
 			return new CookieJar($app['request'], $app['encrypter'], $options);
 		});
-	}
+
+        //now add an after filter to send the queued cookies
+        $app = $this->app;
+        $this->app->after(function($request, $response) use ($app)
+        {
+            $queuedCookies = $app['cookie']->getQueuedCookies();
+            foreach ($queuedCookies as $cookie)
+            {
+                $response->headers->setCookie($cookie);
+            }
+        });
+
+    }
 
 	/**
 	 * Get the default cookie options.
