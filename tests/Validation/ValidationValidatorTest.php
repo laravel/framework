@@ -4,6 +4,7 @@ use Mockery as m;
 use Illuminate\Validation\Validator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
@@ -472,15 +473,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => array(1, 2, 3)), array('foo' => 'Array|Max:2'));
 		$this->assertFalse($v->passes());
 
-		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
-		$file->expects($this->any())->method('getSize')->will($this->returnValue(3072));
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('isValid', 'getSize'), array(__FILE__, basename(__FILE__)));
+		$file->expects($this->at(0))->method('isValid')->will($this->returnValue(true));
+		$file->expects($this->at(1))->method('getSize')->will($this->returnValue(3072));
 		$v = new Validator($trans, array(), array('photo' => 'Max:10'));
 		$v->setFiles(array('photo' => $file));
 		$this->assertTrue($v->passes());
 
-		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
-		$file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('isValid', 'getSize'), array(__FILE__, basename(__FILE__)));
+		$file->expects($this->at(0))->method('isValid')->will($this->returnValue(true));
+		$file->expects($this->at(1))->method('getSize')->will($this->returnValue(4072));
 		$v = new Validator($trans, array(), array('photo' => 'Max:2'));
+		$v->setFiles(array('photo' => $file));
+		$this->assertFalse($v->passes());
+
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('isValid'), array(__FILE__, basename(__FILE__)));
+		$file->expects($this->any())->method('isValid')->will($this->returnValue(false));
+		$v = new Validator($trans, array(), array('photo' => 'Max:10'));
 		$v->setFiles(array('photo' => $file));
 		$this->assertFalse($v->passes());
 	}
