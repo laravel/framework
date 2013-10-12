@@ -6,8 +6,8 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Support\Contracts\MessageProviderInterface;
 
 class Validator implements MessageProviderInterface {
@@ -633,14 +633,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateMax($attribute, $value, $parameters)
 	{
-		// check file upload is valid first, before checking size
-		// if the upload did not succeed, we don't know the real size
-		// of the file (size returns 0 for invalid uploads), so rather
-		// than returning a misleading result, best to fail early
-		if (($value instanceof UploadedFile) AND !$value->isValid())
-		{
-			return false;
-		}
+		if ($value instanceof UploadedFile and ! $value->isValid()) return false;
 
 		return $this->getSize($attribute, $value) <= $parameters[0];
 	}
