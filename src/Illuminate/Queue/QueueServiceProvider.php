@@ -3,8 +3,8 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
-use Illuminate\Queue\Console\SubscribeCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Queue\Console\SubscribeCommand;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;

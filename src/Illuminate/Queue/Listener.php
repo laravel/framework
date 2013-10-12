@@ -19,6 +19,13 @@ class Listener {
 	protected $environment;
 
 	/**
+	 * The amount of seconds to wait before polling the queue.
+	 *
+	 * @var  int
+	 */
+	protected $sleep = 3;
+
+	/**
 	 * Create a new queue listener.
 	 *
 	 * @param  string  $commandPath
@@ -83,7 +90,7 @@ class Listener {
 	 */
 	public function makeProcess($connection, $queue, $delay, $memory, $timeout)
 	{
-		$string = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep';
+		$string = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s';
 
 		// If the environment is set, we will append it to the command string so the
 		// workers will run under the specified environment. Otherwise, they will
@@ -93,7 +100,7 @@ class Listener {
 			$string .= ' --env='.$this->environment;
 		}
 
-		$command = sprintf($string, $connection, $queue, $delay, $memory);
+		$command = sprintf($string, $connection, $queue, $delay, $memory, $this->sleep);
 
 		return new Process($command, $this->commandPath, null, null, $timeout);
 	}
@@ -138,6 +145,27 @@ class Listener {
 	public function setEnvironment($environment)
 	{
 		$this->environment = $environment;
+	}
+
+	/**
+	 * Get the amount of seconds to wait before polling the queue.
+	 *
+	 * @return int
+	 */
+	public function getSleep()
+	{
+		return $this->sleep;
+	}
+
+	/**
+	 * Set the amount of seconds to wait before polling the queue.
+	 *
+	 * @param  int  $sleep
+	 * @return void
+	 */
+	public function setSleep($sleep)
+	{
+		$this->sleep = $sleep;
 	}
 
 }
