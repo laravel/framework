@@ -814,6 +814,8 @@ class Builder {
 	 */
 	public function orderBy($column, $direction = 'asc')
 	{
+		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
+
 		$this->orders[] = compact('column', 'direction');
 
 		return $this;
