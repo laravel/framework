@@ -193,6 +193,8 @@ class Validator implements MessageProviderInterface {
 	protected function mergeRules($attribute, $rules)
 	{
 		$current = array_get($this->rules, $attribute, array());
+		
+		$rules = (is_string($rules)) ? $rules : array_get($rules, $attribute, array());
 
 		$merge = head($this->explodeRules(array($rules)));
 
