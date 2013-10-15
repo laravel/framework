@@ -986,7 +986,7 @@ class Builder {
 	}
 
 	/**
-	 * Pluck a single column from the database.
+	 * Pluck a single column from the first result of a query.
 	 *
 	 * @param  string  $column
 	 * @return mixed
