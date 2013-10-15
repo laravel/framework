@@ -15,6 +15,13 @@ class BelongsTo extends Relation {
 	protected $foreignKey;
 
 	/**
+	 * The foreign key of the relation model.
+	 *
+	 * @var string
+	 */
+	protected $otherKey;
+
+	/**
 	 * The name of the relationship.
 	 *
 	 * @var string
@@ -28,12 +35,14 @@ class BelongsTo extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $foreignKey
 	 * @param  string  $relation
+	 * @param  string  $otherKey
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $parent, $foreignKey, $relation)
+	public function __construct(Builder $query, Model $parent, $foreignKey, $relation, $otherKey = null)
 	{
 		$this->relation = $relation;
 		$this->foreignKey = $foreignKey;
+		$this->otherKey = $otherKey;
 
 		parent::__construct($query, $parent);
 	}
@@ -60,7 +69,14 @@ class BelongsTo extends Relation {
 			// For belongs to relationships, which are essentially the inverse of has one
 			// or has many relationships, we need to actually query on the primary key
 			// of the related models matching on the foreign key that's on a parent.
-			$key = $this->related->getKeyName();
+			if (is_null($this->otherKey))
+			{
+				$key = $this->related->getKeyName();
+			}
+			else
+			{
+				$key = $this->otherKey;
+			}
 
 			$table = $this->related->getTable();
 
@@ -216,6 +232,16 @@ class BelongsTo extends Relation {
 	public function getForeignKey()
 	{
 		return $this->foreignKey;
+	}
+
+	/**
+	 * Get the other foreign key of the relationship.
+	 *
+	 * @return string
+	 */
+	public function getOtherKey()
+	{
+		return $this->otherKey;
 	}
 
 }

@@ -550,15 +550,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
 	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
 	 */
-	public function hasOne($related, $foreignKey = null)
+	public function hasOne($related, $foreignKey = null, $otherKey = null)
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
 
-		return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey);
+		return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $otherKey);
 	}
 
 	/**
@@ -586,9 +587,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function belongsTo($related, $foreignKey = null)
+	public function belongsTo($related, $foreignKey = null, $otherKey = null)
 	{
 		list(, $caller) = debug_backtrace(false);
 
@@ -609,7 +611,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$query = $instance->newQuery();
 
-		return new BelongsTo($query, $this, $foreignKey, $relation);
+		return new BelongsTo($query, $this, $foreignKey, $relation, $otherKey);
 	}
 
 	/**
@@ -647,15 +649,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
 	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
 	 */
-	public function hasMany($related, $foreignKey = null)
+	public function hasMany($related, $foreignKey = null, $otherKey = null)
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
 
-		return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey);
+		return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $otherKey);
 	}
 
 	/**

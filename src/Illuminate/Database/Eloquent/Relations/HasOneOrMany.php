@@ -15,16 +15,25 @@ abstract class HasOneOrMany extends Relation {
 	protected $foreignKey;
 
 	/**
+	 * The foreign key of the relation model.
+	 *
+	 * @var string
+	 */
+	protected $otherKey;
+
+	/**
 	 * Create a new has many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $parent, $foreignKey)
+	public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey = null)
 	{
 		$this->foreignKey = $foreignKey;
+		$this->otherKey = $otherKey;
 
 		parent::__construct($query, $parent);
 	}
@@ -38,7 +47,14 @@ abstract class HasOneOrMany extends Relation {
 	{
 		if (static::$constraints)
 		{
-			$key = $this->parent->getKey();
+			if (is_null($this->otherKey))
+			{
+				$key = $this->parent->getKey();
+			}
+			else
+			{
+				$key = $this->otherKey;
+			}
 
 			$this->query->where($this->foreignKey, '=', $key);
 		}
@@ -242,6 +258,16 @@ abstract class HasOneOrMany extends Relation {
 	public function getForeignKey()
 	{
 		return $this->foreignKey;
+	}
+
+	/**
+	 * Get the other foreign key for the relationship.
+	 *
+	 * @return string
+	 */
+	public function getOtherKey()
+	{
+		return $this->otherKey;
 	}
 
 	/**
