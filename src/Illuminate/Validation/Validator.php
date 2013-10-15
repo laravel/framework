@@ -243,6 +243,7 @@ class Validator implements MessageProviderInterface {
 	{
 		if (trim($rule) == '') return;
 
+		$ruleOriginal = $rule;
 		list($rule, $parameters) = $this->parseRule($rule);
 
 		// We will get the value for the given attribute from the array of data and then
@@ -256,7 +257,7 @@ class Validator implements MessageProviderInterface {
 
 		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
 		{
-			$this->addFailure($attribute, $rule, $parameters);
+			$this->addFailure($attribute, $ruleOriginal, $parameters);
 		}
 	}
 
@@ -1073,9 +1074,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getMessage($attribute, $rule)
 	{
-		$lowerRule = strtolower(snake_case($rule));
-
-		$inlineMessage = $this->getInlineMessage($attribute, $lowerRule);
+		$inlineMessage = $this->getInlineMessage($attribute, $rule);
 
 		// First we will retrieve the custom message for the validation rule if one
 		// exists. If a custom validation message is being used we'll return the
@@ -1085,7 +1084,7 @@ class Validator implements MessageProviderInterface {
 			return $inlineMessage;
 		}
 
-		$customKey = "validation.custom.{$attribute}.{$lowerRule}";
+		$customKey = "validation.custom.{$attribute}.{$rule}";
 
 		$customMessage = $this->translator->trans($customKey);
 
@@ -1110,7 +1109,7 @@ class Validator implements MessageProviderInterface {
 		// messages out of the translator service for this validation rule.
 		else
 		{
-			$key = "validation.{$lowerRule}";
+			$key = "validation.{$rule}";
 
 			return $this->translator->trans($key);
 		}
@@ -1120,12 +1119,12 @@ class Validator implements MessageProviderInterface {
 	 * Get the inline message for a rule if it exists.
 	 *
 	 * @param  string  $attribute
-	 * @param  string  $lowerRule
+	 * @param  string  $rule
 	 * @return string
 	 */
-	protected function getInlineMessage($attribute, $lowerRule)
+	protected function getInlineMessage($attribute, $rule)
 	{
-		$keys = array("{$attribute}.{$lowerRule}", $lowerRule);
+		$keys = array("{$attribute}.{$rule}", $rule);
 
 		// First we will check for a custom message for an attribute specific rule
 		// message for the fields, then we will check for a general custom line
@@ -1148,14 +1147,12 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getSizeMessage($attribute, $rule)
 	{
-		$lowerRule = strtolower(snake_case($rule));
-
 		// There are three different types of size validations. The attribute may be
 		// either a number, file, or string so we will check a few things to know
 		// which type of value it is and return the correct line for that type.
 		$type = $this->getAttributeType($attribute);
 
-		$key = "validation.{$lowerRule}.{$type}";
+		$key = "validation.{$rule}.{$type}";
 
 		return $this->translator->trans($key);
 	}
@@ -1585,7 +1582,9 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function addExtensions(array $extensions)
 	{
-		$this->extensions = array_merge($this->extensions, $extensions);
+		foreach ($extensions as $rule => $extension) {
+			$this->addExtension($rule, $extension);
+		}
 	}
 
 	/**
@@ -1613,6 +1612,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function addExtension($rule, $extension)
 	{
+		$rule = str_replace('__', '_', snake_case($rule));
+		
 		$this->extensions[$rule] = $extension;
 	}
 
