@@ -405,7 +405,7 @@ if( ! function_exists('array_group_by'))
 	/**
 	 * Return a array object with arrays grouped by the key
 	 *
-	 * If no key is given to the method, the entire array will be replaced.
+	 * If no key is given to the method, the entire array is returned
 	 *
 	 * @param  array   $array
 	 * @param  string  $key
