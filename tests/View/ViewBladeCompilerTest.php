@@ -74,6 +74,20 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testEscapedWithAtEchosAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('{{$name}}', $compiler->compileString('@{{$name}}'));
+		$this->assertEquals('{{ $name }}', $compiler->compileString('@{{ $name }}'));
+		$this->assertEquals('{{
+			$name
+		}}', 
+		$compiler->compileString('@{{
+			$name
+		}}'));
+	}
+
+
 	public function testReversedEchosAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);

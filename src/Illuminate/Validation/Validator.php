@@ -1613,7 +1613,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function addExtension($rule, $extension)
 	{
-		$this->extensions[$rule] = $extension;
+		$this->extensions[snake_case($rule)] = $extension;
 	}
 
 	/**
