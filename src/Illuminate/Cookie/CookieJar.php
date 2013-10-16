@@ -37,6 +37,13 @@ class CookieJar {
 	protected $domain = null;
 
 	/**
+	 * A list of queued cookies to send later, keyed by cookie name
+	 *
+	 * @var array
+	 */
+	protected $queued = array();
+
+	/**
 	 * Create a new cookie manager instance.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
@@ -194,6 +201,40 @@ class CookieJar {
 	public function getEncrypter()
 	{
 		return $this->encrypter;
+	}
+
+	/**
+	 * Queue a cookie to send with the next response
+	 *
+	 * If a cookie with this name already exists, overrite it
+	 *
+	 * @param Cookie $cookie
+	 */
+	public function queue(Cookie $cookie)
+	{
+		$this->queued[$cookie->getName()] = $cookie;
+	}
+
+	/**
+	 * Remove a cookie from the queue (if it has been set)
+	 *
+	 * @param $cookieName
+	 */
+	public function unqueue($cookieName) 
+	{
+		if (array_key_exists($cookieName,$this->queued))
+		{
+			unset($this->queued[$cookieName]);
+		}
+	}
+
+	/**
+	 * Get the cookies which have been queued for the next request
+	 *
+	 * @return array
+	 */
+	public function getQueuedCookies() {
+		return $this->queued;
 	}
 
 }

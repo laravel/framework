@@ -64,6 +64,22 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($cookie->get('foo'));
 	}
 
+	public function testQueuedCookies()
+	{
+		$cookie = $this->getCreator();
+		$this->assertEmpty($cookie->getQueuedCookies()); // better not be anything in the array yet
+		$cookie->queue($cookie->make('foo','bar'));
+		$this->assertArrayHasKey('foo',$cookie->getQueuedCookies());
+	}
+
+	public function testUnqueue()
+	{
+		$cookie = $this->getCreator();
+		$cookie->queue($cookie->make('foo','bar'));
+		$this->assertArrayHasKey('foo',$cookie->getQueuedCookies());
+		$cookie->unqueue('foo');
+		$this->assertEmpty($cookie->getQueuedCookies());
+	}
 
 	public function getCreator()
 	{
