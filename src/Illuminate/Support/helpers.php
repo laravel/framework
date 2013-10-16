@@ -400,6 +400,39 @@ if ( ! function_exists('array_sort'))
 	}
 }
 
+if( ! function_exists('array_group_by'))
+{
+	/**
+	 * Return a array object with arrays grouped by the key
+	 *
+	 * If no key is given to the method, the entire array will be replaced.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return array
+	 */
+	function array_group_by($array, $key) {
+		
+		if (is_null($key)) return $array;
+	    	$result = array();
+	    
+		    foreach($array as $item){
+		    	
+		        $group_key = $item[$key]
+		        
+		        if(!array_key_exists($group_key, $result)) {
+		        	
+		            $result[$group_key] = array();
+		            
+		        }
+		        
+		        $result[$group_key][] = $item;
+		    }
+		    
+		    return $result;
+	}
+}
+
 if ( ! function_exists('asset'))
 {
 	/**
