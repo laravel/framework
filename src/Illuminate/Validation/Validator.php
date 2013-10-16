@@ -69,6 +69,13 @@ class Validator implements MessageProviderInterface {
 	protected $customMessages = array();
 
 	/**
+	 * The array of fallback error messages.
+	 *
+	 * @var array
+	 */
+	protected $fallbackMessages = array();
+
+	/**
 	 * The array of custom attribute names.
 	 *
 	 * @var array
@@ -1105,15 +1112,19 @@ class Validator implements MessageProviderInterface {
 			return $this->getSizeMessage($attribute, $rule);
 		}
 
-		// Finally, if on developer specified messages have been set, and no other
+		// Finally, if no developer specified messages have been set, and no other
 		// special messages apply for this rule, we will just pull the default
 		// messages out of the translator service for this validation rule.
-		else
-		{
-			$key = "validation.{$lowerRule}";
+		$key = "validation.{$lowerRule}";
 
-			return $this->translator->trans($key);
+		if ($key != ($value = $this->translator->trans($key)))
+		{
+			return $value; 
 		}
+
+		return $this->getInlineMessage(
+			$attribute, $lowerRule, $this->fallbackMessages
+		) ?: $key;
 	}
 
 	/**
@@ -1121,10 +1132,13 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  string  $lowerRule
+	 * @param  array   $source
 	 * @return string
 	 */
-	protected function getInlineMessage($attribute, $lowerRule)
+	protected function getInlineMessage($attribute, $lowerRule, $source = null)
 	{
+		$source = $source ?: $this->customMessages;
+
 		$keys = array("{$attribute}.{$lowerRule}", $lowerRule);
 
 		// First we will check for a custom message for an attribute specific rule
@@ -1132,10 +1146,7 @@ class Validator implements MessageProviderInterface {
 		// that is not attribute specific. If we find either we'll return it.
 		foreach ($keys as $key)
 		{
-			if (isset($this->customMessages[$key]))
-			{
-				return $this->customMessages[$key];
-			}
+			if (isset($source[$key])) return $source[$key];
 		}
 	}
 
@@ -1776,6 +1787,27 @@ class Validator implements MessageProviderInterface {
 	public function setCustomMessages(array $messages)
 	{
 		$this->customMessages = array_merge($this->customMessages, $messages);
+	}
+
+	/**
+	 * Get the fallback messages for the validator.
+	 *
+	 * @return void
+	 */
+	public function getFallbackMessages()
+	{
+		return $this->fallbackMessages;
+	}
+
+	/**
+	 * Set the fallback messages for the validator.
+	 *
+	 * @param  array  $messages
+	 * @return void
+	 */
+	public function setFallbackMessages(array $messages)
+	{
+		$this->fallbackMessages = $messages;
 	}
 
 	/**

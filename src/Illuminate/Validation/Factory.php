@@ -42,6 +42,13 @@ class Factory {
 	protected $implicitExtensions = array();
 
 	/**
+	 * All of the fallback messages for custom rules.
+	 *
+	 * @var array
+	 */
+	protected $fallbackMessages = array();
+
+	/**
 	 * The Validator resolver instance.
 	 *
 	 * @var Closure
@@ -89,6 +96,19 @@ class Factory {
 			$validator->setContainer($this->container);
 		}
 
+		$this->addExtensions($validator);
+
+		return $validator;
+	}
+
+	/**
+	 * Add the extensions to a validator instance.
+	 *
+	 * @param  \Illuminate\Validation\Validator  $validator
+	 * @return void
+	 */
+	protected function addExtensions($validator)
+	{
 		$validator->addExtensions($this->extensions);
 
 		// Next, we will add the implicit extensions, which are similar to the required
@@ -98,7 +118,7 @@ class Factory {
 
 		$validator->addImplicitExtensions($implicit);
 
-		return $validator;
+		$validator->setFallbackMessages($this->fallbackMessages);
 	}
 
 	/**
@@ -126,11 +146,14 @@ class Factory {
 	 *
 	 * @param  string  $rule
 	 * @param  Closure|string  $extension
+	 * @param  string  $message
 	 * @return void
 	 */
-	public function extend($rule, $extension)
+	public function extend($rule, $extension, $message = null)
 	{
 		$this->extensions[$rule] = $extension;
+
+		if ($message) $this->fallbackMessages[strtolower(snake_case($rule))] = $message;
 	}
 
 	/**
@@ -138,11 +161,14 @@ class Factory {
 	 *
 	 * @param  string   $rule
 	 * @param  Closure  $extension
+	 * @param  string  $message
 	 * @return void
 	 */
-	public function extendImplicit($rule, Closure $extension)
+	public function extendImplicit($rule, Closure $extension, $message = null)
 	{
 		$this->implicitExtensions[$rule] = $extension;
+
+		if ($message) $this->fallbackMessages[strtolower(snake_case($rule))] = $message;
 	}
 
 	/**
