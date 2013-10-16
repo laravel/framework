@@ -1582,9 +1582,12 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function addExtensions(array $extensions)
 	{
-		$keys = array_map('snake_case', array_keys($extensions));
+		if ($extensions)
+		{
+			$keys = array_map('snake_case', array_keys($extensions));
 
-		$extensions = array_combine($keys, array_values($extensions));
+			$extensions = array_combine($keys, array_values($extensions));
+		}
 
 		$this->extensions = array_merge($this->extensions, $extensions);
 	}
