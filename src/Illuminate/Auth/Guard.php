@@ -45,13 +45,6 @@ class Guard {
 	protected $request;
 
 	/**
-	 * The cookies queued by the guards.
-	 *
-	 * @var array
-	 */
-	protected $queuedCookies = array();
-
-	/**
 	 * The event dispatcher instance.
 	 *
 	 * @var \Illuminate\Events\Dispatcher
@@ -339,7 +332,7 @@ class Guard {
 		// identifier. We will then decrypt this later to retrieve the users.
 		if ($remember)
 		{
-			$this->queuedCookies[] = $this->createRecaller($id);
+			$this->getCookieJar()->queue($this->createRecaller($id));
 		}
 
 		// If we have an event dispatcher instance set we will fire an event so that
@@ -429,17 +422,7 @@ class Guard {
 
 		$recaller = $this->getRecallerName();
 
-		$this->queuedCookies[] = $this->getCookieJar()->forget($recaller);
-	}
-
-	/**
-	 * Get the cookies queued by the guard.
-	 *
-	 * @return array
-	 */
-	public function getQueuedCookies()
-	{
-		return $this->queuedCookies;
+		$this->getCookieJar()->queue($this->getCookieJar()->forget($recaller));
 	}
 
 	/**

@@ -19,6 +19,16 @@ class CookieServiceProvider extends ServiceProvider {
 
 			return $cookies->setDefaultPathAndDomain($config['path'], $config['domain']);
 		});
-	}
 
+		//now add an after filter to send the queued cookies
+		$app = $this->app;
+		$this->app->after(function($request, $response) use ($app)
+		{
+			$queuedCookies = $app['cookie']->getQueuedCookies();
+			foreach ($queuedCookies as $cookie)
+			{
+				$response->headers->setCookie($cookie);
+			}
+		});
+	}
 }
