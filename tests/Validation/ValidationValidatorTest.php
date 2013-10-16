@@ -787,6 +787,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('foo!', $v->messages()->first('name'));
+
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.foo_bar' => 'foo!'), 'en', 'messages');
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo_bar'));
+		$v->addExtension('FooBar', function() { return false; });
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('foo!', $v->messages()->first('name'));
 	}
 
 
