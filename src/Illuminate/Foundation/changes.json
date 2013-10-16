@@ -55,6 +55,7 @@
 		{"message": "Added 'shared' method to View to pull a single shared item out.", "backport": null},
 		{"message": "Added assertHasOldInput test assertion.", "backport": null},
 		{"message": "Added slick new 'sometimes' method to Validator for conditionally adding rules.", "backport": null},
-		{"message": "Added new '--sleep' option to queue:listen command to control time between jobs.", "backport": null}
+		{"message": "Added new '--sleep' option to queue:listen command to control time between jobs.", "backport": null},
+		{"message": "Allow Blade processing on echos to be escaped using the @ sign.", "backport": null}
 	]
 }
