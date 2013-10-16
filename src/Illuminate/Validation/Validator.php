@@ -1091,7 +1091,7 @@ class Validator implements MessageProviderInterface {
 			return $this->getSizeMessage($attribute, $rule);
 		}
 
-		// Finally, if on developer specified messages have been set, and no other
+		// Finally, if no developer specified messages have been set, and no other
 		// special messages apply for this rule, we will just pull the default
 		// messages out of the translator service for this validation rule.
 		else
