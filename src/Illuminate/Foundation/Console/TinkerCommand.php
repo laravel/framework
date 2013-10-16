@@ -44,18 +44,23 @@ class TinkerCommand extends Command {
 	 */
 	protected function runBorisShell()
 	{
-		// Disable the exception/error handlers so Boris can handle them
-		restore_error_handler();
-		restore_exception_handler();
+		$this->setupBorisErrorHandling();
+
+		with(new \Boris\Boris('> '))->start();
+	}
+
+	/**
+	 * Setup the Boris exception handling.
+	 *
+	 * @return void
+	 */
+	protected function setupBorisErrorHandling()
+	{
+		restore_error_handler(); restore_exception_handler();
+
 		$this->laravel->make('artisan')->setCatchExceptions(false);
 
-		// Stop the shutdown handler outputting a JSON error object
 		$this->laravel->error(function() { return ''; });
-
-		// Run Boris
-		with(new \Boris\Boris('> '))->start();
-
-		return;
 	}
 
 	/**
