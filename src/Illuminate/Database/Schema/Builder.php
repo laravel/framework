@@ -56,7 +56,9 @@ class Builder {
 	 */
 	public function hasColumn($table, $column)
 	{
-		return in_array($column, $this->getColumnListing($table));
+		$column = strtolower($column);
+
+		return in_array($column, array_map('strtolower', $this->getColumnListing($table)));
 	}
 
 	/**
