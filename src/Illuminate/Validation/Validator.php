@@ -863,7 +863,7 @@ class Validator implements MessageProviderInterface {
 			$extra[$segments[$i]] = $segments[$i + 1];
 		}
 
-		return $extra;	
+		return $extra;
 	}
 
 	/**
@@ -1105,7 +1105,7 @@ class Validator implements MessageProviderInterface {
 
 		if ($key != ($value = $this->translator->trans($key)))
 		{
-			return $value; 
+			return $value;
 		}
 
 		return $this->getInlineMessage(
@@ -1582,6 +1582,13 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function addExtensions(array $extensions)
 	{
+		if ($extensions)
+		{
+			$keys = array_map('snake_case', array_keys($extensions));
+
+			$extensions = array_combine($keys, array_values($extensions));
+		}
+
 		$this->extensions = array_merge($this->extensions, $extensions);
 	}
 
