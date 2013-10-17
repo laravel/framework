@@ -139,7 +139,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 */
 	public function deleteExpired()
 	{
-		$expired = Carbon::now()->addSeconds($this->expires);
+		$expired = Carbon::now()->subSeconds($this->expires);
 
 		$this->getTable()->where('created_at', '<', $expired)->delete();
 	}
