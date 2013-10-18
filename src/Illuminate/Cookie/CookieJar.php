@@ -37,6 +37,13 @@ class CookieJar {
 	protected $domain = null;
 
 	/**
+	 * All of the cookies queued for sending.
+	 *
+	 * @var array
+	 */
+	protected $queued = array();
+
+	/**
 	 * Create a new cookie manager instance.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
@@ -151,6 +158,36 @@ class CookieJar {
 	}
 
 	/**
+	 * Queue a cookie to send with the next response.
+	 *
+	 * @param  dynamic
+	 * @return void
+	 */
+	public function queue()
+	{
+		if (head(func_get_args()) instanceof Cookie)
+		{
+			$cookie = head(func_get_args());
+		}
+		else
+		{
+			$cookie = call_user_func_array(array($this, 'make'), func_get_args());
+		}
+
+		$this->queued[$cookie->getName()] = $cookie;
+	}
+
+	/**
+	 * Remove a cookie from the queue.
+	 *
+	 * @param $cookieName
+	 */
+	public function unqueue($name) 
+	{
+		unset($this->queued[$name]);
+	}
+
+	/**
 	 * Get the path and domain, or the default values.
 	 *
 	 * @param  string  $path
@@ -194,6 +231,16 @@ class CookieJar {
 	public function getEncrypter()
 	{
 		return $this->encrypter;
+	}
+
+	/**
+	 * Get the cookies which have been queued for the next request
+	 *
+	 * @return array
+	 */
+	public function getQueuedCookies()
+	{
+		return $this->queued;
 	}
 
 }

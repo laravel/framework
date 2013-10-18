@@ -75,6 +75,8 @@
 		{"message": "Added slick new 'sometimes' method to Validator for conditionally adding rules.", "backport": null},
 		{"message": "Added new '--sleep' option to queue:listen command to control time between jobs.", "backport": null},
 		{"message": "Allow Blade processing on echos to be escaped using the @ sign.", "backport": null},
-		{"message": "Allow custom messages to be registered when using Validator::extend.", "backport": null}
+		{"message": "Allow custom messages to be registered when using Validator::extend.", "backport": null},
+		{"message": "Added new auth:clear-reminders command for clearing expired password reminders.", "backport": null},
+		{"message": "Added Cookie::queue method for creating cookies that are automatically attached to the final response.", "backport": null}
 	]
 }

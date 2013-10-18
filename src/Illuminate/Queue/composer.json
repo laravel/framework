@@ -16,7 +16,7 @@
         "symfony/process": "2.4.*"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "2.1.*",
+        "aws/aws-sdk-php": "2.4.*",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },
