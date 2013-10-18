@@ -520,14 +520,11 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function dispatch(Request $request)
 	{
-		if ($this->isDownForMaintenance())
-		{
-			$response = $this['events']->until('illuminate.app.down');
+		$response = $this->isDownForMaintenance()
+			? $this['events']->until('illuminate.app.down')
+			: $this['router']->dispatch($this->prepareRequest($request));
 
-			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
-		}
-		
-		return $this['router']->dispatch($this->prepareRequest($request));
+		return $this->prepareResponse($response);
 	}
 
 	/**
