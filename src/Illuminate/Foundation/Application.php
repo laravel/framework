@@ -230,13 +230,14 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Get the current application environment.
+	 * Get or check the current application environment.
 	 *
-	 * @return string
+	 * @param string
+	 * @return string|bool
 	 */
-	public function environment()
+	public function environment($environment = null)
 	{
-		return $this['env'];
+		return $environment ? $environment == $this['env'] : $this['env'];
 	}
 
 	/**
