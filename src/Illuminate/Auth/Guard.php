@@ -332,7 +332,7 @@ class Guard {
 		// identifier. We will then decrypt this later to retrieve the users.
 		if ($remember)
 		{
-			$this->getCookieJar()->queue($this->createRecaller($id));
+			$this->queueRecallerCookie($id);
 		}
 
 		// If we have an event dispatcher instance set we will fire an event so that
@@ -371,6 +371,17 @@ class Guard {
 		$this->setUser($this->provider->retrieveById($id));
 
 		return $this->user instanceof UserInterface;
+	}
+
+	/**
+	 * Queue the recaller cookie into the cookie jar.
+	 *
+	 * @param  string  $id
+	 * @return void
+	 */
+	protected function queueRecallerCookie($id)
+	{
+		$this->getCookieJar()->queue($this->createRecaller($id));
 	}
 
 	/**
