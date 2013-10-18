@@ -14,7 +14,7 @@
         "classpreloader/classpreloader": "1.0.*",
         "doctrine/dbal": "2.4.*",
         "ircmaxell/password-compat": "1.0.*",
-        "filp/whoops": "1.0.7",
+        "filp/whoops": "1.0.8",
         "jeremeamia/superclosure": "1.0.*",
         "monolog/monolog": "1.6.*",
         "nesbot/carbon": "1.*",
@@ -64,9 +64,9 @@
         "illuminate/workbench": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "2.2.*",
-        "iron-io/iron_mq": "1.4.4",
-        "pda/pheanstalk": "2.0.*",
+        "aws/aws-sdk-php": "2.4.*",
+        "iron-io/iron_mq": "1.4.*",
+        "pda/pheanstalk": "2.1.*",
         "mockery/mockery": "0.8.0",
         "phpunit/phpunit": "3.7.*"
     },
