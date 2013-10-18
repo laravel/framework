@@ -99,7 +99,7 @@ class ReminderServiceProvider extends ServiceProvider {
 
 		$app['command.auth.reminders.clear'] = $app->share(function($app)
 		{
-			return new ClearRemindersCommand($app['auth.reminder.repository']);
+			return new ClearRemindersCommand;
 		});
 
 		$this->commands('command.auth.reminders', 'command.auth.reminders.clear');
