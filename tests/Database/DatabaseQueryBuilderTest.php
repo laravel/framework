@@ -731,7 +731,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$method     = 'whereFooBarAndBazOrQux';
 		$parameters = array('corge', 'waldo', 'fred');
-		$builder    = m::mock('Illuminate\Database\Query\Builder[where]');
+		$builder    = m::mock('Illuminate\Database\Query\Builder')->makePartial();
 
 		$builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturn($builder);
 		$builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturn($builder);
@@ -745,7 +745,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$method     = 'whereIosVersionAndAndroidVersionOrOrientation';
 		$parameters = array('6.1', '4.2', 'Vertical');
-		$builder    = m::mock('Illuminate\Database\Query\Builder[where]');
+		$builder    = m::mock('Illuminate\Database\Query\Builder')->makePartial();
 
 		$builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturn($builder);
 		$builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);

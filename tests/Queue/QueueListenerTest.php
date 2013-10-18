@@ -12,9 +12,9 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase {
 
 	public function testRunProcessCallsProcess()
 	{
-		$process = m::mock('Symfony\Component\Process\Process[run]');
+		$process = m::mock('Symfony\Component\Process\Process')->makePartial();
 		$process->shouldReceive('run')->once();
-		$listener = m::mock('Illuminate\Queue\Listener[memoryExceeded]');
+		$listener = m::mock('Illuminate\Queue\Listener')->makePartial();
 		$listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(false);
 
 		$listener->runProcess($process, 1);
@@ -23,9 +23,9 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase {
 
 	public function testListenerStopsWhenMemoryIsExceeded()
 	{
-		$process = m::mock('Symfony\Component\Process\Process[run]');
+		$process = m::mock('Symfony\Component\Process\Process')->makePartial();
 		$process->shouldReceive('run')->once();
-		$listener = m::mock('Illuminate\Queue\Listener[memoryExceeded,stop]');
+		$listener = m::mock('Illuminate\Queue\Listener')->makePartial();
 		$listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(true);
 		$listener->shouldReceive('stop')->once();
 
