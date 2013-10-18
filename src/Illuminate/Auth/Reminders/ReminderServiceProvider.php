@@ -2,6 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Console\MakeRemindersCommand;
+use Illuminate\Auth\Console\ClearRemindersCommand;
 use Illuminate\Auth\Reminders\DatabaseReminderRepository as DbRepository;
 
 class ReminderServiceProvider extends ServiceProvider {
@@ -96,7 +97,12 @@ class ReminderServiceProvider extends ServiceProvider {
 			return new MakeRemindersCommand($app['files']);
 		});
 
-		$this->commands('command.auth.reminders');
+		$app['command.auth.reminders.clear'] = $app->share(function($app)
+		{
+			return new ClearRemindersCommand($app['auth.reminder.repository']);
+		});
+
+		$this->commands('command.auth.reminders', 'command.auth.reminders.clear');
 	}
 
 	/**
