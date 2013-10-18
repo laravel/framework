@@ -64,6 +64,10 @@ abstract class Controller {
 		{
 			$filter = $this->registerClosureFilter($filter);
 		}
+		elseif ($this->isInstanceFilter($filter))
+		{
+			$filter = $this->registerInstanceFilter($filter);
+		}
 		else
 		{
 			list($filter, $parameters) = Route::parseFilter($filter);
@@ -83,6 +87,30 @@ abstract class Controller {
 		$this->getFilterer()->filter($name = spl_object_hash($filter), $filter);
 
 		return $name;
+	}
+
+	/**
+	 * Check if a filter is a local method
+	 * @param  mixed  $filter
+	 * @return boolean
+	 */
+	protected function isInstanceFilter($filter)
+	{
+		return is_string($filter) and starts_with($filter, '@');
+	}
+
+	/**
+	 * Register a controller instance method as a filter.
+	 *
+	 * @param  string  $filter
+	 * @return string
+	 */
+	protected function registerInstanceFilter($filter)
+	{
+		$name = substr($filter, 1);
+		$this->getFilterer()->filter($filter, array($controller = $this, $name));
+
+		return $filter;
 	}
 
 	/**
