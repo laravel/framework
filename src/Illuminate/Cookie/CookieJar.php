@@ -37,7 +37,7 @@ class CookieJar {
 	protected $domain = null;
 
 	/**
-	 * A list of queued cookies to send later, keyed by cookie name
+	 * All of the cookies queued for sending.
 	 *
 	 * @var array
 	 */
@@ -204,28 +204,33 @@ class CookieJar {
 	}
 
 	/**
-	 * Queue a cookie to send with the next response
+	 * Queue a cookie to send with the next response.
 	 *
-	 * If a cookie with this name already exists, overrite it
-	 *
-	 * @param Cookie $cookie
+	 * @param  dynamic
+	 * @return void
 	 */
-	public function queue(Cookie $cookie)
+	public function queue()
 	{
+		if (head(func_get_args()) instanceof Cookie)
+		{
+			$cookie = head(func_get_args());
+		}
+		else
+		{
+			$cookie = call_user_func_array(array($this, 'make'), func_get_args());
+		}
+
 		$this->queued[$cookie->getName()] = $cookie;
 	}
 
 	/**
-	 * Remove a cookie from the queue (if it has been set)
+	 * Remove a cookie from the queue.
 	 *
 	 * @param $cookieName
 	 */
-	public function unqueue($cookieName) 
+	public function unqueue($name) 
 	{
-		if (array_key_exists($cookieName,$this->queued))
-		{
-			unset($this->queued[$cookieName]);
-		}
+		unset($this->queued[$name]);
 	}
 
 	/**
@@ -233,7 +238,8 @@ class CookieJar {
 	 *
 	 * @return array
 	 */
-	public function getQueuedCookies() {
+	public function getQueuedCookies()
+	{
 		return $this->queued;
 	}
 
