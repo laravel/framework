@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Auth\Reminders;
 
-use DateTime;
+use Carbon\Carbon;
 use Illuminate\Database\Connection;
 
 class DatabaseReminderRepository implements ReminderRepositoryInterface {
@@ -39,7 +39,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 * @param  \Illuminate\Database\Connection  $connection
 	 * @param  string  $table
 	 * @param  string  $hashKey
-	 * @param  int  $expires 
+	 * @param  int  $expires
 	 * @return void
 	 */
 	public function __construct(Connection $connection, $table, $hashKey, $expires = 60)
@@ -79,7 +79,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 */
 	protected function getPayload($email, $token)
 	{
-		return array('email' => $email, 'token' => $token, 'created_at' => new DateTime);
+		return array('email' => $email, 'token' => $token, 'created_at' => new Carbon);
 	}
 
 	/**
@@ -130,6 +130,18 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	public function delete($token)
 	{
 		$this->getTable()->where('token', $token)->delete();
+	}
+
+	/**
+	 * Delete expired reminders.
+	 *
+	 * @return void
+	 */
+	public function deleteExpired()
+	{
+		$expired = Carbon::now()->subSeconds($this->expires);
+
+		$this->getTable()->where('created_at', '<', $expired)->delete();
 	}
 
 	/**
