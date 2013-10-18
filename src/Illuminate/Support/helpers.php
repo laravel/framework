@@ -418,7 +418,7 @@ if( ! function_exists('array_group_by'))
 	    
 		    foreach($array as $item){
 		    	
-		        $group_key = $item[$key]
+		        $group_key = $item[$key];
 		        
 		        if(!array_key_exists($group_key, $result)) {
 		        	
