@@ -467,9 +467,8 @@ class Blueprint {
 	/**
 	 * Create a new unsigned integer column on the table.
 	 *
-	 * @param  string  $column
-	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
+	 * @param  string $column
+	 * @param  bool   $autoIncrement
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedInteger($column, $autoIncrement = false)
@@ -480,9 +479,8 @@ class Blueprint {
 	/**
 	 * Create a new unsigned big integer column on the table.
 	 *
-	 * @param  string  $column
-	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
+	 * @param  string $column
+	 * @param  bool   $autoIncrement
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedBigInteger($column, $autoIncrement = false)
@@ -510,7 +508,6 @@ class Blueprint {
 	 * @param  int|null	$total
 	 * @param  int|null $places
 	 * @return \Illuminate\Support\Fluent
-	 *
 	 */
 	public function double($column, $total = null, $places = null)
 	{
