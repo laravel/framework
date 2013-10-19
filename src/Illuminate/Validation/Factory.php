@@ -9,7 +9,7 @@ class Factory {
 	/**
 	 * The Translator implementation.
 	 *
-	 * @var Symfony\Component\Translator\TranslatorInterface
+	 * @var \Symfony\Component\Translation\TranslatorInterface
 	 */
 	protected $translator;
 
@@ -89,7 +89,7 @@ class Factory {
 		}
 
 		// Next we'll set the IoC container instance of the validator, which is used to
-		// resolves out class baesd validator extensions. If it's not set then these
+		// resolves out class based validator extensions. If it's not set then these
 		// types of extensions will not be possible on these validation instances.
 		if ( ! is_null($this->container))
 		{
