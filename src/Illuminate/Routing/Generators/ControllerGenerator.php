@@ -43,7 +43,7 @@ class ControllerGenerator {
 	 * @param  string  $controller
 	 * @param  string  $path
 	 * @param  array   $options
-	 * @return void
+	 * @return bool
 	 */
 	public function make($controller, $path, array $options = array())
 	{
