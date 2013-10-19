@@ -84,7 +84,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 */
 	public function delete($migration)
 	{
-		$query = $this->table()->where('migration', $migration->migration)->delete();
+		$this->table()->where('migration', $migration->migration)->delete();
 	}
 
 	/**
