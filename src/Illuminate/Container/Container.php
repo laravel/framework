@@ -33,7 +33,7 @@ class Container implements ArrayAccess {
 	/**
 	 * All of the registered resolving callbacks.
 	 *
-	 * @var array
+	 * @var Closure[]
 	 */
 	protected $resolvingCallbacks = array();
 
@@ -100,7 +100,7 @@ class Container implements ArrayAccess {
 	 * @param  string               $abstract
 	 * @param  Closure|string|null  $concrete
 	 * @param  bool                 $shared
-	 * @return bool
+	 * @return void
 	 */
 	public function bindIf($abstract, $concrete = null, $shared = false)
 	{
@@ -119,7 +119,7 @@ class Container implements ArrayAccess {
 	 */
 	public function singleton($abstract, $concrete = null)
 	{
-		return $this->bind($abstract, $concrete, true);
+		$this->bind($abstract, $concrete, true);
 	}
 
 	/**
@@ -333,7 +333,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Resolve all of the dependencies from the ReflectionParameters.
 	 *
-	 * @param  array  $parameters
+	 * @param  ReflectionParameter[]  $parameters
 	 * @return array
 	 */
 	protected function getDependencies($parameters)
