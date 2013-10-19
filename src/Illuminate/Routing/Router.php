@@ -56,6 +56,13 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected $controllerDispatcher;
 
 	/**
+	 * The controller inspector instance.
+	 *
+	 * @var \Illuminate\Routing\ControllerInspector
+	 */
+	protected $inspector;
+
+	/**
 	 * Indicates if the router is running filters.
 	 *
 	 * @var bool
@@ -1401,7 +1408,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function getInspector()
 	{
-		return new ControllerInspector;
+		return $this->inspector ?: $this->inspector = new ControllerInspector;
 	}
 
 	/**
