@@ -40,7 +40,7 @@ class Handler {
 	/**
 	 * All of the register exception handlers.
 	 *
-	 * @var array
+	 * @var Closure[]
 	 */
 	protected $handlers = array();
 
@@ -54,9 +54,10 @@ class Handler {
 	/**
 	 * Create a new error handler instance.
 	 *
-	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface  $responsePreparer
-	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
-	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
+	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface $responsePreparer
+	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface       $plainDisplayer
+	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface       $debugDisplayer
+	 * @param  bool                                                    $debug
 	 * @return void
 	 */
 	public function __construct(ResponsePreparerInterface $responsePreparer,
@@ -201,8 +202,8 @@ class Handler {
 	/**
 	 * Handle a console exception.
 	 *
-	 * @param  Exception  $exception
-	 * @return void
+	 * @param  \Exception $exception
+	 * @return \Illuminate\Http\Response | null
 	 */
 	public function handleConsole($exception)
 	{
@@ -212,9 +213,9 @@ class Handler {
 	/**
 	 * Handle the given exception.
 	 *
-	 * @param  Exception  $exception
-	 * @param  bool  $fromConsole
-	 * @return void
+	 * @param  \Exception $exception
+	 * @param  bool       $fromConsole
+	 * @return \Illuminate\Http\Response | null
 	 */
 	protected function callCustomHandlers($exception, $fromConsole = false)
 	{
@@ -260,6 +261,8 @@ class Handler {
 				return $response;
 			}
 		}
+
+		return null;
 	}
 
 	/**
@@ -279,7 +282,7 @@ class Handler {
 	 * Determine if the given handler handles this exception.
 	 *
 	 * @param  Closure    $handler
-	 * @param  Exception  $exception
+	 * @param  \Exception  $exception
 	 * @return bool
 	 */
 	protected function handlesException(Closure $handler, $exception)
@@ -292,8 +295,8 @@ class Handler {
 	/**
 	 * Determine if the given handler type hints the exception.
 	 *
-	 * @param  ReflectionFunction  $reflection
-	 * @param  Exception  $exception
+	 * @param  ReflectionFunction $reflection
+	 * @param  \Exception         $exception
 	 * @return bool
 	 */
 	protected function hints(ReflectionFunction $reflection, $exception)
@@ -308,7 +311,7 @@ class Handler {
 	/**
 	 * Format an exception thrown by a handler.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception $e
 	 * @return string
 	 */
 	protected function formatException(\Exception $e)
