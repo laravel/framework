@@ -43,7 +43,7 @@ class ViewPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $source
-	 * @return void
+	 * @return bool
 	 */
 	public function publish($package, $source)
 	{
@@ -51,7 +51,7 @@ class ViewPublisher {
 
 		$this->makeDestination($destination);
 
-		$this->files->copyDirectory($source, $destination);
+		return $this->files->copyDirectory($source, $destination);
 	}
 
 	/**
@@ -59,7 +59,7 @@ class ViewPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $packagePath
-	 * @return void
+	 * @return bool
 	 */
 	public function publishPackage($package, $packagePath = null)
 	{
@@ -67,7 +67,7 @@ class ViewPublisher {
 
 		$source = $this->getSource($package, $name, $packagePath ?: $this->packagePath);
 
-		$this->publish($package, $source);
+		return $this->publish($package, $source);
 	}
 
 	/**
