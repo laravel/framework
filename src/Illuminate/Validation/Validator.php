@@ -395,8 +395,6 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateRequiredWith($attribute, $value, $parameters)
 	{
-		$other = $parameters[0];
-
 		if ($this->getPresentCount($parameters) != count($parameters))
 		{
 			return true;
@@ -1785,7 +1783,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the fallback messages for the validator.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function getFallbackMessages()
 	{
@@ -1876,7 +1874,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Call a class baesd validator extension.
+	 * Call a class based validator extension.
 	 *
 	 * @param  string  $callback
 	 * @param  array   $parameters
