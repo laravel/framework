@@ -23,9 +23,9 @@ class BeanstalkdJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
-	 * @param  Pheanstalk  $pheanstalk
-	 * @param  Pheanstalk_Job  $job
+	 * @param  \Illuminate\Container\Container $container
+	 * @param  Pheanstalk                      $pheanstalk
+	 * @param  Pheanstalk_Job                  $job
 	 * @return void
 	 */
 	public function __construct(Container $container,
@@ -95,7 +95,7 @@ class BeanstalkdJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container
+	 * @return \Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{
