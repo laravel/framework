@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class RoutesCommand extends Command {
 
-    	/**
+	/**
 	 * The console command name.
 	 *
 	 * @var string
