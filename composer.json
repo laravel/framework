@@ -14,7 +14,7 @@
         "classpreloader/classpreloader": "1.0.*",
         "doctrine/dbal": "2.4.*",
         "ircmaxell/password-compat": "1.0.*",
-        "filp/whoops": "1.0.8",
+        "filp/whoops": "1.0.7",
         "jeremeamia/superclosure": "1.0.*",
         "monolog/monolog": "1.6.*",
         "nesbot/carbon": "1.*",
