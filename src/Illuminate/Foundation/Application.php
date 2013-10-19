@@ -1,29 +1,25 @@
 <?php namespace Illuminate\Foundation;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Route;
-use Illuminate\Routing\Router;
 use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Exception\ExceptionServiceProvider;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\ProviderRepository;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Support\Contracts\ResponsePreparerInterface;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Foundation\ProviderRepository;
-use Illuminate\Routing\RoutingServiceProvider;
-use Illuminate\Exception\ExceptionServiceProvider;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
-use Illuminate\Support\Contracts\ResponsePreparerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirect;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirect;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class Application extends Container implements HttpKernelInterface, ResponsePreparerInterface {
 
@@ -611,6 +607,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Call the booting callbacks for the application.
 	 *
+	 * @param array $callbacks
 	 * @return void
 	 */
 	protected function fireAppCallbacks(array $callbacks)
