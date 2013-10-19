@@ -43,15 +43,15 @@ class ConfigPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $source
-	 * @return void
+	 * @return bool
 	 */
 	public function publish($package, $source)
 	{
-		$destination = $this->publishPath."/packages/{$package}";		
+		$destination = $this->publishPath."/packages/{$package}";
 
 		$this->makeDestination($destination);
 
-		$this->files->copyDirectory($source, $destination);
+		return $this->files->copyDirectory($source, $destination);
 	}
 
 	/**
@@ -59,7 +59,7 @@ class ConfigPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $packagePath
-	 * @return void
+	 * @return bool
 	 */
 	public function publishPackage($package, $packagePath = null)
 	{
@@ -72,7 +72,7 @@ class ConfigPublisher {
 
 		$source = $this->getSource($package, $name, $path);
 
-		$this->publish($package, $source);
+		return $this->publish($package, $source);
 	}
 
 	/**
