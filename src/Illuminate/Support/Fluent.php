@@ -138,8 +138,8 @@ class Fluent implements ArrayAccess {
 	/**
 	 * Dynamically check if an attribute is set.
 	 *
-	 * @param  string  $key
-	 * @return void
+	 * @param  string $key
+	 * @return bool
 	 */
 	public function __isset($key)
 	{

@@ -54,7 +54,7 @@ class ChangesCommand extends Command {
 	 * Format the given change message.
 	 *
 	 * @param  array   $change
-	 * @return stirng
+	 * @return string
 	 */
 	protected function formatMessage(array $change)
 	{

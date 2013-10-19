@@ -349,15 +349,15 @@ class Guard {
 	/**
 	 * Log the given user ID into the application.
 	 *
-	 * @param  mixed  $id
-	 * @param  bool   $remember
-	 * @return \Illuminate\Auth\UserInterface
+	 * @param  mixed $id
+	 * @param  bool  $remember
+	 * @return void
 	 */
 	public function loginUsingId($id, $remember = false)
 	{
 		$this->session->put($this->getName(), $id);
 
-		return $this->login($this->provider->retrieveById($id), $remember);
+		$this->login($this->provider->retrieveById($id), $remember);
 	}
 
 	/**

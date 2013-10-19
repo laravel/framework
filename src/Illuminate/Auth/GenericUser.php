@@ -66,6 +66,7 @@ class GenericUser implements UserInterface {
 	/**
 	 * Dynamically check if a value is set on the user.
 	 *
+	 * @param  string $key
 	 * @return bool
 	 */
 	public function __isset($key)
@@ -76,7 +77,8 @@ class GenericUser implements UserInterface {
 	/**
 	 * Dynamically unset a value on the user.
 	 *
-	 * @return bool
+	 * @param  string $key
+	 * @return void
 	 */
 	public function __unset($key)
 	{

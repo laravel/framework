@@ -605,7 +605,6 @@ class Grammar extends BaseGrammar {
 	 * Compile a delete statement into SQL.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @param  array  $values
 	 * @return string
 	 */
 	public function compileDelete(Builder $query)

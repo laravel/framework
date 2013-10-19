@@ -14,9 +14,16 @@ class QueueManager {
 	/**
 	 * The array of resolved queue connections.
 	 *
-	 * @var array
+	 * @var \Illuminate\Queue\QueueInterface[]
 	 */
 	protected $connections = array();
+
+	/**
+	 * The array of driver connectors
+	 *
+	 * @var \Closure[]
+	 */
+	protected $connectors = array();
 
 	/**
 	 * Create a new queue manager instance.

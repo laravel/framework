@@ -12,6 +12,16 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 class Manager {
 
 	/**
+	 * @var \Illuminate\Database\DatabaseManager
+	 */
+	protected $manager;
+
+	/**
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
+
+	/**
 	 * The current globally used instance.
 	 *
 	 * @var \Illuminate\Database\Capsule\Manager
@@ -42,7 +52,7 @@ class Manager {
 	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
-	protected function setupContainer($container)
+	protected function setupContainer(Container $container)
 	{
 		$this->container = $container ?: new Container;
 
@@ -202,7 +212,7 @@ class Manager {
 	/**
 	 * Get the current cache manager instance.
 	 *
-	 * @return \Illuminate\Cache\Manager
+	 * @return \Illuminate\Cache\CacheManager
 	 */
 	public function getCacheManager()
 	{

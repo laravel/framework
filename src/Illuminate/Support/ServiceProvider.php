@@ -120,7 +120,7 @@ abstract class ServiceProvider {
 	/**
 	 * Get a class from the ReflectionClass inheritance chain.
 	 *
-	 * @param  ReflectionClass  $reflection
+	 * @param  \ReflectionClass $reflect
 	 * @return array
 	 */
 	protected function getClassChain(ReflectionClass $reflect)

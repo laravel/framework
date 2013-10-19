@@ -51,7 +51,7 @@ class ViewPublisher {
 
 		$this->makeDestination($destination);
 
-		return $this->files->copyDirectory($source, $destination);
+		$this->files->copyDirectory($source, $destination);
 	}
 
 	/**
@@ -67,7 +67,7 @@ class ViewPublisher {
 
 		$source = $this->getSource($package, $name, $packagePath ?: $this->packagePath);
 
-		return $this->publish($package, $source);
+		$this->publish($package, $source);
 	}
 
 	/**

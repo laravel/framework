@@ -209,6 +209,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the select clause for the relation query.
 	 *
+	 * @param array $columns
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
@@ -810,7 +811,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array  $attributes
 	 * @param  bool   $exists
-	 * @return \Illuminate\Database\Eloquent\Relation\Pivot
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
 	 */
 	public function newPivot(array $attributes = array(), $exists = false)
 	{

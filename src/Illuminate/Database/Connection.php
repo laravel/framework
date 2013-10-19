@@ -1,11 +1,12 @@
 <?php namespace Illuminate\Database;
 
-use PDO;
 use Closure;
 use DateTime;
+use Doctrine\DBAL\Connection as DoctrineConnection;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Database\Query\Processors\Processor;
-use Doctrine\DBAL\Connection as DoctrineConnection;
+use Illuminate\Events\Dispatcher;
+use PDO;
 
 class Connection implements ConnectionInterface {
 
@@ -54,7 +55,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The cache manager instance.
 	 *
-	 * @var \Illuminate\Cache\CacheManger
+	 * @var \Illuminate\Cache\CacheManager
 	 */
 	protected $cache;
 
@@ -66,7 +67,7 @@ class Connection implements ConnectionInterface {
 	protected $fetchMode = PDO::FETCH_ASSOC;
 
 	/**
-	 * The number of active transasctions.
+	 * The number of active transactions.
 	 *
 	 * @var int
 	 */
@@ -542,7 +543,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Handle an exception that occurred during a query.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception $e
 	 * @param  string     $query
 	 * @param  array      $bindings
 	 * @return void
@@ -759,7 +760,7 @@ class Connection implements ConnectionInterface {
 	 * @param  \Illuminate\Events\Dispatcher
 	 * @return void
 	 */
-	public function setEventDispatcher(\Illuminate\Events\Dispatcher $events)
+	public function setEventDispatcher(Dispatcher $events)
 	{
 		$this->events = $events;
 	}

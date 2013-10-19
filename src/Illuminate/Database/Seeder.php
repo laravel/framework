@@ -2,7 +2,6 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
 
 class Seeder {
 
@@ -61,8 +60,8 @@ class Seeder {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
+	 * @param  \Illuminate\Container\Container $container
+	 * @return \Illuminate\Database\Seeder
 	 */
 	public function setContainer(Container $container)
 	{
@@ -74,8 +73,8 @@ class Seeder {
 	/**
 	 * Set the console command instance.
 	 *
-	 * @param  \Illuminate\Console\Command  $command
-	 * @return void
+	 * @param  \Illuminate\Console\Command $command
+	 * @return \Illuminate\Database\Seeder
 	 */
 	public function setCommand(Command $command)
 	{

@@ -3,7 +3,6 @@
 use Illuminate\Support\MessageBag;
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\Engines\BladeEngine;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Compilers\BladeCompiler;

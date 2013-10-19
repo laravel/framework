@@ -42,7 +42,7 @@ class Mailer {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 

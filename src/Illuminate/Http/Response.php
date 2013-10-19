@@ -45,8 +45,8 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	/**
 	 * Set the content on the response.
 	 *
-	 * @param  mixed  $content
-	 * @return void
+	 * @param  mixed $content
+	 * @return \Illuminate\Http\Response
 	 */
 	public function setContent($content)
 	{

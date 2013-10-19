@@ -51,7 +51,7 @@ class ConfigPublisher {
 
 		$this->makeDestination($destination);
 
-		return $this->files->copyDirectory($source, $destination);
+		$this->files->copyDirectory($source, $destination);
 	}
 
 	/**
@@ -72,7 +72,7 @@ class ConfigPublisher {
 
 		$source = $this->getSource($package, $name, $path);
 
-		return $this->publish($package, $source);
+		$this->publish($package, $source);
 	}
 
 	/**

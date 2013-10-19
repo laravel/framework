@@ -1532,7 +1532,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array   $attributes
 	 * @param  string  $table
 	 * @param  bool    $exists
-	 * @return \Illuminate\Database\Eloquent\Relation\Pivot
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
 	 */
 	public function newPivot(Model $parent, array $attributes, $table, $exists)
 	{
@@ -2240,7 +2240,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		// If the value is in simply year, month, day format, we will instantiate the
-		// Carbon instances from that fomrat. Again, this provides for simple date
+		// Carbon instances from that format. Again, this provides for simple date
 		// fields on the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{
@@ -2596,7 +2596,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Determine if an attribute exists on the model.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function __isset($key)
 	{

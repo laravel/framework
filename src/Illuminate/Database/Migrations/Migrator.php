@@ -240,6 +240,7 @@ class Migrator {
 	/**
 	 * Require in all the migration files in a given path.
 	 *
+	 * @param  string $path
 	 * @param  array  $files
 	 * @return void
 	 */
@@ -251,7 +252,8 @@ class Migrator {
 	/**
 	 * Pretend to run the migrations.
 	 *
-	 * @param  object  $migration
+	 * @param  object $migration
+	 * @param  string $method
 	 * @return void
 	 */
 	protected function pretendToRun($migration, $method)

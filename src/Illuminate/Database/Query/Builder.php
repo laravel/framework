@@ -345,7 +345,7 @@ class Builder {
 	 * Determine if the given operator and value combination is legal.
 	 *
 	 * @param  string  $operator
-	 * @param  mxied  $value
+	 * @param  mixed  $value
 	 * @return bool
 	 */
 	protected function invalidOperatorAndValue($operator, $value)
@@ -1370,7 +1370,8 @@ class Builder {
 		// Once we have executed the query, we will reset the aggregate property so
 		// that more select queries can be executed against the database without
 		// the aggregate value getting in the way when the grammar builds it.
-		$this->columns = null; $this->aggregate = null;
+		$this->columns = null;
+		$this->aggregate = null;
 
 		if (isset($results[0]))
 		{
@@ -1403,7 +1404,8 @@ class Builder {
 		{
 			foreach ($values as $key => $value)
 			{
-				ksort($value); $values[$key] = $value;
+				ksort($value);
+				$values[$key] = $value;
 			}
 		}
 
