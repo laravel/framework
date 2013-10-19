@@ -34,7 +34,7 @@ class Writer {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispacher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $dispatcher;
 
@@ -174,8 +174,9 @@ class Writer {
 	/**
 	 * Fires a log event.
 	 *
-	 * @param  string  $level
-	 * @param  array   $parameters
+	 * @param  string       $level
+	 * @param  string|array $message
+	 * @param  array        $context
 	 * @return void
 	 */
 	protected function fireLogEvent($level, $message, array $context = array())
