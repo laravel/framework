@@ -77,6 +77,7 @@
 		{"message": "Allow Blade processing on echos to be escaped using the @ sign.", "backport": null},
 		{"message": "Allow custom messages to be registered when using Validator::extend.", "backport": null},
 		{"message": "Added new auth:clear-reminders command for clearing expired password reminders.", "backport": null},
-		{"message": "Added Cookie::queue method for creating cookies that are automatically attached to the final response.", "backport": null}
+		{"message": "Added Cookie::queue method for creating cookies that are automatically attached to the final response.", "backport": null},
+		{"message": "Allow environment to be checked via App::environment method.", "backport": null}
 	]
 }
