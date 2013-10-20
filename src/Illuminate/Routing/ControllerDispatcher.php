@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ControllerDispatcher {
 
@@ -87,9 +88,14 @@ class ControllerDispatcher {
      */
     protected function call($instance, $route, $method)
     {
-        $parameters = $route->parametersWithoutNulls();
+        if (is_callable(array($instance, $method)))
+        {
+            $parameters = $route->parametersWithoutNulls();
 
-        return call_user_func_array(array($instance, $method), $parameters);
+            return call_user_func_array(array($instance, $method), $parameters);
+        }
+
+        throw new NotFoundHttpException;
     }
 
     /**
