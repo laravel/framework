@@ -32,7 +32,7 @@ class Environment {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
@@ -443,7 +443,7 @@ class Environment {
 	 */
 	public function inject($section, $content)
 	{
-		return $this->startSection($section, $content);
+		$this->startSection($section, $content);
 	}
 
 	/**

@@ -55,7 +55,9 @@ class Dispatcher {
 	{
 		if (str_contains($event, '*'))
 		{
-			return $this->setupWildcardListen($event, $listener);
+			$this->setupWildcardListen($event, $listener);
+
+			return;
 		}
 
 		$this->listeners[$event][$priority][] = $this->makeListener($listener);
@@ -186,7 +188,7 @@ class Dispatcher {
 				return $response;
 			}
 
-			// If a boolean false is returned from a listener, we will stop propogating
+			// If a boolean false is returned from a listener, we will stop propagating
 			// the event to any further listeners down in the chain, else we keep on
 			// looping through the listeners and firing every one in our sequence.
 			if ($response === false) break;

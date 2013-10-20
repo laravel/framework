@@ -61,7 +61,7 @@ class AliasLoader {
 	{
 		if (isset($this->aliases[$alias]))
 		{
-			return class_alias($this->aliases[$alias], $alias);
+			class_alias($this->aliases[$alias], $alias);
 		}
 	}
 

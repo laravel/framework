@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support;
 
+use Patchwork\Utf8;
+
 class Str {
 
 	/**
@@ -17,7 +19,7 @@ class Str {
 	 */
 	public static function ascii($value)
 	{
-		return \Patchwork\Utf8::toAscii($value);
+		return Utf8::toAscii($value);
 	}
 
 	/**
@@ -270,7 +272,7 @@ class Str {
 		// Remove all characters that are not the separator, letters, numbers, or whitespace.
 		$title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
 
-		// Convert all dashes/undescores into separator
+		// Convert all dashes/underscores into separator
 		$flip = $separator == '-' ? '_' : '-';
 
 		$title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);

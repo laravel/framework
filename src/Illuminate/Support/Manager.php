@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Foundation\Application;
 
 abstract class Manager {
 
@@ -31,7 +32,7 @@ abstract class Manager {
 	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	public function __construct($app)
+	public function __construct(Application $app)
 	{
 		$this->app = $app;
 	}
@@ -114,6 +115,13 @@ abstract class Manager {
 	{
 		return $this->drivers;
 	}
+
+	/**
+	 * Get the default driver name.
+	 *
+	 * @return string
+	 */
+	abstract protected function getDefaultDriver();
 
 	/**
 	 * Dynamically call the default driver instance.

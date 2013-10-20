@@ -182,7 +182,7 @@ class Request extends SymfonyRequest {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function input($key = null, $default = null)
 	{
@@ -327,8 +327,8 @@ class Request extends SymfonyRequest {
 	public function flashOnly($keys)
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
-		
-		return $this->flash('only', $keys);
+
+		$this->flash('only', $keys);
 	}
 
 	/**
@@ -340,8 +340,8 @@ class Request extends SymfonyRequest {
 	public function flashExcept($keys)
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
-		
-		return $this->flash('except', $keys);
+
+		$this->flash('except', $keys);
 	}
 
 	/**
@@ -452,6 +452,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Get the data format expected in the response.
 	 *
+	 * @param  string $default
 	 * @return string
 	 */
 	public function format($default = 'html')

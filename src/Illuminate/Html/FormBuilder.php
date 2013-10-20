@@ -79,15 +79,15 @@ class FormBuilder {
 	/**
 	 * Create a new form builder instance.
 	 *
-	 * @param  \Illuminate\Routing\UrlGenerator  $url
-	 * @param  \Illuminate\Html\HtmlBuilder  $html
-	 * @param  string  $csrfToken
+	 * @param  \Illuminate\Html\HtmlBuilder     $html
+	 * @param  \Illuminate\Routing\UrlGenerator $url
+	 * @param  string                           $csrfToken
 	 * @return void
 	 */
 	public function __construct(HtmlBuilder $html, UrlGenerator $url, $csrfToken)
 	{
-		$this->url = $url;
 		$this->html = $html;
+		$this->url = $url;
 		$this->csrfToken = $csrfToken;
 	}
 
@@ -598,11 +598,11 @@ class FormBuilder {
 	/**
 	 * Get the check state for a checkable input.
 	 *
-	 * @param  string  $type
-	 * @param  string  $name
-	 * @param  mixed   $value
-	 * @param  bool    $checked
-	 * @return void
+	 * @param  string $type
+	 * @param  string $name
+	 * @param  mixed  $value
+	 * @param  bool   $checked
+	 * @return bool
 	 */
 	protected function getCheckedState($type, $name, $value, $checked)
 	{

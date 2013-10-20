@@ -7,7 +7,7 @@ class PackageCreator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -38,7 +38,7 @@ class PackageCreator {
 	/**
 	 * Create a new package creator instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)
@@ -74,7 +74,7 @@ class PackageCreator {
 	 *
 	 * @param  Package  $package
 	 * @param  string   $path
-	 * @return void
+	 * @return string
 	 */
 	public function createWithResources(Package $package, $path)
 	{
@@ -97,6 +97,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool  $plain
 	 * @return void
 	 */
 	public function writeSupportFiles(Package $package, $directory, $plain)
@@ -140,6 +141,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool  $plain
 	 * @return void
 	 */
 	protected function writeComposerFile(Package $package, $directory, $plain)
@@ -171,9 +173,9 @@ class PackageCreator {
 	 * @param  string  $directory
 	 * @return void
 	 */
-	public function writeIgnoreFile(Package $package, $directory, $plain)
+	public function writeIgnoreFile(Package $package, $directory)
 	{
-		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');	
+		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');
 	}
 
 	/**
@@ -216,6 +218,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool  $plain
 	 * @return void
 	 */
 	public function writePublicDirectory(Package $package, $directory, $plain)
@@ -246,6 +249,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool  $plain
 	 * @return void
 	 */
 	public function writeServiceProvider(Package $package, $directory, $plain)
