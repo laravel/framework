@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Controller {
 
@@ -125,29 +124,6 @@ abstract class Controller {
 	public static function setFilterer(RouteFiltererInterface $filterer)
 	{
 		static::$filterer = $filterer;
-	}
-
-	/**
-	 * Handle calls to missing methods on the controller.
-	 *
-	 * @param  array  $parameters
-	 * @return mixed
-	 */
-	public function missingMethod($parameters)
-	{
-		throw new NotFoundHttpException("Controller method not found.");
-	}
-
-	/**
-	 * Handle calls to missing methods on the controller.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
-	public function __call($method, $parameters)
-	{
-		return $this->missingMethod($parameters);
 	}
 
 }

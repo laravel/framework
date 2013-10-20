@@ -25,6 +25,29 @@ class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('getIndex', $response);
 	}
 
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testDispatchToMethodThatDoesntExist()
+	{
+		$request = Request::create('controller');
+		$route = new Route(array('GET'), 'controller', array('uses' => function() {}));
+		$route->bind($request);
+		$dispatcher = new ControllerDispatcher(m::mock('Illuminate\Routing\RouteFiltererInterface'), new Container);
+		$dispatcher->dispatch($route, $request, 'ControllerDispatcherTestControllerStub', 'getDragon');
+	}
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testDispatchToProtectedMethod()
+	{
+		$request = Request::create('controller');
+		$route = new Route(array('GET'), 'controller', array('uses' => function() {}));
+		$route->bind($request);
+		$dispatcher = new ControllerDispatcher(m::mock('Illuminate\Routing\RouteFiltererInterface'), new Container);
+		$dispatcher->dispatch($route, $request, 'ControllerDispatcherTestControllerStub', 'getFoo');
+	}
 }
 
 
@@ -35,7 +58,7 @@ class ControllerDispatcherTestControllerStub extends Controller {
 		return __FUNCTION__;
 	}
 
-	public function getFoo()
+	protected function getFoo()
 	{
 		return __FUNCTION__;
 	}
