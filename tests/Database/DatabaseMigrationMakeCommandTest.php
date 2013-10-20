@@ -29,7 +29,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 		$command->setLaravel($app);
 		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/database/migrations', 'users', true);
 
-		$this->runCommand($command, array('name' => 'create_foo', '--table' => 'users', '--create' => true));
+		$this->runCommand($command, array('name' => 'create_foo', '--create' => 'users'));
 	}
 
 
