@@ -32,7 +32,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.0.8';
+	const VERSION = '4.0.9';
 
 	/**
 	 * Indicates if the application has "booted".
