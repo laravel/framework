@@ -31,9 +31,11 @@ class TailCommand extends Command {
 
 		if ($path)
 		{
-			$this->getConnection()->run('tail -f '.$path, function($out)
+			$output = $this->output;
+
+			$this->getConnection()->run('tail -f '.$path, function($line) use ($output)
 			{
-				$this->line($out);
+				$output->write($line);
 			});
 		}
 		else
