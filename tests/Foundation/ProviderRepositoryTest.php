@@ -15,7 +15,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
 		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
-		$app = m::mock('Illuminate\Foundation\Application[register,setDeferredServices,runningInConsole]');
+		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
 		$repo->shouldReceive('createProvider')->once()->with($app, 'foo')->andReturn($provider);
 		$app->shouldReceive('register')->once()->with($provider);
@@ -31,7 +31,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
 		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
-		$app = m::mock('Illuminate\Foundation\Application[register,setDeferredServices,runningInConsole]');
+		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
 		$repo->shouldReceive('createProvider')->once()->with($app, 'providers')->andReturn($provider);
 		$app->shouldReceive('register')->once()->with($provider);
