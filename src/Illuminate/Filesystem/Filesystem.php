@@ -93,7 +93,7 @@ class Filesystem {
 		}
 		else
 		{
-			return $this->put($data);
+			return $this->put($path, $data);
 		}
 	}
 
