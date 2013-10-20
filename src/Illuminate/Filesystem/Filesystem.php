@@ -289,11 +289,19 @@ class Filesystem {
 	 * @param  string  $path
 	 * @param  int     $mode
 	 * @param  bool    $recursive
+	 * @param  bool    $force
 	 * @return bool
 	 */
-	public function makeDirectory($path, $mode = 0777, $recursive = false)
+	public function makeDirectory($path, $mode = 0777, $recursive = false, $force = false)
 	{
-		return mkdir($path, $mode, $recursive);
+		if ($force)
+		{
+			return @mkdir($path, $mode, $recursive);
+		}
+		else
+		{
+			return mkdir($path, $mode, $recursive);
+		}
 	}
 
 	/**
