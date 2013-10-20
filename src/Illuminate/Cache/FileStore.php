@@ -96,7 +96,7 @@ class FileStore implements StoreInterface {
 	{
 		try
 		{
-			$this->files->makeDirectory(dirname($path), 0777, true);
+			$this->files->makeDirectory(dirname($path), 0777, true, true);
 		}
 		catch (\Exception $e)
 		{
