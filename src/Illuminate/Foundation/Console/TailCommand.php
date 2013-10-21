@@ -67,8 +67,6 @@ class TailCommand extends Command {
 	 */
 	protected function tailLocalLogs($path)
 	{
-		if ($this->option('sql')) $this->registerQueryLogger();
-
 		$output = $this->output;
 
 		with(new Process('tail -f '.$path))->setTimeout(null)->run(function($type, $line) use ($output)
@@ -86,8 +84,6 @@ class TailCommand extends Command {
 	 */
 	protected function tailRemoteLogs($path, $connection)
 	{
-		if ($this->option('sql')) $this->registerQueryLogger();
-
 		$out = $this->output;
 
 		$this->getRemote($connection)->run('tail -f '.$path, function($line) use ($out)
@@ -139,23 +135,6 @@ class TailCommand extends Command {
 	}
 
 	/**
-	 * Register a query logger for local tailing convenience.
-	 *
-	 * @return void
-	 */
-	protected function registerQueryLogger()
-	{
-		$app = $this->laravel;
-
-		$this->laravel['db']->listen(function($sql, $bindings, $time) use ($app)
-		{
-			$sql = str_replace_array('\?', $bindings, $sql);
-
-			$app['log']->debug($sql.' ['.$time.'ms]');
-		});
-	}
-
-	/**
 	 * Get the console command arguments.
 	 *
 	 * @return array
@@ -176,8 +155,6 @@ class TailCommand extends Command {
 	{
 		return array(
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The fully qualified path to the log file.'),
-
-			array('sql', null, InputOption::VALUE_NONE, 'Indicates if SQL queries should be logged.'),
 		);
 	}
 
