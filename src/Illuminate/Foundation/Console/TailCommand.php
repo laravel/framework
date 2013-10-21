@@ -71,7 +71,7 @@ class TailCommand extends Command {
 
 		$output = $this->output;
 
-		with(new Process('tail -f '.$path))->run(function($type, $line) use ($output)
+		with(new Process('tail -f '.$path))->setTimeout(null)->run(function($type, $line) use ($output)
 		{
 			$output->write($line);
 		});
