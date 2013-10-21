@@ -21,7 +21,6 @@
         "patchwork/utf8": "1.1.*",
         "phpseclib/phpseclib": "0.3.*",
         "predis/predis": "0.8.*",
-        "react/socket": "0.3.*",
         "swiftmailer/swiftmailer": "5.0.*",
         "symfony/browser-kit": "2.4.*",
         "symfony/console": "2.4.*",
