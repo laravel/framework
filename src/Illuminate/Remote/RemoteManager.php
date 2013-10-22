@@ -110,7 +110,7 @@ class RemoteManager {
 	{
 		$this->setOutput($connection = new Connection(
 
-			$name, $config['host'], $config['username'], $this->getAuth($config)
+			$name, $config['host'], $config['username'], $this->getAuth($config), $keyphrase
 
 		));
 
@@ -140,7 +140,7 @@ class RemoteManager {
 	{
 		if (isset($config['key']) and trim($config['key']) != '')
 		{
-			return array('key' => $config['key']);
+			return array('key' => $config['key'], 'keyphrase' => $config['keyphrase']);
 		}
 		elseif (isset($config['password']))
 		{
