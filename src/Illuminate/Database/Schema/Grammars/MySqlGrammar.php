@@ -60,7 +60,13 @@ class MySqlGrammar extends Grammar {
 	{
 		$columns = implode(', ', $this->getColumns($blueprint));
 
-		$sql = 'create table '.$this->wrapTable($blueprint)." ($columns)";
+		$sql = 'create table '.$this->wrapTable($blueprint)." ($columns";
+
+		// MySQL requires primary keys to be added when the table is initially created
+		// if they are referenced by foreign keys, so we will need to check for primary
+		// key commands and add the columns to the table's declaration here so they can
+		// be created on the tables.
+		$sql .= (string) $this->addPrimaryKeys($blueprint).")";
 
 		// Once we have the primary SQL, we can add the encoding option to the SQL for
 		// the table.  Then, we can check if a storage engine has been supplied for
@@ -73,6 +79,24 @@ class MySqlGrammar extends Grammar {
 		}
 
 		return $sql;
+	}
+
+	/**
+	 * Get the primary key syntax for a table creation statement.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @return string|null
+	 */
+	protected function addPrimaryKeys(Blueprint $blueprint)
+	{
+		$primary = $this->getCommandByName($blueprint, 'primary');
+
+		if ( ! is_null($primary))
+		{
+			$columns = $this->columnize($primary->columns);
+
+			return ", primary key {$primary->index}({$columns})";
+		}
 	}
 
 	/**
@@ -122,6 +146,11 @@ class MySqlGrammar extends Grammar {
 	 */
 	public function compilePrimary(Blueprint $blueprint, Fluent $command)
 	{
+		// Primary key definitions are included in create commands.
+		if ($blueprint->creating()) {
+		    return;
+		}
+
 		$command->name(null);
 
 		return $this->compileKey($blueprint, $command, 'primary key');
