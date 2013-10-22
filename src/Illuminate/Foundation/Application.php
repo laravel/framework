@@ -114,13 +114,49 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		$this['request'] = $this->createRequest($request);
 
-		// The exception handler class takes care of determining which of the bound
-		// exception handler Closures should be called for a given exception and
-		// gets the response from them. We'll bind it here to allow overrides.
+		$this->registerBaseServiceProviders();
+	}
+
+	/**
+	 * Register all of the base service providers.
+	 *
+	 * @return void
+	 */
+	protected function registerBaseServiceProviders()
+	{
+		foreach (array('Exception', 'Routing', 'Event') as $name)
+		{
+			$this->{"register{$name}Provider"}();
+		}
+	}
+
+	/**
+	 * Register the exception service provider.
+	 *
+	 * @return void
+	 */
+	protected function registerExceptionProvider()
+	{
 		$this->register(new ExceptionServiceProvider($this));
+	}
 
+	/**
+	 * Register the routing service provider.
+	 *
+	 * @return void
+	 */
+	protected function registerRoutingProvider()
+	{
 		$this->register(new RoutingServiceProvider($this));
+	}
 
+	/**
+	 * Register the event service provider.
+	 *
+	 * @return void
+	 */
+	protected function registerEventProvider()
+	{
 		$this->register(new EventServiceProvider($this));
 	}
 
