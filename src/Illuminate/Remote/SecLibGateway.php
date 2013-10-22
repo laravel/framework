@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Remote;
 
-use Net_SFTP;
-use Crypt_RSA;
+use Net_SFTP, Crypt_RSA;
 use Illuminate\Filesystem\Filesystem;
 
 class SecLibGateway implements GatewayInterface {
@@ -35,6 +34,13 @@ class SecLibGateway implements GatewayInterface {
 	protected $files;
 
 	/**
+	 * The SecLib connection instance.
+	 *
+	 * @var \Net_SFTP
+	 */
+	protected $connection;
+
+	/**
 	 * Create a new gateway implementation.
 	 *
 	 * @param  string  $host
@@ -46,8 +52,6 @@ class SecLibGateway implements GatewayInterface {
 		$this->auth = $auth;
 		$this->files = $files;
 		$this->setHostAndPort($host);
-
-		$this->connection = new Net_SFTP($this->host, $this->port);
 	}
 
 	/**
@@ -78,7 +82,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function connect($username)
 	{
-		$this->connection->login($username, $this->getAuthForLogin());
+		$this->getConnection()->login($username, $this->getAuthForLogin());
 	}
 
 	/**
@@ -88,7 +92,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function connected()
 	{
-		return $this->connection->isConnected();
+		return $this->getConnection()->isConnected();
 	}
 
 	/**
@@ -99,7 +103,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function run($command)
 	{
-		$this->connection->exec($command, false);
+		$this->getConnection()->exec($command, false);
 	}
 
 	/**
@@ -111,7 +115,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function put($local, $remote)
 	{
-		$this->connection->put($remote, $local, NET_SFTP_LOCAL_FILE);
+		$this->getConnection()->put($remote, $local, NET_SFTP_LOCAL_FILE);
 	}
 
 	/**
@@ -123,7 +127,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function putString($remote, $contents)
 	{
-		$this->connection->put($remote, $contents);
+		$this->getConnection()->put($remote, $contents);
 	}
 
 	/**
@@ -133,7 +137,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function nextLine()
 	{
-		$value = $this->connection->_get_channel_packet(NET_SSH2_CHANNEL_EXEC);
+		$value = $this->getConnection()->_get_channel_packet(NET_SSH2_CHANNEL_EXEC);
 
 		return $value === true ? null : $value;
 	}
@@ -150,7 +154,7 @@ class SecLibGateway implements GatewayInterface {
 		// in place of a password, and avoids the developer specifying a pass.
 		if ($this->hasRsaKey())
 		{
-			return $this->loadRsaKey($this->auth['key']);
+			return $this->loadRsaKey($this->auth);
 		}
 
 		// If a plain password was set on the auth credentials, we will just return
@@ -177,14 +181,37 @@ class SecLibGateway implements GatewayInterface {
 	/**
 	 * Load the RSA key instance.
 	 *
-	 * @param  string  $path
+	 * @param  array  $auth
 	 * @return \Crypt_RSA
 	 */
-	protected function loadRsaKey($path)
+	protected function loadRsaKey(array $auth)
 	{
-		with($key = new Crypt_RSA)->loadKey($this->files->get($path));
+		with($key = $this->getKey($auth))->loadKey($this->files->get($auth['key']));
 
 		return $key;
+	}
+
+	/**
+	 * Create a new RSA key instance.
+	 *
+	 * @param  array  $auth
+	 * @return \Crypt_RSA
+	 */
+	protected function getKey(array $auth)
+	{
+		with($key = $this->getNewKey())->setPassword(array_get($auth, 'keyphrase'));
+
+		return $key;
+	}
+
+	/**
+	 * Get a new RSA key instance.
+	 *
+	 * @return \Crypt_RSA
+	 */
+	public function getNewKey()
+	{
+		return new Crypt_RSA;
 	}
 
 	/**
@@ -194,7 +221,39 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function status()
 	{
-		return $this->connection->getExitStatus();
+		return $this->getConnection()->getExitStatus();
+	}
+
+	/**
+	 * Get the host used by the gateway.
+	 *
+	 * @return string
+	 */
+	public function getHost()
+	{
+		return $this->host;
+	}
+
+	/**
+	 * Get the port used by the gateway.
+	 *
+	 * @return int
+	 */
+	public function getPort()
+	{
+		return $this->port;
+	}
+
+	/**
+	 * Get the underlying Net_SFTP connection.
+	 *
+	 * @return \Net_SFTP
+	 */
+	public function getConnection()
+	{
+		if ($this->connection) return $this->connection;
+
+		return $this->connection = new Net_SFTP($this->host, $this->port);
 	}
 
 }
