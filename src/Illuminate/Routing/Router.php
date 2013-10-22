@@ -912,7 +912,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			$response = $this->dispatchToRoute($request);
 		}
 
-		$response = $this->prepareResponse($response);
+		$response = $this->prepareResponse($request, $response);
 
 		// Once this route has run and the response has been prepared, we will run the
 		// after filter to do any last work on the response or for this application
@@ -942,7 +942,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			$response = $route->run($request);
 		}
 
-		$response = $this->prepareResponse($response);
+		$response = $this->prepareResponse($request, $response);
 
 		// After we have a prepared response from the route or filter we will call to
 		// the "after" filters to do any last minute processing on this request or
@@ -1285,17 +1285,18 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Create a response instance from the given value.
 	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  mixed  $response
 	 * @return \Illuminate\Http\Response
 	 */
-	protected function prepareResponse($response)
+	protected function prepareResponse($request, $response)
 	{
 		if ( ! $response instanceof SymfonyResponse)
 		{
 			$response = new Response($response);
 		}
 
-		return $response;
+		return $response->prepare($request);
 	}
 
 	/**
