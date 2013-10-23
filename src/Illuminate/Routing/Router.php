@@ -1357,6 +1357,30 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Determine if the current route matches a given name.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function currentRouteNamed($name)
+	{
+		return $this->current()->getName() == $name;
+	}
+
+	/**
+	 * Determine if the current route action matches a given action.
+	 *
+	 * @param  string  $action
+	 * @return bool
+	 */
+	public function currentRouteUses($action)
+	{
+		$current = $this->current()->getAction();
+
+		return isset($current['controller']) && $current['controller'] == $action;
+	}
+
+	/**
 	 * Get the request currently being dispatched.
 	 *
 	 * @return \Illuminate\Http\Request
