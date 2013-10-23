@@ -10,7 +10,7 @@ class Route extends Facade {
 	 */
 	public static function is($name)
 	{
-		return static::$app['router']->currentRouteNamed($name);
+		return static::$app['router']->current()->getName() == $name;
 	}
 
 	/**
@@ -21,7 +21,8 @@ class Route extends Facade {
 	 */
 	public static function uses($action)
 	{
-		return static::$app['router']->currentRouteUses($action);
+		$currentAction = $app['router']->current()->getAction();
+		return isset($currentAction['controller']) && $currentAction['controller'] == $action;
 	}
 
 	/**
