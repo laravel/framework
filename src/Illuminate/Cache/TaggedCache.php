@@ -2,7 +2,7 @@
 
 use Closure;
 
-class TaggedCache {
+class TaggedCache implements StoreInterface {
 
 	/**
 	 * The cache store implementation.
@@ -186,5 +186,15 @@ class TaggedCache {
 	public function taggedItemKey($key)
 	{
 		return $this->tags->getNamespace().':'.$key;
+	}
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return $this->store->getPrefix();
 	}
 }
