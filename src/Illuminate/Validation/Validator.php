@@ -1028,7 +1028,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$parsed = date_parse_from_format($parameters[0], $value);
 
-		return $parsed['error_count'] === 0;
+		return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
 	}
 
 	/**
