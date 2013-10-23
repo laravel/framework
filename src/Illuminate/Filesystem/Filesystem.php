@@ -112,12 +112,14 @@ class Filesystem {
 	/**
 	 * Delete the file at a given path.
 	 *
-	 * @param  string  $path
+	 * @param  string|array  $paths
 	 * @return bool
 	 */
-	public function delete($path)
+	public function delete($paths)
 	{
-		return @unlink($path);
+		$paths = is_array($paths) ? $paths : func_get_args();
+
+		foreach ($paths as $path) { @unlink($path); }
 	}
 
 	/**
