@@ -40,10 +40,11 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('30', $router->dispatch(Request::create('30', 'GET'))->getContent());
 
 		$router = $this->getRouter();
-		$router->get('{foo?}/{baz?}', function($name = 'taylor', $age = 25) { return $name.$age; });
+		$router->get('{foo?}/{baz?}', array('as' => 'foo', function($name = 'taylor', $age = 25) { return $name.$age; }));
 		$this->assertEquals('taylor25', $router->dispatch(Request::create('/', 'GET'))->getContent());
 		$this->assertEquals('fred25', $router->dispatch(Request::create('fred', 'GET'))->getContent());
 		$this->assertEquals('fred30', $router->dispatch(Request::create('fred/30', 'GET'))->getContent());
+		$this->assertTrue($router->currentRouteNamed('foo'));
 	}
 
 
@@ -84,6 +85,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->disableFilters();
 		$router->get('bar', 'RouteTestControllerDispatchStub@bar');
 		$this->assertEquals('baz', $router->dispatch(Request::create('bar', 'GET'))->getContent());
+
+		$this->assertTrue($router->currentRouteUses('RouteTestControllerDispatchStub@bar'));
 	}
 
 
