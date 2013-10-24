@@ -24,6 +24,8 @@ class PaginationServiceProvider extends ServiceProvider {
 
 			$paginator->setViewName($app['config']['view.pagination']);
 
+			$app->refresh('request', $paginator, 'setRequest');
+
 			return $paginator;
 		});
 	}

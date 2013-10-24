@@ -281,11 +281,29 @@ class Container implements ArrayAccess {
 	 *
 	 * @param  string  $abstract
 	 * @param  \Closure  $callback
-	 * @return void
+	 * @return mixed
 	 */
 	public function rebinding($abstract, Closure $callback)
 	{
 		$this->reboundCallbacks[$abstract][] = $callback;
+
+		if ($this->bound($abstract)) return $this->make($abstract);
+	}
+
+	/**
+	 * Refresh an instance on the given target and method.
+	 *
+	 * @param  string  $abstract
+	 * @param  mixed  $target
+	 * @param  string  $method
+	 * @return mixed
+	 */
+	public function refresh($abstract, $target, $method)
+	{
+		return $this->rebinding($abstract, function($instance) use ($target)
+		{
+			$target->{$method}($instance);
+		});
 	}
 
 	/**
@@ -300,7 +318,7 @@ class Container implements ArrayAccess {
 
 		foreach ($this->getReboundCallbacks($abstract) as $callback)
 		{
-			call_user_func($callback, $instance);
+			call_user_func($callback, $this, $instance);
 		}
 	}
 

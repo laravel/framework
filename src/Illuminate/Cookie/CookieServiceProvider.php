@@ -11,6 +11,31 @@ class CookieServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
+		$this->registerRequestBinder();
+
+		$this->registerAfterEvent();
+	}
+
+	/**
+	 * Register the request rebinding event.
+	 *
+	 * @return void
+	 */
+	protected function registerRequestBinder()
+	{
+		$this->app->rebinding('request', function($app, $request)
+		{
+			$app['cookie']->setRequest($instance);
+		});
+	}
+
+	/**
+	 * Register the "after" application event.
+	 *
+	 * @return void
+	 */
+	protected function registerAfterEvent()
+	{
 		$app = $this->app;
 
 		$this->app->after(function($request, $response) use ($app)
