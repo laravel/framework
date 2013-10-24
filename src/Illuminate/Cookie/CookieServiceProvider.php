@@ -25,7 +25,7 @@ class CookieServiceProvider extends ServiceProvider {
 	{
 		$this->app->rebinding('request', function($app, $request)
 		{
-			$app['cookie']->setRequest($instance);
+			$app['cookie']->setRequest($request);
 		});
 	}
 
