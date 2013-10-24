@@ -72,6 +72,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		});
 		$router->get('bar', 'RouteTestControllerDispatchStub@bar');
 		$this->assertEquals('filter', $router->dispatch(Request::create('bar', 'GET'))->getContent());
+		
+		$router = $this->getRouter();
+		$router->get('baz', 'RouteTestControllerDispatchStub@baz');
+		$this->assertEquals('filtered', $router->dispatch(Request::create('baz', 'GET'))->getContent());
 
 
 		/**
@@ -515,12 +519,21 @@ class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
 	public function __construct()
 	{
 		$this->beforeFilter('foo', array('only' => 'bar'));
+		$this->beforeFilter('@filter', array('only' => 'baz'));
 	}
 	public function foo()
 	{
 		return 'bar';
 	}
 	public function bar()
+	{
+		return 'baz';
+	}
+	public function filter()
+	{
+		return 'filtered';
+	}
+	public function baz()
 	{
 		return 'baz';
 	}
