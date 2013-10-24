@@ -54,6 +54,15 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
 		$result = $repo->remember('foo', 10, function() { return 'bar'; });
 		$this->assertEquals('bar', $result);
+
+		/**
+		 * Use Carbon object...
+		 */
+		$repo = $this->getRepository();
+		$repo->getStore()->shouldReceive('get')->andReturn(null);
+		$repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+		$result = $repo->remember('foo', Carbon\Carbon::now()->addMinutes(10), function() { return 'bar'; });
+		$this->assertEquals('bar', $result);
 	}
 
 
