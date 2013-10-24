@@ -30,6 +30,17 @@ class QueueManager {
 	}
 
 	/**
+	 * Determine if the driver is connected.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function connected($name = null)
+	{
+		return isset($this->connections[$name ?: $this->getDefault()]);
+	}
+
+	/**
 	 * Resolve a queue connection instance.
 	 *
 	 * @param  string  $name

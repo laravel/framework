@@ -181,4 +181,25 @@ class IronQueue extends Queue implements QueueInterface {
 		return $this->iron;
 	}
 
+	/**
+	 * Get the request instance.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Set the request instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
+	}
+
 }

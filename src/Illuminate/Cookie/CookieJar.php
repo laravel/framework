@@ -224,6 +224,17 @@ class CookieJar {
 	}
 
 	/**
+	 * Set the request instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request
+	 * @return void
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
+	}
+
+	/**
 	 * Get the encrypter instance.
 	 *
 	 * @return \Illuminate\Encryption\Encrypter
