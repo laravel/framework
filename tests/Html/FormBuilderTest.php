@@ -244,13 +244,18 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFormSelectYear()
 	{
-		$select1 = $this->formBuilder->selectYear('year', 2000, 2020);
-		$select2 = $this->formBuilder->selectYear('year', 2000, 2020, null, array('id' => 'foo'));
-		$select3 = $this->formBuilder->selectYear('year', 2000, 2020, '2000');
+		$year = date('Y');
 
-		$this->assertContains('<select name="year"><option value="2000">2000</option><option value="2001">2001</option>', $select1);
-		$this->assertContains('<select id="foo" name="year"><option value="2000">2000</option><option value="2001">2001</option>', $select2);
-		$this->assertContains('<select name="year"><option value="2000" selected="selected">2000</option><option value="2001">2001</option>', $select3);
+		$select1 = $this->formBuilder->selectYear('year');
+		$select2 = $this->formBuilder->selectYear('year', 6, $year, array('id' => 'foo'));
+		$select3 = $this->formBuilder->selectYear('year', 8);
+
+		$this->assertContains('<select name="year"><option value="' . $year .'">' . $year .'</option><option value="' . ($year + 1) .'">' . ($year + 1) .'</option>', $select1);
+		$this->assertContains('<option value="' . ($year + 6) .'">' . ($year + 6) .'</option></select>', $select1);
+
+		$this->assertContains('<select id="foo" name="year"><option value="' . $year .'" selected="selected">' . $year .'</option>', $select2);
+
+		$this->assertContains('<option value="' . ($year + 8) .'">' . ($year + 8) .'</option></select>', $select3);
 	}
 
 

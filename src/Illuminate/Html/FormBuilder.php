@@ -443,15 +443,16 @@ class FormBuilder {
 	 * Create a select year field.
 	 *
 	 * @param  string  $name
-	 * @param  string  $begin
-	 * @param  string  $end
+	 * @param  integer $years
 	 * @param  string  $selected
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function selectYear()
+	public function selectYear($name, $years = 6, $selected = null, $options = array())
 	{
-		return call_user_func_array(array($this, 'selectRange'), func_get_args());
+	    $year = date('Y');
+
+	    return $this->selectRange($name, $year, $year + $years, $selected, $options);
 	}
 
 	/**
