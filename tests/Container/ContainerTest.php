@@ -213,6 +213,32 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($container->bound('object'));
 	}
 
+
+	public function testReboundListeners()
+	{
+		unset($_SERVER['__test.rebind']);
+
+		$container = new Container;
+		$container->bind('foo', function() {});
+		$container->rebinding('foo', function() { $_SERVER['__test.rebind'] = true; });
+		$container->bind('foo', function() {});
+
+		$this->assertTrue($_SERVER['__test.rebind']);
+	}
+
+
+	public function testReboundListenersOnInstances()
+	{
+		unset($_SERVER['__test.rebind']);
+
+		$container = new Container;
+		$container->instance('foo', function() {});
+		$container->rebinding('foo', function() { $_SERVER['__test.rebind'] = true; });
+		$container->instance('foo', function() {});
+
+		$this->assertTrue($_SERVER['__test.rebind']);
+	}
+
 }
 
 class ContainerConcreteStub {}
