@@ -300,7 +300,7 @@ class Container implements ArrayAccess {
 	 */
 	public function refresh($abstract, $target, $method)
 	{
-		return $this->rebinding($abstract, function($instance) use ($target)
+		return $this->rebinding($abstract, function($app, $instance) use ($target, $method)
 		{
 			$target->{$method}($instance);
 		});
