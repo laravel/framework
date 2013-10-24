@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Cache;
 
 use Closure;
-use ArrayAccess;
 use DateTime;
+use ArrayAccess;
 use Carbon\Carbon;
 
 class Repository implements ArrayAccess {
@@ -52,7 +52,7 @@ class Repository implements ArrayAccess {
 	public function get($key, $default = null)
 	{
 		$value = $this->store->get($key);
-		
+
 		return ! is_null($value) ? $value : value($default);
 	}
 
@@ -138,7 +138,7 @@ class Repository implements ArrayAccess {
 
 		$this->forever($key, $value = $callback());
 
-		return $value;	
+		return $value;
 	}
 
 	/**
@@ -232,7 +232,7 @@ class Repository implements ArrayAccess {
 
 		if ($duration instanceof Carbon)
 		{
-			return max(0, Carbon::now()->diffInMinutes(false));
+			return max(0, Carbon::now()->diffInMinutes($duration, false));
 		}
 		else
 		{
