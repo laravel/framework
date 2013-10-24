@@ -482,7 +482,7 @@ class FormBuilder {
 	 * @param  string  $selected
 	 * @return string
 	 */
-	protected function getSelectOption($display, $value, $selected)
+	public function getSelectOption($display, $value, $selected)
 	{
 		if (is_array($display))
 		{
@@ -861,7 +861,7 @@ class FormBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	protected function getIdAttribute($name, $attributes)
+	public function getIdAttribute($name, $attributes)
 	{
 		if (array_key_exists('id', $attributes))
 		{
