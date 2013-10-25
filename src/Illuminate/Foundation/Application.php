@@ -115,7 +115,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$this['request'] = function()
 		{
 			throw new \Exception("Using request outside of scope. Try moving call to before handler or route.");
-		}
+		};
 
 		$this->registerBaseServiceProviders();
 	}
