@@ -504,12 +504,12 @@ class Grammar extends BaseGrammar {
 
 		foreach ($query->unions as $union)
 		{
-			$joiner = $union['all'] ? 'union all ' : 'union ';
+			$joiner = $union['all'] ? ' union all ' : ' union ';
 
-			$sql = $joiner.$union['query']->toSql();
+			$sql .= $joiner.$union['query']->toSql();
 		}
 
-		return $sql;
+		return ltrim($sql);
 	}
 
 	/**
