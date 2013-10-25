@@ -12,43 +12,18 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testEnvironmentDetection()
 	{
-		$request = m::mock('Illuminate\Http\Request');
-		$request->shouldReceive('getHost')->andReturn('foo');
-		$request->server = m::mock('StdClass');
-		$env = new Illuminate\Foundation\EnvironmentDetector($request);
-
+		$env = m::mock('Illuminate\Foundation\EnvironmentDetector')->makePartial();
+		$env->shouldReceive('isMachine')->once()->with('localhost')->andReturn(false);
 		$result = $env->detect(array(
 			'local'   => array('localhost')
 		));
 		$this->assertEquals('production', $result);
 
-		$request = m::mock('Illuminate\Http\Request');
-		$request->shouldReceive('getHost')->andReturn('localhost');
-		$request->server = m::mock('StdClass');
-		$env = new Illuminate\Foundation\EnvironmentDetector($request);
 
+		$env = m::mock('Illuminate\Foundation\EnvironmentDetector')->makePartial();
+		$env->shouldReceive('isMachine')->once()->with('localhost')->andReturn(true);
 		$result = $env->detect(array(
 			'local'   => array('localhost')
-		));
-		$this->assertEquals('local', $result);
-
-		$request = m::mock('Illuminate\Http\Request');
-		$request->shouldReceive('getHost')->andReturn('localhost');
-		$request->server = m::mock('StdClass');
-		$env = new Illuminate\Foundation\EnvironmentDetector($request);
-
-		$result = $env->detect(array(
-			'local'   => array('local*')
-		));
-		$this->assertEquals('local', $result);
-
-		$request = m::mock('Illuminate\Http\Request');
-		$request->shouldReceive('getHost')->andReturn('localhost');
-		$request->server = m::mock('StdClass');
-		$env = new Illuminate\Foundation\EnvironmentDetector($request);
-
-		$result = $env->detect(array(
-			'local'   => array(gethostname())
 		));
 		$this->assertEquals('local', $result);
 	}
@@ -56,10 +31,7 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testClosureCanBeUsedForCustomEnvironmentDetection()
 	{
-		$request = m::mock('Illuminate\Http\Request');
-		$request->shouldReceive('getHost')->andReturn('foo');
-		$request->server = m::mock('StdClass');
-		$env = new Illuminate\Foundation\EnvironmentDetector($request);
+		$env = new Illuminate\Foundation\EnvironmentDetector;
 
 		$result = $env->detect(function() { return 'foobar'; });
 		$this->assertEquals('foobar', $result);
@@ -68,15 +40,11 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testConsoleEnvironmentDetection()
 	{
-		$request = m::mock('Illuminate\Http\Request');
-		$request->shouldReceive('getHost')->andReturn('foo');
-		$request->server = m::mock('StdClass');
-		$request->server->shouldReceive('get')->once()->with('argv')->andReturn(array('--env=local'));
-		$env = new Illuminate\Foundation\EnvironmentDetector($request);
+		$env = new Illuminate\Foundation\EnvironmentDetector;
 
 		$result = $env->detect(array(
 			'local'   => array('foobar')
-		), true);
+		), array('--env=local'));
 		$this->assertEquals('local', $result);
 	}
 
