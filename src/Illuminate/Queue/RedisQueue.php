@@ -85,7 +85,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->setMeta($payload, 'attempts', $attempts);
 
-		$this->redis->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);	
+		$this->redis->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
 	}
 
 	/**
@@ -96,6 +96,8 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function pop($queue = null)
 	{
+		$original = $queue ?: $this->default;
+
 		$this->migrateAllExpiredJobs($queue = $this->getQueue($queue));
 
 		$job = $this->redis->lpop($queue);
@@ -104,7 +106,7 @@ class RedisQueue extends Queue implements QueueInterface {
 		{
 			$this->redis->zadd($queue.':reserved', $this->getTime() + 60, $job);
 
-			return new RedisJob($this->container, $this, $job, $queue);
+			return new RedisJob($this->container, $this, $job, $original);
 		}
 	}
 
@@ -117,7 +119,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function deleteReserved($queue, $job)
 	{
-		$this->redis->zrem($queue.':reserved', $job);
+		$this->redis->zrem($this->getQueue($queue).':reserved', $job);
 	}
 
 	/**

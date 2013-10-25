@@ -1,7 +1,9 @@
 <?php namespace Illuminate\Cache;
 
 use Closure;
+use DateTime;
 use ArrayAccess;
+use Carbon\Carbon;
 
 class Repository implements ArrayAccess {
 
@@ -50,16 +52,31 @@ class Repository implements ArrayAccess {
 	public function get($key, $default = null)
 	{
 		$value = $this->store->get($key);
-		
+
 		return ! is_null($value) ? $value : value($default);
+	}
+
+	/**
+	 * Store an item in the cache.
+	 *
+	 * @param  string              $key
+	 * @param  mixed               $value
+	 * @param  Carbon|Datetime|int $minutes
+	 * @return void
+	 */
+	public function put($key, $value, $minutes)
+	{
+		$minutes = $this->getMinutes($minutes);
+
+		$this->store->put($key, $value, $minutes);
 	}
 
 	/**
 	 * Store an item in the cache if the key does not exist.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  string              $key
+	 * @param  mixed               $value
+	 * @param  Carbon|Datetime|int $minutes
 	 * @return void
 	 */
 	public function add($key, $value, $minutes)
@@ -70,9 +87,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * Get an item from the cache, or store the default value.
 	 *
-	 * @param  string   $key
-	 * @param  int      $minutes
-	 * @param  Closure  $callback
+	 * @param  string              $key
+	 * @param  Carbon|Datetime|int $minutes
+	 * @param  Closure             $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -121,7 +138,7 @@ class Repository implements ArrayAccess {
 
 		$this->forever($key, $value = $callback());
 
-		return $value;	
+		return $value;
 	}
 
 	/**
@@ -198,6 +215,29 @@ class Repository implements ArrayAccess {
 	public function offsetUnset($key)
 	{
 		return $this->forget($key);
+	}
+
+	/**
+	 * Calculate the number of minutes with the given duration.
+	 *
+	 * @param  Carbon|DateTime|int  $duration
+	 * @return int
+	 */
+	protected function getMinutes($duration)
+	{
+		if ($duration instanceof DateTime)
+		{
+			$duration = Carbon::instance($duration);
+		}
+
+		if ($duration instanceof Carbon)
+		{
+			return max(0, Carbon::now()->diffInMinutes($duration, false));
+		}
+		else
+		{
+			return intval($duration);
+		}
 	}
 
 	/**
