@@ -124,22 +124,6 @@ if ($env != 'testing') ini_set('display_errors', 'Off');
 
 /*
 |--------------------------------------------------------------------------
-| Set The Console Request If Necessary
-|--------------------------------------------------------------------------
-|
-| If we're running in a console context, we won't have a host on this
-| request so we'll need to re-bind a new request with a URL from a
-| configuration file. This will help the URL generator generate.
-|
-*/
-
-if ($app->runningInConsole())
-{
-	$app->setRequestForConsoleEnvironment();
-}
-
-/*
-|--------------------------------------------------------------------------
 | Set The Default Timezone
 |--------------------------------------------------------------------------
 |
@@ -178,6 +162,22 @@ AliasLoader::getInstance($config['aliases'])->register();
 */
 
 Request::enableHttpMethodParameterOverride();
+
+/*
+|--------------------------------------------------------------------------
+| Set The Console Request If Necessary
+|--------------------------------------------------------------------------
+|
+| If we're running in a console context, we won't have a host on this
+| request so we'll need to re-bind a new request with a URL from a
+| configuration file. This will help the URL generator generate.
+|
+*/
+
+if ($app->runningInConsole())
+{
+	$app->setRequestForConsoleEnvironment();
+}
 
 /*
 |--------------------------------------------------------------------------
