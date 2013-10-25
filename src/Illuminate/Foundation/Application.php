@@ -550,18 +550,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Handles the given request and delivers the response.
-	 *
-	 * @return void
-	 */
-	public function run()
-	{
-		$response = $this->dispatch($this['request']);
-
-		$this->terminate($this['request'], $response);
-	}
-
-	/**
 	 * Handle the given request and get the response.
 	 *
 	 * Provides compatibility with BrowserKit functional testing.
