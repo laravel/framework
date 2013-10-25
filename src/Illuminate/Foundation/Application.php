@@ -300,9 +300,9 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function detectEnvironment($envs)
 	{
-		$this['env'] = with(new EnvironmentDetector())->detect($envs, $_SERVER['argv']);
+		$args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
 
-		return $this['env'];
+		return $this['env'] = with(new EnvironmentDetector())->detect($envs, $args);
 	}
 
 	/**

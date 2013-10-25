@@ -126,7 +126,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		if ($this->app->runningInConsole()) return true;
 
-		return $app->isBooted() and $this->requestWantsJson();
+		return $this->app->isBooted() and $this->requestWantsJson();
 	}
 
 	/**
