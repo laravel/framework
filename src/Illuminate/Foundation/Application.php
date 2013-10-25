@@ -108,11 +108,15 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Create a new Illuminate application instance.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
-	public function __construct(Request $request = null)
+	public function __construct()
 	{
+		$this['request'] = function()
+		{
+			throw new \Exception("Using request outside of scope. Try moving call to before handler or route.");
+		}
+
 		$this->registerBaseServiceProviders();
 	}
 
