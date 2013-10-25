@@ -160,60 +160,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Create the request for the application.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Request
-	 */
-	protected function createRequest(Request $request = null)
-	{
-		return $request ?: static::onRequest('createFromGlobals');
-	}
-
-	/**
-	 * Redirect the request if it has a trailing slash.
-	 *
-	 * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
-	 */
-	public function redirectIfTrailingSlash()
-	{
-		if ($this->runningInConsole()) return;
-
-		// Here we will check if the request path ends in a single trailing slash and
-		// redirect it using a 301 response code if it does which avoids duplicate
-		// content in this application while still providing a solid experience.
-		$path = $this['request']->getPathInfo();
-
-		if ($this->hasTrailingSlash($path))
-		{
-			$this->redirectWithoutSlash();
-		}
-	}
-
-	/**
-	 * Determine if the given path has a trailing slash.
-	 *
-	 * @param  string  $path
-	 * @return string
-	 */
-	protected function hasTrailingSlash($path)
-	{
-		return ($path != '/' and ends_with($path, '/') and ! ends_with($path, '//'));
-	}
-
-	/**
-	 * Send a redirect response without the trailing slash.
-	 *
-	 * @return void
-	 */
-	protected function redirectWithoutSlash()
-	{
-		with(new SymfonyRedirect($this['request']->fullUrl(), 301))->send();
-
-		exit;
-	}
-
-	/**
 	 * Bind the installation paths to the application.
 	 *
 	 * @param  array  $paths
