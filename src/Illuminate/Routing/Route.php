@@ -391,7 +391,7 @@ class Route {
 	{
 		if (isset($this->action['domain']))
 		{
-			return trim($request->getHost().'/'.$request->path(), '/');			
+			return trim($request->getHost().'/'.$request->path(), '/');
 		}
 		else
 		{
@@ -513,7 +513,7 @@ class Route {
 	{
 		foreach ($wheres as $key => $pattern)
 		{
-			$pattern = "(?:/({$pattern})";
+			$pattern = "(?:/(?P<{$key}>({$pattern}))";
 
 			// Here we will need to replace the optional parameters while keeping track of the
 			// count we are replacing. This will let us properly close this finished regular
