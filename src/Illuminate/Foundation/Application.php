@@ -16,6 +16,7 @@ use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirect;
 
-class Application extends Container implements HttpKernelInterface, ResponsePreparerInterface {
+class Application extends Container implements HttpKernelInterface, TerminableInterface, ResponsePreparerInterface {
 
 	/**
 	 * The Laravel framework version.
@@ -112,8 +113,6 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function __construct(Request $request = null)
 	{
-		$this['request'] = $this->createRequest($request);
-
 		$this->registerBaseServiceProviders();
 	}
 
@@ -296,16 +295,12 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	/**
 	 * Detect the application's current environment.
 	 *
-	 * @param  array|string  $environments
+	 * @param  array|string  $envs
 	 * @return string
 	 */
-	public function detectEnvironment($environments)
+	public function detectEnvironment($envs)
 	{
-		$this['env'] = with(new EnvironmentDetector($this['request']))->detect(
-
-			$environments, $this->runningInConsole()
-
-		);
+		$this['env'] = with(new EnvironmentDetector())->detect($envs, $_SERVER['argv']);
 
 		return $this['env'];
 	}
@@ -495,14 +490,21 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Register a "close" application filter.
+	 * Register a "close" application callback, or call them.
 	 *
 	 * @param  Closure|string  $callback
 	 * @return void
 	 */
-	public function close($callback)
+	public function close($callback = null)
 	{
-		$this->closeCallbacks[] = $callback;
+		if (is_null($callback))
+		{
+			$this->callCloseCallbacks();
+		}
+		else
+		{
+			$this->closeCallbacks[] = $callback;
+		}
 	}
 
 	/**
@@ -532,6 +534,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		{
 			$this->shutdownCallbacks[] = $callback;
 		}
+	}
+
+	/**
+	 * Determine if the application has booted.
+	 *
+	 * @return bool
+	 */
+	public function isBooted()
+	{
+		return $this->booted;
 	}
 
 	/**
@@ -615,6 +627,8 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		$this->refreshRequest($request = Request::createFromBase($request));
 
+		$this->boot();
+
 		return $this->dispatch($request);
 	}
 
@@ -645,11 +659,9 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function terminate(SymfonyRequest $request, SymfonyResponse $response)
 	{
-		$this->callCloseCallbacks($request, $response);
-
-		$response->send();
-
 		$this->callFinishCallbacks($request, $response);
+
+		$this->shutdown();
 	}
 
 	/**

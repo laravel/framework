@@ -27,6 +27,11 @@ class Application extends \Symfony\Component\Console\Application {
 	 */
 	public static function start($app)
 	{
+		// Here, we will go ahead and "boot" the application for usage. This simply
+		// calls the boot method on all of the service providers so they get all
+		// their work done and are ready to handle interacting with dev input.
+		$app->boot();
+
 		$artisan = require __DIR__.'/start.php';
 
 		$artisan->setAutoExit(false);

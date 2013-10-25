@@ -1,40 +1,21 @@
 <?php namespace Illuminate\Foundation;
 
 use Closure;
-use Illuminate\Http\Request;
 
 class EnvironmentDetector {
-
-	/**
-	 * The request instance.
-	 *
-	 * @var \Illuminate\Http\Request
-	 */
-	protected $request;
-
-	/**
-	 * Create a new environment detector instance.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
-	 */
-	public function __construct(Request $request)
-	{
-		$this->request = $request;
-	}
 
 	/**
 	 * Detect the application's current environment.
 	 *
 	 * @param  array|string  $environments
-	 * @param  bool  $inConsole
+	 * @param  array|null  $consoleArgs
 	 * @return string
 	 */
-	public function detect($environments, $inConsole = false)
+	public function detect($environments, $consoleArgs = null)
 	{
-		if ($inConsole)
+		if ($consoleArgs)
 		{
-			return $this->detectConsoleEnvironment($environments);
+			return $this->detectConsoleEnvironment($environments, $consoleArgs);
 		}
 		else
 		{
@@ -58,8 +39,6 @@ class EnvironmentDetector {
 			return call_user_func($environments);
 		}
 
-		$webHost = $this->getHost();
-
 		foreach ($environments as $environment => $hosts)
 		{
 			// To determine the current environment, we'll simply iterate through the possible
@@ -67,10 +46,7 @@ class EnvironmentDetector {
 			// are currently processing here, then return back these environment's names.
 			foreach ((array) $hosts as $host)
 			{
-				if (str_is($host, $webHost) or $this->isMachine($host))
-				{
-					return $environment;
-				}
+				if ($this->isMachine($host)) return $environment;
 			}
 		}
 
@@ -81,14 +57,15 @@ class EnvironmentDetector {
 	 * Set the application environment from command-line arguments.
 	 *
 	 * @param  mixed   $environments
+	 * @param  array  $args
 	 * @return string
 	 */
-	protected function detectConsoleEnvironment($environments)
+	protected function detectConsoleEnvironment($environments, array $args)
 	{
 		// First we will check if an environment argument was passed via console arguments
 		// and if it was that automatically overrides as the environment. Otherwise, we
 		// will check the environment as a "web" request like a typical HTTP request.
-		if ( ! is_null($value = $this->getEnvironmentArgument()))
+		if ( ! is_null($value = $this->getEnvironmentArgument($args)))
 		{
 			return head(array_slice(explode('=', $value), 1));
 		}
@@ -101,34 +78,15 @@ class EnvironmentDetector {
 	/**
 	 * Get the enviornment argument from the console.
 	 *
+	 * @param  array  $args
 	 * @return string|null
 	 */
-	protected function getEnvironmentArgument()
+	protected function getEnvironmentArgument(array $args)
 	{
-		return array_first($this->getConsoleArguments(), function($k, $v)
+		return array_first($args, function($k, $v)
 		{
 			return starts_with($v, '--env');
 		});
-	}
-
-	/**
-	 * Get the actual host for the web request.
-	 *
-	 * @return string
-	 */
-	protected function getHost()
-	{
-		return $this->request->getHost();
-	}
-
-	/**
-	 * Get the server console arguments.
-	 *
-	 * @return array
-	 */
-	protected function getConsoleArguments()
-	{
-		return $this->request->server->get('argv');
 	}
 
 	/**
@@ -137,7 +95,7 @@ class EnvironmentDetector {
 	 * @param  string  $name
 	 * @return bool
 	 */
-	protected function isMachine($name)
+	public function isMachine($name)
 	{
 		return str_is($name, gethostname());
 	}

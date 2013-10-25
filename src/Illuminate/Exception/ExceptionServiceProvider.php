@@ -124,9 +124,19 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function shouldReturnJson()
 	{
-		$definitely = ($this->app['request']->ajax() or $this->app->runningInConsole());
+		if ($this->app->runningInConsole()) return true;
 
-		return $definitely or $this->app['request']->wantsJson();
+		return $app->isBooted() and $this->requestWantsJson();
+	}
+
+	/**
+	 * Determine if the request warrants a JSON response.
+	 *
+	 * @return bool
+	 */
+	protected function requestWantsJson()
+	{
+		return $this->app['request']->ajax() or $this->app['request']->wantsJson();
 	}
 
 	/**
