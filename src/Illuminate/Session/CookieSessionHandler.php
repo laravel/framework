@@ -53,7 +53,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function write($sessionId, $data)
 	{
-		$this->setCookie($this->cookie->make($sessionId, $data, $this->minutes));
+		$this->cookie->queue($sessionId, $data, $this->minutes);
 	}
 
 	/**
@@ -61,20 +61,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function destroy($sessionId)
 	{
-		$this->setCookie($this->cookie->forget($sessionId));
-	}
-
-	/**
-	 * Set the given cookie in the headers.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return void
-	 */
-	protected function setCookie($cookie)
-	{
-		if (headers_sent()) return;
-
-		setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+		$this->cookie->queue($this->cookie->forget($sessionId));
 	}
 
 	/**
