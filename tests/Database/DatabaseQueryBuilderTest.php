@@ -548,12 +548,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
-		$builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 2)));
 		$builder->getConnection()->shouldReceive('select')->once()->with('select "column1", "column2" from "users"', array())->andReturn(array(array('column1' => 'foo', 'column2' => 'bar')));
 		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
 		$builder->from('users')->select('column1', 'column2');
 		$count = $builder->count();
-		$average = $builder->sum('id');
+		$this->assertEquals(1, $count);
+		$sum = $builder->sum('id');
+		$this->assertEquals(2, $sum);
 		$result = $builder->get();
 		$this->assertEquals(array(array('column1' => 'foo', 'column2' => 'bar')), $result);
 	}
