@@ -168,23 +168,17 @@ class SessionManager extends Manager {
 	 */
 	protected function buildSession($handler)
 	{
-		return new Store(new NativeSessionStorage($this->getOptions(), $handler));
+		return new Store($this->app['config']['session.cookie'], $handler);
 	}
 
 	/**
-	 * Get the session options.
+	 * Get the session configuration.
 	 *
 	 * @return array
 	 */
-	protected function getOptions()
+	public function getSessionConfig()
 	{
-		$config = $this->app['config']['session'];
-
-		return array(
-			'cookie_domain' => $config['domain'], 'cookie_lifetime' => $config['lifetime'] * 60,
-			'cookie_path' => $config['path'], 'cookie_httponly' => '1', 'name' => $config['cookie'],
-			'gc_divisor' => $config['lottery'][1], 'gc_probability' => $config['lottery'][0],
-		);
+		return $this->app['config']['session'];
 	}
 
 	/**

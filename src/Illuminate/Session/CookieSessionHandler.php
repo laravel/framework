@@ -12,6 +12,13 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	protected $cookie;
 
 	/**
+	 * The request instance.
+	 *
+	 * @var \Symfony\Component\HttpFoundation\Request
+	 */
+	protected $request;
+
+	/**
 	 * Create a new cookie driven handler instance.
 	 *
 	 * @param  \Illuminate\Cookie\CookieJar  $cookie
@@ -45,7 +52,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function read($sessionId)
 	{
-		return $this->cookie->get($sessionId) ?: '';
+		return $this->request->cookies->get($sessionId) ?: '';
 	}
 
 	/**
@@ -70,6 +77,17 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	public function gc($lifetime)
 	{
 		return true;
+	}
+
+	/**
+	 * Set the request instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
 	}
 
 }

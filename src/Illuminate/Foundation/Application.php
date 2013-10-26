@@ -557,8 +557,12 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function run(SymfonyRequest $request)
 	{
+		$this->refreshRequest($request = Request::createFromBase($request));
+
 		$response = with(new \Stack\Builder)
 						->push('Illuminate\Cookie\Guard', $this['encrypter'])
+						->push('Illuminate\Cookie\Queue', $this['cookie'])
+						->push('Illuminate\Session\Middleware', $this['session'])
 						->resolve($this)
 						->handle($request);
 
