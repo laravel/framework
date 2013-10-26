@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Session;
 
 use SessionHandlerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
@@ -529,6 +530,17 @@ class Store implements SessionInterface {
 	public function handlerNeedsRequest()
 	{
 		return $this->handler instanceof CookieSessionHandler;
+	}
+
+	/**
+	 * Set the request on the handler instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function registerRequestWithHandler(Request $request)
+	{
+		$this->handler->setRequest($request);
 	}
 
 }
