@@ -550,6 +550,26 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Run the application and send the response.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function run(SymfonyRequest $request)
+	{
+		$response = with(new \Stack\Builder)
+						->push('Illuminate\Cookie\Guard', $this['encrypter'])
+						->resolve($this)
+						->handle($request);
+
+		$this->callCloseCallbacks($request, $response);
+
+		$response->send();
+
+		$this->terminate($request, $response);
+	}
+
+	/**
 	 * Handle the given request and get the response.
 	 *
 	 * Provides compatibility with BrowserKit functional testing.
