@@ -102,6 +102,22 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	}
 
 	/**
+	* Retrieve a group from the loaded array.
+	*
+	* @param  string  $group
+	* @param  string  $locale
+	* @return array
+	*/
+	public function group($group, $locale)
+	{
+		list($namespace, $group) = $this->parseKey($group);
+
+		$this->load($namespace, $group, $locale);
+
+		return $this->loaded[$namespace][$group][$locale];
+	}
+
+	/**
 	 * Make the place-holder replacements on a line.
 	 *
 	 * @param  string  $line
