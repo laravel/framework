@@ -48,7 +48,7 @@ class Request extends SymfonyRequest {
 	public function url()
 	{
 		return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
-	}	
+	}
 
 	/**
 	 * Get the full URL for the request.
@@ -117,13 +117,13 @@ class Request extends SymfonyRequest {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	/**
 	 * Determine if the request is the result of an AJAX call.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function ajax()
@@ -234,6 +234,17 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Determine if a cookie is set on the request.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function hasCookie($key)
+	{
+		return ! is_null($this->cookie($key));
+	}
+
+	/**
 	 * Retrieve a cookie from the request.
 	 *
 	 * @param  string  $key
@@ -327,7 +338,7 @@ class Request extends SymfonyRequest {
 	public function flashOnly($keys)
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
-		
+
 		return $this->flash('only', $keys);
 	}
 
@@ -340,7 +351,7 @@ class Request extends SymfonyRequest {
 	public function flashExcept($keys)
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
-		
+
 		return $this->flash('except', $keys);
 	}
 

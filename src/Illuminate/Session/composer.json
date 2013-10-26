@@ -13,6 +13,7 @@
         "illuminate/cookie": "4.1.x",
         "illuminate/encryption": "4.1.x",
         "illuminate/support": "4.1.x",
+        "nesbot/carbon": "1.*",
         "symfony/http-foundation": "2.4.*"
     },
     "require-dev": {

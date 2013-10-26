@@ -143,7 +143,7 @@ class Guard {
 	{
 		if (isset($this->cookie))
 		{
-			return $this->getCookieJar()->get($this->getRecallerName());
+			return $this->request->cookies->get($this->getRecallerName());
 		}
 	}
 
@@ -180,7 +180,7 @@ class Guard {
 	 * Attempt to authenticate using HTTP Basic Auth.
 	 *
 	 * @param  string  $field
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Symfony\Component\HttpFoundation\Response|null
 	 */
 	public function basic($field = 'email', Request $request = null)
@@ -201,7 +201,7 @@ class Guard {
 	 * Perform a stateless HTTP Basic login attempt.
 	 *
 	 * @param  string  $field
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Symfony\Component\HttpFoundation\Response|null
 	 */
 	public function onceBasic($field = 'email', Request $request = null)
@@ -217,7 +217,7 @@ class Guard {
 	/**
 	 * Attempt to authenticate using basic authentication.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $field
 	 * @return bool
 	 */
@@ -231,7 +231,7 @@ class Guard {
 	/**
 	 * Get the credential array for a HTTP Basic request.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request 
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  string  $field
 	 * @return array
 	 */

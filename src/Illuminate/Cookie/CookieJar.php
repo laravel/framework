@@ -2,17 +2,8 @@
 
 use Closure;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class CookieJar {
-
-	/**
-	 * The current request instance.
-	 *
-	 * @var \Symfony\Component\HttpFoundation\Request
-	 */
-	protected $request;
 
 	/**
 	 * The default path (if specified).
@@ -34,40 +25,6 @@ class CookieJar {
 	 * @var array
 	 */
 	protected $queued = array();
-
-	/**
-	 * Create a new cookie manager instance.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return void
-	 */
-	public function __construct(Request $request)
-	{
-		$this->request = $request;
-	}
-
-	/**
-	 * Determine if a cookie exists and is not null.
-	 *
-	 * @param  string  $key
-	 * @return bool
-	 */
-	public function has($key)
-	{
-		return ! is_null($this->get($key));
-	}
-
-	/**
-	 * Get the value of the given cookie.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $default
-	 * @return mixed
-	 */
-	public function get($key, $default = null)
-	{
-		return $this->request->cookies->get($key) ?: value($default);
-	}
 
 	/**
 	 * Create a new cookie instance.
@@ -115,6 +72,18 @@ class CookieJar {
 	public function forget($name)
 	{
 		return $this->make($name, null, -2628000);
+	}
+
+	/**
+	 * Get a queued cookie instance.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return \Symfony\Component\HttpFoundation\Cookie
+	 */
+	public function queued($key, $default = null)
+	{
+		return array_get($this->queued, $key, $default);
 	}
 
 	/**
@@ -171,27 +140,6 @@ class CookieJar {
 		list($this->path, $this->domain) = array($path, $domain);
 
 		return $this;
-	}
-
-	/**
-	 * Get the request instance.
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Request
-	 */
-	public function getRequest()
-	{
-		return $this->request;
-	}
-
-	/**
-	 * Set the request instance.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request
-	 * @return void
-	 */
-	public function setRequest(Request $request)
-	{
-		$this->request = $request;
 	}
 
 	/**

@@ -5,23 +5,6 @@ use Illuminate\Support\ServiceProvider;
 class SessionServiceProvider extends ServiceProvider {
 
 	/**
-	 * The default options for session cookies.
-	 *
-	 * @var array
-	 */
-	protected $cookieDefaults = array('secure' => false, 'http_only' => true);
-
-	/**
-	 * Bootstrap the application events.
-	 *
-	 * @return void
-	 */
-	public function boot()
-	{
-		$this->registerSessionEvents();
-	}
-
-	/**
 	 * Register the service provider.
 	 *
 	 * @return void
@@ -77,101 +60,6 @@ class SessionServiceProvider extends ServiceProvider {
 
 			return $manager->driver();
 		});
-	}
-
-	/**
-	 * Register the events needed for session management.
-	 *
-	 * @return void
-	 */
-	protected function registerSessionEvents()
-	{
-		$config = $this->app['config']['session'];
-
-		// The session needs to be started and closed, so we will register a before
-		// and after events to do all stuff for us. This will manage the loading
-		// the session "payloads", as well as writing them after each request.
-		if ( ! is_null($config['driver']))
-		{
-			$this->registerBootingEvent();
-
-			$this->registerCloseEvent();
-		}
-	}
-
-	/**
-	 * Register the session booting event.
-	 *
-	 * @return void
-	 */
-	protected function registerBootingEvent()
-	{
-		$this->app->booting(function($app)
-		{
-			$app['session.store']->start();
-		});
-	}
-
-	/**
-	 * Register the session close event.
-	 *
-	 * @return void
-	 */
-	protected function registerCloseEvent()
-	{
-		if ($this->getDriver() == 'array') return;
-
-		// The cookie toucher is responsible for updating the expire time on the cookie
-		// so that it is refreshed for each page load. Otherwise it is only set here
-		// once by PHP and never updated on each subsequent page load of the apps.
-		$this->registerCookieToucher();
-
-		$app = $this->app;
-
-		$this->app->close(function() use ($app)
-		{
-			$app['session.store']->save();
-		});
-	}
-
-	/**
-	 * Update the session cookie lifetime on each page load.
-	 *
-	 * @return void
-	 */
-	protected function registerCookieToucher()
-	{
-		$me = $this;
-
-		$this->app->close(function() use ($me)
-		{
-			if ( ! headers_sent()) $me->touchSessionCookie();
-		});
-	}
-
-	/**
-	 * Update the session identifier cookie with a new expire time.
-	 *
-	 * @return void
-	 */
-	public function touchSessionCookie()
-	{
-		$config = array_merge($this->cookieDefaults, $this->app['config']['session']);
-
-		$expire = $this->getExpireTime($config);
-
-		setcookie($config['cookie'], session_id(), $expire, $config['path'], $config['domain'], $config['secure'], $config['http_only']);
-	}
-
-	/**
-	 * Get the new session cookie expire time.
-	 *
-	 * @param  array  $config
-	 * @return int
-	 */
-	protected function getExpireTime($config)
-	{
-		return $config['lifetime'] == 0 ? 0 : time() + ($config['lifetime'] * 60);
 	}
 
 	/**
