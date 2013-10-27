@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Session;
 
+use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 
 class FileSessionHandler implements \SessionHandlerInterface {
