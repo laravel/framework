@@ -43,7 +43,17 @@ class SessionManager extends Manager {
 	}
 
 	/**
-	 * Create an instance of the native session driver.
+	 * Create an instance of the file session driver.
+	 *
+	 * @return \Illuminate\Session\Store
+	 */
+	protected function createFileDriver()
+	{
+		return $this->createNativeDriver();
+	}
+
+	/**
+	 * Create an instance of the file session driver.
 	 *
 	 * @return \Illuminate\Session\Store
 	 */
