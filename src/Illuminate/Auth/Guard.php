@@ -66,9 +66,11 @@ class Guard {
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
-                                SessionStore $session)
+                                SessionStore $session,
+                                Request $request = null)
 	{
 		$this->session = $session;
+		$this->request = $request;
 		$this->provider = $provider;
 	}
 
@@ -141,10 +143,7 @@ class Guard {
 	 */
 	protected function getRecaller()
 	{
-		if (isset($this->cookie))
-		{
-			return $this->request->cookies->get($this->getRecallerName());
-		}
+		return $this->request->cookies->get($this->getRecallerName());
 	}
 
 	/**
