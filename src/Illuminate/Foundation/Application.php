@@ -688,7 +688,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function prepareRequest(Request $request)
 	{
-		if (isset($this['session.store']))
+		if ( ! is_null($this['config']['session.driver']))
 		{
 			$request->setSessionStore($this['session.store']);
 		}
