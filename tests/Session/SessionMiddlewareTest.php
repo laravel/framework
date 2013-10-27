@@ -45,4 +45,22 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, head($response->headers->getCookies())->getValue());
 	}
 
+
+	public function testSessionIsNotUsedWhenNoDriver()
+	{
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET');
+		$response = new Symfony\Component\HttpFoundation\Response;
+		$middle = new Illuminate\Session\Middleware(
+			$app = m::mock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+			$manager = m::mock('Illuminate\Session\SessionManager')
+		);
+		$manager->shouldReceive('getSessionConfig')->andReturn(array(
+			'driver' => null,
+		));
+		$app->shouldReceive('handle')->once()->with($request, Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST, true)->andReturn($response);
+		$middleResponse = $middle->handle($request);
+
+		$this->assertTrue($response === $middleResponse);
+	}
+
 }
