@@ -109,4 +109,5 @@ return array_map('realpath', array(
     $basePath.'/vendor/filp/whoops/src/Whoops/Handler/PrettyPageHandler.php',
     $basePath.'/vendor/filp/whoops/src/Whoops/Handler/JsonResponseHandler.php',
     $basePath.'/vendor/stack/builder/src/Stack/Builder.php',
+    $basePath.'/vendor/stack/builder/src/Stack/StackedHttpKernel.php',
 ));
