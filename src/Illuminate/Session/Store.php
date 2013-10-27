@@ -102,6 +102,18 @@ class Store implements SessionInterface {
 	}
 
 	/**
+	 * Read the session data from the handler.
+	 *
+	 * @return array
+	 */
+	protected function readFromHandler()
+	{
+		$data = $this->handler->read($this->getId());
+
+		return $data ? unserialize($data) : array();
+	}
+
+	/**
 	 * Initialize a bag in storage if it doesn't exist.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Session\SessionBagInterface  $bag
@@ -112,18 +124,6 @@ class Store implements SessionInterface {
 		$this->bagData[$bag->getStorageKey()] = $this->get($bag->getStorageKey(), array());
 
 		$this->forget($bag->getStorageKey());
-	}
-
-	/**
-	 * Read the session data from the handler.
-	 *
-	 * @return array
-	 */
-	protected function readFromHandler()
-	{
-		$data = $this->handler->read($this->getId());
-
-		return $data ? unserialize($data) : array();
 	}
 
 	/**
@@ -232,7 +232,7 @@ class Store implements SessionInterface {
 	 *
 	 * @return void
 	 */
-	protected function ageFlashData()
+	public function ageFlashData()
 	{
 		foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
 
@@ -445,6 +445,11 @@ class Store implements SessionInterface {
 	public function clear()
 	{
 		$this->attributes = array();
+
+		foreach ($this->bags as $bag)
+		{
+			$bag->clear();
+		}
 	}
 
 	/**
@@ -470,7 +475,7 @@ class Store implements SessionInterface {
 	 */
 	public function registerBag(SessionBagInterface $bag)
 	{
-		$this->bags[$name] = $bag;
+		$this->bags[$bag->getStorageKey()] = $bag;
 	}
 
 	/**
@@ -490,6 +495,17 @@ class Store implements SessionInterface {
 	public function getMetadataBag()
 	{
 		return $this->metaBag;
+	}
+
+	/**
+	 * Get the raw bag data array for a given bag.
+	 *
+	 * @param  string  $name
+	 * @return array
+	 */
+	public function getBagData($name)
+	{
+		return array_get($this->bagData, $name, array());
 	}
 
 	/**
@@ -538,9 +554,12 @@ class Store implements SessionInterface {
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
-	public function registerRequestWithHandler(Request $request)
+	public function setRequestOnHandler(Request $request)
 	{
-		$this->handler->setRequest($request);
+		if ($this->handlerNeedsRequest())
+		{
+			$this->handler->setRequest($request);
+		}
 	}
 
 }
