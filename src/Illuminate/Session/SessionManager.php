@@ -51,7 +51,7 @@ class SessionManager extends Manager {
 	{
 		$path = $this->app['config']['session.files'];
 
-		return $this->buildSession(new NativeFileSessionHandler($path));
+		return $this->buildSession(new FileSessionHandler($this->app['files'], $path));
 	}
 
 	/**
