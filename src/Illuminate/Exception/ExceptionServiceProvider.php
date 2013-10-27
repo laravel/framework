@@ -147,7 +147,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	protected function registerPrettyWhoopsHandler()
 	{
 		$me = $this;
-		
+
 		$this->app['whoops.handler'] = $this->app->share(function() use ($me)
 		{
 			with($handler = new PrettyPageHandler)->setEditor('sublime');
@@ -181,7 +181,9 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function getResourcePath()
 	{
-		return __DIR__.'/resources';
+		$base = $this->app['path.base'];
+
+		return $base.'/vendor/laravel/framework/src/Illuminate/Exception/resources';
 	}
 
 }
