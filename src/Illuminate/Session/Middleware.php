@@ -47,50 +47,55 @@ class Middleware implements HttpKernelInterface {
 	 */
 	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
+		// If a session driver has been configured, we will need to start the session here
+		// so that the data is ready for an application. Note that the Laravel sessions
+		// do not make use of PHP "native" sessions in any way since they are crappy.
 		if ($this->sessionConfigured())
 		{
-			with($session = $this->getDriver())->setId($request->cookies->get($session->getName()));
-
-			if ($session->handlerNeedsRequest())
-			{
-				$session->registerRequestWithHandler($request);
-			}
-
-			$session->start();
+			$session = $this->startSession($request);
 		}
 
 		$response = $this->app->handle($request, $type, $catch);
 
+		// Again, if the session has been configured we will need to close out the session
+		// so that the attributes may be persisted to some storage medium. We will also
+		// add the session identifier cookie to the application response headers now.
 		if ($this->sessionConfigured())
 		{
-			$session->save();
+			$this->closeSession($session);
 
-			$this->collectGarbage($session);
-
-			$this->setCookieOnResponse($response, $session);
+			$this->addCookieToResponse($response, $session);
 		}
 
 		return $response;
 	}
 
 	/**
-	 * Set the session cookie on the application response.
+	 * Start the session for the given request.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Response  $response
-	 * @param  \Symfony\Component\HttpFoundation\Session\SessionInterface  $session
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Illuminate\Session\SessionInterface
+	 */
+	protected function startSession(Request $request)
+	{
+		with($session = $this->getSession($request))->setRequestOnHandler($request);
+
+		$session->start();
+
+		return $session;
+	}
+
+	/**
+	 * Close the session handling for the request.
+	 *
+	 * @param  \Illuminate\Session\SessionInterface  $session
 	 * @return void
 	 */
-	protected function setCookieOnResponse(Response $response, SessionInterface $session)
+	protected function closeSession(SessionInterface $session)
 	{
-		$config = $this->manager->getSessionConfig();
+		$session->save();
 
-		if ( ! in_array($config['driver'], array(null, 'array')))
-		{
-			$response->headers->setCookie(new Cookie(
-				$session->getName(), $session->getId(), $this->getCookieLifetime($config),
-				$config['path'], $config['domain'], false, true
-			));
-		}
+		$this->collectGarbage($session);
 	}
 
 	/**
@@ -103,22 +108,43 @@ class Middleware implements HttpKernelInterface {
 	{
 		$config = $this->manager->getSessionConfig();
 
-		if (mt_rand(1, $config['lottery'][1]) <= $config['lottery'][0])
+		// Here we will see if this request hits the garbage collection lottery by hitting
+		// the odds needed to perform garbage collection on any given request. If we do
+		// hit it, we'll call this handler to let it delete all the expired sessions.
+		if ($this->configHitsLottery($config))
 		{
 			$session->getHandler()->gc($this->getLifetimeSeconds());
 		}
 	}
 
 	/**
-	 * Determine if a session driver has been configured.
+	 * Determine if the configuration odds hit the lottery.
 	 *
+	 * @param  array  $config
 	 * @return bool
 	 */
-	protected function sessionConfigured()
+	protected function configHitsLottery(array $config)
 	{
-		$config = $this->manager->getSessionConfig();
+		return mt_rand(1, $config['lottery'][1]) <= $config['lottery'][0];
+	}
 
-		return ! is_null($config['driver']);
+	/**
+	 * Add the session cookie to the application response.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Symfony\Component\HttpFoundation\Session\SessionInterface  $session
+	 * @return void
+	 */
+	protected function addCookieToResponse(Response $response, SessionInterface $session)
+	{
+		$s = $session;
+
+		if ($this->sessionIsPersistent($c = $this->manager->getSessionConfig()))
+		{
+			$response->headers->setCookie(new Cookie(
+				$s->getName(), $s->getId(), $this->getCookieLifetime(), $c['path'], $c['domain']
+			));
+		}
 	}
 
 	/**
@@ -134,12 +160,39 @@ class Middleware implements HttpKernelInterface {
 	/**
 	 * Get the cookie lifetime in seconds.
 	 *
-	 * @param  array  $config
 	 * @return int
 	 */
-	protected function getCookieLifetime(array $config)
+	protected function getCookieLifetime()
 	{
+		$config = $this->manager->getSessionConfig();
+
 		return $config['expire_on_close'] ? 0 : Carbon::now()->addMinutes($config['lifetime']);
+	}
+
+	/**
+	 * Determine if a session driver has been configured.
+	 *
+	 * @return bool
+	 */
+	protected function sessionConfigured()
+	{
+		return ! is_null(array_get($this->manager->getSessionConfig(), 'driver'));
+	}
+
+	/**
+	 * Determine if the configured session driver is persistent.
+	 *
+	 * @param  array|null  $config
+	 * @return bool
+	 */
+	protected function sessionIsPersistent(array $config = null)
+	{
+		// Some session drivers are not persistent, such as the test array driver or even
+		// when the developer don't have a session driver configured at all, which the
+		// session cookies will not need to get set on any responses in those cases.
+		$config = $config ?: $this->manager->getSessionConfig();
+
+		return ! in_array($config['driver'], array(null, 'array'));
 	}
 
 	/**
@@ -147,9 +200,13 @@ class Middleware implements HttpKernelInterface {
 	 *
 	 * @return \Illuminate\Session\SessionInterface
 	 */
-	public function getDriver()
+	public function getSession(Request $request)
 	{
-		return $this->manager->driver();
+		$session = $this->manager->driver();
+
+		$session->setId($request->cookies->get($session->getName()));
+
+		return $session;
 	}
 
 }
