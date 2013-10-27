@@ -141,8 +141,6 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testNullIsReturnedForUserIfNoUserFound()
 	{
 		$mock = $this->getGuard();
-		$mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
-		$cookies->shouldReceive('get')->once()->andReturn(null);
 		$mock->getSession()->shouldReceive('get')->once()->andReturn(null);
 		$this->assertNull($mock->user());
 	}
@@ -224,9 +222,6 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => 'recaller'));
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
-		$cookie = m::mock('Illuminate\Cookie\CookieJar');
-		$guard->setCookieJar($cookie);
-		$cookie->shouldReceive('get')->once()->with($guard->getRecallerName())->andReturn('recaller');
 		$guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$guard->getProvider()->shouldReceive('retrieveById')->once()->with('recaller')->andReturn($user);

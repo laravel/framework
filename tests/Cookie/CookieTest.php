@@ -45,20 +45,13 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCookiesAreProperlyParsed()
-	{
-		$cookie = $this->getCreator();
-		$cookie->getRequest()->cookies->set('foo', 'bar');
-		$this->assertEquals('bar', $cookie->get('foo'));
-        $this->assertEquals('zee', $cookie->get('someOtherFoo', 'zee'));
-	}
-
 	public function testQueuedCookies()
 	{
 		$cookie = $this->getCreator();
 		$this->assertEmpty($cookie->getQueuedCookies());
 		$cookie->queue($cookie->make('foo','bar'));
 		$this->assertArrayHasKey('foo', $cookie->getQueuedCookies());
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('foo'));
 	}
 
 	public function testUnqueue()
