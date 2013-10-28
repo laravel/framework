@@ -16,6 +16,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	{
 		$app = new Application;
 		$request = Illuminate\Http\Request::create('/', 'GET');
+		$app['config'] = array('session.driver' => 'foo');
 		$app['session.store'] = m::mock('Illuminate\Session\Store');
 		$app->prepareRequest($request);
 		$this->assertEquals($app['session.store'], $request->getSessionStore());
