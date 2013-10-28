@@ -108,14 +108,12 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Create a new Illuminate application instance.
 	 *
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(Request $request = null)
 	{
-		$this['request'] = function()
-		{
-			throw new \Exception("Using request outside of scope. Try moving call to before handler or route.");
-		};
+		$this->instance('request', $request ?: Request::createFromGlobals());
 
 		$this->registerBaseServiceProviders();
 	}
@@ -562,7 +560,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 						->push('Illuminate\Cookie\Queue', $this['cookie'])
 						->push('Illuminate\Session\Middleware', $this['session'])
 						->resolve($this)
-						->handle($request);
+						->handle($this['request']);
 
 		$this->callCloseCallbacks($request, $response);
 
