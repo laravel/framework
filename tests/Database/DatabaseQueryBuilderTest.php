@@ -614,6 +614,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', array('foo', 'bar', 1))->andReturn(1);
 		$result = $builder->from('users')->where('id', '=', 1)->update(array('email' => 'foo', 'name' => 'bar'));
 		$this->assertEquals(1, $result);
+
+		$builder = $this->getMySqlBuilder();
+		$builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `email` = ?, `name` = ? where `id` = ? order by `foo` desc limit 5', array('foo', 'bar', 1))->andReturn(1);
+		$result = $builder->from('users')->where('id', '=', 1)->orderBy('foo', 'desc')->limit(5)->update(array('email' => 'foo', 'name' => 'bar'));
+		$this->assertEquals(1, $result);
 	}
 
 

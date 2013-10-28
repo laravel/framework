@@ -151,7 +151,7 @@ class Encrypter {
 	 *
 	 * @param  string  $iv
 	 * @param  string  $value
-	 * @return string  
+	 * @return string
 	 */
 	protected function hash($iv, $value)
 	{
@@ -201,12 +201,12 @@ class Encrypter {
 	/**
 	 * Verify that the encryption payload is valid.
 	 *
-	 * @param  array  $data
+	 * @param  array|mixed  $data
 	 * @return bool
 	 */
-	protected function invalidPayload(array $data)
+	protected function invalidPayload($data)
 	{
-		return ! isset($data['iv']) or ! isset($data['value']) or ! isset($data['mac']);
+		return ! is_array($data) or ! isset($data['iv']) or ! isset($data['value']) or ! isset($data['mac']);
 	}
 
 	/**
