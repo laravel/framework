@@ -116,6 +116,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$this->instance('request', $request = Request::createFromGlobals());
 
 		$this->registerBaseServiceProviders();
+
+		$this->instance('Illuminate\Container\Container', $this);
 	}
 
 	/**
