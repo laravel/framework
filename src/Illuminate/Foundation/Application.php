@@ -205,16 +205,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Attach the live debugger provider.
-	 *
-	 * @return void
-	 */
-	public function attachDebugger()
-	{
-		$this->register('Illuminate\Exception\LiveServiceProvider');
-	}
-
-	/**
 	 * Get or check the current application environment.
 	 *
 	 * @param  dynamic
