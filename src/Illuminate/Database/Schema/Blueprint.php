@@ -150,7 +150,7 @@ class Blueprint {
 	 *
 	 * @return bool
 	 */
-	protected function creating()
+	public function creating()
 	{
 		foreach ($this->commands as $command)
 		{

@@ -25,7 +25,7 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer');
+	protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
 
 	/**
 	 * Compile the query to determine if a table exists.
@@ -433,7 +433,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function typeBoolean(Fluent $column)
 	{
-		return 'tinyint';
+		return 'integer';
 	}
 
 	/**
