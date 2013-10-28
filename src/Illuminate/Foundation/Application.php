@@ -57,13 +57,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	protected $bootedCallbacks = array();
 
 	/**
-	 * The array of close callbacks.
-	 *
-	 * @var array
-	 */
-	protected $closeCallbacks = array();
-
-	/**
 	 * The array of finish callbacks.
 	 *
 	 * @var array
@@ -76,6 +69,13 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @var array
 	 */
 	protected $shutdownCallbacks = array();
+
+	/**
+	 * All of the developer defined middlewares.
+	 *
+	 * @var array
+	 */
+	protected $middlewares = array();
 
 	/**
 	 * All of the registered service providers.
@@ -430,24 +430,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Register a "close" application callback, or call them.
-	 *
-	 * @param  Closure|string  $callback
-	 * @return void
-	 */
-	public function close($callback = null)
-	{
-		if (is_null($callback))
-		{
-			$this->callCloseCallbacks();
-		}
-		else
-		{
-			$this->closeCallbacks[] = $callback;
-		}
-	}
-
-	/**
 	 * Register a "finish" application filter.
 	 *
 	 * @param  Closure|string  $callback
@@ -549,18 +531,58 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$request = $request ?: $this['request'];
 
-		$response = with(new \Stack\Builder)
-						->push('Illuminate\Cookie\Guard', $this['encrypter'])
-						->push('Illuminate\Cookie\Queue', $this['cookie'])
-						->push('Illuminate\Session\Middleware', $this['session'])
-						->resolve($this)
-						->handle($request);
-
-		$this->callCloseCallbacks($request, $response);
+		$response = with($stack = $this->getStackedClient())->handle($request);
 
 		$response->send();
 
-		$this->terminate($request, $response);
+		$stack->terminate($request, $response);
+	}
+
+	/**
+	 * Get the stacked HTTP kernel for the application.
+	 *
+	 * @return  \Symfony\Component\HttpKernel\HttpKernelInterface
+	 */
+	protected function getStackedClient()
+	{
+		$client = with(new \Stack\Builder)
+						->push('Illuminate\Cookie\Guard', $this['encrypter'])
+						->push('Illuminate\Cookie\Queue', $this['cookie'])
+						->push('Illuminate\Session\Middleware', $this['session']);
+
+		$this->mergeCustomMiddlewares($client);
+
+		return $client->resolve($this);
+	}
+
+	/**
+	 * Merge the developer defined middlewares onto the stack.
+	 *
+	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface
+	 * @return void
+	 */
+	protected function mergeCustomMiddlewares(HttpKernelInterface $client)
+	{
+		foreach ($this->middlewares as $key => $value)
+		{
+			$parameters = array_unshift($value, $key);
+
+			call_user_func_array(array($client, 'push'), $parameters);
+		}
+	}
+
+	/**
+	 * Add a HttpKernel middleware onto the stack.
+	 *
+	 * @param  string  $class
+	 * @param  array  $parameters
+	 * @return \Illuminate\Foundation\Application
+	 */
+	public function middleware($class, array $parameters = array())
+	{
+		$this->middlewares[$class] = $parameters;
+
+		return $this;
 	}
 
 	/**
@@ -627,21 +649,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$this->instance('request', $request);
 
 		Facade::clearResolvedInstance('request');
-	}
-
-	/**
-	 * Call the "close" callbacks assigned to the application.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Symfony\Component\HttpFoundation\Response  $response
-	 * @return void
-	 */
-	public function callCloseCallbacks(SymfonyRequest $request, SymfonyResponse $response)
-	{
-		foreach ($this->closeCallbacks as $callback)
-		{
-			call_user_func($callback, $request, $response);
-		}
 	}
 
 	/**
