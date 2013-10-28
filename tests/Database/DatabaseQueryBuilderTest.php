@@ -584,7 +584,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->from('users');
 		$count = $builder->count('column1');
 		$this->assertEquals(1, $count);
-		$result = $builder->get('column2', 'column3');
+		$result = $builder->get(['column2', 'column3']);
 		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result);
 	}
 
