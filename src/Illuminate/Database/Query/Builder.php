@@ -392,13 +392,14 @@ class Builder {
 	 * @param  string  $column
 	 * @param  array   $values
 	 * @param  string  $boolean
+	 * @param  bool  $not
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function whereBetween($column, array $values, $boolean = 'and')
+	public function whereBetween($column, array $values, $boolean = 'and', $not = false)
 	{
 		$type = 'between';
 
-		$this->wheres[] = compact('column', 'type', 'boolean');
+		$this->wheres[] = compact('column', 'type', 'boolean', 'not');
 
 		$this->bindings = array_merge($this->bindings, $values);
 
@@ -410,11 +411,37 @@ class Builder {
 	 *
 	 * @param  string  $column
 	 * @param  array   $values
+	 * @param  bool  $not
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orWhereBetween($column, array $values)
+	public function orWhereBetween($column, array $values, $not = false)
 	{
 		return $this->whereBetween($column, $values, 'or');
+	}
+
+	/**
+	 * Add a where not between statement to the query.
+	 *
+	 * @param  string  $column
+	 * @param  array   $values
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function whereNotBetween($column, array $values, $boolean = 'and')
+	{
+		return $this->whereBetween($column, $values, $boolean, true);
+	}
+
+	/**
+	 * Add an or where not between statement to the query.
+	 *
+	 * @param  string  $column
+	 * @param  array   $values
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function orWhereNotBetween($column, array $values)
+	{
+		return $this->whereNotBetween($column, $values, 'or');
 	}
 
 	/**

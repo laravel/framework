@@ -267,7 +267,9 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereBetween(Builder $query, $where)
 	{
-		return $this->wrap($where['column']).' between ? and ?';
+		$between = $where['not'] ? 'not between' : 'between';
+
+		return $this->wrap($where['column']).' '.$between.' ? and ?';
 	}
 
 	/**
