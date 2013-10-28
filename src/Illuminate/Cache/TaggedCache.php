@@ -27,7 +27,7 @@ class TaggedCache implements StoreInterface {
 	 */
 	public function __construct(StoreInterface $store, $names)
 	{
-		$this->tags = new Tags($store, $names);
+		$this->tags = new TagSet($store, $names);
 		$this->store = $store;
 	}
 
