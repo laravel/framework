@@ -543,14 +543,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
-	public function run(SymfonyRequest $request)
+	public function run(SymfonyRequest $request = null)
 	{
+		$request = $request ?: $this['request'];
+
 		$response = with(new \Stack\Builder)
 						->push('Illuminate\Cookie\Guard', $this['encrypter'])
 						->push('Illuminate\Cookie\Queue', $this['cookie'])
 						->push('Illuminate\Session\Middleware', $this['session'])
 						->resolve($this)
-						->handle($this['request']);
+						->handle($request);
 
 		$this->callCloseCallbacks($request, $response);
 
