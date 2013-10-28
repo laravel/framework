@@ -21,6 +21,15 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Taylor', $container->make('name'));
 	}
 
+	public function testBindIfDoesRegisterIfAliasAlreadyRegistered()
+	{
+		$container = new Container;
+		$container->bind(array('name', 'developer'), function() { return 'Taylor'; });
+		$container->bindIf('developer', function() { return 'Dayle'; });
+
+		$this->assertEquals('Dayle', $container->make('developer'));
+	}
+
 
 	public function testSharedClosureResolution()
 	{
@@ -102,6 +111,73 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->instance(array('zoom' => 'zing'), 'wow');
 		$this->assertEquals('wow', $container->make('zoom'));
 		$this->assertEquals('wow', $container->make('zing'));
+	}
+
+	public function testIsAlias()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$container->alias('foo', 'baz');
+		$this->assertFalse($container->isAlias('foo'));
+		$this->assertTrue($container->isAlias('baz'));
+	}
+
+	public function testDropAlias()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$container->alias('foo', 'baz');
+		
+		$this->assertTrue($container->isAlias('baz'));
+
+		$container->dropAlias('baz');
+
+		$this->assertFalse($container->isAlias('baz'));
+		$this->assertFalse($container->bound('baz'));
+	}
+
+	public function testBoundAliases()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$this->assertTrue($container->bound('foo'));
+		$container->alias('foo', 'baz');
+		$this->assertTrue($container->bound('baz'));
+	}
+
+	public function testInstanceAliasCanBeOverridden()
+	{
+		$class1 = new StdClass;
+		$class2 = new StdClass;
+
+		$container = new Container;
+		$container->instance(array('foo' => 'bar'), $class1);
+
+		$this->assertTrue($container->bound('foo'));
+		$this->assertTrue($container->bound('bar'));
+
+		$this->assertSame($container->make('bar'), $container->make('foo'));
+
+		$container->instance('bar', $class2);
+
+		$this->assertNotSame($container->make('bar'), $container->make('foo'));
+	}
+
+	public function testBoundAliasCanBeOverridden()
+	{
+		$container = new Container;
+		$container['foo'] = 'bar';
+		$container->alias('foo', 'baz');
+
+		$this->assertEquals($container['baz'], $container['foo']);
+		$this->assertFalse($container->offsetExists('baz'));
+
+		$container['baz'] = 'boom';
+
+		$this->assertTrue($container->offsetExists('baz'));
+		$this->assertNotEquals($container['baz'], $container['foo']);
+
+		$this->assertEquals('boom', $container['baz']);
 	}
 
 

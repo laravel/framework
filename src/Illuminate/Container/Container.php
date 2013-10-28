@@ -59,6 +59,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bound($abstract)
 	{
+		$abstract = $this->getAlias($abstract);
 		return isset($this[$abstract]) or isset($this->instances[$abstract]);
 	}
 
@@ -86,6 +87,13 @@ class Container implements ArrayAccess {
 		// abstract type. This will allow concrete type to be registered as shared
 		// without being forced to state their classes in both of the parameter.
 		unset($this->instances[$abstract]);
+
+		// Just in case an $abstract was previously defined as an alias, we need to
+		// remove the alias from the container.
+		if ($this->isAlias($abstract))
+		{
+			$this->dropAlias($abstract);
+		}
 
 		if (is_null($concrete))
 		{
@@ -240,6 +248,13 @@ class Container implements ArrayAccess {
 			$this->alias($abstract, $alias);
 		}
 
+		// Just in case an $abstract was previously defined as an alias, we need to
+		// remove the alias from the container.
+		if ($this->isAlias($abstract))
+		{
+			$this->dropAlias($abstract);
+		}
+
 		// We'll check to determine if this type has been bound before, and if it has
 		// we will fire the rebound callbacks registered with the container and it
 		// can be updated with consuming classes that have gotten resolved here.
@@ -274,6 +289,31 @@ class Container implements ArrayAccess {
 	protected function extractAlias(array $definition)
 	{
 		return array(key($definition), current($definition));
+	}
+
+	/**
+	 * Identifies if the value is an alias within the container.
+	 *
+	 * @param  string $alias
+	 * @return boolan
+	 */
+	public function isAlias($alias)
+	{
+		return isset($this->aliases[$alias]);
+	}
+
+	/**
+	 * Removes the alias from the container
+	 *
+	 * @param string $alias
+	 * @return void
+	 */
+	public function dropAlias($alias)
+	{
+		if ($this->isAlias($alias))
+		{
+			unset($this->aliases[$alias]);
+		}
 	}
 
 	/**
