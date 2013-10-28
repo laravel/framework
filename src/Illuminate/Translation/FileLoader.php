@@ -70,10 +70,33 @@ class FileLoader implements LoaderInterface {
 	{
 		if (isset($this->hints[$namespace]))
 		{
-			return $this->loadPath($this->hints[$namespace], $locale, $group);
+			$lines = $this->loadPath($this->hints[$namespace], $locale, $group);
+
+			return $this->loadNamespaceOverrides($lines, $locale, $group, $namespace);
 		}
 
 		return array();
+	}
+
+	/**
+	 * Load a local namespaced translation group for overrides.
+	 *
+	 * @param  array  $lines
+	 * @param  string  $locale
+	 * @param  string  $group
+	 * @param  string  $namespace
+	 * @return array
+	 */
+	protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
+	{
+		$file = "{$this->path}/packages/{$locale}/{$namespace}/{$group}.php";
+
+		if ($this->files->exists($file))
+		{
+			return array_replace_recursive($lines, $this->files->getRequire($file));
+		}
+
+		return $lines;
 	}
 
 	/**

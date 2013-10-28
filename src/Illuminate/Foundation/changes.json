@@ -29,7 +29,8 @@
 		{"message": "When unit testing, the application instance is now refreshed once per test class - not every test.", "backport": null},
 		{"message": "Added 'whereNotBetween' support to the query builder.", "backport": null},
 		{"message": "Added App::middleware method to inject middlewares onto Stack.", "backport": null},
-		{"message": "Deprecate 'close' application hooks, Stack middlewares should be used instead.", "backport": null}
+		{"message": "Deprecate 'close' application hooks, Stack middlewares should be used instead.", "backport": null},
+		{"message": "A new packages directory within `lang` can now override package language files.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
