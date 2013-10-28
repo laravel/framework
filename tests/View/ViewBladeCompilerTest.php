@@ -182,7 +182,14 @@ boom
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
-
+	public function testSideBySideStatementsAreCompiled() 
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@lang(foo) bar @choice(baz,1) foo @lang(bar)';
+		$expected = '<?php echo \Illuminate\Support\Facades\Lang::get(foo); ?> bar <?php echo \Illuminate\Support\Facades\Lang::choice(baz,1); ?> foo <?php echo \Illuminate\Support\Facades\Lang::get(bar); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+	
 	public function testUnlessStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
