@@ -21,7 +21,7 @@ class AuthManager extends Manager {
 
 		$guard->setDispatcher($this->app['events']);
 
-		$guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
+		return $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
 	}
 
 	/**
