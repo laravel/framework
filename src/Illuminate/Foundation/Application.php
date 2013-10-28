@@ -561,11 +561,13 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  \Stack\Builder
 	 * @return void
 	 */
-	protected function mergeCustomMiddlewares($stack)
+	protected function mergeCustomMiddlewares(\Stack\Builder $stack)
 	{
-		foreach ($this->middlewares as $key => $value)
+		foreach ($this->middlewares as $middleware)
 		{
-			$parameters = array_unshift($value, $key);
+			list($class, $parameters) = $middleware;
+
+			$parameters = array_unshift($parameters, $class);
 
 			call_user_func_array(array($stack, 'push'), $parameters);
 		}
@@ -580,7 +582,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function middleware($class, array $parameters = array())
 	{
-		$this->middlewares[$class] = $parameters;
+		$this->middlewares[] = compact('class', 'parameters');
 
 		return $this;
 	}
