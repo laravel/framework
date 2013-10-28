@@ -611,10 +611,24 @@ class Grammar extends BaseGrammar {
 	public function compileDelete(Builder $query)
 	{
 		$table = $this->wrapTable($query->from);
+		
+		// If the query has any "join" clauses, we will setup the joins on the builder
+		// and compile them so we can attach them to this update, as update queries
+		// can get join statements to attach to other tables when they're needed.
+		if (isset($query->joins))
+		{
+			$joins = ' '.$this->compileJoins($query, $query->joins);
+			$deleteTable = $table;
+		}
+		else
+		{
+			$joins = '';
+			$deleteTable = '';
+		}
 
 		$where = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-		return trim("delete from $table ".$where);
+		return trim("delete $deleteTable from $table ".$where);
 	}
 
 	/**
