@@ -73,9 +73,9 @@
         "classmap": [
             ["src/Illuminate/Queue/IlluminateQueueClosure.php"]
         ],
-    	"files": [
+        "files": [
             "src/Illuminate/Support/helpers.php"
-    	],
+        ],
         "psr-0": {
             "Illuminate": "src/"
         }
