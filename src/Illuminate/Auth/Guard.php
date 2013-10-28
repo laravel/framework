@@ -17,6 +17,13 @@ class Guard {
 	protected $user;
 
 	/**
+	 * Indicates if the user was authenticated via a recaller cookie.
+	 *
+	 * @var bool
+	 */
+	protected $viaRemember = false;
+
+	/**
 	 * The user provider implementation.
 	 *
 	 * @var \Illuminate\Auth\UserProviderInterface
@@ -131,6 +138,8 @@ class Guard {
 		if (is_null($user) and ! is_null($recaller))
 		{
 			$user = $this->provider->retrieveByID($recaller);
+
+			$this->viaRemember = ! is_null($user);
 		}
 
 		return $this->user = $user;
@@ -576,6 +585,16 @@ class Guard {
 	public function getRecallerName()
 	{
 		return 'remember_'.md5(get_class($this));
+	}
+
+	/**
+	 * Determine if the user was authenticated via "remember me" cookie.
+	 *
+	 * @return bool
+	 */
+	public function viaRemember()
+	{
+		return $this->viaRemember;
 	}
 
 }

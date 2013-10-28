@@ -226,6 +226,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$guard->getProvider()->shouldReceive('retrieveById')->once()->with('recaller')->andReturn($user);
 		$this->assertEquals($user, $guard->user());
+		$this->assertTrue($guard->viaRemember());
 	}
 
 

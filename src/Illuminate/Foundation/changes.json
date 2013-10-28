@@ -30,7 +30,8 @@
 		{"message": "Added 'whereNotBetween' support to the query builder.", "backport": null},
 		{"message": "Added App::middleware method to inject middlewares onto Stack.", "backport": null},
 		{"message": "Deprecate 'close' application hooks, Stack middlewares should be used instead.", "backport": null},
-		{"message": "A new packages directory within `lang` can now override package language files.", "backport": null}
+		{"message": "A new packages directory within `lang` can now override package language files.", "backport": null},
+		{"message": "Added new 'Auth::viaRemember method to determine if user was authed via 'remember me' cookie.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
