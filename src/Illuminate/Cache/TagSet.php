@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class Tags {
+class TagSet {
 
 	/**
 	 * The cache store implementation.
@@ -17,7 +17,7 @@ class Tags {
 	protected $names = array();
 
 	/**
-	 * Create a new tags instance.
+	 * Create a new TagSet instance.
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
 	 * @param  string  $names
