@@ -20,7 +20,9 @@
 		{"message": "Added new 'tail' Artisan command for tailing remote log files.", "backport": null},
 		{"message": "Support passing an array of files or dynamic arguments into File::delete.", "backport": null},
 		{"message": "Support calling local controller methods as filters using @method syntax.", "backport": null},
-		{"message": "Support passing Carbon instances into Cache put style methods.", "backport": null}
+		{"message": "Support passing Carbon instances into Cache put style methods.", "backport": null},
+		{"message": "New SessionInterface implementation - moved away from Symfony's implmentation.", "backport": null},
+		{"message": "Now using Stack\\Builder in Application::run.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
