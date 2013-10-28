@@ -558,16 +558,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Merge the developer defined middlewares onto the stack.
 	 *
-	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface
+	 * @param  \Stack\Builder
 	 * @return void
 	 */
-	protected function mergeCustomMiddlewares(HttpKernelInterface $client)
+	protected function mergeCustomMiddlewares($stack)
 	{
 		foreach ($this->middlewares as $key => $value)
 		{
 			$parameters = array_unshift($value, $key);
 
-			call_user_func_array(array($client, 'push'), $parameters);
+			call_user_func_array(array($stack, 'push'), $parameters);
 		}
 	}
 
