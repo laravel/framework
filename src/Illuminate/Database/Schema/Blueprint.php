@@ -270,6 +270,16 @@ class Blueprint {
 	}
 
 	/**
+	* Indicate that the soft delete column should be dropped.
+	*
+	* @return void
+	*/
+	public function dropSoftDeletes()
+	{
+		$this->dropColumn('deleted_at');
+	}
+
+	/**
 	 * Rename the table to a given name.
 	 *
 	 * @param  string  $to
@@ -491,6 +501,20 @@ class Blueprint {
 	public function float($column, $total = 8, $places = 2)
 	{
 		return $this->addColumn('float', $column, compact('total', 'places'));
+	}
+
+	/**
+	 * Create a new double column on the table.
+	 *
+	 * @param  string   $column
+	 * @param  int|null	$total
+	 * @param  int|null $places
+	 * @return \Illuminate\Support\Fluent
+	 *
+	 */
+	public function double($column, $total = null, $places = null)
+	{
+		return $this->addColumn('double', $column, compact('total', 'places'));
 	}
 
 	/**

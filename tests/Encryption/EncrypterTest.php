@@ -20,19 +20,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	{
 		$e = $this->getEncrypter();
 		$payload = $e->encrypt('foo');
-		$payload .= 'adslkadlf';
-		$e->decrypt($payload);
-	}
-
-
-	/**
-	 * @expectedException Illuminate\Encryption\DecryptException
-	 */
-	public function testExceptionThrownWhenValueIsInvalid()
-	{
-		$e = $this->getEncrypter();
-		$payload = $e->encrypt('foo');
-		$payload .= 'adlkasdf';
+		$payload = str_shuffle($payload);
 		$e->decrypt($payload);
 	}
 

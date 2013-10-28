@@ -18,6 +18,17 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasOnTrueReturnsTrue()
+	{
+		$config = $this->getRepository();
+		$options = $this->getDummyOptions();
+		$config->getLoader()->shouldReceive('load')->once()->with('production', 'app', null)->andReturn($options);
+
+		$this->assertTrue($config->has('app.bing'));
+		$this->assertEquals(true,$config->get('app.bing'));
+	}
+
+
 	public function testGetReturnsBasicItems()
 	{
 		$config = $this->getRepository();
@@ -128,7 +139,7 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	protected function getDummyOptions()
 	{
-		return array('foo' => 'bar', 'baz' => array('boom' => 'breeze'));
+		return array('foo' => 'bar', 'baz' => array('boom' => 'breeze'), 'bing' => true);
 	}
 
 }

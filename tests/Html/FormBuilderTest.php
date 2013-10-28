@@ -35,12 +35,14 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$form2 = $this->formBuilder->open(array('method' => 'POST', 'class' => 'form', 'id' => 'id-form'));
 		$form3 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16'));
 		$form4 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16', 'files' => true));
+		$form5 = $this->formBuilder->open(array('method' => 'PUT'));
 
 
 		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-8">', $form1);
 		$this->assertEquals('<form method="POST" action="http://localhost/foo" accept-charset="UTF-8" class="form" id="id-form"><input name="_token" type="hidden" value="">', $form2);
 		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16">', $form3);
 		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16" enctype="multipart/form-data">', $form4);
+		$this->assertEquals('<form method="POST" action="http://localhost/foo" accept-charset="UTF-8"><input name="_method" type="hidden" value="PUT"><input name="_token" type="hidden" value="">', $form5);
 	}
 
 
@@ -74,14 +76,24 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testPasswordsNotFilled()
 	{
-		$session = m::mock('Illuminate\Session\Store');
-		$session->shouldReceive('hasOldInput')->with('password')->andReturn(true);
-		$session->shouldReceive('getOldInput')->with('password')->andReturn('mypass');
-		$this->formBuilder->setSessionStore($session);
+		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+
+		$session->shouldReceive('getOldInput')->never();
 
 		$form1 = $this->formBuilder->password('password');
 
 		$this->assertEquals('<input name="password" type="password" value="">', $form1);
+	}
+
+	public function testFilesNotFilled()
+	{
+		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+
+		$session->shouldReceive('getOldInput')->never();
+
+		$form = $this->formBuilder->file('img');
+
+		$this->assertEquals('<input name="img" type="file">', $form);
 	}
 
 
@@ -96,6 +108,30 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($form1, $form2);
 		$this->assertEquals('<input name="foo" type="text" value="foobar">', $form3);
 		$this->assertEquals('<input class="span2" name="foo" type="text">', $form4);
+	}
+
+
+	public function testFormTextRepopulation()
+	{
+		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+		$this->setModel($model = array('relation' => array('key' => 'attribute'), 'other' => 'val'));
+
+		$session->shouldReceive('getOldInput')->twice()->with('name_with_dots')->andReturn('some value');
+		$input = $this->formBuilder->text('name.with.dots', 'default value');
+		$this->assertEquals('<input name="name.with.dots" type="text" value="some value">', $input);
+
+		$session->shouldReceive('getOldInput')->once()->with('text.key.sub')->andReturn(null);
+		$input = $this->formBuilder->text('text[key][sub]', 'default value');
+		$this->assertEquals('<input name="text[key][sub]" type="text" value="default value">', $input);
+
+		$session->shouldReceive('getOldInput')->with('relation.key')->andReturn(null);
+		$input1 = $this->formBuilder->text('relation[key]');
+
+		$this->setModel($model, false);
+		$input2 = $this->formBuilder->text('relation[key]');
+
+		$this->assertEquals('<input name="relation[key]" type="text" value="attribute">', $input1);
+		$this->assertEquals($input1, $input2);
 	}
 
 
@@ -148,10 +184,12 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$form1 = $this->formBuilder->textarea('foo');
 		$form2 = $this->formBuilder->textarea('foo', 'foobar');
 		$form3 = $this->formBuilder->textarea('foo', null, array('class' => 'span2'));
+		$form4 = $this->formBuilder->textarea('foo', null, array('size' => '60x15'));
 
 		$this->assertEquals('<textarea name="foo" cols="50" rows="10"></textarea>', $form1);
 		$this->assertEquals('<textarea name="foo" cols="50" rows="10">foobar</textarea>', $form2);
 		$this->assertEquals('<textarea class="span2" name="foo" cols="50" rows="10"></textarea>', $form3);
+		$this->assertEquals('<textarea name="foo" cols="60" rows="15"></textarea>', $form4);
 	}
 
 
@@ -181,6 +219,26 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 			array('class' => 'class-name', 'id' => 'select-id')
 		);
 		$this->assertEquals($select, '<select class="class-name" id="select-id" name="size"><option value="L">Large</option><option value="S">Small</option></select>');
+	}
+
+
+	public function testFormSelectRepopulation()
+	{
+		$list = array('L' => 'Large', 'M' => 'Medium', 'S' => 'Small');
+		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+		$this->setModel($model = array('size' => array('key' => 'S'), 'other' => 'val'));
+
+		$session->shouldReceive('getOldInput')->twice()->with('size')->andReturn('M');
+		$select = $this->formBuilder->select('size', $list, 'S');
+		$this->assertEquals($select, '<select name="size"><option value="L">Large</option><option value="M" selected="selected">Medium</option><option value="S">Small</option></select>');
+
+		$session->shouldReceive('getOldInput')->twice()->with('size.multi')->andReturn(array('L', 'S'));
+		$select = $this->formBuilder->select('size[multi][]', $list, 'M', array('multiple' => 'multiple'));
+		$this->assertEquals($select, '<select multiple="multiple" name="size[multi][]"><option value="L" selected="selected">Large</option><option value="M">Medium</option><option value="S" selected="selected">Small</option></select>');
+
+		$session->shouldReceive('getOldInput')->once()->with('size.key')->andReturn(null);
+		$select = $this->formBuilder->select('size[key]', $list);
+		$this->assertEquals($select, '<select name="size[key]"><option value="L">Large</option><option value="M">Medium</option><option value="S" selected="selected">Small</option></select>');
 	}
 
 
@@ -220,9 +278,9 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testFormCheckbox()
 	{
 		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+
+		$session->shouldReceive('getOldInput')->withNoArgs()->andReturn(array());
 		$session->shouldReceive('getOldInput')->with('foo')->andReturn(null);
-		$session->shouldReceive('getOldInput')->andReturn(array());
-		$session->shouldReceive('hasOldInput')->andReturn(false);
 
 		$form1 = $this->formBuilder->input('checkbox', 'foo');
 		$form2 = $this->formBuilder->checkbox('foo');
@@ -233,6 +291,30 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input name="foo" type="checkbox" value="1">', $form2);
 		$this->assertEquals('<input checked="checked" name="foo" type="checkbox" value="foobar">', $form3);
 		$this->assertEquals('<input class="span2" name="foo" type="checkbox" value="foobar">', $form4);
+	}
+
+
+	public function testFormCheckboxRepopulation()
+	{
+		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+		$session->shouldReceive('getOldInput')->withNoArgs()->andReturn(array(1));
+
+		$session->shouldReceive('getOldInput')->once()->with('check')->andReturn(null);
+		$check = $this->formBuilder->checkbox('check', 1, true);
+		$this->assertEquals('<input name="check" type="checkbox" value="1">', $check);
+
+		$session->shouldReceive('getOldInput')->with('check.key')->andReturn('yes');
+		$check = $this->formBuilder->checkbox('check[key]', 'yes');
+		$this->assertEquals('<input checked="checked" name="check[key]" type="checkbox" value="yes">', $check);
+
+		$session->shouldReceive('getOldInput')->with('multicheck')->andReturn(array(1, 3));
+		$check1 = $this->formBuilder->checkbox('multicheck[]', 1);
+		$check2 = $this->formBuilder->checkbox('multicheck[]', 2, true);
+		$check3 = $this->formBuilder->checkbox('multicheck[]', 3);
+
+		$this->assertEquals('<input checked="checked" name="multicheck[]" type="checkbox" value="1">', $check1);
+		$this->assertEquals('<input name="multicheck[]" type="checkbox" value="2">', $check2);
+		$this->assertEquals('<input checked="checked" name="multicheck[]" type="checkbox" value="3">', $check3);
 	}
 
 
@@ -247,6 +329,20 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input name="foo" type="radio" value="foo">', $form2);
 		$this->assertEquals('<input checked="checked" name="foo" type="radio" value="foobar">', $form3);
 		$this->assertEquals('<input class="span2" name="foo" type="radio" value="foobar">', $form4);
+	}
+
+
+	public function testFormRadioRepopulation()
+	{
+		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
+
+		$session->shouldReceive('getOldInput')->with('radio')->andReturn(1);
+
+		$radio1 = $this->formBuilder->radio('radio', 1);
+		$radio2 = $this->formBuilder->radio('radio', 2, true);
+
+		$this->assertEquals('<input checked="checked" name="radio" type="radio" value="1">', $radio1);
+		$this->assertEquals('<input name="radio" type="radio" value="2">', $radio2);
 	}
 
 
@@ -283,5 +379,37 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$image = $this->formBuilder->image($url);
 
 		$this->assertEquals('<input src="'. $url .'" type="image">', $image);
+	}
+
+	protected function setModel(array $data, $object = true)
+	{
+		if ($object) $data = new FormBuilderModelStub($data);
+
+		$this->formBuilder->model($data, array('method' => 'GET'));
+	}
+}
+
+class FormBuilderModelStub {
+
+	protected $data;
+
+	public function __construct(array $data = array())
+	{
+		foreach ($data as $key => $val)
+		{
+			if (is_array($val)) $val = new self($val);
+
+			$this->data[$key] = $val;
+		}
+	}
+
+	public function __get($key)
+	{
+		return $this->data[$key];
+	}
+
+	public function __isset($key)
+	{
+		return isset($this->data[$key]);
 	}
 }

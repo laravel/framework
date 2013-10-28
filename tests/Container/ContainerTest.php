@@ -204,6 +204,15 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor', $instance->name);
 	}
 
+	public function testUnsetRemoveBoundInstances()
+	{
+		$container = new Container;
+		$container->instance('object', new StdClass);
+		unset($container['object']);
+
+		$this->assertFalse($container->bound('object'));
+	}
+
 }
 
 class ContainerConcreteStub {}

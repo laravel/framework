@@ -1,8 +1,10 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\ViewPublisher;
 use Illuminate\Foundation\AssetPublisher;
 use Illuminate\Foundation\ConfigPublisher;
+use Illuminate\Foundation\Console\ViewPublishCommand;
 use Illuminate\Foundation\Console\AssetPublishCommand;
 use Illuminate\Foundation\Console\ConfigPublishCommand;
 
@@ -26,7 +28,9 @@ class PublisherServiceProvider extends ServiceProvider {
 
 		$this->registerConfigPublisher();
 
-		$this->commands('command.asset.publish', 'command.config.publish');
+		$this->registerViewPublisher();
+
+		$this->commands('command.asset.publish', 'command.config.publish', 'command.view.publish');
 	}
 
 	/**
@@ -104,6 +108,43 @@ class PublisherServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the view publisher class and command.
+	 *
+	 * @return void
+	 */
+	protected function registerViewPublisher()
+	{
+		$this->registerViewPublishCommand();
+
+		$this->app['view.publisher'] = $this->app->share(function($app)
+		{
+			$viewPath = $app['path'].'/views';
+
+			// Once we have created the view publisher, we will set the default packages
+			// path on this object so that it knows where to find all of the packages
+			// that are installed for the application and can move them to the app.
+			$publisher = new ViewPublisher($app['files'], $viewPath);
+
+			$publisher->setPackagePath($app['path.base'].'/vendor');
+
+			return $publisher;
+		});
+	}
+
+	/**
+	 * Register the view publish console command.
+	 *
+	 * @return void
+	 */
+	protected function registerViewPublishCommand()
+	{
+		$this->app['command.view.publish'] = $this->app->share(function($app)
+		{
+			return new ViewPublishCommand($app['view.publisher']);
+		});
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
@@ -114,7 +155,9 @@ class PublisherServiceProvider extends ServiceProvider {
 			'asset.publisher',
 			'command.asset.publish',
 			'config.publisher',
-			'command.config.publish'
+			'command.config.publish',
+			'view.publisher',
+			'command.view.publish'
 		);
 	}
 

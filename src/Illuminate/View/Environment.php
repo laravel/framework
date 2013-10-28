@@ -671,6 +671,18 @@ class Environment {
 	}
 
 	/**
+	 * Get an item from the shared data.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	public function shared($key, $default = null)
+	{
+		return array_get($this->shared, $key, $default);
+	}
+
+	/**
 	 * Get all of the shared data for the environment.
 	 *
 	 * @return array

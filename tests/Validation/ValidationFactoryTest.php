@@ -27,6 +27,15 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
 		$validator = $factory->make(array(), array());
 		$this->assertEquals(array('foo' => function() {}, 'implicit' => function() {}), $validator->getExtensions());
 		$this->assertEquals($presence, $validator->getPresenceVerifier());
+
+		$presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$factory->extend('foo', function() {}, 'foo!');
+		$factory->extendImplicit('implicit', function() {}, 'implicit!');
+		$factory->setPresenceVerifier($presence);
+		$validator = $factory->make(array(), array());
+		$this->assertEquals(array('foo' => function() {}, 'implicit' => function() {}), $validator->getExtensions());
+		$this->assertEquals(array('foo' => 'foo!', 'implicit' => 'implicit!'), $validator->getFallbackMessages());
+		$this->assertEquals($presence, $validator->getPresenceVerifier());
 	}
 
 

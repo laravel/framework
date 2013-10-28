@@ -190,9 +190,14 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
+		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
 
-		return preg_replace($pattern, '<?php echo $1; ?>', $value);
+		$callback = function($matches)
+		{
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$matches[2].'; ?>';
+		};
+
+		return preg_replace_callback($pattern, $callback, $value);
 	}
 
 	/**

@@ -29,10 +29,10 @@ class Worker {
 	 * @param  string  $queue
 	 * @param  int     $delay
 	 * @param  int     $memory
-	 * @param  bool    $sleep
+	 * @param  int     $sleep
 	 * @return void
 	 */
-	public function pop($connection, $queue = null, $delay = 0, $memory = 128, $sleep = false)
+	public function pop($connection, $queue = null, $delay = 0, $memory = 128, $sleep = 3)
 	{
 		$connection = $this->manager->connection($connection);
 
@@ -45,9 +45,9 @@ class Worker {
 		{
 			$this->process($job, $delay);
 		}
-		elseif ($sleep)
+		else
 		{
-			$this->sleep(1);
+			$this->sleep($sleep);
 		}
 	}
 

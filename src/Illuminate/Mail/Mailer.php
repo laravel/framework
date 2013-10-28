@@ -21,7 +21,7 @@ class Mailer {
 	/**
 	 * The Swift Mailer instance.
 	 *
-	 * @var Swift_Mailer
+	 * @var \Swift_Mailer
 	 */
 	protected $swift;
 
@@ -57,7 +57,7 @@ class Mailer {
 	 * Create a new Mailer instance.
 	 *
 	 * @param  \Illuminate\View\Environment  $views
-	 * @param  Swift_Mailer  $swift
+	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
 	public function __construct(Environment $views, Swift_Mailer $swift)
@@ -83,8 +83,8 @@ class Mailer {
 	 *
 	 * @param  string  $view
 	 * @param  array   $data
-	 * @param  mixed  $callback
-	 * @return void
+	 * @param  mixed   $callback
+	 * @return int
 	 */
 	public function plain($view, array $data, $callback)
 	{
@@ -97,7 +97,7 @@ class Mailer {
 	 * @param  string|array  $view
 	 * @param  array  $data
 	 * @param  Closure|string  $callback
-	 * @return void
+	 * @return int
 	 */
 	public function send($view, array $data, $callback)
 	{
@@ -139,15 +139,15 @@ class Mailer {
 	/**
 	 * Queue a new e-mail message for sending on the given queue.
 	 *
+	 * @param  string  $queue
 	 * @param  string|array  $view
 	 * @param  array   $data
 	 * @param  Closure|string  $callback
-	 * @param  string  $queue
 	 * @return void
 	 */
 	public function queueOn($queue, $view, array $data, $callback)
 	{
-		return $this->queue($view, $data, $callback, $queue);
+		$this->queue($view, $data, $callback, $queue);
 	}
 
 	/**
@@ -179,7 +179,7 @@ class Mailer {
 	 */
 	public function laterOn($queue, $delay, $view, array $data, $callback)
 	{
-		return $this->later($delay, $view, $data, $callback, $queue);
+		$this->later($delay, $view, $data, $callback, $queue);
 	}
 
 	/**
@@ -281,8 +281,8 @@ class Mailer {
 	/**
 	 * Send a Swift Message instance.
 	 *
-	 * @param  Swift_Message  $message
-	 * @return void
+	 * @param  \Swift_Message  $message
+	 * @return int
 	 */
 	protected function sendSwiftMessage($message)
 	{
@@ -299,7 +299,7 @@ class Mailer {
 	/**
 	 * Log that a message was sent.
 	 *
-	 * @param  Swift_Message  $message
+	 * @param  \Swift_Message  $message
 	 * @return void
 	 */
 	protected function logMessage($message)
@@ -314,7 +314,7 @@ class Mailer {
 	 *
 	 * @param  Closure|string  $callback
 	 * @param  \Illuminate\Mail\Message  $message
-	 * @return void
+	 * @return mixed
 	 */
 	protected function callMessageBuilder($callback, $message)
 	{
@@ -386,7 +386,7 @@ class Mailer {
 	/**
 	 * Get the Swift Mailer instance.
 	 *
-	 * @return Swift_Mailer
+	 * @return \Swift_Mailer
 	 */
 	public function getSwiftMailer()
 	{
@@ -396,7 +396,7 @@ class Mailer {
 	/**
 	 * Set the Swift Mailer instance.
 	 *
-	 * @param  Swift_Mailer  $swift
+	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
 	public function setSwiftMailer($swift)

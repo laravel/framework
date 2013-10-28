@@ -15,7 +15,8 @@
         "illuminate/hashing": "4.0.x",
         "illuminate/http": "4.0.x",
         "illuminate/session": "4.0.x",
-        "illuminate/support": "4.0.x"
+        "illuminate/support": "4.0.x",
+        "nesbot/carbon": "1.*"
     },
     "require-dev": {
         "illuminate/console": "4.0.x",

@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Artisan;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\ChangesCommand;
+use Illuminate\Foundation\Console\EnvironmentCommand;
 
 class ArtisanServiceProvider extends ServiceProvider {
 
@@ -30,7 +31,12 @@ class ArtisanServiceProvider extends ServiceProvider {
 			return new ChangesCommand;
 		});
 
-		$this->commands('command.changes');
+		$this->app['command.environment'] = $this->app->share(function($app)
+		{
+			return new EnvironmentCommand;
+		});
+
+		$this->commands('command.changes', 'command.environment');
 	}
 
 	/**
@@ -40,7 +46,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('artisan', 'command.changes');
+		return array('artisan', 'command.changes', 'command.environment');
 	}
 
 }

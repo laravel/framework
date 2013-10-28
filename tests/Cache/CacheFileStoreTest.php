@@ -19,7 +19,6 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 		$files = $this->mockFilesystem();
 		$md5 = md5('foo');
 		$full_dir = __DIR__.'/'.substr($md5, 0, 2).'/'.substr($md5, 2, 2);
-		$files->expects($this->once())->method('isDirectory')->with($this->equalTo($full_dir))->will($this->returnValue(false));
 		$files->expects($this->once())->method('makeDirectory')->with($this->equalTo($full_dir), $this->equalTo(0777), $this->equalTo(true));
 		$files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$md5));
 		$store = new FileStore($files, __DIR__);

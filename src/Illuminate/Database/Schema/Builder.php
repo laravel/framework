@@ -58,7 +58,9 @@ class Builder {
 	{
 		$schema = $this->connection->getDoctrineSchemaManager();
 
-		return in_array($column, array_keys($schema->listTableColumns($table)));
+		$columns = array_keys(array_change_key_case($schema->listTableColumns($table)));
+
+		return in_array(strtolower($column), $columns);
 	}
 
 	/**

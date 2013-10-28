@@ -4,6 +4,7 @@ use Mockery as m;
 use Illuminate\Validation\Validator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
@@ -472,15 +473,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => array(1, 2, 3)), array('foo' => 'Array|Max:2'));
 		$this->assertFalse($v->passes());
 
-		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
-		$file->expects($this->any())->method('getSize')->will($this->returnValue(3072));
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('isValid', 'getSize'), array(__FILE__, basename(__FILE__)));
+		$file->expects($this->at(0))->method('isValid')->will($this->returnValue(true));
+		$file->expects($this->at(1))->method('getSize')->will($this->returnValue(3072));
 		$v = new Validator($trans, array(), array('photo' => 'Max:10'));
 		$v->setFiles(array('photo' => $file));
 		$this->assertTrue($v->passes());
 
-		$file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array('getSize'), array(__FILE__, false));
-		$file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('isValid', 'getSize'), array(__FILE__, basename(__FILE__)));
+		$file->expects($this->at(0))->method('isValid')->will($this->returnValue(true));
+		$file->expects($this->at(1))->method('getSize')->will($this->returnValue(4072));
 		$v = new Validator($trans, array(), array('photo' => 'Max:2'));
+		$v->setFiles(array('photo' => $file));
+		$this->assertFalse($v->passes());
+
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('isValid'), array(__FILE__, basename(__FILE__)));
+		$file->expects($this->any())->method('isValid')->will($this->returnValue(false));
+		$v = new Validator($trans, array(), array('photo' => 'Max:10'));
 		$v->setFiles(array('photo' => $file));
 		$this->assertFalse($v->passes());
 	}
@@ -745,12 +754,60 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSoemtimesAddingRules()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', 'Confirmed', function($i) { return $i->x == 'foo'; });
+		$this->assertEquals(array('x' => array('Required', 'Confirmed')), $v->getRules());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', 'Confirmed', function($i) { return $i->x == 'bar'; });
+		$this->assertEquals(array('x' => array('Required')), $v->getRules());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', 'Foo|Bar', function($i) { return $i->x == 'foo'; });
+		$this->assertEquals(array('x' => array('Required', 'Foo', 'Bar')), $v->getRules());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
+		$v->sometimes('x', array('Foo', 'Bar:Baz'), function($i) { return $i->x == 'foo'; });
+		$this->assertEquals(array('x' => array('Required', 'Foo', 'Bar:Baz')), $v->getRules());
+	}
+
+
 	public function testCustomValidators()
 	{
 		$trans = $this->getRealTranslator();
 		$trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
 		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
 		$v->addExtension('foo', function() { return false; });
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('foo!', $v->messages()->first('name'));
+
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.foo_bar' => 'foo!'), 'en', 'messages');
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo_bar'));
+		$v->addExtension('FooBar', function() { return false; });
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('foo!', $v->messages()->first('name'));
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo_bar'));
+		$v->addExtension('FooBar', function() { return false; });
+		$v->setFallbackMessages(array('foo_bar' => 'foo!'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('foo!', $v->messages()->first('name'));
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo_bar'));
+		$v->addExtensions(array('FooBar' => function() { return false; }));
+		$v->setFallbackMessages(array('foo_bar' => 'foo!'));
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('foo!', $v->messages()->first('name'));

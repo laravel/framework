@@ -147,7 +147,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		$line = $this->get($key, $replace, $locale = $locale ?: $this->locale);
 
-		array_unshift($replace, $number);
+		$replace['count'] = $number;
 
 		return $this->makeReplacements($this->getSelector()->choose($line, $number, $locale), $replace);
 	}

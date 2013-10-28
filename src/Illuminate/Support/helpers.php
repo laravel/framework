@@ -259,7 +259,7 @@ if ( ! function_exists('array_get'))
 	function array_get($array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
-		
+
 		if (isset($array[$key])) return $array[$key];
 
 		foreach (explode('.', $key) as $segment)
@@ -297,16 +297,34 @@ if ( ! function_exists('array_pluck'))
 	 * Pluck an array of values from an array.
 	 *
 	 * @param  array   $array
+	 * @param  string  $value
 	 * @param  string  $key
 	 * @return array
 	 */
-	function array_pluck($array, $key)
+	function array_pluck($array, $value, $key = null)
 	{
-		return array_map(function($value) use ($key)
-		{
-			return is_object($value) ? $value->$key : $value[$key];
+		$results = array();
 
-		}, $array);
+		foreach ($array as $item)
+		{
+			$itemValue = is_object($item) ? $item->{$value} : $item[$value];
+
+			// If the key is "null", we will just append the value to the array and keep
+			// looping. Otherwise we will key the array using the value of the key we
+			// received from the developer. Then we'll return the final array form.
+			if (is_null($key))
+			{
+				$results[] = $itemValue;
+			}
+			else
+			{
+				$itemKey = is_object($item) ? $item->{$key} : $item[$key];
+
+				$results[$itemKey] = $itemValue;
+			}
+		}
+
+		return $results;
 	}
 }
 
@@ -339,7 +357,7 @@ if ( ! function_exists('array_set'))
 	 * @param  array   $array
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array
 	 */
 	function array_set(&$array, $key, $value)
 	{
@@ -363,6 +381,8 @@ if ( ! function_exists('array_set'))
 		}
 
 		$array[array_shift($keys)] = $value;
+
+		return $array;
 	}
 }
 
@@ -613,7 +633,7 @@ if ( ! function_exists('object_get'))
 	function object_get($object, $key, $default = null)
 	{
 		if (is_null($key)) return $object;
-		
+
 		foreach (explode('.', $key) as $segment)
 		{
 			if ( ! is_object($object) or ! isset($object->{$segment}))
@@ -625,6 +645,26 @@ if ( ! function_exists('object_get'))
 		}
 
 		return $object;
+	}
+}
+
+if ( ! function_exists('preg_replace_sub'))
+{
+	/**
+	 * Replace a given pattern with each value in the array in sequentially.
+	 *
+	 * @param  string  $pattern
+	 * @param  array   $replacements
+	 * @param  string  $subject
+	 * @return string
+	 */
+	function preg_replace_sub($pattern, &$replacements, $subject)
+	{
+		return preg_replace_callback($pattern, function($match) use (&$replacements)
+		{
+			return array_shift($replacements);
+
+		}, $subject);
 	}
 }
 

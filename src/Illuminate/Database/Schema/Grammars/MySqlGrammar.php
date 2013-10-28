@@ -376,6 +376,24 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a double type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDouble(Fluent $column)
+	{
+		if ($column->total and $column->places)
+		{
+			return "double({$column->total}, {$column->places})";
+		}
+		else
+		{
+			return 'double';
+		}
+	}
+
+	/**
 	 * Create the column definition for a decimal type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column

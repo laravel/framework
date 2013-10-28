@@ -4,6 +4,7 @@ use Closure;
 use Countable;
 use ArrayAccess;
 use ArrayIterator;
+use CachingIterator;
 use IteratorAggregate;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
@@ -156,6 +157,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Reduce the collection to a single value.
+	 *
+	 * @param  callable  $callback
+	 * @param  mixed  $initial
+	 * @return mixed
+	 */
+	public function reduce($callback, $initial = null)
+	{
+		return array_reduce($this->items, $callback, $initial);
+	}
+
+	/**
 	 * Execute a callback over each item.
 	 *
 	 * @param  Closure  $callback
@@ -176,7 +189,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function map(Closure $callback)
 	{
-		return new static(array_map($callback, $this->items));
+		return new static(array_map($callback, $this->items, array_keys($this->items)));
 	}
 
 	/**
@@ -353,40 +366,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function lists($value, $key = null)
 	{
-		$results = array();
-
-		foreach ($this->items as $item)
-		{
-			$itemValue = $this->getListValue($item, $value);
-
-			// If the key is "null", we will just append the value to the array and keep
-			// looping. Otherwise we will key the array using the value of the key we
-			// received from the developer. Then we'll return the final array form.
-			if (is_null($key))
-			{
-				$results[] = $itemValue;
-			}
-			else
-			{
-				$itemKey = $this->getListValue($item, $key);
-
-				$results[$itemKey] = $itemValue;
-			}
-		}
-
-		return $results;
-	}
-
-	/**
-	 * Get the value of a list item object.
-	 *
-	 * @param  mixed  $item
-	 * @param  mixed  $key
-	 * @return mixed
-	 */
-	protected function getListValue($item, $key)
-	{
-		return is_object($item) ? object_get($item, $key) : $item[$key];
+		return array_pluck($this->items, $value, $key);
 	}
 
 	/**
@@ -446,6 +426,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function getIterator()
 	{
 		return new ArrayIterator($this->items);
+	}
+
+	/**
+	 * Get a CachingIterator instance.
+	 *
+	 * @return \CachingIterator
+	 */
+	public function getCachingIterator($flags = CachingIterator::CALL_TOSTRING)
+	{
+		return new CachingIterator($this->getIterator(), $flags);
 	}
 
 	/**

@@ -329,6 +329,17 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a double type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDouble(Fluent $column)
+	{
+		return 'double precision';
+	}
+
+	/**
 	 * Create the column definition for a decimal type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column

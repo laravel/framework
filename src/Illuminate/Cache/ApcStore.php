@@ -20,7 +20,7 @@ class ApcStore implements StoreInterface {
 	 * Create a new APC store.
 	 *
 	 * @param  \Illuminate\Cache\ApcWrapper  $apc
-	 * @param  string                       $prefix
+	 * @param  string  $prefix
 	 * @return void
 	 */
 	public function __construct(ApcWrapper $apc, $prefix = '')

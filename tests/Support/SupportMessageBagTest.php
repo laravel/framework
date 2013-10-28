@@ -5,6 +5,12 @@ use Mockery as m;
 
 class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 
+	public function tearDown()
+	{
+		m::close();
+	}
+
+
 	public function testUniqueness()
 	{
 		$container = new MessageBag;
@@ -114,14 +120,6 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$container->add('boom', 'baz');
 
 		$this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
-	}
-
-
-	public function testCastingAsStringReturnsBagAsJson()
-	{
-		$container = m::mock('Illuminate\Support\MessageBag[toJson]');
-		$container->shouldReceive('toJson')->once()->andReturn('foo');
-		$this->assertEquals('foo', $container->__toString());
 	}
 
 }

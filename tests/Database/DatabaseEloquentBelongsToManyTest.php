@@ -314,6 +314,11 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 
 		$related->shouldReceive('getTable')->andReturn('roles');
 		$related->shouldReceive('getKeyName')->andReturn('id');
+		$related->shouldReceive('newPivot')->andReturnUsing(function()
+		{
+			$reflector = new ReflectionClass('Illuminate\Database\Eloquent\Relations\Pivot');
+			return $reflector->newInstanceArgs(func_get_args());
+		});
 
 		$builder->shouldReceive('join')->once()->with('user_role', 'roles.id', '=', 'user_role.role_id');
 		$builder->shouldReceive('where')->once()->with('user_role.user_id', '=', 1);

@@ -44,9 +44,12 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 */
 	public function addConstraints()
 	{
-		parent::addConstraints();
+		if (static::$constraints)
+		{
+			parent::addConstraints();
 
-		$this->query->where($this->morphType, $this->morphClass);
+			$this->query->where($this->morphType, $this->morphClass);
+		}
 	}
 
 	/**
@@ -74,23 +77,6 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 
 		$this->query->where($this->morphType, $this->morphClass);
 	}	
-
-	/**
-	 * Remove the original where clause set by the relationship.
-	 *
-	 * The remaining constraints on the query will be reset and returned.
-	 *
-	 * @return array
-	 */
-	public function getAndResetWheres()
-	{
-		// We actually need to remove two where clauses from polymorphic queries so we
-		// will make an extra call to clear the second where clause here so that it
-		// will not get in the way. This parent method will remove the other one.
-		$this->removeSecondWhereClause();
-
-		return parent::getAndResetWheres();
-	}
 
 	/**
 	 * Attach a model instance to the parent model.

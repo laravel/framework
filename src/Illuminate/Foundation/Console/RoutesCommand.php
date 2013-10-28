@@ -89,7 +89,7 @@ class RoutesCommand extends Command {
 			$results[] = $this->getRouteInformation($name, $route);
 		}
 
-		return $results;
+		return array_filter($results);
 	}
 
 	/**
@@ -105,13 +105,14 @@ class RoutesCommand extends Command {
 
 		$action = $route->getAction() ?: 'Closure';
 
-		return array(
+		return $this->filterRoute(array(
 			'host'   => $route->getHost(),
 			'uri'    => $uri,
 			'name'   => $this->getRouteName($name),
 			'action' => $action,
 			'before' => $this->getBeforeFilters($route),
-			'after'  => $this->getAfterFilters($route));
+			'after'  => $this->getAfterFilters($route)
+		));
 	}
 
 	/**
@@ -184,6 +185,39 @@ class RoutesCommand extends Command {
 	protected function getAfterFilters($route)
 	{
 		return implode(', ',$route->getAfterFilters());
+	}
+
+	/**
+	 * Filter the route by URI and / or name.
+	 *
+	 * @param  array  $route
+	 * @return array|null
+	 */
+	protected function filterRoute(array $route)
+	{
+		if (($this->option('name') and ! str_contains($route['name'], $this->option('name'))) or
+			 $this->option('path') and ! str_contains($route['uri'], $this->option('path')))
+		{
+			return null;
+		}
+		else
+		{
+			return $route;
+		}
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'),
+
+			array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
+		);
 	}
 
 }

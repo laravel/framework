@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Pivot extends Model {
 
@@ -70,7 +71,7 @@ class Pivot extends Model {
 	 * @param  \Illuminate\Database\Eloquent\Builder
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	protected function setKeysForSaveQuery($query)
+	protected function setKeysForSaveQuery(Builder $query)
 	{
 		$query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
@@ -116,13 +117,15 @@ class Pivot extends Model {
 	 *
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
 	 */
 	public function setPivotKeys($foreignKey, $otherKey)
 	{
 		$this->foreignKey = $foreignKey;
 
 		$this->otherKey = $otherKey;
+
+		return $this;
 	}
 
 	/**

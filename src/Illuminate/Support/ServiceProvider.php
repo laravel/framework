@@ -80,7 +80,7 @@ abstract class ServiceProvider {
 		// Next, we will see if the application view folder contains a folder for the
 		// package and namespace. If it does, we'll give that folder precedence on
 		// the loader list for the views so the package views can be overridden.
-		$appView = $this->getAppViewPath($package, $namespace);
+		$appView = $this->getAppViewPath($package);
 
 		if ($this->app['files']->isDirectory($appView))
 		{
@@ -182,12 +182,11 @@ abstract class ServiceProvider {
 	 * Get the application package view path.
 	 *
 	 * @param  string  $package
-	 * @param  string  $namespace
 	 * @return string
 	 */
-	protected function getAppViewPath($package, $namespace)
+	protected function getAppViewPath($package)
 	{
-		return $this->app['path']."/views/packages/{$package}/{$namespace}";
+		return $this->app['path']."/views/packages/{$package}";
 	}
 
 	/**

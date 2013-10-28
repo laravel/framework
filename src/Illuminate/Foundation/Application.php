@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use Illuminate\Support\Contracts\ResponsePreparerInterface;
-use Symfony\Component\HttpKernel\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -32,7 +32,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.0.6';
+	const VERSION = '4.0.9';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -100,13 +100,49 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	{
 		$this['request'] = $this->createRequest($request);
 
-		// The exception handler class takes care of determining which of the bound
-		// exception handler Closures should be called for a given exception and
-		// gets the response from them. We'll bind it here to allow overrides.
+		$this->registerBaseServiceProviders();
+	}
+
+	/**
+	 * Register all of the base service providers.
+	 *
+	 * @return void
+	 */
+	protected function registerBaseServiceProviders()
+	{
+		foreach (array('Exception', 'Routing', 'Event') as $name)
+		{
+			$this->{"register{$name}Provider"}();
+		}
+	}
+
+	/**
+	 * Register the exception service provider.
+	 *
+	 * @return void
+	 */
+	protected function registerExceptionProvider()
+	{
 		$this->register(new ExceptionServiceProvider($this));
+	}
 
+	/**
+	 * Register the routing service provider.
+	 *
+	 * @return void
+	 */
+	protected function registerRoutingProvider()
+	{
 		$this->register(new RoutingServiceProvider($this));
+	}
 
+	/**
+	 * Register the event service provider.
+	 *
+	 * @return void
+	 */
+	protected function registerEventProvider()
+	{
 		$this->register(new EventServiceProvider($this));
 	}
 
@@ -196,13 +232,21 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	}
 
 	/**
-	 * Get the current application environment.
+	 * Get or check the current application environment.
 	 *
+	 * @param  dynamic
 	 * @return string
 	 */
 	public function environment()
 	{
-		return $this['env'];
+		if (count(func_get_args()) > 0)
+		{
+			return in_array($this['env'], func_get_args());
+		}
+		else
+		{
+			return $this['env'];
+		}
 	}
 
 	/**
@@ -621,9 +665,9 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 */
 	public function prepareRequest(Request $request)
 	{
-		if (isset($this['session']))
+		if (isset($this['session.store']))
 		{
-			$request->setSessionStore($this['session']);
+			$request->setSessionStore($this['session.store']);
 		}
 
 		return $request;
@@ -753,6 +797,16 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		$manifest = $this['config']['app.manifest'];
 
 		return new ProviderRepository(new Filesystem, $manifest);
+	}
+
+	/**
+	 * Get the current application locale.
+	 *
+	 * @return string
+	 */
+	public function getLocale()
+	{
+		return $this['config']->get('app.locale');
 	}
 
 	/**

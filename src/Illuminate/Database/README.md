@@ -42,6 +42,10 @@ Once the Capsule instance has been registered. You may use it like so:
 ```
 $users = Capsule::table('users')->where('votes', '>' 100)->get();
 ```
+Other core methods may be accessed directly from the Capsule in the same manner as from the DB facade:
+```
+$results = Capsule::select('select * from users where id = ?', array(1));
+```
 
 **Using The Schema Builder**
 

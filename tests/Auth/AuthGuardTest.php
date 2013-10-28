@@ -167,7 +167,10 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
-		$cookies->shouldReceive('forget')->once()->with('bar');
+
+		$cookie = m::mock('Symfony\Component\HttpFoundation\Cookie');
+		$cookies->shouldReceive('forget')->once()->with('bar')->andReturn($cookie);
+		$cookies->shouldReceive('queue')->once()->with($cookie);
 		$mock->getSession()->shouldReceive('forget')->once()->with('foo');
 		$mock->setUser($user);
 		$mock->logout();
@@ -191,19 +194,15 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testLoginMethodQueuesCookieWhenRemembering()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$cookie = m::mock('Illuminate\Cookie\CookieJar');
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->setCookieJar($cookie);
-		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo')->andReturn(new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo'));
+		$foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
+		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo')->andReturn($foreverCookie);
+		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
 		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('foo');
 		$guard->login($user, true);
-
-		$cookies = $guard->getQueuedCookies();
-		$this->assertEquals(1, count($cookies));
-		$this->assertEquals('foo', $cookies[0]->getValue());
-		$this->assertEquals($cookies[0]->getName(), $guard->getRecallerName());
 	}
 
 

@@ -276,6 +276,11 @@ class Builder {
 	 */
 	public function where($column, $operator = null, $value = null, $boolean = 'and')
 	{
+		if ($this->invalidOperatorAndValue($operator, $value))
+		{
+			throw new \InvalidArgumentException("Value must be provided.");
+		}
+
 		// If the columns is actually a Closure instance, we will assume the developer
 		// wants to begin a nested where statement which is wrapped in parenthesis.
 		// We'll add that Closure to the query then return back out immediately.
@@ -334,6 +339,20 @@ class Builder {
 	public function orWhere($column, $operator = null, $value = null)
 	{
 		return $this->where($column, $operator, $value, 'or');
+	}
+
+	/**
+	 * Determine if the given operator and value combination is legal.
+	 *
+	 * @param  string  $operator
+	 * @param  mxied  $value
+	 * @return bool
+	 */
+	protected function invalidOperatorAndValue($operator, $value)
+	{
+		$isOperator = in_array($operator, $this->operators);
+
+		return ($isOperator and $operator != '=' and is_null($value));
 	}
 
 	/**
@@ -795,7 +814,27 @@ class Builder {
 	 */
 	public function orderBy($column, $direction = 'asc')
 	{
+		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
+
 		$this->orders[] = compact('column', 'direction');
+
+		return $this;
+	}
+
+	/**
+	 * Add a raw "order by" clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @param  array  $bindings
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function orderByRaw($sql, $bindings = array())
+	{
+		$type = 'raw';
+
+		$this->orders[] = compact('type', 'sql');
+
+		$this->bindings = array_merge($this->bindings, $bindings);
 
 		return $this;
 	}
@@ -806,11 +845,22 @@ class Builder {
 	 * @param  int  $value
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function skip($value)
+	public function offset($value)
 	{
 		$this->offset = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Alias to set the "offset" value of the query.
+	 *
+	 * @param  int  $value
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function skip($value)
+	{
+		return $this->offset($value);
 	}
 
 	/**
@@ -819,11 +869,22 @@ class Builder {
 	 * @param  int  $value
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function take($value)
+	public function limit($value)
 	{
 		if ($value > 0) $this->limit = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Alias to set the "limit" value of the query.
+	 *
+	 * @param  int  $value
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function take($value)
+	{
+		return $this->limit($value);
 	}
 
 	/**
@@ -851,7 +912,7 @@ class Builder {
 		{
 			call_user_func($query, $query = $this->newQuery());
 		}
-		
+
 		$this->unions[] = compact('query', 'all');
 
 		return $this->mergeBindings($query);
@@ -905,7 +966,7 @@ class Builder {
 	}
 
 	/**
-	 * Pluck a single column from the database.
+	 * Pluck a single column's value from the first result of a query.
 	 *
 	 * @param  string  $column
 	 * @return mixed
@@ -1031,6 +1092,30 @@ class Builder {
 		$me = $this;
 
 		return function() use ($me, $columns) { return $me->getFresh($columns); };
+	}
+
+	/**
+	 * Chunk the results of the query.
+	 *
+	 * @param  int  $count
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function chunk($count, $callback)
+	{
+		$results = $this->forPage($page = 1, $count)->get();
+
+		while (count($results) > 0)
+		{
+			// On each chunk result set, we will pass them to the callback and then let the
+			// developer take care of everything within the callback, which allows us to
+			// keep the memory low for spinning through large result sets for working.
+			call_user_func($callback, $results);
+
+			$page++;
+
+			$results = $this->forPage($page, $count)->get();
+		}
 	}
 
 	/**
@@ -1171,7 +1256,7 @@ class Builder {
 		// Once we have the total number of records to be paginated, we can grab the
 		// current page and the result array. Then we are ready to create a brand
 		// new Paginator instances for the results which will create the links.
-		$page = $paginator->getCurrentPage();
+		$page = $paginator->getCurrentPage($total);
 
 		$results = $this->forPage($page, $perPage)->get($columns);
 
@@ -1463,20 +1548,6 @@ class Builder {
 	}
 
 	/**
-	 * Get a copy of the where clauses and bindings in an array.
-	 *
-	 * @return array
-	 */
-	public function getAndResetWheres()
-	{
-		$values = array($this->wheres, $this->bindings);
-
-		list($this->wheres, $this->bindings) = array(null, array());
-
-		return $values;
-	}
-
-	/**
 	 * Remove all of the expressions from a list of bindings.
 	 *
 	 * @param  array  $bindings
@@ -1515,11 +1586,13 @@ class Builder {
 	 * Set the bindings on the query builder.
 	 *
 	 * @param  array  $bindings
-	 * @return void
+	 * @return \Illuminate\Database\Query\Builder
 	 */
 	public function setBindings(array $bindings)
 	{
 		$this->bindings = $bindings;
+
+		return $this;
 	}
 
 	/**

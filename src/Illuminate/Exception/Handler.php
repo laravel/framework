@@ -130,7 +130,7 @@ class Handler {
 		{
 			$e = new ErrorException($message, $level, 0, $file, $line);
 
-			$this->handleException($e);
+			throw $e;
 		}
 	}
 
@@ -313,9 +313,14 @@ class Handler {
 	 */
 	protected function formatException(\Exception $e)
 	{
-		$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
+		if ($this->debug)
+		{
+			$location = $e->getMessage().' in '.$e->getFile().':'.$e->getLine();
 
-		return 'Error in exception handler: '.$location;
+			return 'Error in exception handler: '.$location;
+		}
+
+		return 'Error in exception handler.';
 	}
 
 	/**
