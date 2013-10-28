@@ -46,17 +46,17 @@ class SQLiteGrammar extends Grammar {
 		// row inserts in SQLite. However, if there are multiples, we'll continue.
 		if (count($values) == 1)
 		{
-			return parent::compileInsert($query, $values[0]);
+			return parent::compileInsert($query, reset($values));
 		}
 
-		$names = $this->columnize(array_keys($values[0]));
+		$names = $this->columnize(array_keys(reset($values)));
 
 		$columns = array();
 
 		// SQLite requires us to build the multi-row insert as a listing of select with
 		// unions joining them together. So we'll build out this list of columns and
 		// then join them all together with select unions to complete the queries.
-		foreach (array_keys($values[0]) as $column)
+		foreach (array_keys(reset($values)) as $column)
 		{
 			$columns[] = '? as '.$this->wrap($column);
 		}
