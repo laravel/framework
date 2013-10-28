@@ -24,6 +24,8 @@
 		{"message": "New SessionInterface implementation - moved away from Symfony's implmentation.", "backport": null},
 		{"message": "Native session driver has been replaced be 'file'. Specifying 'native' driver will just use the new file driver.", "backport": null},
 		{"message": "Now using Stack\\Builder in Application::run.", "backport": null},
+		{"message": "Cookies should now be accessed via Input::cookie - Cookie::get will continue to work for this release.", "backport": null},
+		{"message": "When accessing cookies outside of a request context, you will need to decrypt them manually.", "backport": null},
 		{"message": "When unit testing, the application instance is now refreshed once per test class - not every test.", "backport": null}
 	],
 	"4.0.x": [
