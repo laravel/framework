@@ -22,7 +22,9 @@
 		{"message": "Support calling local controller methods as filters using @method syntax.", "backport": null},
 		{"message": "Support passing Carbon instances into Cache put style methods.", "backport": null},
 		{"message": "New SessionInterface implementation - moved away from Symfony's implmentation.", "backport": null},
-		{"message": "Now using Stack\\Builder in Application::run.", "backport": null}
+		{"message": "Native session driver has been replaced be 'file'. Specifying 'native' driver will just use the new file driver.", "backport": null},
+		{"message": "Now using Stack\\Builder in Application::run.", "backport": null},
+		{"message": "When unit testing, the application instance is now refreshed once per test class - not every test.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
