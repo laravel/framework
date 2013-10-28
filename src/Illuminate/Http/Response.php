@@ -94,9 +94,9 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 */
 	protected function shouldBeJson($content)
 	{
-		return ($content instanceof JsonableInterface or
-			    $content instanceof ArrayObject or
-			    is_array($content));
+		return $content instanceof JsonableInterface ||
+			   $content instanceof ArrayObject ||
+			   is_array($content);
 	}
 
 	/**
