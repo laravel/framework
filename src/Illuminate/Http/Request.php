@@ -48,7 +48,7 @@ class Request extends SymfonyRequest {
 	public function url()
 	{
 		return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
-	}	
+	}
 
 	/**
 	 * Get the full URL for the request.
@@ -117,13 +117,13 @@ class Request extends SymfonyRequest {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	/**
 	 * Determine if the request is the result of an AJAX call.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function ajax()
@@ -265,7 +265,9 @@ class Request extends SymfonyRequest {
 	 */
 	public function hasFile($key)
 	{
-		return $this->file($key) instanceof \SplFileInfo;
+		if (is_array($file = $this->file($key))) $file = head($file);
+
+		return $file instanceof \SplFileInfo;
 	}
 
 	/**
@@ -327,7 +329,7 @@ class Request extends SymfonyRequest {
 	public function flashOnly($keys)
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
-		
+
 		return $this->flash('only', $keys);
 	}
 
@@ -340,7 +342,7 @@ class Request extends SymfonyRequest {
 	public function flashExcept($keys)
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
-		
+
 		return $this->flash('except', $keys);
 	}
 
