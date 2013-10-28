@@ -561,6 +561,34 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAggregateReset2()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', array())->andReturn(array(array('column2' => 'foo', 'column3' => 'bar')));
+		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('users');
+		$count = $builder->count('column1');
+		$this->assertEquals(1, $count);
+		$result = $builder->select('column2', 'column3')->get();
+		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result);
+	}
+
+
+	public function testAggregateReset3()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', array())->andReturn(array(array('column2' => 'foo', 'column3' => 'bar')));
+		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('users');
+		$count = $builder->count('column1');
+		$this->assertEquals(1, $count);
+		$result = $builder->get('column2', 'column3');
+		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result);
+	}
+
+
 	public function testInsertMethod()
 	{
 		$builder = $this->getBuilder();
