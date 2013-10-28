@@ -48,6 +48,8 @@ class KeyGenerateCommand extends Command {
 
 		$this->files->put($path, $contents);
 
+		$this->laravel['config']['app.key'] = $key;
+
 		$this->info("Application key [$key] set successfully.");
 	}
 

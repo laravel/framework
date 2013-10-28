@@ -98,7 +98,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		$line = array_get($this->loaded[$namespace][$group][$locale], $item);
 
-		if ($line) return $this->makeReplacements($line, $replace);
+		if ( ! is_null($line)) return $this->makeReplacements($line, $replace);
 	}
 
 	/**
