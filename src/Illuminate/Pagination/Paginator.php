@@ -87,7 +87,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		$this->env = $env;
 		$this->items = $items;
 		$this->total = (int) $total;
-		$this->perPage = (int) $perPage;
+		$this->perPage = (int) $perPage > 0 ? $perPage : $this->total;
 	}
 
 	/**
