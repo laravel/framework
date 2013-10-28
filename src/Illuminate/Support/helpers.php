@@ -282,11 +282,12 @@ if ( ! function_exists('array_only'))
 	 *
 	 * @param  array  $array
 	 * @param  array  $keys
+	 * @param  array  $defaults
 	 * @return array
 	 */
-	function array_only($array, $keys)
+	function array_only($array, $keys, $defaults = array())
 	{
-		return array_intersect_key($array, array_flip((array) $keys));
+		return array_merge($defaults, array_intersect_key($array, array_flip((array) $keys)));
 	}
 }
 
