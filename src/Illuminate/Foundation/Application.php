@@ -882,7 +882,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
 		$parameters = array($url, 'GET', array(), array(), array(), $_SERVER);
 
-		$this->instance('request', static::onRequest('create', $parameters));
+		$this->refreshRequest(static::onRequest('create', $parameters));
 	}
 
 	/**
