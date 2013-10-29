@@ -714,7 +714,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSQLiteBuilder();
 		$builder->select('*')->from('users')->orderBy('email', 'desc');
-		$this->assertEquals('select * from "users" order by "email" collate nocase desc', $builder->toSql());
+		$this->assertEquals('select * from "users" order by "email" desc', $builder->toSql());
 	}
 
 

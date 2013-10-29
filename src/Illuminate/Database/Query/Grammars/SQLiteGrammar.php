@@ -17,7 +17,7 @@ class SQLiteGrammar extends Grammar {
 
 		return 'order by '.implode(', ', array_map(function($order) use ($me)
 		{
-			return $me->wrap($order['column']).' collate nocase '.$order['direction'];
+			return $me->wrap($order['column']).' '.$order['direction'];
 		}
 		, $orders));
 	}
