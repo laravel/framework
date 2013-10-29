@@ -276,7 +276,9 @@ class Request extends SymfonyRequest {
 	 */
 	public function hasFile($key)
 	{
-		return $this->file($key) instanceof \SplFileInfo;
+		if (is_array($file = $this->file($key))) $file = head($file);
+
+		return $file instanceof \SplFileInfo;
 	}
 
 	/**
