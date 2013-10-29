@@ -163,11 +163,12 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	/**
 	 * Get the pagination links view.
 	 *
+	 * @param  string  $view
 	 * @return \Illuminate\View\View
 	 */
-	public function links()
+	public function links($view = null)
 	{
-		return $this->env->getPaginationView($this);
+		return $this->env->getPaginationView($this, $view);
 	}
 
 	/**
@@ -440,7 +441,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	public function toArray()
 	{
 		return array(
-			'total' => $this->total, 'per_page' => $this->perPage, 
+			'total' => $this->total, 'per_page' => $this->perPage,
 			'current_page' => $this->currentPage, 'last_page' => $this->lastPage,
 			'from' => $this->from, 'to' => $this->to, 'data' => $this->getCollection()->toArray(),
 		);
