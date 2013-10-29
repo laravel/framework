@@ -445,7 +445,7 @@ class Environment {
 	{
 		if ($content === '')
 		{
-			ob_start() and $this->sectionStack[] = $section;
+			ob_start() && $this->sectionStack[] = $section;
 		}
 		else
 		{

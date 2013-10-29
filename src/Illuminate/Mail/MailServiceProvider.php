@@ -40,7 +40,7 @@ class MailServiceProvider extends ServiceProvider {
 			// on each one, which makes the developer's life a lot more convenient.
 			$from = $app['config']['mail.from'];
 
-			if (is_array($from) and isset($from['address']))
+			if (is_array($from) && isset($from['address']))
 			{
 				$mailer->alwaysFrom($from['address'], $from['name']);
 			}

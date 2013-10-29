@@ -48,7 +48,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	public function load($locale, $group, $namespace = null)
 	{
-		if (is_null($namespace) or $namespace == '*')
+		if (is_null($namespace) || $namespace == '*')
 		{
 			return $this->loadPath($this->path, $locale, $group);
 		}

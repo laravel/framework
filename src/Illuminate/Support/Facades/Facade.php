@@ -93,7 +93,7 @@ abstract class Facade {
 	{
 		$name = static::getFacadeAccessor();
 
-		return isset(static::$resolvedInstance[$name]) and static::$resolvedInstance[$name] instanceof MockInterface;
+		return isset(static::$resolvedInstance[$name]) && static::$resolvedInstance[$name] instanceof MockInterface;
 	}
 
 	/**

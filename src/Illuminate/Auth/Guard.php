@@ -135,7 +135,7 @@ class Guard {
 		// the application. Once we have a user we can return it to the caller.
 		$recaller = $this->getRecaller();
 
-		if (is_null($user) and ! is_null($recaller))
+		if (is_null($user) && ! is_null($recaller))
 		{
 			$user = $this->provider->retrieveByID($recaller);
 

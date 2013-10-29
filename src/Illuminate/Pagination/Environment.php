@@ -127,7 +127,7 @@ class Environment {
 	{
 		$page = (int) $this->currentPage ?: $this->request->query->get($this->pageName, 1);
 
-		if ($page < 1 or filter_var($page, FILTER_VALIDATE_INT) === false)
+		if ($page < 1 || filter_var($page, FILTER_VALIDATE_INT) === false)
 		{
 			return 1;
 		}

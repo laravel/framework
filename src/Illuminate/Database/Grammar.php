@@ -62,7 +62,7 @@ abstract class Grammar {
 		// segments as if it was a table and the rest as just regular values.
 		foreach ($segments as $key => $segment)
 		{
-			if ($key == 0 and count($segments) > 1)
+			if ($key == 0 && count($segments) > 1)
 			{
 				$wrapped[] = $this->wrapTable($segment);
 			}
