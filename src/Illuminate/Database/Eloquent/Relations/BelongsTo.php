@@ -103,10 +103,17 @@ class BelongsTo extends Relation {
 	 */
 	public function addEagerConstraints(array $models)
 	{
-		// We'll grab the primary key name of the related models since it could be set to
-		// a non-standard name and not "id". We will then construct the constraint for
-		// our eagerly loading query so it returns the proper models from execution.
-		$key = $this->related->getKeyName();
+		if (is_null($this->otherKey))
+		{
+			// We'll grab the primary key name of the related models since it could be set to
+			// a non-standard name and not "id". We will then construct the constraint for
+			// our eagerly loading query so it returns the proper models from execution.
+			$key = $this->related->getKeyName();
+		}
+		else
+		{
+			$key = $this->otherKey;
+		}
 
 		$key = $this->related->getTable().'.'.$key;
 
