@@ -17,7 +17,7 @@ abstract class Job {
 	protected $container;
 
 	/**
-	 * Has the job been deleted for the backend
+	 * Indicates if the job has been deleted.
 	 *
 	 * @var bool
 	 */
@@ -41,7 +41,7 @@ abstract class Job {
 	}
 
 	/**
-	 * Has this job been deleted from the backend
+	 * Determine if the job has been deleted.
 	 *
 	 * @return bool
 	 */

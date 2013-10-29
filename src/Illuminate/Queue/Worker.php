@@ -75,7 +75,7 @@ class Worker {
 			// If we catch an exception, we will attempt to release the job back onto
 			// the queue so it is not lost. This will let is be retried at a later
 			// time by another listener (or the same one). We will do that here.
-			if (!$job->isDeleted()) $job->release($delay);
+			if ( ! $job->isDeleted()) $job->release($delay);
 
 			throw $e;
 		}
