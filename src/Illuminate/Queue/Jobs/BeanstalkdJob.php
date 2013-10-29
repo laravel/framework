@@ -55,6 +55,7 @@ class BeanstalkdJob extends Job {
 	public function delete()
 	{
 		parent::delete();
+
 		$this->pheanstalk->delete($this->job);
 	}
 
