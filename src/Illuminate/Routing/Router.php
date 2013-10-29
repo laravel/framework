@@ -818,7 +818,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if ($action instanceof Closure) return false;
 
-		return is_string($action) or is_string(array_get($action, 'uses'));
+		return is_string($action) || is_string(array_get($action, 'uses'));
 	}
 
 	/**
@@ -1227,7 +1227,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$methods = $filter['methods'];
 
-		return (is_null($methods) or in_array($method, $methods));
+		return (is_null($methods) || in_array($method, $methods));
 	}
 
 	/**

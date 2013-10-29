@@ -70,7 +70,7 @@ class ControllerInspector {
 	{
 		if ($method->class == 'Illuminate\Routing\Controller') return false;
 
-		return $method->isPublic() and starts_with($method->name, $this->verbs);
+		return $method->isPublic() && starts_with($method->name, $this->verbs);
 	}
 
 	/**

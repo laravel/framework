@@ -126,7 +126,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		if ($this->app->runningInConsole()) return true;
 
-		return $this->app->isBooted() and $this->requestWantsJson();
+		return $this->app->isBooted() && $this->requestWantsJson();
 	}
 
 	/**
@@ -136,7 +136,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function requestWantsJson()
 	{
-		return $this->app['request']->ajax() or $this->app['request']->wantsJson();
+		return $this->app['request']->ajax() || $this->app['request']->wantsJson();
 	}
 
 	/**

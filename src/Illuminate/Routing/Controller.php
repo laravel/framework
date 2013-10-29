@@ -111,7 +111,7 @@ abstract class Controller {
 	 */
 	protected function isInstanceFilter($filter)
 	{
-		if (is_string($filter) and starts_with($filter, '@'))
+		if (is_string($filter) && starts_with($filter, '@'))
 		{
 			if (method_exists($this, substr($filter, 1))) return true;
 
