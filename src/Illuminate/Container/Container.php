@@ -573,11 +573,11 @@ class Container implements ArrayAccess {
 	 * @param  string  $abstract
 	 * @return bool
 	 */
-	protected function isShared($abstract)
+	public function isShared($abstract)
 	{
-		$set = isset($this->bindings[$abstract]['shared']);
+		$shared = array_get($this->bindings, "{$abstract}.shared");
 
-		return $set && $this->bindings[$abstract]['shared'] === true;
+		return isset($this->instances[$abstract]) || $shared === true;
 	}
 
 	/**
@@ -611,6 +611,27 @@ class Container implements ArrayAccess {
 	public function getBindings()
 	{
 		return $this->bindings;
+	}
+
+	/**
+	 * Remove a resolved instance from the instance cache.
+	 *
+	 * @param  string  $abstract
+	 * @return void
+	 */
+	public function forgetInstance($abstract)
+	{
+		unset($this->instances[$abstract]);
+	}
+
+	/**
+	 * Clear all of the instances from the container.
+	 *
+	 * @return void
+	 */
+	public function forgetInstances()
+	{
+		$this->instances = array();
 	}
 
 	/**
