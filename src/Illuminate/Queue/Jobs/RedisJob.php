@@ -60,6 +60,7 @@ class RedisJob extends Job {
 	 */
 	public function delete()
 	{
+		parent::delete();
 		$this->redis->deleteReserved($this->queue, $this->job);
 	}
 
