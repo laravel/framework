@@ -1,10 +1,6 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Closure;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator {

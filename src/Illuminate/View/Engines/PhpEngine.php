@@ -1,7 +1,6 @@
 <?php namespace Illuminate\View\Engines;
 
 use Illuminate\View\Exception;
-use Illuminate\View\Environment;
 
 class PhpEngine implements EngineInterface {
 

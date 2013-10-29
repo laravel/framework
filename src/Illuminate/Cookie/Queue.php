@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Cookie;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class Queue implements HttpKernelInterface {

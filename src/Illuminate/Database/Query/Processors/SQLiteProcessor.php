@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Database\Query\Processors;
 
-use Illuminate\Database\Query\Builder;
-
 class SQLiteProcessor extends Processor {
 
 	/**
