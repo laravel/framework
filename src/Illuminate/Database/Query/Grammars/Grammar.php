@@ -506,12 +506,23 @@ class Grammar extends BaseGrammar {
 
 		foreach ($query->unions as $union)
 		{
-			$joiner = $union['all'] ? ' union all ' : ' union ';
-
-			$sql .= $joiner.$union['query']->toSql();
+			$sql .= $this->compileUnion($union);
 		}
 
 		return ltrim($sql);
+	}
+
+	/**
+	 * Compile a single union statement.
+	 *
+	 * @param  array  $union
+	 * @return string
+	 */
+	protected function compileUnion(array $union)
+	{
+		$joiner = $union['all'] ? ' union all ' : ' union ';
+
+		return $joiner.$union['query']->toSql();
 	}
 
 	/**
