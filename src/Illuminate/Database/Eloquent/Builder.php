@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
-use DateTime;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;

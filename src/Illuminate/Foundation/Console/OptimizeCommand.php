@@ -2,10 +2,8 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
-use Illuminate\Foundation\AssetPublisher;
 use ClassPreloader\Command\PreCompileCommand;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class OptimizeCommand extends Command {
 

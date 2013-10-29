@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Html;
 
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Html\HtmlBuilder as Html;
 use Illuminate\Session\Store as Session;
 
 class FormBuilder {

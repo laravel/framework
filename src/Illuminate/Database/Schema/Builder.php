@@ -2,7 +2,6 @@
 
 use Closure;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Grammars\Grammar;
 
 class Builder {
 

@@ -3,7 +3,6 @@
 use PDO;
 use Closure;
 use DateTime;
-use Illuminate\Cache\CacheManager;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 

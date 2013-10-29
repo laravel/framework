@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database;
 
-use Illuminate\Support\Manager;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseManager implements ConnectionResolverInterface {

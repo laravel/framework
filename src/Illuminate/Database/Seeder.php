@@ -2,7 +2,6 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
 
 class Seeder {
 
