@@ -173,7 +173,7 @@ class ViewServiceProvider extends ServiceProvider {
 	{
 		$config = $app['config']['session'];
 
-		if (isset($app['session.store']) and ! is_null($config['driver']))
+		if (isset($app['session.store']) && ! is_null($config['driver']))
 		{
 			return $app['session.store']->has('errors');
 		}

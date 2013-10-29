@@ -394,7 +394,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeDouble(Fluent $column)
 	{
-		if ($column->total and $column->places)
+		if ($column->total && $column->places)
 		{
 			return "double({$column->total}, {$column->places})";
 		}
@@ -542,7 +542,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if (in_array($column->type, $this->serials) and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) && $column->autoIncrement)
 		{
 			return ' auto_increment primary key';
 		}

@@ -122,7 +122,7 @@ class Encrypter {
 		// If the payload is not valid JSON or does not have the proper keys set we will
 		// assume it is invalid and bail out of the routine since we will not be able
 		// to decrypt the given value. We'll also check the MAC for this encryption.
-		if ( ! $payload or $this->invalidPayload($payload))
+		if ( ! $payload || $this->invalidPayload($payload))
 		{
 			throw new DecryptException("Invalid data.");
 		}
@@ -206,7 +206,7 @@ class Encrypter {
 	 */
 	protected function invalidPayload($data)
 	{
-		return ! is_array($data) or ! isset($data['iv']) or ! isset($data['value']) or ! isset($data['mac']);
+		return ! is_array($data) || ! isset($data['iv']) || ! isset($data['value']) || ! isset($data['mac']);
 	}
 
 	/**
