@@ -194,7 +194,16 @@ breeze
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
-
+	
+	
+	public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled() 
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = "Foo @lang(function_call('foo(blah)')) bar";
+		$expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+	
 
 	public function testIncludesAreCompiled()
 	{
