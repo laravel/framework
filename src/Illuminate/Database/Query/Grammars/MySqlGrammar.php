@@ -12,6 +12,55 @@ class MySqlGrammar extends Grammar {
 	protected $wrapper = '`%s`';
 
 	/**
+	 * The components that make up a select clause.
+	 *
+	 * @var array
+	 */
+	protected $selectComponents = array(
+		'aggregate',
+		'columns',
+		'from',
+		'joins',
+		'wheres',
+		'groups',
+		'havings',
+		'orders',
+		'limit',
+		'offset',
+	);
+
+	/**
+	 * Compile a select query into SQL.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder
+	 * @return string
+	 */
+	public function compileSelect(Builder $query)
+	{
+		$sql = parent::compileSelect($query);
+
+		if ($query->unions)
+		{
+			$sql = '('.$sql.') '.$this->compileUnions($query);
+		}
+
+		return $sql;
+	}
+
+	/**
+	 * Compile a single union statement.
+	 *
+	 * @param  array  $union
+	 * @return string
+	 */
+	protected function compileUnion(array $union)
+	{
+		$joiner = $union['all'] ? ' union all ' : ' union ';
+
+		return $joiner.'('.$union['query']->toSql().')';
+	}
+
+	/**
 	 * Compile an update statement into SQL.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
