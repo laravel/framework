@@ -3,8 +3,6 @@
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class AutoloadCommand extends Command {
 

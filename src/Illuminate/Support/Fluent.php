@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Support;
 
-use Closure;
 use ArrayAccess;
 
 class Fluent implements ArrayAccess {

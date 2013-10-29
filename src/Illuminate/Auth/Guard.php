@@ -2,7 +2,6 @@
 
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\Response;
