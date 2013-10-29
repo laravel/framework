@@ -87,7 +87,7 @@ class FileSessionHandler implements \SessionHandlerInterface {
 		$files = Finder::create()
 					->in($this->path)
 					->files()
-					->ignoreDotFiles()
+					->ignoreDotFiles(true)
 					->date('<= now - '.$lifetime.' seconds');
 
 		foreach ($files as $file)
