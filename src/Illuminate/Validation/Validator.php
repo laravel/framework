@@ -197,7 +197,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  string|array  $rules
 	 * @return void
 	 */
-	protected function mergeRules($attribute, $rules)
+	public function mergeRules($attribute, $rules)
 	{
 		$current = array_get($this->rules, $attribute, array());
 
@@ -1835,7 +1835,7 @@ class Validator implements MessageProviderInterface {
 	public function messages()
 	{
 		if ( ! $this->messages) $this->passes();
-		
+
 		return $this->messages;
 	}
 
@@ -1847,7 +1847,7 @@ class Validator implements MessageProviderInterface {
 	public function errors()
 	{
 		if ( ! $this->messages) $this->passes();
-		
+
 		return $this->messages;
 	}
 
