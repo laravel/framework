@@ -58,6 +58,7 @@ class SyncJob extends Job {
 	 */
 	public function delete()
 	{
+		parent::delete();
 		//
 	}
 
