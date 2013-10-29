@@ -183,6 +183,18 @@ class Container implements ArrayAccess {
 	}
 
 	/**
+	 * Bind a shared Closure into the container.
+	 *
+	 * @param  string  $abstract
+	 * @param  \Closure  $closure
+	 * @return void
+	 */
+	public function bindShared($abstract, Closure $closure)
+	{
+		return $this->bind($abstract, $this->share($closure), true);
+	}
+
+	/**
 	 * "Extend" an abstract type in the container.
 	 *
 	 * @param  string   $abstract

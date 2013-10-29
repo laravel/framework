@@ -24,7 +24,7 @@ class MailServiceProvider extends ServiceProvider {
 	{
 		$this->registerSwiftMailer();
 
-		$this->app['mailer'] = $this->app->share(function($app)
+		$this->app->bindShared('mailer', function($app)
 		{
 			// Once we have create the mailer instance, we will set a container instance
 			// on the mailer. This allows us to resolve mailer classes via containers

@@ -38,7 +38,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSessionManager()
 	{
-		$this->app['session'] = $this->app->share(function($app)
+		$this->app->bindShared('session', function($app)
 		{
 			return new SessionManager($app);
 		});
@@ -51,7 +51,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSessionDriver()
 	{
-		$this->app['session.store'] = $this->app->share(function($app)
+		$this->app->bindShared('session.store', function($app)
 		{
 			// First, we will create the session manager which is responsible for the
 			// creation of the various session drivers when they are needed by the

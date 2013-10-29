@@ -18,7 +18,7 @@ class PaginationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app['paginator'] = $this->app->share(function($app)
+		$this->app->bindShared('paginator', function($app)
 		{
 			$paginator = new Environment($app['request'], $app['view'], $app['translator']);
 

@@ -42,7 +42,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerAssetPublishCommand();
 
-		$this->app['asset.publisher'] = $this->app->share(function($app)
+		$this->app->bindShared('asset.publisher', function($app)
 		{
 			$publicPath = $app['path.public'];
 
@@ -64,7 +64,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerAssetPublishCommand()
 	{
-		$this->app['command.asset.publish'] = $this->app->share(function($app)
+		$this->app->bindShared('command.asset.publish', function($app)
 		{
 			return new AssetPublishCommand($app['asset.publisher']);
 		});
@@ -79,14 +79,14 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerConfigPublishCommand();
 
-		$this->app['config.publisher'] = $this->app->share(function($app)
+		$this->app->bindShared('config.publisher', function($app)
 		{
-			$configPath = $app['path'].'/config';
+			$path = $app['path'].'/config';
 
 			// Once we have created the configuration publisher, we will set the default
 			// package path on the object so that it knows where to find the packages
 			// that are installed for the application and can move them to the app.
-			$publisher = new ConfigPublisher($app['files'], $configPath);
+			$publisher = new ConfigPublisher($app['files'], $path);
 
 			$publisher->setPackagePath($app['path.base'].'/vendor');
 
@@ -101,7 +101,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerConfigPublishCommand()
 	{
-		$this->app['command.config.publish'] = $this->app->share(function($app)
+		$this->app->bindShared('command.config.publish', function($app)
 		{
 			return new ConfigPublishCommand($app['config.publisher']);
 		});
@@ -116,7 +116,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerViewPublishCommand();
 
-		$this->app['view.publisher'] = $this->app->share(function($app)
+		$this->app->bindShared('view.publisher', function($app)
 		{
 			$viewPath = $app['path'].'/views';
 
@@ -138,7 +138,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerViewPublishCommand()
 	{
-		$this->app['command.view.publish'] = $this->app->share(function($app)
+		$this->app->bindShared('command.view.publish', function($app)
 		{
 			return new ViewPublishCommand($app['view.publisher']);
 		});

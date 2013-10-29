@@ -20,12 +20,12 @@ class ComposerServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app['composer'] = $this->app->share(function($app)
+		$this->app->bindShared('composer', function($app)
 		{
 			return new Composer($app['files'], $app['path.base']);
 		});
 
-		$this->app['command.dump-autoload'] = $this->app->share(function($app)
+		$this->app->bindShared('command.dump-autoload', function($app)
 		{
 			return new AutoloadCommand($app['composer']);
 		});

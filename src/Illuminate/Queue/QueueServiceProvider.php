@@ -44,7 +44,7 @@ class QueueServiceProvider extends ServiceProvider {
 	{
 		$me = $this;
 
-		$this->app['queue'] = $this->app->share(function($app) use ($me)
+		$this->app->bindShared('queue', function($app) use ($me)
 		{
 			// Once we have an instance of the queue manager, we will register the various
 			// resolvers for the queue connectors. These connectors are responsible for
@@ -66,7 +66,7 @@ class QueueServiceProvider extends ServiceProvider {
 	{
 		$this->registerWorkCommand();
 
-		$this->app['queue.worker'] = $this->app->share(function($app)
+		$this->app->bindShared('queue.worker', function($app)
 		{
 			return new Worker($app['queue']);
 		});
@@ -79,9 +79,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerWorkCommand()
 	{
-		$app = $this->app;
-
-		$app['command.queue.work'] = $app->share(function($app)
+		$this->app->bindShared('command.queue.work', function($app)
 		{
 			return new WorkCommand($app['queue.worker']);
 		});
@@ -98,7 +96,7 @@ class QueueServiceProvider extends ServiceProvider {
 	{
 		$this->registerListenCommand();
 
-		$this->app['queue.listener'] = $this->app->share(function($app)
+		$this->app->bindShared('queue.listener', function($app)
 		{
 			return new Listener($app['path.base']);
 		});
@@ -111,9 +109,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerListenCommand()
 	{
-		$app = $this->app;
-
-		$app['command.queue.listen'] = $app->share(function($app)
+		$this->app->bindShared('command.queue.listen', function($app)
 		{
 			return new ListenCommand($app['queue.listener']);
 		});
@@ -128,9 +124,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSubscriber()
 	{
-		$app = $this->app;
-
-		$app['command.queue.subscribe'] = $app->share(function($app)
+		$this->app->bindShared('command.queue.subscribe', function($app)
 		{
 			return new SubscribeCommand;
 		});

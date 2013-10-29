@@ -11,7 +11,7 @@ class EncryptionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app['encrypter'] = $this->app->share(function($app)
+		$this->app->bindShared('encrypter', function($app)
 		{
 			return new Encrypter($app['config']['app.key']);
 		});
