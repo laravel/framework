@@ -18,12 +18,12 @@ class CacheServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app['cache'] = $this->app->share(function($app)
+		$this->app->bindShared('cache', function($app)
 		{
 			return new CacheManager($app);
 		});
 
-		$this->app['memcached.connector'] = $this->app->share(function()
+		$this->app->bindShared('memcached.connector', function()
 		{
 			return new MemcachedConnector;
 		});
@@ -38,7 +38,7 @@ class CacheServiceProvider extends ServiceProvider {
 	 */
 	public function registerCommands()
 	{
-		$this->app['command.cache.clear'] = $this->app->share(function($app)
+		$this->app->bindShared('command.cache.clear', function($app)
 		{
 			return new Console\ClearCommand($app['cache'], $app['files']);
 		});

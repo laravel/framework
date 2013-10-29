@@ -36,9 +36,9 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerEngineResolver()
 	{
-		list($me, $app) = array($this, $this->app);
+		$me = $this;
 
-		$app['view.engine.resolver'] = $app->share(function($app) use ($me)
+		$this->app->bindShared('view.engine.resolver', function($app) use ($me)
 		{
 			$resolver = new EngineResolver;
 
@@ -95,7 +95,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerViewFinder()
 	{
-		$this->app['view.finder'] = $this->app->share(function($app)
+		$this->app->bindShared('view.finder', function($app)
 		{
 			$paths = $app['config']['view.paths'];
 
@@ -110,7 +110,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerEnvironment()
 	{
-		$this->app['view'] = $this->app->share(function($app)
+		$this->app->bindShared('view', function($app)
 		{
 			// Next we need to grab the engine resolver instance that will be used by the
 			// environment. The resolver will be used by an environment to get each of

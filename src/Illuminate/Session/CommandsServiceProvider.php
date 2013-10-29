@@ -18,9 +18,7 @@ class CommandsServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$app = $this->app;
-
-		$app['command.session.database'] = $app->share(function($app)
+		$this->app->bindShared('command.session.database', function($app)
 		{
 			return new Console\MakeTableCommand($app['files']);
 		});
