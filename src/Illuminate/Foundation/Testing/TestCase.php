@@ -42,6 +42,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Creates the application.
+	 *
+	 * Needs to be implemented by subclasses.
+	 *
+	 * @return Symfony\Component\HttpKernel\HttpKernelInterface
+	 */
+	abstract protected function createApplication();
+
+	/**
 	 * Call the given URI and return the Response.
 	 *
 	 * @param  string  $method
