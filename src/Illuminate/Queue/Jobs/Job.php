@@ -17,6 +17,13 @@ abstract class Job {
 	protected $container;
 
 	/**
+	 * Has the job been deleted for the backend
+	 *
+	 * @var bool
+	 */
+	protected $deleted = false;
+
+	/**
 	 * Fire the job.
 	 *
 	 * @return void
@@ -28,7 +35,20 @@ abstract class Job {
 	 *
 	 * @return void
 	 */
-	abstract public function delete();
+	public function delete()
+	{
+		$this->deleted = true;
+	}
+
+	/**
+	 * Has this job been deleted from the backend
+	 *
+	 * @return bool
+	 */
+	public function isDeleted()
+	{
+		return $this->deleted;
+	}
 
 	/**
 	 * Release the job back into the queue.

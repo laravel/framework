@@ -63,6 +63,7 @@ class SqsJob extends Job {
 	 */
 	public function delete()
 	{
+		parent::delete();
 		$this->sqs->deleteMessage(array(
 
 			'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
