@@ -352,7 +352,7 @@ class Builder {
 	{
 		$isOperator = in_array($operator, $this->operators);
 
-		return ($isOperator and $operator != '=' and is_null($value));
+		return ($isOperator && $operator != '=' && is_null($value));
 	}
 
 	/**
@@ -731,7 +731,7 @@ class Builder {
 			// If the segment is not a boolean connector, we can assume it is a column's name
 			// and we will add it to the query as a new constraint as a where clause, then
 			// we can keep iterating through the dynamic method string's segments again.
-			if ($segment != 'And' and $segment != 'Or')
+			if ($segment != 'And' && $segment != 'Or')
 			{
 				$this->addDynamic($segment, $connector, $parameters, $index);
 
@@ -1188,7 +1188,7 @@ class Builder {
 		// If a key was specified and we have results, we will go ahead and combine
 		// the values with the keys of all of the records so that the values can
 		// be accessed by the key of the rows instead of simply being numeric.
-		if ( ! is_null($key) and count($results) > 0)
+		if ( ! is_null($key) && count($results) > 0)
 		{
 			$keys = $results->fetch($key)->all();
 

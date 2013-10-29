@@ -253,7 +253,7 @@ class Handler {
 			// If this handler returns a "non-null" response, we will return it so it will
 			// get sent back to the browsers. Once the handler returns a valid response
 			// we will cease iterating through them and calling these other handlers.
-			if (isset($response) and ! is_null($response))
+			if (isset($response) && ! is_null($response))
 			{
 				return $response;
 			}
@@ -300,7 +300,7 @@ class Handler {
 
 		$expected = $parameters[0];
 
-		return ! $expected->getClass() or $expected->getClass()->isInstance($exception);
+		return ! $expected->getClass() || $expected->getClass()->isInstance($exception);
 	}
 
 	/**

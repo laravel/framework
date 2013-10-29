@@ -159,7 +159,7 @@ class Request extends SymfonyRequest {
 			return true;
 		}
 
-		if (is_bool($this->input($key)) or is_array($this->input($key)))
+		if (is_bool($this->input($key)) || is_array($this->input($key)))
 		{
 			return true;
 		}
@@ -457,7 +457,7 @@ class Request extends SymfonyRequest {
 	{
 		$acceptable = $this->getAcceptableContentTypes();
 
-		return isset($acceptable[0]) and $acceptable[0] == 'application/json';
+		return isset($acceptable[0]) && $acceptable[0] == 'application/json';
 	}
 
 	/**

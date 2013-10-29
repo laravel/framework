@@ -141,7 +141,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		// The page number will get validated and adjusted if it either less than one
 		// or greater than the last page available based on the count of the given
 		// items array. If it's greater than the last, we'll give back the last.
-		if (is_numeric($page) and $page > $lastPage)
+		if (is_numeric($page) && $page > $lastPage)
 		{
 			return $lastPage > 0 ? $lastPage : 1;
 		}
@@ -157,7 +157,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 */
 	protected function isValidPageNumber($page)
 	{
-		return $page >= 1 and filter_var($page, FILTER_VALIDATE_INT) !== false;
+		return $page >= 1 && filter_var($page, FILTER_VALIDATE_INT) !== false;
 	}
 
 	/**

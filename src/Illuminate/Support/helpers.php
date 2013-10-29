@@ -233,7 +233,7 @@ if ( ! function_exists('array_forget'))
 		{
 			$key = array_shift($keys);
 
-			if ( ! isset($array[$key]) or ! is_array($array[$key]))
+			if ( ! isset($array[$key]) || ! is_array($array[$key]))
 			{
 				return;
 			}
@@ -263,7 +263,7 @@ if ( ! function_exists('array_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
-			if ( ! is_array($array) or ! array_key_exists($segment, $array))
+			if ( ! is_array($array) || ! array_key_exists($segment, $array))
 			{
 				return value($default);
 			}
@@ -371,7 +371,7 @@ if ( ! function_exists('array_set'))
 			// If the key doesn't exist at this depth, we will just create an empty array
 			// to hold the next value, allowing us to create the arrays to hold final
 			// values at the correct depth. Then we'll keep digging into the array.
-			if ( ! isset($array[$key]) or ! is_array($array[$key]))
+			if ( ! isset($array[$key]) || ! is_array($array[$key]))
 			{
 				$array[$key] = array();
 			}
@@ -635,7 +635,7 @@ if ( ! function_exists('object_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
-			if ( ! is_object($object) or ! isset($object->{$segment}))
+			if ( ! is_object($object) || ! isset($object->{$segment}))
 			{
 				return value($default);
 			}

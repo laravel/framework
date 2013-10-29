@@ -54,7 +54,7 @@ class OptimizeCommand extends Command {
 
 		$this->composer->dumpOptimized();
 
-		if ($this->option('force') or ! $this->laravel['config']['app.debug'])
+		if ($this->option('force') || ! $this->laravel['config']['app.debug'])
 		{
 			$this->info('Compiling common classes');
 
