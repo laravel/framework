@@ -91,7 +91,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	public function testGetLinksCallsEnvironmentProperly()
 	{
 		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
-		$env->shouldReceive('getPaginationView')->once()->with($p)->andReturn('foo');
+		$env->shouldReceive('getPaginationView')->once()->with($p, null)->andReturn('foo');
 
 		$this->assertEquals('foo', $p->links());
 	}

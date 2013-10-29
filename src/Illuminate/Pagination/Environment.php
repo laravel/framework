@@ -109,13 +109,14 @@ class Environment {
 	 * Get the pagination view.
 	 *
 	 * @param  \Illuminate\Pagination\Paginator  $paginator
+	 * @param  string  $view
 	 * @return \Illuminate\View\View
 	 */
-	public function getPaginationView(Paginator $paginator)
+	public function getPaginationView(Paginator $paginator, $view = null)
 	{
 		$data = array('environment' => $this, 'paginator' => $paginator);
 
-		return $this->view->make($this->getViewName(), $data);
+		return $this->view->make($this->getViewName($view), $data);
 	}
 
 	/**
@@ -191,10 +192,13 @@ class Environment {
 	/**
 	 * Get the name of the pagination view.
 	 *
+	 * @param  string  $view
 	 * @return string
 	 */
-	public function getViewName()
+	public function getViewName($view = null)
 	{
+		if ( ! is_null($view)) return $view;
+
 		return $this->viewName ?: 'pagination::slider';
 	}
 
