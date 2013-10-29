@@ -1241,7 +1241,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = 15, $columns = array('*'))
+	public function paginate($perPage = 15, $columns = array('*'), $countColumn = '*')
 	{
 		$paginator = $this->connection->getPaginator();
 
@@ -1251,7 +1251,7 @@ class Builder {
 		}
 		else
 		{
-			return $this->ungroupedPaginate($paginator, $perPage, $columns);
+			return $this->ungroupedPaginate($paginator, $perPage, $columns, $countColumn);
 		}
 	}
 
@@ -1298,9 +1298,9 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
+	protected function ungroupedPaginate($paginator, $perPage, $columns, $countColumn)
 	{
-		$total = $this->getPaginationCount();
+		$total = $this->getPaginationCount($countColumn);
 
 		// Once we have the total number of records to be paginated, we can grab the
 		// current page and the result array. Then we are ready to create a brand
@@ -1317,7 +1317,7 @@ class Builder {
 	 *
 	 * @return int
 	 */
-	public function getPaginationCount()
+	public function getPaginationCount($column = '*')
 	{
 		list($orders, $this->orders) = array($this->orders, null);
 
@@ -1326,7 +1326,7 @@ class Builder {
 		// Because some database engines may throw errors if we leave the ordering
 		// statements on the query, we will "back them up" and remove them from
 		// the query. Once we have the count we will put them back onto this.
-		$total = $this->count();
+		$total = $this->count($column);
 
 		$this->orders = $orders;
 
