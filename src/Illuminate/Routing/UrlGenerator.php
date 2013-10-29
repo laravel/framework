@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Routing;
 
 use InvalidArgumentException;
-use Illuminate\Routing\RouteCollection;
 use Symfony\Component\HttpFoundation\Request;
 
 class UrlGenerator {

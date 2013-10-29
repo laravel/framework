@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Cookie;
 
-use Closure;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CookieJar {

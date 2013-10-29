@@ -5,8 +5,6 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;

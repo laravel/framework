@@ -1,9 +1,7 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class MigrateCommand extends BaseCommand {
 

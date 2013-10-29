@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Closure;
-use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface {
