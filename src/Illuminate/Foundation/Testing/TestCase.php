@@ -3,7 +3,7 @@
 use Illuminate\View\View;
 use Illuminate\Auth\UserInterface;
 
-class TestCase extends \PHPUnit_Framework_TestCase {
+abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * The Illuminate application instance.
