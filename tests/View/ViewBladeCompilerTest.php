@@ -134,6 +134,14 @@ this is a comment
  */ ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
+	
+	public function testDefinitionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@define($foo, "bar")';
+		$expected = '<?php if ( ! isset($foo)) $foo = "bar"; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
 
 
 	public function testIfStatementsAreCompiled()
