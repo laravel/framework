@@ -668,9 +668,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
 	{
-		$firstKey = $firstKey ?: $this->getForeignKey();
-
 		$through = new $through;
+
+		$firstKey = $firstKey ?: $this->getForeignKey();
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
