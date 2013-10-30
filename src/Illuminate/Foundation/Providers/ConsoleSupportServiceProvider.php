@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Support\ServiceProvider;
+
 class ConsoleSupportProvider extends ServiceProvider {
 
 	/**
