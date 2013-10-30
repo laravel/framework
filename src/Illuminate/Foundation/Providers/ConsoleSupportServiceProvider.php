@@ -2,7 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class ConsoleSupportProvider extends ServiceProvider {
+class ConsoleSupportServiceProvider extends ServiceProvider {
 
 	/**
 	 * The provider class names.
