@@ -53,7 +53,7 @@ abstract class HasOneOrMany extends Relation {
 			}
 			else
 			{
-				$key = $this->otherKey;
+				$key = $this->parent->{$this->otherKey};
 			}
 
 			$this->query->where($this->foreignKey, '=', $key);
@@ -174,7 +174,16 @@ abstract class HasOneOrMany extends Relation {
 	 */
 	public function save(Model $model)
 	{
-		$model->setAttribute($this->getPlainForeignKey(), $this->parent->getKey());
+		if (is_null($this->otherKey))
+		{
+			$key = $this->parent->getKey();
+		}
+		else
+		{
+			$key = $this->parent->{$this->otherKey};
+		}
+
+		$model->setAttribute($this->getPlainForeignKey(), $key);
 
 		return $model->save() ? $model : false;
 	}
@@ -200,8 +209,17 @@ abstract class HasOneOrMany extends Relation {
 	 */
 	public function create(array $attributes)
 	{
+		if (is_null($this->otherKey))
+		{
+			$key = $this->parent->getKey();
+		}
+		else
+		{
+			$key = $this->parent->{$this->otherKey};
+		}
+
 		$foreign = array(
-			$this->getPlainForeignKey() => $this->parent->getKey()
+			$this->getPlainForeignKey() => $key
 		);
 
 		// Here we will set the raw attributes to avoid hitting the "fill" method so

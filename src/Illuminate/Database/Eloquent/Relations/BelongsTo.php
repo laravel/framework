@@ -130,12 +130,21 @@ class BelongsTo extends Relation {
 	{
 		$keys = array();
 
+		if (is_null($this->otherKey))
+		{
+			$key = $this->foreignKey;
+		}
+		else
+		{
+			$key = $this->otherKey;
+		}
+
 		// First we need to gather all of the keys from the parent models so we know what
 		// to query for via the eager loading query. We will add them to an array then
 		// execute a "where in" statement to gather up all of those related records.
 		foreach ($models as $model)
 		{
-			if ( ! is_null($value = $model->{$this->foreignKey}))
+			if ( ! is_null($value = $model->{$key}))
 			{
 				$keys[] = $value;
 			}
