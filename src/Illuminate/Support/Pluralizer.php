@@ -75,6 +75,7 @@ class Pluralizer {
 		'child' => 'children',
 		'foot' => 'feet',
 		'goose' => 'geese',
+		'human' => 'humans',
 		'man' => 'men',
 		'move' => 'moves',
 		'person' => 'people',
