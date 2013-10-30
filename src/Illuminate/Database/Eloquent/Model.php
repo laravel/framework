@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
@@ -654,6 +655,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$instance = new $related;
 
 		return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey);
+	}
+
+	/**
+	 * Define a has-many-through relationship.
+	 *
+	 * @param  string  $related
+	 * @param  string  $through
+	 * @param  string|null  $firstKey
+	 * @param  string|null  $secondKey
+	 * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+	 */
+	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
+	{
+		$firstKey = $firstKey ?: $this->getForeignKey();
+
+		$secondKey = $secondKey ?: with($through = new $through)->getForeignKey();
+
+		return new HasManyThrough(with(new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
