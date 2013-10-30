@@ -9,6 +9,7 @@ class ConsoleSupportProvider extends ServiceProvider {
 	 */
 	protected $providers = array(
 		'Illuminate\Foundation\Providers\CommandCreatorServiceProvider',
+		'Illuminate\Foundation\Providers\ComposerServiceProvider',
 		'Illuminate\Foundation\Providers\KeyGeneratorServiceProvider',
 		'Illuminate\Foundation\Providers\MaintenanceServiceProvider',
 		'Illuminate\Foundation\Providers\OptimizeServiceProvider',
