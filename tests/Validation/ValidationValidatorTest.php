@@ -573,13 +573,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	public function testValidationExists()
 	{
 		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.exists' => ':attribute is invalid!|:attribute are invalid!'), 'en', 'messages');
+
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users'));
 		$mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
 		$mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array())->andReturn(true);
 		$v->setPresenceVerifier($mock);
 		$this->assertTrue($v->passes());
 
-		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users,email,account_id,1,name,taylor'));
 		$mock4 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
 		$mock4->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array('account_id' => 1, 'name' => 'taylor'))->andReturn(true);
@@ -591,12 +592,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, null, array())->andReturn(false);
 		$v->setPresenceVerifier($mock2);
 		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('email is invalid!', $v->messages()->first('email'));
 
-		$v = new Validator($trans, array('email' => array('foo')), array('email' => 'Exists:users,email_addr'));
+		$v = new Validator($trans, array('emails' => array('foo', 'bar')), array('emails' => 'Exists:users,email_addr'));
 		$mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-		$mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', array('foo'), array())->andReturn(false);
+		$mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', array('foo', 'bar'), array())->andReturn(false);
 		$v->setPresenceVerifier($mock3);
 		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('emails are invalid!', $v->messages()->first('emails'));
 	}
 
 
