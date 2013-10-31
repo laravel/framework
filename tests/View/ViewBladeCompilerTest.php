@@ -71,6 +71,64 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ 
 			$name
 		}}'));
+
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name || "foo" }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name||"foo" }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{$name||"foo"}}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{
+			$name||"foo"
+		}}'));
+
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{ $name || \'foo\' }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{ $name||\'foo\' }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{$name||\'foo\'}}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{
+			$name||\'foo\'
+		}}'));
+
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{ $age || 90 }}'));
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{ $age||90 }}'));
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{$age||90}}'));
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{
+			$age||90
+		}}'));
+
+		$this->assertEquals('<?php echo "Hello world || foo"; ?>', $compiler->compileString('{{ "Hello world || foo" }}'));
+		$this->assertEquals('<?php echo "Hello world||foo"; ?>', $compiler->compileString('{{ "Hello world||foo" }}'));
+		$this->assertEquals('<?php echo "Hello world||foo"; ?>', $compiler->compileString('{{"Hello world||foo"}}'));
+		$this->assertEquals('<?php echo "Hello world||foo"; ?>', $compiler->compileString('{{
+			"Hello world||foo"
+		}}'));
+
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name or "foo" }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{$name or "foo"}}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{
+			$name or "foo"
+		}}'));
+
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{ $name or \'foo\' }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{$name or \'foo\'}}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{
+			$name or \'foo\'
+		}}'));
+
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{ $age or 90 }}'));
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{$age or 90}}'));
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{
+			$age or 90
+		}}'));
+
+		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{ "Hello world or foo" }}'));
+		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{"Hello world or foo"}}'));
+		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{
+			"Hello world or foo"
+		}}'));
+
+		$this->assertEquals('<?php echo \'Hello world or foo\'; ?>', $compiler->compileString('{{ \'Hello world or foo\' }}'));
+		$this->assertEquals('<?php echo \'Hello world or foo\'; ?>', $compiler->compileString('{{\'Hello world or foo\'}}'));
+		$this->assertEquals('<?php echo \'Hello world or foo\'; ?>', $compiler->compileString('{{
+			\'Hello world or foo\'
+		}}'));
 	}
 
 
