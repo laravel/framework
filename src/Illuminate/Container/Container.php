@@ -59,6 +59,17 @@ class Container implements ArrayAccess {
 	protected $globalResolvingCallbacks = array();
 
 	/**
+	 * Determine if a given string is resolvable.
+	 *
+	 * @param  string  $abstract
+	 * @return bool
+	 */
+	protected function resolvable($abstract)
+	{
+		return $this->bound($abstract) || $this->isAlias($abstract);
+	}
+
+	/**
 	 * Determine if the given abstract type has been bound.
 	 *
 	 * @param  string  $abstract
@@ -67,6 +78,17 @@ class Container implements ArrayAccess {
 	public function bound($abstract)
 	{
 		return isset($this[$abstract]) || isset($this->instances[$abstract]);
+	}
+
+	/**
+	 * Determine if a given string is an alias.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function isAlias($name)
+	{
+		return isset($this->aliases[$name]);
 	}
 
 	/**
