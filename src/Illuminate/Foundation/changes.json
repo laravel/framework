@@ -98,6 +98,7 @@
 		{"message": "Added new auth:clear-reminders command for clearing expired password reminders.", "backport": null},
 		{"message": "Added Cookie::queue method for creating cookies that are automatically attached to the final response.", "backport": null},
 		{"message": "Allow environment to be checked via App::environment method.", "backport": null},
-		{"message": "Add support for order by and limit on MySQL update queries.", "backport": null}
+		{"message": "Add support for order by and limit on MySQL update queries.", "backport": null},
+		{"message": "Tweak Container::resolve to accept a type, new resolvingAny method for all objects.", "backport": null}
 	]
 }
