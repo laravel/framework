@@ -386,6 +386,25 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Determine if all of the given attributes fail the required test.
+	 *
+	 * @param  array  $attributes
+	 * @return bool
+	 */
+	protected function allFailingRequired(array $attributes)
+	{
+		foreach ($attributes as $key)
+		{
+			if ( $this->validateRequired($key, $this->getValue($key)))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Validate that an attribute exists when another attribute exists
 	 *
 	 * @param  string  $attribute
@@ -420,7 +439,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateRequiredWithout($attribute, $value, $parameters)
 	{
-		if ($this->anyFailingRequired($parameters))
+		if ($this->allFailingRequired($parameters))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
