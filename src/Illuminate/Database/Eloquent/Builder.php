@@ -38,6 +38,11 @@ class Builder {
 		'count', 'min', 'max', 'avg', 'sum', 'exists',
 	);
 
+	public function __clone()
+	{
+		$this->query = clone $this->query;
+	}
+
 	/**
 	 * Create a new Eloquent query builder instance.
 	 *
