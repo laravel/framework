@@ -585,9 +585,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function belongsTo($related, $foreignKey = null)
+	public function belongsTo($related, $foreignKey = null, $otherKey = null)
 	{
 		list(, $caller) = debug_backtrace(false);
 
@@ -601,14 +602,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$foreignKey = snake_case($relation).'_id';
 		}
 
+		$instance = new $related;
+
 		// Once we have the foreign key names, we'll just create a new Eloquent query
 		// for the related models and returns the relationship instance which will
 		// actually be responsible for retrieving and hydrating every relations.
-		$instance = new $related;
-
 		$query = $instance->newQuery();
 
-		return new BelongsTo($query, $this, $foreignKey, $relation);
+		$otherKey = $otherKey ?: $instance->getKeyName();
+
+		return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
 	}
 
 	/**
