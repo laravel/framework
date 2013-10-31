@@ -31,7 +31,8 @@
 		{"message": "A new packages directory within `lang` can now override package language files.", "backport": null},
 		{"message": "Added new 'Auth::viaRemember method to determine if user was authed via 'remember me' cookie.", "backport": null},
 		{"message": "Allow passing a view name to paginator's 'links' method.", "backport": null},
-		{"message": "Added new hasManyThrough relationship type.", "backport": null}
+		{"message": "Added new hasManyThrough relationship type.", "backport": null},
+		{"message": "Allow for easier cloning of Eloquent query builders.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
