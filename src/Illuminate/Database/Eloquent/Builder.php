@@ -607,9 +607,14 @@ class Builder {
 	{
 		$relationQuery = $relation->getBaseQuery();
 
-		$hasQuery->mergeWheres($relationQuery->wheres, $relationQuery->getBindings());
+		// Here we have the "has" query and the original relation. We need to copy over any
+		// where clauses the developer may have put in the relationship function over to
+		// the has query, and then copy the bindings from the "has" query to the main.
+		$hasQuery->mergeWheres(
+			$relationQuery->wheres, $relationQuery->getBindings()
+		);
 
-		$this->query->mergeBindings($relationQuery);
+		$this->query->mergeBindings($hasQuery->getQuery());
 	}
 
 	/**
