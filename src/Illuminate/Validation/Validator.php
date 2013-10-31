@@ -1112,6 +1112,13 @@ class Validator implements MessageProviderInterface {
 			return $this->getSizeMessage($attribute, $rule);
 		}
 
+		// Exists rule can validate single or multiple values, so we need to return
+		// a proper message form depending on the values count
+		elseif ($rule == 'Exists')
+		{
+			return $this->translator->transChoice("validation.exists", count($this->getValue($attribute)));
+		}
+
 		// Finally, if no developer specified messages have been set, and no other
 		// special messages apply for this rule, we will just pull the default
 		// messages out of the translator service for this validation rule.
