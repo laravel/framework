@@ -96,10 +96,10 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		return new HasMany($builder, $parent, 'table.foreign_key');
+		return new HasMany($builder, $parent, 'table.foreign_key', 'id');
 	}
 
 }
