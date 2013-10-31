@@ -72,4 +72,11 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('Class', 'foo'), Str::parseCallback('Class', 'foo'));
 	}
 
+
+	public function testFinish()
+	{
+		$this->assertEquals('abbc', Str::finish('ab', 'bc'));
+		$this->assertEquals('abbc', Str::finish('abbcbc', 'bc'));
+	}
+
 }
