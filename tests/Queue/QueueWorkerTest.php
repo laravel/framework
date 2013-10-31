@@ -23,6 +23,19 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testJobIsPoppedOffFirstQueueInListAndProcessed()
+	{
+		$worker = $this->getMock('Illuminate\Queue\Worker', array('process'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
+		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+		$job = m::mock('Illuminate\Queue\Jobs\Job');
+		$connection->shouldReceive('pop')->once()->with('queue1')->andReturn(null);
+		$connection->shouldReceive('pop')->once()->with('queue2')->andReturn($job);
+		$worker->expects($this->once())->method('process')->with($this->equalTo($job));
+
+		$worker->pop('connection', 'queue1,queue2');
+	}
+
+
 	public function testWorkerSleepsIfNoJobIsPresentAndSleepIsEnabled()
 	{
 		$worker = $this->getMock('Illuminate\Queue\Worker', array('process', 'sleep'), array($manager = m::mock('Illuminate\Queue\QueueManager')));

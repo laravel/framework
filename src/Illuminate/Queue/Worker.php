@@ -36,7 +36,7 @@ class Worker {
 	{
 		$connection = $this->manager->connection($connection);
 
-		$job = $connection->pop($queue);
+		$job = $this->getNextJob($connection, $queue);
 
 		// If we're able to pull a job off of the stack, we will process it and
 		// then make sure we are not exceeding our memory limits for the run
@@ -48,6 +48,23 @@ class Worker {
 		else
 		{
 			$this->sleep($sleep);
+		}
+	}
+
+	/**
+	 * Get the next job from the queue connection.
+	 *
+	 * @param  \Illuminate\Queue\Queue  $connection
+	 * @param  string  $queue
+	 * @return \Illuminate\Queue\Jobs\Job|null
+	 */
+	protected function getNextJob($connection, $queue)
+	{
+		if (is_null($queue)) return $connection->pop();
+
+		foreach (explode(',', $queue) as $queue)
+		{
+			if ( ! is_null($job = $connection->pop($queue))) return $job;
 		}
 	}
 
