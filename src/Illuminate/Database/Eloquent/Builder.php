@@ -583,17 +583,76 @@ class Builder {
 	 * @param  string  $operator
 	 * @param  int     $count
 	 * @param  string  $boolean
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and')
+	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
 	{
 		$relation = $this->getHasRelationQuery($relation);
 
 		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery());
 
-		$this->mergeWheresToHas($query, $relation);
+		if ($callback) call_user_func($callback, $query);
 
-		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count, $boolean);
+		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
+	}
+
+	/**
+	 * Add a relationship count condition to the query with where clauses.
+	 *
+	 * @param  string  $relation
+	 * @param  \Closure  $callback
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function hasWhere($relation, Closure $callback, $operator = '>=', $count = 1)
+	{
+		return $this->has($relation, $operator, $count, 'and', $callback);
+	}
+
+	/**
+	 * Add a relationship count condition to the query with an "or".
+	 *
+	 * @param  string  $relation
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orHas($relation, $operator = '>=', $count = 1)
+	{
+		return $this->has($relation, $operator, $count, 'or');
+	}
+
+	/**
+	 * Add a relationship count condition to the query with where clauses and an "or".
+	 *
+	 * @param  string  $relation
+	 * @param  \Closure  $callback
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orHasWhere($relation, Closure $callback, $operator = '>=', $count = 1)
+	{
+		return $this->has($relation, $operator, $count, 'or', $callback);
+	}
+
+	/**
+	 * Add the "has" condition where clause to the query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
+	 * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+	 * @param  string  $operator
+	 * @param  int  $count
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
+	{
+		$this->mergeWheresToHas($hasQuery, $relation);
+
+		return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
 	}
 
 	/**
@@ -605,11 +664,11 @@ class Builder {
 	 */
 	protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
 	{
-		$relationQuery = $relation->getBaseQuery();
-
 		// Here we have the "has" query and the original relation. We need to copy over any
 		// where clauses the developer may have put in the relationship function over to
 		// the has query, and then copy the bindings from the "has" query to the main.
+		$relationQuery = $relation->getBaseQuery();
+
 		$hasQuery->mergeWheres(
 			$relationQuery->wheres, $relationQuery->getBindings()
 		);
@@ -631,19 +690,6 @@ class Builder {
 		{
 			return $me->getModel()->$relation();
 		});
-	}
-
-	/**
-	 * Add a relationship count condition to the query with an "or".
-	 *
-	 * @param  string  $relation
-	 * @param  string  $operator
-	 * @param  int     $count
-	 * @return \Illuminate\Database\Eloquent\Builder|static
-	 */
-	public function orHas($relation, $operator = '>=', $count = 1)
-	{
-		return $this->has($relation, $operator, $count, 'or');
 	}
 
 	/**
