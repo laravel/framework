@@ -48,6 +48,8 @@ class WorkCommand extends Command {
 	 */
 	public function fire()
 	{
+		if ($this->downForMaintenance()) return;
+
 		$queue = $this->option('queue');
 
 		$delay = $this->option('delay');
@@ -60,6 +62,18 @@ class WorkCommand extends Command {
 		$connection = $this->argument('connection');
 
 		$this->worker->pop($connection, $queue, $delay, $memory, $this->option('sleep'));
+	}
+
+	/**
+	 * Determine if the worker should run in maintenance mode.
+	 *
+	 * @return bool
+	 */
+	protected function downForMaintenance()
+	{
+		if ($this->option('force')) return false;
+
+		return $this->laravel->isDownForMaintenance();
 	}
 
 	/**
@@ -85,6 +99,8 @@ class WorkCommand extends Command {
 			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'),
 
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
+
+			array('force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode.'),
 
 			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
 
