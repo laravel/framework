@@ -680,7 +680,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		$new['prefix'] = static::formatGroupPrefix($new, $old);
 
-		return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'domain')), $new);
+		if (isset($new['domain'])) unset($old['domain']);
+
+		return array_merge_recursive(array_except($old, array('namespace', 'prefix')), $new);
 	}
 
 	/**

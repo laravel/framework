@@ -13,6 +13,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
+		$route = $router->get('foo/bar', array('domain' => 'api.{name}.bar', function($name) { return $name; }));
+		$this->assertEquals('taylor', $router->dispatch(Request::create('http://api.taylor.bar/foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
 		$router->get('foo/bar', function() { return 'hello'; });
 		$router->post('foo/bar', function() { return 'post hello'; });
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
@@ -55,7 +59,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = $this->getRouter();
 		$router->get('{baz?}', function($age = 25) { return $age; });
-		$this->assertEquals('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());;		
+		$this->assertEquals('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+	}
+
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testRoutesDontMatchNonMatchingDomain()
+	{
+		$router = $this->getRouter();
+		$route = $router->get('foo/bar', array('domain' => 'api.foo.bar', function() { return 'hello'; }));
+		$this->assertEquals('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
 	}
 
 
@@ -72,7 +87,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		});
 		$router->get('bar', 'RouteTestControllerDispatchStub@bar');
 		$this->assertEquals('filter', $router->dispatch(Request::create('bar', 'GET'))->getContent());
-		
+
 		$router = $this->getRouter();
 		$router->get('baz', 'RouteTestControllerDispatchStub@baz');
 		$this->assertEquals('filtered', $router->dispatch(Request::create('baz', 'GET'))->getContent());
