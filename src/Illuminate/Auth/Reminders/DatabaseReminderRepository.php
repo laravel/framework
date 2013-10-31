@@ -40,7 +40,6 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 * @param  string  $table
 	 * @param  string  $hashKey
 	 * @param  int  $expires
-	 * @return void
 	 */
 	public function __construct(Connection $connection, $table, $hashKey, $expires = 60)
 	{

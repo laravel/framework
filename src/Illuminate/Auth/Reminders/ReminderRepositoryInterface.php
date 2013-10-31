@@ -6,7 +6,7 @@ interface ReminderRepositoryInterface {
 	 * Create a new reminder record and token.
 	 *
 	 * @param  \Illuminate\Auth\RemindableInterface  $user
-	 * @return string
+	 * @return mixed
 	 */
 	public function create(RemindableInterface $user);
 
