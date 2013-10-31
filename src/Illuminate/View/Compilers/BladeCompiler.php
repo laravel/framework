@@ -34,6 +34,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'SectionStart',
 		'SectionStop',
 		'SectionOverwrite',
+		'Definitions',
 	);
 
 	/**
@@ -389,6 +390,19 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$pattern = $this->createPlainMatcher('overwrite');
 
 		return preg_replace($pattern, '$1<?php $__env->stopSection(true); ?>$2', $value);
+	}
+
+	/**
+	 * Compile fallback definition statements into valid PHP.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileDefinitions($value)
+	{
+		$pattern = '/(?<!\w)(\s*)@define\((\$[^,]+),\s*(.+)\)/';
+		
+		return preg_replace($pattern, '$1<?php if ( ! isset($2)) $2 = $3; ?>', $value);
 	}
 
 	/**
