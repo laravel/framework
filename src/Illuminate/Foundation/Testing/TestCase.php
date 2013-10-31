@@ -266,7 +266,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 		if (is_null($value))
 		{
-			$this->assertTrue($this->app['session.store']->has($key));
+			$this->assertTrue($this->app['session.store']->has($key), "Session missing key: $key");
 		}
 		else
 		{
@@ -314,7 +314,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		{
 			if (is_int($key))
 			{
-				$this->assertTrue($errors->has($value));
+				$this->assertTrue($errors->has($value), "Session missing error: $value");
 			}
 			else
 			{
