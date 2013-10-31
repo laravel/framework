@@ -6,7 +6,6 @@
 		{"message": "Added newest and oldest methods to query builder for timestamp short-hand queries.", "backport": null},
 		{"message": "Rebuild the routing layer for speed and efficiency.", "backport": null},
 		{"message": "Added morphToMany relation for polymorphic many-to-many relations.", "backport": null},
-		{"message": "Added live debug console via 'debug' Artisan command.", "backport": null},
 		{"message": "Make Boris available from Tinker command when available.", "backport": null},
 		{"message": "Allow route names to be specified on resources.", "backport": null},
 		{"message": "Collection `push` now appends. New `prepend` method on collections.", "backport": null},
