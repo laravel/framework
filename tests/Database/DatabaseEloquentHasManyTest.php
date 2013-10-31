@@ -14,7 +14,17 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreateMethodProperlyCreatesNewModel()
 	{
-		$relation = $this->getRelation();
+		$this->doCreateMethodProperlyCreatesNewModel();
+	}
+
+	public function testCreateMethodProperlyCreatesNewModelWithOtherKey()
+	{
+		$this->doCreateMethodProperlyCreatesNewModel('other_key');
+	}
+
+	protected function doCreateMethodProperlyCreatesNewModel($otherKey = null)
+	{
+		$relation = $this->getRelation($otherKey);
 		$created = $this->getMock('Illuminate\Database\Eloquent\Model', array('save', 'getKey', 'setRawAttributes'));
 		$created->expects($this->once())->method('save')->will($this->returnValue(true));
 		$relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($created);
@@ -23,9 +33,20 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($created, $relation->create(array('name' => 'taylor')));
 	}
 
+
 	public function testUpdateMethodUpdatesModelsWithTimestamps()
 	{
-		$relation = $this->getRelation();
+		$this->doUpdateMethodUpdatesModelsWithTimestamps();
+	}
+
+	public function testUpdateMethodUpdatesModelsWithTimestampsWithOtherKey()
+	{
+		$this->doUpdateMethodUpdatesModelsWithTimestamps('other_key');
+	}
+
+	protected function doUpdateMethodUpdatesModelsWithTimestamps($otherKey = null)
+	{
+		$relation = $this->getRelation($otherKey);
 		$relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
 		$relation->getRelated()->shouldReceive('freshTimestamp')->once()->andReturn(100);
 		$relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
@@ -37,7 +58,17 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 
 	public function testRelationIsProperlyInitialized()
 	{
-		$relation = $this->getRelation();
+		$this->doRelationIsProperlyInitialized();
+	}
+
+	public function testRelationIsProperlyInitializedWithOtherKey()
+	{
+		$this->doRelationIsProperlyInitialized('other_key');
+	}
+
+	protected function doRelationIsProperlyInitialized($otherKey = null)
+	{
+		$relation = $this->getRelation($otherKey);
 		$model = m::mock('Illuminate\Database\Eloquent\Model');
 		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = array()) { return new Collection($array); });
 		$model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
@@ -49,7 +80,17 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 
 	public function testEagerConstraintsAreProperlyAdded()
 	{
-		$relation = $this->getRelation();
+		$this->doEagerConstraintsAreProperlyAdded();
+	}
+
+	public function testEagerConstraintsAreProperlyAddedWithOtherKey()
+	{
+		$this->doEagerConstraintsAreProperlyAdded('other_key');
+	}
+
+	protected function doEagerConstraintsAreProperlyAdded($otherKey = null)
+	{
+		$relation = $this->getRelation($otherKey);
 		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', array(1, 2));
 		$model1 = new EloquentHasManyModelStub;
 		$model1->id = 1;
@@ -61,7 +102,17 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 
 	public function testModelsAreProperlyMatchedToParents()
 	{
-		$relation = $this->getRelation();
+		$this->doModelsAreProperlyMatchedToParents();
+	}
+
+	public function testModelsAreProperlyMatchedToParentsWithOtherKey()
+	{
+		$this->doModelsAreProperlyMatchedToParents('other_key');
+	}
+
+	protected function doModelsAreProperlyMatchedToParents($otherKey = null)
+	{
+		$relation = $this->getRelation($otherKey);
 
 		$result1 = new EloquentHasManyModelStub;
 		$result1->foreign_key = 1;
@@ -89,17 +140,24 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	protected function getRelation()
+	protected function getRelation($otherKey = null)
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
+
+		if (is_null($otherKey)) {
+			$parent->shouldReceive('getKey')->andReturn(1);
+		} else {
+			$parent->shouldReceive('getAttribute')->andReturn(1);
+		}
+
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		return new HasMany($builder, $parent, 'table.foreign_key');
+
+		return new HasMany($builder, $parent, 'table.foreign_key', $otherKey);
 	}
 
 }
