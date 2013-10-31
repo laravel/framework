@@ -108,7 +108,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @var array
 	 */
-	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted');
+	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted');
 
 	/**
 	 * Create a new Validator instance.
@@ -438,6 +438,24 @@ class Validator implements MessageProviderInterface {
 	 * @return bool
 	 */
 	protected function validateRequiredWithout($attribute, $value, $parameters)
+	{
+		if ($this->anyFailingRequired($parameters))
+		{
+			return $this->validateRequired($attribute, $value);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate that an attribute exists when other attributes do not exists
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredWithoutAll($attribute, $value, $parameters)
 	{
 		if ($this->allFailingRequired($parameters))
 		{
@@ -1446,6 +1464,22 @@ class Validator implements MessageProviderInterface {
 	 * @return string
 	 */
 	protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
+	{
+		$parameters = $this->getAttributeList($parameters);
+
+		return str_replace(':values', implode(' / ', $parameters), $message);
+	}
+
+	/**
+	 * Replace all place-holders for the required_without_all rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceRequiredWithoutAll($message, $attribute, $rule, $parameters)
 	{
 		$parameters = $this->getAttributeList($parameters);
 
