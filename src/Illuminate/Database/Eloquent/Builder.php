@@ -815,7 +815,7 @@ class Builder {
 	 */
 	public function __clone()
 	{
-		$this->builder = clone $this->builder;
+		$this->query = clone $this->query;
 	}
 
 }
