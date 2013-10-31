@@ -77,6 +77,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals('abbc', Str::finish('ab', 'bc'));
 		$this->assertEquals('abbc', Str::finish('abbcbc', 'bc'));
+		$this->assertEquals('abcbbc', Str::finish('abcbbcbc', 'bc'));
 	}
 
 }
