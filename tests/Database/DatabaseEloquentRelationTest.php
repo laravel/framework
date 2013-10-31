@@ -15,10 +15,10 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$builder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
 		$builder->shouldReceive('where');
-		$relation = new HasOne($builder, $parent, 'foreign_key');
+		$relation = new HasOne($builder, $parent, 'foreign_key', 'id');
 		$related->shouldReceive('getTable')->andReturn('table');
 		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 		$related->shouldReceive('freshTimestampString')->andReturn(new DateTime);
