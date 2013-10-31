@@ -17,21 +17,21 @@ class PasswordBroker {
 	/**
 	 * The user provider implementation.
 	 *
-	 * @var \Illuminate\Auth\UserProviderInterface
+	 * @var UserProviderInterface
 	 */
 	protected $users;
 
 	/**
 	 * The redirector instance.
 	 *
-	 * @var \Illuminate\Routing\Redirector
+	 * @var Redirector
 	 */
 	protected $redirector;
 
 	/**
 	 * The mailer instance.
 	 *
-	 * @var \Illuminate\Mail\Mailer
+	 * @var Mailer
 	 */
 	protected $mailer;
 
@@ -45,12 +45,11 @@ class PasswordBroker {
 	/**
 	 * Create a new password broker instance.
 	 *
-	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
-	 * @param  \Illuminate\Auth\UserProviderInterface  $users
-	 * @param  \Illuminate\Routing\Redirector  $redirect
-	 * @param  \Illuminate\Mail\Mailer  $mailer
-	 * @param  string  $reminderView
-	 * @return void
+	 * @param ReminderRepositoryInterface $reminders
+	 * @param UserProviderInterface       $users
+	 * @param Redirector                  $redirect
+	 * @param Mailer                      $mailer
+	 * @param string                      $reminderView
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
@@ -206,6 +205,7 @@ class PasswordBroker {
 	 *
 	 * @param  array  $credentials
 	 * @return \Illuminate\Auth\Reminders\RemindableInterface
+	 * @throws \UnexpectedValueException
 	 */
 	public function getUser(array $credentials)
 	{
