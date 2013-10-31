@@ -74,7 +74,9 @@ class Str {
 	 */
 	public static function finish($value, $cap)
 	{
-		return rtrim($value, $cap).$cap;
+		$quoted = preg_quote($cap, '/');
+
+		return preg_replace('/(?:'.$quoted.')+$/', '', $value).$cap;
 	}
 
 	/**
