@@ -587,13 +587,45 @@ class Builder {
 	 */
 	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and')
 	{
-		$instance = $this->model->$relation();
+		$relation = $this->getHasRelationQuery($relation);
 
-		$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery());
 
-		$this->query->mergeBindings($query->getQuery());
+		$this->mergeWheresToHas($query, $relation);
 
 		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count, $boolean);
+	}
+
+	/**
+	 * Merge the "wheres" from a relation query to a has query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
+	 * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+	 * @return void
+	 */
+	protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
+	{
+		$relationQuery = $relation->getBaseQuery();
+
+		$hasQuery->mergeWheres($relationQuery->wheres, $relationQuery->getBindings());
+
+		$this->query->mergeBindings($relationQuery);
+	}
+
+	/**
+	 * Get the "has relation" base query instance.
+	 *
+	 * @param  string  $relation
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	protected function getHasRelationQuery($relation)
+	{
+		$me = $this;
+
+		return Relation::noConstraints(function() use ($me, $relation)
+		{
+			return $me->getModel()->$relation();
+		});
 	}
 
 	/**

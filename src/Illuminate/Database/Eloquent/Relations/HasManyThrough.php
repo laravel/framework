@@ -36,7 +36,9 @@ class HasManyThrough extends Relation {
 	 */
 	public function addConstraints()
 	{
-		$this->setJoin($parentTable = $this->parent->getTable());
+		$parentTable = $this->parent->getTable();
+
+		$this->setJoin();
 
 		if (static::$constraints)
 		{
@@ -45,16 +47,31 @@ class HasManyThrough extends Relation {
 	}
 
 	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query)
+	{
+		$this->setJoin($query);
+
+		return parent::getRelationCountQuery($query);
+	}
+
+	/**
 	 * Set the join clause on the query.
 	 *
-	 * @param  string  $parentTable
+	 * @param  \Illuminate\Databaes\Eloquent\Builder|null  $query
 	 * @return void
 	 */
-	protected function setJoin($parentTable)
+	protected function setJoin(Builder $query = null)
 	{
+		$query = $query ?: $this->query;
+
 		$foreignKey = $this->related->getTable().'.'.$this->secondKey;
 
-		$this->query->join($parentTable, $this->getQualifiedParentKey(), '=', $foreignKey);
+		$query->join($this->parent->getTable(), $this->getQualifiedParentKeyName(), '=', $foreignKey);
 	}
 
 	/**
@@ -196,9 +213,19 @@ class HasManyThrough extends Relation {
 	 *
 	 * @return string
 	 */
-	protected function getQualifiedParentKey()
+	protected function getQualifiedParentKeyName()
 	{
 		return $this->parent->getQualifiedKeyName();
+	}
+
+	/**
+	 * Get the key for comparing against the pareny key in "has" query.
+	 *
+	 * @return string
+	 */
+	public function getHasCompareKey()
+	{
+		return $this->farParent->getQualifiedKeyName();
 	}
 
 }

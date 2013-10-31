@@ -240,6 +240,16 @@ abstract class HasOneOrMany extends Relation {
 	}
 
 	/**
+	 * Get the key for comparing against the pareny key in "has" query.
+	 *
+	 * @return string
+	 */
+	public function getHasCompareKey()
+	{
+		return $this->getForeignKey();
+	}
+
+	/**
 	 * Get the foreign key for the relationship.
 	 *
 	 * @return string
@@ -269,6 +279,16 @@ abstract class HasOneOrMany extends Relation {
 	protected function getParentKey()
 	{
 		return $this->parent->getAttribute($this->localKey);
+	}
+
+	/**
+	 * Get the fully qualified parent key naem.
+	 *
+	 * @return string
+	 */
+	protected function getQualifiedParentKeyName()
+	{
+		return $this->parent->getTable().'.'.$this->localKey;
 	}
 
 }

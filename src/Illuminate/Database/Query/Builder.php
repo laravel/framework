@@ -1591,7 +1591,7 @@ class Builder {
 	 */
 	public function mergeWheres($wheres, $bindings)
 	{
-		$this->wheres = array_merge($this->wheres, (array) $wheres);
+		$this->wheres = array_merge((array) $this->wheres, (array) $wheres);
 
 		$this->bindings = array_values(array_merge($this->bindings, (array) $bindings));
 	}
