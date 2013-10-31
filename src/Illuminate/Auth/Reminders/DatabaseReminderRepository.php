@@ -8,7 +8,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * The database connection instance.
 	 *
-	 * @var \Illuminate\Database\Connection
+	 * @var Connection
 	 */
 	protected $connection;
 
@@ -36,11 +36,10 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new reminder repository instance.
 	 *
-	 * @param  \Illuminate\Database\Connection  $connection
-	 * @param  string  $table
-	 * @param  string  $hashKey
-	 * @param  int  $expires
-	 * @return void
+	 * @param Connection $connection
+	 * @param string     $table
+	 * @param string     $hashKey
+	 * @param int        $expires
 	 */
 	public function __construct(Connection $connection, $table, $hashKey, $expires = 60)
 	{
@@ -53,7 +52,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new reminder record and token.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param RemindableInterface $user
 	 * @return string
 	 */
 	public function create(RemindableInterface $user)
@@ -85,8 +84,8 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Determine if a reminder record exists and is valid.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
-	 * @param  string  $token
+	 * @param RemindableInterface $user
+	 * @param string              $token
 	 * @return bool
 	 */
 	public function exists(RemindableInterface $user, $token)
@@ -147,7 +146,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new token for the user.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param RemindableInterface $user
 	 * @return string
 	 */
 	public function createNewToken(RemindableInterface $user)
@@ -172,7 +171,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Get the database connection instance.
 	 *
-	 * @return \Illuminate\Database\Connection
+	 * @return Connection
 	 */
 	public function getConnection()
 	{
