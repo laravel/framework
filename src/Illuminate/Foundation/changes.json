@@ -32,7 +32,8 @@
 		{"message": "Added new 'Auth::viaRemember method to determine if user was authed via 'remember me' cookie.", "backport": null},
 		{"message": "Allow passing a view name to paginator's 'links' method.", "backport": null},
 		{"message": "Added new hasManyThrough relationship type.", "backport": null},
-		{"message": "Allow for easier cloning of Eloquent query builders.", "backport": null}
+		{"message": "Cloned Eloquent query builders now clone the underlying query builder.", "backport": null},
+		{"message": "Allow for passing of custom attributes into Validator::make as fourth parameter.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
