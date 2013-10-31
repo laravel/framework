@@ -92,7 +92,7 @@ class Container implements ArrayAccess {
 		// If no concrete type was given, we will simply set the concrete type to the
 		// abstract type. This will allow concrete type to be registered as shared
 		// without being forced to state their classes in both of the parameter.
-		unset($this->instances[$abstract]);
+		$this->dropStaleInstances($abstract);
 
 		if (is_null($concrete))
 		{
@@ -258,6 +258,8 @@ class Container implements ArrayAccess {
 
 			$this->alias($abstract, $alias);
 		}
+
+		unset($this->aliases[$abstract]);
 
 		// We'll check to determine if this type has been bound before, and if it has
 		// we will fire the rebound callbacks registered with the container and it
@@ -646,6 +648,19 @@ class Container implements ArrayAccess {
 	public function getBindings()
 	{
 		return $this->bindings;
+	}
+
+	/**
+	 * Drop all of the stale instances and aliases.
+	 *
+	 * @param  string  $abstract
+	 * @return void
+	 */
+	protected function dropStaleInstances($abstract)
+	{
+		unset($this->instances[$abstract]);
+
+		unset($this->aliases[$abstract]);
 	}
 
 	/**
