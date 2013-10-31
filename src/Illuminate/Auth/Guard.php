@@ -67,9 +67,9 @@ class Guard {
 	/**
 	 * Create a new authentication guard.
 	 *
-	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
-	 * @param  \Illuminate\Session\Store  $session
-	 * @param \Symfony\Component\HttpFoundation\Request $request
+	 * @param  \Illuminate\Auth\UserProviderInterface    $provider
+	 * @param  \Illuminate\Session\Store                 $session
+	 * @param  \Symfony\Component\HttpFoundation\Request $request
 	 */
 	public function __construct(UserProviderInterface $provider,
                                 SessionStore $session,
