@@ -719,6 +719,20 @@ class Builder {
 	}
 
 	/**
+	 * Call the given model scope on the underlying model.
+	 *
+	 * @param  string  $scope
+	 * @param  array  $parameters
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	protected function callScope($scope, $parameters)
+	{
+		array_unshift($parameters, $this);
+
+		return call_user_func_array(array($this->model, $scope), $parameters) ?: $this;
+	}
+
+	/**
 	 * Get the underlying query builder instance.
 	 *
 	 * @return \Illuminate\Database\Query\Builder|static
@@ -796,9 +810,7 @@ class Builder {
 	{
 		if (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
 		{
-			array_unshift($parameters, $this);
-
-			call_user_func_array(array($this->model, $scope), $parameters);
+			return $this->callScope($scope, $parameters);
 		}
 		else
 		{
