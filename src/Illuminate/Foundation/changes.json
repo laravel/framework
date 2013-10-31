@@ -35,7 +35,8 @@
 		{"message": "Cloned Eloquent query builders now clone the underlying query builder.", "backport": null},
 		{"message": "Allow for passing of custom attributes into Validator::make as fourth parameter.", "backport": null},
 		{"message": "Allow comma delimited list of queues to be passed to queue:listen / queue:work to implement queue priority.", "backport": null},
-		{"message": "When new bindings are added to container, old aliases bound to that key will now be dropped.", "backport": null}
+		{"message": "When new bindings are added to container, old aliases bound to that key will now be dropped.", "backport": null},
+		{"message": "Added new 'resolvable' and 'isAlias' methods to the container.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
