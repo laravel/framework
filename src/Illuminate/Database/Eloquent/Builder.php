@@ -776,4 +776,14 @@ class Builder {
 		return in_array($method, $this->passthru) ? $result : $this;
 	}
 
+	/**
+	 * Force a clone of the underlying query builder when cloning.
+	 *
+	 * @return void
+	 */
+	public function __clone()
+	{
+		$this->builder = clone $this->builder;
+	}
+
 }
