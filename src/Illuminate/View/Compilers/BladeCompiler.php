@@ -193,7 +193,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		$callback = function($matches)
 		{
-			$matches[2] = preg_replace('/^(.+?)(?:\|\||\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $matches[2]);
+			$matches[2] = preg_replace('/^(?!"|\')(.+?)(?:\s*\|\|\s*|\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $matches[2]);
 			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$matches[2].'; ?>';
 		};
 
@@ -212,7 +212,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		$callback = function($matches)
 		{
-			$matches[1] = preg_replace('/^(.+?)(?:\|\||\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $matches[1]);
+			$matches[1] = preg_replace('/^(?!"|\')(.+?)(?:\s*\|\|\s*|\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $matches[1]);
 			return '<?php echo e('.$matches[1].'); ?>';
 		};
 
