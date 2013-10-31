@@ -194,10 +194,21 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResolvingCallbacksAreCalledForSpecificAbstracts()
+	{
+		$container = new Container;
+		$container->resolving('foo', function($object) { return $object->name = 'taylor'; });
+		$container->bind('foo', function() { return new StdClass; });
+		$instance = $container->make('foo');
+
+		$this->assertEquals('taylor', $instance->name);
+	}
+
+
 	public function testResolvingCallbacksAreCalled()
 	{
 		$container = new Container;
-		$container->resolving(function($object) { return $object->name = 'taylor'; });
+		$container->resolvingAny(function($object) { return $object->name = 'taylor'; });
 		$container->bind('foo', function() { return new StdClass; });
 		$instance = $container->make('foo');
 
