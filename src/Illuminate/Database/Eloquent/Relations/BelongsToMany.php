@@ -740,7 +740,7 @@ class BelongsToMany extends Relation {
 	 * @return void
 	 */
 	public function touchIfTouching()
-	{ 
+	{
 	 	if ($this->touchingParent()) $this->getParent()->touch();
 
 	 	if ($this->getParent()->touches($this->relationName)) $this->touch();
@@ -864,6 +864,16 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Get the key for comparing against the pareny key in "has" query.
+	 *
+	 * @return string
+	 */
+	public function getHasCompareKey()
+	{
+		return $this->getForeignKey();
+	}
+
+	/**
 	 * Get the fully qualified foreign key for the relation.
 	 *
 	 * @return string
@@ -881,6 +891,16 @@ class BelongsToMany extends Relation {
 	public function getOtherKey()
 	{
 		return $this->table.'.'.$this->otherKey;
+	}
+
+	/**
+	 * Get the fully qualified parent key naem.
+	 *
+	 * @return string
+	 */
+	protected function getQualifiedParentKeyName()
+	{
+		return $this->parent->getQualifiedKeyName();
 	}
 
 	/**

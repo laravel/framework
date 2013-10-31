@@ -100,11 +100,11 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 		$relation = $this->getRelation();
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$query->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'));
-		$relation->getParent()->shouldReceive('getQualifiedKeyName')->andReturn('foo');
+		$relation->getParent()->shouldReceive('getTable')->andReturn('table');
 		$query->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type('Illuminate\Database\Query\Expression'));
 		$relation->getParent()->shouldReceive('getQuery')->andReturn($parentQuery = m::mock('StdClass'));
 		$parentQuery->shouldReceive('getGrammar')->once()->andReturn($grammar = m::mock('StdClass'));
-		$grammar->shouldReceive('wrap')->once()->with('foo');
+		$grammar->shouldReceive('wrap')->once()->with('table.id');
 
 		$relation->getRelationCountQuery($query);
 	}
