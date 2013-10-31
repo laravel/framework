@@ -105,6 +105,7 @@
 		{"message": "Allow environment to be checked via App::environment method.", "backport": null},
 		{"message": "Add support for order by and limit on MySQL update queries.", "backport": null},
 		{"message": "Tweak Container::resolve to accept a type, new resolvingAny method for all objects.", "backport": null},
-		{"message": "Do not run queue workers while application is in maintenance mode.", "backport": null}
+		{"message": "Do not run queue workers while application is in maintenance mode.", "backport": null},
+		{"message": "Values returned from scopes are now returned for chaining.", "backport": null}
 	]
 }
