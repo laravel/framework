@@ -26,7 +26,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		if ( ! $this->app) $this->refreshApplication();
+		if ( ! $this->app)
+		{
+			$this->refreshApplication();
+
+			$this->app->boot();
+		}
 	}
 
 	/**
@@ -292,7 +297,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Assert that the session has errors bound.
-	 * 
+	 *
 	 * @param  string|array  $bindings
 	 * @param  mixed  $format
 	 * @return void
