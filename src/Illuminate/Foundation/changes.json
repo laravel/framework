@@ -40,7 +40,7 @@
 		{"message": "BelongsTo relationships may now reference any key on parent model, not just primary key.", "backport": null},
 		{"message": "HasOne, HasMany, and morph relationships may now use any key on parent model, not just primary key.", "backport": null},
 		{"message": "Eloquent 'has' method will now maintain where clauses set on relation.", "backport": null},
-		{"message": "New 'hasWhere' and 'orHasWhere' Eloquent methods that allow extra constraints on 'has' type queries.", "backport": null}
+		{"message": "New 'whereHas' and 'orWhereHas' Eloquent methods that allow extra constraints on 'has' type queries.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
