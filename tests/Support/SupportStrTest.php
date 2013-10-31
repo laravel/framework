@@ -80,4 +80,14 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('abcbbc', Str::finish('abcbbcbc', 'bc'));
 	}
 
+
+	public function testIs()
+	{
+		$this->assertTrue(Str::is('/', '/'));
+		$this->assertFalse(Str::is('/', ' /'));
+		$this->assertFalse(Str::is('/', '/a'));
+		$this->assertTrue(Str::is('foo/*', 'foo/bar/baz'));
+		$this->assertTrue(Str::is('*/foo', 'blah/baz/foo'));
+	}
+
 }
