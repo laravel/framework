@@ -99,6 +99,18 @@ class QueueManager {
 	 * @param  Closure  $resolver
 	 * @return void
 	 */
+	public function extend($driver, Closure $resolver)
+	{
+		return $this->addConnector($driver, $resolver);
+	}
+
+	/**
+	 * Add a queue connection resolver.
+	 *
+	 * @param  string   $driver
+	 * @param  Closure  $resolver
+	 * @return void
+	 */
 	public function addConnector($driver, Closure $resolver)
 	{
 		$this->connectors[$driver] = $resolver;

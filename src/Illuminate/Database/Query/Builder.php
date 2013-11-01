@@ -142,6 +142,7 @@ class Builder {
 	protected $operators = array(
 		'=', '<', '>', '<=', '>=', '<>', '!=',
 		'like', 'not like', 'between', 'ilike',
+		'&', '|', '^', '<<', '>>',
 	);
 
 	/**

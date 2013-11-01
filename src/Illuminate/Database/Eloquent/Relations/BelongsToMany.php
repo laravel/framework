@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BelongsToMany extends Relation {
 
@@ -83,6 +84,19 @@ class BelongsToMany extends Relation {
 		$results = $this->take(1)->get($columns);
 
 		return count($results) > 0 ? $results->first() : null;
+	}
+
+	/**
+	 * Execute the query and get the first result or throw an exception.
+	 *
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|static
+	 */
+	public function firstOrFail($columns = array('*'))
+	{
+		if ( ! is_null($model = $this->first($columns))) return $model;
+
+		throw new ModelNotFoundException;
 	}
 
 	/**

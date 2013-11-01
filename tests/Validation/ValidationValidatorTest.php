@@ -766,7 +766,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testSoemtimesAddingRules()
+	public function testSometimesAddingRules()
 	{
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
