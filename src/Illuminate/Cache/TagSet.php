@@ -1,9 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-use ArrayIterator;
-use IteratorAggregate;
-
-class TagSet implements IteratorAggregate {
+class TagSet {
 
 	/**
 	 * The cache store implementation.
@@ -95,16 +92,6 @@ class TagSet implements IteratorAggregate {
 	public function tagKey($name)
 	{
 		return 'tag:'.$name.':key';
-	}
-
-	/**
-	 * Get a traversable implementation for the class.
-	 *
-	 * @return \ArrayIterator
-	 */
-	public function getIterator()
-	{
-		return new ArrayIterator($this->names);
 	}
 
 }
