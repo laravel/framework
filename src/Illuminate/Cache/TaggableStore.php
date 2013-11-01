@@ -19,19 +19,20 @@ abstract class TaggableStore {
 	 * @param  string  $name
 	 * @return \Illuminate\Cache\TaggedCache
 	 */
-	public function tags($names)
+	public function tag($name)
 	{
-		return new TaggedCache($this, $names);
+		return $this->tags(array($name));
 	}
 
 	/**
 	 * Begin executing a new tags operation.
 	 *
-	 * @param  string  $name
+	 * @param  array|dynamic  $names
 	 * @return \Illuminate\Cache\TaggedCache
 	 */
-	public function tag($name)
+	public function tags($names)
 	{
-		return $this->tags(array($name));
+		return new TaggedCache($this, is_array($names) ? $names : func_get_args());
 	}
+
 }

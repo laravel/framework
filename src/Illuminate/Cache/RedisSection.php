@@ -18,7 +18,8 @@ class RedisSection extends TaggedCache {
 	 */
 	public function __construct(StoreInterface $store, $name)
 	{
-		parent::$construct($store, array($name));
+		parent::__construct($store, array($name));
+
 		$this->name = $name;
 	}
 
