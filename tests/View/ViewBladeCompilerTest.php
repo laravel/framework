@@ -73,6 +73,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		}}'));
 
 		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name or "foo" }}'));
+		$this->assertEquals('<?php echo isset($user->name) ? $user->name : "foo"; ?>', $compiler->compileString('{{ $user->name or "foo" }}'));
 		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{$name or "foo"}}'));
 		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{
 			$name or "foo"
