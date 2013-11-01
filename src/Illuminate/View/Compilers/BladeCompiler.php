@@ -195,7 +195,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		$callback = function($matches) use ($me)
 		{
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>';
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$me->compileEchoDefaults($matches[2]).'; ?>';
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
