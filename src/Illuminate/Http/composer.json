@@ -10,7 +10,8 @@
     "require": {
         "illuminate/session": "4.1.x",
         "illuminate/support": "4.1.x",
-        "symfony/http-foundation": "2.4.*"
+        "symfony/http-foundation": "2.4.*",
+        "symfony/http-kernel": "2.4.*"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",

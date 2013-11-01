@@ -43,7 +43,8 @@
 		{"message": "New 'whereHas' and 'orWhereHas' Eloquent methods that allow extra constraints on 'has' type queries.", "backport": null},
 		{"message": "New 'or' syntax in Blade echos can be used to build isset statements and echos.", "backport": null},
 		{"message": "Allow the 'name' of belongsTo and belongsToMany to be explictly set.", "backport": null},
-		{"message": "New Cache::tags feature that allows tagging cached items and flushing them by any tag.", "backport": null}
+		{"message": "New Cache::tags feature that allows tagging cached items and flushing them by any tag.", "backport": null},
+		{"message": "New FrameGuard middleware sends SAMEORIGIN X-Frame-Options header on each response by default.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
