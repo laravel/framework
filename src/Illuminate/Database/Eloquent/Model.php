@@ -591,17 +591,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $related
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
+	 * @param  string  $relation
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function belongsTo($related, $foreignKey = null, $otherKey = null)
+	public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
 	{
-		list(, $caller) = debug_backtrace(false);
+		// If no relation name was given, we will use this debug backtrace to extract
+		// the calling method's name and use that as the relationship name as most
+		// of the time this will be what we desire to use for the relatinoships.
+		if (is_null($relation))
+		{
+			list(, $caller) = debug_backtrace(false);
+
+			$relation = $caller['function'];
+		}
 
 		// If no foreign key was supplied, we can use a backtrace to guess the proper
 		// foreign key name by using the name of the relationship function, which
 		// when combined with an "_id" should conventionally match the columns.
-		$relation = $caller['function'];
-
 		if (is_null($foreignKey))
 		{
 			$foreignKey = snake_case($relation).'_id';
@@ -721,11 +728,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
+	 * @param  string  $relation
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
-	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null)
+	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
 	{
-		$caller = $this->getBelongsToManyCaller();
+		// If no relationship name was passed, we will pull backtraces to get the
+		// name of the calling function. We will use that function name as the
+		// title of this relation since that is a great convention to apply.
+		if (is_null($relation))
+		{
+			$caller = $this->getBelongsToManyCaller();
+
+			$name = $caller['function'];
+		}
 
 		// First, we'll need to determine the foreign key and "other key" for the
 		// relationship. Once we have determined the keys we'll make the query
@@ -749,7 +765,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// appropriate query constraint and entirely manages the hydrations.
 		$query = $instance->newQuery();
 
-		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $caller['function']);
+		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $relation);
 	}
 
 	/**
