@@ -164,7 +164,7 @@ class Validator implements MessageProviderInterface {
 	{
 		foreach ($rules as $key => &$rule)
 		{
-			$rule = (is_string($rule)) ? explode('|', $rule) : $rule;
+			$rule = explode('|', $rule);
 		}
 
 		return $rules;
