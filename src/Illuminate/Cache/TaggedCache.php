@@ -12,9 +12,9 @@ class TaggedCache implements StoreInterface {
 	protected $store;
 
 	/**
-	 * The tag names.
+	 * The tag set instance.
 	 *
-	 * @var array
+	 * @var \Illuminate\Cache\TagSet
 	 */
 	protected $tags;
 
@@ -22,13 +22,13 @@ class TaggedCache implements StoreInterface {
 	 * Create a new tagged cache instance.
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
-	 * @param  string  $names
+	 * @param  \Illuminate\Cache\TagSet  $tags
 	 * @return void
 	 */
-	public function __construct(StoreInterface $store, $names)
+	public function __construct(StoreInterface $store, TagSet $tags)
 	{
+		$this->tags = $tags;
 		$this->store = $store;
-		$this->tags = new TagSet($store, $names);
 	}
 
 	/**

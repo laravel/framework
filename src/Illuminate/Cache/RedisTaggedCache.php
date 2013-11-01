@@ -52,9 +52,7 @@ class RedisTaggedCache extends TaggedCache {
 	 */
 	protected function deleteForeverKeys()
 	{
-		$namespace = $this->tags->getNamespace();
-
-		foreach (explode('|', $namespace) as $segment)
+		foreach (explode('|', $this->tags->getNamespace()) as $segment)
 		{
 			$this->deleteForeverValues($segment = $this->foreverKey($segment));
 
@@ -86,7 +84,7 @@ class RedisTaggedCache extends TaggedCache {
 	 */
 	protected function foreverKey($segment)
 	{
-		return $this->getPrefix().':'.$segment.':forever';
+		return $this->getPrefix().$segment.':forever';
 	}
 
 }
