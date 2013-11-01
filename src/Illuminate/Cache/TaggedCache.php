@@ -185,7 +185,7 @@ class TaggedCache implements StoreInterface {
 	 */
 	public function taggedItemKey($key)
 	{
-		return $this->tags->getNamespace().':'.$key;
+		return $this->getPrefix().sha1($this->tags->getNamespace()).':'.$key;
 	}
 
 	/**

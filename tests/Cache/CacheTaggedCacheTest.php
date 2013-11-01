@@ -34,5 +34,6 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 		$store->tag('zap')->flush();
 		$this->assertNull($store->tags($tags1)->get('foo'));
 		$this->assertEquals('bar', $store->tags($tags2)->get('foo'));
-	}	
+	}
+
 }
