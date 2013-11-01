@@ -64,6 +64,7 @@
 		{"message": "Add support for order by and limit on MySQL update queries.", "backport": null},
 		{"message": "Tweak Container::resolve to accept a type, new resolvingAny method for all objects.", "backport": null},
 		{"message": "Do not run queue workers while application is in maintenance mode.", "backport": null},
-		{"message": "Values returned from scopes are now returned for chaining.", "backport": null}
+		{"message": "Values returned from scopes are now returned for chaining.", "backport": null},
+		{"message": "New 'nullableTimestamps' method on Schema builder.", "backport": null}
 	]
 }
