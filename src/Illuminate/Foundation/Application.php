@@ -106,9 +106,22 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function __construct(Request $request = null)
 	{
-		$this->instance('request', $request = Request::createFromGlobals());
+		$this->registerBaseBindings($request ?: Request::createFromGlobals());
 
 		$this->registerBaseServiceProviders();
+
+		$this->registerBaseMiddlewares();
+	}
+
+	/**
+	 * Register the basic bindings into the container.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return void
+	 */
+	protected function registerBaseBindings($request)
+	{
+		$this->instance('request', $request);
 
 		$this->instance('Illuminate\Container\Container', $this);
 	}
@@ -558,12 +571,22 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		foreach ($this->middlewares as $middleware)
 		{
-			list($class, $parameters) = $middleware;
+			list($class, $parameters) = array_values($middleware);
 
-			$parameters = array_unshift($parameters, $class);
+			array_unshift($parameters, $class);
 
 			call_user_func_array(array($stack, 'push'), $parameters);
 		}
+	}
+
+	/**
+	 * Register the default, but optional middlewares.
+	 *
+	 * @return void
+	 */
+	protected function registerBaseMiddlewares()
+	{
+		$this->middleware('Illuminate\Http\FrameGuard');
 	}
 
 	/**
@@ -578,6 +601,20 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$this->middlewares[] = compact('class', 'parameters');
 
 		return $this;
+	}
+
+	/**
+	 * Remove a custom middleware from the application.
+	 *
+	 * @param  string  $class
+	 * @return void
+	 */
+	public function forgetMiddleware($class)
+	{
+		$this->middlewares = array_filter($this->middlewares, function($m) use ($class)
+		{
+			return $m['class'] != $class;
+		});
 	}
 
 	/**
