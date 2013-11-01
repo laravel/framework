@@ -142,6 +142,14 @@ class RedisStore implements StoreInterface {
 	}
 
 	/**
+	 * alias for section
+	 */
+	public function tag($name)
+	{
+		return $this->section($name);
+	}
+
+	/**
 	 * Get the Redis connection instance.
 	 *
 	 * @return \Predis\Connection\SingleConnectionInterface

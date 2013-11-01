@@ -1,6 +1,26 @@
 <?php namespace Illuminate\Cache;
 
-class RedisSection extends Section {
+class RedisSection extends TaggedCache {
+
+	/**
+	 * The section name.
+	 *
+	 * @var string
+	 */
+	protected $name;
+
+	/**
+	 * Creates a new RedisSection
+	 *
+	 * @param  \Illuminate\Cache\StoreInterface  $store
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function __construct(StoreInterface $store, $name)
+	{
+		parent::$construct($store, array($name));
+		$this->name = $name;
+	}
 
 	/**
 	 * Store an item in the cache indefinitely.
@@ -13,7 +33,7 @@ class RedisSection extends Section {
 	{
 		$this->store->connection()->lpush($this->foreverKey(), $key);
 
-		$this->store->forever($this->sectionItemKey($key), $value);
+		parent::forever($key, $value);
 	}
 
 	/**
@@ -56,7 +76,7 @@ class RedisSection extends Section {
 
 		return array_map(function($x) use ($me)
 		{
-			return $me->getPrefix().$me->sectionItemKey($x);
+			return $me->getPrefix().$me->taggedItemKey($x);
 
 		}, array_unique($this->store->connection()->lrange($this->foreverKey(), 0, -1)));
 	}
@@ -68,7 +88,7 @@ class RedisSection extends Section {
 	 */
 	protected function foreverKey()
 	{
-		return $this->sectionKey().':forever';
+		return $this->tags->tagKey($this->name).':forever';
 	}
 
 	/**
