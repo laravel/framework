@@ -27,8 +27,8 @@ class TaggedCache implements StoreInterface {
 	 */
 	public function __construct(StoreInterface $store, $names)
 	{
-		$this->tags = new TagSet($store, $names);
 		$this->store = $store;
+		$this->tags = new TagSet($store, $names);
 	}
 
 	/**
@@ -197,4 +197,5 @@ class TaggedCache implements StoreInterface {
 	{
 		return $this->store->getPrefix();
 	}
+
 }

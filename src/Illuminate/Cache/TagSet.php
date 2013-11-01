@@ -60,24 +60,24 @@ class TagSet {
 
 	/**
 	 * get an array of tag identifiers for all tags
-	 * @return array 
+	 * @return array
 	 */
 	protected function tagIds()
 	{
 		$ids = array();
-		foreach ($this->names as $name) 
+		foreach ($this->names as $name)
 			$ids[] = $this->tagId($name);
 		return $ids;
 	}
 
 	/**
 	 * get a unique namespace that will change if any of the tags are flushed
-	 * @return string 
+	 * @return string
 	 */
 	public function getNamespace()
 	{
 		//The sha1 ensures that the namespace is not too long, but is otherwise unnecessary
-		return sha1(implode('|', $this->tagIds())); 
+		return sha1(implode('|', $this->tagIds()));
 	}
 
 	/**
@@ -90,7 +90,7 @@ class TagSet {
 	{
 		$this->store->forever($this->tagKey($name), $id = uniqid());
 
-		return $id; 
+		return $id;
 	}
 
 	/**
@@ -103,4 +103,5 @@ class TagSet {
 	{
 		return 'tag:'.$name.':key';
 	}
+
 }
