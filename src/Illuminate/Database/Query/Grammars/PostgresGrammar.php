@@ -5,6 +5,17 @@ use Illuminate\Database\Query\Builder;
 class PostgresGrammar extends Grammar {
 
 	/**
+	 * All of the available clause operators.
+	 *
+	 * @var array
+	 */
+	protected $operators = array(
+		'=', '<', '>', '<=', '>=', '<>', '!=',
+		'like', 'not like', 'between', 'ilike',
+		'&', '|', '#', '<<', '>>',
+	);
+
+	/**
 	 * Compile an update statement into SQL.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
