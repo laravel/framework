@@ -68,36 +68,8 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{$name}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ 
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
 			$name
-		}}'));
-
-		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name || "foo" }}'));
-		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name||"foo" }}'));
-		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{$name||"foo"}}'));
-		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{
-			$name||"foo"
-		}}'));
-
-		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{ $name || \'foo\' }}'));
-		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{ $name||\'foo\' }}'));
-		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{$name||\'foo\'}}'));
-		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{
-			$name||\'foo\'
-		}}'));
-
-		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{ $age || 90 }}'));
-		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{ $age||90 }}'));
-		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{$age||90}}'));
-		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{
-			$age||90
-		}}'));
-
-		$this->assertEquals('<?php echo "Hello world || foo"; ?>', $compiler->compileString('{{ "Hello world || foo" }}'));
-		$this->assertEquals('<?php echo "Hello world||foo"; ?>', $compiler->compileString('{{ "Hello world||foo" }}'));
-		$this->assertEquals('<?php echo "Hello world||foo"; ?>', $compiler->compileString('{{"Hello world||foo"}}'));
-		$this->assertEquals('<?php echo "Hello world||foo"; ?>', $compiler->compileString('{{
-			"Hello world||foo"
 		}}'));
 
 		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name or "foo" }}'));
@@ -120,6 +92,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{ "Hello world or foo" }}'));
 		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{"Hello world or foo"}}'));
+		$this->assertEquals('<?php echo $foo + $or + $baz; ?>', $compiler->compileString('{{$foo + $or + $baz}}'));
 		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{
 			"Hello world or foo"
 		}}'));
@@ -139,7 +112,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('{{ $name }}', $compiler->compileString('@{{ $name }}'));
 		$this->assertEquals('{{
 			$name
-		}}', 
+		}}',
 		$compiler->compileString('@{{
 			$name
 		}}'));
@@ -154,7 +127,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{$name}}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ $name }}}'));
-		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ 
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{
 			$name
 		}}}'));
 	}
@@ -180,16 +153,16 @@ test';
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '{{--this is a comment--}}';
-		$expected = '<?php /* this is a comment */ ?>';
+		$expected = '<?php /*this is a comment*/ ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 
 
 		$string = '{{--
 this is a comment
 --}}';
-		$expected = '<?php /* 
+		$expected = '<?php /*
 this is a comment
- */ ?>';
+*/ ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
@@ -252,16 +225,16 @@ breeze
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
-	
-	
-	public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled() 
+
+
+	public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = "Foo @lang(function_call('foo(blah)')) bar";
 		$expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
-	
+
 
 	public function testIncludesAreCompiled()
 	{
