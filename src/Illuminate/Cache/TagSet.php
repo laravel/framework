@@ -1,6 +1,9 @@
 <?php namespace Illuminate\Cache;
 
-class TagSet {
+use ArrayIterator;
+use IteratorAggregate;
+
+class TagSet implements IteratorAggregate {
 
 	/**
 	 * The cache store implementation.
@@ -25,68 +28,58 @@ class TagSet {
 	 */
 	public function __construct(StoreInterface $store, $names)
 	{
-		$this->names = $names;
 		$this->store = $store;
+		$this->names = $names;
 	}
 
 	/**
-	 * Reset all tags
+	 * Reset all tags in the set.
 	 *
-	 * @return string
+	 * @return void
 	 */
 	public function reset()
 	{
-		foreach($this->names as $name)
-			$this->resetTag($name);
+		array_walk($this->names, array($this, 'resetTag'));
 	}
 
 	/**
-	 * Get the unique tag identifier.
+	 * Get the unique tag identifier for a given tag.
 	 *
-	 * @param  string the name for a given tag
+	 * @param  string  $name
 	 * @return string
 	 */
-	protected function tagId($name)
+	public function tagId($name)
 	{
-		$id = $this->store->get($this->tagKey($name));
-
-		if (is_null($id))
-		{
-			$id = $this->resetTag($name);
-		}
-
-		return $id;
+		return $this->store->get($this->tagKey($name)) ?: $this->resetTag($name);
 	}
 
 	/**
-	 * get an array of tag identifiers for all tags
+	 * Get an array of tag identifiers for all of the tags in the set.
+	 *
 	 * @return array
 	 */
 	protected function tagIds()
 	{
-		$ids = array();
-		foreach ($this->names as $name)
-			$ids[] = $this->tagId($name);
-		return $ids;
+		return array_map(array($this, 'tagId'), $this->names);
 	}
 
 	/**
-	 * get a unique namespace that will change if any of the tags are flushed
+	 * Get a unique namespace that changes when any of the tags are flushed.
+	 *
 	 * @return string
 	 */
 	public function getNamespace()
 	{
-		//The sha1 ensures that the namespace is not too long, but is otherwise unnecessary
-		return sha1(implode('|', $this->tagIds()));
+		return implode('|', $this->tagIds());
 	}
 
 	/**
-	 * Reset the tag, returning a new tag identifier
+	 * Reset the tag and return the new tag identifier
 	 *
-	 * @param string $name
+	 * @param  string  $name
 	 * @return string
 	 */
-	protected function resetTag($name)
+	public function resetTag($name)
 	{
 		$this->store->forever($this->tagKey($name), $id = uniqid());
 
@@ -96,12 +89,22 @@ class TagSet {
 	/**
 	 * Get the tag identifier key for a given tag.
 	 *
-	 * @param string $name
+	 * @param  string  $name
 	 * @return string
 	 */
 	public function tagKey($name)
 	{
 		return 'tag:'.$name.':key';
+	}
+
+	/**
+	 * Get a traversable implementation for the class.
+	 *
+	 * @return \ArrayIterator
+	 */
+	public function getIterator()
+	{
+		return new ArrayIterator($this->names);
 	}
 
 }
