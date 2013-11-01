@@ -2,7 +2,7 @@
 
 use Closure;
 
-class Section {
+class TaggedCache implements StoreInterface {
 
 	/**
 	 * The cache store implementation.
@@ -12,22 +12,22 @@ class Section {
 	protected $store;
 
 	/**
-	 * The section name.
+	 * The tag set instance.
 	 *
-	 * @var string
+	 * @var \Illuminate\Cache\TagSet
 	 */
-	protected $name;
+	protected $tags;
 
 	/**
-	 * Create a new section instance.
+	 * Create a new tagged cache instance.
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
-	 * @param  string  $name
+	 * @param  \Illuminate\Cache\TagSet  $tags
 	 * @return void
 	 */
-	public function __construct(StoreInterface $store, $name)
+	public function __construct(StoreInterface $store, TagSet $tags)
 	{
-		$this->name = $name;
+		$this->tags = $tags;
 		$this->store = $store;
 	}
 
@@ -51,7 +51,7 @@ class Section {
 	 */
 	public function get($key, $default = null)
 	{
-		$value = $this->store->get($this->sectionItemKey($key));
+		$value = $this->store->get($this->taggedItemKey($key));
 
 		return ! is_null($value) ? $value : value($default);
 	}
@@ -66,7 +66,7 @@ class Section {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		return $this->store->put($this->sectionItemKey($key), $value, $minutes);
+		return $this->store->put($this->taggedItemKey($key), $value, $minutes);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Section {
 	 */
 	public function increment($key, $value = 1)
 	{
-		$this->store->increment($this->sectionItemKey($key), $value);
+		$this->store->increment($this->taggedItemKey($key), $value);
 	}
 
 	/**
@@ -90,7 +90,7 @@ class Section {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		$this->store->decrement($this->sectionItemKey($key), $value);
+		$this->store->decrement($this->taggedItemKey($key), $value);
 	}
 
 	/**
@@ -102,7 +102,7 @@ class Section {
 	 */
 	public function forever($key, $value)
 	{
-		$this->store->forever($this->sectionItemKey($key), $value);
+		$this->store->forever($this->taggedItemKey($key), $value);
 	}
 
 	/**
@@ -113,7 +113,7 @@ class Section {
 	 */
 	public function forget($key)
 	{
-		$this->store->forget($this->sectionItemKey($key));
+		$this->store->forget($this->taggedItemKey($key));
 	}
 
 	/**
@@ -123,7 +123,7 @@ class Section {
 	 */
 	public function flush()
 	{
-		$this->reset();
+		$this->tags->reset();
 	}
 
 	/**
@@ -178,53 +178,24 @@ class Section {
 	}
 
 	/**
-	 * Get a fully qualified section item key.
+	 * Get a fully qualified key for a tagged item.
 	 *
 	 * @param  string  $key
 	 * @return string
 	 */
-	public function sectionItemKey($key)
+	public function taggedItemKey($key)
 	{
-		return $this->name.':'.$this->sectionId().':'.$key;
+		return $this->getPrefix().sha1($this->tags->getNamespace()).':'.$key;
 	}
 
 	/**
-	 * Reset the section, returning a new section identifier
+	 * Get the cache key prefix.
 	 *
 	 * @return string
 	 */
-	protected function reset()
+	public function getPrefix()
 	{
-		$this->store->forever($this->sectionKey(), $id = uniqid());
-
-		return $id;
-	}
-
-	/**
-	 * Get the unique section identifier.
-	 *
-	 * @return string
-	 */
-	protected function sectionId()
-	{
-		$id = $this->store->get($this->sectionKey());
-
-		if (is_null($id))
-		{
-			$id = $this->reset();
-		}
-
-		return $id;
-	}
-
-	/**
-	 * Get the section identifier key.
-	 *
-	 * @return string
-	 */
-	protected function sectionKey()
-	{
-		return 'section:'.$this->name.':key';
+		return $this->store->getPrefix();
 	}
 
 }
