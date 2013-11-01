@@ -598,6 +598,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Add nullable creation and update timestamps to the table.
+	 *
+	 * @return void
+	 */
+	public function nullableTimestamps()
+	{
+		$this->timestamp('created_at')->nullable();
+
+		$this->timestamp('updated_at')->nullable();
+	}
+
+	/**
 	 * Add creation and update timestamps to the table.
 	 *
 	 * @return void
