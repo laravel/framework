@@ -221,20 +221,21 @@ class Builder {
 	 * @param  string  $table
 	 * @param  string  $first
 	 * @param  string  $operator
-	 * @param  string  $second
+	 * @param  string  $two
 	 * @param  string  $type
+	 * @param  bool  $where
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function join($table, $first, $operator = null, $second = null, $type = 'inner')
+	public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
 	{
 		// If the first "column" of the join is really a Closure instance the developer
 		// is trying to build a join with a complex "on" clause containing more than
 		// one condition, so we'll add the join and call a Closure with the query.
-		if ($first instanceof Closure)
+		if ($one instanceof Closure)
 		{
-			$this->joins[] = new JoinClause($type, $table);
+			$this->joins[] = new JoinClause($this, $type, $table);
 
-			call_user_func($first, end($this->joins));
+			call_user_func($one, end($this->joins));
 		}
 
 		// If the column is simply a string, we can assume the join simply has a basic
@@ -242,14 +243,29 @@ class Builder {
 		// this simple join clauses attached to it. There is not a join callback.
 		else
 		{
-			$join = new JoinClause($type, $table);
+			$join = new JoinClause($this, $type, $table);
 
-			$join->on($first, $operator, $second);
-
-			$this->joins[] = $join;
+			$this->joins[] = $join->on(
+				$one, $operator, $two, 'and', $where
+			);
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Add a "join where" clause to the query.
+	 *
+	 * @param  string  $table
+	 * @param  string  $first
+	 * @param  string  $operator
+	 * @param  string  $two
+	 * @param  string  $type
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function joinWhere($table, $one, $operator, $two, $type = 'inner')
+	{
+		return $this->join($table, $one, $operator, $two, $type, true);
 	}
 
 	/**
@@ -264,6 +280,20 @@ class Builder {
 	public function leftJoin($table, $first, $operator = null, $second = null)
 	{
 		return $this->join($table, $first, $operator, $second, 'left');
+	}
+
+	/**
+	 * Add a "join where" clause to the query.
+	 *
+	 * @param  string  $table
+	 * @param  string  $first
+	 * @param  string  $operator
+	 * @param  string  $two
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function leftJoinWhere($table, $one, $operator, $two)
+	{
+		return $this->joinWhere($table, $one, $operator, $two, 'left');
 	}
 
 	/**
@@ -1641,6 +1671,19 @@ class Builder {
 	public function setBindings(array $bindings)
 	{
 		$this->bindings = $bindings;
+
+		return $this;
+	}
+
+	/**
+	 * Add a binding to the query.
+	 *
+	 * @param  mixed  $value
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function addBinding($value)
+	{
+		$this->bindings[] = $value;
 
 		return $this;
 	}
