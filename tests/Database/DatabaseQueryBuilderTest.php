@@ -388,6 +388,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->leftJoin('photos', 'users.id', '=', 'photos.id');
 		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id"', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->leftJoinWhere('photos', 'users.id', '=', 'bar')->joinWhere('photos', 'users.id', '=', 'foo');
+		$this->assertEquals('select * from "users" left join "photos" on "users"."id" = ? inner join "photos" on "users"."id" = ?', $builder->toSql());
+		$this->assertEquals(array('bar', 'foo'), $builder->getBindings());
 	}
 
 
@@ -399,6 +404,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 			$j->on('users.id', '=', 'contacts.id')->orOn('users.name', '=', 'contacts.name');
 		});
 		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "users"."name" = "contacts"."name"', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->join('contacts', function($j)
+		{
+			$j->where('users.id', '=', 'foo')->orWhere('users.name', '=', 'bar');
+		});
+		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
+		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
 	}
 
 

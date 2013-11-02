@@ -176,7 +176,7 @@ class Grammar extends BaseGrammar {
 	{
 		$first = $this->wrap($clause['first']);
 
-		$second = $this->wrap($clause['second']);
+		$second = $clause['where'] ? '?' : $this->wrap($clause['second']);
 
 		return "{$clause['boolean']} $first {$clause['operator']} $second";
 	}
