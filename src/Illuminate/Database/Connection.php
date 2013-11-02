@@ -622,13 +622,24 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
-	 * Get the currently used PDO connection.
+	 * Get the current PDO connection.
 	 *
 	 * @return PDO
 	 */
 	public function getPdo()
 	{
 		return $this->pdo;
+	}
+
+	/**
+	 * Set the PDO connection.
+	 *
+	 * @param  PDO  $pdo
+	 * @return void
+	 */
+	public function setPdo(PDO $pdo)
+	{
+		$this->pdo = $pdo;
 	}
 
 	/**
