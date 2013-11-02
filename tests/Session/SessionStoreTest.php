@@ -120,7 +120,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		return array(
 			'name',
 			m::mock('SessionHandlerInterface'),
-			1
+			'1'
 		);
 	}
 
