@@ -108,7 +108,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @var array
 	 */
-	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted');
+	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted');
 
 	/**
 	 * Create a new Validator instance.
@@ -387,6 +387,25 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Determine if all of the given attributes fail the required test.
+	 *
+	 * @param  array  $attributes
+	 * @return bool
+	 */
+	protected function allFailingRequired(array $attributes)
+	{
+		foreach ($attributes as $key)
+		{
+			if ($this->validateRequired($key, $this->getValue($key)))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Validate that an attribute exists when another attribute exists
 	 *
 	 * @param  string  $attribute
@@ -422,6 +441,24 @@ class Validator implements MessageProviderInterface {
 	protected function validateRequiredWithout($attribute, $value, $parameters)
 	{
 		if ($this->anyFailingRequired($parameters))
+		{
+			return $this->validateRequired($attribute, $value);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate that an attribute exists when all other attributes do not exist
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredWithoutAll($attribute, $value, $parameters)
+	{
+		if ($this->allFailingRequired($parameters))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
@@ -1428,6 +1465,22 @@ class Validator implements MessageProviderInterface {
 	 * @return string
 	 */
 	protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
+	{
+		$parameters = $this->getAttributeList($parameters);
+
+		return str_replace(':values', implode(' / ', $parameters), $message);
+	}
+
+	/**
+	 * Replace all place-holders for the required_without_all rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceRequiredWithoutAll($message, $attribute, $rule, $parameters)
 	{
 		$parameters = $this->getAttributeList($parameters);
 
