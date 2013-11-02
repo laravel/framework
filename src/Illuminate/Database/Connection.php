@@ -650,6 +650,16 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Change the value of the currently used PDO connection.
+	 *
+	 * @param mixed $pdo
+	 */
+	public function setPdo($pdo)
+	{
+		$this->pdo = $pdo;
+	}
+
+	/**
 	 * Get the database connection name.
 	 *
 	 * @return string|null
