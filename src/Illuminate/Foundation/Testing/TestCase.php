@@ -30,6 +30,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		{
 			$this->refreshApplication();
 
+			$this->app->setRequestForConsoleEnvironment();
+
 			$this->app->boot();
 		}
 	}
