@@ -406,7 +406,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Validate that an attribute exists when another attribute exists
+	 * Validate that an attribute exists when another attribute exists.
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
@@ -431,7 +431,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Validate that an attribute exists when another attribute does not exists
+	 * Validate that an attribute exists when another attribute does not.
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
@@ -449,7 +449,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Validate that an attribute exists when all other attributes do not exist
+	 * Validate that an attribute exists when all other attributes do not.
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
