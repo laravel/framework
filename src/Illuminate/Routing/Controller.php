@@ -20,11 +20,28 @@ abstract class Controller {
 	protected $afterFilters = array();
 
 	/**
+	 * The layout used by the controller.
+	 *
+	 * @var \Illuminate\View\View
+	 */
+	protected $layout;
+
+	/**
 	 * The route filterer implementation.
 	 *
 	 * @var \Illuminate\Routing\RouteFiltererInterface
 	 */
 	protected static $filterer;
+
+	/**
+	 * Create a new Controller instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		$this->setupLayout();
+	}
 
 	/**
 	 * Register a "before" filter on the controler.
@@ -161,6 +178,23 @@ abstract class Controller {
 	{
 		static::$filterer = $filterer;
 	}
+
+	/**
+	 * Get the layout used by the controler.
+	 *
+	 * @return \Illuminate\View\View|null
+	 */
+	public function getLayout()
+	{
+		return $this->layout;
+	}
+
+	/**
+	 * Setup the layout used by the controller.
+	 *
+	 * @return void
+	 */
+	protected function setupLayout() {}
 
 	/**
 	 * Handle calls to missing methods on the controller.
