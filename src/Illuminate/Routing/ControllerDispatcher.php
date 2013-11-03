@@ -97,7 +97,7 @@ class ControllerDispatcher {
 	{
 		$parameters = $route->parametersWithoutNulls();
 
-		return call_user_func_array(array($instance, $method), $parameters);
+		return $instance->callAction($method, $parameters);
 	}
 
 	/**
