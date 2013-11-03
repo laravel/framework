@@ -61,9 +61,9 @@ class ControllerDispatcher {
             $response = $this->call($instance, $route, $method);
     	}
 
-		// If no response is returned from the controller action and a layout is being
-		// used we will assume we want to just return the layout view as any nested
-		// views were probably bound on this view during this controller actions.
+        // If no response has been returned thus far and a controller "layout" has been set
+        // then we will go ahead and set the layout as the response to the method, which
+        // lets a controller define a single layout and append to it from all methods.
 		if (is_null($response) && ! is_null($instance->getLayout()))
 		{
 			$response = $instance->getLayout();
