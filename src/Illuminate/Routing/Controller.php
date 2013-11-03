@@ -201,16 +201,6 @@ abstract class Controller {
 	}
 
 	/**
-	 * Get the layout used by the controller.
-	 *
-	 * @return \Illuminate\View\View|null
-	 */
-	public function getLayout()
-	{
-		return $this->layout;
-	}
-
-	/**
 	 * Handle calls to missing methods on the controller.
 	 *
 	 * @param  string  $method
