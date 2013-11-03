@@ -61,14 +61,6 @@ class ControllerDispatcher {
 			$response = $this->call($instance, $route, $method);
 		}
 
-		// If no response has been returned thus far and a controller "layout" has been set
-		// then we will go ahead and set the layout as the response to the method, which
-		// lets a controller define a single layout and append to it from all methods.
-		if (is_null($response) && ! is_null($instance->getLayout()))
-		{
-			$response = $instance->getLayout();
-		}
-
 		return $response;
 	}
 
