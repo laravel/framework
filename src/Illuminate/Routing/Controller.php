@@ -199,12 +199,13 @@ abstract class Controller {
 	/**
 	 * Handle calls to missing methods on the controller.
 	 *
+	 * @param  string  $method
 	 * @param  array  $parameters
 	 * @return mixed
 	 */
-	public function missingMethod($parameters)
+	public function missingMethod($method, $parameters)
 	{
-		throw new NotFoundHttpException("Controller method not found.");
+		throw new NotFoundHttpException("Controller method [{$method}] not found.");
 	}
 
 	/**
@@ -216,7 +217,7 @@ abstract class Controller {
 	 */
 	public function __call($method, $parameters)
 	{
-		return $this->missingMethod($parameters);
+		return $this->missingMethod($method, $parameters);
 	}
 
 }

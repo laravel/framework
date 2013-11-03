@@ -46,7 +46,8 @@
 		{"message": "New Cache::tags feature that allows tagging cached items and flushing them by any tag.", "backport": null},
 		{"message": "New FrameGuard middleware sends SAMEORIGIN X-Frame-Options header on each response by default.", "backport": null},
 		{"message": "Added 'joinWhere' and 'leftJoinWhere' to query builder for joins with bindings.", "backport": null},
-		{"message": "Added 'require_without_all' validation rule.", "backport": null}
+		{"message": "Added 'require_without_all' validation rule.", "backport": null},
+		{"message": "Controller method is now passed to missingMethod as first parameter.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
