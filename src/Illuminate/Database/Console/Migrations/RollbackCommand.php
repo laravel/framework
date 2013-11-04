@@ -73,6 +73,10 @@ class RollbackCommand extends Command {
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
+
+			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
+
+			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
 		);
 	}
 
