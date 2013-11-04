@@ -34,16 +34,6 @@ abstract class Controller {
 	protected $layout;
 
 	/**
-	 * Create a new Controller instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		$this->setupLayout();
-	}
-
-	/**
 	 * Register a "before" filter on the controler.
 	 *
 	 * @param  \Closure|string  $name
@@ -187,20 +177,34 @@ abstract class Controller {
 	protected function setupLayout() {}
 
 	/**
-	 * Get the layout used by the controller.
+	 * Execute an action on the controller.
 	 *
-	 * @return \Illuminate\View\View|null
+	 * @param string  $method
+	 * @param array   $parameters
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function getLayout()
+	public function callAction($method, $parameters)
 	{
-		return $this->layout;
+		$this->setupLayout();
+
+		$response = call_user_func_array(array($this, $method), $parameters);
+
+		// If no response is returned from the controller action and a layout is being
+		// used we will assume we want to just return the layout view as any nested
+		// views were probably bound on this view during this controller actions.
+		if (is_null($response) and ! is_null($this->layout))
+		{
+			$response = $this->layout;
+		}
+
+		return $response;
 	}
 
 	/**
 	 * Handle calls to missing methods on the controller.
 	 *
 	 * @param  string  $method
-	 * @param  array  $parameters
+	 * @param  array   $parameters
 	 * @return mixed
 	 */
 	public function missingMethod($method, $parameters)
