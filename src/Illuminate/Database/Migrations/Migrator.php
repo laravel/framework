@@ -146,7 +146,7 @@ class Migrator {
 	 * @param  bool  $pretend
 	 * @return int
 	 */
-	public function rollback($pretend = false)
+	public function rollback($path, $pretend = false)
 	{
 		$this->notes = array();
 
@@ -154,6 +154,8 @@ class Migrator {
 		// migration operation. We'll then reverse those migrations and run each
 		// of them "down" to reverse the last migration "operation" which ran.
 		$migrations = $this->repository->getLast();
+
+		$this->requireFiles($path, $files = $this->getMigrationFiles($path));
 
 		if (count($migrations) == 0)
 		{
