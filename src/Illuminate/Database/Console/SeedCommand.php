@@ -51,8 +51,6 @@ class SeedCommand extends Command {
 		$this->resolver->setDefaultConnection($this->getDatabase());
 
 		$this->getSeeder()->run();
-
-		$this->info('Database seeded!');
 	}
 
 	/**
