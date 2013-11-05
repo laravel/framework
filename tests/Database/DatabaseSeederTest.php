@@ -28,4 +28,18 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 		$seeder->call('ClassName');
 	}
 
+	public function testSetContainer()
+	{
+		$seeder = new Seeder;
+		$container = m::mock('Illuminate\Container\Container');
+		$this->assertEquals($seeder->setContainer($container), $seeder);
+	}
+
+	public function testSetCommand()
+	{
+		$seeder = new Seeder;
+		$command = m::mock('Illuminate\Console\Command');
+		$this->assertEquals($seeder->setCommand($command), $seeder);
+	}
+
 }
