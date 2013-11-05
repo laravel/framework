@@ -339,7 +339,12 @@ class Route {
 	{
 		if (count($this->parameterNames()) == 0) return array();
 
-		return array_filter(array_intersect_key($matches, array_flip($this->parameterNames())));
+		$parameters = array_intersect_key($matches, array_flip($this->parameterNames()));
+
+		return array_filter($parameters, function($value)
+		{
+			return is_string($value) && strlen($value) > 0;
+		});
 	}
 
 	/**
