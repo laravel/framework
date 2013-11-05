@@ -77,7 +77,7 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerCommands()
 	{
-		$commands = array('Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make');
+		$commands = array('Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make', 'Publish');
 
 		// We'll simply spin through the list of commands that are migration related
 		// and register each one of them with an application container. They will
@@ -93,7 +93,8 @@ class MigrationServiceProvider extends ServiceProvider {
 		$this->commands(
 			'command.migrate', 'command.migrate.make',
 			'command.migrate.install', 'command.migrate.rollback',
-			'command.migrate.reset', 'command.migrate.refresh'
+			'command.migrate.reset', 'command.migrate.refresh',
+			'command.migrate.publish'
 		);
 	}
 
@@ -190,6 +191,29 @@ class MigrationServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the "publish" migration command.
+	 *
+	 * @return void
+	 */
+	protected function registerPublishCommand()
+	{
+		$this->app->bindShared('migration.publisher', function($app)
+		{
+			return new MigrationPublisher($app['files']);
+		});
+
+		$this->app->bindShared('command.migrate.publish', function($app) 
+		{
+			$publisher = $app['migration.publisher'];
+
+			$packagePath = $app['path.base'].'/vendor';
+			$destPath = $app['path.app'].'/database/migrations';
+
+			return new PublishCommand($publisher, $packagePath, $destPath);
+		});
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
@@ -201,6 +225,7 @@ class MigrationServiceProvider extends ServiceProvider {
 			'command.migrate.rollback', 'command.migrate.reset',
 			'command.migrate.refresh', 'command.migrate.install',
 			'migration.creator', 'command.migrate.make',
+			'migration.publisher', 'command.migrate.publish',
 		);
 	}
 
