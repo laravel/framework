@@ -44,6 +44,23 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTagsWithStringArgument()
+	{
+		$store = new ArrayStore;
+		$store->tags('bop')->put('foo', 'bar', 10);
+		$this->assertEquals('bar', $store->tags('bop')->get('foo'));
+	}
+
+
+	public function testTagsCacheForever()
+	{
+		$store = new ArrayStore;
+		$tags = array('bop', 'zap');
+		$store->tags($tags)->forever('foo', 'bar');
+		$this->assertEquals('bar', $store->tags($tags)->get('foo'));
+	}
+
+
 	public function testRedisCacheTagsPushForeverKeysCorrectly()
 	{
 		$store = m::mock('Illuminate\Cache\StoreInterface');
