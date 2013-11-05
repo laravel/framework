@@ -13,7 +13,7 @@ class RedisTaggedCache extends TaggedCache {
 	{
 		$this->pushForeverKeys($namespace = $this->tags->getNamespace(), $key);
 
-		$this->store->forever(sha1($namespace).':'.$key, $value);
+		parent::forever( $key, $value);
 	}
 
 	/**
