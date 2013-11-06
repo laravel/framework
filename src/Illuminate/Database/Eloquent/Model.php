@@ -1798,8 +1798,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getForeignKey()
 	{
-		return snake_case(class_basename($this)).'_id';
-	}
+		if(is_null($this->table))
+		{
+			return snake_case(class_basename($this)).'_id';
+		}
+		
+		return  snake_case(str_singular($this->table)).'_id' ;	}
 
 	/**
 	 * Get the hidden attributes for the model.
