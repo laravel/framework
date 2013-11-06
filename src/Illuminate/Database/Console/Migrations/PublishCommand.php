@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
-use Illuminate\Database\Migrations\MigrationPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Database\Migrations\MigrationPublisher;
 
 class PublishCommand extends Command {
 
