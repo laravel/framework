@@ -373,7 +373,14 @@ class Container implements ArrayAccess {
 	 */
 	protected function getReboundCallbacks($abstract)
 	{
-		return array_get($this->reboundCallbacks, $abstract, array());
+		if (isset($this->reboundCallbacks[$abstract]))
+		{
+			return $this->reboundCallbacks[$abstract];
+		}
+		else
+		{
+			return array();
+		}
 	}
 
 	/**
@@ -634,7 +641,14 @@ class Container implements ArrayAccess {
 	 */
 	public function isShared($abstract)
 	{
-		$shared = array_get($this->bindings, "{$abstract}.shared");
+		if (isset($this->bindings[$abstract]['shared']))
+		{
+			$shared = $this->bindings[$abstract]['shared'];
+		}
+		else
+		{
+			$shared = false;
+		}
 
 		return isset($this->instances[$abstract]) || $shared === true;
 	}
