@@ -242,8 +242,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		if ( ! isset(static::$booted[get_class($this)]))
 		{
 			static::$booted[get_class($this)] = true;
+			
+			$this->fireModelEvent('booting', false);
 
 			static::boot();
+			
+			$this->fireModelEvent('booted', false);
 		}
 
 		$this->syncOriginal();
