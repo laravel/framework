@@ -1376,17 +1376,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		return $this->current()->getName() == $name;
 	}
 
-    /**
+	/**
 	 * Get the current route action.
 	 *
 	 * @return string|null
 	 */
-    public function currentRouteAction()
-    {
-        $current = $this->current()->getAction();
+	public function currentRouteAction()
+	{
+		$action = $this->current()->getAction();
 
-        return isset($action['controller']) ? $action['controller'] : null;
-    }
+		return isset($action['controller']) ? $action['controller'] : null;
+	}
 
 	/**
 	 * Determine if the current route action matches a given action.
@@ -1396,8 +1396,6 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteUses($action)
 	{
-		$current = $this->current()->getAction();
-
 		return $this->currentRouteAction() == $action;
 	}
 
