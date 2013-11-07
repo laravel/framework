@@ -213,7 +213,7 @@ class Manager {
 	}
 
 	/**
-	 * Set the cache manager to bse used by connections.
+	 * Set the cache manager to be used by connections.
 	 *
 	 * @param  \Illuminate\Cache\CacheManager  $cache
 	 * @return void
