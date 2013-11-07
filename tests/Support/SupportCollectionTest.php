@@ -265,6 +265,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
 	}
 
+	public function testTransform()
+	{
+		$data = new Collection(array('taylor', 'colin', 'shawn'));
+		$data->transform(function($item) { return strrev($item); });
+		$this->assertEquals(array('rolyat', 'niloc', 'nwahs'), array_values($data->all()));
+	}
+
 }
 
 class TestAccessorEloquentTestStub

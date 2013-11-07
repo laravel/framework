@@ -196,11 +196,23 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Run a map over each of the items.
 	 *
 	 * @param  Closure  $callback
-	 * @return array
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function map(Closure $callback)
 	{
 		return new static(array_map($callback, $this->items, array_keys($this->items)));
+	}
+
+	/**
+	 * Transform each item in the collection using a callback.
+	 *
+	 * @param  Closure  $callback
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function transform(Closure $callback)
+	{
+		$this->items = array_map($callback, $this->items);
+		return $this;
 	}
 
 	/**
