@@ -204,12 +204,12 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Process each of the items using a callback.
+	 * Transform each item in the collection using a callback.
 	 *
 	 * @param  Closure  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function process(Closure $callback)
+	public function transform(Closure $callback)
 	{
 		$this->items = array_map($callback, $this->items);
 		return $this;

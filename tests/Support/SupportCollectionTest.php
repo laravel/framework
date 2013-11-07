@@ -265,10 +265,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
 	}
 
-	public function testProcess()
+	public function testTransform()
 	{
 		$data = new Collection(array('taylor', 'colin', 'shawn'));
-		$data->process(function($item) { return strrev($item); });
+		$data->transform(function($item) { return strrev($item); });
 		$this->assertEquals(array('rolyat', 'niloc', 'nwahs'), array_values($data->all()));
 	}
 
