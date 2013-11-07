@@ -737,6 +737,21 @@ class Blueprint {
 
 		return $column;
 	}
+	
+	/**
+	 * Remove a column from the blueprint.
+	 *
+	 * @param  string  $name
+	 */
+	public function removeColumn($name)
+	{
+		foreach($this->columns as $index => $col){
+			if($col['attributes']['name'] === $name){
+				unset($this->columns[$index]);
+			}
+		}
+		return $this;
+	}
 
 	/**
 	 * Add a new command to the blueprint.
