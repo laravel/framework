@@ -33,6 +33,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'Language',
 		'SectionStart',
 		'SectionStop',
+		'SectionAppend',
 		'SectionOverwrite',
 	);
 
@@ -396,6 +397,19 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$pattern = $this->createPlainMatcher('endsection');
 
 		return preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
+	}
+
+	/**
+	 * Compile Blade section append statements into valid PHP.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileSectionAppend($value)
+	{
+		$pattern = $this->createPlainMatcher('append');
+
+		return preg_replace($pattern, '$1<?php $__env->appendSection(); ?>$2', $value);
 	}
 
 	/**

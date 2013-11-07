@@ -296,6 +296,13 @@ breeze
 	}
 
 
+	public function testAppendSectionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php $__env->appendSection(); ?>', $compiler->compileString('@append'));
+	}
+
+
 	public function testCustomExtensionsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
