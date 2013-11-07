@@ -32,24 +32,24 @@ class Str {
 	}
 
 	/**
-	 * Determine if a given string contains a given sub-string.
+	 * Determine if a given string contains a given substring.
 	 *
 	 * @param  string        $haystack
-	 * @param  string|array  $needle
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
-	public static function contains($haystack, $needle)
+	public static function contains($haystack, $needles)
 	{
-		foreach ((array) $needle as $n)
+		foreach ((array) $needles as $needle)
 		{
-			if ($n != '' && strpos($haystack, $n) !== false) return true;
+			if ($needle != '' && strpos($haystack, $needle) !== false) return true;
 		}
 
 		return false;
 	}
 
 	/**
-	 * Determine if a given string ends with a given needle.
+	 * Determine if a given string ends with a given substring.
 	 *
 	 * @param string $haystack
 	 * @param string|array $needles
@@ -291,7 +291,7 @@ class Str {
 	}
 
 	/**
-	 * Determine if a string starts with a given needle.
+	 * Determine if a given string starts with a given substring.
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needles
