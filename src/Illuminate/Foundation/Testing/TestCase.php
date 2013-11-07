@@ -2,6 +2,7 @@
 
 use Illuminate\View\View;
 use Illuminate\Auth\UserInterface;
+use Symfony\Component\Console\Input\ArrayInput;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
@@ -355,7 +356,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app[$class]->run();
+		$input = new ArrayInput(array('command' => 'db:seed', '--class' => $class));
+        $this->app['artisan']->run($input);
 	}
 
 	/**
