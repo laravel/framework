@@ -212,6 +212,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function transform(Closure $callback)
 	{
 		$this->items = array_map($callback, $this->items);
+
 		return $this;
 	}
 
