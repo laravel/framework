@@ -237,6 +237,19 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSessionAppending()
+	{
+		$environment = $this->getEnvironment();
+		$environment->startSection('foo');
+		echo 'hi';
+		$environment->appendSection();
+		$environment->startSection('foo');
+		echo 'there';
+		$environment->appendSection();
+		$this->assertEquals('hithere', $environment->yieldContent('foo'));
+	}
+
+
 	public function testYieldSectionStopsAndYields()
 	{
 		$environment = $this->getEnvironment();
