@@ -59,7 +59,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle != '' && $needle == substr($haystack, strlen($haystack) - strlen($needle))) return true;
+			if ($needle == substr($haystack, -strlen($needle))) return true;
 		}
 
 		return false;
