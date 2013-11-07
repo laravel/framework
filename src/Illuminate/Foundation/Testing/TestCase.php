@@ -339,7 +339,9 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app[$class]->run();
+		$artisan = $this->app->make('artisan');
+
+		$artisan->call('db:seed', array('--class' => $class));
 	}
 
 	/**
