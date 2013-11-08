@@ -339,9 +339,15 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$artisan = $this->app['artisan'];
+		$command = $this->getMockBuilder('\Illuminate\Console\Command')
+					->disableOriginalConstructor()
+					->setMethods(array('getOutput', 'writeln'))
+					->getMock();
 
-		$artisan->call('db:seed', array('--class' => $class));
+		$command->expects($this->any())->method('getOutput')->will($this->returnValue($command));
+		$command->expects($this->any())->method('writeln')->will($this->returnValue(null));
+
+		$this->app[$class]->setCommand($command)->run();
 	}
 
 	/**
