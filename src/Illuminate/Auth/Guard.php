@@ -330,9 +330,7 @@ class Guard {
 	 */
 	public function login(UserInterface $user, $remember = false)
 	{
-		$id = $user->getAuthIdentifier();
-
-		$this->session->put($this->getName(), $id);
+		$this->updateSession($id = $user->getAuthIdentifier());
 
 		// If the user should be permanently "remembered" by the application we will
 		// queue a permanent cookie that contains the encrypted copy of the user
@@ -351,6 +349,19 @@ class Guard {
 		}
 
 		$this->setUser($user);
+	}
+
+	/**
+	 * Update the session with the given ID.
+	 *
+	 * @param  string  $id
+	 * @return void
+	 */
+	protected function updateSession($id)
+	{
+		$this->session->put($this->getName(), $id);
+
+		$this->session->regenerate();
 	}
 
 	/**

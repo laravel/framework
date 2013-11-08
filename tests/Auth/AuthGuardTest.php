@@ -91,6 +91,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
 		$mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
+		$session->shouldReceive('regenerate')->once();
 		$mock->login($user);
 	}
 
@@ -105,6 +106,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
 		$mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
+		$session->shouldReceive('regenerate')->once();
 		$mock->login($user);
 	}
 
@@ -198,6 +200,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo')->andReturn($foreverCookie);
 		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
 		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
+		$session->shouldReceive('regenerate')->once();
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('foo');
 		$guard->login($user, true);
