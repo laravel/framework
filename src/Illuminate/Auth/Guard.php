@@ -361,7 +361,7 @@ class Guard {
 	{
 		$this->session->put($this->getName(), $id);
 
-		$this->session->regenerate();
+		$this->session->migrate(true);
 	}
 
 	/**
