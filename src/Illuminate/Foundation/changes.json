@@ -49,7 +49,8 @@
 		{"message": "Added 'require_without_all' validation rule.", "backport": null},
 		{"message": "Controller method is now passed to missingMethod as first parameter.", "backport": null},
 		{"message": "New @append Blade directive for appending content onto a section.", "backport": null},
-		{"message": "Session IDs are now automatically regenerated on login.", "backport": null}
+		{"message": "Session IDs are now automatically regenerated on login.", "backport": null},
+		{"message": "Improve Auth::once to get rid of redundant database call.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
