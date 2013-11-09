@@ -1034,6 +1034,19 @@ class Builder {
 	}
 
 	/**
+	 * Indicate that the query results should be cached forever.
+	 *
+	 * @param  string  $key
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function rememberForever($key = null)
+	{
+		list($this->cacheMinutes, $this->cacheKey) = array(0, $key);
+
+		return $this;
+	}
+
+	/**
 	 * Execute a query for a single record by ID.
 	 *
 	 * @param  int    $id
@@ -1126,6 +1139,10 @@ class Builder {
 
 		$callback = $this->getCacheCallback($columns);
 
+		// Remember forever
+		if ($minutes == 0) return $cache->rememberForever($key, $callback);
+
+		// Remember for some minutes
 		return $cache->remember($key, $minutes, $callback);
 	}
 
