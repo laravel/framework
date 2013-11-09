@@ -11,9 +11,16 @@ class Guard {
 	/**
 	 * The currently authenticated user.
 	 *
-	 * @var UserInterface
+	 * @var \Illuminate\Auth\UserInterface
 	 */
 	protected $user;
+
+	/**
+	 * The user we last attempted to retrieve.
+	 *
+	 * @var \Illuminate\Auth\UserInterface
+	 */
+	protected $lastAttempted;
 
 	/**
 	 * Indicates if the user was authenticated via a recaller cookie.
@@ -164,7 +171,7 @@ class Guard {
 	{
 		if ($this->validate($credentials))
 		{
-			$this->setUser($this->provider->retrieveByCredentials($credentials));
+			$this->setUser($this->lastAttempted);
 
 			return true;
 		}
@@ -271,7 +278,7 @@ class Guard {
 	{
 		$this->fireAttemptEvent($credentials, $remember, $login);
 
-		$user = $this->provider->retrieveByCredentials($credentials);
+		$this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
 
 		// If an implementation of UserInterface was returned, we'll ask the provider
 		// to validate the user against the given credentials, and if they are in
