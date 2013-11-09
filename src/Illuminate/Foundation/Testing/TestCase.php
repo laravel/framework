@@ -355,7 +355,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app[$class]->run();
+		$this->app['artisan']->call('seed', array('--class' => $class));
 	}
 
 	/**
