@@ -712,9 +712,9 @@ class Blueprint {
 	 */
 	protected function createIndexName($type, array $columns)
 	{
-		$table = str_replace(array('-', '.'), '_', $this->table);
+		$index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
 
-		return strtolower($table.'_'.implode('_', $columns).'_'.$type);
+		return str_replace(array('-', '.'), '_', $index);
 	}
 
 	/**
