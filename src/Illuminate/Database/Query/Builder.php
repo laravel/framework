@@ -1041,7 +1041,7 @@ class Builder {
 	 */
 	public function rememberForever($key = null)
 	{
-		list($this->cacheMinutes, $this->cacheKey) = array(0, $key);
+		list($this->cacheMinutes, $this->cacheKey) = array(-1, $key);
 
 		return $this;
 	}
@@ -1130,20 +1130,26 @@ class Builder {
 	{
 		if (is_null($this->columns)) $this->columns = $columns;
 
-		list($key, $minutes) = $this->getCacheInfo();
-
 		// If the query is requested ot be cached, we will cache it using a unique key
 		// for this database connection and query statement, including the bindings
 		// that are used on this query, providing great convenience when caching.
+		list($key, $minutes) = $this->getCacheInfo();
+
 		$cache = $this->connection->getCacheManager();
 
 		$callback = $this->getCacheCallback($columns);
 
-		// Remember forever
-		if ($minutes == 0) return $cache->rememberForever($key, $callback);
-
-		// Remember for some minutes
-		return $cache->remember($key, $minutes, $callback);
+		// If the "minutes" value is less than zero, we will use that as the indicator
+		// that the value should be remembered values should be stored indefinitely
+		// and if we have minutes we will use the typical remember function here.
+		if ($minutes < 0)
+		{
+			return $cache->rememberForever($key, $callback);
+		}
+		else
+		{
+			return $cache->remember($key, $minutes, $callback);
+		}
 	}
 
 	/**
