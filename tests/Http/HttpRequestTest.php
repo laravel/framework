@@ -238,6 +238,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAllInputReturnsNestedInputAndFiles()
+	{
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, array(__FILE__, 'photo.jpg'));
+		$request = Request::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), array('foo' => array('photo' => $file)));
+		$this->assertEquals(array('foo' => array('bar' => 'baz', 'photo' => $file), 'boom' => 'breeze'), $request->all());
+	}
+
+
 	public function testOldMethodCallsSession()
 	{
 		$request = Request::create('/', 'GET');
