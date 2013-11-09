@@ -65,6 +65,25 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($query->get(), array('results'));
 	}
 
+	public function testSelectWithCachingForever()
+	{
+		$connection = m::mock('Illuminate\Database\ConnectionInterface');
+		$connection->shouldReceive('getName')->andReturn('connection_name');
+		$connection->shouldReceive('getCacheManager')->once()->andReturn($cache = m::mock('StdClass'));
+		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
+		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+
+		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getFresh'), array($connection, $grammar, $processor));
+		$builder->expects($this->once())->method('getFresh')->with($this->equalTo(array('*')))->will($this->returnValue(array('results')));
+		$query = $builder->select('*')->from('users')->where('email', 'foo@bar.com')->rememberForever();
+
+		$cache->shouldReceive('rememberForever')
+												->once()
+												->with($query->getCacheKey(), m::type('Closure'))
+												->andReturnUsing(function($key, $callback) { return $callback(); });
+
+		$this->assertEquals($query->get(), array('results'));
+	}
 
 	public function testBasicAlias()
 	{
