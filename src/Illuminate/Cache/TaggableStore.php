@@ -10,7 +10,7 @@ abstract class TaggableStore {
 	 */
 	public function section($name)
 	{
-		return $this->tag($name);
+		return $this->tags($name);
 	}
 
 	/**
