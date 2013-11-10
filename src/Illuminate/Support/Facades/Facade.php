@@ -181,7 +181,7 @@ abstract class Facade {
 	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	public static function setFacadeApplication($app)
+	public static function setFacadeApplication(\Illuminate\Foundation\Application $app)
 	{
 		static::$app = $app;
 	}
