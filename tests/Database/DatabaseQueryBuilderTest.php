@@ -47,40 +47,51 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testSelectWithCaching()
 	{
-		$connection = m::mock('Illuminate\Database\ConnectionInterface');
-		$connection->shouldReceive('getName')->andReturn('connection_name');
-		$connection->shouldReceive('getCacheManager')->once()->andReturn($cache = m::mock('StdClass'));
-		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-
-		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getFresh'), array($connection, $grammar, $processor));
-		$builder->expects($this->once())->method('getFresh')->with($this->equalTo(array('*')))->will($this->returnValue(array('results')));
-		$query = $builder->select('*')->from('users')->where('email', 'foo@bar.com')->remember(5);
+		$cache = m::mock('stdClass');
+		$query = $this->setupCacheTestQuery($cache);
+		$query = $query->remember(5);
 
 		$cache->shouldReceive('remember')
 	                     ->once()
 	                     ->with($query->getCacheKey(), 5, m::type('Closure'))
 	                     ->andReturnUsing(function($key, $minutes, $callback) { return $callback(); });
 
+
 		$this->assertEquals($query->get(), array('results'));
 	}
 
 	public function testSelectWithCachingForever()
 	{
-		$connection = m::mock('Illuminate\Database\ConnectionInterface');
-		$connection->shouldReceive('getName')->andReturn('connection_name');
-		$connection->shouldReceive('getCacheManager')->once()->andReturn($cache = m::mock('StdClass'));
-		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-
-		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getFresh'), array($connection, $grammar, $processor));
-		$builder->expects($this->once())->method('getFresh')->with($this->equalTo(array('*')))->will($this->returnValue(array('results')));
-		$query = $builder->select('*')->from('users')->where('email', 'foo@bar.com')->rememberForever();
-
+		$cache = m::mock('stdClass');
+		$query = $this->setupCacheTestQuery($cache);
+		$query = $query->rememberForever();
+	
 		$cache->shouldReceive('rememberForever')
 												->once()
 												->with($query->getCacheKey(), m::type('Closure'))
 												->andReturnUsing(function($key, $callback) { return $callback(); });
+
+
+
+		$this->assertEquals($query->get(), array('results'));
+	}
+
+	public function testSelectWithCachingAndTags()
+	{
+		$taggedCache = m::mock('StdClass');
+		$cache = m::mock('stdClass');
+		$cache->shouldReceive('tags')
+				->once()
+				->with(array('foo','bar'))
+				->andReturn($taggedCache);
+
+		$query = $this->setupCacheTestQuery($cache);
+		$query = $query->tags(array('foo', 'bar'))->remember(5);
+
+		$taggedCache->shouldReceive('remember')
+						->once()
+						->with($query->getCacheKey(), 5, m::type('Closure'))
+						->andReturnUsing(function($key, $minutes, $callback) { return $callback(); });
 
 		$this->assertEquals($query->get(), array('results'));
 	}
@@ -841,6 +852,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->noValidMethodHere();
 	}
 
+	public function setupCacheTestQuery($cache)
+	{
+		$connection = m::mock('Illuminate\Database\ConnectionInterface');
+		$connection->shouldReceive('getName')->andReturn('connection_name');
+		$connection->shouldReceive('getCacheManager')->once()->andReturn($cache);
+		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
+		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+
+		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getFresh'), array($connection, $grammar, $processor));
+		$builder->expects($this->once())->method('getFresh')->with($this->equalTo(array('*')))->will($this->returnValue(array('results')));
+		return $builder->select('*')->from('users')->where('email', 'foo@bar.com');		
+	}
 
 	protected function getBuilder()
 	{
