@@ -1175,7 +1175,7 @@ class Builder {
 	/**
 	 * Get the cache object with tags assigned, if applicable
 	 * 
-	 * @return \Illuminate\Cache\StoreInterface
+	 * @return \Illuminate\Cache\CacheManager
 	 */
 	protected function getCache()
 	{
