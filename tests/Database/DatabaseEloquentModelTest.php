@@ -109,10 +109,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
 
+		$model->id = 1;
 		$model->foo = 'bar';
 		// make sure foo isn't synced so we can test that dirty attributes only are updated
 		$model->syncOriginal();
-		$model->id = 1;
 		$model->name = 'taylor';
 		$model->exists = true;
 		$this->assertTrue($model->save());
@@ -130,8 +130,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('until');
 		$events->shouldReceive('fire');
 
-		$model->syncOriginal();
 		$model->id = 1;
+		$model->syncOriginal();
 		$model->created_at = 'foo';
 		$model->updated_at = 'bar';
 		$model->exists = true;
@@ -179,6 +179,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
 
 		$model->id = 1;
+		$model->syncOriginal();
 		$model->name = 'taylor';
 		$model->exists = true;
 		$this->assertTrue($model->save());
