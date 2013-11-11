@@ -1,7 +1,9 @@
 <?php namespace Illuminate\View;
 
 use ArrayAccess;
+use Illuminate\Support\MessageBag;
 use Illuminate\View\Engines\EngineInterface;
+use Illuminate\Support\Contracts\MessageProviderInterface;
 use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
 use Illuminate\Support\Contracts\RenderableInterface as Renderable;
 
@@ -140,6 +142,26 @@ class View implements ArrayAccess, Renderable {
 
 		return $this;
 	}
+    
+    /**
+     * Add validation errors to the view.
+     *
+     * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
+     * @return \Illuminate\View\View
+     */
+    public function withErrors($provider)
+    {
+        if ($provider instanceof MessageProviderInterface)
+        {
+            $this->with('errors', $provider->getMessageBag());
+        }
+        else
+        {
+            $this->with('errors', new MessageBag((array) $provider));
+        }
+
+        return $this;
+    }
 
 	/**
 	 * Add a view instance to the view data.
