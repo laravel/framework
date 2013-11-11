@@ -186,6 +186,30 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUpdateUsesOldPrimaryKey()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('id' => 2, 'foo' => 'bar'));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+		$model->id = 1;
+		$model->syncOriginal();
+		$model->id = 2;
+		$model->foo = 'bar';
+		$model->exists = true;
+
+		$this->assertTrue($model->save());
+	}
+
+
 	public function testTimestampsAreReturnedAsObjects()
 	{
 		$model = $this->getMock('EloquentDateModelStub', array('getDateFormat'));
