@@ -120,16 +120,15 @@ class PasswordBroker {
 	/**
 	 * Reset the password for the given token.
 	 *
-	 * @param  array    $credentials
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */
-	public function reset(array $credentials, Closure $callback)
+	public function reset(Closure $callback)
 	{
 		// If the responses from the validate method is not a user instance, we will
 		// assume that it is a redirect and simply return it from this method and
 		// the user is properly redirected having an error message on the post.
-		$user = $this->validateReset($credentials);
+		$user = $this->validateReset();
 
 		if ( ! $user instanceof RemindableInterface)
 		{
@@ -151,25 +150,25 @@ class PasswordBroker {
 	/**
 	 * Validate a password reset for the given credentials.
 	 *
-	 * @param  array  $credentials
 	 * @return \Illuminate\Auth\RemindableInterface
 	 */
-	protected function validateReset(array $credentials)
+	protected function validateReset()
 	{
-		if (is_null($user = $this->getUser($credentials)))
-		{
-			return $this->makeErrorRedirect('user');
-		}
+        $userId = $this->reminders->exists($this->getToken());
+        if ($userId === false)
+        {
+            return $this->makeErrorRedirect('token');
+        }
 
 		if ( ! $this->validNewPasswords())
 		{
 			return $this->makeErrorRedirect('password');
 		}
 
-		if ( ! $this->reminders->exists($user, $this->getToken()))
-		{
-			return $this->makeErrorRedirect('token');
-		}
+        if (is_null($user = $this->getUser($userId)))
+        {
+            return $this->makeErrorRedirect('user');
+        }
 
 		return $user;
 	}
