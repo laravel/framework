@@ -100,7 +100,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * The accessors to append to the model's array form.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $appends = array();
@@ -1314,9 +1314,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function setKeysForSaveQuery(Builder $query)
 	{
-		$query->where($this->getKeyName(), '=', $this->original[$this->getKeyName()]);
+		$query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
 
 		return $query;
+	}
+
+	/**
+	 * Get the primary key value for a save query.
+	 *
+	 * @return mixed
+	 */
+	protected function getKeyForSaveQuery()
+	{
+		if (isset($this->original[$this->getKeyName()]))
+		{
+			return $this->original[$this->getKeyName()];
+		}
+		else
+		{
+			return $this->getAttribute($this->getKeyName());
+		}
 	}
 
 	/**
@@ -2014,7 +2031,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return array_intersect_key($values, array_flip($this->visible));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));	
+		return array_diff_key($values, array_flip($this->hidden));
 	}
 
 	/**
@@ -2365,7 +2382,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * Get all the loaded relations for the instance.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getRelations()
