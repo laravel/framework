@@ -135,6 +135,13 @@ class Builder {
 	protected $cacheMinutes;
 
 	/**
+	 * The tags for the query cache.
+	 *
+	 * @var array
+	 */
+	protected $cacheTags;
+
+	/**
 	 * All of the available clause operators.
 	 *
 	 * @var array
@@ -1047,6 +1054,19 @@ class Builder {
 	}
 
 	/**
+	 * Indicate that the results, if cached, should use the passed tags for cache invalidation
+	 * 
+	 * @param  array|dynamic  $cacheTags
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function tags($cacheTags)
+	{
+		$this->cacheTags = $cacheTags;
+
+		return $this;
+	}
+
+	/**
 	 * Execute a query for a single record by ID.
 	 *
 	 * @param  int    $id
@@ -1135,7 +1155,7 @@ class Builder {
 		// that are used on this query, providing great convenience when caching.
 		list($key, $minutes) = $this->getCacheInfo();
 
-		$cache = $this->connection->getCacheManager();
+		$cache = $this->getCache();
 
 		$callback = $this->getCacheCallback($columns);
 
@@ -1150,6 +1170,18 @@ class Builder {
 		{
 			return $cache->remember($key, $minutes, $callback);
 		}
+	}
+
+	/**
+	 * Get the cache object with tags assigned, if applicable
+	 * 
+	 * @return \Illuminate\Cache\CacheManager
+	 */
+	protected function getCache()
+	{
+		$cache = $this->connection->getCacheManager();
+
+		return $this->cacheTags ? $cache->tags($this->cacheTags) : $cache;
 	}
 
 	/**
