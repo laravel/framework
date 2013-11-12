@@ -15,6 +15,8 @@ use Illuminate\Console\Application;
 
 $artisan = new Application('Laravel Framework', $app::VERSION);
 
+$app->instance('artisan', $artisan);
+
 /*
 |--------------------------------------------------------------------------
 | Set The Laravel Exception Handler
