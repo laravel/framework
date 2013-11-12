@@ -207,7 +207,7 @@ class MigrationServiceProvider extends ServiceProvider {
 			$publisher = $app['migration.publisher'];
 
 			$packagePath = $app['path.base'].'/vendor';
-			$destPath = $app['path.app'].'/database/migrations';
+			$destPath = $app['path'].'/database/migrations';
 
 			return new PublishCommand($publisher, $packagePath, $destPath);
 		});
