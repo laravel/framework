@@ -62,7 +62,6 @@ class View implements ArrayAccess, Renderable {
 		$this->environment = $environment;
 
 		$this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
-		$this->sections = array();
 	}
 
 	/**
