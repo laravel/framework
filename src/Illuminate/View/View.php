@@ -88,10 +88,7 @@ class View implements ArrayAccess, Renderable {
 		// separate view's evaluations later.
 		$env->decrementRender();
 
-		if ($env->doneRendering()) {
-			$this->sections = $env->getSections();
-			$env->flushSections();
-		}
+		if ($env->doneRendering()) $env->flushSections();
 
 		return $contents;
 	}
