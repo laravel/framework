@@ -8,5 +8,12 @@ interface RemindableInterface {
 	 * @return string
 	 */
 	public function getReminderEmail();
+    
+	/**
+	 * Get the id of the user
+	 *
+	 * @return int
+	 */
+    public function getAuthIdentifier();
 
 }

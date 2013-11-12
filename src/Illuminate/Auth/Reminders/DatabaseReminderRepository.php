@@ -58,7 +58,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 */
 	public function create(RemindableInterface $user)
 	{
-		$email = $user->getReminderEmail();
+		$email = $user->getAuthIdentifier();
 
 		// We will create a new, random token for the user so that we can e-mail them
 		// a safe link to the password reset form. Then we will insert a record in
@@ -73,29 +73,26 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Build the record payload for the table.
 	 *
-	 * @param  string  $email
+	 * @param  int  $id
 	 * @param  string  $token
 	 * @return array
 	 */
-	protected function getPayload($email, $token)
+	protected function getPayload($id, $token)
 	{
-		return array('email' => $email, 'token' => $token, 'created_at' => new Carbon);
+		return array('id' => $id, 'token' => $token, 'created_at' => new Carbon);
 	}
 
 	/**
-	 * Determine if a reminder record exists and is valid.
+	 * Determine if the token exsists, amd returns the id of the user if has not expired
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
 	 * @param  string  $token
-	 * @return bool
+	 * @return int|bool
 	 */
-	public function exists(RemindableInterface $user, $token)
+	public function exists($token)
 	{
-		$email = $user->getReminderEmail();
+		$reminder = $this->getTable()->where('token', $token)->first();
 
-		$reminder = $this->getTable()->where('email', $email)->where('token', $token)->first();
-
-		return $reminder && ! $this->reminderExpired($reminder);
+		return ($reminder and ! $this->reminderExpired($reminder) ? $reminder->user_id : false);
 	}
 
 	/**
