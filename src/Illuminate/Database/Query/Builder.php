@@ -1054,8 +1054,8 @@ class Builder {
 	}
 
 	/**
-	 * Indicate that the results, if cached, should use the passed tags for cache invalidation
-	 * 
+	 * Indicate that the results, if cached, should use the given cache tags.
+	 *
 	 * @param  array|dynamic  $cacheTags
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
@@ -1173,8 +1173,8 @@ class Builder {
 	}
 
 	/**
-	 * Get the cache object with tags assigned, if applicable
-	 * 
+	 * Get the cache object with tags assigned, if applicable.
+	 *
 	 * @return \Illuminate\Cache\CacheManager
 	 */
 	protected function getCache()
