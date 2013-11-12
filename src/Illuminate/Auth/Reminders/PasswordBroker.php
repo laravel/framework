@@ -165,7 +165,7 @@ class PasswordBroker {
 			return $this->makeErrorRedirect('password');
 		}
 
-        if (is_null($user = $this->getUser(array('id' => $userId))))
+        if (is_null($user = $this->getUser($userId)))
         {
             return $this->makeErrorRedirect('user');
         }
