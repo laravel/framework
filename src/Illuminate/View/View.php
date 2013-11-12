@@ -96,6 +96,38 @@ class View implements ArrayAccess, Renderable {
 
 		return $contents;
 	}
+	
+	/**
+	 * Get the sections from the view.
+	 *
+	 * @return array
+	 */
+	 public function renderSections()
+	 {
+		$env = $this->environment;
+
+		// We will keep track of the amount of views being rendered so we can flush
+		// the section after the complete rendering operation is done. This will
+		// clear out the sections for any separate views that may be rendered.
+		$env->incrementRender();
+
+		$env->callComposer($this);
+
+		$contents = $this->getContents();
+
+		// Once we've finished rendering the view, we'll decrement the render count
+		// then if we are at the bottom of the stack we'll storing sections
+		// and then flush them out as they might interfere with totally
+		// separate view's evaluations later.
+		$env->decrementRender();
+
+		if ($env->doneRendering()) {
+			$sections = $env->getSections();
+			$env->flushSections();
+		}
+
+		return $sections;
+	}
 
 	/**
 	 * Get the evaluated contents of the view.
@@ -219,16 +251,6 @@ class View implements ArrayAccess, Renderable {
 	public function getData()
 	{
 		return $this->data;
-	}
-	
-	/**
-	 * Get sections array gathered from Environment.
-	 *
-	 * @return array
-	 */
-	public function getSections()
-	{
-		return $this->sections;
 	}
 
 	/**
