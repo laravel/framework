@@ -142,26 +142,6 @@ class View implements ArrayAccess, Renderable {
 
 		return $this;
 	}
-    
-    /**
-     * Add validation errors to the view.
-     *
-     * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
-     * @return \Illuminate\View\View
-     */
-    public function withErrors($provider)
-    {
-        if ($provider instanceof MessageProviderInterface)
-        {
-            $this->with('errors', $provider->getMessageBag());
-        }
-        else
-        {
-            $this->with('errors', new MessageBag((array) $provider));
-        }
-
-        return $this;
-    }
 
 	/**
 	 * Add a view instance to the view data.
@@ -174,6 +154,26 @@ class View implements ArrayAccess, Renderable {
 	public function nest($key, $view, array $data = array())
 	{
 		return $this->with($key, $this->environment->make($view, $data));
+	}
+
+	/**
+	 * Add validation errors to the view.
+	 *
+	 * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
+	 * @return \Illuminate\View\View
+	 */
+	public function withErrors($provider)
+	{
+		if ($provider instanceof MessageProviderInterface)
+		{
+			$this->with('errors', $provider->getMessageBag());
+		}
+		else
+		{
+			$this->with('errors', new MessageBag((array) $provider));
+		}
+
+		return $this;
 	}
 
 	/**
