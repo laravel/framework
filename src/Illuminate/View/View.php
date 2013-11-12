@@ -83,9 +83,8 @@ class View implements ArrayAccess, Renderable {
 		$contents = $this->getContents();
 
 		// Once we've finished rendering the view, we'll decrement the render count
-		// then if we are at the bottom of the stack we'll storing sections
-		// and then flush them out as they might interfere with totally
-		// separate view's evaluations later.
+		// then if we are at the bottom of the stack we'll flush out sections as
+		// they might interfere with totally separate view's evaluations later.
 		$env->decrementRender();
 
 		if ($env->doneRendering()) $env->flushSections();
