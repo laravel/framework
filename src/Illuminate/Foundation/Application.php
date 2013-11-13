@@ -525,6 +525,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function booted($callback)
 	{
 		$this->bootedCallbacks[] = $callback;
+
+		if ($this->isBooted()) $this->fireAppCallbacks(array($callback));
 	}
 
 	/**
