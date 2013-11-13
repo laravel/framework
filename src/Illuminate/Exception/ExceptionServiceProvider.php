@@ -122,9 +122,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function shouldReturnJson()
 	{
-		if ($this->app->runningInConsole()) return true;
-
-		return $this->app->isBooted() && $this->requestWantsJson();
+		return $this->app->runningInConsole() || $this->requestWantsJson();
 	}
 
 	/**

@@ -184,6 +184,20 @@ $app->getProviderRepository()->load($app, $providers);
 
 /*
 |--------------------------------------------------------------------------
+| Register Booted Start Files
+|--------------------------------------------------------------------------
+|
+| Once the application has been booted there are several "start" files
+| we will want to include. We'll register our "booted" handler here
+| so the files are included after the application gets booted up.
+|
+*/
+
+$app->booted(function() use ($app, $env)
+{
+
+/*
+|--------------------------------------------------------------------------
 | Load The Application Start Script
 |--------------------------------------------------------------------------
 |
@@ -226,3 +240,5 @@ if (file_exists($path)) require $path;
 $routes = $app['path'].'/routes.php';
 
 if (file_exists($routes)) require $routes;
+
+});
