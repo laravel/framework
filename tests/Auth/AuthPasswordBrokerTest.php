@@ -17,7 +17,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$broker = $this->getMock('Illuminate\Auth\Reminders\PasswordBroker', array('getUser', 'makeErrorRedirect'), array_values($mocks));
 		$broker->expects($this->once())->method('getUser')->will($this->returnValue(null));
 
-		$this->assertEquals(PasswordBroker::USER_NOT_FOUND, $broker->remind(array('credentials')));
+		$this->assertEquals(PasswordBroker::INVALID_USER, $broker->remind(array('credentials')));
 	}
 
 
@@ -81,7 +81,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$broker = $this->getBroker($mocks = $this->getMocks());
 		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn(null);
 
-		$this->assertEquals(PasswordBroker::USER_NOT_FOUND, $broker->reset(array('creds'), function() {}));
+		$this->assertEquals(PasswordBroker::INVALID_USER, $broker->reset(array('creds'), function() {}));
 	}
 
 
@@ -139,7 +139,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 			return 'foo';
 		};
 
-		$this->assertEquals('foo', $broker->reset(array('password' => 'password', 'token' => 'token'), $callback));
+		$this->assertEquals(PasswordBroker::PASSWORD_RESET, $broker->reset(array('password' => 'password', 'token' => 'token'), $callback));
 		$this->assertEquals(array('user' => $user, 'password' => 'password'), $_SERVER['__auth.reminder']);
 	}
 
