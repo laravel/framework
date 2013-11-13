@@ -511,7 +511,7 @@ if ( ! function_exists('e'))
 if ( ! function_exists('ends_with'))
 {
 	/**
-	 * Determine if a given string ends with a given needle.
+	 * Determine if a given string ends with a given substring.
 	 *
 	 * @param string $haystack
 	 * @param string|array $needle
@@ -742,7 +742,7 @@ if ( ! function_exists('snake_case'))
 if ( ! function_exists('starts_with'))
 {
 	/**
-	 * Determine if a string starts with a given needle.
+	 * Determine if a given string starts with a given substring.
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needle
@@ -770,7 +770,7 @@ if ( ! function_exists('storage_path'))
 if ( ! function_exists('str_contains'))
 {
 	/**
-	 * Determine if a given string contains a given sub-string.
+	 * Determine if a given string contains a given substring.
 	 *
 	 * @param  string        $haystack
 	 * @param  string|array  $needle
