@@ -7,32 +7,39 @@ use Illuminate\Auth\UserProviderInterface;
 class PasswordBroker {
 
 	/**
-	 * Constant representing the user not found response.
-	 *
-	 * @var int
-	 */
-	const USER_NOT_FOUND = 1;
-
-	/**
 	 * Constant representing a successfully sent reminder.
 	 *
 	 * @var int
 	 */
-	const REMINDER_SENT = 2;
+	const REMINDER_SENT = 1;
+
+	/**
+	 * Constant representing a successfully reset password.
+	 *
+	 * @var int
+	 */
+	const PASSWORD_RESET = 2;
+
+	/**
+	 * Constant representing the user not found response.
+	 *
+	 * @var int
+	 */
+	const INVALID_USER = 3;
 
 	/**
 	 * Constant representing an invalid password.
 	 *
 	 * @var int
 	 */
-	const INVALID_PASSWORD = 3;
+	const INVALID_PASSWORD = 4;
 
 	/**
 	 * Constant representing an invalid token.
 	 *
 	 * @var int
 	 */
-	const INVALID_TOKEN = 4;
+	const INVALID_TOKEN = 5;
 
 	/**
 	 * The password reminder repository.
@@ -158,11 +165,11 @@ class PasswordBroker {
 		// Once we have called this callback, we will remove this token row from the
 		// table and return the response from this callback so the user gets sent
 		// to the destination given by the developers from the callback return.
-		$response = call_user_func($callback, $user, $pass);
+		call_user_func($callback, $user, $pass);
 
 		$this->reminders->delete($credentials['token']);
 
-		return $response;
+		return self::PASSWORD_RESET;
 	}
 
 	/**
