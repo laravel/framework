@@ -578,7 +578,7 @@ class BelongsToMany extends Relation {
 	 * @param  bool   $touch
 	 * @return void
 	 */
-	protected function updateExistingPivot($id, array $attributes, $touch)
+	public function updateExistingPivot($id, array $attributes, $touch)
 	{
 		if (in_array($this->updatedAt(), $this->pivotColumns))
 		{
@@ -808,7 +808,7 @@ class BelongsToMany extends Relation {
 	 * @param  mixed  $id
 	 * @return \Illuminate\Database\Query\Builder
 	 */
-	protected function newPivotStatementForId($id)
+	public function newPivotStatementForId($id)
 	{
 		$pivot = $this->newPivotStatement();
 
