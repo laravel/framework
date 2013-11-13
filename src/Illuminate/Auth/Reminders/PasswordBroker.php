@@ -2,10 +2,37 @@
 
 use Closure;
 use Illuminate\Mail\Mailer;
-use Illuminate\Routing\Redirector;
 use Illuminate\Auth\UserProviderInterface;
 
 class PasswordBroker {
+
+	/**
+	 * Constant representing the user not found response.
+	 *
+	 * @var int
+	 */
+	const USER_NOT_FOUND = 1;
+
+	/**
+	 * Constant representing a successfully sent reminder.
+	 *
+	 * @var int
+	 */
+	const REMINDER_SENT = 2;
+
+	/**
+	 * Constant representing an invalid password.
+	 *
+	 * @var int
+	 */
+	const INVALID_PASSWORD = 3;
+
+	/**
+	 * Constant representing an invalid token.
+	 *
+	 * @var int
+	 */
+	const INVALID_TOKEN = 4;
 
 	/**
 	 * The password reminder repository.
@@ -20,13 +47,6 @@ class PasswordBroker {
 	 * @var \Illuminate\Auth\UserProviderInterface
 	 */
 	protected $users;
-
-	/**
-	 * The redirector instance.
-	 *
-	 * @var \Illuminate\Routing\Redirector
-	 */
-	protected $redirector;
 
 	/**
 	 * The mailer instance.
@@ -47,20 +67,17 @@ class PasswordBroker {
 	 *
 	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
 	 * @param  \Illuminate\Auth\UserProviderInterface  $users
-	 * @param  \Illuminate\Routing\Redirector  $redirect
 	 * @param  \Illuminate\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
 	 * @return void
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
-                                Redirector $redirect,
                                 Mailer $mailer,
                                 $reminderView)
 	{
 		$this->users = $users;
 		$this->mailer = $mailer;
-		$this->redirect = $redirect;
 		$this->reminders = $reminders;
 		$this->reminderView = $reminderView;
 	}
@@ -81,7 +98,7 @@ class PasswordBroker {
 
 		if (is_null($user))
 		{
-			return $this->makeErrorRedirect('user');
+			return self::USER_NOT_FOUND;
 		}
 
 		// Once we have the reminder token, we are ready to send a message out to the
@@ -91,7 +108,7 @@ class PasswordBroker {
 
 		$this->sendReminder($user, $token, $callback);
 
-		return $this->redirect->refresh()->with('success', true);
+		return self::REMINDER_SENT;
 	}
 
 	/**
@@ -136,14 +153,14 @@ class PasswordBroker {
 			return $user;
 		}
 
-		$pass = $this->getPassword();
+		$pass = $credentials['password'];
 
 		// Once we have called this callback, we will remove this token row from the
 		// table and return the response from this callback so the user gets sent
 		// to the destination given by the developers from the callback return.
 		$response = call_user_func($callback, $user, $pass);
 
-		$this->reminders->delete($this->getToken());
+		$this->reminders->delete($credentials['token']);
 
 		return $response;
 	}
@@ -158,17 +175,17 @@ class PasswordBroker {
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
-			return $this->makeErrorRedirect('user');
+			return self::USER_NOT_FOUND;
 		}
 
-		if ( ! $this->validNewPasswords())
+		if ( ! $this->validNewPasswords($credentials))
 		{
-			return $this->makeErrorRedirect('password');
+			return self::INVALID_PASSWORD;
 		}
 
-		if ( ! $this->reminders->exists($user, $this->getToken()))
+		if ( ! $this->reminders->exists($user, $credentials['token']))
 		{
-			return $this->makeErrorRedirect('token');
+			return self::INVALID_TOKEN;
 		}
 
 		return $user;
@@ -177,28 +194,14 @@ class PasswordBroker {
 	/**
 	 * Determine if the passwords match for the request.
 	 *
+	 * @param  array  $credentials
 	 * @return bool
 	 */
-	protected function validNewPasswords()
+	protected function validNewPasswords(array $credentials)
 	{
-		$password = $this->getPassword();
-
-		$confirm = $this->getConfirmedPassword();
+		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
 
 		return $password && strlen($password) >= 6 && $password == $confirm;
-	}
-
-	/**
-	 * Make an error redirect response.
-	 *
-	 * @param  string  $reason
-	 * @return \Illuminate\Http\RedirectResponse
-	 */
-	protected function makeErrorRedirect($reason = '')
-	{
-		if ($reason != '') $reason = 'reminders.'.$reason;
-
-		return $this->redirect->refresh()->with('error', true)->with('reason', $reason);
 	}
 
 	/**
@@ -217,46 +220,6 @@ class PasswordBroker {
 		}
 
 		return $user;
-	}
-
-	/**
-	 * Get the current request object.
-	 *
-	 * @return \Illuminate\Http\Request
-	 */
-	protected function getRequest()
-	{
-		return $this->redirect->getUrlGenerator()->getRequest();
-	}
-
-	/**
-	 * Get the reset token for the current request.
-	 *
-	 * @return string
-	 */
-	protected function getToken()
-	{
-		return $this->getRequest()->input('token');
-	}
-
-	/**
-	 * Get the password for the current request.
-	 *
-	 * @return string
-	 */
-	protected function getPassword()
-	{
-		return $this->getRequest()->input('password');
-	}
-
-	/**
-	 * Get the confirmed password.
-	 *
-	 * @return string
-	 */
-	protected function getConfirmedPassword()
-	{
-		return $this->getRequest()->input('password_confirmation');
 	}
 
 	/**
