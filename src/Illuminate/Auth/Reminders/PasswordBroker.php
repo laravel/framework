@@ -70,6 +70,13 @@ class PasswordBroker {
 	protected $reminderView;
 
 	/**
+	 * The custom password validator callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $passwordValidator;
+
+	/**
 	 * Create a new password broker instance.
 	 *
 	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
@@ -105,7 +112,7 @@ class PasswordBroker {
 
 		if (is_null($user))
 		{
-			return self::USER_NOT_FOUND;
+			return self::INVALID_USER;
 		}
 
 		// Once we have the reminder token, we are ready to send a message out to the
@@ -182,7 +189,7 @@ class PasswordBroker {
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
-			return self::USER_NOT_FOUND;
+			return self::INVALID_USER;
 		}
 
 		if ( ! $this->validNewPasswords($credentials))
@@ -199,12 +206,41 @@ class PasswordBroker {
 	}
 
 	/**
+	 * Set a custom password validator.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function validator(Closure $callback)
+	{
+		$this->passwordValidator = $callback;
+	}
+
+	/**
 	 * Determine if the passwords match for the request.
 	 *
 	 * @param  array  $credentials
 	 * @return bool
 	 */
 	protected function validNewPasswords(array $credentials)
+	{
+		if (isset($this->passwordValidator))
+		{
+			return call_user_func($this->passwordValidator, $credentials);
+		}
+		else
+		{
+			return $this->validatePasswordWithDefaults($credentials);
+		}
+	}
+
+	/**
+	 * Determine if the passwords are valid for the request.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	protected function validatePasswordWithDefaults(array $credentials)
 	{
 		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
 
