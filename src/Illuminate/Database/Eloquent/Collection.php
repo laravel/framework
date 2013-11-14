@@ -13,7 +13,7 @@ class Collection extends BaseCollection {
 	 */
 	public function find($key, $default = null)
 	{
-		return array_first($this->items, function($key, $model) use ($key)
+		return array_first($this->items, function($_, $model) use ($key)
 		{
 			return $model->getKey() == $key;
 
