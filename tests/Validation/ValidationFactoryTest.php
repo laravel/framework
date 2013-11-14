@@ -21,19 +21,21 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('baz' => array('boom')), $validator->getRules());
 
 		$presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-		$factory->extend('foo', function() {});
-		$factory->extendImplicit('implicit', function() {});
+		$noop1 = function() {};
+		$noop2 = function() {};
+		$factory->extend('foo', $noop1);
+		$factory->extendImplicit('implicit', $noop2);
 		$factory->setPresenceVerifier($presence);
 		$validator = $factory->make(array(), array());
-		$this->assertEquals(array('foo' => function() {}, 'implicit' => function() {}), $validator->getExtensions());
+		$this->assertEquals(array('foo' => $noop1, 'implicit' => $noop2), $validator->getExtensions());
 		$this->assertEquals($presence, $validator->getPresenceVerifier());
 
 		$presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-		$factory->extend('foo', function() {}, 'foo!');
-		$factory->extendImplicit('implicit', function() {}, 'implicit!');
+		$factory->extend('foo', $noop1, 'foo!');
+		$factory->extendImplicit('implicit', $noop2, 'implicit!');
 		$factory->setPresenceVerifier($presence);
 		$validator = $factory->make(array(), array());
-		$this->assertEquals(array('foo' => function() {}, 'implicit' => function() {}), $validator->getExtensions());
+		$this->assertEquals(array('foo' => $noop1, 'implicit' => $noop2), $validator->getExtensions());
 		$this->assertEquals(array('foo' => 'foo!', 'implicit' => 'implicit!'), $validator->getFallbackMessages());
 		$this->assertEquals($presence, $validator->getPresenceVerifier());
 	}
