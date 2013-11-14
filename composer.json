@@ -16,7 +16,7 @@
         "ircmaxell/password-compat": "1.0.*",
         "filp/whoops": "1.0.7",
         "jeremeamia/superclosure": "1.0.*",
-        "monolog/monolog": "1.6.*",
+        "monolog/monolog": "1.*",
         "nesbot/carbon": "1.*",
         "patchwork/utf8": "1.1.*",
         "predis/predis": "0.8.*",
