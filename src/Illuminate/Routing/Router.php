@@ -185,7 +185,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
-	 * Register a new DELETE route with the router.
+	 * Register a new OPTIONS route with the router.
 	 *
 	 * @param  string  $uri
 	 * @param  \Closure|array|string  $action
@@ -243,7 +243,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $uri
 	 * @param  string  $controller
 	 * @param  array   $names
-	 * @return \Illuminate\Routing\Route
+	 * @return void
 	 */
 	public function controller($uri, $controller, $names = array())
 	{
