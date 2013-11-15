@@ -205,7 +205,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function any($uri, $action)
 	{
-		$verbs = array('GET', 'POST', 'PUT', 'PATCH', 'DELETE');
+		$verbs = array('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE');
 
 		return $this->addRoute($verbs, $uri, $action);
 	}
