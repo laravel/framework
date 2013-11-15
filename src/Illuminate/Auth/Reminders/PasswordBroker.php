@@ -101,7 +101,7 @@ class PasswordBroker {
 	 *
 	 * @param  array    $credentials
 	 * @param  Closure  $callback
-	 * @return \Illuminate\Http\RedirectResponse
+	 * @return string
 	 */
 	public function remind(array $credentials, Closure $callback = null)
 	{
