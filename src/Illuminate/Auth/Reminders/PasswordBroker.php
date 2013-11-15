@@ -255,6 +255,8 @@ class PasswordBroker {
 	 */
 	public function getUser(array $credentials)
 	{
+		$credentials = array_except($credentials, array('token'));
+
 		$user = $this->users->retrieveByCredentials($credentials);
 
 		if ($user && ! $user instanceof RemindableInterface)
