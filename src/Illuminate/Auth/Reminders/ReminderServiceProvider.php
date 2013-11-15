@@ -52,7 +52,7 @@ class ReminderServiceProvider extends ServiceProvider {
 			// aggregate service of sorts providing a convenient interface for resets.
 			return new PasswordBroker(
 
-				$reminders, $users, $app['redirect'], $app['mailer'], $view
+				$reminders, $users, $app['mailer'], $view
 
 			);
 		});
