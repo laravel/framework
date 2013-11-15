@@ -11,35 +11,35 @@ class PasswordBroker {
 	 *
 	 * @var int
 	 */
-	const REMINDER_SENT = 1;
+	const REMINDER_SENT = 'reminder.sent';
 
 	/**
 	 * Constant representing a successfully reset password.
 	 *
 	 * @var int
 	 */
-	const PASSWORD_RESET = 2;
+	const PASSWORD_RESET = 'reminder.reset';
 
 	/**
 	 * Constant representing the user not found response.
 	 *
 	 * @var int
 	 */
-	const INVALID_USER = 3;
+	const INVALID_USER = 'reminder.user';
 
 	/**
 	 * Constant representing an invalid password.
 	 *
 	 * @var int
 	 */
-	const INVALID_PASSWORD = 4;
+	const INVALID_PASSWORD = 'reminder.password';
 
 	/**
 	 * Constant representing an invalid token.
 	 *
 	 * @var int
 	 */
-	const INVALID_TOKEN = 5;
+	const INVALID_TOKEN = 'reminder.token';
 
 	/**
 	 * The password reminder repository.
