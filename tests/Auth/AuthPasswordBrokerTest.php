@@ -115,6 +115,17 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRedirectReturnedByRemindWhenPasswordDoesntPassValidator()
+	{
+		$creds = array('password' => 'abcdef', 'password_confirmation' => 'abcdef');
+		$broker = $this->getBroker($mocks = $this->getMocks());
+		$broker->validator(function($credentials) { return strlen($credentials['password']) >= 7; });
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
+
+		$this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
+	}
+
+
 	public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
 	{
 		$creds = array('token' => 'token');
