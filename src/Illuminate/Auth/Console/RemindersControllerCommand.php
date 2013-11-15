@@ -53,6 +53,8 @@ class RemindersControllerCommand extends Command {
 			$this->files->copy(__DIR__.'/stubs/controller.stub', $destination);
 
 			$this->info('Password reminders controller created successfully!');
+
+			$this->comment("Route: Route::controller('password', 'RemindersController')");
 		}
 		else
 		{
