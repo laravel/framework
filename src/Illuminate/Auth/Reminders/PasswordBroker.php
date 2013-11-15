@@ -255,7 +255,7 @@ class PasswordBroker {
 	 */
 	public function getUser(array $credentials)
 	{
-		$credentials = array_except($credentials, array('token'));
+		$credentials = array_except($credentials, array('password_confirmation', 'token'));
 
 		$user = $this->users->retrieveByCredentials($credentials);
 
