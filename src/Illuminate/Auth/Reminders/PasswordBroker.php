@@ -2,10 +2,44 @@
 
 use Closure;
 use Illuminate\Mail\Mailer;
-use Illuminate\Routing\Redirector;
 use Illuminate\Auth\UserProviderInterface;
 
 class PasswordBroker {
+
+	/**
+	 * Constant representing a successfully sent reminder.
+	 *
+	 * @var int
+	 */
+	const REMINDER_SENT = 'reminder.sent';
+
+	/**
+	 * Constant representing a successfully reset password.
+	 *
+	 * @var int
+	 */
+	const PASSWORD_RESET = 'reminder.reset';
+
+	/**
+	 * Constant representing the user not found response.
+	 *
+	 * @var int
+	 */
+	const INVALID_USER = 'reminder.user';
+
+	/**
+	 * Constant representing an invalid password.
+	 *
+	 * @var int
+	 */
+	const INVALID_PASSWORD = 'reminder.password';
+
+	/**
+	 * Constant representing an invalid token.
+	 *
+	 * @var int
+	 */
+	const INVALID_TOKEN = 'reminder.token';
 
 	/**
 	 * The password reminder repository.
@@ -22,13 +56,6 @@ class PasswordBroker {
 	protected $users;
 
 	/**
-	 * The redirector instance.
-	 *
-	 * @var \Illuminate\Routing\Redirector
-	 */
-	protected $redirector;
-
-	/**
 	 * The mailer instance.
 	 *
 	 * @var \Illuminate\Mail\Mailer
@@ -43,24 +70,28 @@ class PasswordBroker {
 	protected $reminderView;
 
 	/**
+	 * The custom password validator callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $passwordValidator;
+
+	/**
 	 * Create a new password broker instance.
 	 *
 	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
 	 * @param  \Illuminate\Auth\UserProviderInterface  $users
-	 * @param  \Illuminate\Routing\Redirector  $redirect
 	 * @param  \Illuminate\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
 	 * @return void
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
-                                Redirector $redirect,
                                 Mailer $mailer,
                                 $reminderView)
 	{
 		$this->users = $users;
 		$this->mailer = $mailer;
-		$this->redirect = $redirect;
 		$this->reminders = $reminders;
 		$this->reminderView = $reminderView;
 	}
@@ -81,7 +112,7 @@ class PasswordBroker {
 
 		if (is_null($user))
 		{
-			return $this->makeErrorRedirect('user');
+			return self::INVALID_USER;
 		}
 
 		// Once we have the reminder token, we are ready to send a message out to the
@@ -91,7 +122,7 @@ class PasswordBroker {
 
 		$this->sendReminder($user, $token, $callback);
 
-		return $this->redirect->refresh()->with('success', true);
+		return self::REMINDER_SENT;
 	}
 
 	/**
@@ -136,16 +167,16 @@ class PasswordBroker {
 			return $user;
 		}
 
-		$pass = $this->getPassword();
+		$pass = $credentials['password'];
 
 		// Once we have called this callback, we will remove this token row from the
 		// table and return the response from this callback so the user gets sent
 		// to the destination given by the developers from the callback return.
-		$response = call_user_func($callback, $user, $pass);
+		call_user_func($callback, $user, $pass);
 
-		$this->reminders->delete($this->getToken());
+		$this->reminders->delete($credentials['token']);
 
-		return $response;
+		return self::PASSWORD_RESET;
 	}
 
 	/**
@@ -158,47 +189,62 @@ class PasswordBroker {
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
-			return $this->makeErrorRedirect('user');
+			return self::INVALID_USER;
 		}
 
-		if ( ! $this->validNewPasswords())
+		if ( ! $this->validNewPasswords($credentials))
 		{
-			return $this->makeErrorRedirect('password');
+			return self::INVALID_PASSWORD;
 		}
 
-		if ( ! $this->reminders->exists($user, $this->getToken()))
+		if ( ! $this->reminders->exists($user, $credentials['token']))
 		{
-			return $this->makeErrorRedirect('token');
+			return self::INVALID_TOKEN;
 		}
 
 		return $user;
 	}
 
 	/**
-	 * Determine if the passwords match for the request.
+	 * Set a custom password validator.
 	 *
-	 * @return bool
+	 * @param  \Closure  $callback
+	 * @return void
 	 */
-	protected function validNewPasswords()
+	public function validator(Closure $callback)
 	{
-		$password = $this->getPassword();
-
-		$confirm = $this->getConfirmedPassword();
-
-		return $password && strlen($password) >= 6 && $password == $confirm;
+		$this->passwordValidator = $callback;
 	}
 
 	/**
-	 * Make an error redirect response.
+	 * Determine if the passwords match for the request.
 	 *
-	 * @param  string  $reason
-	 * @return \Illuminate\Http\RedirectResponse
+	 * @param  array  $credentials
+	 * @return bool
 	 */
-	protected function makeErrorRedirect($reason = '')
+	protected function validNewPasswords(array $credentials)
 	{
-		if ($reason != '') $reason = 'reminders.'.$reason;
+		if (isset($this->passwordValidator))
+		{
+			return call_user_func($this->passwordValidator, $credentials);
+		}
+		else
+		{
+			return $this->validatePasswordWithDefaults($credentials);
+		}
+	}
 
-		return $this->redirect->refresh()->with('error', true)->with('reason', $reason);
+	/**
+	 * Determine if the passwords are valid for the request.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	protected function validatePasswordWithDefaults(array $credentials)
+	{
+		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
+
+		return $password && strlen($password) >= 6 && $password == $confirm;
 	}
 
 	/**
@@ -217,46 +263,6 @@ class PasswordBroker {
 		}
 
 		return $user;
-	}
-
-	/**
-	 * Get the current request object.
-	 *
-	 * @return \Illuminate\Http\Request
-	 */
-	protected function getRequest()
-	{
-		return $this->redirect->getUrlGenerator()->getRequest();
-	}
-
-	/**
-	 * Get the reset token for the current request.
-	 *
-	 * @return string
-	 */
-	protected function getToken()
-	{
-		return $this->getRequest()->input('token');
-	}
-
-	/**
-	 * Get the password for the current request.
-	 *
-	 * @return string
-	 */
-	protected function getPassword()
-	{
-		return $this->getRequest()->input('password');
-	}
-
-	/**
-	 * Get the confirmed password.
-	 *
-	 * @return string
-	 */
-	protected function getConfirmedPassword()
-	{
-		return $this->getRequest()->input('password_confirmation');
 	}
 
 	/**
