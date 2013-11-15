@@ -554,11 +554,12 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Sync the intermediate tables with a list of IDs.
+	 * Sync the intermediate tables with a list of IDs, and return
+	 * an array with the detached, attached and updated IDs
 	 *
 	 * @param  array  $ids
 	 * @param  bool   $detaching
-	 * @return array  Array with attached, detatched and updated relation IDs
+	 * @return array
 	 */
 	public function sync(array $ids, $detaching = true)
 	{
@@ -617,12 +618,13 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Attach all of the IDs that aren't in the current array.
+	 * Attach all of the IDs that aren't in the current array, and return
+	 * an array with the newly attached and updated IDs
 	 *
 	 * @param  array  $records
 	 * @param  array  $current
 	 * @param  bool   $touch
-	 * @return array  Array with newly attached and updated relation IDs
+	 * @return array
 	 */
 	protected function attachNew(array $records, array $current, $touch = true)
 	{
