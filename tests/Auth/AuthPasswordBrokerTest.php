@@ -89,7 +89,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	{
 		$creds = array('password' => 'foo', 'password_confirmation' => 'bar');
 		$broker = $this->getBroker($mocks = $this->getMocks());
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array_except($creds, array('password_confirmation')))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 
 		$this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
 	}
@@ -99,7 +99,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	{
 		$creds = array('password' => null, 'password_confirmation' => null);
 		$broker = $this->getBroker($mocks = $this->getMocks());
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array_except($creds, array('password_confirmation')))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 
 		$this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
 	}
@@ -109,7 +109,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	{
 		$creds = array('password' => 'abc', 'password_confirmation' => 'abc');
 		$broker = $this->getBroker($mocks = $this->getMocks());
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array_except($creds, array('password_confirmation')))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 
 		$this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
 	}
@@ -120,7 +120,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$creds = array('password' => 'abcdef', 'password_confirmation' => 'abcdef');
 		$broker = $this->getBroker($mocks = $this->getMocks());
 		$broker->validator(function($credentials) { return strlen($credentials['password']) >= 7; });
-		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
+		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array_except($creds, array('password_confirmation')))->andReturn($user = m::mock('Illuminate\Auth\Reminders\RemindableInterface'));
 
 		$this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
 	}
