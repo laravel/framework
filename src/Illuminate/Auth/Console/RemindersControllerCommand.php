@@ -54,7 +54,7 @@ class RemindersControllerCommand extends Command {
 
 			$this->info('Password reminders controller created successfully!');
 
-			$this->comment("Route: Route::controller('password', 'RemindersController')");
+			$this->comment("Route: Route::controller('password', 'RemindersController');");
 		}
 		else
 		{
