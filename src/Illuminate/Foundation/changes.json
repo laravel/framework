@@ -66,6 +66,7 @@
 		{"message": "Do not run queue workers while application is in maintenance mode.", "backport": null},
 		{"message": "Values returned from scopes are now returned for chaining.", "backport": null},
 		{"message": "New 'nullableTimestamps' method on Schema builder.", "backport": null},
-		{"message": "Added 'extend' alias method for 'addConnector' in QueueManager class.", "backport": null}
+		{"message": "Added 'extend' alias method for 'addConnector' in QueueManager class.", "backport": null},
+		{"message": "Fixed exception handling bug that caused HTML to be dumped into console.", "backport": null}
 	]
 }
