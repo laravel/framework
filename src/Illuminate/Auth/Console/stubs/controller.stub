@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Auth\Reminders\PasswordBroker;
+
 class RemindersController extends Controller {
 
 	/**
@@ -21,10 +23,10 @@ class RemindersController extends Controller {
 	{
 		switch (Password::remind(Input::only('email')))
 		{
-			case Password::INVALID_USER:
+			case PasswordBroker::INVALID_USER:
 				return Redirect::back()->with('error', Lang::get($reason));
 
-			case Password::REMINDER_SENT:
+			case PasswordBroker::REMINDER_SENT:
 				return Redirect::back()->with('status', Lang::get($reason));
 		}
 	}
@@ -62,12 +64,12 @@ class RemindersController extends Controller {
 
 		switch ($response)
 		{
-			case Password::INVALID_PASSWORD:
-			case Password::INVALID_TOKEN:
-			case Password::INVALID_USER:
+			case PasswordBroker::INVALID_PASSWORD:
+			case PasswordBroker::INVALID_TOKEN:
+			case PasswordBroker::INVALID_USER:
 				return Redirect::back()->with('error', Lang::get($response));
 
-			case Password::PASSWORD_RESET:
+			case PasswordBroker::PASSWORD_RESET:
 				return Redirect::to('/');
 		}
 	}
