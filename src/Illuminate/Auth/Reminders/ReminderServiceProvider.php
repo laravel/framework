@@ -101,7 +101,7 @@ class ReminderServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('command.auth.reminders.controller', function($app)
 		{
-			return new RemindersControllerCommand;
+			return new RemindersControllerCommand($app['files']);
 		});
 
 		$this->commands(
