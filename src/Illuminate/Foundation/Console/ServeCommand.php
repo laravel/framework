@@ -38,7 +38,7 @@ class ServeCommand extends Command {
 
 		$this->info("Laravel development server started on http://{$host}:{$port}");
 
-		passthru(PHP_BINARY." -S {$host}:{$port} -t \"{$public}\" server.php");
+		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} -t \"{$public}\" server.php");
 	}
 
 	/**
