@@ -245,15 +245,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$data = new Collection(array('foo', 'baz'));
 		$data->splice(1, 0, 'bar');
-		$this->assertEquals(array('foo', 'bar', 'baz'), array_values($data->all()));
+		$this->assertEquals(array('foo', 'bar', 'baz'), $data->all());
 
 		$data = new Collection(array('foo', 'baz'));
 		$data->splice(1, 1);
-		$this->assertEquals(array('foo'), array_values($data->all()));
+		$this->assertEquals(array('foo'), $data->all());
 
 		$data = new Collection(array('foo', 'baz'));
-		$data->splice(1, 1, 'bar');
-		$this->assertEquals(array('foo', 'bar'), array_values($data->all()));
+		$cut = $data->splice(1, 1, 'bar');
+		$this->assertEquals(array('foo', 'bar'), $data->all());
+		$this->assertEquals(array('baz'), $cut->all());
 	}
 
 	public function testGetListValueWithAccessors()
