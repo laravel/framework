@@ -56,6 +56,29 @@ class Redirector {
 	}
 
 	/**
+	 * Create a new redirect response to the previous location
+	 * or fallback to a supplied route when referer does not exist.
+	 *
+	 * @param  string $fallback
+	 * @param  int    $status
+	 * @param  array  $headers
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function backWithFallback($fallback, $status = 302, $headers = array())
+	{
+		$back = $this->generator->getRequest()->headers->get('referer');
+		
+		if ( $back )
+		{
+			return $this->createRedirect($back, $status, $headers);
+		}
+		else
+		{
+			return $this->createRedirect($fallback, $status, $headers);
+		}
+	}
+
+	/**
 	 * Create a new redirect response to the current URI.
 	 *
 	 * @param  int    $status
