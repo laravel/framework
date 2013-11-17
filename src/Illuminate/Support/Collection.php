@@ -378,7 +378,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function splice($offset, $length = 0, $replacement = array())
 	{
-		array_splice($this->items, $offset, $length, $replacement);
+		return new static(array_splice($this->items, $offset, $length, $replacement));
 	}
 
 	/**
