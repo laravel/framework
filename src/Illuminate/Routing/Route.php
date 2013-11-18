@@ -63,7 +63,7 @@ class Route {
 	 *
 	 * @var string
 	 */
-	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\-_%=]+))';
+	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\,\-_%=]+))';
 
 	/**
 	 * The regular expression for an optional wildcard.
