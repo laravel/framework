@@ -132,7 +132,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
-		$uri = $this->app['url']->route($name, $routeParameters, true);
+		$uri = $this->app['url']->route($name, $routeParameters);
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
