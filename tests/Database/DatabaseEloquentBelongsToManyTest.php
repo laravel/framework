@@ -190,6 +190,23 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDetachCanHaveAdditionalConstraints()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+		$query->shouldReceive('where')->once()->with('type', 'test_type')->andReturn($query);
+		$query->shouldReceive('whereIn')->once()->with('role_id', array(1));
+		$query->shouldReceive('delete')->once()->andReturn(true);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$relation->expects($this->once())->method('touchIfTouching');
+
+		$this->assertTrue($relation->detach(1, true, array('type' => 'test_type')));
+	}
+
+
 	public function testDetachMethodClearsAllPivotRecordsWhenNoIDsAreGiven()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
