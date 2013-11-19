@@ -105,7 +105,7 @@ class IronJob extends Job {
 	 */
 	public function attempts()
 	{
-		throw new \LogicException("This driver doesn't support attempt counting.");
+		return array_get(json_decode($this->job->body, true), 'attempts');
 	}
 
 	/**

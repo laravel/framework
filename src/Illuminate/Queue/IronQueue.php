@@ -157,7 +157,9 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	protected function createPayload($job, $data = '')
 	{
-		return $this->crypt->encrypt(parent::createPayload($job, $data));
+		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
+
+		return $this->crypt->encrypt($payload);
 	}
 
 	/**

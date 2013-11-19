@@ -194,21 +194,6 @@ class RedisQueue extends Queue implements QueueInterface {
 	}
 
 	/**
-	 * Set the attempts variable on a payload string.
-	 *
-	 * @param  string  $payload
-	 * @param  string  $key
-	 * @param  int  $attempts
-	 * @return string
-	 */
-	protected function setMeta($payload, $key, $attempts)
-	{
-		$payload = json_decode($payload, true);
-
-		return json_encode(array_set($payload, $key, $attempts));
-	}
-
-	/**
 	 * Get a random ID string.
 	 *
 	 * @return string

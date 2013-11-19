@@ -74,6 +74,21 @@ abstract class Queue {
 	}
 
 	/**
+	 * Set the attempts variable on a payload string.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $key
+	 * @param  int  $attempts
+	 * @return string
+	 */
+	protected function setMeta($payload, $key, $attempts)
+	{
+		$payload = json_decode($payload, true);
+
+		return json_encode(array_set($payload, $key, $attempts));
+	}
+
+	/**
 	 * Calculate the number of seconds with the given delay.
 	 *
 	 * @param  \DateTime|int  $delay
