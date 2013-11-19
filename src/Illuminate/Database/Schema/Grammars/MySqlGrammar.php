@@ -43,9 +43,9 @@ class MySqlGrammar extends Grammar {
 	 * @param  string  $table
 	 * @return string
 	 */
-	public function compileColumnExists($table)
+	public function compileColumnExists()
 	{
-		return "select column_name from information_schema.columns where table_name = '$table'";
+		return "select column_name from information_schema.columns where table_schema = ? and table_name = ?";
 	}
 
 	/**
