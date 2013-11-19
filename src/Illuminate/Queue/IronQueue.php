@@ -145,7 +145,9 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	protected function createPushedIronJob($job)
 	{
-		return new IronJob($this->container, $this->iron, $job, $this->default, true);
+		$queue = array_get(json_decode($job->body, true), 'iron_queue', $this->default);
+
+		return new IronJob($this->container, $this->iron, $job, $queue, true);
 	}
 
 	/**
@@ -153,11 +155,14 @@ class IronQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  string  $job
 	 * @param  mixed   $data
+	 * @param  string  $queue
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $queue = null)
 	{
 		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
+
+		$payload = $this->setMeta($payload, 'iron_queue', $this->getQueue($queue));
 
 		return $this->crypt->encrypt($payload);
 	}

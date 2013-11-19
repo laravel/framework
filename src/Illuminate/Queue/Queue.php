@@ -45,9 +45,10 @@ abstract class Queue {
 	 *
 	 * @param  string  $job
 	 * @param  mixed   $data
+	 * @param  string  $queue
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $queue = null)
 	{
 		if ($job instanceof Closure)
 		{
