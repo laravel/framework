@@ -730,7 +730,7 @@ class BelongsToMany extends Relation {
 		$query = $this->newPivotQuery();
 
 		// Here we add the possible extra constraints on the query
-		if ($callable)
+		if ($callable and is_callable($callable))
 		{
 			$query = $callable($query);
 		}
