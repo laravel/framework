@@ -37,4 +37,5 @@ class MySqlBuilder extends Builder {
 
 		return $this->connection->getPostProcessor()->processColumnListing($results);
 	}
+
 }
