@@ -203,7 +203,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
 		$relation->expects($this->once())->method('touchIfTouching');
 
-		$this->assertTrue($relation->detach(1, true, array('type' => 'test_type')));
+		$this->assertTrue($relation->detach(1, true, function($query) {
+			return $query->where('type', 'test_type');
+		}));
 	}
 
 
