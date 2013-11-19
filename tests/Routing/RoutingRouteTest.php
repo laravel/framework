@@ -125,6 +125,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
+		$router->get('foo/bar', function() { return 'hello'; });
+		$router->before('RouteTestFilterStub');
+		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', function() { return 'hello'; });
+		$router->before('RouteTestFilterStub@handle');
+		$this->assertEquals('handling!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
 		$router->get('foo/bar', array('before' => 'foo', function() { return 'hello'; }));
 		$router->filter('foo', function() { return 'foo!'; });
 		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
@@ -569,4 +579,15 @@ class RouteModelBindingStub {
 
 class RouteModelBindingNullStub {
 	public function find($value) {}
+}
+
+class RouteTestFilterStub {
+	public function filter()
+	{
+		return 'foo!';
+	}
+	public function handle()
+	{
+		return 'handling!';
+	}
 }

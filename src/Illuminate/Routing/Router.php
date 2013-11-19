@@ -1037,7 +1037,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addGlobalFilter($filter, $callback)
 	{
-		$this->events->listen('router.'.$filter, $callback);
+		$this->events->listen('router.'.$filter, $this->parseFilter($callback));
 	}
 
 	/**
@@ -1049,7 +1049,25 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function filter($name, $callback)
 	{
-		$this->events->listen('router.filter: '.$name, $callback);
+		$this->events->listen('router.filter: '.$name, $this->parseFilter($callback));
+	}
+
+	/**
+	 * Parse the registered filter.
+	 *
+	 * @param  \Closure|string  $callback
+	 * @return mixed
+	 */
+	protected function parseFilter($callback)
+	{
+		if (is_string($callback) and ! str_contains($callback, '@'))
+		{
+			return $callback.'@filter';
+		}
+		else
+		{
+			return $callback;
+		}
 	}
 
 	/**
