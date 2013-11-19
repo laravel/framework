@@ -188,8 +188,10 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testEagerLoadRelationsLoadTopLevelRelationships()
 	{
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('loadRelation'), $this->getMocks());
-		$builder->setEagerLoads(array('foo' => function() {}, 'foo.bar' => function() {}));
-		$builder->expects($this->once())->method('loadRelation')->with($this->equalTo(array('models')), $this->equalTo('foo'), $this->equalTo(function() {}))->will($this->returnValue(array('foo')));
+		$nop1 = function() {};
+		$nop2 = function() {};
+		$builder->setEagerLoads(array('foo' => $nop1, 'foo.bar' => $nop2));
+		$builder->expects($this->once())->method('loadRelation')->with($this->equalTo(array('models')), $this->equalTo('foo'), $this->equalTo($nop1)->will($this->returnValue(array('foo')));
 		$results = $builder->eagerLoadRelations(array('models'));
 
 		$this->assertEquals(array('foo'), $results);
