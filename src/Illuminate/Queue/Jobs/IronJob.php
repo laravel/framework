@@ -94,8 +94,23 @@ class IronJob extends Job {
 		}
 		else
 		{
-			throw new \LogicException("Pushed jobs may not be released.");
+			$this->releasePushedJob($delay);
 		}
+	}
+
+	/**
+	 * Release a pushed job back onto the queue.
+	 *
+	 * @param  int  $delay
+	 * @return void
+	 */
+	protected function releasePushedJob($delay)
+	{
+		$payload = json_decode($this->job->body, true);
+
+		array_set($payload, 'attempts', array_get($payload, 'attempts', 0));
+
+		$this->iron->postMessage($this->queue, json_encode($payload), array('delay' => $this->getSeconds($delay)));
 	}
 
 	/**

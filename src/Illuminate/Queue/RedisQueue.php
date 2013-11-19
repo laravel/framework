@@ -181,10 +181,11 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Create a payload string from the given job and data.
 	 *
 	 * @param  string  $job
-	 * @param  mixed  $data
+	 * @param  mixed   $data
+	 * @param  string  $queue
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $queue = null)
 	{
 		$payload = parent::createPayload($job, $data);
 
