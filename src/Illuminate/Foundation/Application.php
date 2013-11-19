@@ -106,11 +106,21 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function __construct(Request $request = null)
 	{
-		$this->registerBaseBindings($request ?: Request::createFromGlobals());
+		$this->registerBaseBindings($request ?: $this->createNewRequest());
 
 		$this->registerBaseServiceProviders();
 
 		$this->registerBaseMiddlewares();
+	}
+
+	/**
+	 * Create a new request instance from the request class.
+	 *
+	 * @return \Illuminate\Http\Request
+	 */
+	protected function createNewRequest()
+	{
+		return forward_static_call(array(static::$requestClass, 'createFromGlobals'));
 	}
 
 	/**
