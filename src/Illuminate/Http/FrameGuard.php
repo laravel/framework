@@ -37,7 +37,7 @@ class FrameGuard implements HttpKernelInterface {
 	{
 		$response = $this->app->handle($request, $type, $catch);
 
-		$response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+		$response->headers->set('X-Frame-Options', 'SAMEORIGIN', false);
 
 		return $response;
 	}
