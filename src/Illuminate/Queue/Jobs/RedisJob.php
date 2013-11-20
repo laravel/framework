@@ -95,7 +95,7 @@ class RedisJob extends Job {
 	 */
 	public function getJobId()
 	{
-		return array_get(json_decode($this->job, true), 'redis_id');
+		return array_get(json_decode($this->job, true), 'id');
 	}
 
 	/**
