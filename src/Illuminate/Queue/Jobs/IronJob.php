@@ -20,13 +20,6 @@ class IronJob extends Job {
 	protected $job;
 
 	/**
-	 * The name of the queue the job came from.
-	 *
-	 * @var string
-	 */
-	protected $queue;
-
-	/**
 	 * Indicates if the message was a push message.
 	 *
 	 * @var bool
@@ -46,12 +39,10 @@ class IronJob extends Job {
 	public function __construct(Container $container,
                                 IronMQ $iron,
                                 $job,
-                                $queue,
                                 $pushed = false)
 	{
 		$this->job = $job;
 		$this->iron = $iron;
-		$this->queue = $queue;
 		$this->pushed = $pushed;
 		$this->container = $container;
 	}
@@ -77,7 +68,7 @@ class IronJob extends Job {
 
 		if (isset($this->job->pushed)) return;
 
-		$this->iron->deleteMessage($this->queue, $this->job->id);
+		$this->iron->deleteMessage($this->getQueue(), $this->job->id);
 	}
 
 	/**
@@ -105,7 +96,7 @@ class IronJob extends Job {
 
 		array_set($payload, 'attempts', array_get($payload, 'attempts', 0) + 1);
 
-		$this->iron->postMessage($this->queue, json_encode($payload), array('delay' => $this->getSeconds($delay)));
+		$this->iron->postMessage($this->getQueue(), json_encode($payload), array('delay' => $this->getSeconds($delay)));
 	}
 
 	/**
@@ -156,6 +147,16 @@ class IronJob extends Job {
 	public function getIronJob()
 	{
 		return $this->job;
+	}
+
+	/**
+	 * Get the name of the queue the job belongs to.
+	 *
+	 * @return string
+	 */
+	public function getQueue()
+	{
+		return array_get(json_decode($this->job->body, true), 'queue');
 	}
 
 }

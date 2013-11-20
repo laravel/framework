@@ -46,7 +46,8 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 	public function testReleaseProperlyReleasesJobOntoIron()
 	{
 		$job = $this->getJob();
-		$job->getIron()->shouldReceive('releaseMessage')->once()->with('default', 1, 5);
+		$job->getIron()->shouldReceive('deleteMessage')->once();
+		$job->getIron()->shouldReceive('postMessage')->once()->with('default', json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 2, 'queue' => 'default')), array('delay' => 5));
 
 		$job->release(5);
 	}
@@ -57,8 +58,7 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 		return new Illuminate\Queue\Jobs\IronJob(
 			m::mock('Illuminate\Container\Container'),
 			m::mock('IronMQ'),
-			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60),
-			'default'
+			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 1, 'queue' => 'default')), 'timeout' => 60)
 		);
 	}
 
