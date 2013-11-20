@@ -88,14 +88,9 @@ class IronJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
-		if ( ! $this->pushed)
-		{
-			$this->iron->releaseMessage($this->queue, $this->job->id, $delay);
-		}
-		else
-		{
-			$this->releasePushedJob($delay);
-		}
+		if ( ! $this->pushed) $this->delete();
+
+		$this->recreateJob($delay);
 	}
 
 	/**
@@ -104,11 +99,11 @@ class IronJob extends Job {
 	 * @param  int  $delay
 	 * @return void
 	 */
-	protected function releasePushedJob($delay)
+	protected function recreateJob($delay)
 	{
 		$payload = json_decode($this->job->body, true);
 
-		array_set($payload, 'attempts', array_get($payload, 'attempts', 0));
+		array_set($payload, 'attempts', array_get($payload, 'attempts', 0) + 1);
 
 		$this->iron->postMessage($this->queue, json_encode($payload), array('delay' => $this->getSeconds($delay)));
 	}
