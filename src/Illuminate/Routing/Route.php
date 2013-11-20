@@ -757,6 +757,16 @@ class Route {
 	}
 
 	/**
+	 * Get the URI that the route responds to.
+	 *
+	 * @return string
+	 */
+	public function getUri()
+	{
+		return $this->uri;
+	}
+
+	/**
 	 * Get the name of the route instance.
 	 *
 	 * @return string

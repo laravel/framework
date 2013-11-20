@@ -502,6 +502,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$routes = $router->getRoutes();
 
 		$this->assertEquals(6, count($routes));
+
+		$router = $this->getRouter();
+		$router->resource('foo-bars', 'FooController', array('only' => array('show')));
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();
+
+		$this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+
+		$router = $this->getRouter();
+		$router->resource('foo-bars.foo-bazs', 'FooController', array('only' => array('show')));
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();
+
+		$this->assertEquals('foo-bars/{foo_bars}/foo-bazs/{foo_bazs}', $routes[0]->getUri());
 	}
 
 
