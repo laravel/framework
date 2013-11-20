@@ -207,7 +207,7 @@ abstract class Controller {
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function missingMethod($method, $parameters)
+	public function missingMethod($method, $parameters = array())
 	{
 		throw new NotFoundHttpException("Controller method [{$method}] not found.");
 	}
