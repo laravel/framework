@@ -329,7 +329,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// We need to extract the base resource from the resource name. Nested resources
 		// are supported in the framework, but we need to know what name to use for a
 		// place-holder on the route wildcards, which should be the base resources.
-		$base = last(explode('.', $name));
+		$base = $this->getResourceWildcard(last(explode('.', $name)));
 
 		$defaults = $this->resourceDefaults;
 
@@ -418,7 +418,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		$uri = $this->getNestedResourceUri($segments);
 
-		return str_replace('/{'.last($segments).'}', '', $uri);
+		return str_replace('/{'.$this->getResourceWildcard(last($segments)).'}', '', $uri);
 	}
 
 	/**
@@ -429,12 +429,14 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function getNestedResourceUri(array $segments)
 	{
+		$me = $this;
+
 		// We will spin through the segments and create a place-holder for each of the
 		// resource segments, as well as the resource itself. Then we should get an
 		// entire string for the resource URI that contains all nested resources.
-		return implode('/', array_map(function($s)
+		return implode('/', array_map(function($s) use ($me)
 		{
-			return $s.'/{'.$s.'}';
+			return $s.'/{'.$me->getResourceWildcard($s).'}';
 
 		}, $segments));
 	}
@@ -484,6 +486,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		$prefix = str_replace('/', '.', $this->getLastGroupPrefix());
 
 		return trim("{$prefix}.{$resource}.{$method}", '.');
+	}
+
+	/**
+	 * Format a resource wildcard for usage.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public function getResourceWildcard($value)
+	{
+		return str_replace('-', '_', $value);
 	}
 
 	/**
@@ -1127,7 +1140,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function bind($key, $binder)
 	{
-		$this->binders[$key] = $binder;
+		$this->binders[str_replace('-', '_', $key)] = $binder;
 	}
 
 	/**
