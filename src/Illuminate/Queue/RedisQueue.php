@@ -189,7 +189,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$payload = parent::createPayload($job, $data);
 
-		$payload = $this->setMeta($payload, 'id', $this->getRandomId());
+		$payload = $this->setMeta($payload, 'redis_id', $this->getRandomId());
 
 		return $this->setMeta($payload, 'attempts', 1);
 	}
