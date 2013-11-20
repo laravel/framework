@@ -349,7 +349,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $path
-	 * @return
+	 * @return string
 	 *
 	 * @throws \InvalidArgumentException
 	 */
