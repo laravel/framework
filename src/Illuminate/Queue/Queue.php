@@ -18,6 +18,8 @@ abstract class Queue {
 	 * Marshal a push queue request and fire the job.
 	 *
 	 * @return Illuminate\Http\Response
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function marshal()
 	{

@@ -309,6 +309,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  array  $attributes
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 *
+	 * @throws MassAssignmentException
 	 */
 	public function fill(array $attributes)
 	{
@@ -508,6 +510,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  mixed  $id
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 *
+	 * @throws ModelNotFoundException
 	 */
 	public static function findOrFail($id, $columns = array('*'))
 	{

@@ -81,6 +81,8 @@ class MailServiceProvider extends ServiceProvider {
 	 *
 	 * @param  array  $config
 	 * @return void
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function registerSwiftTransport($config)
 	{

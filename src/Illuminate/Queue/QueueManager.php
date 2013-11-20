@@ -81,6 +81,8 @@ class QueueManager {
 	 *
 	 * @param  string  $driver
 	 * @return \Illuminate\Queue\Connectors\ConnectorInterface
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getConnector($driver)
 	{

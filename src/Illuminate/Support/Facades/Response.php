@@ -114,6 +114,8 @@ class Response {
 	 * @param  string  $method
 	 * @param  array  $parameters
 	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
 	 */
 	public static function __callStatic($method, $parameters)
 	{

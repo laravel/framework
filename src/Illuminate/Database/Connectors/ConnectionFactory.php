@@ -60,6 +60,8 @@ class ConnectionFactory {
 	 *
 	 * @param  array  $config
 	 * @return \Illuminate\Database\Connectors\ConnectorInterface
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function createConnector(array $config)
 	{
@@ -95,6 +97,8 @@ class ConnectionFactory {
 	 * @param  string  $prefix
 	 * @param  array   $config
 	 * @return \Illuminate\Database\Connection
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function createConnection($driver, PDO $connection, $database, $prefix = '', $config = null)
 	{

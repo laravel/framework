@@ -780,6 +780,9 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  string  $message
 	 * @param  array   $headers
 	 * @return void
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{

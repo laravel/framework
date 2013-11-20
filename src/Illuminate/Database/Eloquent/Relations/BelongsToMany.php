@@ -91,6 +91,8 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 *
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
