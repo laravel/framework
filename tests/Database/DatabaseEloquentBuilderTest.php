@@ -191,7 +191,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$nop1 = function() {};
 		$nop2 = function() {};
 		$builder->setEagerLoads(array('foo' => $nop1, 'foo.bar' => $nop2));
-		$builder->expects($this->once())->method('loadRelation')->with($this->equalTo(array('models')), $this->equalTo('foo'), $this->equalTo($nop1)->will($this->returnValue(array('foo')));
+		$builder->expects($this->once())->method('loadRelation')->with($this->equalTo(array('models')), $this->equalTo('foo'), $this->equalTo($nop1))->will($this->returnValue(array('foo')));
 		$results = $builder->eagerLoadRelations(array('models'));
 
 		$this->assertEquals(array('foo'), $results);
