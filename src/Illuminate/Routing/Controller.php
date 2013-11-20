@@ -115,6 +115,8 @@ abstract class Controller {
 	 *
 	 * @param  mixed  $filter
 	 * @return boolean
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function isInstanceFilter($filter)
 	{
@@ -206,6 +208,8 @@ abstract class Controller {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
 	public function missingMethod($method, $parameters = array())
 	{

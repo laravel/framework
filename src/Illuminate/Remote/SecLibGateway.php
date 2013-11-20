@@ -146,6 +146,7 @@ class SecLibGateway implements GatewayInterface {
 	 * Get the authentication object for login.
 	 *
 	 * @return \Crypt_RSA|string
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getAuthForLogin()
 	{

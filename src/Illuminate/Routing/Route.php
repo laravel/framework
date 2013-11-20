@@ -259,6 +259,8 @@ class Route {
 	 * Get the key / value list of parameters for the route.
 	 *
 	 * @return array
+	 *
+	 * @throws \LogicException
 	 */
 	public function parameters()
 	{

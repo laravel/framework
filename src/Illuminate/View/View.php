@@ -332,6 +332,8 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return \Illuminate\View\View
+	 *
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{

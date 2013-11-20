@@ -349,7 +349,9 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $path
-	 * @return string
+	 * @return
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function createDirectory(Package $package, $path)
 	{

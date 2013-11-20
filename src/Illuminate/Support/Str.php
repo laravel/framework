@@ -185,6 +185,8 @@ class Str {
 	 *
 	 * @param  int     $length
 	 * @return string
+	 *
+	 * @throws \RuntimeException
 	 */
 	public static function random($length = 16)
 	{
@@ -338,6 +340,8 @@ class Str {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
 	 */
 	public static function __callStatic($method, $parameters)
 	{
