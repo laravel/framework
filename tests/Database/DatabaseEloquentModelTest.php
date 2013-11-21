@@ -734,7 +734,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @expectedException LogicException
 	 */
-	public function testGetModelAttributeMethodThrowsExepcitonIfNotRelation()
+	public function testGetModelAttributeMethodThrowsExceptionIfNotRelation()
 	{
 		$model = new EloquentModelStub;
 		$relation = $model->incorrect_relation_stub;
