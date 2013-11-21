@@ -731,6 +731,16 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException LogicException
+	 */
+	public function testGetModelAttributeMethodThrowsExepcitonIfNotRelation()
+	{
+		$model = new EloquentModelStub;
+		$relation = $model->incorrect_relation_stub;
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -775,6 +785,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	public function belongsToExplicitKeyStub()
 	{
 		return $this->belongsTo('EloquentModelSaveStub', 'foo');
+	}
+	public function incorrectRelationStub()
+	{
+		return 'foo';
 	}
 	public function getDates()
 	{
