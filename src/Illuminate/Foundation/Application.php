@@ -387,9 +387,14 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 			$this[$key] = $value;
 		}
 
-		$this->serviceProviders[] = $provider;
+		$this->markAsRegistered($provider);
 
-		$this->loadedProviders[get_class($provider)] = true;
+		// If the application has already booted, we will call this boot method on
+		// the provider class so it has an opportunity to do its boot logic and
+		// will be ready for any usage by the developer's application logics.
+		if ($this->booted) $provider->boot();
+
+		return $provider;
 	}
 
 	/**
@@ -401,6 +406,19 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	protected function resolveProviderClass($provider)
 	{
 		return new $provider($this);
+	}
+
+	/**
+	 * Mark the given provider as registered.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider
+	 * @return void
+	 */
+	protected function markAsRegistered($provider)
+	{
+		$this->serviceProviders[] = $provider;
+
+		$this->loadedProviders[get_class($provider)] = true;
 	}
 
 	/**
@@ -570,7 +588,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
-		
+
 		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
