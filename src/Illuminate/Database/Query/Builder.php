@@ -1411,7 +1411,7 @@ class Builder {
 		{
 			// If the order type is raw we need to check if it
 			// contains bindings and back up the bindings as well.
-			if ($order['type'] === 'raw' && isset($order['bindings']) && $order['bindings'])
+			if (isset($order['type']) && $order['type'] === 'raw' && isset($order['bindings']) && $order['bindings'])
 			{
 				$bindings = $this->getBindings();
 
