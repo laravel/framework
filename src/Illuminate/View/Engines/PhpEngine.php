@@ -49,6 +49,8 @@ class PhpEngine implements EngineInterface {
 	 *
 	 * @param  Exception  $e
 	 * @return void
+	 *
+	 * @throws $e
 	 */
 	protected function handleViewException($e)
 	{

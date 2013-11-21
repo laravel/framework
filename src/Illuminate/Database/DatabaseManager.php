@@ -168,6 +168,8 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getConfig($name)
 	{

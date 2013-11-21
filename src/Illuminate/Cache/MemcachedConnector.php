@@ -9,6 +9,8 @@ class MemcachedConnector {
 	 *
 	 * @param array  $servers
 	 * @return \Memcached
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function connect(array $servers)
 	{

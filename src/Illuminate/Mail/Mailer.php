@@ -252,6 +252,8 @@ class Mailer {
 	 *
 	 * @param  string|array  $view
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseView($view)
 	{
@@ -315,6 +317,8 @@ class Mailer {
 	 * @param  Closure|string  $callback
 	 * @param  \Illuminate\Mail\Message  $message
 	 * @return mixed
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function callMessageBuilder($callback, $message)
 	{

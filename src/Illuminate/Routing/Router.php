@@ -1104,6 +1104,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $class
 	 * @param  \Closure  $callback
 	 * @return void
+	 *
+	 * @throws NotFoundHttpException
 	 */
 	public function model($key, $class, Closure $callback = null)
 	{

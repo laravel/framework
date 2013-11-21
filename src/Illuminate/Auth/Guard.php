@@ -465,6 +465,8 @@ class Guard {
 	 * Get the cookie creator instance used by the guard.
 	 *
 	 * @return \Illuminate\Cookie\CookieJar
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function getCookieJar()
 	{

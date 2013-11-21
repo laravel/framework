@@ -170,6 +170,8 @@ class UrlGenerator {
 	 * @param  mixed   $parameters
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function route($name, $parameters = array(), $route = null)
 	{
