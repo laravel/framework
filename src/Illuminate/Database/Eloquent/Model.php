@@ -4,6 +4,7 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
+use LogicException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -2205,9 +2206,15 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (method_exists($this, $camelKey))
 		{
-			$relations = $this->$camelKey()->getResults();
+			$relations = $this->$camelKey();
 
-			return $this->relations[$key] = $relations;
+			if ( ! $relations instanceof Relation)
+			{
+				throw new LogicException('Relationship method must return an object of type '
+					. 'Illuminate\Database\Eloquent\Relations\Relation');
+			}
+
+			return $this->relations[$key] = $relations->getResults();
 		}
 	}
 
