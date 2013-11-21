@@ -243,11 +243,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		if ( ! isset(static::$booted[get_class($this)]))
 		{
 			static::$booted[get_class($this)] = true;
-			
+
 			$this->fireModelEvent('booting', false);
 
 			static::boot();
-			
+
 			$this->fireModelEvent('booted', false);
 		}
 
@@ -2206,15 +2206,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (method_exists($this, $camelKey))
 		{
-			$relations = $this->$camelKey();
-
-			if ( ! $relations instanceof Relation)
-			{
-				throw new LogicException('Relationship method must return an object of type '
-					. 'Illuminate\Database\Eloquent\Relations\Relation');
-			}
-
-			return $this->relations[$key] = $relations->getResults();
+			return $this->getRelationshipFromMethod($key, $camelKey);
 		}
 	}
 
@@ -2259,6 +2251,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			return $this->attributes[$key];
 		}
+	}
+
+	/**
+	 * Get a relationship value from a method.
+	 *
+	 * @param  string  $key
+	 * @param  string  $camelKey
+	 * @return mixed
+	 */
+	protected function getRelationshipFromMethod($key, $camelKey)
+	{
+		$relations = $this->$camelKey();
+
+		if ( ! $relations instanceof Relation)
+		{
+			throw new LogicException('Relationship method must return an object of type '
+				. 'Illuminate\Database\Eloquent\Relations\Relation');
+		}
+
+		return $this->relations[$key] = $relations->getResults();
 	}
 
 	/**
