@@ -311,6 +311,8 @@ class Builder {
 	 * @param  mixed   $value
 	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\Builder|static
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function where($column, $operator = null, $value = null, $boolean = 'and')
 	{
@@ -1792,6 +1794,8 @@ class Builder {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{

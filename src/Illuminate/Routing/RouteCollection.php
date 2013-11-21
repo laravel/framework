@@ -100,6 +100,8 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Routing\Route
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
 	public function match(Request $request)
 	{
@@ -150,6 +152,8 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 *
 	 * @param  string  $other
 	 * @return void
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
 	 */
 	protected function methodNotAllowed($other)
 	{

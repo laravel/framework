@@ -123,6 +123,8 @@ class Handler {
 	 * @param  string  $file
 	 * @param  int     $line
 	 * @param  array   $context
+	 *
+	 * @throws \ErrorException
 	 */
 	public function handleError($level, $message, $file, $line, $context)
 	{

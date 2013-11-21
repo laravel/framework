@@ -135,6 +135,8 @@ class RemoteManager {
 	 *
 	 * @param  array  $config
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getAuth(array $config)
 	{
@@ -155,6 +157,8 @@ class RemoteManager {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getConfig($name)
 	{
