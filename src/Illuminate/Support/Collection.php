@@ -224,7 +224,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function filter(Closure $callback)
 	{
-		return new static(array_filter($this->items, $callback));
+		return new static(array_values(array_filter($this->items, $callback)));
 	}
 
 	/**
