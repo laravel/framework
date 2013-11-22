@@ -81,7 +81,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('{{ $name }}', $compiler->compileString('@{{ $name }}'));
 		$this->assertEquals('{{
 			$name
-		}}', 
+		}}',
 		$compiler->compileString('@{{
 			$name
 		}}'));
@@ -100,6 +100,15 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 			$name
 		}}}'));
 	}
+
+
+	public function testEchosWithDefaultValuesAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php echo isset($foo) ? $foo : \'bar\'; ?>', $compiler->compileString('{{ $foo or \'bar\' }}'));
+		$this->assertEquals('<?php echo e(isset($foo) ? $foo : \'bar\'); ?>', $compiler->compileString('{{{ $foo or \'bar\' }}}'));
+	}
+
 
 	public function testExtendsAreCompiled()
 	{
@@ -194,16 +203,16 @@ breeze
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
-	
-	
-	public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled() 
+
+
+	public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = "Foo @lang(function_call('foo(blah)')) bar";
 		$expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
-	
+
 
 	public function testIncludesAreCompiled()
 	{
