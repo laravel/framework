@@ -113,4 +113,65 @@ class Collection extends BaseCollection {
 		return array_map(function($m) { return $m->getKey(); }, $this->items);
 	}
 
+	/**
+	 * Merge collection with another collection.
+	 *
+	 * @param  \Illuminate\Support\Collection  $collection
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function mergeCollection(Collection $collection)
+	{
+		foreach ($collection as $item)
+		{
+			if ( ! $this->contains($item->getKey()))
+			{
+				$this->add($item);
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Diff collection with another collection.
+	 *
+	 * @param  \Illuminate\Support\Collection  $collection
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function diffCollection(Collection $collection)
+	{
+		$diff = new static;
+
+		foreach ($this->items as $item)
+		{
+			if ( ! $collection->contains($item->getKey()))
+			{
+				$diff->add($item);
+			}
+		}
+
+		return $diff;
+	}
+
+	/**
+	 * Intersect collection with another collection.
+	 *
+	 * @param  \Illuminate\Support\Collection  $collection
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function intersectCollection(Collection $collection)
+	{
+		$intersect = new static;
+
+		foreach ($this->items as $item)
+		{
+			if ( $collection->contains($item->getKey()))
+			{
+				$intersect->add($item);
+			}
+		}
+
+		return $intersect;
+	}
+
 }
