@@ -5,6 +5,17 @@ use Illuminate\Database\Query\Builder;
 class SqlServerGrammar extends Grammar {
 
 	/**
+	 * All of the available clause operators.
+	 *
+	 * @var array
+	 */
+	protected $operators = array(
+		'=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
+		'like', 'not like', 'between', 'ilike',
+		'&', '&=', '|', '|=', '^', '^=',
+	);
+
+	/**
 	 * The keyword identifier wrapper format.
 	 *
 	 * @var string
@@ -124,7 +135,7 @@ class SqlServerGrammar extends Grammar {
 
 			return "between {$start} and {$finish}";
 		}
-	
+
 		return ">= {$start}";
 	}
 

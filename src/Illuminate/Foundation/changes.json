@@ -60,6 +60,13 @@
 		{"message": "Allow custom messages to be registered when using Validator::extend.", "backport": null},
 		{"message": "Added new auth:clear-reminders command for clearing expired password reminders.", "backport": null},
 		{"message": "Added Cookie::queue method for creating cookies that are automatically attached to the final response.", "backport": null},
-		{"message": "Allow environment to be checked via App::environment method.", "backport": null}
+		{"message": "Allow environment to be checked via App::environment method.", "backport": null},
+		{"message": "Add support for order by and limit on MySQL update queries.", "backport": null},
+		{"message": "Tweak Container::resolve to accept a type, new resolvingAny method for all objects.", "backport": null},
+		{"message": "Do not run queue workers while application is in maintenance mode.", "backport": null},
+		{"message": "Values returned from scopes are now returned for chaining.", "backport": null},
+		{"message": "New 'nullableTimestamps' method on Schema builder.", "backport": null},
+		{"message": "Added 'extend' alias method for 'addConnector' in QueueManager class.", "backport": null},
+		{"message": "Fixed exception handling bug that caused HTML to be dumped into console.", "backport": null}
 	]
 }

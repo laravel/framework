@@ -32,24 +32,24 @@ class Str {
 	}
 
 	/**
-	 * Determine if a given string contains a given sub-string.
+	 * Determine if a given string contains a given substring.
 	 *
 	 * @param  string        $haystack
-	 * @param  string|array  $needle
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
-	public static function contains($haystack, $needle)
+	public static function contains($haystack, $needles)
 	{
-		foreach ((array) $needle as $n)
+		foreach ((array) $needles as $needle)
 		{
-			if (strpos($haystack, $n) !== false) return true;
+			if ($needle != '' && strpos($haystack, $needle) !== false) return true;
 		}
 
 		return false;
 	}
 
 	/**
-	 * Determine if a given string ends with a given needle.
+	 * Determine if a given string ends with a given substring.
 	 *
 	 * @param string $haystack
 	 * @param string|array $needles
@@ -59,7 +59,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle == substr($haystack, strlen($haystack) - strlen($needle))) return true;
+			if ($needle == substr($haystack, -strlen($needle))) return true;
 		}
 
 		return false;
@@ -74,7 +74,9 @@ class Str {
 	 */
 	public static function finish($value, $cap)
 	{
-		return rtrim($value, $cap).$cap;
+		$quoted = preg_quote($cap, '/');
+
+		return preg_replace('/(?:'.$quoted.')+$/', '', $value).$cap;
 	}
 
 	/**
@@ -93,14 +95,7 @@ class Str {
 		// Asterisks are translated into zero-or-more regular expression wildcards
 		// to make it convenient to check if the strings starts with the given
 		// pattern such as "library/*", making any string check convenient.
-		if ($pattern !== '/')
-		{
-			$pattern = str_replace('\*', '.*', $pattern).'\z';
-		}
-		else
-		{
-			$pattern = '/$';
-		}
+		$pattern = str_replace('\*', '.*', $pattern).'\z';
 
 		return (bool) preg_match('#^'.$pattern.'#', $value);
 	}
@@ -296,7 +291,7 @@ class Str {
 	}
 
 	/**
-	 * Determine if a string starts with a given needle.
+	 * Determine if a given string starts with a given substring.
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needles
@@ -306,7 +301,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if (strpos($haystack, $needle) === 0) return true;
+			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
 		}
 
 		return false;

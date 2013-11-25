@@ -127,7 +127,7 @@ class HtmlBuilder {
 
 		return '<a href="'.$url.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
-	
+
 	/**
 	 * Generate a HTTPS HTML link.
 	 *
@@ -200,7 +200,7 @@ class HtmlBuilder {
 
 	/**
 	 * Generate a HTML link to an email address.
-	 * 
+	 *
 	 * @param  string  $email
 	 * @param  string  $title
 	 * @param  array   $attributes
@@ -209,14 +209,14 @@ class HtmlBuilder {
 	public function mailto($email, $title = null, $attributes = array())
 	{
 		$email = $this->email($email);
-		
+
 		$title = $title ?: $email;
-		
+
 		$email = $this->obfuscate('mailto:') . $email;
-		
+
 		return '<a href="'.$email.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
-	
+
 	/**
 	 * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
 	 *
@@ -368,6 +368,8 @@ class HtmlBuilder {
 
 		foreach (str_split($value) as $letter)
 		{
+			if (ord($letter) > 128) return $letter;
+
 			// To properly obfuscate the value, we will randomly convert each letter to
 			// its entity or hexadecimal representation, keeping a bot from sniffing
 			// the randomly obfuscated letters out of the string on the responses.

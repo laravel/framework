@@ -385,7 +385,7 @@ class Builder {
 	{
 		$column = $this->model->getQualifiedDeletedAtColumn();
 
-		foreach ($this->query->wheres as $key => $where)
+		foreach ((array) $this->query->wheres as $key => $where)
 		{
 			// If the where clause is a soft delete date constraint, we will remove it from
 			// the query and reset the keys on the wheres. This allows this developer to
@@ -523,7 +523,7 @@ class Builder {
 		// and is error prone while we remove the developer's own where clauses.
 		$query = Relation::noConstraints(function() use ($me, $relation)
 		{
-			return $me->getModel()->$relation();			
+			return $me->getModel()->$relation();
 		});
 
 		$nested = $this->nestedRelations($relation);
@@ -688,6 +688,20 @@ class Builder {
 	}
 
 	/**
+	 * Call the given model scope on the underlying model.
+	 *
+	 * @param  string  $scope
+	 * @param  array  $parameters
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	protected function callScope($scope, $parameters)
+	{
+		array_unshift($parameters, $this);
+
+		return call_user_func_array(array($this->model, $scope), $parameters) ?: $this;
+	}
+
+	/**
 	 * Get the underlying query builder instance.
 	 *
 	 * @return \Illuminate\Database\Query\Builder|static
@@ -765,9 +779,7 @@ class Builder {
 	{
 		if (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
 		{
-			array_unshift($parameters, $this);
-
-			call_user_func_array(array($this->model, $scope), $parameters);
+			return $this->callScope($scope, $parameters);
 		}
 		else
 		{
@@ -775,6 +787,16 @@ class Builder {
 		}
 
 		return in_array($method, $this->passthru) ? $result : $this;
+	}
+
+	/**
+	 * Force a clone of the underlying query builder when cloning.
+	 *
+	 * @return void
+	 */
+	public function __clone()
+	{
+		$this->query = clone $this->query;
 	}
 
 }
