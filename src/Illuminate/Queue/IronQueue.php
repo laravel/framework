@@ -63,7 +63,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
+		$payload = $this->createPayload($job, $data, $queue);
 
 		return $this->iron->postMessage($this->getQueue($queue), $payload)->id;
 	}
@@ -81,7 +81,7 @@ class IronQueue extends Queue implements QueueInterface {
 	{
 		$delay = $this->getSeconds($delay);
 
-		$payload = $this->createPayload($job, $data);
+		$payload = $this->createPayload($job, $data, $queue);
 
 		return $this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'))->id;
 	}
