@@ -355,6 +355,50 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		return new static($results);
 	}
 
+	/** 
+	 * Diff items with the collection items.
+	 *
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function diff($items)
+	{
+		if ($items instanceof Collection)
+		{
+			$items = $items->all();
+		}
+		elseif ($items instanceof ArrayableInterface)
+		{
+			$items = $items->toArray();
+		}
+
+		$results = array_diff($this->items, $items);
+
+		return new static($results);
+	}
+
+	/**
+	 * Intersect items with the collection items.
+	 *
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function intersect($items)
+	{
+		if ($items instanceof Collection)
+		{
+			$items = $items->all();
+		}
+		elseif ($items instanceof ArrayableInterface)
+		{
+			$tiems = $items->toArray();
+		}
+
+		$results = array_intersect($this->items, $items);
+
+		return new static($results);
+	}
+
 	/**
 	 * Slice the underlying collection array.
 	 *
