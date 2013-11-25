@@ -58,7 +58,8 @@
 		{"message": "Added support for checking job attempts to Iron.io queue jobs.", "backport": null},
 		{"message": "Added support for releasing pushed Iron.io jobs back onto the queue.", "backport": null},
 		{"message": "Allow strict mode option to be enabled for MySQL connections.", "backport": null},
-		{"message": "Added 'wherePivot' and 'orWherePivot' methods to BelongsToMany relationship for convenience.", "backport": null}
+		{"message": "Added 'wherePivot' and 'orWherePivot' methods to BelongsToMany relationship for convenience.", "backport": null},
+		{"message": "Added automatic separation of read / write connections into database layer.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

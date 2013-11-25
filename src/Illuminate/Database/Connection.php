@@ -16,6 +16,13 @@ class Connection implements ConnectionInterface {
 	protected $pdo;
 
 	/**
+	 * The active PDO connection used for reads.
+	 *
+	 * @var PDO
+	 */
+	protected $readPdo;
+
+	/**
 	 * The query grammar implementation.
 	 *
 	 * @var \Illuminate\Database\Query\Grammars\Grammar
@@ -268,7 +275,7 @@ class Connection implements ConnectionInterface {
 			// For select statements, we'll simply execute the query and return an array
 			// of the database result set. Each element in the array will be a single
 			// row from the database table, and will either be an array or objects.
-			$statement = $me->getPdo()->prepare($query);
+			$statement = $me->getReadPdo()->prepare($query);
 
 			$statement->execute($me->prepareBindings($bindings));
 
@@ -636,14 +643,39 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Get the current PDO connection used for reading.
+	 *
+	 * @return PDO
+	 */
+	public function getReadPdo()
+	{
+		return $this->readPdo ?: $this->pdo;
+	}
+
+	/**
 	 * Set the PDO connection.
 	 *
 	 * @param  PDO  $pdo
-	 * @return void
+	 * @return \Illuminate\Database\Connection
 	 */
 	public function setPdo(PDO $pdo)
 	{
 		$this->pdo = $pdo;
+
+		return $this;
+	}
+
+	/**
+	 * Set the PDO connection used for reading.
+	 *
+	 * @param  PDO  $pdo
+	 * @return \Illuminate\Database\Connection
+	 */
+	public function setReadPdo(PDO $pdo)
+	{
+		$this->readPdo = $pdo;
+
+		return $this;
 	}
 
 	/**
