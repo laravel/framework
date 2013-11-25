@@ -202,7 +202,13 @@ class UrlGenerator {
 
 		$path = preg_replace_sub('/\{.*?\}/', $parameters, $route->uri());
 
-		return $this->trimUrl($this->getRouteRoot($route, $domain), $path);
+		$url = $this->trimUrl($this->getRouteRoot($route, $domain), $path);
+
+		if ($query = $this->getQueryString($parameters)) {
+			$url .= $query;
+		}
+
+		return $url;
 	}
 
 	/**
@@ -272,6 +278,45 @@ class UrlGenerator {
 	protected function getRouteRoot($route, $domain)
 	{
 		return $this->getRootUrl($this->getScheme($route->secure()), $domain);
+	}
+
+	/**
+	 * Extract a query string from an array of parameters.
+	 *
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function getQueryString(array $parameters)
+	{
+		if (empty($parameters))
+		{
+			return '';
+		}
+
+		// first, we'll get the members of the array that have a string key -
+		// these will be transformed into query strings such as ?foo=bar.
+		$legal = array_flip(array_filter(array_keys($parameters), function($key)
+		{
+			return !is_numeric($key);
+		}));
+
+		$queryParams = array_intersect_key($parameters, $legal);
+
+		$queryString = '';
+
+		if (!empty($queryParams))
+		{
+			$queryString .= '?' . http_build_query($queryParams);
+		}
+
+		// next, get the members of the array that have a numeric key - these
+		// will be appended as query strings without a value, i.e. ?baz.
+		if ($extra = array_diff_key($parameters, $legal))
+		{
+			$queryString .= ($queryString === '' ? '?' : '&') . implode('&', $extra);
+		}
+
+		return $queryString;
 	}
 
 	/**
