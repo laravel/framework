@@ -77,18 +77,18 @@ abstract class Queue {
 	}
 
 	/**
-	 * Set the attempts variable on a payload string.
+	 * Set additional meta on a payload string.
 	 *
 	 * @param  string  $payload
 	 * @param  string  $key
-	 * @param  int  $attempts
+	 * @param  string  $value
 	 * @return string
 	 */
-	protected function setMeta($payload, $key, $attempts)
+	protected function setMeta($payload, $key, $value)
 	{
 		$payload = json_decode($payload, true);
 
-		return json_encode(array_set($payload, $key, $attempts));
+		return json_encode(array_set($payload, $key, $value));
 	}
 
 	/**
