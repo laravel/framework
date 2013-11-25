@@ -519,7 +519,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		throw new ModelNotFoundException;
+		throw new ModelNotFoundException(get_called_class().': model not found');
 	}
 
 	/**
