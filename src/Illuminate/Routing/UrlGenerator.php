@@ -204,7 +204,8 @@ class UrlGenerator {
 
 		$url = $this->trimUrl($this->getRouteRoot($route, $domain), $path);
 
-		if ($query = $this->getQueryString($parameters)) {
+		if ($query = $this->getQueryString($parameters))
+		{
 			$url .= $query;
 		}
 
