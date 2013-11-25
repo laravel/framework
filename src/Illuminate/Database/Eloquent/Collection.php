@@ -119,7 +119,7 @@ class Collection extends BaseCollection {
 	 * @param  \Illuminate\Support\Collection  $collection
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function mergeCollection(Collection $collection)
+	public function merge($collection)
 	{
 		foreach ($collection as $item)
 		{
@@ -138,7 +138,7 @@ class Collection extends BaseCollection {
 	 * @param  \Illuminate\Support\Collection  $collection
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function diffCollection(Collection $collection)
+	public function diff($collection)
 	{
 		$diff = new static;
 
@@ -159,7 +159,7 @@ class Collection extends BaseCollection {
 	 * @param  \Illuminate\Support\Collection  $collection
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function intersectCollection(Collection $collection)
+	public function intersect($collection)
 	{
 		$intersect = new static;
 
