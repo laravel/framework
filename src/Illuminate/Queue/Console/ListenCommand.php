@@ -66,7 +66,9 @@ class ListenCommand extends Command {
 		// connection being run for the queue operation currently being executed.
 		$queue = $this->getQueue($connection);
 
-		$this->listener->listen($connection, $queue, $delay, $memory, $timeout);
+		$this->listener->listen(
+			$connection, $queue, $delay, $memory, $timeout
+		);
 	}
 
 	/**
@@ -97,6 +99,8 @@ class ListenCommand extends Command {
 		$this->listener->setEnvironment($this->laravel->environment());
 
 		$this->listener->setSleep($this->option('sleep'));
+
+		$this->listener->setMaxTries($this->option('tries'));
 	}
 
 	/**
@@ -128,6 +132,8 @@ class ListenCommand extends Command {
 			array('timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60),
 
 			array('sleep', null, InputOption::VALUE_OPTIONAL, 'Seconds to wait before checking queue for jobs', 3),
+
+			array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
 		);
 	}
 

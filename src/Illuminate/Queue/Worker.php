@@ -12,29 +12,39 @@ class Worker {
 	protected $manager;
 
 	/**
+	 * The failed job provider implementation.
+	 *
+	 * @var \Illuminate\Queue\FailedJobProviderInterface
+	 */
+	protected $failer;
+
+	/**
 	 * Create a new queue worker.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
+	 * @param  \Illuminate\Queue\FailedJobProviderInterface  $failer
 	 * @return void
 	 */
-	public function __construct(QueueManager $manager)
+	public function __construct(QueueManager $manager, FailedJobProviderInterface $failer)
 	{
+		$this->failer = $failer;
 		$this->manager = $manager;
 	}
 
 	/**
 	 * Listen to the given queue.
 	 *
-	 * @param  string  $connection
+	 * @param  string  $connectionName
 	 * @param  string  $queue
 	 * @param  int     $delay
 	 * @param  int     $memory
 	 * @param  int     $sleep
+	 * @param  int     $maxTries
 	 * @return void
 	 */
-	public function pop($connection, $queue = null, $delay = 0, $memory = 128, $sleep = 3)
+	public function pop($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
 	{
-		$connection = $this->manager->connection($connection);
+		$connection = $this->manager->connection($connectionName);
 
 		$job = $this->getNextJob($connection, $queue);
 
@@ -43,7 +53,9 @@ class Worker {
 		// which is to protect against run-away memory leakages from here.
 		if ( ! is_null($job))
 		{
-			$this->process($job, $delay);
+			$this->process(
+				$connectionName, $job, $maxTries, $delay
+			);
 		}
 		else
 		{
@@ -71,14 +83,21 @@ class Worker {
 	/**
 	 * Process a given job from the queue.
 	 *
+	 * @param  string  $connection
 	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  int  $maxTries
 	 * @param  int  $delay
 	 * @return void
 	 *
 	 * @throws \Exception
 	 */
-	public function process(Job $job, $delay)
+	public function process($connection, Job $job, $maxTries = 0, $delay = 0)
 	{
+		if ($maxTries > 0 && $job->attempts() > $maxTries)
+		{
+			return $this->logFailedJob($connection, $job);
+		}
+
 		try
 		{
 			// First we will fire off the job. Once it is done we will see if it will
@@ -98,6 +117,18 @@ class Worker {
 
 			throw $e;
 		}
+	}
+
+	/**
+	 * Log a failed job into storage.
+	 *
+	 * @param  string  $connection
+	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @return void
+	 */
+	protected function logFailedJob($connection, Job $job)
+	{
+		$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
 	}
 
 	/**

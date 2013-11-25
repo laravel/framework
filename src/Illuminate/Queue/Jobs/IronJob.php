@@ -54,7 +54,17 @@ class IronJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job->body, true));
+		$this->resolveAndFire(json_decode($this->getRawBody(), true));
+	}
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	public function getRawBody()
+	{
+		return $this->job->body;
 	}
 
 	/**

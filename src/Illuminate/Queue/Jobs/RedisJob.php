@@ -20,13 +20,6 @@ class RedisJob extends Job {
 	protected $job;
 
 	/**
-	 * The queue the job belongs to.
-	 *
-	 * @var string
-	 */
-	protected $queue;
-
-	/**
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container  $container
@@ -50,7 +43,17 @@ class RedisJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job, true));
+		$this->resolveAndFire(json_decode($this->getRawBody(), true));
+	}
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	public function getRawBody()
+	{
+		return $this->job;
 	}
 
 	/**
