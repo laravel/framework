@@ -19,7 +19,7 @@
 		{"message": "Support passing an array of files or dynamic arguments into File::delete.", "backport": null},
 		{"message": "Support calling local controller methods as filters using @method syntax.", "backport": null},
 		{"message": "Support passing Carbon instances into Cache put style methods.", "backport": null},
-		{"message": "New SessionInterface implementation - moved away from Symfony's implmentation.", "backport": null},
+		{"message": "New SessionInterface implementation - moved away from Symfony's implementation.", "backport": null},
 		{"message": "Native session driver has been replaced by 'file'. Specifying 'native' driver will just use the new file driver.", "backport": null},
 		{"message": "Now using Stack\\Builder in Application::run.", "backport": null},
 		{"message": "Cookies should now be accessed via Input::cookie - Cookie::get will continue to work for this release.", "backport": null},
