@@ -17,7 +17,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
 		$job = m::mock('Illuminate\Queue\Jobs\Job');
 		$connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
-		$worker->expects($this->once())->method('process')->with($this->equalTo($job));
+		$worker->expects($this->once())->method('process')->with($this->equalTo('connection'), $this->equalTo($job), $this->equalTo(0), $this->equalTo(0));
 
 		$worker->pop('connection', 'queue');
 	}
@@ -30,7 +30,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job = m::mock('Illuminate\Queue\Jobs\Job');
 		$connection->shouldReceive('pop')->once()->with('queue1')->andReturn(null);
 		$connection->shouldReceive('pop')->once()->with('queue2')->andReturn($job);
-		$worker->expects($this->once())->method('process')->with($this->equalTo($job));
+		$worker->expects($this->once())->method('process')->with($this->equalTo('connection'), $this->equalTo($job), $this->equalTo(0), $this->equalTo(0));
 
 		$worker->pop('connection', 'queue1,queue2');
 	}
@@ -56,7 +56,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('autoDelete')->once()->andReturn(true);
 		$job->shouldReceive('delete')->once();
 
-		$worker->process($job, 0);
+		$worker->process('connection', $job, 0, 0);
 	}
 
 
@@ -68,7 +68,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('autoDelete')->once()->andReturn(false);
 		$job->shouldReceive('delete')->never();
 
-		$worker->process($job, 0);
+		$worker->process('connection', $job, 0, 0);
 	}
 
 
@@ -83,7 +83,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('isDeleted')->once()->andReturn(false);
 		$job->shouldReceive('release')->once()->with(5);
 
-		$worker->process($job, 5);
+		$worker->process('connection', $job, 0, 5);
 	}
 
 
@@ -98,7 +98,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('isDeleted')->once()->andReturn(true);
 		$job->shouldReceive('release')->never();
 
-		$worker->process($job, 5);
+		$worker->process('connection', $job, 0, 5);
 	}
 
 }

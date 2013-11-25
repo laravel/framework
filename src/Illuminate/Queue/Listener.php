@@ -26,6 +26,20 @@ class Listener {
 	protected $sleep = 3;
 
 	/**
+	 * The amount of times to try a job before logging it failed.
+	 *
+	 * @var  int
+	 */
+	protected $maxTries = 0;
+
+	/**
+	 * The queue worker command line.
+	 *
+	 * @var string
+	 */
+	protected $workerCommand = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
+
+	/**
 	 * Create a new queue listener.
 	 *
 	 * @param  string  $commandPath
@@ -90,7 +104,7 @@ class Listener {
 	 */
 	public function makeProcess($connection, $queue, $delay, $memory, $timeout)
 	{
-		$string = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s';
+		$string = $this->workerCommand;
 
 		// If the environment is set, we will append it to the command string so the
 		// workers will run under the specified environment. Otherwise, they will
@@ -100,7 +114,13 @@ class Listener {
 			$string .= ' --env='.$this->environment;
 		}
 
-		$command = sprintf($string, $connection, $queue, $delay, $memory, $this->sleep);
+		// Next, we will just format out the worker commands with all of the various
+		// options available for the command. This will produce the final command
+		// line that we will pass into a Symfony process object for processing.
+		$command = sprintf(
+			$string, $connection, $queue, $delay,
+			$memory, $this->sleep, $this->maxTries
+		);
 
 		return new Process($command, $this->commandPath, null, null, $timeout);
 	}
@@ -166,6 +186,17 @@ class Listener {
 	public function setSleep($sleep)
 	{
 		$this->sleep = $sleep;
+	}
+
+	/**
+	 * Set the amount of times to try a job before logging it failed.
+	 *
+	 * @param  int  $tries
+	 * @return void
+	 */
+	public function setMaxTries($tries)
+	{
+		$this->maxTries = $tries;
 	}
 
 }

@@ -52,6 +52,16 @@ class SyncJob extends Job {
 	}
 
 	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	public function getRawBody()
+	{
+		//
+	}
+
+	/**
 	 * Delete the job from the queue.
 	 *
 	 * @return void
