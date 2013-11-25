@@ -32,7 +32,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.0.9';
+	const VERSION = '4.0.10';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -570,7 +570,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
-		
+
 		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
