@@ -74,6 +74,34 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Set a where clause for a pivot table column.
+	 *
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  mixed   $value
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function wherePivot($column, $operator = null, $value = null, $boolean = 'and')
+	{
+		return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
+	}
+
+	/**
+	 * Set an or where clause for a pivot table column.
+	 *
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  mixed   $value
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function orWherePivot($column, $operator = null, $value = null)
+	{
+		return $this->wherePivot($column, $operator, $value, 'or');
+	}
+
+	/**
 	 * Execute the query and get the first result.
 	 *
 	 * @param  array   $columns
