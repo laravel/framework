@@ -89,6 +89,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(1,2,3), $c->modelKeys());
 	}
 
+
 	public function testCollectionMergesWithGivenCollection()
 	{
 		$one = m::mock('Illuminate\Database\Eloquent\Model');
@@ -103,8 +104,9 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$c1 = new Collection(array($one, $two));
 		$c2 = new Collection(array($two, $three));
 
-		$this->assertEquals(new Collection(array($one, $two, $three)), $c1->mergeCollection($c2));
+		$this->assertEquals(new Collection(array($one, $two, $three)), $c1->merge($c2));
 	}
+
 
 	public function testCollectionDiffsWithGivenCollection()
 	{
@@ -120,8 +122,9 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$c1 = new Collection(array($one, $two));
 		$c2 = new Collection(array($two, $three));
 
-		$this->assertEquals(new Collection(array($one)), $c1->diffCollection($c2));
+		$this->assertEquals(new Collection(array($one)), $c1->diff($c2));
 	}
+
 
 	public function testCollectionIntersectsWithGivenCollection()
 	{
@@ -137,8 +140,9 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$c1 = new Collection(array($one, $two));
 		$c2 = new Collection(array($two, $three));
 
-		$this->assertEquals(new Collection(array($two)), $c1->intersectCollection($c2));
+		$this->assertEquals(new Collection(array($two)), $c1->intersect($c2));
 	}
+
 
 	public function testLists()
 	{
