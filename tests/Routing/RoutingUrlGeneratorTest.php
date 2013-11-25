@@ -78,7 +78,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testRoutesWithDomains()
 	{
-			$url = new UrlGenerator(
+		$url = new UrlGenerator(
 			$routes = new Illuminate\Routing\RouteCollection,
 			$request = Illuminate\Http\Request::create('http://www.foo.com/')
 		);
@@ -99,7 +99,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testRoutesWithDomainsAndPorts()
 	{
-			$url = new UrlGenerator(
+		$url = new UrlGenerator(
 			$routes = new Illuminate\Routing\RouteCollection,
 			$request = Illuminate\Http\Request::create('http://www.foo.com:8080/')
 		);
