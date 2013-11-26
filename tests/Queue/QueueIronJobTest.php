@@ -34,6 +34,7 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 		$job = new Illuminate\Queue\Jobs\IronJob(
 			m::mock('Illuminate\Container\Container'),
 			m::mock('IronMQ'),
+			m::mock('Illuminate\Encryption\Encrypter'),
 			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60, 'pushed' => true),
 			'default'
 		);
@@ -45,9 +46,16 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testReleaseProperlyReleasesJobOntoIron()
 	{
-		$job = $this->getJob();
+		$job = new Illuminate\Queue\Jobs\IronJob(
+			m::mock('Illuminate\Container\Container'),
+			m::mock('IronMQ'),
+			$crypt = m::mock('Illuminate\Encryption\Encrypter', array('encrypt')),
+			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 1, 'queue' => 'default')), 'timeout' => 60)
+		);
+
 		$job->getIron()->shouldReceive('deleteMessage')->once();
-		$job->getIron()->shouldReceive('postMessage')->once()->with('default', json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 2, 'queue' => 'default')), array('delay' => 5));
+		$job->getIron()->shouldReceive('postMessage')->once()->with('default', 'encrypted', array('delay' => 5));
+		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 2, 'queue' => 'default')))->andReturn('encrypted');
 
 		$job->release(5);
 	}
@@ -58,6 +66,7 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 		return new Illuminate\Queue\Jobs\IronJob(
 			m::mock('Illuminate\Container\Container'),
 			m::mock('IronMQ'),
+			m::mock('Illuminate\Encryption\Encrypter', array('encrypt')),
 			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 1, 'queue' => 'default')), 'timeout' => 60)
 		);
 	}
