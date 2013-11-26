@@ -50,7 +50,7 @@ class FlushFailedCommand extends Command {
 	{
 		$this->failer->flush();
 
-		$this->info('All failed jobs deleted!');
+		$this->info('All failed jobs deleted successfully!');
 	}
 
 }

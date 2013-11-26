@@ -57,7 +57,7 @@ class ListFailedCommand extends Command {
 
 		if (count($rows) == 0)
 		{
-			return $this->info('Awesome! No failed jobs!');
+			return $this->info('No failed jobs!');
 		}
 
 		$table = $this->getHelperSet()->get('table');
