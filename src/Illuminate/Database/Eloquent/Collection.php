@@ -165,7 +165,7 @@ class Collection extends BaseCollection {
 
 		foreach ($this->items as $item)
 		{
-			if ( $collection->contains($item->getKey()))
+			if ($collection->contains($item->getKey()))
 			{
 				$intersect->add($item);
 			}
