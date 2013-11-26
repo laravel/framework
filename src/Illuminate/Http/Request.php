@@ -533,4 +533,35 @@ class Request extends SymfonyRequest {
 		return isset($this->sessionStore);
 	}
 
+	/**
+	 * Determine if the request comes with an entity tag.
+	 *
+	 * @return bool
+	 */
+	public function hasETags()
+	{
+		return count($this->getETags()) > 0;
+	}
+
+	/**
+	 * Get the first entity tag of the request.
+	 *
+	 * @return null|string
+	 */
+	public function getFirstETag()
+	{
+		$etags = $this->getETags();
+
+		if (count($etags) > 0 and isset($etags[0]))
+		{
+			$etag = trim($etags[0], '"');
+			if (strlen($etag) > 0)
+			{
+				return $etag;
+			}
+		}
+
+		return null;
+	}
+
 }

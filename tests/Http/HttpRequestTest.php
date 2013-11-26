@@ -265,4 +265,23 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('atom', $request->format());
 	}
 
+
+	public function testHasETags()
+	{
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_IF_NONE_MATCH' => 'entity_tag_value'));
+		$this->assertTrue($request->hasETags());
+
+		$request = Request::create('/', 'GET', array(), array(), array(), array());
+		$this->assertFalse($request->hasETags());
+	}
+
+	
+	public function testGetFirstETag()
+	{
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_IF_NONE_MATCH' => 'entity_tag_value'));
+		$this->assertEquals('entity_tag_value', $request->getFirstETag());
+
+		$request = Request::create('/', 'GET', array(), array(), array(), array());
+		$this->assertNull($request->getFirstETag());
+	}
 }
