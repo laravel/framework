@@ -61,7 +61,8 @@
 		{"message": "Added 'wherePivot' and 'orWherePivot' methods to BelongsToMany relationship for convenience.", "backport": null},
 		{"message": "Added automatic separation of read / write connections into database layer.", "backport": null},
 		{"message": "Added automatic failed job handling for all queue drivers. New --tries switch for queue:listen and queue:work.", "backport": null},
-		{"message": "Cache:add now returns true when the value is actually added. False is returned otherwise.", "backport": null}
+		{"message": "Cache:add now returns true when the value is actually added. False is returned otherwise.", "backport": null},
+		{"message": "Added merge, diff, and intersect to the Collection class.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

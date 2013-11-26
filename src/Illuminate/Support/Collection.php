@@ -334,48 +334,36 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Merge items with the collection items.
+	 * Merge the collection with the given items.
 	 *
 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function merge($items)
 	{
-		$items = $this->getArrayableItems($items);
-
-		$results = array_merge($this->items, $items);
-
-		return new static($results);
+		return new static(array_merge($this->items, $this->getArrayableItems($items)));
 	}
 
-	/** 
-	 * Diff items with the collection items.
+	/**
+	 * Diff the collection with the given items.
 	 *
 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function diff($items)
 	{
-		$items = $this->getArrayableItems($items);
-
-		$results = array_diff($this->items, $items);
-
-		return new static($results);
+		return new static(array_diff($this->items, $this->getArrayableItems($items)));
 	}
 
 	/**
-	 * Intersect items with the collection items.
+	 * Intersect the collection with the given items.
 	 *
  	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function intersect($items)
 	{
-		$items = $this->getArrayableItems($items);
-
-		$results = array_intersect($this->items, $items);
-
-		return new static($results);
+		return new static(array_intersect($this->items, $this->getArrayableItems($items)));
 	}
 
 	/**
@@ -571,7 +559,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Results array of items from Collection or ArrayableInterface. 
+	 * Results array of items from Collection or ArrayableInterface.
 	 *
   	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return array
