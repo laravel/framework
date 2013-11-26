@@ -425,11 +425,6 @@ class FormBuilderModelStub {
 		return $this->data[$key];
 	}
 
-	public function __set($key, $value)
-	{
-		$this->data[$key] = $value;
-	}
-
 	public function __isset($key)
 	{
 		return isset($this->data[$key]);
