@@ -154,6 +154,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDiffCollection()
+	{
+		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
+		$this->assertEquals(array('id' => 1), $c->diff(new Collection(array('first_word' => 'Hello', 'last_word' => 'World')))->all());
+	}
+
+
+	public function testIntersectCollection()
+	{
+		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
+		$this->assertEquals(array('first_word' => 'Hello'), $c->intersect(new Collection(array('first_world' => 'Hello', 'last_word' => 'World')))->all());
+	}
+
+
 	public function testCollapse()
 	{
 		$data = new Collection(array(array($object1 = new StdClass), array($object2 = new StdClass)));
