@@ -55,6 +55,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('attempts')->once()->andReturn(10);
 		$job->shouldReceive('getQueue')->once()->andReturn('queue');
 		$job->shouldReceive('getRawBody')->once()->andReturn('body');
+		$job->shouldReceive('delete')->once();
 		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body');
 
 		$worker->process('connection', $job, 3, 0);
