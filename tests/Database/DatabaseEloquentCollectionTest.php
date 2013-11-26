@@ -90,6 +90,60 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCollectionMergesWithGivenCollection()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getKey')->andReturn(1);
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getKey')->andReturn(2);
+
+		$three = m::mock('Illuminate\Database\Eloquent\Model');
+		$three->shouldReceive('getKey')->andReturn(3);
+
+		$c1 = new Collection(array($one, $two));
+		$c2 = new Collection(array($two, $three));
+
+		$this->assertEquals(new Collection(array($one, $two, $three)), $c1->merge($c2));
+	}
+
+
+	public function testCollectionDiffsWithGivenCollection()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getKey')->andReturn(1);
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getKey')->andReturn(2);
+
+		$three = m::mock('Illuminate\Database\Eloquent\Model');
+		$three->shouldReceive('getKey')->andReturn(3);
+
+		$c1 = new Collection(array($one, $two));
+		$c2 = new Collection(array($two, $three));
+
+		$this->assertEquals(new Collection(array($one)), $c1->diff($c2));
+	}
+
+
+	public function testCollectionIntersectsWithGivenCollection()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getKey')->andReturn(1);
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getKey')->andReturn(2);
+
+		$three = m::mock('Illuminate\Database\Eloquent\Model');
+		$three->shouldReceive('getKey')->andReturn(3);
+
+		$c1 = new Collection(array($one, $two));
+		$c2 = new Collection(array($two, $three));
+
+		$this->assertEquals(new Collection(array($two)), $c1->intersect($c2));
+	}
+
+
 	public function testLists()
 	{
 		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), (object) array('name' => 'dayle', 'email' => 'bar')));

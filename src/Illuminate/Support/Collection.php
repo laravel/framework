@@ -341,16 +341,39 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function merge($items)
 	{
-		if ($items instanceof Collection)
-		{
-			$items = $items->all();
-		}
-		elseif ($items instanceof ArrayableInterface)
-		{
-			$items = $items->toArray();
-		}
+		$items = $this->getArrayableItems($items);
 
 		$results = array_merge($this->items, $items);
+
+		return new static($results);
+	}
+
+	/** 
+	 * Diff items with the collection items.
+	 *
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function diff($items)
+	{
+		$items = $this->getArrayableItems($items);
+
+		$results = array_diff($this->items, $items);
+
+		return new static($results);
+	}
+
+	/**
+	 * Intersect items with the collection items.
+	 *
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function intersect($items)
+	{
+		$items = $this->getArrayableItems($items);
+
+		$results = array_intersect($this->items, $items);
 
 		return new static($results);
 	}
@@ -545,6 +568,26 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function __toString()
 	{
 		return $this->toJson();
+	}
+
+	/**
+	 * Results array of items from Collection or ArrayableInterface. 
+	 *
+  	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return array
+	 */
+	private function getArrayableItems($items)
+	{
+		if ($items instanceof Collection)
+		{
+			$items = $items->all();
+		}
+		elseif ($items instanceof ArrayableInterface)
+		{
+			$tiems = $items->toArray();
+		}
+
+		return $items;
 	}
 
 }
