@@ -390,6 +390,8 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		$this->serviceProviders[] = $provider;
 
 		$this->loadedProviders[get_class($provider)] = true;
+
+		return $provider;
 	}
 
 	/**
