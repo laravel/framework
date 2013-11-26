@@ -33,6 +33,8 @@ class QueueServiceProvider extends ServiceProvider {
 		$this->registerListener();
 
 		$this->registerSubscriber();
+
+		$this->registerFailedJobServices();
 	}
 
 	/**
@@ -68,7 +70,7 @@ class QueueServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('queue.worker', function($app)
 		{
-			return new Worker($app['queue']);
+			return new Worker($app['queue'], $app['queue.failer']);
 		});
 	}
 
@@ -239,13 +241,31 @@ class QueueServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the failed job services.
+	 *
+	 * @return void
+	 */
+	protected function registerFailedJobServices()
+	{
+		$this->app->bindShared('queue.failer', function($app)
+		{
+			$config = $app['config']['queue.failed'];
+
+			return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
+		});
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
 	 */
 	public function provides()
 	{
-		return array('queue', 'queue.worker', 'queue.listener', 'command.queue.work', 'command.queue.listen', 'command.queue.subscribe');
+		return array(
+			'queue', 'queue.worker', 'queue.listener', 'queue.failer',
+			'command.queue.work', 'command.queue.listen', 'command.queue.subscribe'
+		);
 	}
 
 }
