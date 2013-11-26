@@ -2,6 +2,7 @@
 
 use IronMQ;
 use Illuminate\Container\Container;
+use Illuminate\Encryption\Encrypter;
 
 class IronJob extends Job {
 
@@ -11,6 +12,13 @@ class IronJob extends Job {
 	 * @var IronMQ
 	 */
 	protected $iron;
+
+	/**
+	 * The encrypter instance.
+	 *
+	 * @var \Illuminate\Encryption\Encrypter
+	 */
+	protected $crypt;
 
 	/**
 	 * The IronMQ message instance.
@@ -38,11 +46,13 @@ class IronJob extends Job {
 	 */
 	public function __construct(Container $container,
                                 IronMQ $iron,
+                                Encrypter $crypt,
                                 $job,
                                 $pushed = false)
 	{
 		$this->job = $job;
 		$this->iron = $iron;
+		$this->crypt = $crypt;
 		$this->pushed = $pushed;
 		$this->container = $container;
 	}
@@ -92,11 +102,21 @@ class IronJob extends Job {
 	 */
 	protected function recreateJob($delay)
 	{
+		$this->iron->postMessage($this->getQueue(), $this->createPayload(), array('delay' => $this->getSeconds($delay)));
+	}
+
+	/**
+	 * Create a payload string from the old payload and increment the attempts.
+	 *
+	 * @return string
+	 */
+	protected function createPayload()
+	{
 		$payload = json_decode($this->job->body, true);
 
 		array_set($payload, 'attempts', array_get($payload, 'attempts', 1) + 1);
 
-		$this->iron->postMessage($this->getQueue(), json_encode($payload), array('delay' => $this->getSeconds($delay)));
+		return $this->crypt->encrypt(json_encode($payload));
 	}
 
 	/**

@@ -105,7 +105,7 @@ class IronQueue extends Queue implements QueueInterface {
 		{
 			$job->body = $this->crypt->decrypt($job->body);
 
-			return new IronJob($this->container, $this->iron, $job);
+			return new IronJob($this->container, $this->iron, $this->crypt, $job);
 		}
 	}
 
@@ -145,7 +145,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	protected function createPushedIronJob($job)
 	{
-		return new IronJob($this->container, $this->iron, $job, true);
+		return new IronJob($this->container, $this->iron, $this->crypt, $job, true);
 	}
 
 	/**
