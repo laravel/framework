@@ -71,7 +71,7 @@ class QueueServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('queue.worker', function($app)
 		{
-			return new Worker($app['queue'], $app['queue.failer']);
+			return new Worker($app['queue'], $app['queue.failer'], $app['events']);
 		});
 	}
 

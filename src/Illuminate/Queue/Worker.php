@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Queue;
 
 use Illuminate\Queue\Jobs\Job;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 
 class Worker {
@@ -20,15 +21,26 @@ class Worker {
 	protected $failer;
 
 	/**
+	 * The event dispatcher instance.
+	 *
+	 * @var \Illuminate\Events\Dispatcher
+	 */
+	protected $events;
+
+	/**
 	 * Create a new queue worker.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @param  \Illuminate\Queue\Failed\FailedJobProviderInterface  $failer
+	 * @param  \Illuminate\Events\Dispatcher  $events
 	 * @return void
 	 */
-	public function __construct(QueueManager $manager, FailedJobProviderInterface $failer = null)
+	public function __construct(QueueManager $manager,
+                                FailedJobProviderInterface $failer = null,
+                                Dispatcher $events = null)
 	{
 		$this->failer = $failer;
+		$this->events = $events;
 		$this->manager = $manager;
 	}
 
@@ -134,6 +146,23 @@ class Worker {
 			$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
 
 			$job->delete();
+
+			$this->raiseFailedJobEvent($connection, $job);
+		}
+	}
+
+	/**
+	 * Raise the failed queue job event.
+	 *
+	 * @param  string  $connection
+	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @return void
+	 */
+	protected function raiseFailedJobEvent($connection, Job $job)
+	{
+		if ($this->events)
+		{
+			$this->events->fire('illuminate.queue.failed', array($connection, $job));
 		}
 	}
 
