@@ -41,6 +41,8 @@ class FailConsoleServiceProvider extends ServiceProvider {
 		{
 			return new FlushFailedCommand($app['queue.failer']);
 		});
+
+		$this->commands('command.queue.failed', 'command.queue.retry', 'command.queue.forget', 'command.queue.flush');
 	}
 
 	/**
