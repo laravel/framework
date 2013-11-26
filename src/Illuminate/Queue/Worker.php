@@ -25,7 +25,7 @@ class Worker {
 	 * @param  \Illuminate\Queue\FailedJobProviderInterface  $failer
 	 * @return void
 	 */
-	public function __construct(QueueManager $manager, FailedJobProviderInterface $failer)
+	public function __construct(QueueManager $manager, FailedJobProviderInterface $failer = null)
 	{
 		$this->failer = $failer;
 		$this->manager = $manager;
@@ -128,7 +128,10 @@ class Worker {
 	 */
 	protected function logFailedJob($connection, Job $job)
 	{
-		$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
+		if ($this->failer)
+		{
+			$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
+		}
 	}
 
 	/**
