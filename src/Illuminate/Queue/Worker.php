@@ -55,7 +55,7 @@ class Worker {
 		if ( ! is_null($job))
 		{
 			$this->process(
-				$connectionName, $job, $maxTries, $delay
+				$this->manager->getName($connectionName), $job, $maxTries, $delay
 			);
 		}
 		else
