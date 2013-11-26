@@ -104,7 +104,7 @@ class IronJob extends Job {
 	{
 		$payload = json_decode($this->job->body, true);
 
-		array_set($payload, 'attempts', array_get($payload, 'attempts', 0) + 1);
+		array_set($payload, 'attempts', array_get($payload, 'attempts', 1) + 1);
 
 		$this->iron->recreate(json_encode($payload), $this->getQueue(), $delay);
 	}
@@ -116,7 +116,7 @@ class IronJob extends Job {
 	 */
 	public function attempts()
 	{
-		return array_get(json_decode($this->job->body, true), 'attempts');
+		return array_get(json_decode($this->job->body, true), 'attempts', 1);
 	}
 
 	/**
