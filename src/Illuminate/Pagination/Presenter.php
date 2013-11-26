@@ -37,6 +37,31 @@ abstract class Presenter {
 	}
 
 	/**
+	 * Get HTML wrapper for a page link.
+	 *
+	 * @param  string  $url
+	 * @param  int  $page
+	 * @return string
+	 */
+	abstract public function getPageLinkWrapper($url, $page);
+
+	/**
+	 * Get HTML wrapper for disabled text.
+	 *
+	 * @param  string  $text
+	 * @return string
+	 */
+	abstract public function getDisabledTextWrapper($text);
+
+	/**
+	 * Get HTML wrapper for active text.
+	 *
+	 * @param  string  $text
+	 * @return string
+	 */
+	abstract public function getActivePageWrapper($text);
+
+	/**
 	 * Render the Pagination contents.
 	 *
 	 * @return string
@@ -73,7 +98,7 @@ abstract class Presenter {
 		{
 			// If the current page is equal to the page we're iterating on, we will create a
 			// disabled link for that page. Otherwise, we can create a typical active one
-			// for the link.
+			// for the link. We will use this implementing class's methods to get HTML.
 			if ($this->currentPage == $page)
 			{
 				$pages[] = $this->getActivePageWrapper($page);
@@ -251,30 +276,5 @@ abstract class Presenter {
 	{
 		$this->lastPage = $page;
 	}
-	
-	/**
-	 * Get html wrapper for a page link
-	 * 
-	 * @param  string $url
-	 * @param  int    $page
-	 * @return string
-	 */
-	abstract public function getPageLinkWrapper($url, $page);
-	
-	/**
-	 * Get html wrapper for a disabled text
-	 * 
-	 * @param  string $text
-	 * @return string
-	 */
-	abstract public function getDisabledTextWrapper($text);
-	
-	/**
-	 * Get html wrapper for an active text
-	 * 
-	 * @param  string $text
-	 * @return string
-	 */
-	abstract public function getActivePageWrapper($text);
-	
+
 }
