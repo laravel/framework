@@ -73,7 +73,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function hasHintInformation($name)
 	{
-		return strpos($name, self::HINT_PATH_SEPARATOR) > 0;
+		return strpos($name, static::HINT_PATH_SEPARATOR) > 0;
 	}
 
 	/**
@@ -120,7 +120,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	protected function getNamespaceSegments($name)
 	{
-		$segments = explode(self::HINT_PATH_SEPARATOR, $name);
+		$segments = explode(static::HINT_PATH_SEPARATOR, $name);
 
 		if (count($segments) != 2)
 		{
