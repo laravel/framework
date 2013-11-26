@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Queue;
 
 use Illuminate\Queue\Jobs\Job;
+use Illuminate\Queue\Failed\FailedJobProviderInterface;
 
 class Worker {
 
@@ -14,7 +15,7 @@ class Worker {
 	/**
 	 * The failed job provider implementation.
 	 *
-	 * @var \Illuminate\Queue\FailedJobProviderInterface
+	 * @var \Illuminate\Queue\Failed\FailedJobProviderInterface
 	 */
 	protected $failer;
 
@@ -22,7 +23,7 @@ class Worker {
 	 * Create a new queue worker.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
-	 * @param  \Illuminate\Queue\FailedJobProviderInterface  $failer
+	 * @param  \Illuminate\Queue\Failed\FailedJobProviderInterface  $failer
 	 * @return void
 	 */
 	public function __construct(QueueManager $manager, FailedJobProviderInterface $failer = null)
