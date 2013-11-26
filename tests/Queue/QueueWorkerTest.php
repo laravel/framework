@@ -15,6 +15,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 	{
 		$worker = $this->getMock('Illuminate\Queue\Worker', array('process'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
 		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+		$manager->shouldReceive('getName')->andReturn('connection');
 		$job = m::mock('Illuminate\Queue\Jobs\Job');
 		$connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
 		$worker->expects($this->once())->method('process')->with($this->equalTo('connection'), $this->equalTo($job), $this->equalTo(0), $this->equalTo(0));
@@ -27,6 +28,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 	{
 		$worker = $this->getMock('Illuminate\Queue\Worker', array('process'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
 		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+		$manager->shouldReceive('getName')->andReturn('connection');
 		$job = m::mock('Illuminate\Queue\Jobs\Job');
 		$connection->shouldReceive('pop')->once()->with('queue1')->andReturn(null);
 		$connection->shouldReceive('pop')->once()->with('queue2')->andReturn($job);

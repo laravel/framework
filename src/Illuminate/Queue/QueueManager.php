@@ -140,6 +140,17 @@ class QueueManager {
 	}
 
 	/**
+	 * Get the full name for the given connection.
+	 *
+	 * @param  string  $connection
+	 * @return string
+	 */
+	public function getName($connection = null)
+	{
+		return $connection ?: $this->getDefault();
+	}
+
+	/**
 	 * Dynamically pass calls to the default connection.
 	 *
 	 * @param  string  $method
