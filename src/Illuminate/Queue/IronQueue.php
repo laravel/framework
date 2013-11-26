@@ -76,6 +76,8 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	public function pushRaw($payload, $queue = null, array $options = array())
 	{
+		$payload = $this->crypt->encrypt($payload);
+
 		return $this->iron->postMessage($this->getQueue($queue), $payload, $options)->id;
 	}
 
@@ -91,7 +93,7 @@ class IronQueue extends Queue implements QueueInterface {
 	{
 		$options = array('delay' => $this->getSeconds($delay));
 
-		return $this->pushRaw($this->crypt->encrypt($payload), $queue, $options);
+		return $this->pushRaw($payload, $queue, $options);
 	}
 
 	/**
@@ -109,7 +111,7 @@ class IronQueue extends Queue implements QueueInterface {
 
 		$payload = $this->createPayload($job, $data, $queue);
 
-		return $this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'))->id;
+		return $this->pushRaw($payload, $this->getQueue($queue), compact('delay'));
 	}
 
 	/**
@@ -198,9 +200,7 @@ class IronQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
 
-		$payload = $this->setMeta($payload, 'queue', $this->getQueue($queue));
-
-		return $this->crypt->encrypt($payload);
+		return $this->setMeta($payload, 'queue', $this->getQueue($queue));
 	}
 
 	/**

@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Queue;
+<?php namespace Illuminate\Queue\Failed;
 
 interface FailedJobProviderInterface {
 
@@ -31,7 +31,7 @@ interface FailedJobProviderInterface {
 	 * Delete a single failed job from storage.
 	 *
 	 * @param  mixed  $id
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($id);
 

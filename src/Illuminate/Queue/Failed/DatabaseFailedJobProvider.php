@@ -1,5 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php namespace Illuminate\Queue\Failed;
 
+use DateTime;
 use Illuminate\Database\ConnectionResolverInterface;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface {
@@ -50,7 +51,9 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	 */
 	public function log($connection, $queue, $payload)
 	{
-		$this->getTable()->insert(compact('connection', 'queue', 'payload'));
+		$failed_at = new DateTime;
+
+		$this->getTable()->insert(compact('connection', 'queue', 'payload', 'failed_at'));
 	}
 
 	/**
@@ -78,11 +81,11 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	 * Delete a single failed job from storage.
 	 *
 	 * @param  mixed  $id
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($id)
 	{
-		$this->getTable()->where('id', $id)->delete();
+		return $this->getTable()->where('id', $id)->delete() > 0;
 	}
 
 	/**
