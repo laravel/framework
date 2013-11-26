@@ -25,22 +25,22 @@ class FailConsoleServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.queue.failed', function($app)
 		{
-			return new ListFailedCommand($app['queue.failer']);
+			return new ListFailedCommand;
 		});
 
 		$this->app->bindShared('command.queue.retry', function($app)
 		{
-			return new RetryCommand($app['queue.failer'], $app['queue']);
+			return new RetryCommand;
 		});
 
 		$this->app->bindShared('command.queue.forget', function($app)
 		{
-			return new ForgetFailedCommand($app['queue.failer']);
+			return new ForgetFailedCommand;
 		});
 
 		$this->app->bindShared('command.queue.flush', function($app)
 		{
-			return new FlushFailedCommand($app['queue.failer']);
+			return new FlushFailedCommand;
 		});
 
 		$this->app->bindShared('command.queue.failed-table', function($app)
