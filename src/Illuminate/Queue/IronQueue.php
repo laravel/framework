@@ -71,11 +71,27 @@ class IronQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  string  $payload
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function pushRaw($payload, $queue = null)
+	public function pushRaw($payload, $queue = null, array $options = array())
 	{
-		return $this->iron->postMessage($this->getQueue($queue), $payload)->id;
+		return $this->iron->postMessage($this->getQueue($queue), $payload, $options)->id;
+	}
+
+	/**
+	 * Push a raw payload onto the queue after encrypting the payload.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  int  $delay
+	 * @return mixed
+	 */
+	public function recreate($payload, $queue = null, $delay)
+	{
+		$options = array('delay' => $this->getSeconds($delay));
+
+		return $this->pushRaw($this->crypt->encrypt($payload), $queue, $options);
 	}
 
 	/**
@@ -115,8 +131,20 @@ class IronQueue extends Queue implements QueueInterface {
 		{
 			$job->body = $this->crypt->decrypt($job->body);
 
-			return new IronJob($this->container, $this->iron, $job);
+			return new IronJob($this->container, $this, $job);
 		}
+	}
+
+	/**
+	 * Delete a message from the Iron queue.
+	 *
+	 * @param  string  $queue
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function deleteMessage($queue, $id)
+	{
+		$this->iron->deleteMessage($queue, $id);
 	}
 
 	/**

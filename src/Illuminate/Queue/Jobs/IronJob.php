@@ -1,14 +1,14 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use IronMQ;
+use Illuminate\Queue\IronQueue;
 use Illuminate\Container\Container;
 
 class IronJob extends Job {
 
 	/**
-	 * The IronMQ instance.
+	 * The Iron queue instance.
 	 *
-	 * @var IronMQ
+	 * @var \Illuminate\Queue\IronQueue
 	 */
 	protected $iron;
 
@@ -30,14 +30,14 @@ class IronJob extends Job {
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @param  IronMQ  $iron
+	 * @param  \Illuminate\Queue\IronQueue  $iron
 	 * @param  object  $job
 	 * @param  string  $queue
 	 * @param  bool    $pushed
 	 * @return void
 	 */
 	public function __construct(Container $container,
-                                IronMQ $iron,
+                                IronQueue $iron,
                                 $job,
                                 $pushed = false)
 	{
@@ -106,7 +106,7 @@ class IronJob extends Job {
 
 		array_set($payload, 'attempts', array_get($payload, 'attempts', 0) + 1);
 
-		$this->iron->postMessage($this->getQueue(), json_encode($payload), array('delay' => $this->getSeconds($delay)));
+		$this->iron->recreate(json_encode($payload), $this->getQueue(), $delay);
 	}
 
 	/**
@@ -140,9 +140,9 @@ class IronJob extends Job {
 	}
 
 	/**
-	 * Get the underlying IronMQ instance.
+	 * Get the underlying Iron queue instance.
 	 *
-	 * @return IronMQ
+	 * @return \Illuminate\Queue\IronQueue
 	 */
 	public function getIron()
 	{
