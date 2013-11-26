@@ -452,7 +452,9 @@ class Builder {
 		// also set the proper connection name for the model after we create it.
 		foreach ($results as $result)
 		{
-			$models[] = $model = $this->model->newFromBuilder($result);
+			$model = $this->model->newFromBuilder($result);
+
+			$models[$model->getKey()] = $model;
 
 			$model->setConnection($connection);
 		}
