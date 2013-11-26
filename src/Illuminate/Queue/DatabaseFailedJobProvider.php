@@ -102,7 +102,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	 */
 	protected function getTable()
 	{
-		return $this->resolver($this->database)->table($this->table);
+		return $this->resolver->connection($this->database)->table($this->table);
 	}
 
 }
