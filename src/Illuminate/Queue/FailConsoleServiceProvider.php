@@ -4,6 +4,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\RetryCommand;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Console\FlushFailedCommand;
+use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand;
 
 class FailConsoleServiceProvider extends ServiceProvider {
@@ -42,7 +43,15 @@ class FailConsoleServiceProvider extends ServiceProvider {
 			return new FlushFailedCommand($app['queue.failer']);
 		});
 
-		$this->commands('command.queue.failed', 'command.queue.retry', 'command.queue.forget', 'command.queue.flush');
+		$this->app->bindShared('command.queue.failed-table', function($app)
+		{
+			return new FailedTableCommand($app['files']);
+		});
+
+		$this->commands(
+			'command.queue.failed', 'command.queue.retry', 'command.queue.forget',
+			'command.queue.flush', 'command.queue.failed-table'
+		);
 	}
 
 	/**
@@ -53,7 +62,7 @@ class FailConsoleServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return array(
-			'command.queue.failed', 'command.queue.retry', 'command.queue.forget', 'command.queue.flush',
+			'command.queue.failed', 'command.queue.retry', 'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
 		);
 	}
 
