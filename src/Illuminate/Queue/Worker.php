@@ -132,6 +132,8 @@ class Worker {
 		if ($this->failer)
 		{
 			$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
+
+			$job->delete();
 		}
 	}
 
