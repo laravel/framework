@@ -6,7 +6,7 @@ if ( ! function_exists('action'))
 	 * Generate a URL to a controller action.
 	 *
 	 * @param  string  $name
-	 * @param  string  $parameters
+	 * @param  array   $parameters
 	 * @return string
 	 */
 	function action($name, $parameters = array())
