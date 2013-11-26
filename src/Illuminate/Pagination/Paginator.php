@@ -74,6 +74,13 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	protected $query = array();
 
 	/**
+	 * The fragment to be appended to all URLs.
+	 *
+	 * @var string
+	 */
+	protected $fragment;
+
+	/**
 	 * Create a new Paginator instance.
 	 *
 	 * @param  \Illuminate\Pagination\Environment  $env
@@ -191,7 +198,32 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 			$parameters = array_merge($parameters, $this->query);
 		}
 
-		return $this->env->getCurrentUrl().'?'.http_build_query($parameters, null, '&');
+		$fragment = $this->buildFragment();
+
+		return $this->env->getCurrentUrl().'?'.http_build_query($parameters, null, '&').$fragment;
+	}
+
+	/**
+	 * Get / set the URL fragment to be appended to URLs.
+	 *
+	 * @param  string|null  $fragment
+	 * @return \Illuminate\Pagination\Paginator|string
+	 */
+	public function fragment($fragment = null)
+	{
+		if (is_null($fragment)) return $this->fragment;
+
+		$this->fragment = $fragment; return $this;
+	}
+
+	/**
+	 * Build the full fragment portion of a URL.
+	 *
+	 * @return string
+	 */
+	protected function buildFragment()
+	{
+		return $this->fragment ? '#'.$this->fragment : '';
 	}
 
 	/**
