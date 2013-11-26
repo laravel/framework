@@ -55,6 +55,11 @@ class ListFailedCommand extends Command {
 			$rows[] = array_values(array_except((array) $failed, array('payload')));
 		}
 
+		if (count($rows) == 0)
+		{
+			return $this->info('Awesome! No failed jobs!');
+		}
+
 		$table = $this->getHelperSet()->get('table');
 
 		$table->setHeaders(array('ID', 'Connection', 'Queue', 'Failed At'))
