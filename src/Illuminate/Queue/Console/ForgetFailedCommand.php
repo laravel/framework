@@ -4,7 +4,6 @@ use Illuminate\Console\Command;
 use Illuminate\Queue\QueueManager;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Illuminate\Queue\Failed\FailedJobProviderInterface;
 
 class ForgetFailedCommand extends Command {
 
@@ -23,33 +22,13 @@ class ForgetFailedCommand extends Command {
 	protected $description = 'Delete a failed queue job';
 
 	/**
-	 * The failed job provider implementation.
-	 *
-	 * @var \Illuminate\Queue\Failed\FailedJobProviderInterface
-	 */
-	protected $failer;
-
-	/**
-	 * Create a new failed job lister command instance.
-	 *
-	 * @param  \Illuminate\Queue\Failed\FailedJobProviderInterface  $failer
-	 * @return void
-	 */
-	public function __construct(FailedJobProviderInterface $failer)
-	{
-		parent::__construct();
-
-		$this->failer = $failer;
-	}
-
-	/**
 	 * Execute the console command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		if ($this->failer->forget($this->argument('id')))
+		if ($this->laravel['queue.failer']->forget($this->argument('id')))
 		{
 			$this->info('Failed job deleted successfully!');
 		}

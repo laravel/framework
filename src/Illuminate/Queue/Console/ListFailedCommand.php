@@ -3,7 +3,6 @@
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Illuminate\Queue\Failed\FailedJobProviderInterface;
 
 class ListFailedCommand extends Command {
 
@@ -22,26 +21,6 @@ class ListFailedCommand extends Command {
 	protected $description = 'List all of the failed queue jobs';
 
 	/**
-	 * The failed job provider implementation.
-	 *
-	 * @var \Illuminate\Queue\Failed\FailedJobProviderInterface
-	 */
-	protected $failer;
-
-	/**
-	 * Create a new failed job lister command instance.
-	 *
-	 * @param  \Illuminate\Queue\Failed\FailedJobProviderInterface  $failer
-	 * @return void
-	 */
-	public function __construct(FailedJobProviderInterface $failer)
-	{
-		parent::__construct();
-
-		$this->failer = $failer;
-	}
-
-	/**
 	 * Execute the console command.
 	 *
 	 * @return void
@@ -50,7 +29,7 @@ class ListFailedCommand extends Command {
 	{
 		$rows = array();
 
-		foreach ($this->failer->all() as $failed)
+		foreach ($this->laravel['queue.failer']->all() as $failed)
 		{
 			$rows[] = array_values(array_except((array) $failed, array('payload')));
 		}
