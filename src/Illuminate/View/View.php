@@ -72,11 +72,9 @@ class View implements ArrayAccess, Renderable {
 	public function render()
 	{
 		$env = $this->environment;
-		
-		// If we are at the top of the stack we'll flush out sections as
-		// old ones might interfere with totally separate view's evaluations later.
+
 		if ($env->doneRendering()) $env->flushSections();
-		
+
 		// We will keep track of the amount of views being rendered so we can flush
 		// the section after the complete rendering operation is done. This will
 		// clear out the sections for any separate views that may be rendered.
@@ -86,12 +84,14 @@ class View implements ArrayAccess, Renderable {
 
 		$contents = $this->getContents();
 
-		// Once we've finished rendering the view, we'll decrement the render count.
+		// Once we've finished rendering the view, we'll decrement the render count
+		// so that each sections get flushed out next time a view is created and
+		// no old sections are staying around in the memory of an environment.
 		$env->decrementRender();
 
 		return $contents;
 	}
-	
+
 	/**
 	 * Get the sections from the view.
 	 *
