@@ -365,7 +365,7 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
-	 * @return void
+	 * @return \Illuminate\Support\ServiceProvider
 	 */
 	public function register($provider, $options = array())
 	{
@@ -390,6 +390,8 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		$this->serviceProviders[] = $provider;
 
 		$this->loadedProviders[get_class($provider)] = true;
+
+		return $provider;
 	}
 
 	/**
