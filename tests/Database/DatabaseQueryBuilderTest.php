@@ -52,9 +52,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$query = $query->remember(5);
 
 		$cache->shouldReceive('remember')
-	                     ->once()
-	                     ->with($query->getCacheKey(), 5, m::type('Closure'))
-	                     ->andReturnUsing(function($key, $minutes, $callback) { return $callback(); });
+						 ->once()
+						 ->with($query->getCacheKey(), 5, m::type('Closure'))
+						 ->andReturnUsing(function($key, $minutes, $callback) { return $callback(); });
 
 
 		$this->assertEquals($query->get(), array('results'));
@@ -65,7 +65,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$cache = m::mock('stdClass');
 		$query = $this->setupCacheTestQuery($cache);
 		$query = $query->rememberForever();
-	
+
 		$cache->shouldReceive('rememberForever')
 												->once()
 												->with($query->getCacheKey(), m::type('Closure'))
@@ -862,8 +862,51 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getFresh'), array($connection, $grammar, $processor));
 		$builder->expects($this->once())->method('getFresh')->with($this->equalTo(array('*')))->will($this->returnValue(array('results')));
-		return $builder->select('*')->from('users')->where('email', 'foo@bar.com');		
+		return $builder->select('*')->from('users')->where('email', 'foo@bar.com');
 	}
+
+
+	public function testMySqlLock()
+	{
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
+		$this->assertEquals('select * from `foo` where `bar` = ? for update', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
+		$this->assertEquals('select * from `foo` where `bar` = ? lock in share mode', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+	}
+
+
+	public function testPostgresLock()
+	{
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
+		$this->assertEquals('select * from "foo" where "bar" = ? for update', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
+		$this->assertEquals('select * from "foo" where "bar" = ? for share', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+	}
+
+
+	public function testSqlServerLock()
+	{
+		$builder = $this->getSqlServerBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
+		$this->assertEquals('select * from [foo] with(rowlock,updlock,holdlock) where [bar] = ?', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+
+		$builder = $this->getSqlServerBuilder();
+		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
+		$this->assertEquals('select * from [foo] with(rowlock,holdlock) where [bar] = ?', $builder->toSql());
+		$this->assertEquals(array('baz'), $builder->getBindings());
+	}
+
 
 	protected function getBuilder()
 	{

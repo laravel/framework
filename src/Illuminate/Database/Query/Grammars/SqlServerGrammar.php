@@ -68,6 +68,29 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Compile the "from" portion of the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  string  $table
+	 * @return string
+	 */
+	protected function compileFrom(Builder $query, $table)
+	{
+		$from = parent::compileFrom($query, $table);
+
+		if (is_string($query->lock)) return $from.' '.$query->lock;
+
+		if ( ! is_null($query->lock))
+		{
+			return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
+		}
+		else
+		{
+			return $from;
+		}
+	}
+
+	/**
 	 * Create a full ANSI offset clause for the query.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query

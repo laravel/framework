@@ -64,7 +64,9 @@
 		{"message": "Cache:add now returns true when the value is actually added. False is returned otherwise.", "backport": null},
 		{"message": "Added merge, diff, and intersect to the Collection class.", "backport": null},
 		{"message": "Added fragment method to paginator.", "backport": null},
-		{"message": "Added 'renderSections' method to the View.", "backport": null}
+		{"message": "Added 'renderSections' method to the View.", "backport": null},
+		{"message": "Added 'renderSections' method to the View.", "backport": null},
+		{"message": "Added pessimistic locking to query builder via 'lock', 'lockForUpdate', and 'sharedLock'.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

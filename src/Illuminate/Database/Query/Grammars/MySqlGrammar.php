@@ -27,6 +27,7 @@ class MySqlGrammar extends Grammar {
 		'orders',
 		'limit',
 		'offset',
+		'lock',
 	);
 
 	/**
@@ -58,6 +59,20 @@ class MySqlGrammar extends Grammar {
 		$joiner = $union['all'] ? ' union all ' : ' union ';
 
 		return $joiner.'('.$union['query']->toSql().')';
+	}
+
+	/**
+	 * Compile the lock into SQL.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  bool|string  $value
+	 * @return string
+	 */
+	protected function compileLock(Builder $query, $value)
+	{
+		if (is_string($value)) return $value;
+
+		return $value ? 'for update' : 'lock in share mode';
 	}
 
 	/**
