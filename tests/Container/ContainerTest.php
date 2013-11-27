@@ -38,6 +38,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testParametersCanOverrideDependencies()
+	{
+		$container = new Container;
+		$stub = new ContainerDependentStub($mock = $this->getMock('IContainerContractStub'));
+		$resolved = $container->make('ContainerNestedDependentStub', array($stub));
+		$this->assertTrue($resolved instanceof ContainerNestedDependentStub);
+		$this->assertEquals($mock, $resolved->inner->impl);
+	}
+
+
 	public function testSharedConcreteResolution()
 	{
 		$container = new Container;
