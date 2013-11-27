@@ -495,14 +495,16 @@ class Container implements ArrayAccess {
 			return new $concrete;
 		}
 
-		$parameters = $constructor->getParameters();
+		$classes = $constructor->getParameters();
 
 		// Once we have all the constructor's parameters we can create each of the
 		// dependency instances and then use the reflection instances to make a
 		// new instance of this class, injecting the created dependencies in.
-		$dependencies = $this->getDependencies($parameters);
+		$deps = array_merge($parameters, $this->getDependencies(
+			array_diff_key($classes, $parameters)
+		));
 
-		return $reflector->newInstanceArgs($dependencies);
+		return $reflector->newInstanceArgs($deps);
 	}
 
 	/**
