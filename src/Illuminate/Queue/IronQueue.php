@@ -63,9 +63,37 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
+		return $this->pushRaw($this->createPayload($job, $data, $queue), $queue);
+	}
 
-		return $this->iron->postMessage($this->getQueue($queue), $payload)->id;
+	/**
+	 * Push a raw payload onto the queue.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  array   $options
+	 * @return mixed
+	 */
+	public function pushRaw($payload, $queue = null, array $options = array())
+	{
+		$payload = $this->crypt->encrypt($payload);
+
+		return $this->iron->postMessage($this->getQueue($queue), $payload, $options)->id;
+	}
+
+	/**
+	 * Push a raw payload onto the queue after encrypting the payload.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  int  $delay
+	 * @return mixed
+	 */
+	public function recreate($payload, $queue = null, $delay)
+	{
+		$options = array('delay' => $this->getSeconds($delay));
+
+		return $this->pushRaw($payload, $queue, $options);
 	}
 
 	/**
@@ -81,9 +109,9 @@ class IronQueue extends Queue implements QueueInterface {
 	{
 		$delay = $this->getSeconds($delay);
 
-		$payload = $this->createPayload($job, $data);
+		$payload = $this->createPayload($job, $data, $queue);
 
-		return $this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'))->id;
+		return $this->pushRaw($payload, $this->getQueue($queue), compact('delay'));
 	}
 
 	/**
@@ -105,8 +133,20 @@ class IronQueue extends Queue implements QueueInterface {
 		{
 			$job->body = $this->crypt->decrypt($job->body);
 
-			return new IronJob($this->container, $this->iron, $job);
+			return new IronJob($this->container, $this, $job);
 		}
+	}
+
+	/**
+	 * Delete a message from the Iron queue.
+	 *
+	 * @param  string  $queue
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function deleteMessage($queue, $id)
+	{
+		$this->iron->deleteMessage($queue, $id);
 	}
 
 	/**
@@ -145,7 +185,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	protected function createPushedIronJob($job)
 	{
-		return new IronJob($this->container, $this->iron, $job, true);
+		return new IronJob($this->container, $this, $job, true);
 	}
 
 	/**
@@ -160,9 +200,7 @@ class IronQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
 
-		$payload = $this->setMeta($payload, 'queue', $this->getQueue($queue));
-
-		return $this->crypt->encrypt($payload);
+		return $this->setMeta($payload, 'queue', $this->getQueue($queue));
 	}
 
 	/**

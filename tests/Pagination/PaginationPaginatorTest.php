@@ -132,4 +132,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar', 'baz'), $p->getIterator()->getArrayCopy());
 	}
 
+
+	public function testGetUrlAddsFragment()
+	{
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
+		$env->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
+		$env->shouldReceive('getPageName')->twice()->andReturn('page');
+
+		$p->fragment("a-fragment");
+
+		$this->assertEquals('http://foo.com?page=1#a-fragment', $p->getUrl(1));
+		$p->addQuery('foo', 'bar');
+		$this->assertEquals('http://foo.com?page=1&foo=bar#a-fragment', $p->getUrl(1));
+	}
+
 }

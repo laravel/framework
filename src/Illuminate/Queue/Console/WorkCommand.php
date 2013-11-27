@@ -61,7 +61,7 @@ class WorkCommand extends Command {
 
 		$connection = $this->argument('connection');
 
-		$this->worker->pop($connection, $queue, $delay, $memory, $this->option('sleep'));
+		$this->worker->pop($connection, $queue, $delay, $memory, $this->option('sleep'), $this->option('tries'));
 	}
 
 	/**
@@ -100,11 +100,13 @@ class WorkCommand extends Command {
 
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
 
-			array('force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode.'),
+			array('force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'),
 
 			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
 
 			array('sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3),
+
+			array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
 		);
 	}
 

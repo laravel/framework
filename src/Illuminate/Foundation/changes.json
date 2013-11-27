@@ -19,7 +19,7 @@
 		{"message": "Support passing an array of files or dynamic arguments into File::delete.", "backport": null},
 		{"message": "Support calling local controller methods as filters using @method syntax.", "backport": null},
 		{"message": "Support passing Carbon instances into Cache put style methods.", "backport": null},
-		{"message": "New SessionInterface implementation - moved away from Symfony's implmentation.", "backport": null},
+		{"message": "New SessionInterface implementation - moved away from Symfony's implementation.", "backport": null},
 		{"message": "Native session driver has been replaced by 'file'. Specifying 'native' driver will just use the new file driver.", "backport": null},
 		{"message": "Now using Stack\\Builder in Application::run.", "backport": null},
 		{"message": "Cookies should now be accessed via Input::cookie - Cookie::get will continue to work for this release.", "backport": null},
@@ -56,7 +56,14 @@
 		{"message": "Added new `auth:reminders-controller' command to generate an entire password reminder controller.", "backport": null},
 		{"message": "New 'Password::validator' function that allows custom validation on passwords when resetting.", "backport": null},
 		{"message": "Added support for checking job attempts to Iron.io queue jobs.", "backport": null},
-		{"message": "Added support for releasing pushed Iron.io jobs back onto the queue.", "backport": null}
+		{"message": "Added support for releasing pushed Iron.io jobs back onto the queue.", "backport": null},
+		{"message": "Allow strict mode option to be enabled for MySQL connections.", "backport": null},
+		{"message": "Added 'wherePivot' and 'orWherePivot' methods to BelongsToMany relationship for convenience.", "backport": null},
+		{"message": "Added automatic separation of read / write connections into database layer.", "backport": null},
+		{"message": "Added automatic failed job handling for all queue drivers. New --tries switch for queue:listen and queue:work.", "backport": null},
+		{"message": "Cache:add now returns true when the value is actually added. False is returned otherwise.", "backport": null},
+		{"message": "Added merge, diff, and intersect to the Collection class.", "backport": null},
+		{"message": "Added fragment method to paginator.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

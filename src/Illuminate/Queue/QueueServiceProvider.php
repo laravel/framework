@@ -9,6 +9,7 @@ use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
+use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 
 class QueueServiceProvider extends ServiceProvider {
 
@@ -33,6 +34,8 @@ class QueueServiceProvider extends ServiceProvider {
 		$this->registerListener();
 
 		$this->registerSubscriber();
+
+		$this->registerFailedJobServices();
 	}
 
 	/**
@@ -68,7 +71,7 @@ class QueueServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('queue.worker', function($app)
 		{
-			return new Worker($app['queue']);
+			return new Worker($app['queue'], $app['queue.failer'], $app['events']);
 		});
 	}
 
@@ -239,13 +242,31 @@ class QueueServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the failed job services.
+	 *
+	 * @return void
+	 */
+	protected function registerFailedJobServices()
+	{
+		$this->app->bindShared('queue.failer', function($app)
+		{
+			$config = $app['config']['queue.failed'];
+
+			return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
+		});
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
 	 */
 	public function provides()
 	{
-		return array('queue', 'queue.worker', 'queue.listener', 'command.queue.work', 'command.queue.listen', 'command.queue.subscribe');
+		return array(
+			'queue', 'queue.worker', 'queue.listener', 'queue.failer',
+			'command.queue.work', 'command.queue.listen', 'command.queue.subscribe'
+		);
 	}
 
 }

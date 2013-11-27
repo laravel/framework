@@ -1118,7 +1118,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getMessage($attribute, $rule)
 	{
-		$lowerRule = strtolower(snake_case($rule));
+		$lowerRule = snake_case($rule);
 
 		$inlineMessage = $this->getInlineMessage($attribute, $lowerRule);
 
@@ -1197,7 +1197,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getSizeMessage($attribute, $rule)
 	{
-		$lowerRule = strtolower(snake_case($rule));
+		$lowerRule = snake_case($rule);
 
 		// There are three different types of size validations. The attribute may be
 		// either a number, file, or string so we will check a few things to know

@@ -26,13 +26,16 @@ class BeanstalkdJob extends Job {
 	 * @param  \Illuminate\Container  $container
 	 * @param  Pheanstalk  $pheanstalk
 	 * @param  Pheanstalk_Job  $job
+	 * @param  string  $queue
 	 * @return void
 	 */
 	public function __construct(Container $container,
                                 Pheanstalk $pheanstalk,
-                                Pheanstalk_Job $job)
+                                Pheanstalk_Job $job,
+                                $queue)
 	{
 		$this->job = $job;
+		$this->queue = $queue;
 		$this->container = $container;
 		$this->pheanstalk = $pheanstalk;
 	}
@@ -44,7 +47,17 @@ class BeanstalkdJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job->getData(), true));
+		$this->resolveAndFire(json_decode($this->getRawBody(), true));
+	}
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	public function getRawBody()
+	{
+		return $this->job->getData();
 	}
 
 	/**

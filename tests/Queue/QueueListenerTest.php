@@ -29,7 +29,7 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase {
 		$listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(true);
 		$listener->shouldReceive('stop')->once();
 
-		$listener->runProcess($process, 1);	
+		$listener->runProcess($process, 1);
 	}
 
 
@@ -41,7 +41,7 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Symfony\Component\Process\Process', $process);
 		$this->assertEquals(__DIR__, $process->getWorkingDirectory());
 		$this->assertEquals(3, $process->getTimeout());
-		$this->assertEquals('php artisan queue:work connection --queue="queue" --delay=1 --memory=2 --sleep=3', $process->getCommandLine());
+		$this->assertEquals('php artisan queue:work connection --queue="queue" --delay=1 --memory=2 --sleep=3 --tries=0', $process->getCommandLine());
 	}
 
 }

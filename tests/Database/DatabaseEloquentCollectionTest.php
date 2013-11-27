@@ -33,6 +33,22 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testContainsIndicatesIfModelInArray()
+	{
+		$mockModel = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel->shouldReceive('getKey')->andReturn(1);
+		$mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel2->shouldReceive('getKey')->andReturn(2);
+		$mockModel3 = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel3->shouldReceive('getKey')->andReturn(3);
+		$c = new Collection(array($mockModel, $mockModel2));
+
+		$this->assertTrue($c->contains($mockModel));
+		$this->assertTrue($c->contains($mockModel2));
+		$this->assertFalse($c->contains($mockModel3));
+	}
+
+
 	public function testContainsIndicatesIfKeyedModelInArray()
 	{
 		$mockModel = m::mock('Illuminate\Database\Eloquent\Model');
