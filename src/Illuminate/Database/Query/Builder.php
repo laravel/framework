@@ -928,7 +928,7 @@ class Builder {
 	{
 		$type = 'raw';
 
-		$this->orders[] = compact('type', 'sql');
+		$this->orders[] = compact('type', 'sql', 'bindings');
 
 		$this->bindings = array_merge($this->bindings, $bindings);
 
@@ -1449,6 +1449,40 @@ class Builder {
 	{
 		list($orders, $this->orders) = array($this->orders, null);
 
+		foreach ($orders as $order)
+		{
+			// If the order type is raw we need to check if it
+			// contains bindings and back up the bindings as well.
+			if (isset($order['type']) && $order['type'] === 'raw' && isset($order['bindings']) && $order['bindings'])
+			{
+				$bindings = $this->getBindings();
+
+				$keys = array();
+
+				foreach ($order['bindings'] as $value)
+				{
+					if ($key = array_keys($bindings, $value))
+					{
+						if (count($key) > 1)
+						{
+							// If more than one matched binding is found we remove the last one
+							// because the other bindigs are before the order bindigs
+							$key = max($key);
+						}
+
+						$keys[] = $key;
+					}
+				}
+
+				if ($keys)
+				{
+					$newBindings = array_except($bindings, $keys);
+
+					$this->setBindings($newBindings);
+				}
+			}
+		}
+
 		$columns = $this->columns;
 
 		// Because some database engines may throw errors if we leave the ordering
@@ -1457,6 +1491,11 @@ class Builder {
 		$total = $this->count();
 
 		$this->orders = $orders;
+
+		if (isset($bindings))
+		{
+			$this->setBindings($bindings);
+		}
 
 		// Once the query is run we need to put the old select columns back on the
 		// instance so that the select query will run properly. Otherwise, they
