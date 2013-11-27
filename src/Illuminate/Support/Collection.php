@@ -367,6 +367,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Return only unique items from the collection array.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function unique()
+	{
+		return new static(array_unique($this->items));
+	}
+
+	/**
 	 * Slice the underlying collection array.
 	 *
 	 * @param  int   $offset
