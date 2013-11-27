@@ -29,6 +29,7 @@ class Grammar extends BaseGrammar {
 		'limit',
 		'offset',
 		'unions',
+		'lock',
 	);
 
 	/**
@@ -639,6 +640,18 @@ class Grammar extends BaseGrammar {
 	public function compileTruncate(Builder $query)
 	{
 		return array('truncate '.$this->wrapTable($query->from) => array());
+	}
+
+	/**
+	 * Compile the lock into SQL.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  bool|string  $value
+	 * @return string
+	 */
+	protected function compileLock(Builder $query, $value)
+	{
+		return is_string($value) ? $value : '';
 	}
 
 	/**
