@@ -26,6 +26,38 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $result);
 	}
 
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function testFindOrFailMethodThrowsModelNotFoundException()
+	{
+		$query = m::mock('Illuminate\Database\Query\Builder');
+		$query->shouldReceive('where')->once()->with('foo', '=', 'bar');
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($query));
+ 		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('getKeyName')->once()->andReturn('foo');
+		$model->shouldReceive('getTable')->once()->andReturn('table');
+		$query->shouldReceive('from')->once()->with('table');
+		$builder->setModel($model);
+		$builder->expects($this->once())->method('first')->with($this->equalTo(array('column')))->will($this->returnValue(null));
+		$result = $builder->findOrFail('bar', array('column'));
+	}
+
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function testFirstOrFailMethodThrowsModelNotFoundException()
+	{
+		$query = m::mock('Illuminate\Database\Query\Builder');
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($query));
+ 		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('getTable')->once()->andReturn('table');
+		$query->shouldReceive('from')->once()->with('table');
+		$builder->setModel($model);
+		$builder->expects($this->once())->method('first')->with($this->equalTo(array('column')))->will($this->returnValue(null));
+		$result = $builder->firstOrFail(array('column'));
+	}
+
 	public function testFindWithMany()
 	{
 		$query = m::mock('Illuminate\Database\Query\Builder');
