@@ -144,6 +144,20 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCollectionReturnsUniqueItems()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getKey')->andReturn(1);
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getKey')->andReturn(2);
+
+		$c = new Collection(array($one, $two, $two));
+
+		$this->assertEquals(new Collection(array($one, $two)), $c->unique());
+	}
+
+
 	public function testLists()
 	{
 		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), (object) array('name' => 'dayle', 'email' => 'bar')));

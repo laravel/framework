@@ -174,4 +174,24 @@ class Collection extends BaseCollection {
 		return $intersect;
 	}
 
+	/**
+	 * Return only unique items from the collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function unique()
+	{
+		$unique = new static;
+
+		foreach ($this->items as $item)
+		{
+			if ( ! $unique->contains($item->getKey()))
+			{
+				$unique->add($item);
+			}
+		}
+
+		return $unique;
+	}
+
 }
