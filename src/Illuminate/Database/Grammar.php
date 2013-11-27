@@ -43,6 +43,9 @@ abstract class Grammar {
 	{
 		if ($this->isExpression($value)) return $this->getValue($value);
 
+		// Don't attempt to wrap an empty value;
+		if (empty($value)) return;
+		
 		// If the value being wrapped has a column alias we will need to separate out
 		// the pieces so we can wrap each of the segments of the expression on it
 		// own, and then joins them both back together with the "as" connector.
