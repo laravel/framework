@@ -44,7 +44,8 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 		return new Illuminate\Queue\Jobs\BeanstalkdJob(
 			m::mock('Illuminate\Container\Container'),
 			m::mock('Pheanstalk_Pheanstalk'),
-			m::mock('Pheanstalk_Job')
+			m::mock('Pheanstalk_Job'),
+			'default'
 		);
 	}
 

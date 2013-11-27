@@ -13,6 +13,11 @@ class Collection extends BaseCollection {
 	 */
 	public function find($key, $default = null)
 	{
+		if ($key instanceof Model)
+		{
+			$key = $key->getKey();
+		}
+
 		return array_first($this->items, function($itemKey, $model) use ($key)
 		{
 			return $model->getKey() == $key;
@@ -114,37 +119,38 @@ class Collection extends BaseCollection {
 	}
 
 	/**
-	 * Merge collection with another collection.
+	 * Merge the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection  $collection
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function merge($collection)
 	{
+		$dictionary = $this->getDictionary($this);
+
 		foreach ($collection as $item)
 		{
-			if ( ! $this->contains($item->getKey()))
-			{
-				$this->add($item);
-			}
+			$dictionary[$item->getKey()] = $item;
 		}
 
-		return $this;
+		return new static(array_values($dictionary));
 	}
 
 	/**
-	 * Diff collection with another collection.
+	 * Diff the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection  $collection
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function diff($collection)
 	{
 		$diff = new static;
 
+		$dictionary = $this->getDictionary($collection);
+
 		foreach ($this->items as $item)
 		{
-			if ( ! $collection->contains($item->getKey()))
+			if ( ! isset($dictionary[$item->getKey()]))
 			{
 				$diff->add($item);
 			}
@@ -154,18 +160,20 @@ class Collection extends BaseCollection {
 	}
 
 	/**
-	 * Intersect collection with another collection.
+	 * Intersect the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection  $collection
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function intersect($collection)
 	{
 		$intersect = new static;
 
+		$dictionary = $this->getDictionary($collection);
+
 		foreach ($this->items as $item)
 		{
-			if ($collection->contains($item->getKey()))
+			if (isset($dictionary[$item->getKey()]))
 			{
 				$intersect->add($item);
 			}
@@ -181,17 +189,27 @@ class Collection extends BaseCollection {
 	 */
 	public function unique()
 	{
-		$unique = new static;
+		$dictionary = $this->getDictionary($this);
 
-		foreach ($this->items as $item)
+		return new static(array_values($dictionary));
+	}
+
+	/*
+	 * Get a dictionary keyed by primary keys.
+	 *
+	 * @param  \Illuminate\Support\Collection  $collection
+	 * @return array
+	 */
+	protected function getDictionary($collection)
+	{
+		$dictionary = array();
+
+		foreach ($collection as $value)
 		{
-			if ( ! $unique->contains($item->getKey()))
-			{
-				$unique->add($item);
-			}
+			$dictionary[$value->getKey()] = $value;
 		}
 
-		return $unique;
+		return $dictionary;
 	}
 
 }

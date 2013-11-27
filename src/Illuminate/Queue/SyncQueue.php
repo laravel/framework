@@ -18,6 +18,19 @@ class SyncQueue extends Queue implements QueueInterface {
 	}
 
 	/**
+	 * Push a raw payload onto the queue.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  array   $options
+	 * @return mixed
+	 */
+	public function pushRaw($payload, $queue = null, array $options = array())
+	{
+		//
+	}
+
+	/**
 	 * Push a new job onto the queue after a delay.
 	 *
 	 * @param  \DateTime|int  $delay

@@ -77,11 +77,16 @@ class Repository implements ArrayAccess {
 	 * @param  string              $key
 	 * @param  mixed               $value
 	 * @param  Carbon|Datetime|int $minutes
-	 * @return void
+	 * @return bool
 	 */
 	public function add($key, $value, $minutes)
 	{
-		if (is_null($this->get($key))) $this->put($key, $value, $minutes);
+		if (is_null($this->get($key)))
+		{
+			$this->put($key, $value, $minutes); return true;
+		}
+
+		return false;
 	}
 
 	/**

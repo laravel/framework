@@ -17,6 +17,13 @@ abstract class Job {
 	protected $container;
 
 	/**
+	 * The name of the queue the job belongs to.
+	 *
+	 * @var string
+	 */
+	protected $queue;
+
+	/**
 	 * Indicates if the job has been deleted.
 	 *
 	 * @var bool
@@ -64,6 +71,13 @@ abstract class Job {
 	 * @return int
 	 */
 	abstract public function attempts();
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	abstract public function getRawBody();
 
 	/**
 	 * Resolve and fire the job handler method.
@@ -130,6 +144,16 @@ abstract class Job {
 		{
 			return intval($delay);
 		}
+	}
+
+	/**
+	 * Get the name of the queue the job belongs to.
+	 *
+	 * @return string
+	 */
+	public function getQueue()
+	{
+		return $this->queue;
 	}
 
 }
