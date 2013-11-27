@@ -589,7 +589,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
 			call_user_func_array(array($stack, 'push'), $parameters);
 		}
-<<<<<<< HEAD
 	}
 
 	/**
@@ -628,10 +627,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			return $m['class'] != $class;
 		});
-=======
-
-		return $this['router']->dispatch($this->prepareRequest($request));
->>>>>>> 4.0
 	}
 
 	/**
