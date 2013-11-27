@@ -74,6 +74,7 @@ class Pluralizer {
 	public static $irregular = array(
 		'child' => 'children',
 		'foot' => 'feet',
+		'freshman' => 'freshmen',
 		'goose' => 'geese',
 		'human' => 'humans',
 		'man' => 'men',
