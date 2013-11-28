@@ -108,7 +108,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 *
 	 * @var array
 	 */
-	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'delete', 'destroy');
 
 	/**
 	 * Create a new Router instance.
@@ -577,6 +577,22 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		$uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
 
 		return $this->get($uri, $this->getResourceAction($name, $controller, 'edit', $options));
+	}
+
+	/**
+	 * Add the delete method for a resourceful route.
+	 *
+	 * @param  string  $name
+	 * @param  string  $base
+	 * @param  string  $controller
+	 * @param  array   $options
+	 * @return void
+	 */
+	protected function addResourceDelete($name, $base, $controller, $options)
+	{
+		$uri = $this->getResourceUri($name).'/{'.$base.'}/delete';
+
+		return $this->get($uri, $this->getResourceAction($name, $controller, 'delete', $options));
 	}
 
 	/**
