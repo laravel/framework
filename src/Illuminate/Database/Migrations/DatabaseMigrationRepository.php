@@ -119,7 +119,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 			// The migrations table is responsible for keeping track of which of the
 			// migrations have actually run for the application. We'll create the
 			// table to hold the migration file's path as well as the batch ID.
-			$table->string('migration')->unique();
+			$table->string('migration');
 
 			$table->integer('batch');
 		});
