@@ -17,7 +17,7 @@ class ModelNotFoundException extends \RuntimeException {
 	public function setModel($model)
 	{
 		$this->model = $model;
-		$this->message = "{$model} not found";
+		$this->message = "{$model} model not found";
 
 		return $this;
 	}
