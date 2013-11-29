@@ -103,7 +103,7 @@ class OptimizeCommand extends Command {
 	 */
 	protected function registerClassPreloaderCommand()
 	{
-		$this->laravel['artisan']->add(new PreCompileCommand);
+		$this->getApplication()->add(new PreCompileCommand);
 	}
 
 	/**
