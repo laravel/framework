@@ -22,6 +22,17 @@ class Application extends \Symfony\Component\Console\Application {
 	protected $laravel;
 
 	/**
+	 * Create and boot a new Console application.
+	 *
+	 * @param  \Illuminate\Foundation\Application  $app
+	 * @return \Illuminate\Console\Application
+	 */
+	public static function start($app)
+	{
+		return static::make($app)->boot();
+	}
+
+	/**
 	 * Create a new Console application.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
@@ -40,7 +51,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Boot the Console application.
 	 *
-	 * @return void
+	 * @return \Illuminate\Console\Application
 	 */
 	public function boot()
 	{
