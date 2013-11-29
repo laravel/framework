@@ -22,31 +22,40 @@ class Application extends \Symfony\Component\Console\Application {
 	protected $laravel;
 
 	/**
-	 * Start a new Console application.
+	 * Create a new Console application.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return \Illuminate\Console\Application
 	 */
-	public static function start($app)
+	public static function make($app)
 	{
-		// Here, we will go ahead and "boot" the application for usage. This simply
-		// calls the boot method on all of the service providers so they get all
-		// their work done and are ready to handle interacting with dev input.
 		$app->boot();
 
-		$artisan = require __DIR__.'/start.php';
+		return with($console = new static('Laravel Framework', $app::VERSION))
+									->setLaravel($app)
+									->setExceptionHandler($app['exception'])
+									->setAutoExit(false);
+	}
 
-		$artisan->setAutoExit(false);
+	/**
+	 * Boot the Console application.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		require $this->laravel['path'].'/start/artisan.php';
 
 		// If the event dispatcher is set on the application, we will fire an event
 		// with the Artisan instance to provide each listener the opportunity to
 		// register their commands on this application before it gets started.
-		if (isset($app['events']))
+		if (isset($this->laravel['events']))
 		{
-			$app['events']->fire('artisan.start', array($artisan));
+			$this->laravel['events']
+					->fire('artisan.start', array($this));
 		}
 
-		return $artisan;
+		return $this;
 	}
 
 	/**
@@ -175,22 +184,39 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Set the exception handler instance.
 	 *
 	 * @param  \Illuminate\Exception\Handler  $handler
-	 * @return void
+	 * @return \Illuminate\Console\Application
 	 */
 	public function setExceptionHandler($handler)
 	{
 		$this->exceptionHandler = $handler;
+
+		return $this;
 	}
 
 	/**
 	 * Set the Laravel application instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $laravel
-	 * @return void
+	 * @return \Illuminate\Console\Application
 	 */
 	public function setLaravel($laravel)
 	{
 		$this->laravel = $laravel;
+
+		return $this;
+	}
+
+	/**
+	 * Set whether the Console app should auto-exit when done.
+	 *
+	 * @param  bool  $boolean
+	 * @return \Illuminate\Console\Application
+	 */
+	public function setAutoExit($boolean)
+	{
+		parent::setAutoExit($boolean);
+
+		return $this;
 	}
 
 }

@@ -41,7 +41,9 @@ class Artisan {
 
 		$this->app->loadDeferredProviders();
 
-		return $this->artisan = ConsoleApplication::start($this->app);
+		$this->artisan = ConsoleApplication::make($this->app);
+
+		return $this->artisan->boot();
 	}
 
 	/**
