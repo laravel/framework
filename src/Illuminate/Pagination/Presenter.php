@@ -192,8 +192,13 @@ abstract class Presenter {
 	 * @param  string  $text
 	 * @return string
 	 */
-	public function getPrevious($text = '&laquo;')
+	public function getPrevious($text = null)
 	{
+		if (!$text)
+		{
+			$text = $this->paginator->getEnvironment()->getTranslator()->trans('pagination.arrow_prev') ?: '&laquo;';
+		}
+
 		// If the current page is less than or equal to one, it means we can't go any
 		// further back in the pages, so we will render a disabled previous button
 		// when that is the case. Otherwise, we will give it an active "status".
@@ -215,8 +220,13 @@ abstract class Presenter {
 	 * @param  string  $text
 	 * @return string
 	 */
-	public function getNext($text = '&raquo;')
+	public function getNext($text = null)
 	{
+		if (!$text)
+		{
+			$text = $this->paginator->getEnvironment()->getTranslator()->trans('pagination.arrow_next') ?: '&raquo;';
+		}
+
 		// If the current page is greater than or equal to the last page, it means we
 		// can't go any further into the pages, as we're already on this last page
 		// that is available, so we will make it the "next" link style disabled.
@@ -237,9 +247,13 @@ abstract class Presenter {
 	 *
 	 * @return string
 	 */
-	public function getDots()
+	public function getDots($text = null)
 	{
-		return $this->getDisabledTextWrapper("...");
+		if (!$text)
+		{
+			$text = $this->paginator->getEnvironment()->getTranslator()->trans('pagination.dots') ?: '&hellip;';
+		}
+		return $this->getDisabledTextWrapper($text);
 	}
 
 	/**
