@@ -42,10 +42,14 @@ class Application extends \Symfony\Component\Console\Application {
 	{
 		$app->boot();
 
-		return with($console = new static('Laravel Framework', $app::VERSION))
-									->setLaravel($app)
-									->setExceptionHandler($app['exception'])
-									->setAutoExit(false);
+		$console = with($console = new static('Laravel Framework', $app::VERSION))
+								->setLaravel($app)
+								->setExceptionHandler($app['exception'])
+								->setAutoExit(false);
+
+		$app->instance('artisan', $console);
+
+		return $console;
 	}
 
 	/**
