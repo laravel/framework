@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Html\FormBuilder
+ */
 class Form extends Facade {
 
 	/**
