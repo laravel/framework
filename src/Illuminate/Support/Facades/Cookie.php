@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Cookie\CookieJar
+ */
 class Cookie extends Facade {
 
 	/**
