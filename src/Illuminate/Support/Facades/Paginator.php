@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Pagination\Environment
+ */
 class Paginator extends Facade {
 
 	/**
