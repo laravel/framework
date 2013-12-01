@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Foundation\Application
+ */
 class App extends Facade {
 
 	/**
