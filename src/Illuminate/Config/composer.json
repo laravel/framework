@@ -16,7 +16,9 @@
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Config": ""}
+        "psr-0": {
+            "Illuminate\\Config": ""
+        }
     },
     "target-dir": "Illuminate/Config",
     "extra": {

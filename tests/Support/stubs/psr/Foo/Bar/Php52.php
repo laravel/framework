@@ -1,5 +1,6 @@
 <?php
 
-class Foo_Bar_Php52 {
+class Foo_Bar_Php52
+{
 
 }

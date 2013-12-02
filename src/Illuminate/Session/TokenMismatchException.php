@@ -1,3 +1,5 @@
 <?php namespace Illuminate\Session;
 
-class TokenMismatchException extends \Exception {}
+class TokenMismatchException extends \Exception
+{
+}

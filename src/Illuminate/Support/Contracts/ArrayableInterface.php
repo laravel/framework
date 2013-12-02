@@ -1,12 +1,13 @@
 <?php namespace Illuminate\Support\Contracts;
 
-interface ArrayableInterface {
+interface ArrayableInterface
+{
 
-	/**
-	 * Get the instance as an array.
-	 *
-	 * @return array
-	 */
-	public function toArray();
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray();
 
 }

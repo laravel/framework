@@ -2,13 +2,14 @@
 
 use Exception;
 
-interface ExceptionDisplayerInterface {
+interface ExceptionDisplayerInterface
+{
 
-	/**
-	 * Display the given exception to the user.
-	 *
-	 * @param  \Exception  $exception
-	 */
-	public function display(Exception $exception);
+    /**
+     * Display the given exception to the user.
+     *
+     * @param  \Exception $exception
+     */
+    public function display(Exception $exception);
 
 }
