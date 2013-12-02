@@ -121,7 +121,7 @@ class Response {
 	{
 		if (isset(static::$macros[$method]))
 		{
-			return call_user_func_array(static::$macros[$method], func_get_args());
+			return call_user_func_array(static::$macros[$method], $parameters);
 		}
 
 		throw new \BadMethodCallException("Call to undefined method $method");
