@@ -24,7 +24,9 @@
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Auth": ""}
+        "psr-0": {
+            "Illuminate\\Auth": ""
+        }
     },
     "target-dir": "Illuminate/Auth",
     "extra": {

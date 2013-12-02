@@ -20,7 +20,9 @@
         "illuminate/redis": "4.1.*"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Cache": ""}
+        "psr-0": {
+            "Illuminate\\Cache": ""
+        }
     },
     "target-dir": "Illuminate/Cache",
     "extra": {
