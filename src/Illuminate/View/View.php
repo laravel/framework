@@ -93,7 +93,7 @@ class View implements ArrayAccess, Renderable {
 
 		if ($env->doneRendering()) $env->flushSections();
 
-		return $response !== null ? $response : $contents;
+		return $response ?: $contents;
 	}
 
 	/**
