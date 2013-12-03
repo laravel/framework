@@ -194,7 +194,7 @@ abstract class HasOneOrMany extends Relation {
 		);
 
 		// First fill the attributes with input data
-		// Then override them with foreign keys and other data that is not in fillable array
+		// Then override them with foreign keys and data already filtered by fillable
 		$instance = $this->related->newInstance();
 
 		$instance->fill($attributes);
