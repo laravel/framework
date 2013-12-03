@@ -582,7 +582,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		}
 		elseif ($items instanceof ArrayableInterface)
 		{
-			$tiems = $items->toArray();
+			$items = $items->toArray();
 		}
 
 		return $items;
