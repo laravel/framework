@@ -73,27 +73,40 @@ class View implements ArrayAccess, Renderable {
 	 */
 	public function render(Closure $callback = null)
 	{
-		$env = $this->environment;
+		$contents = $this->renderContents();
 
+		$response = isset($callback) ? $callback($this, $contents) : null;
+
+		// Once we have the contents of the view, we will flush the sections if we are
+		// done rendering all views so that there is nothing left hanging over when
+		// anothoer view is rendered in the future by the application developers.
+		$this->environment->flushSectionsIfDoneRendering();
+
+		return $response ?: $contents;
+	}
+
+	/**
+	 * Get the contents of the view instance.
+	 *
+	 * @return string
+	 */
+	protected function renderContents()
+	{
 		// We will keep track of the amount of views being rendered so we can flush
 		// the section after the complete rendering operation is done. This will
 		// clear out the sections for any separate views that may be rendered.
-		$env->incrementRender();
+		$this->environment->incrementRender();
 
-		$env->callComposer($this);
+		$this->environment->callComposer($this);
 
 		$contents = $this->getContents();
 
 		// Once we've finished rendering the view, we'll decrement the render count
 		// so that each sections get flushed out next time a view is created and
 		// no old sections are staying around in the memory of an environment.
-		$env->decrementRender();
+		$this->environment->decrementRender();
 
-		$response = isset($callback) ? $callback($this, $contents) : null;
-
-		if ($env->doneRendering()) $env->flushSections();
-
-		return $response ?: $contents;
+		return $contents;
 	}
 
 	/**
