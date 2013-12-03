@@ -34,8 +34,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getEnvironment()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
 		$view->getEngine()->shouldReceive('get')->once()->with('path', array('foo' => 'bar', 'shared' => 'foo'))->andReturn('contents');
 		$view->getEnvironment()->shouldReceive('decrementRender')->once()->ordered();
-		$view->getEnvironment()->shouldReceive('doneRendering')->once()->ordered()->andReturn(true);
-		$view->getEnvironment()->shouldReceive('flushSections')->once()->ordered();
+		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
 		$me = $this;
 		$callback = function(View $rendered, $contents) use ($me, $view)
@@ -68,8 +67,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getEnvironment()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
 		$view->getEngine()->shouldReceive('get')->once()->with('path', array('foo' => 'bar', 'shared' => 'foo'))->andReturn('contents');
 		$view->getEnvironment()->shouldReceive('decrementRender')->once();
-		$view->getEnvironment()->shouldReceive('doneRendering')->once()->andReturn(false);
-		$view->getEnvironment()->shouldReceive('flushSections')->never();
+		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
 		$this->assertEquals('contents', $view->render());
 	}

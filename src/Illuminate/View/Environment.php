@@ -564,6 +564,16 @@ class Environment {
 	}
 
 	/**
+	 * Flush all of the section contents if done rendering.
+	 *
+	 * @return void
+	 */
+	public function flushSectionsIfDoneRendering()
+	{
+		if ($this->doneRendering()) $this->flushSections();
+	}
+
+	/**
 	 * Increment the rendering counter.
 	 *
 	 * @return void
