@@ -97,7 +97,7 @@ class View implements ArrayAccess, Renderable {
 	}
 
 	/**
-	 * Get the sectiosn of the view.
+	 * Get the sections of the rendered view.
 	 *
 	 * @return array
 	 */
