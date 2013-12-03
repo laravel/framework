@@ -1,6 +1,7 @@
 <?php namespace Illuminate\View;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Support\MessageBag;
 use Illuminate\View\Engines\EngineInterface;
 use Illuminate\Support\Contracts\MessageProviderInterface;
@@ -67,13 +68,12 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Get the string contents of the view.
 	 *
+	 * @param  \Closure  $callback
 	 * @return string
 	 */
-	public function render()
+	public function render(Closure $callback = null)
 	{
 		$env = $this->environment;
-
-		if ($env->doneRendering()) $env->flushSections();
 
 		// We will keep track of the amount of views being rendered so we can flush
 		// the section after the complete rendering operation is done. This will
@@ -89,19 +89,26 @@ class View implements ArrayAccess, Renderable {
 		// no old sections are staying around in the memory of an environment.
 		$env->decrementRender();
 
-		return $contents;
+		$response = isset($callback) ? $callback($this, $contents) : null;
+
+		if ($env->doneRendering()) $env->flushSections();
+
+		return $response !== null ? $response : $contents;
 	}
 
 	/**
-	 * Get the sections from the view.
+	 * Get the sections of the rendered view.
 	 *
 	 * @return array
 	 */
-	 public function renderSections()
-	 {
-		$this->render();
+	public function renderSections()
+	{
+		$env = $this->environment;
 
-		return $this->getEnvironment()->getSections();
+		return $this->render(function($view) use ($env)
+		{
+			return $env->getSections();
+		});
 	}
 
 	/**
