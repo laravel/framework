@@ -456,7 +456,7 @@ class Route {
 	{
 		$value = static::compileWhereParameters($value, $wheres);
 
-		return preg_replace('/\{(([\w\-]+)[^?])\}/', static::$wildcard, $value);
+		return preg_replace('/\{([\w\-]+)\}/', static::$wildcard, $value);
 	}
 
 	/**
