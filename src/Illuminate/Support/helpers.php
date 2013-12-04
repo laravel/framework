@@ -198,6 +198,22 @@ if ( ! function_exists('array_first'))
 	}
 }
 
+if ( ! function_exists('array_last'))
+{
+	/**
+	 * Return the last element in an array passing a given truth test.
+	 *
+	 * @param  array    $array
+	 * @param  Closure  $callback
+	 * @param  mixed    $default
+	 * @return mixed
+	 */
+	function array_last($array, $callback, $default = null)
+	{
+		return array_first(array_reverse($array), $callback, $default);
+	}
+}
+
 if ( ! function_exists('array_flatten'))
 {
 	/**
