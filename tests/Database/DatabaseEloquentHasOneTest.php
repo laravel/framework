@@ -27,12 +27,13 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	public function testCreateMethodProperlyCreatesNewModel()
 	{
 		$relation = $this->getRelation();
-		$created = $this->getMock('Illuminate\Database\Eloquent\Model', array('save', 'getKey', 'setRawAttributes'));
-		$created->expects($this->once())->method('save')->will($this->returnValue(true));
+		$created = new EloquentHasOneRelationStub;
 		$relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($created);
-		$created->expects($this->once())->method('setRawAttributes')->with($this->equalTo(array('name' => 'taylor', 'foreign_key' => 1)));
-
-		$this->assertEquals($created, $relation->create(array('name' => 'taylor')));
+		$related = $relation->create(array('name' => 'taylor', 'foo' => 'bar'));
+		$this->assertEquals('taylor', $related->name);
+		$this->assertNull($related->foo);
+		$this->assertEquals(1, $related->foreign_key);
+		$this->assertTrue($related->exists);
 	}
 
 
@@ -127,4 +128,13 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 
 class EloquentHasOneModelStub extends Illuminate\Database\Eloquent\Model {
 	public $foreign_key = 'foreign.value';
+}
+
+class EloquentHasOneRelationStub extends Illuminate\Database\Eloquent\Model {
+	protected $fillable = array('name');
+	public function save(array $options = array())
+	{
+		$this->exists = true;
+		return true;
+	}
 }
