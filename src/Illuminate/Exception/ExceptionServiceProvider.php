@@ -132,7 +132,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function shouldReturnJson()
 	{
-		return $this->app->runningInConsole() || $this->requestWantsJson();
+		return $this->app->runningInConsole() or $this->requestWantsJson();
 	}
 
 	/**
@@ -142,7 +142,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function requestWantsJson()
 	{
-		return $this->app['request']->ajax() || $this->app['request']->wantsJson();
+		return $this->app['request']->ajax() or $this->app['request']->wantsJson();
 	}
 
 	/**

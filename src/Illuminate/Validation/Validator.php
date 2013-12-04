@@ -262,7 +262,7 @@ class Validator implements MessageProviderInterface {
 
 		$method = "validate{$rule}";
 
-		if ($validatable && ! $this->$method($attribute, $value, $parameters, $this))
+		if ($validatable and ! $this->$method($attribute, $value, $parameters, $this))
 		{
 			$this->addFailure($attribute, $rule, $parameters);
 		}
@@ -296,7 +296,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function isValidatable($rule, $attribute, $value)
 	{
-		return $this->validateRequired($attribute, $value) || $this->isImplicit($rule);
+		return $this->validateRequired($attribute, $value) or $this->isImplicit($rule);
 	}
 
 	/**
@@ -355,7 +355,7 @@ class Validator implements MessageProviderInterface {
 		{
 			return false;
 		}
-		elseif (is_string($value) && trim($value) === '')
+		elseif (is_string($value) and trim($value) === '')
 		{
 			return false;
 		}
@@ -496,7 +496,7 @@ class Validator implements MessageProviderInterface {
 
 		foreach ($attributes as $key)
 		{
-			if (isset($this->data[$key]) || isset($this->files[$key]))
+			if (isset($this->data[$key]) or isset($this->files[$key]))
 			{
 				$count++;
 			}
@@ -529,7 +529,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = array_get($this->data, $parameters[0]);
 
-		return (isset($other) && $value == $other);
+		return (isset($other) and $value == $other);
 	}
 
 	/**
@@ -544,7 +544,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) && $value != $this->data[$other];
+		return isset($this->data[$other]) and $value != $this->data[$other];
 	}
 
 	/**
@@ -560,7 +560,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$acceptable = array('yes', 'on', 1);
 
-		return ($this->validateRequired($attribute, $value) && in_array($value, $acceptable));
+		return ($this->validateRequired($attribute, $value) and in_array($value, $acceptable));
 	}
 
 	/**
@@ -624,7 +624,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$length = strlen((string) $value);
 
-		return $length >= $parameters[0] && $length <= $parameters[1];
+		return $length >= $parameters[0] and $length <= $parameters[1];
 	}
 
 	/**
@@ -652,7 +652,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$size = $this->getSize($attribute, $value);
 
-		return $size >= $parameters[0] && $size <= $parameters[1];
+		return $size >= $parameters[0] and $size <= $parameters[1];
 	}
 
 	/**
@@ -678,7 +678,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateMax($attribute, $value, $parameters)
 	{
-		if ($value instanceof UploadedFile && ! $value->isValid()) return false;
+		if ($value instanceof UploadedFile and ! $value->isValid()) return false;
 
 		return $this->getSize($attribute, $value) <= $parameters[0];
 	}
@@ -698,7 +698,7 @@ class Validator implements MessageProviderInterface {
 		// return the proper size accordingly. If it is a number, then number itself
 		// is the size. If it is a file, we take kilobytes, and for a string the
 		// entire length of the string will be considered the attribute size.
-		if (is_numeric($value) && $hasNumeric)
+		if (is_numeric($value) and $hasNumeric)
 		{
 			return array_get($this->data, $attribute);
 		}
@@ -976,7 +976,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateMimes($attribute, $value, $parameters)
 	{
-		if ( ! $value instanceof File || $value->getPath() == '')
+		if ( ! $value instanceof File or $value->getPath() == '')
 		{
 			return true;
 		}
@@ -1066,7 +1066,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$parsed = date_parse_from_format($parameters[0], $value);
 
-		return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
+		return $parsed['error_count'] === 0 and $parsed['warning_count'] === 0;
 	}
 
 	/**

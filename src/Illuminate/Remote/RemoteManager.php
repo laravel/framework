@@ -38,7 +38,7 @@ class RemoteManager {
 	 */
 	public function into($name)
 	{
-		if (is_string($name) || is_array($name))
+		if (is_string($name) or is_array($name))
 		{
 			return $this->connection($name);
 		}
@@ -140,7 +140,7 @@ class RemoteManager {
 	 */
 	protected function getAuth(array $config)
 	{
-		if (isset($config['key']) && trim($config['key']) != '')
+		if (isset($config['key']) and trim($config['key']) != '')
 		{
 			return array('key' => $config['key'], 'keyphrase' => $config['keyphrase']);
 		}

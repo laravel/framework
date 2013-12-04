@@ -65,7 +65,7 @@ class MakeCommand extends BaseCommand {
 
 		$create = $this->input->getOption('create');
 		
-		if ( ! $table && is_string($create))
+		if ( ! $table and is_string($create))
 		{
 			$table = $create;
 		}

@@ -85,7 +85,7 @@ class Grammar extends BaseGrammar {
 		// If the query has a "distinct" constraint and we're not asking for all columns
 		// we need to prepend "distinct" onto the column name so that the query takes
 		// it into account when it performs the aggregating operations on the data.
-		if ($query->distinct && $column !== '*')
+		if ($query->distinct and $column !== '*')
 		{
 			$column = 'distinct '.$column;
 		}
