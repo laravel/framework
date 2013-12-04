@@ -8,7 +8,7 @@ class RedisJob extends Job {
 	/**
 	 * The Redis queue instance.
 	 *
-	 * @var \Illuminate\Queues\RedisQueue
+	 * @var \Illuminate\Queue\RedisQueue
 	 */
 	protected $redis;
 
@@ -22,7 +22,7 @@ class RedisJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @param  \Illuminate\Redis\Queue  $redis
 	 * @param  string  $job
 	 * @param  string  $queue
@@ -104,7 +104,7 @@ class RedisJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container
+	 * @return \Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{
