@@ -97,11 +97,20 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Get the first item from the collection.
 	 *
+	 * @param  \Closure   $callback
+	 * @param  mixed      $default
 	 * @return mixed|null
 	 */
-	public function first()
+	public function first(Closure $callback = null, $default = null)
 	{
-		return count($this->items) > 0 ? reset($this->items) : null;
+		if (is_null($callback))
+		{
+			return count($this->items) > 0 ? reset($this->items) : null;
+		}
+		else
+		{
+			return array_first($this->items, $callback, $default);
+		}
 	}
 
 	/**
