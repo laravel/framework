@@ -149,7 +149,8 @@ class RedisQueue extends Queue implements QueueInterface {
 	/**
 	 * Migrate the delayed jobs that are ready to the regular queue.
 	 *
-	 * @param  string  $queue
+	 * @param  string  $from
+	 * @param  string  $to
 	 * @return void
 	 */
 	public function migrateExpiredJobs($from, $to)

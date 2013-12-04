@@ -294,6 +294,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('rolyat', 'niloc', 'nwahs'), array_values($data->all()));
 	}
 
+
+	public function testFirstWithCallback()
+	{
+		$data = new Collection(array('foo', 'bar', 'baz'));
+		$result = $data->first(function($key, $value) { return $value === 'bar'; });
+		$this->assertEquals('bar', $result);
+	}
+
+
+	public function testFirstWithCallbackAndDefault()
+	{
+		$data = new Collection(array('foo', 'bar'));
+		$result = $data->first(function($key, $value) { return $value === 'baz'; }, 'default');
+		$this->assertEquals('default', $result);
+	}
+
 }
 
 class TestAccessorEloquentTestStub
