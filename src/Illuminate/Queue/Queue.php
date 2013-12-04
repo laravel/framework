@@ -10,14 +10,12 @@ abstract class Queue {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
 	/**
 	 * Marshal a push queue request and fire the job.
-	 *
-	 * @return Illuminate\Http\Response
 	 *
 	 * @throws \RuntimeException
 	 */
@@ -122,7 +120,7 @@ abstract class Queue {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

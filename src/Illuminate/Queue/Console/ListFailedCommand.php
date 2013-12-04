@@ -1,8 +1,6 @@
 <?php namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class ListFailedCommand extends Command {
 
