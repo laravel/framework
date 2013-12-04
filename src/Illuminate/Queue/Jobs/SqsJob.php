@@ -8,7 +8,7 @@ class SqsJob extends Job {
 	/**
 	 * The Amazon SQS client instance.
 	 *
-	 * @var Aws\Sqs\SqsClient
+	 * @var \Aws\Sqs\SqsClient
 	 */
 	protected $sqs;
 
@@ -109,7 +109,7 @@ class SqsJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container
+	 * @return \Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{
