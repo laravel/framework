@@ -42,7 +42,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle != '' && strpos($haystack, $needle) !== false) return true;
+			if ($needle != '' and strpos($haystack, $needle) !== false) return true;
 		}
 
 		return false;
@@ -303,7 +303,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
+			if ($needle != '' and strpos($haystack, $needle) === 0) return true;
 		}
 
 		return false;

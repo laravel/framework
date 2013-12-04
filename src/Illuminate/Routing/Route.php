@@ -345,7 +345,7 @@ class Route {
 
 		return array_filter($parameters, function($value)
 		{
-			return is_string($value) && strlen($value) > 0;
+			return is_string($value) and strlen($value) > 0;
 		});
 	}
 

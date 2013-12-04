@@ -66,7 +66,7 @@ class Container implements ArrayAccess {
 	 */
 	protected function resolvable($abstract)
 	{
-		return $this->bound($abstract) || $this->isAlias($abstract);
+		return $this->bound($abstract) or $this->isAlias($abstract);
 	}
 
 	/**
@@ -77,7 +77,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bound($abstract)
 	{
-		return isset($this[$abstract]) || isset($this->instances[$abstract]);
+		return isset($this[$abstract]) or isset($this->instances[$abstract]);
 	}
 
 	/**
@@ -660,7 +660,7 @@ class Container implements ArrayAccess {
 			$shared = false;
 		}
 
-		return isset($this->instances[$abstract]) || $shared === true;
+		return isset($this->instances[$abstract]) or $shared === true;
 	}
 
 	/**
@@ -672,7 +672,7 @@ class Container implements ArrayAccess {
 	 */
 	protected function isBuildable($concrete, $abstract)
 	{
-		return $concrete === $abstract || $concrete instanceof Closure;
+		return $concrete === $abstract or $concrete instanceof Closure;
 	}
 
 	/**

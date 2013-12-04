@@ -244,7 +244,7 @@ class PasswordBroker {
 	{
 		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
 
-		return $password && strlen($password) >= 6 && $password == $confirm;
+		return $password and strlen($password) >= 6 and $password == $confirm;
 	}
 
 	/**
@@ -261,7 +261,7 @@ class PasswordBroker {
 
 		$user = $this->users->retrieveByCredentials($credentials);
 
-		if ($user && ! $user instanceof RemindableInterface)
+		if ($user and ! $user instanceof RemindableInterface)
 		{
 			throw new \UnexpectedValueException("User must implement Remindable interface.");
 		}

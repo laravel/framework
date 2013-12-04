@@ -106,7 +106,7 @@ class Worker {
 	 */
 	public function process($connection, Job $job, $maxTries = 0, $delay = 0)
 	{
-		if ($maxTries > 0 && $job->attempts() > $maxTries)
+		if ($maxTries > 0 and $job->attempts() > $maxTries)
 		{
 			return $this->logFailedJob($connection, $job);
 		}

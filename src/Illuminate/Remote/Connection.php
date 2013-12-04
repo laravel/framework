@@ -177,7 +177,7 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function formatCommands($commands)
 	{
-		return is_array($commands) ? implode(' && ', $commands) : $commands;
+		return is_array($commands) ? implode(' and ', $commands) : $commands;
 	}
 
 	/**

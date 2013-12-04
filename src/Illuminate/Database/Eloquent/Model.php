@@ -344,7 +344,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function fillableFromArray(array $attributes)
 	{
-		if (count($this->fillable) > 0 && ! static::$unguarded)
+		if (count($this->fillable) > 0 and ! static::$unguarded)
 		{
 			return array_intersect_key($attributes, array_flip($this->fillable));
 		}
@@ -851,7 +851,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$caller = $trace['function'];
 
-			return ( ! in_array($caller, Model::$manyMethods) && $caller != $self);
+			return ( ! in_array($caller, Model::$manyMethods) and $caller != $self);
 		});
 	}
 
@@ -1502,7 +1502,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->setUpdatedAt($time);
 		}
 
-		if ( ! $this->exists && ! $this->isDirty(static::CREATED_AT))
+		if ( ! $this->exists and ! $this->isDirty(static::CREATED_AT))
 		{
 			$this->setCreatedAt($time);
 		}
@@ -1605,7 +1605,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// while it is constructing and executing various queries against it.
 		$builder->setModel($this)->with($this->with);
 
-		if ($excludeDeleted && $this->softDelete)
+		if ($excludeDeleted and $this->softDelete)
 		{
 			$builder->whereNull($this->getQualifiedDeletedAtColumn());
 		}
@@ -1630,7 +1630,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function trashed()
 	{
-		return $this->softDelete && ! is_null($this->{static::DELETED_AT});
+		return $this->softDelete and ! is_null($this->{static::DELETED_AT});
 	}
 
 	/**
@@ -1955,7 +1955,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if ($this->isGuarded($key)) return false;
 
-		return empty($this->fillable) && ! starts_with($key, '_');
+		return empty($this->fillable) and ! starts_with($key, '_');
 	}
 
 	/**
@@ -1966,7 +1966,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function isGuarded($key)
 	{
-		return in_array($key, $this->guarded) || $this->guarded == array('*');
+		return in_array($key, $this->guarded) or $this->guarded == array('*');
 	}
 
 	/**
@@ -1976,7 +1976,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function totallyGuarded()
 	{
-		return count($this->fillable) == 0 && $this->guarded == array('*');
+		return count($this->fillable) == 0 and $this->guarded == array('*');
 	}
 
 	/**
@@ -2139,7 +2139,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// If the relation value has been set, we will set it on this attributes
 			// list for returning. If it was not arrayable or null, we'll not set
 			// the value on the array because it is some type of invalid value.
-			if (isset($relation) || is_null($value))
+			if (isset($relation) or is_null($value))
 			{
 				$attributes[$key] = $relation;
 			}
@@ -2187,7 +2187,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the key references an attribute, we can just go ahead and return the
 		// plain attribute value from the model. This allows every attribute to
 		// be dynamically accessed through the _get method without accessors.
-		if ($inAttributes || $this->hasGetMutator($key))
+		if ($inAttributes or $this->hasGetMutator($key))
 		{
 			return $this->getAttributeValue($key);
 		}
@@ -2529,7 +2529,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($this->attributes as $key => $value)
 		{
-			if ( ! array_key_exists($key, $this->original) || $value !== $this->original[$key])
+			if ( ! array_key_exists($key, $this->original) or $value !== $this->original[$key])
 			{
 				$dirty[$key] = $value;
 			}
@@ -2775,8 +2775,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __isset($key)
 	{
-		return ((isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-			    ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
+		return ((isset($this->attributes[$key]) or isset($this->relations[$key])) ||
+			    ($this->hasGetMutator($key) and ! is_null($this->getAttributeValue($key))));
 	}
 
 	/**

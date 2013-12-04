@@ -427,7 +427,7 @@ class Builder {
 	 */
 	protected function isSoftDeleteConstraint(array $where, $column)
 	{
-		return $where['column'] == $column && $where['type'] == 'Null';
+		return $where['column'] == $column and $where['type'] == 'Null';
 	}
 
 	/**
@@ -577,7 +577,7 @@ class Builder {
 	{
 		$dots = str_contains($name, '.');
 
-		return $dots && starts_with($name, $relation) && $name != $relation;
+		return $dots and starts_with($name, $relation) and $name != $relation;
 	}
 
 	/**
