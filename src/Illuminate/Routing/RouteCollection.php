@@ -62,10 +62,10 @@ class RouteCollection implements Countable, IteratorAggregate {
 	{
 		foreach ($route->methods() as $method)
 		{
-			$this->routes[$method][] = $route;
+			$this->routes[$method][$route->getUri()] = $route;
 		}
 
-		$this->allRoutes[] = $route;
+		$this->allRoutes[$method.$route->getUri()] = $route;
 	}
 
 	/**
@@ -183,7 +183,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function get($method = null)
 	{
-		if (is_null($method)) return $this->allRoutes;
+		if (is_null($method)) return $this->getRoutes();
 
 		return array_get($this->routes, $method, array());
 	}
@@ -228,7 +228,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function getRoutes()
 	{
-		return $this->allRoutes;
+		return array_values($this->allRoutes);
 	}
 
 	/**
@@ -238,7 +238,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function getIterator()
 	{
-		return new ArrayIterator($this->allRoutes);
+		return new ArrayIterator($this->getRoutes());
 	}
 
 	/**
@@ -248,7 +248,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function count()
 	{
-		return count($this->allRoutes);
+		return count($this->getRoutes());
 	}
 
 }
