@@ -169,7 +169,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function check(array $routes, $request)
 	{
-		return array_last($routes, function($key, $value) use ($request)
+		return array_first($routes, function($key, $value) use ($request)
 		{
 			return $value->matches($request);
 		});
