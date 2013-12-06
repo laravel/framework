@@ -2,6 +2,7 @@
 
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class PlainDisplayer implements ExceptionDisplayerInterface {
 
@@ -12,7 +13,9 @@ class PlainDisplayer implements ExceptionDisplayerInterface {
 	 */
 	public function display(Exception $exception)
 	{
-		return new Response(file_get_contents(__DIR__.'/resources/plain.html'), 500);
+		$status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+
+		return new Response(file_get_contents(__DIR__.'/resources/plain.html'), $status);
 	}
 
 }
