@@ -276,7 +276,7 @@ class Mailer {
 				array_get($view, 'html'), array_get($view, 'text')
 			);
 		}
-		
+
 		throw new \InvalidArgumentException("Invalid view.");
 	}
 
@@ -295,6 +295,8 @@ class Mailer {
 		elseif (isset($this->logger))
 		{
 			$this->logMessage($message);
+
+			return 1;
 		}
 	}
 
