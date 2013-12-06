@@ -149,9 +149,7 @@ class Handler {
 		// type of exceptions to handled by a Closure giving great flexibility.
 		if ( ! is_null($response))
 		{
-			$response = $this->prepareResponse($response);
-
-			$response->send();
+			return $this->prepareResponse($response);
 		}
 
 		// If no response was sent by this custom exception handler, we will call the
@@ -159,10 +157,8 @@ class Handler {
 		// it show the exception to the user / developer based on the situation.
 		else
 		{
-			$this->displayException($exception);
+			return $this->displayException($exception);
 		}
-
-		$this->bail();
 	}
 
 	/**
@@ -183,7 +179,7 @@ class Handler {
 
 			if ( ! $this->isFatal($type)) return;
 
-			$this->handleException(new FatalError($message, $type, 0, $file, $line));
+			$this->handleException(new FatalError($message, $type, 0, $file, $line))->send();
 		}
 	}
 
@@ -272,7 +268,7 @@ class Handler {
 	{
 		$displayer = $this->debug ? $this->debugDisplayer : $this->plainDisplayer;
 
-		$displayer->display($exception);
+		return $displayer->display($exception);
 	}
 
 	/**
@@ -354,16 +350,6 @@ class Handler {
 	protected function prepareResponse($response)
 	{
 		return $this->responsePreparer->prepareResponse($response);
-	}
-
-	/**
-	 * Exit the application.
-	 *
-	 * @return void
-	 */
-	protected function bail()
-	{
-		exit(1);
 	}
 
 	/**
