@@ -108,6 +108,17 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasOldInputWithoutKey ()
+	{
+		$session = $this->getSession();
+		$session->flash('boom', 'baz');
+		$this->assertFalse($session->hasOldInput());
+
+		$session->flashInput(array('foo' => 'bar'));
+		$this->assertTrue($session->hasOldInput());
+	}
+
+
 	public function getSession()
 	{
 		$reflection = new ReflectionClass('Illuminate\Session\Store');
