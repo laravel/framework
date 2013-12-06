@@ -200,11 +200,14 @@ class UrlGenerator {
 	{
 		$domain = $this->getRouteDomain($route, $parameters);
 
-		$path = preg_replace_sub('/\{.*?\}/', $parameters, $route->uri());
+		$routeParams = $this->extractRouteParams($route, $parameters);
+
+		$path = preg_replace_sub('/\{.*?\}/', $routeParams, $route->uri());
 
 		$url = $this->trimUrl($this->getRouteRoot($route, $domain), $path);
 
-		if ($query = $this->getQueryString($parameters))
+		// if any parameters remain, they will be appended as a query string
+		if ($parameters && $query = $this->getQueryString($parameters))
 		{
 			$url .= $query;
 		}
@@ -279,6 +282,35 @@ class UrlGenerator {
 	protected function getRouteRoot($route, $domain)
 	{
 		return $this->getRootUrl($this->getScheme($route->secure()), $domain);
+	}
+
+	/**
+	 * Given a certain route, get only the route parameters from an array.
+	 *
+	 * @param  \Illuminate\Routing\Route $route
+	 * @param  array $parameters
+	 *
+	 * @return array
+	 */
+	protected function extractRouteParams($route, &$parameters)
+	{
+		$routeParams = $route->parameterNames();
+		$result = array();
+
+		foreach ($routeParams as $param)
+		{
+			if (isset($parameters[$param]))
+			{
+				$result[$param] = $parameters[$param];
+				unset($parameters[$param]);
+			}
+			else
+			{
+				$result[$param] = array_shift($parameters);
+			}
+		}
+
+		return $result;
 	}
 
 	/**
