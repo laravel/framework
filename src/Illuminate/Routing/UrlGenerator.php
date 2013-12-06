@@ -198,18 +198,49 @@ class UrlGenerator {
 	 */
 	protected function toRoute($route, $parameters)
 	{
-		$domain = $this->getRouteDomain($route, $parameters);
+            $domain = $this->getRouteDomain($route, $parameters);
 
-		$path = preg_replace_sub('/\{.*?\}/', $parameters, $route->uri());
+            if( count(array_filter(array_keys($parameters), 'is_string')) ) // check if it is associative array
+            {
+                $path = preg_replace_callback('/\{(.*?)(\??)\}/', function($match) use (&$parameters)
+                {
+                    if( isset($parameters[$match[1]]) )
+                    {
+                        $val = $parameters[$match[1]];
+                        unset( $parameters[$match[1]] );
+                        return $val;
+                    }
 
-		$url = $this->trimUrl($this->getRouteRoot($route, $domain), $path);
+                    return $match[0]; // we simply leave non-existent keys
+                }, $route->uri());
+            }
 
-		if ($query = $this->getQueryString($parameters))
-		{
-			$url .= $query;
-		}
+            $path = preg_replace_sub('/\{.*?\}/', $parameters, $path);
 
-		return $url;
+            if( count($parameters) )
+            {
+                $aKeys = array_filter(array_keys($parameters), 'is_string');
+                $nKeys = array_filter(array_keys($parameters), 'is_numeric');
+
+                $params = array();
+                foreach($aKeys as $k) $params[$k] = $parameters[$k];
+                foreach($nKeys as $n) $params[$parameters[$n]] = '';
+
+                $query = http_build_query($params);
+                if( ends_with($path, '?') )
+                {
+                    $path .= '&' . $query;
+                }
+                else
+                {
+                    $path .= '?' . $query;
+                }
+
+                //optional replace, which I think is an overhead
+                $path = preg_replace('/=(&|$)/', '$1', $path);
+            }
+
+            return $this->trimUrl($this->getRouteRoot($route, $domain), $path);
 	}
 
 	/**
@@ -279,45 +310,6 @@ class UrlGenerator {
 	protected function getRouteRoot($route, $domain)
 	{
 		return $this->getRootUrl($this->getScheme($route->secure()), $domain);
-	}
-
-	/**
-	 * Extract a query string from an array of parameters.
-	 *
-	 * @param  array  $parameters
-	 * @return string
-	 */
-	protected function getQueryString(array $parameters)
-	{
-		if (empty($parameters))
-		{
-			return '';
-		}
-
-		// first, we'll get the members of the array that have a string key -
-		// these will be transformed into query strings such as ?foo=bar.
-		$legal = array_flip(array_filter(array_keys($parameters), function($key)
-		{
-			return !is_numeric($key);
-		}));
-
-		$queryParams = array_intersect_key($parameters, $legal);
-
-		$queryString = '';
-
-		if (!empty($queryParams))
-		{
-			$queryString .= '?' . http_build_query($queryParams);
-		}
-
-		// next, get the members of the array that have a numeric key - these
-		// will be appended as query strings without a value, i.e. ?baz.
-		if ($extra = array_diff_key($parameters, $legal))
-		{
-			$queryString .= ($queryString === '' ? '?' : '&') . implode('&', $extra);
-		}
-
-		return $queryString;
 	}
 
 	/**
