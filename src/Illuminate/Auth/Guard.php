@@ -382,7 +382,9 @@ class Guard {
 	{
 		$this->session->put($this->getName(), $id);
 
-		return $this->login($this->provider->retrieveById($id), $remember);
+		$this->login($user = $this->provider->retrieveById($id), $remember);
+
+		return $user;
 	}
 
 	/**
