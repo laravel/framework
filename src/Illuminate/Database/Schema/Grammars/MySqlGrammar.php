@@ -361,7 +361,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTinyInteger(Fluent $column)
 	{
-		return 'tinyint(1)';
+		return 'tinyint';
 	}
 
 	/**
