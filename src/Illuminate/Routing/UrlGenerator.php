@@ -199,6 +199,8 @@ class UrlGenerator {
 	protected function toRoute($route, $parameters)
 	{
             $domain = $this->getRouteDomain($route, $parameters);
+            
+            $path = $route->uri();
 
             if( count(array_filter(array_keys($parameters), 'is_string')) ) // check if it is associative array
             {
@@ -212,7 +214,7 @@ class UrlGenerator {
                     }
 
                     return $match[0]; // we simply leave non-existent keys
-                }, $route->uri());
+                }, $path);
             }
 
             $path = preg_replace_sub('/\{.*?\}/', $parameters, $path);
