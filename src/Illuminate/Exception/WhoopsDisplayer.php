@@ -3,6 +3,7 @@
 use Exception;
 use Whoops\Run;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class WhoopsDisplayer implements ExceptionDisplayerInterface {
 
@@ -40,7 +41,9 @@ class WhoopsDisplayer implements ExceptionDisplayerInterface {
 	 */
 	public function display(Exception $exception)
 	{
-		return new Response($this->whoops->handleException($exception), 500);
+		$status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+
+		return new Response($this->whoops->handleException($exception), $status);
 	}
 
 }
