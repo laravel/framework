@@ -265,7 +265,9 @@ class Store implements SessionInterface {
 	 */
 	public function hasOldInput($key = null)
 	{
-		return ! is_null($this->getOldInput($key));
+		$old = $this->getOldInput($key);
+
+		return ! empty($old);
 	}
 
 	/**
