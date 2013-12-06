@@ -19,6 +19,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(2, $p->getLastPage());
 		$this->assertEquals(1, $p->getCurrentPage());
+
+		// Test Paginator without setting total items (perPage param goes instead of total).
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 2);
+		$env->shouldReceive('getCurrentPage')->once()->andReturn(1);
+		$p->setupPaginationContext();
+
+		$this->assertEquals(2, $p->getLastPage());
+		$this->assertEquals(1, $p->getCurrentPage());
 	}
 
 
@@ -106,6 +114,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foo.com?page=1', $p->getUrl(1));
 		$p->addQuery('foo', 'bar');
 		$this->assertEquals('http://foo.com?page=1&foo=bar', $p->getUrl(1));
+	}
+
+
+	public function testItemsAndPageItemsAccess()
+	{
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
+		$this->assertEquals(array('foo', 'bar', 'baz'), $p->getItems());
+		$this->assertEquals(array('foo', 'bar'), $p->getPageItems());
 	}
 
 

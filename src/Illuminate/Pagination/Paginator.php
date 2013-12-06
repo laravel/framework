@@ -84,17 +84,27 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 * Create a new Paginator instance.
 	 *
 	 * @param  \Illuminate\Pagination\Environment  $env
-	 * @param  array  $items
-	 * @param  int    $total
-	 * @param  int    $perPage
+	 * @param  array     $items
+	 * @param  int       $total
+	 * @param  int|null  $perPage
 	 * @return void
 	 */
-	public function __construct(Environment $env, array $items, $total, $perPage)
+	public function __construct(Environment $env, array $items, $total, $perPage = null)
 	{
 		$this->env = $env;
 		$this->items = $items;
-		$this->total = (int) $total;
-		$this->perPage = (int) $perPage;
+		// We are not setting all 4 params, which means that paginator
+		// is being set to work in "basic" mode tailored towards simple
+		// previous and next links.
+		if (is_null($perPage))
+		{
+			$this->perPage = (int) $total;
+		}
+		else
+		{
+			$this->total = (int) $total;
+			$this->perPage = (int) $perPage;
+		}
 	}
 
 	/**
@@ -121,6 +131,12 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		$this->lastPage = ceil($this->total / $this->perPage);
 
 		$this->currentPage = $this->calculateCurrentPage($this->lastPage);
+
+		// Update last page if total is not set.
+		if (is_null($this->total))
+		{
+			$this->lastPage = $this->count() > $this->perPage ? $this->currentPage + 1 : $this->currentPage;
+		}
 	}
 
 	/**
@@ -148,7 +164,9 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		// The page number will get validated and adjusted if it either less than one
 		// or greater than the last page available based on the count of the given
 		// items array. If it's greater than the last, we'll give back the last.
-		if (is_numeric($page) && $page > $lastPage)
+		// If total is null, then we have to trust user input since last page could
+		// not be calculated.
+		if (is_numeric($page) && $page > $lastPage && ! is_null($this->total))
 		{
 			return $lastPage > 0 ? $lastPage : 1;
 		}
@@ -339,6 +357,16 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	}
 
 	/**
+	 * Get a collection instance containing the current page items only.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function getPageCollection()
+	{
+		return new Collection($this->getPageItems());
+	}
+
+	/**
 	 * Get the items being paginated.
 	 *
 	 * @return array
@@ -357,6 +385,16 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	public function setItems($items)
 	{
 		$this->items = $items;
+	}
+
+	/**
+	 * Get the items being paginated in current page only.
+	 *
+	 * @return array
+	 */
+	public function getPageItems()
+	{
+		return array_slice($this->items, 0, $this->perPage);
 	}
 
 	/**
