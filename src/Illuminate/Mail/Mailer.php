@@ -54,6 +54,13 @@ class Mailer {
 	protected $pretending = false;
 
 	/**
+	 * Array of failed recipients.
+	 *
+	 * @var array
+	 */
+	protected $failedRecipients = array();
+
+	/**
 	 * Create a new Mailer instance.
 	 *
 	 * @param  \Illuminate\View\Environment  $views
@@ -290,7 +297,7 @@ class Mailer {
 	{
 		if ( ! $this->pretending)
 		{
-			return $this->swift->send($message);
+			return $this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
 		{
@@ -397,6 +404,16 @@ class Mailer {
 	public function getSwiftMailer()
 	{
 		return $this->swift;
+	}
+
+	/**
+	 * Get the array of failed recipients.
+	 *
+	 * @return array
+	 */
+	public function getFailedRecipients()
+	{
+		return $this->failedRecipients;
 	}
 
 	/**
