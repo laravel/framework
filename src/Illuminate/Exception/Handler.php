@@ -149,7 +149,7 @@ class Handler {
 		// type of exceptions to handled by a Closure giving great flexibility.
 		if ( ! is_null($response))
 		{
-			return $this->prepareResponse($response);
+			$response = $this->prepareResponse($response);
 		}
 
 		// If no response was sent by this custom exception handler, we will call the
@@ -157,8 +157,12 @@ class Handler {
 		// it show the exception to the user / developer based on the situation.
 		else
 		{
-			return $this->displayException($exception);
+			$response = $this->displayException($exception);
 		}
+
+		return $this->responsePreparer->readyForResponses()
+								? $response
+								: $response->send();
 	}
 
 	/**

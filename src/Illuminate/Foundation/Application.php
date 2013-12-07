@@ -762,6 +762,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if the application is ready for responses.
+	 *
+	 * @return bool
+	 */
+	public function readyForResponses()
+	{
+		return $this->booted;
+	}
+
+	/**
 	 * Determine if the application is currently down for maintenance.
 	 *
 	 * @return bool
