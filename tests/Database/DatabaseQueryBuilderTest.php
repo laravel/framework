@@ -80,13 +80,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$taggedCache = m::mock('StdClass');
 		$cache = m::mock('stdClass');
-		$cache->shouldReceive('tags')
+		$cache->shouldReceive('cacheTags')
 				->once()
 				->with(array('foo','bar'))
 				->andReturn($taggedCache);
 
 		$query = $this->setupCacheTestQuery($cache);
-		$query = $query->tags(array('foo', 'bar'))->remember(5);
+		$query = $query->cacheTags(array('foo', 'bar'))->remember(5);
 
 		$taggedCache->shouldReceive('remember')
 						->once()
