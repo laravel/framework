@@ -202,10 +202,10 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 		$view->shouldReceive('render')->once()->andReturn('rendered.view');
 		$swift = new FailingSwiftMailerStub;
 		$mailer->setSwiftMailer($swift);
-		
+
 		$mailer->send('foo', array('data'), function($m) {});
 
-		$this->assertEquals(array('taylorotwell@gmail.com'), $mailer->getFailedRecipients());
+		$this->assertEquals(array('taylorotwell@gmail.com'), $mailer->failures());
 	}
 
 
