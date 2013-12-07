@@ -1105,7 +1105,7 @@ class Builder {
 	 * @param  array|dynamic  $cacheTags
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function tags($cacheTags)
+	public function cacheTags($cacheTags)
 	{
 		$this->cacheTags = $cacheTags;
 
@@ -1227,7 +1227,7 @@ class Builder {
 	{
 		$cache = $this->connection->getCacheManager();
 
-		return $this->cacheTags ? $cache->tags($this->cacheTags) : $cache;
+		return $this->cacheTags ? $cache->cacheTags($this->cacheTags) : $cache;
 	}
 
 	/**
