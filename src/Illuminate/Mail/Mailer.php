@@ -411,7 +411,7 @@ class Mailer {
 	 *
 	 * @return array
 	 */
-	public function getFailedRecipients()
+	public function failures()
 	{
 		return $this->failedRecipients;
 	}
