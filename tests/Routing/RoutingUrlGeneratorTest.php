@@ -35,7 +35,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
 		$this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
-	}	
+	}
 
 
 	public function testBasicRouteGeneration()
@@ -76,9 +76,26 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRoutesMaintainRequestScheme()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('https://www.foo.com/')
+		);
+
+		/**
+		 * Named Routes
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'foo'));
+		$routes->add($route);
+
+		$this->assertEquals('https://www.foo.com/foo/bar', $url->route('foo'));
+	}
+
+
 	public function testRoutesWithDomains()
 	{
-			$url = new UrlGenerator(
+		$url = new UrlGenerator(
 			$routes = new Illuminate\Routing\RouteCollection,
 			$request = Illuminate\Http\Request::create('http://www.foo.com/')
 		);
