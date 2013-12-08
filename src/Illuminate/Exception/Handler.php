@@ -160,7 +160,18 @@ class Handler {
 			$response = $this->displayException($exception);
 		}
 
-		return $this->responsePreparer->readyForResponses()
+		return $this->sendResponse($response);
+	}
+
+	/**
+	 * Send the repsonse back to the client.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @return mixed
+	 */
+	protected function sendResponse($response)
+	{
+		return $this->responsePreparer->readyForResponses() && ! $this->runningInConsole()
 								? $response
 								: $response->send();
 	}
@@ -354,6 +365,16 @@ class Handler {
 	protected function prepareResponse($response)
 	{
 		return $this->responsePreparer->prepareResponse($response);
+	}
+
+	/**
+	 * Determine if we are running in the console.
+	 *
+	 * @return bool
+	 */
+	public function runningInConsole()
+	{
+		return php_sapi_name() == 'cli';
 	}
 
 	/**
