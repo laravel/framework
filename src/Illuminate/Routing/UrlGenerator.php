@@ -153,7 +153,7 @@ class UrlGenerator {
 	 */
 	protected function getScheme($secure)
 	{
-		if (is_null($secure))
+		if ( ! $secure)
 		{
 			return $this->request->getScheme().'://';
 		}
