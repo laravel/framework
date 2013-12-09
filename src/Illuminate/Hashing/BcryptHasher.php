@@ -7,7 +7,7 @@ class BcryptHasher implements HasherInterface {
 	 *
 	 * @var bool
 	 */
-	protected $rounds = 8;
+	protected $rounds = 10;
 
 	/**
 	 * Hash the given value.
