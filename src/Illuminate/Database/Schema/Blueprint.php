@@ -218,13 +218,13 @@ class Blueprint {
 	/**
 	 * Indicate that the given columns should be altered.
 	 *
-	 * @param  string  $column_name
-	 * @param  string  $type in mysql format (eg. varchar(255))
+	 * @param  string  $columnName
+	 * @param  string  $type
 	 * @return \Illuminate\Support\Fluent
 	 */
-	public function updateColumn($column_name, $type)
+	public function updateColumn($columnName, $type)
 	{
-		return $this->addCommand('updateColumn', compact('column_name', 'type'));
+		return $this->addCommand('updateColumn', compact('columnName', 'type'));
 	}
 
 	/**

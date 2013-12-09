@@ -287,11 +287,9 @@ class MySqlGrammar extends Grammar {
 	{
 		$table = $this->wrapTable($blueprint);
 
-		$column_name = $command->column_name;
+		$type = $this->{'type'.ucfirst($command->type)}($command);
 
-		$type = $command->type;
-
-		return "alter table {$table} modify {$column_name} {$type}";
+		return "alter table {$table} modify {$command->columnName} {$type}";
 	}
 
 	/**
