@@ -277,6 +277,24 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Compile an update column command.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $command
+	 * @return string
+	 */
+	public function compileUpdateColumn(Blueprint $blueprint, Fluent $command)
+	{
+		$table = $this->wrapTable($blueprint);
+
+		$column_name = $command->column_name;
+
+		$type = $command->type;
+
+		return "alter table {$table} modify {$column_name} {$type}";
+	}
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column

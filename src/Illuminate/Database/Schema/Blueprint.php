@@ -216,6 +216,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Indicate that the given columns should be altered.
+	 *
+	 * @param  string  $column_name
+	 * @param  string  $type in mysql format (eg. varchar(255))
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function updateColumn($column_name, $type)
+	{
+		return $this->addCommand('updateColumn', compact('column_name', 'type'));
+	}
+
+	/**
 	 * Indicate that the given primary key should be dropped.
 	 *
 	 * @param  string|array  $index
