@@ -1227,7 +1227,7 @@ class Builder {
 	{
 		$cache = $this->connection->getCacheManager();
 
-		return $this->cacheTags ? $cache->cacheTags($this->cacheTags) : $cache;
+		return $this->cacheTags ? $cache->tags($this->cacheTags) : $cache;
 	}
 
 	/**
