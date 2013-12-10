@@ -29,10 +29,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		if ( ! $this->app)
 		{
 			$this->refreshApplication();
-
-			$this->app->setRequestForConsoleEnvironment();
-
-			$this->app->boot();
 		}
 	}
 
@@ -46,6 +42,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		$this->app = $this->createApplication();
 
 		$this->client = $this->createClient();
+
+		$this->app->setRequestForConsoleEnvironment();
+
+		$this->app->boot();
 	}
 
 	/**
