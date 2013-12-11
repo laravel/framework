@@ -67,7 +67,8 @@
 		{"message": "Added 'renderSections' method to the View.", "backport": null},
 		{"message": "Added pessimistic locking to query builder via 'lock', 'lockForUpdate', and 'sharedLock'.", "backport": null},
 		{"message": "Closure can now be passed to Collection->first, functions similarly to array_first.", "backport": null},
-		{"message": "Added Mail::failures to get the failed recipients for a message.", "backport": null}
+		{"message": "Added Mail::failures to get the failed recipients for a message.", "backport": null},
+		{"message": "Renamed `Model::tags($cacheTags)` to `Model::cacheTags($cacheTags)`", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

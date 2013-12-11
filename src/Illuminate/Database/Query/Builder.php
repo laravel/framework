@@ -1105,7 +1105,7 @@ class Builder {
 	 * @param  array|dynamic  $cacheTags
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function tags($cacheTags)
+	public function cacheTags($cacheTags)
 	{
 		$this->cacheTags = $cacheTags;
 
