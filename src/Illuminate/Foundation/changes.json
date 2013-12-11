@@ -65,7 +65,6 @@
 		{"message": "Added merge, diff, and intersect to the Collection class.", "backport": null},
 		{"message": "Added fragment method to paginator.", "backport": null},
 		{"message": "Added 'renderSections' method to the View.", "backport": null},
-		{"message": "Added 'renderSections' method to the View.", "backport": null},
 		{"message": "Added pessimistic locking to query builder via 'lock', 'lockForUpdate', and 'sharedLock'.", "backport": null},
 		{"message": "Closure can now be passed to Collection->first, functions similarly to array_first.", "backport": null},
 		{"message": "Added Mail::failures to get the failed recipients for a message.", "backport": null}
