@@ -439,7 +439,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $attributes
 	 * @return \Illuminate\Database\Eloquent\Model|null
 	 */
-	protected static function firstByAttributes($attributes)
+	public static function firstByAttributes($attributes)
 	{
 		$query = static::query();
 
