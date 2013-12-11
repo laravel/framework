@@ -9,16 +9,16 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/cache": "4.1.*",
-        "illuminate/cookie": "4.1.*",
-        "illuminate/encryption": "4.1.*",
-        "illuminate/support": "4.1.*",
+        "illuminate/cache": "4.2.*",
+        "illuminate/cookie": "4.2.*",
+        "illuminate/encryption": "4.2.*",
+        "illuminate/support": "4.2.*",
         "nesbot/carbon": "1.*",
         "symfony/finder": "2.4.*",
         "symfony/http-foundation": "2.4.*"
     },
     "require-dev": {
-        "illuminate/console": "4.1.*",
+        "illuminate/console": "4.2.*",
         "mockery/mockery": "0.8.0",
         "phpunit/phpunit": "3.7.*"
     },
