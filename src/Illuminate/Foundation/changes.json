@@ -1,4 +1,6 @@
 {
+	"4.2.x": [
+	],
 	"4.1.x": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
 		{"message": "Allow before and after validation rules to reference other fields.", "backport": null},

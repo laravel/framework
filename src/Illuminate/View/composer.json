@@ -9,10 +9,10 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/container": "4.1.x",
-        "illuminate/events": "4.1.x",
-        "illuminate/filesystem": "4.1.x",
-        "illuminate/support": "4.1.x"
+        "illuminate/container": "4.2.*",
+        "illuminate/events": "4.2.*",
+        "illuminate/filesystem": "4.2.*",
+        "illuminate/support": "4.2.*"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",
