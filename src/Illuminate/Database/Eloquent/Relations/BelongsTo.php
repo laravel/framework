@@ -29,7 +29,7 @@ class BelongsTo extends Relation {
 	protected $relation;
 
 	/**
-	 * Create a new has many relationship instance.
+	 * Create a new belongs to relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
