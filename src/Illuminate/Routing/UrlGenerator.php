@@ -202,7 +202,9 @@ class UrlGenerator {
 
 		$path = preg_replace_sub('/\{.*?\}/', $parameters, $route->uri());
 
-		return $this->trimUrl($this->getRouteRoot($route, $domain), $path);
+		$query = count($parameters) > 0 ? '?'.http_build_query($parameters) : '';
+
+		return $this->trimUrl($this->getRouteRoot($route, $domain), $path.$query);
 	}
 
 	/**
