@@ -416,6 +416,28 @@ if ( ! function_exists('array_sort'))
 	}
 }
 
+if ( ! function_exists('array_where'))
+{
+	/**
+	 * Filter the array using the given Closure.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	function array_where($array, Closure $callback)
+	{
+		$filtered = array();
+
+		foreach ($array as $key => $value)
+		{
+			if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
+		}
+
+		return $filtered;
+	}
+}
+
 if ( ! function_exists('asset'))
 {
 	/**
