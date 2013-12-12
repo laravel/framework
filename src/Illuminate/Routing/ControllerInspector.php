@@ -10,7 +10,7 @@ class ControllerInspector {
 	 * @var array
 	 */
 	protected $verbs = array(
-		'any', 'get', 'post', 'put', 
+		'any', 'get', 'post', 'put',
 		'delete', 'head', 'options'
 	);
 
@@ -131,7 +131,7 @@ class ControllerInspector {
 	 */
 	public function addUriWildcards($uri)
 	{
-		return $uri.'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
+		return $uri.'/{one?}/{two?}/{three?}/{four?}/{five?}';
 	}
 
 }
