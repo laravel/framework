@@ -456,7 +456,7 @@ class Route {
 	{
 		$value = static::compileWhereParameters($value, $wheres);
 
-		return preg_replace('/\{([\w\-]+)\}/', static::$wildcard, $value);
+		return preg_replace('/\{([A-Za-z\-\_]+)\}/', static::$wildcard, $value);
 	}
 
 	/**
@@ -499,9 +499,9 @@ class Route {
 	 */
 	protected static function compileStandardOptional($value, $custom = 0)
 	{
-		$value = preg_replace('/\/\{([\w\-]+)\?\}/', static::$optional, $value, -1, $count);
+		$value = preg_replace('/\/\{([A-Za-z\-\_]+)\?\}/', static::$optional, $value, -1, $count);
 
-		$value = preg_replace('/^(\{([\w\-]+)\?\})/', static::$leadingOptional, $value, -1, $leading);
+		$value = preg_replace('/^(\{([A-Za-z\-\_]+)\?\})/', static::$leadingOptional, $value, -1, $leading);
 
 		$total = $leading + $count + $custom;
 
