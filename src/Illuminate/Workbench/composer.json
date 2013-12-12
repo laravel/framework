@@ -8,12 +8,12 @@
         }
     ],
     "require": {
-        "illuminate/filesystem": "4.1.x",
-        "illuminate/support": "4.1.x",
+        "illuminate/filesystem": "4.2.*",
+        "illuminate/support": "4.2.*",
         "symfony/finder": "2.4.*"
     },
     "require-dev": {
-        "illuminate/console": "4.1.x",
+        "illuminate/console": "4.2.*",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },
