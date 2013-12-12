@@ -193,18 +193,100 @@ class UrlGenerator {
 	 * Get the URL for a given route instance.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
-	 * @param  mixed  $parameters
+	 * @param  array  $parameters
 	 * @return string
 	 */
-	protected function toRoute($route, $parameters)
+	protected function toRoute($route, array $parameters)
 	{
 		$domain = $this->getRouteDomain($route, $parameters);
 
-		$path = preg_replace_sub('/\{.*?\}/', $parameters, $route->uri());
+		return $this->replaceRouteParameters(
 
-		$query = count($parameters) > 0 ? '?'.http_build_query($parameters) : '';
+			$this->trimUrl($this->getRouteRoot($route, $domain), $route->uri()), $parameters
 
-		return $this->trimUrl($this->getRouteRoot($route, $domain), $path.$query);
+		);
+	}
+
+	/**
+	 * Replace all of the wildcard parameters for a route path.
+	 *
+	 * @param  string  $path
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function replaceRouteParameters($path, array $parameters)
+	{
+		foreach ($parameters as $key => $value)
+		{
+			$path = $this->replaceRouteParameter($path, $key, $value, $parameters);
+		}
+
+		return $path.$this->getRouteQueryString($parameters);
+	}
+
+	/**
+	 * Replace a given route parameter for a route path.
+	 *
+	 * @param  string  $path
+	 * @param  string  $key
+	 * @param  string  $value
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function replaceRouteParameter($path, $key, $value, array &$parameters)
+	{
+		$pattern = is_string($key) ? '/\{'.$key.'[\?]?\}/' : '/\{.*?\}/';
+
+		$path = preg_replace($pattern, $value, $path, 1, $count);
+
+		// If the parameter was actually replaced in the route path, we are going to remove
+		// it from the parameter array (by reference), which is so we can use any of the
+		// extra parameters as query string variables once we process all the matches.
+		if ($count > 0) unset($parameters[$key]);
+
+		return $path;
+	}
+
+	/**
+	 * Get the query string for a given route.
+	 *
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function getRouteQueryString(array $parameters)
+	{
+		if (count($parameters) == 0) return '';
+
+		$query = http_build_query($keyed = $this->getStringParameters($parameters));
+
+		if (count($keyed) < count($parameters))
+		{
+			$query .= '&'.implode('&', $this->getNumericParameters($parameters));
+		}
+
+		return '?'.trim($query, '&');
+	}
+
+	/**
+	 * Get the string parameters from a given list.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function getStringParameters(array $parameters)
+	{
+		return array_where($parameters, function($k, $v) { return is_string($k); });
+	}
+
+	/**
+	 * Get the numeric parameters from a given list.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function getNumericParameters(array $parameters)
+	{
+		return array_where($parameters, function($k, $v) { return is_numeric($k); });
 	}
 
 	/**
@@ -228,11 +310,7 @@ class UrlGenerator {
 	 */
 	protected function formatDomain($route, &$parameters)
 	{
-		return $this->addPortToDomain(preg_replace_sub(
-
-			'/\{.*?\}/', $parameters, $this->getDomainAndScheme($route)
-
-		));
+		return $this->addPortToDomain($this->getDomainAndScheme($route));
 	}
 
 	/**
