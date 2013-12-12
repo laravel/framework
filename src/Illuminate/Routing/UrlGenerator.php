@@ -221,7 +221,9 @@ class UrlGenerator {
 			$path = $this->replaceRouteParameter($path, $key, $value, $parameters);
 		}
 
-		return $path.$this->getRouteQueryString($parameters);
+		$path = preg_replace('/\{.*?\?\}/', '', $path);
+
+		return trim($path, '/').$this->getRouteQueryString($parameters);
 	}
 
 	/**
