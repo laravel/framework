@@ -116,7 +116,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testRoutesWithDomainsAndPorts()
 	{
-			$url = new UrlGenerator(
+		$url = new UrlGenerator(
 			$routes = new Illuminate\Routing\RouteCollection,
 			$request = Illuminate\Http\Request::create('http://www.foo.com:8080/')
 		);
@@ -132,6 +132,20 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
 		$this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', array('taylor', 'otwell')));
+	}
+
+
+	public function testUrlGenerationForControllers()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com:8080/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/{one}/{two?}/{three?}', array('as' => 'foo', function() {}));
+		$routes->add($route);
+
+		$this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
 	}
 
 }
