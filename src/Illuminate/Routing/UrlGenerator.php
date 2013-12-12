@@ -261,7 +261,7 @@ class UrlGenerator {
 
 		if (count($keyed) < count($parameters))
 		{
-			$query .= '&'.implode($this->getNumericParameters($parameters));
+			$query .= '&'.implode('&', $this->getNumericParameters($parameters));
 		}
 
 		return '?'.trim($query, '&');

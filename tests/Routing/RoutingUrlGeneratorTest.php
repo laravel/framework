@@ -147,6 +147,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
                 $this->assertEquals('http://www.foo.com/foo/param/opt?foo=bar&baz', $url->route('foo', array('param', 'opt', 'foo' => 'bar', 'baz')));
                 $this->assertEquals('http://www.foo.com/foo/param/opt?foo=bar&baz', $url->route('foo', array('param' => 'param', 'opt' => 'opt', 'foo' => 'bar', 'baz')));
+                $this->assertEquals('http://www.foo.com/foo/param/opt?foo=bar&baz&extra', $url->route('foo', array('extra', 'foo' => 'bar', 'opt' => 'opt', 'param' => 'param', 'baz')));
 
 
                 $url = new UrlGenerator(
