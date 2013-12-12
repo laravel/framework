@@ -258,7 +258,7 @@ if ( ! function_exists('array_get'))
 	function array_get($array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
-		
+
 		if (isset($array[$key])) return $array[$key];
 
 		foreach (explode('.', $key) as $segment)
@@ -612,7 +612,7 @@ if ( ! function_exists('object_get'))
 	function object_get($object, $key, $default = null)
 	{
 		if (is_null($key)) return $object;
-		
+
 		foreach (explode('.', $key) as $segment)
 		{
 			if ( ! is_object($object) or ! isset($object->{$segment}))
@@ -909,4 +909,18 @@ if ( ! function_exists('with'))
 	{
 		return $object;
 	}
+}
+
+if ( ! function_exists('message_bag'))
+{
+    /**
+     * Return the data in MessageBag, useful for quick MessageBag creation
+     *
+     * @param Array $data
+     * @return \Illuminate\Support\MessageBag
+     */
+    function message_bag(array $data)
+    {
+        return new \Illuminate\Support\MessageBag($data);
+    }
 }

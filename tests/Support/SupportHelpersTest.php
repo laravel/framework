@@ -222,4 +222,24 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		array_values(array_sort($array, function($v) { return $v['name']; })));
 	}
 
+    function testMessageBag()
+    {
+        $array = array(
+            'email' => array('Email is required', 'Email is invalid'),
+            'password' => 'Password is not strong enough',
+            'You got some errors there, better fix that quick'
+        );
+
+        $result = array(
+            'email' => array('Email is required', 'Email is invalid'),
+            'password' => array('Password is not strong enough'),
+            array('You got some errors there, better fix that quick')
+        );
+
+        $bag = message_bag($array);
+
+        $this->assertInstanceOf('\Illuminate\Support\MessageBag', $bag, 'message_bag create MessageBag instance');
+        $this->assertEquals($result, $bag->getMessages());
+    }
+
 }
