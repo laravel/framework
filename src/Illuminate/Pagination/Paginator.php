@@ -118,7 +118,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 */
 	protected function calculateCurrentAndLastPages()
 	{
-		$this->lastPage = ceil($this->total / $this->perPage);
+		$this->lastPage = (int) ceil($this->total / $this->perPage);
 
 		$this->currentPage = $this->calculateCurrentPage($this->lastPage);
 	}
@@ -284,7 +284,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		}
 		else
 		{
-			return min($this->currentPage, ceil($total / $this->perPage));
+			return min($this->currentPage, (int) ceil($total / $this->perPage));
 		}
 	}
 
