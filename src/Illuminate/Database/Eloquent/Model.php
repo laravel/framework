@@ -884,10 +884,15 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Destroy the models for the given IDs.
 	 *
 	 * @param  array|int  $ids
-	 * @return void
+	 * @return int
 	 */
 	public static function destroy($ids)
 	{
+		// We'll initialize a count here so we will return the total number of deletes
+		// for the operation. The developers can then check this number as a boolean
+		// type value or get this total count of records deleted for logging, etc.
+		$count = 0;
+
 		$ids = is_array($ids) ? $ids : func_get_args();
 
 		$instance = new static;
@@ -899,8 +904,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($instance->whereIn($key, $ids)->get() as $model)
 		{
-			$model->delete();
+			if ($model->delete()) $count++;
 		}
+
+		return $count;
 	}
 
 	/**
