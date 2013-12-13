@@ -233,14 +233,15 @@ class Validator implements MessageProviderInterface {
 	 * @param string $attribute
 	 * @param array  $rules
 	 */
-	public function passAttribute($attribute, $rules)
+	protected function passAttribute($attribute, $rules)
 	{
 		foreach ($rules as $rule => $closure)
 		{
 			if ($closure instanceof \Closure) 
 			{
 				$this->addExtension($rule, $closure);			
-			} else
+			} 
+			else
 			{
 				// if the value of the array is not a closure
 				// this means the value of the array is the rule name.
@@ -259,7 +260,7 @@ class Validator implements MessageProviderInterface {
 	{
 		return ! $this->passes();
 	}
-	
+
 	/**
 	 * Validate a given attribute against a rule.
 	 *
