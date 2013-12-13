@@ -6,6 +6,7 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route {
 
@@ -59,25 +60,11 @@ class Route {
 	protected $parameterNames;
 
 	/**
-	 * The regular expression for a wildcard.
+	 * The compiled version of the route.
 	 *
-	 * @var string
+	 * @var \Symfony\Component\Routing\CompiledRoute
 	 */
-	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+?))';
-
-	/**
-	 * The regular expression for an optional wildcard.
-	 *
-	 * @var string
-	 */
-	protected static $optional = '(?:/(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+?))';
-
-	/**
-	 * The regular expression for a leading optional wildcard.
-	 *
-	 * @var string
-	 */
-	protected static $leadingOptional = '(\/$|^(?:(?P<$2>([a-zA-Z0-9\.\,\-_%=+]+?)))';
+	protected $compiled;
 
 	/**
 	 * The validators used by the routes.
@@ -126,12 +113,51 @@ class Route {
 	 */
 	public function matches(Request $request)
 	{
+		$this->compileRoute();
+
 		foreach ($this->getValidators() as $validator)
 		{
 			if ( ! $validator->matches($this, $request)) return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Compile the route into a Symfony CompiledRoute instance.
+	 *
+	 * @return void
+	 */
+	protected function compileRoute()
+	{
+		$optionals = $this->extractOptionalParameters();
+
+		$uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri);
+
+		$this->compiled = with(
+
+			new SymfonyRoute($uri, $optionals, $this->wheres, array(), $this->domain() ?: '')
+
+		)->compile();
+	}
+
+	/**
+	 * Get the optional parameters for the route.
+	 *
+	 * @return array
+	 */
+	protected function extractOptionalParameters()
+	{
+		preg_match_all('/\{(\w+?)\?\}/', $this->uri, $matches);
+
+		$optional = array();
+
+		if (isset($matches[1]))
+		{
+			foreach ($matches[1] as $key) { $optional[$key] = null; }
+		}
+
+		return $optional;
 	}
 
 	/**
@@ -318,6 +344,8 @@ class Route {
 	 */
 	public function bind(Request $request)
 	{
+		$this->compileRoute();
+
 		$this->bindParameters($request);
 
 		return $this;
@@ -331,9 +359,16 @@ class Route {
 	 */
 	public function bindParameters(Request $request)
 	{
-		preg_match($this->fullMatchExpression(), $this->fullMatchPath($request), $matches);
+		preg_match($this->compiled->getRegex(), '/'.$request->path(), $matches);
 
 		$parameters = $this->combineMatchesWithKeys(array_slice($matches, 1));
+
+		if ( ! is_null($this->compiled->getHostRegex()))
+		{
+			preg_match($this->compiled->getHostRegex(), $request->getHost(), $matches);
+
+			$parameters = array_merge($parameters, $this->combineMatchesWithKeys(array_slice($matches, 1)));
+		}
 
 		return $this->parameters = $this->replaceDefaults($parameters);
 	}
@@ -381,187 +416,6 @@ class Route {
 		}
 
 		return $parameters;
-	}
-
-	/**
-	 * Get the full match expression for the route.
-	 *
-	 * @return string
-	 */
-	protected function fullMatchExpression()
-	{
-		$value = trim($this->hostExpression(false).'/'.$this->uriExpression(false), '/');
-
-		return $this->delimit($value ?: '/');
-	}
-
-	/**
-	 * Get the full match path for the request.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return string
-	 */
-	protected function fullMatchPath($request)
-	{
-		if (isset($this->action['domain']))
-		{
-			return trim($request->getHost().'/'.$request->path(), '/');
-		}
-		else
-		{
-			return $request->path();
-		}
-	}
-
-	/**
-	 * Get the regular expression for the host.
-	 *
-	 * @param  bool  $delimit
-	 * @return string|null
-	 */
-	public function hostExpression($delimit = true)
-	{
-		if ( ! isset($this->action['domain'])) return;
-
-		return $this->compileString($this->action['domain'], $delimit, $this->wheres);
-	}
-
-	/**
-	 * Get the regular expression for the URI.
-	 *
-	 * @param  bool  $delimit
-	 * @return string|null
-	 */
-	public function uriExpression($delimit = true)
-	{
-		return $this->compileString($this->uri, $delimit, $this->wheres);
-	}
-
-	/**
-	 * Compile the given route string as a regular expression.
-	 *
-	 * @param  string  $value
-	 * @param  bool  $delimit
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	public static function compileString($value, $delimit = true, array $wheres = array())
-	{
-		$value = static::prepareString($value);
-
-		$value = static::compileOptional(static::compileParameters($value, $wheres), $wheres);
-
-		return $delimit ? static::delimit($value) : $value;
-	}
-
-	/**
-	 * Prepare a string for use as regular expression.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected static function prepareString($value)
-	{
-		return str_replace('.', '\.', $value);
-	}
-
-	/**
-	 * Compile the wildcards for a given string.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	protected static function compileParameters($value, array $wheres = array())
-	{
-		$value = static::compileWhereParameters($value, $wheres);
-
-		return preg_replace('/\{([A-Za-z\-\_]+?)\}/', static::$wildcard, $value);
-	}
-
-	/**
-	 * Compile the defined "where" parameters.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	protected static function compileWhereParameters($value, array $wheres)
-	{
-		foreach ($wheres as $key => $pattern)
-		{
-			$value = str_replace('{'.$key.'}', '(?P<'.$key.'>('.$pattern.'))', $value);
-		}
-
-		return $value;
-	}
-
-	/**
-	 * Compile the optional wildcards for a given string.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	protected static function compileOptional($value, $wheres = array())
-	{
-		list($value, $custom) = static::compileWhereOptional($value, $wheres);
-
-		return static::compileStandardOptional($value, $custom);
-	}
-
-	/**
-	 * Compile the standard optional wildcards for a given string.
-	 *
-	 * @param  string  $value
-	 * @param  int  $custom
-	 * @return string
-	 */
-	protected static function compileStandardOptional($value, $custom = 0)
-	{
-		$value = preg_replace('/\/\{([A-Za-z\-\_]+?)\?\}/', static::$optional, $value, -1, $count);
-
-		$value = preg_replace('/^(\{([A-Za-z\-\_]+?)\?\})/', static::$leadingOptional, $value, -1, $leading);
-
-		$total = $leading + $count + $custom;
-
-		return $total > 0 ? $value .= str_repeat(')?', $total) : $value;
-	}
-
-	/**
-	 * Compile the defined optional "where" parameters.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @param  int  $total
-	 * @return string
-	 */
-	protected static function compileWhereOptional($value, $wheres, $total = 0)
-	{
-		foreach ($wheres as $key => $pattern)
-		{
-			$pattern = "(?:/(?P<{$key}>({$pattern}))";
-
-			// Here we will need to replace the optional parameters while keeping track of the
-			// count we are replacing. This will let us properly close this finished regular
-			// expressions with the proper number of parenthesis so that it is valid code.
-			$value = str_replace('/{'.$key.'?}', $pattern, $value, $count);
-
-			$total = $total + $count;
-		}
-
-		return array($value, $total);
-	}
-
-	/**
-	 * Delimit a regular expression.
-	 *
-	 * @param   string  $value
-	 * @return  string
-	 */
-	protected static function delimit($value)
-	{
-		return trim($value) == '' ? null : '#^'.$value.'$#u';
 	}
 
 	/**
@@ -829,6 +683,16 @@ class Route {
 		$this->action = $action;
 
 		return $this;
+	}
+
+	/**
+	 * Get the compiled version of the route.
+	 *
+	 * @return void
+	 */
+	public function getCompiled()
+	{
+		return $this->compiled;
 	}
 
 }
