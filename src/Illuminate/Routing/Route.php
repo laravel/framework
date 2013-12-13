@@ -264,7 +264,14 @@ class Route {
 	 */
 	public function parameters()
 	{
-		if (isset($this->parameters)) return array_map('urldecode', $this->parameters);
+		if (isset($this->parameters))
+		{
+			return array_map(function($value)
+			{
+				return is_string($value) ? urldecode($value) : $value;
+
+			}, $this->parameters);
+		}
 
 		throw new \LogicException("Route is not bound.");
 	}
