@@ -20,6 +20,24 @@ class UrlGenerator {
 	protected $request;
 
 	/**
+	 * Characters that should not be URL encoded.
+	 *
+	 * @var array
+	 */
+	protected $dontEncode = array(
+		'%2F' => '/',
+		'%40' => '@',
+		'%3A' => ':',
+		'%3B' => ';',
+		'%2C' => ',',
+		'%3D' => '=',
+		'%2B' => '+',
+		'%21' => '!',
+		'%2A' => '*',
+		'%7C' => '|',
+	);
+
+	/**
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
@@ -200,11 +218,11 @@ class UrlGenerator {
 	{
 		$domain = $this->getRouteDomain($route, $parameters);
 
-		return $this->replaceRouteParameters(
+		return strtr(rawurlencode($this->replaceRouteParameters(
 
 			$this->trimUrl($this->getRouteRoot($route, $domain), $route->uri()), $parameters
 
-		);
+		)), $this->dontEncode).$this->getRouteQueryString($parameters);
 	}
 
 	/**
@@ -214,16 +232,14 @@ class UrlGenerator {
 	 * @param  array  $parameters
 	 * @return string
 	 */
-	protected function replaceRouteParameters($path, array $parameters)
+	protected function replaceRouteParameters($path, array &$parameters)
 	{
 		foreach ($parameters as $key => $value)
 		{
 			$path = $this->replaceRouteParameter($path, $key, $value, $parameters);
 		}
 
-		$path = preg_replace('/\{.*?\?\}/', '', $path);
-
-		return trim($path, '/').$this->getRouteQueryString($parameters);
+		return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
 	}
 
 	/**
