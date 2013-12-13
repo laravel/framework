@@ -6,6 +6,7 @@ use Illuminate\Routing\Router;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
+
 	public function testBasicDispatchingOfRoutes()
 	{
 		$router = $this->getRouter();
@@ -65,6 +66,24 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->get('foo/bar', function() { return 'second'; });
 		$this->assertEquals('second', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 	}
+
+
+        public function testNonGreedyMatches()
+        {
+            $route = new Route('GET', 'images/{id}.{ext}', function() {});
+
+            $request1 = Request::create('images/1.png', 'GET');
+            $this->assertTrue($route->matches($request1));
+            $route->bind($request1);
+            $this->assertEquals('1', $route->parameter('id'));
+            $this->assertEquals('png', $route->parameter('ext'));
+
+            $request2 = Request::create('images/12.png', 'GET');
+            $this->assertTrue($route->matches($request2));
+            $route->bind($request2);
+            $this->assertEquals('12', $route->parameter('id'));
+            $this->assertEquals('png', $route->parameter('ext'));
+        }
 
 
 	/**
@@ -342,24 +361,24 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$route->where('bar', '[0-9]+');
 		$this->assertFalse($route->matches($request));
 	}
-	
-	
+
+
 	public function testDotDoesNotMatchEverything()
 	{
 		$route = new Route('GET', 'images/{id}.{ext}', function() {});
-		
+
 		$request1 = Request::create('images/1.png', 'GET');
 		$this->assertTrue($route->matches($request1));
 		$route->bind($request1);
 		$this->assertEquals('1', $route->parameter('id'));
 		$this->assertEquals('png', $route->parameter('ext'));
-		
+
 		$request2 = Request::create('images/12.png', 'GET');
 		$this->assertTrue($route->matches($request2));
 		$route->bind($request2);
 		$this->assertEquals('12', $route->parameter('id'));
 		$this->assertEquals('png', $route->parameter('ext'));
-		
+
 	}
 
 

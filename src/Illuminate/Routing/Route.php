@@ -441,14 +441,15 @@ class Route {
 	public static function compileString($value, $delimit = true, array $wheres = array())
 	{
 		$value = static::prepareString($value);
+
 		$value = static::compileOptional(static::compileParameters($value, $wheres), $wheres);
 
 		return $delimit ? static::delimit($value) : $value;
 	}
-	
+
 	/**
 	 * Prepare a string for use as regular expression.
-	 * 
+	 *
 	 * @param  string  $value
 	 * @return string
 	 */
@@ -468,7 +469,7 @@ class Route {
 	{
 		$value = static::compileWhereParameters($value, $wheres);
 
-		return preg_replace('/\{([A-Za-z\-\_]+)\}/', static::$wildcard, $value);
+		return preg_replace('/\{([A-Za-z\-\_]+?)\}/', static::$wildcard, $value);
 	}
 
 	/**
@@ -511,9 +512,9 @@ class Route {
 	 */
 	protected static function compileStandardOptional($value, $custom = 0)
 	{
-		$value = preg_replace('/\/\{([A-Za-z\-\_]+)\?\}/', static::$optional, $value, -1, $count);
+		$value = preg_replace('/\/\{([A-Za-z\-\_]+?)\?\}/', static::$optional, $value, -1, $count);
 
-		$value = preg_replace('/^(\{([A-Za-z\-\_]+)\?\})/', static::$leadingOptional, $value, -1, $leading);
+		$value = preg_replace('/^(\{([A-Za-z\-\_]+?)\?\})/', static::$leadingOptional, $value, -1, $leading);
 
 		$total = $leading + $count + $custom;
 
