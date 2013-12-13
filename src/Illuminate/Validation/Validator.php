@@ -232,6 +232,7 @@ class Validator implements MessageProviderInterface {
 	 * 
 	 * @param string $attribute
 	 * @param array  $rules
+	 * @return void
 	 */
 	protected function passAttribute($attribute, $rules)
 	{
