@@ -17,7 +17,7 @@ class QueryException extends \PDOException {
 	protected $bindings;
 
 	/**
-	 * Create a new query excetion instance.
+	 * Create a new query exception instance.
 	 *
 	 * @param  string  $sql
 	 * @param  array  $bindings
