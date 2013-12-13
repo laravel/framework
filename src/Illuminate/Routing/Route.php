@@ -63,7 +63,7 @@ class Route {
 	 *
 	 * @var string
 	 */
-	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+?))';
+	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+))';
 
 	/**
 	 * The regular expression for an optional wildcard.
@@ -276,7 +276,7 @@ class Route {
 	 */
 	public function parametersWithoutNulls()
 	{
-        return array_filter($this->parameters(), function($p) { return ! is_null($p); });
+		return array_filter($this->parameters(), function($p) { return ! is_null($p); });
 	}
 
 	/**
@@ -440,9 +440,21 @@ class Route {
 	 */
 	public static function compileString($value, $delimit = true, array $wheres = array())
 	{
+		$value = static::prepareString($value);
 		$value = static::compileOptional(static::compileParameters($value, $wheres), $wheres);
 
 		return $delimit ? static::delimit($value) : $value;
+	}
+	
+	/**
+	 * Prepare a string for use as regular expression.
+	 * 
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected static function prepareString($value)
+	{
+		return str_replace('.', '\.', $value);
 	}
 
 	/**
