@@ -234,35 +234,21 @@ class UrlGenerator {
 	 */
 	protected function replaceRouteParameters($path, array &$parameters)
 	{
-		foreach ($parameters as $key => $value)
-		{
-			$path = $this->replaceRouteParameter($path, $key, $value, $parameters);
-		}
+        // Replace associative parameters
+        count($parameters) && $path = preg_replace_callback('/\{(.*?)\??\}/', function($matches) use(&$parameters) {
+                if( isset( $parameters[ $matches[1] ] ) ) {
+                    $var = $parameters[ $matches[1] ];
+                    unset($parameters[ $matches[1] ]);
+                    return $var;
+                }
+
+                return $matches[0];
+            }, $path);
+
+        // Replace parameters which were passed with numeric keys
+        count($parameters) && $path = preg_replace_sub('/\{.*?\}/', $parameters, $path, count($parameters));
 
 		return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
-	}
-
-	/**
-	 * Replace a given route parameter for a route path.
-	 *
-	 * @param  string  $path
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @param  array  $parameters
-	 * @return string
-	 */
-	protected function replaceRouteParameter($path, $key, $value, array &$parameters)
-	{
-		$pattern = is_string($key) ? '/\{'.$key.'[\?]?\}/' : '/\{.*?\}/';
-
-		$path = preg_replace($pattern, $value, $path, 1, $count);
-
-		// If the parameter was actually replaced in the route path, we are going to remove
-		// it from the parameter array (by reference), which is so we can use any of the
-		// extra parameters as query string variables once we process all the matches.
-		if ($count > 0) unset($parameters[$key]);
-
-		return $path;
 	}
 
 	/**

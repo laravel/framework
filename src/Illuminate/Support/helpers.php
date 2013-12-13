@@ -697,13 +697,13 @@ if ( ! function_exists('preg_replace_sub'))
 	 * @param  string  $subject
 	 * @return string
 	 */
-	function preg_replace_sub($pattern, &$replacements, $subject)
+	function preg_replace_sub($pattern, &$replacements, $subject, $limit = -1)
 	{
 		return preg_replace_callback($pattern, function($match) use (&$replacements)
 		{
 			return array_shift($replacements);
 
-		}, $subject);
+		}, $subject, $limit);
 	}
 }
 
