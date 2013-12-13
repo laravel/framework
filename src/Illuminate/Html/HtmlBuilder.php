@@ -181,7 +181,8 @@ class HtmlBuilder {
 	 */
 	public function linkRoute($name, $title = null, $parameters = array(), $attributes = array())
 	{
-		return $this->link($this->url->route($name, $parameters), $title, $attributes);
+		if (!is_array($parameters)) $parameters = array($parameters);
+		return $this->link($this->url->route($name, array_map('urlencode', $parameters)), $title, $attributes);
 	}
 
 	/**
