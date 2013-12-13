@@ -63,21 +63,21 @@ class Route {
 	 *
 	 * @var string
 	 */
-	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+))';
+	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+?))';
 
 	/**
 	 * The regular expression for an optional wildcard.
 	 *
 	 * @var string
 	 */
-	protected static $optional = '(?:/(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+))';
+	protected static $optional = '(?:/(?P<$1>([a-zA-Z0-9\.\,\-_%=+]+?))';
 
 	/**
 	 * The regular expression for a leading optional wildcard.
 	 *
 	 * @var string
 	 */
-	protected static $leadingOptional = '(\/$|^(?:(?P<$2>([a-zA-Z0-9\.\,\-_%=+]+)))';
+	protected static $leadingOptional = '(\/$|^(?:(?P<$2>([a-zA-Z0-9\.\,\-_%=+]+?)))';
 
 	/**
 	 * The validators used by the routes.
