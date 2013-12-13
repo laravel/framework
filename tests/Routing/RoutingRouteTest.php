@@ -350,11 +350,13 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		
 		$request1 = Request::create('images/1.png', 'GET');
 		$this->assertTrue($route->matches($request1));
+		$route->bind($request1);
 		$this->assertEquals('1', $route->parameter('id'));
 		$this->assertEquals('png', $route->parameter('ext'));
 		
 		$request2 = Request::create('images/12.png', 'GET');
 		$this->assertTrue($route->matches($request2));
+		$route->bind($request2);
 		$this->assertEquals('12', $route->parameter('id'));
 		$this->assertEquals('png', $route->parameter('ext'));
 		
