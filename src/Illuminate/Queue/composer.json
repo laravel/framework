@@ -32,7 +32,7 @@
     "target-dir": "Illuminate/Queue",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "suggest": {
