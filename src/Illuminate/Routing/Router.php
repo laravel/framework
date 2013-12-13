@@ -120,8 +120,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	public function __construct(Dispatcher $events, Container $container = null)
 	{
 		$this->events = $events;
-		$this->container = $container ?: new Container;
 		$this->routes = new RouteCollection;
+		$this->container = $container ?: new Container;
 	}
 
 	/**
