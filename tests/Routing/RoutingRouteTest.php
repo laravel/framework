@@ -67,6 +67,24 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+        public function testNonGreedyMatches()
+        {
+            $route = new Route('GET', 'images/{id}.{ext}', function() {});
+
+            $request1 = Request::create('images/1.png', 'GET');
+            $this->assertTrue($route->matches($request1));
+            $route->bind($request1);
+            $this->assertEquals('1', $route->parameter('id'));
+            $this->assertEquals('png', $route->parameter('ext'));
+
+            $request2 = Request::create('images/12.png', 'GET');
+            $this->assertTrue($route->matches($request2));
+            $route->bind($request2);
+            $this->assertEquals('12', $route->parameter('id'));
+            $this->assertEquals('png', $route->parameter('ext'));
+        }
+
+
 	/**
 	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
@@ -344,6 +362,25 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDotDoesNotMatchEverything()
+	{
+		$route = new Route('GET', 'images/{id}.{ext}', function() {});
+
+		$request1 = Request::create('images/1.png', 'GET');
+		$this->assertTrue($route->matches($request1));
+		$route->bind($request1);
+		$this->assertEquals('1', $route->parameter('id'));
+		$this->assertEquals('png', $route->parameter('ext'));
+
+		$request2 = Request::create('images/12.png', 'GET');
+		$this->assertTrue($route->matches($request2));
+		$route->bind($request2);
+		$this->assertEquals('12', $route->parameter('id'));
+		$this->assertEquals('png', $route->parameter('ext'));
+
+	}
+
+
 	public function testRouteBinding()
 	{
 		$router = $this->getRouter();
@@ -380,34 +417,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->get('foo/{bar}', function($name) { return $name; });
 		$router->model('bar', 'RouteModelBindingNullStub', function() { return 'missing'; });
 		$this->assertEquals('missing', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
-	}
-
-
-	public function testRouteCompilationAgainstHosts()
-	{
-		$this->assertEquals(1, preg_match(Route::compileString('{foo}.website.{baz}'), 'baz.website.com'));
-	}
-
-
-	public function testRouteCompilationAgainstUris()
-	{
-		$this->assertEquals(1, preg_match(Route::compileString('{foo}'), 'foo'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}'), 'foo/bar'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/baz/{boom}'), 'foo/bar/baz/boom'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/{baz}'), 'foo/bar/baz'));
-
-		$this->assertEquals(0, preg_match(Route::compileString('{foo}'), 'foo/bar'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}'), 'foo/'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/baz/{boom}'), 'foo/baz/boom'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/{baz}'), 'foo/bar/baz/brick'));
-
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{baz?}'), 'foo/bar'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo/bar'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo/bar/baz'));
-
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{baz?}'), 'foo/bar/baz'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo/bar/baz/boom'));
 	}
 
 
