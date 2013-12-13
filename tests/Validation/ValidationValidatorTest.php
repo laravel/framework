@@ -921,6 +921,31 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo!', $v->messages()->first('name'));
 	}
 
+	public function testFailedClosureBasedCustomRule() 
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar'), array('foo' => 
+			array(
+			    'baz' => function($attribute, $value, $parameters) {
+				return false;
+			    }
+			)
+		    ));
+		$this->assertFalse($v->passes());	
+	}
+	
+	public function testSuccessfulClosureBasedCustomRule() 
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar'), array('foo' => 
+			array(
+			    'baz' => function($attribute, $value, $parameters) {
+				return true;
+			    }
+			)
+		    ));
+		$this->assertTrue($v->passes());	
+	}
 
 	public function testCustomImplicitValidators()
 	{
