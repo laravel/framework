@@ -23,7 +23,7 @@
     "target-dir": "Illuminate/Hashing",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "minimum-stability": "dev"
