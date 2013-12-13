@@ -89,7 +89,7 @@ class ControllerDispatcher {
 	{
 		$parameters = $route->parametersWithoutNulls();
 
-		return $instance->callAction($method, $parameters);
+		return $instance->callAction($method, array_map('urldecode', $parameters));
 	}
 
 	/**
