@@ -6,7 +6,6 @@ use Illuminate\Routing\Router;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
-
 	public function testBasicDispatchingOfRoutes()
 	{
 		$router = $this->getRouter();
@@ -418,34 +417,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->get('foo/{bar}', function($name) { return $name; });
 		$router->model('bar', 'RouteModelBindingNullStub', function() { return 'missing'; });
 		$this->assertEquals('missing', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
-	}
-
-
-	public function testRouteCompilationAgainstHosts()
-	{
-		$this->assertEquals(1, preg_match(Route::compileString('{foo}.website.{baz}'), 'baz.website.com'));
-	}
-
-
-	public function testRouteCompilationAgainstUris()
-	{
-		$this->assertEquals(1, preg_match(Route::compileString('{foo}'), 'foo'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}'), 'foo/bar'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/baz/{boom}'), 'foo/bar/baz/boom'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/{baz}'), 'foo/bar/baz'));
-
-		$this->assertEquals(0, preg_match(Route::compileString('{foo}'), 'foo/bar'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}'), 'foo/'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/baz/{boom}'), 'foo/baz/boom'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/{baz}'), 'foo/bar/baz/brick'));
-
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{baz?}'), 'foo/bar'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo/bar'));
-		$this->assertEquals(1, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo/bar/baz'));
-
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{baz?}'), 'foo/bar/baz'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo'));
-		$this->assertEquals(0, preg_match(Route::compileString('foo/{bar}/{baz?}'), 'foo/bar/baz/boom'));
 	}
 
 
