@@ -575,9 +575,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router = $this->getRouter();
 		$router->resource('foo', 'ResourceControllerStub', array('model' => 'RouteModelBindingStub', 'only' => array('show')));
 
-		$router->dispatch(Request::create('foo/taylor', 'GET'))->getContent();
-
-		$this->assertEquals('TAYLOR', 'TAYLOR');
+		$this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
 	}
 
 
