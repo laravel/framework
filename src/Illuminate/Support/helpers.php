@@ -807,6 +807,22 @@ if ( ! function_exists('storage_path'))
 	}
 }
 
+if ( ! function_exists('str_truncate'))
+{
+	/**
+	 * Truncate a given string if it exceeds the character limit.
+	 * 
+	 * @param  string  $string
+	 * @param  int     $limit
+	 * @param  string  $pad
+	 * @return string
+	 */
+	function str_truncate($string, $limit = 150, $pad = null)
+	{
+		return Illuminate\Support\Str::truncate($string, $limit, $pad);
+	}
+}
+
 if ( ! function_exists('str_contains'))
 {
 	/**
