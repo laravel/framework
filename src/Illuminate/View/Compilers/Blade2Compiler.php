@@ -62,8 +62,9 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
                 if( $t_id == T_INLINE_HTML ) {
                     $t_content = $this->compileExtensions($t_content);
 
-                    $t_content = preg_replace_callback('/(?(R)\((?:[^\(\)]|(?R))*\)|(?<!\w)(\s*)@(\w+)(\s*(?R)+)?)/', function($match) use(&$footer){
-                        return $this->compileEquation($match[0], $match[2], @$match[3], $match[1], $footer);
+                    $obj = $this;
+                    $t_content = preg_replace_callback('/(?(R)\((?:[^\(\)]|(?R))*\)|(?<!\w)(\s*)@(\w+)(\s*(?R)+)?)/', function($match) use($obj, &$footer){
+                        return $obj->compileEquation($match[0], $match[2], @$match[3], $match[1], $footer);
                     }, $t_content);
 
                     $t_content = $this->compileComments($t_content);
