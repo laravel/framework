@@ -277,6 +277,21 @@ class Str {
 
 		return trim($title, $separator);
 	}
+	
+	/**
+	 * Truncate a given string if it exceeds the character limit.
+	 * 
+	 * @param  string  $string
+	 * @param  int     $limit
+	 * @param  string  $pad
+	 * @return string
+	 */
+	public static function truncate($string, $limit = 150, $pad = null)
+	{
+		if (strlen($string) < $limit) return $string;
+		
+		return preg_replace('/\s+?(\S+)?$/', '', substr($string, 0, $limit)).$pad;
+	}
 
 	/**
 	 * Convert a string to snake case.
