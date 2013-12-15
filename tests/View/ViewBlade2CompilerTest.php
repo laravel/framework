@@ -143,14 +143,13 @@ class ViewBlade2CompilerTest extends PHPUnit_Framework_TestCase {
 		$compiler = new Blade2Compiler($this->getFiles(), __DIR__);
 		$string = '@extends(\'foo\')
 test';
-		$expected = "test\r\n".'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 
 
 		$compiler = new Blade2Compiler($this->getFiles(), __DIR__);
-		$string = '@extends(name(foo))
-test';
-		$expected = "test\r\n".'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$string = '@extends(name(foo))'.PHP_EOL.'test';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
