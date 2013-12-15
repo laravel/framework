@@ -69,10 +69,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('controller' => 'foo@bar'));
 		$routes->add($route);
 
+        /**
+         * Non ASCII routes
+         */
+        $route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/åαф/{baz}', array('as' => 'foobarbaz'));
+        $routes->add($route);
+
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall')));
 		$this->assertEquals('https://www.foo.com/foo/bar', $url->route('baz'));
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
+        $this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', array('baz' => 'åαф')));
 	}
 
 
