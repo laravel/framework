@@ -63,9 +63,16 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
                     $t_content = $this->compileExtensions($t_content);
 
                     $obj = $this;
-                    $t_content = preg_replace_callback('/(?(R)\((?:[^\(\)]|(?R))*\)|(?<!\w)(\s*)@(\w+)(\s*(?R)+)?)/', function($match) use($obj, &$footer){
-                        return $obj->compileEquation($match[0], $match[2], @$match[3], $match[1], $footer);
-                    }, $t_content);
+                    $t_content = preg_replace_callback(
+                        '/\B # we shouldnt have words before
+                        @(\w+) # control word should start with @
+                        ([ \t]*) # and we can have spaces afterwards
+                        (\( ( (?>[^()]+) | (?3) )* \))? # and optional expression within brackets
+                        /x',
+                        function($match) use($obj, &$footer){
+                            return $obj->compileEquation($match[0], $match[1], @$match[3], $match[2], $footer)
+                                . (@$match[3]?'':$match[2]);
+                        }, $t_content);
 
                     $t_content = $this->compileComments($t_content);
                     $t_content = $this->compileEchos($t_content);
@@ -80,7 +87,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
         }
 
         if( count($footer) )
-            $result = ltrim($result, "\r\n") . "\r\n" . implode("\r\n", array_reverse($footer));
+            $result = ltrim($result, PHP_EOL) . PHP_EOL . implode(PHP_EOL, array_reverse($footer));
 
 		return $result;
 	}
@@ -114,7 +121,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
             case 'elseif':
             case 'while':
             case 'foreach':
-                $replacement = "<?php $func{$expr}: ?>";
+                $replacement = "<?php $func{$spaces}{$expr}: ?>";
                 break;
             case 'else':
                 $replacement = "<?php else: ?>";
@@ -125,7 +132,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
                 $replacement = "<?php $func; ?>";
                 break;
             case 'unless':
-                $replacement = "<?php if ( !$expr): ?>";
+                $replacement = "<?php if ( ! $expr): ?>";
                 break;
             case 'endunless':
                 $replacement = "<?php endif; ?>";
@@ -138,6 +145,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
                 break;
             case 'include':
             case 'extends':
+                // remove outer brackets so that (a,b) becomes a,b
                 $expr = preg_replace('/^\\((.*)\\)$/', '$1', $expr);
                 $data = "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
                 if($func == 'include')
@@ -151,7 +159,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
                 $replacement = $content;
         }
 
-        return $spaces . $replacement;
+        return $replacement;
     }
 
 	/**
@@ -189,6 +197,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileComments($value)
 	{
+        // match {{--comment--}}
 		$pattern = sprintf('/%s--((.|\s)*?)--%s/', $this->contentTags[0], $this->contentTags[1]);
 
 		return preg_replace($pattern, '<?php /*$1*/ ?>', $value);
@@ -222,6 +231,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
 	{
 		$me = $this;
 
+        // match @{{ content }}
 		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
 
 		$callback = function($matches) use ($me)
@@ -242,6 +252,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
 	{
 		$me = $this;
 
+        // match {{{ content }}}
 		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
 
 		$callback = function($matches) use ($me)
@@ -260,6 +271,7 @@ class Blade2Compiler extends Compiler implements CompilerInterface {
 	 */
 	public function compileEchoDefaults($value)
 	{
+        // match {{ $a or $b }}
 		return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
 	}
 
