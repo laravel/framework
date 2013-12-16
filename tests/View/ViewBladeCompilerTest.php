@@ -174,10 +174,10 @@ this is a comment
 	public function testIfStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@if (name(foo(bar)))
+		$string = '@if(name(foo(bar)))
 breeze
 @endif';
-		$expected = '<?php if (name(foo(bar))): ?>
+		$expected = '<?php if(name(foo(bar))): ?>
 breeze
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
@@ -187,12 +187,12 @@ breeze
 	public function testElseStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@if (name(foo(bar)))
+		$string = '@if(name(foo(bar)))
 breeze
 @else
 boom
 @endif';
-		$expected = '<?php if (name(foo(bar))): ?>
+		$expected = '<?php if(name(foo(bar))): ?>
 breeze
 <?php else: ?>
 boom
@@ -204,14 +204,14 @@ boom
 	public function testElseIfStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@if (name(foo(bar)))
+		$string = '@if(name(foo(bar)))
 breeze
-@elseif (boom(breeze))
+@elseif(boom(breeze))
 boom
 @endif';
-		$expected = '<?php if (name(foo(bar))): ?>
+		$expected = '<?php if(name(foo(bar))): ?>
 breeze
-<?php elseif (boom(breeze)): ?>
+<?php elseif(boom(breeze)): ?>
 boom
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
