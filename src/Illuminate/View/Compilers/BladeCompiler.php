@@ -26,6 +26,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
     protected $escapedTags = array('{{{', '}}}');
 
     /**
+     * Array of footer lines to be added to template
+     *
+     * @var array
+     */
+    protected $footer;
+
+    /**
      * Compile the view at the given path.
      *
      * @param  string  $path
@@ -33,6 +40,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
      */
     public function compile($path)
     {
+        $this->footer = array();
         $contents = $this->compileString($this->files->get($path));
 
         if ( ! is_null($this->cachePath))
@@ -69,9 +77,14 @@ class BladeCompiler extends Compiler implements CompilerInterface {
                         ([ \t]*) # and we can have spaces afterwards
                         (\( ( (?>[^()]+) | (?3) )* \))? # and optional expression within brackets
                         /x',
-                        function($match) use($obj, &$footer){
-                            return $obj->compileEquation($match[0], $match[1], @$match[3], $match[2], $footer)
-                            . (@$match[3]?'':$match[2]);
+                        function($match) use($obj)
+                        {
+                            if( method_exists($obj, $method = 'compile' . ucfirst($match[1])) )
+                            {
+                                $match[0] = $obj->$method(@$match[3]);
+                            }
+
+                            return $match[0] . (@$match[3]?'':$match[2]);
                         }, $t_content);
 
                     $t_content = $this->compileComments($t_content);
@@ -86,80 +99,126 @@ class BladeCompiler extends Compiler implements CompilerInterface {
             }
         }
 
-        if( count($footer) )
-            $result = ltrim($result, PHP_EOL) . PHP_EOL . implode(PHP_EOL, array_reverse($footer));
+        if( count($this->footer) )
+            $result = ltrim($result, PHP_EOL) . PHP_EOL . implode(PHP_EOL, array_reverse($this->footer));
 
         return $result;
     }
 
-    public function compileEquation($content, $func, $expr, $spaces, &$footer)
+    protected function compileEach($expr)
     {
-        switch($func)
-        {
-            case 'each':
-                $replacement = "<?php echo \$__env->renderEach{$expr}; ?>";
-                break;
-            case 'yield':
-                $replacement = "<?php echo \$__env->yieldContent{$expr}; ?>";
-                break;
-            case 'show':
-                $replacement = "<?php echo \$__env->yieldSection(); ?>";
-                break;
-            case 'section':
-                $replacement = "<?php \$__env->startSection{$expr}; ?>";
-                break;
-            case 'append':
-                $replacement = "<?php \$__env->appendSection(); ?>";
-                break;
-            case 'stop':
-                $replacement = "<?php \$__env->stopSection(); ?>";
-                break;
-            case 'overwrite':
-                $replacement = "<?php \$__env->stopSection(true); ?>";
-                break;
-            case 'if':
-            case 'elseif':
-            case 'while':
-            case 'foreach':
-                $replacement = "<?php $func{$spaces}{$expr}: ?>";
-                break;
-            case 'else':
-                $replacement = "<?php else: ?>";
-                break;
-            case 'endif':
-            case 'endforeach':
-            case 'endwhile':
-                $replacement = "<?php $func; ?>";
-                break;
-            case 'unless':
-                $replacement = "<?php if ( ! $expr): ?>";
-                break;
-            case 'endunless':
-                $replacement = "<?php endif; ?>";
-                break;
-            case 'lang':
-                $replacement = "<?php echo \\Illuminate\\Support\\Facades\\Lang::get$expr; ?>";
-                break;
-            case 'choice':
-                $replacement = "<?php echo \\Illuminate\\Support\\Facades\\Lang::choice$expr; ?>";
-                break;
-            case 'include':
-            case 'extends':
-                // remove outer brackets so that (a,b) becomes a,b
-                $expr = preg_replace('/^\\((.*)\\)$/', '$1', $expr);
-                $data = "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
-                if($func == 'include')
-                    $replacement = $data;
-                else {
-                    $footer[] = $data;
-                    $replacement = '';
-                }
-                break;
-            default:
-                $replacement = $content;
-        }
+        return "<?php echo \$__env->renderEach{$expr}; ?>";
+    }
 
-        return $replacement;
+    protected function compileYield($expr)
+    {
+        return "<?php echo \$__env->yieldContent{$expr}; ?>";
+    }
+
+    protected function compileShow($expr)
+    {
+        return "<?php echo \$__env->yieldSection(); ?>";
+    }
+
+    protected function compileSection($expr)
+    {
+        return "<?php \$__env->startSection{$expr}; ?>";
+    }
+
+    protected function compileAppend($expr)
+    {
+        return "<?php \$__env->appendSection(); ?>";
+    }
+
+    protected function compileStop($expr)
+    {
+        return "<?php \$__env->stopSection(); ?>";
+    }
+
+    protected function compileOverwrite($expr)
+    {
+        return "<?php \$__env->stopSection(true); ?>";
+    }
+
+    protected function compileUnless($expr)
+    {
+        return "<?php if ( ! $expr): ?>";
+    }
+
+    protected function compileEndunless($expr)
+    {
+        return "<?php endif; ?>";
+    }
+
+    protected function compileLang($expr)
+    {
+        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::get$expr; ?>";
+    }
+
+    protected function compileChoice($expr)
+    {
+        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::choice$expr; ?>";
+    }
+
+    protected function compileElse($expr)
+    {
+        return "<?php else: ?>";
+    }
+
+    protected function compileForeach($expr)
+    {
+        return "<?php foreach{$expr}: ?>";
+    }
+
+    protected function compileIf($expr)
+    {
+        return "<?php if{$expr}: ?>";
+    }
+
+    protected function compileElseif($expr)
+    {
+        return "<?php elseif{$expr}: ?>";
+    }
+
+    protected function compileWhile($expr)
+    {
+        return "<?php while{$expr}: ?>";
+    }
+
+    protected function compileEndwhile($expr)
+    {
+        return "<?php endwhile; ?>";
+    }
+
+    protected function compileEndforeach($expr)
+    {
+        return "<?php endforeach; ?>";
+    }
+
+    protected function compileEndif($expr)
+    {
+        return "<?php endif; ?>";
+    }
+
+    protected function compileExtends($expr)
+    {
+        // remove outer brackets so that (a,b) becomes a,b
+        if( starts_with($expr, '(') )
+            $expr = substr($expr, 1, -1);
+        $data = "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+
+        $this->footer[] = $data;
+
+        return '';
+    }
+
+    protected function compileInclude($expr)
+    {
+        // remove outer brackets so that (a,b) becomes a,b
+        if( starts_with($expr, '(') )
+            $expr = substr($expr, 1, -1);
+
+        return "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
 
     /**
