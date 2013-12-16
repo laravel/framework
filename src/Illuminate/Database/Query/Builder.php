@@ -947,7 +947,7 @@ class Builder {
 	 */
 	public function offset($value)
 	{
-		$this->offset = $value;
+		$this->offset = $value > 0 ? $value : 0;
 
 		return $this;
 	}
