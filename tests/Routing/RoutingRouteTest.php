@@ -19,6 +19,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('dayle', $router->dispatch(Request::create('http://api.dayle.baz/foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
+		$route = $router->get('foo/{age}', array('domain' => 'api.{name}.bar', function($name, $age) { return $name.$age; }));
+		$this->assertEquals('taylor25', $router->dispatch(Request::create('http://api.taylor.bar/foo/25', 'GET'))->getContent());
+
+		$router = $this->getRouter();
 		$router->get('foo/bar', function() { return 'hello'; });
 		$router->post('foo/bar', function() { return 'post hello'; });
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());

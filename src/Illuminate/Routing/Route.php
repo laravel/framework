@@ -367,7 +367,7 @@ class Route {
 		{
 			preg_match($this->compiled->getHostRegex(), $request->getHost(), $matches);
 
-			$parameters = array_merge($parameters, $this->combineMatchesWithKeys(array_slice($matches, 1)));
+			$parameters = array_merge($this->combineMatchesWithKeys(array_slice($matches, 1)), $parameters);
 		}
 
 		return $this->parameters = $this->replaceDefaults($parameters);
