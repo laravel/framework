@@ -1,3 +1,3 @@
 <?php namespace Illuminate\View;
 
-class ViewNotFoundException extends \RuntimeException {}
+class ViewNotFoundException extends \InvalidArgumentException {}
