@@ -101,12 +101,12 @@ class FileViewFinder implements ViewFinderInterface {
 
 		if (count($segments) != 2)
 		{
-			throw new \InvalidArgumentException("View [$name] has an invalid name.");
+			throw new ViewNotFoundException("View [$name] has an invalid name.");
 		}
 
 		if ( ! isset($this->hints[$segments[0]]))
 		{
-			throw new \InvalidArgumentException("No hint path defined for [{$segments[0]}].");
+			throw new ViewNotFoundException("No hint path defined for [{$segments[0]}].");
 		}
 
 		return $segments;
@@ -132,7 +132,7 @@ class FileViewFinder implements ViewFinderInterface {
 			}
 		}
 
-		throw new \InvalidArgumentException("View [$name] not found.");
+		throw new ViewNotFoundException("View [$name] not found.");
 	}
 
 	/**

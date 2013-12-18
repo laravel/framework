@@ -168,7 +168,7 @@ class Environment {
 		{
 			$this->finder->find($view);
 		}
-		catch (\InvalidArgumentException $e)
+		catch (ViewNotFoundException $e)
 		{
 			return false;
 		}
