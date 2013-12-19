@@ -426,14 +426,15 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Get an item from the collection by key.
+	 * Get one or more items at random from the collection.
 	 *
+	 * @param  int  $amount
 	 * @return mixed
 	 */
-	public function random()
+	public function random($amount = 1)
 	{
-		$key = array_rand($this->items);
-		return $this->items[$key];
+		$keys = array_rand($this->items, $amount);
+		return is_array($keys) ? array_intersect_key($this->items, $keys) : $this->items[$keys];
 	}
 
 	/**
