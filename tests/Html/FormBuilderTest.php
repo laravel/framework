@@ -33,7 +33,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$form1 = $this->formBuilder->open(array('method' => 'GET'));
 		$form2 = $this->formBuilder->open(array('method' => 'POST', 'class' => 'form', 'id' => 'id-form'));
-		$form3 = $this->formBuilder->open(array('method' => 'POST', 'class' => ['form', 'form-foo'], 'id' => 'id-form'));
+		$form3 = $this->formBuilder->open(array('method' => 'POST', 'class' => array('form', 'form-foo'), 'id' => 'id-form'));
 		$form4 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16'));
 		$form5 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16', 'files' => true));
 		$form6 = $this->formBuilder->open(array('method' => 'PUT'));
