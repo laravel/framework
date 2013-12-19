@@ -250,7 +250,6 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testTakeLast()
 	{
-
 		$data = new Collection(array('taylor', 'dayle', 'shawn'));
 		$data = $data->take(-2);
 		$this->assertEquals(array('dayle', 'shawn'), $data->all());
