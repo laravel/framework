@@ -177,13 +177,13 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	{
 		$connection = $this->getConnection();
 		$connection->shouldReceive('getSchemaBuilder->getColumnType')->once()->with('users', 'foo')->andReturnUsing(function($table, $column) {
-			$column = new StdClass;
-			$column->Type = 'int(10) unsigned';
-			$column->Null = 'NO';
-			$column->Default = '100';
-			$column->Extra = 'auto_increment';
+			$result = new StdClass;
+			$result->Type = 'int(10) unsigned';
+			$result->Null = 'NO';
+			$result->Default = '100';
+			$result->Extra = 'auto_increment';
 			$processor = new \Illuminate\Database\Query\Processors\MySqlProcessor;
-			return $processor->processColumnType(array($column));
+			return $processor->processColumnType(array($result));
 		});
 		$blueprint = new Blueprint('users');
 		$blueprint->renameColumn('foo', 'bar');
