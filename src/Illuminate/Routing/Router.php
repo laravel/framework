@@ -1401,6 +1401,15 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * @deprecated Deprecated in 4.1. Use current instead.
+	 * @see current()
+	 */
+	public function getCurrentRoute()
+	{
+		return $this->current();
+	}
+
+	/**
 	 * Get the current route name.
 	 *
 	 * @return string|null
