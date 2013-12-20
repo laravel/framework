@@ -45,7 +45,7 @@ class QueryException extends PDOException {
 	 *
 	 * @param  string  $sql
 	 * @param  array  $bindings
-	 * @param  \PDOException $previous
+	 * @param  \Exception $previous
 	 * @return string
 	 */
 	protected function formatMessage($sql, $bindings, $previous)
