@@ -173,6 +173,27 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRenameColumn()
+	{
+		$connection = $this->getConnection();
+		$connection->shouldReceive('getSchemaBuilder->getColumnType')->once()->with('users', 'foo')->andReturnUsing(function($table, $column) {
+			$column = new StdClass;
+			$column->Type = 'int(10) unsigned';
+			$column->Null = 'NO';
+			$column->Default = '100';
+			$column->Extra = 'auto_increment';
+			$processor = new \Illuminate\Database\Query\Processors\MySqlProcessor;
+			return $processor->processColumnType(array($column));
+		});
+		$blueprint = new Blueprint('users');
+		$blueprint->renameColumn('foo', 'bar');
+		$statements = $blueprint->toSql($connection, $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` change `foo` `bar` int(10) unsigned not null default 100 auto_increment', $statements[0]);
+	}
+
+
 	public function testAddingPrimaryKey()
 	{
 		$blueprint = new Blueprint('users');

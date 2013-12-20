@@ -38,4 +38,22 @@ class MySqlBuilder extends Builder {
 		return $this->connection->getPostProcessor()->processColumnListing($results);
 	}
 
+	/**
+	 * Get a full string representation of a column's type.
+	 *
+	 * @param  string  $table
+	 * @param  string  $column
+	 * @return string
+	 */
+	public function getColumnType($table, $column)
+	{
+		$sql = $this->grammar->compileDescribe($table, $column);
+
+		$result = $this->connection->select($sql);
+
+		$column = $this->connection->getPostProcessor()->processColumnType($result);
+
+		return $this->grammar->compileType($column);
+	}
+
 }
