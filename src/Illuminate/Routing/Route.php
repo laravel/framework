@@ -268,6 +268,15 @@ class Route {
 	}
 
 	/**
+	 * @deprecated Deprecated in 4.1. Use parameter instead.
+	 * @see parameter()
+	 */
+	public function getParameter($name, $default = null)
+	{
+		return $this->parameter($name, $default);
+	}
+
+	/**
 	 * Set a parameter to the given value.
 	 *
 	 * @param  string  $name
@@ -300,6 +309,15 @@ class Route {
 		}
 
 		throw new \LogicException("Route is not bound.");
+	}
+
+	/**
+	 * @deprecated Deprecated in 4.1. Use parameters instead.
+	 * @see parameters()
+	 */
+	public function getParameters()
+	{
+		return $this->parameters();
 	}
 
 	/**
@@ -613,6 +631,15 @@ class Route {
 	}
 
 	/**
+	 * @deprecated Deprecated in 4.1. Use methods instead.
+	 * @see methods()
+	 */
+	public function getMethods()
+	{
+		return $this->methods();
+	}
+
+	/**
 	 * Determine if the route only responds to HTTPS requests.
 	 *
 	 * @return bool
@@ -640,6 +667,15 @@ class Route {
 	public function getUri()
 	{
 		return $this->uri;
+	}
+
+	/**
+	 * @deprecated Deprecated in 4.1. Use uri instead.
+	 * @see uri()
+	 */
+	public function getPath()
+	{
+		return $this->uri();
 	}
 
 	/**
