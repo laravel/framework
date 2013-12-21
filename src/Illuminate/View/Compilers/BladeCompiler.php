@@ -50,6 +50,19 @@ class BladeCompiler extends Compiler implements CompilerInterface {
     }
 
     /**
+     * For internal use only
+     *
+     *
+     * @param string $methodName
+     * @param string $expression
+     * @return string
+     */
+    public function __compileMethod($methodName, $expression)
+    {
+        return $this->$methodName($expression);
+    }
+
+    /**
      * Compile the given Blade template contents.
      *
      * @param  string  $value
@@ -81,7 +94,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
                         {
                             if( method_exists($obj, $method = 'compile' . ucfirst($match[1])) )
                             {
-                                $match[0] = $obj->$method(@$match[3]);
+                                $match[0] = $obj->__compileMethod($method, @$match[3]);
                             }
 
                             return $match[0] . (@$match[3]?'':$match[2]);
