@@ -1,5 +1,8 @@
 {
 	"4.2.*": [
+		
+	],
+	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
 		{"message": "Allow before and after validation rules to reference other fields.", "backport": null},
 		{"message": "Added splice method to Collection class.", "backport": null},
