@@ -591,6 +591,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
 		$this->assertTrue($relation->getParent() === $model);
 		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+
+		require_once __DIR__.'/stubs/NamespacedStubs.php';
+		$model = new Foo\Bar\EloquentModelStub;
+		$this->addMockConnection($model);
+		$relation = $model->hasOne('EloquentModelSaveStub', 'foo');
+		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertTrue($relation->getQuery()->getModel() instanceof Foo\Bar\EloquentModelSaveStub);
 	}
 
 
@@ -618,6 +626,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
 		$this->assertTrue($relation->getParent() === $model);
 		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+
+		require_once __DIR__.'/stubs/NamespacedStubs.php';
+		$model = new Foo\Bar\EloquentModelStub;
+		$this->addMockConnection($model);
+		$relation = $model->hasMany('EloquentModelSaveStub', 'foo');
+		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertTrue($relation->getQuery()->getModel() instanceof Foo\Bar\EloquentModelSaveStub);
 	}
 
 
@@ -640,6 +656,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('belongs_to_stub_id', $relation->getForeignKey());
 		$this->assertTrue($relation->getParent() === $model);
 		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+
+		require_once __DIR__.'/stubs/NamespacedStubs.php';
+		$model = new Foo\Bar\EloquentModelStub;
+		$this->addMockConnection($model);
+		$relation = $model->belongsToStub();
+		$this->assertEquals('belongs_to_stub_id', $relation->getForeignKey());
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertTrue($relation->getQuery()->getModel() instanceof Foo\Bar\EloquentModelSaveStub);
 
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
@@ -679,6 +703,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('table.other', $relation->getOtherKey());
 		$this->assertTrue($relation->getParent() === $model);
 		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+
+		require_once __DIR__.'/stubs/NamespacedStubs.php';
+		$model = new Foo\Bar\EloquentModelStub;
+		$this->addMockConnection($model);
+		$relation = $model->belongsToMany('EloquentModelSaveStub', 'table', 'foreign', 'other');
+		$this->assertEquals('table.foreign', $relation->getForeignKey());
+		$this->assertEquals('table.other', $relation->getOtherKey());
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertTrue($relation->getQuery()->getModel() instanceof Foo\Bar\EloquentModelSaveStub);
 	}
 
 
@@ -687,7 +720,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelWithoutTableStub;
 		$this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
 
-		require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+		require_once __DIR__.'/stubs/NamespacedStubs.php';
 		$namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
 		$this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
 	}

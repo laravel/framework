@@ -566,7 +566,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
-		$instance = new $related;
+		$instance = $this->newRelated($related);
 
 		$localKey = $localKey ?: $this->getKeyName();
 
@@ -584,7 +584,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
 	{
-		$instance = new $related;
+		$instance = $this->newRelated($related);
 
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
@@ -624,7 +624,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$foreignKey = snake_case($relation).'_id';
 		}
 
-		$instance = new $related;
+		$instance = $this->newRelated($related);
 
 		// Once we have the foreign key names, we'll just create a new Eloquent query
 		// for the related models and returns the relationship instance which will
@@ -678,7 +678,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
-		$instance = new $related;
+		$instance = $this->newRelated($related);
 
 		$localKey = $localKey ?: $this->getKeyName();
 
@@ -702,7 +702,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough(with(new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		return new HasManyThrough(with($this->newRelated($related))->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
@@ -717,7 +717,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
 	{
-		$instance = new $related;
+		$instance = $this->newRelated($related);
 
 		// Here we will gather up the morph type and ID for the relationship so that we
 		// can properly query the intermediate table of a relation. Finally, we will
@@ -758,7 +758,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// instances as well as the relationship instances we need for this.
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
-		$instance = new $related;
+		$instance = $this->newRelated($related);
 
 		$otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -798,7 +798,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// instances, as well as the relationship instances we need for these.
 		$foreignKey = $foreignKey ?: $name.'_id';
 
-		$instance = new $related;
+		$instance = $this->newRelated($related);
 
 		$otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -836,6 +836,30 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$otherKey = $otherKey ?: $name.'_id';
 
 		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
+	}
+
+	/**
+	 * Create an instance of the related object, detecting the namespace if necessary
+	 * @param  string $className
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	protected function newRelated($className)
+	{
+		// If class name starts with "\", assume it is fully qualified
+		if (starts_with($className, '\\')) {
+			return new $className;
+		}	
+
+		// Get the namespace of the calling class
+		$namespace = substr(get_called_class(), 0, strrpos(get_called_class(), '\\'));
+		
+		// Try prepending the namespace first, in case there is a global class
+		// with the same name
+		if (class_exists($namespacedClass = "{$namespace}\\{$className}")) {
+			$className = $namespacedClass;
+		}
+
+		return new $className;
 	}
 
 	/**
