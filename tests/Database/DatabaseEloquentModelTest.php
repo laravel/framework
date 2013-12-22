@@ -599,6 +599,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
 		$this->assertTrue($relation->getParent() === $model);
 		$this->assertTrue($relation->getQuery()->getModel() instanceof Foo\Bar\EloquentModelSaveStub);
+
+		$model = new Foo\Bar\EloquentModelStub;
+		$this->addMockConnection($model);
+		$relation = $model->hasOne('\EloquentModelSaveStub', 'foo');
+		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
 	}
 
 
