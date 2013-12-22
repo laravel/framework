@@ -5,7 +5,7 @@ class BcryptHasher implements HasherInterface {
 	/**
 	 * Default crypt cost factor.
 	 *
-	 * @var bool
+	 * @var integer
 	 */
 	protected $rounds = 10;
 
