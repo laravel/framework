@@ -276,7 +276,7 @@ abstract class HasOneOrMany extends Relation {
 	 *
 	 * @return mixed
 	 */
-	protected function getParentKey()
+	public function getParentKey()
 	{
 		return $this->parent->getAttribute($this->localKey);
 	}
@@ -286,7 +286,7 @@ abstract class HasOneOrMany extends Relation {
 	 *
 	 * @return string
 	 */
-	protected function getQualifiedParentKeyName()
+	public function getQualifiedParentKeyName()
 	{
 		return $this->parent->getTable().'.'.$this->localKey;
 	}
