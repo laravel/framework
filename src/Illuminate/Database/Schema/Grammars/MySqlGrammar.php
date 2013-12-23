@@ -574,7 +574,7 @@ class MySqlGrammar extends Grammar {
 	{
 		if ( ! is_null($column->comment))
 		{
-			return " comment '".strval(mysql_real_escape_string(column->comment))."'";
+			return " comment '".strval(mysql_real_escape_string($column->comment))."'";
 		}
 	}
 
