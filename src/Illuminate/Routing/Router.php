@@ -1420,7 +1420,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteNamed($name)
 	{
-		return $this->current()->getName() == $name;
+		return $this->currentRouteName() == $name;
 	}
 
 	/**
@@ -1430,7 +1430,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteAction()
 	{
-		$action = $this->current()->getAction();
+		$current = $this->current();
+
+		if (is_null($current)) return null;
+
+		$action = $current->getAction();
 
 		return isset($action['controller']) ? $action['controller'] : null;
 	}
