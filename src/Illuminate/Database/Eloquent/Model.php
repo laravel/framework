@@ -702,7 +702,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough(with($this->newRelated($related))->newQuery(), $this, $through, $firstKey, $secondKey);
+		return new HasManyThrough($this->newRelated($related)->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
@@ -839,23 +839,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Create an instance of the related object, detecting the namespace if necessary
-	 * @param  string $className
+	 * Create an instance of the related object, detecting the namespace if necessary.
+	 * @param  string  $className
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	protected function newRelated($className)
 	{
-		// If class name starts with "\", assume it is fully qualified
-		if (starts_with($className, '\\')) {
+		// If class name starts with "\", assume it is fully qualified.
+		if (starts_with($className, '\\'))
+		{
 			return new $className;
 		}	
 
-		// Get the namespace of the calling class
-		$namespace = substr(get_called_class(), 0, strrpos(get_called_class(), '\\'));
+		// Get the namespace of the calling class.
+		$namespace = substr(get_class($this), 0, strrpos(get_class($this), '\\'));
 		
 		// Try prepending the namespace first, in case there is a global class
-		// with the same name
-		if (class_exists($namespacedClass = "{$namespace}\\{$className}")) {
+		// with the same name.
+		if (class_exists($namespacedClass = "{$namespace}\\{$className}"))
+		{
 			$className = $namespacedClass;
 		}
 
