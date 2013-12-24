@@ -289,7 +289,9 @@ class MySqlGrammar extends Grammar {
 
 		$type = $this->{'type'.ucfirst($command->type)}($command);
 
-		return "alter table {$table} modify {$command->columnName} {$type}";
+		$sql = "alter table {$table} modify {$command->columnName} {$type}";
+
+		return $this->addModifiers($sql, $blueprint, $command);
 	}
 
 	/**
