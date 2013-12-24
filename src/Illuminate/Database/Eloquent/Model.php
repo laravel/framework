@@ -5,6 +5,7 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
+use ReflectionClass;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -851,14 +852,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return new $className;
 		}	
 
-		// Get the namespace of the calling class.
 		$namespace = substr(get_class($this), 0, strrpos(get_class($this), '\\'));
-		
+
 		// Try prepending the namespace first, in case there is a global class
 		// with the same name.
-		if (class_exists($namespacedClass = "{$namespace}\\{$className}"))
+		$namespacedClass = $namespace . '\\' . $className;
+		if (class_exists($namespacedClass))
 		{
-			$className = $namespacedClass;
+			return new $namespacedClass;
 		}
 
 		return new $className;
