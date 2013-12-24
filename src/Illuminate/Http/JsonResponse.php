@@ -56,4 +56,21 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 		return $this;
 	}
 
+	/**
+	 * Set ETag and/or Last-Modified and check against current request if a not modified response should be returned.
+	 *
+	 * @param string|null           $etag
+	 * @param \Datetime|Carbon|null $lastModified
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function remember($etag = null, $lastModified = null)
+	{
+		$this->setEtag($etag)->setLastModified($lastModified);
+
+		$this->isNotModified(\Request::instance());
+
+		return $this;
+	}
+
 }
