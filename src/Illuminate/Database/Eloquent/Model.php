@@ -661,9 +661,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// them on the relations. Otherwise, we will just make a great estimate.
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
+		if( ! $this->exists)
+		{
+			// Return "fake" relationship so the builder gets a chance to try again
+			return new MorphTo($this->newQuery(), $this, $id, 'id');
+		}
+
 		$class = $this->$type;
 
-		return $this->belongsTo($class, $id);
+		$instance = new $class;
+
+		// Once we have the foreign key names, we'll just create a new Eloquent query
+		// for the related models and returns the relationship instance which will
+		// actually be responsible for retrieving and hydrating every relations.
+		$query = $instance->newQuery();
+
+		$otherKey = $instance->getKeyName();
+
+		return new MorphTo($query, $this, $id, $otherKey);
 	}
 
 	/**

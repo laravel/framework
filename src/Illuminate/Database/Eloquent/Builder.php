@@ -487,16 +487,73 @@ class Builder {
 	 *
 	 * @param  array     $models
 	 * @param  string    $name
-	 * @param  \Closure  $constraints
+	 * @param  \Closure|array  $constraints
 	 * @return array
 	 */
-	protected function loadRelation(array $models, $name, Closure $constraints)
+	protected function loadRelation(array $models, $name, $constraints)
 	{
 		// First we will "back up" the existing where conditions on the query so we can
 		// add our eager constraints. Then we will merge the wheres that were on the
 		// query back to it in order that any where conditions might be specified.
 		$relation = $this->getRelation($name);
 
+		// In order for a MorphTo relationships to eagerload, we need to know what kind of
+		// related models we are dealing with, this information is not captured in the relationship
+		// and must be gathered from the actual models
+		if($relation instanceof MorphTo)
+		{
+			// First we collect the necessary information that we need
+			$relationForType = $modelsForType = array();
+			foreach ($models as $model)
+			{
+				$relation = $this->getRelation($name, $model);
+				$type = get_class($relation->getModel());
+
+				$relationForType[$type] = $relation;
+				$modelsForType[$type][] = $model;
+			}
+
+			// Now we are going to load the related models
+			$results = array();
+			foreach ($relationForType as $type => $relation)
+			{
+				$typeModels = $modelsForType[$type];
+
+				if(array_key_exists($type, $constraints))
+				{
+					$constraintsForType = $constraints[$type];
+				}
+				else
+				{
+					$constraintsForType = function($q) { return $q; };
+				}
+
+				$newResults = $this->processEagerloads($typeModels, $constraintsForType, $relation, $name, $type);
+
+				$results = array_merge($results, $newResults);
+			}
+
+			// Finally, we map everything back in the correct positions
+			foreach ($models as &$model)
+			{
+				$modelKey = $model->getKey();
+				foreach($results as $result)
+				{
+					if($result->getKey() == $modelKey)
+					{
+						$model = $result;
+					}
+				}
+			}
+
+			return $models;
+		}
+
+		return $this->processEagerloads($models, $constraints, $relation, $name);
+	}
+
+	protected function processEagerloads($models, $constraints, $relation, $name, $type = null)
+	{
 		$relation->addEagerConstraints($models);
 
 		call_user_func($constraints, $relation);
@@ -517,16 +574,16 @@ class Builder {
 	 * @param  string  $relation
 	 * @return \Illuminate\Database\Eloquent\Relations\Relation
 	 */
-	public function getRelation($relation)
+	public function getRelation($relation, $model = null)
 	{
-		$me = $this;
+		$model = $model ?: $this->getModel();
 
 		// We want to run a relationship query without any constrains so that we will
 		// not have to remove these where clauses manually which gets really hacky
 		// and is error prone while we remove the developer's own where clauses.
-		$query = Relation::noConstraints(function() use ($me, $relation)
+		$query = Relation::noConstraints(function() use ($model, $relation)
 		{
-			return $me->getModel()->$relation();
+			return $model->$relation();
 		});
 
 		$nested = $this->nestedRelations($relation);
