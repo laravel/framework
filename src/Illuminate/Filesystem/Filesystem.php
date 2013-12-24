@@ -121,7 +121,10 @@ class Filesystem {
 	 */
 	public function delete($paths)
 	{
-		$paths = is_array($paths) ? $paths : func_get_args();
+		if( ! is_array($paths))
+		{
+			return @unlink($paths);
+		}
 
 		foreach ($paths as $path) { @unlink($path); }
 	}
