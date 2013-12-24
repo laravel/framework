@@ -216,6 +216,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Indicate that the given columns should be altered.
+	 *
+	 * @param  string  $columnName
+	 * @param  string  $type
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function updateColumn($columnName, $type)
+	{
+		return $this->addCommand('updateColumn', compact('columnName', 'type'));
+	}
+
+	/**
 	 * Indicate that the given primary key should be dropped.
 	 *
 	 * @param  string|array  $index
