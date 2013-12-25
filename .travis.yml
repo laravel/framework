@@ -15,3 +15,4 @@ script: phpunit -d memory_limit=1024M
 matrix:
   allow_failures:
     - php: hhvm
+  fast_finish: true
