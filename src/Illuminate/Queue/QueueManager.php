@@ -145,9 +145,20 @@ class QueueManager {
 	 *
 	 * @return string
 	 */
-	protected function getDefault()
+	public function getDefault()
 	{
 		return $this->app['config']['queue.default'];
+	}
+
+	/**
+	 * Set the name of the default queue connection.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setDefault($name)
+	{
+		$this->app['config']['queue.default'] = $name;
 	}
 
 	/**

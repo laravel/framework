@@ -194,9 +194,20 @@ class SessionManager extends Manager {
 	 *
 	 * @return string
 	 */
-	protected function getDefaultDriver()
+	public function getDefaultDriver()
 	{
 		return $this->app['config']['session.driver'];
+	}
+
+	/**
+	 * Set the default session driver name.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setDefaultDriver($name)
+	{
+		$this->app['config']['session.driver'] = $name;
 	}
 
 }

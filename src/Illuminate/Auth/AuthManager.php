@@ -97,9 +97,20 @@ class AuthManager extends Manager {
 	 *
 	 * @return string
 	 */
-	protected function getDefaultDriver()
+	public function getDefaultDriver()
 	{
 		return $this->app['config']['auth.driver'];
+	}
+
+	/**
+	 * Set the default authentication driver name.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setDefaultDriver($name)
+	{
+		$this->app['config']['auth.driver'] = $name;
 	}
 
 }
