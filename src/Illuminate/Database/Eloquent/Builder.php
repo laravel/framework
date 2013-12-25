@@ -514,59 +514,49 @@ class Builder {
 				$modelsForType[$type][] = $model;
 			}
 
-			// Now we are going to load the related models
 			$results = array();
 			foreach ($relationForType as $type => $relation)
 			{
 				$typeModels = $modelsForType[$type];
 
+				$typeModels = $relation->initRelation($typeModels, $name);
+
 				if(array_key_exists($type, $constraints))
 				{
-					$constraintsForType = $constraints[$type];
+					$typeConstraints = $constraints[$type];
 				}
 				else
 				{
-					$constraintsForType = function($q) { return $q; };
+					$typeConstraints = function($q) { return $q; };
 				}
 
-				$newResults = $this->processEagerloads($typeModels, $constraintsForType, $relation, $name, $type);
+				$newResults = $this->processEagerloads($typeModels, $typeConstraints, $relation);
 
-				$results = array_merge($results, $newResults);
+				$results = array_merge($results, $newResults->all());
 			}
 
-			// Finally, we map everything back in the correct positions
-			foreach ($models as &$model)
-			{
-				$modelKey = $model->getKey();
-				foreach($results as $result)
-				{
-					if($result->getKey() == $modelKey)
-					{
-						$model = $result;
-					}
-				}
-			}
+			$results = new Collection($results);
+		}
+		else
+		{
+			$models = $relation->initRelation($models, $name);
 
-			return $models;
+			$results = $this->processEagerloads($models, $constraints, $relation);
 		}
 
-		return $this->processEagerloads($models, $constraints, $relation, $name);
+		return $relation->match($models, $results, $name);
 	}
 
-	protected function processEagerloads($models, $constraints, $relation, $name, $type = null)
+	protected function processEagerloads($models, $constraints, $relation)
 	{
 		$relation->addEagerConstraints($models);
 
 		call_user_func($constraints, $relation);
 
-		$models = $relation->initRelation($models, $name);
-
 		// Once we have the results, we just match those back up to their parent models
 		// using the relationship instance. Then we just return the finished arrays
 		// of models which have been eagerly hydrated and are readied for return.
-		$results = $relation->get();
-
-		return $relation->match($models, $results, $name);
+		return $relation->get();
 	}
 
 	/**

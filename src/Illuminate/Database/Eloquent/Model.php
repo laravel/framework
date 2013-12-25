@@ -665,7 +665,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		if( ! $this->exists)
 		{
 			// Return "fake" relationship so the builder gets a chance to try again
-			return new MorphTo($this->newQuery(), $this, $id, 'id');
+			return new MorphTo($this->newQuery(), $this, $id, 'id', $type);
 		}
 
 		$class = $this->$type;
@@ -679,7 +679,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$otherKey = $instance->getKeyName();
 
-		return new MorphTo($query, $this, $id, $otherKey);
+		return new MorphTo($query, $this, $id, $otherKey, $type);
 	}
 
 	/**
