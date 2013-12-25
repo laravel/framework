@@ -174,9 +174,20 @@ class RemoteManager {
 	 *
 	 * @return string
 	 */
-	protected function getDefaultConnection()
+	public function getDefaultConnection()
 	{
 		return $this->app['config']['remote.default'];
+	}
+
+	/**
+	 * Set the default connection name.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setDefaultConnection($name)
+	{
+		$this->app['config']['remote.default'] = $name;
 	}
 
 	/**
