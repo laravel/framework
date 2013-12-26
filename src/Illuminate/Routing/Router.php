@@ -1407,7 +1407,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteName()
 	{
-		return $this->current()->getName();
+		return ($this->current()) ? $this->current()->getName() : null;
 	}
 
 	/**
@@ -1418,7 +1418,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteNamed($name)
 	{
-		return $this->current()->getName() == $name;
+		return ($this->current()) ? $this->current()->getName() == $name : false;
 	}
 
 	/**
