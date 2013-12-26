@@ -149,6 +149,13 @@ class Builder {
 	protected $cacheTags;
 
 	/**
+	 * The driver for the query cache.
+	 *
+	 * @var string
+	 */
+	protected $cacheDriver;
+
+	/**
 	 * All of the available clause operators.
 	 *
 	 * @var array
@@ -1113,6 +1120,19 @@ class Builder {
 	}
 
 	/**
+	 * Indicate that the results, if cached, should use the given cache driver.
+	 *
+	 * @param  string  $cacheDriver
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function cacheDriver($cacheDriver)
+	{
+		$this->cacheDriver = $cacheDriver;
+
+		return $this;
+	}
+
+	/**
 	 * Execute a query for a single record by ID.
 	 *
 	 * @param  int    $id
@@ -1225,7 +1245,7 @@ class Builder {
 	 */
 	protected function getCache()
 	{
-		$cache = $this->connection->getCacheManager();
+		$cache = $this->connection->getCacheManager()->driver($this->cacheDriver);
 
 		return $this->cacheTags ? $cache->tags($this->cacheTags) : $cache;
 	}
