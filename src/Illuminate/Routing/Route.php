@@ -646,7 +646,7 @@ class Route {
 	 * Set the URI that the route responds to.
 	 *
 	 * @param  string  $uri
-	 * @return $this
+	 * @return \Illuminate\Routing\Route
 	 */
 	public function setUri($uri)
 	{
