@@ -89,7 +89,7 @@ class TinkerCommand extends Command {
 
 			// If an exception occurs, we will just display the message and keep this
 			// loop going so we can keep executing commands. However, when a fatal
-			// error occurs, we have no choice but to bail out of the routines.
+			// error occurs, we have no choice but to bail out of this routines.
 			catch (\Exception $e)
 			{
 				$this->error($e->getMessage());
