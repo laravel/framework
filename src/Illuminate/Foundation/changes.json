@@ -70,7 +70,8 @@
 		{"message": "Added Mail::failures to get the failed recipients for a message.", "backport": null},
 		{"message": "Renamed `Model::tags($cacheTags)` to `Model::cacheTags($cacheTags)`", "backport": null},
 		{"message": "Model::destroy now returns the total number of records deleted.", "backport": null},
-		{"message": "Fixed relative URL generation.", "backport": null}
+		{"message": "Fixed relative URL generation.", "backport": null},
+		{"message": "Added --seeder option to migrate:refresh Artisan command.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
