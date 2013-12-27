@@ -171,7 +171,6 @@ class BelongsTo extends Relation {
 		// key of the relationship, then we can easily match the children back onto
 		// the parents using that dictionary and the primary key of the children.
 		$dictionary = array();
-
 		foreach ($results as $result)
 		{
 			$dictionary[$result->getAttribute($other)] = $result;
