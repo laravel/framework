@@ -895,8 +895,9 @@ class Validator implements MessageProviderInterface {
 	protected function getExtraConditions(array $segments)
 	{
 		$extra = array();
+		$count = count($segments);
 
-		for ($i = 0; $i < count($segments); $i = $i + 2)
+		for ($i = 0; $i < $count; $i = $i + 2)
 		{
 			$extra[$segments[$i]] = $segments[$i + 1];
 		}
