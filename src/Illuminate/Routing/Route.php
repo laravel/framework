@@ -643,6 +643,19 @@ class Route {
 	}
 
 	/**
+	 * Set the URI that the route responds to.
+	 *
+	 * @param  string  $uri
+	 * @return $this
+	 */
+	public function setUri($uri)
+	{
+		$this->uri = $uri;
+
+		return $this;
+	}
+
+	/**
 	 * Get the name of the route instance.
 	 *
 	 * @return string
