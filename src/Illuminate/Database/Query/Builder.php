@@ -954,7 +954,7 @@ class Builder {
 	 */
 	public function offset($value)
 	{
-		$this->offset = $value;
+		$this->offset = max(0, $value);
 
 		return $this;
 	}
