@@ -149,7 +149,7 @@ class Builder {
 	protected $cacheTags;
 
 	/**
-	 * The driver for the query cache.
+	 * The cache driver to be used.
 	 *
 	 * @var string
 	 */
@@ -1101,9 +1101,7 @@ class Builder {
 	 */
 	public function rememberForever($key = null)
 	{
-		list($this->cacheMinutes, $this->cacheKey) = array(-1, $key);
-
-		return $this;
+		return $this->remember(-1, $key);
 	}
 
 	/**
