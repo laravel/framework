@@ -93,7 +93,7 @@ class Filesystem {
 	{
 		if ($this->exists($path))
 		{
-			return $this->put($path, $data.$this->get($path));			
+			return $this->put($path, $data.$this->get($path));
 		}
 		else
 		{
@@ -123,7 +123,11 @@ class Filesystem {
 	{
 		$paths = is_array($paths) ? $paths : func_get_args();
 
-		foreach ($paths as $path) { @unlink($path); }
+		$success = true;
+
+		foreach ($paths as $path) { if ( ! @unlink($path)) $success = false; }
+
+		return $success;
 	}
 
 	/**
@@ -395,7 +399,7 @@ class Filesystem {
 		}
 
 		if ( ! $preserve) @rmdir($directory);
-		
+
 		return true;
 	}
 
