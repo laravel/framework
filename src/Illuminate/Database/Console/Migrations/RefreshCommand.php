@@ -75,7 +75,7 @@ class RefreshCommand extends Command {
 
 			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
 
-			array('seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'),
+			array('seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'),
 		);
 	}
 
