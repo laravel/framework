@@ -117,7 +117,7 @@ class Filesystem {
 	 * Delete the file at a given path.
 	 *
 	 * @param  string|array  $paths
-	 * @return bool
+	 * @return bool|void
 	 */
 	public function delete($paths)
 	{
