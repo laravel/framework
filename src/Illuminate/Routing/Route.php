@@ -262,6 +262,18 @@ class Route {
 	 * @param  mixed  $default
 	 * @return string
 	 */
+	public function getParameter($name, $default = null)
+	{
+		return $this->parameter($name, $default);
+	}
+
+	/**
+	 * Get a given parameter from the route.
+	 *
+	 * @param  string  $name
+	 * @param  mixed  $default
+	 * @return string
+	 */
 	public function parameter($name, $default = null)
 	{
 		return array_get($this->parameters(), $name) ?: $default;
@@ -597,9 +609,29 @@ class Route {
 	 *
 	 * @return string
 	 */
+	public function getPath()
+	{
+		return $this->uri();
+	}
+
+	/**
+	 * Get the URI associated with the route.
+	 *
+	 * @return string
+	 */
 	public function uri()
 	{
 		return $this->uri;
+	}
+
+	/**
+	 * Get the HTTP verbs the route responds to.
+	 *
+	 * @return array
+	 */
+	public function getMethods()
+	{
+		return $this->methods();
 	}
 
 	/**
