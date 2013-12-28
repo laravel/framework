@@ -1603,7 +1603,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  \Illuminate\Database\Query\Builder $baseQueryBuilder
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public function getQueryBuilder($baseQueryBuilder)
+	public function newQueryBuilder($baseQueryBuilder)
 	{
 		return new Builder($baseQueryBuilder);
 	}
