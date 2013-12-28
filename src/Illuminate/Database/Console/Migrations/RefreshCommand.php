@@ -37,7 +37,7 @@ class RefreshCommand extends Command {
 
 		if ($this->needsSeeding())
 		{
-			$this->runSeeder();
+			$this->runSeeder($database);
 		}
 	}
 
@@ -52,11 +52,12 @@ class RefreshCommand extends Command {
 	}
 
 	/**
-	 * Run the databsae seeder command.
+	 * Run the database seeder command.
 	 *
+	 * @param  string  $database
 	 * @return void
 	 */
-	protected function runSeeder()
+	protected function runSeeder($database)
 	{
 		$class = $this->option('seeder') ?: 'DatabaseSeeder';
 
