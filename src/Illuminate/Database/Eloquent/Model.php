@@ -1605,7 +1605,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function newQuery($excludeDeleted = true)
 	{
-		$builder = new Builder($this->newBaseQueryBuilder());
+		$builder = $this->newEloquentBuilder($this->newBaseQueryBuilder());
 
 		// Once we have the query builders, we will set the model instances so the
 		// builder can easily access any information it may need from the model
@@ -1628,6 +1628,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function newQueryWithDeleted()
 	{
 		return $this->newQuery(false);
+	}
+
+	/**
+	 * Create a new Eloquent query builder for the model.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder $query
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function newEloquentBuilder($query)
+	{
+		return new Builder($query);
 	}
 
 	/**
@@ -2783,7 +2794,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function __isset($key)
 	{
 		return ((isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-			    ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
+				($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
 	}
 
 	/**

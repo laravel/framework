@@ -17,7 +17,7 @@
     },
     "require-dev": {
         "illuminate/events": "4.2.*",
-        "aws/aws-sdk-php": "2.4.*",
+        "aws/aws-sdk-php": "2.5.*",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },
