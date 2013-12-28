@@ -1598,14 +1598,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get a new query builder for the model's table.
-	 *
-	 * @param  bool  $excludeDeleted
-	 * @return \Illuminate\Database\Eloquent\Builder|static
-	 */
-	public function newQuery($excludeDeleted = true)
-	{
-		$builder = new Builder($this->newBaseQueryBuilder());
+         * Get a new base query builder for the model's query builder.
+         *
+         * @param  \Illuminate\Database\Query\Builder $baseQueryBuilder
+         * @return \Illuminate\Database\Eloquent\Builder|static
+         */
+        public function newQueryBuilder($baseQueryBuilder)
+        {
+                return new Builder($baseQueryBuilder);
+        }
+
+        /**
+         * Get a new query builder for the model's table.
+         *
+         * @param  bool  $excludeDeleted
+         * @return \Illuminate\Database\Eloquent\Builder|static
+         */
+        public function newQuery($excludeDeleted = true)
+        {
+                $builder = $this->newQueryBuilder($this->newBaseQueryBuilder());
 
 		// Once we have the query builders, we will set the model instances so the
 		// builder can easily access any information it may need from the model
