@@ -896,7 +896,9 @@ class Validator implements MessageProviderInterface {
 	{
 		$extra = array();
 
-		for ($i = 0; $i < count($segments); $i = $i + 2)
+		$count = count($segments);
+
+		for ($i = 0; $i < $count; $i = $i + 2)
 		{
 			$extra[$segments[$i]] = $segments[$i + 1];
 		}

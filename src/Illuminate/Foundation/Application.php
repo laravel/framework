@@ -388,12 +388,12 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function registerDeferredProvider($provider, $service = null)
 	{
-		$this->register($instance = new $provider($this));
-
 		// Once the provider that provides the deferred service has been registered we
 		// will remove it from our local list of the deferred services with related
 		// providers so that this container does not try to resolve it out again.
 		if ($service) unset($this->deferredServices[$service]);
+
+		$this->register($instance = new $provider($this));
 
 		if ( ! $this->booted)
 		{

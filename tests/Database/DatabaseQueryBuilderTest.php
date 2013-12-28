@@ -48,10 +48,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testSelectWithCaching()
 	{
 		$cache = m::mock('stdClass');
-		$query = $this->setupCacheTestQuery($cache);
+		$driver = m::mock('stdClass');
+		$query = $this->setupCacheTestQuery($cache, $driver);
+
 		$query = $query->remember(5);
 
-		$cache->shouldReceive('remember')
+		$driver->shouldReceive('remember')
 						 ->once()
 						 ->with($query->getCacheKey(), 5, m::type('Closure'))
 						 ->andReturnUsing(function($key, $minutes, $callback) { return $callback(); });
@@ -63,10 +65,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testSelectWithCachingForever()
 	{
 		$cache = m::mock('stdClass');
-		$query = $this->setupCacheTestQuery($cache);
+		$driver = m::mock('stdClass');
+		$query = $this->setupCacheTestQuery($cache, $driver);
+
 		$query = $query->rememberForever();
 
-		$cache->shouldReceive('rememberForever')
+		$driver->shouldReceive('rememberForever')
 												->once()
 												->with($query->getCacheKey(), m::type('Closure'))
 												->andReturnUsing(function($key, $callback) { return $callback(); });
@@ -80,12 +84,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$taggedCache = m::mock('StdClass');
 		$cache = m::mock('stdClass');
-		$cache->shouldReceive('tags')
+		$driver = m::mock('stdClass');
+
+		$driver->shouldReceive('tags')
 				->once()
 				->with(array('foo','bar'))
 				->andReturn($taggedCache);
 
-		$query = $this->setupCacheTestQuery($cache);
+		$query = $this->setupCacheTestQuery($cache, $driver);
 		$query = $query->cacheTags(array('foo', 'bar'))->remember(5);
 
 		$taggedCache->shouldReceive('remember')
@@ -342,8 +348,16 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" limit 10 offset 5', $builder->toSql());
 
 		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->skip(-5)->take(10);
+		$this->assertEquals('select * from "users" limit 10 offset 0', $builder->toSql());
+
+		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->forPage(2, 15);
 		$this->assertEquals('select * from "users" limit 15 offset 15', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->forPage(-2, 15);
+		$this->assertEquals('select * from "users" limit 15 offset 0', $builder->toSql());
 	}
 
 
@@ -852,11 +866,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->noValidMethodHere();
 	}
 
-	public function setupCacheTestQuery($cache)
+	public function setupCacheTestQuery($cache, $driver)
 	{
 		$connection = m::mock('Illuminate\Database\ConnectionInterface');
 		$connection->shouldReceive('getName')->andReturn('connection_name');
 		$connection->shouldReceive('getCacheManager')->once()->andReturn($cache);
+		$cache->shouldReceive('driver')->once()->andReturn($driver);
 		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 

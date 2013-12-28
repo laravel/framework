@@ -1395,6 +1395,16 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 *
 	 * @return \Illuminate\Routing\Route
 	 */
+	public function getCurrentRoute()
+	{
+		return $this->current();
+	}
+
+	/**
+	 * Get the currently dispatched route instance.
+	 *
+	 * @return \Illuminate\Routing\Route
+	 */
 	public function current()
 	{
 		return $this->current;

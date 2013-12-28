@@ -149,6 +149,13 @@ class Builder {
 	protected $cacheTags;
 
 	/**
+	 * The cache driver to be used.
+	 *
+	 * @var string
+	 */
+	protected $cacheDriver;
+
+	/**
 	 * All of the available clause operators.
 	 *
 	 * @var array
@@ -947,7 +954,7 @@ class Builder {
 	 */
 	public function offset($value)
 	{
-		$this->offset = $value;
+		$this->offset = max(0, $value);
 
 		return $this;
 	}
@@ -1094,9 +1101,7 @@ class Builder {
 	 */
 	public function rememberForever($key = null)
 	{
-		list($this->cacheMinutes, $this->cacheKey) = array(-1, $key);
-
-		return $this;
+		return $this->remember(-1, $key);
 	}
 
 	/**
@@ -1108,6 +1113,19 @@ class Builder {
 	public function cacheTags($cacheTags)
 	{
 		$this->cacheTags = $cacheTags;
+
+		return $this;
+	}
+
+	/**
+	 * Indicate that the results, if cached, should use the given cache driver.
+	 *
+	 * @param  string  $cacheDriver
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function cacheDriver($cacheDriver)
+	{
+		$this->cacheDriver = $cacheDriver;
 
 		return $this;
 	}
@@ -1225,7 +1243,7 @@ class Builder {
 	 */
 	protected function getCache()
 	{
-		$cache = $this->connection->getCacheManager();
+		$cache = $this->connection->getCacheManager()->driver($this->cacheDriver);
 
 		return $this->cacheTags ? $cache->tags($this->cacheTags) : $cache;
 	}
