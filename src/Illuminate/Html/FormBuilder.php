@@ -151,6 +151,17 @@ class FormBuilder {
 	}
 
 	/**
+	 * Set model on form builder.
+	 *
+	 * @param  mixed  $model
+	 * @return void
+	 */
+	public function setModel($model)
+	{
+		$this->model = $model;
+	}
+
+	/**
 	 * Close the current form.
 	 *
 	 * @return string
