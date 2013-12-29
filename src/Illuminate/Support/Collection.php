@@ -368,7 +368,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function intersect($items)
@@ -423,6 +423,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		if ($limit < 0) return $this->slice($limit, abs($limit));
 
 		return $this->slice(0, $limit);
+	}
+
+	/**
+	 * Get one or more items at random from the collection.
+	 *
+	 * @param  int  $amount
+	 * @return mixed
+	 */
+	public function random($amount = 1)
+	{
+		$keys = array_rand($this->items, $amount);
+		return is_array($keys) ? array_intersect_key($this->items, $keys) : $this->items[$keys];
 	}
 
 	/**
@@ -581,7 +593,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Results array of items from Collection or ArrayableInterface.
 	 *
-  	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return array
 	 */
 	private function getArrayableItems($items)
