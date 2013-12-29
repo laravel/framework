@@ -115,7 +115,6 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 *
 	 * @param  \Illuminate\Events\Dispatcher  $events
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(Dispatcher $events, Container $container = null)
 	{
@@ -356,12 +355,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// We need to extract the base resource from the resource name. Nested resources
 		// are supported in the framework, but we need to know what name to use for a
 		// place-holder on the route wildcards, which should be the base resources.
-		$callback = function($me) use ($name, $controller, $options)
+		$callback = function(Router $me) use ($name, $controller, $options)
 		{
 			$me->resource($name, $controller, $options);
 		};
 
-		return $this->group(compact('prefix'), $callback);
+		$this->group(compact('prefix'), $callback);
 	}
 
 	/**
@@ -508,7 +507,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @param  array   $options
-	 * @return void
+	 * @return Route
 	 */
 	protected function addResourceIndex($name, $base, $controller, $options)
 	{
@@ -524,7 +523,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @param  array   $options
-	 * @return void
+	 * @return Route
 	 */
 	protected function addResourceCreate($name, $base, $controller, $options)
 	{
@@ -540,7 +539,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @param  array   $options
-	 * @return void
+	 * @return Route
 	 */
 	protected function addResourceStore($name, $base, $controller, $options)
 	{
@@ -556,7 +555,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @param  array   $options
-	 * @return void
+	 * @return Route
 	 */
 	protected function addResourceShow($name, $base, $controller, $options)
 	{
@@ -572,7 +571,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @param  array   $options
-	 * @return void
+	 * @return Route
 	 */
 	protected function addResourceEdit($name, $base, $controller, $options)
 	{
@@ -594,7 +593,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$this->addPutResourceUpdate($name, $base, $controller, $options);
 
-		return $this->addPatchResourceUpdate($name, $base, $controller);
+		$this->addPatchResourceUpdate($name, $base, $controller);
 	}
 
 	/**
@@ -604,7 +603,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @param  array   $options
-	 * @return void
+	 * @return Route
 	 */
 	protected function addPutResourceUpdate($name, $base, $controller, $options)
 	{
@@ -635,7 +634,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $base
 	 * @param  string  $controller
 	 * @param  array   $options
-	 * @return void
+	 * @return Route
 	 */
 	protected function addResourceDestroy($name, $base, $controller, $options)
 	{
@@ -849,7 +848,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Add a controller based route action to the action array.
 	 *
 	 * @param  array|string  $action
-	 * @return void
+	 * @return array
 	 */
 	protected function getControllerAction($action)
 	{
@@ -1047,7 +1046,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Register a new global filter with the router.
 	 *
 	 * @param  string  $filter
-	 * @param  mxied   $callback
+	 * @param  mixed   $callback
 	 * @return void
 	 */
 	protected function addGlobalFilter($filter, $callback)
@@ -1111,7 +1110,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function model($key, $class, Closure $callback = null)
 	{
-		return $this->bind($key, function($value) use ($class, $callback)
+		$this->bind($key, function($value) use ($class, $callback)
 		{
 			if (is_null($value)) return null;
 
