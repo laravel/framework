@@ -151,7 +151,7 @@ class FormBuilder {
 	}
 
 	/**
-	 * Set model on form builder.
+	 * Set the model instance on the form builder.
 	 *
 	 * @param  mixed  $model
 	 * @return void
