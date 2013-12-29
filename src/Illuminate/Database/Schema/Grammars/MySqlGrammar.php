@@ -277,6 +277,71 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Compile a describe query.
+	 *
+	 * @param  string $table
+	 * @param  string $column
+	 * @return string
+	 */
+	public function compileDescribe($table, $column = null)
+	{
+		$sql = 'describe ' . $this->wrapTable($table);
+
+		if ( ! is_null($column))
+		{
+			$sql .= ' ' . $this->wrap($column);
+		}
+
+		return $sql;
+	}
+
+	/**
+	 * Compile a rename column command.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $command
+	 * @param  \Illuminate\Database\Connection  $connection
+	 * @return string
+	 */
+	public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+	{
+		$table = $this->wrapTable($blueprint);
+		$from = $this->wrap($command->from);
+		$to = $this->wrap($command->to);
+		$type = $this->compileType($connection->getSchemaBuilder()->getColumnType($blueprint->getTable(), $command->from));
+
+		return "alter table {$table} change {$from} {$to} {$type}";
+	}
+
+	/**
+	 * Compile a column's type from a describe statement.
+	 *
+	 * @param  array $column
+	 * @return string
+	 */
+	public function compileType($column)
+	{
+		$type = $column['type'];
+
+		if ( ! $column['nullable'])
+		{
+			$type .= ' not null';
+		}
+
+		if ($column['default'])
+		{
+			$type .= ' default ' . $column['default'];
+		}
+
+		if ( ! empty($column['extra']))
+		{
+			$type .= ' ' . $column['extra'];
+		}
+
+		return $type;
+	}
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column

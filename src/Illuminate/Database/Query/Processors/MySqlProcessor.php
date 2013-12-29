@@ -15,4 +15,20 @@ class MySqlProcessor extends Processor {
 		return array_map(function($r) { return $r->column_name; }, $results);
 	}
 
+	/**
+	 * Process the results of a column description query.
+	 *
+	 * @param  object $results
+	 * @return array
+	 */
+	public function processColumnType($results)
+	{
+		return array(
+			'type'     => $results[0]->Type,
+			'nullable' => $results[0]->Null === 'YES',
+			'default'  => $results[0]->Default === 'NULL' ? null : $results[0]->Default,
+			'extra'    => $results[0]->Extra
+		);
+	}
+
 }
