@@ -115,6 +115,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 *
 	 * @param  \Illuminate\Events\Dispatcher  $events
 	 * @param  \Illuminate\Container\Container  $container
+	 * @return void
 	 */
 	public function __construct(Dispatcher $events, Container $container = null)
 	{
@@ -355,12 +356,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// We need to extract the base resource from the resource name. Nested resources
 		// are supported in the framework, but we need to know what name to use for a
 		// place-holder on the route wildcards, which should be the base resources.
-		$callback = function(Router $me) use ($name, $controller, $options)
+		$callback = function($me) use ($name, $controller, $options)
 		{
 			$me->resource($name, $controller, $options);
 		};
 
-		$this->group(compact('prefix'), $callback);
+		return $this->group(compact('prefix'), $callback);
 	}
 
 	/**
@@ -593,7 +594,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$this->addPutResourceUpdate($name, $base, $controller, $options);
 
-		$this->addPatchResourceUpdate($name, $base, $controller);
+		return $this->addPatchResourceUpdate($name, $base, $controller);
 	}
 
 	/**
@@ -1110,7 +1111,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function model($key, $class, Closure $callback = null)
 	{
-		$this->bind($key, function($value) use ($class, $callback)
+		return $this->bind($key, function($value) use ($class, $callback)
 		{
 			if (is_null($value)) return null;
 
