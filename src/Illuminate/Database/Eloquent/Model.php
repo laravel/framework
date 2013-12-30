@@ -817,7 +817,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Define a polymorphic many-to-many relationship.
+	 * Define a polymorphic, inverse many-to-many relationship.
 	 *
 	 * @param  string  $related
 	 * @param  string  $name
