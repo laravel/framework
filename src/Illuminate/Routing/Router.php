@@ -249,15 +249,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function controller($uri, $controller, $names = array())
 	{
+		$prepended = $controller;
+
 		// First, we will check to see if a controller prefix has been registered in
 		// the route group. If it has, we will need to prefix it before trying to
 		// reflect into the class instance and pull out the method for routing.
 		if (count($this->groupStack) > 0)
 		{
-			$controller = $this->prependGroupUses($controller);
+			$prepended = $this->prependGroupUses($controller);
 		}
 
-		$routable = $this->getInspector()->getRoutable($controller, $uri);
+		$routable = $this->getInspector()->getRoutable($prepended, $uri);
 
 		// When a controller is routed using this method, we use Reflection to parse
 		// out all of the routable methods for the controller, then register each
