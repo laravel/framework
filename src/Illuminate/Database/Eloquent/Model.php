@@ -637,7 +637,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Define an polymorphic, inverse one-to-one or many relationship.
+	 * Define a polymorphic, inverse one-to-one or many relationship.
 	 *
 	 * @param  string  $name
 	 * @param  string  $type
@@ -779,7 +779,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Define a many-to-many relationship.
+	 * Define a polymorphic many-to-many relationship.
 	 *
 	 * @param  string  $related
 	 * @param  string  $name
@@ -816,7 +816,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Define a many-to-many relationship.
+	 * Define a polymorphic many-to-many relationship.
 	 *
 	 * @param  string  $related
 	 * @param  string  $name
