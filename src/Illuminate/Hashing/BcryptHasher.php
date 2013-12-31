@@ -24,7 +24,7 @@ class BcryptHasher implements HasherInterface {
 
 		$hash = password_hash($value, PASSWORD_BCRYPT, array('cost' => $cost));
 
-		if ($hash === false)
+		if (!$hash)
 		{
 			throw new \RuntimeException("Bcrypt hashing not supported.");
 		}
