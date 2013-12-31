@@ -10,7 +10,7 @@ class MakeRemindersCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'auth:reminders';
+	protected $name = 'auth:reminders-table';
 
 	/**
 	 * The console command description.
