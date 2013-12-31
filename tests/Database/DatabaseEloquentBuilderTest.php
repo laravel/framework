@@ -35,6 +35,16 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $result);
 	}
 
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function testFindOrFailShouldThrowAnException()
+	{
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('find'), array($this->getMockQuery()));
+		$builder->expects($this->once())->method('find')->will($this->returnValue(null));
+		$builder->findOrFail('bar');
+	}
+
 
 	public function testFirstMethod()
 	{
@@ -46,6 +56,16 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$result = $builder->first();
 		$this->assertEquals('bar', $result);
+	}
+
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function testFirstOrFailShouldThrowAnException()
+	{
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($this->getMockQuery()));
+		$builder->expects($this->once())->method('first')->will($this->returnValue(null));
+		$builder->firstOrFail('bar');
 	}
 
 
@@ -74,6 +94,71 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$results = $builder->get(array('foo'));
 
 		$this->assertEquals(array(), $results->all());
+	}
+
+
+	public function testPluckMethodWithModelFound()
+	{
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($this->getMockQuery()));
+		$mockModel = new StdClass;
+		$mockModel->name = 'foo';
+		$builder->expects($this->any())->method('first')->with($this->equalTo(array('name')))->will($this->returnValue($mockModel));
+
+		$this->assertEquals('foo', $builder->pluck('name'));
+	}
+
+	public function testPluckMethodWithModelNotFound()
+	{
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($this->getMockQuery()));
+		$builder->expects($this->any())->method('first')->with($this->equalTo(array('name')))->will($this->returnValue(null));
+
+		$this->assertNull($builder->pluck('name'));
+	}
+
+
+	public function testChunkExecuteCallbackOverPaginatedRequest()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', array($this->getMockQuery()));
+		$builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
+		$builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
+		$builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
+		$builder->shouldReceive('get')->times(3)->andReturn(array('foo1', 'foo2'), array('foo3'), array());
+
+		$callbackExecutionAssertor = m::mock('StdClass');
+		$callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->once();
+		$callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
+		$callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->once();
+
+		$builder->chunk(2, function($results) use($callbackExecutionAssertor) {
+			foreach ($results as $result) {
+				$callbackExecutionAssertor->doSomething($result);
+			}
+		});
+	}
+
+
+	public function testListsReturnsTheMutatedAttributesOfAModel()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
+		$model = $this->getMockModel();
+		$model->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
+		$model->shouldReceive('newFromBuilder')->with(array('name' => 'bar'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'bar')));
+		$model->shouldReceive('newFromBuilder')->with(array('name' => 'baz'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'baz')));
+		$builder->setModel($model);
+
+		$this->assertEquals(array('foo_bar', 'foo_baz'), $builder->lists('name'));
+	}
+
+	public function testListsWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
+		$model = $this->getMockModel();
+		$model->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
+		$builder->setModel($model);
+
+		$this->assertEquals(array('bar', 'baz'), $builder->lists('name'));
 	}
 
 
@@ -312,5 +397,16 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	public function scopeApproved($query)
 	{
 		$query->where('foo', 'bar');
+	}
+}
+class EloquentBuilderTestListsStub {
+	protected $attributes;
+	public function __construct($attributes)
+	{
+		$this->attributes = $attributes;
+	}
+	public function __get($key)
+	{
+		return 'foo_' . $this->attributes[$key];
 	}
 }
