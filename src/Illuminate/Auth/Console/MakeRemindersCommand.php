@@ -3,7 +3,7 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class MakeRemindersCommand extends Command {
+class RemindersTableCommand extends Command {
 
 	/**
 	 * The console command name.

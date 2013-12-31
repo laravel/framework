@@ -3,7 +3,7 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class MakeTableCommand extends Command {
+class SessionTableCommand extends Command {
 
 	/**
 	 * The console command name.
