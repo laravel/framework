@@ -265,7 +265,10 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 */
 	public function addQuery($key, $value)
 	{
-		$this->query[$key] = $value;
+		if ($key !== $this->env->getPageName())
+		{
+			$this->query[$key] = $value;
+		}
 
 		return $this;
 	}
