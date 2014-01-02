@@ -26,6 +26,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $result);
 	}
 
+
 	public function testThatFindByMethod()
 	{
 		$query = m::mock('Illuminate\Database\Query\Builder');
@@ -39,6 +40,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$result = $builder->findBy(array('name' => 'Taylor', 'homie' => 'Dayle'), array('column'));
 		$this->assertEquals('baz', $result);
 	}
+
 
 	public function testFindWithMany()
 	{
