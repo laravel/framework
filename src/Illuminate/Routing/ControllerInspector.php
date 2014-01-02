@@ -83,9 +83,39 @@ class ControllerInspector {
 	{
 		$verb = $this->getVerb($name = $method->name);
 
-		$uri = $this->addUriWildcards($plain = $this->getPlainUri($name, $prefix));
+		$plain = $this->getPlainUri($name, $prefix);
+
+		$params = $this->getMethodArguments($method);
+		
+		// If a method contains any arguments we include them in the uri
+		if($params)
+		{
+			$uri = $plain."/".$params;
+		}
+		else
+		{
+			$uri = $this->addUriWildcards($plain);
+		}
 
 		return compact('verb', 'plain', 'uri');
+	}
+
+	/**
+	 * Get all arguments for a given method in a controller
+	 * 
+	 * @param ReflectionMethod $method
+	 * @return string
+	 */
+	public function getMethodArguments(ReflectionMethod $method)
+	{
+		$argumentsWithCurlyBrackets = array();
+
+		foreach($method->getParameters() as $param)
+		{
+			array_push($argumentsWithCurlyBrackets, "{" .$param->getName(). "}");
+		}
+
+		return implode("/", $argumentsWithCurlyBrackets);
 	}
 
 	/**
