@@ -284,14 +284,11 @@ class Guard {
 		// and ask the provider to validate it against the given credentials,
 		// and if they are in fact valid we'll log the users into the
 		// application and return true.
-		if ( ! is_null($user))
+		if ( ! is_null($user) && $this->provider->validateCredentials($user, $credentials))
 		{
-			if ($this->provider->validateCredentials($user, $credentials))
-			{
-				if ($login) $this->login($user, $remember);
+			if ($login) $this->login($user, $remember);
 
-				return true;
-			}
+			return true;
 		}
 
 		return false;
