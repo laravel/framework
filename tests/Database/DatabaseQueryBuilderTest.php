@@ -1041,6 +1041,47 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddBindingWithArrayMergesBindings()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('foo', 'bar'));
+		$builder->addBinding(array('baz'));
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testAddBindingWithArrayMergesBindingsInCorrectOrder()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('bar', 'baz'), 'having');
+		$builder->addBinding(array('foo'), 'where');
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testMergeBuilders()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('foo', 'bar'));
+		$otherBuilder = $this->getBuilder();
+		$otherBuilder->addBinding(array('baz'));
+		$builder->mergeBindings($otherBuilder);
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testMergeBuildersBindingOrder()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding('foo', 'where');
+		$builder->addBinding('baz', 'having');
+		$otherBuilder = $this->getBuilder();
+		$otherBuilder->addBinding('bar', 'where');
+		$builder->mergeBindings($otherBuilder);
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
 	protected function getBuilder()
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
