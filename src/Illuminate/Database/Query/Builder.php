@@ -396,7 +396,7 @@ class Builder {
 
 		if ( ! $value instanceof Expression)
 		{
-			$this->bindings['where'][] = $value;
+			$this->addBinding($value, 'where');
 		}
 
 		return $this;
@@ -443,7 +443,7 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'sql', 'boolean');
 
-		$this->bindings['where'] = array_merge($this->bindings['where'], $bindings);
+		$this->addBinding($bindings, 'where');
 
 		return $this;
 	}
@@ -475,7 +475,7 @@ class Builder {
 
 		$this->wheres[] = compact('column', 'type', 'boolean', 'not');
 
-		$this->bindings['where'] = array_merge($this->bindings['where'], $values);
+		$this->addBinding($values, 'where');
 
 		return $this;
 	}
@@ -671,7 +671,7 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
-		$this->bindings['where'] = array_merge($this->bindings['where'], $values);
+		$this->addBinding($values, 'where');
 
 		return $this;
 	}
@@ -940,7 +940,7 @@ class Builder {
 
 		$this->havings[] = compact('type', 'column', 'operator', 'value');
 
-		$this->bindings['having'][] = $value;
+		$this->addBinding($value, 'having');
 
 		return $this;
 	}
@@ -959,7 +959,7 @@ class Builder {
 
 		$this->havings[] = compact('type', 'sql', 'boolean');
 
-		$this->bindings['having'] = array_merge($this->bindings['having'], $bindings);
+		$this->addBinding($bindings, 'having');
 
 		return $this;
 	}
@@ -1027,7 +1027,7 @@ class Builder {
 
 		$this->orders[] = compact('type', 'sql');
 
-		$this->bindings['order'] = array_merge($this->bindings['order'], $bindings);
+		$this->addBinding($bindings, 'order');
 
 		return $this;
 	}
@@ -1884,7 +1884,7 @@ class Builder {
 	 */
 	public function setBindings(array $bindings, $type = 'where')
 	{
-		if (!array_key_exists($type, $this->bindings))
+		if ( ! array_key_exists($type, $this->bindings))
 		{
 			throw new \InvalidArgumentException("Invalid binding type: $type");
 		}
@@ -1903,12 +1903,19 @@ class Builder {
 	 */
 	public function addBinding($value, $type = 'where')
 	{
-		if (!array_key_exists($type, $this->bindings))
+		if ( ! array_key_exists($type, $this->bindings))
 		{
 			throw new \InvalidArgumentException("Invalid binding type: $type");
 		}
 
-		$this->bindings[$type][] = $value;
+		if (is_array($value))
+		{
+			$this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
+		}
+		else
+		{
+			$this->bindings[$type][] = $value;
+		}
 
 		return $this;
 	}
