@@ -5,120 +5,120 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MorphToMany extends BelongsToMany {
 
-	/**
-	 * The type of the polymorphic relation.
-	 *
-	 * @var string
-	 */
-	protected $morphType;
+    /**
+     * The type of the polymorphic relation.
+     *
+     * @var string
+     */
+    protected $morphType;
 
-	/**
-	 * The class name of the morph type constraint.
-	 *
-	 * @var string
-	 */
-	protected $morphClass;
+    /**
+     * The class name of the morph type constraint.
+     *
+     * @var string
+     */
+    protected $morphClass;
 
-	/**
-	 * Indicates if we are connecting the inverse of the relation.
-	 *
-	 * This primarily affects the morphClass constraint.
-	 *
-	 * @var bool
-	 */
-	protected $inverse;
+    /**
+     * Indicates if we are connecting the inverse of the relation.
+     *
+     * This primarily affects the morphClass constraint.
+     *
+     * @var bool
+     */
+    protected $inverse;
 
-	/**
-	 * Create a new has many relationship instance.
-	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder  $query
-	 * @param  \Illuminate\Database\Eloquent\Model  $parent
-	 * @param  string  $name
-	 * @param  string  $table
-	 * @param  string  $foreignKey
-	 * @param  string  $otherKey
-	 * @param  string  $relationName
-	 * @param  bool  $inverse
-	 * @return void
-	 */
-	public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null, $inverse = false)
-	{
-		$this->inverse = $inverse;
-		$this->morphType = $name.'_type';
-		$this->morphClass = $inverse ? get_class($query->getModel()) : get_class($parent);
+    /**
+     * Create a new has many relationship instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $name
+     * @param  string  $table
+     * @param  string  $foreignKey
+     * @param  string  $otherKey
+     * @param  string  $relationName
+     * @param  bool  $inverse
+     * @return void
+     */
+    public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null, $inverse = false)
+    {
+        $this->inverse = $inverse;
+        $this->morphType = $name.'_type';
+        $this->morphClass = $inverse ? get_class($query->getModel()) : get_class($parent);
 
-		parent::__construct($query, $parent, $table, $foreignKey, $otherKey, $relationName);
-	}
+        parent::__construct($query, $parent, $table, $foreignKey, $otherKey, $relationName);
+    }
 
-	/**
-	 * Set the where clause for the relation query.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-	 */
-	protected function setWhere()
-	{
-		parent::setWhere();
+    /**
+     * Set the where clause for the relation query.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    protected function setWhere()
+    {
+        parent::setWhere();
 
-		$this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
+        $this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Set the constraints for an eager load of the relation.
-	 *
-	 * @param  array  $models
-	 * @return void
-	 */
-	public function addEagerConstraints(array $models)
-	{
-		parent::addEagerConstraints($models);
+    /**
+     * Set the constraints for an eager load of the relation.
+     *
+     * @param  array  $models
+     * @return void
+     */
+    public function addEagerConstraints(array $models)
+    {
+        parent::addEagerConstraints($models);
 
-		$this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
-	}
+        $this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
+    }
 
-	/**
-	 * Create a new pivot attachment record.
-	 *
-	 * @param  int   $id
-	 * @param  bool  $timed
-	 * @return array
-	 */
-	protected function createAttachRecord($id, $timed)
-	{
-		$record = parent::createAttachRecord($id, $timed);
+    /**
+     * Create a new pivot attachment record.
+     *
+     * @param  int   $id
+     * @param  bool  $timed
+     * @return array
+     */
+    protected function createAttachRecord($id, $timed)
+    {
+        $record = parent::createAttachRecord($id, $timed);
 
-		return array_add($record, $this->morphType, $this->morphClass);
-	}
+        return array_add($record, $this->morphType, $this->morphClass);
+    }
 
-	/**
-	 * Create a new query builder for the pivot table.
-	 *
-	 * @return \Illuminate\Database\Query\Builder
-	 */
-	protected function newPivotQuery()
-	{
-		$query = parent::newPivotQuery();
+    /**
+     * Create a new query builder for the pivot table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function newPivotQuery()
+    {
+        $query = parent::newPivotQuery();
 
-		return $query->where($this->morphType, $this->morphClass);
-	}
+        return $query->where($this->morphType, $this->morphClass);
+    }
 
-	/**
-	 * Create a new pivot model instance.
-	 *
-	 * @param  array  $attributes
-	 * @param  bool   $exists
-	 * @return \Illuminate\Database\Eloquent\Relation\Pivot
-	 */
-	public function newPivot(array $attributes = array(), $exists = false)
-	{
-		$pivot = new MorphPivot($this->parent, $attributes, $this->table, $exists);
+    /**
+     * Create a new pivot model instance.
+     *
+     * @param  array  $attributes
+     * @param  bool   $exists
+     * @return \Illuminate\Database\Eloquent\Relation\Pivot
+     */
+    public function newPivot(array $attributes = array(), $exists = false)
+    {
+        $pivot = new MorphPivot($this->parent, $attributes, $this->table, $exists);
 
-		$pivot->setPivotKeys($this->foreignKey, $this->otherKey);
+        $pivot->setPivotKeys($this->foreignKey, $this->otherKey);
 
-		$pivot->setMorphType($this->morphType);
+        $pivot->setMorphType($this->morphType);
 
-		return $pivot;
-	}
+        return $pivot;
+    }
 
 }

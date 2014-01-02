@@ -26,9 +26,9 @@ error_reporting(-1);
 
 if ( ! extension_loaded('mcrypt'))
 {
-	echo 'Mcrypt PHP extension required.'.PHP_EOL;
+    echo 'Mcrypt PHP extension required.'.PHP_EOL;
 
-	exit(1);
+    exit(1);
 }
 
 /*
@@ -74,7 +74,7 @@ $app->instance('app', $app);
 
 if (isset($unitTesting))
 {
-	$app['env'] = $env = $testEnvironment;
+    $app['env'] = $env = $testEnvironment;
 }
 
 /*
@@ -105,7 +105,7 @@ Facade::setFacadeApplication($app);
 
 $app->instance('config', $config = new Config(
 
-	$app->getConfigLoader(), $env
+    $app->getConfigLoader(), $env
 
 ));
 
