@@ -64,7 +64,7 @@ class Connection implements ConnectionInterface {
      * @param  string  $username
      * @param  array   $auth
      * @param  \Illuminate\Remote\GatewayInterface
-     * @param  
+     * @param
      */
     public function __construct($name, $host, $username, array $auth, GatewayInterface $gateway = null)
     {

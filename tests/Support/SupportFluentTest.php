@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Illuminate\Support\Fluent;
 

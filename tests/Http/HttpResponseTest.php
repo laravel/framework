@@ -26,7 +26,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $mock = m::mock('Illuminate\Support\Contracts\RenderableInterface');
         $mock->shouldReceive('render')->once()->andReturn('foo');
         $response = new Illuminate\Http\Response($mock);
-        $this->assertEquals('foo', $response->getContent());        
+        $this->assertEquals('foo', $response->getContent());
     }
 
 

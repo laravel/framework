@@ -48,7 +48,7 @@ class ProviderRepository {
         // provides. This is used to know which services are "deferred" loaders.
         if ($this->shouldRecompile($manifest, $providers))
         {
-            $manifest = $this->compileManifest($app, $providers);   
+            $manifest = $this->compileManifest($app, $providers);
         }
 
         // If the application is running in the console, we will not lazy load any of
