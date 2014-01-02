@@ -19,7 +19,7 @@ class TailCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = "Tail a log file on a remote server";
+	protected $description = "Tail a log file. Note: will not work on Windows servers.";
 
 	/**
 	 * Execute the console command.
