@@ -83,6 +83,19 @@ class Builder {
     }
 
 	/**
+	 * Find a single using an array of column to value pairs.
+	 *
+	 * @param  array  $constraints
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|static|null
+	 */
+	public function findBy(array $constraints, $columns = array('*'))
+	{
+		$this->whereEquals($constraints);
+		return $this->first($columns);
+	}
+
+	/**
 	 * Find a model by its primary key or throw an exception.
 	 *
 	 * @param  mixed  $id

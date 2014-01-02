@@ -26,6 +26,20 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $result);
 	}
 
+	public function testThatFindByMethod()
+	{
+		$query = m::mock('Illuminate\Database\Query\Builder');
+		$query->shouldReceive('whereEquals')->once()->with(array('name' => 'Taylor', 'homie' => 'Dayle'));
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($query));
+ 		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('getTable')->once()->andReturn('table');
+		$query->shouldReceive('from')->once()->with('table');
+		$builder->setModel($model);
+		$builder->expects($this->once())->method('first')->with($this->equalTo(array('column')))->will($this->returnValue('baz'));
+		$result = $builder->findBy(array('name' => 'Taylor', 'homie' => 'Dayle'), array('column'));
+		$this->assertEquals('baz', $result);
+	}
+
 	public function testFindWithMany()
 	{
 		$query = m::mock('Illuminate\Database\Query\Builder');
