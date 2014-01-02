@@ -4,35 +4,35 @@ use Illuminate\Database\Query\Builder;
 
 class PostgresProcessor extends Processor {
 
-	/**
-	 * Process an "insert get ID" query.
-	 *
-	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @param  string  $sql
-	 * @param  array   $values
-	 * @param  string  $sequence
-	 * @return int
-	 */
-	public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
-	{
-		$results = $query->getConnection()->select($sql, $values);
+    /**
+     * Process an "insert get ID" query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sql
+     * @param  array   $values
+     * @param  string  $sequence
+     * @return int
+     */
+    public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
+    {
+        $results = $query->getConnection()->select($sql, $values);
 
-		$sequence = $sequence ?: 'id';
+        $sequence = $sequence ?: 'id';
 
-		$result = (array) $results[0];
+        $result = (array) $results[0];
 
-		return (int) $result[$sequence];
-	}
+        return (int) $result[$sequence];
+    }
 
-	/**
-	 * Process the results of a column listing query.
-	 *
-	 * @param  array  $results
-	 * @return array
-	 */
-	public function processColumnListing($results)
-	{
-		return array_values(array_map(function($r) { return $r->column_name; }, $results));
-	}
+    /**
+     * Process the results of a column listing query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processColumnListing($results)
+    {
+        return array_values(array_map(function($r) { return $r->column_name; }, $results));
+    }
 
 }
