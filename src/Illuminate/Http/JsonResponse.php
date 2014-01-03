@@ -6,6 +6,13 @@ use Illuminate\Support\Contracts\JsonableInterface;
 class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 
 	/**
+	 * The request instance.
+	 *
+	 * @var \Illuminate\Http\Request
+	 */
+	protected $request;
+
+	/**
 	 * Get the json_decoded data from the response
 	 *
 	 * @param  bool $assoc
@@ -54,6 +61,52 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 		$this->headers->setCookie($cookie);
 
 		return $this;
+	}
+
+	/**
+	 * Remember a response.
+	 *
+	 * If $etag is set to true, an etag will be automatically generated.
+	 *
+	 * @param string|bool|null      $etag
+	 * @param \Datetime|Carbon|null $lastModified
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function remember($etag = true, $lastModified = null)
+	{
+		if ($etag === true)
+		{
+			$etag = sha1(json_encode($this->content));
+		}
+
+		$this->setEtag($etag)->setLastModified($lastModified);
+
+		$this->isNotModified($this->getRequest());
+
+		return $this;
+	}
+
+	/**
+	 * Get the request instance.
+	 *
+	 * @return \Illuminate\Http\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Set the request instance.
+	 *
+	 * @param \Illuminate\Http\Request $request
+	 *
+	 * @return void
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
 	}
 
 }

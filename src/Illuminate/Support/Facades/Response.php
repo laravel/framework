@@ -26,7 +26,11 @@ class Response {
 	 */
 	public static function make($content = '', $status = 200, array $headers = array())
 	{
-		return new IlluminateResponse($content, $status, $headers);
+		$response = new IlluminateResponse($content, $status, $headers);
+		$app      = Facade::getFacadeApplication();
+		$response->setRequest($app['request']);
+
+		return $response;
 	}
 
 	/**
@@ -60,7 +64,11 @@ class Response {
 			$data = $data->toArray();
 		}
 
-		return new JsonResponse($data, $status, $headers);
+		$response = new JsonResponse($data, $status, $headers);
+		$app      = Facade::getFacadeApplication();
+		$response->setRequest($app['request']);
+
+		return $response;
 	}
 
 	/**

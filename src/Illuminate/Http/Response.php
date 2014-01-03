@@ -8,6 +8,13 @@ use Illuminate\Support\Contracts\RenderableInterface;
 class Response extends \Symfony\Component\HttpFoundation\Response {
 
 	/**
+	 * The request instance.
+	 *
+	 * @var \Illuminate\Http\Request
+	 */
+	protected $request;
+
+	/**
 	 * The original content of the response.
 	 *
 	 * @var mixed
@@ -107,6 +114,52 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	public function getOriginalContent()
 	{
 		return $this->original;
+	}
+
+	/**
+	 * Remember a response.
+	 *
+	 * If $etag is set to true, an etag will be automatically generated.
+	 *
+	 * @param string|bool|null      $etag
+	 * @param \Datetime|Carbon|null $lastModified
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function remember($etag = true, $lastModified = null)
+	{
+		if ($etag === true)
+		{
+			$etag = sha1(json_encode($this->content));
+		}
+
+		$this->setEtag($etag)->setLastModified($lastModified);
+
+		$this->isNotModified($this->getRequest());
+
+		return $this;
+	}
+
+	/**
+	 * Get the request instance.
+	 *
+	 * @return \Illuminate\Http\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Set the request instance.
+	 *
+	 * @param \Illuminate\Http\Request $request
+	 *
+	 * @return void
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
 	}
 
 }
