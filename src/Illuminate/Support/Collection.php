@@ -346,17 +346,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Group an associative array by a field
 	 *
-	 * @param string $attribute
+	 * @param string $groupBy
 	 *
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function groupBy($attribute)
+	public function groupBy($groupBy)
 	{
 		$results = array();
 
 		foreach ($this->items as $item)
 		{
-			$results[$item[$attribute]][] = $item;
+			$attribute = array_get($item, $groupBy);
+			$results[$attribute][] = $item;
 		}
 
 		return new static($results);
