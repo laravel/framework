@@ -344,6 +344,25 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Group an associative array by a field
+	 *
+	 * @param string $attribute
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function groupBy($attribute)
+	{
+		$results = array();
+
+		foreach ($this->items as $item)
+		{
+			$results[$item[$attribute]][] = $item;
+		}
+
+		return new static($results);
+	}
+
+	/**
 	 * Merge the collection with the given items.
 	 *
 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
