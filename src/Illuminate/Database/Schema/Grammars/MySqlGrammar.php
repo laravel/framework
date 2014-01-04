@@ -25,7 +25,7 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer');
+	protected $serials = array('tinyInteger','smallInteger','mediumInteger','bigInteger', 'integer');
 
 	/**
 	 * Compile the query to determine the list of tables.
