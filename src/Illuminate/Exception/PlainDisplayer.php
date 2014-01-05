@@ -13,7 +13,7 @@ class PlainDisplayer implements ExceptionDisplayerInterface {
 	 */
 	public function display(Exception $exception)
 	{
-		$status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+		$status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
 
 		return new Response(file_get_contents(__DIR__.'/resources/plain.html'), $status);
 	}
