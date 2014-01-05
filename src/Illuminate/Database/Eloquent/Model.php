@@ -316,6 +316,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function fill(array $attributes)
 	{
+		$totallyGuarded = $this->totallyGuarded();
+		
 		foreach ($this->fillableFromArray($attributes) as $key => $value)
 		{
 			$key = $this->removeTableFromKey($key);
@@ -327,7 +329,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			{
 				$this->setAttribute($key, $value);
 			}
-			elseif ($this->totallyGuarded())
+			elseif ($totallyGuarded)
 			{
 				throw new MassAssignmentException($key);
 			}
