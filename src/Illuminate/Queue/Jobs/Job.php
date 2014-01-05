@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Queue\Jobs;
 
+use DateTime;
+
 abstract class Job {
 
 	/**
