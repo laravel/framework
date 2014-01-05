@@ -428,7 +428,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
     /**
      * Get one or more items randomly from the collection.
      *
-     * @param int $amount
+     * @param  int $amount
      * @return mixed
      */
     public function random($amount = 1)
