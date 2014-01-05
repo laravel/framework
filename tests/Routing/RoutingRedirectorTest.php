@@ -95,6 +95,29 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIntendedWithRouteRedirectToIntendedUrlInSession()
+	{
+		$this->url->shouldReceive('route')->with('home', array())->andReturn('http://foo.com/bar');
+
+		$this->session->shouldReceive('get')->with('url.intended', 'http://foo.com/bar')->andReturn('/');
+		$this->session->shouldReceive('forget')->with('url.intended');
+
+		$response = $this->redirect->intendedWithRoute('home');
+		$this->assertEquals('http://foo.com/', $response->getTargetUrl());
+	}
+
+	public function testIntendedWithRouteWithoutIntendedUrlInSession()
+	{
+		$this->url->shouldReceive('route')->with('home', array())->andReturn('http://foo.com/bar');
+
+		$this->session->shouldReceive('get')->with('url.intended', 'http://foo.com/bar')->andReturn('http://foo.com/bar');
+		$this->session->shouldReceive('forget')->with('url.intended');
+
+		$response = $this->redirect->intendedWithRoute('home');
+		$this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
+	}
+
+
 	public function testRefreshRedirectToCurrentUrl()
 	{
 		$this->request->shouldReceive('path')->andReturn('http://foo.com/bar');

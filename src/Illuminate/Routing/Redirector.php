@@ -102,6 +102,26 @@ class Redirector {
 	}
 
 	/**
+	 * Create a new redirect resonse to the previously intended location defaulting to a named route.
+	 *
+	 * @param  string  $default
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @param  bool    $secure
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function intendedWithRoute($route, $parameters = array(), $status = 302, $headers = array(), $secure = null)
+	{
+		$route = $this->generator->route($route, $parameters);
+
+		$path = $this->session->get('url.intended', $route);
+
+		$this->session->forget('url.intended');
+
+		return $this->to($path, $status, $headers, $secure);
+	}
+
+	/**
 	 * Create a new redirect response to the given path.
 	 *
 	 * @param  string  $path
