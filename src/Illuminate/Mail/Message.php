@@ -19,7 +19,7 @@ class Message {
 	 * @param  \Swift_Message  $swift
 	 * @return void
 	 */
-	public function __construct($swift)
+	public function __construct(Swift_Message $swift)
 	{
 		$this->swift = $swift;
 	}
