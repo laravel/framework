@@ -15,9 +15,22 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Illuminate\Support\Contracts\ResponsePreparerInterface;
+use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class Application extends Container implements HttpKernelInterface, TerminableInterface, ResponsePreparerInterface {
 
@@ -801,17 +814,84 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @return void
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\GoneHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
 	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{
-		if ($code == 404)
+		switch ($code)
 		{
-			throw new NotFoundHttpException($message);
-		}
-		else
-		{
-			throw new HttpException($code, $message, null, $headers);
+			// error code 400
+			case Response::HTTP_BAD_REQUEST:
+				throw new BadRequestHttpException($message);
+
+			// error code 401
+			case Response::HTTP_UNAUTHORIZED:
+				throw new UnauthorizedHttpException($message);
+
+			// error code 403
+			case Response::HTTP_FORBIDDEN:
+				throw new AccessDeniedHttpException($message);
+
+			// error code 404
+			case Response::HTTP_NOT_FOUND:
+				throw new NotFoundHttpException($message);
+
+			// error code 405
+			case Response::HTTP_METHOD_NOT_ALLOWED:
+				throw new MethodNotAllowedHttpException($message);
+
+			// error code 406
+			case Response::HTTP_NOT_ACCEPTABLE:
+				throw new NotAcceptableHttpException($message);
+
+			// error code 409
+			case Response::HTTP_CONFLICT:
+				throw new ConflictHttpException($message);
+
+			// error code 410
+			case Response::HTTP_GONE:
+				throw new GoneHttpException($message);
+
+			// error code 411
+			case Response::HTTP_LENGTH_REQUIRED:
+				throw new LengthRequiredHttpException($message);
+
+			// error code 412
+			case Response::HTTP_PRECONDITION_FAILED:
+				throw new PreconditionFailedHttpException($message);
+
+			// error code 415
+			case Response::HTTP_UNSUPPORTED_MEDIA_TYPE:
+				throw new UnsupportedMediaTypeHttpException($message);
+
+			// error code 428
+			case Response::HTTP_PRECONDITION_REQUIRED:
+				throw new PreconditionRequiredHttpException($message);
+
+			// error code 429
+			case Response::HTTP_TOO_MANY_REQUESTS:
+				throw new TooManyRequestsHttpException($message);
+
+			// error code 503
+			case Response::HTTP_SERVICE_UNAVAILABLE:
+				throw new ServiceUnavailableHttpException($message);
+
+			// all other error codes including 500
+			default:
+				throw new HttpException($code, $message, null, $headers);
 		}
 	}
 

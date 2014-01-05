@@ -263,7 +263,7 @@ class Guard {
 	{
 		$headers = array('WWW-Authenticate' => 'Basic');
 
-		return new Response('Invalid credentials.', 401, $headers);
+		return new Response('Invalid credentials.', Response::HTTP_UNAUTHORIZED, $headers);
 	}
 
 	/**

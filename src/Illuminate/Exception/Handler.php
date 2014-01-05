@@ -3,6 +3,7 @@
 use Closure;
 use ErrorException;
 use ReflectionFunction;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Contracts\ResponsePreparerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException as FatalError;
@@ -248,7 +249,7 @@ class Handler {
 			// the HttpException interfaces we'll grab the error code from the class.
 			else
 			{
-				$code = 500;
+				$code = Response::HTTP_INTERNAL_SERVER_ERROR;
 			}
 
 			// We will wrap this handler in a try / catch and avoid white screens of death
