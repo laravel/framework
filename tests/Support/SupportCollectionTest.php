@@ -204,6 +204,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data->sortBy(function($x) { return $x; });
 
 		$this->assertEquals(array('dayle', 'taylor'), array_values($data->all()));
+
+		$data = new Collection(array('dayle', 'taylor'));
+		$data->sortBy(function($x) { return $x; }, true);
+
+		$this->assertEquals(array('taylor', 'dayle'), array_values($data->all()));
 	}
 
 
