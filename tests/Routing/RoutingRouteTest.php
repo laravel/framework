@@ -473,7 +473,41 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->filter('bar', function() {});
 		$router->filter('baz', function() { return 'foo!'; });
 		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		
 	}
+
+	/**
+	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function testGroupEnvironment() {
+		/**
+		 * Group Environment
+		 */
+		$router = $this->getRouter();
+
+		$router->group(array('environment' => 'testing'), function() use ($router)
+		{
+			$router->get('bar', function() { return 'hello'; });
+		});
+
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+
+		$router->group(array('environment' => 'somethingElse'), function() use ($router)
+		{
+			$router->get('foo', function() { return 'hello'; });
+		});
+
+
+		$this->assertNotEquals('hello', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+
+		
+	}
+
+	
 
 
 	public function testMergingControllerUses()
@@ -605,6 +639,7 @@ class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
 		return 'baz';
 	}
 }
+
 
 
 class RouteModelBindingStub {
