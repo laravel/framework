@@ -772,7 +772,13 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addRoute($methods, $uri, $action)
 	{
-		return $this->routes->add($this->createRoute($methods, $uri, $action));
+		$route = $this->createRoute($methods, $uri, $action);
+		// We only want to add the route if it is part of the environment
+		if(!$this->getGroupEnvironment($route) ||
+			($this->getGroupEnvironment($route) == $this->getApplicationEnvironment() ) ) {
+			return $this->routes->add($route);
+		}
+		return false;
 	}
 
 	/**
@@ -1521,6 +1527,28 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
 		return $this->dispatch(Request::createFromBase($request));
+	}
+
+	/**
+	 * Get the environment for the router
+	 * @return string|bool the environment set by the route group
+	 */
+	public function getGroupEnvironment($route) {
+
+		$routeAction = $route->getAction();
+		if(isset($routeAction['environment'])) {
+			return $routeAction['environment'];
+		}
+
+		return false;
+
+	}
+
+	public function getApplicationEnvironment() {
+		if(method_exists($this->container,'environment')) {
+			return $this->container->environment();
+		}
+		return 'testing';
 	}
 
 }
