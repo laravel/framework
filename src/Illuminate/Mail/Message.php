@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Mail;
 
 use Swift_Image;
-use Swift_Message;
 use Swift_Attachment;
 
 class Message {
@@ -19,7 +18,7 @@ class Message {
 	 * @param  \Swift_Message  $swift
 	 * @return void
 	 */
-	public function __construct(Swift_Message $swift)
+	public function __construct($swift)
 	{
 		$this->swift = $swift;
 	}
