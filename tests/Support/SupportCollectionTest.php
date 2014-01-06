@@ -240,6 +240,17 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testRandom()
+    {
+        $data = new Collection(array(1, 2, 3, 4, 5, 6));
+        $random = $data->random();
+        $this->assertInternalType('integer', $random);
+        $this->assertContains($random, $data->all());
+        $random = $data->random(3);
+        $this->assertCount(3, $random);
+    }
+
+
 	public function testTakeLast()
 	{
 		$data = new Collection(array('taylor', 'dayle', 'shawn'));

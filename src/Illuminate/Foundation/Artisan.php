@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Foundation;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Console\Application as ConsoleApplication;
 
 class Artisan {
