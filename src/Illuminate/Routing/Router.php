@@ -1539,8 +1539,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function getGroupEnvironment($route) {
 
-		if(isset($route->getAction()['environment'])) {
-			return $route->getAction()['environment'];
+		$routeAction = $route->getAction();
+		if(isset($routeAction['environment'])) {
+			return $routeAction['environment'];
 		}
 
 		return false;
