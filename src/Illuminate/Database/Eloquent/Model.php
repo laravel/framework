@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database\Eloquent;
 
-use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;

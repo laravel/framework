@@ -2,7 +2,6 @@
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as IlluminateResponse;
-use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
