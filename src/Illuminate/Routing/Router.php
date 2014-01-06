@@ -772,16 +772,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addRoute($methods, $uri, $action)
 	{
-
 		$route = $this->createRoute($methods, $uri, $action);
-		// var_dump($this->container->environment());
 		// We only want to add the route if it is part of the environment
-		
 		if(!$this->getGroupEnvironment($route) ||
 			($this->getGroupEnvironment($route) == $this->getApplicationEnvironment() ) ) {
 			return $this->routes->add($route);
 		}
-
 		return false;
 	}
 
@@ -1549,7 +1545,6 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	public function getApplicationEnvironment() {
-		// dd(method_exists($this->container,'environment'));
 		if(method_exists($this->container,'environment')) {
 			return $this->container->environment();
 		}

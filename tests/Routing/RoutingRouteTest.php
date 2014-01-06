@@ -485,26 +485,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		 * Group Environment
 		 */
 		$router = $this->getRouter();
-
 		$router->group(array('environment' => 'testing'), function() use ($router)
 		{
 			$router->get('bar', function() { return 'hello'; });
 		});
-
-
 		$this->assertEquals('hello', $router->dispatch(Request::create('bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
-
 		$router->group(array('environment' => 'somethingElse'), function() use ($router)
 		{
 			$router->get('foo', function() { return 'hello'; });
 		});
-
-
 		$this->assertNotEquals('hello', $router->dispatch(Request::create('foo', 'GET'))->getContent());
-
-		
 	}
 
 	
