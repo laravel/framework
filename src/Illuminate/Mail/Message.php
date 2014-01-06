@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Mail;
 
 use Swift_Image;
-use Swift_Message;
 use Swift_Attachment;
 
 class Message {
