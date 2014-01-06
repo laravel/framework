@@ -34,7 +34,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	public function testExistsPassesAndFailsViews()
 	{
 		$env = $this->getEnvironment();
-		$env->getFinder()->shouldReceive('find')->once()->with('foo')->andThrow('InvalidArgumentException');
+		$env->getFinder()->shouldReceive('find')->once()->with('foo')->andThrow('Illuminate\View\ViewNotFoundException');
 		$env->getFinder()->shouldReceive('find')->once()->with('bar')->andReturn('path.php');
 
 		$this->assertFalse($env->exists('foo'));
