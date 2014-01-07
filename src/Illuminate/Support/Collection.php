@@ -253,7 +253,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Sort the collection using the given Closure.
 	 *
 	 * @param  \Closure  $callback
-	 * @param  int  $options
+	 * @param  int   $options
 	 * @param  bool  $descending
 	 * @return \Illuminate\Support\Collection
 	 */
@@ -269,14 +269,8 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 			$results[$key] = $callback($value);
 		}
 
-		if (!$descending)
-		{
-			asort($results, $options);
-		}
-		else
-		{
-			arsort($results, $options);
-		}
+		$descending ? arsort($results, $options)
+                    : asort($results, $options);
 
 		// Once we have sorted all of the keys in the array, we will loop through them
 		// and grab the corresponding model so we can set the underlying items list
