@@ -38,7 +38,14 @@ class ServeCommand extends Command {
 
 		$this->info("Laravel development server started on http://{$host}:{$port}");
 
-		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} -t \"{$public}\" server.php");
+		$evariables = '';
+
+		if ( $this->input->getOption('environment-variables') )
+		{
+			$evariables = '-d variables_order=EGPCS';
+		}
+		
+		passthru("php {$evariables} -S {$host}:{$port} -t \"{$public}\" server.php");
 	}
 
 	/**
@@ -67,6 +74,8 @@ class ServeCommand extends Command {
 			array('host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', 'localhost'),
 
 			array('port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000),
+
+			array('environment-variables', null, InputOption::VALUE_NONE, 'Pass current environment variables through.'),
 		);
 	}
 
