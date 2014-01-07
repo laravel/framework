@@ -326,6 +326,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('default', $result);
 	}
 
+	public function testGroupByAttribute()
+	{
+		$data = new Collection(array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2'), array('rating' => 2, 'name' => '3')));
+		$result = $data->groupBy('rating');
+		$this->assertEquals(array(1 => array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2')), 2 => array(array('rating' => 2, 'name' => '3'))), $result->toArray());
+	}
+
 }
 
 class TestAccessorEloquentTestStub
