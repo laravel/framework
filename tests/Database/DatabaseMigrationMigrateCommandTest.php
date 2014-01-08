@@ -28,14 +28,14 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testMigrationRepositoryCreatedWhenNecessary()
 	{
 		$params = array($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-		$command = $this->getMock('Illuminate\Database\Console\Migrations\MigrateCommand', array('fire'), $params);
+		$command = $this->getMock('Illuminate\Database\Console\Migrations\MigrateCommand', array('call'), $params);
 		$app = array('path' => __DIR__);
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/database/migrations', false, null);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 		$migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
-		$command->expects($this->once())->method('fire')->with($this->equalTo('migrate:install'), $this->equalTo(array('--database' => null)));
+		$command->expects($this->once())->method('call')->with($this->equalTo('migrate:install'), $this->equalTo(array('--database' => null)));
 
 		$this->runCommand($command);
 	}

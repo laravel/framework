@@ -95,7 +95,7 @@ class MigrateCommand extends BaseCommand {
 		if ( ! $this->migrator->repositoryExists())
 		{
 			$options = array('--database' => $this->input->getOption('database'));
-
+			$this->call('migrate:install', $options);
 		}
 	}
 
