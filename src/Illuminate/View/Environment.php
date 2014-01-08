@@ -627,6 +627,18 @@ class Environment {
 	}
 
 	/**
+	 * Prepend a new namespace to the loader.
+	 *
+	 * @param  string  $namespace
+	 * @param  string|array  $hints
+	 * @return void
+	 */
+	public function prependNamespace($namespace, $hints)
+	{
+		$this->finder->prependNamespace($namespace, $hints);
+	}
+
+	/**
 	 * Register a valid view extension and its engine.
 	 *
 	 * @param  string   $extension
