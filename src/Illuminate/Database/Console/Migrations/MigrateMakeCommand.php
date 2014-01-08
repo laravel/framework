@@ -4,7 +4,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\Migrations\MigrationCreator;
 
-class MakeCommand extends BaseCommand {
+class MigrateMakeCommand extends BaseCommand {
 
 	/**
 	 * The console command name.
@@ -64,7 +64,7 @@ class MakeCommand extends BaseCommand {
 		$table = $this->input->getOption('table');
 
 		$create = $this->input->getOption('create');
-		
+
 		if ( ! $table && is_string($create))
 		{
 			$table = $create;

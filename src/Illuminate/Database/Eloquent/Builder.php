@@ -594,7 +594,7 @@ class Builder {
 	{
 		$relation = $this->getHasRelationQuery($relation);
 
-		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery());
+		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
 		if ($callback) call_user_func($callback, $query);
 

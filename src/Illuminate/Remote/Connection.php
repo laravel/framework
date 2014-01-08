@@ -64,7 +64,7 @@ class Connection implements ConnectionInterface {
 	 * @param  string  $username
 	 * @param  array   $auth
 	 * @param  \Illuminate\Remote\GatewayInterface
-	 * @param  
+	 * @param
 	 */
 	public function __construct($name, $host, $username, array $auth, GatewayInterface $gateway = null)
 	{
@@ -214,7 +214,10 @@ class Connection implements ConnectionInterface {
 	{
 		if ( ! $this->gateway->connected())
 		{
-			$this->gateway->connect($this->username);
+			if ( ! $this->gateway->connect($this->username))
+			{
+				throw new \RuntimeException("Unable to connect to remote server.");
+			}
 		}
 
 		return $this->gateway;

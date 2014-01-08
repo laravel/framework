@@ -4,7 +4,6 @@ use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Debug\ExceptionHandler as KernelHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
 

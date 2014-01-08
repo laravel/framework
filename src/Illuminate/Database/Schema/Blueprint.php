@@ -654,7 +654,7 @@ class Blueprint {
 	 */
 	public function morphs($name)
 	{
-		$this->integer("{$name}_id");
+		$this->unsignedInteger("{$name}_id");
 
 		$this->string("{$name}_type");
 	}

@@ -239,13 +239,49 @@ class BelongsToMany extends Relation {
 	 * Add the constraints for a relationship count query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function getRelationCountQuery(Builder $query)
+	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
-		$this->setJoin($query);
+		if ($parent->getQuery()->from == $query->getQuery()->from)
+		{
+			return $this->getRelationCountQueryForSelfJoin($query, $parent);
+		}
+		else
+		{
+			$this->setJoin($query);
 
-		return parent::getRelationCountQuery($query);
+			return parent::getRelationCountQuery($query, $parent);
+		}
+	}
+
+	/**
+	 * Add the constraints for a relationship count query on the same table.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQueryForSelfJoin(Builder $query, Builder $parent)
+	{
+		$query->select(new \Illuminate\Database\Query\Expression('count(*)'));
+
+		$query->from($this->table.' as '.$hash = $this->getRelationCountHash());
+
+		$key = $this->wrap($this->getQualifiedParentKeyName());
+
+		return $query->where($hash.'.person_id', '=', new \Illuminate\Database\Query\Expression($key));
+	}
+
+	/**
+	 * Get a relationship join table hash.
+	 *
+	 * @return string
+	 */
+	public function getRelationCountHash()
+	{
+		return 'self_'.md5(microtime(true));
 	}
 
 	/**

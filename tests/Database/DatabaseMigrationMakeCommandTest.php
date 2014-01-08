@@ -1,7 +1,7 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Database\Console\Migrations\MakeCommand;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
 class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
@@ -62,7 +62,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 
 
-class DatabaseMigrationMakeCommandTestStub extends MakeCommand
+class DatabaseMigrationMakeCommandTestStub extends MigrateMakeCommand
 {
 	public function call($command, array $arguments = array())
 	{
