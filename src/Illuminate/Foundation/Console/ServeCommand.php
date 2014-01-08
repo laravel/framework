@@ -27,7 +27,7 @@ class ServeCommand extends Command {
 	public function fire()
 	{
 		$this->checkPhpVersion();
-		
+
 		chdir($this->laravel['path.base']);
 
 		$host = $this->input->getOption('host');
@@ -38,7 +38,7 @@ class ServeCommand extends Command {
 
 		$this->info("Laravel development server started on http://{$host}:{$port}");
 
-		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} -t \"{$public}\" server.php");
+		passthru('"'.PHP_BINARY.'"'." -d variables_order=EGPCS -S {$host}:{$port} -t \"{$public}\" server.php");
 	}
 
 	/**
