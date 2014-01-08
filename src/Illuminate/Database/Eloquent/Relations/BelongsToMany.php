@@ -244,7 +244,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
-		if ($original->getQuery()->from == $query->getQuery()->from)
+		if ($parent->getQuery()->from == $query->getQuery()->from)
 		{
 			return $this->getRelationCountQueryForSelfJoin($query, $parent);
 		}
