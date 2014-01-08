@@ -15,7 +15,7 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 	{
 		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
 		$migrator->shouldReceive('setConnection')->once()->with(null);
-		$migrator->shouldReceive('rollback')->once()->with(false);
+		$migrator->shouldReceive('rollback')->once()->with(false, null);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 
 		$this->runCommand($command);
@@ -26,12 +26,21 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 	{
 		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
 		$migrator->shouldReceive('setConnection')->once()->with('foo');
-		$migrator->shouldReceive('rollback')->once()->with(true);
+		$migrator->shouldReceive('rollback')->once()->with(true, null);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 
 		$this->runCommand($command, array('--pretend' => true, '--database' => 'foo'));
 	}
 
+	public function testRollbackCommandCanHaveNameArgument()
+	{
+		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+		$migrator->shouldReceive('setConnection')->once()->with('foo');
+		$migrator->shouldReceive('rollback')->once()->with(false, 'foo_bar_baz');
+		$migrator->shouldReceive('getNotes')->andReturn(array());
+
+		$this->runCommand($command, array('--name' => 'foo_bar_baz', '--database' => 'foo'));
+	}
 
 	protected function runCommand($command, $input = array())
 	{
