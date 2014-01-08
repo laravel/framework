@@ -60,9 +60,11 @@ class MigrateCommand extends BaseCommand {
 		// a database for real, which is helpful for double checking migrations.
 		$pretend = $this->input->getOption('pretend');
 
+		$name = $this->input->getOption('name');
+
 		$path = $this->getMigrationPath();
 
-		$this->migrator->run($path, $pretend);
+		$this->migrator->run($path, $pretend, $name);
 
 		// Once the migrator has run we will grab the note output and send it out to
 		// the console screen, since the migrator itself functions without having
@@ -94,7 +96,6 @@ class MigrateCommand extends BaseCommand {
 		{
 			$options = array('--database' => $this->input->getOption('database'));
 
-			$this->call('migrate:install', $options);
 		}
 	}
 
@@ -117,6 +118,8 @@ class MigrateCommand extends BaseCommand {
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 
 			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
+
+			array('name', null, InputOption::VALUE_OPTIONAL, 'Comma separated list of migrations files to run in this batch.', null),
 		);
 	}
 

@@ -49,8 +49,8 @@ class Migrator {
 	 * @return void
 	 */
 	public function __construct(MigrationRepositoryInterface $repository,
-								Resolver $resolver,
-                                Filesystem $files)
+	                            Resolver $resolver,
+	                            Filesystem $files)
 	{
 		$this->files = $files;
 		$this->resolver = $resolver;
@@ -62,13 +62,37 @@ class Migrator {
 	 *
 	 * @param  string  $path
 	 * @param  bool    $pretend
+	 * @param  string  $name
 	 * @return void
 	 */
-	public function run($path, $pretend = false)
+	public function run($path, $pretend = false, $name = null)
 	{
 		$this->notes = array();
 
-		$this->requireFiles($path, $files = $this->getMigrationFiles($path));
+		$files = $this->getMigrationFiles($path);
+
+		// filter files to rollback from current batch
+		if(!is_null($name) && $name != ',')
+		{
+			if(strpos($name, ',') !== -1)
+			{
+				$name = explode(',', $name);
+			}
+			else
+			{
+				$name = array($name);
+			}
+			$files = array_filter($files, function($file) use ($name)
+			{
+				if(in_array(substr($file, 18), $name))
+				{
+					return $file;
+				}
+
+			});
+		}
+
+		$this->requireFiles($path, $files);
 
 		// Once we grab all of the migration files for the path, we will compare them
 		// against the migrations that have already been run for this package then
@@ -144,9 +168,10 @@ class Migrator {
 	 * Rollback the last migration operation.
 	 *
 	 * @param  bool  $pretend
+	 * @param string $name
 	 * @return int
 	 */
-	public function rollback($pretend = false)
+	public function rollback($pretend = false, $name = null)
 	{
 		$this->notes = array();
 
@@ -155,19 +180,40 @@ class Migrator {
 		// of them "down" to reverse the last migration "operation" which ran.
 		$migrations = $this->repository->getLast();
 
-		if (count($migrations) == 0)
+		// filter files to rollback from current batch
+		if(!is_null($name) && $name != ',')
 		{
-			$this->note('<info>Nothing to rollback.</info>');
-
-			return count($migrations);
+			if(strpos($name, ',') !== -1)
+			{
+				$name = explode(',', $name);
+			}
+			else
+			{
+				$name = array($name);
+			}
 		}
 
 		// We need to reverse these migrations so that they are "downed" in reverse
 		// to what they run on "up". It lets us backtrack through the migrations
 		// and properly reverse the entire database schema operation that ran.
-		foreach ($migrations as $migration)
+		foreach ($migrations as $m => $migration)
 		{
+			if(!is_null($name))
+			{
+				// roleback migrations that were specified by names if name given
+				if(!in_array(substr($migration->migration, 18), $name))
+				{
+					unset($migrations[$m]);
+					continue;
+				}
+			}
+
 			$this->runDown((object) $migration, $pretend);
+		}
+
+		if (count($migrations) == 0)
+		{
+			$this->note('<info>Nothing to rollback.</info>');
 		}
 
 		return count($migrations);
