@@ -650,13 +650,14 @@ class Blueprint {
 	 * Add the proper columns for a polymorphic table.
 	 *
 	 * @param  string  $name
+	 * @param  bool    $nullable
 	 * @return void
 	 */
-	public function morphs($name)
+	public function morphs($name, $nullable = false)
 	{
-		$this->integer("{$name}_id");
+		$this->unsignedInteger("{$name}_id")->nullable($nullable);
 
-		$this->string("{$name}_type");
+		$this->string("{$name}_type")->nullable($nullable);
 	}
 
 	/**
