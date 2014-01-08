@@ -324,7 +324,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  string  $provider
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	protected function resolveProviderClass($provider)
+	public function resolveProviderClass($provider)
 	{
 		return new $provider($this);
 	}
