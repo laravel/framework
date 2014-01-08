@@ -151,7 +151,7 @@ class Migrator {
 
 		if ($pretend)
 		{
-			$this->pretendToRun($migration, 'up');
+			return $this->pretendToRun($migration, 'up');
 		}
 
 		$migration->up();
