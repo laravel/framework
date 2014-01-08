@@ -36,12 +36,18 @@ abstract class Grammar {
 	/**
 	 * Wrap a value in keyword identifiers.
 	 *
-	 * @param  string  $value
+	 * @param  \Illuminate\Database\Query\Expression|string  $value
 	 * @return string
 	 */
 	public function wrap($value)
 	{
 		if ($this->isExpression($value)) return $this->getValue($value);
+
+		if (is_array($value) || is_object($value))
+		{
+			$type = is_object($value) ? get_class($value) : 'Array';
+			throw new \InvalidArgumentException("Argument 1 of wrap() expects a string or Illuminate\Database\Query\Expression, got $type");
+		}
 
 		// If the value being wrapped has a column alias we will need to separate out
 		// the pieces so we can wrap each of the segments of the expression on it
