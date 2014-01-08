@@ -50,7 +50,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	public function testEagerConstraintsAreProperlyAdded()
 	{
 		$relation = $this->getRelation();
-		$relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', array(1, 2));
+		$relation->getQuery()->shouldReceive('whereIn')->once()->with('foreign_key', array(1, 2));
 		$model1 = new EloquentHasManyModelStub;
 		$model1->id = 1;
 		$model2 = new EloquentHasManyModelStub;
@@ -89,17 +89,27 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetKeysFromRelation()
+	{
+		$relation = $this->getRelation();
+		$relation->getParent()->shouldReceive('getTable')->andReturn('parents');
+		$relation->getRelated()->shouldReceive('getTable')->andReturn('related');
+		$this->assertEquals('parents.id', $relation->getQualifiedParentKeyName());
+		$this->assertEquals('related.foreign_key', $relation->getQualifiedRelatedKeyName());
+	}
+
+
 	protected function getRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+		$builder->shouldReceive('where')->with('foreign_key', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		return new HasMany($builder, $parent, 'table.foreign_key', 'id');
+		return new HasMany($builder, $parent, 'foreign_key', 'id');
 	}
 
 }
