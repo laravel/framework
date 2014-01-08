@@ -185,6 +185,25 @@ class FileViewFinder implements ViewFinderInterface {
 	}
 
 	/**
+	 * Prepend a namespace hint to the finder.
+	 *
+	 * @param  string  $namespace
+	 * @param  string|array  $hints
+	 * @return void
+	 */
+	public function prependNamespace($namespace, $hints)
+	{
+		$hints = (array) $hints;
+
+		if (isset($this->hints[$namespace]))
+		{
+			$hints = array_merge($hints, $this->hints[$namespace]);
+		}
+
+		$this->hints[$namespace] = $hints;
+	}
+
+	/**
 	 * Register an extension with the view finder.
 	 *
 	 * @param  string  $extension
