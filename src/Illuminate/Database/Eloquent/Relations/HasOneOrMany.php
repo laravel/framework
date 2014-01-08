@@ -291,4 +291,14 @@ abstract class HasOneOrMany extends Relation {
 		return $this->parent->getTable().'.'.$this->localKey;
 	}
 
+	/**
+	 * Get the fully qualified related key name.
+	 *
+	 * @return string
+	 */
+	public function getQualifiedRelatedKeyName()
+	{
+		return $this->related->getTable().'.'.$this->otherKey;
+	}
+
 }
