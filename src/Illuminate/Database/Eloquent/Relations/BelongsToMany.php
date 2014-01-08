@@ -271,7 +271,7 @@ class BelongsToMany extends Relation {
 
 		$key = $this->wrap($this->getQualifiedParentKeyName());
 
-		return $query->where($hash.'.person_id', '=', new \Illuminate\Database\Query\Expression($key));
+		return $query->where($hash.'.'.$this->foreignKey, '=', new \Illuminate\Database\Query\Expression($key));
 	}
 
 	/**
