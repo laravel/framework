@@ -109,6 +109,20 @@ class Collection extends BaseCollection {
 	}
 
 	/**
+	 * Get the sum of values for a given key
+	 *
+	 * @param string $key
+	 * @return mixed
+	 */
+	public function sum($key)
+	{
+		return $this->reduce(function($result, $item) use ($key)
+		{
+			return $result += $item->{$key};
+		}, 0);
+	}
+
+	/**
 	 * Get the array of primary keys
 	 *
 	 * @return array

@@ -32,6 +32,17 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(10, $c->min('foo'));
 	}
 
+	public function testGettingSumFromCollection()
+	{
+		$c = new Collection(array((object) array('foo' => 10), (object) array('foo' => 20)));
+		$this->assertEquals(30, $c->sum('foo'));
+	}
+
+	public function testGettingSumFromEmptyCollection()
+	{
+		$c = new Collection();
+		$this->assertEquals(0, $c->sum('foo'));
+	}
 
 	public function testContainsIndicatesIfModelInArray()
 	{
