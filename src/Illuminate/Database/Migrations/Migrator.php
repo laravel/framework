@@ -237,7 +237,7 @@ class Migrator {
 
 		if ($pretend)
 		{
-			$this->pretendToRun($instance, 'down');
+			return $this->pretendToRun($instance, 'down');
 		}
 
 		$instance->down();
