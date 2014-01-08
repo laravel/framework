@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
-use LogicException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -80,11 +79,10 @@ class BelongsTo extends Relation {
 	 * Add the constraints for a relationship count query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
 	 * @return \Illuminate\Database\Eloquent\Builder
-	 *
-	 * @throws \LogicException
 	 */
-	public function getRelationCountQuery(Builder $query)
+	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
 		$query->select(new Expression('count(*)'));
 

@@ -20,7 +20,7 @@ class CommandsServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.session.database', function($app)
 		{
-			return new Console\MakeTableCommand($app['files']);
+			return new Console\SessionTableCommand($app['files']);
 		});
 
 		$this->commands('command.session.database');

@@ -78,11 +78,11 @@ class SecLibGateway implements GatewayInterface {
 	 * Connect to the SSH server.
 	 *
 	 * @param  string  $username
-	 * @return void
+	 * @return bool
 	 */
 	public function connect($username)
 	{
-		$this->getConnection()->login($username, $this->getAuthForLogin());
+		return $this->getConnection()->login($username, $this->getAuthForLogin());
 	}
 
 	/**

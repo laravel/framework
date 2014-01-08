@@ -3,12 +3,12 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Migrations\MigrationCreator;
-use Illuminate\Database\Console\Migrations\MakeCommand;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class MigrationServiceProvider extends ServiceProvider {
@@ -185,7 +185,7 @@ class MigrationServiceProvider extends ServiceProvider {
 
 			$packagePath = $app['path.base'].'/vendor';
 
-			return new MakeCommand($creator, $packagePath);
+			return new MigrateMakeCommand($creator, $packagePath);
 		});
 	}
 

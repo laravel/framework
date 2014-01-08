@@ -76,7 +76,8 @@
 		{"message": "Fixed relative URL generation.", "backport": null},
 		{"message": "Added --seeder option to migrate:refresh Artisan command.", "backport": null},
 		{"message": "Added 'cacheDriver' method to query builder.", "backport": null},
-		{"message": "Added support for whereHas on belongsTo relationships.", "backport": null}
+		{"message": "Added support for whereHas on belongsTo relationships.", "backport": null},
+		{"message": "Added groupBy to Collection class.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
