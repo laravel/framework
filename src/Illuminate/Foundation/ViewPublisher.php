@@ -47,7 +47,7 @@ class ViewPublisher {
 	 */
 	public function publish($package, $source)
 	{
-		$destination = $this->publishPath."/{$package}";
+		$destination = $this->publishPath."/packages/{$package}";
 
 		$this->makeDestination($destination);
 
