@@ -173,7 +173,7 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
 		$composers = $env->composers(array(
 			'foo' => 'bar',
-			'baz@baz' => ['qux', 'foo'],
+			'baz@baz' => array('qux', 'foo'),
 		));
 
 		$reflections = array(
