@@ -741,6 +741,28 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelWithMultipleDateFormats()
+	{
+		$model = new EloquentModelWithDateFormatsStub;
+		$model->datefield = '2014-01-01 12:00:00';
+		$this->assertEquals('2014-01-01 12:00:00', $model->datefield->format('Y-m-d H:i:s'));
+		$model->datefield = '01/01/2014 12:00';
+		$this->assertEquals('2014-01-01 12:00:00', $model->datefield->format('Y-m-d H:i:s'));
+		$model->setRawAttributes(array('datefield' => '01/01/2014 12:00'));
+		$this->assertEquals('2014-01-01 12:00:00', $model->datefield->format('Y-m-d H:i:s'));
+	}
+
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testModelWithMultipleDateFormatsInvalidFormat()
+	{
+		$model = new EloquentModelWithDateFormatsStub;
+		$model->datefield = 'foo';
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -860,3 +882,15 @@ class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelWithoutTableStub extends Illuminate\Database\Eloquent\Model {}
+
+class EloquentModelWithDateFormatsStub extends Illuminate\Database\Eloquent\Model {
+	protected $dates = array('datefield');
+	public function getDateFormats()
+	{
+		return array('Y-m-d H:i:s', 'm/d/Y H:i');
+	}
+	public function getDateFormat()
+	{
+		return 'Y-m-d H:i:s';
+	}
+}
