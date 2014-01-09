@@ -294,7 +294,7 @@ class Migrator {
 	 * Pretend to run the migrations.
 	 *
 	 * @param  object  $migration
-	 * @return void
+	 * @return null
 	 */
 	protected function pretendToRun($migration, $method)
 	{
