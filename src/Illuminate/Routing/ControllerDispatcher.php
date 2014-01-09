@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Routing;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 
@@ -135,9 +136,20 @@ class ControllerDispatcher {
 			// router take care of calling these filters so we do not duplicate logics.
 			if ($this->filterApplies($filter, $request, $method))
 			{
-				$route->after($filter['original']);
+				$route->after($this->getAssignableAfter($filter));
 			}
 		}
+	}
+
+	/**
+	 * Get the assignable after filter for the route.
+	 *
+	 * @param  Closure|string  $filter
+	 * @return string
+	 */
+	protected function getAssignableAfter($filter)
+	{
+		return $filter['original'] instanceof Closure ? $filter['filter'] : $filter['original'];
 	}
 
 	/**
