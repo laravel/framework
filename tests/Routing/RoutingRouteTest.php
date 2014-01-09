@@ -130,6 +130,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('filtered', $router->dispatch(Request::create('baz', 'GET'))->getContent());
 
 
+		unset($_SERVER['__test.after.filter']);
+		$router = $this->getRouter();
+		$router->filter('qux', function()
+		{
+			$_SERVER['__test.after.filter'] = true;
+		});
+		$router->get('qux', 'RouteTestControllerDispatchStub@qux');
+		$this->assertEquals('qux', $router->dispatch(Request::create('qux', 'GET'))->getContent());
+		$this->assertTrue($_SERVER['__test.after.filter']);
+
 		/**
 		 * Test filters disabled...
 		 */
@@ -587,6 +597,7 @@ class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
 	{
 		$this->beforeFilter('foo', array('only' => 'bar'));
 		$this->beforeFilter('@filter', array('only' => 'baz'));
+		$this->afterFilter('qux', array('only' => 'qux'));
 	}
 	public function foo()
 	{
@@ -603,6 +614,10 @@ class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
 	public function baz()
 	{
 		return 'baz';
+	}
+	public function qux()
+	{
+		return 'qux';
 	}
 }
 

@@ -68,6 +68,8 @@ abstract class Controller {
 	{
 		$parameters = array();
 
+		$original = $filter;
+
 		if ($filter instanceof Closure)
 		{
 			$filter = $this->registerClosureFilter($filter);
@@ -81,7 +83,7 @@ abstract class Controller {
 			list($filter, $parameters) = Route::parseFilter($filter);
 		}
 
-		return compact('filter', 'parameters', 'options');
+		return compact('original', 'filter', 'parameters', 'options');
 	}
 
 	/**
