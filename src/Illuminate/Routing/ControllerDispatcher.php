@@ -135,7 +135,7 @@ class ControllerDispatcher {
 			// router take care of calling these filters so we do not duplicate logics.
 			if ($this->filterApplies($filter, $request, $method))
 			{
-				$route->after($filter['filter']);
+				$route->after($filter['original']);
 			}
 		}
 	}
