@@ -286,17 +286,17 @@ class Environment {
 	}
 
 	/**
-	 * Register multiple View composers via an array.
+	 * Register multiple view composers via an array.
 	 *
-	 * @param array $composers
-	 *
+	 * @param array  $composers
 	 * @return array
 	 */
 	public function composers(array $composers)
 	{
 		$registered = array();
 
-		foreach ($composers as $callback => $views) {
+		foreach ($composers as $callback => $views)
+		{
 			$registered += $this->composer($views, $callback);
 		}
 
