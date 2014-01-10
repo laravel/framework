@@ -93,7 +93,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	{
 		$email = $user->getReminderEmail();
 
-		$reminder = $this->getTable()->where('email', $email)->where('token', $token)->first();
+		$reminder = (object) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
 		return $reminder && ! $this->reminderExpired($reminder);
 	}
