@@ -618,4 +618,14 @@ class Guard {
 		return $this->viaRemember;
 	}
 
+	/**
+	 * Get the last user that was attempted to be retrieved.
+	 *
+	 * @return \Illuminate\Auth\UserInterface
+	 */
+	public function getLastAttempted()
+	{
+		return $this->lastAttempted;
+	}
+
 }
