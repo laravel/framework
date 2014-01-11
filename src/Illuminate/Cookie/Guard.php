@@ -63,7 +63,15 @@ class Guard implements HttpKernelInterface {
 		{
 			try
 			{
-				$request->cookies->set($key, $this->encrypter->decrypt($c));
+				if(is_array($c))
+				{
+					foreach ($c as $name => $value)
+						$$request->cookies->set($key[$name], $this->encrypter->decrypt($value));
+				}
+				else
+				{
+					$request->cookies->set($key, $this->encrypter->decrypt($c));
+				}
 			}
 			catch (DecryptException $e)
 			{
