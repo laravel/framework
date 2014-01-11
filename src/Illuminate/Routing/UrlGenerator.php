@@ -276,7 +276,7 @@ class UrlGenerator {
 		// should insert its key in the path
 		if (method_exists($value, 'getKey'))
 		{
-	    		$value = $value->getKey():
+	    		$value = $value->getKey();
 		}
 
 		$path = preg_replace($pattern, $value, $path, 1, $count);
