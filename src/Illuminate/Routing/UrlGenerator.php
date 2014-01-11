@@ -270,6 +270,14 @@ class UrlGenerator {
 	protected function replaceRouteParameter($path, $key, $value, array &$parameters)
 	{
 		$pattern = is_string($key) ? '/\{'.$key.'[\?]?\}/' : '/\{.*?\}/';
+		
+		// When the value is an object implementing the getKey() method 
+		// it means that it must be an instance of a model and that we 
+		// should insert its key in the path
+		if (method_exists($value, 'getKey'))
+		{
+	    		$value = $value->getKey();
+		}
 
 		$path = preg_replace($pattern, $value, $path, 1, $count);
 
