@@ -63,7 +63,7 @@ class HasManyThrough extends Relation {
 	/**
 	 * Set the join clause on the query.
 	 *
-	 * @param  \Illuminate\Databaes\Eloquent\Builder|null  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder|null  $query
 	 * @return void
 	 */
 	protected function setJoin(Builder $query = null)

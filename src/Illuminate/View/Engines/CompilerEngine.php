@@ -63,7 +63,7 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * Handle a view exception.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return void
 	 *
 	 * @throws $e
