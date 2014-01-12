@@ -91,6 +91,21 @@ class RouteCollection implements Countable, IteratorAggregate {
 		// processing a request and easily generate URLs to the given controllers.
 		if (isset($action['controller']))
 		{
+			$this->addToActionList($action, $route);
+		}
+	}
+
+	/**
+	 * Add a route to the controller action dictionary.
+	 *
+	 * @param  array  $action
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return void
+	 */
+	protected function addToActionList($action, $route)
+	{
+		if ( ! isset($this->actionList[$action['controller']]))
+		{
 			$this->actionList[$action['controller']] = $route;
 		}
 	}
