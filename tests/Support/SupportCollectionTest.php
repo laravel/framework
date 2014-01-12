@@ -201,12 +201,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testSortBy()
 	{
 		$data = new Collection(array('taylor', 'dayle'));
-		$data->sortBy(function($x) { return $x; });
+		$data = $data->sortBy(function($x) { return $x; });
 
 		$this->assertEquals(array('dayle', 'taylor'), array_values($data->all()));
 
 		$data = new Collection(array('dayle', 'taylor'));
-		$data->sortBy(function($x) { return $x; }, true);
+		$data->sortByDesc(function($x) { return $x; });
 
 		$this->assertEquals(array('taylor', 'dayle'), array_values($data->all()));
 	}

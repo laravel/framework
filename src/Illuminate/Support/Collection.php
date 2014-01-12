@@ -436,6 +436,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Sort the collection in descending order using the given Closure.
+	 *
+	 * @param  \Closure  $callback
+	 * @param  int   $options
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function sortByDesc(Closure $callback, $options = SORT_REGULAR)
+	{
+		return $this->sortBy($callback, $options, true);
+	}
+
+	/**
 	 * Splice portion of the underlying collection array.
 	 *
 	 * @param  int    $offset
