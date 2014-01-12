@@ -289,16 +289,24 @@ class UrlGenerator {
 	 */
 	protected function getRouteQueryString(array $parameters)
 	{
-		if (count($parameters) == 0) return '';
+        if (count($parameters) == 0) return '';
 
-		$query = http_build_query($keyed = $this->getStringParameters($parameters));
+        $query = http_build_query($keyed = $this->getStringParameters($parameters));
 
-		if (count($keyed) < count($parameters))
-		{
-			$query .= '&'.implode('&', $this->getNumericParameters($parameters));
-		}
+        if ($query == '')
+        {
+            // All parameters are numeric indexed - return "nice" uri string
+            return '/'.implode('/', $parameters);
+        }
+        else
+        {
+            if (count($keyed) < count($parameters))
+            {
+                $query .= '&'.implode('&', $this->getNumericParameters($parameters));
+            }
 
-		return '?'.trim($query, '&');
+            return '?'.trim($query, '&');
+        }
 	}
 
 	/**
