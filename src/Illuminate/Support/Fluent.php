@@ -1,8 +1,10 @@
 <?php namespace Illuminate\Support;
 
 use ArrayAccess;
+use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Support\Contracts\JsonableInterface;
 
-class Fluent implements ArrayAccess {
+class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface {
 
 	/**
 	 * All of the attributes set on the container.
@@ -154,6 +156,27 @@ class Fluent implements ArrayAccess {
 	public function __unset($key)
 	{
 		unset($this->attributes[$key]);
+	}
+
+	/**
+	 * Get the attributes as a plain array.
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return $this->attributes;
+	}
+
+	/**
+	 * Get the attributes as JSON.
+	 *
+	 * @param  int  $options
+	 * @return string
+	 */
+	public function toJson($options = 0)
+	{
+		return json_encode($this->toArray(), $options);
 	}
 
 }
