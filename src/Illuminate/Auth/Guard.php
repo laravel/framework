@@ -589,6 +589,16 @@ class Guard {
 	}
 
 	/**
+	 * Get the last user we attempted to authenticate.
+	 *
+	 * @return \Illuminate\Auth\UserInterface
+	 */
+	public function getLastAttempted()
+	{
+		return $this->lastAttempted;
+	}
+
+	/**
 	 * Get a unique identifier for the auth session value.
 	 *
 	 * @return string
@@ -616,16 +626,6 @@ class Guard {
 	public function viaRemember()
 	{
 		return $this->viaRemember;
-	}
-
-	/**
-	 * Get the last user that was attempted to be retrieved.
-	 *
-	 * @return \Illuminate\Auth\UserInterface
-	 */
-	public function getLastAttempted()
-	{
-		return $this->lastAttempted;
 	}
 
 }
