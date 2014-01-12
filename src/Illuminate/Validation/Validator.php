@@ -104,7 +104,7 @@ class Validator implements MessageProviderInterface {
 	protected $numericRules = array('Numeric', 'Integer');
 
 	/**
-	 * The implicit validation rules.
+	 * The validation rules that imply the field is required.
 	 *
 	 * @var array
 	 */
