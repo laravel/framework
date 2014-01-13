@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.4.0",
         "classpreloader/classpreloader": "1.0.*",
         "d11wtq/boris": "1.0.*",
         "ircmaxell/password-compat": "1.0.*",
