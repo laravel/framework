@@ -51,9 +51,9 @@ class Connection implements ConnectionInterface {
 	protected $events;
 
 	/**
-	 * The paginator environment instance.
+	 * The paginator factory instance.
 	 *
-	 * @var \Illuminate\Pagination\Paginator
+	 * @var \Illuminate\Pagination\Factory
 	 */
 	protected $paginator;
 
@@ -794,9 +794,9 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
-	 * Get the paginator environment instance.
+	 * Get the paginator factory instance.
 	 *
-	 * @return \Illuminate\Pagination\Environment
+	 * @return \Illuminate\Pagination\Factory
 	 */
 	public function getPaginator()
 	{
@@ -809,9 +809,9 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
-	 * Set the pagination environment instance.
+	 * Set the pagination factory instance.
 	 *
-	 * @param  \Illuminate\Pagination\Environment|\Closure  $paginator
+	 * @param  \Illuminate\Pagination\Factory|\Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)
