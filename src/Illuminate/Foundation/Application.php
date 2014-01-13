@@ -1002,7 +1002,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'queue'          => 'Illuminate\Queue\QueueManager',
 			'redirect'       => 'Illuminate\Routing\Redirector',
 			'redis'          => 'Illuminate\Redis\Database',
-			'request'        => 'Illuminate\Http\Requset',
+			'request'        => 'Illuminate\Http\Request',
 			'router'         => 'Illuminate\Routing\Router',
 			'session'        => 'Illuminate\Session\SessionManager',
 			'session.store'  => 'Illuminate\Session\Store',
