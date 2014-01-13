@@ -158,6 +158,7 @@ class ControllerDispatcher {
 	 * @param  array  $filter
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $method
+	 * @return bool
 	 */
 	protected function filterApplies($filter, $request, $method)
 	{
@@ -178,6 +179,7 @@ class ControllerDispatcher {
 	 * @param  array  $filter
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $method
+	 * @return bool
 	 */
 	protected function filterFailsOnly($filter, $request, $method)
 	{
@@ -192,6 +194,7 @@ class ControllerDispatcher {
 	 * @param  array  $filter
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $method
+	 * @return bool
 	 */
 	protected function filterFailsExcept($filter, $request, $method)
 	{
@@ -206,6 +209,7 @@ class ControllerDispatcher {
 	 * @param  array  $filter
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $method
+	 * @return bool
 	 */
 	protected function filterFailsOn($filter, $request, $method)
 	{

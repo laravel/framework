@@ -53,7 +53,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 *
 	 * Needs to be implemented by subclasses.
 	 *
-	 * @return Symfony\Component\HttpKernel\HttpKernelInterface
+	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
 	 */
 	abstract public function createApplication();
 
