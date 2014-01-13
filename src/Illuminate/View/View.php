@@ -11,9 +11,9 @@ use Illuminate\Support\Contracts\RenderableInterface as Renderable;
 class View implements ArrayAccess, Renderable {
 
 	/**
-	 * The view environment instance.
+	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Environment
+	 * @var \Illuminate\View\Factory
 	 */
 	protected $factory;
 
@@ -209,11 +209,11 @@ class View implements ArrayAccess, Renderable {
 	}
 
 	/**
-	 * Get the view environment instance.
+	 * Get the view factory instance.
 	 *
-	 * @return \Illuminate\View\Environment
+	 * @return \Illuminate\View\Factory
 	 */
-	public function getEnvironment()
+	public function getFactory()
 	{
 		return $this->factory;
 	}
