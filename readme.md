@@ -16,7 +16,7 @@ Laravel is accessible, yet powerful, providing powerful tools needed for large, 
 
 Documentation for the entire framework can be found on the [Laravel website](http://laravel.com/docs).
 
-## Contributing To Laravel
+## Contributing
 
 Thank you for considering contributing to the Laravel framework. If you are submitting a bug-fix, or an enhancement that is **not** a breaking change, submit your pull request to the branch corresponding to the latest stable release of the framework, such as the `4.1` branch. If you are submitting a breaking change or an entirely new component, submit your pull request to the `master` branch.
 
