@@ -295,6 +295,19 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		// a more convenient way of specifying your service provider classes.
 		if (is_string($provider))
 		{
+
+			// If this provider has already been registered, return the previous instance.
+			// This is to prevent repeat register() / boot() calls on providers used by
+			// multiple packages.
+			if (array_key_exists($provider, $this->loadedProviders))
+			{
+				return array_first($this->serviceProviders, function($key, $value) use ($provider)
+				{
+					return get_class($value) == $provider;
+				});
+			}
+
+			// This provider was not found, so instantiate it.
 			$provider = $this->resolveProviderClass($provider);
 		}
 
