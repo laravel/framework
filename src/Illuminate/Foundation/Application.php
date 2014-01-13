@@ -324,7 +324,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  string  $provider
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	protected function resolveProviderClass($provider)
+	public function resolveProviderClass($provider)
 	{
 		return new $provider($this);
 	}
@@ -970,6 +970,52 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public static function onRequest($method, $parameters = array())
 	{
 		return forward_static_call_array(array(static::requestClass(), $method), $parameters);
+	}
+
+	/**
+	 * Register the core class aliases in the container.
+	 *
+	 * @return void
+	 */
+	public function registerCoreContainerAliases()
+	{
+		$aliases = array(
+			'app'            => 'Illuminate\Foundation\Application',
+			'artisan'        => 'Illuminate\Console\Application',
+			'auth'           => 'Illuminate\Auth\AuthManager',
+			'blade.compiler' => 'Illuminate\View\Compilers\BladeCompiler',
+			'cache'          => 'Illuminate\Cache\Repository',
+			'config'         => 'Illuminate\Config\Repository',
+			'cookie'         => 'Illuminate\Cookie\CookieJar',
+			'encrypter'      => 'Illuminate\Encryption\Encrypter',
+			'db'             => 'Illuminate\Database\DatabaseManager',
+			'events'         => 'Illuminate\Events\Dispatacher',
+			'files'          => 'Illuminate\Filesystem\Filesystem',
+			'form'           => 'Illuminate\Html\FormBuilder',
+			'hash'           => 'Illuminate\Hashing\HasherInterface',
+			'html'           => 'Illuminate\Html\HtmlBuilder',
+			'translator'     => 'Illuminate\Translation\Translator',
+			'log'            => 'Illuminate\Log\Writer',
+			'mailer'         => 'Illuminate\Mail\Mailer',
+			'paginator'      => 'Illuminate\Pagination\Environment',
+			'auth.reminder'  => 'Illuminate\Auth\Reminders\PasswordBroker',
+			'queue'          => 'Illuminate\Queue\QueueManager',
+			'redirect'       => 'Illuminate\Routing\Redirector',
+			'redis'          => 'Illuminate\Redis\Database',
+			'request'        => 'Illuminate\Http\Request',
+			'router'         => 'Illuminate\Routing\Router',
+			'session'        => 'Illuminate\Session\SessionManager',
+			'session.store'  => 'Illuminate\Session\Store',
+			'remote'         => 'Illuminate\Remote\RemoteManager',
+			'url'            => 'Illuminate\Routing\UrlGenerator',
+			'validator'      => 'Illuminate\Validation\Factory',
+			'view'           => 'Illuminate\View\Environment',
+		);
+
+		foreach ($aliases as $key => $alias)
+		{
+			$this->alias($key, $alias);
+		}
 	}
 
 	/**

@@ -34,7 +34,7 @@ class Writer {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispacher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $dispatcher;
 

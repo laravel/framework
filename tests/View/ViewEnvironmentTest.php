@@ -165,6 +165,26 @@ class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testComposersCanBeMassRegistered()
+	{
+		$env = $this->getEnvironment();
+		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: bar', m::type('Closure'));
+		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: qux', m::type('Closure'));
+		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$composers = $env->composers(array(
+			'foo' => 'bar',
+			'baz@baz' => array('qux', 'foo'),
+		));
+
+		$reflections = array(
+			new ReflectionFunction($composers[0]),
+			new ReflectionFunction($composers[1]),
+		);
+		$this->assertEquals(array('class' => 'foo', 'method' => 'compose', 'container' => null), $reflections[0]->getStaticVariables());
+		$this->assertEquals(array('class' => 'baz', 'method' => 'baz', 'container' => null), $reflections[1]->getStaticVariables());
+	}
+
+
 	public function testClassCallbacks()
 	{
 		$env = $this->getEnvironment();

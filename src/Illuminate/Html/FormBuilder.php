@@ -612,7 +612,7 @@ class FormBuilder {
 	 * @param  string  $name
 	 * @param  mixed   $value
 	 * @param  bool    $checked
-	 * @return void
+	 * @return bool
 	 */
 	protected function getCheckedState($type, $name, $value, $checked)
 	{

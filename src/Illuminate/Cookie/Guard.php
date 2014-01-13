@@ -63,7 +63,7 @@ class Guard implements HttpKernelInterface {
 		{
 			try
 			{
-				$request->cookies->set($key, $this->encrypter->decrypt($c));
+				$request->cookies->set($key, $this->decryptCookie($c));
 			}
 			catch (DecryptException $e)
 			{
@@ -72,6 +72,37 @@ class Guard implements HttpKernelInterface {
 		}
 
 		return $request;
+	}
+
+	/**
+	 * Decrypt the given cookie and return the value.
+	 *
+	 * @param  string|array  $cookie
+	 * @return string|array
+	 */
+	protected function decryptCookie($cookie)
+	{
+		return is_array($cookie)
+						? $this->decryptArray($cookie)
+						: $this->encrypter->decrypt($cookie);
+	}
+
+	/**
+	 * Decrypt an array based cookie.
+	 *
+	 * @param  array  $cookie
+	 * @return array
+	 */
+	protected function decryptArray(array $cookie)
+	{
+		$decrypted = array();
+
+		foreach ($cookie as $key => $value)
+		{
+			$decrypted[$key] = $this->encrypter->decrypt($value);
+		}
+
+		return $decrypted;
 	}
 
 	/**
