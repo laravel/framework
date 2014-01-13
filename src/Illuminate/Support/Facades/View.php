@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
 /**
- * @see \Illuminate\View\Factory
+ * @see \Illuminate\View\Environment
  */
 class View extends Facade {
 

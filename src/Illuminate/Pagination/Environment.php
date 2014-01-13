@@ -1,10 +1,10 @@
 <?php namespace Illuminate\Pagination;
 
 use Illuminate\Http\Request;
-use Illuminate\View\Factory as ViewFactory;
+use Illuminate\View\Environment as ViewEnvironment;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class Factory {
+class Environment {
 
 	/**
 	 * The request instance.
@@ -14,9 +14,9 @@ class Factory {
 	protected $request;
 
 	/**
-	 * The view factory instance.
+	 * The view environment instance.
 	 *
-	 * @var \Illuminate\View\Factory
+	 * @var \Illuminate\View\Environment
 	 */
 	protected $view;
 
@@ -63,15 +63,15 @@ class Factory {
 	protected $pageName;
 
 	/**
-	 * Create a new pagination factory.
+	 * Create a new pagination environment.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Illuminate\View\Factory  $view
+	 * @param  \Illuminate\View\Environment  $view
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
 	 * @return void
 	 */
-	public function __construct(Request $request, ViewFactory $view, TranslatorInterface $trans, $pageName = 'page')
+	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageName = 'page')
 	{
 		$this->view = $view;
 		$this->trans = $trans;
@@ -256,22 +256,22 @@ class Factory {
 	}
 
 	/**
-	 * Get the current view factory.
+	 * Get the current view driver.
 	 *
-	 * @return \Illuminate\View\Factory
+	 * @return \Illuminate\View\Environment
 	 */
-	public function getViewFactory()
+	public function getViewDriver()
 	{
 		return $this->view;
 	}
 
 	/**
-	 * Set the current view factory.
+	 * Set the current view driver.
 	 *
-	 * @param  \Illuminate\View\Factory  $view
+	 * @param  \Illuminate\View\Environment  $view
 	 * @return void
 	 */
-	public function setViewFactory(ViewFactory $view)
+	public function setViewDriver(ViewEnvironment $view)
 	{
 		$this->view = $view;
 	}
