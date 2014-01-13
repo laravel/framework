@@ -769,6 +769,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  array|string  $methods
 	 * @param  string  $uri
 	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
 	 */
 	protected function addRoute($methods, $uri, $action)
 	{

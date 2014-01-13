@@ -10,6 +10,7 @@ class PlainDisplayer implements ExceptionDisplayerInterface {
 	 * Display the given exception to the user.
 	 *
 	 * @param  \Exception  $exception
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function display(Exception $exception)
 	{

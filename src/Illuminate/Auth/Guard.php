@@ -589,6 +589,16 @@ class Guard {
 	}
 
 	/**
+	 * Get the last user we attempted to authenticate.
+	 *
+	 * @return \Illuminate\Auth\UserInterface
+	 */
+	public function getLastAttempted()
+	{
+		return $this->lastAttempted;
+	}
+
+	/**
 	 * Get a unique identifier for the auth session value.
 	 *
 	 * @return string

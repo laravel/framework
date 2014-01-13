@@ -212,7 +212,7 @@ class Handler {
 	/**
 	 * Handle a console exception.
 	 *
-	 * @param  Exception  $exception
+	 * @param  \Exception  $exception
 	 * @return void
 	 */
 	public function handleConsole($exception)
@@ -223,7 +223,7 @@ class Handler {
 	/**
 	 * Handle the given exception.
 	 *
-	 * @param  Exception  $exception
+	 * @param  \Exception  $exception
 	 * @param  bool  $fromConsole
 	 * @return void
 	 */
@@ -290,7 +290,7 @@ class Handler {
 	 * Determine if the given handler handles this exception.
 	 *
 	 * @param  Closure    $handler
-	 * @param  Exception  $exception
+	 * @param  \Exception  $exception
 	 * @return bool
 	 */
 	protected function handlesException(Closure $handler, $exception)
@@ -304,7 +304,7 @@ class Handler {
 	 * Determine if the given handler type hints the exception.
 	 *
 	 * @param  ReflectionFunction  $reflection
-	 * @param  Exception  $exception
+	 * @param  \Exception  $exception
 	 * @return bool
 	 */
 	protected function hints(ReflectionFunction $reflection, $exception)
@@ -319,7 +319,7 @@ class Handler {
 	/**
 	 * Format an exception thrown by a handler.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return string
 	 */
 	protected function formatException(\Exception $e)
