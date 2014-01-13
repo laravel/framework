@@ -92,7 +92,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/View/Engines/EngineResolver.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/View/ViewFinderInterface.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/View/FileViewFinder.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/View/Environment.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/View/Factory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Contracts/MessageProviderInterface.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/MessageBag.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/View.php',
