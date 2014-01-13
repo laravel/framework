@@ -997,7 +997,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'translator'     => 'Illuminate\Translation\Translator',
 			'log'            => 'Illuminate\Log\Writer',
 			'mailer'         => 'Illuminate\Mail\Mailer',
-			'paginator'      => 'Illuminate\Pagination\Factory',
+			'paginator'      => array('Illuminate\Pagination\Factory', 'Illuminate\Pagination\Environment'),
 			'auth.reminder'  => 'Illuminate\Auth\Reminders\PasswordBroker',
 			'queue'          => 'Illuminate\Queue\QueueManager',
 			'redirect'       => 'Illuminate\Routing\Redirector',
@@ -1009,12 +1009,15 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'remote'         => 'Illuminate\Remote\RemoteManager',
 			'url'            => 'Illuminate\Routing\UrlGenerator',
 			'validator'      => 'Illuminate\Validation\Factory',
-			'view'           => 'Illuminate\View\Factory',
+			'view'           => array('Illuminate\View\Factory', 'Illuminate\View\Environment'),
 		);
 
-		foreach ($aliases as $key => $alias)
+		foreach ($aliases as $key => $aliases)
 		{
-			$this->alias($key, $alias);
+			foreach ((array) $aliases as $alias)
+			{
+				$this->alias($key, $alias);
+			}
 		}
 	}
 
