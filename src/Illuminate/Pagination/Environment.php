@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\View\Factory as ViewFactory;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * DEPRECATED: Please use Illuminate\Pagination\Factory instead!
+ */
 class Environment extends Factory {
 
 	/**
