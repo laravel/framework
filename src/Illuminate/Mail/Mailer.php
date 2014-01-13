@@ -4,7 +4,7 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Log\Writer;
-use Illuminate\View\Factory;
+use Illuminate\View\Environment;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
@@ -12,9 +12,9 @@ use Illuminate\Support\SerializableClosure;
 class Mailer {
 
 	/**
-	 * The view factory instance.
+	 * The view environment instance.
 	 *
-	 * @var \Illuminate\View\Factory
+	 * @var \Illuminate\View\Environment
 	 */
 	protected $views;
 
@@ -63,11 +63,11 @@ class Mailer {
 	/**
 	 * Create a new Mailer instance.
 	 *
-	 * @param  \Illuminate\View\Factory  $views
+	 * @param  \Illuminate\View\Environment  $views
 	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
-	public function __construct(Factory $views, Swift_Mailer $swift)
+	public function __construct(Environment $views, Swift_Mailer $swift)
 	{
 		$this->views = $views;
 		$this->swift = $swift;
@@ -387,11 +387,11 @@ class Mailer {
 	}
 
 	/**
-	 * Get the view factory instance.
+	 * Get the view environment instance.
 	 *
-	 * @return \Illuminate\View\Factory
+	 * @return \Illuminate\View\Environment
 	 */
-	public function getViewFactory()
+	public function getViewEnvironment()
 	{
 		return $this->views;
 	}

@@ -11,11 +11,11 @@ use Illuminate\Support\Contracts\RenderableInterface as Renderable;
 class View implements ArrayAccess, Renderable {
 
 	/**
-	 * The view factory instance.
+	 * The view environment instance.
 	 *
-	 * @var \Illuminate\View\Factory
+	 * @var \Illuminate\View\Environment
 	 */
-	protected $factory;
+	protected $environment;
 
 	/**
 	 * The engine implementation.
@@ -48,19 +48,19 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Create a new view instance.
 	 *
-	 * @param  \Illuminate\View\Factory  $factory
+	 * @param  \Illuminate\View\Environment  $environment
 	 * @param  \Illuminate\View\Engines\EngineInterface  $engine
 	 * @param  string  $view
 	 * @param  string  $path
 	 * @param  array   $data
 	 * @return void
 	 */
-	public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = array())
+	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array())
 	{
 		$this->view = $view;
 		$this->path = $path;
 		$this->engine = $engine;
-		$this->factory = $factory;
+		$this->environment = $environment;
 
 		$this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
 	}
@@ -80,7 +80,7 @@ class View implements ArrayAccess, Renderable {
 		// Once we have the contents of the view, we will flush the sections if we are
 		// done rendering all views so that there is nothing left hanging over when
 		// anothoer view is rendered in the future by the application developers.
-		$this->factory->flushSectionsIfDoneRendering();
+		$this->environment->flushSectionsIfDoneRendering();
 
 		return $response ?: $contents;
 	}
@@ -95,16 +95,16 @@ class View implements ArrayAccess, Renderable {
 		// We will keep track of the amount of views being rendered so we can flush
 		// the section after the complete rendering operation is done. This will
 		// clear out the sections for any separate views that may be rendered.
-		$this->factory->incrementRender();
+		$this->environment->incrementRender();
 
-		$this->factory->callComposer($this);
+		$this->environment->callComposer($this);
 
 		$contents = $this->getContents();
 
 		// Once we've finished rendering the view, we'll decrement the render count
 		// so that each sections get flushed out next time a view is created and
 		// no old sections are staying around in the memory of an environment.
-		$this->factory->decrementRender();
+		$this->environment->decrementRender();
 
 		return $contents;
 	}
@@ -116,11 +116,11 @@ class View implements ArrayAccess, Renderable {
 	 */
 	public function renderSections()
 	{
-		$factory = $this->factory;
+		$env = $this->environment;
 
-		return $this->render(function($view) use ($factory)
+		return $this->render(function($view) use ($env)
 		{
-			return $factory->getSections();
+			return $env->getSections();
 		});
 	}
 
@@ -141,7 +141,7 @@ class View implements ArrayAccess, Renderable {
 	 */
 	protected function gatherData()
 	{
-		$data = array_merge($this->factory->getShared(), $this->data);
+		$data = array_merge($this->environment->getShared(), $this->data);
 
 		foreach ($data as $key => $value)
 		{
@@ -185,7 +185,7 @@ class View implements ArrayAccess, Renderable {
 	 */
 	public function nest($key, $view, array $data = array())
 	{
-		return $this->with($key, $this->factory->make($view, $data));
+		return $this->with($key, $this->environment->make($view, $data));
 	}
 
 	/**
@@ -209,13 +209,13 @@ class View implements ArrayAccess, Renderable {
 	}
 
 	/**
-	 * Get the view factory instance.
+	 * Get the view environment instance.
 	 *
-	 * @return \Illuminate\View\Factory
+	 * @return \Illuminate\View\Environment
 	 */
-	public function getFactory()
+	public function getEnvironment()
 	{
-		return $this->factory;
+		return $this->environment;
 	}
 
 	/**
