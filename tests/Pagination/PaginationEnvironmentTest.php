@@ -1,9 +1,9 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Pagination\Factory;
+use Illuminate\Pagination\Environment;
 
-class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
+class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
@@ -13,13 +13,13 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreationOfEnvironment()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 	}
 
 
 	public function testPaginatorCanBeCreated()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com', 'GET');
 		$env->setRequest($request);
 
@@ -29,9 +29,9 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationViewCanBeCreated()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$paginator = m::mock('Illuminate\Pagination\Paginator');
-		$env->getViewFactory()->shouldReceive('make')->once()->with('pagination::slider', array('environment' => $env, 'paginator' => $paginator))->andReturn('foo');
+		$env->getViewDriver()->shouldReceive('make')->once()->with('pagination::slider', array('environment' => $env, 'paginator' => $paginator))->andReturn('foo');
 
 		$this->assertEquals('foo', $env->getPaginationView($paginator));
 	}
@@ -39,13 +39,13 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testCurrentPageCanBeRetrieved()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
 		$env->setRequest($request);
 
 		$this->assertEquals(2, $env->getCurrentPage());
 
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=-1', 'GET');
 		$env->setRequest($request);
 
@@ -55,7 +55,7 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testSettingCurrentUrlOverrulesRequest()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
 		$env->setRequest($request);
 		$env->setCurrentPage(3);
@@ -66,13 +66,13 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testCurrentUrlCanBeRetrieved()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com/bar?page=2', 'GET');
 		$env->setRequest($request);
 
 		$this->assertEquals('http://foo.com/bar', $env->getCurrentUrl());
 
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
 		$env->setRequest($request);
 
@@ -82,21 +82,21 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testOverridingPageParam()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$this->assertEquals('page', $env->getPageName());
 		$env->setPageName('foo');
 		$this->assertEquals('foo', $env->getPageName());
 	}
 
 
-	protected function getFactory()
+	protected function getEnvironment()
 	{
 		$request = m::mock('Illuminate\Http\Request');
-		$view = m::mock('Illuminate\View\Factory');
+		$view = m::mock('Illuminate\View\Environment');
 		$trans = m::mock('Symfony\Component\Translation\TranslatorInterface');
 		$view->shouldReceive('addNamespace')->once()->with('pagination', realpath(__DIR__.'/../../src/Illuminate/Pagination').'/views');
 
-		return new Factory($request, $view, $trans, 'page');
+		return new Environment($request, $view, $trans, 'page');
 	}
 
 }

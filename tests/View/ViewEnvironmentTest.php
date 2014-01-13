@@ -1,9 +1,9 @@
 <?php
 
 use Mockery as m;
-use Illuminate\View\Factory;
+use Illuminate\View\Environment;
 
-class ViewFactoryTest extends PHPUnit_Framework_TestCase {
+class ViewEnvironmentTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
@@ -15,7 +15,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	{
 		unset($_SERVER['__test.view']);
 
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
 		$env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
 		$env->getFinder()->shouldReceive('addExtension')->once()->with('php');
@@ -33,7 +33,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testExistsPassesAndFailsViews()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->getFinder()->shouldReceive('find')->once()->with('foo')->andThrow('InvalidArgumentException');
 		$env->getFinder()->shouldReceive('find')->once()->with('bar')->andReturn('path.php');
 
@@ -44,7 +44,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testRenderEachCreatesViewForEachItemInArray()
 	{
-		$env = m::mock('Illuminate\View\Factory[make]', $this->getEnvironmentArgs());
+		$env = m::mock('Illuminate\View\Environment[make]', $this->getEnvironmentArgs());
 		$env->shouldReceive('make')->once()->with('foo', array('key' => 'bar', 'value' => 'baz'))->andReturn($mockView1 = m::mock('StdClass'));
 		$env->shouldReceive('make')->once()->with('foo', array('key' => 'breeze', 'value' => 'boom'))->andReturn($mockView2 = m::mock('StdClass'));
 		$mockView1->shouldReceive('render')->once()->andReturn('dayle');
@@ -58,7 +58,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testEmptyViewsCanBeReturnedFromRenderEach()
 	{
-		$env = m::mock('Illuminate\View\Factory[make]', $this->getEnvironmentArgs());
+		$env = m::mock('Illuminate\View\Environment[make]', $this->getEnvironmentArgs());
 		$env->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock('StdClass'));
 		$mockView->shouldReceive('render')->once()->andReturn('empty');
 
@@ -68,7 +68,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
     public function testAddANamedViews()
     {
-        $env = $this->getFactory();
+        $env = $this->getEnvironment();
         $env->name('bar', 'foo');
 
         $this->assertEquals(array('foo' => 'bar'), $env->getNames());
@@ -77,7 +77,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
     public function testMakeAViewFromNamedView()
     {
-        $env = $this->getFactory();
+        $env = $this->getEnvironment();
         $env->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
         $env->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
         $env->getFinder()->shouldReceive('addExtension')->once()->with('php');
@@ -92,37 +92,37 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testRawStringsMayBeReturnedFromRenderEach()
 	{
-		$this->assertEquals('foo', $this->getFactory()->renderEach('foo', array(), 'item', 'raw|foo'));
+		$this->assertEquals('foo', $this->getEnvironment()->renderEach('foo', array(), 'item', 'raw|foo'));
 	}
 
 
-	public function testFactoryAddsExtensionWithCustomResolver()
+	public function testEnvironmentAddsExtensionWithCustomResolver()
 	{
-		$factory = $this->getFactory();
+		$environment = $this->getEnvironment();
 
 		$resolver = function(){};
 
-		$factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
-		$factory->getEngineResolver()->shouldReceive('register')->once()->with('bar', $resolver);
-		$factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.foo');
-		$factory->getEngineResolver()->shouldReceive('resolve')->once()->with('bar')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
-		$factory->getDispatcher()->shouldReceive('fire');
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+		$environment->getEngineResolver()->shouldReceive('register')->once()->with('bar', $resolver);
+		$environment->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.foo');
+		$environment->getEngineResolver()->shouldReceive('resolve')->once()->with('bar')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
+		$environment->getDispatcher()->shouldReceive('fire');
 
-		$factory->addExtension('foo', 'bar', $resolver);
+		$environment->addExtension('foo', 'bar', $resolver);
 
-		$view = $factory->make('view', array('data'));
+		$view = $environment->make('view', array('data'));
 		$this->assertTrue($engine === $view->getEngine());
 	}
 
 
 	public function testAddingExtensionPrependsNotAppends()
 	{
-		$factory = $this->getFactory();
-		$factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+		$environment = $this->getEnvironment();
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('foo');
 
-		$factory->addExtension('foo', 'bar');
+		$environment->addExtension('foo', 'bar');
 
-		$extensions = $factory->getExtensions();
+		$extensions = $environment->getExtensions();
 		$this->assertEquals('bar', reset($extensions));
 		$this->assertEquals('foo', key($extensions));
 	}
@@ -130,14 +130,14 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testPrependedExtensionOverridesExistingExtensions()
 	{
-		$factory = $this->getFactory();
-		$factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
-		$factory->getFinder()->shouldReceive('addExtension')->once()->with('baz');
+		$environment = $this->getEnvironment();
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+		$environment->getFinder()->shouldReceive('addExtension')->once()->with('baz');
 
-		$factory->addExtension('foo', 'bar');
-		$factory->addExtension('baz', 'bar');
+		$environment->addExtension('foo', 'bar');
+		$environment->addExtension('baz', 'bar');
 
-		$extensions = $factory->getExtensions();
+		$extensions = $environment->getExtensions();
 		$this->assertEquals('bar', reset($extensions));
 		$this->assertEquals('baz', key($extensions));
 	}
@@ -145,7 +145,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testComposersAreProperlyRegistered()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
 		$callback = $env->composer('foo', function() { return 'bar'; });
 		$callback = $callback[0];
@@ -156,7 +156,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testComposersAreProperlyRegisteredWithPriority()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 1);
 		$callback = $env->composer('foo', function() { return 'bar'; }, 1);
 		$callback = $callback[0];
@@ -167,7 +167,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testComposersCanBeMassRegistered()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: bar', m::type('Closure'));
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: qux', m::type('Closure'));
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
@@ -187,7 +187,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testClassCallbacks()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
 		$env->setContainer($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
@@ -201,7 +201,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testClassCallbacksWithMethods()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
 		$env->setContainer($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
@@ -215,7 +215,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testCallComposerCallsProperEvent()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$view = m::mock('Illuminate\View\View');
 		$view->shouldReceive('getName')->once()->andReturn('name');
 		$env->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', array($view));
@@ -226,7 +226,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testRenderCountHandling()
 	{
-		$env = $this->getFactory();
+		$env = $this->getEnvironment();
 		$env->incrementRender();
 		$this->assertFalse($env->doneRendering());
 		$env->decrementRender();
@@ -236,82 +236,82 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicSectionHandling()
 	{
-		$factory = $this->getFactory();
-		$factory->startSection('foo');
+		$environment = $this->getEnvironment();
+		$environment->startSection('foo');
 		echo 'hi';
-		$factory->stopSection();
-		$this->assertEquals('hi', $factory->yieldContent('foo'));
+		$environment->stopSection();
+		$this->assertEquals('hi', $environment->yieldContent('foo'));
 	}
 
 
 	public function testSectionExtending()
 	{
-		$factory = $this->getFactory();
-		$factory->startSection('foo');
+		$environment = $this->getEnvironment();
+		$environment->startSection('foo');
 		echo 'hi @parent';
-		$factory->stopSection();
-		$factory->startSection('foo');
+		$environment->stopSection();
+		$environment->startSection('foo');
 		echo 'there';
-		$factory->stopSection();
-		$this->assertEquals('hi there', $factory->yieldContent('foo'));
+		$environment->stopSection();
+		$this->assertEquals('hi there', $environment->yieldContent('foo'));
 	}
 
 
 	public function testSessionAppending()
 	{
-		$factory = $this->getFactory();
-		$factory->startSection('foo');
+		$environment = $this->getEnvironment();
+		$environment->startSection('foo');
 		echo 'hi';
-		$factory->appendSection();
-		$factory->startSection('foo');
+		$environment->appendSection();
+		$environment->startSection('foo');
 		echo 'there';
-		$factory->appendSection();
-		$this->assertEquals('hithere', $factory->yieldContent('foo'));
+		$environment->appendSection();
+		$this->assertEquals('hithere', $environment->yieldContent('foo'));
 	}
 
 
 	public function testYieldSectionStopsAndYields()
 	{
-		$factory = $this->getFactory();
-		$factory->startSection('foo');
+		$environment = $this->getEnvironment();
+		$environment->startSection('foo');
 		echo 'hi';
-		$this->assertEquals('hi', $factory->yieldSection());
+		$this->assertEquals('hi', $environment->yieldSection());
 	}
 
 
 	public function testInjectStartsSectionWithContent()
 	{
-		$factory = $this->getFactory();
-		$factory->inject('foo', 'hi');
-		$this->assertEquals('hi', $factory->yieldContent('foo'));
+		$environment = $this->getEnvironment();
+		$environment->inject('foo', 'hi');
+		$this->assertEquals('hi', $environment->yieldContent('foo'));
 	}
 
 
 	public function testEmptyStringIsReturnedForNonSections()
 	{
-		$factory = $this->getFactory();
-		$this->assertEquals('', $factory->yieldContent('foo'));
+		$environment = $this->getEnvironment();
+		$this->assertEquals('', $environment->yieldContent('foo'));
 	}
 
 
 	public function testSectionFlushing()
 	{
-		$factory = $this->getFactory();
-		$factory->startSection('foo');
+		$environment = $this->getEnvironment();
+		$environment->startSection('foo');
 		echo 'hi';
-		$factory->stopSection();
+		$environment->stopSection();
 
-		$this->assertEquals(1, count($factory->getSections()));
+		$this->assertEquals(1, count($environment->getSections()));
 
-		$factory->flushSections();
+		$environment->flushSections();
 
-		$this->assertEquals(0, count($factory->getSections()));
+		$this->assertEquals(0, count($environment->getSections()));
 	}
 
 
-	protected function getFactory()
+	protected function getEnvironment()
 	{
-		return new Factory(
+		return new Environment(
 			m::mock('Illuminate\View\Engines\EngineResolver'),
 			m::mock('Illuminate\View\ViewFinderInterface'),
 			m::mock('Illuminate\Events\Dispatcher')
