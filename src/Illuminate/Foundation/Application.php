@@ -282,6 +282,18 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Force register a service provider with the application.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
+	 * @param  array  $options
+	 * @return \Illuminate\Support\ServiceProvider
+	 */
+	public function forgeRegister($provider, $options = array())
+	{
+		return $this->register($provider, $options, true);
+	}
+
+	/**
 	 * Register a service provider with the application.
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
