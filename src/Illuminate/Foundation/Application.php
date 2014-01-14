@@ -288,26 +288,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  array  $options
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function register($provider, $options = array())
+	public function register($provider, $options = array(), $force = false)
 	{
+		if ($registered = $this->getRegistered($provider) && ! $force)
+                                     return $registered;
+
 		// If the given "provider" is a string, we will resolve it, passing in the
 		// application instance automatically for the developer. This is simply
 		// a more convenient way of specifying your service provider classes.
 		if (is_string($provider))
 		{
-
-			// If this provider has already been registered, return the previous instance.
-			// This is to prevent repeat register() / boot() calls on providers used by
-			// multiple packages.
-			if (array_key_exists($provider, $this->loadedProviders))
-			{
-				return array_first($this->serviceProviders, function($key, $value) use ($provider)
-				{
-					return get_class($value) == $provider;
-				});
-			}
-
-			// This provider was not found, so instantiate it.
 			$provider = $this->resolveProviderClass($provider);
 		}
 
@@ -329,6 +319,25 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		if ($this->booted) $provider->boot();
 
 		return $provider;
+	}
+
+	/**
+	 * Get the registered service provider instnace if it exists.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
+	 * @return \Illuminate\Support\ServiceProvider|null
+	 */
+	public function getRegistered($provider)
+	{
+		$name = is_string($provider) ? $provider : get_class($provider);
+
+		if (array_key_exists($name, $this->loadedProviders))
+		{
+			return array_first($this->serviceProviders, function($key, $value) use ($name)
+			{
+				return get_class($value) == $name;
+			});
+		}
 	}
 
 	/**
