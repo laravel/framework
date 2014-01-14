@@ -79,7 +79,8 @@
 		{"message": "Added support for whereHas on belongsTo relationships.", "backport": null},
 		{"message": "Added groupBy to Collection class.", "backport": null},
 		{"message": "Added the View::composers method.", "backport": null},
-		{"message": "Added new 'sometimes' validation rule short-cut to only run validation if rule is present.", "backport": null}
+		{"message": "Added new 'sometimes' validation rule short-cut to only run validation if rule is present.", "backport": null},
+		{"message": "Duplicate service providers can't be registered without 'force' parameter.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
