@@ -50,19 +50,19 @@ class CacheManager extends Manager {
 		return $this->repository(new MemcachedStore($memcached, $this->getPrefix()));
 	}
 
-        /**
-         * Create an instance of the Memcache cache driver.
-         *
-         * @return \Illuminate\Cache\MemcacheStore
-         */
-        protected function createMemcacheDriver()
-        {
-                $servers = $this->app['config']['cache.memcache'];
+	/**
+	 * Create an instance of the Memcache cache driver.
+	 *
+	 * @return \Illuminate\Cache\MemcacheStore
+	 */
+	protected function createMemcacheDriver()
+	{
+		$servers = $this->app['config']['cache.memcache'];
 
-                $memcache = $this->app['memcache.connector']->connect($servers);
+		$memcache = $this->app['memcache.connector']->connect($servers);
 
-                return $this->repository(new MemcacheStore($memcache, $this->getPrefix()));
-        }
+		return $this->repository(new MemcacheStore($memcache, $this->getPrefix()));
+	}
 
 	/**
 	 * Create an instance of the WinCache cache driver.
