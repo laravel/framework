@@ -8,9 +8,9 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.4.0",
         "illuminate/support": "4.2.*",
-        "phpseclib/phpseclib": "0.3.x"
+        "phpseclib/phpseclib": "0.3.*"
     },
     "require-dev": {
         "mockery/mockery": "0.8.0"
