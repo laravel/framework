@@ -13,7 +13,8 @@
         "illuminate/session": "4.2.*",
         "illuminate/support": "4.2.*",
         "symfony/http-foundation": "2.4.*",
-        "symfony/http-kernel": "2.4.*"
+        "symfony/http-kernel": "2.4.*",
+        "symfony/routing": "2.4.*"
     },
     "require-dev": {
         "illuminate/console": "4.2.*",
