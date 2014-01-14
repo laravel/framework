@@ -43,7 +43,7 @@ abstract class Presenter {
 	 * @param  int  $page
 	 * @return string
 	 */
-	abstract public function getPageLinkWrapper($url, $page);
+	abstract public function getPageLinkWrapper($url, $page, $rel);
 
 	/**
 	 * Get HTML wrapper for disabled text.
@@ -205,7 +205,7 @@ abstract class Presenter {
 		{
 			$url = $this->paginator->getUrl($this->currentPage - 1);
 
-			return $this->getPageLinkWrapper($url, $text);
+			return $this->getPageLinkWrapper($url, $text, 'prev');
 		}
 	}
 
@@ -228,7 +228,7 @@ abstract class Presenter {
 		{
 			$url = $this->paginator->getUrl($this->currentPage + 1);
 
-			return $this->getPageLinkWrapper($url, $text);
+			return $this->getPageLinkWrapper($url, $text, 'next');
 		}
 	}
 
