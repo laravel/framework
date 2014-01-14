@@ -18,10 +18,9 @@
         "illuminate/support": "4.2.*",
         "nesbot/carbon": "1.*"
     },
-    "require-dev": {
+    "suggest": {
         "illuminate/console": "4.2.*",
-        "illuminate/routing": "4.2.*",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/routing": "4.2.*"
     },
     "autoload": {
         "psr-0": {"Illuminate\\Auth": ""}

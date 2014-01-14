@@ -14,10 +14,8 @@
         "symfony/http-foundation": "2.4.*",
         "symfony/http-kernel": "2.4.*"
     },
-    "require-dev": {
-        "monolog/monolog": "1.6.*",
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "3.7.*"
+    "suggest": {
+        "monolog/monolog": "1.*"
     },
     "autoload": {
         "psr-0": {
