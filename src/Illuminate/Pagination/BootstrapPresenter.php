@@ -9,9 +9,10 @@ class BootstrapPresenter extends Presenter {
 	 * @param  int  $page
 	 * @return string
 	 */
-	public function getPageLinkWrapper($url, $page)
+	public function getPageLinkWrapper($url, $page, $rel=null)
 	{
-		return '<li><a href="'.$url.'">'.$page.'</a></li>';
+		$rel = ($rel === null) ? '' : ' rel="'.$rel.'"';
+		return '<li><a href="'.$url.'"'.$rel.'>'.$page.'</a></li>';
 	}
 
 	/**
