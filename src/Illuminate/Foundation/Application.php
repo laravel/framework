@@ -298,6 +298,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
+	 * @param  bool   $force
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
 	public function register($provider, $options = array(), $force = false)
