@@ -928,7 +928,7 @@ class Builder {
 		return $this->orderBy($column, 'asc');
 	}
 
-	/*
+	/**
 	 * Add a raw "order by" clause to the query.
 	 *
 	 * @param  string  $sql
