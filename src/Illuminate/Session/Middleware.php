@@ -53,6 +53,8 @@ class Middleware implements HttpKernelInterface {
 		if ($this->sessionConfigured())
 		{
 			$session = $this->startSession($request);
+
+			$request->setSession($session);
 		}
 
 		$response = $this->app->handle($request, $type, $catch);
