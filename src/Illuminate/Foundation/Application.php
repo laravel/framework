@@ -288,7 +288,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  array  $options
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function forgeRegister($provider, $options = array())
+	public function forceRegister($provider, $options = array())
 	{
 		return $this->register($provider, $options, true);
 	}
@@ -335,7 +335,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Get the registered service provider instnace if it exists.
+	 * Get the registered service provider instance if it exists.
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @return \Illuminate\Support\ServiceProvider|null
