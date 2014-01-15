@@ -240,4 +240,24 @@ class BelongsTo extends Relation {
 		return $this->parent->getTable().'.'.$this->foreignKey;
 	}
 
+	/**
+	 * Get the associated key of the relationship.
+	 *
+	 * @return string
+	 */
+	public function getOtherKey()
+	{
+		return $this->otherKey;
+	}
+
+	/**
+	 * Get the fully qualified associated key of the relationship.
+	 *
+	 * @return string
+	 */
+	public function getQualifiedOtherKeyName()
+	{
+		return $this->related->getTable().'.'.$this->otherKey;
+	}
+
 }
