@@ -50,11 +50,11 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testRenderSectionsReturnsEnvironmentSections()
 	{
 		$view = m::mock('Illuminate\View\View[render]', array(
-				m::mock('Illuminate\View\Environment'),
-				m::mock('Illuminate\View\Engines\EngineInterface'),
-				'view',
-				'path',
-				array()
+			m::mock('Illuminate\View\Factory'),
+			m::mock('Illuminate\View\Engines\EngineInterface'),
+			'view',
+			'path',
+			array()
 		));
 
 		$view->shouldReceive('render')->with(m::type('Closure'))->once()->andReturn($sections = array('foo' => 'bar'));
