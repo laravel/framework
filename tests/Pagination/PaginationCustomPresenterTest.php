@@ -17,7 +17,7 @@ class PaginationCustomPresenterTest extends PHPUnit_Framework_TestCase {
 			->andReturnUsing(function($url, $page) {
 				return '<a href="' . $url . '">' . $page . '</a>';
 			});
-		$this->assertEquals('<a href="http://laravel.com?page=1">1</a>', $customPresenter->getPageLinkWrapper('http://laravel.com?page=1', '1'));	
+		$this->assertEquals('<a href="http://laravel.com?page=1">1</a>', $customPresenter->getPageLinkWrapper('http://laravel.com?page=1', '1', null));
 	}
 
 	public function testGetDisabledTextWrapper() 
