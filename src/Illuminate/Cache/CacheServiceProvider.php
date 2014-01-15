@@ -23,6 +23,16 @@ class CacheServiceProvider extends ServiceProvider {
 			return new CacheManager($app);
 		});
 
+		$this->app->bindShared('cache.store', function($app)
+		{
+			// First, we will create the cache manager which is responsible for the
+			// creation of the various cache drivers when they are needed by the
+			// application instance, and will resolve them on a lazy load basis.
+			$manager = $app['cache'];
+
+			return $manager->driver();
+		});
+
 		$this->app->bindShared('memcached.connector', function()
 		{
 			return new MemcachedConnector;
@@ -53,7 +63,7 @@ class CacheServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('cache', 'memcached.connector', 'command.cache.clear');
+		return array('cache', 'cache.store', 'memcached.connector', 'command.cache.clear');
 	}
 
 }
