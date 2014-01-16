@@ -750,7 +750,7 @@ class Validator implements MessageProviderInterface {
 		return $this->getSize($attribute, $value) <= $parameters[0];
 	}
 
-	/*
+	/**
 	 * Get the size of an attribute.
 	 *
 	 * @param  string  $attribute

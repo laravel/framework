@@ -251,7 +251,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET');
 		$session = m::mock('Illuminate\Session\Store');
 		$session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
-		$request->setSessionStore($session);
+		$request->setSession($session);
 		$this->assertEquals('boom', $request->old('foo', 'bar'));
 	}
 
