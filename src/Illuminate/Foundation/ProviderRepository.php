@@ -19,6 +19,13 @@ class ProviderRepository {
 	protected $manifestPath;
 
 	/**
+	 * Default manifest structure.
+	 *
+	 * @var array
+	 */
+	protected $default = array('when' => array());
+
+	/**
 	 * Create a new service repository instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -48,7 +55,7 @@ class ProviderRepository {
 		// provides. This is used to know which services are "deferred" loaders.
 		if ($this->shouldRecompile($manifest, $providers))
 		{
-			$manifest = $this->compileManifest($app, $providers);	
+			$manifest = $this->compileManifest($app, $providers);
 		}
 
 		// If the application is running in the console, we will not lazy load any of
@@ -57,6 +64,14 @@ class ProviderRepository {
 		if ($app->runningInConsole())
 		{
 			$manifest['eager'] = $manifest['providers'];
+		}
+
+		 // Next we will register events to load the providers for each of the events
+		// that it has requested. This allows the service provider to defer itself
+		// while still getting automatically loaded when a certain event occurs.
+		foreach ($manifest['when'] as $provider => $events)
+		{
+			$this->registerLoadEvents($app, $provider, $events);
 		}
 
 		// We will go ahead and register all of the eagerly loaded providers with the
@@ -68,6 +83,22 @@ class ProviderRepository {
 		}
 
 		$app->setDeferredServices($manifest['deferred']);
+	}
+
+	/**
+	 * Register the load events for the given provider.
+	 *
+	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  string  $provider
+	 * @param  array  $events
+	 * @return void
+	 */
+	protected function registerLoadEvents(Application $app, $provider, array $events)
+	{
+		$app->make('events')->listen($events, function() use ($app, $provider)
+		{
+			$app->register($provider);
+		});
 	}
 
 	/**
@@ -97,6 +128,8 @@ class ProviderRepository {
 				{
 					$manifest['deferred'][$service] = $provider;
 				}
+
+				$manifest['when'][$provider] = $instance->when();
 			}
 
 			// If the service providers are not deferred, we will simply add it to an
@@ -149,7 +182,9 @@ class ProviderRepository {
 		// deferred loading or should be eagerly loaded on each request to us.
 		if ($this->files->exists($path))
 		{
-			return json_decode($this->files->get($path), true);
+			$manifest = json_decode($this->files->get($path), true);
+
+			return array_merge($this->default, $manifest);
 		}
 	}
 

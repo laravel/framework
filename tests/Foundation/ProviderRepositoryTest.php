@@ -13,7 +13,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
 	{
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('when' => array(), 'eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
@@ -29,7 +29,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testServicesAreNeverLazyLoadedWhenRunningInConsole()
 	{
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('when' => array(), 'eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
@@ -54,11 +54,17 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->shouldReceive('createProvider')->once()->with($app, 'foo')->andReturn($fooMock = m::mock('StdClass'));
 		$fooMock->shouldReceive('isDeferred')->once()->andReturn(true);
 		$fooMock->shouldReceive('provides')->once()->andReturn(array('foo.provides1', 'foo.provides2'));
+		$fooMock->shouldReceive('when')->once()->andReturn(array('when-event'));
 
 		// bar mock is added to eagers since it's not reserved
 		$repo->shouldReceive('createProvider')->once()->with($app, 'bar')->andReturn($barMock = m::mock('Illuminate\Support\ServiceProvider'));
 		$barMock->shouldReceive('isDeferred')->once()->andReturn(false);
+		$barMock->shouldReceive('when')->never();
 		$repo->shouldReceive('writeManifest')->once()->andReturnUsing(function($manifest) { return $manifest; });
+
+		// registers the when events
+		$app->shouldReceive('make')->with('events')->andReturn($events = m::mock('StdClass'));
+		$events->shouldReceive('listen')->once()->with(array('when-event'), m::type('Closure'));
 
 		// bar mock should be registered with the application since it's eager
 		$repo->shouldReceive('createProvider')->once()->with($app, 'bar')->andReturn($barMock);
@@ -88,6 +94,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/services.json')->andReturn(true);
 		$files->shouldReceive('get')->once()->with(__DIR__.'/services.json')->andReturn(json_encode($array = array('users' => array('dayle' => true))));
 		$app = new Illuminate\Foundation\Application;
+		$array['when'] = array();
 
 		$this->assertEquals($array, $repo->loadManifest());
 	}
