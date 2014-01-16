@@ -26,7 +26,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.1.16';
+	const VERSION = '4.1.17';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -451,7 +451,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function make($abstract, $parameters = array())
 	{
 		$abstract = $this->getAlias($abstract);
-		
+
 		if (isset($this->deferredServices[$abstract]))
 		{
 			$this->loadDeferredProvider($abstract);
