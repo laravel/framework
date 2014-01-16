@@ -194,7 +194,7 @@ class Collection extends BaseCollection {
 		return new static(array_values($dictionary));
 	}
 
-	/*
+	/**
 	 * Get a dictionary keyed by primary keys.
 	 *
 	 * @param  \Illuminate\Support\Collection  $collection
