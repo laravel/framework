@@ -1594,10 +1594,6 @@ class Builder {
 		{
 			$values = array($values);
 		}
-
-		// Since every insert gets treated like a batch insert, we will make sure the
-		// bindings are structured in a way that is convenient for building these
-		// inserts statements by verifying the elements are actually an array.
 		else
 		{
 			foreach ($values as $key => $value)
