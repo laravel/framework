@@ -581,6 +581,46 @@ class Builder {
 	}
 
 	/**
+	 * Add a basic where clause to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  mixed   $value
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function where($column, $operator = null, $value = null, $boolean = 'and')
+	{
+		if ($column instanceof Closure)
+		{
+			$query = $this->model->newQuery();
+
+			call_user_func($column, $query);
+
+			$this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+		}
+		else
+		{
+			$this->query->where($column, $operator, $value, $boolean);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add an "or where" clause to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  mixed   $value
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orWhere($column, $operator = null, $value = null)
+	{
+		return $this->where($column, $operator, $value, 'or');
+	}
+
+	/**
 	 * Add a relationship count condition to the query.
 	 *
 	 * @param  string  $relation

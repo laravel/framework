@@ -293,10 +293,28 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('from');
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar', null, 'and');
 		$builder->setModel($model = new EloquentBuilderTestScopeStub);
 		$result = $builder->approved();
 
+		$this->assertEquals($builder, $result);
+	}
+
+
+	public function testNestedWhere()
+	{
+		$nestedQuery = $this->getMockEloquentBuilder();
+		$nestedRawQuery = $this->getMockQueryBuilder();
+		$nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+		$model = $this->getMockModel()->makePartial();
+		$model->shouldReceive('newQuery')->once()->andReturn($nestedQuery);
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('from');
+		$builder->setModel($model);
+		$builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and');
+		$nestedQuery->shouldReceive('foo')->once();
+
+		$result = $builder->where(function($query) { $query->foo(); });
 		$this->assertEquals($builder, $result);
 	}
 
@@ -310,6 +328,24 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	protected function getMocks()
 	{
 		return array(m::mock('Illuminate\Database\Query\Builder'));
+	}
+
+
+	protected function getMockModel()
+	{
+		return m::mock('Illuminate\Database\Eloquent\Model');
+	}
+
+
+	protected function getMockEloquentBuilder()
+	{
+		return m::mock('Illuminate\Database\Eloquent\Builder');
+	}
+
+
+	protected function getMockQueryBuilder()
+	{
+		return m::mock('Illuminate\Database\Query\Builder');
 	}
 
 }
