@@ -314,7 +314,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function old($key = null, $default = null)
 	{
-		return $this->getSessionStore()->getOldInput($key, $default);
+		return $this->session()->getOldInput($key, $default);
 	}
 
 	/**
@@ -328,7 +328,7 @@ class Request extends SymfonyRequest {
 	{
 		$flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
-		$this->getSessionStore()->flashInput($flash);
+		$this->session()->flashInput($flash);
 	}
 
 	/**
@@ -364,7 +364,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function flush()
 	{
-		$this->getSessionStore()->flashInput(array());
+		$this->session()->flashInput(array());
 	}
 
 	/**
@@ -496,41 +496,18 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Get the Illuminate session store implementation.
+	 * Get the session associated with the request.
 	 *
 	 * @return \Illuminate\Session\Store
-	 *
-	 * @throws \RuntimeException
 	 */
-	public function getSessionStore()
+	public function session()
 	{
-		if ( ! isset($this->sessionStore))
+		if ( ! $this->hasSession())
 		{
 			throw new \RuntimeException("Session store not set on request.");
 		}
 
-		return $this->sessionStore;
-	}
-
-	/**
-	 * Set the Illuminate session store implementation.
-	 *
-	 * @param  \Illuminate\Session\Store  $session
-	 * @return void
-	 */
-	public function setSessionStore(SessionStore $session)
-	{
-		$this->sessionStore = $session;
-	}
-
-	/**
-	 * Determine if the session store has been set.
-	 *
-	 * @return bool
-	 */
-	public function hasSessionStore()
-	{
-		return isset($this->sessionStore);
+		return $this->getSession();
 	}
 
 }
