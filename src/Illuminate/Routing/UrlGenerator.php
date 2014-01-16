@@ -171,7 +171,7 @@ class UrlGenerator {
 	 */
 	protected function getScheme($secure)
 	{
-		if ( ! $secure)
+		if (is_null($secure))
 		{
 			return $this->request->getScheme().'://';
 		}
@@ -385,7 +385,9 @@ class UrlGenerator {
 	 */
 	protected function getRouteRoot($route, $domain)
 	{
-		return $this->getRootUrl($this->getScheme($route->secure()), $domain);
+		$secure = $route->secure() ?: null;
+
+		return $this->getRootUrl($this->getScheme($secure), $domain);
 	}
 
 	/**
