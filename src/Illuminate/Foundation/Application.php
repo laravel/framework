@@ -143,7 +143,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function registerBaseServiceProviders()
 	{
-		foreach (array('Exception', 'Routing', 'Event') as $name)
+		foreach (array('Event', 'Exception', 'Routing') as $name)
 		{
 			$this->{"register{$name}Provider"}();
 		}
@@ -372,9 +372,13 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function markAsRegistered($provider)
 	{
+		$class = get_class($provider);
+
+		$this['events']->fire('provider.registered: '.$class, array($provider));
+
 		$this->serviceProviders[] = $provider;
 
-		$this->loadedProviders[get_class($provider)] = true;
+		$this->loadedProviders[$class] = true;
 	}
 
 	/**
