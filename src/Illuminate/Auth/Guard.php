@@ -280,11 +280,10 @@ class Guard {
 
 		$this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
 
-		// If something was returned, we can assume it implements UserInterface
-		// and ask the provider to validate it against the given credentials,
-		// and if they are in fact valid we'll log the users into the
-		// application and return true.
-		if ( ! is_null($user) && $this->provider->validateCredentials($user, $credentials))
+		// If an implementation of UserInterface was returned, we'll ask the provider
+		// to validate the user against the given credentials, and if they are in
+		// fact valid we'll log the users into the application and return true.
+		if ($this->hasValidCredentials($user, $credentials))
 		{
 			if ($login) $this->login($user, $remember);
 
@@ -292,6 +291,18 @@ class Guard {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Determine if the user matches the credentials.
+	 *
+	 * @param  mixed  $user
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	protected function hasValidCredentials($user, $credentials)
+	{
+		return ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
 	}
 
 	/**
