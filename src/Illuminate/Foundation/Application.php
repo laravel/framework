@@ -450,6 +450,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function make($abstract, $parameters = array())
 	{
+		$abstract = $this->getAlias($abstract);
+		
 		if (isset($this->deferredServices[$abstract]))
 		{
 			$this->loadDeferredProvider($abstract);
@@ -709,7 +711,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
 
-		return $this['router']->dispatch($this->prepareRequest($request));
+		return $this['router']->dispatch($request);
 	}
 
 	/**
@@ -765,22 +767,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			call_user_func($callback, $this);
 		}
-	}
-
-	/**
-	 * Prepare the request by injecting any services.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Request
-	 */
-	public function prepareRequest(Request $request)
-	{
-		if ( ! is_null($this['config']['session.driver']))
-		{
-			$request->setSessionStore($this['session.store']);
-		}
-
-		return $request;
 	}
 
 	/**

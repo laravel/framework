@@ -69,7 +69,9 @@ class TailCommand extends Command {
 	{
 		$output = $this->output;
 
-		with(new Process('tail -f '.$path))->setTimeout(null)->run(function($type, $line) use ($output)
+		$lines = $this->option('lines');
+
+		with(new Process('tail -f -n '.$lines.' '.$path))->setTimeout(null)->run(function($type, $line) use ($output)
 		{
 			$output->write($line);
 		});
@@ -86,7 +88,9 @@ class TailCommand extends Command {
 	{
 		$out = $this->output;
 
-		$this->getRemote($connection)->run('tail -f '.$path, function($line) use ($out)
+		$lines = $this->option('lines');
+
+		$this->getRemote($connection)->run('tail -f -n '.$lines.' '.$path, function($line) use ($out)
 		{
 			$out->write($line);
 		});
@@ -155,6 +159,8 @@ class TailCommand extends Command {
 	{
 		return array(
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The fully qualified path to the log file.'),
+
+			array('lines', null, InputOption::VALUE_OPTIONAL, 'The number of lines to tail.', 20),
 		);
 	}
 

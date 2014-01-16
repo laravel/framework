@@ -283,17 +283,26 @@ class Guard {
 		// If an implementation of UserInterface was returned, we'll ask the provider
 		// to validate the user against the given credentials, and if they are in
 		// fact valid we'll log the users into the application and return true.
-		if ($user instanceof UserInterface)
+		if ($this->hasValidCredentials($user, $credentials))
 		{
-			if ($this->provider->validateCredentials($user, $credentials))
-			{
-				if ($login) $this->login($user, $remember);
+			if ($login) $this->login($user, $remember);
 
-				return true;
-			}
+			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Determine if the user matches the credentials.
+	 *
+	 * @param  mixed  $user
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	protected function hasValidCredentials($user, $credentials)
+	{
+		return ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
 	}
 
 	/**
