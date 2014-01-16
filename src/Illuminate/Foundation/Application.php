@@ -372,9 +372,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function markAsRegistered($provider)
 	{
-		$class = get_class($provider);
-
-		$this['events']->fire('provider.registered: '.$class, array($provider));
+		$this['events']->fire($class = get_class($provider), array($provider));
 
 		$this->serviceProviders[] = $provider;
 
