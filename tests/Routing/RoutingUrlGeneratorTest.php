@@ -84,6 +84,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall'), false));
 		$this->assertEquals('https://www.foo.com/foo/bar', $url->route('baz'));
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
+		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor')));
 	}
 
 

@@ -250,12 +250,30 @@ class UrlGenerator {
 	 */
 	protected function replaceRouteParameters($path, array &$parameters)
 	{
-		foreach ($parameters as $key => $value)
+		if (count($parameters))
 		{
-			$path = $this->replaceRouteParameter($path, $key, $value, $parameters);
+			$path = preg_replace_sub(
+				'/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
+			);
 		}
 
 		return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
+	}
+
+	/**
+	 * Replace all of the named parameters in the path.
+	 *
+	 * @param  string  $path
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function replaceNamedParameters($path, &$parameters)
+	{
+		return preg_replace_callback('/\{(.*?)\??\}/', function($m) use (&$parameters)
+		{
+			return isset($parameters[$m[1]]) ? array_pull($parameters, $m[1]) : $m[0];
+
+		}, $path);
 	}
 
 	/**
