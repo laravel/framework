@@ -450,6 +450,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function make($abstract, $parameters = array())
 	{
+		$abstract = $this->getAlias($abstract);
+		
 		if (isset($this->deferredServices[$abstract]))
 		{
 			$this->loadDeferredProvider($abstract);
