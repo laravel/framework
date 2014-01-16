@@ -78,7 +78,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$mock = $this->getGuard();
 		$mock->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('fire')->once()->with('auth.attempt', array(array('foo'), false, true));
-		$mock->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn('foo');
+		$mock->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn(null);
 		$this->assertFalse($mock->attempt(array('foo')));
 	}
 
