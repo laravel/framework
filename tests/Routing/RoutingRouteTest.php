@@ -336,6 +336,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('http://foo.com/foo/bar', 'GET');
 		$route = new Route('GET', 'foo/{bar}', array('https', function() {}));
 		$this->assertFalse($route->matches($request));
+
+		/**
+		 * HTTP checks
+		 */
+		$request = Request::create('https://foo.com/foo/bar', 'GET');
+		$route = new Route('GET', 'foo/{bar}', array('http', function() {}));
+		$this->assertFalse($route->matches($request));
+
+		$request = Request::create('http://foo.com/foo/bar', 'GET');
+		$route = new Route('GET', 'foo/{bar}', array('http', function() {}));
+		$this->assertTrue($route->matches($request));
 	}
 
 
