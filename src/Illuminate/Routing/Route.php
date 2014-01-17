@@ -645,6 +645,26 @@ class Route {
 	}
 
 	/**
+	 * Determine if the route only responds to HTTP requests.
+	 *
+	 * @return bool
+	 */
+	public function httpOnly()
+	{
+		return in_array('http', $this->action);
+	}
+
+	/**
+	 * Determine if the route only responds to HTTPS requests.
+	 *
+	 * @return bool
+	 */
+	public function httpsOnly()
+	{
+		return $this->secure();
+	}
+
+	/**
 	 * Determine if the route only responds to HTTPS requests.
 	 *
 	 * @return bool

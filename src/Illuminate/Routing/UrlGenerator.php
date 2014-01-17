@@ -98,7 +98,9 @@ class UrlGenerator {
 
 		$scheme = $this->getScheme($secure);
 
-		$tail = implode('/', (array) $extra);
+		$tail = implode('/', array_map(
+			'rawurlencode', (array) $extra)
+		);
 
 		// Once we have the scheme we will compile the "tail" by collapsing the values
 		// into a single string delimited by slashes. This just makes it convenient
@@ -196,7 +198,7 @@ class UrlGenerator {
 	{
 		$route = $route ?: $this->routes->getByName($name);
 
-		$parameters = (array) $parameters;
+		$parameters = array_map('rawurlencode', (array) $parameters);
 
 		if ( ! is_null($route))
 		{
@@ -277,29 +279,6 @@ class UrlGenerator {
 	}
 
 	/**
-	 * Replace a given route parameter for a route path.
-	 *
-	 * @param  string  $path
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @param  array  $parameters
-	 * @return string
-	 */
-	protected function replaceRouteParameter($path, $key, $value, array &$parameters)
-	{
-		$pattern = is_string($key) ? '/\{'.$key.'[\?]?\}/' : '/\{.*?\}/';
-
-		$path = preg_replace($pattern, $value, $path, 1, $count);
-
-		// If the parameter was actually replaced in the route path, we are going to remove
-		// it from the parameter array (by reference), which is so we can use any of the
-		// extra parameters as query string variables once we process all the matches.
-		if ($count > 0) unset($parameters[$key]);
-
-		return $path;
-	}
-
-	/**
 	 * Get the query string for a given route.
 	 *
 	 * @param  array  $parameters
@@ -307,13 +286,23 @@ class UrlGenerator {
 	 */
 	protected function getRouteQueryString(array $parameters)
 	{
+		// First we will get all of the string parameters that are remaining after we
+		// have replaced the route wildcards. We'll then build a query string from
+		// these string parameters then use it as a starting point for the rest.
 		if (count($parameters) == 0) return '';
 
-		$query = http_build_query($keyed = $this->getStringParameters($parameters));
+		$query = http_build_query(
+			$keyed = $this->getStringParameters($parameters)
+		);
 
+		// Lastly, if there are still parameters remaining, we will fetch the numeric
+		// parameters that are in the array and add them to the query string or we
+		// will build the intial query string if it wasn't started with strings.
 		if (count($keyed) < count($parameters))
 		{
-			$query .= '&'.implode('&', $this->getNumericParameters($parameters));
+			$query .= '&'.implode(
+				'&', $this->getNumericParameters($parameters)
+			);
 		}
 
 		return '?'.trim($query, '&');
@@ -373,7 +362,7 @@ class UrlGenerator {
 	 */
 	protected function getDomainAndScheme($route)
 	{
-		return $this->getScheme($route->secure()).$route->domain();
+		return $this->getRouteScheme($route).$route->domain();
 	}
 
 	/**
@@ -403,9 +392,29 @@ class UrlGenerator {
 	 */
 	protected function getRouteRoot($route, $domain)
 	{
-		$secure = $route->secure() ?: null;
+		return $this->getRootUrl($this->getRouteScheme($route), $domain);
+	}
 
-		return $this->getRootUrl($this->getScheme($secure), $domain);
+	/**
+	 * Get the scheme for the given route.
+	 *
+	 * @param  \Illumiante\Routing\Route  $route
+	 * @return string
+	 */
+	protected function getRouteScheme($route)
+	{
+		if ($route->httpOnly())
+		{
+			return $this->getScheme(false);
+		}
+		elseif ($route->httpsOnly())
+		{
+			return $this->getScheme(true);
+		}
+		else
+		{
+			return $this->getScheme(null);
+		}
 	}
 
 	/**

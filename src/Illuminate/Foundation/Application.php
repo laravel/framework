@@ -143,7 +143,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function registerBaseServiceProviders()
 	{
-		foreach (array('Exception', 'Routing', 'Event') as $name)
+		foreach (array('Event', 'Exception', 'Routing') as $name)
 		{
 			$this->{"register{$name}Provider"}();
 		}
@@ -372,9 +372,11 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function markAsRegistered($provider)
 	{
+		$this['events']->fire($class = get_class($provider), array($provider));
+
 		$this->serviceProviders[] = $provider;
 
-		$this->loadedProviders[get_class($provider)] = true;
+		$this->loadedProviders[$class] = true;
 	}
 
 	/**
@@ -451,7 +453,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function make($abstract, $parameters = array())
 	{
 		$abstract = $this->getAlias($abstract);
-		
+
 		if (isset($this->deferredServices[$abstract]))
 		{
 			$this->loadDeferredProvider($abstract);
@@ -711,7 +713,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
 
-		return $this['router']->dispatch($request);
+		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
 	/**
@@ -767,6 +769,22 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			call_user_func($callback, $this);
 		}
+	}
+
+	/**
+	 * Prepare the request by injecting any services.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Request
+	 */
+	public function prepareRequest(Request $request)
+	{
+		if ( ! is_null($this['config']['session.driver']) && ! $request->hasSession())
+		{
+			$request->setSession($this['session']->driver());
+		}
+
+		return $request;
 	}
 
 	/**
