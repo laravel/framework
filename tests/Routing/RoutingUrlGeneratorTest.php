@@ -107,6 +107,23 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHttpOnlyRoutes()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('https://www.foo.com/')
+		);
+
+		/**
+		 * Named Routes
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'foo', 'http'));
+		$routes->add($route);
+
+		$this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
+	}
+
+
 	public function testRoutesWithDomains()
 	{
 		$url = new UrlGenerator(
