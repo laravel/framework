@@ -639,7 +639,7 @@ class Container implements ArrayAccess {
 	{
 		foreach ($callbacks as $callback)
 		{
-			call_user_func($callback, $object);
+			call_user_func($callback, $object, $this);
 		}
 	}
 
