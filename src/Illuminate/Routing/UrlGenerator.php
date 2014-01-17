@@ -403,7 +403,7 @@ class UrlGenerator {
 	 */
 	protected function getRouteRoot($route, $domain)
 	{
-		$secure = $route->secure() ?: null;
+		$secure = $route->secure() ?: $route->nonsecure() ?: null;
 
 		return $this->getRootUrl($this->getScheme($secure), $domain);
 	}
