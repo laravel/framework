@@ -10,12 +10,12 @@
     "require": {
         "php": ">=5.3.0",
         "filp/whoops": "1.0.7",
-        "illuminate/support": "4.1.x",
-        "symfony/http-foundation": "2.4.x",
+        "illuminate/support": "4.1.*",
+        "symfony/http-foundation": "2.4.*",
         "symfony/http-kernel": "2.4.*"
     },
     "require-dev": {
-        "monolog/monolog": "1.6.x",
+        "monolog/monolog": "1.6.*",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },

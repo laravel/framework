@@ -8,17 +8,17 @@
         }
     ],
     "require": {
-        "illuminate/container": "4.1.x",
-        "illuminate/http": "4.1.x",
-        "illuminate/session": "4.1.x",
-        "illuminate/support": "4.1.x",
+        "illuminate/container": "4.1.*",
+        "illuminate/http": "4.1.*",
+        "illuminate/session": "4.1.*",
+        "illuminate/support": "4.1.*",
         "symfony/http-foundation": "2.4.*",
         "symfony/http-kernel": "2.4.*",
         "symfony/routing": "2.4.*"
     },
     "require-dev": {
-        "illuminate/console": "4.1.x",
-        "illuminate/filesystem": "4.1.x",
+        "illuminate/console": "4.1.*",
+        "illuminate/filesystem": "4.1.*",
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*"
     },

@@ -9,18 +9,18 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/cookie": "4.1.x",
-        "illuminate/encryption": "4.1.x",
-        "illuminate/events": "4.1.x",
-        "illuminate/hashing": "4.1.x",
-        "illuminate/http": "4.1.x",
-        "illuminate/session": "4.1.x",
-        "illuminate/support": "4.1.x",
+        "illuminate/cookie": "4.1.*",
+        "illuminate/encryption": "4.1.*",
+        "illuminate/events": "4.1.*",
+        "illuminate/hashing": "4.1.*",
+        "illuminate/http": "4.1.*",
+        "illuminate/session": "4.1.*",
+        "illuminate/support": "4.1.*",
         "nesbot/carbon": "1.*"
     },
     "require-dev": {
-        "illuminate/console": "4.1.x",
-        "illuminate/routing": "4.1.x",
+        "illuminate/console": "4.1.*",
+        "illuminate/routing": "4.1.*",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
