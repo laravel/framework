@@ -181,4 +181,37 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), $data->lists('email'));
 	}
 
+	public function testOnlyReturnsCollectionWithGivenModelKeys()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getKey')->andReturn(1);
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getKey')->andReturn(2);
+
+		$three = m::mock('Illuminate\Database\Eloquent\Model');
+		$three->shouldReceive('getKey')->andReturn(3);
+
+		$c = new Collection(array($one, $two, $three));
+
+		$this->assertEquals(new Collection(array($one)), $c->only(1));
+		$this->assertEquals(new Collection(array($two, $three)), $c->only(array(2, 3)));
+	}
+
+	public function testExceptReturnsCollectionWithoutGivenModelKeys()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getKey')->andReturn(1);
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getKey')->andReturn(2);
+
+		$three = m::mock('Illuminate\Database\Eloquent\Model');
+		$three->shouldReceive('getKey')->andReturn(3);
+
+		$c = new Collection(array($one, $two, $three));
+
+		$this->assertEquals(new Collection(array($two, $three)), $c->except(1));
+		$this->assertEquals(new Collection(array($one)), $c->except(array(2, 3)));
+	}
 }
