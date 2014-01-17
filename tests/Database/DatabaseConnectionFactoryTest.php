@@ -103,7 +103,18 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 	public function testExceptionIsThrownOnUnsupportedDriver()
 	{
 		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$container->shouldReceive('bound')->once()->andReturn(false);
 		$factory->createConnector(array('driver' => 'foo'));
+	}
+
+
+	public function testCustomConnectorsCanBeResolvedViaContainer()
+	{
+		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
+		$container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
+
+		$this->assertEquals('connector', $factory->createConnector(array('driver' => 'foo')));
 	}
 
 }
