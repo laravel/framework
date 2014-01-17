@@ -212,6 +212,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSortByString()
+	{
+		$data = new Collection(array(array('name' => 'taylor'), array('name' => 'dayle')));
+		$data = $data->sortBy('name');
+
+		$this->assertEquals(array(array('name' => 'dayle'), array('name' => 'taylor')), array_values($data->all()));
+	}
+
+
 	public function testReverse()
 	{
 		$data = new Collection(array('zaeed', 'alan'));
