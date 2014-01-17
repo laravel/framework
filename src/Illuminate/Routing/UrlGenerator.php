@@ -98,7 +98,9 @@ class UrlGenerator {
 
 		$scheme = $this->getScheme($secure);
 
-		$tail = implode('/', (array) $extra);
+		$tail = implode('/', array_map(
+			'rawurlencode', (array) $extra)
+		);
 
 		// Once we have the scheme we will compile the "tail" by collapsing the values
 		// into a single string delimited by slashes. This just makes it convenient
@@ -196,7 +198,7 @@ class UrlGenerator {
 	{
 		$route = $route ?: $this->routes->getByName($name);
 
-		$parameters = (array) $parameters;
+		$parameters = array_map('rawurlencode', (array) $parameters);
 
 		if ( ! is_null($route))
 		{
