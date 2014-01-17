@@ -654,6 +654,16 @@ class Route {
 		return in_array('https', $this->action);
 	}
 
+    /**
+	 * Determine if the route only responds to HTTP requests.
+	 *
+	 * @return bool
+	 */
+	public function nonsecure()
+	{
+		return in_array('http', $this->action);
+	}
+
 	/**
 	 * Get the domain defined for the route.
 	 *
