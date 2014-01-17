@@ -9,9 +9,9 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/encryption": "4.1.x",
-        "illuminate/support": "4.1.x",
-        "symfony/http-kernel": "2.4.x",
+        "illuminate/encryption": "4.1.*",
+        "illuminate/support": "4.1.*",
+        "symfony/http-kernel": "2.4.*",
         "symfony/http-foundation": "2.4.*"
     },
     "require-dev": {

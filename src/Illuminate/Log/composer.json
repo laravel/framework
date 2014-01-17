@@ -9,13 +9,13 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/support": "4.1.x",
+        "illuminate/support": "4.1.*",
         "monolog/monolog": "1.6.*"
     },
     "require-dev": {
         "mockery/mockery": "0.7.2",
         "phpunit/phpunit": "3.7.*",
-        "illuminate/events": "4.1.x"
+        "illuminate/events": "4.1.*"
     },
     "autoload": {
         "psr-0": {
