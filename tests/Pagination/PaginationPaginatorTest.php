@@ -149,7 +149,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginatorDecoratesCollection()
 	{
-		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2);
+		$p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2);
 		$last = $p->last();
 
 		$this->assertEquals('c', $last);
