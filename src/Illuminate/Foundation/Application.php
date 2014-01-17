@@ -713,7 +713,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
 
-		return $this['router']->dispatch($request);
+		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
 	/**
@@ -769,6 +769,22 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			call_user_func($callback, $this);
 		}
+	}
+
+	/**
+	 * Prepare the request by injecting any services.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Request
+	 */
+	public function prepareRequest(Request $request)
+	{
+		if ( ! is_null($this['config']['session.driver']) && ! $request->hasSession())
+		{
+			$request->setSession($this['session']->driver());
+		}
+
+		return $request;
 	}
 
 	/**
