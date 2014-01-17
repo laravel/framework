@@ -75,6 +75,16 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Get the current encoded path info for the request.
+	 *
+	 * @return string
+	 */
+	public function decodedPath()
+	{
+		return rawurldecode($this->path());
+	}
+
+	/**
 	 * Get a segment from the URI (1 based index).
 	 *
 	 * @param  string  $index
