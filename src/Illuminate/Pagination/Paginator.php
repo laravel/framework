@@ -98,6 +98,18 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	}
 
 	/**
+	 * Call a method on the underlying Collection
+	 *
+	 * @param string $method
+	 * @param array  $arguments
+	 * @return mixed
+	 */
+	public function __call($method, $arguments)
+	{
+		return call_user_func_array(array($this->getCollection(), $method), $arguments);
+	}
+
+	/**
 	 * Setup the pagination context (current and last page).
 	 *
 	 * @return \Illuminate\Pagination\Paginator
