@@ -198,7 +198,7 @@ class UrlGenerator {
 	{
 		$route = $route ?: $this->routes->getByName($name);
 
-		$parameters = array_map('rawurlencode', (array) $parameters);
+		$parameters = (array) $parameters;
 
 		if ( ! is_null($route))
 		{

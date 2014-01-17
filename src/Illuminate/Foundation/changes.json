@@ -1,6 +1,6 @@
 {
 	"4.2.*": [
-		
+
 	],
 	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
@@ -83,7 +83,7 @@
 		{"message": "Duplicate service providers can't be registered without 'force' parameter.", "backport": null},
 		{"message": "Added --lines option to the 'tail' Artisan command.", "backport": null}
 	],
-	"4.0.x": [
+	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
 		{"message": "Fixed bug that caused Model->push method to fail.", "backport": null},
 		{"message": "Make session cookie HttpOnly by default.", "backport": null},

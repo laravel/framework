@@ -68,25 +68,29 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->get('foo/bar', function() { return 'first'; });
 		$router->get('foo/bar', function() { return 'second'; });
 		$this->assertEquals('second', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar/åαф', function() { return 'hello'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar/%C3%A5%CE%B1%D1%84', 'GET'))->getContent());
 	}
 
 
-        public function testNonGreedyMatches()
-        {
-            $route = new Route('GET', 'images/{id}.{ext}', function() {});
+		public function testNonGreedyMatches()
+		{
+			$route = new Route('GET', 'images/{id}.{ext}', function() {});
 
-            $request1 = Request::create('images/1.png', 'GET');
-            $this->assertTrue($route->matches($request1));
-            $route->bind($request1);
-            $this->assertEquals('1', $route->parameter('id'));
-            $this->assertEquals('png', $route->parameter('ext'));
+			$request1 = Request::create('images/1.png', 'GET');
+			$this->assertTrue($route->matches($request1));
+			$route->bind($request1);
+			$this->assertEquals('1', $route->parameter('id'));
+			$this->assertEquals('png', $route->parameter('ext'));
 
-            $request2 = Request::create('images/12.png', 'GET');
-            $this->assertTrue($route->matches($request2));
-            $route->bind($request2);
-            $this->assertEquals('12', $route->parameter('id'));
-            $this->assertEquals('png', $route->parameter('ext'));
-        }
+			$request2 = Request::create('images/12.png', 'GET');
+			$this->assertTrue($route->matches($request2));
+			$route->bind($request2);
+			$this->assertEquals('12', $route->parameter('id'));
+			$this->assertEquals('png', $route->parameter('ext'));
+		}
 
 
 	/**
