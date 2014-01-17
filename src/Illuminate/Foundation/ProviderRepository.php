@@ -66,7 +66,7 @@ class ProviderRepository {
 			$manifest['eager'] = $manifest['providers'];
 		}
 
-		 // Next we will register events to load the providers for each of the events
+		// Next, we will register events to load the providers for each of the events
 		// that it has requested. This allows the service provider to defer itself
 		// while still getting automatically loaded when a certain event occurs.
 		foreach ($manifest['when'] as $provider => $events)
