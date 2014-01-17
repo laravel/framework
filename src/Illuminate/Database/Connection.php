@@ -649,10 +649,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getReadPdo()
 	{
-		if ($this->transactions >= 1) 
-		{
-			return $this->getPdo();
-		}
+		if ($this->transactions >= 1) return $this->getPdo();
 
 		return $this->readPdo ?: $this->pdo;
 	}
