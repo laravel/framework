@@ -1142,10 +1142,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Add a new route parameter binder.
 	 *
 	 * @param  string  $key
-	 * @param  callable  $binder
+	 * @param  \Closure  $binder
 	 * @return void
 	 */
-	public function bind($key, $binder)
+	public function bind($key, Closure $binder)
 	{
 		$this->binders[str_replace('-', '_', $key)] = $binder;
 	}
@@ -1349,10 +1349,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Run a callback with filters disable on the router.
 	 *
-	 * @param  callable  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	public function withoutFilters($callback)
+	public function withoutFilters(Closure $callback)
 	{
 		$this->disableFilters();
 
