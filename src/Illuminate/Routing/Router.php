@@ -1145,7 +1145,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  callable  $binder
 	 * @return void
 	 */
-	public function bind($key, $binder)
+	public function bind($key, Closure $binder)
 	{
 		$this->binders[str_replace('-', '_', $key)] = $binder;
 	}
