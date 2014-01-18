@@ -6,6 +6,17 @@
 class Cookie extends Facade {
 
 	/**
+	 * Determine if a cookie exists on the request.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public static function has($key)
+	{
+		return ! is_null(static::$app['request']->cookie($key, null));
+	}
+
+	/**
 	 * Retrieve a cookie from the request.
 	 *
 	 * @param  string  $key

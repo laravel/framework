@@ -176,7 +176,9 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	protected function hasRsaKey()
 	{
-		return (isset($this->auth['key']) && trim($this->auth['key']) != '');
+		$hasKey = (isset($this->auth['key']) && trim($this->auth['key']) != '');
+
+		return $hasKey || (isset($this->auth['keytext']) && trim($this->auth['keytext']) != '');
 	}
 
 	/**
@@ -187,9 +189,22 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	protected function loadRsaKey(array $auth)
 	{
-		with($key = $this->getKey($auth))->loadKey($this->files->get($auth['key']));
+		with($key = $this->getKey($auth))->loadKey($this->readRsaKey($auth));
 
 		return $key;
+	}
+
+	/**
+	 * Read the contents of the RSA key.
+	 *
+	 * @param  array  $auth
+	 * @return string
+	 */
+	protected function readRsaKey(array $auth)
+	{
+		if (isset($auth['key'])) return $this->files->get($auth['key']);
+
+		return $auth['keytext'];
 	}
 
 	/**

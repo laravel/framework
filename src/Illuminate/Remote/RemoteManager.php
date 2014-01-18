@@ -144,6 +144,10 @@ class RemoteManager {
 		{
 			return array('key' => $config['key'], 'keyphrase' => $config['keyphrase']);
 		}
+		elseif (isset($config['keytext']) && trim($config['keytext']) != '')
+		{
+			return array('keytext' => $config['keytext']);
+		}
 		elseif (isset($config['password']))
 		{
 			return array('password' => $config['password']);
