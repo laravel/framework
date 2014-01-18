@@ -74,6 +74,17 @@ class CookieJar {
 	}
 
 	/**
+	 * Determine if a cookie has been queued.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function hasQueued($key)
+	{
+		return ! is_null($this->queued($key));
+	}
+
+	/**
 	 * Get a queued cookie instance.
 	 *
 	 * @param  string  $key
