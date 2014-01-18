@@ -30,6 +30,20 @@ class RemoteSecLibGatewayTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testKeyTextCanBeSetManually()
+	{
+		$files = m::mock('Illuminate\Filesystem\Filesystem');
+		$gateway = m::mock('Illuminate\Remote\SecLibGateway', array('127.0.0.1:22', array('username' => 'taylor', 'keytext' => 'keystuff'), $files))->makePartial();
+		$gateway->shouldReceive('getConnection')->andReturn(m::mock('StdClass'));
+		$gateway->shouldReceive('getNewKey')->andReturn($key = m::mock('StdClass'));
+		$key->shouldReceive('setPassword')->once()->with(null);
+		$key->shouldReceive('loadKey')->once()->with('keystuff');
+		$gateway->getConnection()->shouldReceive('login')->with('taylor', $key);
+
+		$gateway->connect('taylor');
+	}
+
+
 	public function getGateway()
 	{
 		$files = m::mock('Illuminate\Filesystem\Filesystem');
