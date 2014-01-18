@@ -78,7 +78,8 @@
 		{"message": "Added the View::composers method.", "backport": null},
 		{"message": "Added new 'sometimes' validation rule short-cut to only run validation if rule is present.", "backport": null},
 		{"message": "Duplicate service providers can't be registered without 'force' parameter.", "backport": null},
-		{"message": "Added --lines option to the 'tail' Artisan command.", "backport": null}
+		{"message": "Added --lines option to the 'tail' Artisan command.", "backport": null},
+		{"message": "Allow 'keytext' option to be set on Remote configuration.", "backport": null}
 	],
 	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
