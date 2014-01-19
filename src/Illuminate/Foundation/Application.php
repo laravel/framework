@@ -515,6 +515,20 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Register a function for determining when to use array sessions.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function useArraySessions(Closure $callback)
+	{
+		$this->bind('session.reject', function() use ($callback)
+		{
+			return $callback;
+		});
+	}
+
+	/**
 	 * Determine if the application has booted.
 	 *
 	 * @return bool
@@ -603,10 +617,12 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function getStackedClient()
 	{
+		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
+
 		$client = with(new \Stack\Builder)
 						->push('Illuminate\Cookie\Guard', $this['encrypter'])
 						->push('Illuminate\Cookie\Queue', $this['cookie'])
-						->push('Illuminate\Session\Middleware', $this['session']);
+						->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
 
 		$this->mergeCustomMiddlewares($client);
 
