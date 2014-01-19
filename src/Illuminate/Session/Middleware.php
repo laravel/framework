@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Session;
 
+use Closure;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,15 +24,24 @@ class Middleware implements HttpKernelInterface {
 	protected $manager;
 
 	/**
+	 * The callback to determine to use session arrays.
+	 *
+	 * @var \Closure|null
+	 */
+	protected $reject;
+
+	/**
 	 * Create a new session middleware.
 	 *
 	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface  $app
 	 * @param  \Illuminate\Session\SessionManager  $manager
+	 * @param  \Closure|null  $reject
 	 * @return void
 	 */
-	public function __construct(HttpKernelInterface $app, SessionManager $manager)
+	public function __construct(HttpKernelInterface $app, SessionManager $manager, Closure $reject = null)
 	{
 		$this->app = $app;
+		$this->reject = $reject;
 		$this->manager = $manager;
 	}
 
@@ -47,6 +57,8 @@ class Middleware implements HttpKernelInterface {
 	 */
 	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
+		$this->checkRequestForArraySessions($request);
+
 		// If a session driver has been configured, we will need to start the session here
 		// so that the data is ready for an application. Note that the Laravel sessions
 		// do not make use of PHP "native" sessions in any way since they are crappy.
@@ -70,6 +82,22 @@ class Middleware implements HttpKernelInterface {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Check the request and reject callback for array sessions.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function checkRequestForArraySessions(Request $request)
+	{
+		if (is_null($this->reject)) return;
+
+		if (call_user_func($this->reject, $request))
+		{
+			$this->manager->setDefaultDriver('array');
+		}
 	}
 
 	/**
