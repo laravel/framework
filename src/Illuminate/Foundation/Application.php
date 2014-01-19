@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
+use Illuminate\Config\FileEnvironmentVariablesLoader;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -912,6 +913,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function getConfigLoader()
 	{
 		return new FileLoader(new Filesystem, $this['path'].'/config');
+	}
+
+	/**
+	 * Get the environment variables loader instance.
+	 *
+	 * @return \Illuminate\Config\EnvironmentVariablesLoaderInterface
+	 */
+	public function getEnvironmentVariablesLoader()
+	{
+		return new FileEnvironmentVariablesLoader(new Filesystem, $this['path.base']);
 	}
 
 	/**
