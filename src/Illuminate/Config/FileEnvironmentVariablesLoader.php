@@ -2,7 +2,7 @@
 
 use Illuminate\Filesystem\Filesystem;
 
-class FileEnvironmentLoader implements EnvironmentLoaderInterface {
+class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterface {
 
 	/**
 	 * The filesystem instance.
