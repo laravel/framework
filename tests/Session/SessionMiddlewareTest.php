@@ -63,4 +63,18 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($response === $middleResponse);
 	}
 
+
+	public function testCheckingForRequestUsingArraySessions()
+	{
+		$middleware = new Illuminate\Session\Middleware(
+			m::mock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+			$manager = m::mock('Illuminate\Session\SessionManager'),
+			function() { return true; }
+		);
+
+		$manager->shouldReceive('setDefaultDriver')->once()->with('array');
+
+		$middleware->checkRequestForArraySessions(new Symfony\Component\HttpFoundation\Request);
+	}
+
 }
