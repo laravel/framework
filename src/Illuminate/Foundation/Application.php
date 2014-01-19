@@ -938,31 +938,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Get the current application locale.
-	 *
-	 * @return string
-	 */
-	public function getLocale()
-	{
-		return $this['config']->get('app.locale');
-	}
-
-	/**
-	 * Set the current application locale.
-	 *
-	 * @param  string  $locale
-	 * @return void
-	 */
-	public function setLocale($locale)
-	{
-		$this['config']->set('app.locale', $locale);
-
-		$this['translator']->setLocale($locale);
-
-		$this['events']->fire('locale.changed', array($locale));
-	}
-
-	/**
 	 * Get the service providers that have been loaded.
 	 *
 	 * @return array
@@ -1020,6 +995,31 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public static function onRequest($method, $parameters = array())
 	{
 		return forward_static_call_array(array(static::requestClass(), $method), $parameters);
+	}
+
+	/**
+	 * Get the current application locale.
+	 *
+	 * @return string
+	 */
+	public function getLocale()
+	{
+		return $this['config']->get('app.locale');
+	}
+
+	/**
+	 * Set the current application locale.
+	 *
+	 * @param  string  $locale
+	 * @return void
+	 */
+	public function setLocale($locale)
+	{
+		$this['config']->set('app.locale', $locale);
+
+		$this['translator']->setLocale($locale);
+
+		$this['events']->fire('locale.changed', array($locale));
 	}
 
 	/**
