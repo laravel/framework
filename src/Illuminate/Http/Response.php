@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Http;
 
 use ArrayObject;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\RenderableInterface;
 
