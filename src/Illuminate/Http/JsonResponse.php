@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Http;
 
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Support\Contracts\JsonableInterface;
 
 class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
