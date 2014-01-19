@@ -106,6 +106,20 @@ $app->registerCoreContainerAliases();
 
 /*
 |--------------------------------------------------------------------------
+| Register The Environment Variables
+|--------------------------------------------------------------------------
+|
+| Here we will register all of the $_ENV and $_SERVER variables into the
+| process so that they're globally available configuration options so
+| sensitive configuration information can be swept out of the code.
+|
+*/
+
+with($envVariables = new EnvironmentVariables(
+	$app->getEnvironmentVariablesLoader()))->load($env);
+
+/*
+|--------------------------------------------------------------------------
 | Register The Configuration Repository
 |--------------------------------------------------------------------------
 |
