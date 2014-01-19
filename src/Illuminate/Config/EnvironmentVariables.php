@@ -20,7 +20,7 @@ class EnvironmentVariables {
 	 * @param  \Illuminate\Config\EnvironmentLoaderInterface  $loader
 	 * @return void
 	 */
-	public function __construct(EnvironmentLoaderInterface $loader)
+	public function __construct(EnvironmentVariablesLoaderInterface $loader)
 	{
 		$this->loader = $loader;
 	}
