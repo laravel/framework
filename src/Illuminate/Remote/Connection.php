@@ -131,6 +131,18 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Download the contents of a remote file.
+	 *
+	 * @param  string  $remote
+	 * @param  string  $local
+	 * @return void
+	 */
+	public function get($remote, $local)
+	{
+		$this->getGateway()->get($remote, $local);
+	}
+
+	/**
 	 * Upload a local file to the server.
 	 *
 	 * @param  string  $local
