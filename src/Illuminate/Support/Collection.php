@@ -318,7 +318,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function merge($items)
 	{
-		if ($items instanceof Collection)
+		if ($items instanceof \Illuminate\Support\Collection)
 		{
 			$items = $items->all();
 		}
