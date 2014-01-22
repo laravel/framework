@@ -448,7 +448,7 @@ class Grammar extends BaseGrammar {
 
 		$parameter = $this->parameter($having['value']);
 
-		return 'and '.$column.' '.$having['operator'].' '.$parameter;
+		return $having['boolean'].' '.$column.' '.$having['operator'].' '.$parameter;
 	}
 
 	/**
