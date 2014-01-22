@@ -150,7 +150,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getString($remote)
 	{
-		$this->getGateway()->getString($remote);
+		return $this->getGateway()->getString($remote);
 	}
 
 	/**
