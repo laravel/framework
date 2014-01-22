@@ -126,7 +126,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function getString($remote)
 	{
-		$this->getConnection()->get($remote);
+		return $this->getConnection()->get($remote);
 	}
 
 	/**
