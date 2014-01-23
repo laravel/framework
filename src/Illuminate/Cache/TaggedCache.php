@@ -81,7 +81,7 @@ class TaggedCache implements StoreInterface {
 	{
 		if (is_null($this->get($key)))
 		{
-			$this->store->put($key, $value, $minutes); return true;
+			$this->put($key, $value, $minutes); return true;
 		}
 
 		return false;
