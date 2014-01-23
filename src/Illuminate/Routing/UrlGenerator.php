@@ -398,7 +398,7 @@ class UrlGenerator {
 	/**
 	 * Get the scheme for the given route.
 	 *
-	 * @param  \Illumiante\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
 	protected function getRouteScheme($route)
