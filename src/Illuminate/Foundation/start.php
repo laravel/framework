@@ -74,7 +74,7 @@ $app->instance('app', $app);
 
 if (isset($unitTesting))
 {
-	$app['env'] = $env = $testEnvironment;
+	$app['env'] = $env = $app['env.unitTesting'];
 }
 
 /*
@@ -149,7 +149,7 @@ $app->instance('config', $config = new Config(
 
 $app->startExceptionHandling();
 
-if ($env != 'testing') ini_set('display_errors', 'Off');
+if ($env != $app['env.unitTesting']) ini_set('display_errors', 'Off');
 
 /*
 |--------------------------------------------------------------------------
