@@ -79,9 +79,9 @@ class TaggedCache implements StoreInterface {
 	 */
 	public function add($key, $value, $minutes)
 	{
-		if (is_null($this->get($this->taggedItemKey($key))))
+		if (is_null($this->get($key)))
 		{
-			$this->store->put($this->taggedItemKey($key), $value, $minutes); return true;
+			$this->store->put($key, $value, $minutes); return true;
 		}
 
 		return false;
