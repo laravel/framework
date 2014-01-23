@@ -1408,7 +1408,7 @@ class Builder {
 	/**
 	 * Create a paginator for a grouped pagination statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -1423,7 +1423,7 @@ class Builder {
 	/**
 	 * Build a paginator instance from a raw result array.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  array  $results
 	 * @param  int    $perPage
 	 * @return \Illuminate\Pagination\Paginator
@@ -1443,7 +1443,7 @@ class Builder {
 	/**
 	 * Create a paginator for an un-grouped pagination statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
