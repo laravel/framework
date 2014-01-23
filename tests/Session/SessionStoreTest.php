@@ -74,16 +74,18 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$session = $this->getSession();
 		$session->put('boom', 'baz');
-		$session->flashInput(array('foo' => 'bar'));
+		$session->flashInput(array('foo' => 'bar', 'bar' => 0));
 
 		$this->assertTrue($session->hasOldInput('foo'));
 		$this->assertEquals('bar', $session->getOldInput('foo'));
+		$this->assertEquals(0, $session->getOldInput('bar'));
 		$this->assertFalse($session->hasOldInput('boom'));
 
 		$session->ageFlashData();
 
 		$this->assertTrue($session->hasOldInput('foo'));
 		$this->assertEquals('bar', $session->getOldInput('foo'));
+		$this->assertEquals(0, $session->getOldInput('bar'));
 		$this->assertFalse($session->hasOldInput('boom'));
 	}
 
@@ -92,19 +94,33 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$session = $this->getSession();
 		$session->flash('foo', 'bar');
+		$session->flash('bar', 0);
 
 		$this->assertTrue($session->has('foo'));
 		$this->assertEquals('bar', $session->get('foo'));
+		$this->assertEquals(0, $session->get('bar'));
 
 		$session->ageFlashData();
 
 		$this->assertTrue($session->has('foo'));
 		$this->assertEquals('bar', $session->get('foo'));
+		$this->assertEquals(0, $session->get('bar'));
 
 		$session->ageFlashData();
 
 		$this->assertFalse($session->has('foo'));
 		$this->assertEquals(null, $session->get('foo'));
+	}
+
+
+	public function testHasOldInputWithoutKey ()
+	{
+		$session = $this->getSession();
+		$session->flash('boom', 'baz');
+		$this->assertFalse($session->hasOldInput());
+
+		$session->flashInput(array('foo' => 'bar'));
+		$this->assertTrue($session->hasOldInput());
 	}
 
 

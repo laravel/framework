@@ -36,7 +36,7 @@ class Seeder {
 	{
 		$this->resolve($class)->run();
 
-		if ( ! is_null($this->command))
+		if (isset($this->command))
 		{
 			$this->command->getOutput()->writeln("<info>Seeded:</info> $class");
 		}

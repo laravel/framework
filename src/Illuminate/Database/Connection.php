@@ -60,7 +60,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The cache manager instance.
 	 *
-	 * @var \Illuminate\Cache\CacheManger
+	 * @var \Illuminate\Cache\CacheManager
 	 */
 	protected $cache;
 
@@ -649,6 +649,8 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getReadPdo()
 	{
+		if ($this->transactions >= 1) return $this->getPdo();
+
 		return $this->readPdo ?: $this->pdo;
 	}
 
@@ -796,7 +798,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the paginator environment instance.
 	 *
-	 * @return \Illuminate\Pagination\Environment
+	 * @return \Illuminate\Pagination\Factory
 	 */
 	public function getPaginator()
 	{
@@ -811,7 +813,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the pagination environment instance.
 	 *
-	 * @param  \Illuminate\Pagination\Environment|\Closure  $paginator
+	 * @param  \Illuminate\Pagination\Factory|\Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)

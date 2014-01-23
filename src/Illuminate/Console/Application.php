@@ -3,6 +3,7 @@
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 class Application extends \Symfony\Component\Console\Application {
@@ -42,10 +43,14 @@ class Application extends \Symfony\Component\Console\Application {
 	{
 		$app->boot();
 
-		return with($console = new static('Laravel Framework', $app::VERSION))
-									->setLaravel($app)
-									->setExceptionHandler($app['exception'])
-									->setAutoExit(false);
+		$console = with($console = new static('Laravel Framework', $app::VERSION))
+								->setLaravel($app)
+								->setExceptionHandler($app['exception'])
+								->setAutoExit(false);
+
+		$app->instance('artisan', $console);
+
+		return $console;
 	}
 
 	/**

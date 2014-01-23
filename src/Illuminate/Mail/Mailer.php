@@ -4,7 +4,7 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Log\Writer;
-use Illuminate\View\Environment;
+use Illuminate\View\Factory;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
@@ -12,9 +12,9 @@ use Illuminate\Support\SerializableClosure;
 class Mailer {
 
 	/**
-	 * The view environment instance.
+	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Environment
+	 * @var \Illuminate\View\Factory
 	 */
 	protected $views;
 
@@ -42,7 +42,7 @@ class Mailer {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
@@ -54,13 +54,20 @@ class Mailer {
 	protected $pretending = false;
 
 	/**
+	 * Array of failed recipients.
+	 *
+	 * @var array
+	 */
+	protected $failedRecipients = array();
+
+	/**
 	 * Create a new Mailer instance.
 	 *
-	 * @param  \Illuminate\View\Environment  $views
+	 * @param  \Illuminate\View\Factory  $views
 	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
-	public function __construct(Environment $views, Swift_Mailer $swift)
+	public function __construct(Factory $views, Swift_Mailer $swift)
 	{
 		$this->views = $views;
 		$this->swift = $swift;
@@ -276,7 +283,7 @@ class Mailer {
 				array_get($view, 'html'), array_get($view, 'text')
 			);
 		}
-		
+
 		throw new \InvalidArgumentException("Invalid view.");
 	}
 
@@ -290,11 +297,13 @@ class Mailer {
 	{
 		if ( ! $this->pretending)
 		{
-			return $this->swift->send($message);
+			return $this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
 		{
 			$this->logMessage($message);
+
+			return 1;
 		}
 	}
 
@@ -378,11 +387,11 @@ class Mailer {
 	}
 
 	/**
-	 * Get the view environment instance.
+	 * Get the view factory instance.
 	 *
-	 * @return \Illuminate\View\Environment
+	 * @return \Illuminate\View\Factory
 	 */
-	public function getViewEnvironment()
+	public function getViewFactory()
 	{
 		return $this->views;
 	}
@@ -395,6 +404,16 @@ class Mailer {
 	public function getSwiftMailer()
 	{
 		return $this->swift;
+	}
+
+	/**
+	 * Get the array of failed recipients.
+	 *
+	 * @return array
+	 */
+	public function failures()
+	{
+		return $this->failedRecipients;
 	}
 
 	/**

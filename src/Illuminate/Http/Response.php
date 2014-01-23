@@ -1,11 +1,12 @@
 <?php namespace Illuminate\Http;
 
 use ArrayObject;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\RenderableInterface;
 
 class Response extends \Symfony\Component\HttpFoundation\Response {
+
+	use ResponseTrait;
 
 	/**
 	 * The original content of the response.
@@ -13,34 +14,6 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 * @var mixed
 	 */
 	public $original;
-
-	/**
-	 * Set a header on the Response.
-	 *
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @param  bool    $replace
-	 * @return \Illuminate\Http\Response
-	 */
-	public function header($key, $value, $replace = true)
-	{
-		$this->headers->set($key, $value, $replace);
-
-		return $this;
-	}
-
-	/**
-	 * Add a cookie to the response.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return \Illuminate\Http\Response
-	 */
-	public function withCookie(Cookie $cookie)
-	{
-		$this->headers->setCookie($cookie);
-
-		return $this;
-	}
 
 	/**
 	 * Set the content on the response.

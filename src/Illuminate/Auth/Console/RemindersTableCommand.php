@@ -3,14 +3,14 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class MakeRemindersCommand extends Command {
+class RemindersTableCommand extends Command {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'auth:reminders';
+	protected $name = 'auth:reminders-table';
 
 	/**
 	 * The console command description.

@@ -151,6 +151,17 @@ class FormBuilder {
 	}
 
 	/**
+	 * Set the model instance on the form builder.
+	 *
+	 * @param  mixed  $model
+	 * @return void
+	 */
+	public function setModel($model)
+	{
+		$this->model = $model;
+	}
+
+	/**
 	 * Close the current form.
 	 *
 	 * @return string
@@ -601,7 +612,7 @@ class FormBuilder {
 	 * @param  string  $name
 	 * @param  mixed   $value
 	 * @param  bool    $checked
-	 * @return void
+	 * @return bool
 	 */
 	protected function getCheckedState($type, $name, $value, $checked)
 	{

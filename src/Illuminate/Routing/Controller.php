@@ -68,6 +68,8 @@ abstract class Controller {
 	{
 		$parameters = array();
 
+		$original = $filter;
+
 		if ($filter instanceof Closure)
 		{
 			$filter = $this->registerClosureFilter($filter);
@@ -81,7 +83,7 @@ abstract class Controller {
 			list($filter, $parameters) = Route::parseFilter($filter);
 		}
 
-		return compact('filter', 'parameters', 'options');
+		return compact('original', 'filter', 'parameters', 'options');
 	}
 
 	/**
@@ -205,15 +207,14 @@ abstract class Controller {
 	/**
 	 * Handle calls to missing methods on the controller.
 	 *
-	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
-	public function missingMethod($method, $parameters = array())
+	public function missingMethod($parameters = array())
 	{
-		throw new NotFoundHttpException("Controller method [{$method}] not found.");
+		throw new NotFoundHttpException("Controller method not found.");
 	}
 
 	/**
@@ -225,7 +226,7 @@ abstract class Controller {
 	 */
 	public function __call($method, $parameters)
 	{
-		return $this->missingMethod($method, $parameters);
+		throw new \BadMethodCallException("Method [$method] does not exist.");
 	}
 
 }

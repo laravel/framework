@@ -106,7 +106,7 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 		$parentQuery->shouldReceive('getGrammar')->once()->andReturn($grammar = m::mock('StdClass'));
 		$grammar->shouldReceive('wrap')->once()->with('table.id');
 
-		$relation->getRelationCountQuery($query);
+		$relation->getRelationCountQuery($query, $query);
 	}
 
 

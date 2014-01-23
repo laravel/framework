@@ -50,19 +50,20 @@ class HasManyThrough extends Relation {
 	 * Add the constraints for a relationship count query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function getRelationCountQuery(Builder $query)
+	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
 		$this->setJoin($query);
 
-		return parent::getRelationCountQuery($query);
+		return parent::getRelationCountQuery($query, $parent);
 	}
 
 	/**
 	 * Set the join clause on the query.
 	 *
-	 * @param  \Illuminate\Databaes\Eloquent\Builder|null  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder|null  $query
 	 * @return void
 	 */
 	protected function setJoin(Builder $query = null)

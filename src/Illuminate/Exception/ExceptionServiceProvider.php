@@ -4,7 +4,6 @@ use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Debug\ExceptionHandler as KernelHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
 
@@ -63,9 +62,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 			}
 			else
 			{
-				$handler = new KernelHandler($app['config']['app.debug']);
-
-				return new SymfonyDisplayer($handler);
+				return new PlainDisplayer;
 			}
 		});
 	}
@@ -100,6 +97,8 @@ class ExceptionServiceProvider extends ServiceProvider {
 			// will otherwise run out before we can do anything else. We just want to
 			// let the framework go ahead and finish a request on this end instead.
 			with($whoops = new Run)->allowQuit(false);
+
+			$whoops->writeToOutput(false);
 
 			return $whoops->pushHandler($app['whoops.handler']);
 		});

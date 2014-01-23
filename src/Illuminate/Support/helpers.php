@@ -198,6 +198,22 @@ if ( ! function_exists('array_first'))
 	}
 }
 
+if ( ! function_exists('array_last'))
+{
+	/**
+	 * Return the last element in an array passing a given truth test.
+	 *
+	 * @param  array    $array
+	 * @param  Closure  $callback
+	 * @param  mixed    $default
+	 * @return mixed
+	 */
+	function array_last($array, $callback, $default = null)
+	{
+		return array_first(array_reverse($array), $callback, $default);
+	}
+}
+
 if ( ! function_exists('array_flatten'))
 {
 	/**
@@ -397,6 +413,28 @@ if ( ! function_exists('array_sort'))
 	function array_sort($array, Closure $callback)
 	{
 		return Illuminate\Support\Collection::make($array)->sortBy($callback)->all();
+	}
+}
+
+if ( ! function_exists('array_where'))
+{
+	/**
+	 * Filter the array using the given Closure.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	function array_where($array, Closure $callback)
+	{
+		$filtered = array();
+
+		foreach ($array as $key => $value)
+		{
+			if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
+		}
+
+		return $filtered;
 	}
 }
 
@@ -812,6 +850,22 @@ if ( ! function_exists('str_is'))
 	{
 		return Illuminate\Support\Str::is($pattern, $value);
 	}
+}
+
+if ( ! function_exists('str_limit'))
+{
+		/**
+		 * Limit the number of characters in a string.
+		 *
+		 * @param  string  $value
+		 * @param  int     $limit
+		 * @param  string  $end
+		 * @return string
+		 */
+		function str_limit($value, $limit = 100, $end = '...')
+		{
+				return Illuminate\Support\Str::limit($value, $limit, $end);
+		}
 }
 
 if ( ! function_exists('str_plural'))

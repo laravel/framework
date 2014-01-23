@@ -104,11 +104,13 @@ class Validator implements MessageProviderInterface {
 	protected $numericRules = array('Numeric', 'Integer');
 
 	/**
-	 * The implicit validation rules.
+	 * The validation rules that imply the field is required.
 	 *
 	 * @var array
 	 */
-	protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted');
+	protected $implicitRules = array(
+		'Required', 'RequiredWith', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted'
+	);
 
 	/**
 	 * Create a new Validator instance.
@@ -296,7 +298,39 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function isValidatable($rule, $attribute, $value)
 	{
+		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
+               $this->passesOptionalCheck($attribute);
+	}
+
+	/**
+	 * Determine if the field is present, or the rule implies required.
+	 *
+	 * @param  string  $rule
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function presentOrRuleIsImplicit($rule, $attribute, $value)
+	{
 		return $this->validateRequired($attribute, $value) || $this->isImplicit($rule);
+	}
+
+	/**
+	 * Determine if the attribute passes any optional check.
+	 *
+	 * @param  string  $attribute
+	 * @return bool
+	 */
+	protected function passesOptionalCheck($attribute)
+	{
+		if ($this->hasRule($attribute, array('Sometimes')))
+		{
+			return array_key_exists($attribute, $this->data) || array_key_exists($attribute, $this->files);
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	/**
@@ -343,6 +377,20 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * "Validate" optional attributes.
+	 *
+	 * Always returns true, just lets us put sometimes in rules.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateSometimes()
+	{
+		return true;
+	}
+
+	/**
 	 * Validate that a required attribute exists.
 	 *
 	 * @param  string  $attribute
@@ -365,6 +413,25 @@ class Validator implements MessageProviderInterface {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validate the given attribute is filled if it is present.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateFilled($attribute, $value)
+	{
+		if (array_key_exists($attribute, $this->data) || array_key_exists($attribute, $this->files))
+		{
+			return $this->validateRequired($attribute, $value);
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	/**
@@ -558,9 +625,9 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAccepted($attribute, $value)
 	{
-		$acceptable = array('yes', 'on', 1);
+		$acceptable = array('yes', 'on', '1', 1);
 
-		return ($this->validateRequired($attribute, $value) && in_array($value, $acceptable));
+		return ($this->validateRequired($attribute, $value) && in_array($value, $acceptable, true));
 	}
 
 	/**
@@ -683,7 +750,7 @@ class Validator implements MessageProviderInterface {
 		return $this->getSize($attribute, $value) <= $parameters[0];
 	}
 
-	/*
+	/**
 	 * Get the size of an attribute.
 	 *
 	 * @param  string  $attribute
@@ -896,7 +963,9 @@ class Validator implements MessageProviderInterface {
 	{
 		$extra = array();
 
-		for ($i = 0; $i < count($segments); $i = $i + 2)
+		$count = count($segments);
+
+		for ($i = 0; $i < $count; $i = $i + 2)
 		{
 			$extra[$segments[$i]] = $segments[$i + 1];
 		}
@@ -1582,6 +1651,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function hasRule($attribute, $rules)
 	{
+		$rules = (array) $rules;
+
 		// To determine if the attribute has a rule in the ruleset, we will spin
 		// through each of the rules assigned to the attribute and parse them
 		// all, then check to see if the parsed rules exists in the arrays.

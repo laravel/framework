@@ -34,8 +34,8 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'toSql', 'lists', 'insert', 'insertGetId', 'pluck',
-		'count', 'min', 'max', 'avg', 'sum', 'exists',
+		'toSql', 'lists', 'insert', 'insertGetId', 'pluck', 'count',
+		'min', 'max', 'avg', 'sum', 'exists', 'getBindings',
 	);
 
 	/**
@@ -235,7 +235,7 @@ class Builder {
 	/**
 	 * Get a paginator for a grouped statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -250,7 +250,7 @@ class Builder {
 	/**
 	 * Get a paginator for an ungrouped statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -594,7 +594,7 @@ class Builder {
 	{
 		$relation = $this->getHasRelationQuery($relation);
 
-		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery());
+		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
 		if ($callback) call_user_func($callback, $query);
 

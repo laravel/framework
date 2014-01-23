@@ -33,6 +33,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSometimesCanSkipRequiredRules()
+	{
+		$trans = $this->getTranslator();
+		$trans->shouldReceive('trans')->never();
+		$v = new Validator($trans, array(), array('name' => 'sometimes|required'));
+		$this->assertTrue($v->passes());
+		$this->assertEmpty($v->failed());
+	}
+
+
 	public function testInValidatableRulesReturnsValid()
 	{
 		$trans = $this->getTranslator();
@@ -254,7 +264,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	public function testRequiredWithoutAll()
 	{
 		$trans = $this->getRealTranslator();
-		
+
 		$rules = array(
 			'f1' => 'required_without_all:f2,f3',
 			'f2' => 'required_without_all:f1,f3',
@@ -353,10 +363,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array(), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('foo' => 0), array('foo' => 'Accepted'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('foo' => 'yes'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
 
+		$v = new Validator($trans, array('foo' => 'on'), array('foo' => 'Accepted'));
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('foo' => '1'), array('foo' => 'Accepted'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => 1), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
 	}
 
@@ -757,6 +776,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => 'Alpha'));
 		$this->assertTrue($v->passes());
 
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'aslsdlks
+1
+1'), array('x' => 'Alpha'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('x' => 'http://google.com'), array('x' => 'Alpha'));
 		$this->assertFalse($v->passes());
 	}
@@ -823,16 +848,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('x' => '2012-01-01'), array('x' => 'After:2000-01-01'));
 		$this->assertTrue($v->passes());
-		
+
 		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2013-01-01'), array('start' => 'After:2000-01-01', 'ends' => 'After:start'));
 		$this->assertTrue($v->passes());
-		
+
 		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2000-01-01'), array('start' => 'After:2000-01-01', 'ends' => 'After:start'));
 		$this->assertTrue($v->fails());
-		
+
 		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2013-01-01'), array('start' => 'Before:ends', 'ends' => 'After:start'));
 		$this->assertTrue($v->passes());
-		
+
 		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2000-01-01'), array('start' => 'Before:ends', 'ends' => 'After:start'));
 		$this->assertTrue($v->fails());
 	}

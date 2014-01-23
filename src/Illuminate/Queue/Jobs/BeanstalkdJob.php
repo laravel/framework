@@ -23,7 +23,7 @@ class BeanstalkdJob extends Job {
 	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @param  Pheanstalk  $pheanstalk
 	 * @param  Pheanstalk_Job  $job
 	 * @param  string  $queue
@@ -110,7 +110,7 @@ class BeanstalkdJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container
+	 * @return \Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{

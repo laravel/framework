@@ -29,10 +29,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		if ( ! $this->app)
 		{
 			$this->refreshApplication();
-
-			$this->app->setRequestForConsoleEnvironment();
-
-			$this->app->boot();
 		}
 	}
 
@@ -46,6 +42,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		$this->app = $this->createApplication();
 
 		$this->client = $this->createClient();
+
+		$this->app->setRequestForConsoleEnvironment();
+
+		$this->app->boot();
 	}
 
 	/**
@@ -53,7 +53,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 *
 	 * Needs to be implemented by subclasses.
 	 *
-	 * @return Symfony\Component\HttpKernel\HttpKernelInterface
+	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
 	 */
 	abstract public function createApplication();
 
@@ -355,7 +355,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app['artisan']->call('seed', array('--class' => $class));
+		$this->app['artisan']->call('db:seed', array('--class' => $class));
 	}
 
 	/**

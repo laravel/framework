@@ -10,11 +10,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.4.0",
         "classpreloader/classpreloader": "1.0.*",
         "d11wtq/boris": "1.0.*",
         "ircmaxell/password-compat": "1.0.*",
-        "filp/whoops": "1.0.9",
+        "filp/whoops": "1.0.10",
         "jeremeamia/superclosure": "1.0.*",
         "monolog/monolog": "1.*",
         "nesbot/carbon": "1.*",
@@ -32,6 +32,7 @@
         "symfony/http-foundation": "2.4.*",
         "symfony/http-kernel": "2.4.*",
         "symfony/process": "2.4.*",
+        "symfony/routing": "2.4.*",
         "symfony/translation": "2.4.*"
     },
     "replace": {
@@ -64,7 +65,7 @@
         "illuminate/workbench": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "2.4.*",
+        "aws/aws-sdk-php": "2.5.*",
         "iron-io/iron_mq": "1.4.*",
         "pda/pheanstalk": "2.1.*",
         "mockery/mockery": "0.8.0",
@@ -83,7 +84,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "suggest": {

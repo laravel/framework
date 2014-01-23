@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Html\HtmlBuilder
+ */
 class HTML extends Facade {
 
 	/**

@@ -43,9 +43,9 @@ if ( ! extension_loaded('mcrypt'))
 */
 
 use Illuminate\Http\Request;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Config\EnvironmentVariables;
 use Illuminate\Config\Repository as Config;
 
 /*
@@ -91,6 +91,33 @@ if (isset($unitTesting))
 Facade::clearResolvedInstances();
 
 Facade::setFacadeApplication($app);
+
+/*
+|--------------------------------------------------------------------------
+| Register Facade Aliases To Full Classes
+|--------------------------------------------------------------------------
+|
+| By default, we use short keys in the container for each of the core
+| pieces of the framework. Here we will register the aliases for a
+| list of all of the fully qualified class names making DI easy.
+|
+*/
+
+$app->registerCoreContainerAliases();
+
+/*
+|--------------------------------------------------------------------------
+| Register The Environment Variables
+|--------------------------------------------------------------------------
+|
+| Here we will register all of the $_ENV and $_SERVER variables into the
+| process so that they're globally available configuration options so
+| sensitive configuration information can be swept out of the code.
+|
+*/
+
+with($envVariables = new EnvironmentVariables(
+	$app->getEnvironmentVariablesLoader()))->load($env);
 
 /*
 |--------------------------------------------------------------------------

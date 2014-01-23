@@ -149,6 +149,13 @@ class Builder {
 	protected $cacheTags;
 
 	/**
+	 * The cache driver to be used.
+	 *
+	 * @var string
+	 */
+	protected $cacheDriver;
+
+	/**
 	 * All of the available clause operators.
 	 *
 	 * @var array
@@ -323,7 +330,11 @@ class Builder {
 	 */
 	public function where($column, $operator = null, $value = null, $boolean = 'and')
 	{
-		if ($this->invalidOperatorAndValue($operator, $value))
+		if (func_num_args() == 2)
+		{
+			list($value, $operator) = array($operator, '=');
+		}
+		elseif ($this->invalidOperatorAndValue($operator, $value))
 		{
 			throw new \InvalidArgumentException("Value must be provided.");
 		}
@@ -392,7 +403,7 @@ class Builder {
 	 * Determine if the given operator and value combination is legal.
 	 *
 	 * @param  string  $operator
-	 * @param  mxied  $value
+	 * @param  mixed  $value
 	 * @return bool
 	 */
 	protected function invalidOperatorAndValue($operator, $value)
@@ -917,7 +928,7 @@ class Builder {
 		return $this->orderBy($column, 'asc');
 	}
 
-	/*
+	/**
 	 * Add a raw "order by" clause to the query.
 	 *
 	 * @param  string  $sql
@@ -943,7 +954,7 @@ class Builder {
 	 */
 	public function offset($value)
 	{
-		$this->offset = $value;
+		$this->offset = max(0, $value);
 
 		return $this;
 	}
@@ -1090,9 +1101,7 @@ class Builder {
 	 */
 	public function rememberForever($key = null)
 	{
-		list($this->cacheMinutes, $this->cacheKey) = array(-1, $key);
-
-		return $this;
+		return $this->remember(-1, $key);
 	}
 
 	/**
@@ -1101,9 +1110,22 @@ class Builder {
 	 * @param  array|dynamic  $cacheTags
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function tags($cacheTags)
+	public function cacheTags($cacheTags)
 	{
 		$this->cacheTags = $cacheTags;
+
+		return $this;
+	}
+
+	/**
+	 * Indicate that the results, if cached, should use the given cache driver.
+	 *
+	 * @param  string  $cacheDriver
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function cacheDriver($cacheDriver)
+	{
+		$this->cacheDriver = $cacheDriver;
 
 		return $this;
 	}
@@ -1192,7 +1214,7 @@ class Builder {
 	{
 		if (is_null($this->columns)) $this->columns = $columns;
 
-		// If the query is requested ot be cached, we will cache it using a unique key
+		// If the query is requested to be cached, we will cache it using a unique key
 		// for this database connection and query statement, including the bindings
 		// that are used on this query, providing great convenience when caching.
 		list($key, $minutes) = $this->getCacheInfo();
@@ -1221,7 +1243,7 @@ class Builder {
 	 */
 	protected function getCache()
 	{
-		$cache = $this->connection->getCacheManager();
+		$cache = $this->connection->getCacheManager()->driver($this->cacheDriver);
 
 		return $this->cacheTags ? $cache->tags($this->cacheTags) : $cache;
 	}
@@ -1386,7 +1408,7 @@ class Builder {
 	/**
 	 * Create a paginator for a grouped pagination statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -1401,7 +1423,7 @@ class Builder {
 	/**
 	 * Build a paginator instance from a raw result array.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  array  $results
 	 * @param  int    $perPage
 	 * @return \Illuminate\Pagination\Paginator
@@ -1421,7 +1443,7 @@ class Builder {
 	/**
 	 * Create a paginator for an un-grouped pagination statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator

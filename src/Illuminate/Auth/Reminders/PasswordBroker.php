@@ -183,7 +183,7 @@ class PasswordBroker {
 	 * Validate a password reset for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Auth\RemindableInterface
+	 * @return \Illuminate\Auth\Reminders\RemindableInterface
 	 */
 	protected function validateReset(array $credentials)
 	{
@@ -224,9 +224,11 @@ class PasswordBroker {
 	 */
 	protected function validNewPasswords(array $credentials)
 	{
+		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
+
 		if (isset($this->passwordValidator))
 		{
-			return call_user_func($this->passwordValidator, $credentials);
+			return call_user_func($this->passwordValidator, $credentials) && $password == $confirm;
 		}
 		else
 		{
@@ -242,9 +244,9 @@ class PasswordBroker {
 	 */
 	protected function validatePasswordWithDefaults(array $credentials)
 	{
-		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
+		$matches = $credentials['password'] == $credentials['password_confirmation'];
 
-		return $password && strlen($password) >= 6 && $password == $confirm;
+		return $matches && $credentials['password'] && strlen($credentials['password']) >= 6;
 	}
 
 	/**

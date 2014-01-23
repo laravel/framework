@@ -62,10 +62,10 @@ class RouteCollection implements Countable, IteratorAggregate {
 	{
 		foreach ($route->methods() as $method)
 		{
-			$this->routes[$method][] = $route;
+			$this->routes[$method][$route->domain().$route->getUri()] = $route;
 		}
 
-		$this->allRoutes[] = $route;
+		$this->allRoutes[$method.$route->domain().$route->getUri()] = $route;
 	}
 
 	/**
@@ -90,6 +90,21 @@ class RouteCollection implements Countable, IteratorAggregate {
 		// is used by the route. This will let us reverse route to controllers while
 		// processing a request and easily generate URLs to the given controllers.
 		if (isset($action['controller']))
+		{
+			$this->addToActionList($action, $route);
+		}
+	}
+
+	/**
+	 * Add a route to the controller action dictionary.
+	 *
+	 * @param  array  $action
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return void
+	 */
+	protected function addToActionList($action, $route)
+	{
+		if ( ! isset($this->actionList[$action['controller']]))
 		{
 			$this->actionList[$action['controller']] = $route;
 		}
@@ -183,7 +198,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function get($method = null)
 	{
-		if (is_null($method)) return $this->allRoutes;
+		if (is_null($method)) return $this->getRoutes();
 
 		return array_get($this->routes, $method, array());
 	}
@@ -228,7 +243,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function getRoutes()
 	{
-		return $this->allRoutes;
+		return array_values($this->allRoutes);
 	}
 
 	/**
@@ -238,7 +253,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function getIterator()
 	{
-		return new ArrayIterator($this->allRoutes);
+		return new ArrayIterator($this->getRoutes());
 	}
 
 	/**
@@ -248,7 +263,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function count()
 	{
-		return count($this->allRoutes);
+		return count($this->getRoutes());
 	}
 
 }

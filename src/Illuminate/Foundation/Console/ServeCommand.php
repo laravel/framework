@@ -27,7 +27,7 @@ class ServeCommand extends Command {
 	public function fire()
 	{
 		$this->checkPhpVersion();
-		
+
 		chdir($this->laravel['path.base']);
 
 		$host = $this->input->getOption('host');

@@ -25,7 +25,7 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer');
+	protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
 
 	/**
 	 * Compile the query to determine the list of tables.
@@ -98,7 +98,7 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile a create table command.
+	 * Compile an add column command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Illuminate\Support\Fluent  $command
@@ -361,7 +361,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTinyInteger(Fluent $column)
 	{
-		return 'tinyint(1)';
+		return 'tinyint';
 	}
 
 	/**
@@ -427,7 +427,7 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
-	 * Create the column definition for a enum type.
+	 * Create the column definition for an enum type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string

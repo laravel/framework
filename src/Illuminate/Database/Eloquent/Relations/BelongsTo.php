@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
-use LogicException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
 class BelongsTo extends Relation {
@@ -29,7 +29,7 @@ class BelongsTo extends Relation {
 	protected $relation;
 
 	/**
-	 * Create a new has many relationship instance.
+	 * Create a new belongs to relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
@@ -79,13 +79,16 @@ class BelongsTo extends Relation {
 	 * Add the constraints for a relationship count query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
 	 * @return \Illuminate\Database\Eloquent\Builder
-	 *
-	 * @throws \LogicException
 	 */
-	public function getRelationCountQuery(Builder $query)
+	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
-		throw new LogicException('Has method invalid on "belongsTo" relations.');
+		$query->select(new Expression('count(*)'));
+
+		$otherKey = $this->wrap($query->getModel()->getTable().'.'.$this->otherKey);
+
+		return $query->where($this->getQualifiedForeignKey(), '=', new Expression($otherKey));
 	}
 
 	/**
@@ -225,6 +228,36 @@ class BelongsTo extends Relation {
 	public function getForeignKey()
 	{
 		return $this->foreignKey;
+	}
+
+	/**
+	 * Get the fully qualified foreign key of the relationship.
+	 *
+	 * @return string
+	 */
+	public function getQualifiedForeignKey()
+	{
+		return $this->parent->getTable().'.'.$this->foreignKey;
+	}
+
+	/**
+	 * Get the associated key of the relationship.
+	 *
+	 * @return string
+	 */
+	public function getOtherKey()
+	{
+		return $this->otherKey;
+	}
+
+	/**
+	 * Get the fully qualified associated key of the relationship.
+	 *
+	 * @return string
+	 */
+	public function getQualifiedOtherKeyName()
+	{
+		return $this->related->getTable().'.'.$this->otherKey;
 	}
 
 }
