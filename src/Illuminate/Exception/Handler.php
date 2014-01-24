@@ -82,7 +82,7 @@ class Handler {
 
 		$this->registerExceptionHandler();
 
-		if ($environment != $this->responsePreparer['env.unitTesting']) $this->registerShutdownHandler();
+		if ($environment != $this->responsePreparer['env.testing']) $this->registerShutdownHandler();
 	}
 
 	/**

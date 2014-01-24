@@ -32,7 +32,7 @@ class RoutingServiceProvider extends ServiceProvider {
 			// If the current application environment is the unitTesting environment, 
 			// disable the routing filters, since they can be tested independently of the 
 			// routes and just get in the way of our typical controller testing concerns.
-			if ($app['env'] == $app['env.unitTesting'])
+			if ($app['env'] == $app['env.testing'])
 			{
 				$router->disableFilters();
 			}

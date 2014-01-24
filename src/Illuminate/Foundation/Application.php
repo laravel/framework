@@ -279,7 +279,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function runningUnitTests()
 	{
-		return $this['env'] == $this['env.unitTesting'];
+		return $this['env'] == $this['env.testing'];
 	}
 
 	/**
