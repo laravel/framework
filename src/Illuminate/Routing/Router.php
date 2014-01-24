@@ -1255,7 +1255,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			}
 		}
 
-		foreach ($this->regexFilters as $pattern => $filters) {
+		foreach ($this->regexFilters as $pattern => $filters)
+		{
 			if (preg_match($pattern, $request->path()))
 			{
 				$merge = $this->patternsByMethod($method, $filters);
