@@ -118,7 +118,7 @@ class TinkerCommand extends Command {
 	 */
 	protected function supportsBoris()
 	{
-		return (extension_loaded('readline') and extension_loaded('posix') and extension_loaded('pcntl'));
+		return extension_loaded('readline') && extension_loaded('posix') && extension_loaded('pcntl');
 	}
 
 }
