@@ -294,6 +294,22 @@ class Route {
 	}
 
 	/**
+	 * Unset a parameter on the route if it is set.
+	 *
+	 * @param  string $name
+	 * @return void
+	 */
+	public function unsetParameter($name)
+	{
+		$this->parameters();
+
+		if (array_key_exists($name, $this->parameters))
+		{
+			unset($this->parameters[$name]);
+		}
+	}
+
+	/**
 	 * Get the key / value list of parameters for the route.
 	 *
 	 * @return array
