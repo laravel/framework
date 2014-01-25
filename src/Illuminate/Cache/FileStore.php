@@ -152,7 +152,12 @@ class FileStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->files->delete($this->path($key));
+		$file = $this->path($key);
+
+		if ($this->files->exists($file))
+		{
+			$this->files->delete($file);
+		}
 	}
 
 	/**
