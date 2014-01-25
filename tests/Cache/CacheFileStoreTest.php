@@ -74,6 +74,7 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 		$store->forever('foo', 'Hello World', 10);
 	}
 
+
 	public function testRemoveDeletesFileDoesntExist()
 	{
 		$files = $this->mockFilesystem();
@@ -83,6 +84,7 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 		$store = new FileStore($files, __DIR__);
 		$store->forget('foobull');
 	}
+
 
 	public function testRemoveDeletesFile()
 	{
@@ -95,6 +97,7 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 		$files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5));
 		$store->forget('foobar');
 	}
+
 
 	public function testFlushCleansDirectory()
 	{
