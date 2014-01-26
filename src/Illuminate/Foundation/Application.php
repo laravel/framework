@@ -262,6 +262,26 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		return $this['env'] = with(new EnvironmentDetector())->detect($envs, $args);
 	}
 
+    /**
+     * Include environment file located at the root of the project diretory.
+     *
+     * @return void
+     */
+    public function loadEnvironmentFile()
+    {
+        $environment_file = $this['path.base'].'/.env.php';
+
+        if ($this['env'] != 'production')
+        {
+            $environment_file = $this['path.base'].'/.env.'.$this['env'].'.php';
+        }
+
+        if (file_exists($environment_file))
+        {
+            $_ENV = array_merge($_ENV, include $environment_file);
+        }
+    }
+
 	/**
 	 * Determine if we are running in the console.
 	 *
