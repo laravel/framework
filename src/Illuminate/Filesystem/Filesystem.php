@@ -261,7 +261,7 @@ class Filesystem {
 	 */
 	public function allFiles($directory)
 	{
-		return iterator_to_array(Finder::create()->files()->in($directory), false);
+		return Finder::create()->files()->in($directory);
 	}
 
 	/**
