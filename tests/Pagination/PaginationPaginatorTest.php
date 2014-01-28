@@ -146,4 +146,13 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foo.com?page=1&foo=bar#a-fragment', $p->getUrl(1));
 	}
 
+
+	public function testPaginatorDecoratesCollection()
+	{
+		$p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2);
+		$last = $p->last();
+
+		$this->assertEquals('c', $last);
+	}
+
 }
