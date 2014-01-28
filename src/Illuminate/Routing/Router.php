@@ -341,6 +341,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		{
 			$this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options);
 		}
+
+		$this->bindResourceModel($name, $options);
 	}
 
 	/**
@@ -644,6 +646,19 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		$action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
 		return $this->delete($this->getResourceUri($name).'/{'.$base.'}', $action);
+	}
+
+	/**
+	 * Automatically bind the resource model.
+	 *
+	 * @param  string  $name
+	 * @param  array   $options
+	 * @return void
+	 */
+	protected function bindResourceModel($name, array $options)
+	{
+		if(array_key_exists('model', $options) && class_exists($options['model']))
+			$this->model($name, $options['model']);
 	}
 
 	/**

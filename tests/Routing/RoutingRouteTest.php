@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Illuminate\Routing\Controller;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
@@ -598,6 +599,14 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
 	}
 
+	public function testResourceModelBinding()
+	{
+		$router = $this->getRouter();
+		$router->resource('foo', 'ResourceControllerStub', array('model' => 'RouteModelBindingStub', 'only' => array('show')));
+
+		$this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+	}
+
 
 	protected function getRouter()
 	{
@@ -654,4 +663,8 @@ class RouteTestFilterStub {
 	{
 		return 'handling!';
 	}
+}
+
+class ResourceControllerStub extends Controller {
+	public function show($model) { return strtoupper($model); }
 }
