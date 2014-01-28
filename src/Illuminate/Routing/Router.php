@@ -76,6 +76,13 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected $patternFilters = array();
 
 	/**
+	 * The registered regex based filters.
+	 *
+	 * @var array
+	 */
+	protected $regexFilters = array();
+
+	/**
 	 * The reigstered route value binders.
 	 *
 	 * @var array
@@ -1103,6 +1110,21 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Register a regex-based filter with the router.
+	 *
+	 * @param  string     $pattern
+	 * @param  string     $name
+	 * @param  array|null $methods
+	 * @return void
+	 */
+	public function regexWhen($pattern, $name, $methods = null)
+	{
+		if ( ! is_null($methods)) $methods = array_map('strtoupper', (array) $methods);
+
+		$this->regexFilters[$pattern][] = compact('name', 'methods');
+	}
+
+	/**
 	 * Register a model binder for a wildcard.
 	 *
 	 * @param  string  $key
@@ -1226,6 +1248,16 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			// registered patterns against the path info for the current request to this
 			// applications, and when it matches we will merge into these middlewares.
 			if (str_is($pattern, $request->path()))
+			{
+				$merge = $this->patternsByMethod($method, $filters);
+
+				$results = array_merge($results, $merge);
+			}
+		}
+
+		foreach ($this->regexFilters as $pattern => $filters)
+		{
+			if (preg_match($pattern, $request->path()))
 			{
 				$merge = $this->patternsByMethod($method, $filters);
 
