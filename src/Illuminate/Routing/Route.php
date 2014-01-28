@@ -299,14 +299,11 @@ class Route {
 	 * @param  string $name
 	 * @return void
 	 */
-	public function unsetParameter($name)
+	public function forgetParameter($name)
 	{
 		$this->parameters();
 
-		if (array_key_exists($name, $this->parameters))
-		{
-			unset($this->parameters[$name]);
-		}
+		unset($this->parameters[$name]);
 	}
 
 	/**
