@@ -402,14 +402,23 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Sort the collection using the given Closure.
 	 *
-	 * @param  \Closure  $callback
-	 * @param  int   $options
-	 * @param  bool  $descending
+	 * @param  \Closure|string  $callback
+	 * @param  int              $options
+	 * @param  bool             $descending
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function sortBy(Closure $callback, $options = SORT_REGULAR, $descending = false)
+	public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
 	{
 		$results = array();
+
+		// If we passed a key to sort by, create a closure for it
+		if (is_string($callback))
+		{
+			$callback = function($item) use ($callback)
+			{
+				return is_object($item) ? $item->{$callback} : array_get($item, $callback);
+			};
+		}
 
 		// First we will loop through the items and get the comparator from a callback
 		// function which we were given. Then, we will sort the returned values and
@@ -438,11 +447,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Sort the collection in descending order using the given Closure.
 	 *
-	 * @param  \Closure  $callback
-	 * @param  int   $options
+	 * @param  \Closure|string  $callback
+	 * @param  int              $options
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function sortByDesc(Closure $callback, $options = SORT_REGULAR)
+	public function sortByDesc($callback, $options = SORT_REGULAR)
 	{
 		return $this->sortBy($callback, $options, true);
 	}
