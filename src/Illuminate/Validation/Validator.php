@@ -482,8 +482,6 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateRequiredWith($attribute, $value, $parameters)
 	{
-		$other = $parameters[0];
-
 		if ($this->getPresentCount($parameters) != count($parameters))
 		{
 			return true;
