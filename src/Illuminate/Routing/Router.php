@@ -801,8 +801,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			$action = $this->getControllerAction($action);
 		}
 
-		$route = $this->newRouteObject($methods, $uri = $this->prefix($uri), $action)
-			->where($this->patterns);
+		$route = $this->newRoute(
+			$methods, $uri = $this->prefix($uri), $action
+		);
+
+		$route->where($this->patterns);
 
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
@@ -819,12 +822,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Create a new Route object.
 	 *
 	 * @param  array|string $methods
-	 * @param  string       $uri
-	 * @param  mixed        $action
-	 *
+	 * @param  string  $uri
+	 * @param  mixed  $action
 	 * @return \Illuminate\Routing\Route
 	 */
-	protected function newRouteObject($methods, $uri, $action)
+	protected function newRoute($methods, $uri, $action)
 	{
 		return new Route($methods, $uri, $action);
 	}
