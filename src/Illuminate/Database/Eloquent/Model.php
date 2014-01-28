@@ -4,6 +4,7 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
+use JsonSerializable;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
+abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface, JsonSerializable {
 
 	/**
 	 * The connection name for the model.
@@ -2062,6 +2063,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
+	}
+
+	/**
+	 * Specify data which should be serialized to JSON when encoded with json_encode.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->toArray();
 	}
 
 	/**
