@@ -730,6 +730,11 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
 		}
 
+		if ($this->runningUnitTests() && ! $this['session']->isStarted())
+		{
+			$this['session']->start();
+		}
+
 		return $this['router']->dispatch($this->prepareRequest($request));
 	}
 
