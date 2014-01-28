@@ -122,6 +122,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 			$table->string('migration');
 
 			$table->integer('batch');
+
+            //Without this key, Windows users has incorrect migration ordering during rollback
+            $table->primary('migration');
 		});
 	}
 

@@ -23,7 +23,7 @@ class ViewServiceProvider extends ServiceProvider {
 		// Once the other components have been registered we're ready to include the
 		// view environment and session binder. The session binder will bind onto
 		// the "before" application event and add errors into shared view data.
-		$this->registerEnvironment();
+		$this->registerFactory();
 
 		$this->registerSessionBinder();
 	}
@@ -110,7 +110,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	public function registerEnvironment()
+	public function registerFactory()
 	{
 		$this->app->bindShared('view', function($app)
 		{
@@ -121,7 +121,7 @@ class ViewServiceProvider extends ServiceProvider {
 
 			$finder = $app['view.finder'];
 
-			$env = new Environment($resolver, $finder, $app['events']);
+			$env = new Factory($resolver, $finder, $app['events']);
 
 			// We will also set the container instance on this view environment since the
 			// view composers may be classes registered in the container, which allows

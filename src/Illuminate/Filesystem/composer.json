@@ -8,8 +8,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.1.*",
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
         "symfony/finder": "2.4.*"
     },
     "require-dev": {
@@ -23,7 +23,7 @@
     "target-dir": "Illuminate/Filesystem",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "minimum-stability": "dev"
