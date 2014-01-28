@@ -302,7 +302,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->get('bar/foo', function() { return 'hello'; });
 		$router->get('baz/foo', function() { return 'hello'; });
 		$router->filter('foo', function($route, $request, $bar) { return 'foo'.$bar; });
-		$router->regexWhen('/^(foo|bar).*/', 'foo:bar');
+		$router->whenRegex('/^(foo|bar).*/', 'foo:bar');
 		$this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 		$this->assertEquals('foobar', $router->dispatch(Request::create('bar/foo', 'GET'))->getContent());
 		$this->assertEquals('hello', $router->dispatch(Request::create('baz/foo', 'GET'))->getContent());
@@ -314,7 +314,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router = $this->getRouter();
 		$router->get('{var}/bar', function($var) { return 'hello'; });
 		$router->filter('foo', function($route, $request, $bar) { return 'foo'.$bar; });
-		$router->regexWhen('/^(foo|bar).*/', 'foo:bar');
+		$router->whenRegex('/^(foo|bar).*/', 'foo:bar');
 		$this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 		$this->assertEquals('foobar', $router->dispatch(Request::create('bar/bar', 'GET'))->getContent());
 		$this->assertEquals('hello', $router->dispatch(Request::create('baz/bar', 'GET'))->getContent());
