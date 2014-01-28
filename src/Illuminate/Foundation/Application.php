@@ -654,7 +654,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function registerBaseMiddlewares()
 	{
-		$this->middleware('Illuminate\Http\FrameGuard');
+		//
 	}
 
 	/**
