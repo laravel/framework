@@ -167,7 +167,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @param  string|array  $key
 	 * @param  mixed  $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function assertViewHas($key, $value = null)
 	{
@@ -183,11 +183,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		if (is_null($value))
 		{
 			$this->assertArrayHasKey($key, $response->getData());
+			$data = array_get($response->getData(), $key);
 		}
 		else
 		{
-			$this->assertEquals($value, $response->$key);
+			$data = $response->$key;
+			$this->assertEquals($value, $data);
 		}
+
+		return $data;
 	}
 
 	/**
