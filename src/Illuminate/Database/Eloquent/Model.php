@@ -316,7 +316,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function fill(array $attributes)
 	{
 		$totallyGuarded = $this->totallyGuarded();
-		
+
 		foreach ($this->fillableFromArray($attributes) as $key => $value)
 		{
 			$key = $this->removeTableFromKey($key);
@@ -751,8 +751,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		if (is_null($relation))
 		{
 			$caller = $this->getBelongsToManyCaller();
-
-			$name = $caller['function'];
 		}
 
 		// First, we'll need to determine the foreign key and "other key" for the

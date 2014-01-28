@@ -43,8 +43,6 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
-
 		return $this->pushRaw($this->createPayload($job, $data), $queue);
 	}
 
