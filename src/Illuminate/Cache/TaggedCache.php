@@ -72,8 +72,8 @@ class TaggedCache implements StoreInterface {
 	/**
 	 * Store an item in the cache if the key does not exist.
 	 *
-	 * @param  string              $key
-	 * @param  mixed               $value
+	 * @param  string  $key
+	 * @param  mixed  $value
 	 * @param  Carbon|Datetime|int $minutes
 	 * @return bool
 	 */
