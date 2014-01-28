@@ -208,6 +208,18 @@ class BelongsTo extends Relation {
 	}
 
 	/**
+	 * Remove the relation from the parent.
+	 *
+	 * @return \Illuminate\Database\Eloquebt\Model
+	 */
+	public function disassociate()
+	{
+		$this->parent->setAttribute($this->foreignKey, null);
+
+		return $this->parent->setRelation($this->relation, null);
+	}
+
+	/**
 	 * Update the parent model on the relationship.
 	 *
 	 * @param  array  $attributes
