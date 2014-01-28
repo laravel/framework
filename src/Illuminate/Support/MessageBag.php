@@ -267,7 +267,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	}
 
 	/**
-	 * Specify data which should be serialized to JSON when encoded with json_encode.
+	 * Convert the object into something JSON serializable.
 	 *
 	 * @return array
 	 */
