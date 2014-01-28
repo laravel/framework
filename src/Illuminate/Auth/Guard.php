@@ -143,12 +143,23 @@ class Guard {
 
 		if (is_null($user) && ! is_null($recaller))
 		{
-			$user = $this->provider->retrieveByID($recaller);
-
-			$this->viaRemember = ! is_null($user);
+			$user = $this->getUserByRecaller($recaller);
 		}
 
 		return $this->user = $user;
+	}
+
+	/**
+	 * Pull a user from the repository by its recaller ID.
+	 *
+	 * @param  mixed  $id
+	 * @return mixed
+	 */
+	protected function getUserByRecaller($id)
+	{
+		$this->viaRemember = ! is_null($user = $this->provider->retrieveByID($id));
+
+		return $user;
 	}
 
 	/**
