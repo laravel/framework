@@ -317,7 +317,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function fill(array $attributes)
 	{
 		$totallyGuarded = $this->totallyGuarded();
-		
+
 		foreach ($this->fillableFromArray($attributes) as $key => $value)
 		{
 			$key = $this->removeTableFromKey($key);
@@ -2066,7 +2066,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Specify data which should be serialized to JSON when encoded with json_encode.
+	 * Convert the object into something JSON serializable.
 	 *
 	 * @return array
 	 */
