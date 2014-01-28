@@ -24,9 +24,9 @@ class SQLiteConnector extends Connector implements ConnectorInterface {
 
 		$path = realpath($config['database']);
 
-		// Here we'll verify that the SQLite database exists before we gooing further
-		// as the developer probably wants to know if the database exists and this
-		// SQLite driver will not throw any exception if it does not by default.
+		// Here we'll verify that the SQLite database exists before going further
+		// as the developer probably wants to know if the database exists and by
+		// default this SQLite driver will not throw any exception if it does not.
 		if ($path === false)
 		{
 			throw new \InvalidArgumentException("Database does not exist.");
