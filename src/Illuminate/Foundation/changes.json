@@ -82,7 +82,9 @@
 		{"message": "Allow 'keytext' option to be set on Remote configuration.", "backport": null},
 		{"message": "Added support for '.env' files in the project root directory for loading $_ENV and $_SERVER.", "backport": null},
 		{"message": "Added 'getString' method to the SSH class to allow fetching remote file into a string.", "backport": null},
-		{"message": "Added 'append_config' helper to assign high keys to configuration items.", "backport": null}
+		{"message": "Added 'append_config' helper to assign high keys to configuration items.", "backport": null},
+		{"message": "Nested where queries using Closures with Eloquent will now use Eloquent query builder.", "backport": null},
+		{"message": "Allow passing a string into the 'sortBy' and 'sortByDesc' Collection methods.", "backport": null}
 	],
 	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

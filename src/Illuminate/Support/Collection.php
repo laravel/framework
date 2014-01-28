@@ -411,14 +411,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		$results = array();
 
-		// If we passed a key to sort by, create a closure for it
-		if (is_string($callback))
-		{
-			$callback = function($item) use ($callback)
-			{
-				return is_object($item) ? $item->{$callback} : array_get($item, $callback);
-			};
-		}
+		if (is_string($callback)) $callback = $this->stringSort($callback);
 
 		// First we will loop through the items and get the comparator from a callback
 		// function which we were given. Then, we will sort the returned values and
@@ -442,6 +435,20 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		$this->items = $results;
 
 		return $this;
+	}
+
+	/**
+	 * Get the sort callback for a string value.
+	 *
+	 * @param  string  $value
+	 * @return \Closure
+	 */
+	protected function stringSort($value)
+	{
+		return function($item) use ($value)
+		{
+			return is_object($item) ? $item->{$value} : array_get($item, $value);
+		};
 	}
 
 	/**
