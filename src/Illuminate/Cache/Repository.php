@@ -250,23 +250,6 @@ class Repository implements ArrayAccess {
 	}
 
 	/**
-	 * Handle dynamic calls into Cache macros or pass missing methods to the store.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
-	public function __call($method, $parameters)
-	{
-		if (isset($this->macros[$method]))
-		{
-			return call_user_func_array($this->macros[$method], $parameters);
-		}
-
-		return call_user_func_array(array($this->store, $method), $parameters);
-	}
-
-	/**
 	 * Register a macro with the Cache class.
 	 *
 	 * @param  string $name
@@ -277,4 +260,25 @@ class Repository implements ArrayAccess {
 	{
 		$this->macros[$name] = $callback;
 	}
+
+	/**
+	 * Handle dynamic calls into macros or pass missing methods to the store.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if (isset($this->macros[$method]))
+		{
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+		else
+		{
+			return call_user_func_array(array($this->store, $method), $parameters);
+		}
+	}
+
+
 }
