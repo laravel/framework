@@ -20,6 +20,13 @@ class Builder {
 	protected $grammar;
 
 	/**
+	 * The Blueprint class to use.
+	 *
+	 * @var string
+	 */
+	protected $blueprintClass = 'Illuminate\Database\Schema\Blueprint';
+
+	/**
 	 * Create a new database Schema manager.
 	 *
 	 * @param  \Illuminate\Database\Connection  $connection
@@ -171,7 +178,19 @@ class Builder {
 	 */
 	protected function createBlueprint($table, Closure $callback = null)
 	{
-		return new Blueprint($table, $callback);
+		$class = $this->blueprintClass;
+
+		return new $class($table, $callback);
+	}
+
+	/**
+	 * Set the Blueprint class to use for schema management.
+	 *
+	 * @param string $class
+	 */
+	public function setBlueprintClass($class)
+	{
+		$this->blueprintClass = $class;
 	}
 
 	/**
