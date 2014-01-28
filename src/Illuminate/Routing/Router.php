@@ -76,7 +76,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected $patternFilters = array();
 
 	/**
-	 * The registered regex based filters.
+	 * The registered regular expression based filters.
 	 *
 	 * @var array
 	 */
@@ -1110,14 +1110,14 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
-	 * Register a regex-based filter with the router.
+	 * Register a regular expression based filter with the router.
 	 *
 	 * @param  string     $pattern
 	 * @param  string     $name
 	 * @param  array|null $methods
 	 * @return void
 	 */
-	public function regexWhen($pattern, $name, $methods = null)
+	public function whenRegex($pattern, $name, $methods = null)
 	{
 		if ( ! is_null($methods)) $methods = array_map('strtoupper', (array) $methods);
 
@@ -1240,14 +1240,14 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$results = array();
 
-		$method = $request->getMethod();
+		list($path, $method) = array($request->path(), $request->getMethod());
 
 		foreach ($this->patternFilters as $pattern => $filters)
 		{
 			// To find the patterned middlewares for a request, we just need to check these
 			// registered patterns against the path info for the current request to this
 			// applications, and when it matches we will merge into these middlewares.
-			if (str_is($pattern, $request->path()))
+			if (str_is($pattern, $path))
 			{
 				$merge = $this->patternsByMethod($method, $filters);
 
@@ -1257,7 +1257,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		foreach ($this->regexFilters as $pattern => $filters)
 		{
-			if (preg_match($pattern, $request->path()))
+			// To find the patterned middlewares for a request, we just need to check these
+			// registered patterns against the path info for the current request to this
+			// applications, and when it matches we will merge into these middlewares.
+			if (preg_match($pattern, $path))
 			{
 				$merge = $this->patternsByMethod($method, $filters);
 
