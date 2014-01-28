@@ -189,9 +189,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		{
 			if ($a === $b)
 			{
-		        return 0;
-		    }
-		    return ($a < $b) ? -1 : 1;
+				return 0;
+			}
+			return ($a < $b) ? -1 : 1;
 		});
 
 		$this->assertEquals(range(1, 5), array_values($data->all()));
@@ -254,15 +254,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-    public function testRandom()
-    {
-        $data = new Collection(array(1, 2, 3, 4, 5, 6));
-        $random = $data->random();
-        $this->assertInternalType('integer', $random);
-        $this->assertContains($random, $data->all());
-        $random = $data->random(3);
-        $this->assertCount(3, $random);
-    }
+	public function testRandom()
+	{
+		$data = new Collection(array(1, 2, 3, 4, 5, 6));
+		$random = $data->random();
+		$this->assertInternalType('integer', $random);
+		$this->assertContains($random, $data->all());
+		$random = $data->random(3);
+		$this->assertCount(3, $random);
+	}
 
 
 	public function testTakeLast()
@@ -340,6 +340,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data = new Collection(array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2'), array('rating' => 2, 'name' => '3')));
 		$result = $data->groupBy('rating');
 		$this->assertEquals(array(1 => array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2')), 2 => array(array('rating' => 2, 'name' => '3'))), $result->toArray());
+	}
+
+
+	public function testGettingSumFromCollection()
+	{
+			$c = new Collection(array((object) array('foo' => 50), (object) array('foo' => 50)));
+			$this->assertEquals(100, $c->sum('foo'));
+
+			$c = new Collection(array((object) array('foo' => 50), (object) array('foo' => 50)));
+			$this->assertEquals(100, $c->sum(function($i) { return $i->foo; }));
+	}
+
+	public function testGettingSumFromEmptyCollection()
+	{
+			$c = new Collection();
+			$this->assertEquals(0, $c->sum('foo'));
 	}
 
 }
