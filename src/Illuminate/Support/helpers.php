@@ -71,7 +71,7 @@ if ( ! function_exists('append_config'))
 		}
 
 		return $array;
-
+	}
 }
 
 if ( ! function_exists('array_add'))
