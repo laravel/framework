@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\MigrationPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -22,24 +21,13 @@ class MigratePublishCommand extends Command {
 	protected $description = "Publish a package's migrations to the application";
 
 	/**
-	 * Create a new migration publish command instance.
-	 *
-	 * @param  \Illuminate\Foundation\MigrationPublisher
-	 * @return void
-	 */
-	public function __construct(MigrationPublisher $publisher)
-	{
-		$this->publisher = $publisher;
-	}
-
-	/**
 	 * Execute the console command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		$published = $this->publisher->publish(
+		$published = $this->laravel['migration.publisher']->publish(
 			$this->getSourcePath(), $this->laravel['path'].'/database/migrations'
 		);
 
