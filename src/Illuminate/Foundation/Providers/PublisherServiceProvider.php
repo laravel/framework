@@ -175,7 +175,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.migrate.publish', function($app)
 		{
-			return new MigratePublishCommand($app['migration.publisher']);
+			return new MigratePublishCommand;
 		});
 	}
 
