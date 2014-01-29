@@ -195,6 +195,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWhereEquals()
+	{
+		$builder = $this->getBuilder();
+		$builder->whereEquals(array('name' => 'Taylor', 'homie' => 'Dayle'));
+		$this->assertEquals('select * where "name" = ? and "homie" = ?', $builder->toSql());
+	}
+
+
 	public function testUnions()
 	{
 		$builder = $this->getBuilder();
@@ -473,6 +481,16 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', array(1))->andReturn(array(array('foo' => 'bar')));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')))->andReturnUsing(function($query, $results) { return $results; });
 		$results = $builder->from('users')->find(1);
+		$this->assertEquals(array('foo' => 'bar'), $results);
+	}
+
+
+	public function testFindByReturnsFirstResultByArrayOfConstraints()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "name" = ? and "homie" = ? limit 1', array('Taylor', 'Dayle'))->andReturn(array(array('foo' => 'bar')));
+		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')))->andReturnUsing(function($query, $results) { return $results; });
+		$results = $builder->from('users')->findBy(array('name' => 'Taylor', 'homie' => 'Dayle'));
 		$this->assertEquals(array('foo' => 'bar'), $results);
 	}
 

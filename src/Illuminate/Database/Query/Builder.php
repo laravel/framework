@@ -774,6 +774,21 @@ class Builder {
 	}
 
 	/**
+	 * Add multiple "where equals" clauses using an array.
+	 *
+	 * @param  array  $constraints
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function whereEquals(array $constraints)
+	{
+		foreach ($constraints as $column => $value)
+		{
+			$this->where($column, '=', $value);
+		}
+		return $this;
+	}
+
+	/**
 	 * Handles dynamic "where" clauses to the query.
 	 *
 	 * @param  string  $method
@@ -1149,6 +1164,19 @@ class Builder {
 	public function find($id, $columns = array('*'))
 	{
 		return $this->where('id', '=', $id)->first($columns);
+	}
+
+	/**
+	 * Find a single record using an array of column to value pairs.
+	 *
+	 * @param  array  $constraints
+	 * @param  array  $columns
+	 * @return mixed|static
+	 */
+	public function findBy(array $constraints, $columns = array('*'))
+	{
+		$this->whereEquals($constraints);
+		return $this->first($columns);
 	}
 
 	/**
