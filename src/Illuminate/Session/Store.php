@@ -22,6 +22,13 @@ class Store implements SessionInterface {
 	protected $name;
 
 	/**
+	 * Session store started status.
+	 *
+	 * @var bool
+	 */
+	protected $started = false;
+
+	/**
 	 * The session attributes.
 	 *
 	 * @var array
