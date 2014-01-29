@@ -979,6 +979,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$route = $this->findRoute($request);
 
+        // Inform event subscribers that a route has been found.
+        $this->events->fire('router.routed', array($request, $route));
+
 		// Once we have successfully matched the incoming request to a given route we
 		// can call the before filters on that route. This works similar to global
 		// filters in that if a response is returned we will not call the route.
