@@ -86,7 +86,8 @@
 		{"message": "Nested where queries using Closures with Eloquent will now use Eloquent query builder.", "backport": null},
 		{"message": "Allow passing a string into the 'sortBy' and 'sortByDesc' Collection methods.", "backport": null},
 		{"message": "Added 'sum' method to the base Support collection.", "backport": null},
-		{"message": "Return an empty Collection if the array given to Eloquent::find is empty.", "backport": null}
+		{"message": "Return an empty Collection if the array given to Eloquent::find is empty.", "backport": null},
+		{"message": "Added 'toBase' method to Eloquent collection.", "backport": null}
 	],
 	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
