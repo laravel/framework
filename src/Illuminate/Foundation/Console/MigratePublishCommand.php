@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\MigationPublisher;
+use Illuminate\Foundation\MigrationPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
