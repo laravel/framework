@@ -33,7 +33,7 @@ class MigratePublishCommand extends Command {
 
 		foreach ($published as $migration)
 		{
-			$this->line('<info>Published:</info> '.$migration);
+			$this->line('<info>Published:</info> '.basename($migration));
 		}
 	}
 

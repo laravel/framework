@@ -43,7 +43,7 @@ class MigrationPublisher {
 			$newName = $this->getNewMigrationName($file, $add);
 
 			$this->files->copy(
-				$file, $published = $destination.'/'.$newName
+				$file, $newName = $destination.'/'.$newName
 			);
 
 			$published[] = $newName;
