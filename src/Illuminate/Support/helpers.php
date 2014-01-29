@@ -48,6 +48,32 @@ if ( ! function_exists('app_path'))
 	}
 }
 
+if ( ! function_exists('append_config'))
+{
+	/**
+	 * Assign high numeric IDs to a config item to force appending.
+	 *
+	 * @param  array  $array
+	 * @return array
+	 */
+	function append_config(array $array)
+	{
+		$start = 9999;
+
+		foreach ($array as $key => $value)
+		{
+			if (is_numeric($key))
+			{
+				$start++;
+
+				$array[$start] = array_pull($array, $key);
+			}
+		}
+
+		return $array;
+	}
+}
+
 if ( ! function_exists('array_add'))
 {
 	/**

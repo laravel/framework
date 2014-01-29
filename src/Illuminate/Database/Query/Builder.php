@@ -514,19 +514,28 @@ class Builder {
 		// To handle nested queries we'll actually create a brand new query instance
 		// and pass it off to the Closure that we have. The Closure can simply do
 		// do whatever it wants to a query then we will store it for compiling.
-		$type = 'Nested';
-
 		$query = $this->newQuery();
 
 		$query->from($this->from);
 
 		call_user_func($callback, $query);
 
-		// Once we have let the Closure do its things, we can gather the bindings on
-		// the nested query builder and merge them into these bindings since they
-		// need to get extracted out of the children and assigned to the array.
+		return $this->addNestedWhereQuery($query, $boolean);
+	}
+
+	/**
+	 * Add another query builder as a nested where to the query builder.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder|static $query
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function addNestedWhereQuery($query, $boolean = 'and')
+	{
 		if (count($query->wheres))
 		{
+			$type = 'Nested';
+
 			$this->wheres[] = compact('type', 'query', 'boolean');
 
 			$this->mergeBindings($query);

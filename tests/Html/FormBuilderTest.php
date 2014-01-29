@@ -219,6 +219,17 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 			array('class' => 'class-name', 'id' => 'select-id')
 		);
 		$this->assertEquals($select, '<select class="class-name" id="select-id" name="size"><option value="L">Large</option><option value="S">Small</option></select>');
+
+
+
+		$this->formBuilder->label('select-name-id');
+		$select = $this->formBuilder->select(
+			'select-name-id',
+			array(),
+			null,
+			array('name' => 'select-name')
+		);
+		$this->assertEquals($select, '<select name="select-name" id="select-name-id"></select>');
 	}
 
 
