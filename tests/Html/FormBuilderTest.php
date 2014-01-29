@@ -33,16 +33,18 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$form1 = $this->formBuilder->open(array('method' => 'GET'));
 		$form2 = $this->formBuilder->open(array('method' => 'POST', 'class' => 'form', 'id' => 'id-form'));
-		$form3 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16'));
-		$form4 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16', 'files' => true));
-		$form5 = $this->formBuilder->open(array('method' => 'PUT'));
+		$form3 = $this->formBuilder->open(array('method' => 'POST', 'class' => array('form', 'form-foo'), 'id' => 'id-form'));
+		$form4 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16'));
+		$form5 = $this->formBuilder->open(array('method' => 'GET', 'accept-charset' => 'UTF-16', 'files' => true));
+		$form6 = $this->formBuilder->open(array('method' => 'PUT'));
 
 
 		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-8">', $form1);
 		$this->assertEquals('<form method="POST" action="http://localhost/foo" accept-charset="UTF-8" class="form" id="id-form"><input name="_token" type="hidden" value="">', $form2);
-		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16">', $form3);
-		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16" enctype="multipart/form-data">', $form4);
-		$this->assertEquals('<form method="POST" action="http://localhost/foo" accept-charset="UTF-8"><input name="_method" type="hidden" value="PUT"><input name="_token" type="hidden" value="">', $form5);
+		$this->assertEquals('<form method="POST" action="http://localhost/foo" accept-charset="UTF-8" class="form form-foo" id="id-form"><input name="_token" type="hidden" value="">', $form3);
+		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16">', $form4);
+		$this->assertEquals('<form method="GET" action="http://localhost/foo" accept-charset="UTF-16" enctype="multipart/form-data">', $form5);
+		$this->assertEquals('<form method="POST" action="http://localhost/foo" accept-charset="UTF-8"><input name="_method" type="hidden" value="PUT"><input name="_token" type="hidden" value="">', $form6);
 	}
 
 
