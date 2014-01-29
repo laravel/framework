@@ -653,7 +653,7 @@ class Route {
 	 *
 	 * @return string
 	 */
-	public function prefix($prefix)
+	public function getPrefix()
 	{
 		return $this->uriPrefix;
 	}
