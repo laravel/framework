@@ -5,13 +5,6 @@ use Illuminate\Filesystem\Filesystem;
 class FileViewFinder implements ViewFinderInterface {
 
 	/**
-	 * Path separator for hints in view paths
-	 *
-	 * @var string
-	 */
-	const HINT_PATH_SEPARATOR = '::';
-
-	/**
 	 * The filesystem instance.
 	 *
 	 * @var \Illuminate\Filesystem\Filesystem
@@ -47,6 +40,13 @@ class FileViewFinder implements ViewFinderInterface {
 	protected $extensions = array('blade.php', 'php');
 
 	/**
+	 * Hint path delimiter value.
+	 *
+	 * @var string
+	 */
+	const HINT_PATH_DELIMITER = '::';
+
+	/**
 	 * Create a new file view loader instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -66,17 +66,6 @@ class FileViewFinder implements ViewFinderInterface {
 	}
 
 	/**
-	 * Returns whether or not the view specify a hint information
-	 * 
-	 * @param  string  $name
-	 * @return boolean
-	 */
-	public function hasHintInformation($name)
-	{
-		return strpos($name, static::HINT_PATH_SEPARATOR) > 0;
-	}
-
-	/**
 	 * Get the fully qualified location of the view.
 	 *
 	 * @param  string  $name
@@ -86,10 +75,7 @@ class FileViewFinder implements ViewFinderInterface {
 	{
 		if (isset($this->views[$name])) return $this->views[$name];
 
-		// Removes unnecessary spaces
-		$name = trim($name);
-
-		if ($this->hasHintInformation($name))
+		if ($this->hasHintInformation($name = trim($name)))
 		{
 			return $this->views[$name] = $this->findNamedPathView($name);
 		}
@@ -120,7 +106,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	protected function getNamespaceSegments($name)
 	{
-		$segments = explode(static::HINT_PATH_SEPARATOR, $name);
+		$segments = explode(static::HINT_PATH_DELIMITER, $name);
 
 		if (count($segments) != 2)
 		{
@@ -238,6 +224,17 @@ class FileViewFinder implements ViewFinderInterface {
 		}
 
 		array_unshift($this->extensions, $extension);
+	}
+
+	/**
+	 * Returns whether or not the view specify a hint information
+	 *
+	 * @param  string  $name
+	 * @return boolean
+	 */
+	public function hasHintInformation($name)
+	{
+		return strpos($name, static::HINT_PATH_DELIMITER) > 0;
 	}
 
 	/**
