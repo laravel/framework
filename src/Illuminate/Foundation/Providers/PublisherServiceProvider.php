@@ -4,9 +4,11 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\ViewPublisher;
 use Illuminate\Foundation\AssetPublisher;
 use Illuminate\Foundation\ConfigPublisher;
+use Illuminate\Foundation\MigrationPublisher;
 use Illuminate\Foundation\Console\ViewPublishCommand;
 use Illuminate\Foundation\Console\AssetPublishCommand;
 use Illuminate\Foundation\Console\ConfigPublishCommand;
+use Illuminate\Foundation\Console\MigratePublishCommand;
 
 class PublisherServiceProvider extends ServiceProvider {
 
@@ -30,7 +32,12 @@ class PublisherServiceProvider extends ServiceProvider {
 
 		$this->registerViewPublisher();
 
-		$this->commands('command.asset.publish', 'command.config.publish', 'command.view.publish');
+		$this->registerMigrationPublisher();
+
+		$this->commands(
+			'command.asset.publish', 'command.config.publish',
+			'command.view.publish', 'command.migrate.publish'
+		);
 	}
 
 	/**
@@ -145,6 +152,34 @@ class PublisherServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the migration publisher class and command.
+	 *
+	 * @return void
+	 */
+	protected function registerMigrationPublisher()
+	{
+		$this->registerMigratePublishCommand();
+
+		$this->app->bindShared('migration.publisher', function($app)
+		{
+			return new MigrationPublisher($app['files']);
+		});
+	}
+
+	/**
+	 * Register the migration publisher command.
+	 *
+	 * @return void
+	 */
+	protected function registerMigratePublishCommand()
+	{
+		$this->app->bindShared('command.migrate.publish', function($app)
+		{
+			return new MigratePublishCommand($app['migration.publisher']);
+		});
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
@@ -157,7 +192,9 @@ class PublisherServiceProvider extends ServiceProvider {
 			'config.publisher',
 			'command.config.publish',
 			'view.publisher',
-			'command.view.publish'
+			'command.view.publish',
+			'migration.publisher',
+			'command.migrate.publish',
 		);
 	}
 
