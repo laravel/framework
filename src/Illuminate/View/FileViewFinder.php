@@ -5,6 +5,13 @@ use Illuminate\Filesystem\Filesystem;
 class FileViewFinder implements ViewFinderInterface {
 
 	/**
+	 * Path separator for hints in view paths
+	 *
+	 * @var string
+	 */
+	const HINT_PATH_SEPARATOR = '::';
+
+	/**
 	 * The filesystem instance.
 	 *
 	 * @var \Illuminate\Filesystem\Filesystem
@@ -59,6 +66,17 @@ class FileViewFinder implements ViewFinderInterface {
 	}
 
 	/**
+	 * Returns whether or not the view specify a hint information
+	 * 
+	 * @param  string  $name
+	 * @return boolean
+	 */
+	public function hasHintInformation($name)
+	{
+		return strpos($name, static::HINT_PATH_SEPARATOR) > 0;
+	}
+
+	/**
 	 * Get the fully qualified location of the view.
 	 *
 	 * @param  string  $name
@@ -68,7 +86,10 @@ class FileViewFinder implements ViewFinderInterface {
 	{
 		if (isset($this->views[$name])) return $this->views[$name];
 
-		if (strpos($name, '::') !== false)
+		// Removes unnecessary spaces
+		$name = trim($name);
+
+		if ($this->hasHintInformation($name))
 		{
 			return $this->views[$name] = $this->findNamedPathView($name);
 		}
@@ -99,7 +120,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	protected function getNamespaceSegments($name)
 	{
-		$segments = explode('::', $name);
+		$segments = explode(static::HINT_PATH_SEPARATOR, $name);
 
 		if (count($segments) != 2)
 		{
