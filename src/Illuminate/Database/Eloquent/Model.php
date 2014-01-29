@@ -2380,8 +2380,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function fromDateTime($value)
 	{
-		$format = $this->getDateFormat();
-
 		// If the value is already a DateTime instance, we will just skip the rest of
 		// these checks since they will be a waste of time, and hinder performance
 		// when checking the field. We will just return the DateTime right away.
@@ -2411,10 +2409,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// can return back the finally formatted DateTime instances to the devs.
 		elseif ( ! $value instanceof DateTime)
 		{
-			$value = Carbon::createFromFormat($format, $value);
+			$formats = $this->getDateFormats();
+
+			foreach ($formats as $format)
+			{
+				try
+				{
+					$value = Carbon::createFromFormat($format, $value);
+					break;
+				}
+				catch (\InvalidArgumentException $e)
+				{
+					// do nothing
+				}
+			}
+
+			// If the value is not a DateTime object at this time, throw an exception.
+			if ( ! $value instanceof DateTime)
+			{
+				throw new \InvalidArgumentException("No appropriate date/time format for $value found");
+			}
 		}
 
-		return $value->format($format);
+		return $value->format($this->getDateFormat());
 	}
 
 	/**
@@ -2446,9 +2463,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// that is returned back out to the developers after we convert it here.
 		elseif ( ! $value instanceof DateTime)
 		{
-			$format = $this->getDateFormat();
+			$formats = $this->getDateFormats();
 
-			return Carbon::createFromFormat($format, $value);
+			foreach ($formats as $format)
+			{
+				try
+				{
+					return Carbon::createFromFormat($format, $value);
+				}
+				catch (\InvalidArgumentException $e)
+				{
+					// do nothing
+				}
+			}
+
+			// If nothing has been returned at this time, throw an exception.
+			throw new \InvalidArgumentException("No appropriate date/time format for $value found");
 		}
 
 		return Carbon::instance($value);
@@ -2462,6 +2492,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected function getDateFormat()
 	{
 		return $this->getConnection()->getQueryGrammar()->getDateFormat();
+	}
+
+	/**
+	 * Get an array of accepted input date formats.
+	 *
+	 * @return array
+	 */
+	public function getDateFormats()
+	{
+		return array($this->getDateFormat());
 	}
 
 	/**
