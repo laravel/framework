@@ -1,6 +1,6 @@
 <?php namespace Illuminate\View;
 
-use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\CompilerEngine;
@@ -160,7 +160,7 @@ class ViewServiceProvider extends ServiceProvider {
 			// they don't have to continually run checks for the presence of errors.
 			else
 			{
-				$app['view']->share('errors', new MessageBag);
+				$app['view']->share('errors', new ViewErrorBag);
 			}
 		});
 	}
