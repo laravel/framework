@@ -140,11 +140,11 @@ class PasswordBroker {
 		// so that it may be displayed for an user to click for password reset.
 		$view = $this->reminderView;
 
-		return $this->mailer->send($view, compact('token', 'user'), function($m) use ($user, $callback)
+		return $this->mailer->send($view, compact('token', 'user'), function($m) use ($user, $token, $callback)
 		{
 			$m->to($user->getReminderEmail());
 
-			if ( ! is_null($callback)) call_user_func($callback, $m, $user);
+			if ( ! is_null($callback)) call_user_func($callback, $m, $user, $token);
 		});
 	}
 
