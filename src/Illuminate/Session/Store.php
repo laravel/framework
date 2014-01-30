@@ -57,6 +57,13 @@ class Store implements SessionInterface {
 	protected $handler;
 
 	/**
+	 * Session store started status.
+	 *
+	 * @var bool
+	 */
+	protected $started = false;
+
+	/**
 	 * Create a new session instance.
 	 *
 	 * @param  string  $name

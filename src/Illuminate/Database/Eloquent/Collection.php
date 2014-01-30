@@ -212,4 +212,14 @@ class Collection extends BaseCollection {
 		return $dictionary;
 	}
 
+	/**
+	 * Get a base Support collection instance from this collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function toBase()
+	{
+		return new BaseCollection($this->items);
+	}
+
 }
