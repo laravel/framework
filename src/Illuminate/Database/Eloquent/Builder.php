@@ -95,7 +95,7 @@ class Builder {
 	{
 		if ( ! is_null($model = $this->find($id, $columns))) return $model;
 
-		throw new ModelNotFoundException;
+		throw with(new ModelNotFoundException)->setModel(get_class($this->model));
 	}
 
 	/**
@@ -121,7 +121,7 @@ class Builder {
 	{
 		if ( ! is_null($model = $this->first($columns))) return $model;
 
-		throw new ModelNotFoundException;
+		throw with(new ModelNotFoundException)->setModel(get_class($this->model));
 	}
 
 	/**
