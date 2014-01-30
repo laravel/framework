@@ -223,13 +223,35 @@ class Validator implements MessageProviderInterface {
 		// the other error messages, returning true if we don't have messages.
 		foreach ($this->rules as $attribute => $rules)
 		{
-			foreach ($rules as $rule)
-			{
-				$this->validate($attribute, $rule);
-			}
+			$this->passAttribute($attribute, $rules);
 		}
 
 		return count($this->messages->all()) === 0;
+	}
+	
+	/**
+	 * Validate a single attribute against all the rules
+	 * 
+	 * @param string $attribute
+	 * @param array  $rules
+	 * @return void
+	 */
+	protected function passAttribute($attribute, $rules)
+	{
+		foreach ($rules as $rule => $closure)
+		{
+			if ($closure instanceof \Closure) 
+			{
+				$this->addExtension($rule, $closure);			
+			} 
+			else
+			{
+				// if the value of the array is not a closure
+				// this means the value of the array is the rule name.
+				$rule = $closure;
+			}
+			$this->validate($attribute, $rule);
+		}
 	}
 
 	/**
