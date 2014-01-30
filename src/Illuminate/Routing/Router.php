@@ -979,6 +979,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$route = $this->findRoute($request);
 
+        $this->events->fire('router.matched', array($route, $request));
+
 		// Once we have successfully matched the incoming request to a given route we
 		// can call the before filters on that route. This works similar to global
 		// filters in that if a response is returned we will not call the route.
@@ -1042,6 +1044,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function performBinding($key, $value, $route)
 	{
 		return call_user_func($this->binders[$key], $value, $route);
+	}
+
+	/**
+	 * Register a route matched event listener.
+	 *
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function matched($callback)
+	{
+		$this->events->listen('router.matched', $callback);
 	}
 
 	/**

@@ -19,6 +19,13 @@ class Manager {
 	protected static $instance;
 
 	/**
+	 * The database manager instance.
+	 *
+	 * @var \Illuminate\Database\DatabaseManager
+	 */
+	protected $manager;
+
+	/**
 	 * Create a new database capsule manager.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
@@ -173,6 +180,16 @@ class Manager {
 	public function setAsGlobal()
 	{
 		static::$instance = $this;
+	}
+
+	/**
+	 * Get the database manager instance.
+	 *
+	 * @return \Illuminate\Database\Manager
+	 */
+	public function getDatabaseManager()
+	{
+		return $this->manager;
 	}
 
 	/**
