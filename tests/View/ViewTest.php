@@ -157,12 +157,12 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testViewGatherDataWithRenderable()
 	{
 		$view = $this->getView();
-		$view->getEnvironment()->shouldReceive('incrementRender')->once()->ordered();
-		$view->getEnvironment()->shouldReceive('callComposer')->once()->ordered()->with($view);
-		$view->getEnvironment()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
+		$view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
+		$view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
+		$view->getFactory()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
 		$view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
-		$view->getEnvironment()->shouldReceive('decrementRender')->once()->ordered();
-		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
+		$view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
+		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
 		$view->renderable = m::mock('Illuminate\Support\Contracts\RenderableInterface');
 		$view->renderable->shouldReceive('render')->once()->andReturn('text');
@@ -173,14 +173,14 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testViewRenderSections()
 	{
 		$view = $this->getView();
-		$view->getEnvironment()->shouldReceive('incrementRender')->once()->ordered();
-		$view->getEnvironment()->shouldReceive('callComposer')->once()->ordered()->with($view);
-		$view->getEnvironment()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
+		$view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
+		$view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
+		$view->getFactory()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
 		$view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
-		$view->getEnvironment()->shouldReceive('decrementRender')->once()->ordered();
-		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
+		$view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
+		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-		$view->getEnvironment()->shouldReceive('getSections')->once()->andReturn(array('foo','bar'));
+		$view->getFactory()->shouldReceive('getSections')->once()->andReturn(array('foo','bar'));
 		$sections = $view->renderSections();
 		$this->assertEquals($sections[0], 'foo');
 		$this->assertEquals($sections[1], 'bar');
