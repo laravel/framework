@@ -69,7 +69,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
-	 * @expectedExceptionMessage EloquentModelFindNotFoundStub model not found
 	 */
 	public function testFindOrFailMethodThrowsModelNotFoundException()
 	{
