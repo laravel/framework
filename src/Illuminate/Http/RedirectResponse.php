@@ -112,6 +112,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * Flash a container of errors to the session.
 	 *
 	 * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
+	 * @param  string  $key
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function withErrors($provider, $key = 'default')
