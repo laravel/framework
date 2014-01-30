@@ -473,7 +473,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Validate that an attribute exists when another attribute exists.
+	 * Validate that an attribute exists when any other attribute exists.
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
@@ -482,17 +482,30 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateRequiredWith($attribute, $value, $parameters)
 	{
-		if ($this->getPresentCount($parameters) != count($parameters))
+		if ( ! $this->allFailingRequired($parameters))
 		{
-			return true;
+			return $this->validateRequired($attribute, $value);
 		}
 
-		if ($this->anyFailingRequired($parameters))
+		return true;
+	}
+
+	/**
+	 * Validate that an attribute exists when all other attributes exists.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredWithAll($attribute, $value, $parameters)
+	{
+		if ( ! $this->anyFailingRequired($parameters))
 		{
-			return true;
+			return $this->validateRequired($attribute, $value);
 		}
 
-		return $this->validateRequired($attribute, $value);
+		return true;
 	}
 
 	/**
