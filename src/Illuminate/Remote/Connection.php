@@ -106,7 +106,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @param  string|array  $commands
 	 * @param  \Closure  $callback
-	 * @return void
+	 * @return string
 	 */
 	public function run($commands, Closure $callback = null)
 	{
@@ -122,12 +122,16 @@ class Connection implements ConnectionInterface {
 		// After running the commands against the server, we will continue to ask for
 		// the next line of output that is available, and write it them out using
 		// our callback. Once we hit the end of output, we'll bail out of here.
+		$output = null;
 		while (true)
 		{
 			if (is_null($line = $gateway->nextLine())) break;
 
+			$output .= $line;
 			call_user_func($callback, $line, $this);
 		}
+
+		return trim($output);
 	}
 
 	/**
