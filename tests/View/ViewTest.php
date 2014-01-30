@@ -105,19 +105,20 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $view->foo);
 		$this->assertEquals(array('qux', 'corge'), $view->baz);
 	}
-	
-	
+
+
 	public function testViewGettersSetters()
 	{
 		$view = $this->getView();
 		$this->assertEquals($view->getName(), 'view');
 		$this->assertEquals($view->getPath(), 'path');
-		$this->assertEquals($view->getData()['foo'], 'bar');
+		$data = $view->getData();
+		$this->assertEquals($data['foo'], 'bar');
 		$view->setPath('newPath');
 		$this->assertEquals($view->getPath(), 'newPath');
 	}
-	
-	
+
+
 	public function testViewArrayAccess()
 	{
 		$view = $this->getView();
@@ -129,8 +130,8 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->offsetUnset('foo');
 		$this->assertFalse($view->offsetExists('foo'));
 	}
-	
-	
+
+
 	public function testViewMagicMethods()
 	{
 		$view = $this->getView();
@@ -151,8 +152,8 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view = $this->getView();
 		$view->badMethodCall();
 	}
-	
-	
+
+
 	public function testViewGatherDataWithRenderable()
 	{
 		$view = $this->getView();
@@ -162,13 +163,13 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
 		$view->getEnvironment()->shouldReceive('decrementRender')->once()->ordered();
 		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
-		
+
 		$view->renderable = m::mock('Illuminate\Support\Contracts\RenderableInterface');
 		$view->renderable->shouldReceive('render')->once()->andReturn('text');
 		$view->render();
 	}
-	
-	
+
+
 	public function testViewRenderSections()
 	{
 		$view = $this->getView();
@@ -178,14 +179,14 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
 		$view->getEnvironment()->shouldReceive('decrementRender')->once()->ordered();
 		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
-		
+
 		$view->getEnvironment()->shouldReceive('getSections')->once()->andReturn(array('foo','bar'));
 		$sections = $view->renderSections();
 		$this->assertEquals($sections[0], 'foo');
 		$this->assertEquals($sections[1], 'bar');
 	}
-	
-	
+
+
 	public function testWithErrors()
 	{
 		$view = $this->getView();
