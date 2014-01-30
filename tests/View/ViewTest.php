@@ -190,11 +190,13 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testWithErrors()
 	{
 		$view = $this->getView();
-		$this->assertTrue($view->withErrors(array('foo'=>'bar','qu'=>'ux')) === $view);
+		$errors = array('foo'=>'bar','qu'=>'ux');
+		$this->assertTrue($view->withErrors($errors) === $view);
 		$this->assertTrue($view->errors instanceof \Illuminate\Support\MessageBag);
 		$this->assertEquals(reset($view->errors->get('foo')), 'bar');
 		$this->assertEquals(reset($view->errors->get('qu')), 'ux');
-		$this->assertTrue($view->withErrors(new \Illuminate\Support\MessageBag(array('foo'=>'baz'))) === $view);
+		$data = array('foo'=>'baz');
+		$this->assertTrue($view->withErrors(new \Illuminate\Support\MessageBag($data)) === $view);
 		$this->assertEquals(reset($view->errors->get('foo')), 'baz');
 	}
 
