@@ -4,6 +4,7 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
+use BadMethodCallException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -1178,7 +1179,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  int     $amount
 	 * @return int
 	 */
-	protected function increment($column, $amount = 1)
+	public function increment($column, $amount = 1)
 	{
 		return $this->incrementOrDecrement($column, $amount, 'increment');
 	}
@@ -1190,7 +1191,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  int     $amount
 	 * @return int
 	 */
-	protected function decrement($column, $amount = 1)
+	public function decrement($column, $amount = 1)
 	{
 		return $this->incrementOrDecrement($column, $amount, 'decrement');
 	}
@@ -2820,12 +2821,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __call($method, $parameters)
 	{
-		if (in_array($method, array('increment', 'decrement')))
-		{
-			return call_user_func_array(array($this, $method), $parameters);
-		}
-
 		$query = $this->newQuery();
+
+		if ( ! is_callable(array($query, $method)))
+		{
+			$class = get_class($this);
+			throw new BadMethodCallException("Method {$class}::{$method} does not exist on this class or its query builder.");
+		}
 
 		return call_user_func_array(array($query, $method), $parameters);
 	}
