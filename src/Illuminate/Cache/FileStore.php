@@ -66,7 +66,7 @@ class FileStore implements StoreInterface {
 			return $this->forget($key);
 		}
 
-		return unserialize(substr($contents, 10));
+		return @unserialize(substr($contents, 10));
 	}
 
 	/**
