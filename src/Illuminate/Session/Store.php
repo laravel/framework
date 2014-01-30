@@ -200,11 +200,12 @@ class Store implements SessionInterface {
 	/**
 	 * Generate a new session identifier.
 	 *
+	 * @param  bool  $destroy
 	 * @return bool
 	 */
-	public function regenerate()
+	public function regenerate($destroy = false)
 	{
-		return $this->migrate();
+		return $this->migrate($destroy);
 	}
 
 	/**

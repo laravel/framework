@@ -75,6 +75,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
 		$this->assertEquals('contents', $view->render());
+		$this->assertEquals('contents', (string)$view);
 	}
 
 
@@ -103,6 +104,103 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('bar', $view->foo);
 		$this->assertEquals(array('qux', 'corge'), $view->baz);
+	}
+
+
+	public function testViewGettersSetters()
+	{
+		$view = $this->getView();
+		$this->assertEquals($view->getName(), 'view');
+		$this->assertEquals($view->getPath(), 'path');
+		$data = $view->getData();
+		$this->assertEquals($data['foo'], 'bar');
+		$view->setPath('newPath');
+		$this->assertEquals($view->getPath(), 'newPath');
+	}
+
+
+	public function testViewArrayAccess()
+	{
+		$view = $this->getView();
+		$this->assertTrue($view instanceof ArrayAccess);
+		$this->assertTrue($view->offsetExists('foo'));
+		$this->assertEquals($view->offsetGet('foo'), 'bar');
+		$view->offsetSet('foo','baz');
+		$this->assertEquals($view->offsetGet('foo'), 'baz');
+		$view->offsetUnset('foo');
+		$this->assertFalse($view->offsetExists('foo'));
+	}
+
+
+	public function testViewMagicMethods()
+	{
+		$view = $this->getView();
+		$this->assertTrue(isset($view->foo));
+		$this->assertEquals($view->foo, 'bar');
+		$view->foo = 'baz';
+		$this->assertEquals($view->foo, 'baz');
+		$this->assertEquals($view['foo'], $view->foo);
+		unset($view->foo);
+		$this->assertFalse(isset($view->foo));
+		$this->assertFalse($view->offsetExists('foo'));
+	}
+
+
+	public function testViewBadMethod()
+	{
+		$this->setExpectedException('BadMethodCallException');
+		$view = $this->getView();
+		$view->badMethodCall();
+	}
+
+
+	public function testViewGatherDataWithRenderable()
+	{
+		$view = $this->getView();
+		$view->getEnvironment()->shouldReceive('incrementRender')->once()->ordered();
+		$view->getEnvironment()->shouldReceive('callComposer')->once()->ordered()->with($view);
+		$view->getEnvironment()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
+		$view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
+		$view->getEnvironment()->shouldReceive('decrementRender')->once()->ordered();
+		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
+
+		$view->renderable = m::mock('Illuminate\Support\Contracts\RenderableInterface');
+		$view->renderable->shouldReceive('render')->once()->andReturn('text');
+		$view->render();
+	}
+
+
+	public function testViewRenderSections()
+	{
+		$view = $this->getView();
+		$view->getEnvironment()->shouldReceive('incrementRender')->once()->ordered();
+		$view->getEnvironment()->shouldReceive('callComposer')->once()->ordered()->with($view);
+		$view->getEnvironment()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
+		$view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
+		$view->getEnvironment()->shouldReceive('decrementRender')->once()->ordered();
+		$view->getEnvironment()->shouldReceive('flushSectionsIfDoneRendering')->once();
+
+		$view->getEnvironment()->shouldReceive('getSections')->once()->andReturn(array('foo','bar'));
+		$sections = $view->renderSections();
+		$this->assertEquals($sections[0], 'foo');
+		$this->assertEquals($sections[1], 'bar');
+	}
+
+
+	public function testWithErrors()
+	{
+		$view = $this->getView();
+		$errors = array('foo'=>'bar','qu'=>'ux');
+		$this->assertTrue($view->withErrors($errors) === $view);
+		$this->assertTrue($view->errors instanceof \Illuminate\Support\MessageBag);
+		$foo = $view->errors->get('foo');
+		$this->assertEquals($foo[0], 'bar');
+		$qu = $view->errors->get('qu');
+		$this->assertEquals($qu[0], 'ux');
+		$data = array('foo'=>'baz');
+		$this->assertTrue($view->withErrors(new \Illuminate\Support\MessageBag($data)) === $view);
+		$foo = $view->errors->get('foo');
+		$this->assertEquals($foo[0], 'baz');
 	}
 
 
