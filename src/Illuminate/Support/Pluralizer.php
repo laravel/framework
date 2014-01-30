@@ -105,6 +105,7 @@ class Pluralizer {
 		'moose',
 		'chassis',
 		'traffic',
+		'coreopsis',
 	);
 
 	/**
