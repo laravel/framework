@@ -119,8 +119,6 @@ class SqlServerGrammar extends Grammar {
 		// Next we need to calculate the constraints that should be placed on the query
 		// to get the right offset and limit from our query but if there is no limit
 		// set we will just handle the offset only since that is all that matters.
-		$start = $query->offset + 1;
-
 		$constraint = $this->compileRowConstraint($query);
 
 		$sql = $this->concatenate($components);

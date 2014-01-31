@@ -20,10 +20,10 @@ class TagSet {
 	 * Create a new TagSet instance.
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
-	 * @param  string  $names
+	 * @param  array  $names
 	 * @return void
 	 */
-	public function __construct(StoreInterface $store, $names)
+	public function __construct(StoreInterface $store, array $names = array())
 	{
 		$this->store = $store;
 		$this->names = $names;

@@ -370,7 +370,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function unprepared($query)
 	{
-		return $this->run($query, array(), function($me, $query, $bindings)
+		return $this->run($query, array(), function($me, $query)
 		{
 			if ($me->pretending()) return true;
 
