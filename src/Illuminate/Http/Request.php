@@ -113,12 +113,12 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Determine if the current request URI matches a pattern.
+	 * Determine if the current request URI matches a pattern, accepting 
+	 * patterns to test as function arguments.
 	 *
-	 * @param  string  $pattern
 	 * @return bool
 	 */
-	public function is($pattern)
+	public function is(/* [$pattern1, [pattern2, [..] ] ] */)
 	{
 		foreach (func_get_args() as $pattern)
 		{
