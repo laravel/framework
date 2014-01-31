@@ -18,6 +18,11 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response = new Illuminate\Http\Response(new JsonableStub);
 		$this->assertEquals('foo', $response->getContent());
 		$this->assertEquals('application/json', $response->headers->get('Content-Type'));
+		
+		$response = new Illuminate\Http\Response();
+		$response->setContent(array('foo'=>'bar'));
+		$this->assertEquals('{"foo":"bar"}', $response->getContent());
+		$this->assertEquals('application/json', $response->headers->get('Content-Type'));
 	}
 
 
@@ -27,6 +32,40 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$mock->shouldReceive('render')->once()->andReturn('foo');
 		$response = new Illuminate\Http\Response($mock);
 		$this->assertEquals('foo', $response->getContent());		
+	}
+	
+	
+	public function testHeader()
+	{
+		$response = new Illuminate\Http\Response();
+		$this->assertNull($response->headers->get('foo'));
+		$response->header('foo', 'bar');
+		$this->assertEquals('bar', $response->headers->get('foo'));
+		$response->header('foo', 'baz', false);
+		$this->assertEquals('bar', $response->headers->get('foo'));
+		$response->header('foo', 'baz');
+		$this->assertEquals('baz', $response->headers->get('foo'));
+	}
+	
+	
+	public function testWithCookie()
+	{
+		$response = new Illuminate\Http\Response();
+		$this->assertEquals(0, count($response->headers->getCookies()));
+		$this->assertEquals($response, $response->withCookie(new \Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
+		$cookies = $response->headers->getCookies();
+		$this->assertEquals(1, count($cookies));
+		$this->assertEquals('foo', $cookies[0]->getName());
+		$this->assertEquals('bar', $cookies[0]->getValue());
+	}
+	
+	
+	public function testGetOriginalContent()
+	{
+		$arr = array('foo'=>'bar');
+		$response = new Illuminate\Http\Response();
+		$response->setContent($arr);
+		$this->assertTrue($arr === $response->getOriginalContent());
 	}
 
 
