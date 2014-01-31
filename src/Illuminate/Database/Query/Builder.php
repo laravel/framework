@@ -1584,12 +1584,15 @@ class Builder {
 	{
 		$this->aggregate = compact('function', 'columns');
 
+		$previousColumns = $this->columns;
+
 		$results = $this->get($columns);
 
 		// Once we have executed the query, we will reset the aggregate property so
 		// that more select queries can be executed against the database without
 		// the aggregate value getting in the way when the grammar builds it.
-		$this->columns = null; $this->aggregate = null;
+		$this->aggregate = null;
+		$this->columns = $previousColumns;
 
 		if (isset($results[0]))
 		{
