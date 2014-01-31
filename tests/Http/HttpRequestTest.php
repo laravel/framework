@@ -312,6 +312,16 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFlushMethodCallsSession()
+	{
+		$request = Request::create('/', 'GET');
+		$session = m::mock('Illuminate\Session\Store');
+		$session->shouldReceive('flashInput')->once();
+		$request->setSession($session);
+		$request->flush();
+	}
+
+
 	public function testFormatReturnsAcceptableFormat()
 	{
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
