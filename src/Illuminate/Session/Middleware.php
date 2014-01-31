@@ -76,7 +76,7 @@ class Middleware implements HttpKernelInterface {
 		// add the session identifier cookie to the application response headers now.
 		if ($this->sessionConfigured())
 		{
-			$this->closeSession($session);
+			$this->closeSession($session, $request);
 
 			$this->addCookieToResponse($response, $session);
 		}
@@ -121,11 +121,26 @@ class Middleware implements HttpKernelInterface {
 	 * @param  \Illuminate\Session\SessionInterface  $session
 	 * @return void
 	 */
-	protected function closeSession(SessionInterface $session)
+	protected function closeSession(SessionInterface $session, Request $request)
 	{
+		$session->setPreviousUrl($this->getUrl($request));
+
 		$session->save();
 
 		$this->collectGarbage($session);
+	}
+
+	/**
+	 * Get the full URL for the request.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return string
+	 */
+	protected function getUrl(Request $request)
+	{
+		$url = rtrim(preg_replace('/\?.*/', '', $request->getUri()), '/');
+
+		return $request->getQueryString() ? $url.'?'.$request->getQueryString() : $url;
 	}
 
 	/**
