@@ -50,7 +50,14 @@ class Redirector {
 	 */
 	public function back($status = 302, $headers = array())
 	{
-		$back = $this->generator->getRequest()->headers->get('referer');
+		if ($this->session->hasPreviousUrl())
+		{
+			$back = $this->session->getPreviousUrl();
+		}
+		else
+		{
+			$back = $this->generator->getRequest()->headers->get('referer');
+		}
 
 		return $this->createRedirect($back, $status, $headers);
 	}

@@ -473,6 +473,37 @@ class Store implements SessionInterface {
 	}
 
 	/**
+	 * Determine if the session contains the previous URL.
+	 *
+	 * @return bool
+	 */
+	public function hasPreviousUrl()
+	{
+		return $this->has('_previous_url');
+	}
+
+	/**
+	 * Get the previous URL from the session.
+	 *
+	 * @return string|null
+	 */
+	public function getPreviousUrl()
+	{
+		return $this->get('_previous_url');
+	}
+
+	/**
+	 * Set the previous URL in the session.
+	 *
+	 * @param  string  $url
+	 * @return void
+	 */
+	public function setPreviousUrl($url)
+	{
+		$this->set('_previous_url', $url);
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function isStarted()
