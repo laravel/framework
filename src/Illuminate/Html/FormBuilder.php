@@ -246,7 +246,7 @@ class FormBuilder {
 
 		$options = array_merge($options, $merge);
 
-		return '<input'.$this->html->attributes($options).'>';
+		return '<input'.$this->html->attributes($options).' />';
 	}
 
 	/**
