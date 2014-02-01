@@ -82,7 +82,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$form1 = $this->formBuilder->password('password');
 
-		$this->assertEquals('<input name="password" type="password" value="">', $form1);
+		$this->assertEquals('<input name="password" type="password" value="" />', $form1);
 	}
 
 	public function testFilesNotFilled()
