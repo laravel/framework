@@ -464,6 +464,33 @@ if ( ! function_exists('array_where'))
 	}
 }
 
+if ( ! function_exists('array_enkey'))
+{
+    /**
+     * Return a keyed array using a specific value.
+     *
+     * @param  array  $array
+     * @param  string $key
+     * @param  bool   $preserve
+     *
+     * @return array
+     */
+    function array_enkey($array, $key, $preserve = true)
+    {
+        $keys = array_fetch($array, $key);
+
+        if ( ! $preserve)
+        {
+            foreach ($array as &$item)
+            {
+                array_forget($item, $key);
+            }
+        }
+
+        return array_combine($keys, $array);
+    }
+}
+
 if ( ! function_exists('asset'))
 {
 	/**
