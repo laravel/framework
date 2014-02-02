@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Http\Request
  */
-class Input extends Facade {
+final class Input extends Facade {
 
 	/**
 	 * Get an item from the input data.

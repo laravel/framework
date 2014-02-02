@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Routing\Redirector
  */
-class Redirect extends Facade {
+final class Redirect extends Facade {
 
 	/**
 	 * Get the registered name of the component.

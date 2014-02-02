@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Database\Schema\Builder
  */
-class Schema extends Facade {
+final class Schema extends Facade {
 
 	/**
 	 * Get a schema builder instance for a connection.

@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\View\Compilers\BladeCompiler
  */
-class Blade extends Facade {
+final class Blade extends Facade {
 
 	/**
 	 * Get the registered name of the component.

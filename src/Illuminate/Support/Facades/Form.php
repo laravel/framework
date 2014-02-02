@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Html\FormBuilder
  */
-class Form extends Facade {
+final class Form extends Facade {
 
 	/**
 	 * Get the registered name of the component.
