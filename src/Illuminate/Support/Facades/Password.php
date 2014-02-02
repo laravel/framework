@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Auth\Reminders\PasswordBroker
  */
-class Password extends Facade {
+final class Password extends Facade {
 
 	/**
 	 * Constant representing a successfully sent reminder.

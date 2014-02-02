@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Routing\Router
  */
-class Route extends Facade {
+final class Route extends Facade {
 
 	/**
 	 * Determine if the current route matches a given name.
