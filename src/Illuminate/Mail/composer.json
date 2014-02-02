@@ -18,7 +18,7 @@
     "require-dev": {
         "illuminate/queue": "4.2.*",
         "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "3.8.*"
     },
     "autoload": {
         "psr-0": {

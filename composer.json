@@ -69,7 +69,7 @@
         "iron-io/iron_mq": "1.4.*",
         "pda/pheanstalk": "2.1.*",
         "mockery/mockery": "0.8.0",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "3.8.*"
     },
     "autoload": {
         "classmap": [
