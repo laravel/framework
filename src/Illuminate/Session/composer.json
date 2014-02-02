@@ -20,7 +20,7 @@
     "require-dev": {
         "illuminate/console": "4.2.*",
         "mockery/mockery": "0.8.0",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "3.8.*"
     },
     "autoload": {
         "psr-0": {

@@ -19,7 +19,7 @@
         "illuminate/events": "4.2.*",
         "aws/aws-sdk-php": "2.5.*",
         "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "3.8.*"
     },
     "autoload": {
         "psr-0": {
