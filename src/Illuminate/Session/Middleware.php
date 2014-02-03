@@ -76,7 +76,7 @@ class Middleware implements HttpKernelInterface {
 		// add the session identifier cookie to the application response headers now.
 		if ($this->sessionConfigured())
 		{
-			$this->closeSession($session, $request);
+			$this->closeSession($session);
 
 			$this->addCookieToResponse($response, $session);
 		}
@@ -121,10 +121,8 @@ class Middleware implements HttpKernelInterface {
 	 * @param  \Illuminate\Session\SessionInterface  $session
 	 * @return void
 	 */
-	protected function closeSession(SessionInterface $session, Request $request)
+	protected function closeSession(SessionInterface $session)
 	{
-		$session->setPreviousUrl($this->getUrl($request));
-
 		$session->save();
 
 		$this->collectGarbage($session);
