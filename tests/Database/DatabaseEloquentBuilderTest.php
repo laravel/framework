@@ -351,6 +351,29 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRealNestedWhereWithScopes()
+	{
+		$model = new EloquentBuilderTestNestedStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->where('foo', '=', 'bar')->where(function($query) { $query->where('baz', '>', 9000); });
+		$this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
+		$this->assertEquals(array('bar', 9000), $query->getBindings());
+	}
+
+
+	protected function mockConnectionForModel($model, $database)
+	{
+		$grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
+		$processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
+		$grammar = new $grammarClass;
+		$processor = new $processorClass;
+		$connection = m::mock('Illuminate\Database\ConnectionInterface', array('getQueryGrammar' => $grammar, 'getPostProcessor' => $processor));
+		$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface', array('connection' => $connection));
+		$class = get_class($model);
+		$class::setConnectionResolver($resolver);
+	}
+
+
 	protected function getBuilder()
 	{
 		return new Builder(m::mock('Illuminate\Database\Query\Builder'));
@@ -388,4 +411,8 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$query->where('foo', 'bar');
 	}
+}
+class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'table';
+	protected $softDelete = true;
 }
