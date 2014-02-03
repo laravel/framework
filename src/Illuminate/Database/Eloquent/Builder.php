@@ -593,7 +593,9 @@ class Builder {
 	{
 		if ($column instanceof Closure)
 		{
-			$query = $this->model->newQuery();
+			// Get a new query builder instance but avoid including any soft
+			// delete constraints that could mess up the nested query.
+			$query = $this->model->newQuery(false);
 
 			call_user_func($column, $query);
 
