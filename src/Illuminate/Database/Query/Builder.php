@@ -958,7 +958,7 @@ class Builder {
 			// Insert bindings into query
 			$sql = str_replace(array('%', '?'), array('%%', '%s'), $sql);
 			$sql = vsprintf($sql, $bindings);
-        }
+		}
 
 		return $sql;
 	}
