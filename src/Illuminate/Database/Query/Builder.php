@@ -949,7 +949,7 @@ class Builder {
 			{
 				if ($binding instanceof \DateTime)
 				{
-					$bindings = $binding->format('Y-m-d H:i:s');
+					$binding = $binding->format('Y-m-d H:i:s');
 				}
 
 				$bindings[$i] = $pdo->quote($binding) ?: sprintf("'%s'", str_replace("'", "\'", $binding));
