@@ -441,17 +441,30 @@ class Container implements ArrayAccess {
 	 */
 	protected function getConcrete($abstract)
 	{
+
 		// If we don't have a registered resolver or concrete for the type, we'll just
 		// assume each type is a concrete name and will attempt to resolve it as is
 		// since the container should be able to resolve concretes automatically.
 		if ( ! isset($this->bindings[$abstract]))
 		{
+
+			//Adds support to bind with or without leading slash
+			//Often happens that dependency resolutions return leading backslash less class names
+			//When binding, we often bind with the leading slash, so this 
+			if(is_string($abstract) && strpos($abstract, '\\') !== false && $abstract[0] != '\\' && isset($this->bindings['\\'.$abstract]))
+			{
+				$abstract = '\\'.$abstract;
+			}
+
+			//Return the abstract
 			return $abstract;
+
 		}
 		else
 		{
 			return $this->bindings[$abstract]['concrete'];
 		}
+		
 	}
 
 	/**
