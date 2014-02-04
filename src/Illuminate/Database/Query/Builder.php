@@ -933,11 +933,34 @@ class Builder {
 	/**
 	 * Get the SQL representation of the query.
 	 *
+     * @param  bool  $withBindings
 	 * @return string
 	 */
-	public function toSql()
+	public function toSql($withBindings = false)
 	{
-		return $this->grammar->compileSelect($this);
+		$sql = $this->grammar->compileSelect($this);
+
+		if ($withBindings)
+		{
+			$bindings = $this->bindings;
+			foreach ($bindings as $i => $binding)
+			{
+				if ($binding instanceof \DateTime)
+				{
+					$bindings[$i] = $binding->format('\'Y-m-d H:i:s\'');
+				}
+				else if (is_string($binding))
+				{
+					$bindings[$i] = sprintf("'%s'", str_replace("'", "\'", $binding));
+				}
+			}
+
+			// Insert bindings into query
+			$sql = str_replace(array('%', '?'), array('%%', '%s'), $sql);
+			$sql = vsprintf($sql, $bindings);
+        }
+
+		return $sql;
 	}
 
 	/**
