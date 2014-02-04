@@ -933,11 +933,30 @@ class Builder {
 	/**
 	 * Get the SQL representation of the query.
 	 *
+     * @param  bool  $withBindings
 	 * @return string
 	 */
-	public function toSql()
+	public function toSql($withBindings = false)
 	{
-		return $this->grammar->compileSelect($this);
+		$sql = $this->grammar->compileSelect($this);
+
+		if ($withBindings)
+		{
+			$conn = $this->connection;
+			$bindings = $conn->prepareBindings($this->bindings);
+			$pdo = $conn->getPdo();
+
+			foreach ($bindings as $i => $binding)
+			{
+				$bindings[$i] = $pdo->quote($binding) ?: sprintf("'%s'", str_replace("'", "\'", $binding));
+			}
+
+			// Insert bindings into query
+			$sql = str_replace(array('%', '?'), array('%%', '%s'), $sql);
+			$sql = vsprintf($sql, $bindings);
+		}
+
+		return $sql;
 	}
 
 	/**
