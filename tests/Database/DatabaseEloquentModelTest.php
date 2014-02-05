@@ -67,6 +67,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $result);
 	}
 
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function testFindOrFailMethodThrowsModelNotFoundException()
+	{
+		$result = EloquentModelFindNotFoundStub::findOrFail(1);
+	}
+
 
 	public function testFindMethodWithArrayCallsQueryBuilderCorrectly()
 	{
@@ -826,6 +834,15 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
+		return $mock;
+	}
+}
+
+class EloquentModelFindNotFoundStub extends Illuminate\Database\Eloquent\Model {
+	public function newQuery($excludeDeleted = true)
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn(null);
 		return $mock;
 	}
 }

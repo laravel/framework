@@ -295,6 +295,32 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRegexBasedFilters()
+	{
+		$router = $this->getRouter();
+		$router->get('foo/bar', function() { return 'hello'; });
+		$router->get('bar/foo', function() { return 'hello'; });
+		$router->get('baz/foo', function() { return 'hello'; });
+		$router->filter('foo', function($route, $request, $bar) { return 'foo'.$bar; });
+		$router->whenRegex('/^(foo|bar).*/', 'foo:bar');
+		$this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertEquals('foobar', $router->dispatch(Request::create('bar/foo', 'GET'))->getContent());
+		$this->assertEquals('hello', $router->dispatch(Request::create('baz/foo', 'GET'))->getContent());
+	}
+
+
+	public function testRegexBasedFiltersWithVariables()
+	{
+		$router = $this->getRouter();
+		$router->get('{var}/bar', function($var) { return 'hello'; });
+		$router->filter('foo', function($route, $request, $bar) { return 'foo'.$bar; });
+		$router->whenRegex('/^(foo|bar).*/', 'foo:bar');
+		$this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertEquals('foobar', $router->dispatch(Request::create('bar/bar', 'GET'))->getContent());
+		$this->assertEquals('hello', $router->dispatch(Request::create('baz/bar', 'GET'))->getContent());
+	}
+
+
 	public function testMatchesMethodAgainstRequests()
 	{
 		/**
@@ -561,6 +587,14 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$routes = $routes->getRoutes();
 
 		$this->assertEquals('foo-bars/{foo_bars}/foo-bazs/{foo_bazs}', $routes[0]->getUri());
+
+		$router = $this->getRouter();
+		$router->resource('foo-bars', 'FooController', array('only' => array('show'), 'as' => 'prefix'));
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();
+
+		$this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+		$this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
 	}
 
 
@@ -597,6 +631,35 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
 	}
+
+
+    public function testRouterFiresRoutedEvent()
+    {
+        $events = new Illuminate\Events\Dispatcher();
+        $router = new Router($events);
+        $router->get('foo/bar', function() { return ''; });
+
+        $request = Request::create('http://foo.com/foo/bar', 'GET');
+        $route   = new Route('GET', 'foo/bar', array('http', function() {}));
+
+        $_SERVER['__router.request'] = null;
+        $_SERVER['__router.route']   = null;
+
+        $router->matched(function($route, $request){
+            $_SERVER['__router.request'] = $request;
+            $_SERVER['__router.route']   = $route;
+        });
+
+        $router->dispatchToRoute($request);
+
+        $this->assertInstanceOf('Illuminate\Http\Request', $_SERVER['__router.request']);
+        $this->assertEquals($_SERVER['__router.request'], $request);
+        unset($_SERVER['__router.request']);
+
+        $this->assertInstanceOf('Illuminate\Routing\Route', $_SERVER['__router.route']);
+        $this->assertEquals($_SERVER['__router.route']->getUri(), $route->getUri());
+        unset($_SERVER['__router.route']);
+    }
 
 
 	protected function getRouter()

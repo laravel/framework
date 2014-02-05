@@ -90,6 +90,13 @@ class Validator implements MessageProviderInterface {
 	protected $extensions = array();
 
 	/**
+	 * All of the custom replacer extensions.
+	 *
+	 * @var array
+	 */
+	protected $replacers = array();
+
+	/**
 	 * The size related validation rules.
 	 *
 	 * @var array
@@ -109,7 +116,7 @@ class Validator implements MessageProviderInterface {
 	 * @var array
 	 */
 	protected $implicitRules = array(
-		'Required', 'RequiredWith', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted'
+		'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted'
 	);
 
 	/**
@@ -473,7 +480,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Validate that an attribute exists when another attribute exists.
+	 * Validate that an attribute exists when any other attribute exists.
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
@@ -482,19 +489,30 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateRequiredWith($attribute, $value, $parameters)
 	{
-		$other = $parameters[0];
-
-		if ($this->getPresentCount($parameters) != count($parameters))
+		if ( ! $this->allFailingRequired($parameters))
 		{
-			return true;
+			return $this->validateRequired($attribute, $value);
 		}
 
-		if ($this->anyFailingRequired($parameters))
+		return true;
+	}
+
+	/**
+	 * Validate that an attribute exists when all other attributes exists.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredWithAll($attribute, $value, $parameters)
+	{
+		if ( ! $this->anyFailingRequired($parameters))
 		{
-			return true;
+			return $this->validateRequired($attribute, $value);
 		}
 
-		return $this->validateRequired($attribute, $value);
+		return true;
 	}
 
 	/**
@@ -1318,7 +1336,11 @@ class Validator implements MessageProviderInterface {
 	{
 		$message = str_replace(':attribute', $this->getAttribute($attribute), $message);
 
-		if (method_exists($this, $replacer = "replace{$rule}"))
+		if (isset($this->replacers[snake_case($rule)]))
+		{
+			$message = $this->callReplacer($message, $attribute, snake_case($rule), $parameters);
+		}
+		elseif (method_exists($this, $replacer = "replace{$rule}"))
 		{
 			$message = $this->$replacer($message, $attribute, $rule, $parameters);
 		}
@@ -1751,7 +1773,7 @@ class Validator implements MessageProviderInterface {
 	 * Register a custom validator extension.
 	 *
 	 * @param  string  $rule
-	 * @param  Closure|string  $extension
+	 * @param  \Closure|string  $extension
 	 * @return void
 	 */
 	public function addExtension($rule, $extension)
@@ -1763,14 +1785,54 @@ class Validator implements MessageProviderInterface {
 	 * Register a custom implicit validator extension.
 	 *
 	 * @param  string   $rule
-	 * @param  Closure  $extension
+	 * @param  \Closure|string  $extension
 	 * @return void
 	 */
-	public function addImplicitExtension($rule, Closure $extension)
+	public function addImplicitExtension($rule, $extension)
 	{
 		$this->addExtension($rule, $extension);
 
 		$this->implicitRules[] = studly_case($rule);
+	}
+
+	/**
+	 * Get the array of custom validator message replacers.
+	 *
+	 * @return array
+	 */
+	public function getReplacers()
+	{
+		return $this->replacers;
+	}
+
+	/**
+	 * Register an array of custom validator message replacers.
+	 *
+	 * @param  array  $replacers
+	 * @return void
+	 */
+	public function addReplacers(array $replacers)
+	{
+		if ($replacers)
+		{
+			$keys = array_map('snake_case', array_keys($replacers));
+
+			$replacers = array_combine($keys, array_values($replacers));
+		}
+
+		$this->replacers = array_merge($this->replacers, $replacers);
+	}
+
+	/**
+	 * Register a custom validator message replacer.
+	 *
+	 * @param  string  $rule
+	 * @param  \Closure|string  $replacer
+	 * @return void
+	 */
+	public function addReplacer($rule, $replacer)
+	{
+		$this->replacers[snake_case($rule)] = $replacer;
 	}
 
 	/**
@@ -2032,6 +2094,45 @@ class Validator implements MessageProviderInterface {
 		list($class, $method) = explode('@', $callback);
 
 		return call_user_func_array(array($this->container->make($class), $method), $parameters);
+	}
+
+	/**
+	 * Call a custom validator message replacer.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function callReplacer($message, $attribute, $rule, $parameters)
+	{
+		$callback = $this->replacers[$rule];
+
+		if ($callback instanceof Closure)
+		{
+			return call_user_func_array($callback, func_get_args());
+		}
+		elseif (is_string($callback))
+		{
+			return $this->callClassBasedReplacer($message, $attribute, $rule, $parameters);
+		}
+	}
+
+	/**
+	 * Call a class based validator message replacer.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function callClassBasedReplacer($message, $attribute, $rule, $parameters)
+	{
+		list($class, $method) = explode('@', $callback);
+
+		return call_user_func_array(array($this->container->make($class), $method), func_get_args());
 	}
 
 	/**

@@ -490,4 +490,16 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		return json_encode($this->toArray(), $options);
 	}
 
+	/**
+	 * Call a method on the underlying Collection
+	 *
+	 * @param string $method
+	 * @param array  $arguments
+	 * @return mixed
+	 */
+	public function __call($method, $arguments)
+	{
+		return call_user_func_array(array($this->getCollection(), $method), $arguments);
+	}
+
 }

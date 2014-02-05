@@ -843,7 +843,7 @@ class BelongsToMany extends Relation {
 	 */
 	protected function guessInverseRelation()
 	{
-		return strtolower(str_plural(class_basename($this->getParent())));
+		return camel_case(str_plural(class_basename($this->getParent())));
 	}
 
 	/**
@@ -928,9 +928,9 @@ class BelongsToMany extends Relation {
 	 *
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
-	public function withTimestamps()
+	public function withTimestamps($createdAt = null, $updatedAt = null)
 	{
-		return $this->withPivot($this->createdAt(), $this->updatedAt());
+		return $this->withPivot($createdAt ?: $this->createdAt(), $updatedAt ?: $this->updatedAt());
 	}
 
 	/**

@@ -6,10 +6,25 @@ use Illuminate\Database\Eloquent\Collection;
 
 class HasManyThrough extends Relation {
 
+	/**
+	 * The distance parent model instance.
+	 *
+	 * @var \Illuminate\Database\Eloquent\Model
+	 */
 	protected $farParent;
 
+	/**
+	 * The near key on the relationship.
+	 *
+	 * @var string
+	 */
 	protected $firstKey;
 
+	/**
+	 * The far key on the relationship.
+	 *
+	 * @var string
+	 */
 	protected $secondKey;
 
 	/**
@@ -17,7 +32,8 @@ class HasManyThrough extends Relation {
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
-	 * @param  string  $foreignKey
+	 * @param  string  $firstKey
+	 * @param  string  $secondKey
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey)
