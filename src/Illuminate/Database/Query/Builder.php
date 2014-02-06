@@ -942,16 +942,12 @@ class Builder {
 
 		if ($withBindings)
 		{
-			$bindings = $this->bindings;
-			$pdo = $this->connection->getPdo();
+			$conn = $this->connection;
+			$bindings = $conn->prepareBindings($this->bindings);
+			$pdo = $conn->getPdo();
 
 			foreach ($bindings as $i => $binding)
 			{
-				if ($binding instanceof \DateTime)
-				{
-					$binding = $binding->format('Y-m-d H:i:s');
-				}
-
 				$bindings[$i] = $pdo->quote($binding) ?: sprintf("'%s'", str_replace("'", "\'", $binding));
 			}
 
