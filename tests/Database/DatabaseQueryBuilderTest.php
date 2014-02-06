@@ -1028,16 +1028,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testBindingOrder()
 	{
+		$expectedSql = 'select * from "users" inner join "othertable" on "bar" = ? where "registered" = ? group by "city" having "population" > ? order by match ("foo") against(?)';
+		$expectedBindings = array('foo', 1, 3, 'bar');
+
 		$builder = $this->getBuilder();
-		$builder->select('*')->from('users')->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match (`foo`) against(?)', array('bar'));
-		$this->assertEquals('select * from "users" where "registered" = ? group by "city" having "population" > ? order by match (`foo`) against(?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 3, 2 => 'bar'), $builder->getBindings());
+		$builder->select('*')->from('users')->join('othertable', function($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', array('bar'));
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
 
 		// order of statements reversed
 		$builder = $this->getBuilder();
-		$builder->select('*')->from('users')->orderByRaw('match (`foo`) against(?)', array('bar'))->having('population', '>', 3)->groupBy('city')->where('registered', 1);
-		$this->assertEquals('select * from "users" where "registered" = ? group by "city" having "population" > ? order by match (`foo`) against(?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 3, 2 => 'bar'), $builder->getBindings());
+		$builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', array('bar'))->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', function($join) { $join->where('bar', '=', 'foo'); });
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
 	}
 
 
