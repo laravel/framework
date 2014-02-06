@@ -197,8 +197,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testGetModelsProperlyHydratesModels()
 	{
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get'), $this->getMocks());
-		$records[] = array('name' => 'taylor', 'age' => 26);
-		$records[] = array('name' => 'dayle', 'age' => 28);
+		$records[] = array('id' => 1, 'name' => 'taylor', 'age' => 26);
+		$records[] = array('id' => 2, 'name' => 'dayle', 'age' => 28);
 		$builder->getQuery()->shouldReceive('get')->once()->with(array('foo'))->andReturn($records);
 		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,newInstance]');
 		$model->shouldReceive('getTable')->once()->andReturn('foobars');
@@ -208,12 +208,12 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$model->shouldReceive('newInstance')->andReturnUsing(function() { return new EloquentBuilderTestModelStub; });
 		$models = $builder->getModels(array('foo'));
 
-		$this->assertEquals('taylor', $models[0]->name);
-		$this->assertEquals($models[0]->getAttributes(), $models[0]->getOriginal());
-		$this->assertEquals('dayle', $models[1]->name);
+		$this->assertEquals('taylor', $models[1]->name);
 		$this->assertEquals($models[1]->getAttributes(), $models[1]->getOriginal());
-		$this->assertEquals('foo_connection', $models[0]->getConnectionName());
+		$this->assertEquals('dayle', $models[2]->name);
+		$this->assertEquals($models[2]->getAttributes(), $models[2]->getOriginal());
 		$this->assertEquals('foo_connection', $models[1]->getConnectionName());
+		$this->assertEquals('foo_connection', $models[2]->getConnectionName());
 	}
 
 

@@ -701,12 +701,18 @@ if ( ! function_exists('object_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
-			if ( ! is_object($object) || ! isset($object->{$segment}))
+			if ( is_numeric($segment) && (is_array($object) || $object instanceof ArrayAccess) && isset($object[$segment]) )
+			{
+				$object = $object[$segment];
+			}
+			elseif ( ! is_object($object) || ! isset($object->{$segment}))
 			{
 				return value($default);
 			}
-
-			$object = $object->{$segment};
+			else
+			{
+				$object = $object->{$segment};
+			}
 		}
 
 		return $object;

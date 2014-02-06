@@ -392,6 +392,23 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input src="'. $url .'" type="image">', $image);
 	}
 
+
+	public function testCollectionCheckboxes()
+	{
+		$this->setModel(array(
+			'relations' => new Illuminate\Support\Collection(array(
+				2 => new FormBuilderModelStub(array('id' => 2, 'foo' => 'bar'))
+			))
+		));
+
+		$checkbox = $this->formBuilder->checkbox('relations[1]');
+		$this->assertEquals('<input name="relations[1]" type="checkbox" value="1">', $checkbox);
+
+		$checkbox = $this->formBuilder->checkbox('relations[2]');
+		$this->assertEquals('<input checked="checked" name="relations[2]" type="checkbox" value="1">', $checkbox);
+	}
+
+
 	protected function setModel(array $data, $object = true)
 	{
 		if ($object) $data = new FormBuilderModelStub($data);
