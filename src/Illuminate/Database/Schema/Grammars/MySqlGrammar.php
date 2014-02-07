@@ -3,6 +3,7 @@
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 
 class MySqlGrammar extends Grammar {
 
@@ -18,7 +19,7 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After');
+	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After', 'Comment');
 
 	/**
 	 * The possible column serials
@@ -563,4 +564,19 @@ class MySqlGrammar extends Grammar {
 		}
 	}
 
+
+        /**
+         * Get the SQL for a "comment" column modifier.
+         *
+         * @param \Illuminate\Database\Schema\Blueprint  $blueprint
+         * @param \Illuminate\Support\Fluent  $column
+         * @return string|null
+         */
+        protected function modifyComment(Blueprint $blueprint, Fluent $column)
+        {
+            if ( ! is_null($column->comment))
+            {
+                return ' comment ' . DB::connection()->getPdo()->quote($column->comment);
+            }
+        }
 }
