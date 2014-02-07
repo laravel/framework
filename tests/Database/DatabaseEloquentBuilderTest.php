@@ -339,7 +339,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$nestedRawQuery = $this->getMockQueryBuilder();
 		$nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
 		$model = $this->getMockModel()->makePartial();
-		$model->shouldReceive('newQuery')->once()->andReturn($nestedQuery);
+		$model->shouldReceive('newQuery')->with(false)->once()->andReturn($nestedQuery);
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('from');
 		$builder->setModel($model);
