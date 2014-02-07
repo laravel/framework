@@ -13,7 +13,7 @@
         "phpseclib/phpseclib": "0.3.*"
     },
     "require-dev": {
-        "mockery/mockery": "0.9.0"
+        "mockery/mockery": "0.9"
     },
     "autoload": {
         "psr-0": {
