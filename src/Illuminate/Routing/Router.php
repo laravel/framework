@@ -1120,7 +1120,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function parseFilter($callback)
 	{
-		if (is_string($callback) and ! str_contains($callback, '@'))
+		if (is_string($callback) && ! str_contains($callback, '@'))
 		{
 			return $callback.'@filter';
 		}
