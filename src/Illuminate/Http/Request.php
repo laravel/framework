@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Http;
 
-use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
