@@ -112,7 +112,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 		{
 			return $this->makeReplacements($line, $replace);
 		}
-		elseif (is_array($line) and count($line) > 0)
+		elseif (is_array($line) && count($line) > 0)
 		{
 			return $line;
 		}
