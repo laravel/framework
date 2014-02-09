@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Http;
 
+use Illuminate\Support\Collection;
 use Illuminate\Session\Store as SessionStore;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class Request extends SymfonyRequest {
@@ -430,7 +430,7 @@ class Request extends SymfonyRequest {
 	{
 		if ( ! isset($this->json))
 		{
-			$this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+			$this->json = new Collection((array) json_decode($this->getContent(), true));
 		}
 
 		if (is_null($key)) return $this->json;
@@ -441,7 +441,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Get the input source for the request.
 	 *
-	 * @return \Symfony\Component\HttpFoundation\ParameterBag
+	 * @return mixed
 	 */
 	protected function getInputSource()
 	{
