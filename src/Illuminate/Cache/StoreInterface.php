@@ -15,7 +15,7 @@ interface StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes);
@@ -68,5 +68,15 @@ interface StoreInterface {
 	 * @return string
 	 */
 	public function getPrefix();
+
+    /**
+     * Convert expiry in minutes to the underlying store's native representation
+     * This is typically a seconds-from-now offset, but does vary between stores.
+     *
+     * @param float $minutes
+     * @return mixed
+     */
+    public function getExpiry($minutes);
+
 
 }

@@ -17,9 +17,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * The default number of minutes to store items.
 	 *
-	 * @var int
+	 * @var float
 	 */
-	protected $default = 60;
+	protected $default = 60.0;
 
 	/**
 	 * An array of registered Cache macros.
@@ -66,9 +66,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * Store an item in the cache.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  \DateTime|int  $minutes
+	 * @param  string                $key
+	 * @param  mixed                 $value
+	 * @param  Carbon|Datetime|float $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -81,16 +81,17 @@ class Repository implements ArrayAccess {
 	/**
 	 * Store an item in the cache if the key does not exist.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  \DateTime|int  $minutes
+	 * @param  string                $key
+	 * @param  mixed                 $value
+	 * @param  Carbon|Datetime|float $minutes
 	 * @return bool
 	 */
 	public function add($key, $value, $minutes)
 	{
 		if (is_null($this->get($key)))
 		{
-			$this->put($key, $value, $minutes); return true;
+			$this->put($key, $value, $minutes);
+			return true;
 		}
 
 		return false;
@@ -99,9 +100,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * Get an item from the cache, or store the default value.
 	 *
-	 * @param  string  $key
-	 * @param  \DateTime|int  $minutes
-	 * @param  Closure  $callback
+	 * @param  string                $key
+	 * @param  Carbon|Datetime|float $minutes
+	 * @param  Closure               $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -166,7 +167,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * Set the default cache time in minutes.
 	 *
-	 * @param  int   $minutes
+	 * @param  float  $minutes
 	 * @return void
 	 */
 	public function setDefaultCacheTime($minutes)
@@ -232,8 +233,8 @@ class Repository implements ArrayAccess {
 	/**
 	 * Calculate the number of minutes with the given duration.
 	 *
-	 * @param  \DateTime|int  $duration
-	 * @return int
+	 * @param  Carbon|DateTime|float  $duration
+	 * @return float
 	 */
 	protected function getMinutes($duration)
 	{
@@ -241,11 +242,11 @@ class Repository implements ArrayAccess {
 		{
 			$duration = Carbon::instance($duration);
 
-			return max(0, Carbon::now()->diffInMinutes($duration, false));
+			return max(0, Carbon::now()->diffInSeconds($duration, false) / 60.0);
 		}
 		else
 		{
-			return is_string($duration) ? intval($duration) : $duration;
+			return is_string($duration) ? floatval($duration) : $duration;
 		}
 	}
 

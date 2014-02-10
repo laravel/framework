@@ -50,12 +50,12 @@ class ApcStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return array|bool
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$this->apc->put($this->prefix.$key, $value, $minutes * 60);
+		$this->apc->put($this->prefix.$key, $value, $this->getExpiry($minutes));
 	}
 
 	/**
@@ -124,5 +124,23 @@ class ApcStore extends TaggableStore implements StoreInterface {
 	{
 		return $this->prefix;
 	}
+
+    /**
+     * Convert expiry to APC's native format (offset seconds)
+     *
+     * @param float $minutes
+     * @return int
+     */
+    public function getExpiry($minutes)
+    {
+        if ($minutes === 0.0) {
+            return 0;
+        }
+
+        // Never return zero as a result of the rounding!
+        // Return the lowest possible expiry instead.
+        return max(1, round($minutes * 60));
+
+    }
 
 }

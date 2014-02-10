@@ -28,7 +28,7 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -106,5 +106,12 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 	{
 		return '';
 	}
+
+    /**
+     * Null function to adhere to the interface.
+     */
+    public function getExpiry($minutes) {
+        throw new \LogicException(__CLASS__ . " does not use expiries.");
+    }
 
 }

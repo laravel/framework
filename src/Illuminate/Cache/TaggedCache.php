@@ -61,7 +61,7 @@ class TaggedCache implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -73,15 +73,16 @@ class TaggedCache implements StoreInterface {
 	 * Store an item in the cache if the key does not exist.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  \DateTime|int  $minutes
+	 * @param  mixed  $value
+	 * @param  Carbon|Datetime|float $minutes
 	 * @return bool
 	 */
 	public function add($key, $value, $minutes)
 	{
 		if (is_null($this->get($key)))
 		{
-			$this->put($key, $value, $minutes); return true;
+			$this->put($key, $value, $minutes);
+			return true;
 		}
 
 		return false;
@@ -148,7 +149,7 @@ class TaggedCache implements StoreInterface {
 	 * Get an item from the cache, or store the default value.
 	 *
 	 * @param  string   $key
-	 * @param  int      $minutes
+	 * @param  float    $minutes
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */
