@@ -371,6 +371,12 @@ class View implements ArrayAccess, Renderable {
 	{
 		if (starts_with($method, 'with'))
 		{
+			if ( ! isset($parameters[0]))
+			{
+				$class = get_class($this);
+				throw new \InvalidArgumentException("Missing argument 1 for {$class}::{$method}");
+			}
+
 			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
 		}
 
