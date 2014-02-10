@@ -30,18 +30,19 @@ class CookieJar {
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @param  string  $path
 	 * @param  string  $domain
 	 * @param  bool    $secure
 	 * @param  bool    $httpOnly
 	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
+	public function make($name, $value, $minutes = 0.0, $path = null, $domain = null, $secure = false, $httpOnly = true)
 	{
 		list($path, $domain) = $this->getPathAndDomain($path, $domain);
 
-		$time = ($minutes == 0) ? 0 : time() + ($minutes * 60);
+		// The loose comparison is important here for backwards-compat when $minutes===0
+		$time = ($minutes == 0) ? 0 : time() + round($minutes * 60);
 
 		return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
 	}
