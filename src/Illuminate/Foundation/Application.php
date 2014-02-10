@@ -443,24 +443,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Determine if the given abstract type has been bound.
-	 *
-	 * (Overriding Container::bound)
-	 * 
-	 * @param  string  $abstract
-	 * @return bool
-	 */
-	public function bound($abstract)
-	{
-		if (isset($this->deferredServices[$abstract]))
-		{
-			return true;
-		}
-		
-		return parent::bound($abstract);
-	}
-
-	/**
 	 * Resolve the given type from the container.
 	 *
 	 * (Overriding Container::make)
