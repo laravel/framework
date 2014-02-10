@@ -137,7 +137,7 @@ class Builder {
 	/**
 	 * The number of minutes to cache the query.
 	 *
-	 * @var int
+	 * @var float
 	 */
 	protected $cacheMinutes;
 
@@ -1102,7 +1102,7 @@ class Builder {
 	/**
 	 * Indicate that the query results should be cached.
 	 *
-	 * @param  \DateTime|int  $minutes
+	 * @param  \Carbon\Carbon|\Datetime|float  $minutes
 	 * @param  string  $key
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
