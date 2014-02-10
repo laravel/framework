@@ -14,7 +14,7 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	/**
 	 * The number of minutes to store the data in the cache.
 	 *
-	 * @var int
+	 * @var float
 	 */
 	protected $minutes;
 
@@ -22,7 +22,7 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	 * Create a new cache driven handler instance.
 	 *
 	 * @param  \Illuminate\Cache\Repository  $cache
-	 * @param  int  $minutes
+	 * @param  float  $minutes
 	 * @return void
 	 */
 	public function __construct(Repository $cache, $minutes)

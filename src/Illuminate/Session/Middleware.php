@@ -186,7 +186,7 @@ class Middleware implements HttpKernelInterface {
 	 */
 	protected function getLifetimeSeconds()
 	{
-		return array_get($this->manager->getSessionConfig(), 'lifetime') * 60;
+		return round(array_get($this->manager->getSessionConfig(), 'lifetime') * 60);
 	}
 
 	/**

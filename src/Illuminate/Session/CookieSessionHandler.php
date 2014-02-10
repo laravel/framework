@@ -23,7 +23,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 * Create a new cookie driven handler instance.
 	 *
 	 * @param  \Illuminate\Cookie\CookieJar  $cookie
-	 * @param  int  $minutes
+	 * @param  float  $minutes
 	 * @return void
 	 */
 	public function __construct(CookieJar $cookie, $minutes)
