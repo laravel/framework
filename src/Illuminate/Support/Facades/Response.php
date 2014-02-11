@@ -89,7 +89,7 @@ class Response {
 
 		if ( ! is_null($name))
 		{
-			return $response->setContentDisposition('attachment', $name);
+			return $response->setContentDisposition('attachment', $name, $file);
 		}
 
 		return $response;
