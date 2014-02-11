@@ -4,6 +4,7 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
+use JsonSerializable;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
+abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface, JsonSerializable {
 
 	/**
 	 * The connection name for the model.
@@ -596,7 +597,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation = new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation->polymorph = array('type' => $type, 'id' => $id);
+		return $relation;
 	}
 
 	/**
@@ -667,7 +670,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$class = $this->$type;
 
-		return $this->belongsTo($class, $id);
+		$relation = $this->belongsTo($class, $id);
+		$relation->polymorph = array('type' => $type, 'id' => $id);
+		return $relation;
 	}
 
 	/**
@@ -732,7 +737,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation = new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation->polymorph = array('type' => $type, 'id' => $id);
+		return $relation;
 	}
 
 	/**
@@ -2062,6 +2069,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
+	}
+
+	/**
+	 * Convert the object into something JSON serializable.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->toArray();
 	}
 
 	/**

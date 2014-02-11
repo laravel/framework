@@ -5,11 +5,12 @@ use Countable;
 use ArrayAccess;
 use ArrayIterator;
 use CachingIterator;
+use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 
-class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface {
+class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface, JsonSerializable {
 
 	/**
 	 * The items contained in the collection.
@@ -558,6 +559,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 			return $value instanceof ArrayableInterface ? $value->toArray() : $value;
 
 		}, $this->items);
+	}
+
+	/**
+	 * Convert the object into something JSON serializable.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->toArray();
 	}
 
 	/**
