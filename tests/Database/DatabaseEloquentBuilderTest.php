@@ -339,7 +339,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$nestedRawQuery = $this->getMockQueryBuilder();
 		$nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
 		$model = $this->getMockModel()->makePartial();
-		$model->shouldReceive('newQuery')->once()->andReturn($nestedQuery);
+		$model->shouldReceive('newQuery')->with(false)->once()->andReturn($nestedQuery);
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('from');
 		$builder->setModel($model);
@@ -348,6 +348,29 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$result = $builder->where(function($query) { $query->foo(); });
 		$this->assertEquals($builder, $result);
+	}
+
+
+	public function testRealNestedWhereWithScopes()
+	{
+		$model = new EloquentBuilderTestNestedStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->where('foo', '=', 'bar')->where(function($query) { $query->where('baz', '>', 9000); });
+		$this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
+		$this->assertEquals(array('bar', 9000), $query->getBindings());
+	}
+
+
+	protected function mockConnectionForModel($model, $database)
+	{
+		$grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
+		$processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
+		$grammar = new $grammarClass;
+		$processor = new $processorClass;
+		$connection = m::mock('Illuminate\Database\ConnectionInterface', array('getQueryGrammar' => $grammar, 'getPostProcessor' => $processor));
+		$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface', array('connection' => $connection));
+		$class = get_class($model);
+		$class::setConnectionResolver($resolver);
 	}
 
 
@@ -388,4 +411,8 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$query->where('foo', 'bar');
 	}
+}
+class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'table';
+	protected $softDelete = true;
 }

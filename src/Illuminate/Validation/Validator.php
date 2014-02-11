@@ -2115,24 +2115,25 @@ class Validator implements MessageProviderInterface {
 		}
 		elseif (is_string($callback))
 		{
-			return $this->callClassBasedReplacer($message, $attribute, $rule, $parameters);
+			return $this->callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters);
 		}
 	}
 
 	/**
 	 * Call a class based validator message replacer.
 	 *
+	 * @param  string  $callback
 	 * @param  string  $message
 	 * @param  string  $attribute
 	 * @param  string  $rule
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	protected function callClassBasedReplacer($message, $attribute, $rule, $parameters)
+	protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters)
 	{
 		list($class, $method) = explode('@', $callback);
 
-		return call_user_func_array(array($this->container->make($class), $method), func_get_args());
+		return call_user_func_array(array($this->container->make($class), $method), array_slice(func_get_args(), 1));
 	}
 
 	/**
