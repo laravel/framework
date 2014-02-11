@@ -117,11 +117,23 @@ class Str {
 	 * @param  string  $value
 	 * @param  int     $limit
 	 * @param  string  $end
+	 * @param  boolean $preserve_words
 	 * @return string
 	 */
-	public static function limit($value, $limit = 100, $end = '...')
+	public static function limit($value, $limit = 100, $end = '...', $preserve_words = false)
 	{
 		if (mb_strlen($value) <= $limit) return $value;
+
+		if ($preserve_words) {
+			$cut_area = mb_substr($value, $limit - 1, 2, 'UTF-8');
+			if (strpos($cut_area, ' ') === false) {
+				$value = mb_substr($value, 0, $limit, 'UTF-8');
+				$space_pos = strrpos($value, ' ');
+				if ($space_pos !== false) {
+					return rtrim(mb_substr($value, 0, $space_pos, 'UTF-8')).$end;
+				}
+			}
+		}
 
 		return rtrim(mb_substr($value, 0, $limit, 'UTF-8')).$end;
 	}
