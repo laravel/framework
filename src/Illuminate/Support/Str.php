@@ -117,20 +117,20 @@ class Str {
 	 * @param  string  $value
 	 * @param  int     $limit
 	 * @param  string  $end
-	 * @param  boolean $preserve_words
+	 * @param  boolean $preserveWords
 	 * @return string
 	 */
-	public static function limit($value, $limit = 100, $end = '...', $preserve_words = false)
+	public static function limit($value, $limit = 100, $end = '...', $preserveWords = false)
 	{
 		if (mb_strlen($value) <= $limit) return $value;
 
-		if ($preserve_words) {
-			$cut_area = mb_substr($value, $limit - 1, 2, 'UTF-8');
-			if (strpos($cut_area, ' ') === false) {
+		if ($preserveWords) {
+			$cutArea = mb_substr($value, $limit - 1, 2, 'UTF-8');
+			if (strpos($cutArea, ' ') === false) {
 				$value = mb_substr($value, 0, $limit, 'UTF-8');
-				$space_pos = strrpos($value, ' ');
-				if ($space_pos !== false) {
-					return rtrim(mb_substr($value, 0, $space_pos, 'UTF-8')).$end;
+				$spacePos = strrpos($value, ' ');
+				if ($spacePos !== false) {
+					return rtrim(mb_substr($value, 0, $spacePos, 'UTF-8')).$end;
 				}
 			}
 		}
