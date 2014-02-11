@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Http;
 
-use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -115,10 +114,10 @@ class Request extends SymfonyRequest {
 	/**
 	 * Determine if the current request URI matches a pattern.
 	 *
-	 * @param  string  $pattern
+	 * @param  dynamic  string
 	 * @return bool
 	 */
-	public function is($pattern)
+	public function is()
 	{
 		foreach (func_get_args() as $pattern)
 		{
