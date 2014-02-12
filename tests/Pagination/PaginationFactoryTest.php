@@ -94,7 +94,7 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 		$request = m::mock('Illuminate\Http\Request');
 		$view = m::mock('Illuminate\View\Factory');
 		$trans = m::mock('Symfony\Component\Translation\TranslatorInterface');
-		$view->shouldReceive('addNamespace')->once()->with('pagination', realpath(__DIR__.'/../../src/Illuminate/Pagination').'/views');
+		$view->shouldReceive('addNamespace')->once()->with('pagination', realpath(__DIR__.'/../../src/Pagination').'/views');
 
 		return new Factory($request, $view, $trans, 'page');
 	}

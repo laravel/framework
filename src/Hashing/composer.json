@@ -1,0 +1,30 @@
+{
+    "name": "illuminate/hashing",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
+        "ircmaxell/password-compat": "1.0.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Hashing\\": ""
+        }
+    },
+    "target-dir": "Hashing",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.2-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}

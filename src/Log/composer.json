@@ -1,0 +1,32 @@
+{
+    "name": "illuminate/log",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
+        "monolog/monolog": "1.6.*"
+    },
+    "require-dev": {
+        "illuminate/events": "4.2.*",
+        "mockery/mockery": "0.7.2",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Log\\": ""
+        }
+    },
+    "target-dir": "Log",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.2-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}

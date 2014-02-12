@@ -73,13 +73,13 @@
     },
     "autoload": {
         "classmap": [
-            ["src/Illuminate/Queue/IlluminateQueueClosure.php"]
+            ["src/Queue/IlluminateQueueClosure.php"]
         ],
         "files": [
-            "src/Illuminate/Support/helpers.php"
+            "src/Support/helpers.php"
         ],
-        "psr-0": {
-            "Illuminate": "src/"
+        "psr-4": {
+            "Illuminate\\": "src/"
         }
     },
     "extra": {

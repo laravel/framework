@@ -1,0 +1,35 @@
+{
+    "name": "illuminate/mail",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/container": "4.2.*",
+        "illuminate/log": "4.2.*",
+        "illuminate/support": "4.2.*",
+        "illuminate/view": "4.2.*",
+        "swiftmailer/swiftmailer": "4.3.*"
+    },
+    "require-dev": {
+        "illuminate/queue": "4.2.*",
+        "mockery/mockery": "0.7.2",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Mail\\": ""
+        }
+    },
+    "target-dir": "Mail",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.2-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}
