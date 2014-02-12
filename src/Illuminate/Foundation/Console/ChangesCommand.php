@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -85,7 +86,7 @@ class ChangesCommand extends Command {
 		}
 		else
 		{
-			return array($version, array_get($changes, $version, array()));
+			return array($version, Arr::get($changes, $version, array()));
 		}
 	}
 

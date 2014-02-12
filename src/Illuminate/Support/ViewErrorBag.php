@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support;
 
 use Countable;
+use Illuminate\Support\Arr;
 
 class ViewErrorBag implements Countable {
 
@@ -54,7 +55,7 @@ class ViewErrorBag implements Countable {
 	 */
 	public function __get($key)
 	{
-		return array_get($this->bags, $key, new MessageBag);
+		return Arr::get($this->bags, $key, new MessageBag);
 	}
 
 	/**
@@ -66,7 +67,7 @@ class ViewErrorBag implements Countable {
 	 */
 	public function __set($key, $value)
 	{
-		array_set($this->bags, $key, $value);
+		Arr::set($this->bags, $key, $value);
 	}
 
 }

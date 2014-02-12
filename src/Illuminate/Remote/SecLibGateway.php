@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Remote;
 
 use Net_SFTP, Crypt_RSA;
+use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 
 class SecLibGateway implements GatewayInterface {
@@ -238,7 +239,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	protected function getKey(array $auth)
 	{
-		with($key = $this->getNewKey())->setPassword(array_get($auth, 'keyphrase'));
+		with($key = $this->getNewKey())->setPassword(Arr::get($auth, 'keyphrase'));
 
 		return $key;
 	}

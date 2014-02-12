@@ -4,6 +4,7 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Log\Writer;
+use Illuminate\Support\Arr;
 use Illuminate\View\Factory;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
@@ -280,7 +281,7 @@ class Mailer {
 		elseif (is_array($view))
 		{
 			return array(
-				array_get($view, 'html'), array_get($view, 'text')
+				Arr::get($view, 'html'), Arr::get($view, 'text')
 			);
 		}
 

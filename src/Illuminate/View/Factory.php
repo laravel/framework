@@ -1,6 +1,7 @@
 <?php namespace Illuminate\View;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\View\Engines\EngineResolver;
@@ -243,7 +244,7 @@ class Factory {
 	{
 		$extensions = array_keys($this->extensions);
 
-		return array_first($extensions, function($key, $value) use ($path)
+		return Arr::first($extensions, function($key, $value) use ($path)
 		{
 			return ends_with($path, $value);
 		});
@@ -769,7 +770,7 @@ class Factory {
 	 */
 	public function shared($key, $default = null)
 	{
-		return array_get($this->shared, $key, $default);
+		return Arr::get($this->shared, $key, $default);
 	}
 
 	/**

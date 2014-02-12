@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Redis;
 
 use Predis\Client;
+use Illuminate\Support\Arr;
 
 class Database {
 
@@ -37,7 +38,7 @@ class Database {
 	 */
 	protected function createAggregateClient(array $servers)
 	{
-		$servers = array_except($servers, array('cluster'));
+		$servers = Arr::except($servers, array('cluster'));
 
 		return array('default' => new Client(array_values($servers)));
 	}

@@ -3,6 +3,7 @@
 use PDO;
 use Closure;
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 
@@ -698,7 +699,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getConfig($option)
 	{
-		return array_get($this->config, $option);
+		return Arr::get($this->config, $option);
 	}
 
 	/**

@@ -2,6 +2,7 @@
 
 use Closure;
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
@@ -209,7 +210,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function mergeRules($attribute, $rules)
 	{
-		$current = array_get($this->rules, $attribute, array());
+		$current = Arr::get($this->rules, $attribute, array());
 
 		$merge = head($this->explodeRules(array($rules)));
 
@@ -285,11 +286,11 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getValue($attribute)
 	{
-		if ( ! is_null($value = array_get($this->data, $attribute)))
+		if ( ! is_null($value = Arr::get($this->data, $attribute)))
 		{
 			return $value;
 		}
-		elseif ( ! is_null($value = array_get($this->files, $attribute)))
+		elseif ( ! is_null($value = Arr::get($this->files, $attribute)))
 		{
 			return $value;
 		}
@@ -561,7 +562,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateRequiredIf($attribute, $value, $parameters)
 	{
-		if ($parameters[1] == array_get($this->data, $parameters[0]))
+		if ($parameters[1] == Arr::get($this->data, $parameters[0]))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
@@ -612,7 +613,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateSame($attribute, $value, $parameters)
 	{
-		$other = array_get($this->data, $parameters[0]);
+		$other = Arr::get($this->data, $parameters[0]);
 
 		return (isset($other) && $value == $other);
 	}
@@ -785,7 +786,7 @@ class Validator implements MessageProviderInterface {
 		// entire length of the string will be considered the attribute size.
 		if (is_numeric($value) && $hasNumeric)
 		{
-			return array_get($this->data, $attribute);
+			return Arr::get($this->data, $attribute);
 		}
 		elseif (is_array($value))
 		{

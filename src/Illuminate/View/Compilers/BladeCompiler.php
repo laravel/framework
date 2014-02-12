@@ -1,6 +1,7 @@
 <?php namespace Illuminate\View\Compilers;
 
 use Closure;
+use Illuminate\Support\Arr;
 
 class BladeCompiler extends Compiler implements CompilerInterface {
 
@@ -308,7 +309,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createOpenMatcher('include');
 
-		$replace = '$1<?php echo $__env->make$2, array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$replace = '$1<?php echo $__env->make$2, Arr::except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
 
 		return preg_replace($pattern, $replace, $value);
 	}

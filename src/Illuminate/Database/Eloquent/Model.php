@@ -5,6 +5,7 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
+use Illuminate\Support\Arr;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -849,7 +850,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$self = __FUNCTION__;
 
-		return array_first(debug_backtrace(false), function($trace) use ($self)
+		return Arr::first(debug_backtrace(false), function($trace) use ($self)
 		{
 			$caller = $trace['function'];
 
@@ -1306,7 +1307,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$this->fireModelEvent('saved', false);
 
-		if (array_get($options, 'touch', true)) $this->touchOwners();
+		if (Arr::get($options, 'touch', true)) $this->touchOwners();
 	}
 
 	/**
@@ -2482,7 +2483,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function replicate()
 	{
-		$attributes = array_except($this->attributes, array($this->getKeyName()));
+		$attributes = Arr::except($this->attributes, array($this->getKeyName()));
 
 		with($instance = new static)->setRawAttributes($attributes);
 
@@ -2522,7 +2523,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getOriginal($key = null, $default = null)
 	{
-		return array_get($this->original, $key, $default);
+		return Arr::get($this->original, $key, $default);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Cookie;
 
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CookieJar {
@@ -93,7 +94,7 @@ class CookieJar {
 	 */
 	public function queued($key, $default = null)
 	{
-		return array_get($this->queued, $key, $default);
+		return Arr::get($this->queued, $key, $default);
 	}
 
 	/**

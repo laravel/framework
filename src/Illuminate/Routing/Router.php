@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Events\Dispatcher;
@@ -298,7 +299,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// If a given controller method has been named, we will assign the name to the
 		// controller action array, which provides for a short-cut to method naming
 		// so you don't have to define an individual route for these controllers.
-		$action['as'] = array_pull($names, $method);
+		$action['as'] = Arr::pull($names, $method);
 
 		$this->{$route['verb']}($route['uri'], $action);
 	}
@@ -723,7 +724,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		if (isset($new['domain'])) unset($old['domain']);
 
-		return array_merge_recursive(array_except($old, array('namespace', 'prefix')), $new);
+		return array_merge_recursive(Arr::except($old, array('namespace', 'prefix')), $new);
 	}
 
 	/**
@@ -737,11 +738,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if (isset($new['namespace']))
 		{
-			return trim(array_get($old, 'namespace'), '\\').'\\'.trim($new['namespace'], '\\');
+			return trim(Arr::get($old, 'namespace'), '\\').'\\'.trim($new['namespace'], '\\');
 		}
 		else
 		{
-			return array_get($old, 'namespace');
+			return Arr::get($old, 'namespace');
 		}
 	}
 
@@ -756,11 +757,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if (isset($new['prefix']))
 		{
-			return trim(array_get($old, 'prefix'), '/').'/'.trim($new['prefix'], '/');
+			return trim(Arr::get($old, 'prefix'), '/').'/'.trim($new['prefix'], '/');
 		}
 		else
 		{
-			return array_get($old, 'prefix');
+			return Arr::get($old, 'prefix');
 		}
 	}
 
@@ -773,7 +774,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if (count($this->groupStack) > 0)
 		{
-			return array_get(last($this->groupStack), 'prefix', '');
+			return Arr::get(last($this->groupStack), 'prefix', '');
 		}
 
 		return '';
@@ -874,7 +875,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if ($action instanceof Closure) return false;
 
-		return is_string($action) || is_string(array_get($action, 'uses'));
+		return is_string($action) || is_string(Arr::get($action, 'uses'));
 	}
 
 	/**
@@ -902,7 +903,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		$closure = $this->getClassClosure($action['uses']);
 
-		return array_set($action, 'uses', $closure);
+		return Arr::set($action, 'uses', $closure);
 	}
 
 	/**

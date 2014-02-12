@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Mail\Mailer;
+use Illuminate\Support\Arr;
 use Illuminate\Auth\UserProviderInterface;
 
 class PasswordBroker {
@@ -259,7 +260,7 @@ class PasswordBroker {
 	 */
 	public function getUser(array $credentials)
 	{
-		$credentials = array_except($credentials, array('token'));
+		$credentials = Arr::except($credentials, array('token'));
 
 		$user = $this->users->retrieveByCredentials($credentials);
 

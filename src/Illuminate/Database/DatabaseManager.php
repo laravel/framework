@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseManager implements ConnectionResolverInterface {
@@ -82,7 +83,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 
 		return $this->connection($name);
 	}
-	
+
 	/**
 	 * Disconnect from the given database.
 	 *
@@ -180,7 +181,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 		// If the configuration doesn't exist, we'll throw an exception and bail.
 		$connections = $this->app['config']['database.connections'];
 
-		if (is_null($config = array_get($connections, $name)))
+		if (is_null($config = Arr::get($connections, $name)))
 		{
 			throw new \InvalidArgumentException("Database [$name] not configured.");
 		}

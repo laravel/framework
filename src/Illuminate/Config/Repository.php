@@ -2,6 +2,7 @@
 
 use Closure;
 use ArrayAccess;
+use Illuminate\Support\Arr;
 use Illuminate\Support\NamespacedItemResolver;
 
 class Repository extends NamespacedItemResolver implements ArrayAccess {
@@ -98,7 +99,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 
 		$this->load($group, $namespace, $collection);
 
-		return array_get($this->items[$collection], $item, $default);
+		return Arr::get($this->items[$collection], $item, $default);
 	}
 
 	/**
@@ -125,7 +126,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 		}
 		else
 		{
-			array_set($this->items[$collection], $item, $value);
+			Arr::set($this->items[$collection], $item, $value);
 		}
 	}
 
