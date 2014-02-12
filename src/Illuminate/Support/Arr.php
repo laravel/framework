@@ -274,7 +274,7 @@ class Arr {
      */
     public static function pull(&$array, $key)
     {
-        $value = array_get($array, $key);
+        $value = static::get($array, $key);
 
         static::forget($array, $key);
 
