@@ -485,4 +485,24 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$this->setContentTags($openTag, $closeTag, true);
 	}
 
+	/**
+	* Gets the content tags used for the compiler.
+	*
+	* @return string
+	*/
+	public function getContentTags()
+	{
+		return $this->contentTags;
+	}
+
+	/**
+	* Gets the escaped content tags used for the compiler.
+	*
+	* @return string
+	*/
+	public function getEscapedContentTags()
+	{
+		return $this->escapedTags;
+	}
+
 }
