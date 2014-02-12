@@ -4,6 +4,7 @@ php:
   - 5.3
   - 5.4
   - 5.5
+  - 5.6
   - hhvm
 
 before_script:
@@ -14,5 +15,6 @@ script: phpunit -d memory_limit=1024M
 
 matrix:
   allow_failures:
+    - php: 5.6
     - php: hhvm
   fast_finish: true
