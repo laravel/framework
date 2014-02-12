@@ -43,8 +43,9 @@ class WhoopsDisplayer implements ExceptionDisplayerInterface {
 	public function display(Exception $exception)
 	{
 		$status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+		$headers = $exception instanceof HttpExceptionInterface ? $exception->getHeaders() : array();
 
-		return new Response($this->whoops->handleException($exception), $status);
+		return new Response($this->whoops->handleException($exception), $status, $headers);
 	}
 
 }
