@@ -1,0 +1,34 @@
+{
+    "name": "illuminate/exception",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "filp/whoops": "1.0.10",
+        "illuminate/support": "4.2.*",
+        "symfony/http-foundation": "2.4.x",
+        "symfony/http-kernel": "2.4.*"
+    },
+    "require-dev": {
+        "monolog/monolog": "1.6.*",
+        "mockery/mockery": "0.7.2",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Exception\\": ""
+        }
+    },
+    "target-dir": "Exception",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.2-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}
