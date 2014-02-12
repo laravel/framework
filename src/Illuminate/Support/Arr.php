@@ -324,7 +324,7 @@ class Arr {
      * @param  \Closure  $callback
      * @return array
      */
-    public static function sort($array, Closure $callback)
+    public static function sort($array, \Closure $callback)
     {
         return Collection::make($array)->sortBy($callback)->all();
     }
@@ -336,7 +336,7 @@ class Arr {
      * @param  \Closure  $callback
      * @return array
      */
-    public static function where($array, Closure $callback)
+    public static function where($array, \Closure $callback)
     {
         $filtered = array();
 
