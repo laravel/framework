@@ -5,19 +5,19 @@ use Illuminate\Support\Facades\Response;
 
 class SupportMacroTraitTest extends \PHPUnit_Framework_TestCase {
 
-    private $macroTrait;
+	private $macroTrait;
 
-    public function setUp()
-    {
-        $this->macroTrait = $this->createObjectForTrait();
-    }
+	public function setUp()
+	{
+		$this->macroTrait = $this->createObjectForTrait();
+	}
 
-    private function createObjectForTrait()
-    {
-        $traitName = 'Illuminate\Support\Traits\MacroTrait';
+	private function createObjectForTrait()
+	{
+		$traitName = 'Illuminate\Support\Traits\MacroTrait';
 
-        return $this->getObjectForTrait($traitName);
-    }
+		return $this->getObjectForTrait($traitName);
+	}
 
 	public function testRegisterMacro()
 	{
