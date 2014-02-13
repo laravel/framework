@@ -73,10 +73,9 @@ interface StoreInterface {
      * Convert expiry in minutes to the underlying store's native representation
      * This is typically a seconds-from-now offset, but does vary between stores.
      *
-     * @param float $minutes
+     * @param  float $minutes
      * @return mixed
      */
     public function getExpiry($minutes);
-
 
 }

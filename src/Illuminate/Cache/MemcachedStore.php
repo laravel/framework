@@ -138,20 +138,22 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	}
 
 
-    /**
-     * Convert expiry to memcached's native format (seconds)
-     */
-    public function getExpiry($minutes)
-    {
-        if ($minutes === 0.0) {
-            return 0;
-        }
+	/**
+	 * Convert expiry to memcached's native format (seconds)
+	 *
+	 * @param  float $minutes
+	 * @return int
+	 */
+	public function getExpiry($minutes)
+	{
+		if ($minutes === 0.0)
+		{
+			return 0;
+		}
 
-        // Never return zero as a result of the rounding!
-        // Return the lowest possible expiry instead.
-        return max(1, round($minutes * 60));
-
-    }
-
+		// Never return zero as a result of the rounding!
+		// Return the lowest possible expiry instead.
+		return max(1, round($minutes * 60));
+	}
 
 }
