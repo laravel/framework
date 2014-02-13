@@ -66,8 +66,8 @@ class Repository implements ArrayAccess {
 	/**
 	 * Store an item in the cache.
 	 *
-	 * @param  string              $key
-	 * @param  mixed               $value
+	 * @param  string                $key
+	 * @param  mixed                 $value
 	 * @param  Carbon|Datetime|float $minutes
 	 * @return void
 	 */

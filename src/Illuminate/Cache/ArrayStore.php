@@ -107,11 +107,15 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 		return '';
 	}
 
-    /**
-     * Null function to adhere to the interface.
-     */
-    public function getExpiry($minutes) {
-        throw new \LogicException(__CLASS__ . " does not use expiries.");
-    }
+	/**
+	 * Null function to adhere to the interface.
+	 *
+	 * @param  float $minutes
+	 * @return mixed|void
+	 * @throws \LogicException
+	 */
+	public function getExpiry($minutes) {
+		throw new \LogicException(__CLASS__ . " does not use expiries.");
+	}
 
 }

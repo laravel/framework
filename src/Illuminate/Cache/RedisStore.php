@@ -182,13 +182,15 @@ class RedisStore extends TaggableStore implements StoreInterface {
 		return $this->prefix;
 	}
 
-    /**
-     * Convert expiry to redis' native format (seconds)
-     */
-    public function getExpiry($minutes)
-    {
-        return round($minutes * 60);
-    }
-
+	/**
+	 * Convert expiry to redis' native format (seconds)
+	 *
+	 * @param  float $minutes
+	 * @return int
+	 */
+	public function getExpiry($minutes)
+	{
+		return round($minutes * 60);
+	}
 
 }

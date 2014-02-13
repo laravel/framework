@@ -116,19 +116,22 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 		return $this->prefix;
 	}
 
-    /**
-     * Convert expiry to xcache's native format (seconds offset)
-     */
-    public function getExpiry($minutes)
-    {
-        if ($minutes === 0.0) {
-            return 0;
-        }
+	/**
+	 * Convert expiry to xcache's native format (seconds offset)
+	 *
+	 * @param  float @minutes
+	 * @return int
+	 */
+	public function getExpiry($minutes)
+	{
+		if ($minutes === 0.0)
+		{
+			return 0;
+		}
 
-        // Never return zero as a result of the rounding!
-        // Return the lowest possible expiry instead.
-        return max(1, round($minutes * 60));
-
-    }
+		// Never return zero as a result of the rounding!
+		// Return the lowest possible expiry instead.
+		return max(1, round($minutes * 60));
+	}
 
 }

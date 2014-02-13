@@ -221,7 +221,7 @@ class DatabaseStore implements StoreInterface {
     /**
      * Compute expiry time $minutes from now
      *
-     * @param float $minutes
+     * @param  float $minutes
      * @return int
      */
     public function getExpiry($minutes ) {
