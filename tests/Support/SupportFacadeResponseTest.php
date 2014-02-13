@@ -20,11 +20,4 @@ class SupportFacadeResponseTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('{"foo":"bar"}', $response->getContent());
 	}
 
-
-	public function testResponseMacros()
-	{
-		Response::macro(__CLASS__, function() { return 'foo'; });
-		$this->assertEquals('foo', Response::{__CLASS__}());
-	}
-
 }
