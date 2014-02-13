@@ -9,6 +9,20 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		m::close();
 	}
+	
+	
+	public function testInstanceMethod()
+	{
+		$request = Request::create('', 'GET');
+		$this->assertTrue($request === $request->instance());
+	}
+	
+	
+	public function testRootMethod()
+	{
+		$request = Request::create('http://example.com/foo/bar/script.php?test');
+		$this->assertEquals('http://example.com', $request->root());
+	}
 
 
 	public function testPathMethod()
@@ -18,6 +32,13 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 		$request = Request::create('/foo/bar', 'GET');
 		$this->assertEquals('foo/bar', $request->path());
+	}
+	
+	
+	public function testDecodedPathMethod()
+	{
+		$request = Request::create('/foo%20bar');
+		$this->assertEquals('foo bar', $request->decodedPath());
 	}
 
 
@@ -69,10 +90,29 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($request->is('foo*'));
 		$this->assertFalse($request->is('bar*'));
 		$this->assertTrue($request->is('*bar*'));
+		$this->assertTrue($request->is('bar*', 'foo*', 'baz'));
 
 		$request = Request::create('/', 'GET');
 
 		$this->assertTrue($request->is('/'));
+	}
+	
+	
+	public function testAjaxMethod()
+	{
+		$request = Request::create('/', 'GET');
+		$this->assertFalse($request->ajax());
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'), '{}');
+		$this->assertTrue($request->ajax());
+	}
+	
+	
+	public function testSecureMethod()
+	{
+		$request = Request::create('http://example.com', 'GET');
+		$this->assertFalse($request->secure());
+		$request = Request::create('https://example.com', 'GET');
+		$this->assertTrue($request->secure());
 	}
 
 
@@ -122,6 +162,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array('name' => 'Taylor'));
 		$this->assertEquals('Taylor', $request->query('name'));
 		$this->assertEquals('Bob', $request->query('foo', 'Bob'));
+		$all = $request->query(null);
+		$this->assertEquals('Taylor', $all['name']);
 	}
 
 
@@ -130,6 +172,16 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array(), array('name' => 'Taylor'));
 		$this->assertEquals('Taylor', $request->cookie('name'));
 		$this->assertEquals('Bob', $request->cookie('foo', 'Bob'));
+		$all = $request->cookie(null);
+		$this->assertEquals('Taylor', $all['name']);
+	}
+	
+	
+	public function testHasCookieMethod()
+	{
+		$request = Request::create('/', 'GET', array(), array('foo' => 'bar'));
+		$this->assertTrue($request->hasCookie('foo'));
+		$this->assertFalse($request->hasCookie('qu'));
 	}
 
 
@@ -173,6 +225,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array(), array(), array(), array('foo' => 'bar'));
 		$this->assertEquals('bar', $request->server('foo'));
 		$this->assertEquals('bar', $request->server('foo.doesnt.exist', 'bar'));
+		$all = $request->server(null);
+		$this->assertEquals('bar', $all['foo']);
 	}
 
 
@@ -200,6 +254,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_DO_THIS' => 'foo'));
 		$this->assertEquals('foo', $request->header('do-this'));
+		$all = $request->header(null);
+		$this->assertEquals('foo', $all['do-this'][0]);
 	}
 
 
@@ -256,13 +312,37 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFlushMethodCallsSession()
+	{
+		$request = Request::create('/', 'GET');
+		$session = m::mock('Illuminate\Session\Store');
+		$session->shouldReceive('flashInput')->once();
+		$request->setSession($session);
+		$request->flush();
+	}
+
+
 	public function testFormatReturnsAcceptableFormat()
 	{
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
 		$this->assertEquals('json', $request->format());
+		$this->assertTrue($request->wantsJson());
 
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/atom+xml'));
 		$this->assertEquals('atom', $request->format());
+		$this->assertFalse($request->wantsJson());
+		
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'is/not/known'));
+		$this->assertEquals('html', $request->format());
+		$this->assertEquals('foo', $request->format('foo'));
+	}
+
+
+	public function testSessionMethod()
+	{
+		$this->setExpectedException('RuntimeException');
+		$request = Request::create('/', 'GET');
+		$request->session();
 	}
 
 }

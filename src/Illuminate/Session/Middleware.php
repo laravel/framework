@@ -129,6 +129,19 @@ class Middleware implements HttpKernelInterface {
 	}
 
 	/**
+	 * Get the full URL for the request.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return string
+	 */
+	protected function getUrl(Request $request)
+	{
+		$url = rtrim(preg_replace('/\?.*/', '', $request->getUri()), '/');
+
+		return $request->getQueryString() ? $url.'?'.$request->getQueryString() : $url;
+	}
+
+	/**
 	 * Remove the garbage from the session if necessary.
 	 *
 	 * @param  \Illuminate\Session\SessionInterface  $session

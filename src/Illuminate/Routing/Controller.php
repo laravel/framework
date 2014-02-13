@@ -196,7 +196,7 @@ abstract class Controller {
 		// If no response is returned from the controller action and a layout is being
 		// used we will assume we want to just return the layout view as any nested
 		// views were probably bound on this view during this controller actions.
-		if (is_null($response) and ! is_null($this->layout))
+		if (is_null($response) && ! is_null($this->layout))
 		{
 			$response = $this->layout;
 		}

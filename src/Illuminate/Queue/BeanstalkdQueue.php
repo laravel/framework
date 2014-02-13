@@ -39,11 +39,12 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function push($job, $data = '', $queue = null)
+	public function push($job, $data = '', $queue = null, array $options = array())
 	{
-		return $this->pushRaw($this->createPayload($job, $data), $queue);
+		return $this->pushRaw($this->createPayload($job, $data), $queue, $options);
 	}
 
 	/**
@@ -66,9 +67,10 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed  $data
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function later($delay, $job, $data = '', $queue = null)
+	public function later($delay, $job, $data = '', $queue = null, array $options = array())
 	{
 		$payload = $this->createPayload($job, $data);
 

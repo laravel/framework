@@ -68,11 +68,12 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function push($job, $data = '', $queue = null)
+	public function push($job, $data = '', $queue = null, array $options = array())
 	{
-		return $this->pushRaw($this->createPayload($job, $data, $queue), $queue);
+		return $this->pushRaw($this->createPayload($job, $data, $queue), $queue, $options);
 	}
 
 	/**
@@ -96,11 +97,12 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $payload
 	 * @param  string  $queue
 	 * @param  int  $delay
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function recreate($payload, $queue = null, $delay)
+	public function recreate($payload, $queue = null, $delay, array $options = array())
 	{
-		$options = array('delay' => $this->getSeconds($delay));
+		$options[] = array('delay' => $this->getSeconds($delay));
 
 		return $this->pushRaw($payload, $queue, $options);
 	}
@@ -112,15 +114,16 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed  $data
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function later($delay, $job, $data = '', $queue = null)
+	public function later($delay, $job, $data = '', $queue = null, array $options = array())
 	{
 		$delay = $this->getSeconds($delay);
 
 		$payload = $this->createPayload($job, $data, $queue);
 
-		return $this->pushRaw($payload, $this->getQueue($queue), compact('delay'));
+		return $this->pushRaw($payload, $this->getQueue($queue), compact('delay'), $options);
 	}
 
 	/**
