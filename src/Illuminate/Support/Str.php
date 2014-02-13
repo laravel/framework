@@ -124,12 +124,15 @@ class Str {
 	{
 		if (mb_strlen($value) <= $limit) return $value;
 
-		if ($preserveWords) {
+		if ($preserveWords)
+		{
 			$cutArea = mb_substr($value, $limit - 1, 2, 'UTF-8');
-			if (strpos($cutArea, ' ') === false) {
+			if (strpos($cutArea, ' ') === false)
+			{
 				$value = mb_substr($value, 0, $limit, 'UTF-8');
 				$spacePos = strrpos($value, ' ');
-				if ($spacePos !== false) {
+				if ($spacePos !== false)
+				{
 					return rtrim(mb_substr($value, 0, $spacePos, 'UTF-8')).$end;
 				}
 			}
