@@ -3,6 +3,7 @@
 use Countable;
 use ArrayIterator;
 use IteratorAggregate;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -184,7 +185,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function check(array $routes, $request)
 	{
-		return array_first($routes, function($key, $value) use ($request)
+		return Arr::first($routes, function($key, $value) use ($request)
 		{
 			return $value->matches($request);
 		});
@@ -200,7 +201,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	{
 		if (is_null($method)) return $this->getRoutes();
 
-		return array_get($this->routes, $method, array());
+		return Arr::get($this->routes, $method, array());
 	}
 
 	/**

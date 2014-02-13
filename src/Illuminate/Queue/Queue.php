@@ -2,6 +2,7 @@
 
 use Closure;
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
 
@@ -86,7 +87,7 @@ abstract class Queue {
 	{
 		$payload = json_decode($payload, true);
 
-		return json_encode(array_set($payload, $key, $value));
+		return json_encode(Arr::set($payload, $key, $value));
 	}
 
 	/**

@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -322,7 +323,7 @@ class Builder {
 
 		$column = $this->model->getUpdatedAtColumn();
 
-		return array_add($values, $column, $this->model->freshTimestampString());
+		return Arr::add($values, $column, $this->model->freshTimestampString());
 	}
 
 	/**

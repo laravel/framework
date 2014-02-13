@@ -2,6 +2,7 @@
 
 use Closure;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -184,7 +185,7 @@ class Middleware implements HttpKernelInterface {
 
 		if ($this->sessionIsPersistent($c = $this->manager->getSessionConfig()))
 		{
-			$secure = array_get($c, 'secure', false);
+			$secure = Arr::get($c, 'secure', false);
 
 			$response->headers->setCookie(new Cookie(
 				$s->getName(), $s->getId(), $this->getCookieLifetime(), $c['path'], $c['domain'], $secure
@@ -199,7 +200,7 @@ class Middleware implements HttpKernelInterface {
 	 */
 	protected function getLifetimeSeconds()
 	{
-		return array_get($this->manager->getSessionConfig(), 'lifetime') * 60;
+		return Arr::get($this->manager->getSessionConfig(), 'lifetime') * 60;
 	}
 
 	/**
@@ -221,7 +222,7 @@ class Middleware implements HttpKernelInterface {
 	 */
 	protected function sessionConfigured()
 	{
-		return ! is_null(array_get($this->manager->getSessionConfig(), 'driver'));
+		return ! is_null(Arr::get($this->manager->getSessionConfig(), 'driver'));
 	}
 
 	/**

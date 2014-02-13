@@ -7,6 +7,7 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 
@@ -104,7 +105,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function fetch($key)
 	{
-		return new static(array_fetch($this->items, $key));
+		return new static(Arr::fetch($this->items, $key));
 	}
 
 	/**
@@ -133,7 +134,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		}
 		else
 		{
-			return array_first($this->items, $callback, $default);
+			return Arr::first($this->items, $callback, $default);
 		}
 	}
 
@@ -144,7 +145,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function flatten()
 	{
-		return new static(array_flatten($this->items));
+		return new static(Arr::flatten($this->items));
 	}
 
 	/**
@@ -187,7 +188,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		foreach ($this->items as $key => $value)
 		{
-			$key = is_callable($groupBy) ? $groupBy($value, $key) : array_get($value, $groupBy);
+			$key = is_callable($groupBy) ? $groupBy($value, $key) : Arr::get($value, $groupBy);
 
 			$results[$key][] = $value;
 		}
@@ -260,7 +261,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function lists($value, $key = null)
 	{
-		return array_pluck($this->items, $value, $key);
+		return Arr::pluck($this->items, $value, $key);
 	}
 
 	/**
@@ -543,7 +544,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return function($item) use ($value)
 		{
-			return is_object($item) ? $item->{$value} : array_get($item, $value);
+			return is_object($item) ? $item->{$value} : Arr::get($item, $value);
 		};
 	}
 

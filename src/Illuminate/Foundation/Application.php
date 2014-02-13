@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Config\FileLoader;
@@ -193,7 +194,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		// Here we will bind the install paths into the container as strings that can be
 		// accessed from any point in the system. Each path key is prefixed with path
 		// so that they have the consistent naming convention inside the container.
-		foreach (array_except($paths, array('app')) as $key => $value)
+		foreach (Arr::except($paths, array('app')) as $key => $value)
 		{
 			$this->instance("path.{$key}", realpath($value));
 		}
@@ -347,7 +348,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
 		if (array_key_exists($name, $this->loadedProviders))
 		{
-			return array_first($this->serviceProviders, function($key, $value) use ($name)
+			return Arr::first($this->serviceProviders, function($key, $value) use ($name)
 			{
 				return get_class($value) == $name;
 			});

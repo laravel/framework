@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Session;
 
+use Illuminate\Support\Arr;
 use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
@@ -262,7 +263,7 @@ class Store implements SessionInterface {
 	 */
 	public function get($name, $default = null)
 	{
-		return array_get($this->attributes, $name, $default);
+		return Arr::get($this->attributes, $name, $default);
 	}
 
 	/**
@@ -294,7 +295,7 @@ class Store implements SessionInterface {
 		// convenient, since the request's previous input is available.
 		if (is_null($key)) return $input;
 
-		return array_get($input, $key, $default);
+		return Arr::get($input, $key, $default);
 	}
 
 	/**
@@ -302,7 +303,7 @@ class Store implements SessionInterface {
 	 */
 	public function set($name, $value)
 	{
-		array_set($this->attributes, $name, $value);
+		Arr::set($this->attributes, $name, $value);
 	}
 
 	/**
@@ -435,7 +436,7 @@ class Store implements SessionInterface {
 	 */
 	public function remove($name)
 	{
-		return array_pull($this->attributes, $name);
+		return Arr::pull($this->attributes, $name);
 	}
 
 	/**
@@ -446,7 +447,7 @@ class Store implements SessionInterface {
 	 */
 	public function forget($key)
 	{
-		array_forget($this->attributes, $key);
+		Arr::forget($this->attributes, $key);
 	}
 
 	/**
@@ -493,7 +494,7 @@ class Store implements SessionInterface {
 	 */
 	public function getBag($name)
 	{
-		return array_get($this->bags, $name, function()
+		return Arr::get($this->bags, $name, function()
 		{
 			throw new \InvalidArgumentException("Bag not registered.");
 		});
@@ -515,7 +516,7 @@ class Store implements SessionInterface {
 	 */
 	public function getBagData($name)
 	{
-		return array_get($this->bagData, $name, array());
+		return Arr::get($this->bagData, $name, array());
 	}
 
 	/**

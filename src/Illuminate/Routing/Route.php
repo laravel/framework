@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
@@ -192,7 +193,7 @@ class Route {
 	 */
 	public static function parseFilters($filters)
 	{
-		return array_build(static::explodeFilters($filters), function($key, $value)
+		return Arr::build(static::explodeFilters($filters), function($key, $value)
 		{
 			return Route::parseFilter($value);
 		});
@@ -276,7 +277,7 @@ class Route {
 	 */
 	public function parameter($name, $default = null)
 	{
-		return array_get($this->parameters(), $name) ?: $default;
+		return Arr::get($this->parameters(), $name) ?: $default;
 	}
 
 	/**
@@ -460,7 +461,7 @@ class Route {
 	{
 		foreach ($parameters as $key => &$value)
 		{
-			$value = isset($value) ? $value : array_get($this->defaults, $key);
+			$value = isset($value) ? $value : Arr::get($this->defaults, $key);
 		}
 
 		return $parameters;
@@ -501,7 +502,7 @@ class Route {
 	 */
 	protected function findClosure(array $action)
 	{
-		return array_first($action, function($key, $value)
+		return Arr::first($action, function($key, $value)
 		{
 			return $value instanceof Closure;
 		});
@@ -717,7 +718,7 @@ class Route {
 	 */
 	public function domain()
 	{
-		return array_get($this->action, 'domain');
+		return Arr::get($this->action, 'domain');
 	}
 
 	/**
@@ -750,7 +751,7 @@ class Route {
 	 */
 	public function getName()
 	{
-		return array_get($this->action, 'as');
+		return Arr::get($this->action, 'as');
 	}
 
 	/**
@@ -760,7 +761,7 @@ class Route {
 	 */
 	public function getActionName()
 	{
-		return array_get($this->action, 'controller', 'Closure');
+		return Arr::get($this->action, 'controller', 'Closure');
 	}
 
 	/**

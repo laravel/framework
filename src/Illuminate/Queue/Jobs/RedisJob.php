@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Support\Arr;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 
@@ -88,7 +89,7 @@ class RedisJob extends Job {
 	 */
 	public function attempts()
 	{
-		return array_get(json_decode($this->job, true), 'attempts');
+		return Arr::get(json_decode($this->job, true), 'attempts');
 	}
 
 	/**
@@ -98,7 +99,7 @@ class RedisJob extends Job {
 	 */
 	public function getJobId()
 	{
-		return array_get(json_decode($this->job, true), 'id');
+		return Arr::get(json_decode($this->job, true), 'id');
 	}
 
 	/**

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
 class ListFailedCommand extends Command {
@@ -29,7 +30,7 @@ class ListFailedCommand extends Command {
 
 		foreach ($this->laravel['queue.failer']->all() as $failed)
 		{
-			$rows[] = array_values(array_except((array) $failed, array('payload')));
+			$rows[] = array_values(Arr::except((array) $failed, array('payload')));
 		}
 
 		if (count($rows) == 0)

@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Queue\Connectors;
 
 use Aws\Sqs\SqsClient;
+use Illuminate\Support\Arr;
 use Illuminate\Queue\SqsQueue;
 
 class SqsConnector implements ConnectorInterface {
@@ -13,7 +14,7 @@ class SqsConnector implements ConnectorInterface {
 	 */
 	public function connect(array $config)
 	{
-		$sqsConfig = array_only($config, array('key', 'secret', 'region', 'default_cache_config'));
+		$sqsConfig = Arr::only($config, array('key', 'secret', 'region', 'default_cache_config'));
 
 		$sqs = SqsClient::factory($sqsConfig);
 

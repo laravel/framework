@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Http;
 
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -96,7 +97,7 @@ class Request extends SymfonyRequest {
 
 		$segments = array_filter($segments, function($v) { return $v != ''; });
 
-		return array_get($segments, $index - 1, $default);
+		return Arr::get($segments, $index - 1, $default);
 	}
 
 	/**
@@ -197,7 +198,7 @@ class Request extends SymfonyRequest {
 	{
 		$input = $this->getInputSource()->all() + $this->query->all();
 
-		return array_get($input, $key, $default);
+		return Arr::get($input, $key, $default);
 	}
 
 	/**
@@ -210,7 +211,7 @@ class Request extends SymfonyRequest {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_only($this->input(), $keys) + array_fill_keys($keys, null);
+		return Arr::only($this->input(), $keys) + array_fill_keys($keys, null);
 	}
 
 	/**
@@ -225,7 +226,7 @@ class Request extends SymfonyRequest {
 
 		$results = $this->input();
 
-		foreach ($keys as $key) array_forget($results, $key);
+		foreach ($keys as $key) Arr::forget($results, $key);
 
 		return $results;
 	}
@@ -274,7 +275,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function file($key = null, $default = null)
 	{
-		return array_get($this->files->all(), $key, $default);
+		return Arr::get($this->files->all(), $key, $default);
 	}
 
 	/**
@@ -434,7 +435,7 @@ class Request extends SymfonyRequest {
 
 		if (is_null($key)) return $this->json;
 
-		return array_get($this->json->all(), $key, $default);
+		return Arr::get($this->json->all(), $key, $default);
 	}
 
 	/**

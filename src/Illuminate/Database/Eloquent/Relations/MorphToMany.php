@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -88,7 +89,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		$record = parent::createAttachRecord($id, $timed);
 
-		return array_add($record, $this->morphType, $this->morphClass);
+		return Arr::add($record, $this->morphType, $this->morphClass);
 	}
 
 	/**
