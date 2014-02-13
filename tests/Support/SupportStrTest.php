@@ -39,13 +39,6 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testStringMacros()
-	{
-		Str::macro(__CLASS__, function() { return 'foo'; });
-		$this->assertEquals('foo', Str::{__CLASS__}());
-	}
-
-
 	public function testStartsWith()
 	{
 		$this->assertTrue(Str::startsWith('jason', 'jas'));
