@@ -123,4 +123,12 @@ class SupportArrTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals(array('#foo', '#bar', '#baz'), Arr::flatten(array(array('#foo', '#bar'), array('#baz'))));
 	}
+
+
+	public function testArrayMacros()
+	{
+		Arr::macro(__CLASS__, function() { return 'foo'; });
+		$this->assertEquals('foo', Arr::SupportArrTest());
+	}
+
 }

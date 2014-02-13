@@ -5,342 +5,381 @@ use Illuminate\Support\Collection;
 
 class Arr {
 
-    /**
-     * Add an element to an array if it doesn't exist.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return array
-     */
-    public static function add($array, $key, $value)
-    {
-        if ( ! isset($array[$key])) $array[$key] = $value;
+	/**
+	 * The registered array macros.
+	 *
+	 * @var array
+	 */
+	protected static $macros = array();
 
-        return $array;
-    }
+	/**
+	 * Add an element to an array if it doesn't exist.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return array
+	 */
+	public static function add($array, $key, $value)
+	{
+		if ( ! isset($array[$key])) $array[$key] = $value;
 
-    /**
-     * Build a new array using a callback.
-     *
-     * @param  array  $array
-     * @param  \Closure  $callback
-     * @return array
-     */
-    public static function build($array, Closure $callback)
-    {
-        $results = array();
+		return $array;
+	}
 
-        foreach ($array as $key => $value)
-        {
-            list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
+	/**
+	 * Build a new array using a callback.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	public static function build($array, Closure $callback)
+	{
+		$results = array();
 
-            $results[$innerKey] = $innerValue;
-        }
+		foreach ($array as $key => $value)
+		{
+			list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
 
-        return $results;
-    }
+			$results[$innerKey] = $innerValue;
+		}
 
-    /**
-     * Divide an array into two arrays. One with keys and the other with values.
-     *
-     * @param  array  $array
-     * @return array
-     */
-    public static function divide($array)
-    {
-        return array(array_keys($array), array_values($array));
-    }
+		return $results;
+	}
 
-    /**
-     * Flatten a multi-dimensional associative array with dots.
-     *
-     * @param  array   $array
-     * @param  string  $prepend
-     * @return array
-     */
-    public static function dot($array, $prepend = '')
-    {
-        $results = array();
+	/**
+	 * Divide an array into two arrays. One with keys and the other with values.
+	 *
+	 * @param  array  $array
+	 * @return array
+	 */
+	public static function divide($array)
+	{
+		return array(array_keys($array), array_values($array));
+	}
 
-        foreach ($array as $key => $value)
-        {
-            if (is_array($value))
-            {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
-            }
-            else
-            {
-                $results[$prepend.$key] = $value;
-            }
-        }
+	/**
+	 * Flatten a multi-dimensional associative array with dots.
+	 *
+	 * @param  array   $array
+	 * @param  string  $prepend
+	 * @return array
+	 */
+	public static function dot($array, $prepend = '')
+	{
+		$results = array();
 
-        return $results;
-    }
+		foreach ($array as $key => $value)
+		{
+			if (is_array($value))
+			{
+				$results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+			}
+			else
+			{
+				$results[$prepend.$key] = $value;
+			}
+		}
 
-    /**
-     * Get all of the given array except for a specified array of items.
-     *
-     * @param  array  $array
-     * @param  array  $keys
-     * @return array
-     */
-    public static function except($array, $keys)
-    {
-        return array_diff_key($array, array_flip((array) $keys));
-    }
+		return $results;
+	}
 
-    /**
-     * Fetch a flattened array of a nested array element.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @return array
-     */
-    public static function fetch($array, $key)
-    {
-        foreach (explode('.', $key) as $segment)
-        {
-            $results = array();
+	/**
+	 * Get all of the given array except for a specified array of items.
+	 *
+	 * @param  array  $array
+	 * @param  array  $keys
+	 * @return array
+	 */
+	public static function except($array, $keys)
+	{
+		return array_diff_key($array, array_flip((array) $keys));
+	}
 
-            foreach ($array as $value)
-            {
-                $value = (array) $value;
+	/**
+	 * Fetch a flattened array of a nested array element.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return array
+	 */
+	public static function fetch($array, $key)
+	{
+		foreach (explode('.', $key) as $segment)
+		{
+			$results = array();
 
-                $results[] = $value[$segment];
-            }
+			foreach ($array as $value)
+			{
+				$value = (array) $value;
 
-            $array = array_values($results);
-        }
+				$results[] = $value[$segment];
+			}
 
-        return array_values($results);
-    }
+			$array = array_values($results);
+		}
 
-    /**
-     * Return the first element in an array passing a given truth test.
-     *
-     * @param  array    $array
-     * @param  Closure  $callback
-     * @param  mixed    $default
-     * @return mixed
-     */
-    public static function first($array, $callback, $default = null)
-    {
-        foreach ($array as $key => $value)
-        {
-            if (call_user_func($callback, $key, $value)) return $value;
-        }
+		return array_values($results);
+	}
 
-        return value($default);
-    }
+	/**
+	 * Return the first element in an array passing a given truth test.
+	 *
+	 * @param  array    $array
+	 * @param  Closure  $callback
+	 * @param  mixed    $default
+	 * @return mixed
+	 */
+	public static function first($array, $callback, $default = null)
+	{
+		foreach ($array as $key => $value)
+		{
+			if (call_user_func($callback, $key, $value)) return $value;
+		}
 
-    /**
-     * Return the last element in an array passing a given truth test.
-     *
-     * @param  array    $array
-     * @param  Closure  $callback
-     * @param  mixed    $default
-     * @return mixed
-     */
-    public static function last($array, $callback, $default = null)
-    {
-        return static::first(array_reverse($array), $callback, $default);
-    }
+		return value($default);
+	}
 
-    /**
-     * Flatten a multi-dimensional array into a single level.
-     *
-     * @param  array  $array
-     * @return array
-     */
-    public static function flatten($array)
-    {
-        $return = array();
+	/**
+	 * Return the last element in an array passing a given truth test.
+	 *
+	 * @param  array    $array
+	 * @param  Closure  $callback
+	 * @param  mixed    $default
+	 * @return mixed
+	 */
+	public static function last($array, $callback, $default = null)
+	{
+		return static::first(array_reverse($array), $callback, $default);
+	}
 
-        array_walk_recursive($array, function($x) use (&$return) { $return[] = $x; });
+	/**
+	 * Flatten a multi-dimensional array into a single level.
+	 *
+	 * @param  array  $array
+	 * @return array
+	 */
+	public static function flatten($array)
+	{
+		$return = array();
 
-        return $return;
-    }
+		array_walk_recursive($array, function($x) use (&$return) { $return[] = $x; });
 
-    /**
-     * Remove an array item from a given array using "dot" notation.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @return void
-     */
-    public static function forget(&$array, $key)
-    {
-        $keys = explode('.', $key);
+		return $return;
+	}
 
-        while (count($keys) > 1)
-        {
-            $key = array_shift($keys);
+	/**
+	 * Remove an array item from a given array using "dot" notation.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return void
+	 */
+	public static function forget(&$array, $key)
+	{
+		$keys = explode('.', $key);
 
-            if ( ! isset($array[$key]) || ! is_array($array[$key]))
-            {
-                return;
-            }
+		while (count($keys) > 1)
+		{
+			$key = array_shift($keys);
 
-            $array =& $array[$key];
-        }
+			if ( ! isset($array[$key]) || ! is_array($array[$key]))
+			{
+				return;
+			}
 
-        unset($array[array_shift($keys)]);
-    }
+			$array =& $array[$key];
+		}
 
-    /**
-     * Get an item from an array using "dot" notation.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @param  mixed   $default
-     * @return mixed
-     */
-    public static function get($array, $key, $default = null)
-    {
-        if (is_null($key)) return $array;
+		unset($array[array_shift($keys)]);
+	}
 
-        if (isset($array[$key])) return $array[$key];
+	/**
+	 * Get an item from an array using "dot" notation.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	public static function get($array, $key, $default = null)
+	{
+		if (is_null($key)) return $array;
 
-        foreach (explode('.', $key) as $segment)
-        {
-            if ( ! is_array($array) || ! array_key_exists($segment, $array))
-            {
-                return value($default);
-            }
+		if (isset($array[$key])) return $array[$key];
 
-            $array = $array[$segment];
-        }
+		foreach (explode('.', $key) as $segment)
+		{
+			if ( ! is_array($array) || ! array_key_exists($segment, $array))
+			{
+				return value($default);
+			}
 
-        return $array;
-    }
+			$array = $array[$segment];
+		}
 
-    /**
-     * Get a subset of the items from the given array.
-     *
-     * @param  array  $array
-     * @param  array  $keys
-     * @return array
-     */
-    public static function only($array, $keys)
-    {
-        return array_intersect_key($array, array_flip((array) $keys));
-    }
+		return $array;
+	}
 
-    /**
-     * Pluck an array of values from an array.
-     *
-     * @param  array   $array
-     * @param  string  $value
-     * @param  string  $key
-     * @return array
-     */
-    public static function pluck($array, $value, $key = null)
-    {
-        $results = array();
+	/**
+	 * Get a subset of the items from the given array.
+	 *
+	 * @param  array  $array
+	 * @param  array  $keys
+	 * @return array
+	 */
+	public static function only($array, $keys)
+	{
+		return array_intersect_key($array, array_flip((array) $keys));
+	}
 
-        foreach ($array as $item)
-        {
-            $itemValue = is_object($item) ? $item->{$value} : $item[$value];
+	/**
+	 * Pluck an array of values from an array.
+	 *
+	 * @param  array   $array
+	 * @param  string  $value
+	 * @param  string  $key
+	 * @return array
+	 */
+	public static function pluck($array, $value, $key = null)
+	{
+		$results = array();
 
-            // If the key is "null", we will just append the value to the array and keep
-            // looping. Otherwise we will key the array using the value of the key we
-            // received from the developer. Then we'll return the final array form.
-            if (is_null($key))
-            {
-                $results[] = $itemValue;
-            }
-            else
-            {
-                $itemKey = is_object($item) ? $item->{$key} : $item[$key];
+		foreach ($array as $item)
+		{
+			$itemValue = is_object($item) ? $item->{$value} : $item[$value];
 
-                $results[$itemKey] = $itemValue;
-            }
-        }
+			// If the key is "null", we will just append the value to the array and keep
+			// looping. Otherwise we will key the array using the value of the key we
+			// received from the developer. Then we'll return the final array form.
+			if (is_null($key))
+			{
+				$results[] = $itemValue;
+			}
+			else
+			{
+				$itemKey = is_object($item) ? $item->{$key} : $item[$key];
 
-        return $results;
-    }
+				$results[$itemKey] = $itemValue;
+			}
+		}
 
-    /**
-     * Get a value from the array, and remove it.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @return mixed
-     */
-    public static function pull(&$array, $key)
-    {
-        $value = static::get($array, $key);
+		return $results;
+	}
 
-        static::forget($array, $key);
+	/**
+	 * Get a value from the array, and remove it.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public static function pull(&$array, $key)
+	{
+		$value = static::get($array, $key);
 
-        return $value;
-    }
+		static::forget($array, $key);
 
-    /**
-     * Set an array item to a given value using "dot" notation.
-     *
-     * If no key is given to the method, the entire array will be replaced.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return array
-     */
-    public static function set(&$array, $key, $value)
-    {
-        if (is_null($key)) return $array = $value;
+		return $value;
+	}
 
-        $keys = explode('.', $key);
+	/**
+	 * Set an array item to a given value using "dot" notation.
+	 *
+	 * If no key is given to the method, the entire array will be replaced.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return array
+	 */
+	public static function set(&$array, $key, $value)
+	{
+		if (is_null($key)) return $array = $value;
 
-        while (count($keys) > 1)
-        {
-            $key = array_shift($keys);
+		$keys = explode('.', $key);
 
-            // If the key doesn't exist at this depth, we will just create an empty array
-            // to hold the next value, allowing us to create the arrays to hold final
-            // values at the correct depth. Then we'll keep digging into the array.
-            if ( ! isset($array[$key]) || ! is_array($array[$key]))
-            {
-                $array[$key] = array();
-            }
+		while (count($keys) > 1)
+		{
+			$key = array_shift($keys);
 
-            $array =& $array[$key];
-        }
+			// If the key doesn't exist at this depth, we will just create an empty array
+			// to hold the next value, allowing us to create the arrays to hold final
+			// values at the correct depth. Then we'll keep digging into the array.
+			if ( ! isset($array[$key]) || ! is_array($array[$key]))
+			{
+				$array[$key] = array();
+			}
 
-        $array[array_shift($keys)] = $value;
+			$array =& $array[$key];
+		}
 
-        return $array;
-    }
+		$array[array_shift($keys)] = $value;
 
-    /**
-     * Sort the array using the given Closure.
-     *
-     * @param  array  $array
-     * @param  \Closure  $callback
-     * @return array
-     */
-    public static function sort($array, Closure $callback)
-    {
-        return Collection::make($array)->sortBy($callback)->all();
-    }
+		return $array;
+	}
 
-    /**
-     * Filter the array using the given Closure.
-     *
-     * @param  array  $array
-     * @param  \Closure  $callback
-     * @return array
-     */
-    public static function where($array, Closure $callback)
-    {
-        $filtered = array();
+	/**
+	 * Sort the array using the given Closure.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	public static function sort($array, Closure $callback)
+	{
+		return Collection::make($array)->sortBy($callback)->all();
+	}
 
-        foreach ($array as $key => $value)
-        {
-            if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
-        }
+	/**
+	 * Filter the array using the given Closure.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	public static function where($array, Closure $callback)
+	{
+		$filtered = array();
 
-        return $filtered;
-    }
+		foreach ($array as $key => $value)
+		{
+			if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
+		}
+
+		return $filtered;
+	}
+
+	/**
+	 * Register a custom array macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public static function macro($name, $macro)
+	{
+		static::$macros[$name] = $macro;
+	}
+
+	/**
+	 * Dynamically handle calls to the array class.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public static function __callStatic($method, $parameters)
+	{
+		if (isset(static::$macros[$method]))
+		{
+			return call_user_func_array(static::$macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
+	}
+
 }
