@@ -124,7 +124,7 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function getExpiry($minutes)
 	{
-		if ($minutes === 0.0)
+		if ($minutes == 0)
 		{
 			return 0;
 		}
