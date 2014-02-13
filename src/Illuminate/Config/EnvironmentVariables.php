@@ -37,8 +37,6 @@ class EnvironmentVariables {
 			$_ENV[$key] = $value;
 
 			$_SERVER[$key] = $value;
-
-			putenv("{$key}={$value}");
 		}
 	}
 

@@ -30,14 +30,13 @@ abstract class Queue {
 	 * @param  array  $jobs
 	 * @param  mixed  $data
 	 * @param  string  $queue
-	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function bulk($jobs, $data = '', $queue = null, array $options = array())
+	public function bulk($jobs, $data = '', $queue = null)
 	{
 		foreach ((array) $jobs as $job)
 		{
-			$this->push($job, $data, $queue, $options);
+			$this->push($job, $data, $queue);
 		}
 	}
 

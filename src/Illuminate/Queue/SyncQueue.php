@@ -8,10 +8,9 @@ class SyncQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function push($job, $data = '', $queue = null, array $options = array())
+	public function push($job, $data = '', $queue = null)
 	{
 		$this->resolveJob($job, $data)->fire();
 
@@ -38,12 +37,11 @@ class SyncQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed  $data
 	 * @param  string  $queue
-	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function later($delay, $job, $data = '', $queue = null, array $options = array())
+	public function later($delay, $job, $data = '', $queue = null)
 	{
-		return $this->push($job, $data, $queue, $options);
+		return $this->push($job, $data, $queue);
 	}
 
 	/**

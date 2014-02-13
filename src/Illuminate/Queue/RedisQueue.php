@@ -47,12 +47,11 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @param  array   $options
 	 * @return void
 	 */
-	public function push($job, $data = '', $queue = null, array $options = array())
+	public function push($job, $data = '', $queue = null)
 	{
-		return $this->pushRaw($this->createPayload($job, $data), $queue, $options);
+		return $this->pushRaw($this->createPayload($job, $data), $queue);
 	}
 
 	/**
@@ -75,10 +74,9 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed  $data
 	 * @param  string  $queue
-	 * @param  array   $options
 	 * @return void
 	 */
-	public function later($delay, $job, $data = '', $queue = null, array $options = array())
+	public function later($delay, $job, $data = '', $queue = null)
 	{
 		$payload = $this->createPayload($job, $data);
 
