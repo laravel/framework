@@ -54,7 +54,7 @@ class ListFailedCommand extends Command {
 	{
 		$row = array_values(array_except($failed, array('payload')));
 
-		array_splice($row, 3, 0, array_get($failed, 'payload.job'));
+		array_splice($row, 3, 0, array_get(json_decode($failed['payload'], true), 'job'));
 
 		return $row;
 	}
