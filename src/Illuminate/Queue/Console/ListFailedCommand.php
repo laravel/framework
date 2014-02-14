@@ -29,7 +29,7 @@ class ListFailedCommand extends Command {
 
 		foreach ($this->laravel['queue.failer']->all() as $failed)
 		{
-			$rows[] = array_values(array_except((array) $failed, array('payload')));
+			$rows[] = $this->parseFailedJob((array) $failed);
 		}
 
 		if (count($rows) == 0)
@@ -39,9 +39,24 @@ class ListFailedCommand extends Command {
 
 		$table = $this->getHelperSet()->get('table');
 
-		$table->setHeaders(array('ID', 'Connection', 'Queue', 'Failed At'))
+		$table->setHeaders(array('ID', 'Connection', 'Queue', 'Class', 'Failed At'))
               ->setRows($rows)
               ->render($this->output);
+	}
+
+	/**
+	 * Parse the failed job row.
+	 *
+	 * @param  array  $failed
+	 * @return array
+	 */
+	protected function parseFailedJob(array $failed)
+	{
+		$row = array_values(array_except($failed, array('payload')));
+
+		array_splice($row, 3, 0, array_get($failed, 'payload.job'));
+
+		return $row;
 	}
 
 }
