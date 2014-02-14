@@ -524,6 +524,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->filter('bar', function() {});
 		$router->filter('baz', function() { return 'foo!'; });
 		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		
+		/**
+		 * getPrefix() method
+		 */
+		$router = $this->getRouter();
+		$router->group(array('prefix' => 'foo'), function() use ($router)
+		{
+			$router->get('bar', function() { return 'hello'; });
+		});		
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();		
+		$this->assertEquals('foo', $routes[0]->getPrefix());
 	}
 
 
