@@ -30,6 +30,8 @@ class RetryCommand extends Command {
 
 		if ( ! is_null($failed))
 		{
+			$failed->payload = $this->resetAttempts($failed->payload);
+
 			$this->laravel['queue']->connection($failed->connection)->pushRaw($failed->payload, $failed->queue);
 
 			$this->laravel['queue.failer']->forget($failed->id);
@@ -40,6 +42,21 @@ class RetryCommand extends Command {
 		{
 			$this->error('No failed job matches the given ID.');
 		}
+	}
+
+	/**
+	 * Reset the payload attempts.
+	 *
+	 * @param  string  $payload
+	 * @return string
+	 */
+	protected function resetAttempts($payload)
+	{
+		$payload = json_decode($payload, true);
+
+		if (isset($payload['attempts'])) $payload['attempts'] = 0;
+
+		return json_encode($payload);
 	}
 
 	/**
