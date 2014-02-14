@@ -848,12 +848,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$self = __FUNCTION__;
 
-		return array_first(debug_backtrace(false), function($trace) use ($self)
+		$caller = array_first(debug_backtrace(false), function($key, $trace) use ($self)
 		{
 			$caller = $trace['function'];
 
 			return ( ! in_array($caller, Model::$manyMethods) && $caller != $self);
 		});
+
+		return ! is_null($caller) ? $caller['function'] : null;
 	}
 
 	/**
