@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Queue\Capsule;
 
-use Illuminate\Container\Container;
-use Illuminate\Queue\QueueManager;
-use Illuminate\Queue\QueueServiceProvider;
 use Illuminate\Support\Fluent;
+use Illuminate\Queue\QueueManager;
+use Illuminate\Container\Container;
+use Illuminate\Queue\QueueServiceProvider;
 
 class Manager {
 
@@ -32,7 +32,7 @@ class Manager {
         $this->setupContainer($container);
 
         // Once we have the container setup, we will setup the default configuration
-        // options in the container "config" binding. This will make the queue
+        // options in the container "config" bindings. This just makes this queue
         // manager behave correctly since all the correct binding are in place.
         $this->setupDefaultConfiguration();
 
@@ -74,9 +74,15 @@ class Manager {
         $this->manager = new QueueManager($this->container);
     }
 
+    /**
+     * Register the default connectors that the component ships with.
+     *
+     * @return void
+     */
     protected function registerConnectors()
     {
         $provider = new QueueServiceProvider($this->container);
+
         $provider->registerConnectors($this->manager);
     }
 
