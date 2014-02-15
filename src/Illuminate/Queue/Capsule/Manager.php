@@ -103,6 +103,7 @@ class Manager {
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
+     * @param  string  $connection
      * @return mixed
      */
     public static function push($job, $data = '', $queue = null, $connection = null)
@@ -113,9 +114,10 @@ class Manager {
     /**
      * Push a new an array of jobs onto the queue.
      *
-     * @param  array  $jobs
-     * @param  mixed  $data
+     * @param  array   $jobs
+     * @param  mixed   $data
      * @param  string  $queue
+     * @param  string  $connection
      * @return mixed
      */
     public static function bulk($jobs, $data = '', $queue = null, $connection = null)
@@ -127,9 +129,10 @@ class Manager {
      * Push a new job onto the queue after a delay.
      *
      * @param  \DateTime|int  $delay
-     * @param  string  $job
-     * @param  mixed  $data
-     * @param  string  $queue
+     * @param  string         $job
+     * @param  mixed          $data
+     * @param  string         $queue
+     * @param  string         $connection
      * @return mixed
      */
     public static function later($delay, $job, $data = '', $queue = null, $connection = null)

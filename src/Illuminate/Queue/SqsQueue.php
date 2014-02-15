@@ -64,9 +64,9 @@ class SqsQueue extends Queue implements QueueInterface {
 	 * Push a new job onto the queue after a delay.
 	 *
 	 * @param  \DateTime|int  $delay
-	 * @param  string  $job
-	 * @param  mixed  $data
-	 * @param  string  $queue
+	 * @param  string         $job
+	 * @param  mixed          $data
+	 * @param  string         $queue
 	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
