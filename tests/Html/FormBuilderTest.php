@@ -298,10 +298,10 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$form3 = $this->formBuilder->checkbox('foo', 'foobar', true);
 		$form4 = $this->formBuilder->checkbox('foo', 'foobar', false, array('class' => 'span2'));
 
-		$this->assertEquals('<input name="foo" type="checkbox">', $form1);
-		$this->assertEquals('<input name="foo" type="checkbox" value="1">', $form2);
-		$this->assertEquals('<input checked="checked" name="foo" type="checkbox" value="foobar">', $form3);
-		$this->assertEquals('<input class="span2" name="foo" type="checkbox" value="foobar">', $form4);
+		$this->assertEquals('<input name="foo" type="hidden"><input name="foo" type="checkbox">', $form1);
+		$this->assertEquals('<input name="foo" type="hidden" value="0"><input name="foo" type="checkbox" value="1">', $form2);
+		$this->assertEquals('<input name="foo" type="hidden" value="0"><input checked="checked" name="foo" type="checkbox" value="foobar">', $form3);
+		$this->assertEquals('<input class="span2" name="foo" type="hidden" value="0"<input class="span2" name="foo" type="checkbox" value="foobar">', $form4);
 	}
 
 
