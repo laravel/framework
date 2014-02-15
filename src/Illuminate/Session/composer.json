@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "illuminate/console": "4.1.*",
-        "mockery/mockery": "0.8.0",
+        "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
