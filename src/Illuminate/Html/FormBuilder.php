@@ -567,7 +567,9 @@ class FormBuilder {
 	 */
 	public function checkbox($name, $value = 1, $checked = null, $options = array())
 	{
-		return $this->checkable('checkbox', $name, $value, $checked, $options);
+		$hidden = $this->input('hidden', $name, ($value ? 0 : 1), $options);
+		$checkbox = $this->checkable('checkbox', $name, $value, $checked, $options);
+		return $hidden.$checkbox;
 	}
 
 	/**
