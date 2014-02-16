@@ -246,6 +246,28 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Run a select statement and return the first column as an array
+	 *
+	 * @param  string  $query
+	 * @param  array   $bindings
+	 * @return array
+	 */
+	public function selectColumn($query, $bindings = array())
+	{
+		// get the fetch mode so we can set it back after we are done
+		$mode = $this->getFetchMode();
+
+		// Set the fetch mode to column and fetch the results
+		$this->setFetchMode(\PDO::FETCH_COLUMN);
+		$results = $this->select($query, $bindings);
+
+		// reset the fetch mode
+		$this->setFetchMode($mode);
+
+		return $results;
+	}
+
+	/**
 	 * Run a select statement and return a single result.
 	 *
 	 * @param  string  $query
