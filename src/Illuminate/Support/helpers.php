@@ -191,9 +191,15 @@ if ( ! function_exists('array_fetch'))
 
 			foreach ($array as $value)
 			{
-				$value = (array) $value;
-
-				$results[] = $value[$segment];
+				if (is_object($value))
+				{
+					$results[] = $value->{$segment};
+				}
+				else
+				{
+					$value = (array) $value;
+					$results[] = $value[$segment];
+				}
 			}
 
 			$array = array_values($results);
