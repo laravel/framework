@@ -1136,9 +1136,7 @@ class Validator implements MessageProviderInterface {
 
 		if (strtotime($value) === false) return false;
 
-		$date = date_parse($value);
-
-		return checkdate($date['month'], $date['day'], $date['year']);
+		return true;
 	}
 
 	/**
