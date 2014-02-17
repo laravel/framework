@@ -8,9 +8,10 @@ interface QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function push($job, $data = '', $queue = null);
+	public function push($job, $data = '', $queue = null, array $options = array());
 
 	/**
 	 * Push a raw payload onto the queue.
@@ -29,9 +30,10 @@ interface QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed  $data
 	 * @param  string  $queue
+	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function later($delay, $job, $data = '', $queue = null);
+	public function later($delay, $job, $data = '', $queue = null, array $options = array());
 
 	/**
 	 * Pop the next job off of the queue.
