@@ -192,7 +192,7 @@ class FileStore implements StoreInterface {
 	 * @param  float  $minutes
 	 * @return int
 	 */
-	protected function getExpiry($minutes)
+	public function getExpiry($minutes)
 	{
 
 		// The loose comparison is important here to deal with the integer zero (backwards-compat)
