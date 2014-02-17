@@ -21,7 +21,7 @@
     "require-dev": {
         "illuminate/console": "4.1.*",
         "illuminate/routing": "4.1.*",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "4.0.*"
     },
     "autoload": {
         "psr-0": {"Illuminate\\Auth": ""}

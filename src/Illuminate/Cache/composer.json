@@ -13,7 +13,7 @@
         "nesbot/carbon": "1.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
+        "phpunit/phpunit": "4.0.*",
         "illuminate/database": "4.1.*",
         "illuminate/encryption": "4.1.*",
         "illuminate/filesystem": "4.1.*",
