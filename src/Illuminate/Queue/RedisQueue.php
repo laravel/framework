@@ -71,9 +71,9 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Push a new job onto the queue after a delay.
 	 *
 	 * @param  \DateTime|int  $delay
-	 * @param  string  $job
-	 * @param  mixed  $data
-	 * @param  string  $queue
+	 * @param  string         $job
+	 * @param  mixed          $data
+	 * @param  string         $queue
 	 * @return void
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
@@ -89,7 +89,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  string  $queue
 	 * @param  string  $payload
 	 * @param  string  $delay
-	 * @param  int  $attempts
+	 * @param  int     $attempts
 	 * @return void
 	 */
 	public function release($queue, $payload, $delay, $attempts)
@@ -169,7 +169,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Get the delayed jobs that are ready.
 	 *
 	 * @param  string  $queue
-	 * @param  int  $time
+	 * @param  int     $time
 	 * @return array
 	 */
 	protected function getExpiredJobs($queue, $time)
@@ -181,7 +181,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Remove the delayed jobs that are ready for processing.
 	 *
 	 * @param  string  $queue
-	 * @param  int  $time
+	 * @param  int     $time
 	 * @return void
 	 */
 	protected function removeExpiredJobs($queue, $time)

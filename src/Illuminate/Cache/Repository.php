@@ -66,9 +66,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * Store an item in the cache.
 	 *
-	 * @param  string              $key
-	 * @param  mixed               $value
-	 * @param  Carbon|Datetime|int $minutes
+	 * @param  string         $key
+	 * @param  mixed          $value
+	 * @param  \DateTime|int  $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -81,9 +81,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * Store an item in the cache if the key does not exist.
 	 *
-	 * @param  string              $key
-	 * @param  mixed               $value
-	 * @param  Carbon|Datetime|int $minutes
+	 * @param  string         $key
+	 * @param  mixed          $value
+	 * @param  \DateTime|int  $minutes
 	 * @return bool
 	 */
 	public function add($key, $value, $minutes)
@@ -99,9 +99,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * Get an item from the cache, or store the default value.
 	 *
-	 * @param  string              $key
-	 * @param  Carbon|Datetime|int $minutes
-	 * @param  Closure             $callback
+	 * @param  string         $key
+	 * @param  \DateTime|int  $minutes
+	 * @param  Closure        $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -232,7 +232,7 @@ class Repository implements ArrayAccess {
 	/**
 	 * Calculate the number of minutes with the given duration.
 	 *
-	 * @param  Carbon|DateTime|int  $duration
+	 * @param  \DateTime|int  $duration
 	 * @return int
 	 */
 	protected function getMinutes($duration)
