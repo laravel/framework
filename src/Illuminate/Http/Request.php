@@ -121,7 +121,7 @@ class Request extends SymfonyRequest {
 	{
 		foreach (func_get_args() as $pattern)
 		{
-			if (str_is(urldecode($pattern), urldecode($this->path())))
+			if (str_is($pattern, urldecode($this->path())))
 			{
 				return true;
 			}
