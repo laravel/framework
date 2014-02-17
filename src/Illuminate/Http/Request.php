@@ -94,7 +94,7 @@ class Request extends SymfonyRequest {
 	{
 		$segments = explode('/', trim($this->getPathInfo(), '/'));
 
-		$segments = array_filter($segments, function($v) { return $v != ''; });
+		$segments = array_values(array_filter($segments));
 
 		return array_get($segments, $index - 1, $default);
 	}
