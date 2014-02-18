@@ -80,6 +80,8 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->createPayload($job, $data);
 
+		$delay = $this->getSeconds($delay);
+
 		$this->redis->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
 	}
 
