@@ -277,6 +277,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a char type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeChar(Fluent $column)
+	{
+		return "char({$column->length})";
+	}
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
