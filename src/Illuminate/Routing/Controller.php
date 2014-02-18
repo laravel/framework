@@ -34,7 +34,7 @@ abstract class Controller {
 	protected $layout;
 
 	/**
-	 * Register a "before" filter on the controler.
+	 * Register a "before" filter on the controller.
 	 *
 	 * @param  \Closure|string  $name
 	 * @param  array  $options
@@ -46,7 +46,7 @@ abstract class Controller {
 	}
 
 	/**
-	 * Register an "after" filter on the controler.
+	 * Register an "after" filter on the controller.
 	 *
 	 * @param  \Closure|string  $name
 	 * @param  array  $options
