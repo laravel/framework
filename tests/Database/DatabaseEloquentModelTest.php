@@ -750,6 +750,20 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelIsBootedOnUnserialize()
+	{
+		$model = new EloquentModelBootingTestStub;
+		$this->assertTrue(EloquentModelBootingTestStub::isBooted());
+		$model->foo = 'bar';
+		$string = serialize($model);
+		$model = null;
+		EloquentModelBootingTestStub::unboot();
+		$this->assertFalse(EloquentModelBootingTestStub::isBooted());
+		$model = unserialize($string);
+		$this->assertTrue(EloquentModelBootingTestStub::isBooted());
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -878,3 +892,14 @@ class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelWithoutTableStub extends Illuminate\Database\Eloquent\Model {}
+
+class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
+	public static function unboot()
+	{
+		unset(static::$booted[get_called_class()]);
+	}
+	public static function isBooted()
+	{
+		return array_key_exists(get_called_class(), static::$booted);
+	}
+}
