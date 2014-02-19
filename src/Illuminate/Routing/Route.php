@@ -744,6 +744,16 @@ class Route {
 	}
 
 	/**
+	 * Get the prefix of the route instance.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return array_get($this->action, 'prefix');
+	}
+
+	/**
 	 * Get the name of the route instance.
 	 *
 	 * @return string
