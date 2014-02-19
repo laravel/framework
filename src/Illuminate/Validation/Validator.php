@@ -1218,7 +1218,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getDateFormat($attribute)
 	{
-		if ($result = $this->hasRule($attribute, 'DateFormat'))
+		if ($result = $this->getRule($attribute, 'DateFormat'))
 		{
 			list($rule, $params) = $result;
 			$format = $params[0];
@@ -1698,24 +1698,31 @@ class Validator implements MessageProviderInterface {
 	 * Determine if the given attribute has a rule in the given set.
 	 *
 	 * @param  string  $attribute
-	 * @param  array   $rules
+	 * @param  string|array  $rules
 	 * @return bool
 	 */
 	protected function hasRule($attribute, $rules)
 	{
+		return ! is_null($this->getRule($attribute, $rules));
+	}
+
+	/**
+	 * Get a rule and its parameters for a given attribute.
+	 *
+	 * @param  string  $attribute
+	 * @param  string|array  $rules
+	 * @return bool
+	 */
+	protected function getRule($attribute, $rules)
+	{
 		$rules = (array) $rules;
 
-		// To determine if the attribute has a rule in the ruleset, we will spin
-		// through each of the rules assigned to the attribute and parse them
-		// all, then check to see if the parsed rules exists in the arrays.
 		foreach ($this->rules[$attribute] as $rule)
 		{
 			list($rule, $parameters) = $this->parseRule($rule);
 
 			if (in_array($rule, $rules)) return [$rule, $parameters];
 		}
-
-		return false;
 	}
 
 	/**
