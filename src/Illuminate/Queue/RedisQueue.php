@@ -64,7 +64,9 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function pushRaw($payload, $queue = null, array $options = array())
 	{
-		return $this->redis->rpush($this->getQueue($queue), $payload);
+		$this->redis->rpush($this->getQueue($queue), $payload);
+
+		return array_get(json_decode($payload, true), 'id');
 	}
 
 	/**
@@ -81,6 +83,8 @@ class RedisQueue extends Queue implements QueueInterface {
 		$payload = $this->createPayload($job, $data);
 
 		$this->redis->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
+
+		return array_get(json_decode($payload, true), 'id');
 	}
 
 	/**

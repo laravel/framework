@@ -16,7 +16,8 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 		$queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
 		$redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(array('job' => 'foo', 'data' => array('data'), 'id' => 'foo', 'attempts' => 1)));
 
-		$queue->push('foo', array('data'));
+		$id = $queue->push('foo', array('data'));
+		$this->assertEquals('foo', $id);
 	}
 
 
@@ -32,7 +33,8 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 			json_encode(array('job' => 'foo', 'data' => array('data'), 'id' => 'foo', 'attempts' => 1))
 		);
 
-		$queue->later(1, 'foo', array('data'));
+		$id = $queue->later(1, 'foo', array('data'));
+		$this->assertEquals('foo', $id);
 	}
 
 
