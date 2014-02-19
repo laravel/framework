@@ -899,6 +899,16 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Get the current state of query logging on the connection.
+	 *
+	 * @return bool
+	 */
+	public function getQueryLogState()
+	{
+		return $this->loggingQueries;
+	}
+
+	/**
 	 * Enable the query log on the connection.
 	 *
 	 * @return void
