@@ -15,7 +15,7 @@
         "symfony/http-foundation": "2.4.*"
     },
     "require-dev": {
-        "mockery/mockery": "0.7.2",
+        "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
