@@ -319,7 +319,7 @@ class Route {
 		{
 			return array_map(function($value)
 			{
-				return is_string($value) ? urldecode($value) : $value;
+				return is_string($value) ? rawurldecode($value) : $value;
 
 			}, $this->parameters);
 		}
