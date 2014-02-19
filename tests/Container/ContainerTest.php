@@ -183,6 +183,18 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExtendInstancesArePreserved()
+	{
+		$container = new Container;
+		$container->bind('foo', function() { $obj = new StdClass; $obj->foo = 'bar'; return $obj; });
+		$obj = new StdClass; $obj->foo = 'foo';
+		$container->instance('foo', $obj);
+		$container->extend('foo', function($obj, $container) { $obj->bar = 'baz'; return $obj; });
+		$container->extend('foo', function($obj, $container) { $obj->baz = 'foo'; return $obj; });
+		$this->assertEquals('foo', $container->make('foo')->foo);
+	}
+
+
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
