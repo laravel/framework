@@ -1396,15 +1396,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		$data = array_merge(array($route, $request, $response), $parameters);
 
-		$filtered = array_filter($data, function($p)
-		{
-			if (is_null($p) || $p === '')
-			{
-			    return false;
-			}
-
-			return true;
-		});
+		$filtered = array_filter($data, function($p) { return ! (is_null($p) || $p === ''); });
 
 		return $this->events->until('router.filter: '.$filter, $filtered);
 	}
