@@ -1166,6 +1166,13 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateBefore($attribute, $value, $parameters)
 	{
+		if ($format = $this->getDateFormat($attribute))
+		{
+			$date = DateTime::createFromFormat($format, $value);
+			$before = DateTime::createFromFormat($format, $parameters[0]);
+			return $date < $before;
+		}
+
 		if ( ! ($date = strtotime($parameters[0])))
 		{
 			return strtotime($value) < strtotime($this->getValue($parameters[0]));
@@ -1186,6 +1193,13 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAfter($attribute, $value, $parameters)
 	{
+		if ($format = $this->getDateFormat($attribute))
+		{
+			$date = DateTime::createFromFormat($format, $value);
+			$after = DateTime::createFromFormat($format, $parameters[0]);
+			return $date > $after;
+		}
+
 		if ( ! ($date = strtotime($parameters[0])))
 		{
 			return strtotime($value) > strtotime($this->getValue($parameters[0]));
@@ -1193,6 +1207,22 @@ class Validator implements MessageProviderInterface {
 		else
 		{
 			return strtotime($value) > $date;
+		}
+	}
+
+	/**
+	 * Get the date format for an attribute if it has one.
+	 *
+	 * @param  string $attribute
+	 * @return string|null
+	 */
+	protected function getDateFormat($attribute)
+	{
+		if ($result = $this->hasRule($attribute, 'DateFormat'))
+		{
+			list($rule, $params) = $result;
+			$format = $params[0];
+			return $format;
 		}
 	}
 
@@ -1682,7 +1712,7 @@ class Validator implements MessageProviderInterface {
 		{
 			list($rule, $parameters) = $this->parseRule($rule);
 
-			if (in_array($rule, $rules)) return true;
+			if (in_array($rule, $rules)) return [$rule, $parameters];
 		}
 
 		return false;
