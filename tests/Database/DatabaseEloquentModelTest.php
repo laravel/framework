@@ -249,8 +249,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testTimestampsAreReturnedAsObjectsOnCreate()
 	{
 		$timestamps = array(
-			'created_at' => new DateTime,
-			'updated_at' => new DateTime
+			'created_at' => Carbon\Carbon::now(),
+			'updated_at' => Carbon\Carbon::now()
 		);
 		$model = new EloquentDateModelStub;
 		Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -266,8 +266,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testDateTimeAttributesReturnNullIfSetToNull()
 	{
 		$timestamps = array(
-			'created_at' => new DateTime,
-			'updated_at' => new DateTime
+			'created_at' => Carbon\Carbon::now(),
+			'updated_at' => Carbon\Carbon::now()
 		);
 		$model = new EloquentDateModelStub;
 		Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -372,7 +372,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->setSoftDeleting(true);
 		$query = m::mock('stdClass');
 		$query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
-		$query->shouldReceive('update')->once()->with(array('deleted_at' => $model->fromDateTime(new DateTime)));
+		$query->shouldReceive('update')->once()->with(array('deleted_at' => $model->fromDateTime(Carbon\Carbon::now())));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('touchOwners');
 		$model->exists = true;
