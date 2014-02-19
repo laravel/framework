@@ -23,8 +23,9 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testDelayedPushProperlyPushesJobOntoRedis()
 	{
-		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'getRandomId'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
+		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getSeconds', 'getTime', 'getRandomId'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
 		$queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+		$queue->expects($this->once())->method('getSeconds')->with(1)->will($this->returnValue(1));
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
 
 		$redis->shouldReceive('zadd')->once()->with(
@@ -35,6 +36,24 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 
 		$id = $queue->later(1, 'foo', array('data'));
 		$this->assertEquals('foo', $id);
+	}
+
+
+	public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
+	{
+		$date = m::mock('DateTime');
+		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getSeconds', 'getTime', 'getRandomId'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
+		$queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+		$queue->expects($this->once())->method('getSeconds')->with($date)->will($this->returnValue(1));
+		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
+
+		$redis->shouldReceive('zadd')->once()->with(
+			'queues:default:delayed',
+			2,
+			json_encode(array('job' => 'foo', 'data' => array('data'), 'id' => 'foo', 'attempts' => 1))
+		);
+
+		$queue->later($date, 'foo', array('data'));
 	}
 
 
