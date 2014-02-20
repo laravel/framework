@@ -294,6 +294,19 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a char type.
+	 * SQLite only has one internal text type and converts all char types
+	 * to internal text type so just use varchar.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeChar(Fluent $column)
+	{
+		return 'varchar';
+	}
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
