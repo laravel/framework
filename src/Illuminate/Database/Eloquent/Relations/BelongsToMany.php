@@ -527,10 +527,11 @@ class BelongsToMany extends Relation {
 	public function sync($ids, $detaching = true)
 	{
 		// If we have a collection of models, get the keys.
-		if ($ids instanceof Collection) {
+		if ($ids instanceof Collection)
+		{
 			$ids = $ids->lists($this->otherKey);
 		}
-		
+
 		// First we need to attach any of the associated models that are not currently
 		// in this joining table. We'll spin through the given IDs, checking to see
 		// if they exist in the array of current ones, and if not we will insert.
