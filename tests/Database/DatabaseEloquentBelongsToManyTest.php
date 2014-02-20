@@ -33,7 +33,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		// Make sure the foreign keys were set on the pivot models...
 		$this->assertEquals('user_id', $results[0]->pivot->getForeignKey());
 		$this->assertEquals('role_id', $results[0]->pivot->getOtherKey());
-		
+
 		$this->assertEquals('taylor', $results[0]->name);
 		$this->assertEquals(1, $results[0]->pivot->user_id);
 		$this->assertEquals(2, $results[0]->pivot->role_id);
@@ -134,7 +134,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
 		$relation->expects($this->once())->method('touchIfTouching');
-		
+
 		$relation->attach(2, array('foo' => 'bar'));
 	}
 
@@ -169,7 +169,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
 		$relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
 		$relation->expects($this->once())->method('touchIfTouching');
-		
+
 		$relation->attach(2, array('foo' => 'bar'));
 	}
 
@@ -304,7 +304,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('lists')->once()->with('role_id')->andReturn(array(1, 2, 3));
 
 		$collection = m::mock('Illuminate\Database\Eloquent\Collection');
-		$collection->shouldReceive('lists')->once()->andReturn(array(1, 2, 3));
+		$collection->shouldReceive('modelKeys')->once()->andReturn(array(1, 2, 3));
 		$relation->expects($this->once())->method('formatSyncList')->with(array(1, 2, 3))->will($this->returnValue(array(1 => array(),2 => array(),3 => array())));
 		$relation->sync($collection);
 	}

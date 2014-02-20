@@ -529,7 +529,7 @@ class BelongsToMany extends Relation {
 		// If we have a collection of models, get the keys.
 		if ($ids instanceof Collection)
 		{
-			$ids = $ids->lists($this->otherKey);
+			$ids = $ids->modelKeys();
 		}
 
 		// First we need to attach any of the associated models that are not currently
