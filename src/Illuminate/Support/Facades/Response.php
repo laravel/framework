@@ -5,6 +5,7 @@ use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Support\Str;
 
 class Response {
 
@@ -89,7 +90,7 @@ class Response {
 
 		if ( ! is_null($name))
 		{
-			return $response->setContentDisposition('attachment', $name);
+			return $response->setContentDisposition('attachment', Str::ascii($name));
 		}
 
 		return $response;
