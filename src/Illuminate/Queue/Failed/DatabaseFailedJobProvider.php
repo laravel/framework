@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Queue\Failed;
 
-use DateTime;
+use Carbon\Carbon;
 use Illuminate\Database\ConnectionResolverInterface;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface {
@@ -51,7 +51,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	 */
 	public function log($connection, $queue, $payload)
 	{
-		$failed_at = new DateTime;
+		$failed_at = Carbon::now();
 
 		$this->getTable()->insert(compact('connection', 'queue', 'payload', 'failed_at'));
 	}

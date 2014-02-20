@@ -188,6 +188,11 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => 'foo:0,taylor', function() { return 'hello'; }));
+		$router->filter('foo', function($route, $request, $age, $name) { return $age.$name; });
+		$this->assertEquals('0taylor', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
 		$router->get('foo/bar', array('before' => 'foo:bar,baz', function() { return 'hello'; }));
 		$router->filter('foo', function($route, $request, $bar, $baz) { return $bar.$baz; });
 		$this->assertEquals('barbaz', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
@@ -524,7 +529,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->filter('bar', function() {});
 		$router->filter('baz', function() { return 'foo!'; });
 		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-		
+
 		/**
 		 * getPrefix() method
 		 */
@@ -532,9 +537,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->group(array('prefix' => 'foo'), function() use ($router)
 		{
 			$router->get('bar', function() { return 'hello'; });
-		});		
+		});
 		$routes = $router->getRoutes();
-		$routes = $routes->getRoutes();		
+		$routes = $routes->getRoutes();
 		$this->assertEquals('foo', $routes[0]->getPrefix());
 	}
 

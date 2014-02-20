@@ -95,7 +95,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  string  $payload
 	 * @param  string  $queue
-	 * @param  int  $delay
+	 * @param  int     $delay
 	 * @return mixed
 	 */
 	public function recreate($payload, $queue = null, $delay)
@@ -110,7 +110,7 @@ class IronQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
-	 * @param  mixed  $data
+	 * @param  mixed   $data
 	 * @param  string  $queue
 	 * @return mixed
 	 */
