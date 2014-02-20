@@ -241,6 +241,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __construct(array $attributes = array())
 	{
+		$this->bootIfNotBooted();
+
+		$this->syncOriginal();
+
+		$this->fill($attributes);
+	}
+
+	/**
+	 * Check if the model needs to be booted and if so, do it.
+	 *
+	 * @return void
+	 */
+	protected function bootIfNotBooted()
+	{
 		if ( ! isset(static::$booted[get_class($this)]))
 		{
 			static::$booted[get_class($this)] = true;
@@ -251,10 +265,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			$this->fireModelEvent('booted', false);
 		}
-
-		$this->syncOriginal();
-
-		$this->fill($attributes);
 	}
 
 	/**
@@ -2865,6 +2875,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function __toString()
 	{
 		return $this->toJson();
+	}
+
+	/**
+	 * When a model is being unserialized, check if it needs to be booted.
+	 *
+	 * @return void
+	 */
+	public function __wakeup()
+	{
+		$this->bootIfNotBooted();
 	}
 
 }

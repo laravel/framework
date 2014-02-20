@@ -919,6 +919,16 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Determine whether we're logging queries.
+	 *
+	 * @return bool
+	 */
+	public function logging()
+	{
+		return $this->loggingQueries;
+	}
+
+	/**
 	 * Get the name of the connected database.
 	 *
 	 * @return string

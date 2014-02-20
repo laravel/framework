@@ -249,8 +249,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testTimestampsAreReturnedAsObjectsOnCreate()
 	{
 		$timestamps = array(
-			'created_at' => new DateTime,
-			'updated_at' => new DateTime
+			'created_at' => Carbon\Carbon::now(),
+			'updated_at' => Carbon\Carbon::now()
 		);
 		$model = new EloquentDateModelStub;
 		Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -266,8 +266,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testDateTimeAttributesReturnNullIfSetToNull()
 	{
 		$timestamps = array(
-			'created_at' => new DateTime,
-			'updated_at' => new DateTime
+			'created_at' => Carbon\Carbon::now(),
+			'updated_at' => Carbon\Carbon::now()
 		);
 		$model = new EloquentDateModelStub;
 		Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -372,7 +372,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->setSoftDeleting(true);
 		$query = m::mock('stdClass');
 		$query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
-		$query->shouldReceive('update')->once()->with(array('deleted_at' => $model->fromDateTime(new DateTime)));
+		$query->shouldReceive('update')->once()->with(array('deleted_at' => $model->fromDateTime(Carbon\Carbon::now())));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('touchOwners');
 		$model->exists = true;
@@ -750,6 +750,20 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelIsBootedOnUnserialize()
+	{
+		$model = new EloquentModelBootingTestStub;
+		$this->assertTrue(EloquentModelBootingTestStub::isBooted());
+		$model->foo = 'bar';
+		$string = serialize($model);
+		$model = null;
+		EloquentModelBootingTestStub::unboot();
+		$this->assertFalse(EloquentModelBootingTestStub::isBooted());
+		$model = unserialize($string);
+		$this->assertTrue(EloquentModelBootingTestStub::isBooted());
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -878,3 +892,14 @@ class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelWithoutTableStub extends Illuminate\Database\Eloquent\Model {}
+
+class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
+	public static function unboot()
+	{
+		unset(static::$booted[get_called_class()]);
+	}
+	public static function isBooted()
+	{
+		return array_key_exists(get_called_class(), static::$booted);
+	}
+}

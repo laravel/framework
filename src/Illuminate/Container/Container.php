@@ -239,9 +239,18 @@ class Container implements ArrayAccess {
 			throw new \InvalidArgumentException("Type {$abstract} is not bound.");
 		}
 
-		$extender = $this->getExtender($abstract, $closure);
+		if (isset($this->instances[$abstract]))
+		{
+			$this->instances[$abstract] = $closure($this->instances[$abstract], $this);
 
-		$this->bind($abstract, $extender, $this->isShared($abstract));
+			$this->rebound($abstract);
+		}
+		else
+		{
+			$extender = $this->getExtender($abstract, $closure);
+
+			$this->bind($abstract, $extender, $this->isShared($abstract));
+		}
 	}
 
 	/**
