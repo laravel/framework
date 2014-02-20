@@ -11,6 +11,7 @@
         "php": ">=5.3.0"
     },
     "require-dev": {
+        "jeremeamia/superclosure": "1.0.*",
         "patchwork/utf8": "1.1.*",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "3.7.*"
