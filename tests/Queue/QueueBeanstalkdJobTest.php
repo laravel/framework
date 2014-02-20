@@ -39,6 +39,15 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBuryProperlyBuryTheJobFromBeanstalkd()
+	{
+		$job = $this->getJob();
+		$job->getPheanstalk()->shouldReceive('bury')->once()->with($job->getPheanstalkJob());
+
+		$job->bury();
+	}
+
+
 	protected function getJob()
 	{
 		return new Illuminate\Queue\Jobs\BeanstalkdJob(
