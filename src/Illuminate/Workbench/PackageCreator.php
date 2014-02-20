@@ -173,7 +173,7 @@ class PackageCreator {
 	 */
 	public function writeIgnoreFile(Package $package, $directory, $plain)
 	{
-		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');	
+		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');
 	}
 
 	/**
@@ -340,7 +340,7 @@ class PackageCreator {
 		{
 			$stub = str_replace('{{'.snake_case($key).'}}', $value, $stub);
 		}
-		
+
 		return $stub;
 	}
 
