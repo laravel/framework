@@ -11,7 +11,7 @@
         "php": ">=5.4.0",
         "illuminate/filesystem": "4.2.*",
         "illuminate/support": "4.2.*",
-        "symfony/translation": "2.4.*"
+        "symfony/translation": "2.5.*"
     },
     "require-dev": {
         "mockery/mockery": "0.9.*",

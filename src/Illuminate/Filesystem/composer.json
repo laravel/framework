@@ -10,7 +10,7 @@
     "require": {
         "php": ">=5.4.0",
         "illuminate/support": "4.2.*",
-        "symfony/finder": "2.4.*"
+        "symfony/finder": "2.5.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.0.*"

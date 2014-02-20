@@ -13,7 +13,7 @@
         "illuminate/container": "4.2.*",
         "illuminate/http": "4.2.*",
         "illuminate/support": "4.2.*",
-        "symfony/process": "2.4.*"
+        "symfony/process": "2.5.*"
     },
     "require-dev": {
         "illuminate/events": "4.2.*",

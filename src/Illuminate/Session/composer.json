@@ -14,8 +14,8 @@
         "illuminate/encryption": "4.2.*",
         "illuminate/support": "4.2.*",
         "nesbot/carbon": "~1.0",
-        "symfony/finder": "2.4.*",
-        "symfony/http-foundation": "2.4.*"
+        "symfony/finder": "2.5.*",
+        "symfony/http-foundation": "2.5.*"
     },
     "require-dev": {
         "illuminate/console": "4.2.*",
