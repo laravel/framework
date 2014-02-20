@@ -245,4 +245,21 @@ class HasManyThrough extends Relation {
 		return $this->farParent->getQualifiedKeyName();
 	}
 
+	/**
+	 * Find a model by its primary key.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|static|null
+	 */
+	public function find($id, $columns = array('*'))
+	{
+		$select = $this->getSelectColumns($columns);
+
+		$model = $this->query->addSelect($select)->getModel();
+
+		$this->query->where($model->getTable().'.'.$model->getKeyName(), '=', $id);
+
+		return $this->first($columns);
+	}
 }
