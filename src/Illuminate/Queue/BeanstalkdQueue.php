@@ -64,7 +64,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
-	 * @param  mixed  $data
+	 * @param  mixed   $data
 	 * @param  string  $queue
 	 * @return mixed
 	 */
