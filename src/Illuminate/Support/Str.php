@@ -1,10 +1,10 @@
 <?php namespace Illuminate\Support;
 
-use Illuminate\Support\Traits\MacroTrait;
+use Illuminate\Support\Traits\MacroableTrait;
 
 class Str {
 
-	use MacroTrait;
+	use MacroableTrait;
 
 	/**
 	 * Transliterate a UTF-8 value to ASCII.

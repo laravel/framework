@@ -14,7 +14,7 @@ class SupportMacroTraitTest extends \PHPUnit_Framework_TestCase {
 
 	private function createObjectForTrait()
 	{
-		$traitName = 'Illuminate\Support\Traits\MacroTrait';
+		$traitName = 'Illuminate\Support\Traits\MacroableTrait';
 
 		return $this->getObjectForTrait($traitName);
 	}
