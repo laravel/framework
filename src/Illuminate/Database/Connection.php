@@ -923,7 +923,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @return bool
 	 */
-	public function getQueryLogState()
+	public function logging()
 	{
 		return $this->loggingQueries;
 	}
