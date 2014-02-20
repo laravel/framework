@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Routing;
 
-use InvalidArgumentException;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 
 class UrlGenerator {
 
