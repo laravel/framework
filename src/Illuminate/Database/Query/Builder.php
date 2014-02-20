@@ -1102,7 +1102,7 @@ class Builder {
 	/**
 	 * Indicate that the query results should be cached.
 	 *
-	 * @param  \Carbon\Carbon|\Datetime|int  $minutes
+	 * @param  \DateTime|int  $minutes
 	 * @param  string  $key
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */

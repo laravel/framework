@@ -27,8 +27,8 @@ abstract class Queue {
 	/**
 	 * Push a new an array of jobs onto the queue.
 	 *
-	 * @param  array  $jobs
-	 * @param  mixed  $data
+	 * @param  array   $jobs
+	 * @param  mixed   $data
 	 * @param  string  $queue
 	 * @return mixed
 	 */
@@ -64,7 +64,7 @@ abstract class Queue {
 	 * Create a payload string for the given Closure job.
 	 *
 	 * @param  \Closure  $job
-	 * @param  mixed  $data
+	 * @param  mixed     $data
 	 * @return string
 	 */
 	protected function createClosurePayload($job, $data)
