@@ -1711,7 +1711,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  string  $attribute
 	 * @param  string|array  $rules
-	 * @return bool
+	 * @return array|null
 	 */
 	protected function getRule($attribute, $rules)
 	{
