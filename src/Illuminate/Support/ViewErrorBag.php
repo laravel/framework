@@ -12,6 +12,17 @@ class ViewErrorBag implements Countable {
 	protected $bags = [];
 
 	/**
+	 * Get a MessageBag instance from the bags.
+	 *
+	 * @param  string  $key
+	 * @return \Illuminate\Support\MessageBag
+	 */
+	public function getBag($key)
+	{
+		return array_get($this->bags, $key, new MessageBag);
+	}
+
+	/**
 	 * Add a new MessageBag instance to the bags.
 	 *
 	 * @param  string  $key
