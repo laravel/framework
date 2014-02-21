@@ -275,8 +275,13 @@ class Builder {
 	 * @param  array  $values
 	 * @return int
 	 */
-	public function update(array $values)
+	public function update(array $values, $fill = true)
 	{
+		if ($fill)
+		{
+			$values = $this->model->fill($values)->toArray();
+		}
+		
 		return $this->query->update($this->addUpdatedAtColumn($values));
 	}
 
