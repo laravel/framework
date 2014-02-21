@@ -12,9 +12,6 @@
         "illuminate/support": "4.2.*",
         "phpseclib/phpseclib": "0.3.*"
     },
-    "require-dev": {
-        "mockery/mockery": "0.8.0"
-    },
     "autoload": {
         "psr-0": {
             "Illuminate\\Remote": ""

@@ -12,15 +12,13 @@
         "illuminate/http": "4.2.*",
         "illuminate/session": "4.2.*",
         "illuminate/support": "4.2.*",
-        "symfony/http-foundation": "2.4.*",
-        "symfony/http-kernel": "2.4.*",
-        "symfony/routing": "2.4.*"
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*",
+        "symfony/routing": "2.5.*"
     },
-    "require-dev": {
+    "suggest": {
         "illuminate/console": "4.2.*",
-        "illuminate/filesystem": "4.2.*",
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/filesystem": "4.2.*"
     },
     "autoload": {
         "psr-0": {
