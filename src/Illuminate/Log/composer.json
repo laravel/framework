@@ -10,7 +10,7 @@
     "require": {
         "php": ">=5.3.0",
         "illuminate/support": "4.1.*",
-        "monolog/monolog": "1.6.*"
+        "monolog/monolog": "1.*"
     },
     "require-dev": {
         "mockery/mockery": "0.9.*",
