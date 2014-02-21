@@ -1237,7 +1237,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ( ! $this->exists)
 		{
-			return $this->newQuery()->update($attributes);
+			return $this->newQuery()->update($attributes, false);
 		}
 
 		return $this->fill($attributes)->save();
@@ -1353,7 +1353,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// models are updated, giving them a chance to do any special processing.
 			$dirty = $this->getDirty();
 
-			$this->setKeysForSaveQuery($query)->update($dirty);
+			$this->setKeysForSaveQuery($query)->update($dirty, false);
 
 			$this->fireModelEvent('updated', false);
 		}
