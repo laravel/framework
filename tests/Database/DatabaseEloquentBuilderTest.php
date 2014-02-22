@@ -16,7 +16,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$query = m::mock('Illuminate\Database\Query\Builder');
 		$query->shouldReceive('where')->once()->with('foo', '=', 'bar');
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($query));
- 		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
 		$model->shouldReceive('getKeyName')->once()->andReturn('foo');
 		$model->shouldReceive('getTable')->once()->andReturn('table');
 		$query->shouldReceive('from')->once()->with('table');
@@ -34,7 +34,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$query = m::mock('Illuminate\Database\Query\Builder');
 		$query->shouldReceive('where')->once()->with('foo', '=', 'bar');
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($query));
- 		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
 		$model->shouldReceive('getKeyName')->once()->andReturn('foo');
 		$model->shouldReceive('getTable')->once()->andReturn('table');
 		$query->shouldReceive('from')->once()->with('table');
@@ -50,7 +50,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$query = m::mock('Illuminate\Database\Query\Builder');
 		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('first'), array($query));
- 		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
 		$model->shouldReceive('getTable')->once()->andReturn('table');
 		$query->shouldReceive('from')->once()->with('table');
 		$builder->setModel($model);
@@ -191,6 +191,36 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$paginator->shouldReceive('make')->once()->with(array('baz'), 3, 2)->andReturn(array('results'));
 
 		$this->assertEquals(array('results'), $builder->groupBy('foo')->paginate());
+	}
+
+
+	public function testCursorMethod()
+	{
+		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get'), $this->getMocks());
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('getPerPage')->once()->andReturn(15);
+		$model->shouldReceive('getTable')->once()->andReturn('foo_table');
+		$query = $this->getMock('Illuminate\Database\Query\Builder', array('from', 'getConnection', 'skip', 'take'), array(
+			m::mock('Illuminate\Database\ConnectionInterface'),
+			m::mock('Illuminate\Database\Query\Grammars\Grammar'),
+			m::mock('Illuminate\Database\Query\Processors\Processor'),
+		));
+		$builder->setQuery($query);
+		$query->expects($this->once())->method('from')->will($this->returnValue('foo_table'));
+		$builder->setModel($model);
+		$conn = m::mock('stdClass');
+		$paginator = m::mock('stdClass');
+		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
+		$conn->shouldReceive('getPaginator')->once()->andReturn($paginator);
+		$query->expects($this->once())->method('getConnection')->will($this->returnValue($conn));
+		$query->expects($this->once())->method('skip')->with(0)->will($this->returnValue($query));
+		$query->expects($this->once())->method('take')->with(16)->will($this->returnValue($query));
+		$collection = m::mock('stdClass');
+		$collection->shouldReceive('all')->once()->andReturn(array('results'));
+		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue($collection));
+		$paginator->shouldReceive('make')->once()->with(array('results'), 15)->andReturn(array('results'));
+
+		$this->assertEquals(array('results'), $builder->cursor());
 	}
 
 
