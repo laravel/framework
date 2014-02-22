@@ -95,6 +95,69 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPluckMethodWithModelFound()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$mockModel = new StdClass;
+		$mockModel->name = 'foo';
+		$builder->shouldReceive('first')->with(array('name'))->andReturn($mockModel);
+
+		$this->assertEquals('foo', $builder->pluck('name'));
+	}
+
+	public function testPluckMethodWithModelNotFound()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder->shouldReceive('first')->with(array('name'))->andReturn(null);
+
+		$this->assertNull($builder->pluck('name'));
+	}
+
+
+	public function testChunkExecuteCallbackOverPaginatedRequest()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', array($this->getMockQueryBuilder()));
+		$builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
+		$builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
+		$builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
+		$builder->shouldReceive('get')->times(3)->andReturn(array('foo1', 'foo2'), array('foo3'), array());
+
+		$callbackExecutionAssertor = m::mock('StdClass');
+		$callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->once();
+		$callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
+		$callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->once();
+
+		$builder->chunk(2, function($results) use($callbackExecutionAssertor) {
+			foreach ($results as $result) {
+				$callbackExecutionAssertor->doSomething($result);
+			}
+		});
+	}
+
+
+	public function testListsReturnsTheMutatedAttributesOfAModel()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
+		$builder->setModel($this->getMockModel());
+		$builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
+		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'bar'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'bar')));
+		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'baz'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'baz')));
+
+		$this->assertEquals(array('foo_bar', 'foo_baz'), $builder->lists('name'));
+	}
+
+	public function testListsWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
+		$builder->setModel($this->getMockModel());
+		$builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
+
+		$this->assertEquals(array('bar', 'baz'), $builder->lists('name'));
+	}
+
+
 	public function testWithDeletedProperlyRemovesDeletedClause()
 	{
 		$builder = new Illuminate\Database\Eloquent\Builder(new Illuminate\Database\Query\Builder(
@@ -367,4 +430,15 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'table';
 	protected $softDelete = true;
+}
+class EloquentBuilderTestListsStub {
+	protected $attributes;
+	public function __construct($attributes)
+	{
+		$this->attributes = $attributes;
+	}
+	public function __get($key)
+	{
+		return 'foo_' . $this->attributes[$key];
+	}
 }
