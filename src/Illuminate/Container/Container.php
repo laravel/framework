@@ -509,10 +509,12 @@ class Container implements ArrayAccess {
 		// Once we have all the constructor's parameters we can create each of the
 		// dependency instances and then use the reflection instances to make a
 		// new instance of this class, injecting the created dependencies in.
-		$deps = array_merge($parameters, $this->getDependencies(
+		// Merge arrays with + then sort, to retain the keys.
+		$deps = $parameters + $this->getDependencies(
 			array_diff_key($classes, $parameters)
-		));
+		);
 
+		ksort($deps);
 		return $reflector->newInstanceArgs($deps);
 	}
 
@@ -526,7 +528,7 @@ class Container implements ArrayAccess {
 	{
 		$dependencies = array();
 
-		foreach ($parameters as $parameter)
+		foreach ($parameters as $key => $parameter)
 		{
 			$dependency = $parameter->getClass();
 
@@ -535,11 +537,11 @@ class Container implements ArrayAccess {
 			// we'll just bomb out with an error since we have no-where to go.
 			if (is_null($dependency))
 			{
-				$dependencies[] = $this->resolveNonClass($parameter);
+				$dependencies[$key] = $this->resolveNonClass($parameter);
 			}
 			else
 			{
-				$dependencies[] = $this->resolveClass($parameter);
+				$dependencies[$key] = $this->resolveClass($parameter);
 			}
 		}
 
