@@ -206,13 +206,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $mutatorCache = array();
 
 	/**
-	 * The many to many relationship methods.
-	 *
-	 * @var array
-	 */
-	public static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
-
-	/**
 	 * The name of the "created at" column.
 	 *
 	 * @var string
@@ -624,12 +617,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If no relation name was given, we will use this debug backtrace to extract
 		// the calling method's name and use that as the relationship name as most
 		// of the time this will be what we desire to use for the relatinoships.
-		if (is_null($relation))
-		{
-			list(, $caller) = debug_backtrace(false);
-
-			$relation = $caller['function'];
-		}
+		$relation = $relation ?: $this->getRelationCaller();
 
 		// If no foreign key was supplied, we can use a backtrace to guess the proper
 		// foreign key name by using the name of the relationship function, which
@@ -666,10 +654,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// use that to get both the class and foreign key that will be utilized.
 		if (is_null($name))
 		{
-			list(, $caller) = debug_backtrace(false);
+			$caller = $this->getRelationCaller();
 
-			$name = snake_case($caller['function']);
+			$name = snake_case($caller);
 		}
+
+		$relation = isset($caller) ? $caller : camel_case($name);
 
 		// Next we will guess the type and ID if necessary. The type and IDs may also
 		// be passed into the function so that the developers may manually specify
@@ -678,7 +668,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$class = $this->$type;
 
-		return $this->belongsTo($class, $id);
+		return $this->belongsTo($class, $id, null, $relation);
 	}
 
 	/**
@@ -761,10 +751,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If no relationship name was passed, we will pull backtraces to get the
 		// name of the calling function. We will use that function name as the
 		// title of this relation since that is a great convention to apply.
-		if (is_null($relation))
-		{
-			$relation = $this->getBelongsToManyCaller();
-		}
+		$relation = $relation ?: $this->getRelationCaller();
 
 		// First, we'll need to determine the foreign key and "other key" for the
 		// relationship. Once we have determined the keys we'll make the query
@@ -799,12 +786,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
+	 * @param  string  $relation
 	 * @param  bool    $inverse
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
 	 */
-	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
+	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $relation = null, $inverse = false)
 	{
-		$caller = $this->getBelongsToManyCaller();
+		$relation = $relation ?: $this->getRelationCaller();
 
 		// First, we will need to determine the foreign key and "other key" for the
 		// relationship. Once we have determined the keys we will make the query
@@ -824,7 +812,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		return new MorphToMany(
 			$query, $this, $name, $table, $foreignKey,
-			$otherKey, $caller, $inverse
+			$otherKey, $relation, $inverse
 		);
 	}
 
@@ -836,10 +824,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
+	 * @param  string  $relation
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
 	 */
-	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
+	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
 	{
+		$relation = $relation ?: $this->getRelationCaller();
+
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		// For the inverse of the polymorphic many-to-many relations, we will change
@@ -847,26 +838,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// of the morph-to-many method since we're figuring out these inverses.
 		$otherKey = $otherKey ?: $name.'_id';
 
-		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
+		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, $relation, true);
 	}
 
 	/**
-	 * Get the relationship name of the belongs to many.
+	 * Get the relationship name.
 	 *
 	 * @return  string
 	 */
-	protected function getBelongsToManyCaller()
+	protected function getRelationCaller()
 	{
-		$self = __FUNCTION__;
+		$caller = last(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3));
 
-		$caller = array_first(debug_backtrace(false), function($key, $trace) use ($self)
-		{
-			$caller = $trace['function'];
-
-			return ( ! in_array($caller, Model::$manyMethods) && $caller != $self);
-		});
-
-		return ! is_null($caller) ? $caller['function'] : null;
+		return array_get($caller, 'function');
 	}
 
 	/**

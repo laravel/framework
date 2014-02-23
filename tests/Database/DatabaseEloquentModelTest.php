@@ -646,6 +646,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->addMockConnection($model);
 		$relation = $model->belongsToStub();
 		$this->assertEquals('belongs_to_stub_id', $relation->getForeignKey());
+		$this->assertEquals('belongsToStub', $relation->getRelationName());
 		$this->assertTrue($relation->getParent() === $model);
 		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
 
@@ -660,12 +661,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = m::mock('Illuminate\Database\Eloquent\Model[belongsTo]');
 		$model->foo_type = 'FooClass';
-		$model->shouldReceive('belongsTo')->with('FooClass', 'foo_id');
+		$model->shouldReceive('belongsTo')->with('FooClass', 'foo_id', null, 'foo');
 		$relation = $model->morphTo('foo');
 
 		$model = m::mock('EloquentModelStub[belongsTo]');
 		$model->morph_to_stub_type = 'FooClass';
-		$model->shouldReceive('belongsTo')->with('FooClass', 'morph_to_stub_id');
+		$model->shouldReceive('belongsTo')->with('FooClass', 'morph_to_stub_id', null, 'morphToStub');
 		$relation = $model->morphToStub();
 	}
 
