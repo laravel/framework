@@ -133,6 +133,51 @@ abstract class Controller {
 	}
 
 	/**
+	 * Remove the given named controller before filter.
+	 *
+	 * @param  string  $filter
+	 * @param  array  $options
+	 * @return void
+	 */
+	public function removeBeforeFilter($filter)
+	{
+		$this->beforeFilters = $this->removeFilter($filter, $this->getBeforeFilters());
+	}
+
+	/**
+	 * Remove the given named controller after filter.
+	 *
+	 * @param  string  $filter
+	 * @param  array  $options
+	 * @return void
+	 */
+	public function removeAfterFilter($filter)
+	{
+		$this->afterFilters = $this->removeFilter($filter, $this->getAfterFilters());
+	}
+
+	/**
+	 * Remove the given controller filter from the provided filter array.
+	 *
+	 * @param  string  $filter
+	 * @param  array  $activeFilters
+	 * @return array
+	 */
+	protected function removeFilter($filter, $activeFilters)
+	{
+		$newFilters = array();
+		foreach ($activeFilters as $activeFilter)
+		{
+			if ($activeFilter['original'] !== $filter)
+			{
+				$newFilters[] = $activeFilter;
+			}
+		}
+
+		return $newFilters;
+	}
+
+	/**
 	 * Get the registered "before" filters.
 	 *
 	 * @return array
