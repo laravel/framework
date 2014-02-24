@@ -205,6 +205,18 @@ class Manager {
     }
 
     /**
+     * Pass dynamic instance methods to the manager.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return call_user_func_array(array($this->manager, $method), $parameters);
+    }
+
+    /**
      * Dynamically pass methods to the default connection.
      *
      * @param  string  $method
