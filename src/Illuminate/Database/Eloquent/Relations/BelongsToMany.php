@@ -267,7 +267,9 @@ class BelongsToMany extends Relation {
 	{
 		$query->select(new \Illuminate\Database\Query\Expression('count(*)'));
 
-		$query->from($this->table.' as '.$hash = $this->getRelationCountHash());
+		$tablePrefix = $this->query->getQuery()->getConnection()->getTablePrefix();
+
+		$query->from($this->table.' as '.$tablePrefix.$hash = $this->getRelationCountHash());
 
 		$key = $this->wrap($this->getQualifiedParentKeyName());
 
