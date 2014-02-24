@@ -50,7 +50,10 @@ class OptimizeCommand extends Command {
 	{
 		$this->info('Generating optimized class loader');
 
-		$this->composer->dumpOptimized();
+		if ( ! $this->option('no-composer'))
+		{
+			$this->composer->dumpOptimized();
+		}
 
 		if ($this->option('force') || ! $this->laravel['config']['app.debug'])
 		{
@@ -115,6 +118,7 @@ class OptimizeCommand extends Command {
 	{
 		return array(
 			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
+			array('no-composer', null, InputOption::VALUE_NONE, 'Do not execute composer dump-autoload.'),
 		);
 	}
 
