@@ -78,32 +78,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		{
 			if (is_array($token))
 			{
-				list($t_id, $t_content, $t_no) = $token;
-				if ($t_id == T_INLINE_HTML)
-				{
-					$t_content = $this->compileExtensions($t_content);
-
-					$t_content = preg_replace_callback(
-						'/\B # we should not have words before
-						@(\w+) # control word should start with @
-						([ \t]*) # and we can have spaces afterwards
-						(\( ( (?>[^()]+) | (?3) )* \))? # and optional expression within brackets
-						/x',
-						function($match)
-						{
-							if (method_exists($this, $method = 'compile' . ucfirst($match[1])))
-							{
-								$match[0] = $this->__compileMethod($method, @$match[3]);
-							}
-
-							return $match[0] . (@$match[3]?'':$match[2]);
-						}, $t_content);
-
-					$t_content = $this->compileComments($t_content);
-					$t_content = $this->compileEchos($t_content);
-				}
-
-				$result .= $t_content;
+				$result .= $this->compileToken($token);
 			}
 			else
 			{
@@ -117,6 +92,31 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		}
 
 		return $result;
+	}
+
+	protected function compileToken()
+	{
+		list($t_id, $t_content, $t_no) = $token;
+
+		if ($t_id == T_INLINE_HTML)
+		{
+			$t_content = $this->compileExtensions($t_content);
+
+			$t_content = preg_replace_callback(function($match)
+			{
+				if (method_exists($this, $method = 'compile' . ucfirst($match[1])))
+				{
+					$match[0] = $this->__compileMethod($method, @$match[3]);
+				}
+
+				return $match[0] . (@$match[3]?'':$match[2]);
+			}, $t_content);
+
+			$t_content = $this->compileComments($t_content);
+			$t_content = $this->compileEchos($t_content);
+		}
+
+		return $t_content;
 	}
 
 	protected function compileEach($expr)
@@ -307,14 +307,12 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$me = $this;
-
 		// match @{{ content }}
 		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
 
-		$callback = function($matches) use ($me)
+		$callback = function($matches)
 		{
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$me->compileEchoDefaults($matches[2]).'; ?>';
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>';
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -328,14 +326,12 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$me = $this;
-
 		// match {{{ content }}}
 		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
 
-		$callback = function($matches) use ($me)
+		$callback = function($matches)
 		{
-			return '<?php echo e('.$me->compileEchoDefaults($matches[1]).'); ?>';
+			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>';
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
