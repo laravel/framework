@@ -12,32 +12,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $extensions = array();
 
 	/**
-	 * All of the available compiler functions.
-	 *
-	 * @var array
-	 */
-	protected $compilers = array(
-		'Extensions',
-		'Extends',
-		'Comments',
-		'Echos',
-		'Openings',
-		'Closings',
-		'Else',
-		'Unless',
-		'EndUnless',
-		'Includes',
-		'Each',
-		'Yields',
-		'Shows',
-		'Language',
-		'SectionStart',
-		'SectionStop',
-		'SectionAppend',
-		'SectionOverwrite',
-	);
-
-	/**
 	 * Array of opening and closing tags for echos.
 	 *
 	 * @var array
@@ -52,6 +26,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $escapedTags = array('{{{', '}}}');
 
 	/**
+	 * Array of footer lines to be added to template
+	 *
+	 * @var array
+	 */
+	protected $footer;
+
+	/**
 	 * Compile the view at the given path.
 	 *
 	 * @param  string  $path
@@ -59,12 +40,26 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path)
 	{
+		$this->footer = array();
 		$contents = $this->compileString($this->files->get($path));
 
 		if ( ! is_null($this->cachePath))
 		{
 			$this->files->put($this->getCompiledPath($path), $contents);
 		}
+	}
+
+	/**
+	 * For internal use only
+	 *
+	 *
+	 * @param string $methodName
+	 * @param string $expression
+	 * @return string
+	 */
+	public function __compileMethod($methodName, $expression)
+	{
+		return $this->$methodName($expression);
 	}
 
 	/**
@@ -75,12 +70,167 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compileString($value)
 	{
-		foreach ($this->compilers as $compiler)
+		$tokens = token_get_all($value);
+
+		$result = '';
+
+		foreach ($tokens as $token)
 		{
-			$value = $this->{"compile{$compiler}"}($value);
+			$result .= (is_array($token) ? $this->parseToken($token) : $token);
 		}
 
-		return $value;
+		if (count($this->footer))
+		{
+			$result = ltrim($result, PHP_EOL) . PHP_EOL . implode(PHP_EOL, array_reverse($this->footer));
+		}
+
+		return $result;
+	}
+
+	protected function parseToken($token)
+	{
+		list($t_id, $t_content, $t_no) = $token;
+
+		if ($t_id == T_INLINE_HTML)
+		{
+			$t_content = $this->compileExtensions($t_content);
+
+			$t_content = preg_replace_callback(function($match)
+			{
+				if (method_exists($this, $method = 'compile' . ucfirst($match[1])))
+				{
+					$match[0] = $this->__compileMethod($method, @$match[3]);
+				}
+
+				return $match[0] . (@$match[3]?'':$match[2]);
+			}, $t_content);
+
+			$t_content = $this->compileComments($t_content);
+			$t_content = $this->compileEchos($t_content);
+		}
+
+		return $t_content;
+	}
+
+	protected function compileEach($expr)
+	{
+		return "<?php echo \$__env->renderEach{$expr}; ?>";
+	}
+
+	protected function compileYield($expr)
+	{
+		return "<?php echo \$__env->yieldContent{$expr}; ?>";
+	}
+
+	protected function compileShow($expr)
+	{
+		return "<?php echo \$__env->yieldSection(); ?>";
+	}
+
+	protected function compileSection($expr)
+	{
+		return "<?php \$__env->startSection{$expr}; ?>";
+	}
+
+	protected function compileAppend($expr)
+	{
+		return "<?php \$__env->appendSection(); ?>";
+	}
+
+	protected function compileStop($expr)
+	{
+		return "<?php \$__env->stopSection(); ?>";
+	}
+
+	protected function compileOverwrite($expr)
+	{
+		return "<?php \$__env->stopSection(true); ?>";
+	}
+
+	protected function compileUnless($expr)
+	{
+		return "<?php if ( ! $expr): ?>";
+	}
+
+	protected function compileEndunless($expr)
+	{
+		return "<?php endif; ?>";
+	}
+
+	protected function compileLang($expr)
+	{
+		return "<?php echo \\Illuminate\\Support\\Facades\\Lang::get$expr; ?>";
+	}
+
+	protected function compileChoice($expr)
+	{
+		return "<?php echo \\Illuminate\\Support\\Facades\\Lang::choice$expr; ?>";
+	}
+
+	protected function compileElse($expr)
+	{
+		return "<?php else: ?>";
+	}
+
+	protected function compileForeach($expr)
+	{
+		return "<?php foreach{$expr}: ?>";
+	}
+
+	protected function compileIf($expr)
+	{
+		return "<?php if{$expr}: ?>";
+	}
+
+	protected function compileElseif($expr)
+	{
+		return "<?php elseif{$expr}: ?>";
+	}
+
+	protected function compileWhile($expr)
+	{
+		return "<?php while{$expr}: ?>";
+	}
+
+	protected function compileEndwhile($expr)
+	{
+		return "<?php endwhile; ?>";
+	}
+
+	protected function compileEndforeach($expr)
+	{
+		return "<?php endforeach; ?>";
+	}
+
+	protected function compileEndif($expr)
+	{
+		return "<?php endif; ?>";
+	}
+
+	protected function compileExtends($expr)
+	{
+		// remove outer brackets so that (a,b) becomes a,b
+		if (starts_with($expr, '('))
+		{
+			$expr = substr($expr, 1, -1);
+		}
+
+		$data = "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+
+		$this->footer[] = $data;
+
+		return '';
+	}
+
+	protected function compileInclude($expr)
+	{
+		// remove outer brackets so that (a,b) becomes a,b
+		if (starts_with($expr, '('))
+		{
+			$expr = substr($expr, 1, -1);
+		}
+
+		return "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 	}
 
 	/**
@@ -111,47 +261,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Compile Blade template extensions into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileExtends($value)
-	{
-		// By convention, Blade views using template inheritance must begin with the
-		// @extends expression, otherwise they will not be compiled with template
-		// inheritance. So, if they do not start with that we will just return.
-		if (strpos($value, '@extends') !== 0)
-		{
-			return $value;
-		}
-
-		$lines = preg_split("/(\r?\n)/", $value);
-
-		// Next, we just want to split the values by lines, and create an expression
-		// to include the parent layout at the end of the templates. Which allows
-		// the sections to get registered before the parent view gets rendered.
-		$lines = $this->compileLayoutExtends($lines);
-
-		return implode("\r\n", array_slice($lines, 1));
-	}
-
-	/**
-	 * Compile the proper template inheritance for the lines.
-	 *
-	 * @param  array  $lines
-	 * @return array
-	 */
-	protected function compileLayoutExtends($lines)
-	{
-		$pattern = $this->createMatcher('extends');
-
-		$lines[] = preg_replace($pattern, '$1@include$2', $lines[0]);
-
-		return $lines;
-	}
-
-	/**
 	 * Compile Blade comments into valid PHP.
 	 *
 	 * @param  string  $value
@@ -159,6 +268,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileComments($value)
 	{
+		// match {{--comment--}}
 		$pattern = sprintf('/%s--((.|\s)*?)--%s/', $this->contentTags[0], $this->contentTags[1]);
 
 		return preg_replace($pattern, '<?php /*$1*/ ?>', $value);
@@ -190,13 +300,12 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$me = $this;
-
+		// match @{{ content }}
 		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
 
-		$callback = function($matches) use ($me)
+		$callback = function($matches)
 		{
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$me->compileEchoDefaults($matches[2]).'; ?>';
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>';
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -210,13 +319,12 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$me = $this;
-
+		// match {{{ content }}}
 		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
 
-		$callback = function($matches) use ($me)
+		$callback = function($matches)
 		{
-			return '<?php echo e('.$me->compileEchoDefaults($matches[1]).'); ?>';
+			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>';
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -230,232 +338,8 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compileEchoDefaults($value)
 	{
+		// match {{ $a or $b }}
 		return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
-	}
-
-	/**
-	 * Compile Blade structure openings into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileOpenings($value)
-	{
-		$pattern = '/(?(R)\((?:[^\(\)]|(?R))*\)|(?<!\w)(\s*)@(if|elseif|foreach|for|while)(\s*(?R)+))/';
-
-		return preg_replace($pattern, '$1<?php $2$3: ?>', $value);
-	}
-
-	/**
-	 * Compile Blade structure closings into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileClosings($value)
-	{
-		$pattern = '/(\s*)@(endif|endforeach|endfor|endwhile)(\s*)/';
-
-		return preg_replace($pattern, '$1<?php $2; ?>$3', $value);
-	}
-
-	/**
-	 * Compile Blade else statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileElse($value)
-	{
-		$pattern = $this->createPlainMatcher('else');
-
-		return preg_replace($pattern, '$1<?php else: ?>$2', $value);
-	}
-
-	/**
-	 * Compile Blade unless statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileUnless($value)
-	{
-		$pattern = $this->createMatcher('unless');
-
-		return preg_replace($pattern, '$1<?php if ( !$2): ?>', $value);
-	}
-
-	/**
-	 * Compile Blade end unless statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileEndUnless($value)
-	{
-		$pattern = $this->createPlainMatcher('endunless');
-
-		return preg_replace($pattern, '$1<?php endif; ?>$2', $value);
-	}
-
-	/**
-	 * Compile Blade include statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileIncludes($value)
-	{
-		$pattern = $this->createOpenMatcher('include');
-
-		$replace = '$1<?php echo $__env->make$2, array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
-
-		return preg_replace($pattern, $replace, $value);
-	}
-
-	/**
-	 * Compile Blade each statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileEach($value)
-	{
-		$pattern = $this->createMatcher('each');
-
-		return preg_replace($pattern, '$1<?php echo $__env->renderEach$2; ?>', $value);
-	}
-
-	/**
-	 * Compile Blade yield statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileYields($value)
-	{
-		$pattern = $this->createMatcher('yield');
-
-		return preg_replace($pattern, '$1<?php echo $__env->yieldContent$2; ?>', $value);
-	}
-
-	/**
-	 * Compile Blade show statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileShows($value)
-	{
-		$pattern = $this->createPlainMatcher('show');
-
-		return preg_replace($pattern, '$1<?php echo $__env->yieldSection(); ?>$2', $value);
-	}
-
-	/**
-	 * Compile Blade language and language choice statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileLanguage($value)
-	{
-		$pattern = $this->createMatcher('lang');
-
-		$value = preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::get$2; ?>', $value);
-
-		$pattern = $this->createMatcher('choice');
-
-		return preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::choice$2; ?>', $value);
-	}
-
-	/**
-	 * Compile Blade section start statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileSectionStart($value)
-	{
-		$pattern = $this->createMatcher('section');
-
-		return preg_replace($pattern, '$1<?php $__env->startSection$2; ?>', $value);
-	}
-
-	/**
-	 * Compile Blade section stop statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileSectionStop($value)
-	{
-		$pattern = $this->createPlainMatcher('stop');
-
-		$value = preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
-
-		$pattern = $this->createPlainMatcher('endsection');
-
-		return preg_replace($pattern, '$1<?php $__env->stopSection(); ?>$2', $value);
-	}
-
-	/**
-	 * Compile Blade section append statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileSectionAppend($value)
-	{
-		$pattern = $this->createPlainMatcher('append');
-
-		return preg_replace($pattern, '$1<?php $__env->appendSection(); ?>$2', $value);
-	}
-
-	/**
-	 * Compile Blade section stop statements into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	protected function compileSectionOverwrite($value)
-	{
-		$pattern = $this->createPlainMatcher('overwrite');
-
-		return preg_replace($pattern, '$1<?php $__env->stopSection(true); ?>$2', $value);
-	}
-
-	/**
-	 * Get the regular expression for a generic Blade function.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
-	}
-
-	/**
-	 * Get the regular expression for a generic Blade function.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createOpenMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
-	}
-
-	/**
-	 * Create a plain Blade matcher.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createPlainMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
 	}
 
 	/**
