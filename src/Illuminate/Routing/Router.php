@@ -440,14 +440,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function getNestedResourceUri(array $segments)
 	{
-		$me = $this;
-
 		// We will spin through the segments and create a place-holder for each of the
 		// resource segments, as well as the resource itself. Then we should get an
 		// entire string for the resource URI that contains all nested resources.
-		return implode('/', array_map(function($s) use ($me)
+		return implode('/', array_map(function($s)
 		{
-			return $s.'/{'.$me->getResourceWildcard($s).'}';
+			return $s.'/{'.$this->getResourceWildcard($s).'}';
 
 		}, $segments));
 	}
