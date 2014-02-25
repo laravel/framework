@@ -73,7 +73,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$tokens = token_get_all($value);
 
 		$result = '';
-		$footer = array();
 
 		foreach ($tokens as $token)
 		{
@@ -84,18 +83,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 				{
 					$t_content = $this->compileExtensions($t_content);
 
-					$obj = $this;
 					$t_content = preg_replace_callback(
-						'/\B # we shouldnt have words before
+						'/\B # we should not have words before
 						@(\w+) # control word should start with @
 						([ \t]*) # and we can have spaces afterwards
 						(\( ( (?>[^()]+) | (?3) )* \))? # and optional expression within brackets
 						/x',
-						function($match) use($obj)
+						function($match)
 						{
-							if (method_exists($obj, $method = 'compile' . ucfirst($match[1])))
+							if (method_exists($this, $method = 'compile' . ucfirst($match[1])))
 							{
-								$match[0] = $obj->__compileMethod($method, @$match[3]);
+								$match[0] = $this->__compileMethod($method, @$match[3]);
 							}
 
 							return $match[0] . (@$match[3]?'':$match[2]);
