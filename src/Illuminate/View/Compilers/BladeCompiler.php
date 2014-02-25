@@ -76,13 +76,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 	protected function parseToken($token)
 	{
-		list($t_id, $t_content, $t_no) = $token;
+		list($id, $content, $no) = $token;
 
-		if ($t_id == T_INLINE_HTML)
+		if ($id == T_INLINE_HTML)
 		{
-			$t_content = $this->compileExtensions($t_content);
+			$content = $this->compileExtensions($content);
 
-			$t_content = preg_replace_callback('/\B@(\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
+			$content = preg_replace_callback('/\B@(\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
 				function($match)
 				{
 					if (method_exists($this, $method = 'compile' . ucfirst($match[1])))
@@ -91,13 +91,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 					}
 
 					return $match[0] . (@$match[3]?'':$match[2]);
-				}, $t_content);
+				}, $content);
 
-			$t_content = $this->compileComments($t_content);
-			$t_content = $this->compileEchos($t_content);
+			$content = $this->compileComments($content);
+			$content = $this->compileEchos($content);
 		}
 
-		return $t_content;
+		return $content;
 	}
 
 	protected function compileEach($expr)
