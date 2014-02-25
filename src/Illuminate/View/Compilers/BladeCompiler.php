@@ -75,12 +75,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$result = '';
 		$footer = array();
 
-		foreach($tokens as $token)
+		foreach ($tokens as $token)
 		{
-			if( is_array($token) )
+			if (is_array($token))
 			{
 				list($t_id, $t_content, $t_no) = $token;
-				if( $t_id == T_INLINE_HTML ) {
+				if ($t_id == T_INLINE_HTML)
+				{
 					$t_content = $this->compileExtensions($t_content);
 
 					$obj = $this;
@@ -92,7 +93,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 						/x',
 						function($match) use($obj)
 						{
-							if( method_exists($obj, $method = 'compile' . ucfirst($match[1])) )
+							if (method_exists($obj, $method = 'compile' . ucfirst($match[1])))
 							{
 								$match[0] = $obj->__compileMethod($method, @$match[3]);
 							}
@@ -112,8 +113,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			}
 		}
 
-		if( count($this->footer) )
+		if (count($this->footer))
+		{
 			$result = ltrim($result, PHP_EOL) . PHP_EOL . implode(PHP_EOL, array_reverse($this->footer));
+		}
 
 		return $result;
 	}
@@ -216,8 +219,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected function compileExtends($expr)
 	{
 		// remove outer brackets so that (a,b) becomes a,b
-		if( starts_with($expr, '(') )
+		if (starts_with($expr, '('))
+		{
 			$expr = substr($expr, 1, -1);
+		}
+
 		$data = "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 
 		$this->footer[] = $data;
@@ -228,8 +234,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected function compileInclude($expr)
 	{
 		// remove outer brackets so that (a,b) becomes a,b
-		if( starts_with($expr, '(') )
+		if (starts_with($expr, '('))
+		{
 			$expr = substr($expr, 1, -1);
+		}
 
 		return "<?php echo \$__env->make($expr, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 	}
