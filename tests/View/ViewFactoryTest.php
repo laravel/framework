@@ -66,28 +66,28 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-    public function testAddANamedViews()
-    {
-        $factory = $this->getFactory();
-        $factory->name('bar', 'foo');
+	public function testAddANamedViews()
+	{
+		$factory = $this->getFactory();
+		$factory->name('bar', 'foo');
 
-        $this->assertEquals(array('foo' => 'bar'), $factory->getNames());
-    }
+		$this->assertEquals(array('foo' => 'bar'), $factory->getNames());
+	}
 
 
-    public function testMakeAViewFromNamedView()
-    {
-        $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
+	public function testMakeAViewFromNamedView()
+	{
+		$factory = $this->getFactory();
+		$factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
+		$factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
+		$factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
 		$factory->getDispatcher()->shouldReceive('fire');
-        $factory->addExtension('php', 'php');
-        $factory->name('view', 'foo');
-        $view = $factory->of('foo', array('data'));
+		$factory->addExtension('php', 'php');
+		$factory->name('view', 'foo');
+		$view = $factory->of('foo', array('data'));
 
-        $this->assertTrue($engine === $view->getEngine());
-    }
+		$this->assertTrue($engine === $view->getEngine());
+	}
 
 
 	public function testRawStringsMayBeReturnedFromRenderEach()
