@@ -76,14 +76,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		foreach ($tokens as $token)
 		{
-			if (is_array($token))
-			{
-				$result .= $this->compileToken($token);
-			}
-			else
-			{
-				$result .= $token;
-			}
+			$result .= (is_array($token) ? $this->compileToken($token) : $token);
 		}
 
 		if (count($this->footer))
@@ -94,7 +87,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		return $result;
 	}
 
-	protected function compileToken()
+	protected function compileToken($token)
 	{
 		list($t_id, $t_content, $t_no) = $token;
 
