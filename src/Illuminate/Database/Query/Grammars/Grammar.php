@@ -458,13 +458,11 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileOrders(Builder $query, $orders)
 	{
-		$me = $this;
-
-		return 'order by '.implode(', ', array_map(function($order) use ($me)
+		return 'order by '.implode(', ', array_map(function($order)
 		{
 			if (isset($order['sql'])) return $order['sql'];
 
-			return $me->wrap($order['column']).' '.$order['direction'];
+			return $this->wrap($order['column']).' '.$order['direction'];
 		}
 		, $orders));
 	}
