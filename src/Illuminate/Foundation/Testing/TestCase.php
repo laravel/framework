@@ -336,6 +336,47 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Set the session to the given array.
+	 *
+	 * @param  array  $data
+	 * @return void
+	 */
+	public function session(array $data)
+	{
+		$this->startSession();
+
+		foreach ($data as $key => $value)
+		{
+			$this->app['session']->put($key, $value);
+		}
+	}
+
+	/**
+	 * Flush all of the current session data.
+	 *
+	 * @return void
+	 */
+	public function flushSession()
+	{
+		$this->startSession();
+
+		$this->app['session']->flush();
+	}
+
+	/**
+	 * Start the session for the application.
+	 *
+	 * @return void
+	 */
+	protected function startSession()
+	{
+		if ( ! $this->app['session']->isStarted())
+		{
+			$this->app['session']->start();
+		}
+	}
+
+	/**
 	 * Set the currently logged in user for the application.
 	 *
 	 * @param  \Illuminate\Auth\UserInterface  $user
