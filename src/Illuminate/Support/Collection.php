@@ -186,7 +186,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		foreach ($this->items as $key => $value)
 		{
-			$key = is_callable($groupBy) ? $groupBy($value, $key) : array_get($value, $groupBy);
+			$key = is_callable($groupBy) ? $groupBy($value, $key) : data_get($value, $groupBy);
 
 			$results[$key][] = $value;
 		}
