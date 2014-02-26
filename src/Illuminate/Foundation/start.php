@@ -228,7 +228,7 @@ $app->booted(function() use ($app, $env)
 | Load The Application Start Script
 |--------------------------------------------------------------------------
 |
-| The start script gives us the application the opportunity to override
+| The start scripts gives this application the opportunity to override
 | any of the existing IoC bindings, as well as register its own new
 | bindings for things like repositories, etc. We'll load it here.
 |

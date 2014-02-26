@@ -78,6 +78,7 @@ header {
   overflow: auto;
   float: left;
   width: 30%;
+  background: #FFF;
 }
   .frame {
     padding: 14px;

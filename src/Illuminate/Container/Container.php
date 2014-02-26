@@ -504,25 +504,30 @@ class Container implements ArrayAccess {
 			return new $concrete;
 		}
 
-		$classes = $constructor->getParameters();
+		$dependencies = $constructor->getParameters();
 
 		// Once we have all the constructor's parameters we can create each of the
 		// dependency instances and then use the reflection instances to make a
 		// new instance of this class, injecting the created dependencies in.
-		$deps = array_merge($parameters, $this->getDependencies(
-			array_diff_key($classes, $parameters)
-		));
+		$parameters = $this->keyParametersByArgument(
+			$dependencies, $parameters
+		);
 
-		return $reflector->newInstanceArgs($deps);
+		$instances = $this->getDependencies(
+			$dependencies, $parameters
+		);
+
+		return $reflector->newInstanceArgs($instances);
 	}
 
 	/**
 	 * Resolve all of the dependencies from the ReflectionParameters.
 	 *
 	 * @param  array  $parameters
+	 * @param  array  $primitives
 	 * @return array
 	 */
-	protected function getDependencies($parameters)
+	protected function getDependencies($parameters, array $primitives = array())
 	{
 		$dependencies = array();
 
@@ -532,8 +537,12 @@ class Container implements ArrayAccess {
 
 			// If the class is null, it means the dependency is a string or some other
 			// primitive type which we can not resolve since it is not a class and
-			// we'll just bomb out with an error since we have no-where to go.
-			if (is_null($dependency))
+			// we will just bomb out with an error since we have no-where to go.
+			if (array_key_exists($parameter->name, $primitives))
+			{
+				$dependencies[] = $primitives[$parameter->name];
+			}
+			elseif (is_null($dependency))
 			{
 				$dependencies[] = $this->resolveNonClass($parameter);
 			}
@@ -597,6 +606,28 @@ class Container implements ArrayAccess {
 				throw $e;
 			}
 		}
+	}
+
+	/**
+	 * If extra parameters are passed by numeric ID, rekey them by argument name.
+	 *
+	 * @param  array  $dependencies
+	 * @param  array  $parameters
+	 * @param  array
+	 */
+	protected function keyParametersByArgument(array $dependencies, array $parameters)
+	{
+		foreach ($parameters as $key => $value)
+		{
+			if (is_numeric($key))
+			{
+				unset($parameters[$key]);
+
+				$parameters[$dependencies[$key]->name] = $value;
+			}
+		}
+
+		return $parameters;
 	}
 
 	/**
