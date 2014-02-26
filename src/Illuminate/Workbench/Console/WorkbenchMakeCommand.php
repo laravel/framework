@@ -107,7 +107,7 @@ class WorkbenchMakeCommand extends Command {
 	{
 		$package = $this->argument('package');
 
-		return array_map('studly_case', explode('/', $package, 2));		
+		return array_map('studly_case', explode('/', $package, 2));
 	}
 
 	/**

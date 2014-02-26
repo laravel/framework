@@ -46,7 +46,7 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		wincache_ucache_add($this->prefix.$key, $value, $minutes * 60);
+		wincache_ucache_set($this->prefix.$key, $value, $minutes * 60);
 	}
 
 	/**

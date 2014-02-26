@@ -145,6 +145,25 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($_SERVER['__test.after.filter']);
 
 		/**
+		 * Test filter removal.
+		 */
+		$router = $this->getRouter();
+		$router->filter('removeBefore', function() {
+			$_SERVER['__test.before.removeBeforeFilter'] = true;
+		});
+		$router->get('beforeRoute', 'RouteTestControllerRemoveFilterStub@beforeRoute');
+		$this->assertEquals('beforeRoute', $router->dispatch(Request::create('beforeRoute', 'GET'))->getContent());
+		$this->assertTrue(!isset($_SERVER['__test.after.removeBeforeFilter']) || is_null(isset($_SERVER['__test.after.removeBeforeFilter'])));
+
+		$router = $this->getRouter();
+		$router->filter('removeAfter', function() {
+			$_SERVER['__test.after.removeAfterFilter'] = true;
+		});
+		$router->get('afterRoute', 'RouteTestControllerRemoveFilterStub@afterRoute');
+		$this->assertEquals('afterRoute', $router->dispatch(Request::create('afterRoute', 'GET'))->getContent());
+		$this->assertTrue(!isset($_SERVER['__test.after.removeAfterFilter']) || is_null(isset($_SERVER['__test.after.removeAfterFilter'])));
+
+		/**
 		 * Test filters disabled...
 		 */
 		$router = $this->getRouter();
@@ -713,6 +732,37 @@ class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
 	public function qux()
 	{
 		return 'qux';
+	}
+}
+
+class RouteTestControllerRemoveFilterStub extends \Illuminate\Routing\Controller {
+	public function __construct()
+	{
+		$this->beforeFilter('removeBefore', array('only' => 'beforeRoute'));
+		$this->beforeFilter('@inlineBeforeFilter', array('only' => 'beforeRoute'));
+		$this->afterFilter('removeAfter', array('only' => 'afterRoute'));
+		$this->afterFilter('@inlineAfterFilter', array('only' => 'afterRoute'));
+
+		$this->forgetBeforeFilter('removeBefore');
+		$this->forgetBeforeFilter('@inlineBeforeFilter');
+		$this->forgetAfterFilter('removeAfter');
+		$this->forgetAfterFilter('@inlineAfterFilter');
+	}
+	public function beforeRoute()
+	{
+		return __FUNCTION__;
+	}
+	public function afterRoute()
+	{
+		return __FUNCTION__;
+	}
+	public function inlineBeforeFilter()
+	{
+		return __FUNCTION__;
+	}
+	public function inlineAfterFilter()
+	{
+		return __FUNCTION__;
 	}
 }
 
