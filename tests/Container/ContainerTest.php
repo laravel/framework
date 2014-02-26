@@ -272,6 +272,24 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($_SERVER['__test.rebind']);
 	}
 
+
+	public function testPassingSomePrimitiveParameters()
+	{
+		$container = new Container;
+		$value = $container->make('ContainerMixedPrimitiveStub', array('first' => 'taylor', 'last' => 'otwell'));
+		$this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
+		$this->assertEquals('taylor', $value->first);
+		$this->assertEquals('otwell', $value->last);
+		$this->assertInstanceOf('ContainerConcreteStub', $value->stub);
+
+		$container = new Container;
+		$value = $container->make('ContainerMixedPrimitiveStub', array(0 => 'taylor', 2 => 'otwell'));
+		$this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
+		$this->assertEquals('taylor', $value->first);
+		$this->assertEquals('otwell', $value->last);
+		$this->assertInstanceOf('ContainerConcreteStub', $value->stub);
+	}
+
 }
 
 class ContainerConcreteStub {}
@@ -302,5 +320,15 @@ class ContainerDefaultValueStub {
 	{
 		$this->stub = $stub;
 		$this->default = $default;
+	}
+}
+
+class ContainerMixedPrimitiveStub {
+	public $first; public $last; public $stub;
+	public function __construct($first, ContainerConcreteStub $stub, $last)
+	{
+		$this->stub = $stub;
+		$this->last = $last;
+		$this->first = $first;
 	}
 }
