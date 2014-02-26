@@ -50,7 +50,11 @@ class OptimizeCommand extends Command {
 	{
 		$this->info('Generating optimized class loader');
 
-		if ( ! $this->option('no-composer'))
+		if ($this->option('no-optimize'))
+		{
+			$this->composer->dumpAutoloads();
+		}
+		else
 		{
 			$this->composer->dumpOptimized();
 		}
@@ -118,7 +122,7 @@ class OptimizeCommand extends Command {
 	{
 		return array(
 			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
-			array('no-composer', null, InputOption::VALUE_NONE, 'Do not execute composer dump-autoload.'),
+			array('no-optimize', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
 		);
 	}
 
