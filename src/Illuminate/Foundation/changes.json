@@ -93,7 +93,8 @@
 		{"message": "Fixed required_with behavior to match required_without. Added required_with_any.", "backport": null},
 		{"message": "Added ability to register custom message replacers with the Validator.", "backport": null},
 		{"message": "Added support for 'char' columns in the Schema builder.", "backport": null},
-		{"message": "Added 'forgetBeforeFilter' and 'forgetAfterFilter' to controllers.", "backport": null}
+		{"message": "Added 'forgetBeforeFilter' and 'forgetAfterFilter' to controllers.", "backport": null},
+		{"message": "Allow container parameter overrides to be specified by argument name.", "backport": null}
 	],
 	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
