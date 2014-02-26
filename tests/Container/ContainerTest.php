@@ -215,6 +215,21 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor', $instance->default);
 	}
 
+	public function testResolutionOfPassedParameterWithoutClosure()
+	{
+		$container = new Container;
+		$instance = $container->make('ContainerPartialReflectionStub', array(1 => 'foo'));
+		$this->assertInstanceOf('ContainerConcreteStub', $instance->stub);
+		$this->assertEquals('foo', $instance->param);
+	}
+
+	public function testResolutionOfPassedParameterWithoutClosureReverse()
+	{
+		$container = new Container;
+		$instance = $container->make('ContainerPartialReflectionStubReverse', array('foo'));
+		$this->assertInstanceOf('ContainerConcreteStub', $instance->stub);
+		$this->assertEquals('foo', $instance->param);
+	}
 
 	public function testResolvingCallbacksAreCalledForSpecificAbstracts()
 	{
@@ -302,5 +317,23 @@ class ContainerDefaultValueStub {
 	{
 		$this->stub = $stub;
 		$this->default = $default;
+	}
+}
+
+class ContainerPartialReflectionStub {
+	public $stub; public $param;
+	public function __construct(ContainerConcreteStub $stub, $param)
+	{
+		$this->stub = $stub;
+		$this->param = $param;
+	}
+}
+
+class ContainerPartialReflectionStubReverse {
+	public $stub; public $param;
+	public function __construct($param, ContainerConcreteStub $stub)
+	{
+		$this->stub = $stub;
+		$this->param = $param;
 	}
 }
