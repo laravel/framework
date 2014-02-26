@@ -151,25 +151,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->filter('removeBefore', function() {
 			$_SERVER['__test.before.removeBeforeFilter'] = true;
 		});
-		$router->get('removeBefore', 'RouteTestControllerDispatchStub@removeBefore');
-		$this->assertEquals('removeBefore', $router->dispatch(Request::create('removeBefore', 'GET'))->getContent());
+		$router->get('beforeRoute', 'RouteTestControllerRemoveFilterStub@beforeRoute');
+		$this->assertEquals('beforeRoute', $router->dispatch(Request::create('beforeRoute', 'GET'))->getContent());
 		$this->assertTrue(!isset($_SERVER['__test.after.removeBeforeFilter']) || is_null(isset($_SERVER['__test.after.removeBeforeFilter'])));
 
 		$router = $this->getRouter();
 		$router->filter('removeAfter', function() {
 			$_SERVER['__test.after.removeAfterFilter'] = true;
 		});
-		$router->get('removeAfter', 'RouteTestControllerDispatchStub@removeAfter');
-		$this->assertEquals('removeAfter', $router->dispatch(Request::create('removeAfter', 'GET'))->getContent());
+		$router->get('afterRoute', 'RouteTestControllerRemoveFilterStub@afterRoute');
+		$this->assertEquals('afterRoute', $router->dispatch(Request::create('afterRoute', 'GET'))->getContent());
 		$this->assertTrue(!isset($_SERVER['__test.after.removeAfterFilter']) || is_null(isset($_SERVER['__test.after.removeAfterFilter'])));
-
-		$router = $this->getRouter();
-		$router->get('rb', 'RouteTestControllerDispatchStub@rb');
-		$this->assertEquals('rb', $router->dispatch(Request::create('rb', 'GET'))->getContent());
-
-		$router = $this->getRouter();
-		$router->get('ra', 'RouteTestControllerDispatchStub@ra');
-		$this->assertEquals('ra', $router->dispatch(Request::create('ra', 'GET'))->getContent());
 
 		/**
 		 * Test filters disabled...
@@ -719,16 +711,7 @@ class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
 	{
 		$this->beforeFilter('foo', array('only' => 'bar'));
 		$this->beforeFilter('@filter', array('only' => 'baz'));
-		$this->beforeFilter('removeBefore', array('only' => 'removeBefore'));
-		$this->beforeFilter('@rbFilter', array('only' => 'rb'));
 		$this->afterFilter('qux', array('only' => 'qux'));
-		$this->afterFilter('removeAfter', array('only' => 'removeAfter'));
-		$this->afterFilter('@raFilter', array('only' => 'ra'));
-
-		$this->removeBeforeFilter('removeBefore');
-		$this->removeBeforeFilter('@rbFilter');
-		$this->removeAfterFilter('removeAfter');
-		$this->removeAfterFilter('@raFilter');
 	}
 	public function foo()
 	{
@@ -750,29 +733,36 @@ class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
 	{
 		return 'qux';
 	}
-	public function rb()
+}
+
+class RouteTestControllerRemoveFilterStub extends \Illuminate\Routing\Controller {
+	public function __construct()
 	{
-		return 'rb';
+		$this->beforeFilter('removeBefore', array('only' => 'beforeRoute'));
+		$this->beforeFilter('@inlineBeforeFilter', array('only' => 'beforeRoute'));
+		$this->afterFilter('removeAfter', array('only' => 'afterRoute'));
+		$this->afterFilter('@inlineAfterFilter', array('only' => 'afterRoute'));
+
+		$this->forgetBeforeFilter('removeBefore');
+		$this->forgetBeforeFilter('@inlineBeforeFilter');
+		$this->forgetAfterFilter('removeAfter');
+		$this->forgetAfterFilter('@inlineAfterFilter');
 	}
-	public function ra()
+	public function beforeRoute()
 	{
-		return 'ra';
+		return __FUNCTION__;
 	}
-	public function removeBefore()
+	public function afterRoute()
 	{
-		return 'removeBefore';
+		return __FUNCTION__;
 	}
-	public function removeAfter()
+	public function inlineBeforeFilter()
 	{
-		return 'removeAfter';
+		return __FUNCTION__;
 	}
-	public function rbFilter()
+	public function inlineAfterFilter()
 	{
-		return 'rbFilter';
-	}
-	public function raFilter()
-	{
-		return 'raFilter';
+		return __FUNCTION__;
 	}
 }
 
