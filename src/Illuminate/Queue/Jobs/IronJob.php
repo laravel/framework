@@ -166,7 +166,7 @@ class IronJob extends Job {
 	 */
 	public function getQueue()
 	{
-		return array_get(json_decode($this->job->body, true), 'queue');
+		return $this->job->queue;
 	}
 
 }
