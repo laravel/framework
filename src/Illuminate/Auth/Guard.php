@@ -145,6 +145,13 @@ class Guard {
 		{
 			$user = $this->getUserByRecaller($recaller);
 		}
+		
+		// We clear the session if exists and the user is null
+		if (is_null($user) && ! is_null($id))
+		{
+			$this->clearUserDataFromStorage();
+			$this->loggedOut = true;
+		}
 
 		return $this->user = $user;
 	}
