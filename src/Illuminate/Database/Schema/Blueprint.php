@@ -739,10 +739,16 @@ class Blueprint {
 	 * @param  string  $name
 	 * @param  array   $parameters
 	 * @return \Illuminate\Support\Fluent
+	 * @throws \InvalidArgumentException  If autoIncrement is not a boolean.
 	 */
 	protected function addColumn($type, $name, array $parameters = array())
 	{
 		$attributes = array_merge(compact('type', 'name'), $parameters);
+
+		if (isset($attributes['autoIncrement']) && ! is_bool($attributes['autoIncrement']))
+		{
+			throw new \InvalidArgumentException('An autoIncrement argument was given but was not boolean.');
+		}
 
 		$this->columns[] = $column = new Fluent($attributes);
 
