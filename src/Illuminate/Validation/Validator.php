@@ -1647,7 +1647,14 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceBefore($message, $attribute, $rule, $parameters)
 	{
-		return str_replace(':date', $parameters[0], $message);
+		if ( ! ($date = strtotime($parameters[0])))
+		{
+			return str_replace(':date', $this->getAttribute($parameters[0]), $message);
+		}
+		else
+		{
+			return str_replace(':date', $parameters[0], $message);
+		}
 	}
 
 	/**
@@ -1661,7 +1668,14 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceAfter($message, $attribute, $rule, $parameters)
 	{
-		return str_replace(':date', $parameters[0], $message);
+		if ( ! ($date = strtotime($parameters[0])))
+		{
+			return str_replace(':date', $this->getAttribute($parameters[0]), $message);
+		}
+		else
+		{
+			return str_replace(':date', $parameters[0], $message);
+		}
 	}
 
 	/**
