@@ -123,7 +123,10 @@ abstract class Facade {
 	 *
 	 * @throws \RuntimeException
 	 */
-	abstract protected static function getFacadeAccessor();
+	protected static function getFacadeAccessor()
+	{
+		throw new \RuntimeException("Facade does not implement getFacadeAccessor method.");
+	}
 
 	/**
 	 * Resolve the facade root instance from the container.
