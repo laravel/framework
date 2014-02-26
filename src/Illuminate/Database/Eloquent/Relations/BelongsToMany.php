@@ -556,8 +556,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Sync the intermediate tables with a list of IDs, and return
-	 * an array with the detached, attached and updated IDs
+	 * Sync the intermediate tables with a list of IDs.
 	 *
 	 * @param  array  $ids
 	 * @param  bool   $detaching
@@ -565,8 +564,9 @@ class BelongsToMany extends Relation {
 	 */
 	public function sync(array $ids, $detaching = true)
 	{
-		// Keep track of what is changed
-		$changes = array('attached' => array(), 'detached' => array(), 'updated' => array());
+		$changes = array(
+			'attached' => array(), 'detached' => array(), 'updated' => array()
+		);
 
 		// First we need to attach any of the associated models that are not currently
 		// in this joining table. We'll spin through the given IDs, checking to see
@@ -583,13 +583,16 @@ class BelongsToMany extends Relation {
 		if ($detaching && count($detach) > 0)
 		{
 			$this->detach($detach);
+
 			$changes['detached'] = (array) array_walk($detach, 'intval');
 		}
 
 		// Now we are finally ready to attach the new records. Note that we'll disable
 		// touching until after the entire operation is complete so we don't fire a
 		// ton of touch operations until we are totally done syncing the records.
-		$changes = array_merge($changes, $this->attachNew($records, $current, false));
+		$changes = array_merge(
+			$changes, $this->attachNew($records, $current, false)
+		);
 
 		$this->touchIfTouching();
 
@@ -620,8 +623,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Attach all of the IDs that aren't in the current array, and return
-	 * an array with the newly attached and updated IDs
+	 * Attach all of the IDs that aren't in the current array.
 	 *
 	 * @param  array  $records
 	 * @param  array  $current
@@ -630,7 +632,6 @@ class BelongsToMany extends Relation {
 	 */
 	protected function attachNew(array $records, array $current, $touch = true)
 	{
-		// Keep track of what is changed
 		$changes = array('attached' => array(), 'updated' => array());
 
 		foreach ($records as $id => $attributes)
@@ -641,11 +642,13 @@ class BelongsToMany extends Relation {
 			if ( ! in_array($id, $current))
 			{
 				$this->attach($id, $attributes, $touch);
+
 				$changes['attached'][] = (int) $id;
 			}
 			elseif (count($attributes) > 0)
 			{
 				$this->updateExistingPivot($id, $attributes, $touch);
+
 				$changes['updated'][] = (int) $id;
 			}
 		}
