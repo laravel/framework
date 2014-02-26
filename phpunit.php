@@ -1,5 +1,14 @@
 <?php
 
+error_reporting(E_ALL);
+
+set_error_handler(function($no, $str, $file, $line, $context) {
+	// allow user-suppressed errors to pass
+	if (error_reporting() === 0) return;
+	echo "PHP error no. $no - $str" . PHP_EOL . "In $file on line $line" . PHP_EOL;
+	exit(1);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Register The Composer Auto Loader
