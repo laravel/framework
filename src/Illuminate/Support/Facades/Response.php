@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Support\Contracts\ArrayableInterface;
@@ -89,7 +90,7 @@ class Response {
 
 		if ( ! is_null($name))
 		{
-			return $response->setContentDisposition('attachment', $name);
+			return $response->setContentDisposition('attachment', $name, Str::ascii($name));
 		}
 
 		return $response;
