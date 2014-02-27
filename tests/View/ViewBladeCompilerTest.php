@@ -345,6 +345,14 @@ breeze
 	}
 
 
+	public function testExpressionWithinHTML()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<html <?php echo $foo; ?>>', $compiler->compileString('<html {{ $foo }}>'));
+		$this->assertEquals('<html <?php echo $foo; ?> <?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
+	}
+
+
 	protected function getFiles()
 	{
 		return m::mock('Illuminate\Filesystem\Filesystem');
