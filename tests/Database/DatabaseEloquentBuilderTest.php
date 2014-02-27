@@ -249,7 +249,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$nop2 = function() {};
 		$builder->setEagerLoads(array('foo' => $nop1, 'foo.bar' => $nop2));
 		$builder->shouldAllowMockingProtectedMethods()->shouldReceive('loadRelation')->with(array('models'), 'foo', $nop1)->andReturn(array('foo'));
-		
+
 		$results = $builder->eagerLoadRelations(array('models'));
 		$this->assertEquals(array('foo'), $results);
 	}
