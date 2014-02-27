@@ -9,15 +9,15 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		m::close();
 	}
-	
-	
+
+
 	public function testInstanceMethod()
 	{
 		$request = Request::create('', 'GET');
 		$this->assertTrue($request === $request->instance());
 	}
-	
-	
+
+
 	public function testRootMethod()
 	{
 		$request = Request::create('http://example.com/foo/bar/script.php?test');
@@ -33,8 +33,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/foo/bar', 'GET');
 		$this->assertEquals('foo/bar', $request->path());
 	}
-	
-	
+
+
 	public function testDecodedPathMethod()
 	{
 		$request = Request::create('/foo%20bar');
@@ -104,8 +104,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($request->is('/'));
 	}
-	
-	
+
+
 	public function testAjaxMethod()
 	{
 		$request = Request::create('/', 'GET');
@@ -113,8 +113,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'), '{}');
 		$this->assertTrue($request->ajax());
 	}
-	
-	
+
+
 	public function testSecureMethod()
 	{
 		$request = Request::create('http://example.com', 'GET');
@@ -183,8 +183,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$all = $request->cookie(null);
 		$this->assertEquals('Taylor', $all['name']);
 	}
-	
-	
+
+
 	public function testHasCookieMethod()
 	{
 		$request = Request::create('/', 'GET', array(), array('foo' => 'bar'));
@@ -339,7 +339,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/atom+xml'));
 		$this->assertEquals('atom', $request->format());
 		$this->assertFalse($request->wantsJson());
-		
+
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'is/not/known'));
 		$this->assertEquals('html', $request->format());
 		$this->assertEquals('foo', $request->format('foo'));
