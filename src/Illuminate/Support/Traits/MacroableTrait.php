@@ -22,6 +22,17 @@ trait MacroableTrait {
 	}
 
 	/**
+	 * Checks if macro is registered
+	 *
+	 * @param  string    $name
+	 * @return boolean
+	 */
+	public static function hasMacro($name)
+	{
+		return isset(static::$macros[$name]);
+	}
+
+	/**
 	 * Dynamically handle calls to the class.
 	 *
 	 * @param  string  $method
@@ -32,12 +43,26 @@ trait MacroableTrait {
 	 */
 	public static function __callStatic($method, $parameters)
 	{
-		if (isset(static::$macros[$method]))
+		if (static::hasMacro($method))
 		{
 			return call_user_func_array(static::$macros[$method], $parameters);
 		}
 
 		throw new \BadMethodCallException("Method {$method} does not exist.");
+	}
+
+	/**
+	 * Dynamically handle calls to the form builder.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, $parameters)
+	{
+		return static::__callStatic($method, $parameters);
 	}
 
 }
