@@ -1168,9 +1168,7 @@ class Validator implements MessageProviderInterface {
 	{
 		if ($format = $this->getDateFormat($attribute))
 		{
-			$date = DateTime::createFromFormat($format, $value);
-			$before = DateTime::createFromFormat($format, $parameters[0]);
-			return $date < $before;
+			return $this->validateBeforeWithFormat($format, $value, $parameters);
 		}
 
 		if ( ! ($date = strtotime($parameters[0])))
@@ -1181,6 +1179,20 @@ class Validator implements MessageProviderInterface {
 		{
 			return strtotime($value) < $date;
 		}
+	}
+
+	/**
+	 * Validate the date is before a given date with a given format.
+	 *
+	 * @param  string  $format
+	 * @param  mixed   $value
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function validateBeforeWithFormat($format, $value, $parameters)
+	{
+		return DateTime::createFromFormat($format, $value) <
+               DateTime::createFromFormat($format, $parameters[0]);
 	}
 
 	/**
@@ -1195,9 +1207,7 @@ class Validator implements MessageProviderInterface {
 	{
 		if ($format = $this->getDateFormat($attribute))
 		{
-			$date = DateTime::createFromFormat($format, $value);
-			$after = DateTime::createFromFormat($format, $parameters[0]);
-			return $date > $after;
+			return $this->validateAfterWithFormat($format, $value, $parameters);
 		}
 
 		if ( ! ($date = strtotime($parameters[0])))
@@ -1211,6 +1221,20 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Validate the date is after a given date with a given format.
+	 *
+	 * @param  string  $format
+	 * @param  mixed   $value
+	 * @param  array   $parameters
+	 * @return bool
+	 */
+	protected function validateAfterWithFormat($format, $value, $parameters)
+	{
+		return DateTime::createFromFormat($format, $value) >
+               DateTime::createFromFormat($format, $parameters[0]);
+	}
+
+	/**
 	 * Get the date format for an attribute if it has one.
 	 *
 	 * @param  string $attribute
@@ -1220,9 +1244,7 @@ class Validator implements MessageProviderInterface {
 	{
 		if ($result = $this->getRule($attribute, 'DateFormat'))
 		{
-			list($rule, $params) = $result;
-			$format = $params[0];
-			return $format;
+			return $result[1][0];
 		}
 	}
 
