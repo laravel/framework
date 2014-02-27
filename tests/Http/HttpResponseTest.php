@@ -18,7 +18,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response = new Illuminate\Http\Response(new JsonableStub);
 		$this->assertEquals('foo', $response->getContent());
 		$this->assertEquals('application/json', $response->headers->get('Content-Type'));
-		
+
 		$response = new Illuminate\Http\Response();
 		$response->setContent(array('foo'=>'bar'));
 		$this->assertEquals('{"foo":"bar"}', $response->getContent());
@@ -33,8 +33,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response = new Illuminate\Http\Response($mock);
 		$this->assertEquals('foo', $response->getContent());
 	}
-	
-	
+
+
 	public function testHeader()
 	{
 		$response = new Illuminate\Http\Response();
@@ -46,8 +46,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response->header('foo', 'baz');
 		$this->assertEquals('baz', $response->headers->get('foo'));
 	}
-	
-	
+
+
 	public function testWithCookie()
 	{
 		$response = new Illuminate\Http\Response();
@@ -58,8 +58,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $cookies[0]->getName());
 		$this->assertEquals('bar', $cookies[0]->getValue());
 	}
-	
-	
+
+
 	public function testGetOriginalContent()
 	{
 		$arr = array('foo'=>'bar');
@@ -67,8 +67,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response->setContent($arr);
 		$this->assertTrue($arr === $response->getOriginalContent());
 	}
-	
-	
+
+
 	public function testHeaderOnRedirect()
 	{
 		$response = new RedirectResponse('foo.bar');
@@ -80,9 +80,9 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response->header('foo', 'baz');
 		$this->assertEquals('baz', $response->headers->get('foo'));
 	}
-	
-	
-	public function testWithOnRedirect()	
+
+
+	public function testWithOnRedirect()
 {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
@@ -90,8 +90,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $session->shouldReceive('flash')->twice();
 		$response->with(array('name', 'age'));
 	}
-	
-	
+
+
 	public function testWithCookieOnRedirect()
 	{
 		$response = new RedirectResponse('foo.bar');
@@ -145,14 +145,14 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
         $response->withErrors($provider);
     }
-	
-	
+
+
 	public function testSettersGettersOnRequest()
 	{
 		$response = new RedirectResponse('foo.bar');
 		$this->assertNull($response->getRequest());
 		$this->assertNull($response->getSession());
-		
+
 		$request = Request::create('/', 'GET');
 		$session = m::mock('Illuminate\Session\Store');
 		$response->setRequest($request);
@@ -161,7 +161,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($session === $response->getSession());
 	}
 
-	
+
     public function testRedirectWithErrorsArrayConvertsToMessageBag()
     {
         $response = new RedirectResponse('foo.bar');
@@ -172,8 +172,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $provider = array('foo' => 'bar');
         $response->withErrors($provider);
     }
-	
-	
+
+
 	public function testMagicCall()
 	{
 		$response = new RedirectResponse('foo.bar');

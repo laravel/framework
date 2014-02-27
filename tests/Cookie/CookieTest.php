@@ -29,7 +29,7 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($c2->isSecure());
 		$this->assertEquals('/domain', $c2->getDomain());
 		$this->assertEquals('/path', $c2->getPath());
-		
+
 		$c3 = $cookie->forget('color');
 		$this->assertTrue($c3->getValue() === null);
 		$this->assertTrue($c3->getExpiresTime() < time());
