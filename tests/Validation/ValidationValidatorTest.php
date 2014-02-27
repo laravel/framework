@@ -902,6 +902,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBeforeAndAfterWithFormat()
+	{
+		date_default_timezone_set('UTC');
+		$trans = $this->getRealTranslator();
+
+		$v = new Validator($trans, array('x' => '02/04/2012'), array('x' => 'After:03/03/2012|Before:01/05/2012'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('x' => '02/04/2012'), array('x' => 'date_format:d/m/Y|After:03/03/2012|Before:01/05/2012'));
+		$this->assertTrue($v->passes());
+	}
+
+
 	public function testSometimesAddingRules()
 	{
 		$trans = $this->getRealTranslator();
