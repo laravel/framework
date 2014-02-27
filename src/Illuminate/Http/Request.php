@@ -30,6 +30,16 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Get the request method.
+	 *
+	 * @return string
+	 */
+	public function method()
+	{
+		return $this->getMethod();
+	}
+
+	/**
 	 * Get the root URL for the application.
 	 *
 	 * @return string
