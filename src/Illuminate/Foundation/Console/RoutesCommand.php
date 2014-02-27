@@ -109,7 +109,12 @@ class RoutesCommand extends Command {
 	 */
 	protected function getRouteInformation(Route $route)
 	{
-		$uri = head($route->methods()).' '.$route->uri();
+		// $uri = head($route->methods()).' '.$route->uri();
+
+		// deal with Route::match() multiple verbs to single method
+		$methods = $route->methods();
+		if (end($methods) == 'HEAD') array_pop($methods);
+		$uri = implode('|',$methods).' '.$route->uri();
 
 		return $this->filterRoute(array(
 			'host'   => $route->domain(),
