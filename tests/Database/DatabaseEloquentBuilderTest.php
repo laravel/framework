@@ -421,16 +421,19 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentBuilderTestModelStub extends Illuminate\Database\Eloquent\Model {}
+
 class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	public function scopeApproved($query)
 	{
 		$query->where('foo', 'bar');
 	}
 }
+
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'table';
 	protected $softDelete = true;
 }
+
 class EloquentBuilderTestListsStub {
 	protected $attributes;
 	public function __construct($attributes)
