@@ -911,18 +911,16 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function getClassClosure($controller)
 	{
-		$me = $this;
-
 		// Here we'll get an instance of this controller dispatcher and hand it off to
 		// the Closure so it will be used to resolve the class instances out of our
 		// IoC container instance and call the appropriate methods on the class.
 		$d = $this->getControllerDispatcher();
 
-		return function() use ($me, $d, $controller)
+		return function() use ($d, $controller)
 		{
-			$route = $me->current();
+			$route = $this->current();
 
-			$request = $me->getCurrentRequest();
+			$request = $this->getCurrentRequest();
 
 			// Now we can split the controller and method out of the action string so that we
 			// can call them appropriately on the class. This controller and method are in
