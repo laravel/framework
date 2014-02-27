@@ -40,4 +40,18 @@ trait MacroableTrait {
 		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
+	/**
+	 * Dynamically handle calls to the form builder.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, $parameters)
+	{
+		return static::__callStatic($method, $parameters);
+	}
+
 }

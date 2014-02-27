@@ -76,6 +76,14 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRegisterMacroWithNonStaticCall()
+	{
+		$repo = $this->getRepository();
+		$repo::macro(__CLASS__, function() { return 'Taylor'; });
+		$this->assertEquals($repo->{__CLASS__}(), 'Taylor');
+	}
+
+
 	protected function getRepository()
 	{
 		return new Illuminate\Cache\Repository(m::mock('Illuminate\Cache\StoreInterface'));
