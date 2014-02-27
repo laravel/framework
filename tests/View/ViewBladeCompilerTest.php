@@ -174,7 +174,7 @@ this is a comment
 	public function testIfStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@if(name(foo(bar)))
+		$string = '@if (name(foo(bar)))
 breeze
 @endif';
 		$expected = '<?php if(name(foo(bar))): ?>
@@ -187,7 +187,7 @@ breeze
 	public function testElseStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@if(name(foo(bar)))
+		$string = '@if (name(foo(bar)))
 breeze
 @else
 boom
@@ -335,6 +335,13 @@ breeze
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('[[
 			$name
 		]]'));
+	}
+
+
+	public function testExpressionsOnTheSameLine()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo \Illuminate\Support\Facades\Lang::get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
 	}
 
 
