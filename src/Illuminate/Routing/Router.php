@@ -915,6 +915,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// the Closure so it will be used to resolve the class instances out of our
 		// IoC container instance and call the appropriate methods on the class.
 		$d = $this->getControllerDispatcher();
+		
+		// If not specified, use the default action.
+	        if ( strpos($controller, '@') === false )
+	        {
+	            $controller .= '@index';
+	        }
 
 		return function() use ($d, $controller)
 		{
