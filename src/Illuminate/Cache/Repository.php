@@ -4,8 +4,13 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
+use Illuminate\Support\Traits\MacroableTrait;
 
 class Repository implements ArrayAccess {
+
+	use MacroableTrait {
+		__call as macroCall;
+	}
 
 	/**
 	 * The cache store implementation.
@@ -20,13 +25,6 @@ class Repository implements ArrayAccess {
 	 * @var int
 	 */
 	protected $default = 60;
-
-	/**
-	 * An array of registered Cache macros.
-	 *
-	 * @var array
-	 */
-	protected $macros = array();
 
 	/**
 	 * Create a new cache repository instance.
@@ -250,18 +248,6 @@ class Repository implements ArrayAccess {
 	}
 
 	/**
-	 * Register a macro with the Cache class.
-	 *
-	 * @param  string    $name
-	 * @param  callable  $callback
-	 * @return void
-	 */
-	public function macro($name, $callback)
-	{
-		$this->macros[$name] = $callback;
-	}
-
-	/**
 	 * Handle dynamic calls into macros or pass missing methods to the store.
 	 *
 	 * @param  string  $method
@@ -270,15 +256,14 @@ class Repository implements ArrayAccess {
 	 */
 	public function __call($method, $parameters)
 	{
-		if (isset($this->macros[$method]))
+		if (static::hasMacro($method))
 		{
-			return call_user_func_array($this->macros[$method], $parameters);
+			return $this->macroCall($method, $parameters);
 		}
 		else
 		{
 			return call_user_func_array(array($this->store, $method), $parameters);
 		}
 	}
-
 
 }
