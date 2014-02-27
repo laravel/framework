@@ -778,6 +778,7 @@ class EloquentTestObserverStub {
 	public function creating() {}
 	public function saved() {}
 }
+
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
 	protected $guarded = array();
