@@ -217,4 +217,15 @@ class TaggedCache implements StoreInterface {
 		return $this->store->getPrefix();
 	}
 
+    /**
+     * Since TaggedCache defers actual storage to another StoreInterface
+     * $this->store, this method is just an identity map.
+     *
+     * @param  float $minutes
+     * @return float
+     */
+    public function getExpiry($minutes) {
+        return $minutes;
+    }
+
 }
