@@ -83,7 +83,7 @@ class DatabaseStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -95,7 +95,7 @@ class DatabaseStore implements StoreInterface {
 		// time and place that on the table so we will check it on our retrieval.
 		$value = $this->encrypter->encrypt($value);
 
-		$expiration = $this->getTime() + ($minutes * 60);
+		$expiration = $this->getExpiry($minutes);
 
 		try
 		{
@@ -217,5 +217,15 @@ class DatabaseStore implements StoreInterface {
 	{
 		return $this->prefix;
 	}
+
+    /**
+     * Compute expiry time $minutes from now
+     *
+     * @param  float $minutes
+     * @return int
+     */
+    public function getExpiry($minutes ) {
+        return $this->getTime() + round($minutes * 60);
+    }
 
 }

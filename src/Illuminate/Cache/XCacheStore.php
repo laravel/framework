@@ -41,12 +41,12 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
 	{
-		xcache_set($this->prefix.$key, $value, $minutes * 60);
+		xcache_set($this->prefix.$key, $value, $this->getExpiry($minutes));
 	}
 
 	/**
@@ -114,6 +114,24 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	public function getPrefix()
 	{
 		return $this->prefix;
+	}
+
+	/**
+	 * Convert expiry to xcache's native format (seconds offset)
+	 *
+	 * @param  float @minutes
+	 * @return int
+	 */
+	public function getExpiry($minutes)
+	{
+		if ($minutes == 0)
+		{
+			return 0;
+		}
+
+		// Never return zero as a result of the rounding!
+		// Return the lowest possible expiry instead.
+		return max(1, round($minutes * 60));
 	}
 
 }

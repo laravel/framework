@@ -59,7 +59,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -68,7 +68,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 
 		$this->connection()->set($this->prefix.$key, $value);
 
-		$this->connection()->expire($this->prefix.$key, $minutes * 60);
+		$this->connection()->expire($this->prefix.$key, $this->getExpiry($minutes));
 	}
 
 	/**
@@ -180,6 +180,17 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	public function getPrefix()
 	{
 		return $this->prefix;
+	}
+
+	/**
+	 * Convert expiry to redis' native format (seconds)
+	 *
+	 * @param  float $minutes
+	 * @return int
+	 */
+	public function getExpiry($minutes)
+	{
+		return round($minutes * 60);
 	}
 
 }

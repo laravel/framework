@@ -41,12 +41,12 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
 	{
-		wincache_ucache_set($this->prefix.$key, $value, $minutes * 60);
+		wincache_ucache_add($this->prefix.$key, $value, $this->getExpiry($minutes));
 	}
 
 	/**
@@ -114,6 +114,24 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	public function getPrefix()
 	{
 		return $this->prefix;
+	}
+
+	/**
+	 * Convert expiry to wincache's native format (offset seconds)
+	 *
+	 * @param  float $minutes
+	 * @return int
+	 */
+	public function getExpiry($minutes)
+	{
+		if ($minutes == 0)
+		{
+			return 0;
+		}
+
+		// Never return zero as a result of the rounding!
+		// Return the lowest possible expiry instead.
+		return max(1, round($minutes * 60));
 	}
 
 }

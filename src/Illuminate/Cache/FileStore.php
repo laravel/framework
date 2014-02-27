@@ -74,12 +74,12 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  float   $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$value = $this->expiration($minutes).serialize($value);
+		$value = $this->getExpiry($minutes).serialize($value);
 
 		$this->createCacheDirectory($path = $this->path($key));
 
@@ -189,14 +189,16 @@ class FileStore implements StoreInterface {
 	/**
 	 * Get the expiration time based on the given minutes.
 	 *
-	 * @param  int  $minutes
+	 * @param  float  $minutes
 	 * @return int
 	 */
-	protected function expiration($minutes)
+	public function getExpiry($minutes)
 	{
-		if ($minutes === 0) return 9999999999;
 
-		return time() + ($minutes * 60);
+		// The loose comparison is important here to deal with the integer zero (backwards-compat)
+		if ($minutes == 0) return 9999999999;
+
+		return time() + round($minutes * 60);
 	}
 
 	/**
