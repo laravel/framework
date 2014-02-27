@@ -93,15 +93,29 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 * @param  \Illuminate\Pagination\Factory  $factory
 	 * @param  array  $items
 	 * @param  int    $total
-	 * @param  int    $perPage
+	 * @param  mixed  $perPage
 	 * @return void
 	 */
-	public function __construct(Factory $factory, array $items, $total, $perPage)
+	public function __construct(Factory $factory, array $items, $total, $perPage = null)
 	{
-		$this->items = $items;
 		$this->factory = $factory;
-		$this->total = (int) $total;
-		$this->perPage = (int) $perPage;
+
+		// Paginator received only 3 parameters which means that it's being used
+		// in cursor mode. In this mode third argument $total is used as $perPage.
+		if (is_null($perPage))
+		{
+			$this->items = array_slice($items, 0, $perPage);
+			$this->perPage = (int) $total;
+
+			$cursor = array_slice($items, $this->perPage, 1);
+			$this->cursor = empty($cursor) ? null : $cursor[0];
+		}
+		else
+		{
+			$this->items = $items;
+			$this->total = (int) $total;
+			$this->perPage = (int) $perPage;
+		}
 	}
 
 	/**

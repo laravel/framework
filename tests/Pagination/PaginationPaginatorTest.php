@@ -22,6 +22,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPaginationContextIsSetupCorrectlyInCursorMode()
+	{
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 2);
+		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
+		$p->setupPaginationContext();
+
+		$this->assertEquals(2, $p->getLastPage());
+		$this->assertEquals(1, $p->getCurrentPage());
+		$this->assertEquals('baz', $p->getCursor());
+	}
+
+
 	public function testPaginationContextSetsUpRangeCorrectly()
 	{
 		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
