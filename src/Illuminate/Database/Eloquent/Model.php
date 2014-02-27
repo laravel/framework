@@ -2077,6 +2077,41 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Convert the model instance to JSON without visible and hidden filter.
+	 *
+	 * @param  int  $options
+	 * @return string
+	 */
+	public function toRawJson($options = 0)
+	{
+		return json_encode($this->toRawArray(), $options);
+	}
+
+	/**
+	 * Convert the model instance to an array without visible or hidden filter
+	 * @return array
+	 */
+	public function toRawArray()
+	{
+		$savedHidden  = $this->hidden;
+		$savedVisible = $this->visible;
+
+		// Reset
+		$this->setVisible(array());
+		$this->setHidden(array());
+
+		$attributes = $this->attributesToArray();
+
+		$rawArray = array_merge($attributes, $this->relationsToArray());
+
+		// Re set old values
+		$this->setVisible($savedHidden);
+		$this->setHidden($savedVisible);
+
+		return $rawArray;
+	}
+
+	/**
 	 * Convert the model instance to an array.
 	 *
 	 * @return array
