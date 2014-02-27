@@ -256,18 +256,13 @@ class Repository implements ArrayAccess {
 	 */
 	public function __call($method, $parameters)
 	{
-		try
+		if (isset(static::$macros[$method]))
 		{
-			return $this->macroCall($method, $parameters);
+			return call_user_func_array(static::$macros[$method], $parameters);
 		}
-		catch (\BadMethodCallException $e)
+		else
 		{
-			if (is_callable(array($this->store, $method)))
-			{
-				return call_user_func_array(array($this->store, $method), $parameters);
-			}
-
-			throw $e;
+			return call_user_func_array(array($this->store, $method), $parameters);
 		}
 	}
 
