@@ -71,12 +71,12 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 		$store->expects($this->once())->method('getTime')->will($this->returnValue(1));
 		$table->shouldReceive('insert')->once()->with(array('key' => 'prefixfoo', 'value' => 'bar', 'expiration' => 61))->andReturnUsing(function()
 		{
-			throw new Exception;			
+			throw new Exception;
 		});
 		$table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
 		$table->shouldReceive('update')->once()->with(array('value' => 'bar', 'expiration' => 61));
 
-		$store->put('foo', 'bar', 1);	
+		$store->put('foo', 'bar', 1);
 	}
 
 

@@ -38,7 +38,7 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testDropIndexDefaultNames() 
+	public function testDropIndexDefaultNames()
 	{
 		$blueprint = new Blueprint('users');
 		$blueprint->dropUnique(array('foo', 'bar'));
