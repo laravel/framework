@@ -26,11 +26,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $escapedTags = array('{{{', '}}}');
 
 	/**
-	 * Array of footer lines to be added to template
+	 * Array of footer lines to be added to template.
 	 *
 	 * @var array
 	 */
-	protected $footer;
+	protected $footer = array();
 
 	/**
 	 * Compile the view at the given path.
