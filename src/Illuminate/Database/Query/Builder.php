@@ -1507,6 +1507,26 @@ class Builder {
 	}
 
 	/**
+	 * Get a paginator in cursor mode for the "select" statement.
+	 *
+	 * @param  int    $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	public function cursor($perPage = null, $columns = array('*'))
+	{
+		$paginator = $this->connection->getPaginator();
+
+		$page = $paginator->getCurrentPage();
+		$perPage = $perPage ?: $this->model->getPerPage();
+
+		// Use skip method to set correct offset and take perPage + 1 items.
+		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
+
+		return $paginator->make($this->get($columns), $perPage);
+	}
+
+	/**
 	 * Determine if any rows exist for the current query.
 	 *
 	 * @return bool
