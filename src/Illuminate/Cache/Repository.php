@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Traits\MacroableTrait;
 
 class Repository implements ArrayAccess {
+
 	use MacroableTrait {
 		__call as macroCall;
 	}
@@ -255,13 +256,19 @@ class Repository implements ArrayAccess {
 	 */
 	public function __call($method, $parameters)
 	{
-		try {
+		try
+		{
 			return $this->macroCall($method, $parameters);
-		} catch (\BadMethodCallException $e) {
-			if (is_callable(array($this->store, $method))) {
+		}
+		catch (\BadMethodCallException $e)
+		{
+			if (is_callable(array($this->store, $method)))
+			{
 				return call_user_func_array(array($this->store, $method), $parameters);
 			}
+
 			throw $e;
 		}
 	}
+
 }
