@@ -581,7 +581,7 @@ class Validator implements MessageProviderInterface {
 
 		foreach ($attributes as $key)
 		{
-			if (isset($this->data[$key]) || isset($this->files[$key]))
+			if ( ! is_null(array_get($this->data, $key, null)) || ! is_null(array_get($this->files, $key, null)))
 			{
 				$count++;
 			}
