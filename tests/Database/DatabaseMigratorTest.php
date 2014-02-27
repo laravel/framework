@@ -88,7 +88,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		});
 		$resolver->shouldReceive('connection')->with(null)->andReturn($connection);
 
-		$migrator->run(__DIR__, true);	
+		$migrator->run(__DIR__, true);
 	}
 
 
