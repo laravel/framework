@@ -108,7 +108,7 @@ class TailCommand extends Command {
 	}
 
 	/**
-	 * Get the path to the Laraevl log file.
+	 * Get the path to the Laravel log file.
 	 *
 	 * @param  string  $connection
 	 * @return string
