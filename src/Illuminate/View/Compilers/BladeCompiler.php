@@ -273,6 +273,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the end-section statements into valid PHP.
+	 *
+	 * @param string  $expression
+	 * @return string
+	 */
+	protected function compileEndsection($expression)
+	{
+		return "<?php \$__env->stopSection(); ?>";
+	}
+
+	/**
 	 * Compile the stop statements into valid PHP.
 	 *
 	 * @param string  $expression

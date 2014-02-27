@@ -295,6 +295,13 @@ breeze
 	}
 
 
+	public function testEndSectionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php $__env->stopSection(); ?>', $compiler->compileString('@endsection'));
+	}
+
+
 	public function testAppendSectionsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
