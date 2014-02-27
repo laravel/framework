@@ -256,9 +256,9 @@ class Repository implements ArrayAccess {
 	 */
 	public function __call($method, $parameters)
 	{
-		if (isset(static::$macros[$method]))
+		if (static::hasMacro($method))
 		{
-			return call_user_func_array(static::$macros[$method], $parameters);
+			return $this->macroCall($method, $parameters);
 		}
 		else
 		{
