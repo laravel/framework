@@ -1308,9 +1308,7 @@ class Builder {
 	 */
 	protected function getCacheCallback($columns)
 	{
-		$me = $this;
-
-		return function() use ($me, $columns) { return $me->getFresh($columns); };
+		return function() use ($columns) { return $this->getFresh($columns); };
 	}
 
 	/**
