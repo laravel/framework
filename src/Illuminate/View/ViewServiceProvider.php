@@ -35,9 +35,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerEngineResolver()
 	{
-		$me = $this;
-
-		$this->app->bindShared('view.engine.resolver', function($app) use ($me)
+		$this->app->bindShared('view.engine.resolver', function($app)
 		{
 			$resolver = new EngineResolver;
 
@@ -46,7 +44,7 @@ class ViewServiceProvider extends ServiceProvider {
 			// on the extension of view files. We call a method for each engines.
 			foreach (array('php', 'blade') as $engine)
 			{
-				$me->{'register'.ucfirst($engine).'Engine'}($resolver);
+				$this->{'register'.ucfirst($engine).'Engine'}($resolver);
 			}
 
 			return $resolver;
