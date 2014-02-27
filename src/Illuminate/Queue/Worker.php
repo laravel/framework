@@ -36,8 +36,8 @@ class Worker {
 	 * @return void
 	 */
 	public function __construct(QueueManager $manager,
-                                FailedJobProviderInterface $failer = null,
-                                Dispatcher $events = null)
+								FailedJobProviderInterface $failer = null,
+								Dispatcher $events = null)
 	{
 		$this->failer = $failer;
 		$this->events = $events;

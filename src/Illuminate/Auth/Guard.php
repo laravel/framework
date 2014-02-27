@@ -79,8 +79,8 @@ class Guard {
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
-                                SessionStore $session,
-                                Request $request = null)
+								SessionStore $session,
+								Request $request = null)
 	{
 		$this->session = $session;
 		$this->request = $request;

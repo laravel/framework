@@ -30,9 +30,9 @@ class BeanstalkdJob extends Job {
 	 * @return void
 	 */
 	public function __construct(Container $container,
-                                Pheanstalk $pheanstalk,
-                                Pheanstalk_Job $job,
-                                $queue)
+								Pheanstalk $pheanstalk,
+								Pheanstalk_Job $job,
+								$queue)
 	{
 		$this->job = $job;
 		$this->queue = $queue;

@@ -37,9 +37,9 @@ class IronJob extends Job {
 	 * @return void
 	 */
 	public function __construct(Container $container,
-                                IronQueue $iron,
-                                $job,
-                                $pushed = false)
+								IronQueue $iron,
+								$job,
+								$pushed = false)
 	{
 		$this->job = $job;
 		$this->iron = $iron;

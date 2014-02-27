@@ -175,8 +175,8 @@ class Builder {
 	 * @return void
 	 */
 	public function __construct(ConnectionInterface $connection,
-                                Grammar $grammar,
-                                Processor $processor)
+								Grammar $grammar,
+								Processor $processor)
 	{
 		$this->grammar = $grammar;
 		$this->processor = $processor;

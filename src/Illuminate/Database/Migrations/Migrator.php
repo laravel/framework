@@ -50,7 +50,7 @@ class Migrator {
 	 */
 	public function __construct(MigrationRepositoryInterface $repository,
 								Resolver $resolver,
-                                Filesystem $files)
+								Filesystem $files)
 	{
 		$this->files = $files;
 		$this->resolver = $resolver;
