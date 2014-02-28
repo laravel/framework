@@ -5,6 +5,7 @@ use Illuminate\Queue\Jobs\Job;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class WorkCommand extends Command {
 
@@ -85,13 +86,15 @@ class WorkCommand extends Command {
 	 */
 	protected function writeOutput(Job $job, $failed)
 	{
+		$options = OutputInterface::OUTPUT_RAW;
+
 		if ($failed)
 		{
-			$this->line('<error>Failed:</error> '.$job->getName());
+			$this->output->writeln('<error>Failed:</error> '.$job->getName(), $options);
 		}
 		else
 		{
-			$this->line('<info>Processed:</info> '.$job->getName());
+			$this->output->writeln('<info>Processed:</info> '.$job->getName(), $options);
 		}
 	}
 
