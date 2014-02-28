@@ -47,16 +47,17 @@ class Response {
 	 * @param  string|array  $data
 	 * @param  int    $status
 	 * @param  array  $headers
+	 * @param  int    $options
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public static function json($data = array(), $status = 200, array $headers = array())
+	public static function json($data = array(), $status = 200, array $headers = array(), $options = 0)
 	{
 		if ($data instanceof ArrayableInterface)
 		{
 			$data = $data->toArray();
 		}
 
-		return new JsonResponse($data, $status, $headers);
+		return new JsonResponse($data, $status, $headers, $options);
 	}
 
 	/**
