@@ -37,8 +37,7 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 	 */
 	public function getData($assoc = false, $depth = 512, $options = null)
 	{
-		if (is_null($options))
-			$options = $this->jsonOptions;
+		$options = $options ?: $this->jsonOptions;
 
 		return json_decode($this->data, $assoc, $depth, $options);
 	}
@@ -48,7 +47,9 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 	 */
 	public function setData($data = array())
 	{
-		$this->data = $data instanceof JsonableInterface ? $data->toJson($this->jsonOptions) : json_encode($data, $this->jsonOptions);
+		$this->data = $data instanceof JsonableInterface
+                                   ? $data->toJson($this->jsonOptions)
+                                   : json_encode($data, $this->jsonOptions);
 
 		return $this->update();
 	}
