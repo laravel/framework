@@ -335,7 +335,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		return array_first(static::$globalScopes[get_called_class()], function($key, $value) use ($scope)
 		{
-			return $scope instanceof $registered;
+			return $scope instanceof $value;
 		});
 	}
 
