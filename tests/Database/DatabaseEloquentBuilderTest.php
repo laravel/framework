@@ -383,6 +383,15 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSimpleWhere()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
+		$result = $builder->where('foo', '=', 'bar');
+		$this->assertEquals($result, $builder);
+	}
+
+
 	protected function mockConnectionForModel($model, $database)
 	{
 		$grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
