@@ -10,7 +10,8 @@
 		{"message": "Added ability to register global Eloquent scopes using traits and addGlobalScope.", "backport": null},
 		{"message": "Soft deleting converted to use new global scope facilities.", "backport": null},
 		{"message": "Added ability to extend Eloquent Builder using 'macro' method.", "backport": null},
-		{"message": "Soft deleting models now use SoftDeletingTrait instead of softDelete property.", "backport": null}
+		{"message": "Soft deleting models now use SoftDeletingTrait instead of softDelete property.", "backport": null},
+		{"message": "The queue:listen command will now write the names of the jobs it processes to the console.", "backport": null}
 	],
 	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
