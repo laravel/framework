@@ -584,7 +584,7 @@ class BelongsToMany extends Relation {
 		{
 			$this->detach($detach);
 
-			$changes['detached'] = (array) array_walk($detach, 'intval');
+			$changes['detached'] = (array) array_map('intval', $detach);
 		}
 
 		// Now we are finally ready to attach the new records. Note that we'll disable
