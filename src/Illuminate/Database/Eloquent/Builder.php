@@ -29,6 +29,20 @@ class Builder {
 	protected $eagerLoad = array();
 
 	/**
+	 * All of the registered builder macros.
+	 *
+	 * @var array
+	 */
+	protected $macros = array();
+
+	/**
+	 * A replacement for the typical delete function.
+	 *
+	 * @var \Closure
+	 */
+	protected $onDelete;
+
+	/**
 	 * The methods that should be returned from query builder.
 	 *
 	 * @var array
@@ -332,9 +346,9 @@ class Builder {
 	 */
 	public function delete()
 	{
-		if ($this->model->isSoftDeleting())
+		if (isset($this->onDelete))
 		{
-			return $this->softDelete();
+			return call_user_func($this->onDelete, $this);
 		}
 		else
 		{
@@ -343,91 +357,14 @@ class Builder {
 	}
 
 	/**
-	 * Soft delete the record in the database.
+	 * Register a replacement for the default delete function.
 	 *
-	 * @return int
+	 * @param  \Closure  $callback
+	 * @return void
 	 */
-	protected function softDelete()
+	public function onDelete(Closure $callback)
 	{
-		$column = $this->model->getDeletedAtColumn();
-
-		return $this->update(array($column => $this->model->freshTimestampString()));
-	}
-
-	/**
-	 * Force a delete on a set of soft deleted models.
-	 *
-	 * @return int
-	 */
-	public function forceDelete()
-	{
-		return $this->query->delete();
-	}
-
-	/**
-	 * Restore the soft-deleted model instances.
-	 *
-	 * @return int
-	 */
-	public function restore()
-	{
-		if ($this->model->isSoftDeleting())
-		{
-			$column = $this->model->getDeletedAtColumn();
-
-			return $this->update(array($column => null));
-		}
-	}
-
-	/**
-	 * Include the soft deleted models in the results.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|static
-	 */
-	public function withTrashed()
-	{
-		$column = $this->model->getQualifiedDeletedAtColumn();
-
-		foreach ((array) $this->query->wheres as $key => $where)
-		{
-			// If the where clause is a soft delete date constraint, we will remove it from
-			// the query and reset the keys on the wheres. This allows this developer to
-			// include deleted model in a relationship result set that is lazy loaded.
-			if ($this->isSoftDeleteConstraint($where, $column))
-			{
-				unset($this->query->wheres[$key]);
-
-				$this->query->wheres = array_values($this->query->wheres);
-			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Force the result set to only included soft deletes.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|static
-	 */
-	public function onlyTrashed()
-	{
-		$this->withTrashed();
-
-		$this->query->whereNotNull($this->model->getQualifiedDeletedAtColumn());
-
-		return $this;
-	}
-
-	/**
-	 * Determine if the given where clause is a soft delete constraint.
-	 *
-	 * @param  array   $where
-	 * @param  string  $column
-	 * @return bool
-	 */
-	protected function isSoftDeleteConstraint(array $where, $column)
-	{
-		return $where['type'] == 'Null' && $where['column'] == $column;
+		$this->onDelete = $callback;
 	}
 
 	/**
@@ -591,7 +528,7 @@ class Builder {
 	{
 		if ($column instanceof Closure)
 		{
-			$query = $this->model->newQuery(false);
+			$query = $this->model->newQueryWithoutScopes();
 
 			call_user_func($column, $query);
 
@@ -893,6 +830,29 @@ class Builder {
 	}
 
 	/**
+	 * Extend the builder with a given callback.
+	 *
+	 * @param  string  $name
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function macro($name, Closure $callback)
+	{
+		$this->macros[$name] = $callback;
+	}
+
+	/**
+	 * Get the given macro by name.
+	 *
+	 * @param  string  $name
+	 * @return \Closure
+	 */
+	public function getMacro($name)
+	{
+		return array_get($this->macros, $name);
+	}
+
+	/**
 	 * Dynamically handle calls into the query instance.
 	 *
 	 * @param  string  $method
@@ -901,7 +861,13 @@ class Builder {
 	 */
 	public function __call($method, $parameters)
 	{
-		if (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
+		if (isset($this->macros[$method]))
+		{
+			array_unshift($parameters, $this);
+
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+		elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
 		{
 			return $this->callScope($scope, $parameters);
 		}
