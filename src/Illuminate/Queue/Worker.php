@@ -53,7 +53,7 @@ class Worker {
 	 * @param  int     $memory
 	 * @param  int     $sleep
 	 * @param  int     $maxTries
-	 * @return void
+	 * @return array
 	 */
 	public function pop($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
 	{
@@ -66,13 +66,15 @@ class Worker {
 		// which is to protect against run-away memory leakages from here.
 		if ( ! is_null($job))
 		{
-			$this->process(
+			return $this->process(
 				$this->manager->getName($connectionName), $job, $maxTries, $delay
 			);
 		}
 		else
 		{
 			$this->sleep($sleep);
+
+			return ['job' => null, 'failed' => false];
 		}
 	}
 
@@ -119,6 +121,8 @@ class Worker {
 			$job->fire();
 
 			if ($job->autoDelete()) $job->delete();
+
+			return ['job' => $job, 'failed' => false];
 		}
 
 		catch (\Exception $e)
@@ -137,7 +141,7 @@ class Worker {
 	 *
 	 * @param  string  $connection
 	 * @param  \Illuminate\Queue\Jobs\Job  $job
-	 * @return void
+	 * @return array
 	 */
 	protected function logFailedJob($connection, Job $job)
 	{
@@ -149,6 +153,8 @@ class Worker {
 
 			$this->raiseFailedJobEvent($connection, $job);
 		}
+
+		return ['job' => $job, 'failed' => true];
 	}
 
 	/**
