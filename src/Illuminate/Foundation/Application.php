@@ -547,7 +547,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		if ($this->booted) return;
 
-		array_walk($this->serviceProviders, function($p) { $p->boot(); });
+		array_walk($this->serviceProviders, function(&$p) { $p->boot(); });
 
 		$this->bootApplication();
 	}
