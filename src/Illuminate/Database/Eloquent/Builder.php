@@ -599,7 +599,7 @@ class Builder {
 		}
 		else
 		{
-			return call_user_func_array(
+			call_user_func_array(
 				array($this->query, 'where'), array_slice(func_get_args(), 0, func_num_args())
 			);
 		}
