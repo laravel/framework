@@ -2099,7 +2099,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// Reset
 		$this->setVisible(array());
 		$this->setHidden(array());
-
 		$attributes = $this->attributesToArray();
 
 		$rawArray = array_merge($attributes, $this->relationsToArray());

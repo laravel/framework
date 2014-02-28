@@ -547,10 +547,10 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Get the collection of items as a plain array.
-	 *
-	 * @return array
-	 */
+	* Get the collection of items as a plain array.
+	*
+	* @return array
+	*/
 	public function toArray()
 	{
 		return array_map(function($value)
@@ -561,14 +561,39 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Get the collection of items as JSON.
-	 *
-	 * @param  int  $options
-	 * @return string
-	 */
+	* Get the collection of items as a plain array without taking care of visible or hidden.
+	*
+	* @return array
+	*/
+	public function toRawArray()
+	{
+		return array_map(function($value)
+		{
+			return $value instanceof ArrayableInterface ? $value->toRawArray() : $value;
+
+		}, $this->items);
+	}
+
+	/**
+	* Get the collection of items as JSON.
+	*
+	* @param  int  $options
+	* @return string
+	*/
 	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
+	}
+
+	/**
+	* Get the collection of items as JSON without take care of visible or hidden.
+	*
+	* @param  int  $options
+	* @return string
+	*/
+	public function toRawJson($options = 0)
+	{
+		return json_encode($this->toRawArray(), $options);
 	}
 
 	/**

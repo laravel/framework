@@ -57,6 +57,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo.array', 'bar.array'), $results);
 	}
 
+	public function testToRawArrayCallsToArrayOnEachItemInCollection()
+	{
+		$item1 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item1->shouldReceive('toRawArray')->once()->andReturn('foo.array');
+		$item2 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item2->shouldReceive('toRawArray')->once()->andReturn('bar.array');
+		$c = new Collection(array($item1, $item2));
+		$results = $c->toRawArray();
+
+		$this->assertEquals(array('foo.array', 'bar.array'), $results);
+	}
+
 
 	public function testToJsonEncodesTheToArrayResult()
 	{
@@ -76,6 +88,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(json_encode('foo'), (string) $c);
 	}
 
+	public function testToRawJsonEncodesTheToArrayResult()
+	{
+		$c = $this->getMock('Illuminate\Support\Collection', array('toRawArray'));
+		$c->expects($this->once())->method('toRawArray')->will($this->returnValue('foo'));
+		$results = $c->toRawJson();
+
+		$this->assertEquals(json_encode('foo'), $results);
+	}
 
 	public function testOffsetAccess()
 	{
