@@ -66,11 +66,13 @@ class CookieJar {
 	 * Expire the given cookie.
 	 *
 	 * @param  string  $name
+	 * @param  string  $path
+	 * @param  string  $domain
 	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
-	public function forget($name)
+	public function forget($name, $path = null, $domain = null)
 	{
-		return $this->make($name, null, -2628000);
+		return $this->make($name, null, -2628000, $path, $domain);
 	}
 
 	/**
