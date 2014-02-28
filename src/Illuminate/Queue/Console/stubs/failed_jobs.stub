@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateFailedJobsTable extends Migration {
@@ -11,13 +12,13 @@ class CreateFailedJobsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('failed_jobs', function($t)
+		Schema::create('failed_jobs', function(Blueprint $table)
 		{
-			$t->increments('id');
-			$t->text('connection');
-			$t->text('queue');
-			$t->text('payload');
-			$t->timestamp('failed_at');
+			$table->increments('id');
+			$table->text('connection');
+			$table->text('queue');
+			$table->text('payload');
+			$table->timestamp('failed_at');
 		});
 	}
 
