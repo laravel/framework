@@ -347,7 +347,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('from');
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar', null, 'and');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar');
 		$builder->setModel($model = new EloquentBuilderTestScopeStub);
 		$result = $builder->approved();
 
