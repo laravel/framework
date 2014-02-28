@@ -59,9 +59,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testToRawArrayCallsToArrayOnEachItemInCollection()
 	{
-		$item1 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item1 = m::mock('Illuminate\Support\Contracts\RawArrayableInterface');
 		$item1->shouldReceive('toRawArray')->once()->andReturn('foo.array');
-		$item2 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item2 = m::mock('Illuminate\Support\Contracts\RawArrayableInterface');
 		$item2->shouldReceive('toRawArray')->once()->andReturn('bar.array');
 		$c = new Collection(array($item1, $item2));
 		$results = $c->toRawArray();

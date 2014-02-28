@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\RawJsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Support\Contracts\RawArrayableInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -20,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
+abstract class Model implements ArrayAccess, ArrayableInterface, RawArrayableInterface, JsonableInterface, RawJsonableInterface {
 
 	/**
 	 * The connection name for the model.

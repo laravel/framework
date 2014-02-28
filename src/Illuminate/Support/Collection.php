@@ -7,9 +7,11 @@ use ArrayIterator;
 use CachingIterator;
 use IteratorAggregate;
 use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\RawJsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Support\Contracts\RawArrayableInterface;
 
-class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface {
+class Collection implements ArrayAccess, ArrayableInterface, RawArrayableInterface, Countable, IteratorAggregate, JsonableInterface, RawJsonableInterface {
 
 	/**
 	 * The items contained in the collection.
@@ -569,7 +571,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return array_map(function($value)
 		{
-			return $value instanceof ArrayableInterface ? $value->toRawArray() : $value;
+			return $value instanceof RawArrayableInterface ? $value->toRawArray() : $value;
 
 		}, $this->items);
 	}
