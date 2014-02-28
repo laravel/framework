@@ -3,6 +3,13 @@
 trait SoftDeletingTrait {
 
 	/**
+	 * Indicates if the model is currently force deleting.
+	 *
+	 * @var bool
+	 */
+	protected $forceDeleting = false;
+
+	/**
 	 * Boot the soft deleting trait for a model.
 	 *
 	 * @return void
@@ -19,7 +26,11 @@ trait SoftDeletingTrait {
 	 */
 	public function forceDelete()
 	{
-		return $this->delete();
+		$this->forceDeleting = true;
+
+		$this->delete();
+
+		$this->forceDeleting = false;
 	}
 
 	/**
@@ -28,6 +39,23 @@ trait SoftDeletingTrait {
 	 * @return void
 	 */
 	protected function performDeleteOnModel()
+	{
+		if ($this->forceDeleting)
+		{
+			$this->withTrashed()->where($this->getKeyName(), $this->getKey())->forceDelete();
+		}
+		else
+		{
+			return $this->runSoftDelete();
+		}
+	}
+
+	/**
+	 * Perform the actual delete query on this model instance.
+	 *
+	 * @return void
+	 */
+	protected function runSoftDelete()
 	{
 		$query = $this->newQuery()->where($this->getKeyName(), $this->getKey());
 

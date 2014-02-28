@@ -342,7 +342,7 @@ class Builder {
 	/**
 	 * Delete a record from the database.
 	 *
-	 * @return int
+	 * @return mixed
 	 */
 	public function delete()
 	{
@@ -354,6 +354,16 @@ class Builder {
 		{
 			return $this->query->delete();
 		}
+	}
+
+	/**
+	 * Run the default delete function on the builder.
+	 *
+	 * @return mixed
+	 */
+	public function forceDelete()
+	{
+		return $this->query->delete();
 	}
 
 	/**
