@@ -88,12 +88,12 @@ class PublisherServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('config.publisher', function($app)
 		{
-			$path = $app['path'].'/config';
+			$pathConfig = $app['path.config'];
 
 			// Once we have created the configuration publisher, we will set the default
 			// package path on the object so that it knows where to find the packages
 			// that are installed for the application and can move them to the app.
-			$publisher = new ConfigPublisher($app['files'], $path);
+			$publisher = new ConfigPublisher($app['files'], $pathConfig);
 
 			$publisher->setPackagePath($app['path.base'].'/vendor');
 

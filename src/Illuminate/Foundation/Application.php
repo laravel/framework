@@ -933,7 +933,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function getConfigLoader()
 	{
-		return new FileLoader(new Filesystem, $this['path'].'/config');
+		return new FileLoader(new Filesystem, $this['path.config']);
 	}
 
 	/**
