@@ -692,6 +692,29 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRelationNameDetection()
+	{
+		$model = new EloquentModelRelationNameStub;
+		$this->addMockConnection($model);
+
+		$relation = $model->belongsToManyStub();
+		$this->assertEquals('belongsToManyStub', $relation->getRelationName());
+
+		$relation = $model->morphToManyStub();
+		$this->assertEquals('morphToManyStub', $relation->getRelationName());
+
+		$relation = $model->morphedByManyStub();
+		$this->assertEquals('morphedByManyStub', $relation->getRelationName());
+
+		$relation = $model->belongsToStub();
+		$this->assertEquals('belongsToStub', $relation->getRelationName());
+
+		$model->morph_to_stub_type = 'EloquentModelSaveStub';
+		$relation = $model->morphToStub();
+		$this->assertEquals('morphToStub', $relation->getRelationName());
+	}
+
+
 	public function testModelsAssumeTheirName()
 	{
 		$model = new EloquentModelWithoutTableStub;
@@ -832,6 +855,52 @@ class EloquentDateModelStub extends EloquentModelStub {
 	public function getDates()
 	{
 		return array('created_at', 'updated_at');
+	}
+}
+
+class EloquentModelOverridingStub extends Illuminate\Database\Eloquent\Model {
+	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
+	{
+		return parent::belongsToMany($related, $table, $foreignKey, $otherKey, $relation);
+	}
+	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $relation = null, $inverse = false)
+	{
+		return parent::morphToMany($related, $name, $table, $foreignKey, $otherKey, $relation, $inverse);
+	}
+	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
+	{
+		return parent::morphedByMany($related, $name, $table, $foreignKey, $otherKey, $relation);
+	}
+	public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
+	{
+		return parent::belongsTo($related, $foreignKey, $otherKey, $relation);
+	}
+	public function morphTo($name = null, $type = null, $id = null)
+	{
+		return parent::morphTo($name, $type, $id);
+	}
+}
+
+class EloquentModelRelationNameStub extends EloquentModelOverridingStub {
+	public function belongsToManyStub()
+	{
+		return $this->belongsToMany('EloquentModelSaveStub');
+	}
+	public function morphToManyStub()
+	{
+		return $this->morphToMany('EloquentModelSaveStub', 'foo');
+	}
+	public function morphedByManyStub()
+	{
+		return $this->morphedByMany('EloquentModelSaveStub', 'foo');
+	}
+	public function belongsToStub()
+	{
+		return $this->belongsTo('EloquentModelSaveStub');
+	}
+	public function morphToStub()
+	{
+		return $this->morphTo();
 	}
 }
 

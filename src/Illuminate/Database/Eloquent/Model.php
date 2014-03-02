@@ -617,7 +617,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If no relation name was given, we will use this debug backtrace to extract
 		// the calling method's name and use that as the relationship name as most
 		// of the time this will be what we desire to use for the relatinoships.
-		$relation = $relation ?: $this->getRelationCaller();
+		$relation = $relation ?: $this->getRelationCaller(__FUNCTION__);
 
 		// If no foreign key was supplied, we can use a backtrace to guess the proper
 		// foreign key name by using the name of the relationship function, which
@@ -654,7 +654,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// use that to get both the class and foreign key that will be utilized.
 		if (is_null($name))
 		{
-			$caller = $this->getRelationCaller();
+			$caller = $this->getRelationCaller(__FUNCTION__);
 
 			$name = snake_case($caller);
 		}
@@ -751,7 +751,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If no relationship name was passed, we will pull backtraces to get the
 		// name of the calling function. We will use that function name as the
 		// title of this relation since that is a great convention to apply.
-		$relation = $relation ?: $this->getRelationCaller();
+		$relation = $relation ?: $this->getRelationCaller(__FUNCTION__);
 
 		// First, we'll need to determine the foreign key and "other key" for the
 		// relationship. Once we have determined the keys we'll make the query
@@ -792,7 +792,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $relation = null, $inverse = false)
 	{
-		$relation = $relation ?: $this->getRelationCaller();
+		$relation = $relation ?: $this->getRelationCaller(__FUNCTION__);
 
 		// First, we will need to determine the foreign key and "other key" for the
 		// relationship. Once we have determined the keys we will make the query
@@ -829,7 +829,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
 	{
-		$relation = $relation ?: $this->getRelationCaller();
+		$relation = $relation ?: $this->getRelationCaller(__FUNCTION__);
 
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
@@ -846,11 +846,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return  string
 	 */
-	protected function getRelationCaller()
+	protected function getRelationCaller($relation)
 	{
-		$caller = last(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3));
+		$self = __FUNCTION__;
 
-		return array_get($caller, 'function');
+		$class = $this;
+
+		$limit = 2;
+
+		while ($class = get_parent_class($class)) $limit++;
+
+		$caller = array_first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit),
+			function($key, $trace) use ($self, $relation)
+		{
+			$caller = $trace['function'];
+
+			return ($caller != $self && $caller != $relation);
+		});
+
+		return ! is_null($caller) ? $caller['function'] : null;
 	}
 
 	/**
