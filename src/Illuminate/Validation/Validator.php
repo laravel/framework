@@ -694,7 +694,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateDigits($attribute, $value, $parameters)
 	{
-		return strlen((string) $value) == $parameters[0];
+		return $this->validateNumeric($attribute, $value)
+			&& strlen((string) $value) == $parameters[0];
 	}
 
 	/**
