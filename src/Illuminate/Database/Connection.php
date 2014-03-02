@@ -259,12 +259,12 @@ class Connection implements ConnectionInterface {
 
 		// Set the fetch mode to column and fetch the results
 		$this->setFetchMode(\PDO::FETCH_COLUMN);
-		$results = $this->select($query, $bindings);
+		$records = $this->select($query, $bindings);
 
 		// reset the fetch mode
 		$this->setFetchMode($mode);
 
-		return $results;
+		return $records;
 	}
 
 	/**
