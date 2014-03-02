@@ -126,7 +126,7 @@ class Collection extends BaseCollection {
 	 */
 	public function merge($collection)
 	{
-		$dictionary = $this->getDictionary($this);
+		$dictionary = $this->getDictionary();
 
 		foreach ($collection as $item)
 		{
@@ -189,7 +189,7 @@ class Collection extends BaseCollection {
 	 */
 	public function unique()
 	{
-		$dictionary = $this->getDictionary($this);
+		$dictionary = $this->getDictionary();
 
 		return new static(array_values($dictionary));
 	}
@@ -200,8 +200,10 @@ class Collection extends BaseCollection {
 	 * @param  \Illuminate\Support\Collection  $collection
 	 * @return array
 	 */
-	public function getDictionary($collection)
+	public function getDictionary($collection = null)
 	{
+		$collection = $collection ?: $this;
+
 		$dictionary = array();
 
 		foreach ($collection as $value)
