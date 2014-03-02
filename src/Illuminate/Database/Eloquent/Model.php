@@ -848,21 +848,28 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getRelationCaller($relation)
 	{
-		$self = __FUNCTION__;
-
 		$class = $this;
-
 		$limit = 2;
 
 		while ($class = get_parent_class($class)) $limit++;
 
-		$caller = array_first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit),
-			function($key, $trace) use ($self, $relation)
-		{
-			$caller = $trace['function'];
+		$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
 
-			return ($caller != $self && $caller != $relation);
-		});
+		if ($limit == 3)
+		{
+			$caller = last($backtrace);
+		}
+		else
+		{
+			$self = __FUNCTION__;
+
+			$caller = array_first($backtrace, function($key, $trace) use ($self, $relation)
+			{
+				$caller = $trace['function'];
+
+				return ($caller != $self && $caller != $relation);
+			});
+		}
 
 		return ! is_null($caller) ? $caller['function'] : null;
 	}
