@@ -21,16 +21,24 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	protected $default;
 
 	/**
+	 * The timeout for workers
+	 *
+	 * @var int
+	 */
+	protected $ttr;
+
+	/**
 	 * Create a new Beanstalkd queue instance.
 	 *
 	 * @param  Pheanstalk  $pheanstalk
 	 * @param  string  $default
 	 * @return void
 	 */
-	public function __construct(Pheanstalk $pheanstalk, $default)
+	public function __construct(Pheanstalk $pheanstalk, $default, $ttr)
 	{
-		$this->default = $default;
+		$this->default    = $default;
 		$this->pheanstalk = $pheanstalk;
+		$this->ttr        = $ttr;
 	}
 
 	/**
@@ -56,7 +64,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 */
 	public function pushRaw($payload, $queue = null, array $options = array())
 	{
-		return $this->pheanstalk->useTube($this->getQueue($queue))->put($payload);
+		return $this->pheanstalk->useTube($this->getQueue($queue))->put($payload, Pheanstalk::DEFAULT_PRIORITY, PheanstalkInterface::DEFAULT_DELAY, $this->ttr);
 	}
 
 	/**
