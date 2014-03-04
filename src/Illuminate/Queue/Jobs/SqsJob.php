@@ -24,14 +24,14 @@ class SqsJob extends Job {
 	 *
 	 * @param  \Illuminate\Container\Container  $container
 	 * @param  \Aws\Sqs\SqsClient  $sqs
-	 * @param  string  $queue
 	 * @param  array   $job
+	 * @param  string  $queue
 	 * @return void
 	 */
 	public function __construct(Container $container,
                                 SqsClient $sqs,
-                                $queue,
-                                array $job)
+                                array $job,
+                                $queue)
 	{
 		$this->sqs = $sqs;
 		$this->job = $job;
