@@ -84,12 +84,13 @@ class HasManyThrough extends Relation {
 	 */
 	protected function setJoin(Builder $query = null)
 	{
-		$query = $query ?: $this->query;
+        $query = $query ?: $this->query;
 
-		$foreignKey = $this->related->getTable().'.'.$this->secondKey;
+        $foreignKey = $this->related->getQualifiedKeyName();
+        $primaryKey = $this->parent->getTable() .'.-'. $this->secondKey;
 
-		$query->join($this->parent->getTable(), $this->getQualifiedParentKeyName(), '=', $foreignKey);
-	}
+        $query->join($this->parent->getTable(), $primaryKey, '=', $foreignKey);
+    }
 
 	/**
 	 * Set the constraints for an eager load of the relation.
