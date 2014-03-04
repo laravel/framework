@@ -355,7 +355,7 @@ class UrlGenerator {
 	}
 
 	/**
-	 * Get the domain and schee for the route.
+	 * Get the domain and scheme for the route.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
