@@ -60,7 +60,8 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 */
 	public function merge($messages)
 	{
-		if ($messages instanceof MessageProviderInterface) {
+		if ($messages instanceof MessageProviderInterface)
+		{
 			$messages = $messages->getMessageBag()->getMessages();
 		}
 
