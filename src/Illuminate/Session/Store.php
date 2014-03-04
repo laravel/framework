@@ -314,11 +314,15 @@ class Store implements SessionInterface {
 	 */
 	public function put($key, $value = null)
 	{
-		if (is_array($key)) {
-			foreach ($key as $arrayKey => $arrayValue) {
+		if (is_array($key))
+		{
+			foreach ($key as $arrayKey => $arrayValue)
+			{
 				$this->set($arrayKey, $arrayValue);
 			}
-		} else {
+		}
+		else
+		{
 			$this->set($key, $value);
 		}
 	}
