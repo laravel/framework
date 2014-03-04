@@ -15,9 +15,9 @@ class BeanstalkdConnector implements ConnectorInterface {
 	{
 		$pheanstalk = new Pheanstalk($config['host']);
 
-		$config['ttr'] = isset($config['ttr']) ? $config['ttr'] : Pheanstalk::DEFAULT_TTR;
-
-		return new BeanstalkdQueue($pheanstalk, $config['queue'], $config['ttr']);
+		return new BeanstalkdQueue(
+			$pheanstalk, $config['queue'], array_get($config, 'ttr', Pheanstalk::DEFAULT_TTR)
+		);
 	}
 
 }
