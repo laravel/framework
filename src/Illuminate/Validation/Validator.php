@@ -126,6 +126,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
+	 * @param  array $customAttributes
 	 * @return void
 	 */
 	public function __construct(TranslatorInterface $translator, $data, $rules, $messages = array(), $customAttributes = array())
@@ -388,8 +389,6 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * Always returns true, just lets us put sometimes in rules.
 	 *
-	 * @param  string  $attribute
-	 * @param  mixed   $value
 	 * @return bool
 	 */
 	protected function validateSometimes()
@@ -608,7 +607,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $attribute
 	 * @param  mixed   $value
 	 * @param  array   $parameters
-	 * @return void
+	 * @return bool
 	 */
 	protected function validateSame($attribute, $value, $parameters)
 	{
@@ -2003,7 +2002,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the fallback messages for the validator.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function getFallbackMessages()
 	{
