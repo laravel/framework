@@ -16,7 +16,7 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
 		$pheanstalk = $queue->getPheanstalk();
 		$pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
 		$pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
-		$pheanstalk->shouldReceive('put')->twice()->with(json_encode(array('job' => 'foo', 'data' => array('data'))));
+		$pheanstalk->shouldReceive('put')->twice()->with(json_encode(array('job' => 'foo', 'data' => array('data'))), 1024, 0, 60);
 
 		$queue->push('foo', array('data'), 'stack');
 		$queue->push('foo', array('data'));
