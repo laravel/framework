@@ -175,6 +175,23 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHttpsRoutesWithDomains()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('https://foo.com/')
+		);
+
+		/**
+		 * When on HTTPS, no need to specify 443
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'baz', 'domain' => 'sub.foo.com'));
+		$routes->add($route);
+
+		$this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
+	}
+
+
 	public function testUrlGenerationForControllers()
 	{
 		$url = new UrlGenerator(
