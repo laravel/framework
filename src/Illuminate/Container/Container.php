@@ -234,7 +234,7 @@ class Container implements ArrayAccess {
 	 */
 	public function extend($abstract, Closure $closure)
 	{
-		if ( ! isset($this->bindings[$abstract]))
+		if ( ! $this->bound($abstract))
 		{
 			throw new \InvalidArgumentException("Type {$abstract} is not bound.");
 		}
