@@ -56,7 +56,6 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		m::close();
 	}
 
-
 	public function testFireProperlyCallsTheJobHandler()
 	{
 		$job = $this->getJob();
@@ -64,7 +63,6 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$handler->shouldReceive('fire')->once()->with($job, array('data'));
 		$job->fire();
 	}
-
 
 	public function testDeleteRemovesTheJobFromSqs()
 	{

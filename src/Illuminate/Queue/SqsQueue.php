@@ -15,6 +15,13 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	protected $sqs;
 
 	/**
+	 * The account associated with the default tube
+	 *
+	 * @var string
+	 */
+	protected $account;
+
+	/**
 	 * The name of the default tube.
 	 *
 	 * @var string
@@ -27,13 +34,15 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 * @param  \Aws\Sqs\SqsClient  $sqs
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
+	 * @param  string  $account
 	 * @return void
 	 */
-	public function __construct(SqsClient $sqs, Request $request, $default)
+	public function __construct(SqsClient $sqs, Request $request, $default, $account)
 	{
 		$this->sqs = $sqs;
 		$this->request = $request;
 		$this->default = $default;
+		$this->account = $account;
 	}
 
 	/**
@@ -154,7 +163,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 */
 	public function getQueue($queue)
 	{
-		return $queue ?: $this->default;
+		return $this->sqs->getBaseUrl() . '/' . $this->account . '/' . ($queue ?: $this->default);
 	}
 
 	/**

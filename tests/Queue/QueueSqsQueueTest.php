@@ -46,6 +46,17 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 						     						'MessageId' => $this->mockedMessageId))));
 	}
 
+	public function testGetQueueCallsGetBaseUrlAndBuildsQueueUrl()
+	{
+		$queue = new Illuminate\Queue\SqsQueue($this->sqs, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName);
+		$this->sqs->shouldReceive('getBaseUrl')->once()->andReturn($this->baseUrl);
+		$resultQueueUrl = $queue->getQueue($this->queueName);
+		$this->assertEquals($this->queueUrl, $resultQueueUrl);
+		$this->sqs->shouldReceive('getBaseUrl')->once()->andReturn('https://bar');
+		$resultQueueUrl = $queue->getQueue($this->queueName);
+		$this->assertNotEquals($this->queueUrl, $resultQueueUrl);
+	}
+
 	public function testPopProperlyPopsJobOffOfSqs()
 	{
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->sqs, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
