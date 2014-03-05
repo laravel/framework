@@ -870,7 +870,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateUnique($attribute, $value, $parameters)
 	{
-		$this->requireParameterCount(2, $parameters, 'unique');
+		$this->requireParameterCount(1, $parameters, 'unique');
 
 		$table = $parameters[0];
 
@@ -943,7 +943,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateExists($attribute, $value, $parameters)
 	{
-		$this->requireParameterCount(2, $parameters, 'exists');
+		$this->requireParameterCount(1, $parameters, 'exists');
 
 		$table = $parameters[0];
 
