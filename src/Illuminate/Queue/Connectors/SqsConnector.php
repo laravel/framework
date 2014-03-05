@@ -14,7 +14,7 @@ class SqsConnector implements ConnectorInterface {
 	protected $request;
 
 	/**
-	* Create a new Iron connector instance.
+	* Create a new Sqs connector instance.
 	*
 	* @param  \Illuminate\Http\Request  $request
 	* @return void
