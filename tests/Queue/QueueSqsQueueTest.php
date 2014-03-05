@@ -91,23 +91,18 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 	public function testPushedJobsCanBeMarshaled()
 	{
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPushedSqsJob'), array($this->sqs, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
-
 		$request->shouldReceive('header')->once()->with('X-aws-sqsd-msgid')->andReturn('message-id');
 		$request->shouldReceive('header')->once()->with('X-aws-sqsd-receive-count')->andReturn(1);
 		$request->shouldReceive('getContent')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
-
 		$pushedJob = array(
 			'MessageId' => 'message-id',
 			'Body' => json_encode(array('foo' => 'bar')),
 			'Attributes' => array('ApproximateReceiveCount' => 1),
 			'pushed' => true,
 		);
-
 		$queue->expects($this->once())->method('createPushedSqsJob')->with($this->equalTo($pushedJob))->will($this->returnValue($mockSqsJob = m::mock('StdClass')));
 		$mockSqsJob->shouldReceive('fire')->once();
-
 		$response = $queue->marshal();
-
 		$this->assertInstanceOf('Illuminate\Http\Response', $response);
 		$this->assertEquals(200, $response->getStatusCode());
 	}
