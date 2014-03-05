@@ -81,6 +81,17 @@ class Container implements ArrayAccess {
 	}
 
 	/**
+	 * Determine if the given abstract type has been resolved.
+	 *
+	 * @param  string $abstract
+	 * @return bool
+	 */
+	public function resolved($abstract)
+	{
+		return isset($this->resolved[$abstract]) || isset($this->instances[$abstract]);
+	}
+
+	/**
 	 * Determine if a given string is an alias.
 	 *
 	 * @param  string  $name
@@ -129,14 +140,14 @@ class Container implements ArrayAccess {
 			$concrete = $this->getClosure($abstract, $concrete);
 		}
 
-		$bound = $this->bound($abstract);
+		$resolved = $this->resolved($abstract);
 
 		$this->bindings[$abstract] = compact('concrete', 'shared');
 
-		// If the abstract type was already bound in this container, we will fire the
+		// If the abstract type was already resolved in this container, we will fire the
 		// rebound listener so that any objects which have already gotten resolved
 		// can have their copy of the object updated via hte listener callbacks.
-		if ($bound)
+		if ($resolved)
 		{
 			$this->rebound($abstract);
 		}

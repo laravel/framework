@@ -195,6 +195,17 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExtendIsLazyInitialized()
+	{
+		$container = new Container;
+		$container->bind('ContainerLazyExtendStub');
+		$container->extend('ContainerLazyExtendStub', function($obj, $container) { $obj->init(); return $obj; });
+		$this->assertEquals(false, ContainerLazyExtendStub::$initialized);
+		$container->make('ContainerLazyExtendStub');
+		$this->assertEquals(true, ContainerLazyExtendStub::$initialized);
+	}
+
+
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
@@ -331,4 +342,9 @@ class ContainerMixedPrimitiveStub {
 		$this->last = $last;
 		$this->first = $first;
 	}
+}
+
+class ContainerLazyExtendStub {
+	public static $initialized = false;
+	public function init() { static::$initialized = true; }
 }
