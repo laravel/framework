@@ -19,6 +19,13 @@ class SqsJob extends Job {
 	 */
 	protected $job;
 
+    /**
+     * Indicates if the message was a push message.
+     *
+     * @var bool
+     */
+    protected $pushed = false;
+
 	/**
 	 * Create a new job instance.
 	 *
@@ -31,11 +38,13 @@ class SqsJob extends Job {
 	public function __construct(Container $container,
                                 SqsClient $sqs,
                                 $queue,
-                                array $job)
+                                array $job,
+                                $pushed = false)
 	{
 		$this->sqs = $sqs;
 		$this->job = $job;
 		$this->queue = $queue;
+        $this->pushed = $pushed;
 		$this->container = $container;
 	}
 
@@ -67,6 +76,8 @@ class SqsJob extends Job {
 	public function delete()
 	{
 		parent::delete();
+
+        if (isset($this->job->pushed)) return;
 
 		$this->sqs->deleteMessage(array(
 

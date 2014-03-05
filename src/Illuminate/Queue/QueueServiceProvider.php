@@ -199,10 +199,14 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSqsConnector($manager)
 	{
-		$manager->addConnector('sqs', function()
+        $app = $this->app;
+
+		$manager->addConnector('sqs', function() use ($app)
 		{
-			return new SqsConnector;
+			return new SqsConnector($app['request']);
 		});
+
+        $this->registerRequestBinder('sqs');
 	}
 
 	/**
@@ -220,21 +224,22 @@ class QueueServiceProvider extends ServiceProvider {
 			return new IronConnector($app['encrypter'], $app['request']);
 		});
 
-		$this->registerIronRequestBinder();
+		$this->registerRequestBinder('iron');
 	}
 
 	/**
-	 * Register the request rebinding event for the Iron queue.
+	 * Register the request rebinding event for the push queue.
 	 *
+     * @param string $queue
 	 * @return void
 	 */
-	protected function registerIronRequestBinder()
+	protected function registerRequestBinder($queue)
 	{
-		$this->app->rebinding('request', function($app, $request)
+		$this->app->rebinding('request', function($app, $request) use ($queue)
 		{
-			if ($app['queue']->connected('iron'))
+			if ($app['queue']->connected($queue))
 			{
-				$app['queue']->connection('iron')->setRequest($request);
+				$app['queue']->connection($queue)->setRequest($request);
 			}
 		});
 	}
