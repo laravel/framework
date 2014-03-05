@@ -1175,7 +1175,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateDateFormat($attribute, $value, $parameters)
 	{
-		$this->requireParameterCount(1, $parameters, 'date');
+		$this->requireParameterCount(1, $parameters, 'date_format');
 
 		$parsed = date_parse_from_format($parameters[0], $value);
 
@@ -2184,12 +2184,12 @@ class Validator implements MessageProviderInterface {
 	 * Require a certain number of parameters to be present.
 	 *
 	 * @param  int    $count
-	 * @param  array  $parametrers
+	 * @param  array  $parameters
 	 * @param  string $rule
 	 * @return void
 	 * @throws \InvalidArgumentException
 	 */
-	protected function requireParameterCount($count, array $parametrers, $rule)
+	protected function requireParameterCount($count, $parameters, $rule)
 	{
 		if (count($parameters) < $count)
 		{
