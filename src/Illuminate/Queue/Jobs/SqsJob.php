@@ -77,7 +77,7 @@ class SqsJob extends Job {
 	{
 		parent::delete();
 
-        if (isset($this->job->pushed)) return;
+        if (isset($this->job['pushed'])) return;
 
 		$this->sqs->deleteMessage(array(
 
