@@ -86,8 +86,8 @@ class HasManyThrough extends Relation {
 	{
         $query = $query ?: $this->query;
 
-        $foreignKey = $this->related->getQualifiedKeyName();
-        $primaryKey = $this->parent->getTable() .'.-'. $this->secondKey;
+        $foreignKey = $this->related->getTable() . '.' . $this->related->getKeyName();
+        $primaryKey = $this->parent->getTable() .'.'. $this->secondKey;
 
         $query->join($this->parent->getTable(), $primaryKey, '=', $foreignKey);
     }
