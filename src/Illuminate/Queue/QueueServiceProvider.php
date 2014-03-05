@@ -201,7 +201,7 @@ class QueueServiceProvider extends ServiceProvider {
 	{
 		$app = $this->app;
 
-		$manager->addConnector('sqs', function($app)
+		$manager->addConnector('sqs', function() use ($app)
 		{
 			return new SqsConnector($app['request']);
 		});
