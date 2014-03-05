@@ -69,8 +69,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 
 	public function testDeferredServicesAreLazilyInitialized()
 	{
-		$this->markTestIncomplete('Fixed by #3790');
-
 		$app = new Application;
 		$app->setDeferredServices(array('foo' => 'ApplicationLazyDeferredServiceProviderStub'));
 		$this->assertTrue($app->bound('foo'));
