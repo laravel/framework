@@ -284,6 +284,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			}
 		}
 
+		// Automatically register a model observer.
+		if (class_exists($observerClass = $class.'Observer'))
+		{
+			static::observe(new $observerClass);
+		}
+
 		static::bootTraits();
 	}
 
