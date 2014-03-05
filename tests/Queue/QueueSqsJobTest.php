@@ -69,7 +69,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 	public function testDeleteRemovesTheJobFromSqs()
 	{
 		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('deleteMessage'), array($this->credentials, $this->signature, $this->config));
-		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
 		$queue->setContainer($this->mockedContainer);
 		$job = $this->getJob();
 		$job->getSqs()->expects($this->once())->method('deleteMessage')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle));	
@@ -91,8 +91,8 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		return new Illuminate\Queue\Jobs\SqsJob(
 			$this->mockedContainer,
 			$this->mockedSqsClient,
-			$this->queueUrl,
-			($pushed ? array_merge($this->mockedJobData, array('pushed' => true)) : $this->mockedJobData)
+			($pushed ? array_merge($this->mockedJobData, array('pushed' => true)) : $this->mockedJobData),	
+			$this->queueUrl
 		);
 	}
 
