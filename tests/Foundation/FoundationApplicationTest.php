@@ -74,6 +74,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($app->bound('foo'));
 		$this->assertFalse(ApplicationLazyDeferredServiceProviderStub::$initialized);
 		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
+		$this->assertFalse(ApplicationLazyDeferredServiceProviderStub::$initialized);
 		$this->assertEquals('foobar', $app->make('foo'));
 		$this->assertTrue(ApplicationLazyDeferredServiceProviderStub::$initialized);
 	}
