@@ -76,13 +76,23 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$job->delete();
 	}
 
-	protected function getJob()
+	public function testDeleteNoopsOnPushedQueues()
+	{
+		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('deleteMessage'), array($this->credentials, $this->signature, $this->config));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
+		$queue->setContainer($this->mockedContainer);
+		$job = $this->getJob(true);
+		$job->getSqs()->expects($this->never())->method('deleteMessage');
+		$job->delete();
+	}
+
+	protected function getJob($pushed = false)
 	{
 		return new Illuminate\Queue\Jobs\SqsJob(
 			$this->mockedContainer,
 			$this->mockedSqsClient,
 			$this->queueUrl,
-			$this->mockedJobData
+			($pushed ? array_merge($this->mockedJobData, array('pushed' => true)) : $this->mockedJobData)
 		);
 	}
 
