@@ -21,7 +21,7 @@ abstract class Queue {
 	 */
 	public function marshal()
 	{
-		throw new \RuntimeException("Push queues only supported by Iron.");
+		throw new \RuntimeException("Push queues only supported by Iron and SQS.");
 	}
 
 	/**
