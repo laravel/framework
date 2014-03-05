@@ -455,12 +455,20 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$abstract = $this->getAlias($abstract);
 
-		if (isset($this->deferredServices[$abstract]))
-		{
-			$this->loadDeferredProvider($abstract);
-		}
-
 		return parent::make($abstract, $parameters);
+	}
+
+	/**
+	 * Determine if the given abstract type has been bound.
+	 *
+	 * (Overriding Container::bound)
+	 *
+	 * @param  string  $abstract
+	 * @return bool
+	 */
+	public function bound($abstract)
+	{
+		return isset($this->deferredServices[$abstract]) || parent::bound($abstract);
 	}
 
 	/**
@@ -977,6 +985,28 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function setDeferredServices(array $services)
 	{
 		$this->deferredServices = $services;
+
+		foreach ($services as $service => $provider)
+		{
+			$this->bindShared($service, $this->getDeferredClosure($service, $provider));
+		}
+	}
+
+	/**
+	 * Get a closure for a deferred service.
+	 *
+	 * @param  string $abstract
+	 * @param  string $provider
+	 * @return \Closure
+	 */
+	public function getDeferredClosure($abstract, $provider)
+	{
+		return function($app) use($abstract, $provider)
+		{
+			$app->registerDeferredProvider($provider);
+
+			return $app->make($abstract);
+		};
 	}
 
 	/**
