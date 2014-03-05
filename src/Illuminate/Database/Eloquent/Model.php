@@ -2511,7 +2511,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		return array_udiff_assoc($this->attributes, $this->original, function ($attribute, $original)
 		{
-			return $attribute !== $original;
+			return isset($attribute) and $attribute !== $original;
 		});
 	}
 
