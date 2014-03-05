@@ -986,6 +986,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testExceptionThrownOnIncorrectParameterCount()
+	{
+		$trans = $this->getTranslator();
+		$v = new Validator($trans, array(), array('foo' => 'required_if:foo'));
+		$v->passes();
+	}
+
+
 	protected function getTranslator()
 	{
 		return m::mock('Symfony\Component\Translation\TranslatorInterface');
