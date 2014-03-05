@@ -2509,17 +2509,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getDirty()
 	{
-		$dirty = array();
-
-		foreach ($this->attributes as $key => $value)
+		return array_udiff_assoc($this->attributes, $this->original, function ($attribute, $original)
 		{
-			if ( ! array_key_exists($key, $this->original) || $value !== $this->original[$key])
-			{
-				$dirty[$key] = $value;
-			}
-		}
-
-		return $dirty;
+			return isset($attribute) and $attribute !== $original;
+		});
 	}
 
 	/**
