@@ -47,6 +47,18 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDeferredServicesAreSharedProperly()
+	{
+		$app = new Application;
+		$app->setDeferredServices(array('foo' => 'ApplicationDeferredSharedServiceProviderStub'));
+		$this->assertTrue($app->bound('foo'));
+		$one = $app->make('foo'); $two = $app->make('foo');
+		$this->assertInstanceOf('StdClass', $one);
+		$this->assertInstanceOf('StdClass', $two);
+		$this->assertSame($one, $two);
+	}
+
+
 	public function testDeferredServicesCanBeExtended()
 	{
 		$app = new Application;
@@ -116,6 +128,16 @@ class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceP
 	public function register()
 	{
 		$this->app['foo'] = 'foo';
+	}
+}
+
+class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider {
+	protected $defer = true;
+	public function register()
+	{
+		$this->app->bindShared('foo', function() {
+			return new StdClass;
+		});
 	}
 }
 
