@@ -51,16 +51,6 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
-	public function testExceptionThrownOnInvalidMergeArgument()
-	{
-		$container = new MessageBag(array('foo' => array('bar')));
-		$container->merge('foo');
-	}
-
-
 	public function testGetReturnsArrayOfMessagesByKey()
 	{
 		$container = new MessageBag;
