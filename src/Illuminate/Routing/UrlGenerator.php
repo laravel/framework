@@ -373,8 +373,7 @@ class UrlGenerator {
 	 */
 	protected function addPortToDomain($domain)
 	{
-		if ((starts_with($domain, 'http://') && $this->request->getPort() == '80') 
-			|| (starts_with($domain, 'https://') && $this->request->getPort() == '443'))
+		if (in_array($this->request->getPort(), array('80', '443')))
 		{
 			return $domain;
 		}
