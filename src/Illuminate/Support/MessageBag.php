@@ -65,13 +65,6 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 			$messages = $messages->getMessageBag()->getMessages();
 		}
 
-		if ( ! is_array($messages))
-		{
-			$class = get_class($this);
-			$type = is_object($messages) ? get_class($messages) : gettype($messages);
-			throw new \InvalidArgumentException("Argument 1 to $class::merge() must be of type Illuminate\Support\Contracts\MessageProviderInterface or array, $type given");
-		}
-
 		$this->messages = array_merge_recursive($this->messages, $messages);
 
 		return $this;
