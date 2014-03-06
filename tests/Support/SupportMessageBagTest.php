@@ -42,6 +42,25 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMessageBagsCanBeMerged()
+	{
+		$container = new MessageBag(array('foo' => array('bar')));
+		$otherContainer = new MessageBag(array('foo' => array('baz'), 'bar' => array('foo')));
+		$container->merge($otherContainer);
+		$this->assertEquals(array('foo' => array('bar', 'baz'), 'bar' => array('foo')), $container->getMessages());
+	}
+
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testExceptionThrownOnInvalidMergeArgument()
+	{
+		$container = new MessageBag(array('foo' => array('bar')));
+		$container->merge('foo');
+	}
+
+
 	public function testGetReturnsArrayOfMessagesByKey()
 	{
 		$container = new MessageBag;
