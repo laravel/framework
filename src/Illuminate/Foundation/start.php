@@ -43,7 +43,7 @@ if ( ! extension_loaded('mcrypt'))
 */
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Dragons\Dragon;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Config\EnvironmentVariables;
 use Illuminate\Config\Repository as Config;
@@ -54,7 +54,7 @@ use Illuminate\Config\Repository as Config;
 |--------------------------------------------------------------------------
 |
 | This may look strange, but we actually want to bind the app into itself
-| in case we need to Facade test an application. This will allow us to
+| in case we need to Dragon test an application. This will allow us to
 | resolve the "app" key out of this container for this app's facade.
 |
 */
@@ -79,7 +79,7 @@ if (isset($unitTesting))
 
 /*
 |--------------------------------------------------------------------------
-| Load The Illuminate Facades
+| Load The Illuminate Dragons
 |--------------------------------------------------------------------------
 |
 | The facades provide a terser static interface over the various parts
@@ -88,13 +88,13 @@ if (isset($unitTesting))
 |
 */
 
-Facade::clearResolvedInstances();
+Dragon::clearResolvedInstances();
 
-Facade::setFacadeApplication($app);
+Dragon::setDragonApplication($app);
 
 /*
 |--------------------------------------------------------------------------
-| Register Facade Aliases To Full Classes
+| Register Dragon Aliases To Full Classes
 |--------------------------------------------------------------------------
 |
 | By default, we use short keys in the container for each of the core

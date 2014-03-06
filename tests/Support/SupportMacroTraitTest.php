@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Dragons\Response;
 
 class SupportMacroTraitTest extends \PHPUnit_Framework_TestCase {
 
