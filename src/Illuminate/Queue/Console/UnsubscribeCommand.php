@@ -8,21 +8,21 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Log;
 
-class SubscribeCommand extends Command {
+class UnsubscribeCommand extends Command {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'queue:subscribe';
+	protected $name = 'queue:unsubscribe';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Subscribe a URL to an Iron.io or SQS push queue';
+	protected $description = 'Unsubscribe a URL from an Iron.io or SQS push queue';
 
 	/**
 	 * The queue meta information
@@ -48,22 +48,34 @@ class SubscribeCommand extends Command {
 		} 
 		else if ($queue instanceof SqsQueue)
 		{
-			Log::info('SubscribeCommand fire', array('createTopic' => $this->argument('queue')));		
+			Log::info('UnsubscribeCommand fire', array('list' => 'subscriptions'));
 
-			$response = $queue->getSns()->createTopic(array('Name' => $this->argument('queue')));
+			$response = $queue->getSns()->listSubscriptions();
 
-			Log::info('SubscribeCommand fire', array('response' => $response->toArray()));
+			Log::info('UnsubscribeCommand fire', array('listSubscriptions' => $response->toArray()));
 
-			$response = $queue->getSns()->subscribe(array('TopicArn' => $response->get('TopicArn'), 'Protocol' => ((stripos($this->argument('url'), 'https') !== false) ? 'https' : 'http'), 'Endpoint' => $this->argument('url')));
+			$endpoint = $this->argument('url');		
+	
+			$subscription = array_filter($response->toArray()['Subscriptions'], function($element) use ($endpoint) {
+				
+				return $element['Endpoint'] == $endpoint;
+			});
 
-			Log::info('SubscribeCommand fire', array('response' => $response->toArray()));
+			Log::info('UnsubscribeCommand fire', array('subscription' => $subscription));
+	
+			if(count($subscription)) {
+
+				$response = $queue->getSns()->unsubscribe(array('SubscriptionArn' => $subscription[0]['SubscriptionArn']));
+
+				Log::info('UnsubscribeCommand fire', array('response' => $response->toArray()));
+			}
 		} 
 		else 
 		{
 			throw new RuntimeException("The default queue must be either IronMQ or SQS.");
 		}
 
-		$this->line('<info>Queue subscriber added:</info> <comment>'.$this->argument('url').'</comment>');
+		$this->line('<info>Queue </info><comment>'.$this->argument('queue').'</comment><info> unsubscribed from:</info> <comment>'.$this->argument('url').'</comment>');
 	}
 
 	/**
@@ -141,13 +153,13 @@ class SubscribeCommand extends Command {
 
 		if ($queue instanceof IronQueue)
 		{
-			Log::info('SubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getIron()->getQueue($this->argument('queue')))); 
+			Log::info('UnsubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getIron()->getQueue($this->argument('queue')))); 
 
 			return $this->meta = $this->laravel['queue']->getIron()->getQueue($this->argument('queue'));
 		} 
 		else if ($queue instanceof SqsQueue)
 		{
-			Log::info('SubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getSqs()->getQueueAttributes(array('QueueUrl' => $this->argument('queue'))))); 
+			Log::info('UnsubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getSqs()->getQueueAttributes(array('QueueUrl' => $this->argument('queue'))))); 
 
 			return $this->meta = $this->laravel['queue']->getSqs()->getQueueAttributes(array('QueueUrl' => $this->argument('queue')));
 		} 
@@ -168,7 +180,7 @@ class SubscribeCommand extends Command {
 		return array(
 			array('queue', InputArgument::REQUIRED, 'The name of Iron.io queue or SNS topic.'),
 
-			array('url', InputArgument::REQUIRED, 'The URL to be subscribed.'),
+			array('url', InputArgument::REQUIRED, 'The URL to be unsubscribed.'),
 		);
 	}
 

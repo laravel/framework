@@ -1,9 +1,12 @@
 <?php namespace Illuminate\Queue;
 
+use RuntimeException;
+use Aws\Sns\SnsClient;
 use Aws\Sqs\SqsClient;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\SqsJob;
+use Log;
 
 class SqsQueue extends PushQueue implements QueueInterface {
 
@@ -13,6 +16,13 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 * @var \Aws\Sqs\SqsClient
 	 */
 	protected $sqs;
+
+	/**
+	 * The Amazon SNS instance.
+	 *
+	 * @var \Aws\Sns\SnsClient
+	 */
+	protected $sns;
 
 	/**
 	 * The account associated with the default tube
@@ -31,15 +41,17 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	/**
 	 * Create a new Amazon SQS queue instance.
 	 *
-	 * @param  \Aws\Sqs\SqsClient  $sqs
+	 * @param  \Aws\Sqs\SqsClient  $sqs 
+	 * @param  \Aws\Sns\SnsClient  $sns
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
 	 * @param  string  $account
 	 * @return void
 	 */
-	public function __construct(SqsClient $sqs, Request $request, $default, $account)
+	public function __construct(SqsClient $sqs, SnsClient $sns, Request $request, $default, $account)
 	{
 		$this->sqs = $sqs;
+		$this->sns = $sns;
 		$this->request = $request;
 		$this->default = $default;
 		$this->account = $account;
@@ -136,9 +148,38 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	{
 		$r = $this->request;
 
+		Log::info('SqsQueue marshalPushedJob', array('request->header()'=>$r->header()));
+		Log::info('SqsQueue marshalPushedJob', array('request->json()'=>$r->json()));
+
+		$body = $r->getContent();
+
+		if($r->json('Type') == 'SubscriptionConfirmation') {
+	
+			$response = $this->getSns()->confirmSubscription(array('TopicArn' => $r->json('TopicArn'), 'Token' => $r->json('Token'), 'AuthenticateOnUnsubscribe' => 'true'));
+
+			Log::info('SqsQueue marshalPushedJob', array('response' => $response->toArray()));
+
+			$body = '{"job":"NotificationHandler@send","data":{"subscription":"confirmed"}}';
+		} 
+		else if($r->json('Type') == 'Notification') 
+		{ 
+			$body = '{"job":"NotificationHandler@send","data":{"notification":"received"}}';
+		}
+
+		if(($r->header('X-aws-sqsd-msgid') == null) && ($r->header('x-amz-sns-message-id') == null))
+		{
+			throw new RuntimeException("The marshaled job must come from SQS.");	
+		}
+
+		Log::info('SqsQueue marshalPushedJob', array(	'MessageId' => $r->header('xaws-sqsd-msgid') ?: $r->header('x-amz-sns-message-id'),
+                        					'Body' => $body,
+                        					'Attributes' => array('ApproximateReceiveCount' => $r->header('X-aws-sqsd-receive-count')),
+                        					'pushed' => true,
+                					    ));
+
 		return array(
-			'MessageId' => $r->header('X-aws-sqsd-msgid'),
-			'Body' => $r->getContent(),
+			'MessageId' => $r->header('xaws-sqsd-msgid') ?: $r->header('x-amz-sns-message-id'),
+			'Body' => $body,
 			'Attributes' => array('ApproximateReceiveCount' => $r->header('X-aws-sqsd-receive-count')),
 			'pushed' => true,
 		);
@@ -152,7 +193,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	*/
 	protected function createPushedSqsJob($job)
 	{
-		return new SqsJob($this->container, $this->sqs, $this, $job, true);
+		return new SqsJob($this->container, $this->sqs, $job, $this, true);
 	}
 
 	/**
@@ -163,6 +204,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 */
 	public function getQueue($queue)
 	{
+		//return $this->sqs->getQueueUrl(array('QueueName'=>($queue ?: $this->default), 'QueueOwnerAWSAccountId' => $this->account))['QueueUrl'];
 		return $this->sqs->getBaseUrl() . '/' . $this->account . '/' . ($queue ?: $this->default);
 	}
 
@@ -174,6 +216,16 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	public function getSqs()
 	{
 		return $this->sqs;
+	}
+
+	/**
+	 * Get the underlying SNS instance.
+	 *
+	 * @return \Aws\Sns\SnsClient
+	 */
+	public function getSns()
+	{
+		return $this->sns;
 	}
 
 }

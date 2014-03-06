@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Queue\Jobs;
 
 use DateTime;
+use Log;
 
 abstract class Job {
 
@@ -89,6 +90,8 @@ abstract class Job {
 	 */
 	protected function resolveAndFire(array $payload)
 	{
+		Log::info('Job resolveAndFire', array('payload'=>$payload));
+
 		list($class, $method) = $this->parseJob($payload['job']);
 
 		$this->instance = $this->resolve($class);
