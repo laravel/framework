@@ -18,7 +18,7 @@ if ( ! function_exists('action'))
 if ( ! function_exists('app'))
 {
 	/**
-	 * Get the root Facade application instance.
+	 * Get the root Dragon application instance.
 	 *
 	 * @param  string  $make
 	 * @return mixed
@@ -30,7 +30,7 @@ if ( ! function_exists('app'))
 			return app()->make($make);
 		}
 
-		return Illuminate\Support\Facades\Facade::getFacadeApplication();
+		return Illuminate\Support\Dragons\Dragon::getDragonApplication();
 	}
 }
 

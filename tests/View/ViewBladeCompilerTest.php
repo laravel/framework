@@ -235,7 +235,7 @@ breeze
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = "Foo @lang(function_call('foo(blah)')) bar";
-		$expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
+		$expected = "Foo <?php echo \Illuminate\Support\Dragons\Lang::get(function_call('foo(blah)')); ?> bar";
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
@@ -275,8 +275,8 @@ breeze
 	public function testLanguageAndChoicesAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
-		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
+		$this->assertEquals('<?php echo \Illuminate\Support\Dragons\Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
+		$this->assertEquals('<?php echo \Illuminate\Support\Dragons\Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
 	}
 
 
@@ -348,7 +348,7 @@ breeze
 	public function testExpressionsOnTheSameLine()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo \Illuminate\Support\Facades\Lang::get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
+		$this->assertEquals('<?php echo \Illuminate\Support\Dragons\Lang::get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo \Illuminate\Support\Dragons\Lang::get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
 	}
 
 
@@ -357,7 +357,7 @@ breeze
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$this->assertEquals('<html <?php echo $foo; ?>>', $compiler->compileString('<html {{ $foo }}>'));
 		$this->assertEquals('<html<?php echo $foo; ?>>', $compiler->compileString('<html{{ $foo }}>'));
-		$this->assertEquals('<html <?php echo $foo; ?> <?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
+		$this->assertEquals('<html <?php echo $foo; ?> <?php echo \Illuminate\Support\Dragons\Lang::get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
 	}
 
 
