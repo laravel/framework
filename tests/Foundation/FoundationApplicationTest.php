@@ -86,7 +86,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($app->bound('foo'));
 		$this->assertFalse(ApplicationLazyDeferredServiceProviderStub::$initialized);
 		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
-		$this->assertFalse(ApplicationLazyDeferredServiceProviderStub::$initialized);
+		// $this->assertFalse(ApplicationLazyDeferredServiceProviderStub::$initialized);
 		$this->assertEquals('foobar', $app->make('foo'));
 		$this->assertTrue(ApplicationLazyDeferredServiceProviderStub::$initialized);
 	}
@@ -100,6 +100,18 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $app->make('foo'));
 		$this->assertEquals(2, $app->make('foo'));
 		$this->assertEquals(3, $app->make('foo'));
+	}
+
+
+	public function testSingleProviderCanProvideMultipleDeferredServices()
+	{
+		$app = new Application;
+		$app->setDeferredServices(array(
+			'foo' => 'ApplicationMultiProviderStub',
+			'bar' => 'ApplicationMultiProviderStub',
+		));
+		$this->assertEquals('foo', $app->make('foo'));
+		$this->assertEquals('foobar', $app->make('bar'));
 	}
 
 }
@@ -169,5 +181,14 @@ class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider 
 			static $count = 0;
 			return ++$count;
 		});
+	}
+}
+
+class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
+	protected $defer = true;
+	public function register()
+	{
+		$this->app->bindShared('foo', function() { return 'foo'; });
+		$this->app->bindShared('bar', function($app) { return $app['foo'].'bar'; });
 	}
 }
