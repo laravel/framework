@@ -2501,7 +2501,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$dirtyAttributes = $this->getDirty();
 
-		if ( ! is_null($attribute)) return array_key_exists($attribute, $dirtyAttributes);
+		if (is_null($attribute) === false) return array_key_exists($attribute, $dirtyAttributes);
 
 		return count($dirtyAttributes) > 0;
 	}
