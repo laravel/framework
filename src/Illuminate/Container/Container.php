@@ -81,6 +81,17 @@ class Container implements ArrayAccess {
 	}
 
 	/**
+	 * Determine if the given abstract type has been resolved.
+	 *
+	 * @param  string $abstract
+	 * @return bool
+	 */
+	public function resolved($abstract)
+	{
+		return isset($this->resolved[$abstract]) || isset($this->instances[$abstract]);
+	}
+
+	/**
 	 * Determine if a given string is an alias.
 	 *
 	 * @param  string  $name
@@ -129,14 +140,14 @@ class Container implements ArrayAccess {
 			$concrete = $this->getClosure($abstract, $concrete);
 		}
 
-		$bound = $this->bound($abstract);
+		$resolved = $this->resolved($abstract);
 
 		$this->bindings[$abstract] = compact('concrete', 'shared');
 
-		// If the abstract type was already bound in this container, we will fire the
+		// If the abstract type was already resolved in this container, we will fire the
 		// rebound listener so that any objects which have already gotten resolved
 		// can have their copy of the object updated via hte listener callbacks.
-		if ($bound)
+		if ($resolved)
 		{
 			$this->rebound($abstract);
 		}
@@ -234,7 +245,7 @@ class Container implements ArrayAccess {
 	 */
 	public function extend($abstract, Closure $closure)
 	{
-		if ( ! isset($this->bindings[$abstract]))
+		if ( ! $this->bound($abstract))
 		{
 			throw new \InvalidArgumentException("Type {$abstract} is not bound.");
 		}
@@ -405,8 +416,6 @@ class Container implements ArrayAccess {
 	{
 		$abstract = $this->getAlias($abstract);
 
-		$this->resolved[$abstract] = true;
-
 		// If an instance of the type is currently being managed as a singleton we'll
 		// just return an existing instance instead of instantiating new instances
 		// so the developer can keep using the same objects instance every time.
@@ -438,6 +447,8 @@ class Container implements ArrayAccess {
 		}
 
 		$this->fireResolvingCallbacks($abstract, $object);
+
+		$this->resolved[$abstract] = true;
 
 		return $object;
 	}
