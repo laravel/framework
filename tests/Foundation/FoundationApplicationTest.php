@@ -79,6 +79,17 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(ApplicationLazyDeferredServiceProviderStub::$initialized);
 	}
 
+
+	public function testDeferredServicesCanRegisterFactories()
+	{
+		$app = new Application;
+		$app->setDeferredServices(array('foo' => 'ApplicationFactoryProviderStub'));
+		$this->assertTrue($app->bound('foo'));
+		$this->assertEquals(1, $app->make('foo'));
+		$this->assertEquals(2, $app->make('foo'));
+		$this->assertEquals(3, $app->make('foo'));
+	}
+
 }
 
 class ApplicationCustomExceptionHandlerStub extends Illuminate\Foundation\Application {
@@ -125,5 +136,16 @@ class ApplicationLazyDeferredServiceProviderStub extends Illuminate\Support\Serv
 	{
 		static::$initialized = true;
 		$this->app['foo'] = 'foo';
+	}
+}
+
+class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider {
+	protected $defer = true;
+	public function register()
+	{
+		$this->app->bind('foo', function() {
+			static $count = 0;
+			return ++$count;
+		});
 	}
 }

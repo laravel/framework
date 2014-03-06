@@ -416,8 +416,6 @@ class Container implements ArrayAccess {
 	{
 		$abstract = $this->getAlias($abstract);
 
-		$this->resolved[$abstract] = true;
-
 		// If an instance of the type is currently being managed as a singleton we'll
 		// just return an existing instance instead of instantiating new instances
 		// so the developer can keep using the same objects instance every time.
@@ -449,6 +447,8 @@ class Container implements ArrayAccess {
 		}
 
 		$this->fireResolvingCallbacks($abstract, $object);
+
+		$this->resolved[$abstract] = true;
 
 		return $object;
 	}
