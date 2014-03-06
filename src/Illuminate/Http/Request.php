@@ -102,11 +102,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function segment($index, $default = null)
 	{
-		$segments = explode('/', trim($this->getPathInfo(), '/'));
-
-		$segments = array_values(array_filter($segments));
-
-		return array_get($segments, $index - 1, $default);
+		return array_get($this->segments(), $index - 1, $default);
 	}
 
 	/**
@@ -116,9 +112,9 @@ class Request extends SymfonyRequest {
 	 */
 	public function segments()
 	{
-		$path = $this->path();
+		$segments = explode('/', $this->path());
 
-		return $path == '/' ? array() : explode('/', $path);
+		return array_values(array_filter($segments));
 	}
 
 	/**
