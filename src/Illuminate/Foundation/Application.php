@@ -849,6 +849,8 @@ class Application extends Container implements HttpKernelInterface, ResponsePrep
 		$parameters = array($url, 'GET', array(), array(), array(), $_SERVER);
 
 		$this->instance('request', static::onRequest('create', $parameters));
+		
+		$this->request->setBaseUrlForConsoleEnvironment();
 	}
 
 	/**

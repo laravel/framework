@@ -31,6 +31,17 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Set the base URL for the application, particulary when using artisan.
+	 *
+	 * @return void
+	 */
+	public function setBaseUrlForConsoleEnvironment()
+	{
+		$this->baseUrl = $this->getRequestUri();
+	}
+
+
+	/**
 	 * Get the root URL for the application.
 	 *
 	 * @return string
