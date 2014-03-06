@@ -474,6 +474,39 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the stack statements into the content
+	 *
+	 * @param  string $expression
+	 * @return string
+	 */
+	protected function compileStack($expression)
+	{
+		return "<?php echo \$__env->stackContent{$expression}; ?>";
+	}
+
+	/**
+	 * Compile the push statements into valid PHP
+	 *
+	 * @param $expression
+	 * @return string
+	 */
+	protected function compilePush($expression)
+	{
+		return "<?php echo \$__env->startPush{$expression}; ?>";
+	}
+
+	/**
+	 * Compile the endpush statements into valid PHP
+	 *
+	 * @param $expression
+	 * @return string
+	 */
+	protected function compileEndpush($expression)
+	{
+		return "<?php echo \$__env->endPush{$expression}; ?>";
+	}
+
+	/**
 	 * Register a custom Blade compiler.
 	 *
 	 * @param  Closure  $compiler
