@@ -234,6 +234,10 @@ class Writer {
 	 */
 	public function __call($method, $parameters)
 	{
+		if (isset($parameters[0]) && in_array(gettype($parameters[0]), ['object', 'array', 'resource'])) {
+			$parameters[0] = print_r($parameters[0], true);
+		}
+		
 		if (in_array($method, $this->levels))
 		{
 			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
