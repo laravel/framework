@@ -2279,7 +2279,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getAttributeFromArray($key)
 	{
-		if (array_key_exists($key, $this->attributes))
+		if (array_key_exists($key, $this->attributes) ||
+			array_key_exists($key = snake_case($key), $this->attributes) ||
+			array_key_exists($key = camel_case($key), $this->attributes))
 		{
 			return $this->attributes[$key];
 		}

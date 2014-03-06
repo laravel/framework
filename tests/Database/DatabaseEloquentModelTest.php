@@ -29,6 +29,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAttributeAnyCaseAccess()
+	{
+		$model = new EloquentModelStub;
+
+		$model->anyCase = 'foo';
+		$this->assertArrayHasKey('any_case', $model->getAttributes());
+		$this->assertEquals('foo', $model->any_case);
+		$this->assertEquals('foo', $model->anyCase);
+
+		$model->any_case = 'bar';
+		$this->assertEquals('bar', $model->any_case);
+		$this->assertEquals('bar', $model->anyCase);
+	}
+
+
 	public function testCalculatedAttributes()
 	{
 		$model = new EloquentModelStub;
@@ -706,7 +721,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$class = new EloquentModelStub;
 
-		$this->assertEquals(array('list_items', 'password', 'appendable'), $class->getMutatedAttributes());
+		$this->assertEquals(array('any_case', 'list_items', 'password', 'appendable'), $class->getMutatedAttributes());
 	}
 
 
@@ -782,6 +797,14 @@ class EloquentTestObserverStub {
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
 	protected $guarded = array();
+	public function getAnyCaseAttribute($value)
+	{
+		return $value;
+	}
+	public function setAnyCaseAttribute($value)
+	{
+		$this->attributes['any_case'] = $value;
+	}
 	public function getListItemsAttribute($value)
 	{
 		return json_decode($value, true);
