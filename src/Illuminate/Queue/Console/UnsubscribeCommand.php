@@ -6,7 +6,6 @@ use Illuminate\Queue\SqsQueue;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Log;
 
 class UnsubscribeCommand extends Command {
 
@@ -48,11 +47,7 @@ class UnsubscribeCommand extends Command {
 		} 
 		else if ($queue instanceof SqsQueue)
 		{
-			Log::info('UnsubscribeCommand fire', array('list' => 'subscriptions'));
-
 			$response = $queue->getSns()->listSubscriptions();
-
-			Log::info('UnsubscribeCommand fire', array('listSubscriptions' => $response->toArray()));
 
 			$endpoint = $this->argument('url');		
 	
@@ -61,13 +56,9 @@ class UnsubscribeCommand extends Command {
 				return $element['Endpoint'] == $endpoint;
 			});
 
-			Log::info('UnsubscribeCommand fire', array('subscription' => $subscription));
-	
 			if(count($subscription)) {
 
 				$response = $queue->getSns()->unsubscribe(array('SubscriptionArn' => $subscription[0]['SubscriptionArn']));
-
-				Log::info('UnsubscribeCommand fire', array('response' => $response->toArray()));
 			}
 		} 
 		else 
@@ -153,14 +144,10 @@ class UnsubscribeCommand extends Command {
 
 		if ($queue instanceof IronQueue)
 		{
-			Log::info('UnsubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getIron()->getQueue($this->argument('queue')))); 
-
 			return $this->meta = $this->laravel['queue']->getIron()->getQueue($this->argument('queue'));
 		} 
 		else if ($queue instanceof SqsQueue)
 		{
-			Log::info('UnsubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getSqs()->getQueueAttributes(array('QueueUrl' => $this->argument('queue'))))); 
-
 			return $this->meta = $this->laravel['queue']->getSqs()->getQueueAttributes(array('QueueUrl' => $this->argument('queue')));
 		} 
 		else 

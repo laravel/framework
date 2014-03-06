@@ -6,7 +6,6 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\SqsJob;
-use Log;
 
 class SqsQueue extends PushQueue implements QueueInterface {
 
@@ -148,16 +147,11 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	{
 		$r = $this->request;
 
-		Log::info('SqsQueue marshalPushedJob', array('request->header()'=>$r->header()));
-		Log::info('SqsQueue marshalPushedJob', array('request->json()'=>$r->json()));
-
 		$body = $r->getContent();
 
 		if($r->json('Type') == 'SubscriptionConfirmation') {
 	
 			$response = $this->getSns()->confirmSubscription(array('TopicArn' => $r->json('TopicArn'), 'Token' => $r->json('Token'), 'AuthenticateOnUnsubscribe' => 'true'));
-
-			Log::info('SqsQueue marshalPushedJob', array('response' => $response->toArray()));
 
 			$body = '{"job":"NotificationHandler@send","data":{"subscription":"confirmed"}}';
 		} 
@@ -170,12 +164,6 @@ class SqsQueue extends PushQueue implements QueueInterface {
 		{
 			throw new RuntimeException("The marshaled job must come from SQS.");	
 		}
-
-		Log::info('SqsQueue marshalPushedJob', array(	'MessageId' => $r->header('xaws-sqsd-msgid') ?: $r->header('x-amz-sns-message-id'),
-                        					'Body' => $body,
-                        					'Attributes' => array('ApproximateReceiveCount' => $r->header('X-aws-sqsd-receive-count')),
-                        					'pushed' => true,
-                					    ));
 
 		return array(
 			'MessageId' => $r->header('xaws-sqsd-msgid') ?: $r->header('x-amz-sns-message-id'),

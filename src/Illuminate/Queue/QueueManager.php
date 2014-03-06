@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Queue;
 
 use Closure;
-use Log;
 
 class QueueManager {
 
@@ -62,23 +61,15 @@ class QueueManager {
 	{
 		$name = $name ?: $this->getDefaultDriver();
 
-		Log::info('QueueManager connection', array('name'=>$name));
-
 		// If the connection has not been resolved yet we will resolve it now as all
 		// of the connections are resolved when they are actually needed so we do
 		// not make any unnecessary connection to the various queue end-points.
 		if ( ! isset($this->connections[$name]))
 		{
-			Log::info('QueueManager connection calling this->resolve', array('name'=>$name));
-
 			$this->connections[$name] = $this->resolve($name);
-
-			Log::info('QueueManager connection calling setContainer', array('name'=>$name));
-
+		
 			$this->connections[$name]->setContainer($this->app);
 		}
-
-		Log::info('QueueManager connection returning this->connections[name]', array('connections-name'=>$this->connections[$name]));
 
 		return $this->connections[$name];
 	}
@@ -190,8 +181,6 @@ class QueueManager {
 	 */
 	public function __call($method, $parameters)
 	{
-		Log::info('QueueManager __call', array('method'=>$method, 'parameters'=>$parameters));
-
 		$callable = array($this->connection(), $method);
 
 		return call_user_func_array($callable, $parameters);

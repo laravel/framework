@@ -6,7 +6,6 @@ use Illuminate\Queue\SqsQueue;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Log;
 
 class SubscribeCommand extends Command {
 
@@ -48,15 +47,9 @@ class SubscribeCommand extends Command {
 		} 
 		else if ($queue instanceof SqsQueue)
 		{
-			Log::info('SubscribeCommand fire', array('createTopic' => $this->argument('queue')));		
-
 			$response = $queue->getSns()->createTopic(array('Name' => $this->argument('queue')));
 
-			Log::info('SubscribeCommand fire', array('response' => $response->toArray()));
-
 			$response = $queue->getSns()->subscribe(array('TopicArn' => $response->get('TopicArn'), 'Protocol' => ((stripos($this->argument('url'), 'https') !== false) ? 'https' : 'http'), 'Endpoint' => $this->argument('url')));
-
-			Log::info('SubscribeCommand fire', array('response' => $response->toArray()));
 		} 
 		else 
 		{
@@ -141,14 +134,10 @@ class SubscribeCommand extends Command {
 
 		if ($queue instanceof IronQueue)
 		{
-			Log::info('SubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getIron()->getQueue($this->argument('queue')))); 
-
 			return $this->meta = $this->laravel['queue']->getIron()->getQueue($this->argument('queue'));
 		} 
 		else if ($queue instanceof SqsQueue)
 		{
-			Log::info('SubscribeCommand getQueue', array('queue metadata' => $this->laravel['queue']->getSqs()->getQueueAttributes(array('QueueUrl' => $this->argument('queue'))))); 
-
 			return $this->meta = $this->laravel['queue']->getSqs()->getQueueAttributes(array('QueueUrl' => $this->argument('queue')));
 		} 
 		else 

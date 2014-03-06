@@ -4,7 +4,6 @@ use Aws\Sns\SnsClient;
 use Aws\Sqs\SqsClient;
 use Illuminate\Http\Request;
 use Illuminate\Queue\SqsQueue;
-use Log;
 
 class SqsConnector implements ConnectorInterface {
 
@@ -34,8 +33,6 @@ class SqsConnector implements ConnectorInterface {
 	 */
 	public function connect(array $config)
 	{
-		Log::info('SqsConnector connect', array('config'=>$config));
-
 		$sqsConfig = array_only($config, array('key', 'secret', 'region', 'default_cache_config'));
 
 		$sqs = SqsClient::factory($sqsConfig);
