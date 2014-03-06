@@ -16,7 +16,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', array('baz', 'boom'), true));
 
 		/**
-		 * Test HTTPS request URL geneation...
+		 * Test HTTPS request URL generation...
 		 */
 		$url = new UrlGenerator(
 			$routes = new Illuminate\Routing\RouteCollection,
@@ -172,6 +172,23 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
 		$this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', array('taylor', 'otwell')));
+	}
+
+
+	public function testHttpsRoutesWithDomains()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('https://foo.com/')
+		);
+
+		/**
+		 * When on HTTPS, no need to specify 443
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'baz', 'domain' => 'sub.foo.com'));
+		$routes->add($route);
+
+		$this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
 	}
 
 

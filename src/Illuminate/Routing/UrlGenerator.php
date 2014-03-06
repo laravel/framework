@@ -355,7 +355,7 @@ class UrlGenerator {
 	}
 
 	/**
-	 * Get the domain and schee for the route.
+	 * Get the domain and scheme for the route.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
@@ -373,7 +373,8 @@ class UrlGenerator {
 	 */
 	protected function addPortToDomain($domain)
 	{
-		if ($this->request->getPort() == '80')
+		if ((starts_with($domain, 'http://') && $this->request->getPort() == '80') 
+			|| (starts_with($domain, 'https://') && $this->request->getPort() == '443'))
 		{
 			return $domain;
 		}
