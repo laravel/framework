@@ -12,6 +12,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $extensions = array();
 
 	/**
+	 * The file being compiled.
+	 * 
+	 * @var string
+	 */
+	protected $path;
+
+	/**
 	 * All of the available compiler functions.
 	 *
 	 * @var array
@@ -57,14 +64,40 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @param  string  $path
 	 * @return void
 	 */
-	public function compile($path)
+	public function compile($path = null)
 	{
-		$contents = $this->compileString($this->files->get($path));
+		if ($path)
+		{
+			$this->setPath($path);
+		}
+
+		$contents = $this->compileString($this->files->get($this->getPath()));
 
 		if ( ! is_null($this->cachePath))
 		{
-			$this->files->put($this->getCompiledPath($path), $contents);
+			$this->files->put($this->getCompiledPath($this->getPath()), $contents);
 		}
+	}
+
+	/**
+	 * Set the current view path
+	 * 
+	 * @param string $path 
+	 * @return void
+	 */
+	public function setPath($path) 
+	{
+		$this->path = $path;
+	}
+
+	/**
+	 * Get the current view path
+	 * 
+	 * @return string
+	 */
+	public function getPath() 
+	{
+		return $this->path;
 	}
 
 	/**
