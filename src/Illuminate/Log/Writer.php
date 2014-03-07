@@ -5,6 +5,8 @@ use Illuminate\Events\Dispatcher;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\RotatingFileHandler;
+use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\ArrayableInterface;
 
 class Writer {
 
@@ -234,10 +236,26 @@ class Writer {
 	 */
 	public function __call($method, $parameters)
 	{
-		if (isset($parameters[0]) && in_array(gettype($parameters[0]), ['object', 'array', 'resource'])) {
-			$parameters[0] = print_r($parameters[0], true);
+		if (isset($parameters[0]))
+		{
+			if (gettype($parameters[0]) == 'array')
+			{
+				$parameters[0] = print_r($parameters[0], true);
+			}
+
+			if (gettype($parameters[0]) == 'object')
+			{
+				if ($parameters[0] instanceof JsonableInterface)
+				{
+					$parameters[0] = $parameters[0]->toJson();
+				}
+				elseif ($parameters[0] instanceof ArrayableInterface)
+				{
+					$parameters[0] = print_r($parameters[0]->toArray(), true);
+				}
+			}
 		}
-		
+
 		if (in_array($method, $this->levels))
 		{
 			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
