@@ -398,7 +398,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			}
 			elseif ($totallyGuarded)
 			{
-				throw new MassAssignmentException($key);
+				throw new MassAssignmentException($key . ' is guarded and not allowed for mass assignment.');
 			}
 		}
 
