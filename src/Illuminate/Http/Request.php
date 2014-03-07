@@ -293,7 +293,7 @@ class Request extends SymfonyRequest {
 	{
 		if (is_array($file = $this->file($key))) $file = head($file);
 
-		return $file instanceof \SplFileInfo;
+		return $file instanceof \SplFileInfo && $file->getPath() != '';
 	}
 
 	/**
