@@ -101,7 +101,7 @@ class Writer {
 	{
 		$level = $this->parseLevel($level);
 
-		$this->monolog->pushHandler($hnadler = new RotatingFileHandler($path, $days, $level));
+		$this->monolog->pushHandler($handler = new RotatingFileHandler($path, $days, $level));
 
 		$handler->setFormatter(new LineFormatter(null, null, true));
 	}
