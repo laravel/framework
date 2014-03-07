@@ -402,7 +402,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	            {
 	                $this->setAttribute($key, $value);
 	            }
-	            elseif(in_array($key, $this->guarded))
+	            elseif($totallyGuarded))
 	            {
 	                $guardedAttributes[] = $key;
 	            }
