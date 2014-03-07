@@ -81,6 +81,7 @@ class Pluralizer {
 		'move' => 'moves',
 		'person' => 'people',
 		'sex' => 'sexes',
+		'tax' => 'taxes',
 		'tooth' => 'teeth',
 	);
 
