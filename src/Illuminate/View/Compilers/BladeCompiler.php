@@ -12,8 +12,8 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $extensions = array();
 
 	/**
-	 * The file being compiled.
-	 * 
+	 * The file currently being compiled.
+	 *
 	 * @var string
 	 */
 	protected $path;
@@ -80,24 +80,24 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Set the current view path
-	 * 
-	 * @param string $path 
-	 * @return void
+	 * Get the path currently being compiled.
+	 *
+	 * @return string
 	 */
-	public function setPath($path) 
+	public function getPath()
 	{
-		$this->path = $path;
+		return $this->path;
 	}
 
 	/**
-	 * Get the current view path
-	 * 
-	 * @return string
+	 * Set the path currently being compiled.
+	 *
+	 * @param string $path
+	 * @return void
 	 */
-	public function getPath() 
+	public function setPath($path)
 	{
-		return $this->path;
+		$this->path = $path;
 	}
 
 	/**
