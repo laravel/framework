@@ -105,19 +105,29 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 	public function testPushedJobsCanBeMarshaled()
 	{
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPushedSqsJob'), array($this->sqs, $this->sns, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
-		$request->shouldReceive('json')->once()->with('Type')->andReturn('foo');
+		$request->shouldReceive('header')->once()->with('x-amz-sns-message-type')->andReturn('Notification');
 		$request->shouldReceive('header')->once()->with('x-amz-sns-message-id')->andReturn('message-id');
-		$request->shouldReceive('header')->once()->with('X-aws-sqsd-msgid')->andReturn('message-id');
-		$request->shouldReceive('header')->once()->with('X-aws-sqsd-receive-count')->andReturn(1);
+		$request->shouldReceive('header')->once()->with('x-amz-sns-message-id')->andReturn('message-id');
 		$request->shouldReceive('getContent')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
 		$pushedJob = array(
 			'MessageId' => 'message-id',
 			'Body' => json_encode(array('foo' => 'bar')),
-			'Attributes' => array('ApproximateReceiveCount' => 1),
 			'pushed' => true,
 		);
 		$queue->expects($this->once())->method('createPushedSqsJob')->with($this->equalTo($pushedJob))->will($this->returnValue($mockSqsJob = m::mock('StdClass')));
 		$mockSqsJob->shouldReceive('fire')->once();
+		$response = $queue->marshal();
+		$this->assertInstanceOf('Illuminate\Http\Response', $response);
+		$this->assertEquals(200, $response->getStatusCode());
+	}
+
+	public function testSubscriptionConfirmationNoJob()
+	{
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPushedSqsJob'), array($this->sqs, $this->sns, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
+		$request->shouldReceive('header')->once()->with('x-amz-sns-message-type')->andReturn('SubscriptionConfirmation');
+		$request->shouldReceive('json')->once()->with('TopicArn')->andReturn('foo');
+		$request->shouldReceive('json')->once()->with('Token')->andReturn('bar');
+		$this->sns->shouldReceive('confirmSubscription')->once()->with(array('TopicArn' => 'foo', 'Token' => 'bar', 'AuthenticateOnUnsubscribe' => 'true'))->andReturn();
 		$response = $queue->marshal();
 		$this->assertInstanceOf('Illuminate\Http\Response', $response);
 		$this->assertEquals(200, $response->getStatusCode());

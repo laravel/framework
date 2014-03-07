@@ -133,7 +133,16 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	*/
 	public function marshal()
 	{
-		$this->createPushedSqsJob($this->marshalPushedJob())->fire();
+		$r = $this->request;
+
+		if($r->header('x-amz-sns-message-type') == 'SubscriptionConfirmation') 
+		{
+			$response = $this->getSns()->confirmSubscription(array('TopicArn' => $r->json('TopicArn'), 'Token' => $r->json('Token'), 'AuthenticateOnUnsubscribe' => 'true'));
+		} 
+		else 
+		{
+			$this->createPushedSqsJob($this->marshalPushedJob())->fire();
+		}
 
 		return new Response('OK');
 	}
@@ -147,28 +156,14 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	{
 		$r = $this->request;
 
-		$body = $r->getContent();
-
-		if($r->json('Type') == 'SubscriptionConfirmation') {
-	
-			$response = $this->getSns()->confirmSubscription(array('TopicArn' => $r->json('TopicArn'), 'Token' => $r->json('Token'), 'AuthenticateOnUnsubscribe' => 'true'));
-
-			$body = '{"job":"NotificationHandler@send","data":{"subscription":"confirmed"}}';
-		} 
-		else if($r->json('Type') == 'Notification') 
-		{ 
-			$body = '{"job":"NotificationHandler@send","data":{"notification":"received"}}';
-		}
-
-		if(($r->header('X-aws-sqsd-msgid') == null) && ($r->header('x-amz-sns-message-id') == null))
+		if($r->header('x-amz-sns-message-id') == null)
 		{
 			throw new RuntimeException("The marshaled job must come from SQS.");	
 		}
 
 		return array(
-			'MessageId' => $r->header('xaws-sqsd-msgid') ?: $r->header('x-amz-sns-message-id'),
-			'Body' => $body,
-			'Attributes' => array('ApproximateReceiveCount' => $r->header('X-aws-sqsd-receive-count')),
+			'MessageId' => $r->header('x-amz-sns-message-id'),
+			'Body' => $r->getContent(),
 			'pushed' => true,
 		);
 	}
