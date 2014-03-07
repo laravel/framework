@@ -107,8 +107,8 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPushedSqsJob'), array($this->sqs, $this->sns, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
 		$request->shouldReceive('header')->once()->with('x-amz-sns-message-type')->andReturn('Notification');
 		$request->shouldReceive('header')->once()->with('x-amz-sns-message-id')->andReturn('message-id');
-		$request->shouldReceive('header')->once()->with('x-amz-sns-message-id')->andReturn('message-id');
-		$request->shouldReceive('getContent')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
+		$request->shouldReceive('header')->once()->with('x-aws-sqsd-msgid')->andReturn('message-id');
+		$request->shouldReceive('json')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
 		$pushedJob = array(
 			'MessageId' => 'message-id',
 			'Body' => json_encode(array('foo' => 'bar')),
@@ -119,6 +119,18 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$response = $queue->marshal();
 		$this->assertInstanceOf('Illuminate\Http\Response', $response);
 		$this->assertEquals(200, $response->getStatusCode());
+	}
+
+	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testPushedJobsMustComeFromSqsOrSns()
+	{
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPushedSqsJob'), array($this->sqs, $this->sns, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
+		$request->shouldReceive('header')->once()->with('x-amz-sns-message-type')->andReturn('Notification');
+		$request->shouldReceive('header')->once()->with('x-amz-sns-message-id')->andReturn(null);
+		$request->shouldReceive('header')->once()->with('x-aws-sqsd-msgid')->andReturn(null);
+		$response = $queue->marshal();
 	}
 
 	public function testSubscriptionConfirmationNoJob()

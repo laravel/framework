@@ -156,14 +156,9 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	{
 		$r = $this->request;
 
-		if($r->header('x-amz-sns-message-id') == null)
-		{
-			throw new RuntimeException("The marshaled job must come from SQS.");	
-		}
-
 		return array(
-			'MessageId' => $r->header('x-amz-sns-message-id'),
-			'Body' => $r->getContent(),
+			'MessageId' => $this->parseOutMessageId($r),
+			'Body' => $this->parseOutMessage($r),
 			'pushed' => true,
 		);
 	}
@@ -189,6 +184,36 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	{
 		//return $this->sqs->getQueueUrl(array('QueueName'=>($queue ?: $this->default), 'QueueOwnerAWSAccountId' => $this->account))['QueueUrl'];
 		return $this->sqs->getBaseUrl() . '/' . $this->account . '/' . ($queue ?: $this->default);
+	}
+
+	/**
+	 * Parse out the appropriate message id from the request header
+	 *
+	 * @param  Request $request
+	 * @return string
+	 */
+	protected function parseOutMessageId($request)
+	{
+		$snsMessageId = $request->header('x-amz-sns-message-id');
+		$sqsMessageId = $request->header('x-aws-sqsd-msgid');
+		
+		if(($sqsMessageId == null) && ($snsMessageId == null))
+		{
+			throw new RuntimeException("The marshaled job must come from either SQS or SNS.");	
+		}
+
+		return $snsMessageId ?: $sqsMessageId;
+	}
+
+	/**
+	 * Parse out the message from the request
+	 *
+	 * @param  Request $request
+	 * @return string
+	 */
+	protected function parseOutMessage($request)
+	{
+		return stripslashes($request->json('Message'));
 	}
 
 	/**
