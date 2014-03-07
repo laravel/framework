@@ -335,6 +335,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	            {
 	                throw new MassAssignmentException('All columns are guarded and not allowed for mass assignment.');
 	            }
+	            
 	            $key = $this->removeTableFromKey($key);
 	
 	            // The developers may choose to place some attributes in the "fillable"
@@ -344,14 +345,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	            {
 	                $this->setAttribute($key, $value);
 	            }
-	            elseif($totallyGuarded)
+	            elseif ($totallyGuarded)
 	            {
 	                $guardedAttributes[] = $key;
 	            }
 	        }
 	
 	        //if any key is guarded but passed into function for mass assignment
-	        if(count($guardedAttributes) > 0)
+	        if (count($guardedAttributes) > 0)
 	        {
 	            $columns = implode(', ', $guardedAttributes);
 	            $message = $columns . ' column' . (count($guardedAttributes) > 1 ? 's are' : ' is') .
