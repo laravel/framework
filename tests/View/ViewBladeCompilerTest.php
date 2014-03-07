@@ -53,6 +53,24 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCompileCompilesAndGetThePath()
+	{
+		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+		$files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+		$files->shouldReceive('put')->once()->with(__DIR__.'/'.md5('foo'), 'Hello World');
+		$compiler->compile('foo');
+		$this->assertEquals('foo', $compiler->getPath());
+	}
+
+
+	public function testCompileSetAndGetThePath()
+	{
+		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+		$compiler->setPath('foo');
+		$this->assertEquals('foo', $compiler->getPath());
+	}
+
+
 	public function testCompileDoesntStoreFilesWhenCachePathIsNull()
 	{
 		$compiler = new BladeCompiler($files = $this->getFiles(), null);
