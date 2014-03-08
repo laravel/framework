@@ -254,7 +254,7 @@ breeze
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = "Foo @lang(function_call('foo(blah)')) bar";
-		$expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
+		$expected = "Foo <?php echo \Illuminate\Support\Surrogates\Lang::get(function_call('foo(blah)')); ?> bar";
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
@@ -294,8 +294,8 @@ breeze
 	public function testLanguageAndChoicesAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
-		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
+		$this->assertEquals('<?php echo \Illuminate\Support\Surrogates\Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
+		$this->assertEquals('<?php echo \Illuminate\Support\Surrogates\Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
 	}
 
 

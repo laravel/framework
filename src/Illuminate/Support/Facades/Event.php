@@ -1,15 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-/**
- * @see \Illuminate\Events\Dispatcher
- */
-class Event extends Facade {
-
-	/**
-	 * Get the registered name of the component.
-	 *
-	 * @return string
-	 */
-	protected static function getFacadeAccessor() { return 'events'; }
-
-}
+<?php class_alias('Illuminate\Support\Surrogates\Event', 'Illuminate\Support\Facades\Event');
