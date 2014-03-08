@@ -113,7 +113,7 @@ abstract class Surrogate {
 	 */
 	public static function getFacadeRoot()
 	{
-		return static::resolveFacadeInstance(static::getFacadeAccessor());
+		return static::resolveSurrogateInstance(static::getFacadeAccessor());
 	}
 
 	/**
@@ -134,7 +134,7 @@ abstract class Surrogate {
 	 * @param  string  $name
 	 * @return mixed
 	 */
-	protected static function resolveFacadeInstance($name)
+	protected static function resolveSurrogateInstance($name)
 	{
 		if (is_object($name)) return $name;
 
@@ -144,6 +144,19 @@ abstract class Surrogate {
 		}
 
 		return static::$resolvedInstance[$name] = static::$app[$name];
+	}
+
+	/**
+	 * Backwards-compatible alias to resolveSurrogateInstance().
+	 *
+	 * @deprecated
+	 * @param  string  $name
+	 * @return mixed
+	 * @see resolveSurrogateInstance()
+	 */
+	protected static function resolveFacadeInstance($name)
+	{
+		return static::resolveSurrogateInstance($name);
 	}
 
 	/**
@@ -197,7 +210,7 @@ abstract class Surrogate {
 	 */
 	public static function __callStatic($method, $args)
 	{
-		$instance = static::resolveFacadeInstance(static::getFacadeAccessor());
+		$instance = static::resolveSurrogateInstance(static::getFacadeAccessor());
 
 		switch (count($args))
 		{

@@ -44,7 +44,7 @@ Once the Capsule instance has been registered. You may use it like so:
 ```PHP
 $users = Capsule::table('users')->where('votes', '>', 100)->get();
 ```
-Other core methods may be accessed directly from the Capsule in the same manner as from the DB facade:
+Other core methods may be accessed directly from the Capsule in the same manner as from the DB surrogate:
 ```PHP
 $results = Capsule::select('select * from users where id = ?', array(1));
 ```
