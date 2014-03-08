@@ -106,7 +106,10 @@ class Builder {
 	 */
 	public function first($columns = array('*'))
 	{
-		return $this->take(1)->get($columns)->first();
+        $oldLimit = $this->query->limit;
+        $toRet = $this->take(1)->get($columns)->first();
+        $this->query->limit = $oldLimit;
+		return $toRet;
 	}
 
 	/**
