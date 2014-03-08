@@ -7,11 +7,18 @@ use Illuminate\Container\Container;
 class SqsJob extends Job {
 
 	/**
+	 * The name of the queue the job belongs to.
+	 *
+	 * @var string
+	 */
+	protected $queue;
+
+	/**
 	 * The SqsQueue instance
 	 *
 	 * @var \Illuminate\Queue\SqsQueue
 	 */
-	protected $queue;
+	protected $sqsQueue;
 
 	/**
 	 * The Amazon SQS job instance.
@@ -41,7 +48,8 @@ class SqsJob extends Job {
                                 array $job,
 				$pushed = false)
 	{
-		$this->queue = $queue;
+		$this->sqsQueue = $queue;
+		$this->queue = $this->sqsQueue->getQueue();
 		$this->job = $job;
 		$this->pushed = $pushed;
 		$this->container = $container;
@@ -74,19 +82,19 @@ class SqsJob extends Job {
 	 */
 	public function delete()
 	{
-		$queueUrl = $this->queue->getQueue();
-
+		$queueUrl = $this->sqsQueue->getQueueUrl();
+	
 		parent::delete();
 
 		if ($this->pushed) 
 		{
-			$r = $this->queue->getRequest();
+			$r = $this->sqsQueue->getRequest();
 
 			$topic = $this->parseTopicArn($r, 'topic');
 
-			$queueUrl = $this->queue->getQueue($topic);
-
-			$response = $this->queue->getSqs()->receiveMessage(array(
+			$queueUrl = $this->sqsQueue->getQueueUrl($topic);
+	
+			$response = $this->sqsQueue->getSqs()->receiveMessage(array(
 
 				'QueueUrl' => $queueUrl
 			));
@@ -95,10 +103,12 @@ class SqsJob extends Job {
 		} 
 		else 
 		{
+			$queueUrl = $this->sqsQueue->getQueueUrl($this->queue);
+
 			$receiptHandle = $this->job['ReceiptHandle'];
 		}
 
-		$this->queue->getSqs()->deleteMessage(array(
+		$this->sqsQueue->getSqs()->deleteMessage(array(
 
 			'QueueUrl' => $queueUrl, 'ReceiptHandle' => $receiptHandle 
 		));
@@ -179,7 +189,7 @@ class SqsJob extends Job {
 	 */
 	public function getSqsQueue()
 	{
-		return $this->queue;
+		return $this->sqsQueue;
 	}
 
 }

@@ -49,22 +49,22 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 						     						'MessageId' => $this->mockedMessageId))));
 	}
 
-	public function testGetQueueCallsGetBaseUrlAndBuildsQueueUrl()
+	public function testGetQueueUrlCallsGetBaseUrlAndBuildsQueueUrl()
 	{
 		$queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->queueName, $this->account);
 		$this->sqs->shouldReceive('getBaseUrl')->once()->andReturn($this->baseUrl);
-		$resultQueueUrl = $queue->getQueue($this->queueName);
+		$resultQueueUrl = $queue->getQueueUrl($this->queueName);
 		$this->assertEquals($this->queueUrl, $resultQueueUrl);
 		$this->sqs->shouldReceive('getBaseUrl')->once()->andReturn('https://bar');
-		$resultQueueUrl = $queue->getQueue($this->queueName);
+		$resultQueueUrl = $queue->getQueueUrl($this->queueName);
 		$this->assertNotEquals($this->queueUrl, $resultQueueUrl);
 	}
 
 	public function testPopProperlyPopsJobOffOfSqs()
 	{
-		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueueUrl'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
 		$queue->setContainer(m::mock('Illuminate\Container\Container'));
-		$queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+		$queue->expects($this->once())->method('getQueueUrl')->with($this->queueName)->will($this->returnValue($this->queueUrl));
 		$this->sqs->shouldReceive('receiveMessage')->once()->with(array('QueueUrl' => $this->queueUrl, 'AttributeNames' => array('ApproximateReceiveCount')))->andReturn($this->mockedReceiveMessageResponseModel);
 		$result = $queue->pop($this->queueName);
 		$this->assertInstanceOf('Illuminate\Queue\Jobs\SqsJob', $result);
@@ -72,10 +72,10 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
 	{
-		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPayload', 'getQueue', 'getSeconds'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPayload', 'getQueueUrl', 'getSeconds'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
 		$queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
 		$queue->expects($this->once())->method('getSeconds')->with($this->mockedDateTime)->will($this->returnValue($this->mockedDateTime));
-		$queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+		$queue->expects($this->once())->method('getQueueUrl')->with($this->queueName)->will($this->returnValue($this->queueUrl));
 		$this->sqs->shouldReceive('sendMessage')->once()->with(array('QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => $this->mockedDateTime))->andReturn($this->mockedSendMessageResponseModel);
 		$id = $queue->later($this->mockedDateTime, $this->mockedJob, $this->mockedData, $this->queueName);
 		$this->assertEquals($this->mockedMessageId, $id);
@@ -83,10 +83,10 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testDelayedPushProperlyPushesJobOntoSqs()
 	{
-		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPayload', 'getQueue', 'getSeconds'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPayload', 'getQueueUrl', 'getSeconds'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
 		$queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
 		$queue->expects($this->once())->method('getSeconds')->with($this->mockedDelay)->will($this->returnValue($this->mockedDelay));
-		$queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+		$queue->expects($this->once())->method('getQueueUrl')->with($this->queueName)->will($this->returnValue($this->queueUrl));
 		$this->sqs->shouldReceive('sendMessage')->once()->with(array('QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => $this->mockedDelay))->andReturn($this->mockedSendMessageResponseModel);
 		$id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->queueName);
 		$this->assertEquals($this->mockedMessageId, $id);
@@ -94,9 +94,9 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPushProperlyPushesJobOntoSqs()
 	{
-		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPayload', 'getQueue'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPayload', 'getQueueUrl'), array($this->sqs, $this->sns, m::mock('Illuminate\Http\Request'), $this->account, $this->queueName));
 		$queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
-		$queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+		$queue->expects($this->once())->method('getQueueUrl')->with($this->queueName)->will($this->returnValue($this->queueUrl));
 		$this->sqs->shouldReceive('sendMessage')->once()->with(array('QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload))->andReturn($this->mockedSendMessageResponseModel);
 		$id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
 		$this->assertEquals($this->mockedMessageId, $id);

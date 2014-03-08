@@ -79,7 +79,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 */
 	public function pushRaw($payload, $queue = null, array $options = array())
 	{
-		$response = $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
+		$response = $this->sqs->sendMessage(array('QueueUrl' => $this->getQueueUrl($queue), 'MessageBody' => $payload));
 
 		return $response->get('MessageId');
 	}
@@ -101,7 +101,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 
 		return $this->sqs->sendMessage(array(
 
-			'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, 'DelaySeconds' => $delay,
+			'QueueUrl' => $this->getQueueUrl($queue), 'MessageBody' => $payload, 'DelaySeconds' => $delay,
 
 		))->get('MessageId');
 	}
@@ -114,10 +114,12 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 */
 	public function pop($queue = null)
 	{
-		$queue = $this->getQueue($queue);
+		$this->queue = $queue;
+
+		$queueUrl = $this->getQueueUrl($this->queue);
 
 		$response = $this->sqs->receiveMessage(
-			array('QueueUrl' => $queue, 'AttributeNames' => array('ApproximateReceiveCount'))
+			array('QueueUrl' => $queueUrl, 'AttributeNames' => array('ApproximateReceiveCount'))
 		);
 
 		if (count($response['Messages']) > 0)
@@ -174,12 +176,22 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	}
 
 	/**
-	 * Get the queue or return the default.
+	 * Get the queue name
+	 *
+	 * @return string
+	 */
+	public function getQueue()
+	{
+		return $this->queue;
+	}
+
+	/**
+	 * Get the full queue url based on the one passed in or the default.
 	 *
 	 * @param  string|null  $queue
 	 * @return string
 	 */
-	public function getQueue($queue = null)
+	public function getQueueUrl($queue = null)
 	{
 		return $this->sqs->getBaseUrl() . '/' . $this->account . '/' . ($queue ?: $this->queue);
 	}
