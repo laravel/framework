@@ -125,7 +125,7 @@ abstract class Surrogate {
 	 */
 	protected static function getFacadeAccessor()
 	{
-		throw new \RuntimeException("Facade does not implement getFacadeAccessor method.");
+		throw new \RuntimeException("Surrogate does not implement getFacadeAccessor method.");
 	}
 
 	/**

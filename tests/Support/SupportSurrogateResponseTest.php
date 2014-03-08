@@ -1,9 +1,9 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Surrogates\Response;
 
-class SupportFacadeResponseTest extends PHPUnit_Framework_TestCase {
+class SupportSurrogateResponseTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{

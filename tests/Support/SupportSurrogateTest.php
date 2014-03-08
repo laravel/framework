@@ -2,12 +2,12 @@
 
 use Mockery as m;
 
-class SupportFacadeTest extends PHPUnit_Framework_TestCase {
+class SupportSurrogateTest extends PHPUnit_Framework_TestCase {
 
 	public function setUp()
 	{
-		Illuminate\Support\Facades\Facade::clearResolvedInstances();
-		FacadeStub::setFacadeApplication(null);
+		Illuminate\Support\Surrogates\Surrogate::clearResolvedInstances();
+		SurrogateStub::setFacadeApplication(null);
 	}
 
 
@@ -17,13 +17,13 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testFacadeCallsUnderlyingApplication()
+	public function testSurrogateCallsUnderlyingApplication()
 	{
 		$app = new ApplicationStub;
 		$app->setAttributes(array('foo' => $mock = m::mock('StdClass')));
 		$mock->shouldReceive('bar')->once()->andReturn('baz');
-		FacadeStub::setFacadeApplication($app);
-		$this->assertEquals('baz', FacadeStub::bar());
+		SurrogateStub::setFacadeApplication($app);
+		$this->assertEquals('baz', SurrogateStub::bar());
 	}
 
 
@@ -31,9 +31,9 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	{
 		$app = new ApplicationStub;
 		$app->setAttributes(array('foo' => new StdClass));
-		FacadeStub::setFacadeApplication($app);
+		SurrogateStub::setFacadeApplication($app);
 
-		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
+		$this->assertInstanceOf('Mockery\MockInterface', $mock = SurrogateStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
 		$this->assertEquals('baz', $app['foo']->foo('bar'));
 	}
 
@@ -41,10 +41,10 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	{
 		$app = new ApplicationStub;
 		$app->setAttributes(array('foo' => new StdClass));
-		FacadeStub::setFacadeApplication($app);
+		SurrogateStub::setFacadeApplication($app);
 
-		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
-		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
+		$this->assertInstanceOf('Mockery\MockInterface', $mock = SurrogateStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
+		$this->assertInstanceOf('Mockery\MockInterface', $mock = SurrogateStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
 		$this->assertEquals('baz', $app['foo']->foo('bar'));
 		$this->assertEquals('baz2', $app['foo']->foo2('bar2'));
 	}
@@ -52,13 +52,13 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 
 	public function testCanBeMockedWithoutUnderlyingInstance()
 	{
-		FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
-		$this->assertEquals('bar', FacadeStub::foo());
+		SurrogateStub::shouldReceive('foo')->once()->andReturn('bar');
+		$this->assertEquals('bar', SurrogateStub::foo());
 	}
 
 }
 
-class FacadeStub extends Illuminate\Support\Facades\Facade {
+class SurrogateStub extends Illuminate\Support\Surrogates\Surrogate {
 
 	protected static function getFacadeAccessor()
 	{
