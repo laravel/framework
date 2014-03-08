@@ -30,7 +30,7 @@ if ( ! function_exists('app'))
 			return app()->make($make);
 		}
 
-		return Illuminate\Support\Facades\Facade::getFacadeApplication();
+		return Illuminate\Support\Facades\Surrogate::getFacadeApplication();
 	}
 }
 

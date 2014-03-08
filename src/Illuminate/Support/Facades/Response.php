@@ -40,7 +40,7 @@ class Response {
 	 */
 	public static function view($view, $data = array(), $status = 200, array $headers = array())
 	{
-		$app = Facade::getFacadeApplication();
+		$app = Surrogate::getFacadeApplication();
 
 		return static::make($app['view']->make($view, $data), $status, $headers);
 	}

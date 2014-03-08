@@ -88,9 +88,9 @@ if (isset($unitTesting))
 |
 */
 
-Facade::clearResolvedInstances();
+Surrogate::clearResolvedInstances();
 
-Facade::setFacadeApplication($app);
+Surrogate::setFacadeApplication($app);
 
 /*
 |--------------------------------------------------------------------------

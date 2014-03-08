@@ -762,7 +762,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$this->instance('request', $request);
 
-		Facade::clearResolvedInstance('request');
+		Surrogate::clearResolvedInstance('request');
 	}
 
 	/**
