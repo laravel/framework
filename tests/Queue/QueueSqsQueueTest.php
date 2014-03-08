@@ -111,8 +111,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$request->shouldReceive('json')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
 		$pushedJob = array(
 			'MessageId' => 'message-id',
-			'Body' => json_encode(array('foo' => 'bar')),
-			'pushed' => true,
+			'Body' => json_encode(array('foo' => 'bar'))
 		);
 		$queue->expects($this->once())->method('createPushedSqsJob')->with($this->equalTo($pushedJob))->will($this->returnValue($mockSqsJob = m::mock('StdClass')));
 		$mockSqsJob->shouldReceive('fire')->once();

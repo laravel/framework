@@ -1,16 +1,17 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use Aws\Sqs\SqsClient;
+use RuntimeException;
+use Illuminate\Queue\SqsQueue;
 use Illuminate\Container\Container;
 
 class SqsJob extends Job {
 
 	/**
-	 * The Amazon SQS client instance.
+	 * The SqsQueue instance
 	 *
-	 * @var \Aws\Sqs\SqsClient
+	 * @var \Illuminate\Queue\SqsQueue
 	 */
-	protected $sqs;
+	protected $queue;
 
 	/**
 	 * The Amazon SQS job instance.
@@ -24,26 +25,24 @@ class SqsJob extends Job {
 	 *
 	 * @var bool
 	 */
-	protected $pushed = false;
+	protected $pushed;
 
 	/**
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @param  \Aws\Sqs\SqsClient  $sqs
+	 * @param  \Illuminate\Queue\SqsQueue  $queue
 	 * @param  array   $job
-	 * @param  string  $queue
+	 * @param  boolean $pushed
 	 * @return void
 	 */
 	public function __construct(Container $container,
-                                SqsClient $sqs,
+                                SqsQueue $queue,
                                 array $job,
-                                $queue,
 				$pushed = false)
 	{
-		$this->sqs = $sqs;
-		$this->job = $job;
 		$this->queue = $queue;
+		$this->job = $job;
 		$this->pushed = $pushed;
 		$this->container = $container;
 	}
@@ -75,15 +74,51 @@ class SqsJob extends Job {
 	 */
 	public function delete()
 	{
+		$queueUrl = $this->queue->getQueue();
+
 		parent::delete();
 
-		if (isset($this->job['pushed'])) return;
+		if ($this->pushed) 
+		{
+			$r = $this->queue->getRequest();
 
-		$this->sqs->deleteMessage(array(
+			$topic = $this->parseTopicArn($r, 'topic');
 
-			'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
+			$queueUrl = $this->queue->getQueue($topic);
 
+			$response = $this->queue->getSqs()->receiveMessage(array(
+
+				'QueueUrl' => $queueUrl
+			));
+
+			$receiptHandle = $response->toArray()['Messages'][0]['ReceiptHandle'];
+		} 
+		else 
+		{
+			$receiptHandle = $this->job['ReceiptHandle'];
+		}
+
+		$this->queue->getSqs()->deleteMessage(array(
+
+			'QueueUrl' => $queueUrl, 'ReceiptHandle' => $receiptHandle 
 		));
+	}
+
+	/**
+	 * Parse the topic arn for a specific piece of data
+	 * 
+	 * @param  string  $piece
+	 * @return string
+	 */
+	public function parseTopicArn($request, $piece)
+	{
+		$pieces = array('arn', 'aws', 'service', 'region', 'account', 'topic');
+
+		if( ! in_array($piece, $pieces)) throw new RuntimeException("The target piece is not part of the TopicArn."); 
+
+		list($arn, $aws, $service, $region, $account, $topic) = explode(":", $request->header('x-amz-sns-topic-arn'));
+	
+		return compact($pieces)[$piece];
 	}
 
 	/**
@@ -128,16 +163,6 @@ class SqsJob extends Job {
 	}
 
 	/**
-	 * Get the underlying SQS client instance.
-	 *
-	 * @return \Aws\Sqs\SqsClient
-	 */
-	public function getSqs()
-	{
-		return $this->sqs;
-	}
-
-	/**
 	 * Get the underlying raw SQS job.
 	 *
 	 * @return array
@@ -145,6 +170,16 @@ class SqsJob extends Job {
 	public function getSqsJob()
 	{
 		return $this->job;
+	}
+
+	/**
+	 * Get the underlying raw SqsQueue.
+	 *
+	 * @return Illuminate\Queue\SqsQueue
+	 */
+	public function getSqsQueue()
+	{
+		return $this->queue;
 	}
 
 }

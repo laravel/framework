@@ -24,18 +24,18 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	protected $sns;
 
 	/**
-	 * The account associated with the default tube
+	 * The account associated with the default queue
 	 *
 	 * @var string
 	 */
 	protected $account;
 
 	/**
-	 * The name of the default tube.
+	 * The name of the default queue.
 	 *
 	 * @var string
 	 */
-	protected $default;
+	protected $queue;
 
 	/**
 	 * Create a new Amazon SQS queue instance.
@@ -43,16 +43,16 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 * @param  \Aws\Sqs\SqsClient  $sqs 
 	 * @param  \Aws\Sns\SnsClient  $sns
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  string  $default
+	 * @param  string  $queue
 	 * @param  string  $account
 	 * @return void
 	 */
-	public function __construct(SqsClient $sqs, SnsClient $sns, Request $request, $default, $account)
+	public function __construct(SqsClient $sqs, SnsClient $sns, Request $request, $queue, $account)
 	{
 		$this->sqs = $sqs;
 		$this->sns = $sns;
 		$this->request = $request;
-		$this->default = $default;
+		$this->queue = $queue;
 		$this->account = $account;
 	}
 
@@ -122,7 +122,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 
 		if (count($response['Messages']) > 0)
 		{
-			return new SqsJob($this->container, $this->sqs, $response['Messages'][0], $queue);
+			return new SqsJob($this->container, $this, $response['Messages'][0]);
 		}
 	}
 
@@ -158,8 +158,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 
 		return array(
 			'MessageId' => $this->parseOutMessageId($r),
-			'Body' => $this->parseOutMessage($r),
-			'pushed' => true,
+			'Body' => $this->parseOutMessage($r)
 		);
 	}
 
@@ -171,7 +170,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	*/
 	protected function createPushedSqsJob($job)
 	{
-		return new SqsJob($this->container, $this->sqs, $job, $this, true);
+		return new SqsJob($this->container, $this, $job, true);
 	}
 
 	/**
@@ -180,10 +179,9 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	 * @param  string|null  $queue
 	 * @return string
 	 */
-	public function getQueue($queue)
+	public function getQueue($queue = null)
 	{
-		//return $this->sqs->getQueueUrl(array('QueueName'=>($queue ?: $this->default), 'QueueOwnerAWSAccountId' => $this->account))['QueueUrl'];
-		return $this->sqs->getBaseUrl() . '/' . $this->account . '/' . ($queue ?: $this->default);
+		return $this->sqs->getBaseUrl() . '/' . $this->account . '/' . ($queue ?: $this->queue);
 	}
 
 	/**
@@ -196,7 +194,7 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	{
 		$snsMessageId = $request->header('x-amz-sns-message-id');
 		$sqsMessageId = $request->header('x-aws-sqsd-msgid');
-		
+
 		if(($sqsMessageId == null) && ($snsMessageId == null))
 		{
 			throw new RuntimeException("The marshaled job must come from either SQS or SNS.");	
@@ -214,6 +212,16 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	protected function parseOutMessage($request)
 	{
 		return stripslashes($request->json('Message'));
+	}
+
+	/**
+	 * Get the request associated with the object
+	 *
+	 * @return \Illuminate\Http\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
 	}
 
 	/**
