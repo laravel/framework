@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Hash extends \Illuminate\Support\Surrogates\Hash {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Hash', 'Illuminate\Support\Facades\Hash');

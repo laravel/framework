@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Crypt extends \Illuminate\Support\Surrogates\Crypt {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Crypt', 'Illuminate\Support\Facades\Crypt');

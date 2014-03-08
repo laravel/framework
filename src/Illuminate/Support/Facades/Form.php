@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Form extends \Illuminate\Support\Surrogates\Form {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Form', 'Illuminate\Support\Facades\Form');

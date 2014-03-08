@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class HTML extends \Illuminate\Support\Surrogates\HTML {
-}
+<?php class_alias('Illuminate\Support\Surrogates\HTML', 'Illuminate\Support\Facades\HTML');

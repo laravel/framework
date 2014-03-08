@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Schema extends \Illuminate\Support\Surrogates\Schema {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Schema', 'Illuminate\Support\Facades\Schema');

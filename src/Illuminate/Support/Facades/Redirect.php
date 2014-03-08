@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Redirect extends \Illuminate\Support\Surrogates\Redirect {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Redirect', 'Illuminate\Support\Facades\Redirect');

@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class DB extends \Illuminate\Support\Surrogates\DB {
-}
+<?php class_alias('Illuminate\Support\Surrogates\DB', 'Illuminate\Support\Facades\DB');

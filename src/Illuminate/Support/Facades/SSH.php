@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class SSH extends \Illuminate\Support\Surrogates\SSH {
-}
+<?php class_alias('Illuminate\Support\Surrogates\SSH', 'Illuminate\Support\Facades\SSH');

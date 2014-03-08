@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Input extends \Illuminate\Support\Surrogates\Input {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Input', 'Illuminate\Support\Facades\Input');

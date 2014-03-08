@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Cache extends \Illuminate\Support\Surrogates\Cache {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Cache', 'Illuminate\Support\Facades\Cache');

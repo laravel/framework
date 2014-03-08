@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Log extends \Illuminate\Support\Surrogates\Log {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Log', 'Illuminate\Support\Facades\Log');

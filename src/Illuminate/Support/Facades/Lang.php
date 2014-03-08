@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Lang extends \Illuminate\Support\Surrogates\Lang {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Lang', 'Illuminate\Support\Facades\Lang');

@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Cookie extends \Illuminate\Support\Surrogates\Cookie {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Cookie', 'Illuminate\Support\Facades\Cookie');

@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Session extends \Illuminate\Support\Surrogates\Session {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Session', 'Illuminate\Support\Facades\Session');

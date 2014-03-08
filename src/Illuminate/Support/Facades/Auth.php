@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Auth extends \Illuminate\Support\Surrogates\Auth {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Auth', 'Illuminate\Support\Facades\Auth');

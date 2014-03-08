@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Redis extends \Illuminate\Support\Surrogates\Redis {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Redis', 'Illuminate\Support\Facades\Redis');

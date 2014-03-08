@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Paginator extends \Illuminate\Support\Surrogates\Paginator {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Paginator', 'Illuminate\Support\Facades\Paginator');

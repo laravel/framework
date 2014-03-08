@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Event extends \Illuminate\Support\Surrogates\Event {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Event', 'Illuminate\Support\Facades\Event');

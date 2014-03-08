@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Response extends \Illuminate\Support\Surrogates\Response {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Response', 'Illuminate\Support\Facades\Response');

@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class File extends \Illuminate\Support\Surrogates\File {
-}
+<?php class_alias('Illuminate\Support\Surrogates\File', 'Illuminate\Support\Facades\File');

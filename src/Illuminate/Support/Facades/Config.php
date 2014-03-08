@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Config extends \Illuminate\Support\Surrogates\Config {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Config', 'Illuminate\Support\Facades\Config');

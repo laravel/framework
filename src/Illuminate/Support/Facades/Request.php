@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Request extends \Illuminate\Support\Surrogates\Request {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Request', 'Illuminate\Support\Facades\Request');

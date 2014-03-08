@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Queue extends \Illuminate\Support\Surrogates\Queue {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Queue', 'Illuminate\Support\Facades\Queue');

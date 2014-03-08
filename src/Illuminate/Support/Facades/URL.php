@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class URL extends \Illuminate\Support\Surrogates\URL {
-}
+<?php class_alias('Illuminate\Support\Surrogates\URL', 'Illuminate\Support\Facades\URL');

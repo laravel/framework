@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Artisan extends \Illuminate\Support\Surrogates\Artisan {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Artisan', 'Illuminate\Support\Facades\Artisan');

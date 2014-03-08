@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Mail extends \Illuminate\Support\Surrogates\Mail {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Mail', 'Illuminate\Support\Facades\Mail');

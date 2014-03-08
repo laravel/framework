@@ -1,4 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-class Password extends \Illuminate\Support\Surrogates\Password {
-}
+<?php class_alias('Illuminate\Support\Surrogates\Password', 'Illuminate\Support\Facades\Password');
