@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 use Illuminate\Encryption\Encrypter;
+use RuntimeException;
 
 class IronQueue extends PushQueue implements QueueInterface {
 
@@ -158,6 +159,8 @@ class IronQueue extends PushQueue implements QueueInterface {
 	 */
 	public function marshal()
 	{
+		$r = $this->request;
+
 		$this->createPushedIronJob($this->marshalPushedJob())->fire();
 
 		return new Response('OK');
@@ -172,10 +175,11 @@ class IronQueue extends PushQueue implements QueueInterface {
 	{
 		$r = $this->request;
 
+		$messageId = $this->parseOutMessageId($r);
 		$body = $this->parseJobBody($r->getContent());
 
 		return (object) array(
-			'id' => $r->header('iron-message-id'), 'body' => $body, 'pushed' => true,
+			'id' => $messageId, 'body' => $body, 'pushed' => true,
 		);
 	}
 
@@ -203,6 +207,24 @@ class IronQueue extends PushQueue implements QueueInterface {
 		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
 
 		return $this->setMeta($payload, 'queue', $this->getQueue($queue));
+	}
+
+	/**
+	 * Parse out the message id from the request header
+	 *
+	 * @param  Request $request
+	 * @return string
+	 */
+	protected function parseOutMessageId($request)
+	{
+		$messageId = $request->header('iron-message-id');
+
+		if($messageId == null)
+		{
+			throw new RuntimeException("The marshaled job must come from IronMQ.");	
+		}
+
+		return $messageId;
 	}
 
 	/**
