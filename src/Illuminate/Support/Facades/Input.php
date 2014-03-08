@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Http\Request
  */
-class Input extends Facade {
+class Input extends Surrogate {
 
 	/**
 	 * Get an item from the input data.

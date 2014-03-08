@@ -4,7 +4,7 @@
  * @see \Illuminate\Remote\RemoteManager
  * @see \Illuminate\Remote\Connection
  */
-class SSH extends Facade {
+class SSH extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Foundation\Artisan
  */
-class Artisan extends Facade {
+class Artisan extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

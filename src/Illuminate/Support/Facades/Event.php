@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Events\Dispatcher
  */
-class Event extends Facade {
+class Event extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

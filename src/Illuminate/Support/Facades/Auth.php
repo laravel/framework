@@ -4,7 +4,7 @@
  * @see \Illuminate\Auth\AuthManager
  * @see \Illuminate\Auth\Guard
  */
-class Auth extends Facade {
+class Auth extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

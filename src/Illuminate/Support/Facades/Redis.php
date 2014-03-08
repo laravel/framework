@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Redis\Database
  */
-class Redis extends Facade {
+class Redis extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

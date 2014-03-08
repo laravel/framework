@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Translation\Translator
  */
-class Lang extends Facade {
+class Lang extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

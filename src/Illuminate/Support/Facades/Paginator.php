@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Pagination\Environment
  */
-class Paginator extends Facade {
+class Paginator extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

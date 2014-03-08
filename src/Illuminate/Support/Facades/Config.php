@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Config\Repository
  */
-class Config extends Facade {
+class Config extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

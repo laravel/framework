@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\View\Environment
  */
-class View extends Facade {
+class View extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

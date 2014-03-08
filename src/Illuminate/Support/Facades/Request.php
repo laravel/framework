@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Http\Request
  */
-class Request extends Facade {
+class Request extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

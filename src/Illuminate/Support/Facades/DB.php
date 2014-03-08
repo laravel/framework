@@ -4,7 +4,7 @@
  * @see \Illuminate\Database\DatabaseManager
  * @see \Illuminate\Database\Connection
  */
-class DB extends Facade {
+class DB extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

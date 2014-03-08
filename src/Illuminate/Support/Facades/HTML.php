@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Html\HtmlBuilder
  */
-class HTML extends Facade {
+class HTML extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

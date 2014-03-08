@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Hashing\BcryptHasher
  */
-class Hash extends Facade {
+class Hash extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

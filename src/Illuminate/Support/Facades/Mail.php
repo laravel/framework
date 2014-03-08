@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Mail\Mailer
  */
-class Mail extends Facade {
+class Mail extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.

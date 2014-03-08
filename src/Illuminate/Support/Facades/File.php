@@ -3,7 +3,7 @@
 /**
  * @see \Illuminate\Filesystem\Filesystem
  */
-class File extends Facade {
+class File extends Surrogate {
 
 	/**
 	 * Get the registered name of the component.
