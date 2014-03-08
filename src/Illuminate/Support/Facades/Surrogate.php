@@ -5,7 +5,7 @@ use Mockery\MockInterface;
 abstract class Surrogate {
 
 	/**
-	 * The application instance being facaded.
+	 * The application instance using surrogates.
 	 *
 	 * @var \Illuminate\Foundation\Application
 	 */
@@ -19,7 +19,7 @@ abstract class Surrogate {
 	protected static $resolvedInstance;
 
 	/**
-	 * Hotswap the underlying instance behind the facade.
+	 * Hotswap the underlying instance behind the surrogate.
 	 *
 	 * @param  mixed  $instance
 	 * @return void
@@ -32,7 +32,7 @@ abstract class Surrogate {
 	}
 
 	/**
-	 * Initiate a mock expectation on the facade.
+	 * Initiate a mock expectation on the surrogate.
 	 *
 	 * @param  dynamic
 	 * @return \Mockery\Expectation
@@ -85,7 +85,7 @@ abstract class Surrogate {
 	}
 
 	/**
-	 * Determines whether a mock is set as the instance of the facade.
+	 * Determines whether a mock is set as the instance behind the surrogate.
 	 *
 	 * @return bool
 	 */
@@ -107,7 +107,7 @@ abstract class Surrogate {
 	}
 
 	/**
-	 * Get the root object behind the facade.
+	 * Get the root object behind the surrogate.
 	 *
 	 * @return mixed
 	 */
@@ -129,7 +129,7 @@ abstract class Surrogate {
 	}
 
 	/**
-	 * Resolve the facade root instance from the container.
+	 * Resolve the surrogate root instance from the container.
 	 *
 	 * @param  string  $name
 	 * @return mixed
@@ -147,7 +147,7 @@ abstract class Surrogate {
 	}
 
 	/**
-	 * Clear a resolved facade instance.
+	 * Clear a resolved surrogate instance.
 	 *
 	 * @param  string  $name
 	 * @return void
@@ -168,7 +168,7 @@ abstract class Surrogate {
 	}
 
 	/**
-	 * Get the application instance behind the facade.
+	 * Get the application instance behind the surrogate.
 	 *
 	 * @return \Illuminate\Foundation\Application
 	 */

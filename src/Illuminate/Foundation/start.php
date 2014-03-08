@@ -55,7 +55,7 @@ use Illuminate\Config\Repository as Config;
 |
 | This may look strange, but we actually want to bind the app into itself
 | in case we need to Facade test an application. This will allow us to
-| resolve the "app" key out of this container for this app's facade.
+| resolve the "app" key out of this container for this app's surrogate.
 |
 */
 
@@ -79,12 +79,12 @@ if (isset($unitTesting))
 
 /*
 |--------------------------------------------------------------------------
-| Load The Illuminate Facades
+| Load The Illuminate Surrogates
 |--------------------------------------------------------------------------
 |
-| The facades provide a terser static interface over the various parts
-| of the application, allowing their methods to be accessed through
-| a mixtures of magic methods and facade derivatives. It's slick.
+| Each surrogate provides a static proxy to a container instance, allowing
+| the instance methods to be accessed through a mixtures of magic methods
+| and surrogate derivatives. It's slick.
 |
 */
 
