@@ -6,7 +6,7 @@ use Illuminate\Http\Response;
 use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Surrogate;
+use Illuminate\Support\Surrogates\Surrogate;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
