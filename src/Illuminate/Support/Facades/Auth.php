@@ -1,16 +1,4 @@
 <?php namespace Illuminate\Support\Facades;
 
-/**
- * @see \Illuminate\Auth\AuthManager
- * @see \Illuminate\Auth\Guard
- */
-class Auth extends Surrogate {
-
-	/**
-	 * Get the registered name of the component.
-	 *
-	 * @return string
-	 */
-	protected static function getFacadeAccessor() { return 'auth'; }
-
+class Auth extends \Illuminate\Support\Surrogates\Auth {
 }

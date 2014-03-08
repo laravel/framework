@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Support\Facades;
+<?php namespace Illuminate\Support\Surrogates;
 
 use Mockery\MockInterface;
 
