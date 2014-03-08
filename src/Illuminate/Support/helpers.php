@@ -18,7 +18,7 @@ if ( ! function_exists('action'))
 if ( ! function_exists('app'))
 {
 	/**
-	 * Get the root Facade application instance.
+	 * Get the root Surrogate application instance.
 	 *
 	 * @param  string  $make
 	 * @return mixed

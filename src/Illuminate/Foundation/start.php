@@ -54,7 +54,7 @@ use Illuminate\Config\Repository as Config;
 |--------------------------------------------------------------------------
 |
 | This may look strange, but we actually want to bind the app into itself
-| in case we need to Facade test an application. This will allow us to
+| in case we need to surrogate-test an application. This will allow us to
 | resolve the "app" key out of this container for this app's surrogate.
 |
 */
@@ -94,7 +94,7 @@ Surrogate::setFacadeApplication($app);
 
 /*
 |--------------------------------------------------------------------------
-| Register Facade Aliases To Full Classes
+| Register Surrogate Aliases To Full Classes
 |--------------------------------------------------------------------------
 |
 | By default, we use short keys in the container for each of the core
