@@ -606,7 +606,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation = new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation->polymorph = array('type' => $type, 'id' => $id);
+		return $relation;
 	}
 
 	/**
@@ -677,7 +679,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$class = $this->$type;
 
-		return $this->belongsTo($class, $id);
+		$relation = $this->belongsTo($class, $id);
+		$relation->polymorph = array('type' => $type, 'id' => $id);
+		return $relation;
 	}
 
 	/**
@@ -742,7 +746,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation = new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$relation->polymorph = array('type' => $type, 'id' => $id);
+		return $relation;
 	}
 
 	/**

@@ -37,12 +37,61 @@ class Collection extends BaseCollection {
 		{
 			if (is_string($relations)) $relations = func_get_args();
 
+			$this->loadPolymorphics($relations);
+
 			$query = $this->first()->newQuery()->with($relations);
 
 			$this->items = $query->eagerLoadRelations($this->items);
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Loads the polymorphic relations for the collection
+	 *
+	 * @param dynamic $relations
+	 */
+	protected function loadPolymorphics(&$relations)
+	{
+
+		foreach ($relations as $relationKey => $relation)
+		{
+			if(!method_exists($this->first(), $relation)) continue;
+			$relationship = $this->first()->$relation();
+			if(property_exists($relationship, 'polymorph'))
+			{
+				// Now we know we are working with a polymorphic relation we split the
+				// models into their own type collection we split off those that have no
+				// type since the relationship has not been established for them.
+				$modelSets = array('types' => array(), 'noType' => array());
+				foreach ($this->items as $model)
+				{
+					$relationship = $model->$relation();
+					$modelType = $model->{$relationship->polymorph['type']};
+					if(!empty($modelType))
+					{
+						$modelSets['types'][$modelType][] = $model;
+					}
+					else
+					{
+						$modelSets['noType'][] = $model;
+					}
+				}
+				$this->items = array();
+				// Next up we loop over each collection and (lazy) eager load the relations
+				// which works as every model in the collection has the same polymorphic type
+				foreach ($modelSets['types'] as $modelCollection)
+				{
+					$query = current($modelCollection)->newQuery()->with($relations);
+					$this->items = $this->merge($query->eagerLoadRelations($modelCollection))->all();
+				}
+				$this->items = $this->merge($modelSets['noType'])->all();
+
+				// Now we unset the relationship since we have already dealt with it here
+				unset($relations[$relationKey]);
+			}
+		}
 	}
 
 	/**
