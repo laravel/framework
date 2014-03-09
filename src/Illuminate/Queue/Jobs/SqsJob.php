@@ -7,11 +7,11 @@ use Illuminate\Container\Container;
 class SqsJob extends Job {
 
 	/**
-	 * The name of the queue the job belongs to.
+	 * The Amazon SQS job instance.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	protected $queue;
+	protected $job;
 
 	/**
 	 * The SqsQueue instance
@@ -19,13 +19,6 @@ class SqsJob extends Job {
 	 * @var \Illuminate\Queue\SqsQueue
 	 */
 	protected $sqsQueue;
-
-	/**
-	 * The Amazon SQS job instance.
-	 *
-	 * @var array
-	 */
-	protected $job;
 
 	/**
 	 * Indicates if the message was a push message.
@@ -48,11 +41,10 @@ class SqsJob extends Job {
                                 array $job,
 				$pushed = false)
 	{
+		$this->container = $container;
 		$this->sqsQueue = $queue;
-		$this->queue = $this->sqsQueue->getQueue();
 		$this->job = $job;
 		$this->pushed = $pushed;
-		$this->container = $container;
 	}
 
 	/**
@@ -82,35 +74,37 @@ class SqsJob extends Job {
 	 */
 	public function delete()
 	{
-		$queueUrl = $this->sqsQueue->getQueueUrl();
+		$queueUrl = $this->getSqsQueue()->getQueueUrl();
 	
 		parent::delete();
 
-		if ($this->pushed) 
+		if ($this->isPushed()) 
 		{
-			$r = $this->sqsQueue->getRequest();
+			$r = $this->getSqsQueue()->getRequest();
 
 			$topic = $this->parseTopicArn($r, 'topic');
 
-			$queueUrl = $this->sqsQueue->getQueueUrl($topic);
+			$queueUrl = $this->getSqsQueue()->getQueueUrl($topic);
 	
-			$response = $this->sqsQueue->getSqs()->receiveMessage(array(
+			$response = $this->getSqsQueue()->getSqs()->receiveMessage(array(
 
 				'QueueUrl' => $queueUrl
+
 			));
 
 			$receiptHandle = $response->toArray()['Messages'][0]['ReceiptHandle'];
 		} 
 		else 
 		{
-			$queueUrl = $this->sqsQueue->getQueueUrl($this->queue);
+			$queueUrl = $this->getSqsQueue()->getQueueUrl();
 
 			$receiptHandle = $this->job['ReceiptHandle'];
 		}
 
-		$this->sqsQueue->getSqs()->deleteMessage(array(
+		$this->getSqsQueue()->getSqs()->deleteMessage(array(
 
 			'QueueUrl' => $queueUrl, 'ReceiptHandle' => $receiptHandle 
+
 		));
 	}
 
@@ -163,16 +157,6 @@ class SqsJob extends Job {
 	}
 
 	/**
-	 * Get the IoC container instance.
-	 *
-	 * @return \Illuminate\Container\Container
-	 */
-	public function getContainer()
-	{
-		return $this->container;
-	}
-
-	/**
 	 * Get the underlying raw SQS job.
 	 *
 	 * @return array
@@ -190,6 +174,16 @@ class SqsJob extends Job {
 	public function getSqsQueue()
 	{
 		return $this->sqsQueue;
+	}
+
+	/**
+	 * Check whether this is a pushed job
+	 *
+	 * @return boolean
+	 */
+	public function isPushed()
+	{
+		return $this->pushed;
 	}
 
 }

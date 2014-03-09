@@ -80,7 +80,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueueUrl'), array($this->mockedSqsClient, $this->sns, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
 		$queue->expects($this->at(0))->method('getQueueUrl')->with(null)->will($this->returnValue($this->queueUrl));
-		$queue->expects($this->at(1))->method('getQueueUrl')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+		$queue->expects($this->at(1))->method('getQueueUrl')->with(null)->will($this->returnValue($this->queueUrl));
 		$job = $this->getJob($queue);
 		$job->getSqsQueue()->getSqs()->expects($this->once())->method('deleteMessage')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle));	
 		$job->delete();

@@ -24,18 +24,18 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	protected $sns;
 
 	/**
-	 * The account associated with the default queue
-	 *
-	 * @var string
-	 */
-	protected $account;
-
-	/**
 	 * The name of the default queue.
 	 *
 	 * @var string
 	 */
 	protected $queue;
+
+	/**
+	 * The account associated with the default queue
+	 *
+	 * @var string
+	 */
+	protected $account;
 
 	/**
 	 * Create a new Amazon SQS queue instance.
@@ -124,15 +124,15 @@ class SqsQueue extends PushQueue implements QueueInterface {
 
 		if (count($response['Messages']) > 0)
 		{
-			return new SqsJob($this->container, $this, $response['Messages'][0]);
+			return $this->createSqsJob($response['Messages'][0]);
 		}
 	}
 
 	/**
-	* Marshal a push queue request and fire the job.
-	*
-	* @return \Illuminate\Http\Response
-	*/
+	 * Marshal a push queue request and fire the job.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
 	public function marshal()
 	{
 		$r = $this->request;
@@ -143,17 +143,17 @@ class SqsQueue extends PushQueue implements QueueInterface {
 		} 
 		else 
 		{
-			$this->createPushedSqsJob($this->marshalPushedJob())->fire();
+			$this->createSqsJob($this->marshalPushedJob(), $pushed = true)->fire();
 		}
 
 		return new Response('OK');
 	}
 
 	/**
-	* Marshal out the pushed job and payload.
-	*
-	* @return array
-	*/
+	 * Marshal out the pushed job and payload.
+	 *
+	 * @return array
+	 */
 	protected function marshalPushedJob()
 	{
 		$r = $this->request;
@@ -165,14 +165,15 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	}
 
 	/**
-	* Create a new SqsJob for a pushed job.
-	*
-	* @param  array  $job
-	* @return \Illuminate\Queue\Jobs\SqsJob
-	*/
-	protected function createPushedSqsJob($job)
+	 * Create a new SqsJob.
+	 *
+	 * @param  array  $job
+	 * @param  bool	  $pushed 
+	 * @return \Illuminate\Queue\Jobs\SqsJob
+	 */
+	protected function createSqsJob($job, $pushed = false)
 	{
-		return new SqsJob($this->container, $this, $job, true);
+		return new SqsJob($this->container, $this, $job, $pushed);
 	}
 
 	/**
