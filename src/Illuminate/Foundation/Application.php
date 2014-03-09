@@ -6,7 +6,7 @@ use Illuminate\Http\Response;
 use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\NotAFacades\NotAFacade;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
@@ -762,7 +762,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$this->instance('request', $request);
 
-		Facade::clearResolvedInstance('request');
+		NotAFacade::clearResolvedInstance('request');
 	}
 
 	/**
