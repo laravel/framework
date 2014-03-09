@@ -668,6 +668,8 @@ class Blueprint {
 		$this->unsignedInteger("{$name}_id");
 
 		$this->string("{$name}_type");
+
+		$this->index(array("{$name}_id", "{$name}_type"));
 	}
 
 	/**
