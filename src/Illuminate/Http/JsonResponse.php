@@ -6,13 +6,6 @@ use Illuminate\Support\Contracts\JsonableInterface;
 class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 
 	/**
-	 * The json encoding options.
-	 *
-	 * @var int
-	 */
-	protected $jsonOptions;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param  mixed  $data
@@ -32,14 +25,11 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 	 *
 	 * @param  bool $assoc
 	 * @param  int  $depth
-	 * @param  int  $options
 	 * @return mixed
 	 */
-	public function getData($assoc = false, $depth = 512, $options = null)
+	public function getData($assoc = false, $depth = 512)
 	{
-		$options = $options ?: $this->jsonOptions;
-
-		return json_decode($this->data, $assoc, $depth, $options);
+		return json_decode($this->data, $assoc, $depth);
 	}
 
 	/**
