@@ -857,13 +857,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => 'http://g232oogle.com'), array('x' => 'AlphaNum'));
 		$this->assertFalse($v->passes());
 		
-		$v = new Validator($trans, array('x' => '१२३'), array('x' => 'Alpha'));//numbers in Hindi
+		$v = new Validator($trans, array('x' => '१२३'), array('x' => 'AlphaNum'));//numbers in Hindi
 		$this->assertTrue($v->passes());
 		
 		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaNum'));//eastern arabic numerals
 		$this->assertTrue($v->passes());
 		
-		$v = new Validator($trans, array('x' => 'नमस्कार'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'नमस्कार'), array('x' => 'AlphaNum'));
 		$this->assertFalse($v->passes());
 	}
 
@@ -877,10 +877,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => 'http://-g232oogle.com'), array('x' => 'AlphaDash'));
 		$this->assertFalse($v->passes());
 		
-		$v = new Validator($trans, array('x' => 'नमस्कार-_'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'नमस्कार-_'), array('x' => 'AlphaDash'));
 		$this->assertTrue($v->passes());
 		
-		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaNum'));//eastern arabic numerals
+		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaDash'));//eastern arabic numerals
 		$this->assertFalse($v->passes());
 		
 	}
