@@ -3,6 +3,7 @@
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionParameter;
 
 class BindingResolutionException extends \Exception {}
@@ -507,19 +508,46 @@ class Container implements ArrayAccess {
 		return $reflector->newInstanceArgs($deps);
 	}
 
-	/**
-	 * Resolve all of the dependencies from the ReflectionParameters.
-	 *
-	 * @param  array  $parameters
-	 * @return array
-	 */
+    /**
+     * Resolve all of the dependencies from the ReflectionParameters.
+     *
+     * @param  array $parameters
+     *
+     * @throws \Exception
+     * @throws \ReflectionException
+     * @return array
+     */
 	protected function getDependencies($parameters)
 	{
 		$dependencies = array();
 
 		foreach ($parameters as $parameter)
 		{
-			$dependency = $parameter->getClass();
+            try {
+                $dependency = $parameter->getClass();
+            }
+
+            catch (ReflectionException $e) {
+
+                $className = $this->getTypeHint($parameter);
+
+                // We will check if the class is resolvable out of container. If yes then we
+                // alias the name to original class for any future request and re-iterate,
+                // otherwise just throw the exception generated in previous step
+                if($this->resolvable($className))
+                {
+                    $dependency = $this->make($className);
+                    class_alias(get_class($dependency), $className);
+                    $dependencies[] = $dependency;
+
+                    // We're done here. Move on
+                    continue;
+                }
+                else
+                {
+                    throw $e;
+                }
+            }
 
 			// If the class is null, it means the dependency is a string or some other
 			// primitive type which we can not resolve since it is not a class and
@@ -729,6 +757,19 @@ class Container implements ArrayAccess {
 	{
 		$this->instances = array();
 	}
+
+    /**
+     * @param ReflectionParameter $method
+     *
+     * @return string
+     */
+    public function getTypeHint(ReflectionParameter $method)
+    {
+        $result = array();
+        preg_match('/(?<=\>)\s?\w+\s?(?=\$)/', $method->__toString(), $result);
+
+        return trim($result[0]);
+    }
 
 	/**
 	 * Determine if a given offset exists.
