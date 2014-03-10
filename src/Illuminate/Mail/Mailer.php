@@ -317,7 +317,7 @@ class Mailer {
 	{
 		$emails = implode(', ', array_keys((array) $message->getTo()));
 
-		$this->logger->info("Pretending to mail message to: {$emails}");
+		$this->logger->info("Pretending to mail message to: {$emails} [Subject: {$message->getSubject()}] [Body: {$message->getBody()}]");
 	}
 
 	/**
