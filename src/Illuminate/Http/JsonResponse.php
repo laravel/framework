@@ -6,6 +6,13 @@ use Illuminate\Support\Contracts\JsonableInterface;
 class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 
 	/**
+	 * The json encoding options.
+	 *
+	 * @var int
+	 */
+	protected $jsonOptions;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param  mixed  $data
