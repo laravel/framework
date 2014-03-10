@@ -881,7 +881,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 		
 		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaDash'));//eastern arabic numerals
-		$this->assertFalse($v->passes());
+		$this->assertTrue($v->passes());
 		
 	}
 
