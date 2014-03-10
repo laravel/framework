@@ -260,6 +260,71 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($_SERVER['__test.rebind']);
 	}
 
+    public function testCanGetTypeHintWithoutInvokingAutoloader()
+    {
+        $container = new Container();
+
+        $method = new ReflectionMethod('ContainerDependentOnFacadeObjectStub', '__construct');
+        $argument = $method->getParameters();
+
+        $className = $container->getTypeHint($argument[0]);
+        $this->assertEquals('html', $className);
+    }
+
+    public function testResolveAndInjectClassBehindFacadeAsDependency()
+    {
+        $container = new Container;
+        $container->bind('html', function()
+        {
+            return new FacadeObjectStub();
+        });
+
+        $instance = $container->make('ContainerDependentOnFacadeObjectStub');
+
+        $this->assertInstanceOf('ContainerDependentOnFacadeObjectStub', $instance);
+        $this->assertInstanceOf('FacadeObjectStub', $instance->html);
+    }
+
+    public function testResolveAndInjectClassViaClassAlias()
+    {
+        $container = new Container;
+        $container->bind('html', function()
+        {
+            return new FacadeObjectStub();
+        });
+
+        $instance = $container->make('ContainerDependentOnFacadeObjectStub');
+        $instanceTwo = $container->make('ContainerDependentOnFacadeObjectStub');
+        $instanceThree = $container->make('ContainerDependentOnFacadeObjectStub');
+
+        $this->assertInstanceOf('ContainerDependentOnFacadeObjectStub', $instance);
+        $this->assertInstanceOf('ContainerDependentOnFacadeObjectStub', $instanceTwo);
+        $this->assertInstanceOf('ContainerDependentOnFacadeObjectStub', $instanceThree);
+        $this->assertInstanceOf('FacadeObjectStub', $instance->html);
+        $this->assertInstanceOf('FacadeObjectStub', $instanceTwo->html);
+        $this->assertInstanceOf('FacadeObjectStub', $instanceThree->html);
+    }
+
+    public function testResolveAndInjectMultipleClassesBehindFacadeAsDependency()
+    {
+        $container = new Container;
+        $container->bind('html', function()
+        {
+            return new FacadeObjectStub();
+        });
+
+        $container->bind('view', function()
+        {
+            return new FacadeObjectStub();
+        });
+
+        $instance = $container->make('ContainerDependentOnMultipleFacadeObjectStub');
+
+        $this->assertInstanceOf('ContainerDependentOnMultipleFacadeObjectStub', $instance);
+
+        $this->assertInstanceOf('FacadeObjectStub', $instance->html);
+        $this->assertInstanceOf('FacadeObjectStub', $instance->view);
+    }
 }
 
 class ContainerConcreteStub {}
@@ -291,4 +356,23 @@ class ContainerDefaultValueStub {
 		$this->stub = $stub;
 		$this->default = $default;
 	}
+}
+
+class FacadeObjectStub {}
+
+class ContainerDependentOnFacadeObjectStub {
+    public $html;
+    public function __construct(html $html)
+    {
+        $this->html = $html;
+    }
+}
+
+class ContainerDependentOnMultipleFacadeObjectStub {
+    public $html; public $view;
+    public function __construct(html $html, stdClass $stub, view $view)
+    {
+        $this->html = $html;
+        $this->view = $view;
+    }
 }
