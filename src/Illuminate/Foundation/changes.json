@@ -96,7 +96,8 @@
 		{"message": "Added 'forgetBeforeFilter' and 'forgetAfterFilter' to controllers.", "backport": null},
 		{"message": "Allow container parameter overrides to be specified by argument name.", "backport": null},
 		{"message": "BelongsToMany 'sync' method now returns array with information on what changed.", "backport": null},
-		{"message": "TTR configuration option now supported on Beanstalk queues.", "backport": null}
+		{"message": "TTR configuration option now supported on Beanstalk queues.", "backport": null},
+		{"message": "Added support for eager loading of MorphTo relationships.", "backport": null}
 	],
 	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
