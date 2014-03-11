@@ -3,6 +3,7 @@
 use Mockery as m;
 
 use Illuminate\Http\Request;
+use Illuminate\Queue\Console\SubscribeCommand;
 use Aws\Sqs\SqsClient;
 use Guzzle\Service\Resource\Model;
 
@@ -143,4 +144,17 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Illuminate\Http\Response', $response);
 		$this->assertEquals(200, $response->getStatusCode());
 	}
+
+	public function testSubscribeToSqsQueue()
+	{
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createSqsJob'), array($this->sqs, $this->sns, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
+		$request->shouldReceive('header')->once()->with('x-amz-sns-message-type')->andReturn('SubscriptionConfirmation');
+		$request->shouldReceive('json')->once()->with('TopicArn')->andReturn('foo');
+		$request->shouldReceive('json')->once()->with('Token')->andReturn('bar');
+		$this->sns->shouldReceive('confirmSubscription')->once()->with(array('TopicArn' => 'foo', 'Token' => 'bar', 'AuthenticateOnUnsubscribe' => 'true'))->andReturn();
+		$response = $queue->marshal();
+		$this->assertInstanceOf('Illuminate\Http\Response', $response);
+		$this->assertEquals(200, $response->getStatusCode());
+	}
+
 }

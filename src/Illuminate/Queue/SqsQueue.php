@@ -257,4 +257,45 @@ class SqsQueue extends PushQueue implements QueueInterface {
 		return $this->sns;
 	}
 
+	/**
+	 * Subscribe a queue to the endpoint url
+	 *
+	 * @param string  $queue
+	 * @param string  $endpoint
+	 * @param array   $options
+	 * @return array
+	 */
+	public function subscribe($queue, $endpoint, array $options = array())
+	{
+		$topicArn = $this->getSns()->createTopic(array('Name' => $queue))->get('TopicArn');
+
+		$response = $this->getSns()->subscribe(array('TopicArn' => $topicArn, 'Protocol' => ((stripos($endpoint, 'https') !== false) ? 'https' : 'http'), 'Endpoint' => $endpoint));
+
+		return $response->toArray();
+	}
+
+	/**
+	 * Unsubscribe a queue from an endpoint url
+	 *
+	 * @param string  $queue
+	 * @param string  $endpoint
+	 * @return array
+	 */
+	public function unsubscribe($queue, $endpoint)
+	{
+		$response = $this->getSns()->listSubscriptions();
+
+		$subscription = array_values(array_filter($response->toArray()['Subscriptions'], function($element) use ($endpoint) {
+				
+			return $element['Endpoint'] == $endpoint;
+		}));
+	
+		if(count($subscription)) {
+
+			$response = $this->getSns()->unsubscribe(array('SubscriptionArn' => $subscription[0]['SubscriptionArn']));
+		}
+
+		return $response->toArray();
+	}
+
 }

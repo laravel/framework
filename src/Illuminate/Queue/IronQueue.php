@@ -259,4 +259,35 @@ class IronQueue extends PushQueue implements QueueInterface {
 		return $this->iron;
 	}
 
+	/**
+	 * Subscribe a queue to the endpoint url
+	 *
+	 * @param string  $queue
+	 * @param string  $endpoint
+	 * @param array   $options
+	 * @return array
+	 */
+	public function subscribe($queue, $endpoint, array $options = array())
+	{	
+		$response = $this->getIron()->addSubscriber($queue, array('url' => $endpoint));
+	
+		$response = $this->getIron()->updateQueue($queue, $options);
+
+		return $response;
+	}
+	
+	/**
+	 * Unsubscribe a queue from an endpoint url
+	 *
+	 * @param string  $queue
+	 * @param string  $url
+	 * @return array
+	 */
+	public function unsubscribe($queue, $endpoint)
+	{
+		$response = $this->getIron()->removeSubscriber($queue, array('url' => $endpoint));
+
+		return $response;
+	}
+
 }
