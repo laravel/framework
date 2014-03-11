@@ -26,7 +26,7 @@ class BelongsTo extends Relation {
 	 *
 	 * @var string
 	 */
-	protected $relation;
+	protected $relationName;
 
 	/**
 	 * Create a new belongs to relationship instance.
@@ -38,10 +38,10 @@ class BelongsTo extends Relation {
 	 * @param  string  $relation
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $relation)
+	public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $relationName)
 	{
 		$this->otherKey = $otherKey;
-		$this->relation = $relation;
+		$this->relationName = $relationName;
 		$this->foreignKey = $foreignKey;
 
 		parent::__construct($query, $parent);
@@ -204,7 +204,7 @@ class BelongsTo extends Relation {
 	{
 		$this->parent->setAttribute($this->foreignKey, $model->getAttribute($this->otherKey));
 
-		return $this->parent->setRelation($this->relation, $model);
+		return $this->parent->setRelation($this->relationName, $model);
 	}
 
 	/**
@@ -258,6 +258,16 @@ class BelongsTo extends Relation {
 	public function getQualifiedOtherKeyName()
 	{
 		return $this->related->getTable().'.'.$this->otherKey;
+	}
+
+	/**
+	 * Get the relationship name for the relationship.
+	 *
+	 * @return string
+	 */
+	public function getRelationName()
+	{
+		return $this->relationName;
 	}
 
 }
