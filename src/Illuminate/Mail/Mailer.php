@@ -59,6 +59,13 @@ class Mailer {
 	 * @var array
 	 */
 	protected $failedRecipients = array();
+	
+	/**
+	 * Array of parsed views containing html and text view name.
+	 *
+	 * @var array
+	 */
+	protected $parsedViews = array();
 
 	/**
 	 * Create a new Mailer instance.
@@ -111,7 +118,7 @@ class Mailer {
 		// First we need to parse the view, which could either be a string or an array
 		// containing both an HTML and plain text versions of the view which should
 		// be used when sending an e-mail. We will extract both of them out here.
-		list($view, $plain) = $this->parseView($view);
+		list($view, $plain) = $this->parsedViews = $this->parseView($view);
 
 		$data['message'] = $message = $this->createMessage();
 
@@ -316,8 +323,9 @@ class Mailer {
 	protected function logMessage($message)
 	{
 		$emails = implode(', ', array_keys((array) $message->getTo()));
+		$views = implode(', ', $this->parsedViews);
 
-		$this->logger->info("Pretending to mail message to: {$emails} [Subject: {$message->getSubject()}] [Body: {$message->getBody()}]");
+		$this->logger->info("Pretending to mail message to: {$emails} [Subject: {$message->getSubject()}] [Use view: {$views}]");
 	}
 
 	/**
