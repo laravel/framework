@@ -6,7 +6,7 @@ use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 use Illuminate\Encryption\Encrypter;
 
-class IronQueue extends Queue implements QueueInterface {
+class IronQueue extends PushQueue implements QueueInterface {
 
 	/**
 	 * The IronMQ instance.
@@ -21,13 +21,6 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @var \Illuminate\Encryption\Encrypter
 	 */
 	protected $crypt;
-
-	/**
-	 * The current request instance.
-	 *
-	 * @var \Illuminate\Http\Request
-	 */
-	protected $request;
 
 	/**
 	 * The name of the default tube.
@@ -242,27 +235,6 @@ class IronQueue extends Queue implements QueueInterface {
 	public function getIron()
 	{
 		return $this->iron;
-	}
-
-	/**
-	 * Get the request instance.
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Request
-	 */
-	public function getRequest()
-	{
-		return $this->request;
-	}
-
-	/**
-	 * Set the request instance.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return void
-	 */
-	public function setRequest(Request $request)
-	{
-		$this->request = $request;
 	}
 
 }

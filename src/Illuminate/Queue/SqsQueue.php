@@ -1,9 +1,11 @@
 <?php namespace Illuminate\Queue;
 
 use Aws\Sqs\SqsClient;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\SqsJob;
 
-class SqsQueue extends Queue implements QueueInterface {
+class SqsQueue extends PushQueue implements QueueInterface {
 
 	/**
 	 * The Amazon SQS instance.
@@ -23,12 +25,14 @@ class SqsQueue extends Queue implements QueueInterface {
 	 * Create a new Amazon SQS queue instance.
 	 *
 	 * @param  \Aws\Sqs\SqsClient  $sqs
+     * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
 	 * @return void
 	 */
-	public function __construct(SqsClient $sqs, $default)
+	public function __construct(SqsClient $sqs, Request $request, $default)
 	{
 		$this->sqs = $sqs;
+		$this->request = $request;
 		$this->default = $default;
 	}
 
@@ -101,6 +105,46 @@ class SqsQueue extends Queue implements QueueInterface {
 			return new SqsJob($this->container, $this->sqs, $queue, $response['Messages'][0]);
 		}
 	}
+
+    /**
+     * Marshal a push queue request and fire the job.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function marshal()
+    {
+        $this->createPushedSqsJob($this->marshalPushedJob())->fire();
+
+        return new Response('OK');
+    }
+
+    /**
+     * Marshal out the pushed job and payload.
+     *
+     * @return array
+     */
+    protected function marshalPushedJob()
+    {
+        $r = $this->request;
+
+        return array(
+            'MessageId' => $r->header('X-aws-sqsd-msgid'),
+            'Body' => $r->getContent(),
+            'Attributes' => array('ApproximateReceiveCount' => $r->header('X-aws-sqsd-receive-count')),
+            'pushed' => true,
+        );
+    }
+
+    /**
+     * Create a new SqsJob for a pushed job.
+     *
+     * @param  array  $job
+     * @return \Illuminate\Queue\Jobs\SqsJob
+     */
+    protected function createPushedSqsJob($job)
+    {
+        return new SqsJob($this->container, $this->sqs, $this, $job, true);
+    }
 
 	/**
 	 * Get the queue or return the default.
