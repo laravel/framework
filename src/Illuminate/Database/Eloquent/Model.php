@@ -8,6 +8,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -656,7 +657,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphTo
 	 */
 	public function morphTo($name = null, $type = null, $id = null)
 	{
@@ -670,14 +671,27 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$name = snake_case($caller['function']);
 		}
 
-		// Next we will guess the type and ID if necessary. The type and IDs may also
-		// be passed into the function so that the developers may manually specify
-		// them on the relations. Otherwise, we will just make a great estimate.
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
-		$class = $this->$type;
+		// If the type value is null it is probably safe to assume we're eager loading
+		// the relationship. When that is the case we will pass in a dummy query as
+		// there are multiple types in the morph and we can't use single queries.
+		if (is_null($class = $this->$type))
+		{
+			return new MorphTo(
+				$this->newQuery(), $this, $id, null, $type, $name
+			);
+		}
 
-		return $this->belongsTo($class, $id);
+		// If we are not eager loading the relatinship, we will essentially treat this
+		// as a belongs-to style relationship since morph-to extends that class and
+		// we will pass in the appropriate values so that it behaves as expected.
+		else
+		{
+			return new MorphTo(
+				with(new $class)->newQuery(), $this, $id, 'id', $type, $name
+			);
+		}
 	}
 
 	/**
