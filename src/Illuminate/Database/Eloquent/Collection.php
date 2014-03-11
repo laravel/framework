@@ -195,6 +195,32 @@ class Collection extends BaseCollection {
 	}
 
 	/**
+	 * Returns only the models from the collection with the specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function only($keys)
+	{
+		$dictionary = array_only($this->getDictionary($this), $keys);
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Returns all models in the collection except the models with specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function except($keys)
+	{
+	    $dictionary = array_except($this->getDictionary($this), $keys);
+
+	    return new static(array_values($dictionary));
+	}
+
+	/**
 	 * Get a dictionary keyed by primary keys.
 	 *
 	 * @param  \Illuminate\Support\Collection  $collection
