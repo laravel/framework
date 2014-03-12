@@ -4,21 +4,21 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class SubscribeCommand extends Command {
+class UpdateCommand extends Command {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'queue:subscribe';
+	protected $name = 'queue:update';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Subscribe a URL to an Iron.io or SQS push queue';
+	protected $description = 'Update the settings of an Iron.io or SQS push queue';
 
 	/**
 	 * Execute the console command.
@@ -33,9 +33,9 @@ class SubscribeCommand extends Command {
 
 		$advanced = json_decode(stripslashes($this->option('advanced')), true);
 
-		$queue->subscribe($this->argument('queue'), $this->argument('url'), array_only($this->option(), array('retries', 'errqueue')), $advanced);
+		$queue->update($this->argument('queue'), $this->argument('url'), array_only($this->option(), array('retries', 'errqueue')), $advanced);
 
-		$this->line('<info>Queue subscriber added:</info> <comment>'.$this->argument('url').'</comment>');
+		$this->line('<info>Queue </info><comment>'.$this->argument('queue').'</comment><info> has been updated successfully.</info>');
 	}
 
 	/**
@@ -60,7 +60,7 @@ class SubscribeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('retries', null, InputOption::VALUE_OPTIONAL, 'Number of retries.', 3),
+			array('retries', null, InputOption::VALUE_OPTIONAL, 'Number of retries.'),
 
 			array('errqueue', null, InputOption::VALUE_OPTIONAL, 'The error queue where all failed push messages will be routed after N retries.'),
 			

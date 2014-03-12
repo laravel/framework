@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Queue;
 
-abstract class PushQueue extends Queue {
+abstract class PushQueue extends Queue implements PushQueueInterface {
 
 	/**
 	 * The current request instance.

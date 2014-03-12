@@ -168,4 +168,14 @@ abstract class Job {
 		return $this->queue;
 	}
 
+	/**
+	 * Get the IoC container instance.
+	 *
+	 * @return \Illuminate\Container\Container
+	 */
+	public function getContainer()
+	{
+		return $this->container;
+	}
+
 }

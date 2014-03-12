@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue\Connectors;
 
+use Aws\Sns\SnsClient;
 use Aws\Sqs\SqsClient;
 use Illuminate\Http\Request;
 use Illuminate\Queue\SqsQueue;
@@ -14,7 +15,7 @@ class SqsConnector implements ConnectorInterface {
 	protected $request;
 
 	/**
-	 * Create a new SQS connector instance.
+	 * Create a new Sqs connector instance.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
@@ -36,7 +37,9 @@ class SqsConnector implements ConnectorInterface {
 
 		$sqs = SqsClient::factory($sqsConfig);
 
-		return new SqsQueue($sqs, $this->request, $config['queue']);
+		$sns = SnsClient::factory($sqsConfig);
+
+		return new SqsQueue($sqs, $sns, $this->request, $config['queue'], $config['account']);
 	}
 
 }
