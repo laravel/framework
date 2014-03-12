@@ -545,9 +545,27 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->expects($this->once())->method('forPage')->with($this->equalTo(1), $this->equalTo(15))->will($this->returnValue($builder));
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo')));
 		$builder->expects($this->once())->method('getPaginationCount')->will($this->returnValue(10));
-		$paginator->shouldReceive('make')->once()->with(array('foo'), 10, 15)->andReturn(array('results'));
+		$paginator->shouldReceive('make')->once()->with(array('foo'), 10, 15, 'page')->andReturn(array('results'));
 
 		$this->assertEquals(array('results'), $builder->paginate(15, array('*')));
+	}
+
+
+	public function testPaginateCorrectlyCreatesPaginatorInstanceWithPageArgument()
+	{
+        $connection = m::mock('Illuminate\Database\ConnectionInterface');
+        $grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
+        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $builder = $this->getMock('Illuminate\Database\Query\Builder', array('getPaginationCount', 'forPage', 'get'), array($connection, $grammar, $processor));
+        $paginator = m::mock('Illuminate\Pagination\Environment');
+        $paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
+        $connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
+        $builder->expects($this->once())->method('forPage')->with($this->equalTo(1), $this->equalTo(15))->will($this->returnValue($builder));
+        $builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo')));
+        $builder->expects($this->once())->method('getPaginationCount')->will($this->returnValue(10));
+		$paginator->shouldReceive('make')->once()->with(array('foo'), 10, 15, 'foo')->andReturn(array('results'));
+
+		$this->assertEquals(array('results'), $builder->paginate(15, array('*'), 'foo'));
 	}
 
 
@@ -561,7 +579,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(2);
 		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo', 'bar', 'baz')));
-		$paginator->shouldReceive('make')->once()->with(array('baz'), 3, 2)->andReturn(array('results'));
+		$paginator->shouldReceive('make')->once()->with(array('baz'), 3, 2, 'page')->andReturn(array('results'));
 
 		$this->assertEquals(array('results'), $builder->groupBy('foo')->paginate(2, array('*')));
 	}

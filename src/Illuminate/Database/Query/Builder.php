@@ -1411,17 +1411,17 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = 15, $columns = array('*'))
+	public function paginate($perPage = 15, $columns = array('*'), $pageName = 'page')
 	{
 		$paginator = $this->connection->getPaginator();
 
 		if (isset($this->groups))
 		{
-			return $this->groupedPaginate($paginator, $perPage, $columns);
+			return $this->groupedPaginate($paginator, $perPage, $columns, $pageName);
 		}
 		else
 		{
-			return $this->ungroupedPaginate($paginator, $perPage, $columns);
+			return $this->ungroupedPaginate($paginator, $perPage, $columns, $pageName);
 		}
 	}
 
@@ -1433,11 +1433,11 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	protected function groupedPaginate($paginator, $perPage, $columns)
+	protected function groupedPaginate($paginator, $perPage, $columns, $pageName)
 	{
 		$results = $this->get($columns);
 
-		return $this->buildRawPaginator($paginator, $results, $perPage);
+		return $this->buildRawPaginator($paginator, $results, $perPage, $pageName);
 	}
 
 	/**
@@ -1448,16 +1448,16 @@ class Builder {
 	 * @param  int    $perPage
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function buildRawPaginator($paginator, $results, $perPage)
+	public function buildRawPaginator($paginator, $results, $perPage, $pageName)
 	{
 		// For queries which have a group by, we will actually retrieve the entire set
 		// of rows from the table and "slice" them via PHP. This is inefficient and
 		// the developer must be aware of this behavior; however, it's an option.
-		$start = ($paginator->getCurrentPage() - 1) * $perPage;
+		$start = ($paginator->getCurrentPage($pageName) - 1) * $perPage;
 
 		$sliced = array_slice($results, $start, $perPage);
 
-		return $paginator->make($sliced, count($results), $perPage);
+		return $paginator->make($sliced, count($results), $perPage, $pageName);
 	}
 
 	/**
@@ -1468,18 +1468,18 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
+	protected function ungroupedPaginate($paginator, $perPage, $columns, $pageName)
 	{
 		$total = $this->getPaginationCount();
 
 		// Once we have the total number of records to be paginated, we can grab the
 		// current page and the result array. Then we are ready to create a brand
 		// new Paginator instances for the results which will create the links.
-		$page = $paginator->getCurrentPage($total);
+		$page = $paginator->getCurrentPage($pageName);
 
 		$results = $this->forPage($page, $perPage)->get($columns);
 
-		return $paginator->make($results, $total, $perPage);
+		return $paginator->make($results, $total, $perPage, $pageName);
 	}
 
 	/**

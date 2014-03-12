@@ -216,7 +216,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = null, $columns = array('*'))
+	public function paginate($perPage = null, $columns = array('*'), $pageName = 'page')
 	{
 		$perPage = $perPage ?: $this->model->getPerPage();
 
@@ -224,11 +224,11 @@ class Builder {
 
 		if (isset($this->query->groups))
 		{
-			return $this->groupedPaginate($paginator, $perPage, $columns);
+			return $this->groupedPaginate($paginator, $perPage, $columns, $pageName);
 		}
 		else
 		{
-			return $this->ungroupedPaginate($paginator, $perPage, $columns);
+			return $this->ungroupedPaginate($paginator, $perPage, $columns, $pageName);
 		}
 	}
 
@@ -240,11 +240,11 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	protected function groupedPaginate($paginator, $perPage, $columns)
+	protected function groupedPaginate($paginator, $perPage, $columns, $pageName)
 	{
 		$results = $this->get($columns)->all();
 
-		return $this->query->buildRawPaginator($paginator, $results, $perPage);
+		return $this->query->buildRawPaginator($paginator, $results, $perPage, $pageName);
 	}
 
 	/**
@@ -255,18 +255,18 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
+	protected function ungroupedPaginate($paginator, $perPage, $columns, $pageName)
 	{
 		$total = $this->query->getPaginationCount();
 
 		// Once we have the paginator we need to set the limit and offset values for
 		// the query so we can get the properly paginated items. Once we have an
 		// array of items we can create the paginator instances for the items.
-		$page = $paginator->getCurrentPage($total);
+		$page = $paginator->getCurrentPage($pageName);
 
 		$this->query->forPage($page, $perPage);
 
-		return $paginator->make($this->get($columns)->all(), $total, $perPage);
+		return $paginator->make($this->get($columns)->all(), $total, $perPage, $pageName);
 	}
 
 	/**

@@ -164,14 +164,14 @@ class BelongsToMany extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = null, $columns = array('*'))
+	public function paginate($perPage = null, $columns = array('*'), $pageName = 'page')
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
 		// When paginating results, we need to add the pivot columns to the query and
 		// then hydrate into the pivot objects once the results have been gathered
 		// from the database since this isn't performed by the Eloquent builder.
-		$pager = $this->query->paginate($perPage, $columns);
+		$pager = $this->query->paginate($perPage, $columns, $pageName);
 
 		$this->hydratePivotRelation($pager->getItems());
 

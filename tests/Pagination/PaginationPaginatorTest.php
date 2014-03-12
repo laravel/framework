@@ -101,7 +101,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
 		$env->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
-		$env->shouldReceive('getPageName')->twice()->andReturn('page');
 
 		$this->assertEquals('http://foo.com?page=1', $p->getUrl(1));
 		$p->addQuery('foo', 'bar');
@@ -137,7 +136,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$p = new Paginator($env = m::mock('Illuminate\Pagination\Environment'), array('foo', 'bar', 'baz'), 3, 2);
 		$env->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
-		$env->shouldReceive('getPageName')->twice()->andReturn('page');
 
 		$p->fragment("a-fragment");
 
@@ -153,6 +151,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$last = $p->last();
 
 		$this->assertEquals('c', $last);
+	}
+
+    public function testOverridingPageParam()
+    {
+        $p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2);
+        $this->assertEquals('page', $p->getPageName());
+        $p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2, 'foo');
+        $this->assertEquals('foo', $p->getPageName());
 	}
 
 }

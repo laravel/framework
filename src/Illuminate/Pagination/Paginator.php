@@ -81,20 +81,29 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	protected $fragment;
 
 	/**
+     * The input parameter used for the current page.
+     *
+     * @var string
+     */
+    protected $pageName;
+
+    /**
 	 * Create a new Paginator instance.
 	 *
 	 * @param  \Illuminate\Pagination\Environment  $env
 	 * @param  array  $items
 	 * @param  int    $total
 	 * @param  int    $perPage
+	 * @param  string $pageName
 	 * @return void
 	 */
-	public function __construct(Environment $env, array $items, $total, $perPage)
+	public function __construct(Environment $env, array $items, $total, $perPage, $pageName = 'page')
 	{
 		$this->env = $env;
 		$this->items = $items;
 		$this->total = (int) $total;
 		$this->perPage = (int) $perPage;
+        $this->pageName = $pageName;
 	}
 
 	/**
@@ -143,7 +152,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 */
 	protected function calculateCurrentPage($lastPage)
 	{
-		$page = $this->env->getCurrentPage();
+		$page = $this->env->getCurrentPage($this->pageName);
 
 		// The page number will get validated and adjusted if it either less than one
 		// or greater than the last page available based on the count of the given
@@ -187,7 +196,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	public function getUrl($page)
 	{
 		$parameters = array(
-			$this->env->getPageName() => $page,
+			$this->pageName => $page,
 		);
 
 		// If we have any extra query string key / value pairs that need to be added
@@ -326,6 +335,16 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	public function getPerPage()
 	{
 		return $this->perPage;
+	}
+
+	/**
+	 * Get the number of items to be displayed per page.
+	 *
+	 * @return int
+	 */
+	public function getPageName()
+	{
+		return $this->pageName;
 	}
 
 	/**
