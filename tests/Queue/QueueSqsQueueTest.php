@@ -127,7 +127,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 	public function testPushedJobsMustComeFromSqsOrSns()
 	{
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createSqsJob'), array($this->sqs, $this->sns, $request = m::mock('Illuminate\Http\Request'), $this->queueName, $this->account));
-		$request->shouldReceive('header')->once()->with('x-amz-sns-message-type')->andReturn('Notification');
+		$request->shouldReceive('header')->once()->with('x-amz-sns-message-type')->andReturn(null);
 		$request->shouldReceive('header')->once()->with('x-amz-sns-message-id')->andReturn(null);
 		$request->shouldReceive('header')->once()->with('x-aws-sqsd-msgid')->andReturn(null);
 		$response = $queue->marshal();

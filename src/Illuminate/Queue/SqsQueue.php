@@ -228,16 +228,6 @@ class SqsQueue extends PushQueue implements QueueInterface {
 	}
 
 	/**
-	 * Get the request associated with the object
-	 *
-	 * @return \Illuminate\Http\Request
-	 */
-	public function getRequest()
-	{
-		return $this->request;
-	}
-
-	/**
 	 * Get the underlying SQS instance.
 	 *
 	 * @return \Aws\Sqs\SqsClient
