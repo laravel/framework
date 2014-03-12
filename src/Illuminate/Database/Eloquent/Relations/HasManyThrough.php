@@ -84,7 +84,7 @@ class HasManyThrough extends Relation {
 	 */
 	protected function setJoin(Builder $query = null)
 	{
-		$query = $query ?: $this->query;
+		$query = $query ? : $this->query;
 
 		$foreignKey = $this->related->getTable().'.'.$this->secondKey;
 

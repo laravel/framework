@@ -15,7 +15,7 @@ class Pluralizer {
 		'/(x|ch|ss|sh)$/i' => "$1es",
 		'/([^aeiouy]|qu)y$/i' => "$1ies",
 		'/(hive)$/i' => "$1s",
-		'/(?:([^f])fe|([lr])f)$/i' => "$1$2ves",
+		'/(? :([^f])fe|([lr])f)$/i' => "$1$2ves",
 		'/(shea|lea|loa|thie)f$/i' => "$1ves",
 		'/sis$/i' => "ses",
 		'/([ti])um$/i' => "$1a",
@@ -81,7 +81,6 @@ class Pluralizer {
 		'move' => 'moves',
 		'person' => 'people',
 		'sex' => 'sexes',
-		'tax' => 'taxes',
 		'tooth' => 'teeth',
 	);
 
@@ -138,7 +137,7 @@ class Pluralizer {
 
 		$result = static::inflect($value, static::$singular, static::$irregular);
 
-		return static::$singularCache[$value] = $result ?: $value;
+		return static::$singularCache[$value] = $result ? : $value;
 	}
 
 	/**

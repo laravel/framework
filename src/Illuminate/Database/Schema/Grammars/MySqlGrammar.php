@@ -84,12 +84,14 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function compileCreateEncoding($sql, Connection $connection)
 	{
-		if ( ! is_null($charset = $connection->getConfig('charset')))
+		$charset = $connection->getConfig('charset');
+		if ($charset !== null)
 		{
 			$sql .= ' default character set '.$charset;
 		}
 
-		if ( ! is_null($collation = $connection->getConfig('collation')))
+		$collation = $connection->getConfig('collation');
+		if ($collation !== null)
 		{
 			$sql .= ' collate '.$collation;
 		}
@@ -98,7 +100,7 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile an add column command.
+	 * Compile a create table command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Illuminate\Support\Fluent  $command
@@ -489,7 +491,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
-		if ( ! $column->nullable) return 'timestamp default 0';
+		if (!$column->nullable) return 'timestamp default 0';
 
 		return 'timestamp';
 	}
@@ -538,7 +540,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyDefault(Blueprint $blueprint, Fluent $column)
 	{
-		if ( ! is_null($column->default))
+		if ($column->default !== null)
 		{
 			return " default ".$this->getDefaultValue($column->default);
 		}
@@ -568,7 +570,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyAfter(Blueprint $blueprint, Fluent $column)
 	{
-		if ( ! is_null($column->after))
+		if ($column->after !== null)
 		{
 			return ' after '.$this->wrap($column->after);
 		}

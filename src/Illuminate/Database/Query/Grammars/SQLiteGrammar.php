@@ -29,7 +29,7 @@ class SQLiteGrammar extends Grammar {
 		// basic routine regardless of an amount of records given to us to insert.
 		$table = $this->wrapTable($query->from);
 
-		if ( ! is_array(reset($values)))
+		if (!is_array(reset($values)))
 		{
 			$values = array($values);
 		}

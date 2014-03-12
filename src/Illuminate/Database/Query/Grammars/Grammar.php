@@ -40,7 +40,7 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileSelect(Builder $query)
 	{
-		if (is_null($query->columns)) $query->columns = array('*');
+		if ($query->columns === null) $query->columns = array('*');
 
 		return trim($this->concatenate($this->compileComponents($query)));
 	}
@@ -60,7 +60,7 @@ class Grammar extends BaseGrammar {
 			// To compile the query, we'll spin through each component of the query and
 			// see if that component exists. If it does we'll just call the compiler
 			// function for the component which is responsible for making the SQL.
-			if ( ! is_null($query->$component))
+			if ($query->$component !== null)
 			{
 				$method = 'compile'.ucfirst($component);
 
@@ -105,7 +105,7 @@ class Grammar extends BaseGrammar {
 		// If the query is actually performing an aggregating select, we will let that
 		// compiler handle the building of the select clauses, as it will need some
 		// more syntax that is best handled by that function to keep things neat.
-		if ( ! is_null($query->aggregate)) return;
+		if ($query->aggregate !== null) return;
 
 		$select = $query->distinct ? 'select distinct ' : 'select ';
 
@@ -192,7 +192,7 @@ class Grammar extends BaseGrammar {
 	{
 		$sql = array();
 
-		if (is_null($query->wheres)) return '';
+		if ($query->wheres === null) return '';
 
 		// Each type of where clauses has its own compiler function which is responsible
 		// for actually creating the where clauses SQL. This helps keep the code nice
@@ -458,11 +458,13 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileOrders(Builder $query, $orders)
 	{
-		return 'order by '.implode(', ', array_map(function($order)
+		$me = $this;
+
+		return 'order by '.implode(', ', array_map(function($order) use ($me)
 		{
 			if (isset($order['sql'])) return $order['sql'];
 
-			return $this->wrap($order['column']).' '.$order['direction'];
+			return $me->wrap($order['column']).' '.$order['direction'];
 		}
 		, $orders));
 	}
@@ -536,7 +538,7 @@ class Grammar extends BaseGrammar {
 		// basic routine regardless of an amount of records given to us to insert.
 		$table = $this->wrapTable($query->from);
 
-		if ( ! is_array(reset($values)))
+		if (!is_array(reset($values)))
 		{
 			$values = array($values);
 		}

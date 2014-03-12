@@ -48,7 +48,7 @@ class RemindersControllerCommand extends Command {
 	{
 		$destination = $this->laravel['path'].'/controllers/RemindersController.php';
 
-		if ( ! $this->files->exists($destination))
+		if (!$this->files->exists($destination))
 		{
 			$this->files->copy(__DIR__.'/stubs/controller.stub', $destination);
 

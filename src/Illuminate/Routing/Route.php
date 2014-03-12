@@ -117,7 +117,7 @@ class Route {
 
 		foreach ($this->getValidators() as $validator)
 		{
-			if ( ! $validator->matches($this, $request)) return false;
+			if (!$validator->matches($this, $request)) return false;
 		}
 
 		return true;
@@ -136,7 +136,7 @@ class Route {
 
 		$this->compiled = with(
 
-			new SymfonyRoute($uri, $optionals, $this->wheres, array(), $this->domain() ?: '')
+			new SymfonyRoute($uri, $optionals, $this->wheres, array(), $this->domain() ? : '')
 
 		)->compile();
 	}
@@ -167,7 +167,7 @@ class Route {
 	 */
 	public function beforeFilters()
 	{
-		if ( ! isset($this->action['before'])) return array();
+		if (!isset($this->action['before'])) return array();
 
 		return $this->parseFilters($this->action['before']);
 	}
@@ -179,7 +179,7 @@ class Route {
 	 */
 	public function afterFilters()
 	{
-		if ( ! isset($this->action['after'])) return array();
+		if (!isset($this->action['after'])) return array();
 
 		return $this->parseFilters($this->action['after']);
 	}
@@ -237,7 +237,7 @@ class Route {
 	 */
 	public static function parseFilter($filter)
 	{
-		if ( ! str_contains($filter, ':')) return array($filter, array());
+		if (!str_contains($filter, ':')) return array($filter, array());
 
 		return static::parseParameterFilter($filter);
 	}
@@ -276,7 +276,7 @@ class Route {
 	 */
 	public function parameter($name, $default = null)
 	{
-		return array_get($this->parameters(), $name) ?: $default;
+		return array_get($this->parameters(), $name) ? : $default;
 	}
 
 	/**
@@ -319,7 +319,7 @@ class Route {
 		{
 			return array_map(function($value)
 			{
-				return is_string($value) ? rawurldecode($value) : $value;
+				return is_string($value) ? urldecode($value) : $value;
 
 			}, $this->parameters);
 		}
@@ -334,7 +334,7 @@ class Route {
 	 */
 	public function parametersWithoutNulls()
 	{
-		return array_filter($this->parameters(), function($p) { return ! is_null($p); });
+		return array_filter($this->parameters(), function($p) { return ($p !== null); });
 	}
 
 	/**
@@ -396,7 +396,7 @@ class Route {
 		// If the route has a regular expression for the host part of the URI, we will
 		// compile that and get the parameter matches for this domain. We will then
 		// merge them into this parameters array so that this array is completed.
-		if ( ! is_null($this->compiled->getHostRegex()))
+		if ($this->compiled->getHostRegex() !== null)
 		{
 			$params = $this->bindHostParameters(
 				$request, $params
@@ -485,7 +485,7 @@ class Route {
 		// If no "uses" property has been set, we will dig through the array to find a
 		// Closure instance within this list. We will set the first Closure we come
 		// across into the "uses" property that will get fired off by this route.
-		elseif ( ! isset($action['uses']))
+		elseif (!isset($action['uses']))
 		{
 			$action['uses'] = $this->findClosure($action);
 		}

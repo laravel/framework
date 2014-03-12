@@ -5,12 +5,11 @@ use Countable;
 use ArrayAccess;
 use ArrayIterator;
 use CachingIterator;
-use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 
-class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface, JsonSerializable {
+class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface {
 
 	/**
 	 * The items contained in the collection.
@@ -38,7 +37,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public static function make($items)
 	{
-		if (is_null($items)) return new static;
+		if ($items === null) return new static;
 
 		if ($items instanceof Collection) return $items;
 
@@ -127,7 +126,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function first(Closure $callback = null, $default = null)
 	{
-		if (is_null($callback))
+		if ($callback === null)
 		{
 			return count($this->items) > 0 ? reset($this->items) : null;
 		}
@@ -215,7 +214,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function implode($value, $glue = null)
 	{
-		if (is_null($glue)) return implode($this->lists($value));
+		if ($glue === null) return implode($this->lists($value));
 
 		return implode($glue, $this->lists($value));
 	}
@@ -562,16 +561,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Convert the object into something JSON serializable.
-	 *
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return $this->toArray();
-	}
-
-	/**
 	 * Get the collection of items as JSON.
 	 *
 	 * @param  int  $options
@@ -643,7 +632,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function offsetSet($key, $value)
 	{
-		if (is_null($key))
+		if ($key === null)
 		{
 			$this->items[] = $value;
 		}

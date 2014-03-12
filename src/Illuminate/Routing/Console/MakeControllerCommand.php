@@ -91,7 +91,7 @@ class MakeControllerCommand extends Command {
 	 */
 	protected function getPath()
 	{
-		if ( ! is_null($this->input->getOption('path')))
+		if ($this->input->getOption('path') !== null)
 		{
 			return $this->laravel['path.base'].'/'.$this->input->getOption('path');
 		}
@@ -113,7 +113,7 @@ class MakeControllerCommand extends Command {
 	{
 		$path = $this->laravel['path.base'].'/workbench/'.$bench.'/src/controllers';
 
-		if ( ! $this->laravel['files']->isDirectory($path))
+		if (!$this->laravel['files']->isDirectory($path))
 		{
 			$this->laravel['files']->makeDirectory($path);
 		}
@@ -145,7 +145,7 @@ class MakeControllerCommand extends Command {
 	{
 		$option = $this->input->getOption($name);
 
-		return is_null($option) ? array() : explode(',', $option);
+		return ($option === null) ? array() : explode(',', $option);
 	}
 
 	/**

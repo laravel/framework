@@ -31,12 +31,12 @@
             <div class="frame <?php echo ($i == 0 ? 'active' : '') ?>" id="frame-line-<?php echo $i ?>">
                 <div class="frame-method-info">
                   <span class="frame-index"><?php echo (count($v->frames) - $i - 1) ?>.</span>
-                  <span class="frame-class"><?php echo $e($frame->getClass() ?: '') ?></span>
-                  <span class="frame-function"><?php echo $e($frame->getFunction() ?: '') ?></span>
+                  <span class="frame-class"><?php echo $e($frame->getClass() ? : '') ?></span>
+                  <span class="frame-function"><?php echo $e($frame->getFunction() ? : '') ?></span>
                 </div>
 
               <span class="frame-file">
-                <?php echo ($frame->getFile(true) ?: '<#unknown>') ?><!--
+                <?php echo ($frame->getFile(true) ? : '<#unknown>') ?><!--
              --><span class="frame-line"><?php echo (int) $frame->getLine() ?></span>
               </span>
             </div>
@@ -75,10 +75,10 @@
                     <?php $filePath = $frame->getFile(); ?>
                     <?php if($filePath && $editorHref = $v->handler->getEditorHref($filePath, (int) $line)): ?>
                       <a href="<?php echo $editorHref ?>" class="editor-link">
-                        <span class="editor-link-callout">open:</span> <strong><?php echo $e($filePath ?: '<#unknown>') ?></strong>
+                        <span class="editor-link-callout">open:</span> <strong><?php echo $e($filePath ? : '<#unknown>') ?></strong>
                       </a>
                     <?php else: ?>
-                      <strong><?php echo $e($filePath ?: '<#unknown>') ?></strong>
+                      <strong><?php echo $e($filePath ? : '<#unknown>') ?></strong>
                     <?php endif ?>
                   </div>
                   <?php

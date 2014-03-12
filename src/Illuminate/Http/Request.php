@@ -172,7 +172,7 @@ class Request extends SymfonyRequest {
 		{
 			foreach (func_get_args() as $value)
 			{
-				if ( ! $this->has($value)) return false;
+				if (!$this->has($value)) return false;
 			}
 
 			return true;
@@ -260,7 +260,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function hasCookie($key)
 	{
-		return ! is_null($this->cookie($key));
+		return ($this->cookie($key) !== null);
 	}
 
 	/**
@@ -345,7 +345,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function flash($filter = null, $keys = array())
 	{
-		$flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
+		$flash = ($filter !== null) ? $this->$filter($keys) : $this->input();
 
 		$this->session()->flashInput($flash);
 	}
@@ -396,7 +396,7 @@ class Request extends SymfonyRequest {
 	 */
 	protected function retrieveItem($source, $key, $default)
 	{
-		if (is_null($key))
+		if ($key === null)
 		{
 			return $this->$source->all();
 		}
@@ -437,12 +437,12 @@ class Request extends SymfonyRequest {
 	 */
 	public function json($key = null, $default = null)
 	{
-		if ( ! isset($this->json))
+		if (!isset($this->json))
 		{
 			$this->json = new ParameterBag((array) json_decode($this->getContent(), true));
 		}
 
-		if (is_null($key)) return $this->json;
+		if ($key === null) return $this->json;
 
 		return array_get($this->json->all(), $key, $default);
 	}
@@ -521,7 +521,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function session()
 	{
-		if ( ! $this->hasSession())
+		if (!$this->hasSession())
 		{
 			throw new \RuntimeException("Session store not set on request.");
 		}

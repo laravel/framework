@@ -27,7 +27,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.2-dev';
+	const VERSION = '4.1.23';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -107,7 +107,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function __construct(Request $request = null)
 	{
-		$this->registerBaseBindings($request ?: $this->createNewRequest());
+		$this->registerBaseBindings($request ? : $this->createNewRequest());
 
 		$this->registerBaseServiceProviders();
 
@@ -289,7 +289,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  array  $options
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function forceRegister($provider, $options = array())
+	public function forgeRegister($provider, $options = array())
 	{
 		return $this->register($provider, $options, true);
 	}
@@ -304,7 +304,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function register($provider, $options = array(), $force = false)
 	{
-		if ($registered = $this->getRegistered($provider) && ! $force)
+		if ($registered = $this->getRegistered($provider) && !$force)
                                      return $registered;
 
 		// If the given "provider" is a string, we will resolve it, passing in the
@@ -336,7 +336,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Get the registered service provider instance if it exists.
+	 * Get the registered service provider instnace if it exists.
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @return \Illuminate\Support\ServiceProvider|null
@@ -411,7 +411,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		// If the service provider has not already been loaded and registered we can
 		// register it with the application and remove the service from this list
 		// of deferred services, since it will already be loaded on subsequent.
-		if ( ! isset($this->loadedProviders[$provider]))
+		if (!isset($this->loadedProviders[$provider]))
 		{
 			$this->registerDeferredProvider($provider, $service);
 		}
@@ -433,7 +433,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
 		$this->register($instance = new $provider($this));
 
-		if ( ! $this->booted)
+		if (!$this->booted)
 		{
 			$this->booting(function() use ($instance)
 			{
@@ -504,7 +504,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function shutdown($callback = null)
 	{
-		if (is_null($callback))
+		if ($callback === null)
 		{
 			$this->fireAppCallbacks($this->shutdownCallbacks);
 		}
@@ -601,7 +601,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function run(SymfonyRequest $request = null)
 	{
-		$request = $request ?: $this['request'];
+		$request = $request ? : $this['request'];
 
 		$response = with($stack = $this->getStackedClient())->handle($request);
 
@@ -654,7 +654,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function registerBaseMiddlewares()
 	{
-		//
+		$this->middleware('Illuminate\Http\FrameGuard');
 	}
 
 	/**
@@ -727,10 +727,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			$response = $this['events']->until('illuminate.app.down');
 
-			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
+			if ($response !== null) return $this->prepareResponse($response, $request);
 		}
 
-		if ($this->runningUnitTests() && ! $this['session']->isStarted())
+		if ($this->runningUnitTests() && !$this['session']->isStarted())
 		{
 			$this['session']->start();
 		}
@@ -801,7 +801,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function prepareRequest(Request $request)
 	{
-		if ( ! is_null($this['config']['session.driver']) && ! $request->hasSession())
+		if ($this['config']['session.driver'] !== null && !$request->hasSession())
 		{
 			$request->setSession($this['session']->driver());
 		}
@@ -817,7 +817,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function prepareResponse($value)
 	{
-		if ( ! $value instanceof SymfonyResponse) $value = new Response($value);
+		if (!$value instanceof SymfonyResponse) $value = new Response($value);
 
 		return $value->prepare($this['request']);
 	}
@@ -998,7 +998,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public static function requestClass($class = null)
 	{
-		if ( ! is_null($class)) static::$requestClass = $class;
+		if ($class !== null) static::$requestClass = $class;
 
 		return static::$requestClass;
 	}
@@ -1081,7 +1081,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'translator'     => 'Illuminate\Translation\Translator',
 			'log'            => 'Illuminate\Log\Writer',
 			'mailer'         => 'Illuminate\Mail\Mailer',
-			'paginator'      => 'Illuminate\Pagination\Factory',
+			'paginator'      => 'Illuminate\Pagination\Environment',
 			'auth.reminder'  => 'Illuminate\Auth\Reminders\PasswordBroker',
 			'queue'          => 'Illuminate\Queue\QueueManager',
 			'redirect'       => 'Illuminate\Routing\Redirector',
@@ -1093,7 +1093,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'remote'         => 'Illuminate\Remote\RemoteManager',
 			'url'            => 'Illuminate\Routing\UrlGenerator',
 			'validator'      => 'Illuminate\Validation\Factory',
-			'view'           => 'Illuminate\View\Factory',
+			'view'           => 'Illuminate\View\Environment',
 		);
 
 		foreach ($aliases as $key => $alias)

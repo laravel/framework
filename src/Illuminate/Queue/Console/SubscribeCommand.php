@@ -40,7 +40,7 @@ class SubscribeCommand extends Command {
 	{
 		$iron = $this->laravel['queue']->connection();
 
-		if ( ! $iron instanceof IronQueue)
+		if (!$iron instanceof IronQueue)
 		{
 			throw new RuntimeException("Iron.io based queue must be default.");
 		}

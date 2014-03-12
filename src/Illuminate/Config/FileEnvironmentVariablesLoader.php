@@ -27,7 +27,7 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 	public function __construct(Filesystem $files, $path = null)
 	{
 		$this->files = $files;
-		$this->path = $path ?: base_path();
+		$this->path = $path ? : base_path();
 	}
 
 	/**
@@ -40,7 +40,7 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 	{
 		if ($environment == 'production') $environment = null;
 
-		if ( ! $this->files->exists($path = $this->getFile($environment)))
+		if (!$this->files->exists($path = $this->getFile($environment)))
 		{
 			return array();
 		}

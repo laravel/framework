@@ -89,7 +89,7 @@ class IronJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
-		if ( ! $this->pushed) $this->delete();
+		if (!$this->pushed) $this->delete();
 
 		$this->recreateJob($delay);
 	}

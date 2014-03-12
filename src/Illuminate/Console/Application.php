@@ -89,7 +89,7 @@ class Application extends \Symfony\Component\Console\Application {
 		// Unless an output interface implementation was specifically passed to us we
 		// will use the "NullOutput" implementation by default to keep any writing
 		// suppressed so it doesn't leak out to the browser or any other source.
-		$output = $output ?: new NullOutput;
+		$output = $output ? : new NullOutput;
 
 		$input = new ArrayInput($parameters);
 

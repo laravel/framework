@@ -44,7 +44,7 @@ class FileStore implements StoreInterface {
 		// If the file doesn't exists, we obviously can't return the cache so we will
 		// just return null. Otherwise, we'll get the contents of the file and get
 		// the expiration UNIX timestamps from the start of the file's contents.
-		if ( ! $this->files->exists($path))
+		if (!$this->files->exists($path))
 		{
 			return null;
 		}

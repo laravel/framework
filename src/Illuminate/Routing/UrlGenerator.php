@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Routing;
 
-use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Symfony\Component\HttpFoundation\Request;
 
 class UrlGenerator {
 
@@ -15,7 +15,7 @@ class UrlGenerator {
 	/**
 	 * The request instance.
 	 *
-	 * @var \Illuminate\Http\Request
+	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $request;
 
@@ -173,7 +173,7 @@ class UrlGenerator {
 	 */
 	protected function getScheme($secure)
 	{
-		if (is_null($secure))
+		if ($secure === null)
 		{
 			return $this->request->getScheme().'://';
 		}
@@ -196,11 +196,11 @@ class UrlGenerator {
 	 */
 	public function route($name, $parameters = array(), $absolute = true, $route = null)
 	{
-		$route = $route ?: $this->routes->getByName($name);
+		$route = $route ? : $this->routes->getByName($name);
 
 		$parameters = (array) $parameters;
 
-		if ( ! is_null($route))
+		if ($route !== null)
 		{
 			return $this->toRoute($route, $parameters, $absolute);
 		}
@@ -439,7 +439,7 @@ class UrlGenerator {
 	 */
 	protected function getRootUrl($scheme, $root = null)
 	{
-		$root = $root ?: $this->request->root();
+		$root = $root ? : $this->request->root();
 
 		$start = starts_with($root, 'http://') ? 'http://' : 'https://';
 

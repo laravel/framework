@@ -103,7 +103,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 */
 	public function getQueue($queue)
 	{
-		return $queue ?: $this->default;
+		return $queue ? : $this->default;
 	}
 
 	/**

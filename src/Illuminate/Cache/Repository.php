@@ -4,13 +4,8 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
-use Illuminate\Support\Traits\MacroableTrait;
 
 class Repository implements ArrayAccess {
-
-	use MacroableTrait {
-		__call as macroCall;
-	}
 
 	/**
 	 * The cache store implementation.
@@ -25,6 +20,13 @@ class Repository implements ArrayAccess {
 	 * @var int
 	 */
 	protected $default = 60;
+
+	/**
+	 * An array of registered Cache macros.
+	 *
+	 * @var array
+	 */
+	protected $macros = array();
 
 	/**
 	 * Create a new cache repository instance.
@@ -44,7 +46,7 @@ class Repository implements ArrayAccess {
 	 */
 	public function has($key)
 	{
-		return ! is_null($this->get($key));
+		return ($this->get($key) !== null);
 	}
 
 	/**
@@ -58,7 +60,7 @@ class Repository implements ArrayAccess {
 	{
 		$value = $this->store->get($key);
 
-		return ! is_null($value) ? $value : value($default);
+		return ($value !== null) ? $value : value($default);
 	}
 
 	/**
@@ -86,7 +88,7 @@ class Repository implements ArrayAccess {
 	 */
 	public function add($key, $value, $minutes)
 	{
-		if (is_null($this->get($key)))
+		if ($this->get($key) === null)
 		{
 			$this->put($key, $value, $minutes); return true;
 		}
@@ -107,7 +109,8 @@ class Repository implements ArrayAccess {
 		// If the item exists in the cache we will just return this immediately
 		// otherwise we will execute the given Closure and cache the result
 		// of that execution for the given number of minutes in storage.
-		if ( ! is_null($value = $this->get($key)))
+		$value = $this->get($key);
+		if ($value !== null)
 		{
 			return $value;
 		}
@@ -141,7 +144,8 @@ class Repository implements ArrayAccess {
 		// If the item exists in the cache we will just return this immediately
 		// otherwise we will execute the given Closure and cache the result
 		// of that execution for the given number of minutes. It's easy.
-		if ( ! is_null($value = $this->get($key)))
+		$value = $this->get($key);
+		if ($value !== null)
 		{
 			return $value;
 		}
@@ -248,6 +252,18 @@ class Repository implements ArrayAccess {
 	}
 
 	/**
+	 * Register a macro with the Cache class.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function macro($name, $callback)
+	{
+		$this->macros[$name] = $callback;
+	}
+
+	/**
 	 * Handle dynamic calls into macros or pass missing methods to the store.
 	 *
 	 * @param  string  $method
@@ -256,14 +272,15 @@ class Repository implements ArrayAccess {
 	 */
 	public function __call($method, $parameters)
 	{
-		if (static::hasMacro($method))
+		if (isset($this->macros[$method]))
 		{
-			return $this->macroCall($method, $parameters);
+			return call_user_func_array($this->macros[$method], $parameters);
 		}
 		else
 		{
 			return call_user_func_array(array($this->store, $method), $parameters);
 		}
 	}
+
 
 }

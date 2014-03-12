@@ -28,7 +28,7 @@ class RetryCommand extends Command {
 	{
 		$failed = $this->laravel['queue.failer']->find($this->argument('id'));
 
-		if ( ! is_null($failed))
+		if ($failed !== null)
 		{
 			$failed->payload = $this->resetAttempts($failed->payload);
 

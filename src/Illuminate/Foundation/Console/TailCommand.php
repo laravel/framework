@@ -49,7 +49,7 @@ class TailCommand extends Command {
 	 */
 	protected function tailLogFile($path, $connection)
 	{
-		if (is_null($connection))
+		if ($connection === null)
 		{
 			$this->tailLocalLogs($path);
 		}
@@ -117,7 +117,7 @@ class TailCommand extends Command {
 	{
 		if ($this->option('path')) return $this->option('path');
 
-		if (is_null($connection))
+		if ($connection === null)
 		{
 			return base_path().'/app/storage/logs/laravel.log';
 		}

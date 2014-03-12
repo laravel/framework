@@ -63,7 +63,7 @@ class MigrationCreator {
 	 */
 	protected function getStub($table, $create)
 	{
-		if (is_null($table))
+		if ($table === null)
 		{
 			return $this->files->get($this->getStubPath().'/blank.stub');
 		}
@@ -94,7 +94,7 @@ class MigrationCreator {
 		// Here we will replace the table place-holders with the table specified by
 		// the developer, which is useful for quickly creating a tables creation
 		// or update migration from the console instead of typing it manually.
-		if ( ! is_null($table))
+		if ($table !== null)
 		{
 			$stub = str_replace('{{table}}', $table, $stub);
 		}

@@ -66,7 +66,7 @@ class WorkbenchMakeCommand extends Command {
 	{
 		$path = $this->laravel['path.base'].'/workbench';
 
-		$plain = ! $this->option('resources');
+		$plain = !$this->option('resources');
 
 		return $this->creator->create($package, $path, $plain);
 	}

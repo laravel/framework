@@ -62,7 +62,7 @@ class CommandMakeCommand extends Command {
 	 */
 	protected function writeCommand($file, $stub)
 	{
-		if ( ! file_exists($file))
+		if (!file_exists($file))
 		{
 			$this->files->put($file, $this->formatStub($stub));
 
@@ -84,7 +84,7 @@ class CommandMakeCommand extends Command {
 	{
 		$stub = str_replace('{{class}}', $this->input->getArgument('name'), $stub);
 
-		if ( ! is_null($this->option('command')))
+		if ($this->option('command') !== null)
 		{
 			$stub = str_replace('command:name', $this->option('command'), $stub);
 		}
@@ -100,7 +100,8 @@ class CommandMakeCommand extends Command {
 	 */
 	protected function addNamespace($stub)
 	{
-		if ( ! is_null($namespace = $this->input->getOption('namespace')))
+		$namespace = $this->input->getOption('namespace');
+		if ($namespace !== null)
 		{
 			return str_replace('{{namespace}}', ' namespace '.$namespace.';', $stub);
 		}
@@ -119,7 +120,7 @@ class CommandMakeCommand extends Command {
 	{
 		$path = $this->input->getOption('path');
 
-		if (is_null($path))
+		if ($path === null)
 		{
 			return $this->laravel['path'].'/commands';
 		}

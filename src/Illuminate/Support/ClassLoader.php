@@ -57,7 +57,7 @@ class ClassLoader {
 	 */
 	public static function register()
 	{
-		if ( ! static::$registered)
+		if (!static::$registered)
 		{
 			static::$registered = spl_autoload_register(array('\Illuminate\Support\ClassLoader', 'load'));
 		}
@@ -84,7 +84,7 @@ class ClassLoader {
 	 */
 	public static function removeDirectories($directories = null)
 	{
-		if (is_null($directories))
+		if ($directories === null)
 		{
 			static::$directories = array();
 		}
@@ -94,7 +94,7 @@ class ClassLoader {
 
 			static::$directories = array_filter(static::$directories, function($directory) use ($directories)
 			{
-				return ( ! in_array($directory, $directories));
+				return (!in_array($directory, $directories));
 			});
 		}
 	}

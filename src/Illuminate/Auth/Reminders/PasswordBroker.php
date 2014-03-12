@@ -110,7 +110,7 @@ class PasswordBroker {
 		// "flash" data in the session to indicate to the developers the errors.
 		$user = $this->getUser($credentials);
 
-		if (is_null($user))
+		if ($user === null)
 		{
 			return self::INVALID_USER;
 		}
@@ -144,7 +144,7 @@ class PasswordBroker {
 		{
 			$m->to($user->getReminderEmail());
 
-			if ( ! is_null($callback)) call_user_func($callback, $m, $user, $token);
+			if ($callback !== null) call_user_func($callback, $m, $user, $token);
 		});
 	}
 
@@ -162,7 +162,7 @@ class PasswordBroker {
 		// the user is properly redirected having an error message on the post.
 		$user = $this->validateReset($credentials);
 
-		if ( ! $user instanceof RemindableInterface)
+		if (!$user instanceof RemindableInterface)
 		{
 			return $user;
 		}
@@ -187,17 +187,18 @@ class PasswordBroker {
 	 */
 	protected function validateReset(array $credentials)
 	{
-		if (is_null($user = $this->getUser($credentials)))
+		$user = $this->getUser($credentials);
+		if ($user === null)
 		{
 			return self::INVALID_USER;
 		}
 
-		if ( ! $this->validNewPasswords($credentials))
+		if (!$this->validNewPasswords($credentials))
 		{
 			return self::INVALID_PASSWORD;
 		}
 
-		if ( ! $this->reminders->exists($user, $credentials['token']))
+		if (!$this->reminders->exists($user, $credentials['token']))
 		{
 			return self::INVALID_TOKEN;
 		}
@@ -263,7 +264,7 @@ class PasswordBroker {
 
 		$user = $this->users->retrieveByCredentials($credentials);
 
-		if ($user && ! $user instanceof RemindableInterface)
+		if ($user && !$user instanceof RemindableInterface)
 		{
 			throw new \UnexpectedValueException("User must implement Remindable interface.");
 		}

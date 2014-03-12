@@ -53,12 +53,12 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function connection($name = null)
 	{
-		$name = $name ?: $this->getDefaultConnection();
+		$name = $name ? : $this->getDefaultConnection();
 
 		// If we haven't created this connection, we'll create it based on the config
 		// provided in the application. Once we've created the connections we will
 		// set the "fetch mode" for PDO which determines the query return types.
-		if ( ! isset($this->connections[$name]))
+		if (!isset($this->connections[$name]))
 		{
 			$connection = $this->makeConnection($name);
 
@@ -76,7 +76,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function reconnect($name = null)
 	{
-		$name = $name ?: $this->getDefaultConnection();
+		$name = $name ? : $this->getDefaultConnection();
 
 		$this->disconnect($name);
 
@@ -91,7 +91,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function disconnect($name = null)
 	{
-		$name = $name ?: $this->getDefaultConnection();
+		$name = $name ? : $this->getDefaultConnection();
 
 		unset($this->connections[$name]);
 	}
@@ -173,14 +173,15 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	protected function getConfig($name)
 	{
-		$name = $name ?: $this->getDefaultConnection();
+		$name = $name ? : $this->getDefaultConnection();
 
 		// To get the database connection configuration, we will just pull each of the
 		// connection configurations and get the configurations for the given name.
 		// If the configuration doesn't exist, we'll throw an exception and bail.
 		$connections = $this->app['config']['database.connections'];
 
-		if (is_null($config = array_get($connections, $name)))
+		$config = array_get($connections, $name);
+		if ($config === null)
 		{
 			throw new \InvalidArgumentException("Database [$name] not configured.");
 		}

@@ -214,7 +214,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getSchemaBuilder()
 	{
-		if (is_null($this->schemaGrammar)) { $this->useDefaultSchemaGrammar(); }
+		if ($this->schemaGrammar === null) { $this->useDefaultSchemaGrammar(); }
 
 		return new Schema\Builder($this);
 	}
@@ -564,7 +564,7 @@ class Connection implements ConnectionInterface {
 			$this->events->fire('illuminate.query', array($query, $bindings, $time, $this->getName()));
 		}
 
-		if ( ! $this->loggingQueries) return;
+		if (!$this->loggingQueries) return;
 
 		$this->queryLog[] = compact('query', 'bindings', 'time');
 	}
@@ -651,7 +651,7 @@ class Connection implements ConnectionInterface {
 	{
 		if ($this->transactions >= 1) return $this->getPdo();
 
-		return $this->readPdo ?: $this->pdo;
+		return $this->readPdo ? : $this->pdo;
 	}
 
 	/**
@@ -798,7 +798,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the paginator environment instance.
 	 *
-	 * @return \Illuminate\Pagination\Factory
+	 * @return \Illuminate\Pagination\Environment
 	 */
 	public function getPaginator()
 	{
@@ -813,7 +813,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the pagination environment instance.
 	 *
-	 * @param  \Illuminate\Pagination\Factory|\Closure  $paginator
+	 * @param  \Illuminate\Pagination\Environment|\Closure  $paginator
 	 * @return void
 	 */
 	public function setPaginator($paginator)

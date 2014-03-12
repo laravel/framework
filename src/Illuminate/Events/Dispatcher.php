@@ -47,7 +47,7 @@ class Dispatcher {
 	 */
 	public function __construct(Container $container = null)
 	{
-		$this->container = $container ?: new Container;
+		$this->container = $container ? : new Container;
 	}
 
 	/**
@@ -105,9 +105,11 @@ class Dispatcher {
 	 */
 	public function queue($event, $payload = array())
 	{
-		$this->listen($event.'_queue', function() use ($event, $payload)
+		$me = $this;
+
+		$this->listen($event.'_queue', function() use ($me, $event, $payload)
 		{
-			$this->fire($event, $payload);
+			$me->fire($event, $payload);
 		});
 	}
 
@@ -188,7 +190,7 @@ class Dispatcher {
 		// If an array is not given to us as the payload, we will turn it into one so
 		// we can easily use call_user_func_array on the listeners, passing in the
 		// payload to each of them so that they receive each of these arguments.
-		if ( ! is_array($payload)) $payload = array($payload);
+		if (!is_array($payload)) $payload = array($payload);
 
 		$this->firing[] = $event;
 
@@ -199,7 +201,7 @@ class Dispatcher {
 			// If a response is returned from the listener and event halting is enabled
 			// we will just return this response, and not call the rest of the event
 			// listeners. Otherwise we will add the response on the response list.
-			if ( ! is_null($response) && $halt)
+			if ($response !== null && $halt)
 			{
 				array_pop($this->firing);
 
@@ -229,7 +231,7 @@ class Dispatcher {
 	{
 		$wildcards = $this->getWildcardListeners($eventName);
 
-		if ( ! isset($this->sorted[$eventName]))
+		if (!isset($this->sorted[$eventName]))
 		{
 			$this->sortListeners($eventName);
 		}

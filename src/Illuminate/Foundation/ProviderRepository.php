@@ -167,7 +167,7 @@ class ProviderRepository {
 	 */
 	public function shouldRecompile($manifest, $providers)
 	{
-		return is_null($manifest) || $manifest['providers'] != $providers;
+		return ($manifest === null || $manifest['providers'] != $providers);
 	}
 
 	/**
@@ -200,7 +200,7 @@ class ProviderRepository {
 	{
 		$path = $this->manifestPath.'/services.json';
 
-		$this->files->put($path, json_encode($manifest, JSON_PRETTY_PRINT));
+		$this->files->put($path, json_encode($manifest));
 
 		return $manifest;
 	}

@@ -92,7 +92,7 @@ class Middleware implements HttpKernelInterface {
 	 */
 	public function checkRequestForArraySessions(Request $request)
 	{
-		if (is_null($this->reject)) return;
+		if ($this->reject === null) return;
 
 		if (call_user_func($this->reject, $request))
 		{
@@ -221,7 +221,7 @@ class Middleware implements HttpKernelInterface {
 	 */
 	protected function sessionConfigured()
 	{
-		return ! is_null(array_get($this->manager->getSessionConfig(), 'driver'));
+		return (array_get($this->manager->getSessionConfig(), 'driver') !== null);
 	}
 
 	/**
@@ -235,9 +235,9 @@ class Middleware implements HttpKernelInterface {
 		// Some session drivers are not persistent, such as the test array driver or even
 		// when the developer don't have a session driver configured at all, which the
 		// session cookies will not need to get set on any responses in those cases.
-		$config = $config ?: $this->manager->getSessionConfig();
+		$config = $config ? : $this->manager->getSessionConfig();
 
-		return ! in_array($config['driver'], array(null, 'array'));
+		return !in_array($config['driver'], array(null, 'array'));
 	}
 
 	/**

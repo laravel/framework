@@ -51,7 +51,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	{
 		$user = $this->conn->table($this->table)->find($identifier);
 
-		if ( ! is_null($user))
+		if ($user !== null)
 		{
 			return new GenericUser((array) $user);
 		}
@@ -72,7 +72,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 
 		foreach ($credentials as $key => $value)
 		{
-			if ( ! str_contains($key, 'password'))
+			if (!str_contains($key, 'password'))
 			{
 				$query->where($key, $value);
 			}
@@ -83,7 +83,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 		// that there are no matching users for these given credential arrays.
 		$user = $query->first();
 
-		if ( ! is_null($user))
+		if ($user !== null)
 		{
 			return new GenericUser((array) $user);
 		}

@@ -62,7 +62,7 @@ class FileLoader implements LoaderInterface {
 		// as any environment folders with their specific configuration items.
 		$path = $this->getPath($namespace);
 
-		if (is_null($path))
+		if ($path === null)
 		{
 			return $items;
 		}
@@ -126,7 +126,7 @@ class FileLoader implements LoaderInterface {
 		// To check if a group exists, we will simply get the path based on the
 		// namespace, and then check to see if this files exists within that
 		// namespace. False is returned if no path exists for a namespace.
-		if (is_null($path))
+		if ($path === null)
 		{
 			return $this->exists[$key] = false;
 		}
@@ -198,7 +198,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function getPath($namespace)
 	{
-		if (is_null($namespace))
+		if ($namespace === null)
 		{
 			return $this->defaultPath;
 		}
