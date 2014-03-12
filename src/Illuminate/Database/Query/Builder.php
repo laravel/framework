@@ -1409,6 +1409,7 @@ class Builder {
 	 *
 	 * @param  int    $perPage
 	 * @param  array  $columns
+	 * @param  string $pageName
 	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function paginate($perPage = 15, $columns = array('*'), $pageName = 'page')
@@ -1431,6 +1432,7 @@ class Builder {
 	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
+	 * @param  string $pageName
 	 * @return \Illuminate\Pagination\Paginator
 	 */
 	protected function groupedPaginate($paginator, $perPage, $columns, $pageName)
@@ -1446,6 +1448,7 @@ class Builder {
 	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  array  $results
 	 * @param  int    $perPage
+	 * @param  string $pageName
 	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function buildRawPaginator($paginator, $results, $perPage, $pageName)
@@ -1466,6 +1469,7 @@ class Builder {
 	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
+	 * @param  string $pageName
 	 * @return \Illuminate\Pagination\Paginator
 	 */
 	protected function ungroupedPaginate($paginator, $perPage, $columns, $pageName)

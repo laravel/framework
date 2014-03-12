@@ -338,9 +338,9 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	}
 
 	/**
-	 * Get the number of items to be displayed per page.
+	 * Get the input page parameter name used by the paginator.
 	 *
-	 * @return int
+	 * @return string
 	 */
 	public function getPageName()
 	{

@@ -87,6 +87,7 @@ class Environment {
 	 * @param  array  $items
 	 * @param  int    $total
 	 * @param  int    $perPage
+	 * @param  string $pageName
 	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function make(array $items, $total, $perPage, $pageName = 'page')
@@ -113,6 +114,7 @@ class Environment {
 	/**
 	 * Get the number of the current page.
 	 *
+	 * @param  string $pageName
 	 * @return int
 	 */
 	public function getCurrentPage($pageName = 'page')

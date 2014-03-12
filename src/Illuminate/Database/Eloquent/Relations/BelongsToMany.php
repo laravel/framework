@@ -162,6 +162,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  int    $perPage
 	 * @param  array  $columns
+	 * @param  string $pageName
 	 * @return \Illuminate\Pagination\Paginator
 	 */
 	public function paginate($perPage = null, $columns = array('*'), $pageName = 'page')
