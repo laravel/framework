@@ -81,7 +81,7 @@ class HtmlBuilder {
 	/**
 	 * Generate a link to a CSS file.
 	 *
-	 * @param  string  $url
+     * @param  string  $url
 	 * @param  array   $attributes
      * @param  bool    $secure
 	 * @return string
