@@ -261,7 +261,7 @@ class FormBuilder {
 
 		$options = array_merge($options, $merge);
 
-		if (!is_null($this->namespace))
+		if (!is_null($this->namespace) && $options['name'] != '_token')
 		{
 			$options['name'] = $this->getNameAttribute($options['name']);
 		}
