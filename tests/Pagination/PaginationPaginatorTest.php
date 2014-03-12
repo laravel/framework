@@ -153,12 +153,12 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('c', $last);
 	}
 
-    public function testOverridingPageParam()
-    {
-        $p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2);
-        $this->assertEquals('page', $p->getPageName());
-        $p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2, 'foo');
-        $this->assertEquals('foo', $p->getPageName());
+	public function testOverridingPageParam()
+	{
+		$p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2);
+		$this->assertEquals('page', $p->getPageName());
+		$p = new Paginator(m::mock('Illuminate\Pagination\Environment'), array('a', 'b', 'c'), 3, 2, 'foo');
+		$this->assertEquals('foo', $p->getPageName());
 	}
 
 }
