@@ -199,6 +199,18 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		}
 	}
 
+    /**
+     * bind fallback concrete types for abstract entities
+     * @param array $fallbacks
+     */
+    public function bindFallbackTypes(array $fallbacks)
+    {
+        foreach($fallbacks as $abstract => $concrete)
+        {
+            $this->bind($abstract, $concrete);
+        }
+    }
+
 	/**
 	 * Get the application bootstrap file.
 	 *
