@@ -32,7 +32,6 @@ class IronJob extends Job {
 	 * @param  \Illuminate\Container\Container  $container
 	 * @param  \Illuminate\Queue\IronQueue  $iron
 	 * @param  object  $job
-	 * @param  string  $queue
 	 * @param  bool    $pushed
 	 * @return void
 	 */
@@ -127,16 +126,6 @@ class IronJob extends Job {
 	public function getJobId()
 	{
 		return $this->job->id;
-	}
-
-	/**
-	 * Get the IoC container instance.
-	 *
-	 * @return \Illuminate\Container\Container
-	 */
-	public function getContainer()
-	{
-		return $this->container;
 	}
 
 	/**

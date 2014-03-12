@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 use Illuminate\Encryption\Encrypter;
+use RuntimeException;
 
 class IronQueue extends PushQueue implements QueueInterface {
 
@@ -14,6 +15,13 @@ class IronQueue extends PushQueue implements QueueInterface {
 	 * @var IronMQ
 	 */
 	protected $iron;
+
+	/**
+	 * The queue meta information from Iron.io.
+	 *
+	 * @var object
+	 */
+	protected $meta;
 
 	/**
 	 * The encrypter instance.
@@ -135,7 +143,7 @@ class IronQueue extends PushQueue implements QueueInterface {
 		{
 			$job->body = $this->parseJobBody($job->body);
 
-			return new IronJob($this->container, $this, $job);
+			return $this->createIronJob($job);
 		}
 	}
 
@@ -158,7 +166,9 @@ class IronQueue extends PushQueue implements QueueInterface {
 	 */
 	public function marshal()
 	{
-		$this->createPushedIronJob($this->marshalPushedJob())->fire();
+		$r = $this->request;
+
+		$this->createIronJob($this->marshalPushedJob(), true)->fire();
 
 		return new Response('OK');
 	}
@@ -172,22 +182,24 @@ class IronQueue extends PushQueue implements QueueInterface {
 	{
 		$r = $this->request;
 
+		$messageId = $this->parseOutMessageId($r);
 		$body = $this->parseJobBody($r->getContent());
 
 		return (object) array(
-			'id' => $r->header('iron-message-id'), 'body' => $body, 'pushed' => true,
+			'id' => $messageId, 'body' => $body, 'pushed' => true,
 		);
 	}
 
 	/**
-	 * Create a new IronJob for a pushed job.
+	 * Create a new IronJob.
 	 *
 	 * @param  object  $job
+	 * @param  boolean $pushed
 	 * @return \Illuminate\Queue\Jobs\IronJob
 	 */
-	protected function createPushedIronJob($job)
+	protected function createIronJob($job, $pushed = false)
 	{
-		return new IronJob($this->container, $this, $job, true);
+		return new IronJob($this->container, $this, $job, $pushed);
 	}
 
 	/**
@@ -203,6 +215,26 @@ class IronQueue extends PushQueue implements QueueInterface {
 		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
 
 		return $this->setMeta($payload, 'queue', $this->getQueue($queue));
+	}
+
+	/**
+	 * Parse out the message id from the request header
+	 *
+	 * @param  Request $request
+	 * @return string
+	 *
+	 * @throws \RuntimeException
+	 */
+	protected function parseOutMessageId($request)
+	{
+		$messageId = $request->header('iron-message-id');
+
+		if ($messageId == null)
+		{
+			throw new RuntimeException("The marshaled job must come from IronMQ.");	
+		}
+
+		return $messageId;
 	}
 
 	/**
@@ -235,6 +267,166 @@ class IronQueue extends PushQueue implements QueueInterface {
 	public function getIron()
 	{
 		return $this->iron;
+	}
+
+	/**
+	 * Get the queue options.
+	 *
+	 * @param string $queue
+	 * @param string $endpoint
+	 * @param array  $options
+	 * @param array  $advanced
+	 * @return array
+	 */
+	protected function getQueueOptions($queue, $endpoint, $options, $advanced)
+	{
+		return array_merge(
+			array('subscribers' => $this->getSubscriberList($queue, $endpoint)),
+			$this->getStandardOptions($queue, $endpoint, $options),
+			array_merge(array_only($this->getQueueMeta($queue), array('push_type', 'retries_delay')), $advanced)
+		);
+	}
+
+	/**
+	 * Get the standard queue options
+	 *
+	 * @param string $queue
+	 * @param string $endpoint
+	 * @param array  $options
+	 * @return array
+	 */
+	protected function getStandardOptions($queue, $endpoint, $options)
+	{
+		return array(
+			'retries' => $this->getOption($queue, 'retries', (isset($options['retries']) ? $options['retries'] : false)),  
+			'error_queue' => $this->getOption($queue, 'error_queue', (isset($options['errqueue']) ? $options['errqueue'] : false)) 
+		);
+	}
+
+	/**
+	 * Get a queue option
+	 *
+	 * @param string $queue
+	 * @param string $key
+	 * @param string $value
+	 * @return array
+	 *
+	 * @throws \RuntimeException
+	 */
+	protected function getOption($queue, $key, $value = null)
+	{
+		if ($value) return $value;
+
+		try
+		{
+			return $this->getQueueMeta($queue)[$key];
+		}
+		catch (\Exception $e)
+		{
+			switch($key) {
+				case 'retries':
+					return 3;
+				case 'error_queue':
+					return '';
+				default :
+					throw new RuntimeException("The option '".$key."' is not a valid setting for an Iron.io queue");
+			}
+		}
+	}
+
+	/**
+	 * Get the queue information from Iron.io.
+	 *
+	 * @param string $queue
+	 * @return object
+	 */
+	protected function getQueueMeta($queue)
+	{
+		if (isset($this->meta)) return $this->meta;	
+
+		return $this->meta = (array)$this->getIron()->getQueue($queue);
+	}
+
+	/**
+	 * Get the current subscribers for the queue.
+	 *
+	 * @param string $queue
+	 * @param string $endpoint
+	 * @return array
+	 */
+	protected function getSubscriberList($queue, $endpoint)
+	{
+		$subscribers = $this->getCurrentSubscribers($queue);
+
+		$subscribers = array_map(function($subscriber) {
+
+			return (array)$subscriber;
+		
+		}, $subscribers);
+
+		if(array_search($endpoint, array_column($subscribers, 'url')) === false)
+		{
+			$subscribers[] = array('url' => $endpoint);
+		}	
+
+		return $subscribers;
+	}
+
+	/**
+	 * Get the current subscriber list.
+	 *
+	 * @param string $queue
+	 * @return array
+	 */
+	protected function getCurrentSubscribers($queue)
+	{
+		try
+		{
+			return $this->getQueueMeta($queue)['subscribers'];
+		}
+		catch (\Exception $e)
+		{
+			return array();
+		}
+	}
+
+	/**
+	 * Subscribe a queue to the endpoint url
+	 *
+	 * @param string  $queue
+	 * @param string  $endpoint
+	 * @param array   $options
+	 * @return array
+	 */
+	public function subscribe($queue, $endpoint, array $options = array(), array $advanced = array())
+	{
+		return $this->update($queue, $endpoint, $options, $advanced);
+	}
+	
+	/**
+	 * Unsubscribe a queue from an endpoint url
+	 *
+	 * @param string  $queue
+	 * @param string  $url
+	 * @return array
+	 */
+	public function unsubscribe($queue, $endpoint)
+	{ 
+		return $this->getIron()->removeSubscriber($queue, array('url' => $endpoint));
+	}
+
+	/**
+	 * Update queue settings
+	 *
+	 * @param string  $queue
+	 * @param string  $endpoint
+	 * @param array   $options
+	 * @param array   $advanced
+	 * @return array
+	 */
+	public function update($queue, $endpoint, array $options = array(), array $advanced = array())
+	{
+		return $this->getIron()->updateQueue($queue, $this->getQueueOptions($queue, $endpoint, $options, $advanced)); 
 	}
 
 }
