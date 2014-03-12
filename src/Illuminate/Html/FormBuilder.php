@@ -44,6 +44,13 @@ class FormBuilder {
 	protected $model;
 
 	/**
+	 * The namespace for all form parameter names.
+	 *
+	 * @var mixed
+	 */
+	protected $namespace;
+
+	/**
 	 * An array of label names we've created.
 	 *
 	 * @var array
@@ -55,7 +62,7 @@ class FormBuilder {
 	 *
 	 * @var array
 	 */
-	protected $reserved = array('method', 'url', 'route', 'action', 'files');
+	protected $reserved = array('method', 'url', 'route', 'action', 'files', 'namespace');
 
 	/**
 	 * The form methods that should be spoofed, in uppercase.
@@ -94,6 +101,8 @@ class FormBuilder {
 	 */
 	public function open(array $options = array())
 	{
+    $this->namespace = array_get($options, 'namespace', null);
+
 		$method = array_get($options, 'method', 'post');
 
 		// We need to extract the proper method from the attributes. If the method is
@@ -143,6 +152,11 @@ class FormBuilder {
 	{
 		$this->model = $model;
 
+		if(is_object($model) && !isset($options['namespace']))
+		{
+      $options['namespace'] = strtolower(get_class($model));
+		}
+
 		return $this->open($options);
 	}
 
@@ -155,6 +169,11 @@ class FormBuilder {
 	public function setModel($model)
 	{
 		$this->model = $model;
+
+		if(is_object($model))
+		{
+      $this->namespace = strtolower(get_class($model));
+		}
 	}
 
 	/**
@@ -241,6 +260,11 @@ class FormBuilder {
 		$merge = compact('type', 'value', 'id');
 
 		$options = array_merge($options, $merge);
+
+		if (!is_null($this->namespace))
+		{
+			$options['name'] = $this->getNameAttribute($options['name']);
+		}
 
 		return '<input'.$this->html->attributes($options).'>';
 	}
@@ -344,6 +368,11 @@ class FormBuilder {
 
 		unset($options['size']);
 
+		if (!is_null($this->namespace))
+		{
+			$options['name'] = $this->getNameAttribute($options['name']);
+		}
+
 		// Next we will convert the attributes into a string form. Also we have removed
 		// the size attribute, as it was merely a short-cut for the rows and cols on
 		// the element. Then we'll create the final textarea elements HTML for us.
@@ -416,6 +445,11 @@ class FormBuilder {
 		foreach ($list as $value => $display)
 		{
 			$html[] = $this->getSelectOption($display, $value, $selected);
+		}
+
+		if (!is_null($this->namespace))
+		{
+			$options['name'] = $this->getNameAttribute($options['name']);
 		}
 
 		// Once we have all of this HTML, we can join this into a single element after
@@ -866,6 +900,17 @@ class FormBuilder {
 		{
 			return $name;
 		}
+	}
+
+	/**
+	 * Adds namespace prefix to an attribute.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	public function getNameAttribute($name)
+	{
+		return $this->namespace.preg_replace('/^([^\[]+)/i', '[${1}]', $name);
 	}
 
 	/**
