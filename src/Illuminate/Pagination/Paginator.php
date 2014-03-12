@@ -81,13 +81,13 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	protected $fragment;
 
 	/**
-     * The input parameter used for the current page.
-     *
-     * @var string
-     */
-    protected $pageName;
+	 * The input parameter used for the current page.
+	 *
+	 * @var string
+	 */
+	protected $pageName;
 
-    /**
+	/**
 	 * Create a new Paginator instance.
 	 *
 	 * @param  \Illuminate\Pagination\Environment  $env
@@ -103,7 +103,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		$this->items = $items;
 		$this->total = (int) $total;
 		$this->perPage = (int) $perPage;
-        $this->pageName = $pageName;
+		$this->pageName = $pageName;
 	}
 
 	/**
