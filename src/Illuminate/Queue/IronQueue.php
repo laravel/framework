@@ -5,8 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 use Illuminate\Encryption\Encrypter;
+use RuntimeException;
 
-class IronQueue extends Queue implements QueueInterface {
+class IronQueue extends PushQueue implements QueueInterface {
 
 	/**
 	 * The IronMQ instance.
@@ -21,13 +22,6 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @var \Illuminate\Encryption\Encrypter
 	 */
 	protected $crypt;
-
-	/**
-	 * The current request instance.
-	 *
-	 * @var \Illuminate\Http\Request
-	 */
-	protected $request;
 
 	/**
 	 * The name of the default tube.
@@ -165,6 +159,8 @@ class IronQueue extends Queue implements QueueInterface {
 	 */
 	public function marshal()
 	{
+		$r = $this->request;
+
 		$this->createPushedIronJob($this->marshalPushedJob())->fire();
 
 		return new Response('OK');
@@ -179,10 +175,11 @@ class IronQueue extends Queue implements QueueInterface {
 	{
 		$r = $this->request;
 
+		$messageId = $this->parseOutMessageId($r);
 		$body = $this->parseJobBody($r->getContent());
 
 		return (object) array(
-			'id' => $r->header('iron-message-id'), 'body' => $body, 'pushed' => true,
+			'id' => $messageId, 'body' => $body, 'pushed' => true,
 		);
 	}
 
@@ -210,6 +207,24 @@ class IronQueue extends Queue implements QueueInterface {
 		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
 
 		return $this->setMeta($payload, 'queue', $this->getQueue($queue));
+	}
+
+	/**
+	 * Parse out the message id from the request header
+	 *
+	 * @param  Request $request
+	 * @return string
+	 */
+	protected function parseOutMessageId($request)
+	{
+		$messageId = $request->header('iron-message-id');
+
+		if($messageId == null)
+		{
+			throw new RuntimeException("The marshaled job must come from IronMQ.");	
+		}
+
+		return $messageId;
 	}
 
 	/**
@@ -245,24 +260,34 @@ class IronQueue extends Queue implements QueueInterface {
 	}
 
 	/**
-	 * Get the request instance.
+	 * Subscribe a queue to the endpoint url
 	 *
-	 * @return \Symfony\Component\HttpFoundation\Request
+	 * @param string  $queue
+	 * @param string  $endpoint
+	 * @param array   $options
+	 * @return array
 	 */
-	public function getRequest()
-	{
-		return $this->request;
-	}
+	public function subscribe($queue, $endpoint, array $options = array())
+	{	
+		$response = $this->getIron()->addSubscriber($queue, array('url' => $endpoint));
+	
+		$response = $this->getIron()->updateQueue($queue, $options);
 
+		return $response;
+	}
+	
 	/**
-	 * Set the request instance.
+	 * Unsubscribe a queue from an endpoint url
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return void
+	 * @param string  $queue
+	 * @param string  $url
+	 * @return array
 	 */
-	public function setRequest(Request $request)
+	public function unsubscribe($queue, $endpoint)
 	{
-		$this->request = $request;
+		$response = $this->getIron()->removeSubscriber($queue, array('url' => $endpoint));
+
+		return $response;
 	}
 
 }

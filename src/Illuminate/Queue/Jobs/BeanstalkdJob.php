@@ -118,16 +118,6 @@ class BeanstalkdJob extends Job {
 	}
 
 	/**
-	 * Get the IoC container instance.
-	 *
-	 * @return \Illuminate\Container\Container
-	 */
-	public function getContainer()
-	{
-		return $this->container;
-	}
-
-	/**
 	 * Get the underlying Pheanstalk instance.
 	 *
 	 * @return Pheanstalk

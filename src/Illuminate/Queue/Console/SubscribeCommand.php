@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Queue\Console;
 
-use RuntimeException;
-use Illuminate\Queue\IronQueue;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,14 +18,7 @@ class SubscribeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Subscribe a URL to an Iron.io push queue';
-
-	/**
-	 * The queue meta information from Iron.io.
-	 *
-	 * @var object
-	 */
-	protected $meta;
+	protected $description = 'Subscribe a URL to an Iron.io or SQS push queue';
 
 	/**
 	 * Execute the console command.
@@ -38,90 +29,11 @@ class SubscribeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$iron = $this->laravel['queue']->connection();
-
-		if ( ! $iron instanceof IronQueue)
-		{
-			throw new RuntimeException("Iron.io based queue must be default.");
-		}
-
-		$iron->getIron()->updateQueue($this->argument('queue'), $this->getQueueOptions());
+		$queue = $this->laravel['queue']->connection();
+		
+		$queue->subscribe($this->argument('queue'), $this->argument('url'), array_only($this->option(), array('type', 'retries', 'patience')));
 
 		$this->line('<info>Queue subscriber added:</info> <comment>'.$this->argument('url').'</comment>');
-	}
-
-	/**
-	 * Get the queue options.
-	 *
-	 * @return array
-	 */
-	protected function getQueueOptions()
-	{
-		return array(
-			'push_type' => $this->getPushType(), 'subscribers' => $this->getSubscriberList()
-		);
-	}
-
-	/**
-	 * Get the push type for the queue.
-	 *
-	 * @return string
-	 */
-	protected function getPushType()
-	{
-		if ($this->option('type')) return $this->option('type');
-
-		try
-		{
-			return $this->getQueue()->push_type;
-		}
-		catch (\Exception $e)
-		{
-			return 'multicast';
-		}
-	}
-
-	/**
-	 * Get the current subscribers for the queue.
-	 *
-	 * @return array
-	 */
-	protected function getSubscriberList()
-	{
-		$subscribers = $this->getCurrentSubscribers();
-
-		$subscribers[] = array('url' => $this->argument('url'));
-
-		return $subscribers;
-	}
-
-	/**
-	 * Get the current subscriber list.
-	 *
-	 * @return array
-	 */
-	protected function getCurrentSubscribers()
-	{
-		try
-		{
-			return $this->getQueue()->subscribers;
-		}
-		catch (\Exception $e)
-		{
-			return array();
-		}
-	}
-
-	/**
-	 * Get the queue information from Iron.io.
-	 *
-	 * @return object
-	 */
-	protected function getQueue()
-	{
-		if (isset($this->meta)) return $this->meta;
-
-		return $this->meta = $this->laravel['queue']->getIron()->getQueue($this->argument('queue'));
 	}
 
 	/**
@@ -132,7 +44,7 @@ class SubscribeCommand extends Command {
 	protected function getArguments()
 	{
 		return array(
-			array('queue', InputArgument::REQUIRED, 'The name of Iron.io queue.'),
+			array('queue', InputArgument::REQUIRED, 'The name of Iron.io queue or SNS topic.'),
 
 			array('url', InputArgument::REQUIRED, 'The URL to be subscribed.'),
 		);
@@ -146,7 +58,11 @@ class SubscribeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('type', null, InputOption::VALUE_OPTIONAL, 'The push type for the queue.'),
+			array('type', null, InputOption::VALUE_OPTIONAL, 'The push type for the queue.', 'multicast'),
+
+			array('retries', null, InputOption::VALUE_OPTIONAL, 'Number of retries.', 3),
+
+			array('patience', null, InputOption::VALUE_OPTIONAL, 'The number of seconds to wait between retries.', '60'),
 		);
 	}
 

@@ -67,7 +67,7 @@ class QueueManager {
 		if ( ! isset($this->connections[$name]))
 		{
 			$this->connections[$name] = $this->resolve($name);
-
+		
 			$this->connections[$name]->setContainer($this->app);
 		}
 

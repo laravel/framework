@@ -105,4 +105,13 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(200, $response->getStatusCode());
 	}
 
+	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testPushedJobsMustComeFromIronMQ()
+	{
+		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('createPushedIronJob'), array($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), $request = m::mock('Illuminate\Http\Request'), 'default', true));
+		$request->shouldReceive('header')->once()->with('iron-message-id')->andReturn(null);
+		$response = $queue->marshal();
+	}
 }
