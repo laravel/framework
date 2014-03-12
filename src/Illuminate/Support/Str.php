@@ -1,10 +1,13 @@
 <?php namespace Illuminate\Support;
 
-use Illuminate\Support\Traits\MacroableTrait;
-
 class Str {
 
-	use MacroableTrait;
+	/**
+	 * The registered string macros.
+	 *
+	 * @var array
+	 */
+	protected static $macros = array();
 
 	/**
 	 * Transliterate a UTF-8 value to ASCII.
@@ -73,7 +76,7 @@ class Str {
 	{
 		$quoted = preg_quote($cap, '/');
 
-		return preg_replace('/(?:'.$quoted.')+$/', '', $value).$cap;
+		return preg_replace('/(? :'.$quoted.')+$/', '', $value).$cap;
 	}
 
 	/**
@@ -144,9 +147,9 @@ class Str {
 	 */
 	public static function words($value, $words = 100, $end = '...')
 	{
-		preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
+		preg_match('/^\s*+(? :\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-		if ( ! isset($matches[0])) return $value;
+		if (!isset($matches[0])) return $value;
 
 		if (strlen($value) == strlen($matches[0])) return $value;
 
@@ -317,6 +320,37 @@ class Str {
 		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
 
 		return str_replace(' ', '', $value);
+	}
+
+	/**
+	 * Register a custom string macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public static function macro($name, $macro)
+	{
+		static::$macros[$name] = $macro;
+	}
+
+	/**
+	 * Dynamically handle calls to the string class.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public static function __callStatic($method, $parameters)
+	{
+		if (isset(static::$macros[$method]))
+		{
+			return call_user_func_array(static::$macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

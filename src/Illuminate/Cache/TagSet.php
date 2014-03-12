@@ -47,7 +47,7 @@ class TagSet {
 	 */
 	public function tagId($name)
 	{
-		return $this->store->get($this->tagKey($name)) ?: $this->resetTag($name);
+		return $this->store->get($this->tagKey($name)) ? : $this->resetTag($name);
 	}
 
 	/**

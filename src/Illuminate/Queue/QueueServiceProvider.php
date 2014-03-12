@@ -45,14 +45,16 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerManager()
 	{
-		$this->app->bindShared('queue', function($app)
+		$me = $this;
+
+		$this->app->bindShared('queue', function($app) use ($me)
 		{
 			// Once we have an instance of the queue manager, we will register the various
 			// resolvers for the queue connectors. These connectors are responsible for
 			// creating the classes that accept queue configs and instantiate queues.
 			$manager = new QueueManager($app);
 
-			$this->registerConnectors($manager);
+			$me->registerConnectors($manager);
 
 			return $manager;
 		});

@@ -63,7 +63,8 @@ class AssetPublishCommand extends Command {
 	 */
 	protected function publishAssets($package)
 	{
-		if ( ! is_null($path = $this->getPath()))
+		$path = $this->getPath();
+		if ($path !== null)
 		{
 			$this->assets->publish($package, $path);
 		}
@@ -82,15 +83,17 @@ class AssetPublishCommand extends Command {
 	 */
 	protected function getPackages()
 	{
-		if ( ! is_null($package = $this->input->getArgument('package')))
+		$package = $this->input->getArgument('package');
+		if ($package !== null)
 		{
 			return array($package);
+		} else {
+			$bench = $this->input->getOption('bench');
+			if ($bench !== null)
+			{
+				return array($bench);
+			}
 		}
-		elseif ( ! is_null($bench = $this->input->getOption('bench')))
-		{
-			return array($bench);
-		}
-
 		return $this->findAllAssetPackages();
 	}
 
@@ -125,7 +128,7 @@ class AssetPublishCommand extends Command {
 		// First we will check for an explicitly specified path from the user. If one
 		// exists we will use that as the path to the assets. This allows the free
 		// storage of assets wherever is best for this developer's web projects.
-		if ( ! is_null($path))
+		if ($path !== null)
 		{
 			return $this->laravel['path.base'].'/'.$path;
 		}
@@ -135,7 +138,7 @@ class AssetPublishCommand extends Command {
 		// specify the full workbench path using the --path command line option.
 		$bench = $this->input->getOption('bench');
 
-		if ( ! is_null($bench))
+		if ($bench !== null)
 		{
 			return $this->laravel['path.base']."/workbench/{$bench}/public";
 		}

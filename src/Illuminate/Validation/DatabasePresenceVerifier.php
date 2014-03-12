@@ -44,9 +44,9 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	{
 		$query = $this->table($collection)->where($column, '=', $value);
 
-		if ( ! is_null($excludeId) && $excludeId != 'NULL')
+		if ($excludeId !== null && $excludeId != 'NULL')
 		{
-			$query->where($idColumn ?: 'id', '<>', $excludeId);
+			$query->where($idColumn ? : 'id', '<>', $excludeId);
 		}
 
 		foreach ($extra as $key => $extraValue)

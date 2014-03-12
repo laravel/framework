@@ -94,7 +94,7 @@ class Guard {
 	 */
 	public function check()
 	{
-		return ! is_null($this->user());
+		return ($this->user() !== null);
 	}
 
 	/**
@@ -104,7 +104,7 @@ class Guard {
 	 */
 	public function guest()
 	{
-		return ! $this->check();
+		return !$this->check();
 	}
 
 	/**
@@ -119,7 +119,7 @@ class Guard {
 		// If we have already retrieved the user for the current request we can just
 		// return it back immediately. We do not want to pull the user data every
 		// request into the method because that would tremendously slow an app.
-		if ( ! is_null($this->user))
+		if ($this->user !== null)
 		{
 			return $this->user;
 		}
@@ -131,7 +131,7 @@ class Guard {
 		// request, and if one exists, attempt to retrieve the user using that.
 		$user = null;
 
-		if ( ! is_null($id))
+		if ($id !== null)
 		{
 			$user = $this->provider->retrieveByID($id);
 		}
@@ -141,7 +141,7 @@ class Guard {
 		// the application. Once we have a user we can return it to the caller.
 		$recaller = $this->getRecaller();
 
-		if (is_null($user) && ! is_null($recaller))
+		if ($user === null && $recaller !== null)
 		{
 			$user = $this->getUserByRecaller($recaller);
 		}
@@ -157,7 +157,8 @@ class Guard {
 	 */
 	protected function getUserByRecaller($id)
 	{
-		$this->viaRemember = ! is_null($user = $this->provider->retrieveByID($id));
+		$user = $this->provider->retrieveByID($id);
+		$this->viaRemember = ($user !== null);
 
 		return $user;
 	}
@@ -212,7 +213,7 @@ class Guard {
 	{
 		if ($this->check()) return;
 
-		$request = $request ?: $this->getRequest();
+		$request = $request ? : $this->getRequest();
 
 		// If a username is set on the HTTP basic request, we will return out without
 		// interrupting the request lifecycle. Otherwise, we'll need to generate a
@@ -231,9 +232,9 @@ class Guard {
 	 */
 	public function onceBasic($field = 'email', Request $request = null)
 	{
-		$request = $request ?: $this->getRequest();
+		$request = $request ? : $this->getRequest();
 
-		if ( ! $this->once($this->getBasicCredentials($request, $field)))
+		if (!$this->once($this->getBasicCredentials($request, $field)))
 		{
 			return $this->getBasicResponse();
 		}
@@ -248,7 +249,7 @@ class Guard {
 	 */
 	protected function attemptBasic(Request $request, $field)
 	{
-		if ( ! $request->getUser()) return false;
+		if (!$request->getUser()) return false;
 
 		return $this->attempt($this->getBasicCredentials($request, $field));
 	}
@@ -313,7 +314,7 @@ class Guard {
 	 */
 	protected function hasValidCredentials($user, $credentials)
 	{
-		return ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
+		return ($user !== null) && $this->provider->validateCredentials($user, $credentials);
 	}
 
 	/**
@@ -492,7 +493,7 @@ class Guard {
 	 */
 	public function getCookieJar()
 	{
-		if ( ! isset($this->cookie))
+		if (!isset($this->cookie))
 		{
 			throw new \RuntimeException("Cookie jar has not been set.");
 		}
@@ -592,7 +593,7 @@ class Guard {
 	 */
 	public function getRequest()
 	{
-		return $this->request ?: Request::createFromGlobals();
+		return $this->request ? : Request::createFromGlobals();
 	}
 
 	/**

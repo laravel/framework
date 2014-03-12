@@ -42,7 +42,7 @@ class AliasLoader {
 	 */
 	public static function getInstance(array $aliases = array())
 	{
-		if (is_null(static::$instance)) static::$instance = new static($aliases);
+		if (static::$instance === null) static::$instance = new static($aliases);
 		
 		$aliases = array_merge(static::$instance->getAliases(), $aliases);
 
@@ -84,7 +84,7 @@ class AliasLoader {
 	 */
 	public function register()
 	{
-		if ( ! $this->registered)
+		if (!$this->registered)
 		{
 			$this->prependToLoaderStack();
 

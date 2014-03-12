@@ -39,7 +39,7 @@ class TaggedCache implements StoreInterface {
 	 */
 	public function has($key)
 	{
-		return ! is_null($this->get($key));
+		return ($this->get($key) !== null);
 	}
 
 	/**
@@ -53,7 +53,7 @@ class TaggedCache implements StoreInterface {
 	{
 		$value = $this->store->get($this->taggedItemKey($key));
 
-		return ! is_null($value) ? $value : value($default);
+		return ($value !== null) ? $value : value($default);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class TaggedCache implements StoreInterface {
 	 */
 	public function add($key, $value, $minutes)
 	{
-		if (is_null($this->get($key)))
+		if ($this->get($key) === null)
 		{
 			$this->put($key, $value, $minutes); return true;
 		}

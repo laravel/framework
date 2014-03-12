@@ -57,7 +57,7 @@ class ControllerDispatcher {
 		// If no before filters returned a response we'll call the method on the controller
 		// to get the response to be returned to the router. We will then return it back
 		// out for processing by this router and the after filters can be called then.
-		if (is_null($response))
+		if ($response === null)
 		{
 			$response = $this->call($instance, $route, $method);
 		}
@@ -113,7 +113,7 @@ class ControllerDispatcher {
 				// them until we get a response or are finished iterating through this filters.
 				$response = $this->callFilter($filter, $route, $request);
 
-				if ( ! is_null($response)) return $response;
+				if ($response !== null) return $response;
 			}
 		}
 	}
@@ -183,9 +183,9 @@ class ControllerDispatcher {
 	 */
 	protected function filterFailsOnly($filter, $request, $method)
 	{
-		if ( ! isset($filter['options']['only'])) return false;
+		if (!isset($filter['options']['only'])) return false;
 
-		return ! in_array($method, (array) $filter['options']['only']);
+		return !in_array($method, (array) $filter['options']['only']);
 	}
 
 	/**
@@ -198,7 +198,7 @@ class ControllerDispatcher {
 	 */
 	protected function filterFailsExcept($filter, $request, $method)
 	{
-		if ( ! isset($filter['options']['except'])) return false;
+		if (!isset($filter['options']['except'])) return false;
 
 		return in_array($method, (array) $filter['options']['except']);
 	}
@@ -215,14 +215,14 @@ class ControllerDispatcher {
 	{
 		$on = array_get($filter, 'options.on', null);
 
-		if (is_null($on)) return false;
+		if ($on === null) return false;
 
 		// If the "on" is a string, we will explode it on the pipe so you can set any
 		// amount of methods on the filter constraints and it will still work like
 		// you specified an array. Then we will check if the method is in array.
 		if (is_string($on)) $on = explode('|', $on);
 
-		return ! in_array(strtolower($request->getMethod()), $on);
+		return !in_array(strtolower($request->getMethod()), $on);
 	}
 
 	/**

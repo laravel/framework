@@ -1,11 +1,9 @@
 <?php namespace Illuminate\Queue\Console;
 
 use Illuminate\Queue\Worker;
-use Illuminate\Queue\Jobs\Job;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class WorkCommand extends Command {
 
@@ -63,39 +61,7 @@ class WorkCommand extends Command {
 
 		$connection = $this->argument('connection');
 
-		$response = $this->worker->pop(
-			$connection, $queue, $delay, $memory,
-			$this->option('sleep'), $this->option('tries')
-		);
-
-		// If a job was fired by the worker, we'll write the output out to the console
-		// so that the developer can watch live while the queue runs in the console
-		// window, which will also of get logged if stdout is logged out to disk.
-		if ( ! is_null($response['job']))
-		{
-			$this->writeOutput($response['job'], $response['failed']);
-		}
-	}
-
-	/**
-	 * Write the status output for the queue worker.
-	 *
-	 * @param  \Illuminate\Queue\Jobs\Job  $job
-	 * @param  bool  $failed
-	 * @return void
-	 */
-	protected function writeOutput(Job $job, $failed)
-	{
-		$options = OutputInterface::OUTPUT_RAW;
-
-		if ($failed)
-		{
-			$this->output->writeln('<error>Failed:</error> '.$job->getName(), $options);
-		}
-		else
-		{
-			$this->output->writeln('<info>Processed:</info> '.$job->getName(), $options);
-		}
+		$this->worker->pop($connection, $queue, $delay, $memory, $this->option('sleep'), $this->option('tries'));
 	}
 
 	/**

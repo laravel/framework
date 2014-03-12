@@ -58,7 +58,7 @@ abstract class ServiceProvider {
 		// In this method we will register the configuration package for the package
 		// so that the configuration options cleanly cascade into the application
 		// folder to make the developers lives much easier in maintaining them.
-		$path = $path ?: $this->guessPackagePath();
+		$path = $path ? : $this->guessPackagePath();
 
 		$config = $path.'/config';
 
@@ -119,7 +119,7 @@ abstract class ServiceProvider {
 	 */
 	protected function getPackageNamespace($package, $namespace)
 	{
-		if (is_null($namespace))
+		if ($namespace === null)
 		{
 			list($vendor, $namespace) = explode('/', $package);
 		}

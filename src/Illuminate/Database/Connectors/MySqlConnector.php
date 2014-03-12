@@ -26,8 +26,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 		// is set on the server but needs to be set here on this client objects.
 		$charset = $config['charset'];
 
-		$names = "set names '$charset'".
-			( ! is_null($collation) ? " collate '$collation'" : '');
+		$names = "set names '$charset'" . (($collation !== null) ? " collate '$collation'" : '');
 
 		$connection->prepare($names)->execute();
 

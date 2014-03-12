@@ -17,7 +17,7 @@ class PostgresProcessor extends Processor {
 	{
 		$results = $query->getConnection()->select($sql, $values);
 
-		$sequence = $sequence ?: 'id';
+		$sequence = $sequence ? : 'id';
 
 		$result = (array) $results[0];
 		

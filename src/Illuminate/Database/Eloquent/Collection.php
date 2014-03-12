@@ -66,7 +66,7 @@ class Collection extends BaseCollection {
 	 */
 	public function contains($key)
 	{
-		return ! is_null($this->find($key));
+		return ($this->find($key) !== null);
 	}
 
 	/**
@@ -90,7 +90,7 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) || $item->{$key} > $result) ? $item->{$key} : $result;
+			return ($result === null || $item->{$key} > $result) ? $item->{$key} : $result;
 		});
 	}
 
@@ -104,7 +104,7 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) || $item->{$key} < $result) ? $item->{$key} : $result;
+			return ($result === null || $item->{$key} < $result) ? $item->{$key} : $result;
 		});
 	}
 
@@ -150,7 +150,7 @@ class Collection extends BaseCollection {
 
 		foreach ($this->items as $item)
 		{
-			if ( ! isset($dictionary[$item->getKey()]))
+			if (!isset($dictionary[$item->getKey()]))
 			{
 				$diff->add($item);
 			}

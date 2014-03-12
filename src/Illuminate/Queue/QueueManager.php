@@ -48,7 +48,7 @@ class QueueManager {
 	 */
 	public function connected($name = null)
 	{
-		return isset($this->connections[$name ?: $this->getDefaultDriver()]);
+		return isset($this->connections[$name ? : $this->getDefaultDriver()]);
 	}
 
 	/**
@@ -59,12 +59,12 @@ class QueueManager {
 	 */
 	public function connection($name = null)
 	{
-		$name = $name ?: $this->getDefaultDriver();
+		$name = $name ? : $this->getDefaultDriver();
 
 		// If the connection has not been resolved yet we will resolve it now as all
 		// of the connections are resolved when they are actually needed so we do
 		// not make any unnecessary connection to the various queue end-points.
-		if ( ! isset($this->connections[$name]))
+		if (!isset($this->connections[$name]))
 		{
 			$this->connections[$name] = $this->resolve($name);
 
@@ -169,7 +169,7 @@ class QueueManager {
 	 */
 	public function getName($connection = null)
 	{
-		return $connection ?: $this->getDefaultDriver();
+		return $connection ? : $this->getDefaultDriver();
 	}
 
 	/**

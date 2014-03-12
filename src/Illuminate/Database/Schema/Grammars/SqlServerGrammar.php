@@ -469,7 +469,7 @@ class SqlServerGrammar extends Grammar {
 	 */
 	protected function modifyDefault(Blueprint $blueprint, Fluent $column)
 	{
-		if ( ! is_null($column->default))
+		if ($column->default !== null)
 		{
 			return " default ".$this->getDefaultValue($column->default);
 		}

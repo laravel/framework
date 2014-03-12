@@ -68,7 +68,7 @@ class ConfigPublisher {
 		// First we will figure out the source of the package's configuration location
 		// which we do by convention. Once we have that we will move the files over
 		// to the "main" configuration directory for this particular application.
-		$path = $packagePath ?: $this->packagePath;
+		$path = $packagePath ? : $this->packagePath;
 
 		$source = $this->getSource($package, $name, $path);
 
@@ -89,7 +89,7 @@ class ConfigPublisher {
 	{
 		$source = $packagePath."/{$package}/src/config";
 
-		if ( ! $this->files->isDirectory($source))
+		if (!$this->files->isDirectory($source))
 		{
 			throw new \InvalidArgumentException("Configuration not found.");
 		}
@@ -105,7 +105,7 @@ class ConfigPublisher {
 	 */
 	protected function makeDestination($destination)
 	{
-		if ( ! $this->files->isDirectory($destination))
+		if (!$this->files->isDirectory($destination))
 		{
 			$this->files->makeDirectory($destination, 0777, true);
 		}

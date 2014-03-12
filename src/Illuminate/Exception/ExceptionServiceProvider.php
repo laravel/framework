@@ -151,14 +151,17 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerPrettyWhoopsHandler()
 	{
-		$this->app['whoops.handler'] = $this->app->share(function()
+		$me = $this;
+
+		$this->app['whoops.handler'] = $this->app->share(function() use ($me)
 		{
 			with($handler = new PrettyPageHandler)->setEditor('sublime');
 
 			// If the resource path exists, we will register the resource path with Whoops
 			// so our custom Laravel branded exception pages will be used when they are
 			// displayed back to the developer. Otherwise, the default pages are run.
-			if ( ! is_null($path = $this->resourcePath()))
+			$path = $me->resourcePath();
+			if ($path !== null)
 			{
 				$handler->setResourcesPath($path);
 			}

@@ -71,7 +71,7 @@ class ControllerGenerator {
 
 		$controller = str_replace('\\', DIRECTORY_SEPARATOR, $controller);
 
-		if ( ! $this->files->exists($fullPath = $path."/{$controller}.php"))
+		if (!$this->files->exists($fullPath = $path."/{$controller}.php"))
 		{
 			return $this->files->put($fullPath, $stub);
 		}
@@ -88,7 +88,7 @@ class ControllerGenerator {
 	{
 		$directory = $this->getDirectory($controller);
 
-		if ( ! $this->files->isDirectory($full = $path.'/'.$directory))
+		if (!$this->files->isDirectory($full = $path.'/'.$directory))
 		{
 			$this->files->makeDirectory($full, 0777, true);
 		}

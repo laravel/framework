@@ -113,13 +113,13 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function pop($queue = null)
 	{
-		$original = $queue ?: $this->default;
+		$original = $queue ? : $this->default;
 
 		$this->migrateAllExpiredJobs($queue = $this->getQueue($queue));
 
 		$job = $this->redis->lpop($queue);
 
-		if ( ! is_null($job))
+		if ($job !== null)
 		{
 			$this->redis->zadd($queue.':reserved', $this->getTime() + 60, $job);
 
@@ -230,7 +230,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	protected function getQueue($queue)
 	{
-		return 'queues:'.($queue ?: $this->default);
+		return 'queues:'.($queue ? : $this->default);
 	}
 
 	/**

@@ -2,11 +2,8 @@
 
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\Store as Session;
-use Illuminate\Support\Traits\MacroableTrait;
 
 class FormBuilder {
-
-	use MacroableTrait;
 
 	/**
 	 * The HTML builder instance.
@@ -49,6 +46,13 @@ class FormBuilder {
 	 * @var array
 	 */
 	protected $labels = array();
+
+	/**
+	 * The registered form builder macros.
+	 *
+	 * @var array
+	 */
+	protected $macros = array();
 
 	/**
 	 * The reserved form open attributes.
@@ -209,7 +213,7 @@ class FormBuilder {
 	 */
 	protected function formatLabel($name, $value)
 	{
-		return $value ?: ucwords(str_replace('_', ' ', $name));
+		return $value ? : ucwords(str_replace('_', ' ', $name));
 	}
 
 	/**
@@ -223,14 +227,14 @@ class FormBuilder {
 	 */
 	public function input($type, $name, $value = null, $options = array())
 	{
-		if ( ! isset($options['name'])) $options['name'] = $name;
+		if (!isset($options['name'])) $options['name'] = $name;
 
 		// We will get the appropriate value for the given field. We will look for the
 		// value in the session for the value in the old input data then we'll look
 		// in the model instance if one is set. Otherwise we will just use empty.
 		$id = $this->getIdAttribute($name, $options);
 
-		if ( ! in_array($type, $this->skipValueTypes))
+		if (!in_array($type, $this->skipValueTypes))
 		{
 			$value = $this->getValueAttribute($name, $value);
 		}
@@ -331,7 +335,7 @@ class FormBuilder {
 	 */
 	public function textarea($name, $value = null, $options = array())
 	{
-		if ( ! isset($options['name'])) $options['name'] = $name;
+		if (!isset($options['name'])) $options['name'] = $name;
 
 		// Next we will look for the rows and cols attributes, as each of these are put
 		// on the textarea element definition. If they are not present, we will just
@@ -406,7 +410,7 @@ class FormBuilder {
 
 		$options['id'] = $this->getIdAttribute($name, $options);
 
-		if ( ! isset($options['name'])) $options['name'] = $name;
+		if (!isset($options['name'])) $options['name'] = $name;
 
 		// We will simply loop through the options and build an HTML value for each of
 		// them until we have an array of HTML declarations. Then we will join them
@@ -577,7 +581,7 @@ class FormBuilder {
 	 */
 	public function radio($name, $value = null, $checked = null, $options = array())
 	{
-		if (is_null($value)) $value = $name;
+		if ($value === null) $value = $name;
 
 		return $this->checkable('radio', $name, $value, $checked, $options);
 	}
@@ -635,7 +639,7 @@ class FormBuilder {
 	 */
 	protected function getCheckboxCheckedState($name, $value, $checked)
 	{
-		if ( ! $this->oldInputIsEmpty() && is_null($this->old($name))) return false;
+		if (!$this->oldInputIsEmpty() && $this->old($name) === null) return false;
 
 		if ($this->missingOldAndModel($name)) return $checked;
 
@@ -667,7 +671,7 @@ class FormBuilder {
 	 */
 	protected function missingOldAndModel($name)
 	{
-		return (is_null($this->old($name)) && is_null($this->getModelValueAttribute($name)));
+		return ($this->old($name) === null && $this->getModelValueAttribute($name) === null);
 	}
 
 	/**
@@ -718,12 +722,24 @@ class FormBuilder {
 	 */
 	public function button($value = null, $options = array())
 	{
-		if ( ! array_key_exists('type', $options) )
+		if (!array_key_exists('type', $options) )
 		{
 			$options['type'] = 'button';
 		}
 
 		return '<button'.$this->html->attributes($options).'>'.$value.'</button>';
+	}
+
+	/**
+	 * Register a custom form macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public function macro($name, $macro)
+	{
+		$this->macros[$name] = $macro;
 	}
 
 	/**
@@ -877,14 +893,14 @@ class FormBuilder {
 	 */
 	public function getValueAttribute($name, $value = null)
 	{
-		if (is_null($name)) return $value;
+		if ($name === null) return $value;
 
-		if ( ! is_null($this->old($name)))
+		if ($this->old($name) !== null)
 		{
 			return $this->old($name);
 		}
 
-		if ( ! is_null($value)) return $value;
+		if ($value !== null) return $value;
 
 		if (isset($this->model))
 		{
@@ -966,6 +982,25 @@ class FormBuilder {
 		$this->session = $session;
 
 		return $this;
+	}
+
+	/**
+	 * Dynamically handle calls to the form builder.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, $parameters)
+	{
+		if (isset($this->macros[$method]))
+		{
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

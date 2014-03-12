@@ -26,7 +26,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		if ( ! $this->app)
+		if (!$this->app)
 		{
 			$this->refreshApplication();
 		}
@@ -175,12 +175,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 		$response = $this->client->getResponse()->original;
 
-		if ( ! $response instanceof View)
+		if (!$response instanceof View)
 		{
 			return $this->assertTrue(false, 'The response was not a view.');
 		}
 
-		if (is_null($value))
+		if ($value === null)
 		{
 			$this->assertArrayHasKey($key, $response->getData());
 		}
@@ -266,7 +266,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		if (is_array($key)) return $this->assertSessionHasAll($key);
 
-		if (is_null($value))
+		if ($value === null)
 		{
 			$this->assertTrue($this->app['session.store']->has($key), "Session missing key: $key");
 		}
@@ -308,7 +308,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		$this->assertSessionHas('errors');
 
-		$bindings = (array) $bindings;
+		$bindings = (array)$bindings;
 
 		$errors = $this->app['session.store']->get('errors');
 
@@ -370,7 +370,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	protected function startSession()
 	{
-		if ( ! $this->app['session']->isStarted())
+		if (!$this->app['session']->isStarted())
 		{
 			$this->app['session']->start();
 		}

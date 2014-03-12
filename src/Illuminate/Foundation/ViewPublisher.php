@@ -63,7 +63,7 @@ class ViewPublisher {
 	 */
 	public function publishPackage($package, $packagePath = null)
 	{
-		$source = $this->getSource($package, $packagePath ?: $this->packagePath);
+		$source = $this->getSource($package, $packagePath ? : $this->packagePath);
 
 		return $this->publish($package, $source);
 	}
@@ -81,7 +81,7 @@ class ViewPublisher {
 	{
 		$source = $packagePath."/{$package}/src/views";
 
-		if ( ! $this->files->isDirectory($source))
+		if (!$this->files->isDirectory($source))
 		{
 			throw new \InvalidArgumentException("Views not found.");
 		}
@@ -97,7 +97,7 @@ class ViewPublisher {
 	 */
 	protected function makeDestination($destination)
 	{
-		if ( ! $this->files->isDirectory($destination))
+		if (!$this->files->isDirectory($destination))
 		{
 			$this->files->makeDirectory($destination, 0777, true);
 		}

@@ -50,7 +50,8 @@ class ConfigPublishCommand extends Command {
 	{
 		$package = $this->input->getArgument('package');
 
-		if ( ! is_null($path = $this->getPath()))
+		$path = $this->getPath();
+		if ($path !== null)
 		{
 			$this->config->publish($package, $path);
 		}
@@ -71,7 +72,7 @@ class ConfigPublishCommand extends Command {
 	{
 		$path = $this->input->getOption('path');
 
-		if ( ! is_null($path))
+		if ($path !== null)
 		{
 			return $this->laravel['path.base'].'/'.$path;
 		}

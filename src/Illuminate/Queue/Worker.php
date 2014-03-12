@@ -53,7 +53,7 @@ class Worker {
 	 * @param  int     $memory
 	 * @param  int     $sleep
 	 * @param  int     $maxTries
-	 * @return array
+	 * @return void
 	 */
 	public function pop($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
 	{
@@ -64,17 +64,15 @@ class Worker {
 		// If we're able to pull a job off of the stack, we will process it and
 		// then make sure we are not exceeding our memory limits for the run
 		// which is to protect against run-away memory leakages from here.
-		if ( ! is_null($job))
+		if ($job !== null)
 		{
-			return $this->process(
+			$this->process(
 				$this->manager->getName($connectionName), $job, $maxTries, $delay
 			);
 		}
 		else
 		{
 			$this->sleep($sleep);
-
-			return ['job' => null, 'failed' => false];
 		}
 	}
 
@@ -87,11 +85,12 @@ class Worker {
 	 */
 	protected function getNextJob($connection, $queue)
 	{
-		if (is_null($queue)) return $connection->pop();
+		if ($queue === null) return $connection->pop();
 
 		foreach (explode(',', $queue) as $queue)
 		{
-			if ( ! is_null($job = $connection->pop($queue))) return $job;
+			$job = $connection->pop($queue);
+			if ($job !== null) return $job;
 		}
 	}
 
@@ -121,8 +120,6 @@ class Worker {
 			$job->fire();
 
 			if ($job->autoDelete()) $job->delete();
-
-			return ['job' => $job, 'failed' => false];
 		}
 
 		catch (\Exception $e)
@@ -130,7 +127,7 @@ class Worker {
 			// If we catch an exception, we will attempt to release the job back onto
 			// the queue so it is not lost. This will let is be retried at a later
 			// time by another listener (or the same one). We will do that here.
-			if ( ! $job->isDeleted()) $job->release($delay);
+			if (!$job->isDeleted()) $job->release($delay);
 
 			throw $e;
 		}
@@ -141,7 +138,7 @@ class Worker {
 	 *
 	 * @param  string  $connection
 	 * @param  \Illuminate\Queue\Jobs\Job  $job
-	 * @return array
+	 * @return void
 	 */
 	protected function logFailedJob($connection, Job $job)
 	{
@@ -153,8 +150,6 @@ class Worker {
 
 			$this->raiseFailedJobEvent($connection, $job);
 		}
-
-		return ['job' => $job, 'failed' => true];
 	}
 
 	/**

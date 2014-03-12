@@ -59,7 +59,7 @@ class ChangesCommand extends Command {
 	{
 		$message = '<comment>-></comment> <info>'.$change['message'].'</info>';
 
-		if ( ! is_null($change['backport']))
+		if ($change['backport'] !== null)
 		{
 			$message .= ' <comment>(Backported to '.$change['backport'].')</comment>';
 		}
@@ -77,7 +77,7 @@ class ChangesCommand extends Command {
 	{
 		$version = $this->argument('version');
 
-		if (is_null($version))
+		if ($version === null)
 		{
 			$latest = head(array_keys($changes));
 

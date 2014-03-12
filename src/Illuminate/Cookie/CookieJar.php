@@ -83,7 +83,7 @@ class CookieJar {
 	 */
 	public function hasQueued($key)
 	{
-		return ! is_null($this->queued($key));
+		return ($this->queued($key)  !== null);
 	}
 
 	/**
@@ -137,7 +137,7 @@ class CookieJar {
 	 */
 	protected function getPathAndDomain($path, $domain)
 	{
-		return array($path ?: $this->path, $domain ?: $this->domain);
+		return array($path ? : $this->path, $domain ? : $this->domain);
 	}
 
 	/**

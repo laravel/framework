@@ -336,7 +336,7 @@ class Migrator {
 	 */
 	public function setConnection($name)
 	{
-		if ( ! is_null($name))
+		if ($name !== null)
 		{
 			$this->resolver->setDefaultConnection($name);
 		}

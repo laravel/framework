@@ -38,7 +38,7 @@ class ConnectionResolver implements ConnectionResolverInterface {
 	 */
 	public function connection($name = null)
 	{
-		if (is_null($name)) $name = $this->getDefaultConnection();
+		if ($name === null) $name = $this->getDefaultConnection();
 
 		return $this->connections[$name];
 	}

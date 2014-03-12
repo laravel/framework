@@ -90,12 +90,12 @@ class SQLiteGrammar extends Grammar {
 		{
 			$sql .= $this->getForeignKey($foreign);
 
-			if ( ! is_null($foreign->onDelete))
+			if ($foreign->onDelete !== null)
 			{
 				$sql .= " on delete {$foreign->onDelete}";
 			}
 
-			if ( ! is_null($foreign->onUpdate))
+			if ($foreign->onUpdate !== null)
 			{
 				$sql .= " on update {$foreign->onUpdate}";
 			}
@@ -134,7 +134,7 @@ class SQLiteGrammar extends Grammar {
 	{
 		$primary = $this->getCommandByName($blueprint, 'primary');
 
-		if ( ! is_null($primary))
+		if ($primary !== null)
 		{
 			$columns = $this->columnize($primary->columns);
 
@@ -534,7 +534,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function modifyDefault(Blueprint $blueprint, Fluent $column)
 	{
-		if ( ! is_null($column->default))
+		if ($column->default !== null)
 		{
 			return " default ".$this->getDefaultValue($column->default);
 		}

@@ -361,7 +361,7 @@ class Builder {
 		// If the given operator is not found in the list of valid operators we will
 		// assume that the developer is just short-cutting the '=' operators and
 		// we will set the operators to '=' and set the values appropriately.
-		if ( ! in_array(strtolower($operator), $this->operators, true))
+		if (!in_array(strtolower($operator), $this->operators, true))
 		{
 			list($value, $operator) = array($operator, '=');
 		}
@@ -377,7 +377,7 @@ class Builder {
 		// If the value is "null", we will just assume the developer wants to add a
 		// where null clause to the query. So, we will allow a short-cut here to
 		// that method for convenience so the developer doesn't have to check.
-		if (is_null($value))
+		if ($value === null)
 		{
 			return $this->whereNull($column, $boolean, $operator != '=');
 		}
@@ -389,7 +389,7 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-		if ( ! $value instanceof Expression)
+		if (!$value instanceof Expression)
 		{
 			$this->bindings[] = $value;
 		}
@@ -421,7 +421,7 @@ class Builder {
 	{
 		$isOperator = in_array($operator, $this->operators);
 
-		return ($isOperator && $operator != '=' && is_null($value));
+		return ($isOperator && $operator != '=' && $value === null);
 	}
 
 	/**
@@ -1196,7 +1196,7 @@ class Builder {
 	 */
 	public function get($columns = array('*'))
 	{
-		if ( ! is_null($this->cacheMinutes)) return $this->getCached($columns);
+		if ($this->cacheMinutes !== null) return $this->getCached($columns);
 
 		return $this->getFresh($columns);
 	}
@@ -1209,7 +1209,7 @@ class Builder {
 	 */
 	public function getFresh($columns = array('*'))
 	{
-		if (is_null($this->columns)) $this->columns = $columns;
+		if ($this->columns === null) $this->columns = $columns;
 
 		return $this->processor->processSelect($this, $this->runSelect());
 	}
@@ -1232,7 +1232,7 @@ class Builder {
 	 */
 	public function getCached($columns = array('*'))
 	{
-		if (is_null($this->columns)) $this->columns = $columns;
+		if ($this->columns === null) $this->columns = $columns;
 
 		// If the query is requested to be cached, we will cache it using a unique key
 		// for this database connection and query statement, including the bindings
@@ -1285,7 +1285,7 @@ class Builder {
 	 */
 	public function getCacheKey()
 	{
-		return $this->cacheKey ?: $this->generateCacheKey();
+		return $this->cacheKey ? : $this->generateCacheKey();
 	}
 
 	/**
@@ -1308,7 +1308,9 @@ class Builder {
 	 */
 	protected function getCacheCallback($columns)
 	{
-		return function() use ($columns) { return $this->getFresh($columns); };
+		$me = $this;
+
+		return function() use ($me, $columns) { return $me->getFresh($columns); };
 	}
 
 	/**
@@ -1356,7 +1358,7 @@ class Builder {
 		// If a key was specified and we have results, we will go ahead and combine
 		// the values with the keys of all of the records so that the values can
 		// be accessed by the key of the rows instead of simply being numeric.
-		if ( ! is_null($key) && count($results) > 0)
+		if ($key !== null && count($results) > 0)
 		{
 			$keys = $results->fetch($key)->all();
 
@@ -1375,7 +1377,7 @@ class Builder {
 	 */
 	protected function getListSelect($column, $key)
 	{
-		$select = is_null($key) ? array($column) : array($column, $key);
+		$select = ($key === null) ? array($column) : array($column, $key);
 
 		// If the selected column contains a "dot", we will remove it so that the list
 		// operation can run normally. Specifying the table is not needed, since we
@@ -1397,7 +1399,7 @@ class Builder {
 	 */
 	public function implode($column, $glue = null)
 	{
-		if (is_null($glue)) return implode($this->lists($column));
+		if ($glue === null) return implode($this->lists($column));
 
 		return implode($glue, $this->lists($column));
 	}
@@ -1426,7 +1428,7 @@ class Builder {
 	/**
 	 * Create a paginator for a grouped pagination statement.
 	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
+	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -1441,7 +1443,7 @@ class Builder {
 	/**
 	 * Build a paginator instance from a raw result array.
 	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
+	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  array  $results
 	 * @param  int    $perPage
 	 * @return \Illuminate\Pagination\Paginator
@@ -1461,7 +1463,7 @@ class Builder {
 	/**
 	 * Create a paginator for an un-grouped pagination statement.
 	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
+	 * @param  \Illuminate\Pagination\Environment  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -1608,7 +1610,7 @@ class Builder {
 		// Since every insert gets treated like a batch insert, we will make sure the
 		// bindings are structured in a way that is convenient for building these
 		// inserts statements by verifying the elements are actually an array.
-		if ( ! is_array(reset($values)))
+		if (!is_array(reset($values)))
 		{
 			$values = array($values);
 		}
@@ -1720,7 +1722,7 @@ class Builder {
 		// If an ID is passed to the method, we will set the where clause to check
 		// the ID to allow developers to simply and quickly remove a single row
 		// from their database without manually specifying the where clauses.
-		if ( ! is_null($id)) $this->where('id', '=', $id);
+		if ($id !== null) $this->where('id', '=', $id);
 
 		$sql = $this->grammar->compileDelete($this);
 
@@ -1774,7 +1776,7 @@ class Builder {
 	{
 		return array_values(array_filter($bindings, function($binding)
 		{
-			return ! $binding instanceof Expression;
+			return !$binding instanceof Expression;
 		}));
 	}
 

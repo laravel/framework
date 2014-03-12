@@ -46,7 +46,7 @@ class Blueprint {
 	{
 		$this->table = $table;
 
-		if ( ! is_null($callback)) $callback($this);
+		if ($callback !== null) $callback($this);
 	}
 
 	/**
@@ -86,7 +86,8 @@ class Blueprint {
 
 			if (method_exists($grammar, $method))
 			{
-				if ( ! is_null($sql = $grammar->$method($this, $command, $connection)))
+				$sql = $grammar->$method($this, $command, $connection);
+				if ($sql !== null)
 				{
 					$statements = array_merge($statements, (array) $sql);
 				}
@@ -103,7 +104,7 @@ class Blueprint {
 	 */
 	protected function addImpliedCommands()
 	{
-		if (count($this->columns) > 0 && ! $this->creating())
+		if (count($this->columns) > 0 && !$this->creating())
 		{
 			array_unshift($this->commands, $this->createCommand('add'));
 		}
@@ -526,6 +527,7 @@ class Blueprint {
 	 * @param  int|null	$total
 	 * @param  int|null $places
 	 * @return \Illuminate\Support\Fluent
+	 *
 	 */
 	public function double($column, $total = null, $places = null)
 	{
@@ -668,8 +670,6 @@ class Blueprint {
 		$this->unsignedInteger("{$name}_id");
 
 		$this->string("{$name}_type");
-
-		$this->index(array("{$name}_id", "{$name}_type"));
 	}
 
 	/**
@@ -712,7 +712,7 @@ class Blueprint {
 		// If no name was specified for this index, we will create one using a basic
 		// convention of the table name, followed by the columns, followed by an
 		// index type, such as primary or index, which makes the index unique.
-		if (is_null($index))
+		if ($index === null)
 		{
 			$index = $this->createIndexName($type, $columns);
 		}

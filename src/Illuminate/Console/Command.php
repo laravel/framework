@@ -148,7 +148,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function argument($key = null)
 	{
-		if (is_null($key)) return $this->input->getArguments();
+		if ($key === null) return $this->input->getArguments();
 
 		return $this->input->getArgument($key);
 	}
@@ -161,7 +161,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function option($key = null)
 	{
-		if (is_null($key)) return $this->input->getOptions();
+		if ($key === null) return $this->input->getOptions();
 
 		return $this->input->getOption($key);
 	}

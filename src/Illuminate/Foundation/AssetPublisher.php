@@ -53,7 +53,7 @@ class AssetPublisher {
 
 		$success = $this->files->copyDirectory($source, $destination);
 
-		if ( ! $success)
+		if (!$success)
 		{
 			throw new \RuntimeException("Unable to publish assets.");
 		}
@@ -70,7 +70,7 @@ class AssetPublisher {
 	 */
 	public function publishPackage($package, $packagePath = null)
 	{
-		$packagePath = $packagePath ?: $this->packagePath;
+		$packagePath = $packagePath ? : $this->packagePath;
 
 		// Once we have the package path we can just create the source and destination
 		// path and copy the directory from one to the other. The directory copy is

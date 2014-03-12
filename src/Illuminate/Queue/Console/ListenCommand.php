@@ -79,14 +79,14 @@ class ListenCommand extends Command {
 	 */
 	protected function getQueue($connection)
 	{
-		if (is_null($connection))
+		if ($connection === null)
 		{
 			$connection = $this->laravel['config']['queue.default'];
 		}
 
 		$queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
 
-		return $this->input->getOption('queue') ?: $queue;
+		return $this->input->getOption('queue') ? : $queue;
 	}
 
 	/**
@@ -101,11 +101,6 @@ class ListenCommand extends Command {
 		$this->listener->setSleep($this->option('sleep'));
 
 		$this->listener->setMaxTries($this->option('tries'));
-
-		$this->listener->setOutputHandler(function($type, $line)
-		{
-			$this->output->write($line);
-		});
 	}
 
 	/**

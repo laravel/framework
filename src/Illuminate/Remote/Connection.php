@@ -71,7 +71,7 @@ class Connection implements ConnectionInterface {
 		$this->name = $name;
 		$this->host = $host;
 		$this->username = $username;
-		$this->gateway = $gateway ?: new SecLibGateway($host, $auth, new Filesystem);
+		$this->gateway = $gateway ? : new SecLibGateway($host, $auth, new Filesystem);
 	}
 
 	/**
@@ -124,7 +124,8 @@ class Connection implements ConnectionInterface {
 		// our callback. Once we hit the end of output, we'll bail out of here.
 		while (true)
 		{
-			if (is_null($line = $gateway->nextLine())) break;
+			$line = $gateway->nextLine();
+			if ($line === null) break;
 
 			call_user_func($callback, $line, $this);
 		}
@@ -211,9 +212,11 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function getCallback($callback)
 	{
-		if ( ! is_null($callback)) return $callback;
+		if ($callback !== null) return $callback;
 
-		return function($line) { $this->display($line); };
+		$me = $this;
+
+		return function($line) use ($me) { $me->display($line); };
 	}
 
 	/**
@@ -233,9 +236,9 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getGateway()
 	{
-		if ( ! $this->gateway->connected())
+		if (!$this->gateway->connected())
 		{
-			if ( ! $this->gateway->connect($this->username))
+			if (!$this->gateway->connect($this->username))
 			{
 				throw new \RuntimeException("Unable to connect to remote server.");
 			}
@@ -251,7 +254,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getOutput()
 	{
-		if (is_null($this->output)) $this->output = new NullOutput;
+		if ($this->output === null) $this->output = new NullOutput;
 
 		return $this->output;
 	}

@@ -124,7 +124,8 @@ class BelongsToMany extends Relation {
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
-		if ( ! is_null($model = $this->first($columns))) return $model;
+		$model = $this->first($columns);
+		if ($model !== null) return $model;
 
 		throw new ModelNotFoundException;
 	}
@@ -331,7 +332,7 @@ class BelongsToMany extends Relation {
 	 */
 	protected function setJoin($query = null)
 	{
-		$query = $query ?: $this->query;
+		$query = $query ? : $this->query;
 
 		// We need to join to the intermediate table on the related model's primary
 		// key column with the intermediate table's foreign key for the related
@@ -611,7 +612,7 @@ class BelongsToMany extends Relation {
 
 		foreach ($records as $id => $attributes)
 		{
-			if ( ! is_array($attributes))
+			if (!is_array($attributes))
 			{
 				list($id, $attributes) = array($attributes, array());
 			}
@@ -639,7 +640,7 @@ class BelongsToMany extends Relation {
 			// If the ID is not in the list of existing pivot IDs, we will insert a new pivot
 			// record, otherwise, we will just update this existing record on this joining
 			// table, so that the developers will easily update these records pain free.
-			if ( ! in_array($id, $current))
+			if (!in_array($id, $current))
 			{
 				$this->attach($id, $attributes, $touch);
 
@@ -793,7 +794,7 @@ class BelongsToMany extends Relation {
 	{
 		$fresh = $this->parent->freshTimestamp();
 
-		if ( ! $exists) $record[$this->createdAt()] = $fresh;
+		if (!$exists) $record[$this->createdAt()] = $fresh;
 
 		$record[$this->updatedAt()] = $fresh;
 
@@ -949,7 +950,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function withTimestamps($createdAt = null, $updatedAt = null)
 	{
-		return $this->withPivot($createdAt ?: $this->createdAt(), $updatedAt ?: $this->updatedAt());
+		return $this->withPivot($createdAt ? : $this->createdAt(), $updatedAt ? : $this->updatedAt());
 	}
 
 	/**

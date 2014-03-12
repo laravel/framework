@@ -1,11 +1,8 @@
 <?php namespace Illuminate\Html;
 
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Support\Traits\MacroableTrait;
 
 class HtmlBuilder {
-
-	use MacroableTrait;
 
 	/**
 	 * The URL generator instance.
@@ -13,6 +10,13 @@ class HtmlBuilder {
 	 * @var \Illuminate\Routing\UrlGenerator
 	 */
 	protected $url;
+
+	/**
+	 * The registered html macros.
+	 *
+	 * @var array
+	 */
+	protected $macros;
 
 	/**
 	 * Create a new HTML builder instance.
@@ -23,6 +27,18 @@ class HtmlBuilder {
 	public function __construct(UrlGenerator $url = null)
 	{
 		$this->url = $url;
+	}
+
+	/**
+	 * Register a custom HTML macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public function macro($name, $macro)
+	{
+		$this->macros[$name] = $macro;
 	}
 
 	/**
@@ -107,7 +123,7 @@ class HtmlBuilder {
 	{
 		$url = $this->url->to($url, array(), $secure);
 
-		if (is_null($title) || $title === false) $title = $url;
+		if ($title === null || $title === false) $title = $url;
 
 		return '<a href="'.$url.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
@@ -138,7 +154,7 @@ class HtmlBuilder {
 	{
 		$url = $this->url->asset($url, $secure);
 
-		return $this->link($url, $title ?: $url, $attributes, $secure);
+		return $this->link($url, $title ? : $url, $attributes, $secure);
 	}
 
 	/**
@@ -194,7 +210,7 @@ class HtmlBuilder {
 	{
 		$email = $this->email($email);
 
-		$title = $title ?: $email;
+		$title = $title ? : $email;
 
 		$email = $this->obfuscate('mailto:') . $email;
 
@@ -320,7 +336,7 @@ class HtmlBuilder {
 		{
 			$element = $this->attributeElement($key, $value);
 
-			if ( ! is_null($element)) $html[] = $element;
+			if ($element !== null) $html[] = $element;
 		}
 
 		return count($html) > 0 ? ' '.implode(' ', $html) : '';
@@ -337,7 +353,7 @@ class HtmlBuilder {
 	{
 		if (is_numeric($key)) $key = $value;
 
-		if ( ! is_null($value)) return $key.'="'.e($value).'"';
+		if ($value !== null) return $key.'="'.e($value).'"';
 	}
 
 	/**
@@ -371,6 +387,25 @@ class HtmlBuilder {
 		}
 
 		return $safe;
+	}
+
+	/**
+	 * Dynamically handle calls to the html class.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, $parameters)
+	{
+		if (isset($this->macros[$method]))
+		{
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

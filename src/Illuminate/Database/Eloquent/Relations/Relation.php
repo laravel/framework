@@ -106,6 +106,16 @@ abstract class Relation {
 	}
 
 	/**
+	 * Restore all of the soft deleted related models.
+	 *
+	 * @return int
+	 */
+	public function restore()
+	{
+		return $this->query->withTrashed()->restore();
+	}
+
+	/**
 	 * Run a raw update against the base query.
 	 *
 	 * @param  array  $attributes

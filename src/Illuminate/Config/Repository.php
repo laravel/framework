@@ -119,7 +119,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 		// get overwritten if a different item in the group is requested later.
 		$this->load($group, $namespace, $collection);
 
-		if (is_null($item))
+		if ($item === null)
 		{
 			$this->items[$collection] = $value;
 		}
@@ -213,7 +213,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 		// If the configuration file doesn't exist for the given package group we can
 		// assume that we should implicitly use the config file matching the name
 		// of the namespace. Generally packages should use one type or another.
-		if ( ! $this->loader->exists($itemSegments[0], $namespace))
+		if (!$this->loader->exists($itemSegments[0], $namespace))
 		{
 			return array($namespace, 'config', $item);
 		}
@@ -259,7 +259,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 */
 	protected function getPackageNamespace($package, $namespace)
 	{
-		if (is_null($namespace))
+		if ($namespace === null)
 		{
 			list($vendor, $namespace) = explode('/', $package);
 		}
@@ -288,7 +288,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 */
 	protected function getCollection($group, $namespace = null)
 	{
-		$namespace = $namespace ?: '*';
+		$namespace = $namespace ? : '*';
 
 		return $namespace.'::'.$group;
 	}

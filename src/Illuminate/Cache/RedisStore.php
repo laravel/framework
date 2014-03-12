@@ -48,7 +48,8 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		if ( ! is_null($value = $this->connection()->get($this->prefix.$key)))
+		$value = $this->connection()->get($this->prefix.$key)
+		if ($value !== null)
 		{
 			return is_numeric($value) ? $value : unserialize($value);
 		}

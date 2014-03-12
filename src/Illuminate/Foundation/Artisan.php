@@ -36,7 +36,7 @@ class Artisan {
 	 */
 	protected function getArtisan()
 	{
-		if ( ! is_null($this->artisan)) return $this->artisan;
+		if ($this->artisan !== null) return $this->artisan;
 
 		$this->app->loadDeferredProviders();
 

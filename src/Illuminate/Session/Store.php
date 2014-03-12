@@ -76,7 +76,7 @@ class Store implements SessionInterface {
 		$this->name = $name;
 		$this->handler = $handler;
 		$this->metaBag = new MetadataBag;
-		$this->setId($id ?: $this->generateSessionId());
+		$this->setId($id ? : $this->generateSessionId());
 	}
 
 	/**
@@ -86,7 +86,7 @@ class Store implements SessionInterface {
 	{
 		$this->loadSession();
 
-		if ( ! $this->has('_token')) $this->put('_token', str_random(40));
+		if (!$this->has('_token')) $this->put('_token', str_random(40));
 
 		return $this->started = true;
 	}
@@ -146,7 +146,7 @@ class Store implements SessionInterface {
 	 */
 	public function setId($id)
 	{
-		$this->id = $id ?: $this->generateSessionId();
+		$this->id = $id ? : $this->generateSessionId();
 	}
 
 	/**
@@ -254,7 +254,7 @@ class Store implements SessionInterface {
 	 */
 	public function has($name)
 	{
-		return ! is_null($this->get($name));
+		return ($this->get($name) !== null);
 	}
 
 	/**
@@ -275,7 +275,7 @@ class Store implements SessionInterface {
 	{
 		$old = $this->getOldInput($key);
 
-		return is_null($key) ? count($old) > 0 : ! is_null($old);
+		return ($key === null) ? count($old) > 0 : ($old !== null);
 	}
 
 	/**
@@ -292,7 +292,7 @@ class Store implements SessionInterface {
 		// Input that is flashed to the session can be easily retrieved by the
 		// developer, making repopulating old forms and the like much more
 		// convenient, since the request's previous input is available.
-		if (is_null($key)) return $input;
+		if ($key === null) return $input;
 
 		return array_get($input, $key, $default);
 	}

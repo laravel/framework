@@ -51,7 +51,7 @@ class Manager {
 	 */
 	protected function setupContainer($container)
 	{
-		$this->container = $container ?: new Container;
+		$this->container = $container ? : new Container;
 
 		$this->container->instance('config', new Fluent);
 	}

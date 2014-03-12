@@ -44,12 +44,12 @@ abstract class Manager {
 	 */
 	public function driver($driver = null)
 	{
-		$driver = $driver ?: $this->getDefaultDriver();
+		$driver = $driver ? : $this->getDefaultDriver();
 
 		// If the given driver has not been created before, we will create the instances
 		// here and cache it so we can return it next time very quickly. If their is
 		// already a driver created by this name, we'll just return that instance.
-		if ( ! isset($this->drivers[$driver]))
+		if (!isset($this->drivers[$driver]))
 		{
 			$this->drivers[$driver] = $this->createDriver($driver);
 		}
