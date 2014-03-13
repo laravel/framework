@@ -131,4 +131,17 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
 	}
 
+
+	public function testCountReturnsCorrectValue()
+	{
+		$container = new MessageBag;
+		$this->assertEquals(0, $container->count());
+
+		$container->add('foo', 'bar');
+		$container->add('foo', 'baz');
+		$container->add('boom', 'baz');
+
+		$this->assertEquals(3, $container->count());
+	}
+
 }
