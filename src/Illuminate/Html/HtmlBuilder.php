@@ -66,9 +66,9 @@ class HtmlBuilder {
 	/**
 	 * Generate a link to a JavaScript file.
 	 *
-	    * @param  string  $url
+	 * @param  string  $url
 	 * @param  array   $attributes
-        * @param  bool    $secure
+     * @param  bool    $secure
 	 * @return string
 	 */
 	public function script($url, $attributes = array(), $secure = null)
@@ -81,9 +81,9 @@ class HtmlBuilder {
 	/**
 	 * Generate a link to a CSS file.
 	 *
-     * @param  string  $url
+	 * @param  string  $url
 	 * @param  array   $attributes
-        * @param  bool    $secure
+	 * @param  bool    $secure
 	 * @return string
 	 */
 	public function style($url, $attributes = array(), $secure = null)
@@ -103,7 +103,7 @@ class HtmlBuilder {
 	 * @param  string  $url
 	 * @param  string  $alt
 	 * @param  array   $attributes
-        * @param  bool    $secure
+	 * @param  bool    $secure
 	 * @return string
 	 */
 	public function image($url, $alt = null, $attributes = array(), $secure = null)
