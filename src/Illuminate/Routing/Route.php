@@ -18,6 +18,13 @@ class Route {
 	protected $uri;
 
 	/**
+	 * The URI prefix used by this route.
+	 *
+	 * @var string
+	 */
+	protected $uriPrefix;
+
+	/**
 	 * The HTTP methods the route responds to.
 	 *
 	 * @var array
@@ -636,8 +643,19 @@ class Route {
 	public function prefix($prefix)
 	{
 		$this->uri = trim($prefix, '/').'/'.trim($this->uri, '/');
-
+		$this->uriPrefix = trim($prefix, '/').'/'.$this->uriPrefix;
+		
 		return $this;
+	}
+
+	/**
+	 * Get the URI prefix associated with the route.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return $this->uriPrefix;
 	}
 
 	/**
