@@ -246,6 +246,15 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRegenerateToken()
+	{
+		$session = $this->getSession();
+		$token = $session->getToken();
+		$session->regenerateToken();
+		$this->assertNotEquals($token, $session->getToken());
+	}
+
+
 	public function testName()
 	{
 		$session = $this->getSession();
