@@ -230,6 +230,19 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testChunk ()
+	{
+		$data = new Collection(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		$data = $data->chunk(3);
+
+		$this->assertInstanceOf('Illuminate\Support\Collection', $data);
+		$this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
+		$this->assertEquals(4, $data->count());
+		$this->assertEquals(array(1, 2, 3), $data[0]->toArray());
+		$this->assertEquals(array(10), $data[3]->toArray());
+	}
+
+
 	public function testListsWithArrayAndObjectValues()
 	{
 		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
