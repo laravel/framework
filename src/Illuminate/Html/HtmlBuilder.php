@@ -68,7 +68,7 @@ class HtmlBuilder {
 	 *
 	 * @param  string  $url
 	 * @param  array   $attributes
-     * @param  bool    $secure
+	 * @param  bool    $secure
 	 * @return string
 	 */
 	public function script($url, $attributes = array(), $secure = null)
