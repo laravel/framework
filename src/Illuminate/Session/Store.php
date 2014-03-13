@@ -86,7 +86,7 @@ class Store implements SessionInterface {
 	{
 		$this->loadSession();
 
-		if ( ! $this->has('_token')) $this->put('_token', str_random(40));
+		if ( ! $this->has('_token')) $this->regenerateToken();
 
 		return $this->started = true;
 	}
@@ -541,6 +541,16 @@ class Store implements SessionInterface {
 	public function getToken()
 	{
 		return $this->token();
+	}
+
+	/**
+	 * Regenerate the CSRF token value.
+	 *
+	 * @return void
+	 */
+	public function regenerateToken()
+	{
+		$this->put('_token', str_random(40));
 	}
 
 	/**
