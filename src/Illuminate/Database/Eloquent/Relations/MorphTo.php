@@ -4,6 +4,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
 
 class MorphTo extends BelongsTo {
 
@@ -67,7 +68,7 @@ class MorphTo extends BelongsTo {
 	{
 		foreach ($models as $model)
 		{
-			$this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}] = $model;
+			$this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
 		}
 	}
 
@@ -114,9 +115,10 @@ class MorphTo extends BelongsTo {
 		{
 			if (isset($this->dictionary[$type][$result->getKey()]))
 			{
-				$this->dictionary[$type][$result->getKey()]->setRelation(
-					$this->relation, $result
-				);
+				foreach ($this->dictionary[$type][$result->getKey()] as $model)
+				{
+					$model->setRelation($this->relation, $result);
+				}
 			}
 		}
 	}
@@ -146,10 +148,11 @@ class MorphTo extends BelongsTo {
 	{
 		$foreign = $this->foreignKey;
 
-		return Collection::make($this->dictionary[$type])->map(function($model) use ($foreign)
+		return BaseCollection::make($this->dictionary[$type])->map(function($models) use ($foreign)
 		{
-			return $model->{$foreign};
-		});
+			return head($models)->{$foreign};
+
+		})->unique();
 	}
 
 	/**
@@ -158,9 +161,19 @@ class MorphTo extends BelongsTo {
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	protected function createModelByType($type)
+	public function createModelByType($type)
 	{
 		return new $type;
+	}
+
+	/**
+	 * Get the dictionary used by the relationship.
+	 *
+	 * @return array
+	 */
+	public function getDictionary()
+	{
+		return $this->dictionary;
 	}
 
 }
