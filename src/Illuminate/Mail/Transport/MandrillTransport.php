@@ -1,0 +1,103 @@
+<?php namespace Illuminate\Mail\Transport;
+
+use Swift_Transport;
+use Swift_Mime_Message;
+use Swift_Events_EventListener;
+use Guzzle\Http\Client as HttpClient;
+
+class MandrillTransport implements Swift_Transport {
+
+	/**
+	 * The Mandrill API key.
+	 *
+	 * @var string
+	 */
+	protected $key;
+
+	/**
+	 * Create a new Mandrill transport instance.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function __construct($key)
+	{
+		$this->key = $key;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isStarted()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function start()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function stop()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+	{
+		$this->getHttpClient()
+            ->post(null, [], json_encode([
+            	'key' => $this->key, 'raw_message' => (string) $message, 'async' => true,
+            ]))
+            ->send();
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function registerPlugin(Swift_Events_EventListener $plugin)
+	{
+		//
+	}
+
+	/**
+	 * Get a new HTTP client instance.
+	 *
+	 * @return \Guzzle\Http\Client
+	 */
+	protected function getHttpClient()
+	{
+		return new HttpClient('https://mandrillapp.com/api/1.0/messages/send-raw.json');
+	}
+
+	/**
+	 * Get the API key being used by the transport.
+	 *
+	 * @return string
+	 */
+	public function getKey()
+	{
+		return $this->key;
+	}
+
+	/**
+	 * Set the API key being used by the transport.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function setKey($key)
+	{
+		return $this->key = $key;
+	}
+
+}

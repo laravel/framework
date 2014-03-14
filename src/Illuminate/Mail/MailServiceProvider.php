@@ -4,6 +4,8 @@ use Swift_Mailer;
 use Illuminate\Support\ServiceProvider;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
+use Illuminate\Mail\Transport\MailgunTransport;
+use Illuminate\Mail\Transport\MandrillTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class MailServiceProvider extends ServiceProvider {
@@ -97,6 +99,12 @@ class MailServiceProvider extends ServiceProvider {
 			case 'mail':
 				return $this->registerMailTransport($config);
 
+			case 'mailgun':
+				return $this->registerMailgunTransport($config);
+
+			case 'mandrill':
+				return $this->registerMandrillTransport($config);
+
 			default:
 				throw new \InvalidArgumentException('Invalid mail driver.');
 		}
@@ -163,6 +171,38 @@ class MailServiceProvider extends ServiceProvider {
 		$this->app['swift.transport'] = $this->app->share(function()
 		{
 			return MailTransport::newInstance();
+		});
+	}
+
+	/**
+	 * Register the Mailgun Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerMailgunTransport($config)
+	{
+		$mailgun = $this->app['config']->get('services.mailgun', array());
+
+		$this->app->bindShared('swift.transport', function() use ($mailgun)
+		{
+			return new MailgunTransport($mailgun['secret'], $mailgun['domain']);
+		});
+	}
+
+	/**
+	 * Register the Mandrill Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerMandrillTransport($config)
+	{
+		$mandrill = $this->app['config']->get('services.mandrill', array());
+
+		$this->app->bindShared('swift.transport', function() use ($mandrill)
+		{
+			return new MandrillTransport($mandrill['secret']);
 		});
 	}
 
