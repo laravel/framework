@@ -688,8 +688,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// we will pass in the appropriate values so that it behaves as expected.
 		else
 		{
+			$instance = new $class;
+
 			return new MorphTo(
-				with(new $class)->newQuery(), $this, $id, 'id', $type, $name
+				with($instance)->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
 			);
 		}
 	}
