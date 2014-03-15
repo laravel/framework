@@ -1,30 +1,31 @@
 {
-    "name": "illuminate/remote",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
-        }
-    ],
-    "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.1.*",
-        "phpseclib/phpseclib": "0.3.*"
-    },
-    "require-dev": {
-        "mockery/mockery": "0.8.0"
-    },
-    "autoload": {
-        "psr-0": {
-            "Illuminate\\Remote": ""
-        }
-    },
-    "target-dir": "Illuminate/Remote",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "4.1-dev"
-        }
-    },
-    "minimum-stability": "dev"
+	"name": "illuminate/remote",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Taylor Otwell",
+			"email": "taylorotwell@gmail.com"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0",
+		"illuminate/support": "4.1.*",
+		"phpseclib/phpseclib": "0.3.*"
+	},
+	"require-dev": {
+		"mockery/mockery": "0.9.*",
+		"phpunit/phpunit": "4.0.*"
+	},
+	"autoload": {
+		"psr-0": {
+			"Illuminate\\Remote": ""
+		}
+	},
+	"target-dir": "Illuminate/Remote",
+	"extra": {
+		"branch-alias": {
+			"dev-master": "4.1-dev"
+		}
+	},
+	"minimum-stability": "dev"
 }
