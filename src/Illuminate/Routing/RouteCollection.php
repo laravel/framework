@@ -119,28 +119,11 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function addToNameList($action, $route)
 	{
-		$name = $this->getNameForRoute($action);
+		$name = $route->getName();
 
 		if ( ! isset($this->nameList[$name]))
 		{
 			$this->nameList[$name] = $route;
-		}
-	}
-
-	/**
-	 * Parses name for nested route names.
-	 *
-	 * @param  array  $action
-	 * @param  \Illuminate\Routing\Route  $route
-	 * @return void
-	 */
-	protected function getNameForRoute($action)
-	{
-		if(is_array($action['as'])) {
-			$names = array_map(function($name) { return trim($name, ". \t\n\r\0\x0B"); }, $action['as']);
-			return implode('.', $names);
-		} else {
-			return $action['as'];
 		}
 	}
 
