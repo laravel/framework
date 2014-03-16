@@ -138,7 +138,7 @@ class UrlGenerator {
 		// for asset paths, but only for routes to endpoints in the application.
 		$root = $this->getRootUrl($this->getScheme($secure));
 
-		return $this->removeIndex($root).'/'.trim($path, '/');
+		return $this->removeIndex($root).'/'.trim($path, '/') . '?' . filemtime(realpath($path));
 	}
 
 	/**
