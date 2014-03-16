@@ -83,7 +83,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 
 		if (isset($action['as']))
 		{
-			$this->nameList[$action['as']] = $route;
+			$this->addToNameList($action, $route);
 		}
 
 		// When the route is routing to a controller we will also store the action that
@@ -107,6 +107,40 @@ class RouteCollection implements Countable, IteratorAggregate {
 		if ( ! isset($this->actionList[$action['controller']]))
 		{
 			$this->actionList[$action['controller']] = $route;
+		}
+	}
+
+	/**
+	 * Add a route to the named route dictionary.
+	 *
+	 * @param  array  $action
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return void
+	 */
+	protected function addToNameList($action, $route)
+	{
+		$name = $this->getNameForRoute($action);
+
+		if ( ! isset($this->nameList[$name]))
+		{
+			$this->nameList[$name] = $route;
+		}
+	}
+
+	/**
+	 * Parses name for nested route names.
+	 *
+	 * @param  array  $action
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return void
+	 */
+	protected function getNameForRoute($action)
+	{
+		if(is_array($action['as'])) {
+			$names = array_map(function($name) { return trim($name, ". \t\n\r\0\x0B"); }, $action['as']);
+			return implode('.', $names);
+		} else {
+			return $action['as'];
 		}
 	}
 
