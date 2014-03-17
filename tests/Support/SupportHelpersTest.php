@@ -17,6 +17,15 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($array, array('name' => 'taylor', 'languages.php' => true));
 	}
 
+	public function testArrayColumn()
+	{
+		$array = array( array('id' => 1, 'first_name' => 'John', 'last_name' => 'Doe'),
+				array('id' => 2, 'first_name' => 'Sally', 'last_name' => 'Smith'),
+				array('id' => 3, 'first_name' => 'Jane', 'last_name' => 'Jones'));
+
+		$expected = array('John', 'Sally', 'Jane');
+		$this->assertEquals($expected, array_column($array, 'first_name'));
+	}
 
 	public function testArrayGet()
 	{

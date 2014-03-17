@@ -5,6 +5,8 @@ use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Console\SubscribeCommand;
+use Illuminate\Queue\Console\UnsubscribeCommand;
+use Illuminate\Queue\Console\UpdateCommand;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
@@ -34,6 +36,10 @@ class QueueServiceProvider extends ServiceProvider {
 		$this->registerListener();
 
 		$this->registerSubscriber();
+
+		$this->registerUnsubscriber();
+
+		$this->registerUpdater();
 
 		$this->registerFailedJobServices();
 	}
@@ -134,6 +140,36 @@ class QueueServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the push queue unsubscribe command.
+	 *
+	 * @return void
+	 */
+	protected function registerUnsubscriber()
+	{
+		$this->app->bindShared('command.queue.unsubscribe', function($app)
+		{
+			return new UnsubscribeCommand;
+		});
+
+		$this->commands('command.queue.unsubscribe');
+	}
+
+	/**
+	 * Register the push queue update command.
+	 *
+	 * @return void
+	 */
+	protected function registerUpdater()
+	{
+		$this->app->bindShared('command.queue.update', function($app)
+		{
+			return new UpdateCommand;
+		});
+
+		$this->commands('command.queue.update');
+	}
+
+	/**
 	 * Register the connectors on the queue manager.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
@@ -183,7 +219,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRedisConnector($manager)
 	{
-		$app = $this->app;
+		$app = $this->app;	
 
 		$manager->addConnector('redis', function() use ($app)
 		{
@@ -199,10 +235,14 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSqsConnector($manager)
 	{
-		$manager->addConnector('sqs', function()
+		$app = $this->app;
+	
+		$manager->addConnector('sqs', function() use ($app)
 		{
-			return new SqsConnector;
+			return new SqsConnector($app['request']);
 		});
+
+		$this->registerRequestBinder('sqs');
 	}
 
 	/**
@@ -220,21 +260,22 @@ class QueueServiceProvider extends ServiceProvider {
 			return new IronConnector($app['encrypter'], $app['request']);
 		});
 
-		$this->registerIronRequestBinder();
+		$this->registerRequestBinder('iron');
 	}
 
 	/**
-	 * Register the request rebinding event for the Iron queue.
+	 * Register the request rebinding event for the push queue.
 	 *
+	 * @param string $driver
 	 * @return void
 	 */
-	protected function registerIronRequestBinder()
+	protected function registerRequestBinder($driver)
 	{
-		$this->app->rebinding('request', function($app, $request)
+		$this->app->rebinding('request', function($app, $request) use ($driver)
 		{
-			if ($app['queue']->connected('iron'))
+			if ($app['queue']->connected($driver))
 			{
-				$app['queue']->connection('iron')->setRequest($request);
+				$app['queue']->connection($driver)->setRequest($request);
 			}
 		});
 	}
@@ -263,7 +304,8 @@ class QueueServiceProvider extends ServiceProvider {
 	{
 		return array(
 			'queue', 'queue.worker', 'queue.listener', 'queue.failer',
-			'command.queue.work', 'command.queue.listen', 'command.queue.subscribe'
+			'command.queue.work', 'command.queue.listen', 'command.queue.subscribe',
+			'command.queue.unsubscribe', 'command.queue.update'
 		);
 	}
 

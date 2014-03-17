@@ -91,12 +91,12 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPushedJobsCanBeMarshaled()
 	{
-		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('createPushedIronJob'), array($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), $request = m::mock('Illuminate\Http\Request'), 'default', true));
+		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('createIronJob'), array($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), $request = m::mock('Illuminate\Http\Request'), 'default', true));
 		$request->shouldReceive('header')->once()->with('iron-message-id')->andReturn('message-id');
 		$request->shouldReceive('getContent')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
 		$crypt->shouldReceive('decrypt')->once()->with($content)->andReturn($content);
 		$job = (object) array('id' => 'message-id', 'body' => json_encode(array('foo' => 'bar')), 'pushed' => true);
-		$queue->expects($this->once())->method('createPushedIronJob')->with($this->equalTo($job))->will($this->returnValue($mockIronJob = m::mock('StdClass')));
+		$queue->expects($this->once())->method('createIronJob')->with($this->equalTo($job), true)->will($this->returnValue($mockIronJob = m::mock('StdClass')));
 		$mockIronJob->shouldReceive('fire')->once();
 
 		$response = $queue->marshal();
@@ -105,4 +105,13 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(200, $response->getStatusCode());
 	}
 
+	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testPushedJobsMustComeFromIronMQ()
+	{
+		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('createIronJob'), array($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), $request = m::mock('Illuminate\Http\Request'), 'default', true));
+		$request->shouldReceive('header')->once()->with('iron-message-id')->andReturn(null);
+		$response = $queue->marshal();
+	}
 }
