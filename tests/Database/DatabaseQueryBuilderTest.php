@@ -439,7 +439,6 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('bar', 'foo'), $builder->getBindings());
 	}
 
-
 	public function testComplexJoin()
 	{
 		$builder = $this->getBuilder();
@@ -456,6 +455,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		});
 		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
 		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('posts')->join('tags', function($j){
+			$j->onRaw('FIND_IN_SET(tag_id, tags)')->andOnRaw('user_id = 2');
+		});
+		$this->assertEquals('select * from "posts" inner join "tags" on FIND_IN_SET(tag_id, tags) and user_id = 2', $builder->toSql());
 	}
 
 

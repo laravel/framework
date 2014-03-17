@@ -175,6 +175,12 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileJoinConstraint(array $clause)
 	{
+		// compile raw join constraints
+		if (array_key_exists('sql', $clause))
+		{
+			return $clause['sql'];
+		}
+
 		$first = $this->wrap($clause['first']);
 
 		$second = $clause['where'] ? '?' : $this->wrap($clause['second']);

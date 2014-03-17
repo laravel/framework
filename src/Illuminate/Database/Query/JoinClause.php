@@ -105,4 +105,39 @@ class JoinClause {
 		return $this->on($first, $operator, $second, 'or', true);
 	}
 
+	/**
+	 * Add a raw on clause to the query.
+	 *
+	 * @param  string  $sql
+	 * @return @return \Illuminate\Database\Query\JoinClause
+	 */
+	public function onRaw($sql)
+	{
+		$this->clauses[] = compact('sql');
+		return $this;
+	}
+
+	/**
+	 * Add an "or on raw" clause to the join.
+	 *
+	 * @param string $sql
+	 * @return @return \Illuminate\Database\Query\JoinClause
+	 */
+	public function orOnRaw($sql)
+	{
+		$this->clauses[] = array('sql'=>"or $sql");
+		return $this;
+	}
+
+	/**
+	 * Add an "and on raw" clause to the join.
+	 *
+	 * @param string $sql
+	 * @return @return \Illuminate\Database\Query\JoinClause
+	 */
+	public function andOnRaw($sql)
+	{
+		$this->clauses[] = array('sql'=>"and $sql");
+		return $this;
+	}
 }
