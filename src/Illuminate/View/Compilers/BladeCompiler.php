@@ -361,6 +361,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the for statements into valid PHP.
+	 *
+	 * @param string  $expression
+	 * @return string
+	 */
+	protected function compileFor($expression)
+	{
+		return "<?php for{$expression}: ?>";
+	}
+
+	/**
 	 * Compile the foreach statements into valid PHP.
 	 *
 	 * @param string  $expression
@@ -413,6 +424,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected function compileEndwhile($expression)
 	{
 		return "<?php endwhile; ?>";
+	}
+
+	/**
+	 * Compile the end-for statements into valid PHP.
+	 *
+	 * @param string  $expression
+	 * @return string
+	 */
+	protected function compileEndfor($expression)
+	{
+		return "<?php endfor; ?>";
 	}
 
 	/**
