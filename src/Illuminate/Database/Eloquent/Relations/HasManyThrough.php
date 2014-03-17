@@ -246,4 +246,21 @@ class HasManyThrough extends Relation {
 		return $this->farParent->getQualifiedKeyName();
 	}
 
+    /**
+     * Attach a related model
+     *
+     * @param Model $model
+     * @return Model
+     */
+    public function save(Model $model) {
+        $firstKey = $this->firstKey;
+        $secondKey = $this->secondKey;
+
+        $this->parent->$firstKey = $this->farParent->getKey();
+        $this->parent->$secondKey = $model->getKey();
+
+        $this->parent->save();
+
+        return $this->parent;
+    }
 }
