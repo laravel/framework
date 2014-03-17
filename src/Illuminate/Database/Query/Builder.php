@@ -121,6 +121,20 @@ class Builder {
 	public $unions;
 
 	/**
+	 * The maximum number of union records to return.
+	 *
+	 * @var int
+	 */
+	public $unionLimit;
+	
+	/**
+	 * The orderings for the union query.
+	 *
+	 * @var array
+	 */
+	public $unionOrders;
+
+	/**
 	 * Indicates whether row locking is being used.
 	 *
 	 * @var string|bool
@@ -1054,6 +1068,35 @@ class Builder {
 	public function unionAll($query)
 	{
 		return $this->union($query, true);
+	}
+
+	/**
+	 * Set the "limit" value of the union query.
+	 *
+	 * @param  int  $value
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function limitUnion($value)
+	{
+		if ($value > 0) $this->unionLimit = $value;
+
+		return $this;
+	}
+	
+	/**
+	 * Add an "order by" clause to the union query.
+	 *
+	 * @param  string  $column
+	 * @param  string  $direction
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function orderUnionBy($column, $direction = 'asc')
+	{
+		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
+
+		$this->unionOrders[] = compact('column', 'direction');
+
+		return $this;
 	}
 
 	/**
