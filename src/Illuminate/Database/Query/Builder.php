@@ -935,7 +935,14 @@ class Builder {
 	{
 		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
 
-		$this->orders[] = compact('column', 'direction');
+		if ($this->unions)
+		{
+			$this->unionOrders[] = compact('column', 'direction');
+		}
+		else
+		{
+			$this->orders[] = compact('column', 'direction');
+		}
 
 		return $this;
 	}
@@ -1012,7 +1019,16 @@ class Builder {
 	 */
 	public function limit($value)
 	{
-		if ($value > 0) $this->limit = $value;
+		if ($value <= 0) return $this;
+
+		if ($this->unions)
+		{
+			$this->limitUnion = $value;
+		}
+		else
+		{
+			$this->limit = $value;
+		}
 
 		return $this;
 	}
@@ -1068,35 +1084,6 @@ class Builder {
 	public function unionAll($query)
 	{
 		return $this->union($query, true);
-	}
-
-	/**
-	 * Set the "limit" value of the union query.
-	 *
-	 * @param  int  $value
-	 * @return \Illuminate\Database\Query\Builder|static
-	 */
-	public function limitUnion($value)
-	{
-		if ($value > 0) $this->unionLimit = $value;
-
-		return $this;
-	}
-	
-	/**
-	 * Add an "order by" clause to the union query.
-	 *
-	 * @param  string  $column
-	 * @param  string  $direction
-	 * @return \Illuminate\Database\Query\Builder|static
-	 */
-	public function orderUnionBy($column, $direction = 'asc')
-	{
-		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
-
-		$this->unionOrders[] = compact('column', 'direction');
-
-		return $this;
 	}
 
 	/**
