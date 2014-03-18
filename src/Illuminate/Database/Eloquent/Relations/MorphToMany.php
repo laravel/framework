@@ -135,4 +135,24 @@ class MorphToMany extends BelongsToMany {
 		return $pivot;
 	}
 
+	/**
+	 * Get the foreign key "type" name.
+	 *
+	 * @return string
+	 */
+	public function getMorphType()
+	{
+		return $this->morphType;
+	}
+
+	/**
+	 * Get the class name of the parent model.
+	 *
+	 * @return string
+	 */
+	public function getMorphClass()
+	{
+		return $this->morphClass;
+	}
+
 }
