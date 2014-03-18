@@ -168,7 +168,9 @@ class Worker {
 	{
 		if ($this->events)
 		{
-			$this->events->fire('illuminate.queue.failed', array($connection, $job));
+			$data = json_decode($job->getRawBody(), true);
+
+			$this->events->fire('illuminate.queue.failed', array($connection, $job, $data));
 		}
 	}
 

@@ -264,7 +264,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$relation = m::mock('stdClass');
 		$relation->shouldReceive('addEagerConstraints')->once()->with(array('models'));
 		$relation->shouldReceive('initRelation')->once()->with(array('models'), 'orders')->andReturn(array('models'));
-		$relation->shouldReceive('get')->once()->andReturn(array('results'));
+		$relation->shouldReceive('getEager')->once()->andReturn(array('results'));
 		$relation->shouldReceive('match')->once()->with(array('models'), array('results'), 'orders')->andReturn(array('models.matched'));
 		$builder->shouldReceive('getRelation')->once()->with('orders')->andReturn($relation);
 		$results = $builder->eagerLoadRelations(array('models'));

@@ -42,6 +42,15 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMessageBagsCanBeMerged()
+	{
+		$container = new MessageBag(array('foo' => array('bar')));
+		$otherContainer = new MessageBag(array('foo' => array('baz'), 'bar' => array('foo')));
+		$container->merge($otherContainer);
+		$this->assertEquals(array('foo' => array('bar', 'baz'), 'bar' => array('foo')), $container->getMessages());
+	}
+
+
 	public function testGetReturnsArrayOfMessagesByKey()
 	{
 		$container = new MessageBag;
@@ -120,6 +129,19 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$container->add('boom', 'baz');
 
 		$this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
+	}
+
+
+	public function testCountReturnsCorrectValue()
+	{
+		$container = new MessageBag;
+		$this->assertEquals(0, $container->count());
+
+		$container->add('foo', 'bar');
+		$container->add('foo', 'baz');
+		$container->add('boom', 'baz');
+
+		$this->assertEquals(3, $container->count());
 	}
 
 }
