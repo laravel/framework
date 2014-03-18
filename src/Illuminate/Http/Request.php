@@ -44,9 +44,9 @@ class Request extends SymfonyRequest {
 	 *
 	 * @return string
 	 */
-	public function root()
+	public function root($domain = null)
 	{
-		return rtrim($this->getSchemeAndHttpHost().$this->getBaseUrl(), '/');
+		return rtrim(($domain?:$this->getSchemeAndHttpHost()).$this->getBaseUrl(), '/');
 	}
 
 	/**
