@@ -83,15 +83,16 @@ class Response {
 	 * @param  \SplFileInfo|string  $file
 	 * @param  string  $name
 	 * @param  array   $headers
+	 * @param  null|string  $contentDisposition
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
-	public static function download($file, $name = null, array $headers = array())
+	public static function download($file, $name = null, array $headers = array(), $contentDisposition = 'attachment')
 	{
-		$response = new BinaryFileResponse($file, 200, $headers, true, 'attachment');
+		$response = new BinaryFileResponse($file, 200, $headers, true, $contentDisposition);
 
 		if ( ! is_null($name))
 		{
-			return $response->setContentDisposition('attachment', $name, Str::ascii($name));
+			return $response->setContentDisposition($contentDisposition, $name, Str::ascii($name));
 		}
 
 		return $response;
