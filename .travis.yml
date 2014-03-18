@@ -10,7 +10,7 @@ before_script:
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
 
-script: phpunit -d memory_limit=1024M
+script: phpunit
 
 matrix:
   allow_failures:

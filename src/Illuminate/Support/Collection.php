@@ -388,6 +388,25 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Chunk the underlying collection array.
+	 *
+	 * @param  int $size
+	 * @param  bool  $preserveKeys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function chunk($size, $preserveKeys = false)
+	{
+		$chunks = new static;
+
+		foreach (array_chunk($this->items, $size, $preserveKeys) as $chunk)
+		{
+			$chunks->push(new static($chunk));
+		}
+
+		return $chunks;
+	}
+
+	/**
 	 * Sort through each item with a callback.
 	 *
 	 * @param  Closure  $callback

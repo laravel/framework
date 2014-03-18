@@ -12,7 +12,14 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $extensions = array();
 
 	/**
-	 * Array of opening and closing tags for echos.
+	 * The file currently being compiled.
+	 *
+	 * @var string
+	 */
+	protected $path;
+
+	/**
+	 * Array of opening and closing tags for escaped echos.
 	 *
 	 * @var array
 	 */
@@ -38,16 +45,42 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @param  string  $path
 	 * @return void
 	 */
-	public function compile($path)
+	public function compile($path = null)
 	{
 		$this->footer = array();
+
+		if ($path)
+		{
+			$this->setPath($path);
+		}
 
 		$contents = $this->compileString($this->files->get($path));
 
 		if ( ! is_null($this->cachePath))
 		{
-			$this->files->put($this->getCompiledPath($path), $contents);
+			$this->files->put($this->getCompiledPath($this->getPath()), $contents);
 		}
+	}
+
+	/**
+	 * Get the path currently being compiled.
+	 *
+	 * @return string
+	 */
+	public function getPath()
+	{
+		return $this->path;
+	}
+
+	/**
+	 * Set the path currently being compiled.
+	 *
+	 * @param string $path
+	 * @return void
+	 */
+	public function setPath($path)
+	{
+		$this->path = $path;
 	}
 
 	/**
