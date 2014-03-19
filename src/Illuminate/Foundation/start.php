@@ -188,9 +188,16 @@ AliasLoader::getInstance($aliases)->register();
 |--------------------------------------------------------------------------
 |
 */
+$app->registerCoreFallbackTypes();
 
-$illuminateDefault = $app['config']['illuminate'];
-$app->bindFallbackTypes($illuminateDefault['fallbacks']);
+/*
+ |--------------------------------------------------------------------------
+ | Register user defined types to override the defaults
+ |--------------------------------------------------------------------------
+ |
+ */
+$fallbackTypes = $config['fallback'];
+$app->registerFallbackTypes($fallbackTypes);
 
 
 /*
