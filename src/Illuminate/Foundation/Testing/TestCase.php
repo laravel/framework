@@ -212,7 +212,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Assert that the response view does not have a given piece of bound data.
+	 * Assert that the response view is missing a piece of bound data.
 	 *
 	 * @param  string  $key
 	 * @return void
