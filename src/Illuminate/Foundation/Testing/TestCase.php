@@ -221,7 +221,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		$response = $this->client->getResponse()->original;
 
-		$this->assertInstanceOf('Illuminate\View\View', $response, 'The response was not a view.');
+		if ( ! $response instanceof View)
+		{
+			return $this->assertTrue(false, 'The response was not a view.');
+		}
 
 		$this->assertArrayNotHasKey($key, $response->getData());
 	}
