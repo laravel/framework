@@ -212,6 +212,24 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the response view is missing a piece of bound data.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function assertViewMissing($key)
+	{
+		$response = $this->client->getResponse()->original;
+
+		if ( ! $response instanceof View)
+		{
+			return $this->assertTrue(false, 'The response was not a view.');
+		}
+
+		$this->assertArrayNotHasKey($key, $response->getData());
+	}
+
+	/**
 	 * Assert whether the client was redirected to a given URI.
 	 *
 	 * @param  string  $uri
