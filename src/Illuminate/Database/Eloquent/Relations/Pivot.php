@@ -99,7 +99,7 @@ class Pivot extends Model {
 
 		$query = $this->newQuery()->where($this->foreignKey, $foreign);
 
-		return $query->where($this->otherKey, $this->getAttribute($this->otherKey));	
+		return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
 	}
 
 	/**
