@@ -50,7 +50,14 @@ class OptimizeCommand extends Command {
 	{
 		$this->info('Generating optimized class loader');
 
-		$this->composer->dumpOptimized();
+		if ($this->option('psr'))
+		{
+			$this->composer->dumpAutoloads();
+		}
+		else
+		{
+			$this->composer->dumpOptimized();
+		}
 
 		if ($this->option('force') || ! $this->laravel['config']['app.debug'])
 		{
@@ -115,6 +122,8 @@ class OptimizeCommand extends Command {
 	{
 		return array(
 			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
+
+			array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
 		);
 	}
 

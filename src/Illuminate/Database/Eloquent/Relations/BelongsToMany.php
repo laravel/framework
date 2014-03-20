@@ -267,7 +267,9 @@ class BelongsToMany extends Relation {
 	{
 		$query->select(new \Illuminate\Database\Query\Expression('count(*)'));
 
-		$query->from($this->table.' as '.$hash = $this->getRelationCountHash());
+		$tablePrefix = $this->query->getQuery()->getConnection()->getTablePrefix();
+
+		$query->from($this->table.' as '.$tablePrefix.$hash = $this->getRelationCountHash());
 
 		$key = $this->wrap($this->getQualifiedParentKeyName());
 
@@ -558,10 +560,14 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array  $ids
 	 * @param  bool   $detaching
-	 * @return void
+	 * @return array
 	 */
 	public function sync(array $ids, $detaching = true)
 	{
+		$changes = array(
+			'attached' => array(), 'detached' => array(), 'updated' => array()
+		);
+
 		// First we need to attach any of the associated models that are not currently
 		// in this joining table. We'll spin through the given IDs, checking to see
 		// if they exist in the array of current ones, and if not we will insert.
@@ -577,14 +583,20 @@ class BelongsToMany extends Relation {
 		if ($detaching && count($detach) > 0)
 		{
 			$this->detach($detach);
+
+			$changes['detached'] = (array) array_map('intval', $detach);
 		}
 
 		// Now we are finally ready to attach the new records. Note that we'll disable
 		// touching until after the entire operation is complete so we don't fire a
 		// ton of touch operations until we are totally done syncing the records.
-		$this->attachNew($records, $current, false);
+		$changes = array_merge(
+			$changes, $this->attachNew($records, $current, false)
+		);
 
 		$this->touchIfTouching();
+
+		return $changes;
 	}
 
 	/**
@@ -616,10 +628,12 @@ class BelongsToMany extends Relation {
 	 * @param  array  $records
 	 * @param  array  $current
 	 * @param  bool   $touch
-	 * @return void
+	 * @return array
 	 */
 	protected function attachNew(array $records, array $current, $touch = true)
 	{
+		$changes = array('attached' => array(), 'updated' => array());
+
 		foreach ($records as $id => $attributes)
 		{
 			// If the ID is not in the list of existing pivot IDs, we will insert a new pivot
@@ -628,12 +642,17 @@ class BelongsToMany extends Relation {
 			if ( ! in_array($id, $current))
 			{
 				$this->attach($id, $attributes, $touch);
+
+				$changes['attached'][] = (int) $id;
 			}
 			elseif (count($attributes) > 0)
 			{
 				$this->updateExistingPivot($id, $attributes, $touch);
+
+				$changes['updated'][] = (int) $id;
 			}
 		}
+		return $changes;
 	}
 
 	/**

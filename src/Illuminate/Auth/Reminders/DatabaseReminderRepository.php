@@ -93,7 +93,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	{
 		$email = $user->getReminderEmail();
 
-		$reminder = $this->getTable()->where('email', $email)->where('token', $token)->first();
+		$reminder = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
 		return $reminder && ! $this->reminderExpired($reminder);
 	}
@@ -101,12 +101,12 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Determine if the reminder has expired.
 	 *
-	 * @param  object  $reminder
+	 * @param  array  $reminder
 	 * @return bool
 	 */
 	protected function reminderExpired($reminder)
 	{
-		$createdPlusHour = strtotime($reminder->created_at) + $this->expires;
+		$createdPlusHour = strtotime($reminder['created_at']) + $this->expires;
 
 		return $createdPlusHour < $this->getCurrentTime();
 	}

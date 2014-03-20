@@ -41,7 +41,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
 	{
-		$date = m::mock('DateTime');
+		$date = Carbon\Carbon::now();
 		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getSeconds', 'getTime', 'getRandomId'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
 		$queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
 		$queue->expects($this->once())->method('getSeconds')->with($date)->will($this->returnValue(1));

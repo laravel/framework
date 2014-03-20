@@ -658,15 +658,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	public function testMorphToCreatesProperRelation()
 	{
-		$model = m::mock('Illuminate\Database\Eloquent\Model[belongsTo]');
-		$model->foo_type = 'FooClass';
-		$model->shouldReceive('belongsTo')->with('FooClass', 'foo_id');
-		$relation = $model->morphTo('foo');
-
-		$model = m::mock('EloquentModelStub[belongsTo]');
-		$model->morph_to_stub_type = 'FooClass';
-		$model->shouldReceive('belongsTo')->with('FooClass', 'morph_to_stub_id');
+		$model = new EloquentModelStub;
+		$this->addMockConnection($model);
 		$relation = $model->morphToStub();
+		$this->assertEquals('morph_to_stub_id', $relation->getForeignKey());
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
 	}
 
 
@@ -778,9 +775,11 @@ class EloquentTestObserverStub {
 	public function creating() {}
 	public function saved() {}
 }
+
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
 	protected $guarded = array();
+	protected $morph_to_stub_type = 'EloquentModelSaveStub';
 	public function getListItemsAttribute($value)
 	{
 		return json_decode($value, true);

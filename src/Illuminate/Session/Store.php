@@ -86,7 +86,7 @@ class Store implements SessionInterface {
 	{
 		$this->loadSession();
 
-		if ( ! $this->has('_token')) $this->put('_token', str_random(40));
+		if ( ! $this->has('_token')) $this->regenerateToken();
 
 		return $this->started = true;
 	}
@@ -306,15 +306,20 @@ class Store implements SessionInterface {
 	}
 
 	/**
-	 * Put a key / value pair in the session.
+	 * Put a key / value pair or array of key / value pairs in the session.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  string|array  $key
+	 * @param  mixed|null  	 $value
 	 * @return void
 	 */
 	public function put($key, $value)
 	{
-		$this->set($key, $value);
+		if ( ! is_array($key)) $key = array($key => $value);
+
+		foreach ($key as $arrayKey => $arrayValue)
+		{
+			$this->set($arrayKey, $arrayValue);
+		}
 	}
 
 	/**
@@ -536,6 +541,16 @@ class Store implements SessionInterface {
 	public function getToken()
 	{
 		return $this->token();
+	}
+
+	/**
+	 * Regenerate the CSRF token value.
+	 *
+	 * @return void
+	 */
+	public function regenerateToken()
+	{
+		$this->put('_token', str_random(40));
 	}
 
 	/**

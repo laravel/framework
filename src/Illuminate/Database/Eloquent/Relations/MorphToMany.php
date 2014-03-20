@@ -65,6 +65,20 @@ class MorphToMany extends BelongsToMany {
 	}
 
 	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query, Builder $parent)
+	{
+		$query = parent::getRelationCountQuery($query, $parent);
+
+		return $query->where($this->table.'.'.$this->morphType, $this->morphClass);
+	}
+
+	/**
 	 * Set the constraints for an eager load of the relation.
 	 *
 	 * @param  array  $models
@@ -120,5 +134,25 @@ class MorphToMany extends BelongsToMany {
 
 		return $pivot;
 	}
+
+    /**
+     * Get the foreign key "type" name.
+     *
+     * @return string
+     */
+    public function getMorphType()
+    {
+        return $this->morphType;
+    }
+
+    /**
+     * Get the class name of the parent model.
+     *
+     * @return string
+     */
+    public function getMorphClass()
+    {
+        return $this->morphClass;
+    }
 
 }

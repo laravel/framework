@@ -63,7 +63,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('other', 'other.value')->andReturn($query);
 		$query->shouldReceive('delete')->once()->andReturn(true);
 		$pivot->expects($this->once())->method('newQuery')->will($this->returnValue($query));
-		
+
 		$this->assertTrue($pivot->delete());
 	}
 

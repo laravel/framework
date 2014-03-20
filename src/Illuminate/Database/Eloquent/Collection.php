@@ -126,7 +126,7 @@ class Collection extends BaseCollection {
 	 */
 	public function merge($collection)
 	{
-		$dictionary = $this->getDictionary($this);
+		$dictionary = $this->getDictionary();
 
 		foreach ($collection as $item)
 		{
@@ -189,9 +189,35 @@ class Collection extends BaseCollection {
 	 */
 	public function unique()
 	{
-		$dictionary = $this->getDictionary($this);
+		$dictionary = $this->getDictionary();
 
 		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Returns only the models from the collection with the specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function only($keys)
+	{
+		$dictionary = array_only($this->getDictionary($this), $keys);
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Returns all models in the collection except the models with specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function except($keys)
+	{
+	    $dictionary = array_except($this->getDictionary($this), $keys);
+
+	    return new static(array_values($dictionary));
 	}
 
 	/**
@@ -200,8 +226,10 @@ class Collection extends BaseCollection {
 	 * @param  \Illuminate\Support\Collection  $collection
 	 * @return array
 	 */
-	public function getDictionary($collection)
+	public function getDictionary($collection = null)
 	{
+		$collection = $collection ?: $this;
+
 		$dictionary = array();
 
 		foreach ($collection as $value)
