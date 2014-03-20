@@ -82,7 +82,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 
 		return $this->connection($name);
 	}
-	
+
 	/**
 	 * Disconnect from the given database.
 	 *

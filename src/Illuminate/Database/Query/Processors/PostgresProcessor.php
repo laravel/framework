@@ -20,7 +20,7 @@ class PostgresProcessor extends Processor {
 		$sequence = $sequence ?: 'id';
 
 		$result = (array) $results[0];
-		
+
 		$id = $result[$sequence];
 
 		return is_numeric($id) ? (int) $id : $id;
