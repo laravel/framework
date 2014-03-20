@@ -1023,7 +1023,7 @@ class Builder {
 
 		if ($this->unions)
 		{
-			$this->limitUnion = $value;
+			$this->unionLimit = $value;
 		}
 		else
 		{
