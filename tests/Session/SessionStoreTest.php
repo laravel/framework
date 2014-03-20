@@ -223,8 +223,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session->flashInput(array('foo' => 'bar'));
 		$this->assertTrue($session->hasOldInput());
 	}
-    
-    
+
+
 	public function testHandlerNeedsRequest()
 	{
 		$session = $this->getSession();
@@ -243,6 +243,15 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$session = $this->getSession();
 		$this->assertTrue($session->token() == $session->getToken());
+	}
+
+
+	public function testRegenerateToken()
+	{
+		$session = $this->getSession();
+		$token = $session->getToken();
+		$session->regenerateToken();
+		$this->assertNotEquals($token, $session->getToken());
 	}
 
 
@@ -270,7 +279,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 			'1'
 		);
 	}
-    
+
 	public function getSessionName()
 	{
 		return 'name';

@@ -105,7 +105,7 @@ abstract class Manager {
 	public function extend($driver, Closure $callback)
 	{
 		$this->customCreators[$driver] = $callback;
-		
+
 		return $this;
 	}
 

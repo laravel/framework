@@ -249,7 +249,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$nop2 = function() {};
 		$builder->setEagerLoads(array('foo' => $nop1, 'foo.bar' => $nop2));
 		$builder->shouldAllowMockingProtectedMethods()->shouldReceive('loadRelation')->with(array('models'), 'foo', $nop1)->andReturn(array('foo'));
-		
+
 		$results = $builder->eagerLoadRelations(array('models'));
 		$this->assertEquals(array('foo'), $results);
 	}
@@ -262,7 +262,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$relation = m::mock('stdClass');
 		$relation->shouldReceive('addEagerConstraints')->once()->with(array('models'));
 		$relation->shouldReceive('initRelation')->once()->with(array('models'), 'orders')->andReturn(array('models'));
-		$relation->shouldReceive('get')->once()->andReturn(array('results'));
+		$relation->shouldReceive('getEager')->once()->andReturn(array('results'));
 		$relation->shouldReceive('match')->once()->with(array('models'), array('results'), 'orders')->andReturn(array('models.matched'));
 		$builder->shouldReceive('getRelation')->once()->with('orders')->andReturn($relation);
 		$results = $builder->eagerLoadRelations(array('models'));
@@ -347,7 +347,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('from');
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar', null, 'and');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar');
 		$builder->setModel($model = new EloquentBuilderTestScopeStub);
 		$result = $builder->approved();
 
@@ -421,16 +421,19 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentBuilderTestModelStub extends Illuminate\Database\Eloquent\Model {}
+
 class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	public function scopeApproved($query)
 	{
 		$query->where('foo', 'bar');
 	}
 }
+
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'table';
 	protected $softDelete = true;
 }
+
 class EloquentBuilderTestListsStub {
 	protected $attributes;
 	public function __construct($attributes)

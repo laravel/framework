@@ -186,7 +186,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		foreach ($this->items as $key => $value)
 		{
-			$key = is_callable($groupBy) ? $groupBy($value, $key) : array_get($value, $groupBy);
+			$key = is_callable($groupBy) ? $groupBy($value, $key) : data_get($value, $groupBy);
 
 			$results[$key][] = $value;
 		}
@@ -384,6 +384,25 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function slice($offset, $length = null, $preserveKeys = false)
 	{
 		return new static(array_slice($this->items, $offset, $length, $preserveKeys));
+	}
+
+	/**
+	 * Chunk the underlying collection array.
+	 *
+	 * @param  int $size
+	 * @param  bool  $preserveKeys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function chunk($size, $preserveKeys = false)
+	{
+		$chunks = new static;
+
+		foreach (array_chunk($this->items, $size, $preserveKeys) as $chunk)
+		{
+			$chunks->push(new static($chunk));
+		}
+
+		return $chunks;
 	}
 
 	/**

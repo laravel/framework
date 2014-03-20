@@ -13,7 +13,7 @@
         "symfony/finder": "2.4.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "4.0.*"
     },
     "autoload": {
         "psr-0": {

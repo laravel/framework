@@ -212,6 +212,24 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the response view is missing a piece of bound data.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function assertViewMissing($key)
+	{
+		$response = $this->client->getResponse()->original;
+
+		if ( ! $response instanceof View)
+		{
+			return $this->assertTrue(false, 'The response was not a view.');
+		}
+
+		$this->assertArrayNotHasKey($key, $response->getData());
+	}
+
+	/**
 	 * Assert whether the client was redirected to a given URI.
 	 *
 	 * @param  string  $uri
@@ -333,6 +351,47 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	public function assertHasOldInput()
 	{
 		$this->assertSessionHas('_old_input');
+	}
+
+	/**
+	 * Set the session to the given array.
+	 *
+	 * @param  array  $data
+	 * @return void
+	 */
+	public function session(array $data)
+	{
+		$this->startSession();
+
+		foreach ($data as $key => $value)
+		{
+			$this->app['session']->put($key, $value);
+		}
+	}
+
+	/**
+	 * Flush all of the current session data.
+	 *
+	 * @return void
+	 */
+	public function flushSession()
+	{
+		$this->startSession();
+
+		$this->app['session']->flush();
+	}
+
+	/**
+	 * Start the session for the application.
+	 *
+	 * @return void
+	 */
+	protected function startSession()
+	{
+		if ( ! $this->app['session']->isStarted())
+		{
+			$this->app['session']->start();
+		}
 	}
 
 	/**

@@ -27,7 +27,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.1.22';
+	const VERSION = '4.1.24';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -980,6 +980,17 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if the given service is a deferred service.
+	 *
+	 * @param  string  $service
+	 * @return bool
+	 */
+	public function isDeferredService($service)
+	{
+		return isset($this->deferredServices[$service]);
+	}
+
+	/**
 	 * Get or set the request class for the application.
 	 *
 	 * @param  string  $class
@@ -1062,7 +1073,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'cookie'         => 'Illuminate\Cookie\CookieJar',
 			'encrypter'      => 'Illuminate\Encryption\Encrypter',
 			'db'             => 'Illuminate\Database\DatabaseManager',
-			'events'         => 'Illuminate\Events\Dispatacher',
+			'events'         => 'Illuminate\Events\Dispatcher',
 			'files'          => 'Illuminate\Filesystem\Filesystem',
 			'form'           => 'Illuminate\Html\FormBuilder',
 			'hash'           => 'Illuminate\Hashing\HasherInterface',

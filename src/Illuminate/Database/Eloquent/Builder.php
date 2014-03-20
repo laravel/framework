@@ -506,7 +506,7 @@ class Builder {
 		// Once we have the results, we just match those back up to their parent models
 		// using the relationship instance. Then we just return the finished arrays
 		// of models which have been eagerly hydrated and are readied for return.
-		$results = $relation->get();
+		$results = $relation->getEager();
 
 		return $relation->match($models, $results, $name);
 	}
@@ -601,7 +601,7 @@ class Builder {
 		}
 		else
 		{
-			$this->query->where($column, $operator, $value, $boolean);
+			call_user_func_array(array($this->query, 'where'), func_get_args());
 		}
 
 		return $this;
