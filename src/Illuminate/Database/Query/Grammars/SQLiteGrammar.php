@@ -74,4 +74,47 @@ class SQLiteGrammar extends Grammar {
 		return $sql;
 	}
 
+	/**
+	 * Compile a "where day(field)" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereDay(Builder $query, $where)
+	{
+		$value = str_pad('0', $where['value'], 2, STR_PAD_LEFT);
+		$value = $this->parameter($value);
+
+		return 'strftime(\'%d\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+	}
+
+	/**
+	 * Compile a "where month(field)" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereMonth(Builder $query, $where)
+	{
+		$value = str_pad('0', $where['value'], 2, STR_PAD_LEFT);
+		$value = $this->parameter($value);
+
+		return 'strftime(\'%m\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+	}
+
+	/**
+	 * Compile a "where year(field)" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereYear(Builder $query, $where)
+	{
+		$value = $this->parameter($where['value']);
+		return 'strftime(\'%Y\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+	}
+
 }

@@ -785,6 +785,66 @@ class Builder {
 	}
 
 	/**
+	 * Add a where day() between statement to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string   $operator
+	 * @param  int   $value
+	 * @param  string   $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function whereDay($column, $operator, $value, $boolean = 'and')
+	{
+		$type = 'Day';
+
+		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
+
+		$this->bindings[] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Add a where month() between statement to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string   $operator
+	 * @param  int   $value
+	 * @param  string   $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function whereMonth($column, $operator, $value, $boolean = 'and')
+	{
+		$type = 'Month';
+
+		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
+
+		$this->bindings[] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Add a where year() between statement to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string   $operator
+	 * @param  int   $value
+	 * @param  string   $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function whereYear($column, $operator, $value, $boolean = 'and')
+	{
+		$type = 'Year';
+
+		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
+
+		$this->bindings[] = $value;
+
+		return $this;
+	}
+
+	/**
 	 * Handles dynamic "where" clauses to the query.
 	 *
 	 * @param  string  $method
