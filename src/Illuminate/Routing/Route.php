@@ -806,4 +806,15 @@ class Route {
 		return $this->compiled;
 	}
 
+	/**
+	 * Get whether the route has the given HTTP method
+	 *
+	 * @param  string $method
+	 * @return bool
+	 */
+	public function hasMethod($method)
+	{
+		return in_array($method, $this->methods);
+	}
+
 }
