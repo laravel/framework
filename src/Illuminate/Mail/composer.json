@@ -13,7 +13,7 @@
         "illuminate/log": "4.1.*",
         "illuminate/support": "4.1.*",
         "illuminate/view": "4.1.*",
-        "swiftmailer/swiftmailer": "4.3.*"
+        "swiftmailer/swiftmailer": "5.0.*"
     },
     "require-dev": {
         "illuminate/queue": "4.1.*",
