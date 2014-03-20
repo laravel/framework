@@ -204,6 +204,31 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 2014), $builder->getBindings());
 	}
 
+	public function testWhereDaySqlServer()
+	{
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('users')->whereDay('created_at', '=', 1);
+		$this->assertEquals('select * from "users" where day("created_at") = ?', $builder->toSql());
+		$this->assertEquals(array(0 => 1), $builder->getBindings());
+	}
+
+
+	public function testWhereMonthSqlServer()
+	{
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
+		$this->assertEquals('select * from "users" where month("created_at") = ?', $builder->toSql());
+		$this->assertEquals(array(0 => 5), $builder->getBindings());
+	}
+
+	public function testWhereYearSqlServer()
+	{
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
+		$this->assertEquals('select * from "users" where year("created_at") = ?', $builder->toSql());
+		$this->assertEquals(array(0 => 2014), $builder->getBindings());
+	}
+
 
 	public function testWhereBetweens()
 	{
