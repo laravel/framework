@@ -68,7 +68,7 @@ class Composer {
 		{
 			return 'php composer.phar';
 		}
-		
+
 		return 'composer';
 	}
 
