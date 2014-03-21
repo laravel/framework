@@ -206,7 +206,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function bindInstallPaths(array $paths)
 	{
 		// We merge the passed array with the one containing the default install paths, 
-		// so that all the keys needed by the framework exist.
+		// so that all the keys needed by the framework exist. The passed array may
+		// not contain all the keys, which is useful for backward compatibility.
 		$paths = array_merge($this->getDefaultInstallPaths(), $paths);
 
 		$this->instance('path', realpath($paths['app']));
