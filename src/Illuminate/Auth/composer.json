@@ -16,7 +16,7 @@
         "illuminate/http": "4.2.*",
         "illuminate/session": "4.2.*",
         "illuminate/support": "4.2.*",
-        "nesbot/carbon": "1.*"
+        "nesbot/carbon": "~1.0"
     },
     "require-dev": {
         "illuminate/console": "4.2.*",
