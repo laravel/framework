@@ -88,11 +88,11 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 */
 	protected function addWhere($query, $key, $extraValue)
 	{
-		if ($extraValue == 'NULL')
+		if ($extraValue === 'NULL')
 		{
 			$query->whereNull($key);
 		}
-		elseif ($extraValue == 'NOT_NULL')
+		elseif ($extraValue === 'NOT_NULL')
 		{
 			$query->whereNotNull($key);
 		}
