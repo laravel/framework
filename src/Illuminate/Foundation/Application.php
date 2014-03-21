@@ -839,7 +839,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function isDownForMaintenance()
 	{
-		return file_exists($this['path.storage'].'/meta/down');
+		return file_exists($this['config']['app.manifest'].'/down');
 	}
 
 	/**
