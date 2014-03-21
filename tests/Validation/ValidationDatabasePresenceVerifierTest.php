@@ -21,7 +21,7 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase 
 		$builder->shouldReceive('whereNull')->with('foo');
 		$builder->shouldReceive('whereNotNull')->with('bar');
 		$builder->shouldReceive('where')->with('baz', 'taylor');
-        $builder->shouldReceive('where')->with('faz', true);
+		$builder->shouldReceive('where')->with('faz', true);
 		$builder->shouldReceive('count')->once()->andReturn(100);
 
 		$this->assertEquals(100, $verifier->getCount('table', 'column', 'value', null, null, $extra));
