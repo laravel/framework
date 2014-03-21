@@ -39,6 +39,17 @@ class QueueManager {
 	{
 		$this->app['events']->listen('illuminate.queue.failed', $callback);
 	}
+	
+	/**
+	* Register an event listener for the job exception event.
+	*
+	* @param  mixed  $callback
+	* @return void
+	*/
+	public function exception($callback)
+	{
+		$this->app['events']->listen('illuminate.queue.exception', $callback);
+	}	
 
 	/**
 	 * Determine if the driver is connected.

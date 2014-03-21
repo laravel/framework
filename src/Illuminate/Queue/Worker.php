@@ -127,6 +127,8 @@ class Worker {
 			// the queue so it is not lost. This will let is be retried at a later
 			// time by another listener (or the same one). We will do that here.
 			if ( ! $job->isDeleted()) $job->release($delay);
+			
+			$this->raiseJobExceptionEvent($connection, $job, $e);
 
 			throw $e;
 		}
@@ -167,6 +169,24 @@ class Worker {
 			$this->events->fire('illuminate.queue.failed', array($connection, $job, $data));
 		}
 	}
+	
+	/**
+	* Raise the job exception event.
+	*
+	* @param  string  $connection
+	* @param  \Illuminate\Queue\Jobs\Job  $job
+	* @param  \Exception  $exception
+	* @return void
+	*/
+	protected function raiseJobExceptionEvent($connection, Job $job, $exception)
+	{
+		if ($this->events)
+		{
+			$data = json_decode($job->getRawBody(), true);
+
+			$this->events->fire('illuminate.queue.exception', array($connection, $job, $data, $exception));
+		}
+	}	
 
 	/**
 	 * Sleep the script for a given number of seconds.
