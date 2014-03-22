@@ -107,9 +107,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function whereYear(Builder $query, $where)
 	{
-		$value = $this->parameter($where['value']);
-
-		return 'strftime(\'%Y\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+		return $this->dateBasedWhere('%Y', $query, $where);
 	}
 
 	/**
