@@ -232,6 +232,8 @@ class Connection implements ConnectionInterface {
 	 * Get the gateway implementation.
 	 *
 	 * @return \Illuminate\Remote\GatewayInterface
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function getGateway()
 	{
