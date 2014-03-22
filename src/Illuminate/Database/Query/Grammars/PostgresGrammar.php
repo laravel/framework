@@ -172,5 +172,5 @@ class PostgresGrammar extends Grammar {
 	{
 		return array('truncate '.$this->wrapTable($query->from).' restart identity' => array());
 	}
-
+	
 }

@@ -390,6 +390,45 @@ class Grammar extends BaseGrammar {
 	}
 
 	/**
+	 * Compile a "where day(field)" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereDay(Builder $query, $where)
+	{
+		$value = $this->parameter($where['value']);
+		return 'day('.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+	}
+
+	/**
+	 * Compile a "where month(field)" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereMonth(Builder $query, $where)
+	{
+		$value = $this->parameter($where['value']);
+		return 'month('.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+	}
+
+	/**
+	 * Compile a "where year(field)" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereYear(Builder $query, $where)
+	{
+		$value = $this->parameter($where['value']);
+		return 'year('.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+	}
+
+	/**
 	 * Compile the "group by" portions of the query.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
