@@ -12,7 +12,7 @@ class SyncQueue extends Queue implements QueueInterface {
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$this->resolveJob($job, $data)->fire();
+		$this->resolveJob($job, json_encode($data))->fire();
 
 		return 0;
 	}
