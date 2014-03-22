@@ -785,7 +785,7 @@ class Builder {
 	}
 
 	/**
-	 * Add a where day() between statement to the query.
+	 * Add a "where day" statement to the query.
 	 *
 	 * @param  string  $column
 	 * @param  string   $operator
@@ -795,17 +795,11 @@ class Builder {
 	 */
 	public function whereDay($column, $operator, $value, $boolean = 'and')
 	{
-		$type = 'Day';
-
-		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
-
-		$this->bindings[] = $value;
-
-		return $this;
+		return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
 	}
 
 	/**
-	 * Add a where month() between statement to the query.
+	 * Add a "where month" statement to the query.
 	 *
 	 * @param  string  $column
 	 * @param  string   $operator
@@ -815,17 +809,11 @@ class Builder {
 	 */
 	public function whereMonth($column, $operator, $value, $boolean = 'and')
 	{
-		$type = 'Month';
-
-		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
-
-		$this->bindings[] = $value;
-
-		return $this;
+		return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
 	}
 
 	/**
-	 * Add a where year() between statement to the query.
+	 * Add a "where year" statement to the query.
 	 *
 	 * @param  string  $column
 	 * @param  string   $operator
@@ -835,8 +823,21 @@ class Builder {
 	 */
 	public function whereYear($column, $operator, $value, $boolean = 'and')
 	{
-		$type = 'Year';
+		return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
+	}
 
+	/**
+	 * Add a date based (year, month, day) statement to the query.
+	 *
+	 * @param  string  $type
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  int  $value
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	protected function addDateBasedWhere($type, $column, $operator, $value, $boolean = 'and')
+	{
 		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
 
 		$this->bindings[] = $value;

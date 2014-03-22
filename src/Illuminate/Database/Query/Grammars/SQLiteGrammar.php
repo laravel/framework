@@ -75,7 +75,7 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile a "where day(field)" clause.
+	 * Compile a "where day" clause.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
@@ -83,14 +83,11 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function whereDay(Builder $query, $where)
 	{
-		$value = str_pad('0', $where['value'], 2, STR_PAD_LEFT);
-		$value = $this->parameter($value);
-
-		return 'strftime(\'%d\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+		return $this->dateBasedWhere('%d', $query, $where);
 	}
 
 	/**
-	 * Compile a "where month(field)" clause.
+	 * Compile a "where month" clause.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
@@ -98,14 +95,11 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function whereMonth(Builder $query, $where)
 	{
-		$value = str_pad('0', $where['value'], 2, STR_PAD_LEFT);
-		$value = $this->parameter($value);
-
-		return 'strftime(\'%m\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+		return $this->dateBasedWhere('%m', $query, $where);
 	}
 
 	/**
-	 * Compile a "where year(field)" clause.
+	 * Compile a "where year" clause.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
@@ -114,7 +108,25 @@ class SQLiteGrammar extends Grammar {
 	protected function whereYear(Builder $query, $where)
 	{
 		$value = $this->parameter($where['value']);
+
 		return 'strftime(\'%Y\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+	}
+
+	/**
+	 * Compile a date based where clause.
+	 *
+	 * @param  string  $type
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function dateBasedWhere($type, Builder $query, $where)
+	{
+		$value = str_pad('0', $where['value'], 2, STR_PAD_LEFT);
+
+		$value = $this->parameter($value);
+
+		return 'strftime(\''.$type.'\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
 	}
 
 }
