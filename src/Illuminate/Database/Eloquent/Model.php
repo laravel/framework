@@ -2307,6 +2307,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $key
 	 * @param  string  $camelKey
 	 * @return mixed
+	 *
+	 * @throws \LogicException
 	 */
 	protected function getRelationshipFromMethod($key, $camelKey)
 	{
