@@ -68,7 +68,7 @@ class MorphTo extends BelongsTo {
 	{
 		foreach ($models as $model)
 		{
-			if ($model->{$this->morphType}) 
+			if ($model->{$this->morphType})
 			{
 				$this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
 			}
