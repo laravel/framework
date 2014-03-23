@@ -514,6 +514,8 @@ class Request extends SymfonyRequest {
 	 * Get the session associated with the request.
 	 *
 	 * @return \Illuminate\Session\Store
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function session()
 	{
