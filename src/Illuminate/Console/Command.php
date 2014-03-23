@@ -222,9 +222,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	{
 		$dialog = $this->getHelperSet()->get('dialog');
 
-		$choice = $dialog->select($this->output, "<question>$question</question>", $choices, $default, $attempts);
-
-		return $choices[$choice];
+		return $dialog->select($this->output, "<question>$question</question>", $choices, $default, $attempts);
 	}
 
 	/**
