@@ -210,6 +210,24 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
+	 * Give the user a single choice from an array of answers.
+	 *
+	 * @param  string  $question
+	 * @param  array   $choices
+	 * @param  string  $default
+	 * @param  mixed   $attempts
+	 * @return bool
+	 */
+	public function choice($question, array $choices, $default = null, $attempts = false)
+	{
+		$dialog = $this->getHelperSet()->get('dialog');
+
+		$choice = $dialog->select($this->output, "<question>$question</question>", $choices, $default, $attempts);
+
+		return $choices[$choice];
+	}
+
+	/**
 	 * Write a string as standard output.
 	 *
 	 * @param  string  $string
