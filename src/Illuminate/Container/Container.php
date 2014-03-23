@@ -614,6 +614,7 @@ class Container implements ArrayAccess {
 	 * @param  array  $dependencies
 	 * @param  array  $parameters
 	 * @param  array
+	 * @return array
 	 */
 	protected function keyParametersByArgument(array $dependencies, array $parameters)
 	{

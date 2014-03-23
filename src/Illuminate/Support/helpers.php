@@ -557,6 +557,8 @@ if ( ! function_exists('data_get'))
 	 * @param  string  $key
 	 * @param  mixed   $default
 	 * @return mixed
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	function data_get($target, $key, $default = null)
 	{
