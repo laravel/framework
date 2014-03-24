@@ -743,6 +743,40 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
 	}
 
+
+	public function testBooleansAreMutatedProperly()
+	{
+		// Check integer conversion
+		$model = new EloquentBooleanModelStub;
+		$model->completed = 0;
+		$attributes = $model->getAttributes();
+		$this->assertFalse($model->completed);
+		$this->assertFalse($attributes['completed']);
+
+		$model = new EloquentBooleanModelStub;
+		$model->completed = 1;
+		$attributes = $model->getAttributes();
+		$this->assertTrue($model->completed);
+		$this->assertTrue($attributes['completed']);
+
+		$model = new EloquentBooleanModelStub;
+		$model->invited = 0;
+		$this->assertFalse($model->invited);
+
+		$model = new EloquentBooleanModelStub;
+		$model->invited = 1;
+		$this->assertTrue($model->invited);
+
+		$model = new EloquentBooleanModelStub;
+		$model->completed = true;
+		$this->assertTrue($model->completed);
+
+		$model = new EloquentBooleanModelStub;
+		$model->invited = false;
+		$attributes = $model->getAttributes();
+		$this->assertFalse($model->invited);
+		$this->assertFalse($attributes['invited']);
+	}
 }
 
 class EloquentTestObserverStub {
@@ -875,4 +909,8 @@ class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return array_key_exists(get_called_class(), static::$booted);
 	}
+}
+
+class EloquentBooleanModelStub extends EloquentModelStub {
+	protected $booleans = array('completed', 'invited');
 }
