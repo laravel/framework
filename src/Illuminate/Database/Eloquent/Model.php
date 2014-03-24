@@ -1585,7 +1585,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a new query builder for the model's table.
 	 *
-	 * @param  bool  $excludeDeleted
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function newQuery()
