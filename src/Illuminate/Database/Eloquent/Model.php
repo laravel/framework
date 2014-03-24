@@ -130,6 +130,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $dates = array();
 
 	/**
+	 * The attributes that should be mutated to booleans.
+	 *
+	 * @var array
+	 */
+	protected $booleans = array();
+
+	/**
 	 * The relationships that should be touched on save.
 	 *
 	 * @var array
@@ -2236,6 +2243,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			if ($value) return $this->asDateTime($value);
 		}
 
+		// If the attribute is listed as a boolean, we will convert it to a boolean,
+		// which makes it quite easy to work with when actual boolean values are needed
+		// instead of 0 and 1.
+		elseif (in_array($key, $this->getBooleans()))
+		{
+			return $this->asBoolean($value);
+		}
+
 		return $value;
 	}
 
@@ -2328,6 +2343,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			}
 		}
 
+		// If the attribute is listed as a boolean, we will convert it to a boolean,
+		// which makes it quite easy to work with when actual boolean values are needed
+		// instead of 0 and 1.
+		elseif (in_array($key, $this->getBooleans()))
+		{
+			$value = (bool)$value;
+		}
+
 		$this->attributes[$key] = $value;
 	}
 
@@ -2352,6 +2375,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$defaults = array(static::CREATED_AT, static::UPDATED_AT);
 
 		return array_merge($this->dates, $defaults);
+	}
+
+	/**
+	 * Get the attributes that should be converted to booleans.
+	 *
+	 * @return array
+	 */
+	public function getBooleans()
+	{
+		return $this->booleans;
 	}
 
 	/**
@@ -2434,6 +2467,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		return Carbon::instance($value);
+	}
+
+	/**
+	 * Return a value as a boolean.
+	 *
+	 * @param  mixed  $value
+	 * @return boolean
+	 */
+	protected function asBoolean($value)
+	{
+		return (bool)$value;
 	}
 
 	/**
