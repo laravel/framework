@@ -1220,7 +1220,7 @@ class Builder {
 	 */
 	public function find($id, $columns = array('*'))
 	{
-		return $this->where('id', '=', $id)->first($columns);
+		return $this->where($this->from . '.id', '=', $id)->first($columns);
 	}
 
 	/**
