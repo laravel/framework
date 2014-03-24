@@ -840,9 +840,9 @@ class BelongsToMany extends Relation {
 	 */
 	public function touchIfTouching()
 	{
-	 	if ($this->touchingParent()) $this->getParent()->touch();
+		if ($this->touchingParent()) $this->getParent()->touch();
 
-	 	if ($this->getParent()->touches($this->relationName)) $this->touch();
+		if ($this->getParent()->touches($this->relationName)) $this->touch();
 	}
 
 	/**
