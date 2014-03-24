@@ -524,6 +524,20 @@ if ( ! function_exists('class_basename'))
 	}
 }
 
+if ( ! function_exists('config_path'))
+{
+	/**
+	 * Get the path to the config folder.
+	 *
+	 * @param   string $path
+	 * @return  string
+	 */
+	function config_path($path = '')
+	{
+		return app('path.config').($path ? '/'.$path : $path);
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
