@@ -126,11 +126,11 @@ class Handler {
 	 *
 	 * @throws \ErrorException
 	 */
-	public function handleError($level, $message, $file, $line, $context)
+	public function handleError($level, $message, $file = '', $line = 0, $context = array())
 	{
 		if (error_reporting() & $level)
 		{
-			throw new ErrorException($message, $level, 0, $file, $line);
+			throw new ErrorException($message, 0, $level, $file, $line);
 		}
 	}
 
