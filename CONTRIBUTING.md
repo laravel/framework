@@ -4,7 +4,7 @@ This page contains guidelines for contributing to the Laravel framework. Please 
 
 ## Which Branch?
 
-**ALL** bug fixes should be made to the 4.x branch which they belong. Bug fixes should never be sent to the `master` branch unless they fix features that exist only in the upcoming release.
+**ALL** bug fixes should be made to the `4.x` branch which they belong. Bug fixes should never be sent to the `master` branch unless they fix features that exist only in the upcoming release. Also note that Laravel 4.0 is no longer actively developed. Only important fixes there please.
 
 ## Pull Requests
 
@@ -20,7 +20,8 @@ If you have an idea for a new feature you would like to see added to Laravel, yo
 
 Laravel follows the [PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md) and [PSR-1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md) coding standards. In addition to these standards, below is a list of other coding standards that should be followed:
 
+- Tabs must me used for indentation, not 4 spaces.
 - Namespace declarations should be on the same line as `<?php`.
 - Class opening `{` should be on the same line as the class name.
 - Function and control structure opening `{` should be on a separate line.
-- Interface names are suffixed with `Interface` (`FooInterface`)
+- Interface names are suffixed with `Interface` (`FooInterface`).
