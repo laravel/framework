@@ -30,7 +30,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($this->getMockModel());
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn(null);
 		$result = $builder->findOrFail('bar', array('column'));
 	}
