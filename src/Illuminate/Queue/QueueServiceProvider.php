@@ -8,6 +8,7 @@ use Illuminate\Queue\Console\SubscribeCommand;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
+use Illuminate\Queue\Connectors\RabbitConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 
@@ -141,7 +142,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function registerConnectors($manager)
 	{
-		foreach (array('Sync', 'Beanstalkd', 'Redis', 'Sqs', 'Iron') as $connector)
+		foreach (array('Sync', 'Beanstalkd', 'Redis', 'Sqs', 'Iron', 'Rabbit') as $connector)
 		{
 			$this->{"register{$connector}Connector"}($manager);
 		}
@@ -173,6 +174,24 @@ class QueueServiceProvider extends ServiceProvider {
 		{
 			return new BeanstalkdConnector;
 		});
+	}
+
+	/**
+	 * Register the RabbitMQ queue connector.
+	 *
+	 * @param  \Illuminate\Queue\QueueManager  $manager
+	 * @return void
+	 */
+	protected function registerRabbitConnector($manager)
+	{
+		$app = $this->app;
+
+		$manager->addConnector('rabbit', function() use ($app)
+		{
+			return new RabbitConnector($app['request']);
+		});
+
+		$this->registerRequestBinder('rabbit');
 	}
 
 	/**
