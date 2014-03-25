@@ -232,10 +232,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function controllers(array $controllers)
 	{
-			foreach ($controllers as $uri => $name)
-			{
-					$this->controller($uri, $name);
-			}
+		foreach ($controllers as $uri => $name)
+		{
+			$this->controller($uri, $name);
+		}
 	}
 
 	/**
@@ -248,20 +248,20 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function controller($uri, $controller, $names = array())
 	{
-			$routable = $this->getInspector()->getRoutable($controller, $uri);
+		$routable = $this->getInspector()->getRoutable($controller, $uri);
 
-			// When a controller is routed using this method, we use Reflection to parse
-			// out all of the routable methods for the controller, then register each
-			// route explicitly for the developers, so reverse routing is possible.
-			foreach ($routable as $method => $routes)
+		// When a controller is routed using this method, we use Reflection to parse
+		// out all of the routable methods for the controller, then register each
+		// route explicitly for the developers, so reverse routing is possible.
+		foreach ($routable as $method => $routes)
+		{
+			foreach ($routes as $route)
 			{
-					foreach ($routes as $route)
-					{
-							$this->registerInspected($route, $controller, $method, $names);
-					}
+				$this->registerInspected($route, $controller, $method, $names);
 			}
+		}
 
-			$this->addFallthroughRoute($controller, $uri);
+		$this->addFallthroughRoute($controller, $uri);
 	}
 
 	/**
@@ -275,14 +275,14 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function registerInspected($route, $controller, $method, &$names)
 	{
-			$action = array('uses' => $controller.'@'.$method);
+		$action = array('uses' => $controller.'@'.$method);
 
-			// If a given controller method has been named, we will assign the name to the
-			// controller action array, which provides for a short-cut to method naming
-			// so you don't have to define an individual route for these controllers.
-			$action['as'] = array_pull($names, $method);
+		// If a given controller method has been named, we will assign the name to the
+		// controller action array, which provides for a short-cut to method naming
+		// so you don't have to define an individual route for these controllers.
+		$action['as'] = array_pull($names, $method);
 
-			$this->{$route['verb']}($route['uri'], $action);
+		$this->{$route['verb']}($route['uri'], $action);
 	}
 
 	/**
@@ -294,9 +294,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addFallthroughRoute($controller, $uri)
 	{
-			$missing = $this->any($uri.'/{_missing}', $controller.'@missingMethod');
+		$missing = $this->any($uri.'/{_missing}', $controller.'@missingMethod');
 
-			$missing->where('_missing', '(.*)');
+		$missing->where('_missing', '(.*)');
 	}
 
 	/**
