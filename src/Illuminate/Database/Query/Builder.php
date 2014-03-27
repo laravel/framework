@@ -846,7 +846,7 @@ class Builder {
 	{
 		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
 
-		$this->bindings[] = $value;
+		$this->addBinding($value, 'where');
 
 		return $this;
 	}
