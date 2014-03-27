@@ -105,7 +105,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://foo.com?page=1', $p->getUrl(1));
 		$p->addQuery('foo', 'bar');
-		$this->assertEquals('http://foo.com?page=1&foo=bar', $p->getUrl(1));
+		$this->assertEquals('http://foo.com?foo=bar&page=1', $p->getUrl(1));
 	}
 
 
@@ -143,7 +143,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://foo.com?page=1#a-fragment', $p->getUrl(1));
 		$p->addQuery('foo', 'bar');
-		$this->assertEquals('http://foo.com?page=1&foo=bar#a-fragment', $p->getUrl(1));
+		$this->assertEquals('http://foo.com?foo=bar&page=1#a-fragment', $p->getUrl(1));
 	}
 
 
