@@ -449,6 +449,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a SET type
+	 * 
+	 * @param \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSet(Fluent $column)
+	{
+		return "set('".implode("', '", $column->allowed)."')";
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column

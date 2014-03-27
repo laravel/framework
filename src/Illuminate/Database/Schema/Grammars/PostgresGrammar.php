@@ -397,6 +397,21 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a set type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSet(Fluent $column)
+	{
+		$allowed = array_map(function($a) { return "'".$a."'"; }, $column->allowed);
+
+		// As postgres not natively supports SET we need to use an array for the column
+		// and an "is contained by" for the check constraint
+		return "varchar(255) check (\"{$column->name}\" <@ ARRAY[".implode(', ', $allowed)."]::varchar[])";
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
