@@ -37,21 +37,26 @@ class MigratePublishCommand extends Command {
 	}
 
 	/**
-	 * Get the path to the source files (Including vendor and workbench)
+	 * Get the path to the source files, including vendor and workbench.
 	 *
 	 * @return string
 	 */
 	protected function getSourcePath()
 	{
 		$workbench = $this->laravel['path.base'].'/workbench';
-		if (file_exists($workbench)) {
+		
+		if (file_exists($workbench)) 
+		{
 			$path = $workbench.'/'.$this->argument('package').'/src/migrations';
-			if (file_exists($path)) {
+			
+			if (file_exists($path)) 
+			{
 				return $path;
 			}
 		}
 
 		$vendor = $this->laravel['path.base'].'/vendor';
+		
 		return $vendor.'/'.$this->argument('package').'/src/migrations';
 	}
 
