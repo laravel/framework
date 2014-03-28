@@ -347,6 +347,10 @@ class Store implements SessionInterface {
 	 */
 	public function flash($key, $value)
 	{
+		if ($key === 'flash') {
+			throw new \InvalidArgumentException('"flash" is a reserved key');
+		}
+
 		$this->put($key, $value);
 
 		$this->push('flash.new', $key);
