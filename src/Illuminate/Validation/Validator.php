@@ -562,7 +562,10 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(2, $parameters, 'required_if');
 
-		if ($parameters[1] == array_get($this->data, $parameters[0]))
+		$data = array_get($this->data, $parameters[0]);
+		$values = array_slice($parameters, 1);
+
+		if (in_array($data, $values))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
