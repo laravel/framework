@@ -2,8 +2,8 @@
 
 use Swift_Transport;
 use Swift_Mime_Message;
+use GuzzleHttp\Post\PostFile;
 use Swift_Events_EventListener;
-use Guzzle\Http\Client as HttpClient;
 
 class MailgunTransport implements Swift_Transport {
 
@@ -22,25 +22,24 @@ class MailgunTransport implements Swift_Transport {
 	protected $domain;
 
 	/**
-	 * The path where temporary files are written.
+	 * THe Mailgun API end-point.
 	 *
 	 * @var string
 	 */
-	protected $storagePath;
+	protected $url;
 
 	/**
 	 * Create a new Mailgun transport instance.
 	 *
 	 * @param  string  $key
 	 * @param  string  $domain
-	 * @param  string  $storagePath
 	 * @return void
 	 */
-	public function __construct($key, $domain, $storagePath = null)
+	public function __construct($key, $domain)
 	{
 		$this->key = $key;
 		$this->domain = $domain;
-		$this->storagePath = $storagePath;
+		$this->url = 'https://api.mailgun.net/v2/'.$this->domain.'/messages.mime';
 	}
 
 	/**
@@ -72,20 +71,14 @@ class MailgunTransport implements Swift_Transport {
 	 */
 	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
 	{
-		$request = $this->getHttpClient()
-                        ->post()
-                        ->addPostFields(['to' => $this->getTo($message)])
-                        ->setAuth('api', $this->key);
+		$client = $this->getHttpClient();
 
-		$message = (string) $message;
-
-		file_put_contents(
-			$path = $this->getStoragePath().'/'.md5($message), $message
-		);
-
-		$request->addPostFile('message', $path)->send();
-
-		@unlink($path);
+		$response = $client->send($client->post($this->url, ['auth' => ['api', $this->key],
+			'body' => [
+	    		'to' => $this->getTo($message),
+	    		'message' => new PostFile('message', (string) $message),
+	    	],
+    	]));
 	}
 
 	/**
@@ -121,11 +114,11 @@ class MailgunTransport implements Swift_Transport {
 	/**
 	 * Get a new HTTP client instance.
 	 *
-	 * @return \Guzzle\Http\Client
+	 * @return \GuzzleHttp\Client
 	 */
 	protected function getHttpClient()
 	{
-		return new HttpClient('https://api.mailgun.net/v2/'.$this->domain.'/messages.mime');
+		return new \GuzzleHttp\Client;
 	}
 
 	/**
