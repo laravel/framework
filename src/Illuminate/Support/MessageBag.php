@@ -54,6 +54,18 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	}
 
 	/**
+	 * Clear all messages.
+	 *
+	 * @return \Illuminate\Support\MessageBag
+	 */
+	public function clear()
+	{
+		$this->messages = array();
+
+		return $this;
+	}
+
+	/**
 	 * Clear messages for a given key.
 	 *
 	 * @param  string  $key
