@@ -163,25 +163,4 @@ class MailgunTransport implements Swift_Transport {
 		return $this->domain = $domain;
 	}
 
-	/**
-	 * Get the path to the storage directory.
-	 *
-	 * @return string
-	 */
-	public function getStoragePath()
-	{
-		return $this->storagePath ?: storage_path().'/meta';
-	}
-
-	/**
-	 * Set the storage path.
-	 *
-	 * @param  string  $storagePath
-	 * @return void
-	 */
-	public function setStoragePath($storagePath)
-	{
-		$this->storagePath = $storagePath;
-	}
-
 }
