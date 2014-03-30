@@ -34,6 +34,20 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testKeysAreCleared()
+	{
+		$container = new MessageBag;
+		$container->add('foo', 'bar');
+		$container->add('foo', 'baz');
+		$container->add('boom', 'bust');
+		$this->assertTrue($container->has('foo'));
+		$this->assertTrue($container->has('boom'));
+		$container->clearKey('foo');
+		$this->assertFalse($container->has('foo'));
+		$this->assertTrue($container->has('boom'));
+	}
+
+
 	public function testMessagesMayBeMerged()
 	{
 		$container = new MessageBag(array('username' => array('foo')));
