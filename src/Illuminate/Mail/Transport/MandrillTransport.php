@@ -3,7 +3,6 @@
 use Swift_Transport;
 use Swift_Mime_Message;
 use Swift_Events_EventListener;
-use Guzzle\Http\Client as HttpClient;
 
 class MandrillTransport implements Swift_Transport {
 
@@ -54,11 +53,15 @@ class MandrillTransport implements Swift_Transport {
 	 */
 	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
 	{
-		$this->getHttpClient()
-            ->post(null, [], json_encode([
-            	'key' => $this->key, 'raw_message' => (string) $message, 'async' => true,
-            ]))
-            ->send();
+		$client = $this->getHttpClient();
+
+		$client->send($client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
+			'body' => [
+				'key' => $this->key,
+				'raw_message' => (string) $message,
+				'async' => true,
+			],
+		]));
 	}
 
 	/**
@@ -76,7 +79,7 @@ class MandrillTransport implements Swift_Transport {
 	 */
 	protected function getHttpClient()
 	{
-		return new HttpClient('https://mandrillapp.com/api/1.0/messages/send-raw.json');
+		return new \GuzzleHttp\Client;
 	}
 
 	/**
