@@ -1,15 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-/**
- * @see \Illuminate\Pagination\Factory
- */
-class Paginator extends Facade {
-
-	/**
-	 * Get the registered name of the component.
-	 *
-	 * @return string
-	 */
-	protected static function getFacadeAccessor() { return 'paginator'; }
-
-}
+<?php namespace Illuminate\Support\Facades; class Paginator extends Facade { protected static function getFacadeAccessor() { return 'paginator'; } }

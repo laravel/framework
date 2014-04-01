@@ -1,16 +1,1 @@
-<?php namespace Illuminate\Support\Facades;
-
-/**
- * @see \Illuminate\Remote\RemoteManager
- * @see \Illuminate\Remote\Connection
- */
-class SSH extends Facade {
-
-	/**
-	 * Get the registered name of the component.
-	 *
-	 * @return string
-	 */
-	protected static function getFacadeAccessor() { return 'remote'; }
-
-}
+<?php namespace Illuminate\Support\Facades; class SSH extends Facade { protected static function getFacadeAccessor() { return 'remote'; } }

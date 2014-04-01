@@ -1,5 +1,1 @@
-<?php
-
-class Foo_Bar_Php52 {
-
-}
+<?php class Foo_Bar_Php52 { }
