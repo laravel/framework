@@ -1,5 +1,1 @@
-<?php namespace Foo\Bar;
-
-class Php53 {
-
-}
+<?php namespace Foo\Bar; class Php53 { }
