@@ -202,6 +202,34 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Define a set of rules that apply to each element in an array attribute.
+	 *
+	 * @param  string  $attribute
+	 * @param  string|array  $rules
+	 * @return void
+	 */
+	public function each($attribute, $rules)
+	{
+		$data = array_get($this->data, $attribute);
+
+		if ( ! is_array($data))
+		{
+			if ($this->hasRule($attribute, 'Array')) return;
+
+			throw new \InvalidArgumentException('Attribute for each() must be an array.');
+		}
+
+		foreach ($data as $dataKey => $dataValue)
+		{
+			foreach ($rules as $ruleKey => $ruleValue)
+			{
+				$key = "$attribute.$dataKey.$ruleKey";
+				$this->mergeRules($key, $ruleValue);
+			}
+		}
+	}
+
+	/**
 	 * Merge additional rules into a given attribute.
 	 *
 	 * @param  string  $attribute
@@ -1786,6 +1814,11 @@ class Validator implements MessageProviderInterface {
 	protected function getRule($attribute, $rules)
 	{
 		$rules = (array) $rules;
+
+		if ( ! array_key_exists($attribute, $this->rules))
+		{
+			return;
+		}
 
 		foreach ($this->rules[$attribute] as $rule)
 		{
