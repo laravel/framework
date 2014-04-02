@@ -22,10 +22,12 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->registerSwiftMailer();
+		$me = $this;
 
-		$this->app->bindShared('mailer', function($app)
+		$this->app->bindShared('mailer', function($app) use($me)
 		{
+			$me->registerSwiftMailer();
+
 			// Once we have create the mailer instance, we will set a container instance
 			// on the mailer. This allows us to resolve mailer classes via containers
 			// for maximum testability on said classes instead of passing Closures.
