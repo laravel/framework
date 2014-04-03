@@ -127,7 +127,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		//between:min,max
 		$trans = $this->getRealTranslator();
-		$trans->addResource('array', array('validation.between' => ':attribute must between :min and :max'), 'en', 'messages');
+		$trans->addResource('array', array('validation.between.numeric' => ':attribute must between :min and :max'), 'en', 'messages');
 		$trans->addResource('array', array('validation.values.level.1' => 'Low'), 'en', 'messages');
 		$trans->addResource('array', array('validation.values.level.3' => 'High'), 'en', 'messages');
 		$v = new Validator($trans, array('level' => 5333), array('level' => 'between:1,3'));
