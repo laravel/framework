@@ -1536,10 +1536,6 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceBetween($message, $attribute, $rule, $parameters)
 	{
-		foreach ($parameters as &$parameter) {
-			$parameter = $this->getDisplayableValue($attribute, $parameter);
-		}
-		
 		return str_replace(array(':min', ':max'), $parameters, $message);
 	}
 
@@ -1554,8 +1550,6 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceDigits($message, $attribute, $rule, $parameters)
 	{
-		$parameters[0] = $this->getDisplayableValue($attribute, $parameters[0]);
-
 		return str_replace(':digits', $parameters[0], $message);
 	}
 
@@ -1584,8 +1578,6 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceSize($message, $attribute, $rule, $parameters)
 	{
-		$parameters[0] = $this->getDisplayableValue($attribute, $rule);
-
 		return str_replace(':size', $parameters[0], $message);
 	}
 
@@ -1600,8 +1592,6 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceMin($message, $attribute, $rule, $parameters)
 	{
-		$parameters[0] = $this->getDisplayableValue($attribute, $rule);
-
 		return str_replace(':min', $parameters[0], $message);
 	}
 
@@ -1616,8 +1606,6 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceMax($message, $attribute, $rule, $parameters)
 	{
-		$parameters[0] = $this->getDisplayableValue($attribute, $rule);
-
 		return str_replace(':max', $parameters[0], $message);
 	}
 
