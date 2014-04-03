@@ -125,16 +125,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('The bar field is required when color is red.', $v->messages()->first('bar'));
 
-		//between:min,max
-		$trans = $this->getRealTranslator();
-		$trans->addResource('array', array('validation.between.numeric' => ':attribute must between :min and :max'), 'en', 'messages');
-		$trans->addResource('array', array('validation.values.level.1' => 'Low'), 'en', 'messages');
-		$trans->addResource('array', array('validation.values.level.3' => 'High'), 'en', 'messages');
-		$v = new Validator($trans, array('level' => 5333), array('level' => 'between:1,3'));
-		$this->assertFalse($v->passes());
-		$v->messages()->setFormat(':message');
-		$this->assertEquals('level must between Bad and Best.', $v->messages()->first('level'));
-		
 		//in:foo,bar,...
 		$trans = $this->getRealTranslator();
 		$trans->addResource('array', array('validation.in' => ':attribute must be included in :values.'), 'en', 'messages');
@@ -145,14 +135,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('type must be included in Short,Long.', $v->messages()->first('type'));
 
-		//max:foo
-		$trans = $this->getRealTranslator();
-		$trans->addResource('array', array('validation.max' => ':attribute must before :values.'), 'en', 'messages');
-		$trans->addResource('array', array('validation.values.distance.300' => 'Destination'), 'en', 'messages');
-		$v = new Validator($trans, array('distance' => '301'), array('distance' => 'max:300'));
-		$this->assertFalse($v->passes());
-		$v->messages()->setFormat(':message');
-		$this->assertEquals('distance must before Destination.', $v->messages()->first('distance'));
 	}
 
 
