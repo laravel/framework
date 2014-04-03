@@ -133,7 +133,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('type' => '4'), array('type' => 'in:5,300'));
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
-		$this->assertEquals('type must be included in Short,Long.', $v->messages()->first('type'));
+		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
 
 	}
 
