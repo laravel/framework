@@ -14,6 +14,7 @@
 		{"message": "The queue:listen command will now write the names of the jobs it processes to the console.", "backport": null},
 		{"message": "Added Mailgun API transport for Mail::send. Depends on new 'services' configuration file.", "backport": null},
 		{"message": "Added Mandrill API transport for Mail::send. Depends on new 'services' configuration file.", "backport": null},
+		{"message": "Added 'log' mail transport for Mail::send. Writes raw MIME string to log files.", "backport": null},
 		{"message": "Allow TestCase to assert redirect to a relative uri.", "backport": null}
 	],
 	"4.1.*": [

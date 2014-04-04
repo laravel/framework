@@ -32,6 +32,13 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	protected $total;
 
 	/**
+	 * Indicates if a pagination doing "quick" pagination has more items.
+	 *
+	 * @var bool
+	 */
+	protected $hasMore;
+
+	/**
 	 * The amount of items to show per page.
 	 *
 	 * @var int
@@ -86,15 +93,25 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 * @param  \Illuminate\Pagination\Factory  $factory
 	 * @param  array  $items
 	 * @param  int    $total
-	 * @param  int    $perPage
+	 * @param  mixed  $perPage
 	 * @return void
 	 */
-	public function __construct(Factory $factory, array $items, $total, $perPage)
+	public function __construct(Factory $factory, array $items, $total, $perPage = null)
 	{
-		$this->items = $items;
 		$this->factory = $factory;
-		$this->total = (int) $total;
-		$this->perPage = (int) $perPage;
+
+		if (is_null($perPage))
+		{
+			$this->perPage = (int) $total;
+			$this->items = array_slice($items, 0, $perPage);
+			$this->hasMore = count(array_slice($items, $this->perPage, 1)) > 0;
+		}
+		else
+		{
+			$this->items = $items;
+			$this->total = (int) $total;
+			$this->perPage = (int) $perPage;
+		}
 	}
 
 	/**
@@ -118,9 +135,18 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 */
 	protected function calculateCurrentAndLastPages()
 	{
-		$this->lastPage = (int) ceil($this->total / $this->perPage);
+		if ($this->isQuickPaginating())
+		{
+			$this->currentPage = $this->factory->getCurrentPage();
 
-		$this->currentPage = $this->calculateCurrentPage($this->lastPage);
+			$this->lastPage = $this->hasMore ? $this->currentPage + 1 : $this->currentPage;
+		}
+		else
+		{
+			$this->lastPage = (int) ceil($this->total / $this->perPage);
+
+			$this->currentPage = $this->calculateCurrentPage($this->lastPage);
+		}
 	}
 
 	/**
@@ -268,6 +294,16 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		$this->query[$key] = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Deteremine if the paginator is doing "quick" pagination.
+	 *
+	 * @return bool
+	 */
+	public function isQuickPaginating()
+	{
+		return is_null($this->total);
 	}
 
 	/**

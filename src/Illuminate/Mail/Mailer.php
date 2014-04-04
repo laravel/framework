@@ -5,6 +5,7 @@ use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Log\Writer;
 use Illuminate\View\Factory;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
@@ -24,6 +25,13 @@ class Mailer {
 	 * @var \Swift_Mailer
 	 */
 	protected $swift;
+
+	/**
+	 * The event dispatcher instance.
+	 *
+	 * @var \Illuminate\Events\Dispatcher
+	 */
+	protected $events;
 
 	/**
 	 * The global from address and name.
@@ -61,16 +69,24 @@ class Mailer {
 	protected $failedRecipients = array();
 
 	/**
+	 * Array of parsed views containing html and text view name.
+	 *
+	 * @var array
+	 */
+	protected $parsedViews = array();
+
+	/**
 	 * Create a new Mailer instance.
 	 *
 	 * @param  \Illuminate\View\Factory  $views
 	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
-	public function __construct(Factory $views, Swift_Mailer $swift)
+	public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
 	{
 		$this->views = $views;
 		$this->swift = $swift;
+		$this->events = $events;
 	}
 
 	/**
@@ -295,6 +311,11 @@ class Mailer {
 	 */
 	protected function sendSwiftMessage($message)
 	{
+		if ($this->events)
+		{
+			$this->events->fire('mailer.sending', array($message));
+		}
+
 		if ( ! $this->pretending)
 		{
 			return $this->swift->send($message, $this->failedRecipients);
