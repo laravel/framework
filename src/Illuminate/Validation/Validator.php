@@ -221,10 +221,9 @@ class Validator implements MessageProviderInterface {
 
 		foreach ($data as $dataKey => $dataValue)
 		{
-			foreach ($rules as $ruleKey => $ruleValue)
+			foreach ($rules as $ruleValue)
 			{
-				$key = "$attribute.$dataKey.$ruleKey";
-				$this->mergeRules($key, $ruleValue);
+				$this->mergeRules("$attribute.$dataKey", $ruleValue);
 			}
 		}
 	}
@@ -238,7 +237,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function mergeRules($attribute, $rules)
 	{
-		$current = array_get($this->rules, $attribute, array());
+		$current = isset($this->rules[$attribute]) ? $this->rules[$attribute] : [];
 
 		$merge = head($this->explodeRules(array($rules)));
 
