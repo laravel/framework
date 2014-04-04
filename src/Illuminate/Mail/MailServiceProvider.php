@@ -222,7 +222,7 @@ class MailServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('swift.transport', function($app)
 		{
-			return new LogTransport($app['log']);
+			return new LogTransport($app['log']->getMonolog());
 		});
 	}
 
