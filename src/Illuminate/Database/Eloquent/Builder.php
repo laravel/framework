@@ -696,6 +696,11 @@ class Builder {
 	{
 		$this->mergeWheresToHas($hasQuery, $relation);
 
+		if (is_numeric($count))
+		{
+			$count = new Expression($count);
+		}
+
 		return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
 	}
 
