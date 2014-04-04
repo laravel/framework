@@ -241,25 +241,7 @@ class Writer {
 	 */
 	public function __call($method, $parameters)
 	{
-		if (isset($parameters[0]))
-		{
-			if (gettype($parameters[0]) == 'array')
-			{
-				$parameters[0] = print_r($parameters[0], true);
-			}
-
-			if (gettype($parameters[0]) == 'object')
-			{
-				if ($parameters[0] instanceof JsonableInterface)
-				{
-					$parameters[0] = $parameters[0]->toJson();
-				}
-				elseif ($parameters[0] instanceof ArrayableInterface)
-				{
-					$parameters[0] = print_r($parameters[0]->toArray(), true);
-				}
-			}
-		}
+		$this->formatParameters($parameters);
 
 		if (in_array($method, $this->levels))
 		{
@@ -271,6 +253,31 @@ class Writer {
 		}
 
 		throw new \BadMethodCallException("Method [$method] does not exist.");
+	}
+
+	/**
+	 * Format the parameters for the logger.
+	 *
+	 * @param  array  $parameters
+	 * @return void
+	 */
+	protected function formatParameters(&$parameters)
+	{
+		if (isset($parameters[0]))
+		{
+			if (is_array($parameters[0]))
+			{
+				$parameters[0] = var_export($parameters[0], true);
+			}
+			elseif ($parameters[0] instanceof JsonableInterface)
+			{
+				$parameters[0] = $parameters[0]->toJson();
+			}
+			elseif ($parameters[0] instanceof ArrayableInterface)
+			{
+				$parameters[0] = var_export($parameters[0]->toArray(), true);
+			}
+		}
 	}
 
 }
