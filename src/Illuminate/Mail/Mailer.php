@@ -8,6 +8,7 @@ use Illuminate\View\Factory;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
+use Illuminate\Events\Dispatcher;
 
 class Mailer {
 
@@ -59,6 +60,20 @@ class Mailer {
 	 * @var array
 	 */
 	protected $failedRecipients = array();
+	
+	/**
+	 * Array of parsed views containing html and text view name.
+	 *
+	 * @var array
+	 */
+	protected $parsedViews = array();
+	
+	/**
+	 * The event dispatcher instance.
+	 *
+	 * @var \Illuminate\Events\Dispatcher
+	 */
+	protected $events;
 
 	/**
 	 * Create a new Mailer instance.
@@ -67,10 +82,11 @@ class Mailer {
 	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
-	public function __construct(Factory $views, Swift_Mailer $swift)
+	public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
 	{
 		$this->views = $views;
 		$this->swift = $swift;
+		$this->events = $events;
 	}
 
 	/**
@@ -111,7 +127,7 @@ class Mailer {
 		// First we need to parse the view, which could either be a string or an array
 		// containing both an HTML and plain text versions of the view which should
 		// be used when sending an e-mail. We will extract both of them out here.
-		list($view, $plain) = $this->parseView($view);
+		list($view, $plain) = $this->parsedViews = $this->parseView($view);
 
 		$data['message'] = $message = $this->createMessage();
 
@@ -295,6 +311,10 @@ class Mailer {
 	 */
 	protected function sendSwiftMessage($message)
 	{
+		if ($this->events)
+		{
+			$this->events->fire('mailer.sending', array($message));
+		}
 		if ( ! $this->pretending)
 		{
 			return $this->swift->send($message, $this->failedRecipients);
@@ -316,8 +336,9 @@ class Mailer {
 	protected function logMessage($message)
 	{
 		$emails = implode(', ', array_keys((array) $message->getTo()));
+		$views = implode(', ', $this->parsedViews);
 
-		$this->logger->info("Pretending to mail message to: {$emails}");
+		$this->logger->info("Pretending to mail message to: {$emails} [Subject: {$message->getSubject()}] [Use view: {$views}]");
 	}
 
 	/**

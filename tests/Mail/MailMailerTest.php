@@ -139,10 +139,11 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 		$message->shouldReceive('setFrom')->never();
 		$mailer->setSwiftMailer(m::mock('StdClass'));
 		$message->shouldReceive('getTo')->once()->andReturn(array('taylor@userscape.com' => 'Taylor'));
+		$message->shouldReceive('getSubject')->once()->andReturn('Lorem Ipsum');
 		$message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
 		$mailer->getSwiftMailer()->shouldReceive('send')->never();
 		$logger = m::mock('Illuminate\Log\Writer');
-		$logger->shouldReceive('info')->once()->with('Pretending to mail message to: taylor@userscape.com');
+		$logger->shouldReceive('info')->once()->with('Pretending to mail message to: taylor@userscape.com [Subject: Lorem Ipsum] [Use view: foo, ]');
 		$mailer->setLogger($logger);
 		$mailer->pretend();
 
