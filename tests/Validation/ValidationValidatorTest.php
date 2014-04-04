@@ -1056,6 +1056,42 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testValidateEach()
+	{
+		$trans = $this->getRealTranslator();
+		$data = ['foo' => [['field' => 5], ['field' => 10], ['field' => 15]]];
+
+		$v = new Validator($trans, $data, ['foo' => 'array']);
+		$v->each('foo', ['field' => 'numeric|min:6|max:14']);
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, $data, ['foo' => 'array']);
+		$v->each('foo', ['field' => 'numeric|min:4|max:16']);
+		$this->assertTrue($v->passes());
+	}
+
+
+	public function testValidateEachWithNonArrayWithArrayRule()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, ['foo' => 'string'], ['foo' => 'array']);
+		$v->each('foo', ['field' => 'min:7|max:13']);
+		$this->assertFalse($v->passes());
+	}
+
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testValidateEachWithNonArrayWithoutArrayRule()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, ['foo' => 'string'], ['foo' => 'numeric']);
+		$v->each('foo', ['field' => 'min:7|max:13']);
+		$this->assertFalse($v->passes());
+	}
+
+
 	protected function getTranslator()
 	{
 		return m::mock('Symfony\Component\Translation\TranslatorInterface');
