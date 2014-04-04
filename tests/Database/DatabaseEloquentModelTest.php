@@ -72,7 +72,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFindOrFailMethodThrowsModelNotFoundException()
 	{
-		$result = EloquentModelFindNotFoundStub::findOrFail(1);
+		$result = EloquentModelFindOrFailStub::findOrFail(1);
 	}
 
 
@@ -847,16 +847,16 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
+		$mock->shouldReceive('find')->once()->with(1)->andReturn('foo');
 		return $mock;
 	}
 }
 
-class EloquentModelFindNotFoundStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelFindOrFailStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn(null);
+		$mock->shouldReceive('findOrFail')->once()->with(1)->andThrow('Illuminate\Database\Eloquent\ModelNotFoundException');
 		return $mock;
 	}
 }
@@ -876,7 +876,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery($excludeDeleted = true)
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('find')->once()->with(array(1, 2), array('*'))->andReturn('foo');
+		$mock->shouldReceive('find')->once()->with(array(1, 2))->andReturn('foo');
 		return $mock;
 	}
 }

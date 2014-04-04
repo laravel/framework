@@ -77,6 +77,8 @@ class Builder {
 	 */
 	public function findMany($id, $columns = array('*'))
 	{
+		if (empty($id)) return $this->model->newCollection();
+
 		$this->query->whereIn($this->model->getKeyName(), $id);
 
 		return $this->get($columns);
