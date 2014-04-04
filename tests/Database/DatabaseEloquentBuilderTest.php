@@ -243,7 +243,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(new Collection(array('results'))));
 		$paginator->shouldReceive('make')->once()->with(array('results'), 15)->andReturn(array('results'));
 
-		$this->assertEquals(array('results'), $builder->quickPaginate());
+		$this->assertEquals(array('results'), $builder->simplePaginate());
 	}
 
 
