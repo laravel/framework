@@ -32,11 +32,11 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	protected $total;
 
 	/**
-	 * Item, array or object indicating if next page is available.
+	 * Indicates if a pagination doing "quick" pagination has more items.
 	 *
-	 * @var mixed
+	 * @var bool
 	 */
-	protected $cursor;
+	protected $hasMore;
 
 	/**
 	 * The amount of items to show per page.
@@ -100,15 +100,11 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	{
 		$this->factory = $factory;
 
-		// Paginator received only 3 parameters which means that it's being used
-		// in cursor mode. In this mode third argument $total is used as $perPage.
 		if (is_null($perPage))
 		{
-			$this->items = array_slice($items, 0, $perPage);
 			$this->perPage = (int) $total;
-
-			$cursor = array_slice($items, $this->perPage, 1);
-			$this->cursor = empty($cursor) ? null : $cursor[0];
+			$this->items = array_slice($items, 0, $perPage);
+			$this->hasMore = count(array_slice($items, $this->perPage, 1)) > 0;
 		}
 		else
 		{
@@ -139,12 +135,11 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 */
 	protected function calculateCurrentAndLastPages()
 	{
-		if (is_null($this->total))
+		if ($this->isQuickPaginating())
 		{
-			$page = $this->factory->getCurrentPage();
-			$this->currentPage = $this->isValidPageNumber($page) ? (int) $page : 1;
+			$this->currentPage = $this->factory->getCurrentPage();
 
-			$this->lastPage = is_null($this->cursor) ? $this->currentPage : $this->currentPage + 1;
+			$this->lastPage = $this->hasMore ? $this->currentPage + 1 : $this->currentPage;
 		}
 		else
 		{
@@ -302,6 +297,16 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	}
 
 	/**
+	 * Deteremine if the paginator is doing "quick" pagination.
+	 *
+	 * @return bool
+	 */
+	public function isQuickPaginating()
+	{
+		return is_null($this->total);
+	}
+
+	/**
 	 * Get the current page for the request.
 	 *
 	 * @param  int|null  $total
@@ -398,16 +403,6 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	public function getTotal()
 	{
 		return $this->total;
-	}
-
-	/**
-	 * Get cursor for this paginator.
-	 *
-	 * @return mixed
-	 */
-	public function getCursor()
-	{
-		return $this->cursor;
 	}
 
 	/**

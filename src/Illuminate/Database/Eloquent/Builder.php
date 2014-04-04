@@ -284,20 +284,23 @@ class Builder {
 	}
 
 	/**
-	 * Get a paginator in cursor mode for the "select" statement.
+	 * Get a paginator only supporting simple next and previous links.
 	 *
+	 * This is more efficient on larger data-sets, etc.
+	 *
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function cursor($perPage = null, $columns = array('*'))
+	public function quickPaginate($perPage = null, $columns = array('*'))
 	{
 		$paginator = $this->query->getConnection()->getPaginator();
 
 		$page = $paginator->getCurrentPage();
+
 		$perPage = $perPage ?: $this->model->getPerPage();
 
-		// Use skip method to set correct offset and take perPage + 1 items.
 		$this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
 
 		return $paginator->make($this->get($columns)->all(), $perPage);
