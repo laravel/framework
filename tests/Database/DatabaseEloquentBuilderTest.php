@@ -222,7 +222,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCursorMethod()
+	public function testQuickPaginateMethod()
 	{
 		$query = $this->getMock('Illuminate\Database\Query\Builder', array('from', 'getConnection', 'skip', 'take'), array(
 			m::mock('Illuminate\Database\ConnectionInterface'),
@@ -243,7 +243,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(new Collection(array('results'))));
 		$paginator->shouldReceive('make')->once()->with(array('results'), 15)->andReturn(array('results'));
 
-		$this->assertEquals(array('results'), $builder->cursor());
+		$this->assertEquals(array('results'), $builder->quickPaginate());
 	}
 
 

@@ -30,7 +30,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(2, $p->getLastPage());
 		$this->assertEquals(1, $p->getCurrentPage());
-		$this->assertEquals('baz', $p->getCursor());
 	}
 
 

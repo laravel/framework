@@ -690,7 +690,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCursorCorrectlyCreatesPaginatorInstance()
+	public function testQuickPaginateCorrectlyCreatesPaginatorInstance()
 	{
 		$connection = m::mock('Illuminate\Database\ConnectionInterface');
 		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
@@ -704,7 +704,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo')));
 		$paginator->shouldReceive('make')->once()->with(array('foo'), 15)->andReturn(array('results'));
 
-		$this->assertEquals(array('results'), $builder->cursor(15, array('*')));
+		$this->assertEquals(array('results'), $builder->quickPaginate(15, array('*')));
 	}
 
 
