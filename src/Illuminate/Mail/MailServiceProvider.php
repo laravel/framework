@@ -4,6 +4,7 @@ use Swift_Mailer;
 use Illuminate\Support\ServiceProvider;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
+use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
 use Swift_SendmailTransport as SendmailTransport;
@@ -31,7 +32,9 @@ class MailServiceProvider extends ServiceProvider {
 			// Once we have create the mailer instance, we will set a container instance
 			// on the mailer. This allows us to resolve mailer classes via containers
 			// for maximum testability on said classes instead of passing Closures.
-			$mailer = new Mailer($app['view'], $app['swift.mailer'], $app['events']);
+			$mailer = new Mailer(
+				$app['view'], $app['swift.mailer'], $app['events']
+			);
 
 			$mailer->setLogger($app['log'])->setQueue($app['queue']);
 
@@ -104,6 +107,9 @@ class MailServiceProvider extends ServiceProvider {
 
 			case 'mandrill':
 				return $this->registerMandrillTransport($config);
+
+			case 'log':
+				return $this->registerLogTransport($config);
 
 			default:
 				throw new \InvalidArgumentException('Invalid mail driver.');
@@ -203,6 +209,20 @@ class MailServiceProvider extends ServiceProvider {
 		$this->app->bindShared('swift.transport', function() use ($mandrill)
 		{
 			return new MandrillTransport($mandrill['secret']);
+		});
+	}
+
+	/**
+	 * Register the "Log" Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerLogTransport($config)
+	{
+		$this->app->bindShared('swift.transport', function($app)
+		{
+			return new LogTransport($app['log']);
 		});
 	}
 
