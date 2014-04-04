@@ -2,7 +2,6 @@
 
 use Illuminate\Exception\WhoopsDisplayer;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Whoops\Run;
 use Mockery as m;
 
 class WhoopsDisplayerTest extends PHPUnit_Framework_TestCase {
