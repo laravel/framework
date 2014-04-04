@@ -92,6 +92,19 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 
 		return parent::save($model);
 	}
+	
+        /**
+         * Attach an array of models to the parent instance.
+         *
+         * @param  array  $models
+         * @return array
+         */
+        public function saveMany(array $models)
+        {
+               array_walk($models, array($this, 'save'));
+
+               return $models;
+        }	
 
 	/**
 	 * Create a new instance of the related model.
