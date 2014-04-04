@@ -93,7 +93,6 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/services.json')->andReturn(true);
 		$files->shouldReceive('get')->once()->with(__DIR__.'/services.json')->andReturn(json_encode($array = array('users' => array('dayle' => true))));
-		$app = new Illuminate\Foundation\Application;
 		$array['when'] = array();
 
 		$this->assertEquals($array, $repo->loadManifest());
@@ -104,7 +103,6 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	{
 		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('put')->once()->with(__DIR__.'/services.json', json_encode(array('foo')));
-		$app = new Illuminate\Foundation\Application;
 
 		$result = $repo->writeManifest(array('foo'));
 
