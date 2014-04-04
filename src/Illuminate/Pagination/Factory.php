@@ -95,10 +95,10 @@ class Factory {
 	 *
 	 * @param  array  $items
 	 * @param  int    $total
-	 * @param  int    $perPage
+	 * @param  mixed  $perPage
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function make(array $items, $total, $perPage)
+	public function make(array $items, $total, $perPage = null)
 	{
 		$paginator = new Paginator($this, $items, $total, $perPage);
 
