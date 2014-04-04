@@ -960,6 +960,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function delete()
 	{
+		if (is_null($this->primaryKey))
+		{
+			throw new \Exception("No primary key defined on model.");
+		}
+
 		if ($this->exists)
 		{
 			if ($this->fireModelEvent('deleting') === false) return false;
