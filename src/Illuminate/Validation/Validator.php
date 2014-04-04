@@ -842,7 +842,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateIn($attribute, $value, $parameters)
 	{
-		return in_array($value, $parameters);
+		return in_array((string) $value, $parameters);
 	}
 
 	/**
@@ -855,7 +855,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateNotIn($attribute, $value, $parameters)
 	{
-		return ! in_array($value, $parameters);
+		return ! in_array((string) $value, $parameters);
 	}
 
 	/**
