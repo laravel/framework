@@ -244,6 +244,17 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Determine if we're short circuiting the parameter list.
+	 *
+	 * @param  array  $parameters
+	 * @return bool
+	 */
+	protected function usingQuickParameters(array $parameters)
+	{
+		return count($parameters) > 0 and is_numeric( key($parameters) );
+	}
+
+	/**
 	 * Replace all of the wildcard parameters for a route path.
 	 *
 	 * @param  string  $path
@@ -254,9 +265,16 @@ class UrlGenerator {
 	{
 		if (count($parameters))
 		{
-			$path = preg_replace_sub(
-				'/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
-			);
+			if(  $this->usingQuickParameters( $parameters ) )
+			{
+				$path = preg_replace_sub(
+					'/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
+				);
+			}
+			else
+			{
+				$path = $this->replaceNamedParameters($path, $parameters);
+			}
 		}
 
 		return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
