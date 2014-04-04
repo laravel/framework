@@ -115,6 +115,28 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Name is required!', $v->messages()->first('name'));
 	}
 
+	public function testDisplayableValuesAreReplaced()
+	{
+		//required_if:foo,bar
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.required_if' => 'The :attribute field is required when :other is :value.'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.color.1' => 'red'), 'en', 'messages');
+		$v = new Validator($trans, array('color' => '1', 'bar' => ''), array('bar' => 'RequiredIf:color,1'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('The bar field is required when color is red.', $v->messages()->first('bar'));
+
+		//in:foo,bar,...
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.in' => ':attribute must be included in :values.'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.type.5' => 'Short'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.type.300' => 'Long'), 'en', 'messages');
+		$v = new Validator($trans, array('type' => '4'), array('type' => 'in:5,300'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
+
+	}
 
 	public function testCustomValidationLinesAreRespected()
 	{
