@@ -62,7 +62,7 @@ class Writer {
 	 * Call Monolog with the given method and parameters.
 	 *
 	 * @param  string  $method
-	 * @param  array  $parameters
+	 * @param  mixed   $parameters
 	 * @return mixed
 	 */
 	protected function callMonolog($method, $parameters)
@@ -203,7 +203,8 @@ class Writer {
 	 * Fires a log event.
 	 *
 	 * @param  string  $level
-	 * @param  array   $parameters
+	 * @param  string  $message
+	 * @param  array   $context
 	 * @return void
 	 */
 	protected function fireLogEvent($level, $message, array $context = array())
@@ -234,7 +235,7 @@ class Writer {
 	 * Dynamically handle error additions.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @return mixed
 	 *
 	 * @throws \BadMethodCallException
@@ -258,7 +259,7 @@ class Writer {
 	/**
 	 * Format the parameters for the logger.
 	 *
-	 * @param  array  $parameters
+	 * @param  mixed  $parameters
 	 * @return void
 	 */
 	protected function formatParameters(&$parameters)
