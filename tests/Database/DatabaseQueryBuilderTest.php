@@ -704,7 +704,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo')));
 		$paginator->shouldReceive('make')->once()->with(array('foo'), 15)->andReturn(array('results'));
 
-		$this->assertEquals(array('results'), $builder->quickPaginate(15, array('*')));
+		$this->assertEquals(array('results'), $builder->simplePaginate(15, array('*')));
 	}
 
 

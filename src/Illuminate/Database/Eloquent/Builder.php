@@ -293,7 +293,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function quickPaginate($perPage = null, $columns = array('*'))
+	public function simplePaginate($perPage = null, $columns = array('*'))
 	{
 		$paginator = $this->query->getConnection()->getPaginator();
 
