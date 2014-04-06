@@ -74,6 +74,64 @@ if ( ! function_exists('append_config'))
 	}
 }
 
+if ( ! function_exists('array_key_exists_recursive'))
+{
+	/**
+	 * Recursive array_key_exists for nested arrays.
+	 * 
+	 * @param  string   $key   
+	 * @param  array    $array 
+	 * @return boolean           
+	 */
+    function array_key_exists_recursive($key, array $array) 
+    {
+        if (array_key_exists($key, $array)) 
+            return true; 
+
+        foreach ($array as $element) { 
+            if (is_array($element) && array_key_exists_recursive($key, $element)) 
+                return true;
+        }
+        return false;
+    }
+}
+
+if ( ! function_exists('array_first_element'))
+{
+    /**
+     * Return first element of the array. 
+     * Just a shorthand for reset() without touching the array pointer.
+     * 
+     * @param  array  $array 
+     * @return mixed        
+     *
+     * @throws \InvalidArgumentException
+     */
+    function array_first_element(array $array)
+    {
+        if (empty($array)) throw new \InvalidArgumentException('Array passed to array_first_element must not be empty');
+        return reset($array);
+    }
+}
+
+if ( ! function_exists('array_last_element'))
+{
+    /**
+     * Return last element of the array. 
+     * Just a shorthand for end() without touching the array pointer.
+     * 
+     * @param  array  $array 
+     * @return mixed  
+     *
+     * @throws \InvalidArgumentException
+     */
+    function array_last_element(array $array)
+    {
+        if (empty($array)) throw new \InvalidArgumentException('Array passed to array_last_element must not be empty');
+        return end($array);
+    }
+}
+
 if ( ! function_exists('array_add'))
 {
 	/**

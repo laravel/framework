@@ -2,6 +2,28 @@
 
 class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
+	public function testArrayFirstElement()
+	{
+		$this->assertEquals('bar', array_first_element(array('foo' => 'bar')));
+		$this->assertEquals(array('bar'), array_first_element(array(array('bar'))));
+	}
+
+
+	public function testArrayLastElement()
+	{
+		$this->assertEquals('bar', array_last_element(array('foo', 'baz', 'bar')));
+		$this->assertEquals(array('bar'), array_last_element(array(1, 2, array('bar'))));
+		$this->assertEquals(123, array_last_element(array(1, 2, 'bar' => 23, 'baz' => 123 )));
+	}
+
+
+	public function testArrayKeyExistsRecursive()
+	{
+		$this->assertTrue(array_key_exists_recursive('foo', array(array('bar' => array('foo' => 'baz')))));
+		$this->assertFalse(array_key_exists_recursive('nonExistent', array(array('bar' => array('foo' => 'baz')))));
+	}
+
+
 	public function testArrayBuild()
 	{
 		$this->assertEquals(array('foo' => 'bar'), array_build(array('foo' => 'bar'), function($key, $value)
