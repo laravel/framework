@@ -408,10 +408,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         
 		$v = new Validator($trans, array('foo' => 'false'), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
-
+        
 		$v = new Validator($trans, array('foo' => 'yes'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
-
+        
 		$v = new Validator($trans, array('foo' => 'on'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
         
