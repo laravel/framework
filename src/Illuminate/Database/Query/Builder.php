@@ -1586,7 +1586,7 @@ class Builder {
 	 */
 	public function count($column = '*')
 	{
-		return (int)$this->aggregate(__FUNCTION__, array($column));
+		return (int) $this->aggregate(__FUNCTION__, array($column));
 	}
 
 	/**
