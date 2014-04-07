@@ -40,7 +40,6 @@ class Request extends SymfonyRequest {
 		$this->baseUrl = $this->getRequestUri();
 	}
 
-
 	/**
 	 * Get the root URL for the application.
 	 *
