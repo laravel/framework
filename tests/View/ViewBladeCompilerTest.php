@@ -139,6 +139,15 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$compiler->compileString('@{{
 			$name
 		}}'));
+
+		$this->assertEquals('{{{$name}}}', $compiler->compileString('@{{{$name}}}'));
+		$this->assertEquals('{{{ $name }}}', $compiler->compileString('@{{{ $name }}}'));
+		$this->assertEquals('{{{
+			$name
+		}}}',
+		$compiler->compileString('@{{{
+			$name
+		}}}'));
 	}
 
 
