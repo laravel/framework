@@ -393,37 +393,37 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('foo' => 'no'), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
-
+		
 		$v = new Validator($trans, array('foo' => null), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
-
+		
 		$v = new Validator($trans, array(), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
-
+		
 		$v = new Validator($trans, array('foo' => 0), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => false), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => 'false'), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => 'yes'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => 'on'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => '1'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => 1), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => true), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
-        
+		
 		$v = new Validator($trans, array('foo' => 'true'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
 	}
