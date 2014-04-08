@@ -91,6 +91,8 @@ class Builder {
 	 */
 	public function findMany($id, $columns = array('*'))
 	{
+		if (empty($id)) return new Collection;
+
 		$this->query->whereIn($this->model->getKeyName(), $id);
 
 		return $this->get($columns);
@@ -663,6 +665,11 @@ class Builder {
 	protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
 	{
 		$this->mergeWheresToHas($hasQuery, $relation);
+
+		if (is_numeric($count))
+		{
+			$count = new Expression($count);
+		}
 
 		return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
 	}

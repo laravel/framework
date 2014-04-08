@@ -68,7 +68,7 @@ class MailServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerSwiftMailer()
+	public function registerSwiftMailer()
 	{
 		$config = $this->app['config']['mail'];
 
