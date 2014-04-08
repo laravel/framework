@@ -480,10 +480,9 @@ class Builder {
 	 *
 	 * @param  string  $column
 	 * @param  array   $values
-	 * @param  bool  $not
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orWhereBetween($column, array $values, $not = false)
+	public function orWhereBetween($column, array $values)
 	{
 		return $this->whereBetween($column, $values, 'or');
 	}
@@ -1607,7 +1606,7 @@ class Builder {
 	 */
 	public function count($column = '*')
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return (int) $this->aggregate(__FUNCTION__, array($column));
 	}
 
 	/**

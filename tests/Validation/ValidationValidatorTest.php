@@ -2,9 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Validation\Validator;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
@@ -413,6 +411,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => 0), array('foo' => 'Accepted'));
 		$this->assertFalse($v->passes());
 
+		$v = new Validator($trans, array('foo' => false), array('foo' => 'Accepted'));
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('foo' => 'false'), array('foo' => 'Accepted'));
+		$this->assertFalse($v->passes());
+
 		$v = new Validator($trans, array('foo' => 'yes'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
 
@@ -423,6 +427,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('foo' => 1), array('foo' => 'Accepted'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => true), array('foo' => 'Accepted'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('foo' => 'true'), array('foo' => 'Accepted'));
 		$this->assertTrue($v->passes());
 	}
 

@@ -102,7 +102,7 @@ class Handler {
 	 */
 	protected function registerExceptionHandler()
 	{
-		set_exception_handler(array($this, 'handleException'));
+		set_exception_handler(array($this, 'handleUncaughtException'));
 	}
 
 	/**
@@ -138,7 +138,7 @@ class Handler {
 	 * Handle an exception for the application.
 	 *
 	 * @param  \Exception  $exception
-	 * @return void
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handleException($exception)
 	{
@@ -149,31 +149,24 @@ class Handler {
 		// type of exceptions to handled by a Closure giving great flexibility.
 		if ( ! is_null($response))
 		{
-			$response = $this->prepareResponse($response);
+			return $this->prepareResponse($response);
 		}
 
 		// If no response was sent by this custom exception handler, we will call the
 		// default exception displayer for the current application context and let
 		// it show the exception to the user / developer based on the situation.
-		else
-		{
-			$response = $this->displayException($exception);
-		}
-
-		return $this->sendResponse($response);
+		return $this->displayException($exception);
 	}
 
 	/**
-	 * Send the repsonse back to the client.
+	 * Handle an uncaught exception.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Response  $response
-	 * @return mixed
+	 * @param  \Exception  $exception
+	 * @return void
 	 */
-	protected function sendResponse($response)
+	public function handleUncaughtException($exception)
 	{
-		return $this->responsePreparer->readyForResponses() && ! $this->runningInConsole()
-								? $response
-								: $response->send();
+		$this->handleException($exception)->send();
 	}
 
 	/**

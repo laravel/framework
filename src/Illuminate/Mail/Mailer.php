@@ -54,6 +54,13 @@ class Mailer {
 	 */
 	protected $container;
 
+	/*
+	 * The QueueManager instance.
+	 *
+	 * @var \Illuminate\Queue\QueueManager
+	 */
+	protected $queue;
+
 	/**
 	 * Indicates if the actual sending is disabled.
 	 *
