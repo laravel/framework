@@ -109,6 +109,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $appends = array();
 
 	/**
+	 * The persisted accessors to append to the model's array form.
+	 *
+	 * @var array
+	 */
+	protected static $andAppends = array();
+
+	/**
 	 * The attributes that are mass assignable.
 	 *
 	 * @var array
@@ -1880,6 +1887,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Set the persisted accessors to append to model arrays.
+	 *
+	 * @param  array  $appends
+	 * @return void
+	 */
+	public function andAppends(array $appends)
+	{
+		static::$andAppends = $appends;
+		$this->appends = $appends;
+	}
+
+	/**
 	 * Get the fillable attributes for the model.
 	 *
 	 * @return array
@@ -2096,10 +2115,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			);
 		}
 
+		// Here we merge the statically set appends rules with the
+		$appends = empty(static::$andAppends) ? $this->appends : static::$andAppends;
+
 		// Here we will grab all of the appended, calculated attributes to this model
 		// as these attributes are not really in the attributes array, but are run
 		// when we need to array or JSON the model for convenience to the coder.
-		foreach ($this->appends as $key)
+		foreach ($appends as $key)
 		{
 			$attributes[$key] = $this->mutateAttribute($key, null);
 		}
