@@ -1556,7 +1556,17 @@ class Builder {
 
 		$columns = $this->columns;
 
-		$total = $this->count();
+		// We have to check if the value is "null" so that the count function does
+		// not attempt to count an invalid string. Checking the value is better
+		// here because the count function already has an optional parameter.
+		if ( is_null($columns))
+		{
+			$total = $this->count();
+		}
+		else
+		{
+			$total = $this->count($columns);
+		}
 
 		$this->orders = $orders;
 
@@ -1581,12 +1591,17 @@ class Builder {
 	/**
 	 * Retrieve the "count" result of the query.
 	 *
-	 * @param  string  $column
+	 * @param  string  $columns
 	 * @return int
 	 */
-	public function count($column = '*')
+	public function count($columns = '*')
 	{
-		return (int) $this->aggregate(__FUNCTION__, array($column));
+		if ( ! is_array($columns))
+		{
+			$columns = array($columns);
+		}
+
+		return (int) $this->aggregate(__FUNCTION__, $columns);
 	}
 
 	/**
