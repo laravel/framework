@@ -52,6 +52,27 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHydrateCreatesCollectionOfModels()
+	{
+		$data = array(array('name' => 'Taylor'), array('name' => 'Otwell'));
+		$collection = EloquentModelStub::hydrate($data);
+
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
+		$this->assertEquals(2, count($collection));
+		$this->assertInstanceOf('EloquentModelStub', $collection[0]);
+		$this->assertInstanceOf('EloquentModelStub', $collection[1]);
+		$this->assertEquals('Taylor', $collection[0]->name);
+		$this->assertEquals('Otwell', $collection[1]->name);
+	}
+
+
+	public function testHydrateRawMakesRawQuery()
+	{
+		$collection = EloquentModelHydrateRawStub::hydrateRaw('SELECT ?', array('foo'));
+
+		$this->assertEquals('hydrated', $collection);
+	}
+
 	public function testCreateMethodSavesNewModel()
 	{
 		$_SERVER['__eloquent.saved'] = false;
@@ -868,6 +889,16 @@ class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
 		$mock->shouldReceive('whereIn')->once()->with('id', array(1, 2, 3))->andReturn($mock);
 		$mock->shouldReceive('get')->once()->andReturn(array($model = m::mock('StdClass')));
 		$model->shouldReceive('delete')->once();
+		return $mock;
+	}
+}
+
+class EloquentModelHydrateRawStub extends Illuminate\Database\Eloquent\Model {
+	public static function hydrate () { return 'hydrated'; }
+	public function getConnection()
+	{
+		$mock = m::mock('Illuminate\Database\Connection');
+		$mock->shouldReceive('select')->once()->with('SELECT ?', array('foo'));
 		return $mock;
 	}
 }
