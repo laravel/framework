@@ -1549,13 +1549,13 @@ class Builder {
 	 */
 	public function getPaginationCount()
 	{
+		// Because some database engines may throw errors if we leave the ordering
+		// statements on the query, we will "back them up" and remove them from
+		// the query. Once we have the count we will put them back onto this.
 		list($orders, $this->orders) = array($this->orders, null);
 
 		$columns = $this->columns;
 
-		// Because some database engines may throw errors if we leave the ordering
-		// statements on the query, we will "back them up" and remove them from
-		// the query. Once we have the count we will put them back onto this.
 		$total = $this->count();
 
 		$this->orders = $orders;
