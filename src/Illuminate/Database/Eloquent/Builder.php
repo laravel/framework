@@ -424,7 +424,10 @@ class Builder {
 	 */
 	protected function isSoftDeleteConstraint(array $where, $column)
 	{
-		return $where['column'] == $column and $where['type'] == 'Null';
+		if ( isset($where['column']) )
+		{
+			return $where['column'] == $column and $where['type'] == 'Null';
+		}
 	}
 
 	/**
