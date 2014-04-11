@@ -2528,18 +2528,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Determine if the model is dirty or if a given attribute is dirty.
+	 * Determine if the model or a given attribute has been modified.
 	 *
 	 * @param  string|null  $attribute
 	 * @return bool
 	 */
 	public function isDirty($attribute = null)
 	{
-		$dirtyAttributes = $this->getDirty();
+		$dirty = $this->getDirty();
 
-		if (is_null($attribute) === false) return array_key_exists($attribute, $dirtyAttributes);
-
-		return count($dirtyAttributes) > 0;
+		if (is_null($attribute))
+		{
+			return count($dirty) > 0;
+		}
+		else
+		{
+			return array_key_exists($attribute, $dirty);
+		}
 	}
 
 	/**
