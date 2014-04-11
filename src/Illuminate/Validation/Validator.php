@@ -1085,9 +1085,14 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateMimes($attribute, $value, $parameters)
 	{
-		if ( ! $value instanceof File || $value->getPath() == '')
+		if ( ! $value instanceof File)
 		{
 			return true;
+		}
+
+		if ( ! $value->isValid())
+		{
+			return false;
 		}
 
 		// The Symfony File class should do a decent job of guessing the extension
