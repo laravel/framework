@@ -181,6 +181,25 @@ $aliases = $config['aliases'];
 
 AliasLoader::getInstance($aliases)->register();
 
+
+/*
+|--------------------------------------------------------------------------
+| Register fallback concrete types for abstract entities
+|--------------------------------------------------------------------------
+|
+*/
+$app->registerCoreFallbackTypes();
+
+/*
+ |--------------------------------------------------------------------------
+ | Register user defined types to override the defaults
+ |--------------------------------------------------------------------------
+ |
+ */
+$fallbackTypes = $config['fallback'];
+$app->registerFallbackTypes($fallbackTypes);
+
+
 /*
 |--------------------------------------------------------------------------
 | Enable HTTP Method Override
