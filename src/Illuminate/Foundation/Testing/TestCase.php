@@ -242,7 +242,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 		$this->assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
 
-		$this->assertEquals($this->app['url']->to($uri), $response->headers->get('Location'));
+		$this->assertEquals($uri, $response->headers->get('Location'));
 
 		$this->assertSessionHasAll($with);
 	}
