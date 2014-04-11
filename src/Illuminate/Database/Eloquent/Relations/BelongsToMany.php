@@ -293,10 +293,14 @@ class BelongsToMany extends Relation {
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
 	{
-		if ($columns == array('*'))
-		{
-			$columns = array($this->related->getTable().'.*');
-		}
+        if ($columns == array('*') && !is_null($this->query->getQuery()->columns))
+        {
+            $columns = array();
+        }
+        else if ($columns == array('*'))
+        {
+            $columns = array($this->related->getTable().'.*');
+        }
 
 		return array_merge($columns, $this->getAliasedPivotColumns());
 	}
