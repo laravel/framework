@@ -69,7 +69,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testHydrateRawMakesRawQuery()
 	{
 		$collection = EloquentModelHydrateRawStub::hydrateRaw('SELECT ?', array('foo'));
-
 		$this->assertEquals('hydrated', $collection);
 	}
 
@@ -894,11 +893,11 @@ class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelHydrateRawStub extends Illuminate\Database\Eloquent\Model {
-	public static function hydrate () { return 'hydrated'; }
+	public static function hydrate(array $items = array(), $connection = null) { return 'hydrated'; }
 	public function getConnection()
 	{
 		$mock = m::mock('Illuminate\Database\Connection');
-		$mock->shouldReceive('select')->once()->with('SELECT ?', array('foo'));
+		$mock->shouldReceive('select')->once()->with('SELECT ?', array('foo'))->andReturn(array());
 		return $mock;
 	}
 }
