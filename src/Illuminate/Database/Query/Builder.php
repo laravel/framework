@@ -1559,7 +1559,7 @@ class Builder {
 		// We have to check if the value is "null" so that the count function does
 		// not attempt to count an invalid string. Checking the value is better
 		// here because the count function already has an optional parameter.
-		if ( is_null($columns))
+		if (is_null($columns))
 		{
 			$total = $this->count();
 		}
