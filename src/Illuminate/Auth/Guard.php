@@ -79,8 +79,8 @@ class Guard {
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
-                                SessionStore $session,
-                                Request $request = null)
+								SessionStore $session,
+								Request $request = null)
 	{
 		$this->session = $session;
 		$this->request = $request;
@@ -148,9 +148,9 @@ class Guard {
 
 		return $this->user = $user;
 	}
-	
+
 	/**
-	 * Get the currently user id.
+	 * Get the ID for the currently authenticated user.
 	 *
 	 * @return int|null
 	 */
@@ -158,14 +158,7 @@ class Guard {
 	{
 		if ($this->loggedOut) return;
 
-	        $id = $this->session->get($this->getName());
-	        
-	        if (!$id)
-	        {
-	            	$id = $this->getRecaller();
-	        }
-	
-	        return $id;
+		return $this->session->get($this->getName()) ?: $this->getRecaller();
 	}
 
 	/**
