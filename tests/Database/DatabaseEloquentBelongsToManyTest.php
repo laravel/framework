@@ -294,6 +294,23 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSyncMethodConvertsCollectionToArrayOfKeys()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('attach', 'detach', 'touchIfTouching', 'formatSyncList'), $this->getRelationArguments());
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$query->shouldReceive('lists')->once()->with('role_id')->andReturn(array(1, 2, 3));
+
+		$collection = m::mock('Illuminate\Database\Eloquent\Collection');
+		$collection->shouldReceive('modelKeys')->once()->andReturn(array(1, 2, 3));
+		$relation->expects($this->once())->method('formatSyncList')->with(array(1, 2, 3))->will($this->returnValue(array(1 => array(),2 => array(),3 => array())));
+		$relation->sync($collection);
+	}
+
+
 	public function getRelation()
 	{
 		list($builder, $parent) = $this->getRelationArguments();
