@@ -121,6 +121,36 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBeganTransactionFiresEventsIfSet()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+		$connection = $this->getMockConnection(array(), $pdo);
+		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('connection.beganTransaction', $connection);
+		$connection->beginTransaction();
+	}
+
+
+	public function testCommitedFiresEventsIfSet()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+		$connection = $this->getMockConnection(array(), $pdo);
+		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('connection.commited', $connection);
+		$connection->commit();
+	}
+
+
+	public function testRollBackedFiresEventsIfSet()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+		$connection = $this->getMockConnection(array(), $pdo);
+		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('connection.rollBacked', $connection);
+		$connection->rollBack();
+	}
+
+
 	public function testTransactionMethodRunsSuccessfully()
 	{
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO', array('beginTransaction', 'commit'));
