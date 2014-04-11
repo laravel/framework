@@ -170,6 +170,25 @@ test';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
+	public function testPushIsCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@push(\'foo\')
+test
+@endpush';
+		$expected = '<?php echo $__env->startPush(\'foo\'); ?>
+test
+<?php echo $__env->endPush; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+	public function testStackIsCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@stack(\'foo\')';;
+		$expected = '<?php echo $__env->stackContent(\'foo\'); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
 
 	public function testCommentsAreCompiled()
 	{
