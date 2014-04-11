@@ -11,8 +11,8 @@
         "php": ">=5.4.0",
         "filp/whoops": "1.0.10",
         "illuminate/support": "4.2.*",
-        "symfony/http-foundation": "2.4.*",
-        "symfony/http-kernel": "2.4.*"
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*"
     },
     "require-dev": {
         "monolog/monolog": "~1.6",
