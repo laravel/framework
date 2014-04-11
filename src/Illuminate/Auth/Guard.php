@@ -148,6 +148,25 @@ class Guard {
 
 		return $this->user = $user;
 	}
+	
+	/**
+	 * Get the currently user id.
+	 *
+	 * @return int|null
+	 */
+	public function id()
+	{
+		if ($this->loggedOut) return;
+
+	        $id = $this->session->get($this->getName());
+	        
+	        if (!$id)
+	        {
+	            	$id = $this->getRecaller();
+	        }
+	
+	        return $id;
+	}
 
 	/**
 	 * Pull a user from the repository by its recaller ID.
