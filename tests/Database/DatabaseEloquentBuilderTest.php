@@ -318,6 +318,27 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetRelationProperlySetsNestedRelationshipsWithSimilarNames()
+	{
+		$builder = $this->getBuilder();
+		$builder->setModel($this->getMockModel());
+		$builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
+		$builder->getModel()->shouldReceive('ordersGroups')->once()->andReturn($groupsRelation = m::mock('stdClass'));
+
+		$relationQuery = m::mock('stdClass');
+		$relation->shouldReceive('getQuery')->andReturn($relationQuery);
+
+		$groupRelationQuery = m::mock('stdClass');
+		$groupsRelation->shouldReceive('getQuery')->andReturn($groupRelationQuery);
+		$groupRelationQuery->shouldReceive('with')->once()->with(array('lines' => null, 'lines.details' => null));
+
+		$builder->setEagerLoads(array('orders' => null, 'ordersGroups' => null, 'ordersGroups.lines' => null, 'ordersGroups.lines.details' => null));
+
+		$relation = $builder->getRelation('orders');
+		$relation = $builder->getRelation('ordersGroups');
+	}
+
+
 	public function testEagerLoadParsingSetsProperRelationships()
 	{
 		$builder = $this->getBuilder();
