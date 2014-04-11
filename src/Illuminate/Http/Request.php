@@ -177,29 +177,24 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Determine if the request contains a non-emtpy value for an  input item.
+	 * Determine if the request contains a non-emtpy value for an input item.
 	 *
 	 * @param  string|array  $key
 	 * @return bool
 	 */
 	public function has($key)
 	{
-		if (count(func_get_args()) > 1)
+		$keys = is_array($key) ? $key : func_get_args();
+
+		foreach ($keys as $value)
 		{
-			foreach (func_get_args() as $value)
+			if ( ! is_bool($this->input($value)) and ! is_array($this->input($value)) and trim((string) $this->input($value)) === '')
 			{
-				if ( ! $this->has($value)) return false;
+				return false;
 			}
-
-			return true;
 		}
 
-		if (is_bool($this->input($key)) || is_array($this->input($key)))
-		{
-			return true;
-		}
-
-		return trim((string) $this->input($key)) !== '';
+		return true;
 	}
 
 	/**
