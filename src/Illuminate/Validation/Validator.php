@@ -858,6 +858,10 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getStringSize($value)
 	{
+		// We alter the value here so that newlines and unicode are counted
+		// as one character, across all platforms
+		$value = preg_replace('/\r\n?/', "\n", utf8_decode($value));
+
 		if (function_exists('mb_strlen')) return mb_strlen($value);
 
 		return strlen($value);
