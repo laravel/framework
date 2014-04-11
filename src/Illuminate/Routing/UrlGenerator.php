@@ -439,7 +439,7 @@ class UrlGenerator {
 	 */
 	protected function getRootUrl($scheme, $root = null)
 	{
-		$root = $root ?: $this->request->root();
+		$root = $this->request->root($root);
 
 		$start = starts_with($root, 'http://') ? 'http://' : 'https://';
 
