@@ -164,21 +164,16 @@ class Request extends SymfonyRequest {
 	 */
 	public function exists($key)
 	{
+		$keys = is_array($key) ? $key : func_get_args();
+
 		$input = $this->all();
 
-		if (count(func_get_args()) > 1)
+		foreach ($keys as $value)
 		{
-			foreach (func_get_args() as $value)
-			{
-				if ( ! array_key_exists($value, $input)) return false;
-			}
+			if ( ! array_key_exists($value, $input)) return false;
+		}
 
-			return true;
-		}
-		else
-		{
-			return array_key_exists($key, $input);
-		}
+		return true;
 	}
 
 	/**
