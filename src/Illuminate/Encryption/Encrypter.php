@@ -257,6 +257,7 @@ class Encrypter {
 	public function setCipher($cipher)
 	{
 		$this->cipher = $cipher;
+
 		$this->updateBlockSize();
 	}
 
@@ -269,10 +270,16 @@ class Encrypter {
 	public function setMode($mode)
 	{
 		$this->mode = $mode;
+
 		$this->updateBlockSize();
 	}
 
-	private function updateBlockSize()
+	/**
+	 * Update the block size for the current cipher and mode.
+	 *
+	 * @return void
+	 */
+	protected function updateBlockSize()
 	{
 		$this->block = mcrypt_get_iv_size($this->cipher, $this->mode);
 	}
