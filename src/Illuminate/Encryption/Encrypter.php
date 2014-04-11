@@ -16,21 +16,21 @@ class Encrypter {
 	 *
 	 * @var string
 	 */
-	protected $cipher = 'rijndael-256';
+	protected $cipher = MCRYPT_RIJNDAEL_128;
 
 	/**
 	 * The mode used for encryption.
 	 *
 	 * @var string
 	 */
-	protected $mode = 'cbc';
+	protected $mode = MCRYPT_MODE_CBC;
 
 	/**
 	 * The block size of the cipher.
 	 *
 	 * @var int
 	 */
-	protected $block = 32;
+	protected $block = 16;
 
 	/**
 	 * Create a new encrypter instance.
@@ -257,6 +257,7 @@ class Encrypter {
 	public function setCipher($cipher)
 	{
 		$this->cipher = $cipher;
+		$this->updateBlockSize();
 	}
 
 	/**
@@ -268,6 +269,12 @@ class Encrypter {
 	public function setMode($mode)
 	{
 		$this->mode = $mode;
+		$this->updateBlockSize();
+	}
+
+	private function updateBlockSize()
+	{
+		$this->block = mcrypt_get_iv_size($this->cipher, $this->mode);
 	}
 
 }
