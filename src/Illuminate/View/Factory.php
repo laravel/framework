@@ -79,25 +79,11 @@ class Factory {
 	protected $sectionStack = array();
 
 	/**
-	 * The stack of in-progress stacks.
-	 *
-	 * @var array
-	 */
-	protected $stackStack = array();
-
-	/**
 	 * The number of active rendering operations.
 	 *
 	 * @var int
 	 */
 	protected $renderCount = 0;
-
-	/**
-	 * All of the finished, fully pushed stacks
-	 *
-	 * @var array
-	 */
-	protected $stacks = array();
 
 	/**
 	 * Create a new view factory instance.
@@ -486,17 +472,6 @@ class Factory {
 	}
 
 	/**
-	 * @param  string $stackName
-	 * @return void
-	 */
-	public function startPush($stackName)
-	{
-		$this->stackStack[] = $stackName;
-
-		ob_start();
-	}
-
-	/**
 	 * Inject inline content into a section.
 	 *
 	 * @param  string  $section
@@ -535,27 +510,6 @@ class Factory {
 		else
 		{
 			$this->extendSection($last, ob_get_clean());
-		}
-
-		return $last;
-	}
-
-	/**
-	 * Stop pushing content into a stack
-	 *
-	 * @return string
-	 */
-	public function endPush()
-	{
-		$last = array_pop($this->stackStack);
-
-		if (isset($this->stacks[$last]))
-		{
-			$this->stacks[$last] .= ob_get_clean();
-		}
-		else
-		{
-			$this->stacks[$last] = ob_get_clean();
 		}
 
 		return $last;
@@ -601,11 +555,6 @@ class Factory {
 		{
 			$this->sections[$section] = $content;
 		}
-	}
-
-	public function stackContent($stackName)
-	{
-		return isset($this->stacks[$stackName]) ? $this->stacks[$stackName] : '';
 	}
 
 	/**
