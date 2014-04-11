@@ -86,6 +86,7 @@ class Pluralizer {
 		'radius' => 'radii',
 		'sex' => 'sexes',
 		'stimulus' => 'stimuli',
+		'syllabus' => 'syllabi',
 		'tax' => 'taxes',
 		'tooth' => 'teeth',
 	);
