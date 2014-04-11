@@ -157,7 +157,32 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Determine if the request contains a given input item.
+	 * Determine if the request contains a given input item key.
+	 *
+	 * @param  string|array  $key
+	 * @return bool
+	 */
+	public function exists($key)
+	{
+		$input = $this->all();
+
+		if (count(func_get_args()) > 1)
+		{
+			foreach (func_get_args() as $value)
+			{
+				if ( ! array_key_exists($value, $input)) return false;
+			}
+
+			return true;
+		}
+		else
+		{
+			return array_key_exists($key, $input);
+		}
+	}
+
+	/**
+	 * Determine if the request contains a non-emtpy value for an  input item.
 	 *
 	 * @param  string|array  $key
 	 * @return bool
