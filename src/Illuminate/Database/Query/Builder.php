@@ -1675,7 +1675,7 @@ class Builder {
 		{
 			$result = (array) $results[0];
 
-			return $result['aggregate'];
+			return isset($result['aggregate']) ? $result['aggregate'] : $result['AGGREGATE'];
 		}
 	}
 
