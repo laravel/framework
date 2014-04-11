@@ -405,7 +405,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $connection
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public static function hydrate(array $items = array(), $connection = null)
+	public static function hydrate(array $items, $connection = null)
 	{
 		$collection = with($instance = new static)->newCollection();
 
