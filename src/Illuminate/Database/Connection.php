@@ -454,6 +454,11 @@ class Connection implements ConnectionInterface {
 		{
 			$this->pdo->beginTransaction();
 		}
+
+		if (isset($this->events))
+		{
+			$this->events->fire('connection.beganTransaction', $this);
+		}
 	}
 
 	/**
@@ -466,6 +471,11 @@ class Connection implements ConnectionInterface {
 		if ($this->transactions == 1) $this->pdo->commit();
 
 		--$this->transactions;
+
+		if (isset($this->events))
+		{
+			$this->events->fire('connection.commited', $this);
+		}
 	}
 
 	/**
@@ -484,6 +494,11 @@ class Connection implements ConnectionInterface {
 		else
 		{
 			--$this->transactions;
+		}
+
+		if (isset($this->events))
+		{
+			$this->events->fire('connection.rollBacked', $this);
 		}
 	}
 
@@ -876,6 +891,16 @@ class Connection implements ConnectionInterface {
 	public function setFetchMode($fetchMode)
 	{
 		$this->fetchMode = $fetchMode;
+	}
+
+	/**
+	 * Get the number of active transactions.
+	 *
+	 * @return int
+	 */
+	public function getTransactions()
+	{
+		return $this->transactions;
 	}
 
 	/**
