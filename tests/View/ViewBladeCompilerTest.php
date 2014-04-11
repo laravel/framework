@@ -155,6 +155,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		}}}'));
 	}
 
+
 	public function testExtendsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -170,25 +171,28 @@ test';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
+
 	public function testPushIsCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '@push(\'foo\')
 test
 @endpush';
-		$expected = '<?php echo $__env->startPush(\'foo\'); ?>
+		$expected = '<?php $__env->startSection(\'foo\'); ?>
 test
-<?php echo $__env->endPush; ?>';
+<?php $__env->appendSection(); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
+
 
 	public function testStackIsCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '@stack(\'foo\')';;
-		$expected = '<?php echo $__env->stackContent(\'foo\'); ?>';
+		$expected = '<?php echo $__env->yieldContent(\'foo\'); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
+
 
 	public function testCommentsAreCompiled()
 	{

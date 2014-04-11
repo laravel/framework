@@ -536,29 +536,29 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileStack($expression)
 	{
-		return "<?php echo \$__env->stackContent{$expression}; ?>";
+		return "<?php echo \$__env->yieldContent{$expression}; ?>";
 	}
 
 	/**
-	 * Compile the push statements into valid PHP
+	 * Compile the push statements into valid PHP.
 	 *
 	 * @param $expression
 	 * @return string
 	 */
 	protected function compilePush($expression)
 	{
-		return "<?php echo \$__env->startPush{$expression}; ?>";
+		return "<?php \$__env->startSection{$expression}; ?>";
 	}
 
 	/**
-	 * Compile the endpush statements into valid PHP
+	 * Compile the endpush statements into valid PHP.
 	 *
 	 * @param $expression
 	 * @return string
 	 */
 	protected function compileEndpush($expression)
 	{
-		return "<?php echo \$__env->endPush{$expression}; ?>";
+		return "<?php \$__env->appendSection(); ?>";
 	}
 
 	/**
