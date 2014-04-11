@@ -399,17 +399,15 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Create a collection of models that are existing.
+	 * Create a collection of models from plain arrays.
 	 *
-	 * @param  array   $items
+	 * @param  array  $items
 	 * @param  string  $connection
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public static function hydrate(array $items, $connection = null)
 	{
-		$instance = new static;
-
-		$collection = $instance->newCollection();
+		$collection = with($instance = new static)->newCollection();
 
 		foreach ($items as $item)
 		{
@@ -430,7 +428,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Create a collection of models from a raw query.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @param  string  $connection
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
