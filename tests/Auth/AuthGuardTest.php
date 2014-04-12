@@ -111,21 +111,21 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testIsAuthedReturnsTrueWhenUserIsNotNull()
+	public function testIsAuthedReturnsTrueWhenUserIsLogged()
 	{
-		$user = m::mock('Illuminate\Auth\UserInterface');
-		$mock = $this->getGuard();
-		$mock->setUser($user);
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('id'), array($provider, $session, $request));
+		$mock->expects($this->exactly(2))->method('id')->will($this->returnValue(1));
 		$this->assertTrue($mock->check());
 		$this->assertFalse($mock->guest());
 	}
 
 
-	public function testIsAuthedReturnsFalseWhenUserIsNull()
+	public function testIsAuthedReturnsFalseWhenUserIsNotLogged()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$mock = $this->getMock('Illuminate\Auth\Guard', array('user'), array($provider, $session, $request));
-		$mock->expects($this->exactly(2))->method('user')->will($this->returnValue(null));
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('id'), array($provider, $session, $request));
+		$mock->expects($this->exactly(2))->method('id')->will($this->returnValue(null));
 		$this->assertFalse($mock->check());
 		$this->assertTrue($mock->guest());
 	}
