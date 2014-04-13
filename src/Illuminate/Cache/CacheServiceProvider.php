@@ -33,6 +33,11 @@ class CacheServiceProvider extends ServiceProvider {
 			return new MemcachedConnector;
 		});
 
+		$this->app->bindShared('memcache.connector', function()
+		{
+			return new MemcacheConnector;
+		});
+
 		$this->registerCommands();
 	}
 
@@ -58,7 +63,7 @@ class CacheServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('cache', 'cache.store', 'memcached.connector', 'command.cache.clear');
+		return array('cache', 'cache.store', 'memcached.connector', 'memcache.connector', 'command.cache.clear');
 	}
 
 }
