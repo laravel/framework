@@ -175,10 +175,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		if ($difference > 0)
 		{
-			return $this->compileEscapedEchos($this->compileRegularEchos($value));
+			return $this->compilePrefixedEchos($this->compileEscapedEchos($this->compileRegularEchos($value)));
 		}
 
-		return $this->compileRegularEchos($this->compileEscapedEchos($value));
+		return $this->compilePrefixedEchos($this->compileRegularEchos($this->compileEscapedEchos($value)));
 	}
 
 	/**
@@ -211,11 +211,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
+		$me = $this;
+
 		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
 
-		$callback = function($matches)
+		$callback = function($matches) use ($me)
 		{
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>';
+			return $matches[1] ? $matches[0] : '<?php echo '.$me->compileEchoDefaults($matches[2]).'; ?>';
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -229,11 +231,33 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
+		$me = $this;
 
-		$callback = function($matches)
+		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
+
+		$callback = function($matches) use ($me)
 		{
-			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>';
+			return $matches[1] ? $matches[0] : '<?php echo e('.$me->compileEchoDefaults($matches[2]).'); ?>';
+		};
+
+		return preg_replace_callback($pattern, $callback, $value);
+	}
+
+	/**
+	 * Compile the prefixed echo statements.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compilePrefixedEchos($value)
+	{
+		$me = $this;
+
+		$pattern = sprintf('/(@)?(%s|%s)\s*.+?\s*(%s|%s)/s', $this->contentTags[0], $this->escapedTags[0], $this->contentTags[1], $this->escapedTags[1]);
+
+		$callback = function($matches) use ($me)
+		{
+			return $matches[1] ? substr($matches[0], 1) : $matches[0];
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
