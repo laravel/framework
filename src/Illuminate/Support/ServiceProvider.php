@@ -109,6 +109,13 @@ abstract class ServiceProvider {
 			$this->app['view']->addNamespace($namespace, $view);
 		}
 
+		$asset = isset($paths['asset']) ? $paths['asset'] : $path.'/public';
+
+		if ($this->app['files']->isDirectory($asset))
+		{
+			$paths['asset'] = $asset;
+		}
+
 		$this->app->registerPackage($package, $paths);
 	}
 
