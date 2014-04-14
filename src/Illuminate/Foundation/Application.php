@@ -37,6 +37,13 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	protected $booted = false;
 
 	/**
+	 * Packages registered with the application.
+	 *
+	 * @var array
+	 */
+	protected $packages = [];
+
+	/**
 	 * The array of booting callbacks.
 	 *
 	 * @var array
@@ -1052,6 +1059,22 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$this['translator']->setLocale($locale);
 
 		$this['events']->fire('locale.changed', array($locale));
+	}
+
+	public function registerPackage($package, array $paths)
+	{
+		$this->packages[$package] = $paths;
+	}
+
+	public function getPackage($package)
+	{
+		return array_key_exists($package, $this->packages) ?
+			$this->packages[$package] : null;
+	}
+
+	public function getPackages()
+	{
+		return $this->packages;
 	}
 
 	/**
