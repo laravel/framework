@@ -68,7 +68,7 @@ class Composer {
 		{
 			return 'php composer.phar';
 		}
-		
+
 		return 'composer';
 	}
 
@@ -79,7 +79,7 @@ class Composer {
 	 */
 	protected function getProcess()
 	{
-		return new Process('', $this->workingPath);
+		return with(new Process('', $this->workingPath))->setTimeout(null);
 	}
 
 	/**

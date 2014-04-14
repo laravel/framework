@@ -19,6 +19,13 @@ class FileViewFinder implements ViewFinderInterface {
 	protected $paths;
 
 	/**
+	 * The array of views that have been located.
+	 *
+	 * @var array
+	 */
+	protected $views = array();
+
+	/**
 	 * The namespace to file path hints.
 	 *
 	 * @var array
@@ -31,6 +38,13 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @var array
 	 */
 	protected $extensions = array('blade.php', 'php');
+
+	/**
+	 * Hint path delimiter value.
+	 *
+	 * @var string
+	 */
+	const HINT_PATH_DELIMITER = '::';
 
 	/**
 	 * Create a new file view loader instance.
@@ -59,9 +73,14 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function find($name)
 	{
-		if (strpos($name, '::') !== false) return $this->findNamedPathView($name);
+		if (isset($this->views[$name])) return $this->views[$name];
 
-		return $this->findInPaths($name, $this->paths);
+		if ($this->hasHintInformation($name = trim($name)))
+		{
+			return $this->views[$name] = $this->findNamedPathView($name);
+		}
+
+		return $this->views[$name] = $this->findInPaths($name, $this->paths);
 	}
 
 	/**
@@ -82,10 +101,12 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getNamespaceSegments($name)
 	{
-		$segments = explode('::', $name);
+		$segments = explode(static::HINT_PATH_DELIMITER, $name);
 
 		if (count($segments) != 2)
 		{
@@ -106,6 +127,8 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @param  string  $name
 	 * @param  array   $paths
 	 * @return string
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function findInPaths($name, $paths)
 	{
@@ -169,6 +192,25 @@ class FileViewFinder implements ViewFinderInterface {
 	}
 
 	/**
+	 * Prepend a namespace hint to the finder.
+	 *
+	 * @param  string  $namespace
+	 * @param  string|array  $hints
+	 * @return void
+	 */
+	public function prependNamespace($namespace, $hints)
+	{
+		$hints = (array) $hints;
+
+		if (isset($this->hints[$namespace]))
+		{
+			$hints = array_merge($hints, $this->hints[$namespace]);
+		}
+
+		$this->hints[$namespace] = $hints;
+	}
+
+	/**
 	 * Register an extension with the view finder.
 	 *
 	 * @param  string  $extension
@@ -182,6 +224,17 @@ class FileViewFinder implements ViewFinderInterface {
 		}
 
 		array_unshift($this->extensions, $extension);
+	}
+
+	/**
+	 * Returns whether or not the view specify a hint information
+	 *
+	 * @param  string  $name
+	 * @return boolean
+	 */
+	public function hasHintInformation($name)
+	{
+		return strpos($name, static::HINT_PATH_DELIMITER) > 0;
 	}
 
 	/**

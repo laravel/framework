@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Encryption\Encrypter
+ */
 class Crypt extends Facade {
 
 	/**

@@ -10,4 +10,11 @@ interface ResponsePreparerInterface {
 	 */
 	public function prepareResponse($value);
 
+	/**
+	 * Determine if provider is ready to return responses.
+	 *
+	 * @return bool
+	 */
+	public function readyForResponses();
+
 }

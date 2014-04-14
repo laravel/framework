@@ -1,5 +1,9 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Remote\RemoteManager
+ * @see \Illuminate\Remote\Connection
+ */
 class SSH extends Facade {
 
 	/**

@@ -19,9 +19,23 @@ class Manager {
 	protected static $instance;
 
 	/**
+	 * The database manager instance.
+	 *
+	 * @var \Illuminate\Database\DatabaseManager
+	 */
+	protected $manager;
+	
+	/**
+	 * The container instance.
+	 * 
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
+
+	/**
 	 * Create a new database capsule manager.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Container\Container|null  $container
 	 * @return void
 	 */
 	public function __construct(Container $container = null)
@@ -39,7 +53,7 @@ class Manager {
 	/**
 	 * Setup the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Container\Container|null  $container
 	 * @return void
 	 */
 	protected function setupContainer($container)
@@ -176,6 +190,16 @@ class Manager {
 	}
 
 	/**
+	 * Get the database manager instance.
+	 *
+	 * @return \Illuminate\Database\Manager
+	 */
+	public function getDatabaseManager()
+	{
+		return $this->manager;
+	}
+
+	/**
 	 * Get the current event dispatcher instance.
 	 *
 	 * @return \Illuminate\Events\Dispatcher
@@ -213,7 +237,7 @@ class Manager {
 	}
 
 	/**
-	 * Set the cache manager to bse used by connections.
+	 * Set the cache manager to be used by connections.
 	 *
 	 * @param  \Illuminate\Cache\CacheManager  $cache
 	 * @return void
@@ -242,6 +266,18 @@ class Manager {
 	public function setContainer(Container $container)
 	{
 		$this->container = $container;
+	}
+
+	/**
+	 * Dynamically pass methods to the default connection.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public static function __callStatic($method, $parameters)
+	{
+		return call_user_func_array(array(static::connection(), $method), $parameters);
 	}
 
 }

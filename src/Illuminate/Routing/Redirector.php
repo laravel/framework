@@ -92,7 +92,7 @@ class Redirector {
 	 * @param  bool    $secure
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
-	public function intended($default, $status = 302, $headers = array(), $secure = null)
+	public function intended($default = '/', $status = 302, $headers = array(), $secure = null)
 	{
 		$path = $this->session->get('url.intended', $default);
 
@@ -114,6 +114,19 @@ class Redirector {
 	{
 		$path = $this->generator->to($path, array(), $secure);
 
+		return $this->createRedirect($path, $status, $headers);
+	}
+
+	/**
+	 * Create a new redirect response to an external URL (no validation).
+	 *
+	 * @param  string  $path
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function away($path, $status = 302, $headers = array())
+	{
 		return $this->createRedirect($path, $status, $headers);
 	}
 

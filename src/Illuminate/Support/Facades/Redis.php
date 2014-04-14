@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Redis\Database
+ */
 class Redis extends Facade {
 
 	/**

@@ -163,7 +163,7 @@ class AssetPublishCommand extends Command {
 		return array(
 			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to publish.', null),
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the configuration files.', null),
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the asset files.', null),
 		);
 	}
 

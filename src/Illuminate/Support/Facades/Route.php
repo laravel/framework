@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Routing\Router
+ */
 class Route extends Facade {
 
 	/**

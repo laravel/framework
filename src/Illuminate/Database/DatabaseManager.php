@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database;
 
-use Illuminate\Support\Manager;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseManager implements ConnectionResolverInterface {
@@ -77,9 +76,24 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function reconnect($name = null)
 	{
-		unset($this->connections[$name]);
+		$name = $name ?: $this->getDefaultConnection();
+
+		$this->disconnect($name);
 
 		return $this->connection($name);
+	}
+
+	/**
+	 * Disconnect from the given database.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function disconnect($name = null)
+	{
+		$name = $name ?: $this->getDefaultConnection();
+
+		unset($this->connections[$name]);
 	}
 
 	/**
@@ -92,9 +106,22 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		$config = $this->getConfig($name);
 
+		// First we will check by the connection name to see if an extension has been
+		// registered specifically for that connection. If it has we will call the
+		// Closure and pass it the config allowing it to resolve the connection.
 		if (isset($this->extensions[$name]))
 		{
-			return call_user_func($this->extensions[$name], $config);
+			return call_user_func($this->extensions[$name], $config, $name);
+		}
+
+		$driver = $config['driver'];
+
+		// Next we will check to see if an extension has been registered for a driver
+		// and will call the Closure if so, which allows us to have a more generic
+		// resolver for the drivers themselves which applies to all connections.
+		if (isset($this->extensions[$driver]))
+		{
+			return call_user_func($this->extensions[$driver], $config, $name);
 		}
 
 		return $this->factory->make($config, $name);
@@ -141,6 +168,8 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getConfig($name)
 	{
@@ -190,6 +219,16 @@ class DatabaseManager implements ConnectionResolverInterface {
 	public function extend($name, $resolver)
 	{
 		$this->extensions[$name] = $resolver;
+	}
+
+	/**
+	 * Return all of the created connections.
+	 *
+	 * @return array
+	 */
+	public function getConnections()
+	{
+		return $this->connections;
 	}
 
 	/**

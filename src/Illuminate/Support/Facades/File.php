@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Filesystem\Filesystem
+ */
 class File extends Facade {
 
 	/**

@@ -4,7 +4,10 @@ use Closure;
 use Illuminate\Events\Dispatcher;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
+use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\ArrayableInterface;
 
 class Writer {
 
@@ -34,7 +37,7 @@ class Writer {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispacher
+	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $dispatcher;
 
@@ -56,6 +59,23 @@ class Writer {
 	}
 
 	/**
+	 * Call Monolog with the given method and parameters.
+	 *
+	 * @param  string  $method
+	 * @param  mixed   $parameters
+	 * @return mixed
+	 */
+	protected function callMonolog($method, $parameters)
+	{
+		if (is_array($parameters[0]))
+		{
+			$parameters[0] = json_encode($parameters[0]);
+		}
+
+		return call_user_func_array(array($this->monolog, $method), $parameters);
+	}
+
+	/**
 	 * Register a file log handler.
 	 *
 	 * @param  string  $path
@@ -66,7 +86,9 @@ class Writer {
 	{
 		$level = $this->parseLevel($level);
 
-		$this->monolog->pushHandler(new StreamHandler($path, $level));
+		$this->monolog->pushHandler($handler = new StreamHandler($path, $level));
+
+		$handler->setFormatter(new LineFormatter(null, null, true));
 	}
 
 	/**
@@ -81,7 +103,9 @@ class Writer {
 	{
 		$level = $this->parseLevel($level);
 
-		$this->monolog->pushHandler(new RotatingFileHandler($path, $days, $level));
+		$this->monolog->pushHandler($handler = new RotatingFileHandler($path, $days, $level));
+
+		$handler->setFormatter(new LineFormatter(null, null, true));
 	}
 
 	/**
@@ -89,6 +113,8 @@ class Writer {
 	 *
 	 * @param  string  $level
 	 * @return int
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseLevel($level)
 	{
@@ -124,21 +150,13 @@ class Writer {
 	}
 
 	/**
-	 * Get the underlying Monolog instance.
-	 *
-	 * @return \Monolog\Logger
-	 */
-	public function getMonolog()
-	{
-		return $this->monolog;
-	}
-
-	/**
 	 * Register a new callback handler for when
 	 * a log event is triggered.
 	 *
 	 * @param  Closure  $callback
 	 * @return void
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function listen(Closure $callback)
 	{
@@ -148,6 +166,16 @@ class Writer {
 		}
 
 		$this->dispatcher->listen('illuminate.log', $callback);
+	}
+
+	/**
+	 * Get the underlying Monolog instance.
+	 *
+	 * @return \Monolog\Logger
+	 */
+	public function getMonolog()
+	{
+		return $this->monolog;
 	}
 
 	/**
@@ -175,7 +203,8 @@ class Writer {
 	 * Fires a log event.
 	 *
 	 * @param  string  $level
-	 * @param  array   $parameters
+	 * @param  string  $message
+	 * @param  array   $context
 	 * @return void
 	 */
 	protected function fireLogEvent($level, $message, array $context = array())
@@ -190,24 +219,66 @@ class Writer {
 	}
 
 	/**
+	 * Dynamically pass log calls into the writer.
+	 *
+	 * @param  dynamic (level, param, param)
+	 * @return mixed
+	 */
+	public function write()
+	{
+		$level = head(func_get_args());
+
+		return call_user_func_array(array($this, $level), array_slice(func_get_args(), 1));
+	}
+
+	/**
 	 * Dynamically handle error additions.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  mixed   $parameters
 	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{
+		$this->formatParameters($parameters);
+
 		if (in_array($method, $this->levels))
 		{
 			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
 
 			$method = 'add'.ucfirst($method);
 
-			return call_user_func_array(array($this->monolog, $method), $parameters);
+			return $this->callMonolog($method, $parameters);
 		}
 
 		throw new \BadMethodCallException("Method [$method] does not exist.");
+	}
+
+	/**
+	 * Format the parameters for the logger.
+	 *
+	 * @param  mixed  $parameters
+	 * @return void
+	 */
+	protected function formatParameters(&$parameters)
+	{
+		if (isset($parameters[0]))
+		{
+			if (is_array($parameters[0]))
+			{
+				$parameters[0] = var_export($parameters[0], true);
+			}
+			elseif ($parameters[0] instanceof JsonableInterface)
+			{
+				$parameters[0] = $parameters[0]->toJson();
+			}
+			elseif ($parameters[0] instanceof ArrayableInterface)
+			{
+				$parameters[0] = var_export($parameters[0]->toArray(), true);
+			}
+		}
 	}
 
 }

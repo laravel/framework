@@ -21,6 +21,8 @@ class EngineResolver {
 	/**
 	 * Register a new engine resolver.
 	 *
+	 * The engine string typically corresponds to a file extension.
+	 *
 	 * @param  string   $engine
 	 * @param  Closure  $resolver
 	 * @return void

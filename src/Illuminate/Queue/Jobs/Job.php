@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Queue\Jobs;
 
+use DateTime;
+
 abstract class Job {
 
 	/**
@@ -17,6 +19,20 @@ abstract class Job {
 	protected $container;
 
 	/**
+	 * The name of the queue the job belongs to.
+	 *
+	 * @var string
+	 */
+	protected $queue;
+
+	/**
+	 * Indicates if the job has been deleted.
+	 *
+	 * @var bool
+	 */
+	protected $deleted = false;
+
+	/**
 	 * Fire the job.
 	 *
 	 * @return void
@@ -28,7 +44,20 @@ abstract class Job {
 	 *
 	 * @return void
 	 */
-	abstract public function delete();
+	public function delete()
+	{
+		$this->deleted = true;
+	}
+
+	/**
+	 * Determine if the job has been deleted.
+	 *
+	 * @return bool
+	 */
+	public function isDeleted()
+	{
+		return $this->deleted;
+	}
 
 	/**
 	 * Release the job back into the queue.
@@ -44,6 +73,13 @@ abstract class Job {
 	 * @return int
 	 */
 	abstract public function attempts();
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	abstract public function getRawBody();
 
 	/**
 	 * Resolve and fire the job handler method.
@@ -92,6 +128,44 @@ abstract class Job {
 	public function autoDelete()
 	{
 		return isset($this->instance->delete);
+	}
+
+	/**
+	 * Calculate the number of seconds with the given delay.
+	 *
+	 * @param  \DateTime|int  $delay
+	 * @return int
+	 */
+	protected function getSeconds($delay)
+	{
+		if ($delay instanceof DateTime)
+		{
+			return max(0, $delay->getTimestamp() - $this->getTime());
+		}
+		else
+		{
+			return intval($delay);
+		}
+	}
+
+	/**
+	 * Get the name of the queued job class.
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return json_decode($this->getRawBody(), true)['job'];
+	}
+
+	/**
+	 * Get the name of the queue the job belongs to.
+	 *
+	 * @return string
+	 */
+	public function getQueue()
+	{
+		return $this->queue;
 	}
 
 }

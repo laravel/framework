@@ -7,6 +7,7 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 	public function setUp()
 	{
 		Illuminate\Support\Facades\Facade::clearResolvedInstances();
+		FacadeStub::setFacadeApplication(null);
 	}
 
 
@@ -46,6 +47,13 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
 		$this->assertEquals('baz', $app['foo']->foo('bar'));
 		$this->assertEquals('baz2', $app['foo']->foo2('bar2'));
+	}
+
+
+	public function testCanBeMockedWithoutUnderlyingInstance()
+	{
+		FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
+		$this->assertEquals('bar', FacadeStub::foo());
 	}
 
 }

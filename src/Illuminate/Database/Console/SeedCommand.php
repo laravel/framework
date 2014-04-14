@@ -2,7 +2,6 @@
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class SeedCommand extends Command {
@@ -51,8 +50,6 @@ class SeedCommand extends Command {
 		$this->resolver->setDefaultConnection($this->getDatabase());
 
 		$this->getSeeder()->run();
-
-		$this->info('Database seeded!');
 	}
 
 	/**

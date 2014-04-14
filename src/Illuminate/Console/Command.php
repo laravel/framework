@@ -17,14 +17,14 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * The input interface implementation.
 	 *
-	 * @var Symfony\Component\Console\Input\InputInterface
+	 * @var \Symfony\Component\Console\Input\InputInterface
 	 */
 	protected $input;
 
 	/**
 	 * The output interface implementation.
 	 *
-	 * @var Symfony\Component\Console\Output\OutputInterface
+	 * @var \Symfony\Component\Console\Output\OutputInterface
 	 */
 	protected $output;
 
@@ -137,7 +137,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 
 		$arguments['command'] = $command;
 
-		return $instance->run(new ArrayInput($arguments), new NullOutput);	
+		return $instance->run(new ArrayInput($arguments), new NullOutput);
 	}
 
 	/**
@@ -194,11 +194,12 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		return $dialog->ask($this->output, "<question>$question</question>", $default);
 	}
 
+
 	/**
 	 * Prompt the user for input but hide the answer from the console.
 	 *
 	 * @param  string  $question
-	 * @param  bool    $fallabck
+	 * @param  bool    $fallback
 	 * @return string
 	 */
 	public function secret($question, $fallback = true)
@@ -206,6 +207,22 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		$dialog = $this->getHelperSet()->get('dialog');
 
 		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $fallback);
+	}
+
+	/**
+	 * Give the user a single choice from an array of answers.
+	 *
+	 * @param  string  $question
+	 * @param  array   $choices
+	 * @param  string  $default
+	 * @param  mixed   $attempts
+	 * @return bool
+	 */
+	public function choice($question, array $choices, $default = null, $attempts = false)
+	{
+		$dialog = $this->getHelperSet()->get('dialog');
+
+		return $dialog->select($this->output, "<question>$question</question>", $choices, $default, $attempts);
 	}
 
 	/**

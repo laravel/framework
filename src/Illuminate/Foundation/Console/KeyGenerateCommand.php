@@ -40,7 +40,7 @@ class KeyGenerateCommand extends Command {
 	 */
 	public function fire()
 	{
-		$contents = $this->files->get($path = $this->laravel['path'].'/config/app.php');
+		list($path, $contents) = $this->getKeyFile();
 
 		$key = $this->getRandomKey();
 
@@ -48,7 +48,23 @@ class KeyGenerateCommand extends Command {
 
 		$this->files->put($path, $contents);
 
+		$this->laravel['config']['app.key'] = $key;
+
 		$this->info("Application key [$key] set successfully.");
+	}
+
+	/**
+	 * Get the key file and contents.
+	 *
+	 * @return array
+	 */
+	protected function getKeyFile()
+	{
+		$env = $this->option('env') ? $this->option('env').'/' : '';
+
+		$contents = $this->files->get($path = $this->laravel['path']."/config/{$env}app.php");
+
+		return array($path, $contents);
 	}
 
 	/**

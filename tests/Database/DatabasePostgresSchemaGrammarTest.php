@@ -315,6 +315,17 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingDouble()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->double('foo', 15, 8);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" double precision not null', $statements[0]);
+	}
+
+
 	public function testAddingDecimal()
 	{
 		$blueprint = new Blueprint('users');
@@ -344,7 +355,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" varchar(255) not null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" varchar(255) check ("foo" in (\'bar\', \'baz\')) not null', $statements[0]);
 	}
 
 

@@ -46,7 +46,7 @@ class IronConnector implements ConnectorInterface {
 
 		if (isset($config['host'])) $ironConfig['host'] = $config['host'];
 
-		return new IronQueue(new IronMQ($ironConfig), $this->crypt, $this->request, $config['queue']);
+		return new IronQueue(new IronMQ($ironConfig), $this->crypt, $this->request, $config['queue'], $config['encrypt']);
 	}
 
 }

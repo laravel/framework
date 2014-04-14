@@ -194,11 +194,11 @@ class ControllerGenerator {
 	 */
 	protected function getMethods($options)
 	{
-		if (isset($options['only']) and count($options['only']) > 0)
+		if (isset($options['only']) && count($options['only']) > 0)
 		{
 			return $options['only'];
 		}
-		elseif (isset($options['except']) and count($options['except']) > 0)
+		elseif (isset($options['except']) && count($options['except']) > 0)
 		{
 			return array_diff($this->defaults, $options['except']);
 		}

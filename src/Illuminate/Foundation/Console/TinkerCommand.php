@@ -25,6 +25,51 @@ class TinkerCommand extends Command {
 	 */
 	public function fire()
 	{
+		if ($this->supportsBoris())
+		{
+			$this->runBorisShell();
+		}
+		else
+		{
+			$this->comment('Full REPL not supported. Falling back to simple shell.');
+
+			$this->runPlainShell();
+		}
+	}
+
+	/**
+	 * Run the Boris REPL with the current context.
+	 *
+	 * @return void
+	 */
+	protected function runBorisShell()
+	{
+		$this->setupBorisErrorHandling();
+
+		with(new \Boris\Boris('> '))->start();
+	}
+
+	/**
+	 * Setup the Boris exception handling.
+	 *
+	 * @return void
+	 */
+	protected function setupBorisErrorHandling()
+	{
+		restore_error_handler(); restore_exception_handler();
+
+		$this->laravel->make('artisan')->setCatchExceptions(false);
+
+		$this->laravel->error(function() { return ''; });
+	}
+
+	/**
+	 * Run the plain Artisan tinker shell.
+	 *
+	 * @return void
+	 */
+	protected function runPlainShell()
+	{
 		$input = $this->prompt();
 
 		while ($input != 'quit')
@@ -44,7 +89,7 @@ class TinkerCommand extends Command {
 
 			// If an exception occurs, we will just display the message and keep this
 			// loop going so we can keep executing commands. However, when a fatal
-			// a error occurs we have no choice but to bail out of the routines.
+			// error occurs, we have no choice but to bail out of this routines.
 			catch (\Exception $e)
 			{
 				$this->error($e->getMessage());
@@ -64,6 +109,16 @@ class TinkerCommand extends Command {
 		$dialog = $this->getHelperSet()->get('dialog');
 
 		return $dialog->ask($this->output, "<info>></info>", null);
+	}
+
+	/**
+	 * Determine if the current environment supports Boris.
+	 *
+	 * @return bool
+	 */
+	protected function supportsBoris()
+	{
+		return extension_loaded('readline') && extension_loaded('posix') && extension_loaded('pcntl');
 	}
 
 }

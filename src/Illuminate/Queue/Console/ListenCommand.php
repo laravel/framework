@@ -48,7 +48,7 @@ class ListenCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->listener->setEnvironment($this->laravel->environment());
+		$this->setListenerOptions();
 
 		$delay = $this->input->getOption('delay');
 
@@ -66,7 +66,9 @@ class ListenCommand extends Command {
 		// connection being run for the queue operation currently being executed.
 		$queue = $this->getQueue($connection);
 
-		$this->listener->listen($connection, $queue, $delay, $memory, $timeout);
+		$this->listener->listen(
+			$connection, $queue, $delay, $memory, $timeout
+		);
 	}
 
 	/**
@@ -81,10 +83,29 @@ class ListenCommand extends Command {
 		{
 			$connection = $this->laravel['config']['queue.default'];
 		}
-		
+
 		$queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
 
 		return $this->input->getOption('queue') ?: $queue;
+	}
+
+	/**
+	 * Set the options on the queue listener.
+	 *
+	 * @return void
+	 */
+	protected function setListenerOptions()
+	{
+		$this->listener->setEnvironment($this->laravel->environment());
+
+		$this->listener->setSleep($this->option('sleep'));
+
+		$this->listener->setMaxTries($this->option('tries'));
+
+		$this->listener->setOutputHandler(function($type, $line)
+		{
+			$this->output->write($line);
+		});
 	}
 
 	/**
@@ -114,6 +135,10 @@ class ListenCommand extends Command {
 			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
 
 			array('timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60),
+
+			array('sleep', null, InputOption::VALUE_OPTIONAL, 'Seconds to wait before checking queue for jobs', 3),
+
+			array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
 		);
 	}
 

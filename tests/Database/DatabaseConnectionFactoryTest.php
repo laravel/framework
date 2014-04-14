@@ -32,6 +32,33 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMakeCallsCreateConnectionForReadWrite()
+	{
+		$factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', array('createConnector', 'createConnection'), array($container = m::mock('Illuminate\Container\Container')));
+		$container->shouldReceive('bound')->andReturn(false);
+		$connector = m::mock('stdClass');
+		$config = array(
+			'read' => array('database' => 'database'),
+			'write' => array('database' => 'database'),
+			'driver' => 'mysql', 'prefix' => 'prefix', 'name' => 'foo'
+		);
+		$expect = $config;
+		unset($expect['read']);
+		unset($expect['write']);
+		$expect['database'] = 'database';
+		$pdo = new DatabaseConnectionFactoryPDOStub;
+		$connector->shouldReceive('connect')->twice()->with($expect)->andReturn($pdo);
+		$factory->expects($this->exactly(2))->method('createConnector')->with($expect)->will($this->returnValue($connector));
+		$mockConnection = m::mock('stdClass');
+		$mockConnection->shouldReceive('setReadPdo')->once()->andReturn($mockConnection);
+		$passedConfig = array_merge($expect, array('name' => 'foo'));
+		$factory->expects($this->once())->method('createConnection')->with($this->equalTo('mysql'), $this->equalTo($pdo), $this->equalTo('database'), $this->equalTo('prefix'), $this->equalTo($passedConfig))->will($this->returnValue($mockConnection));
+		$connection = $factory->make($config, 'foo');
+
+		$this->assertEquals($mockConnection, $connection);
+	}
+
+
 	public function testMakeCanCallTheContainer()
 	{
 		$factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', array('createConnector'), array($container = m::mock('Illuminate\Container\Container')));
@@ -76,7 +103,18 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 	public function testExceptionIsThrownOnUnsupportedDriver()
 	{
 		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$container->shouldReceive('bound')->once()->andReturn(false);
 		$factory->createConnector(array('driver' => 'foo'));
+	}
+
+
+	public function testCustomConnectorsCanBeResolvedViaContainer()
+	{
+		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
+		$container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
+
+		$this->assertEquals('connector', $factory->createConnector(array('driver' => 'foo')));
 	}
 
 }

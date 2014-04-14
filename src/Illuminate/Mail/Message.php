@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Mail;
 
 use Swift_Image;
-use Swift_Message;
 use Swift_Attachment;
 
 class Message {
@@ -9,14 +8,14 @@ class Message {
 	/**
 	 * The Swift Message instance.
 	 *
-	 * @var Swift_Message
+	 * @var \Swift_Message
 	 */
 	protected $swift;
 
 	/**
 	 * Create a new message instance.
 	 *
-	 * @param  Swift_Message  $swift
+	 * @param  \Swift_Message  $swift
 	 * @return void
 	 */
 	public function __construct($swift)
@@ -118,6 +117,7 @@ class Message {
 	 *
 	 * @param  string|array  $address
 	 * @param  string  $name
+	 * @param  string  $type
 	 * @return \Illuminate\Mail\Message
 	 */
 	protected function addAddresses($address, $name, $type)
@@ -178,7 +178,7 @@ class Message {
 	 * Create a Swift Attachment instance.
 	 *
 	 * @param  string  $file
-	 * @return Swift_Attachment
+	 * @return \Swift_Attachment
 	 */
 	protected function createAttachmentFromPath($file)
 	{
@@ -205,7 +205,7 @@ class Message {
 	 *
 	 * @param  string  $data
 	 * @param  string  $name
-	 * @return Swift_Attachment
+	 * @return \Swift_Attachment
 	 */
 	protected function createAttachmentFromData($data, $name)
 	{
@@ -241,7 +241,7 @@ class Message {
 	/**
 	 * Prepare and attach the given attachment.
 	 *
-	 * @param  Swift_Attachment  $attachment
+	 * @param  \Swift_Attachment  $attachment
 	 * @param  array  $options
 	 * @return \Illuminate\Mail\Message
 	 */
@@ -271,7 +271,7 @@ class Message {
 	/**
 	 * Get the underlying Swift Message instance.
 	 *
-	 * @return Swift_Message
+	 * @return \Swift_Message
 	 */
 	public function getSwiftMessage()
 	{

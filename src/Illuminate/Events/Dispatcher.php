@@ -33,6 +33,13 @@ class Dispatcher {
 	protected $sorted = array();
 
 	/**
+	 * The event firing stack.
+	 *
+	 * @var array
+	 */
+	protected $firing = array();
+
+	/**
 	 * Create a new event dispatcher instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
@@ -40,27 +47,30 @@ class Dispatcher {
 	 */
 	public function __construct(Container $container = null)
 	{
-		$this->container = $container;
+		$this->container = $container ?: new Container;
 	}
 
 	/**
 	 * Register an event listener with the dispatcher.
 	 *
-	 * @param  string  $event
+	 * @param  string|array  $event
 	 * @param  mixed   $listener
 	 * @param  int     $priority
 	 * @return void
 	 */
-	public function listen($event, $listener, $priority = 0)
+	public function listen($events, $listener, $priority = 0)
 	{
-		if (str_contains($event, '*'))
+		foreach ((array) $events as $event)
 		{
-			return $this->setupWildcardListen($event, $listener, $priority = 0);
+			if (str_contains($event, '*'))
+			{
+				return $this->setupWildcardListen($event, $listener);
+			}
+
+			$this->listeners[$event][$priority][] = $this->makeListener($listener);
+
+			unset($this->sorted[$event]);
 		}
-
-		$this->listeners[$event][$priority][] = $this->makeListener($listener);
-
-		unset($this->sorted[$event]);
 	}
 
 	/**
@@ -68,12 +78,11 @@ class Dispatcher {
 	 *
 	 * @param  string  $event
 	 * @param  mixed   $listener
-	 * @param  int     $priority
 	 * @return void
 	 */
-	protected function setupWildcardListen($event, $listener, $priority)
+	protected function setupWildcardListen($event, $listener)
 	{
-		$this->wildcards[$event][] = $listener;
+		$this->wildcards[$event][] = $this->makeListener($listener);
 	}
 
 	/**
@@ -96,11 +105,9 @@ class Dispatcher {
 	 */
 	public function queue($event, $payload = array())
 	{
-		$me = $this;
-
-		$this->listen($event.'_queue', function() use ($me, $event, $payload)
+		$this->listen($event.'_queue', function() use ($event, $payload)
 		{
-			$me->fire($event, $payload);
+			$this->fire($event, $payload);
 		});
 	}
 
@@ -157,12 +164,22 @@ class Dispatcher {
 	}
 
 	/**
+	 * Get the event that is currently firing.
+	 *
+	 * @return string
+	 */
+	public function firing()
+	{
+		return last($this->firing);
+	}
+
+	/**
 	 * Fire an event and call the listeners.
 	 *
 	 * @param  string  $event
 	 * @param  mixed   $payload
-	 * @param  boolean $halt
-	 * @return void
+	 * @param  bool    $halt
+	 * @return array|null
 	 */
 	public function fire($event, $payload = array(), $halt = false)
 	{
@@ -173,7 +190,7 @@ class Dispatcher {
 		// payload to each of them so that they receive each of these arguments.
 		if ( ! is_array($payload)) $payload = array($payload);
 
-		$payload[] = $event;
+		$this->firing[] = $event;
 
 		foreach ($this->getListeners($event) as $listener)
 		{
@@ -182,18 +199,22 @@ class Dispatcher {
 			// If a response is returned from the listener and event halting is enabled
 			// we will just return this response, and not call the rest of the event
 			// listeners. Otherwise we will add the response on the response list.
-			if ( ! is_null($response) and $halt)
+			if ( ! is_null($response) && $halt)
 			{
+				array_pop($this->firing);
+
 				return $response;
 			}
 
-			// If a boolean false is returned from a listener, we will stop propogating
+			// If a boolean false is returned from a listener, we will stop propagating
 			// the event to any further listeners down in the chain, else we keep on
 			// looping through the listeners and firing every one in our sequence.
 			if ($response === false) break;
 
 			$responses[] = $response;
 		}
+
+		array_pop($this->firing);
 
 		return $halt ? null : $responses;
 	}
@@ -259,7 +280,7 @@ class Dispatcher {
 	 * Register an event listener with the dispatcher.
 	 *
 	 * @param  mixed   $listener
-	 * @return void
+	 * @return mixed
 	 */
 	public function makeListener($listener)
 	{
@@ -275,7 +296,7 @@ class Dispatcher {
 	 * Create a class based listener using the IoC container.
 	 *
 	 * @param  mixed    $listener
-	 * @return Closure
+	 * @return \Closure
 	 */
 	public function createClassListener($listener)
 	{

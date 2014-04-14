@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Routing\UrlGenerator
+ */
 class URL extends Facade {
 
 	/**

@@ -4,6 +4,9 @@ use Swift_Mailer;
 use Illuminate\Support\ServiceProvider;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
+use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Mail\Transport\MailgunTransport;
+use Illuminate\Mail\Transport\MandrillTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class MailServiceProvider extends ServiceProvider {
@@ -22,14 +25,18 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->registerSwiftMailer();
+		$me = $this;
 
-		$this->app['mailer'] = $this->app->share(function($app)
+		$this->app->bindShared('mailer', function($app) use ($me)
 		{
+			$me->registerSwiftMailer();
+
 			// Once we have create the mailer instance, we will set a container instance
 			// on the mailer. This allows us to resolve mailer classes via containers
 			// for maximum testability on said classes instead of passing Closures.
-			$mailer = new Mailer($app['view'], $app['swift.mailer']);
+			$mailer = new Mailer(
+				$app['view'], $app['swift.mailer'], $app['events']
+			);
 
 			$mailer->setLogger($app['log'])->setQueue($app['queue']);
 
@@ -40,14 +47,14 @@ class MailServiceProvider extends ServiceProvider {
 			// on each one, which makes the developer's life a lot more convenient.
 			$from = $app['config']['mail.from'];
 
-			if (is_array($from) and isset($from['address']))
+			if (is_array($from) && isset($from['address']))
 			{
 				$mailer->alwaysFrom($from['address'], $from['name']);
 			}
 
 			// Here we will determine if the mailer should be in "pretend" mode for this
 			// environment, which will simply write out e-mail to the logs instead of
-			// sending it over the web, which is useful for local dev enviornments.
+			// sending it over the web, which is useful for local dev environments.
 			$pretend = $app['config']->get('mail.pretend', false);
 
 			$mailer->pretend($pretend);
@@ -61,7 +68,7 @@ class MailServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerSwiftMailer()
+	public function registerSwiftMailer()
 	{
 		$config = $this->app['config']['mail'];
 
@@ -81,6 +88,8 @@ class MailServiceProvider extends ServiceProvider {
 	 *
 	 * @param  array  $config
 	 * @return void
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function registerSwiftTransport($config)
 	{
@@ -94,6 +103,15 @@ class MailServiceProvider extends ServiceProvider {
 
 			case 'mail':
 				return $this->registerMailTransport($config);
+
+			case 'mailgun':
+				return $this->registerMailgunTransport($config);
+
+			case 'mandrill':
+				return $this->registerMandrillTransport($config);
+
+			case 'log':
+				return $this->registerLogTransport($config);
 
 			default:
 				throw new \InvalidArgumentException('Invalid mail driver.');
@@ -161,6 +179,52 @@ class MailServiceProvider extends ServiceProvider {
 		$this->app['swift.transport'] = $this->app->share(function()
 		{
 			return MailTransport::newInstance();
+		});
+	}
+
+	/**
+	 * Register the Mailgun Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerMailgunTransport($config)
+	{
+		$mailgun = $this->app['config']->get('services.mailgun', array());
+
+		$this->app->bindShared('swift.transport', function() use ($mailgun)
+		{
+			return new MailgunTransport($mailgun['secret'], $mailgun['domain']);
+		});
+	}
+
+	/**
+	 * Register the Mandrill Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerMandrillTransport($config)
+	{
+		$mandrill = $this->app['config']->get('services.mandrill', array());
+
+		$this->app->bindShared('swift.transport', function() use ($mandrill)
+		{
+			return new MandrillTransport($mandrill['secret']);
+		});
+	}
+
+	/**
+	 * Register the "Log" Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerLogTransport($config)
+	{
+		$this->app->bindShared('swift.transport', function($app)
+		{
+			return new LogTransport($app['log']->getMonolog());
 		});
 	}
 

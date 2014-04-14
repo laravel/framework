@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Closure;
-use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface {
@@ -31,6 +29,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 * Create a new database migration repository instance.
 	 *
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  string  $table
 	 * @return void
 	 */
 	public function __construct(Resolver $resolver, $table)
@@ -78,12 +77,12 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Remove a migration from the log.
 	 *
-	 * @param  \StdClass  $migration
+	 * @param  object  $migration
 	 * @return void
 	 */
 	public function delete($migration)
 	{
-		$query = $this->table()->where('migration', $migration->migration)->delete();
+		$this->table()->where('migration', $migration->migration)->delete();
 	}
 
 	/**
@@ -135,9 +134,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	{
 		$schema = $this->getConnection()->getSchemaBuilder();
 
-		$prefix = $this->getConnection()->getTablePrefix();
-
-		return $schema->hasTable($prefix.$this->table);
+		return $schema->hasTable($this->table);
 	}
 
 	/**

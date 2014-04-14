@@ -1,14 +1,14 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use IronMQ;
+use Illuminate\Queue\IronQueue;
 use Illuminate\Container\Container;
 
 class IronJob extends Job {
 
 	/**
-	 * The IronMQ instance.
+	 * The Iron queue instance.
 	 *
-	 * @var IronMQ
+	 * @var \Illuminate\Queue\IronQueue
 	 */
 	protected $iron;
 
@@ -20,29 +20,30 @@ class IronJob extends Job {
 	protected $job;
 
 	/**
-	 * The name of the queue the job came from.
+	 * Indicates if the message was a push message.
 	 *
-	 * @var string
+	 * @var bool
 	 */
-	protected $queue;
+	protected $pushed = false;
 
 	/**
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @param  IronMQ    $iron
-	 * @param  StdClass  $job
-	 * @param  string    $queue
+	 * @param  \Illuminate\Queue\IronQueue  $iron
+	 * @param  object  $job
+	 * @param  string  $queue
+	 * @param  bool    $pushed
 	 * @return void
 	 */
 	public function __construct(Container $container,
-                                IronMQ $iron,
+                                IronQueue $iron,
                                 $job,
-                                $queue)
+                                $pushed = false)
 	{
 		$this->job = $job;
 		$this->iron = $iron;
-		$this->queue = $queue;
+		$this->pushed = $pushed;
 		$this->container = $container;
 	}
 
@@ -53,7 +54,17 @@ class IronJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job->body, true));
+		$this->resolveAndFire(json_decode($this->getRawBody(), true));
+	}
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	public function getRawBody()
+	{
+		return $this->job->body;
 	}
 
 	/**
@@ -63,9 +74,11 @@ class IronJob extends Job {
 	 */
 	public function delete()
 	{
+		parent::delete();
+
 		if (isset($this->job->pushed)) return;
 
-		$this->iron->deleteMessage($this->queue, $this->job->id);
+		$this->iron->deleteMessage($this->getQueue(), $this->job->id);
 	}
 
 	/**
@@ -76,7 +89,24 @@ class IronJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
-		$this->iron->releaseMessage($this->queue, $this->job->id, $delay);
+		if ( ! $this->pushed) $this->delete();
+
+		$this->recreateJob($delay);
+	}
+
+	/**
+	 * Release a pushed job back onto the queue.
+	 *
+	 * @param  int  $delay
+	 * @return void
+	 */
+	protected function recreateJob($delay)
+	{
+		$payload = json_decode($this->job->body, true);
+
+		array_set($payload, 'attempts', array_get($payload, 'attempts', 1) + 1);
+
+		$this->iron->recreate(json_encode($payload), $this->getQueue(), $delay);
 	}
 
 	/**
@@ -86,7 +116,7 @@ class IronJob extends Job {
 	 */
 	public function attempts()
 	{
-		throw new \LogicException("This driver doesn't support attempt counting.");
+		return array_get(json_decode($this->job->body, true), 'attempts', 1);
 	}
 
 	/**
@@ -110,9 +140,9 @@ class IronJob extends Job {
 	}
 
 	/**
-	 * Get the underlying IronMQ instance.
+	 * Get the underlying Iron queue instance.
 	 *
-	 * @return IronMQ
+	 * @return \Illuminate\Queue\IronQueue
 	 */
 	public function getIron()
 	{
@@ -127,6 +157,16 @@ class IronJob extends Job {
 	public function getIronJob()
 	{
 		return $this->job;
+	}
+
+	/**
+	 * Get the name of the queue the job belongs to.
+	 *
+	 * @return string
+	 */
+	public function getQueue()
+	{
+		return array_get(json_decode($this->job->body, true), 'queue');
 	}
 
 }

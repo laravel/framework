@@ -1,5 +1,9 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Cache\CacheManager
+ * @see \Illuminate\Cache\Repository
+ */
 class Cache extends Facade {
 
 	/**

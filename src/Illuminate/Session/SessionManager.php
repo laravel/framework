@@ -1,11 +1,8 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 
 class SessionManager extends Manager {
 
@@ -27,7 +24,7 @@ class SessionManager extends Manager {
 	 */
 	protected function createArrayDriver()
 	{
-		return new Store(new MockArraySessionStorage);
+		return new Store($this->app['config']['session.cookie'], new NullSessionHandler);
 	}
 
 	/**
@@ -43,15 +40,25 @@ class SessionManager extends Manager {
 	}
 
 	/**
-	 * Create an instance of the native session driver.
+	 * Create an instance of the file session driver.
 	 *
-	 * @return \Illuminate\Session\Session
+	 * @return \Illuminate\Session\Store
+	 */
+	protected function createFileDriver()
+	{
+		return $this->createNativeDriver();
+	}
+
+	/**
+	 * Create an instance of the file session driver.
+	 *
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createNativeDriver()
 	{
 		$path = $this->app['config']['session.files'];
 
-		return $this->buildSession(new NativeFileSessionHandler($path));
+		return $this->buildSession(new FileSessionHandler($this->app['files'], $path));
 	}
 
 	/**
@@ -80,9 +87,11 @@ class SessionManager extends Manager {
 		return $this->app['db']->connection($connection);
 	}
 
+
 	/**
 	 * Get the database session options.
 	 *
+	 * @param  string $table
 	 * @return array
 	 */
 	protected function getDatabaseOptions($table)
@@ -93,7 +102,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the APC session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createApcDriver()
 	{
@@ -103,7 +112,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Memcached session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createMemcachedDriver()
 	{
@@ -113,7 +122,7 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Wincache session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createWincacheDriver()
 	{
@@ -123,25 +132,40 @@ class SessionManager extends Manager {
 	/**
 	 * Create an instance of the Redis session driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createRedisDriver()
 	{
-		return $this->createCacheBased('redis');
+		$handler = $this->createCacheHandler('redis');
+
+		$handler->getCache()->getStore()->setConnection($this->app['config']['session.connection']);
+
+		return $this->buildSession($handler);
 	}
+
 
 	/**
 	 * Create an instance of a cache driven driver.
 	 *
-	 * @return \Illuminate\Session\CacheDrivenStore
+	 * @param  string  $driver
+	 * @return \Illuminate\Session\Store
 	 */
 	protected function createCacheBased($driver)
 	{
+		return $this->buildSession($this->createCacheHandler($driver));
+	}
+
+	/**
+	 * Create the cache based session handler instance.
+	 *
+	 * @param  string  $driver
+	 * @return \Illuminate\Session\CacheBasedSessionHandler
+	 */
+	protected function createCacheHandler($driver)
+	{
 		$minutes = $this->app['config']['session.lifetime'];
 
-		$handler = new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
-
-		return $this->buildSession($handler);
+		return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
 	}
 
 	/**
@@ -152,23 +176,17 @@ class SessionManager extends Manager {
 	 */
 	protected function buildSession($handler)
 	{
-		return new Store(new NativeSessionStorage($this->getOptions(), $handler));
+		return new Store($this->app['config']['session.cookie'], $handler);
 	}
 
 	/**
-	 * Get the session options.
+	 * Get the session configuration.
 	 *
 	 * @return array
 	 */
-	protected function getOptions()
+	public function getSessionConfig()
 	{
-		$config = $this->app['config']['session'];
-
-		return array(
-			'cookie_domain' => $config['domain'], 'cookie_lifetime' => $config['lifetime'] * 60,
-			'cookie_path' => $config['path'], 'cookie_httponly' => '1', 'name' => $config['cookie'],
-			'gc_divisor' => $config['lottery'][1], 'gc_probability' => $config['lottery'][0],
-		);
+		return $this->app['config']['session'];
 	}
 
 	/**
@@ -176,9 +194,20 @@ class SessionManager extends Manager {
 	 *
 	 * @return string
 	 */
-	protected function getDefaultDriver()
+	public function getDefaultDriver()
 	{
 		return $this->app['config']['session.driver'];
+	}
+
+	/**
+	 * Set the default session driver name.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setDefaultDriver($name)
+	{
+		$this->app['config']['session.driver'] = $name;
 	}
 
 }

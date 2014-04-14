@@ -357,7 +357,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table `users` add `foo` tinyint(1) not null', $statements[0]);
+		$this->assertEquals('alter table `users` add `foo` tinyint not null', $statements[0]);
 	}
 
 
@@ -369,6 +369,28 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table `users` add `foo` float(5, 2) not null', $statements[0]);
+	}
+
+
+	public function testAddingDouble()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->double('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` double not null', $statements[0]);
+	}
+
+
+	public function testAddingDoubleSpecifyingPrecision()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->double('foo', 15, 8);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` double(15, 8) not null', $statements[0]);
 	}
 
 

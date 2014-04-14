@@ -79,6 +79,17 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDeleteExpiredMethodDeletesExpiredTokens()
+	{
+		$repo = $this->getRepo();
+		$repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
+		$query->shouldReceive('where')->once()->with('created_at', '<', m::any())->andReturn($query);
+		$query->shouldReceive('delete')->once();
+
+		$repo->deleteExpired();
+	}
+
+
 	protected function getRepo()
 	{
 		return new Illuminate\Auth\Reminders\DatabaseReminderRepository(m::mock('Illuminate\Database\Connection'), 'table', 'key');

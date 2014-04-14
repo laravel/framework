@@ -51,7 +51,7 @@ header {
   }
     .exc-title-primary { color: #ED591A; }
     .exc-message {
-      font-size: 32px;
+      font-size: 16px;
       margin: 5px 0;
       word-wrap: break-word;
     }
@@ -78,6 +78,7 @@ header {
   overflow: auto;
   float: left;
   width: 30%;
+  background: #FFF;
 }
   .frame {
     padding: 14px;

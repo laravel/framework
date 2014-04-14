@@ -32,23 +32,6 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testMorphOneWhereClausesCanBeRemoved()
-	{
-		$builder = new EloquentMorphResetBuilderStub;
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
-		$parent->shouldReceive('isSoftDeleting')->andReturn(false);
-		$relation = new MorphOne($builder, $parent, 'morph_type', 'morph_id');
-		$relation->where('foo', '=', 'bar');
-		list($wheres, $bindings) = $relation->getAndResetWheres();
-
-		$this->assertEquals('bar', $bindings[0]);
-		$this->assertEquals('Basic', $wheres[0]['type']);
-		$this->assertEquals('foo', $wheres[0]['column']);
-		$this->assertEquals('bar', $wheres[0]['value']);
-	}
-
-
 	/**
 	 * Note that the tests are the exact same for morph many because the classes share this code...
 	 * Will still test to be safe.
@@ -73,22 +56,6 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testMorphManyWhereClausesCanBeRemoved()
-	{
-		$builder = new EloquentMorphResetBuilderStub;
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
-		$relation = new MorphMany($builder, $parent, 'morph_type', 'morph_id');
-		$relation->where('foo', '=', 'bar');
-		list($wheres, $bindings) = $relation->getAndResetWheres();
-
-		$this->assertEquals('bar', $bindings[0]);
-		$this->assertEquals('Basic', $wheres[0]['type']);
-		$this->assertEquals('foo', $wheres[0]['column']);
-		$this->assertEquals('bar', $wheres[0]['value']);
-	}
-
-
 	public function testCreateFunctionOnMorph()
 	{
 		// Doesn't matter which relation type we use since they share the code...
@@ -108,9 +75,9 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
-		return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id');
+		return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
 	}
 
 
@@ -121,9 +88,9 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
-		return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id');
+		return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
 	}
 
 }

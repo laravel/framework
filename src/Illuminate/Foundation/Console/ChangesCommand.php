@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class ChangesCommand extends Command {
@@ -54,7 +53,7 @@ class ChangesCommand extends Command {
 	 * Format the given change message.
 	 *
 	 * @param  array   $change
-	 * @return stirng
+	 * @return string
 	 */
 	protected function formatMessage(array $change)
 	{

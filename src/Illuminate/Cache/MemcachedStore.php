@@ -1,11 +1,13 @@
-<?php namespace Illuminate\Cache; use Memcached;
+<?php namespace Illuminate\Cache;
 
-class MemcachedStore implements StoreInterface {
+use Memcached;
+
+class MemcachedStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * The Memcached instance.
 	 *
-	 * @var Memcached
+	 * @var \Memcached
 	 */
 	protected $memcached;
 
@@ -19,14 +21,14 @@ class MemcachedStore implements StoreInterface {
 	/**
 	 * Create a new Memcached store.
 	 *
-	 * @param  Memcached  $memcached
+	 * @param  \Memcached  $memcached
 	 * @param  string     $prefix
 	 * @return void
 	 */
 	public function __construct(Memcached $memcached, $prefix = '')
 	{
-		$this->prefix = $prefix.':';
 		$this->memcached = $memcached;
+		$this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
 	}
 
 	/**
@@ -113,17 +115,6 @@ class MemcachedStore implements StoreInterface {
 	public function flush()
 	{
 		$this->memcached->flush();
-	}
-
-	/**
-	 * Begin executing a new section operation.
-	 *
-	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
-	 */
-	public function section($name)
-	{
-		return new Section($this, $name);
 	}
 
 	/**

@@ -1,198 +1,59 @@
 <?php namespace Illuminate\Support;
 
-use Closure;
-use Serializable;
-use SplFileObject;
-use ReflectionFunction;
+use Jeremeamia\SuperClosure\SerializableClosure as SuperClosure;
 
 /**
- * Do not use this class unless you really know what you're doing!
- *
- * @author Taylor Otwell <@taylorotwell>
- * @author Jeremy Lindblom <@jeremeamia>
+ * Extends SuperClosure for backwards compatibility.
  */
-class SerializableClosure implements Serializable {
+class SerializableClosure extends SuperClosure {
 
 	/**
-	 * The Closure instance.
-	 *
-	 * @var \Closure
-	 */
-	protected $closure;
-
-	/**
-	 * The ReflectionFunction instance of the Closure.
-	 *
-	 * @var \ReflectionFunction
-	 */
-	protected $reflection;
-
-	/**
-	 * The code contained by the Closure.
+	 * The code for the closure
 	 *
 	 * @var string
 	 */
 	protected $code;
 
 	/**
-	 * Create a new serializable Closure instance.
+	 * The variables that were "used" or imported from the parent scope
 	 *
-	 * @param  \Closure  $closure
-	 * @return void
+	 * @var array
 	 */
-	public function __construct(Closure $closure)
-	{
-		$this->closure = $closure;
-
-		$this->reflection = new ReflectionFunction($closure);
-	}
+	protected $variables;
 
 	/**
-	 * Get the code for the Closure.
+	 * Returns the code of the closure being serialized
 	 *
 	 * @return string
 	 */
 	public function getCode()
 	{
-		return $this->code ?: $this->code = $this->getCodeFromFile();
+		$this->determineCodeAndVariables();
+
+		return $this->code;
 	}
 
 	/**
-	 * Extract the code from the Closure's file.
-	 *
-	 * @return string
-	 */
-	protected function getCodeFromFile()
-	{
-		$file = $this->getFile();
-
-		$code = '';
-
-		// Next, we will just loop through the lines of the file until we get to the end
-		// of the Closure. Then, we will return the complete contents of this Closure
-		// so it can be serialized with these variables and stored for later usage.
-		while ($file->key() < $this->reflection->getEndLine())
-		{
-			$code .= $file->current(); $file->next();
-		}
-
-		$begin = strpos($code, 'function(');
-
-		return substr($code, $begin, strrpos($code, '}') - $begin + 1);
-	}
-
-	/**
-	 * Get an SplObjectFile object at the starting line of the Closure.
-	 *
-	 * @return \SplFileObject
-	 */
-	protected function getFile()
-	{
-		$file = new SplFileObject($this->reflection->getFileName());
-
-		$file->seek($this->reflection->getStartLine() - 1);
-
-		return $file;
-	}
-
-	/**
-	 * Get the variables used by the Closure.
+	 * Returns the "used" variables of the closure being serialized
 	 *
 	 * @return array
 	 */
 	public function getVariables()
 	{
-		if ( ! $this->getUseIndex()) return array();
+		$this->determineCodeAndVariables();
 
-		$staticVariables = $this->reflection->getStaticVariables();
+		return $this->variables;
+	}
 
-		// When looping through the variables, we will only take the variables that are
-		// specified in the use clause, and will not take any other static variables
-		// that may be used by the Closures, allowing this to re-create its state.
-		$usedVariables = array();
-
-		foreach ($this->getUseClauseVariables() as $variable)
+	/**
+	 * Uses the serialize method directly to lazily fetch the code and variables if needed
+	 */
+	protected function determineCodeAndVariables()
+	{
+		if (!$this->code)
 		{
-			$variable = trim($variable, ' $&');
-
-			$usedVariables[$variable] = $staticVariables[$variable];
+			list($this->code, $this->variables) = unserialize($this->serialize());
 		}
-
-		return $usedVariables;
-	}
-
-	/**
-	 * Get the variables from the "use" clause.
-	 *
-	 * @return array
-	 */
-	protected function getUseClauseVariables()
-	{
-		$begin = strpos($code = $this->getCode(), '(', $this->getUseIndex()) + 1;
-
-		return explode(',', substr($code, $begin, strpos($code, ')', $begin) - $begin));
-	}
-
-	/**
-	 * Get the index location of the "use" clause.
-	 *
-	 * @return int
-	 */
-	protected function getUseIndex()
-	{
-		return stripos(strtok($this->getCode(), PHP_EOL), ' use ');
-	}
-
-	/**
-	 * Serialize the Closure instance.
-	 *
-	 * @return string
-	 */
-	public function serialize()
-	{
-		return serialize(array(
-			'code' => $this->getCode(), 'variables' => $this->getVariables()
-		));
-	}
-
-	/**
-	 * Unserialize the Closure instance.
-	 *
-	 * @param  string  $serialized
-	 * @return void
-	 */
-	public function unserialize($serialized)
-	{
-		$payload = unserialize($serialized);
-
-		// We will extract the variables into the current scope so that as the Closure
-		// is built it will inherit the scope it had before it was serialized which
-		// will emulate the Closures existing in that scope instead of right now.
-		extract($payload['variables']);
-
-		eval('$this->closure = '.$payload['code'].';');
-
-		$this->reflection = new ReflectionFunction($this->closure);
-	}
-
-	/**
-	 * Get the unserialized Closure instance.
-	 *
-	 * @return \Closure
-	 */
-	public function getClosure()
-	{
-		return $this->closure;
-	}
-
-	/**
-	 * Invoke the contained Closure.
-	 *
-	 * @return mixed
-	 */
-	public function __invoke()
-	{
-		return call_user_func_array($this->closure, func_get_args());
 	}
 
 }

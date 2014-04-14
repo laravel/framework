@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
-use DateTime;
-use Carbon\Carbon;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -31,10 +30,17 @@ abstract class Relation {
 	protected $related;
 
 	/**
+	 * Indicates if the relation is adding constraints.
+	 *
+	 * @var bool
+	 */
+	protected static $constraints = true;
+
+	/**
 	 * Create a new relation instance.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
-	 * @param  \Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent)
@@ -88,6 +94,16 @@ abstract class Relation {
 	abstract public function getResults();
 
 	/**
+	 * Get the relationship for eager loading.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Collection
+	 */
+	public function getEager()
+	{
+		return $this->get();
+	}
+
+	/**
 	 * Touch all of the related models for the relationship.
 	 *
 	 * @return void
@@ -96,17 +112,7 @@ abstract class Relation {
 	{
 		$column = $this->getRelated()->getUpdatedAtColumn();
 
-		$this->rawUpdate(array($column => $this->getRelated()->freshTimestamp()));
-	}
-
-	/**
-	 * Restore all of the soft deleted related models.
-	 *
-	 * @return int
-	 */
-	public function restore()
-	{
-		return $this->query->withTrashed()->restore();
+		$this->rawUpdate(array($column => $this->getRelated()->freshTimestampString()));
 	}
 
 	/**
@@ -121,113 +127,53 @@ abstract class Relation {
 	}
 
 	/**
-	 * Remove the original where clause set by the relationship.
+	 * Add the constraints for a relationship count query.
 	 *
-	 * The remaining constraints on the query will be reset and returned.
-	 *
-	 * @return array
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function getAndResetWheres()
+	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
-		// When a model is "soft deleting", the "deleted at" where clause will be the
-		// first where clause on the relationship query, so we will actually clear
-		// the second where clause as that is the lazy loading relations clause.
-		if ($this->query->getModel()->isSoftDeleting())
-		{
-			$this->removeSecondWhereClause();
-		}
+		$query->select(new Expression('count(*)'));
 
-		// When the model isn't soft deleting the where clause added by the lazy load
-		// relation query will be the first where clause on this query, so we will
-		// remove that to make room for the eager load constraints on the query.
-		else
-		{
-			$this->removeFirstWhereClause();
-		}
+		$key = $this->wrap($this->getQualifiedParentKeyName());
 
-		return $this->getBaseQuery()->getAndResetWheres();
+		return $query->where($this->getHasCompareKey(), '=', new Expression($key));
 	}
 
 	/**
-	 * Remove the first where clause from the relationship query.
+	 * Run a callback with constrains disabled on the relation.
 	 *
-	 * @return void
+	 * @param  \Closure  $callback
+	 * @return mixed
 	 */
-	protected function removeFirstWhereClause()
+	public static function noConstraints(Closure $callback)
 	{
-		$first = array_shift($this->getBaseQuery()->wheres);
-
-		return $this->removeWhereBinding($first);
-	}
-
-	/**
-	 * Remove the second where clause from the relationship query.
-	 *
-	 * @return void
-	 */
-	protected function removeSecondWhereClause()
-	{
-		$wheres =& $this->getBaseQuery()->wheres;
-
-		// We'll grab the second where clause off of the set of wheres, and then reset
-		// the where clause keys so there are no gaps in the numeric keys. Then we
-		// remove the binding from the query so it doesn't mess things when run.
-		$second = $wheres[1]; unset($wheres[1]);
-
-		$wheres = array_values($wheres);
-
-		return $this->removeWhereBinding($second);
-	}
-
-	/**
-	 * Remove a where clause from the relationship query.
-	 *
-	 * @param  array  $clause
-	 * @return void
-	 */
-	public function removeWhereBinding($clause)
-	{
-		$query = $this->getBaseQuery();
-
-		$bindings = $query->getBindings();
+		static::$constraints = false;
 
 		// When resetting the relation where clause, we want to shift the first element
 		// off of the bindings, leaving only the constraints that the developers put
 		// as "extra" on the relationships, and not original relation constraints.
-		if (array_key_exists('value', $clause))
-		{
-			$bindings = array_slice($bindings, 1);
-		}
+		$results = call_user_func($callback);
 
-		$query->setBindings(array_values($bindings));
-	}
+		static::$constraints = true;
 
-	/**
-	 * Add the constraints for a relationship count query.
-	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder  $query
-	 * @return \Illuminate\Database\Eloquent\Builder
-	 */
-	public function getRelationCountQuery(Builder $query)
-	{
-		$query->select(new Expression('count(*)'));
-
-		$key = $this->wrap($this->parent->getQualifiedKeyName());
-
-		return $query->where($this->getForeignKey(), '=', new Expression($key));
+		return $results;
 	}
 
 	/**
 	 * Get all of the primary keys for an array of models.
 	 *
-	 * @param  array  $models
+	 * @param  array   $models
+	 * @param  string  $key
 	 * @return array
 	 */
-	protected function getKeys(array $models)
+	protected function getKeys(array $models, $key = null)
 	{
-		return array_values(array_map(function($value)
+		return array_values(array_map(function($value) use ($key)
 		{
-			return $value->getKey();
+			return $key ? $value->getAttribute($key) : $value->getKey();
 
 		}, $models));
 	}
@@ -260,6 +206,16 @@ abstract class Relation {
 	public function getParent()
 	{
 		return $this->parent;
+	}
+
+	/**
+	 * Get the fully qualified parent key naem.
+	 *
+	 * @return string
+	 */
+	protected function getQualifiedParentKeyName()
+	{
+		return $this->parent->getQualifiedKeyName();
 	}
 
 	/**

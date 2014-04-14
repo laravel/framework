@@ -20,7 +20,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('create table "users" ("id" integer null primary key autoincrement, "email" varchar null)', $statements[0]);
+		$this->assertEquals('create table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
 
 		$blueprint = new Blueprint('users');
 		$blueprint->increments('id');
@@ -29,8 +29,8 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(2, count($statements));
 		$expected = array(
-			'alter table "users" add column "id" integer null primary key autoincrement',
-			'alter table "users" add column "email" varchar null',
+			'alter table "users" add column "id" integer not null primary key autoincrement',
+			'alter table "users" add column "email" varchar not null',
 		);
 		$this->assertEquals($expected, $statements);
 	}
@@ -55,26 +55,6 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('drop table if exists "users"', $statements[0]);
-	}
-
-
-	public function testDropColumn()
-	{
-		$connection = m::mock('Illuminate\Database\Connection');
-		$connection->shouldReceive('getDoctrineSchemaManager')->once()->andReturn($schema = m::mock('Doctrine\DBAL\Schema\SqliteSchemaManager'));
-
-		$grammar = $this->getMock('Illuminate\Database\Schema\Grammars\SQLiteGrammar', array('getDoctrineTableDiff'));
-		$grammar->expects($this->once())->method('getDoctrineTableDiff')->will($this->returnValue($diff = (object) array('removedColumns' => array())));
-
-		$connection->shouldReceive('getDoctrineColumn')->once()->with('users', 'foo')->andReturn('bar');
-
-		$schema->shouldReceive('getDatabasePlatform')->once()->andReturn($platform = m::mock('StdClass'));
-		$platform->shouldReceive('getAlterTableSQL')->once()->andReturnUsing(function($diff) { return $diff; });
-
-		$blueprint = new Blueprint('users');
-		$blueprint->dropColumn('foo');
-
-		$this->assertEquals(array('removedColumns' => array('foo' => 'bar')), $blueprint->toSql($connection, $grammar));
 	}
 
 
@@ -119,7 +99,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('create table "users" ("foo" varchar null, primary key ("foo"))', $statements[0]);
+		$this->assertEquals('create table "users" ("foo" varchar not null, primary key ("foo"))', $statements[0]);
 	}
 
 
@@ -133,7 +113,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('create table "users" ("foo" varchar null, "order_id" varchar null, foreign key("order_id") references "orders"("id"), primary key ("foo"))', $statements[0]);
+		$this->assertEquals('create table "users" ("foo" varchar not null, "order_id" varchar not null, foreign key("order_id") references "orders"("id"), primary key ("foo"))', $statements[0]);
 	}
 
 
@@ -166,7 +146,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "id" integer null primary key autoincrement', $statements[0]);
+		$this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
 	}
 
 
@@ -177,7 +157,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "id" integer null primary key autoincrement', $statements[0]);
+		$this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
 	}
 
 
@@ -188,14 +168,14 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" varchar null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
 
 		$blueprint = new Blueprint('users');
 		$blueprint->string('foo', 100);
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" varchar null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
 
 		$blueprint = new Blueprint('users');
 		$blueprint->string('foo', 100)->nullable()->default('bar');
@@ -213,7 +193,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" text null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" text not null', $statements[0]);
 	}
 
 
@@ -224,14 +204,14 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
 
 		$blueprint = new Blueprint('users');
 		$blueprint->bigInteger('foo', true);
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null primary key autoincrement', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" integer not null primary key autoincrement', $statements[0]);
 	}
 
 
@@ -242,14 +222,14 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
 
 		$blueprint = new Blueprint('users');
 		$blueprint->integer('foo', true);
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null primary key autoincrement', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" integer not null primary key autoincrement', $statements[0]);
 	}
 
 
@@ -260,7 +240,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
 	}
 
 
@@ -271,7 +251,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
 	}
 
 
@@ -282,7 +262,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" integer null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
 	}
 
 
@@ -293,7 +273,18 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" float null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" float not null', $statements[0]);
+	}
+
+
+	public function testAddingDouble()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->double('foo', 15, 8);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" float not null', $statements[0]);
 	}
 
 
@@ -304,7 +295,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" float null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" float not null', $statements[0]);
 	}
 
 
@@ -315,7 +306,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" tinyint null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" tinyint not null', $statements[0]);
 	}
 
 
@@ -326,7 +317,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" varchar null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
 	}
 
 
@@ -337,7 +328,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" date null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" date not null', $statements[0]);
 	}
 
 
@@ -348,7 +339,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" datetime null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" datetime not null', $statements[0]);
 	}
 
 
@@ -359,7 +350,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" time null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" time not null', $statements[0]);
 	}
 
 
@@ -370,7 +361,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" datetime null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" datetime not null', $statements[0]);
 	}
 
 
@@ -382,8 +373,8 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(2, count($statements));
 		$expected = array(
-			'alter table "users" add column "created_at" datetime null',
-			'alter table "users" add column "updated_at" datetime null'
+			'alter table "users" add column "created_at" datetime not null',
+			'alter table "users" add column "updated_at" datetime not null'
 		);
 		$this->assertEquals($expected, $statements);
 	}
@@ -396,7 +387,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" blob null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" blob not null', $statements[0]);
 	}
 
 

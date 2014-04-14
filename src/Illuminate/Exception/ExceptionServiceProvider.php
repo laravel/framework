@@ -1,11 +1,9 @@
 <?php namespace Illuminate\Exception;
 
-use Closure;
+use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Debug\ExceptionHandler as KernelHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
 
@@ -55,9 +53,17 @@ class ExceptionServiceProvider extends ServiceProvider {
 	{
 		$this->app['exception.plain'] = $this->app->share(function($app)
 		{
-			$handler = new KernelHandler($app['config']['app.debug']);
-
-			return new SymfonyDisplayer($handler);
+			// If the application is running in a console environment, we will just always
+			// use the debug handler as there is no point in the console ever returning
+			// out HTML. This debug handler always returns JSON from the console env.
+			if ($app->runningInConsole())
+			{
+				return $app['exception.debug'];
+			}
+			else
+			{
+				return new PlainDisplayer;
+			}
 		});
 	}
 
@@ -90,7 +96,9 @@ class ExceptionServiceProvider extends ServiceProvider {
 			// We will instruct Whoops to not exit after it displays the exception as it
 			// will otherwise run out before we can do anything else. We just want to
 			// let the framework go ahead and finish a request on this end instead.
-			with($whoops = new \Whoops\Run)->allowQuit(false);
+			with($whoops = new Run)->allowQuit(false);
+
+			$whoops->writeToOutput(false);
 
 			return $whoops->pushHandler($app['whoops.handler']);
 		});
@@ -123,9 +131,17 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function shouldReturnJson()
 	{
-		$definitely = ($this->app['request']->ajax() or $this->app->runningInConsole());
+		return $this->app->runningInConsole() || $this->requestWantsJson();
+	}
 
-		return $definitely or $this->app['request']->wantsJson();
+	/**
+	 * Determine if the request warrants a JSON response.
+	 *
+	 * @return bool
+	 */
+	protected function requestWantsJson()
+	{
+		return $this->app['request']->ajax() || $this->app['request']->wantsJson();
 	}
 
 	/**
@@ -135,16 +151,14 @@ class ExceptionServiceProvider extends ServiceProvider {
 	 */
 	protected function registerPrettyWhoopsHandler()
 	{
-		$me = $this;
-		
-		$this->app['whoops.handler'] = $this->app->share(function() use ($me)
+		$this->app['whoops.handler'] = $this->app->share(function()
 		{
 			with($handler = new PrettyPageHandler)->setEditor('sublime');
 
 			// If the resource path exists, we will register the resource path with Whoops
 			// so our custom Laravel branded exception pages will be used when they are
 			// displayed back to the developer. Otherwise, the default pages are run.
-			if ( ! is_null($path = $me->resourcePath()))
+			if ( ! is_null($path = $this->resourcePath()))
 			{
 				$handler->setResourcesPath($path);
 			}

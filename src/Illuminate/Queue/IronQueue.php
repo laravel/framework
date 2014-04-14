@@ -37,20 +37,29 @@ class IronQueue extends Queue implements QueueInterface {
 	protected $default;
 
 	/**
+	 * Indicates if the messages should be encrypted.
+	 *
+	 * @var bool
+	 */
+	protected $shouldEncrypt;
+
+	/**
 	 * Create a new IronMQ queue instance.
 	 *
 	 * @param  \IronMQ  $iron
 	 * @param  \Illuminate\Encryption\Encrypter  $crypt
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
+	 * @param  bool  $shouldEncrypt
 	 * @return void
 	 */
-	public function __construct(IronMQ $iron, Encrypter $crypt, Request $request, $default)
+	public function __construct(IronMQ $iron, Encrypter $crypt, Request $request, $default, $shouldEncrypt = false)
 	{
 		$this->iron = $iron;
 		$this->crypt = $crypt;
 		$this->request = $request;
 		$this->default = $default;
+		$this->shouldEncrypt = $shouldEncrypt;
 	}
 
 	/**
@@ -59,29 +68,59 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
+		return $this->pushRaw($this->createPayload($job, $data, $queue), $queue);
+	}
 
-		$this->iron->postMessage($this->getQueue($queue), $payload);
+	/**
+	 * Push a raw payload onto the queue.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  array   $options
+	 * @return mixed
+	 */
+	public function pushRaw($payload, $queue = null, array $options = array())
+	{
+		if ($this->shouldEncrypt) $payload = $this->crypt->encrypt($payload);
+
+		return $this->iron->postMessage($this->getQueue($queue), $payload, $options)->id;
+	}
+
+	/**
+	 * Push a raw payload onto the queue after encrypting the payload.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  int     $delay
+	 * @return mixed
+	 */
+	public function recreate($payload, $queue = null, $delay)
+	{
+		$options = array('delay' => $this->getSeconds($delay));
+
+		return $this->pushRaw($payload, $queue, $options);
 	}
 
 	/**
 	 * Push a new job onto the queue after a delay.
 	 *
-	 * @param  int     $delay
+	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
+		$delay = $this->getSeconds($delay);
 
-		$this->iron->postMessage($this->getQueue($queue), $payload, compact('delay'));
+		$payload = $this->createPayload($job, $data, $queue);
+
+		return $this->pushRaw($payload, $this->getQueue($queue), compact('delay'));
 	}
 
 	/**
@@ -101,16 +140,28 @@ class IronQueue extends Queue implements QueueInterface {
 		// queues will be a security hazard to unsuspecting developers using it.
 		if ( ! is_null($job))
 		{
-			$job->body = $this->crypt->decrypt($job->body);
+			$job->body = $this->parseJobBody($job->body);
 
-			return new IronJob($this->container, $this->iron, $job, $queue);
+			return new IronJob($this->container, $this, $job);
 		}
+	}
+
+	/**
+	 * Delete a message from the Iron queue.
+	 *
+	 * @param  string  $queue
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function deleteMessage($queue, $id)
+	{
+		$this->iron->deleteMessage($queue, $id);
 	}
 
 	/**
 	 * Marshal a push queue request and fire the job.
 	 *
-	 * @return Illuminate\Http\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function marshal()
 	{
@@ -122,13 +173,13 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Marshal out the pushed job and payload.
 	 *
-	 * @return StdClass
+	 * @return object
 	 */
 	protected function marshalPushedJob()
 	{
 		$r = $this->request;
 
-		$body = $this->crypt->decrypt($r->getContent());
+		$body = $this->parseJobBody($r->getContent());
 
 		return (object) array(
 			'id' => $r->header('iron-message-id'), 'body' => $body, 'pushed' => true,
@@ -138,12 +189,12 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new IronJob for a pushed job.
 	 *
-	 * @param  \StdClass  $job
+	 * @param  object  $job
 	 * @return \Illuminate\Queue\Jobs\IronJob
 	 */
 	protected function createPushedIronJob($job)
 	{
-		return new IronJob($this->container, $this->iron, $job, $this->default);
+		return new IronJob($this->container, $this, $job, true);
 	}
 
 	/**
@@ -151,11 +202,25 @@ class IronQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  string  $job
 	 * @param  mixed   $data
+	 * @param  string  $queue
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $queue = null)
 	{
-		return $this->crypt->encrypt(parent::createPayload($job, $data));
+		$payload = $this->setMeta(parent::createPayload($job, $data), 'attempts', 1);
+
+		return $this->setMeta($payload, 'queue', $this->getQueue($queue));
+	}
+
+	/**
+	 * Parse the job body for firing.
+	 *
+	 * @param  string  $body
+	 * @return string
+	 */
+	protected function parseJobBody($body)
+	{
+		return $this->shouldEncrypt ? $this->crypt->decrypt($body) : $body;
 	}
 
 	/**
@@ -177,6 +242,27 @@ class IronQueue extends Queue implements QueueInterface {
 	public function getIron()
 	{
 		return $this->iron;
+	}
+
+	/**
+	 * Get the request instance.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Set the request instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
 	}
 
 }
