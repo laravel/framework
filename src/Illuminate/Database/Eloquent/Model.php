@@ -199,6 +199,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $unguarded = false;
 
 	/**
+	 * Indicates if array attribute hiding is enabled.
+	 *
+	 * @var bool
+	 */
+	protected static $unhidden = false;
+
+	/**
 	 * The cache of the mutated attributes for each class.
 	 *
 	 * @var array
@@ -2053,6 +2060,37 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Disable all attribute view restrictions.
+	 *
+	 * @return void
+	 */
+	public static function unhide()
+	{
+		static::$unhidden = true;
+	}
+
+	/**
+	 * Enable the attribute view restrictions.
+	 *
+	 * @return void
+	 */
+	public static function rehide()
+	{
+		static::$unhidden = false;
+	}
+
+	/**
+	 * Set "unhidden" to a given state.
+	 *
+	 * @param  bool  $state
+	 * @return void
+	 */
+	public static function setUnhideState($state)
+	{
+		static::$unhidden = $state;
+	}
+
+	/**
 	 * Determine if the given attribute may be mass assigned.
 	 *
 	 * @param  string  $key
@@ -2091,6 +2129,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function totallyGuarded()
 	{
 		return count($this->fillable) == 0 && $this->guarded == array('*');
+	}
+
+	/**
+	 * Determine if the given key is hidden.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function isHidden($key)
+	{
+		return  (!static::$unhidden && in_array($key, $this->hidden));
 	}
 
 	/**
@@ -2224,7 +2273,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($this->getArrayableRelations() as $key => $value)
 		{
-			if (in_array($key, $this->hidden)) continue;
+			if ($this->isHidden($key)) continue;
 
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
@@ -2280,6 +2329,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getArrayableItems(array $values)
 	{
+		if (static::$unhidden) {
+			return $values;
+		}
+
 		if (count($this->visible) > 0)
 		{
 			return array_intersect_key($values, array_flip($this->visible));
