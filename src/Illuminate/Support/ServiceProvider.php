@@ -116,6 +116,13 @@ abstract class ServiceProvider {
 			$paths['asset'] = $asset;
 		}
 
+		$migrations = isset($paths['migrations']) ? $paths['migrations'] : $path.'/migrations';
+
+		if ($this->app['files']->isDirectory($migrations))
+		{
+			$paths['migrations'] = $migrations;
+		}
+
 		$this->app->registerPackage($package, $paths);
 	}
 
