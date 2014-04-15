@@ -208,6 +208,25 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$user->shouldReceive('getAuthIdentifier')->andReturn('foo');
 		$user->shouldReceive('getRememberToken')->andReturn('recaller');
+		$user->shouldReceive('setRememberToken')->never();
+		$provider->shouldReceive('updateRememberToken')->never();
+		$guard->login($user, true);
+	}
+
+
+	public function testLoginMethodCreatesRememberTokenIfOneDoesntExist()
+	{
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
+		$guard->setCookieJar($cookie);
+		$foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
+		$cookie->shouldReceive('forever')->once()->andReturn($foreverCookie);
+		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
+		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
+		$session->shouldReceive('migrate')->once();
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$user->shouldReceive('getAuthIdentifier')->andReturn('foo');
+		$user->shouldReceive('getRememberToken')->andReturn(null);
 		$user->shouldReceive('setRememberToken')->once();
 		$provider->shouldReceive('updateRememberToken')->once();
 		$guard->login($user, true);
