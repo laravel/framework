@@ -17,13 +17,6 @@ interface UserInterface {
 	public function getAuthPassword();
 
 	/**
-	 * Get the column name for the "remember me" token.
-	 *
-	 * @return string
-	 */
-	public function getRememberTokenName();
-
-	/**
 	 * Get the token value for the "remember me" session.
 	 *
 	 * @return string
@@ -37,5 +30,12 @@ interface UserInterface {
 	 * @return void
 	 */
 	public function setRememberToken($value);
+
+	/**
+	 * Get the column name for the "remember me" token.
+	 *
+	 * @return string
+	 */
+	public function getRememberTokenName();
 
 }
