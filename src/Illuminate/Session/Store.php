@@ -594,7 +594,7 @@ class Store implements SessionInterface {
 	 * @param string $default
 	 * @return mixed
 	 */
-	public function getAndForget($key, $default = null)
+	public function once($key, $default = null)
 	{
 		$item = $this->get($key, $default);
 		$this->forget($key);
