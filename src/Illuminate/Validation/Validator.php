@@ -1711,7 +1711,9 @@ class Validator implements MessageProviderInterface {
 	{
 		$other = $this->getAttribute($parameters[0]);
 
-		return str_replace(array(':other', ':value'), array($other, implode(' / ', array_slice($parameters,1))), $message);
+		$replace = array($other, implode(' / ', array_slice($parameters, 1)));
+
+		return str_replace(array(':other', ':value'), $replace, $message);
 	}
 
 	/**
