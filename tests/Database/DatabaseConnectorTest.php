@@ -29,7 +29,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
 		$connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($connection);
 		$connection->shouldReceive('execute')->once();
-		$connection->shouldReceive('exec')->zeroOrMoreTimes()
+		$connection->shouldReceive('exec')->zeroOrMoreTimes();
 		$result = $connector->connect($config);
 
 		$this->assertTrue($result === $connection);
