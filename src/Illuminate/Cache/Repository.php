@@ -62,6 +62,22 @@ class Repository implements ArrayAccess {
 	}
 
 	/**
+	 * Retrieve an item from the cache by key and delete it.
+	 *
+	 * @param  string $key
+	 * @param  mixed  $default
+	 *
+	 * @return mixed
+	 */
+	public function pick($key, $default = null)
+	{
+		$value = $this->get($key, $default);
+		$this->forget($key);
+
+		return $value;
+	}
+
+	/**
 	 * Store an item in the cache.
 	 *
 	 * @param  string  $key
