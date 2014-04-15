@@ -1709,9 +1709,9 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
 	{
-		$parameters[0] = $this->getAttribute($parameters[0]);
+		$other = $this->getAttribute($parameters[0]);
 
-		return str_replace(array(':other', ':value'), $parameters, $message);
+		return str_replace(array(':other', ':value'), array($other, implode(' / ', array_slice($parameters,1))), $message);
 	}
 
 	/**
