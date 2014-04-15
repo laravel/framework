@@ -505,7 +505,10 @@ class Guard {
 		// listening for anytime a user signs out of this application manually.
 		$this->clearUserDataFromStorage();
 
-		$this->refreshRememberToken($user);
+		if ( ! is_null($this->user))
+		{
+			$this->refreshRememberToken($user);
+		}
 
 		if (isset($this->events))
 		{
