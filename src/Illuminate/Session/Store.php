@@ -592,6 +592,7 @@ class Store implements SessionInterface {
 	 * 
 	 * @param string $key
 	 * @param string $default
+	 * @return mixed
 	 */
 	public function getAndForget($key, $default = null)
 	{
