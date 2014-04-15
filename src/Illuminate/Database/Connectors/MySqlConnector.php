@@ -57,7 +57,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 
 		$dsn = "mysql:dbname={$database}";
 		
-		if (isset($config['unix_socket'])) 
+		if (!isset($config['unix_socket'])) 
 		{
 			$dsn .= ";host={$host}";
 	
