@@ -586,5 +586,18 @@ class Store implements SessionInterface {
 			$this->handler->setRequest($request);
 		}
 	}
+	
+	/**
+	 * Get the value of a given key and then forget it.
+	 * 
+	 * @param string $key
+	 * @param string $default
+	 */
+	public function getAndForget($key, $default = null)
+	{
+		$item = $this->get($key, $default);
+		$this->forget($key);
+		return $item;
+	}
 
 }
