@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Console;
 
+use Symfony\Component\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Question\Question;
@@ -254,19 +255,21 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		return $helper->ask($this->input, $this->output, $question);
 	}
 
-	/**
-	 * Format input to textual table
-	 *
-	 * @param  array $headers
-	 * @param  array $rows
-	 * @return void
-	 */
-	public function table(array $headers, array $rows)
+    /**
+     * Format input to textual table
+     *
+     * @param  array $headers
+     * @param  array $rows
+     * @param string $style
+     * @return void
+     */
+	public function table(array $headers, array $rows, $style = 'default')
 	{
-		$table = $this->getHelperSet()->get('table');
+		$table = new Table($this->output);
 		$table->setHeaders($headers);
 		$table->setRows($rows);
-		$table->render($this->output);
+        $table->setStyle($style);
+		$table->render();
 	}
 
 	/**
