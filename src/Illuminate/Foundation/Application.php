@@ -27,7 +27,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.1.26';
+	const VERSION = '4.1.27';
 
 	/**
 	 * Indicates if the application has "booted".
