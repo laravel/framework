@@ -53,7 +53,15 @@ class MigrateCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-		$this->prepareDatabase();
+        $proceed = $this->confirmToProceed();
+
+        if( ! $proceed )
+        {
+            $this->output->writeln('<info>Did not migrated</info>');
+            return;
+        }
+
+        $this->prepareDatabase();
 
 		// The pretend option can be used for "simulating" the migration and grabbing
 		// the SQL queries that would fire if the migration were to be run against

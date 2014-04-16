@@ -1,10 +1,9 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class RollbackCommand extends Command {
+class RollbackCommand extends BaseCommand {
 
 	/**
 	 * The console command name.
@@ -47,6 +46,14 @@ class RollbackCommand extends Command {
 	 */
 	public function fire()
 	{
+        $proceed = $this->confirmToProceed();
+
+        if( ! $proceed )
+        {
+            $this->output->writeln('Did not Rollback migrations');
+            return;
+        }
+
 		$this->migrator->setConnection($this->input->getOption('database'));
 
 		$pretend = $this->input->getOption('pretend');
