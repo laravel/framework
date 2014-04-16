@@ -14,7 +14,7 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 	public function testRollbackCommandCallsMigratorWithProperArguments()
 	{
 		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
-        $command->setLaravel(new AppDatabaseMigrationRollbackStub());
+		$command->setLaravel(new AppDatabaseMigrationRollbackStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('rollback')->once()->with(false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
@@ -26,7 +26,7 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 	public function testRollbackCommandCanBePretended()
 	{
 		$command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
-        $command->setLaravel(new AppDatabaseMigrationRollbackStub());
+		$command->setLaravel(new AppDatabaseMigrationRollbackStub());
 		$migrator->shouldReceive('setConnection')->once()->with('foo');
 		$migrator->shouldReceive('rollback')->once()->with(true);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
@@ -43,6 +43,6 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 }
 
 class AppDatabaseMigrationRollbackStub {
-    public $env = 'development';
-    public function environment() { return $this->env; }
+	public $env = 'development';
+	public function environment() { return $this->env; }
 }

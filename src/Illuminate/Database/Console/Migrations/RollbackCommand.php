@@ -46,13 +46,7 @@ class RollbackCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-        $proceed = $this->confirmToProceed();
-
-        if( ! $proceed )
-        {
-            $this->output->writeln('Did not Rollback migrations');
-            return;
-        }
+		if( ! $this->confirmToProceed()) return;
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 

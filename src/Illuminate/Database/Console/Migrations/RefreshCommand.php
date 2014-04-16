@@ -25,13 +25,7 @@ class RefreshCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-        $proceed = $this->confirmToProceed();
-
-        if( ! $proceed )
-        {
-            $this->output->writeln('Did not refreshed migrations');
-            return;
-        }
+		if( ! $this->confirmToProceed()) return;
 
 		$database = $this->input->getOption('database');
 
