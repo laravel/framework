@@ -50,6 +50,17 @@ class ConfigPublishCommand extends Command {
 	{
 		$package = $this->input->getArgument('package');
 
+        if($this->config->alreadyExists($package))
+        {
+            $overwrite = $this->confirm('Package Config Already Published. Overwrite previous configuration (Yes or No) ?');
+
+            if( ! $overwrite)
+            {
+                $this->output->writeln('<info>Configuration not published for package: </info>'.$package);
+                return;
+            }
+        }
+
 		if ( ! is_null($path = $this->getPath()))
 		{
 			$this->config->publish($package, $path);
