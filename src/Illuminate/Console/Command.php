@@ -268,7 +268,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		$table = new Table($this->output);
 		$table->setHeaders($headers);
 		$table->setRows($rows);
-        $table->setStyle($style);
+		$table->setStyle($style);
 		$table->render();
 	}
 
