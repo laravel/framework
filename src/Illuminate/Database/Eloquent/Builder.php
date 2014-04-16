@@ -581,6 +581,13 @@ class Builder {
 
 		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
+		// No need to count all rows if checking for >=1.
+		if ($count == 1 && $operator == '>=')
+		{
+			// Replace count(*) in select and return after first row found
+			$query->selectRaw('"1"')->limit(1);
+		}
+
 		if ($callback) call_user_func($callback, $query);
 
 		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
