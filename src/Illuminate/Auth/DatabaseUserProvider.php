@@ -80,11 +80,11 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * Update the "remember me" token for the given user in storage.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\RememberableInterface   $user
 	 * @param  string  $token
 	 * @return void
 	 */
-	public function updateRememberToken(UserInterface $user, $token)
+	public function updateRememberToken(RememberableInterface $user, $token)
 	{
 		$this->conn->table($this->table)
                             ->where('id', $user->getAuthIdentifier())

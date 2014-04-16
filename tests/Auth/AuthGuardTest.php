@@ -164,7 +164,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName', 'getRecallerName'), array($provider, $session, $request));
 		$mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
-		$user = m::mock('Illuminate\Auth\UserInterface');
+		$user = m::mock('Illuminate\Auth\UserInterface', 'Illuminate\Auth\RememberableInterface');
 		$user->shouldReceive('setRememberToken')->once();
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
@@ -186,7 +186,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('clearUserDataFromStorage'), array($provider, $session, $request));
 		$mock->expects($this->once())->method('clearUserDataFromStorage');
 		$mock->setDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-		$user = m::mock('Illuminate\Auth\UserInterface');
+		$user = m::mock('Illuminate\Auth\UserInterface', 'Illuminate\Auth\RememberableInterface');
 		$user->shouldReceive('setRememberToken')->once();
 		$provider->shouldReceive('updateRememberToken')->once();
 		$mock->setUser($user);
@@ -205,7 +205,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
 		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
 		$session->shouldReceive('migrate')->once();
-		$user = m::mock('Illuminate\Auth\UserInterface');
+		$user = m::mock('Illuminate\Auth\UserInterface', 'Illuminate\Auth\RememberableInterface');
 		$user->shouldReceive('getAuthIdentifier')->andReturn('foo');
 		$user->shouldReceive('getRememberToken')->andReturn('recaller');
 		$user->shouldReceive('setRememberToken')->never();
@@ -224,7 +224,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
 		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
 		$session->shouldReceive('migrate')->once();
-		$user = m::mock('Illuminate\Auth\UserInterface');
+		$user = m::mock('Illuminate\Auth\UserInterface', 'Illuminate\Auth\RememberableInterface');
 		$user->shouldReceive('getAuthIdentifier')->andReturn('foo');
 		$user->shouldReceive('getRememberToken')->andReturn(null);
 		$user->shouldReceive('setRememberToken')->once();
