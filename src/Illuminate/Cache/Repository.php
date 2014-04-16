@@ -78,6 +78,28 @@ class Repository implements ArrayAccess {
 	}
 
 	/**
+	 * Retrieve many items from the cache by their keys.
+	 *
+	 * @param  array $keys
+	 * @param  mixed $default
+	 * @return array
+	 */
+	public function getMany(array $keys, $default = null)
+	{
+		$values = array();
+
+		if (empty($keys)) return $values;
+
+		foreach ($keys as $key)
+		{
+			$values[$key] = $this->get($key, $default);
+		}
+
+		// the order of the keys is maintained
+		return array_intersect_key(array_flip($keys), $values);
+	}
+
+	/**
 	 * Store an item in the cache.
 	 *
 	 * @param  string  $key
