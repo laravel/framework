@@ -1,9 +1,8 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
-class RefreshCommand extends Command {
+class RefreshCommand extends BaseCommand {
 
 	/**
 	 * The console command name.
@@ -26,6 +25,14 @@ class RefreshCommand extends Command {
 	 */
 	public function fire()
 	{
+        $proceed = $this->confirmToProceed();
+
+        if( ! $proceed )
+        {
+            $this->output->writeln('Did not refreshed migrations');
+            return;
+        }
+
 		$database = $this->input->getOption('database');
 
 		$this->call('migrate:reset', array('--database' => $database));
