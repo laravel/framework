@@ -177,7 +177,7 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Determine if the request contains a non-emtpy value for an  input item.
+	 * Determine if the request contains a non-empty value for an  input item.
 	 *
 	 * @param  string|array  $key
 	 * @return bool

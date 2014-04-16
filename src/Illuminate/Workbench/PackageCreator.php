@@ -203,7 +203,7 @@ class PackageCreator {
 	{
 		// Once we create the source directory, we will write an empty file to the
 		// directory so that it will be kept in source control allowing the dev
-		// to go ahead and push these components to Github right on creation.
+		// to go ahead and push these components to GitHub right on creation.
 		$path = $directory.'/src/'.$support;
 
 		$this->files->makeDirectory($path, 0777, true);

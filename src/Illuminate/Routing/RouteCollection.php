@@ -204,7 +204,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	}
 
 	/**
-	 * Deterine if the route collection contains a given named route.
+	 * Determine if the route collection contains a given named route.
 	 *
 	 * @param  string  $name
 	 * @return bool
