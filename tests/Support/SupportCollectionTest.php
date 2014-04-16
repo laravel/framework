@@ -195,6 +195,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		});
 
 		$this->assertEquals(range(1, 5), array_values($data->all()));
+		$this->assertEquals(range(0, 4), array_keys($data->all()));
 	}
 
 
@@ -204,11 +205,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data = $data->sortBy(function($x) { return $x; });
 
 		$this->assertEquals(array('dayle', 'taylor'), array_values($data->all()));
+		$this->assertEquals(array(0,1), array_keys($data->all()));
 
 		$data = new Collection(array('dayle', 'taylor'));
 		$data->sortByDesc(function($x) { return $x; });
 
 		$this->assertEquals(array('taylor', 'dayle'), array_values($data->all()));
+		$this->assertEquals(array(0,1), array_keys($data->all()));
 	}
 
 
@@ -218,6 +221,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data = $data->sortBy('name');
 
 		$this->assertEquals(array(array('name' => 'dayle'), array('name' => 'taylor')), array_values($data->all()));
+		$this->assertEquals(array(0,1), array_keys($data->all()));
 	}
 
 
