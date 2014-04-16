@@ -178,8 +178,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function confirm($question, $default = true)
 	{
-        $helper = $this->getHelperSet()->get('question');
-        $question = new ConfirmationQuestion($question, $default);
+		$helper = $this->getHelperSet()->get('question');
+		$question = new ConfirmationQuestion("<question>{$question}</question>", $default);
 
 		return $helper->ask($this->input, $this->output, $question);
 	}
@@ -193,28 +193,28 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function ask($question, $default = null)
 	{
-        $helper = $this->getHelperSet()->get('question');
-        $question = new Question($question, $default);
+		$helper = $this->getHelperSet()->get('question');
+		$question = new Question("<question>$question</question>", $default);
 
 		return $helper->ask($this->input, $this->output, $question);
 	}
 
-    /**
-     * Prompt the user for input with autocomplete
-     *
-     * @param  string $question
-     * @param  array  $list
-     * @param  string $default
-     * @return string
-     */
-    public function autocomplete($question, array $list, $default = null)
-    {
-        $helper = $this->getHelperSet()->get('question');
-        $question = new Question("<question>$question</question>", $default);
-        $question->setAutocompleterValues($list);
+	/**
+	 * Prompt the user for input with autocomplete
+	 *
+	 * @param  string $question
+	 * @param  array  $list
+	 * @param  string $default
+	 * @return string
+	 */
+	public function autocomplete($question, array $list, $default = null)
+	{
+		$helper = $this->getHelperSet()->get('question');
+		$question = new Question("<question>$question</question>", $default);
+		$question->setAutocompleterValues($list);
 
-        return $helper->ask($this->input, $this->output, $question);
-    }
+		return $helper->ask($this->input, $this->output, $question);
+	}
 
 
 	/**
@@ -226,58 +226,47 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function secret($question, $fallback = true)
 	{
-        $helper = $this->getHelperSet()->get('question');
-        $question = new Question($question);
-        $question->setHidden(true);
-        $question->setHiddenFallback($fallback);
+		$helper = $this->getHelperSet()->get('question');
+		$question = new Question("<question>$question</question>");
+		$question->setHidden(true);
+		$question->setHiddenFallback($fallback);
 
 		return $helper->ask($this->input, $this->output, $question);
 	}
-
-    /**
-     * Give the user a single choice from an array of answers.
-     *
-     * @param  string $question
-     * @param  array  $choices
-     * @param  string $default
-     * @param  bool   $multiple
-     * @param  mixed  $attempts
-     * @return bool
-     */
-	public function choice($question, array $choices, $default = null, $multiple = false, $attempts = null)
-	{
-        $helper = $this->getHelperSet()->get('question');
-        $question = new ChoiceQuestion($question, $choices, $default);
-        $question->setMaxAttempts($attempts);
-        $question->setMultiselect($multiple);
-
-		return $helper->ask($this->input, $this->output, $question);
-	}
-
-    /**
-     * Format input to textual table
-     *
-     * @param  array $headers
-     * @param  array $rows
-     * @return void
-     */
-    public function table(array $headers, array $rows)
-    {
-        $table = $this->getHelperSet()->get('table');
-        $table->setHeaders($headers);
-        $table->setRows($rows);
-        $table->render($this->output);
-    }
 
 	/**
-	 * Write a string as standard output.
+	 * Give the user a single choice from an array of answers.
 	 *
-	 * @param  string  $string
+	 * @param  string $question
+	 * @param  array  $choices
+	 * @param  string $default
+	 * @param  bool   $multiple
+	 * @param  mixed  $attempts
+	 * @return bool
+	 */
+	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
+	{
+		$helper = $this->getHelperSet()->get('question');
+		$question = new ChoiceQuestion("<question>$question</question>", $choices, $default);
+		$question->setMaxAttempts($attempts);
+		$question->setMultiselect($multiple);
+
+		return $helper->ask($this->input, $this->output, $question);
+	}
+
+	/**
+	 * Format input to textual table
+	 *
+	 * @param  array $headers
+	 * @param  array $rows
 	 * @return void
 	 */
-	public function line($string)
+	public function table(array $headers, array $rows)
 	{
-		$this->output->writeln($string);
+		$table = $this->getHelperSet()->get('table');
+		$table->setHeaders($headers);
+		$table->setRows($rows);
+		$table->render($this->output);
 	}
 
 	/**
@@ -289,6 +278,17 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	public function info($string)
 	{
 		$this->output->writeln("<info>$string</info>");
+	}
+
+	/**
+	 * Write a string as standard output.
+	 *
+	 * @param  string  $string
+	 * @return void
+	 */
+	public function line($string)
+	{
+		$this->output->writeln($string);
 	}
 
 	/**
