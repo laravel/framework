@@ -44,7 +44,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testPackageIsRespectedWhenMigrating()
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-        $command->setLaravel(new ApplicationDatabaseMigrationStub());
+		$command->setLaravel(new ApplicationDatabaseMigrationStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/bar/src/migrations', false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
@@ -57,8 +57,8 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testVendorPackageIsRespectedWhenMigrating()
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-        $command->setLaravel(new ApplicationDatabaseMigrationStub());
-        $migrator->shouldReceive('setConnection')->once()->with(null);
+		$command->setLaravel(new ApplicationDatabaseMigrationStub());
+		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/foo/bar/src/migrations', false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 		$migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
@@ -103,12 +103,12 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 }
 
 class ApplicationDatabaseMigrationStub implements ArrayAccess {
-    public $content = array();
-    public $env = 'development';
-    public function __construct(array $data = array()) { $this->content = $data; }
-    public function offsetExists($offset) { return isset($this->content[$offset]); }
-    public function offsetGet($offset) { return $this->content[$offset]; }
-    public function offsetSet($offset, $value) { $this->content[$offset] = $value; }
-    public function offsetUnset($offset) { unset($this->content[$offset]); }
-    public function environment() { return $this->env; }
+	public $content = array();
+	public $env = 'development';
+	public function __construct(array $data = array()) { $this->content = $data; }
+	public function offsetExists($offset) { return isset($this->content[$offset]); }
+	public function offsetGet($offset) { return $this->content[$offset]; }
+	public function offsetSet($offset, $value) { $this->content[$offset] = $value; }
+	public function offsetUnset($offset) { unset($this->content[$offset]); }
+	public function environment() { return $this->env; }
 }

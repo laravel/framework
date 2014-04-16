@@ -46,13 +46,7 @@ class ResetCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-        $proceed = $this->confirmToProceed();
-
-        if( ! $proceed )
-        {
-            $this->output->writeln('Did not Reset the migrations');
-            return;
-        }
+		if( ! $this->confirmToProceed()) return;
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 

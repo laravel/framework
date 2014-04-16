@@ -53,13 +53,7 @@ class MigrateCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-        $proceed = $this->confirmToProceed();
-
-        if( ! $proceed )
-        {
-            $this->output->writeln('<info>Did not migrated</info>');
-            return;
-        }
+		if( ! $this->confirmToProceed()) return;
 
         $this->prepareDatabase();
 
