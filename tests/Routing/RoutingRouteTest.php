@@ -387,6 +387,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$route = new Route('GET', 'foo/{bar}', array('https', function() {}));
 		$this->assertTrue($route->matches($request));
 
+		$request = Request::create('https://foo.com/foo/bar', 'GET');
+		$route = new Route('GET', 'foo/{bar}', array('https', 'baz' => true, function() {}));
+		$this->assertTrue($route->matches($request));
+
 		$request = Request::create('http://foo.com/foo/bar', 'GET');
 		$route = new Route('GET', 'foo/{bar}', array('https', function() {}));
 		$this->assertFalse($route->matches($request));
@@ -400,6 +404,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 		$request = Request::create('http://foo.com/foo/bar', 'GET');
 		$route = new Route('GET', 'foo/{bar}', array('http', function() {}));
+		$this->assertTrue($route->matches($request));
+
+		$request = Request::create('http://foo.com/foo/bar', 'GET');
+		$route = new Route('GET', 'foo/{bar}', array('baz' => true, function() {}));
 		$this->assertTrue($route->matches($request));
 	}
 

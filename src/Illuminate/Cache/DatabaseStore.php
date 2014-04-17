@@ -132,7 +132,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		throw new \LogicException("Decrement operations not supported by this driver.");
 	}
 
 	/**
