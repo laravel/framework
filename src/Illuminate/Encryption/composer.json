@@ -9,7 +9,8 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*"
+        "illuminate/support": "4.2.*",
+        "symfony/security": "2.5.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.0.*"
