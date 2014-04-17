@@ -122,29 +122,29 @@ class ConfigPublisher {
 		$this->packagePath = $packagePath;
 	}
 
-    /**
-     * Get destination path
-     *
-     * @param $package
-     *
-     * @return string
-     */
-    public function getDestinationPath($package)
-    {
-        return $this->publishPath."/packages/{$package}";
-    }
+	/**
+	 * Get destination path
+	 *
+	 * @param $package
+	 *
+	 * @return string
+	 */
+	public function getDestinationPath($package)
+	{
+		return $this->publishPath."/packages/{$package}";
+	}
 
-    /**
-     * Check if the package configuration already exists
-     *
-     * @param $package
-     *
-     * @return bool
-     */
-    public function alreadyExists($package)
-    {
-        $destination = $this->getDestinationPath($package);
+	/**
+	 * Check if the package configuration already exists
+	 *
+	 * @param $package
+	 *
+	 * @return bool
+	 */
+	public function alreadyExists($package)
+	{
+		$destination = $this->getDestinationPath($package);
 
-        return $this->files->isDirectory($destination);
-    }
-}
+		return $this->files->isDirectory($destination);
+	}
+	}
