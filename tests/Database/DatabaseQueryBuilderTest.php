@@ -858,6 +858,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "id" = ?', array(1))->andReturn(1);
 		$result = $builder->from('users')->delete(1);
 		$this->assertEquals(1, $result);
+
+		// Test mySQL specific grammar.
+		$builder = $this->getMySqlBuilder();
+		$builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `title` desc limit 3', array('foo'))->andReturn(1);
+		$result = $builder->from('users')->where('email', '=', 'foo')->orderBy('title', 'desc')->limit(3)->delete();
+		$this->assertEquals(1, $result);
+
+		$builder = $this->getMySqlBuilder();
+		$mysql = new Illuminate\Database\Query\Grammars\MySqlGrammar;
+		$builder->from('users')->orderBy('title', 'asc')->limit(3);
+		$this->assertEquals('delete from `users` order by `title` asc limit 3', $mysql->compileDelete($builder));
 	}
 
 

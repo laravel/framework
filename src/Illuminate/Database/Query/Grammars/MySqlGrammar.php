@@ -99,4 +99,21 @@ class MySqlGrammar extends Grammar {
 		return rtrim($sql);
 	}
 
+	/**
+	 * Compile a delete statement into SQL.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @return string
+	 */
+	public function compileDelete(Builder $query)
+	{
+		$table = $this->wrapTable($query->from);
+
+		$where = is_array($query->wheres) ? $this->compileWheres($query) : '';
+		$orderBy = is_array($query->orders) ? $this->compileOrders($query, $query->orders) : '';
+		$limit = $query->limit ? $this->compileLimit($query, $query->limit) : '';
+
+		return trim("delete from $table ".implode(' ', array_filter(array($where, $orderBy, $limit))));
+	}
+
 }
