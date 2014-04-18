@@ -59,7 +59,7 @@ class MigrationCreator {
 	 * Get the migration stub file.
 	 *
 	 * @param  string  $table
-	 * @return void
+	 * @return string
 	 */
 	protected function getStub($table, $create)
 	{
