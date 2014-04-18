@@ -35,11 +35,11 @@ class Builder {
 	 * @var array
 	 */
 	protected $bindings = array(
-		'select' => array(),
-		'join'   => array(),
-		'where'  => array(),
-		'having' => array(),
-		'order'  => array(),
+		'select' => [],
+		'join'   => [],
+		'where'  => [],
+		'having' => [],
+		'order'  => [],
 	);
 
 	/**
@@ -1908,7 +1908,7 @@ class Builder {
 	{
 		if ( ! array_key_exists($type, $this->bindings))
 		{
-			throw new \InvalidArgumentException("Invalid binding type: $type");
+			throw new \InvalidArgumentException("Invalid binding type: {$type}.");
 		}
 
 		$this->bindings[$type] = $bindings;
@@ -1927,7 +1927,7 @@ class Builder {
 	{
 		if ( ! array_key_exists($type, $this->bindings))
 		{
-			throw new \InvalidArgumentException("Invalid binding type: $type");
+			throw new \InvalidArgumentException("Invalid binding type: {$type}.");
 		}
 
 		if (is_array($value))
