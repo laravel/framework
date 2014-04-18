@@ -1,9 +1,13 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class RollbackCommand extends BaseCommand {
+class RollbackCommand extends Command {
+
+	use ConfirmableTrait;
 
 	/**
 	 * The console command name.
@@ -46,7 +50,7 @@ class RollbackCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-		if( ! $this->confirmToProceed()) return;
+		if ( ! $this->confirmToProceed()) return;
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 
@@ -72,6 +76,8 @@ class RollbackCommand extends BaseCommand {
 	{
 		return array(
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+
+			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 		);
