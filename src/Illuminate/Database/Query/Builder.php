@@ -932,13 +932,14 @@ class Builder {
 	 * @param  string  $column
 	 * @param  string  $operator
 	 * @param  string  $value
+	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function having($column, $operator = null, $value = null,$boolean = 'and')
+	public function having($column, $operator = null, $value = null, $boolean = 'and')
 	{
 		$type = 'basic';
 
-		$this->havings[] = compact('type', 'column', 'operator', 'value','boolean');
+		$this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
 		$this->addBinding($value, 'having');
 
@@ -946,17 +947,17 @@ class Builder {
 	}
 
 	/**
-     * Add an "or having" clause to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  mixed   $value
-     * @return \Illuminate\Database\Query\Builder|static
-     */
+	 * Add a "or having" clause to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  string  $value
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
     public function orHaving($column, $operator = null, $value = null)
     {
         return $this->having($column, $operator, $value, 'or');
-    }  
+    }
 
 	/**
 	 * Add a raw having clause to the query.
