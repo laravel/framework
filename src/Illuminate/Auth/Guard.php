@@ -551,7 +551,7 @@ class Guard {
 	}
 
 	/**
-	 * Create a new remember token for the user if one doens't already exist.
+	 * Create a new remember token for the user if one doesn't already exist.
 	 *
 	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @return void
