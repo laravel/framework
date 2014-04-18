@@ -2649,15 +2649,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			{
 				$dirty[$key] = $value;
 			}
-			else if ($value !== $this->original[$key]) {
-				// two equivilent numerical fields shouldn't match as 'dirty', e.g. 1 and "1"
-				if (!is_numeric($value) || !is_numeric($this->original[$key]) || strcmp((string) $value, (string) $this->original[$key]) != 0) {
-					$dirty[$key] = $value;
-				}
+			elseif ($value !== $this->original[$key] &&
+                                 ! $this->originalIsNumericallyEquivalent($key))
+			{
+				$dirty[$key] = $value;
 			}
 		}
 
 		return $dirty;
+	}
+
+	/**
+	 * Deteremine if the new and old values for a given key are numerically equivalent.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	protected function originalIsNumericallyEquivalent($key)
+	{
+		$current = $this->attributes[$key];
+
+		$original = $this->original[$key];
+
+		return is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0;
 	}
 
 	/**
