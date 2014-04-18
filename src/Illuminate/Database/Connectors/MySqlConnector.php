@@ -12,15 +12,13 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	{
 		$dsn = $this->getDsn($config);
 
+		$options = $this->getOptions($config);
+
 		// We need to grab the PDO options that should be used while making the brand
 		// new connection instance. The PDO options control various aspects of the
 		// connection's behavior, and some might be specified by the developers.
-		$options = $this->getOptions($config);
-
 		$connection = $this->createConnection($dsn, $config, $options);
-		
-		// We need to explicitly exec the 'use' mysql command in case the 
-		// unix_socket option is used in the dsn.
+
 		if (isset($config['unix_socket']))
 		{
 			$connection->exec("use {$config['database']};");
@@ -57,30 +55,35 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getDsn(array $config)
 	{
-		// First we will create the basic DSN setup as well as the port if it is in
-		// in the configuration options. This will give us the basic DSN we will
-		// need to establish the PDO connections and return them back for use.
+		return isset($config['unix_socket']) ? $this->getSocketDsn($config) : $this->getHostDsn($config);
+	}
+
+	/**
+	 * Get the DSN string for a socket configuration.
+	 *
+	 * @param  array  $config
+	 * @return string
+	 */
+	protected function getSocketDsn(array $config)
+	{
 		extract($config);
 
-		$dsn = "mysql:";
-		
-		if (!isset($config['unix_socket'])) 
-		{
-			$dsn .= "host={$host}";
-	
-			if (isset($config['port']))
-			{
-				$dsn .= ";port={$port}";
-			}
-		} 
-		else 
-		{
-			$dsn .= "unix_socket={$config['unix_socket']}";
-		}
-		
-		$dsn .= ";dbname={$database}";
+		return "mysql:unix_socket={$config['unix_socket']};dbname={$database}";
+	}
 
-		return $dsn;
+	/**
+	 * Get the DSN string for a host / port configuration.
+	 *
+	 * @param  array  $config
+	 * @return string
+	 */
+	protected function getHostDsn(array $config)
+	{
+		extract($config);
+
+		return isset($config['port'])
+                        ? "mysql:host={$host};port={$port};dbname={$database}"
+                        : "mysql:host={$host};dbname={$database}";
 	}
 
 }
