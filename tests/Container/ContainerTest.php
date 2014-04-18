@@ -38,6 +38,14 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSlashesAreHandled()
+	{
+		$container = new Container;
+		$container->bind('\Foo', function() { return 'hello'; });
+		$this->assertEquals('hello', $container->make('Foo'));
+	}
+
+
 	public function testParametersCanOverrideDependencies()
 	{
 		$container = new Container;
