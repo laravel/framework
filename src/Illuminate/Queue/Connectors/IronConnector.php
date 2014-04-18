@@ -48,7 +48,8 @@ class IronConnector implements ConnectorInterface {
 
 		$iron = new IronMQ($ironConfig);
 
-		if (isset($config['ssl_verifypeer'])) {
+		if (isset($config['ssl_verifypeer']))
+		{
 			$iron->ssl_verifypeer = $config['ssl_verifypeer'];
 		}
 
