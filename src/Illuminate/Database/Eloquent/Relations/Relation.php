@@ -72,7 +72,7 @@ abstract class Relation {
 	 *
 	 * @param  array   $models
 	 * @param  string  $relation
-	 * @return void
+	 * @return array
 	 */
 	abstract public function initRelation(array $models, $relation);
 
