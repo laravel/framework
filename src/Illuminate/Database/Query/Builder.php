@@ -1619,7 +1619,9 @@ class Builder {
 	 */
 	public function sum($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		$result = $this->aggregate(__FUNCTION__, array($column));
+
+		return $result ?: 0;
 	}
 
 	/**
