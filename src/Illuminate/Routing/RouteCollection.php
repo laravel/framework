@@ -173,7 +173,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	}
 
 	/**
-	 * Get a route (if ncessary) that responds when other available methods are present.
+	 * Get a route (if necessary) that responds when other available methods are present.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  array  $others
