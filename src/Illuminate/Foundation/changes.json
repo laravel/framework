@@ -16,7 +16,8 @@
 		{"message": "Added Mandrill API transport for Mail::send. Depends on new 'services' configuration file.", "backport": null},
 		{"message": "Added 'log' mail transport for Mail::send. Writes raw MIME string to log files.", "backport": null},
 		{"message": "Added simplePaginate method to query and Eloquent builder.", "backport": null},
-		{"message": "Destructive migration operations now require confirmation or --force when being run in production.", "backport": null}
+		{"message": "Destructive migration operations now require confirmation or --force when being run in production.", "backport": null},
+		{"message": "Added Cache::pluck method for retrieving a value and then deleting it.", "backport": null}
 	],
 	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
