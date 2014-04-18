@@ -68,7 +68,7 @@ class Repository implements ArrayAccess {
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	public function pluck($key, $default = null)
+	public function pull($key, $default = null)
 	{
 		$value = $this->get($key, $default);
 
