@@ -266,6 +266,22 @@ class Store implements SessionInterface {
 	}
 
 	/**
+	 * Get the value of a given key and then forget it.
+	 *
+	 * @param  string  $key
+	 * @param  string  $default
+	 * @return mixed
+	 */
+	public function pluck($key, $default = null)
+	{
+		$value = $this->get($key, $default);
+
+		$this->forget($key);
+
+		return $value;
+	}
+
+	/**
 	 * Determine if the session contains old input.
 	 *
 	 * @param  string  $key
@@ -585,20 +601,6 @@ class Store implements SessionInterface {
 		{
 			$this->handler->setRequest($request);
 		}
-	}
-	
-	/**
-	 * Get the value of a given key and then forget it.
-	 * 
-	 * @param string $key
-	 * @param string $default
-	 * @return mixed
-	 */
-	public function once($key, $default = null)
-	{
-		$item = $this->get($key, $default);
-		$this->forget($key);
-		return $item;
 	}
 
 }
