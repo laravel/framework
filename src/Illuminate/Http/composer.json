@@ -8,6 +8,7 @@
         }
     ],
     "require": {
+        "php": ">=5.3.0",
         "illuminate/session": "4.1.*",
         "illuminate/support": "4.1.*",
         "symfony/http-foundation": "2.4.*",

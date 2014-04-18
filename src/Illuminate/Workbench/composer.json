@@ -8,6 +8,7 @@
         }
     ],
     "require": {
+        "php": ">=5.3.0",
         "illuminate/filesystem": "4.1.*",
         "illuminate/support": "4.1.*",
         "symfony/finder": "2.4.*"
