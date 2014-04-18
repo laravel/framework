@@ -58,7 +58,7 @@ class MorphTo extends BelongsTo {
 	}
 
 	/**
-	 * Buiild a dictionary with the models.
+	 * Build a dictionary with the models.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Models  $models
 	 * @return void
