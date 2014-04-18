@@ -172,7 +172,7 @@ class Str {
 	 * Get the plural form of an English word.
 	 *
 	 * @param  string  $value
-	 * @param  int  $count
+	 * @param  int     $count
 	 * @return string
 	 */
 	public static function plural($value, $count = 2)
@@ -183,26 +183,64 @@ class Str {
 	/**
 	 * Generate a more truly "random" alpha-numeric string.
 	 *
-	 * @param  int     $length
+	 * @param  int  $length
+	 * @return string
+	 */
+	public static function random($length = 16)
+	{
+		try
+		{
+			$bytes = static::fullRandom($length * 2);
+			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+		}
+		catch (\Exception $e)
+		{
+			return static::quickRandom($length);
+		}
+	}
+
+	/**
+	 * Generate a more truly "random" string.
+	 *
+	 * @param  int  $length
 	 * @return string
 	 *
 	 * @throws \RuntimeException
 	 */
-	public static function random($length = 16)
+	public static function fullRandom($length = 16)
 	{
-		if (function_exists('openssl_random_pseudo_bytes'))
+		$bytes = null;
+
+		if (class_exists('Symfony\Component\Security\Core\Util\SecureRandomSecureRandom'))
 		{
-			$bytes = openssl_random_pseudo_bytes($length * 2);
-
-			if ($bytes === false)
+			try
 			{
-				throw new \RuntimeException('Unable to generate random string.');
+				$bytes = with(new \Symfony\Component\Security\Core\Util\SecureRandomSecureRandom(storage_path('meta/seed.json')))->nextBytes($length);
 			}
-
-			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+			catch (\Exception $e)
+			{
+				$bytes = null;
+			}
 		}
 
-		return static::quickRandom($length);
+		if (($bytes === false || $bytes === null || $bytes === '') && function_exists('openssl_random_pseudo_bytes'))
+		{
+			try
+			{
+				$bytes = openssl_random_pseudo_bytes($length);
+			}
+			catch (\Exception $e)
+			{
+				$bytes = null;
+			}
+		}
+
+		if ($bytes === false || $bytes === null || $bytes === '')
+		{
+			throw new \RuntimeException('Unable to generate random string.');
+		}
+
+		return $bytes;
 	}
 
 	/**
@@ -210,7 +248,7 @@ class Str {
 	 *
 	 * Should not be considered sufficient for cryptography, etc.
 	 *
-	 * @param  int     $length
+	 * @param  int  $length
 	 * @return string
 	 */
 	public static function quickRandom($length = 16)
