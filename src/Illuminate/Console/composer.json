@@ -8,6 +8,7 @@
         }
     ],
     "require": {
+        "php": ">=5.4.0",
         "symfony/console": "2.5.*"
     },
     "require-dev": {
