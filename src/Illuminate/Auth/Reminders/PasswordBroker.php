@@ -131,7 +131,7 @@ class PasswordBroker {
 	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string   $token
 	 * @param  Closure  $callback
-	 * @return void
+	 * @return int
 	 */
 	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null)
 	{
