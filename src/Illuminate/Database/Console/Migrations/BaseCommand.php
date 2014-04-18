@@ -46,4 +46,25 @@ class BaseCommand extends Command {
 		return $this->laravel['path'].'/database/migrations';
 	}
 
+	/**
+	 * Confirm before proceeding with the action
+	 *
+	 * @return bool
+	 */
+	public function confirmToProceed()
+	{
+		if($this->getLaravel()->environment() == 'production')
+		{
+			$this->output->writeln('<info>Application is in Production</info>');
+			$confirmed = $this->confirm('Do you really wish to continue ?');
+
+			if( ! $confirmed)
+			{
+			    $this->output->writeln('<info>Migration Operation Was Cancelled</info>');
+			    return false;
+			}
+		}
+
+		return true;
+	}
 }
