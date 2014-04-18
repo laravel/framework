@@ -120,7 +120,9 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	public function match(Request $request)
 	{
-		$routes = $this->get($request->getMethod());
+		$method = $request->getMethod();
+
+		$routes = $this->get($method);
 
 		// First, we will see if we can find a matching route for this current request
 		// method. If we can, great, we can just return it so that it can be called
@@ -133,33 +135,52 @@ class RouteCollection implements Countable, IteratorAggregate {
 		}
 
 		// If no route was found, we will check if a matching is route is specified on
-		// another HTTP verb. If it is we will need to throw a MethodNotAllowed and
-		// inform the user agent of which HTTP verb it should use for this route.
-		$this->checkForAlternateVerbs($request);
+		// another HTTP verb.
+		$alternativeVerbs = $this->checkForAlternateVerbs($method, $request->path());
+
+		// If we have some verbs, then we might need to complain. First though, 
+		// if this is an OPTIONS call we can programatically offer some useful 
+		// information.
+		if ($alternativeVerbs)
+		{
+			if ($method === 'OPTIONS')
+			{
+				// @TODO Make this talk to the actual Symfony/Laravel response somehow
+				header('Allow: '.implode(',', $alternativeVerbs));
+				exit;
+			}
+
+			// We know that some other route exists for this uri, but we do not 
+			// know how well it is implemented. Really we don't care, just complain
+			// and die.
+			else
+			{
+				$this->methodNotAllowed($method);
+			}
+		}
 
 		throw new NotFoundHttpException;
 	}
 
 	/**
-	 * Determine if any routes match on another HTTP verb.
+	 * Determine if any routes match this URI using another HTTP verb.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
+	 * @param  string  $method
+	 * @param  string  $uri
+	 * @return array
 	 */
-	protected function checkForAlternateVerbs($request)
+	protected function checkForAlternateVerbs($method, $uri)
 	{
-		$others = array_diff(Router::$verbs, array($request->getMethod()));
-
-		// Here we will spin through all verbs except for the current request verb and
-		// check to see if any routes respond to them. If they do, we will return a
-		// proper error response with the correct headers on the response string.
-		foreach ($others as $other)
+		$matchingMethods = array();
+		foreach ($this->actionList as $route)
 		{
-			if ( ! is_null($this->check($this->get($other), $request)))
+			if ($route->uri() == $uri)
 			{
-				$this->methodNotAllowed($other);
+				$matchingMethods = array_merge($matchingMethods, $route->getMethods());
 			}
-		}
+		};
+
+		return array_unique(array_diff($matchingMethods, array($method)));
 	}
 
 	/**
