@@ -945,11 +945,9 @@ if ( ! function_exists('str_plural'))
 if ( ! function_exists('str_random'))
 {
 	/**
-	 * Generate a "random" alpha-numeric string.
+	 * Generate a truly "random" alpha-numeric string.
 	 *
-	 * Should not be considered sufficient for cryptography, etc.
-	 *
-	 * @param  int     $length
+	 * @param  int  $length
 	 * @return string
 	 */
 	function str_random($length = 16)

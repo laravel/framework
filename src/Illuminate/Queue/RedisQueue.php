@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue;
 
+use Illuminate\Support\Str;
 use Illuminate\Redis\Database;
 use Illuminate\Queue\Jobs\RedisJob;
 
@@ -219,7 +220,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	protected function getRandomId()
 	{
-		return str_random(20);
+		return Str::random(20);
 	}
 
 	/**
