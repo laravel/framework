@@ -1,8 +1,12 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
 
-class RefreshCommand extends BaseCommand {
+class RefreshCommand extends Command {
+
+	use ConfirmableTrait;
 
 	/**
 	 * The console command name.
@@ -25,7 +29,7 @@ class RefreshCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-		if( ! $this->confirmToProceed()) return;
+		if ( ! $this->confirmToProceed()) return;
 
 		$database = $this->input->getOption('database');
 
@@ -74,6 +78,8 @@ class RefreshCommand extends BaseCommand {
 	{
 		return array(
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+
+			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
 			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
 

@@ -1,9 +1,12 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class MigrateCommand extends BaseCommand {
+
+	use ConfirmableTrait;
 
 	/**
 	 * The console command name.
@@ -53,7 +56,7 @@ class MigrateCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-		if( ! $this->confirmToProceed()) return;
+		if ( ! $this->confirmToProceed()) return;
 
 		$this->prepareDatabase();
 
@@ -111,6 +114,8 @@ class MigrateCommand extends BaseCommand {
 			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
 
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+
+			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
 
