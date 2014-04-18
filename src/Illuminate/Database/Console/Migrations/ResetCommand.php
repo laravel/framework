@@ -1,10 +1,9 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class ResetCommand extends Command {
+class ResetCommand extends BaseCommand {
 
 	/**
 	 * The console command name.
@@ -47,6 +46,8 @@ class ResetCommand extends Command {
 	 */
 	public function fire()
 	{
+		if( ! $this->confirmToProceed()) return;
+
 		$this->migrator->setConnection($this->input->getOption('database'));
 
 		$pretend = $this->input->getOption('pretend');
