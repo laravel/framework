@@ -18,6 +18,13 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 		$options = $this->getOptions($config);
 
 		$connection = $this->createConnection($dsn, $config, $options);
+		
+		// We need to explicitly exec the 'use' mysql command in case the 
+		// unix_socket option is used in the dsn.
+		if (isset($config['unix_socket']))
+		{
+			$connection->exec("use {$config['database']};");
+		}
 
 		$collation = $config['collation'];
 
@@ -55,20 +62,23 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 		// need to establish the PDO connections and return them back for use.
 		extract($config);
 
-		$dsn = "mysql:host={$host};dbname={$database}";
-
-		if (isset($config['port']))
+		$dsn = "mysql:";
+		
+		if (!isset($config['unix_socket'])) 
 		{
-			$dsn .= ";port={$port}";
-		}
-
-		// Sometimes the developer may specify the specific UNIX socket that should
-		// be used. If that is the case we will add that option to the string we
-		// have created so that it gets utilized while the connection is made.
-		if (isset($config['unix_socket']))
+			$dsn .= "host={$host}";
+	
+			if (isset($config['port']))
+			{
+				$dsn .= ";port={$port}";
+			}
+		} 
+		else 
 		{
-			$dsn .= ";unix_socket={$config['unix_socket']}";
+			$dsn .= "unix_socket={$config['unix_socket']}";
 		}
+		
+		$dsn .= ";dbname={$database}";
 
 		return $dsn;
 	}
