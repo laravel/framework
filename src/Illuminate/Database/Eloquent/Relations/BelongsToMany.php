@@ -785,7 +785,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Set the creation and update timstamps on an attach record.
+	 * Set the creation and update timestamps on an attach record.
 	 *
 	 * @param  array  $record
 	 * @param  bool   $exists
@@ -965,7 +965,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Get the key for comparing against the pareny key in "has" query.
+	 * Get the key for comparing against the parent key in "has" query.
 	 *
 	 * @return string
 	 */
@@ -995,7 +995,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Get the fully qualified parent key naem.
+	 * Get the fully qualified parent key name.
 	 *
 	 * @return string
 	 */

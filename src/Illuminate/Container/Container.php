@@ -455,12 +455,28 @@ class Container implements ArrayAccess {
 		// since the container should be able to resolve concretes automatically.
 		if ( ! isset($this->bindings[$abstract]))
 		{
+			if ($this->missingLeadingSlash($abstract) && isset($this->bindings['\\'.$abstract]))
+			{
+				$abstract = '\\'.$abstract;
+			}
+
 			return $abstract;
 		}
 		else
 		{
 			return $this->bindings[$abstract]['concrete'];
 		}
+	}
+
+	/**
+	 * Determine if the given abstract has a leading slash.
+	 *
+	 * @param  string  $abstract
+	 * @return bool
+	 */
+	protected function missingLeadingSlash($abstract)
+	{
+		return is_string($abstract) && ! starts_with($abstract, '\\');
 	}
 
 	/**
