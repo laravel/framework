@@ -418,7 +418,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Register a deffered provider and service.
+	 * Register a deferred provider and service.
 	 *
 	 * @param  string  $provider
 	 * @param  string  $service

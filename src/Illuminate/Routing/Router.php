@@ -83,7 +83,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected $regexFilters = array();
 
 	/**
-	 * The reigstered route value binders.
+	 * The registered route value binders.
 	 *
 	 * @var array
 	 */
