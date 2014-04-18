@@ -316,7 +316,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Deteremine if a model has a global scope.
+	 * Determine if a model has a global scope.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
 	 * @return bool
@@ -1669,7 +1669,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get a new quer instance without a given scope.
+	 * Get a new query instance without a given scope.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
 	 * @return \Illuminate\Database\Eloquent\Builder
@@ -1708,10 +1708,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Remove all of the global scopes from an Elouqent builder.
+	 * Remove all of the global scopes from an Eloquent builder.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $builder
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function removeGlobalScopes($builder)
 	{
@@ -2370,7 +2370,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return mixed
 	 */
 	public function setAttribute($key, $value)
 	{
@@ -2621,7 +2621,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Deteremine if the new and old values for a given key are numerically equivalent.
+	 * Determine if the new and old values for a given key are numerically equivalent.
 	 *
 	 * @param  string  $key
 	 * @return bool
@@ -2868,7 +2868,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Determine if an attribute exists on the model.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function __isset($key)
 	{
