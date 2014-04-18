@@ -76,7 +76,7 @@ class EnvironmentDetector {
 	}
 
 	/**
-	 * Get the enviornment argument from the console.
+	 * Get the environment argument from the console.
 	 *
 	 * @param  array  $args
 	 * @return string|null
