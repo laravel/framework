@@ -1103,6 +1103,27 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSubSelect()
+	{
+		$expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
+		$expectedBindings = ['subval', 'val'];
+
+		$builder = $this->getPostgresBuilder();
+		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
+		$builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval'); }, 'sub');
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
+
+		$builder = $this->getPostgresBuilder();
+		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
+		$subBuilder = $this->getPostgresBuilder();
+		$subBuilder->from('two')->select('baz')->where('subkey', '=', 'subval');
+		$builder->selectSub($subBuilder, 'sub');
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
+	}
+
+
 	protected function getBuilder()
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
