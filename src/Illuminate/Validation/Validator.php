@@ -152,7 +152,7 @@ class Validator implements MessageProviderInterface {
 		{
 			// If this value is an instance of the HttpFoundation File class we will
 			// remove it from the data array and add it to the files array, which
-			// is used to conveniently separate out the files from other data.
+			// we use to conveniently separate out these files from other data.
 			if ($value instanceof File)
 			{
 				$this->files[$key] = $value;
