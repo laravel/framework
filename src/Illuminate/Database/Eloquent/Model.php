@@ -2621,7 +2621,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Deteremine if the new and old values for a given key are numerically equivalent.
+	 * Determine if the new and old values for a given key are numerically equivalent.
 	 *
 	 * @param  string  $key
 	 * @return bool
@@ -2868,7 +2868,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Determine if an attribute exists on the model.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function __isset($key)
 	{

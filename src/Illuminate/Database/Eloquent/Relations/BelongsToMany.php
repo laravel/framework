@@ -375,7 +375,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array   $models
 	 * @param  string  $relation
-	 * @return void
+	 * @return array
 	 */
 	public function initRelation(array $models, $relation)
 	{
@@ -700,7 +700,7 @@ class BelongsToMany extends Relation {
 	 * Create an array of records to insert into the pivot table.
 	 *
 	 * @param  array  $ids
-	 * @return void
+	 * @return array
 	 */
 	protected function createAttachRecords($ids, array $attributes)
 	{

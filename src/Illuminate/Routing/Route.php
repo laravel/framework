@@ -802,7 +802,7 @@ class Route {
 	/**
 	 * Get the compiled version of the route.
 	 *
-	 * @return void
+	 * @return \Symfony\Component\Routing\CompiledRoute
 	 */
 	public function getCompiled()
 	{
