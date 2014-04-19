@@ -195,7 +195,7 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Detremine if the given input key is an empty string for "has".
+	 * Determine if the given input key is an empty string for "has".
 	 *
 	 * @param  string  $key
 	 * @return bool
