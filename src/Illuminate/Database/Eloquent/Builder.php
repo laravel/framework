@@ -523,7 +523,7 @@ class Builder {
 	{
 		$me = $this;
 
-		// We want to run a relationship query without any constraints so that we will
+		// We want to do a relationship query without any constraints so that we will
 		// not have to remove these where clauses manually which gets really hacky
 		// and is error prone while we remove the developer's own where clauses.
 		$query = Relation::noConstraints(function() use ($me, $relation)
