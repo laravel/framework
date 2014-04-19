@@ -150,7 +150,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 * Determine if any routes match on another HTTP verb.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
+	 * @return array
 	 */
 	protected function checkForAlternateVerbs($request)
 	{
@@ -173,7 +173,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	}
 
 	/**
-	 * Get a route (if ncessary) that responds when other available methods are present.
+	 * Get a route (if necessary) that responds when other available methods are present.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  array  $others
