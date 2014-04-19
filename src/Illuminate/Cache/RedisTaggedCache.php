@@ -77,7 +77,7 @@ class RedisTaggedCache extends TaggedCache {
 	}
 
 	/**
-	 * Get the forever reference key for hte segment.
+	 * Get the forever reference key for the segment.
 	 *
 	 * @param  string  $segment
 	 * @return string

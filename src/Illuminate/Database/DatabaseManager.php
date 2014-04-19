@@ -153,7 +153,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 		});
 
 		// We will setup a Closure to resolve the paginator instance on the connection
-		// since the Paginator isn't sued on every request and needs quite a few of
+		// since the Paginator isn't used on every request and needs quite a few of
 		// our dependencies. It'll be more efficient to lazily resolve instances.
 		$connection->setPaginator(function() use ($app)
 		{
