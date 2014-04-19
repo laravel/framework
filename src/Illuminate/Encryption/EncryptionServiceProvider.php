@@ -13,7 +13,7 @@ class EncryptionServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('encrypter', function($app)
 		{
-			return new Encrypter($app['config']['app.key']);
+			return new Encrypter($app['config']['app.key'], $app['path.storage'].'/meta/seed.json');
 		});
 	}
 
