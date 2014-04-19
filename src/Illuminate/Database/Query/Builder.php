@@ -214,11 +214,58 @@ class Builder {
 	 * Add a new "raw" select expression to the query.
 	 *
 	 * @param  string  $expression
+	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function selectRaw($expression)
+	public function selectRaw($expression, array $bindings = array())
 	{
-		return $this->select(new Expression($expression));
+		$this->addSelect(new Expression($expression));
+
+		if ($bindings)
+		{
+			$this->addBinding($bindings, 'select');
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add a subselect expression to the query.
+	 *
+	 * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+	 * @param  string  $as
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function selectSub($query, $as)
+	{
+		if ($query instanceof Closure)
+		{
+			$callback = $query;
+			$query = $this->newQuery();
+			$callback($query);
+		}
+
+		if ($query instanceof Builder)
+		{
+			$bindings = $query->getBindings();
+			$query = $query->toSql();
+		}
+		elseif (is_string($query))
+		{
+			$bindings = [];
+		}
+		else
+		{
+			$type = is_object($query) ? get_class($query) : gettype($query);
+			$message = "Argument #1 passed to selectSub must be an SQL string, query builder or closure, {$type} given";
+			throw new \InvalidArgumentException($message);
+		}
+
+		$as = $this->grammar->wrap($as);
+
+		$query = '(' . $query . ') as ' . $as;
+
+		return $this->selectRaw($query, $bindings);
 	}
 
 	/**
