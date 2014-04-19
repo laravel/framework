@@ -143,7 +143,7 @@ abstract class Relation {
 	}
 
 	/**
-	 * Run a callback with constrains disabled on the relation.
+	 * Run a callback with constraints disabled on the relation.
 	 *
 	 * @param  \Closure  $callback
 	 * @return mixed

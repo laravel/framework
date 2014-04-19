@@ -300,7 +300,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	}
 
 	/**
-	 * Deteremine if the paginator is doing "quick" pagination.
+	 * Determine if the paginator is doing "quick" pagination.
 	 *
 	 * @return bool
 	 */
