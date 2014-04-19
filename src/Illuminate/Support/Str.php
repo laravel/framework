@@ -264,7 +264,7 @@ class Str {
 	{
 		$title = static::ascii($title);
 
-		// Convert all dashes/undescores into separator
+		// Convert all dashes/underscores into separator
 		$flip = $separator == '-' ? '_' : '-';
 
 		$title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
