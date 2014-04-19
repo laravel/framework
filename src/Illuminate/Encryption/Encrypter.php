@@ -15,6 +15,13 @@ class Encrypter {
 	protected $key;
 
 	/**
+	 * The encryption seed path for symfony.
+	 *
+	 * @var string
+	 */
+	protected $seed;
+
+	/**
 	 * The algorithm used for encryption.
 	 *
 	 * @var string
@@ -39,11 +46,13 @@ class Encrypter {
 	 * Create a new encrypter instance.
 	 *
 	 * @param  string  $key
+	 * @param  string  $seed
 	 * @return void
 	 */
-	public function __construct($key)
+	public function __construct($key, $seed)
 	{
 		$this->key = $key;
+		$this->seed = $seed;
 	}
 
 	/**
@@ -148,7 +157,7 @@ class Encrypter {
 	 */
 	protected function validMac(array $payload)
 	{
-		$bytes = with(new SecureRandom)->nextBytes(16);
+		$bytes = with(new SecureRandom($this->seed))->nextBytes(16);
 
 		$calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 
