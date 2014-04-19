@@ -27,7 +27,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 
 	protected function getEncrypter()
 	{
-		return new Encrypter(str_repeat('a', 32));
+		return new Encrypter(str_repeat('a', 32), realpath(__DIR__.'/seed.json'));
 	}
 
 }

@@ -181,9 +181,9 @@ class Str {
 	}
 
 	/**
-	 * Generate a more truly "random" alpha-numeric string.
+	 * Generate a truly "random" alpha-numeric string.
 	 *
-	 * @param  int     $length
+	 * @param  int  $length
 	 * @return string
 	 *
 	 * @throws \RuntimeException
@@ -206,11 +206,11 @@ class Str {
 	}
 
 	/**
-	 * Generate a "random" alpha-numeric string.
+	 * Quickly generate a "random" alpha-numeric string.
 	 *
 	 * Should not be considered sufficient for cryptography, etc.
 	 *
-	 * @param  int     $length
+	 * @param  int  $length
 	 * @return string
 	 */
 	public static function quickRandom($length = 16)
