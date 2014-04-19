@@ -135,7 +135,7 @@ class Container implements ArrayAccess {
 
 		// If the abstract type was already bound in this container, we will fire the
 		// rebound listener so that any objects which have already gotten resolved
-		// can have their copy of the object updated via hte listener callbacks.
+		// can have their copy of the object updated via the listener callbacks.
 		if ($bound)
 		{
 			$this->rebound($abstract);

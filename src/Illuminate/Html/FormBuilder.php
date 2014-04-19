@@ -239,7 +239,7 @@ class FormBuilder {
 			$value = $this->getValueAttribute($name, $value);
 		}
 
-		// Once we have the type, value, and ID we can marge them into the rest of the
+		// Once we have the type, value, and ID we can merge them into the rest of the
 		// attributes array so we can convert them into their HTML attribute format
 		// when creating the HTML element. Then, we will return the entire input.
 		$merge = compact('type', 'value', 'id');
