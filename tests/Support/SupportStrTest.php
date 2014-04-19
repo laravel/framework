@@ -109,4 +109,13 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(Str::is('*/foo', 'blah/baz/foo'));
 	}
 
+
+	public function testRandom()
+	{
+		$this->assertEquals(1, strlen(Str::random(1)));
+		$this->assertEquals(16, strlen(Str::random(16)));
+		$this->assertEquals(64, strlen(Str::random(64)));
+		$this->assertTrue(ctype_alnum(Str::random(64)));
+	}
+
 }

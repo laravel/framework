@@ -181,36 +181,44 @@ class Str {
 	}
 
 	/**
-	 * Generate a more truly "random" alpha-numeric string.
+	 * Generate a truly "random" alpha-numeric string.
 	 *
-	 * @param  int     $length
+	 * @param  int  $length
 	 * @return string
-	 *
-	 * @throws \RuntimeException
 	 */
 	public static function random($length = 16)
 	{
-		if (function_exists('openssl_random_pseudo_bytes'))
+		$bytes = null;
+		$class = 'Symfony\Component\Security\Core\Util\SecureRandom';
+
+		if (class_exists($class))
 		{
-			$bytes = openssl_random_pseudo_bytes($length * 2);
-
-			if ($bytes === false)
+			try
 			{
-				throw new \RuntimeException('Unable to generate random string.');
+				$bytes = with(new $class($app['path.storage'].'/meta/seed.json'))->nextBytes($length);
 			}
-
-			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+			catch (\Exception $e)
+			{
+				$bytes = null;
+			}
 		}
 
-		return static::quickRandom($length);
+		if ( ! $bytes)
+		{
+			return static::quickRandom($length);
+		}
+		else
+		{
+			return $bytes;
+		}
 	}
 
 	/**
-	 * Generate a "random" alpha-numeric string.
+	 * Quickly generate a "random" alpha-numeric string.
 	 *
 	 * Should not be considered sufficient for cryptography, etc.
 	 *
-	 * @param  int     $length
+	 * @param  int  $length
 	 * @return string
 	 */
 	public static function quickRandom($length = 16)
