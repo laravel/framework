@@ -1,9 +1,13 @@
 <?php namespace Illuminate\Console;
 
+use Symfony\Component\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class Command extends \Symfony\Component\Console\Command\Command {
 
@@ -175,9 +179,10 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function confirm($question, $default = true)
 	{
-		$dialog = $this->getHelperSet()->get('dialog');
+		$helper = $this->getHelperSet()->get('question');
+		$question = new ConfirmationQuestion("<question>{$question}</question>", $default);
 
-		return $dialog->askConfirmation($this->output, "<question>$question</question>", $default);
+		return $helper->ask($this->input, $this->output, $question);
 	}
 
 	/**
@@ -189,9 +194,27 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function ask($question, $default = null)
 	{
-		$dialog = $this->getHelperSet()->get('dialog');
+		$helper = $this->getHelperSet()->get('question');
+		$question = new Question("<question>$question</question>", $default);
 
-		return $dialog->ask($this->output, "<question>$question</question>", $default);
+		return $helper->ask($this->input, $this->output, $question);
+	}
+
+	/**
+	 * Prompt the user for input with autocomplete
+	 *
+	 * @param  string $question
+	 * @param  array  $list
+	 * @param  string $default
+	 * @return string
+	 */
+	public function autocomplete($question, array $list, $default = null)
+	{
+		$helper = $this->getHelperSet()->get('question');
+		$question = new Question("<question>$question</question>", $default);
+		$question->setAutocompleterValues($list);
+
+		return $helper->ask($this->input, $this->output, $question);
 	}
 
 
@@ -204,36 +227,49 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function secret($question, $fallback = true)
 	{
-		$dialog = $this->getHelperSet()->get('dialog');
+		$helper = $this->getHelperSet()->get('question');
+		$question = new Question("<question>$question</question>");
+		$question->setHidden(true);
+		$question->setHiddenFallback($fallback);
 
-		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $fallback);
+		return $helper->ask($this->input, $this->output, $question);
 	}
 
 	/**
 	 * Give the user a single choice from an array of answers.
 	 *
-	 * @param  string  $question
-	 * @param  array   $choices
-	 * @param  string  $default
-	 * @param  mixed   $attempts
+	 * @param  string $question
+	 * @param  array  $choices
+	 * @param  string $default
+	 * @param  bool   $multiple
+	 * @param  mixed  $attempts
 	 * @return bool
 	 */
-	public function choice($question, array $choices, $default = null, $attempts = false)
+	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
 	{
-		$dialog = $this->getHelperSet()->get('dialog');
+		$helper = $this->getHelperSet()->get('question');
+		$question = new ChoiceQuestion("<question>$question</question>", $choices, $default);
+		$question->setMaxAttempts($attempts);
+		$question->setMultiselect($multiple);
 
-		return $dialog->select($this->output, "<question>$question</question>", $choices, $default, $attempts);
+		return $helper->ask($this->input, $this->output, $question);
 	}
 
-	/**
-	 * Write a string as standard output.
-	 *
-	 * @param  string  $string
-	 * @return void
-	 */
-	public function line($string)
+    /**
+     * Format input to textual table
+     *
+     * @param  array $headers
+     * @param  array $rows
+     * @param string $style
+     * @return void
+     */
+	public function table(array $headers, array $rows, $style = 'default')
 	{
-		$this->output->writeln($string);
+		$table = new Table($this->output);
+		$table->setHeaders($headers);
+		$table->setRows($rows);
+		$table->setStyle($style);
+		$table->render();
 	}
 
 	/**
@@ -245,6 +281,17 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	public function info($string)
 	{
 		$this->output->writeln("<info>$string</info>");
+	}
+
+	/**
+	 * Write a string as standard output.
+	 *
+	 * @param  string  $string
+	 * @return void
+	 */
+	public function line($string)
+	{
+		$this->output->writeln($string);
 	}
 
 	/**
