@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\PackageCompiler;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 
@@ -36,7 +37,7 @@ class OptimizeServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.optimize', function($app)
 		{
-			return new OptimizeCommand($app['composer']);
+			return new OptimizeCommand($app['composer'], new PackageCompiler($app['files']));
 		});
 	}
 
