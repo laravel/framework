@@ -5,7 +5,6 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface, JsonSerializable {
+
+	use ObservableTrait;
 
 	/**
 	 * The connection name for the model.
@@ -137,13 +138,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $touches = array();
 
 	/**
-	 * User exposed observable events
-	 *
-	 * @var array
-	 */
-	protected $observables = array();
-
-	/**
 	 * The relations to eager load on every query.
 	 *
 	 * @var array
@@ -170,13 +164,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected static $resolver;
-
-	/**
-	 * The event dispatcher instance.
-	 *
-	 * @var \Illuminate\Events\Dispatcher
-	 */
-	protected static $dispatcher;
 
 	/**
 	 * The array of booted models.
@@ -348,30 +335,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function getGlobalScopes()
 	{
 		return array_get(static::$globalScopes, get_class($this), []);
-	}
-
-	/**
-	 * Register an observer with the Model.
-	 *
-	 * @param  object  $class
-	 * @return void
-	 */
-	public static function observe($class)
-	{
-		$instance = new static;
-
-		$className = get_class($class);
-
-		// When registering a model observer, we will spin through the possible events
-		// and determine if this observer has that method. If it does, we will hook
-		// it into the model's event system, making it convenient to watch these.
-		foreach ($instance->getObservableEvents() as $event)
-		{
-			if (method_exists($class, $event))
-			{
-				static::registerModelEvent($event, $className.'@'.$event);
-			}
-		}
 	}
 
 	/**
@@ -1192,20 +1155,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Remove all of the event listeners for the model.
+	 * Get the observer key.
 	 *
-	 * @return void
+	 * @param  string   $event
+	 * @return string
 	 */
-	public static function flushEventListeners()
+	final protected static function getObservableKey($event)
 	{
-		if ( ! isset(static::$dispatcher)) return;
-
-		$instance = new static;
-
-		foreach ($instance->getObservableEvents() as $event)
-		{
-			static::$dispatcher->forget("eloquent.{$event}: ".get_called_class());
-		}
+		return "eloquent.{$event}";
 	}
 
 	/**
@@ -1217,12 +1174,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected static function registerModelEvent($event, $callback)
 	{
-		if (isset(static::$dispatcher))
-		{
-			$name = get_called_class();
-
-			static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
-		}
+		return static::registerObservableEvent($event, $callback);
 	}
 
 	/**
@@ -1513,16 +1465,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function fireModelEvent($event, $halt = true)
 	{
-		if ( ! isset(static::$dispatcher)) return true;
-
-		// We will append the names of the class to the event to distinguish it from
-		// other model events that are fired, allowing us to listen on each model
-		// event set individually instead of catching event for all the models.
-		$event = "eloquent.{$event}: ".get_class($this);
-
-		$method = $halt ? 'until' : 'fire';
-
-		return static::$dispatcher->$method($event, $this);
+		return $this->fireObservableEvent($event, $halt);
 	}
 
 	/**
@@ -2760,37 +2703,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public static function setConnectionResolver(Resolver $resolver)
 	{
 		static::$resolver = $resolver;
-	}
-
-	/**
-	 * Get the event dispatcher instance.
-	 *
-	 * @return \Illuminate\Events\Dispatcher
-	 */
-	public static function getEventDispatcher()
-	{
-		return static::$dispatcher;
-	}
-
-	/**
-	 * Set the event dispatcher instance.
-	 *
-	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
-	 * @return void
-	 */
-	public static function setEventDispatcher(Dispatcher $dispatcher)
-	{
-		static::$dispatcher = $dispatcher;
-	}
-
-	/**
-	 * Unset the event dispatcher for models.
-	 *
-	 * @return void
-	 */
-	public static function unsetEventDispatcher()
-	{
-		static::$dispatcher = null;
 	}
 
 	/**
