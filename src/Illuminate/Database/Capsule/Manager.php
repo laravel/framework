@@ -24,10 +24,10 @@ class Manager {
 	 * @var \Illuminate\Database\DatabaseManager
 	 */
 	protected $manager;
-	
+
 	/**
 	 * The container instance.
-	 * 
+	 *
 	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;

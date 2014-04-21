@@ -51,5 +51,4 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('users_foo_index', $commands[0]->index);
 	}
 
-
 }

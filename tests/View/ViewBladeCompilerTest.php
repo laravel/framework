@@ -155,6 +155,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		}}}'));
 	}
 
+
 	public function testExtendsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);

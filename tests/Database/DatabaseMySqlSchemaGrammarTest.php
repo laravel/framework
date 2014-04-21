@@ -350,6 +350,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table `users` add `foo` smallint not null', $statements[0]);
 	}
 
+
 	public function testAddingTinyInteger()
 	{
 		$blueprint = new Blueprint('users');

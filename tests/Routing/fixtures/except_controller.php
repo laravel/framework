@@ -12,6 +12,7 @@ class FooController extends \BaseController {
 		//
 	}
 
+
 	/**
 	 * Store a newly created resource in storage.
 	 *
@@ -21,6 +22,7 @@ class FooController extends \BaseController {
 	{
 		//
 	}
+
 
 	/**
 	 * Show the form for editing the specified resource.
@@ -33,6 +35,7 @@ class FooController extends \BaseController {
 		//
 	}
 
+
 	/**
 	 * Update the specified resource in storage.
 	 *
@@ -43,6 +46,7 @@ class FooController extends \BaseController {
 	{
 		//
 	}
+
 
 	/**
 	 * Remove the specified resource from storage.

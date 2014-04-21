@@ -15,6 +15,7 @@ class RoutingControllerInspectorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix/breeze', 'uri' => 'prefix/breeze/{one?}/{two?}/{three?}/{four?}/{five?}'), $data['getBreeze'][0]);
 	}
 
+
 	public function testMethodsAreCorrectWhenControllerIsNamespaced()
 	{
 		$inspector = new Illuminate\Routing\ControllerInspector;

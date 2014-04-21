@@ -22,6 +22,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($array, $fluent->getAttributes());
 	}
 
+
 	/**
 	 * Test the Fluent::get() method.
 	 *
@@ -36,6 +37,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Taylor', $fluent->name);
 		$this->assertNull($fluent->foo);
 	}
+
 
 	/**
 	 * Test the Fluent magic methods can be used to set attributes.
@@ -55,6 +57,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(25, $fluent->age);
 		$this->assertInstanceOf('Illuminate\Support\Fluent', $fluent->programmer());
 	}
+
 
 	/**
 	 * Test the Fluent::__isset() method.
