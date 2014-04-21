@@ -2,6 +2,7 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
+use Illuminate\Foundation\PackageCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use ClassPreloader\Command\PreCompileCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,16 +31,25 @@ class OptimizeCommand extends Command {
 	protected $composer;
 
 	/**
+	 * The package compiler instance.
+	 * 
+	 * @var \Illuminate\Foundation\PackageCompiler
+	 */
+	protected $packages;
+
+	/**
 	 * Create a new optimize command instance.
 	 *
 	 * @param  \Illuminate\Foundation\Composer  $composer
+	 * @param  \Illuminate\Foundation\PackageCompiler  $packages
 	 * @return void
 	 */
-	public function __construct(Composer $composer)
+	public function __construct(Composer $composer, PackageCompiler $packages)
 	{
 		parent::__construct();
 
 		$this->composer = $composer;
+		$this->packages = $packages;
 	}
 
 	/**
@@ -105,7 +115,28 @@ class OptimizeCommand extends Command {
 
 		$core = require __DIR__.'/Optimize/config.php';
 
-		return array_merge($core, $this->laravel['config']['compile']);
+		$packages = $this->option('with-packages') ? $this->getPackageClassFiles() : array();
+
+		return array_merge($core, $packages, $this->laravel['config']['compile']);
+	}
+
+	/**
+	 * Get the package classes that should be combined and compiled.
+	 * 
+	 * @return array
+	 */
+	protected function getPackageClassFiles()
+	{
+		$paths = array();
+
+		foreach ($this->laravel->getLoadedProviders() as $provider => $loaded)
+		{
+			$provider = $this->laravel->getRegistered($provider);
+
+			$paths[] = $this->packages->compile($provider);
+		}
+
+		return array_flatten($paths);
 	}
 
 	/**
@@ -157,6 +188,8 @@ class OptimizeCommand extends Command {
 			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
 
 			array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
+
+			array('with-packages', null, InputOption::VALUE_NONE, 'Compile package class files.'),
 		);
 	}
 
