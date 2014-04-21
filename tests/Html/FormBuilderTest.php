@@ -85,6 +85,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input name="password" type="password" value="">', $form1);
 	}
 
+
 	public function testFilesNotFilled()
 	{
 		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
@@ -414,10 +415,12 @@ class FormBuilderModelStub {
 		}
 	}
 
+
 	public function __get($key)
 	{
 		return $this->data[$key];
 	}
+
 
 	public function __isset($key)
 	{

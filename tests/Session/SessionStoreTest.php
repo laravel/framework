@@ -280,6 +280,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
+
 	public function getSessionName()
 	{
 		return 'name';

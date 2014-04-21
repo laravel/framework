@@ -31,6 +31,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		@unlink(__DIR__.'/file.txt');
 	}
 
+
 	public function testPrependExistingFiles()
 	{
 		$files = new Filesystem;
@@ -40,6 +41,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		@unlink(__DIR__.'/file.txt');
 	}
 
+
 	public function testPrependNewFiles()
 	{
 		$files = new Filesystem;
@@ -47,6 +49,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
 		@unlink(__DIR__.'/file.txt');
 	}
+
 
 	public function testDeleteDirectory()
 	{

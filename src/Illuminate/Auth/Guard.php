@@ -402,7 +402,7 @@ class Guard {
 	 */
 	public function login(UserInterface $user, $remember = false)
 	{
-		$this->updateSession($id = $user->getAuthIdentifier());
+		$this->updateSession($user->getAuthIdentifier());
 
 		// If the user should be permanently "remembered" by the application we will
 		// queue a permanent cookie that contains the encrypted copy of the user

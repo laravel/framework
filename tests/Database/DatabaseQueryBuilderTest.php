@@ -62,6 +62,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($query->get(), array('results'));
 	}
 
+
 	public function testSelectWithCachingForever()
 	{
 		$cache = m::mock('stdClass');
@@ -79,6 +80,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($query->get(), array('results'));
 	}
+
 
 	public function testSelectWithCachingAndTags()
 	{
@@ -101,6 +103,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($query->get(), array('results'));
 	}
+
 
 	public function testBasicAlias()
 	{
@@ -153,6 +156,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 2014), $builder->getBindings());
 	}
 
+
 	public function testWhereDayPostgres()
 	{
 		$builder = $this->getPostgresBuilder();
@@ -170,6 +174,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 5), $builder->getBindings());
 	}
 
+
 	public function testWhereYearPostgres()
 	{
 		$builder = $this->getPostgresBuilder();
@@ -177,6 +182,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" where year("created_at") = ?', $builder->toSql());
 		$this->assertEquals(array(0 => 2014), $builder->getBindings());
 	}
+
 
 	public function testWhereDaySqlite()
 	{
@@ -204,6 +210,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 2014), $builder->getBindings());
 	}
 
+
 	public function testWhereDaySqlServer()
 	{
 		$builder = $this->getPostgresBuilder();
@@ -220,6 +227,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" where month("created_at") = ?', $builder->toSql());
 		$this->assertEquals(array(0 => 5), $builder->getBindings());
 	}
+
 
 	public function testWhereYearSqlServer()
 	{
@@ -260,6 +268,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" where id = ? or email = ?', $builder->toSql());
 		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());
 	}
+
 
 	public function testRawOrWheres()
 	{
@@ -323,6 +332,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
 	}
 
+
 	public function testMultipleUnions()
 	{
 		$builder = $this->getBuilder();
@@ -333,6 +343,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
 	}
 
+
 	public function testMultipleUnionAlls()
 	{
 		$builder = $this->getBuilder();
@@ -342,6 +353,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" where "id" = ? union all select * from "users" where "id" = ? union all select * from "users" where "id" = ?', $builder->toSql());
 		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
 	}
+
 
 	public function testSubSelectWhereIns()
 	{
@@ -968,6 +980,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$builder->noValidMethodHere();
 	}
+
 
 	public function setupCacheTestQuery($cache, $driver)
 	{

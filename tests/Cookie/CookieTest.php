@@ -64,6 +64,7 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('qu'));
 	}
 
+
 	public function testUnqueue()
 	{
 		$cookie = $this->getCreator();
@@ -72,6 +73,7 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$cookie->unqueue('foo');
 		$this->assertEmpty($cookie->getQueuedCookies());
 	}
+
 
 	public function getCreator()
 	{

@@ -37,6 +37,7 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $app['foo']->foo('bar'));
 	}
 
+
 	public function testShouldReceiveCanBeCalledTwice()
 	{
 		$app = new ApplicationStub;

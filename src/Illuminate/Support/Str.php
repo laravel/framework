@@ -51,7 +51,7 @@ class Str {
 	/**
 	 * Determine if a given string ends with a given substring.
 	 *
-	 * @param string $haystack
+	 * @param string       $haystack
 	 * @param string|array $needles
 	 * @return bool
 	 */
@@ -172,7 +172,7 @@ class Str {
 	 * Get the plural form of an English word.
 	 *
 	 * @param  string  $value
-	 * @param  int  $count
+	 * @param  int     $count
 	 * @return string
 	 */
 	public static function plural($value, $count = 2)
@@ -295,7 +295,7 @@ class Str {
 	/**
 	 * Determine if a given string starts with a given substring.
 	 *
-	 * @param  string  $haystack
+	 * @param  string        $haystack
 	 * @param  string|array  $needles
 	 * @return bool
 	 */

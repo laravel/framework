@@ -12,6 +12,7 @@ class FooController extends \BaseController {
 		//
 	}
 
+
 	/**
 	 * Display the specified resource.
 	 *

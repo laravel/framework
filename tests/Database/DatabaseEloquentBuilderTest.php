@@ -23,6 +23,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $result);
 	}
 
+
 	public function testFindOrNewMethodModelFound()
 	{
 		$model = $this->getMockModel();
@@ -37,6 +38,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$result = $builder->find('bar', array('column'));
 		$this->assertEquals($expected, $result);
 	}
+
 
 	public function testFindOrNewMethodModelNotFound()
 	{
@@ -54,6 +56,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Illuminate\Database\Eloquent\Model', $result);
 	}
 
+
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
@@ -66,6 +69,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$result = $builder->findOrFail('bar', array('column'));
 	}
 
+
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
@@ -76,6 +80,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('first')->with(array('column'))->andReturn(null);
 		$result = $builder->firstOrFail(array('column'));
 	}
+
 
 	public function testFindWithMany()
 	{
@@ -136,6 +141,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $builder->pluck('name'));
 	}
 
+
 	public function testPluckMethodWithModelNotFound()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
@@ -177,6 +183,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(array('foo_bar', 'foo_baz'), $builder->lists('name'));
 	}
+
 
 	public function testListsWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
 	{
