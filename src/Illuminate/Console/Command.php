@@ -177,7 +177,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	{
 		$dialog = $this->getHelperSet()->get('dialog');
 
-		return $dialog->askConfirmation($this->output, "<question>$question</question>", $default);
+		return $dialog->askConfirmation($this->output, "<question>$question</question> ", $default);
 	}
 
 	/**
