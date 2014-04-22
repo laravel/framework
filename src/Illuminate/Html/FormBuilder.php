@@ -639,7 +639,7 @@ class FormBuilder {
 	 */
 	protected function getCheckboxCheckedState($name, $value, $checked)
 	{
-		if ( ! $this->oldInputIsEmpty() && is_null($this->old($name))) return false;
+		if (isset($this->session) && ! $this->oldInputIsEmpty() && is_null($this->old($name))) return false;
 
 		if ($this->missingOldAndModel($name)) return $checked;
 
