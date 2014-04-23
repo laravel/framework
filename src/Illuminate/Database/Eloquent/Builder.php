@@ -634,6 +634,9 @@ class Builder {
 	 */
 	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
 	{
+		if (strpos($relation, '.') !== false)
+			return $this->hasNested($relation, $operator, $count, $boolean, $callback);
+
 		$relation = $this->getHasRelationQuery($relation);
 
 		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
@@ -741,6 +744,87 @@ class Builder {
 		{
 			return $me->getModel()->$relation();
 		});
+	}
+
+	/**
+	 * Add a nested relationship count condition to the query
+	 * 
+	 * @param  string    $relation
+	 * @param  string    $operator
+	 * @param  int       $count
+	 * @param  string    $boolean
+	 * @param  \Closure  $callback
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	protected function hasNested($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
+	{
+		$nestedRelations = $this->parseHasNested($relation);
+		
+		return $this->addNestedHasWhere($nestedRelations, $operator, $count, $boolean, $callback);
+	}
+
+	/**
+	 * Parse nested relations for the hasNested
+	 * 
+	 * @param  string $relations
+	 * @return array
+	 */
+	protected function parseHasNested($relations)
+	{
+		$relations = explode('.', $relations);
+
+		foreach ($relations as $key => $relation) {
+			$relations[$key] = array();
+
+			// Find parent query where we will append this one later on
+			$parent = $relations[$key]['parent'] = ($key == 0) ? $this : $relations[$key-1]['query'];
+
+			// Create Relation object accordingly to the parent model
+			$relation = $relations[$key]['relation'] = $parent->getHasRelationQuery($relation);
+
+			// Prepare count query which will be appended to the parent
+			$relations[$key]['query'] = $relation->getRelationCountQuery(
+				$relation->getRelated()->newQuery(),
+				$parent
+			);
+		}
+		return $relations;
+	}
+
+	/**
+	 * Add the has where condition clauses to nested queries applying extra
+	 * constraints only on the deepest relation and defaults on the rest
+	 * 
+	 * @param  array   $relations
+	 * @param  string  $operator
+	 * @param  integer $count
+	 * @param  string  $boolean
+	 * @param  Closure $callback
+	 * @return Illuminate\Database\Eloquent\Builder
+	 */
+	protected function addNestedHasWhere(array $relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
+	{
+		// We will now append count queries to the parent query starting from
+		// the deepest relation and finally all of them will be appended
+		// to the current instance that is calling the method ($this)
+		$relations = array_reverse($relations);
+		$last      = count($relations) - 1;
+
+		foreach ($relations as $key => $nested)
+		{
+			if ($last == $key) $parent = $this;
+			else $parent = $relations[$key+1]['query'];
+
+			if ($key == 0) {
+				if ($callback) call_user_func($callback, $nested['query']);
+
+				// Given constraints will be set only on the deepest relation
+				$parent->addHasWhere($nested['query'], $nested['relation'], $operator, $count, $boolean);
+			} else {
+				$parent->addHasWhere($nested['query'], $nested['relation'], '>=', 1, 'and');
+			}
+		}
+		return $this;
 	}
 
 	/**
