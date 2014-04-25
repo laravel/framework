@@ -40,9 +40,8 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSetMethodProperlyCallsRedis()
 	{
 		$redis = $this->getRedis();
-		$redis->getRedis()->shouldReceive('connection')->twice()->with('default')->andReturn($redis->getRedis());
-		$redis->getRedis()->shouldReceive('set')->once()->with('prefix:foo', serialize('foo'));
-		$redis->getRedis()->shouldReceive('expire')->once()->with('prefix:foo', 60 * 60);
+		$redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+		$redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, serialize('foo'));
 		$redis->put('foo', 'foo', 60);
 	}
 
@@ -50,9 +49,8 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSetMethodProperlyCallsRedisForNumerics()
 	{
 		$redis = $this->getRedis();
-		$redis->getRedis()->shouldReceive('connection')->twice()->with('default')->andReturn($redis->getRedis());
-		$redis->getRedis()->shouldReceive('set')->once()->with('prefix:foo', 1);
-		$redis->getRedis()->shouldReceive('expire')->once()->with('prefix:foo', 60 * 60);
+		$redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+		$redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, 1);
 		$redis->put('foo', 1, 60);
 	}
 
