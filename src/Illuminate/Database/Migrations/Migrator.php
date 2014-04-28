@@ -2,14 +2,14 @@
 
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Application;
+use Illuminate\Container\Container;
 
 class Migrator {
 
 	/**
-	* The application instance.
+	* The application container.
 	*
-	* @var \Illuminate\Foundation\Application
+	* @var \Illuminate\Container\Container
 	*/
 	protected $app;
 
@@ -51,13 +51,14 @@ class Migrator {
 	/**
 	 * Create a new migrator instance.
 	 *
+	 * @param  \Illuminate\Container\Container  $app
 	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(
-		Application $app,
+		Container $app,
 		MigrationRepositoryInterface $repository,
 		Resolver $resolver,
 		Filesystem $files
