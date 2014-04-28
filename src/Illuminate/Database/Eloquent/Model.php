@@ -1309,15 +1309,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	*/
 	public function isUpdated()
 	{
-	if ($this->timestamps)
-	{
-	    if ($this->{static::CREATED_AT} != $this->{static::UPDATED_AT})
-	        return true;
-	    else
-	        return false;
-	}
-	else
-	    return false;
+		return $this->timestamps && $this->{static::CREATED_AT} != $this->{static::UPDATED_AT};
 	}
 
 	/**
