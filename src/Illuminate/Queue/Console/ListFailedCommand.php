@@ -25,7 +25,7 @@ class ListFailedCommand extends Command {
 	 */
 	public function fire()
 	{
-		$rows = array();
+		$rows = [];
 
 		foreach ($this->laravel['queue.failer']->all() as $failed)
 		{

@@ -9,7 +9,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
 
 	/**
 	 * The file currently being compiled.
@@ -37,7 +37,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $footer = array();
+	protected $footer = [];
 
 	/**
 	 * Compile the view at the given path.
@@ -47,7 +47,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path = null)
 	{
-		$this->footer = array();
+		$this->footer = [];
 
 		if ($path)
 		{

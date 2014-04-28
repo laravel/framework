@@ -115,7 +115,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  array   $arguments
 	 * @return integer
 	 */
-	public function call($command, array $arguments = array())
+	public function call($command, array $arguments = [])
 	{
 		$instance = $this->getApplication()->find($command);
 
@@ -131,7 +131,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  array   $arguments
 	 * @return integer
 	 */
-	public function callSilent($command, array $arguments = array())
+	public function callSilent($command, array $arguments = [])
 	{
 		$instance = $this->getApplication()->find($command);
 
@@ -287,7 +287,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	protected function getArguments()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -297,7 +297,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	protected function getOptions()
 	{
-		return array();
+		return [];
 	}
 
 	/**

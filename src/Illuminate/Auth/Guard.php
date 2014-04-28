@@ -223,7 +223,7 @@ class Guard {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function once(array $credentials = array())
+	public function once(array $credentials = [])
 	{
 		if ($this->validate($credentials))
 		{
@@ -241,7 +241,7 @@ class Guard {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function validate(array $credentials = array())
+	public function validate(array $credentials = [])
 	{
 		return $this->attempt($credentials, false, false);
 	}
@@ -330,7 +330,7 @@ class Guard {
 	 * @param  bool   $login
 	 * @return bool
 	 */
-	public function attempt(array $credentials = array(), $remember = false, $login = true)
+	public function attempt(array $credentials = [], $remember = false, $login = true)
 	{
 		$this->fireAttemptEvent($credentials, $remember, $login);
 

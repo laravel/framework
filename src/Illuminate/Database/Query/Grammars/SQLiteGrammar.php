@@ -44,7 +44,7 @@ class SQLiteGrammar extends Grammar {
 
 		$names = $this->columnize(array_keys(reset($values)));
 
-		$columns = array();
+		$columns = [];
 
 		// SQLite requires us to build the multi-row insert as a listing of select with
 		// unions joining them together. So we'll build out this list of columns and
@@ -69,7 +69,7 @@ class SQLiteGrammar extends Grammar {
 	{
 		$sql = array('delete from sqlite_sequence where name = ?' => array($query->from));
 
-		$sql['delete from '.$this->wrapTable($query->from)] = array();
+		$sql['delete from '.$this->wrapTable($query->from)] = [];
 
 		return $sql;
 	}

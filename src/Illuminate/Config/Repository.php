@@ -25,21 +25,21 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 *
 	 * @var array
 	 */
-	protected $items = array();
+	protected $items = [];
 
 	/**
 	 * All of the registered packages.
 	 *
 	 * @var array
 	 */
-	protected $packages = array();
+	protected $packages = [];
 
 	/**
 	 * The after load callbacks for namespaces.
 	 *
 	 * @var array
 	 */
-	protected $afterLoad = array();
+	protected $afterLoad = [];
 
 	/**
 	 * Create a new configuration repository.

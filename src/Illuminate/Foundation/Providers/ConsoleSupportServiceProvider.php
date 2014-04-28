@@ -27,7 +27,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 *
 	 * @var array
 	 */
-	protected $instances = array();
+	protected $instances = [];
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -43,7 +43,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->instances = array();
+		$this->instances = [];
 
 		foreach ($this->providers as $provider)
 		{
@@ -58,7 +58,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		$provides = array();
+		$provides = [];
 
 		foreach ($this->providers as $provider)
 		{

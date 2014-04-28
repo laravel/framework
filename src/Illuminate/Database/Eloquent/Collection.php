@@ -230,7 +230,7 @@ class Collection extends BaseCollection {
 	{
 		$collection = $collection ?: $this;
 
-		$dictionary = array();
+		$dictionary = [];
 
 		foreach ($collection as $value)
 		{

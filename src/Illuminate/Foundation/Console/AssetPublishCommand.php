@@ -103,7 +103,7 @@ class AssetPublishCommand extends Command {
 	{
 		$vendor = $this->laravel['path.base'].'/vendor';
 
-		$packages = array();
+		$packages = [];
 
 		foreach (Finder::create()->directories()->in($vendor)->name('public')->depth('< 3') as $package)
 		{

@@ -73,35 +73,35 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 *
 	 * @var array
 	 */
-	protected $patternFilters = array();
+	protected $patternFilters = [];
 
 	/**
 	 * The registered regular expression based filters.
 	 *
 	 * @var array
 	 */
-	protected $regexFilters = array();
+	protected $regexFilters = [];
 
 	/**
 	 * The registered route value binders.
 	 *
 	 * @var array
 	 */
-	protected $binders = array();
+	protected $binders = [];
 
 	/**
 	 * The globally available parameter patterns.
 	 *
 	 * @var array
 	 */
-	protected $patterns = array();
+	protected $patterns = [];
 
 	/**
 	 * The route group attribute stack.
 	 *
 	 * @var array
 	 */
-	protected $groupStack = array();
+	protected $groupStack = [];
 
 	/**
 	 * All of the verbs supported by the router.
@@ -254,7 +254,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  array   $names
 	 * @return void
 	 */
-	public function controller($uri, $controller, $names = array())
+	public function controller($uri, $controller, $names = [])
 	{
 		$prepended = $controller;
 
@@ -325,7 +325,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  array   $options
 	 * @return void
 	 */
-	public function resource($name, $controller, array $options = array())
+	public function resource($name, $controller, array $options = [])
 	{
 		// If the resource name contains a slash, we will assume the developer wishes to
 		// register these resource routes with a prefix so we will set that up out of
@@ -1269,7 +1269,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function findPatternFilters($request)
 	{
-		$results = array();
+		$results = [];
 
 		list($path, $method) = array($request->path(), $request->getMethod());
 
@@ -1311,7 +1311,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function patternsByMethod($method, $filters)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($filters as $filter)
 		{

@@ -41,14 +41,14 @@ class Factory {
 	 *
 	 * @var array
 	 */
-	protected $shared = array();
+	protected $shared = [];
 
 	/**
 	 * All of the registered view names.
 	 *
 	 * @var array
 	 */
-	protected $names = array();
+	protected $names = [];
 
 	/**
 	 * The extension to engine bindings.
@@ -62,21 +62,21 @@ class Factory {
 	 *
 	 * @var array
 	 */
-	protected $composers = array();
+	protected $composers = [];
 
 	/**
 	 * All of the finished, captured sections.
 	 *
 	 * @var array
 	 */
-	protected $sections = array();
+	protected $sections = [];
 
 	/**
 	 * The stack of in-progress sections.
 	 *
 	 * @var array
 	 */
-	protected $sectionStack = array();
+	protected $sectionStack = [];
 
 	/**
 	 * The number of active rendering operations.
@@ -110,7 +110,7 @@ class Factory {
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function make($view, $data = array(), $mergeData = array())
+	public function make($view, $data = [], $mergeData = [])
 	{
 		$path = $this->finder->find($view);
 
@@ -139,7 +139,7 @@ class Factory {
 	 * @param mixed $data
 	 * @return \Illuminate\View\View
 	 */
-	public function of($view, $data = array())
+	public function of($view, $data = [])
 	{
 		return $this->make($this->names[$view], $data);
 	}
@@ -275,7 +275,7 @@ class Factory {
 	 */
 	public function creator($views, $callback)
 	{
-		$creators = array();
+		$creators = [];
 
 		foreach ((array) $views as $view)
 		{
@@ -293,7 +293,7 @@ class Factory {
 	 */
 	public function composers(array $composers)
 	{
-		$registered = array();
+		$registered = [];
 
 		foreach ($composers as $callback => $views)
 		{
@@ -312,7 +312,7 @@ class Factory {
 	 */
 	public function composer($views, $callback, $priority = null)
 	{
-		$composers = array();
+		$composers = [];
 
 		foreach ((array) $views as $view)
 		{
@@ -576,9 +576,9 @@ class Factory {
 	 */
 	public function flushSections()
 	{
-		$this->sections = array();
+		$this->sections = [];
 
-		$this->sectionStack = array();
+		$this->sectionStack = [];
 	}
 
 	/**

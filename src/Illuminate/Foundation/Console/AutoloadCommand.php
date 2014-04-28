@@ -64,7 +64,7 @@ class AutoloadCommand extends Command {
 	 */
 	protected function findWorkbenches()
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($this->getWorkbenchComposers() as $file)
 		{
@@ -83,7 +83,7 @@ class AutoloadCommand extends Command {
 	{
 		$workbench = $this->laravel['path.base'].'/workbench';
 
-		if ( ! is_dir($workbench)) return array();
+		if ( ! is_dir($workbench)) return [];
 
 		return Finder::create()->files()->in($workbench)->name('composer.json')->depth('< 3');
 	}

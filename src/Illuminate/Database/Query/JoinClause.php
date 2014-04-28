@@ -28,7 +28,7 @@ class JoinClause {
 	 *
 	 * @var array
 	 */
-	public $clauses = array();
+	public $clauses = [];
 
 	/**
 	 * Create a new join clause instance.

@@ -166,7 +166,7 @@ class HasManyThrough extends Relation {
 	 */
 	protected function buildDictionary(Collection $results)
 	{
-		$dictionary = array();
+		$dictionary = [];
 
 		$foreign = $this->farParent->getForeignKey();
 

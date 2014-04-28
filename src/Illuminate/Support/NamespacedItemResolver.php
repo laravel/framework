@@ -7,7 +7,7 @@ class NamespacedItemResolver {
 	 *
 	 * @var array
 	 */
-	protected $parsed = array();
+	protected $parsed = [];
 
 	/**
 	 * Parse a key into namespace, group, and item.

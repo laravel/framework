@@ -73,14 +73,14 @@ class Mailer {
 	 *
 	 * @var array
 	 */
-	protected $failedRecipients = array();
+	protected $failedRecipients = [];
 
 	/**
 	 * Array of parsed views containing html and text view name.
 	 *
 	 * @var array
 	 */
-	protected $parsedViews = array();
+	protected $parsedViews = [];
 
 	/**
 	 * Create a new Mailer instance.

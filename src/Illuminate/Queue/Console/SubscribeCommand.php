@@ -108,7 +108,7 @@ class SubscribeCommand extends Command {
 		}
 		catch (\Exception $e)
 		{
-			return array();
+			return [];
 		}
 	}
 

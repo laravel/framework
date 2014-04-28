@@ -7,7 +7,7 @@ class ClassLoader {
 	 *
 	 * @var array
 	 */
-	protected static $directories = array();
+	protected static $directories = [];
 
 	/**
 	 * Indicates if a ClassLoader has been registered.
@@ -87,7 +87,7 @@ class ClassLoader {
 	{
 		if (is_null($directories))
 		{
-			static::$directories = array();
+			static::$directories = [];
 		}
 		else
 		{

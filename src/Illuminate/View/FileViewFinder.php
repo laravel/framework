@@ -23,14 +23,14 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @var array
 	 */
-	protected $views = array();
+	protected $views = [];
 
 	/**
 	 * The namespace to file path hints.
 	 *
 	 * @var array
 	 */
-	protected $hints = array();
+	protected $hints = [];
 
 	/**
 	 * Register a view extension with the finder.

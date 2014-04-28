@@ -9,7 +9,7 @@ if ( ! function_exists('action'))
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	function action($name, $parameters = array())
+	function action($name, $parameters = [])
 	{
 		return app('url')->action($name, $parameters);
 	}
@@ -103,7 +103,7 @@ if ( ! function_exists('array_build'))
 	 */
 	function array_build($array, Closure $callback)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $key => $value)
 		{
@@ -141,7 +141,7 @@ if ( ! function_exists('array_dot'))
 	 */
 	function array_dot($array, $prepend = '')
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $key => $value)
 		{
@@ -187,7 +187,7 @@ if ( ! function_exists('array_fetch'))
 	{
 		foreach (explode('.', $key) as $segment)
 		{
-			$results = array();
+			$results = [];
 
 			foreach ($array as $value)
 			{
@@ -250,7 +250,7 @@ if ( ! function_exists('array_flatten'))
 	 */
 	function array_flatten($array)
 	{
-		$return = array();
+		$return = [];
 
 		array_walk_recursive($array, function($x) use (&$return) { $return[] = $x; });
 
@@ -344,7 +344,7 @@ if ( ! function_exists('array_pluck'))
 	 */
 	function array_pluck($array, $value, $key = null)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $item)
 		{
@@ -416,7 +416,7 @@ if ( ! function_exists('array_set'))
 			// values at the correct depth. Then we'll keep digging into the array.
 			if ( ! isset($array[$key]) || ! is_array($array[$key]))
 			{
-				$array[$key] = array();
+				$array[$key] = [];
 			}
 
 			$array =& $array[$key];
@@ -454,7 +454,7 @@ if ( ! function_exists('array_where'))
 	 */
 	function array_where($array, Closure $callback)
 	{
-		$filtered = array();
+		$filtered = [];
 
 		foreach ($array as $key => $value)
 		{
@@ -645,7 +645,7 @@ if ( ! function_exists('link_to'))
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	function link_to($url, $title = null, $attributes = array(), $secure = null)
+	function link_to($url, $title = null, $attributes = [], $secure = null)
 	{
 		return app('html')->link($url, $title, $attributes, $secure);
 	}
@@ -676,7 +676,7 @@ if ( ! function_exists('link_to_asset'))
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	function link_to_asset($url, $title = null, $attributes = array(), $secure = null)
+	function link_to_asset($url, $title = null, $attributes = [], $secure = null)
 	{
 		return app('html')->linkAsset($url, $title, $attributes, $secure);
 	}
@@ -693,7 +693,7 @@ if ( ! function_exists('link_to_route'))
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	function link_to_route($name, $title = null, $parameters = array(), $attributes = array())
+	function link_to_route($name, $title = null, $parameters = [], $attributes = [])
 	{
 		return app('html')->linkRoute($name, $title, $parameters, $attributes);
 	}
@@ -710,7 +710,7 @@ if ( ! function_exists('link_to_action'))
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	function link_to_action($action, $title = null, $parameters = array(), $attributes = array())
+	function link_to_action($action, $title = null, $parameters = [], $attributes = [])
 	{
 		return app('html')->linkAction($action, $title, $parameters, $attributes);
 	}
@@ -787,7 +787,7 @@ if ( ! function_exists('route'))
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	function route($route, $parameters = array())
+	function route($route, $parameters = [])
 	{
 		return app('url')->route($route, $parameters);
 	}
@@ -816,7 +816,7 @@ if ( ! function_exists('secure_url'))
 	 * @param  mixed   $parameters
 	 * @return string
 	 */
-	function secure_url($path, $parameters = array())
+	function secure_url($path, $parameters = [])
 	{
 		return url($path, $parameters, true);
 	}
@@ -1018,7 +1018,7 @@ if ( ! function_exists('trans'))
 	 * @param  string  $locale
 	 * @return string
 	 */
-	function trans($id, $parameters = array(), $domain = 'messages', $locale = null)
+	function trans($id, $parameters = [], $domain = 'messages', $locale = null)
 	{
 		return app('translator')->trans($id, $parameters, $domain, $locale);
 	}
@@ -1036,7 +1036,7 @@ if ( ! function_exists('trans_choice'))
 	 * @param  string  $locale
 	 * @return string
 	 */
-	function trans_choice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+	function trans_choice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
 	{
 		return app('translator')->transChoice($id, $number, $parameters, $domain, $locale);
 	}
@@ -1052,7 +1052,7 @@ if ( ! function_exists('url'))
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	function url($path = null, $parameters = array(), $secure = null)
+	function url($path = null, $parameters = [], $secure = null)
 	{
 		return app('url')->to($path, $parameters, $secure);
 	}

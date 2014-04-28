@@ -16,7 +16,7 @@ class QueueManager {
 	 *
 	 * @var array
 	 */
-	protected $connections = array();
+	protected $connections = [];
 
 	/**
 	 * Create a new queue manager instance.

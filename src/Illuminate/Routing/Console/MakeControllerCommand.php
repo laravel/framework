@@ -145,7 +145,7 @@ class MakeControllerCommand extends Command {
 	{
 		$option = $this->input->getOption($name);
 
-		return is_null($option) ? array() : explode(',', $option);
+		return is_null($option) ? [] : explode(',', $option);
 	}
 
 	/**

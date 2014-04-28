@@ -23,7 +23,7 @@ class CookieJar {
 	 *
 	 * @var array
 	 */
-	protected $queued = array();
+	protected $queued = [];
 
 	/**
 	 * Create a new cookie instance.

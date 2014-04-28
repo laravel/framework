@@ -95,7 +95,7 @@ class Guard implements HttpKernelInterface {
 	 */
 	protected function decryptArray(array $cookie)
 	{
-		$decrypted = array();
+		$decrypted = [];
 
 		foreach ($cookie as $key => $value)
 		{

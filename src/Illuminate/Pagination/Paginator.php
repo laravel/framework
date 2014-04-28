@@ -78,7 +78,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 *
 	 * @var array
 	 */
-	protected $query = array();
+	protected $query = [];
 
 	/**
 	 * The fragment to be appended to all URLs.

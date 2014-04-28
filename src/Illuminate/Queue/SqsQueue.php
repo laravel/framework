@@ -53,7 +53,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function pushRaw($payload, $queue = null, array $options = array())
+	public function pushRaw($payload, $queue = null, array $options = [])
 	{
 		$response = $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
 

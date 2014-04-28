@@ -42,14 +42,14 @@ class Handler {
 	 *
 	 * @var array
 	 */
-	protected $handlers = array();
+	protected $handlers = [];
 
 	/**
 	 * All of the handled error messages.
 	 *
 	 * @var array
 	 */
-	protected $handled = array();
+	protected $handled = [];
 
 	/**
 	 * Create a new error handler instance.
@@ -126,7 +126,7 @@ class Handler {
 	 *
 	 * @throws \ErrorException
 	 */
-	public function handleError($level, $message, $file = '', $line = 0, $context = array())
+	public function handleError($level, $message, $file = '', $line = 0, $context = [])
 	{
 		if (error_reporting() & $level)
 		{

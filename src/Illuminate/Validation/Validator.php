@@ -31,7 +31,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @var array
 	 */
-	protected $failedRules = array();
+	protected $failedRules = [];
 
 	/**
 	 * The message bag instance.
@@ -52,7 +52,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @var array
 	 */
-	protected $files = array();
+	protected $files = [];
 
 	/**
 	 * The rules to be applied to the data.
@@ -66,35 +66,35 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @var array
 	 */
-	protected $customMessages = array();
+	protected $customMessages = [];
 
 	/**
 	 * The array of fallback error messages.
 	 *
 	 * @var array
 	 */
-	protected $fallbackMessages = array();
+	protected $fallbackMessages = [];
 
 	/**
 	 * The array of custom attribute names.
 	 *
 	 * @var array
 	 */
-	protected $customAttributes = array();
+	protected $customAttributes = [];
 
 	/**
 	 * All of the custom validator extensions.
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
 
 	/**
 	 * All of the custom replacer extensions.
 	 *
 	 * @var array
 	 */
-	protected $replacers = array();
+	protected $replacers = [];
 
 	/**
 	 * The size related validation rules.
@@ -129,7 +129,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  array  $customAttributes
 	 * @return void
 	 */
-	public function __construct(TranslatorInterface $translator, array $data, array $rules, array $messages = array(), array $customAttributes = array())
+	public function __construct(TranslatorInterface $translator, array $data, array $rules, array $messages = [], array $customAttributes = [])
 	{
 		$this->translator = $translator;
 		$this->customMessages = $messages;
@@ -146,7 +146,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function parseData(array $data)
 	{
-		$this->files = array();
+		$this->files = [];
 
 		foreach ($data as $key => $value)
 		{
@@ -960,7 +960,7 @@ class Validator implements MessageProviderInterface {
 		}
 		else
 		{
-			return array();
+			return [];
 		}
 	}
 
@@ -1032,7 +1032,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getExtraConditions(array $segments)
 	{
-		$extra = array();
+		$extra = [];
 
 		$count = count($segments);
 
@@ -1476,7 +1476,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getAttributeList(array $values)
 	{
-		$attributes = array();
+		$attributes = [];
 
 		// For each attribute in the list we will simply get its displayable form as
 		// this is convenient when replacing lists of parameters like some of the
@@ -1844,7 +1844,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function parseRule($rule)
 	{
-		$parameters = array();
+		$parameters = [];
 
 		// The format for specifying validation rules and parameters follows an
 		// easy {rule}:{parameters} formatting convention. For instance the

@@ -41,56 +41,56 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @var array
 	 */
-	protected $bootingCallbacks = array();
+	protected $bootingCallbacks = [];
 
 	/**
 	 * The array of booted callbacks.
 	 *
 	 * @var array
 	 */
-	protected $bootedCallbacks = array();
+	protected $bootedCallbacks = [];
 
 	/**
 	 * The array of finish callbacks.
 	 *
 	 * @var array
 	 */
-	protected $finishCallbacks = array();
+	protected $finishCallbacks = [];
 
 	/**
 	 * The array of shutdown callbacks.
 	 *
 	 * @var array
 	 */
-	protected $shutdownCallbacks = array();
+	protected $shutdownCallbacks = [];
 
 	/**
 	 * All of the developer defined middlewares.
 	 *
 	 * @var array
 	 */
-	protected $middlewares = array();
+	protected $middlewares = [];
 
 	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
 	 */
-	protected $serviceProviders = array();
+	protected $serviceProviders = [];
 
 	/**
 	 * The names of the loaded service providers.
 	 *
 	 * @var array
 	 */
-	protected $loadedProviders = array();
+	protected $loadedProviders = [];
 
 	/**
 	 * The deferred services and their providers.
 	 *
 	 * @var array
 	 */
-	protected $deferredServices = array();
+	protected $deferredServices = [];
 
 	/**
 	 * The request class used by the application.
@@ -289,7 +289,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  array  $options
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function forceRegister($provider, $options = array())
+	public function forceRegister($provider, $options = [])
 	{
 		return $this->register($provider, $options, true);
 	}
@@ -302,7 +302,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  bool   $force
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function register($provider, $options = array(), $force = false)
+	public function register($provider, $options = [], $force = false)
 	{
 		if ($registered = $this->getRegistered($provider) && ! $force)
                                      return $registered;
@@ -395,7 +395,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			$this->loadDeferredProvider($service);
 		}
 
-		$this->deferredServices = array();
+		$this->deferredServices = [];
 	}
 
 	/**
@@ -451,7 +451,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = array())
+	public function make($abstract, $parameters = [])
 	{
 		$abstract = $this->getAlias($abstract);
 
@@ -664,7 +664,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  array  $parameters
 	 * @return \Illuminate\Foundation\Application
 	 */
-	public function middleware($class, array $parameters = array())
+	public function middleware($class, array $parameters = [])
 	{
 		$this->middlewares[] = compact('class', 'parameters');
 
@@ -864,7 +864,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
 	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
-	public function abort($code, $message = '', array $headers = array())
+	public function abort($code, $message = '', array $headers = [])
 	{
 		if ($code == 404)
 		{
@@ -1012,7 +1012,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$url = $this['config']->get('app.url', 'http://localhost');
 
-		$parameters = array($url, 'GET', array(), array(), array(), $_SERVER);
+		$parameters = array($url, 'GET', [], [], [], $_SERVER);
 
 		$this->refreshRequest(static::onRequest('create', $parameters));
 	}
@@ -1024,7 +1024,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  array  $parameters
 	 * @return mixed
 	 */
-	public static function onRequest($method, $parameters = array())
+	public static function onRequest($method, $parameters = [])
 	{
 		return forward_static_call_array(array(static::requestClass(), $method), $parameters);
 	}

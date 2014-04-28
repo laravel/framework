@@ -90,7 +90,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function getRoutes()
 	{
-		$results = array();
+		$results = [];
 
 		foreach($this->routes as $route)
 		{
@@ -157,7 +157,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function getPatternFilters($route)
 	{
-		$patterns = array();
+		$patterns = [];
 
 		foreach ($route->methods() as $method)
 		{

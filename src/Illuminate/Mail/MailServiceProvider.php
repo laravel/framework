@@ -190,7 +190,7 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMailgunTransport($config)
 	{
-		$mailgun = $this->app['config']->get('services.mailgun', array());
+		$mailgun = $this->app['config']->get('services.mailgun', []);
 
 		$this->app->bindShared('swift.transport', function() use ($mailgun)
 		{
@@ -206,7 +206,7 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMandrillTransport($config)
 	{
-		$mandrill = $this->app['config']->get('services.mandrill', array());
+		$mandrill = $this->app['config']->get('services.mandrill', []);
 
 		$this->app->bindShared('swift.transport', function() use ($mandrill)
 		{

@@ -40,7 +40,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = array())
+	public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = [])
 	{
 		$query = $this->table($collection)->where($column, '=', $value);
 
@@ -66,7 +66,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function getMultiCount($collection, $column, array $values, array $extra = array())
+	public function getMultiCount($collection, $column, array $values, array $extra = [])
 	{
 		$query = $this->table($collection)->whereIn($column, $values);
 
