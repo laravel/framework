@@ -31,7 +31,7 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
 		$migrator->shouldReceive('rollback')->twice()->with(true)->andReturn(true, false);
 		$migrator->shouldReceive('getNotes')->andReturn([]);
 
-		$this->runCommand($command, array('--pretend' => true, '--database' => 'foo'));
+		$this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
 	}
 
 

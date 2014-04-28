@@ -19,7 +19,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 
 	public function testSimpleRangeIsReturnedWhenCantBuildSlier()
 	{
-		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', array('getPageRange', 'getPrevious', 'getNext'), array($paginator = $this->getPaginator()));
+		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', ['getPageRange', 'getPrevious', 'getNext'], [$paginator = $this->getPaginator()]);
 		$presenter->expects($this->once())->method('getPageRange')->with($this->equalTo(1), $this->equalTo(2))->will($this->returnValue('bar'));
 		$presenter->expects($this->once())->method('getPrevious')->will($this->returnValue('foo'));
 		$presenter->expects($this->once())->method('getNext')->will($this->returnValue('baz'));
@@ -40,7 +40,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 
 	public function testBeginningSliderIsCreatedWhenCloseToStart()
 	{
-		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', array('getPageRange', 'getPrevious', 'getNext', 'getStart', 'getFinish'), array($paginator = $this->getPaginator()));
+		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', ['getPageRange', 'getPrevious', 'getNext', 'getStart', 'getFinish'], [$paginator = $this->getPaginator()]);
 		$presenter->setLastPage(14);
 		$presenter->expects($this->once())->method('getFinish')->will($this->returnValue('finish'));
 		$presenter->expects($this->once())->method('getPrevious')->will($this->returnValue('previous'));
@@ -53,7 +53,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 
 	public function testEndingSliderIsCreatedWhenCloseToStart()
 	{
-		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', array('getPageRange', 'getPrevious', 'getNext', 'getStart', 'getFinish'), array($paginator = $this->getPaginator()));
+		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', ['getPageRange', 'getPrevious', 'getNext', 'getStart', 'getFinish'], [$paginator = $this->getPaginator()]);
 		$presenter->setLastPage(14);
 		$presenter->setCurrentPage(13);
 		$presenter->expects($this->once())->method('getStart')->will($this->returnValue('start'));
@@ -67,7 +67,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 
 	public function testSliderIsCreatedWhenCloseToStart()
 	{
-		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', array('getPageRange', 'getPrevious', 'getNext', 'getStart', 'getFinish'), array($paginator = $this->getPaginator()));
+		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', ['getPageRange', 'getPrevious', 'getNext', 'getStart', 'getFinish'], [$paginator = $this->getPaginator()]);
 		$presenter->setLastPage(30);
 		$presenter->setCurrentPage(15);
 		$presenter->expects($this->once())->method('getStart')->will($this->returnValue('start'));
@@ -130,7 +130,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetAdjacentRange()
 	{
-		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', array('getPageRange'), array($paginator = $this->getPaginator()));
+		$presenter = $this->getMock('Illuminate\Pagination\BootstrapPresenter', ['getPageRange'], [$paginator = $this->getPaginator()]);
 		$presenter->expects($this->once())->method('getPageRange')->with($this->equalTo(1), $this->equalTo(7))->will($this->returnValue('foo'));
 		$presenter->setCurrentPage(4);
 

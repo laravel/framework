@@ -22,7 +22,7 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 		$related->shouldReceive('getTable')->andReturn('table');
 		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 		$related->shouldReceive('freshTimestampString')->andReturn(Carbon\Carbon::now());
-		$builder->shouldReceive('update')->once()->with(array('updated_at' => Carbon\Carbon::now()));
+		$builder->shouldReceive('update')->once()->with(['updated_at' => Carbon\Carbon::now()]);
 
 		$relation->touch();
 	}

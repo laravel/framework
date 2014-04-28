@@ -50,7 +50,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testComplexRedirectTo()
 	{
-		$response = $this->redirect->to('bar', 303, array('X-RateLimit-Limit' => 60, 'X-RateLimit-Remaining' => 59), true);
+		$response = $this->redirect->to('bar', 303, ['X-RateLimit-Limit' => 60, 'X-RateLimit-Remaining' => 59], true);
 
 		$this->assertEquals('https://foo.com/bar', $response->getTargetUrl());
 		$this->assertEquals(303, $response->getStatusCode());

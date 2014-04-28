@@ -16,7 +16,7 @@ class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase {
 		$repo->shouldReceive('setSource')->once()->with('foo');
 		$repo->shouldReceive('createRepository')->once();
 
-		$this->runCommand($command, array('--database' => 'foo'));
+		$this->runCommand($command, ['--database' => 'foo']);
 	}
 
 

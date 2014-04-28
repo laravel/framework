@@ -104,14 +104,14 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 	{
 		$config = $this->getRepository();
 		$options = $this->getDummyOptions();
-		$config->getLoader()->shouldReceive('load')->once()->with('production', 'foo', null)->andReturn(array('name' => 'dayle'));
+		$config->getLoader()->shouldReceive('load')->once()->with('production', 'foo', null)->andReturn(['name' => 'dayle']);
 
 		$config->set('foo.name', 'taylor');
 		$this->assertEquals('taylor', $config->get('foo.name'));
 
 		$config = $this->getRepository();
 		$options = $this->getDummyOptions();
-		$config->getLoader()->shouldReceive('load')->once()->with('production', 'foo', 'namespace')->andReturn(array('name' => 'dayle'));
+		$config->getLoader()->shouldReceive('load')->once()->with('production', 'foo', 'namespace')->andReturn(['name' => 'dayle']);
 
 		$config->set('namespace::foo.name', 'taylor');
 		$this->assertEquals('taylor', $config->get('namespace::foo.name'));
@@ -120,14 +120,14 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testPackageRegistersNamespaceAndSetsUpAfterLoadCallback()
 	{
-		$config = $this->getMock('Illuminate\Config\Repository', array('addNamespace'), array(m::mock('Illuminate\Config\LoaderInterface'), 'production'));
+		$config = $this->getMock('Illuminate\Config\Repository', ['addNamespace'], [m::mock('Illuminate\Config\LoaderInterface'), 'production']);
 		$config->expects($this->once())->method('addNamespace')->with($this->equalTo('rees'), $this->equalTo(__DIR__));
-		$config->getLoader()->shouldReceive('cascadePackage')->once()->with('production', 'dayle/rees', 'group', array('foo'))->andReturn(array('bar'));
+		$config->getLoader()->shouldReceive('cascadePackage')->once()->with('production', 'dayle/rees', 'group', ['foo'])->andReturn(['bar']);
 		$config->package('dayle/rees', __DIR__);
 		$afterLoad = $config->getAfterLoadCallbacks();
-		$results = call_user_func($afterLoad['rees'], $config, 'group', array('foo'));
+		$results = call_user_func($afterLoad['rees'], $config, 'group', ['foo']);
 
-		$this->assertEquals(array('bar'), $results);
+		$this->assertEquals(['bar'], $results);
 	}
 
 
@@ -139,7 +139,7 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	protected function getDummyOptions()
 	{
-		return array('foo' => 'bar', 'baz' => array('boom' => 'breeze'), 'bing' => true);
+		return ['foo' => 'bar', 'baz' => ['boom' => 'breeze'], 'bing' => true];
 	}
 
 }

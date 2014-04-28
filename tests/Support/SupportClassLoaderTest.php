@@ -22,10 +22,10 @@ class SupportClassLoaderTest extends PHPUnit_Framework_TestCase {
 	{
 		ClassLoader::removeDirectories();
 		$this->assertEmpty(ClassLoader::getDirectories());
-		ClassLoader::addDirectories($directories = array('foo', 'bar'));
+		ClassLoader::addDirectories($directories = ['foo', 'bar']);
 		$this->assertEquals($directories, ClassLoader::getDirectories());
 		ClassLoader::addDirectories('baz');
-		$this->assertEquals(array_merge($directories, array('baz')), ClassLoader::getDirectories());
+		$this->assertEquals(array_merge($directories, ['baz']), ClassLoader::getDirectories());
 		ClassLoader::removeDirectories('baz');
 		$this->assertEquals($directories, ClassLoader::getDirectories());
 		ClassLoader::removeDirectories($directories);

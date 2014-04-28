@@ -20,14 +20,14 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase {
 			$manager = m::mock('Illuminate\Session\SessionManager')
 		);
 
-		$manager->shouldReceive('getSessionConfig')->andReturn(array(
+		$manager->shouldReceive('getSessionConfig')->andReturn([
 			'driver' => 'file',
-			'lottery' => array(100, 100),
+			'lottery' => [100, 100],
 			'path' => '/',
 			'domain' => null,
 			'lifetime' => 120,
 			'expire_on_close' => false,
-		));
+		]);
 
 		$manager->shouldReceive('driver')->andReturn($driver = m::mock('Illuminate\Session\Store')->makePartial());
 		$driver->shouldReceive('setRequestOnHandler')->once()->with($request);
@@ -54,9 +54,9 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase {
 			$app = m::mock('Symfony\Component\HttpKernel\HttpKernelInterface'),
 			$manager = m::mock('Illuminate\Session\SessionManager')
 		);
-		$manager->shouldReceive('getSessionConfig')->andReturn(array(
+		$manager->shouldReceive('getSessionConfig')->andReturn([
 			'driver' => null,
-		));
+		]);
 		$app->shouldReceive('handle')->once()->with($request, Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST, true)->andReturn($response);
 		$middleResponse = $middle->handle($request);
 

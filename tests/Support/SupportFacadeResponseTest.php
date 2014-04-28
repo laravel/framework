@@ -14,7 +14,7 @@ class SupportFacadeResponseTest extends PHPUnit_Framework_TestCase {
 	public function testArrayableSendAsJson()
 	{
 		$data = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
-		$data->shouldReceive('toArray')->andReturn(array('foo' => 'bar'));
+		$data->shouldReceive('toArray')->andReturn(['foo' => 'bar']);
 
 		$response = Response::json($data);
 		$this->assertEquals('{"foo":"bar"}', $response->getContent());
