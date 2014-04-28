@@ -57,12 +57,11 @@ class Migrator {
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(
-		Container $app,
-		MigrationRepositoryInterface $repository,
-		Resolver $resolver,
-		Filesystem $files
-	) {
+	public function __construct(Container $app,
+								MigrationRepositoryInterface $repository,
+								Resolver $resolver,
+								Filesystem $files)
+	{
 		$this->app = $app;
 		$this->files = $files;
 		$this->resolver = $resolver;
