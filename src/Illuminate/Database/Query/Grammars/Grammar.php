@@ -17,7 +17,7 @@ class Grammar extends BaseGrammar {
 	 *
 	 * @var array
 	 */
-	protected $selectComponents = array(
+	protected $selectComponents = [
 		'aggregate',
 		'columns',
 		'from',
@@ -30,7 +30,7 @@ class Grammar extends BaseGrammar {
 		'offset',
 		'unions',
 		'lock',
-	);
+	];
 
 	/**
 	 * Compile a select query into SQL.
@@ -40,7 +40,7 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileSelect(Builder $query)
 	{
-		if (is_null($query->columns)) $query->columns = array('*');
+		if (is_null($query->columns)) $query->columns = ['*'];
 
 		return trim($this->concatenate($this->compileComponents($query)));
 	}
@@ -461,7 +461,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileHavings(Builder $query, $havings)
 	{
-		$sql = implode(' ', array_map(array($this, 'compileHaving'), $havings));
+		$sql = implode(' ', array_map([$this, 'compileHaving'], $havings));
 
 		return 'having '.preg_replace('/and /', '', $sql, 1);
 	}
@@ -589,7 +589,7 @@ class Grammar extends BaseGrammar {
 
 		if ( ! is_array(reset($values)))
 		{
-			$values = array($values);
+			$values = [$values];
 		}
 
 		$columns = $this->columnize(array_keys(reset($values)));
@@ -685,7 +685,7 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileTruncate(Builder $query)
 	{
-		return array('truncate '.$this->wrapTable($query->from) => []);
+		return ['truncate '.$this->wrapTable($query->from) => []];
 	}
 
 	/**

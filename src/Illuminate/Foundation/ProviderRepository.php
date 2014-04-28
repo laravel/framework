@@ -23,7 +23,7 @@ class ProviderRepository {
 	 *
 	 * @var array
 	 */
-	protected $default = array('when' => []);
+	protected $default = ['when' => []];
 
 	/**
 	 * Create a new service repository instance.
@@ -213,7 +213,7 @@ class ProviderRepository {
 	 */
 	protected function freshManifest(array $providers)
 	{
-		list($eager, $deferred) = array([], []);
+		list($eager, $deferred) = [[], []];
 
 		return compact('providers', 'eager', 'deferred');
 	}

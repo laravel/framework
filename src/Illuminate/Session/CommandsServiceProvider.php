@@ -33,7 +33,7 @@ class CommandsServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.session.database');
+		return ['command.session.database'];
 	}
 
 }

@@ -71,7 +71,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function call()
 	{
-		call_user_func_array(array($this->client, 'request'), func_get_args());
+		call_user_func_array([$this->client, 'request'], func_get_args());
 
 		return $this->client->getResponse();
 	}
@@ -94,7 +94,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 		$parameters[1] = 'https://localhost/'.ltrim($parameters[1], '/');
 
-		return call_user_func_array(array($this, 'call'), $parameters);
+		return call_user_func_array([$this, 'call'], $parameters);
 	}
 
 	/**
@@ -414,7 +414,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app['artisan']->call('db:seed', array('--class' => $class));
+		$this->app['artisan']->call('db:seed', ['--class' => $class]);
 	}
 
 	/**

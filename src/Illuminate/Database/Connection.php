@@ -577,7 +577,7 @@ class Connection implements ConnectionInterface {
 	{
 		if (isset($this->events))
 		{
-			$this->events->fire('illuminate.query', array($query, $bindings, $time, $this->getName()));
+			$this->events->fire('illuminate.query', [$query, $bindings, $time, $this->getName()]);
 		}
 
 		if ( ! $this->loggingQueries) return;
@@ -657,7 +657,7 @@ class Connection implements ConnectionInterface {
 	{
 		$driver = $this->getDoctrineDriver();
 
-		$data = array('pdo' => $this->pdo, 'dbname' => $this->getConfig('database'));
+		$data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
 
 		return new DoctrineConnection($data, $driver);
 	}

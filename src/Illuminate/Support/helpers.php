@@ -126,7 +126,7 @@ if ( ! function_exists('array_divide'))
 	 */
 	function array_divide($array)
 	{
-		return array(array_keys($array), array_values($array));
+		return [array_keys($array), array_values($array)];
 	}
 }
 

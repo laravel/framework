@@ -9,7 +9,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 *
 	 * @var array
 	 */
-	protected $providers = array(
+	protected $providers = [
 		'Illuminate\Foundation\Providers\CommandCreatorServiceProvider',
 		'Illuminate\Foundation\Providers\ComposerServiceProvider',
 		'Illuminate\Foundation\Providers\KeyGeneratorServiceProvider',
@@ -20,7 +20,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 		'Illuminate\Foundation\Providers\ServerServiceProvider',
 		'Illuminate\Foundation\Providers\TinkerServiceProvider',
 		'Illuminate\Queue\FailConsoleServiceProvider',
-	);
+	];
 
 	/**
 	 * An array of the service provider instances.

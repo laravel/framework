@@ -36,7 +36,7 @@ class TagSet {
 	 */
 	public function reset()
 	{
-		array_walk($this->names, array($this, 'resetTag'));
+		array_walk($this->names, [$this, 'resetTag']);
 	}
 
 	/**
@@ -57,7 +57,7 @@ class TagSet {
 	 */
 	protected function tagIds()
 	{
-		return array_map(array($this, 'tagId'), $this->names);
+		return array_map([$this, 'tagId'], $this->names);
 	}
 
 	/**

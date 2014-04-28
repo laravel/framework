@@ -267,11 +267,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	{
 		if ( ! is_null($locale))
 		{
-			return array_filter(array($locale, $this->fallback));
+			return array_filter([$locale, $this->fallback]);
 		}
 		else
 		{
-			return array_filter(array($this->locale, $this->fallback));
+			return array_filter([$this->locale, $this->fallback]);
 		}
 	}
 

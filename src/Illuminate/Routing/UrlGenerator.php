@@ -24,7 +24,7 @@ class UrlGenerator {
 	 *
 	 * @var array
 	 */
-	protected $dontEncode = array(
+	protected $dontEncode = [
 		'%2F' => '/',
 		'%40' => '@',
 		'%3A' => ':',
@@ -35,7 +35,7 @@ class UrlGenerator {
 		'%21' => '!',
 		'%2A' => '*',
 		'%7C' => '|',
-	);
+	];
 
 	/**
 	 * Create a new URL Generator instance.
@@ -373,7 +373,7 @@ class UrlGenerator {
 	 */
 	protected function addPortToDomain($domain)
 	{
-		if (in_array($this->request->getPort(), array('80', '443')))
+		if (in_array($this->request->getPort(), ['80', '443']))
 		{
 			return $domain;
 		}
@@ -454,7 +454,7 @@ class UrlGenerator {
 	 */
 	public function isValidUrl($path)
 	{
-		if (starts_with($path, array('#', '//', 'mailto:', 'tel:'))) return true;
+		if (starts_with($path, ['#', '//', 'mailto:', 'tel:'])) return true;
 
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
 	}

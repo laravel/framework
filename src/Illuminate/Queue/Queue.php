@@ -56,7 +56,7 @@ abstract class Queue {
 		}
 		else
 		{
-			return json_encode(array('job' => $job, 'data' => $data));
+			return json_encode(['job' => $job, 'data' => $data]);
 		}
 	}
 
@@ -71,7 +71,7 @@ abstract class Queue {
 	{
 		$closure = serialize(new SerializableClosure($job));
 
-		return array('job' => 'IlluminateQueueClosure', 'data' => compact('closure'));
+		return ['job' => 'IlluminateQueueClosure', 'data' => compact('closure')];
 	}
 
 	/**

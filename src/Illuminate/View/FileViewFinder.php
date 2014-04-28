@@ -37,7 +37,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array('blade.php', 'php');
+	protected $extensions = ['blade.php', 'php'];
 
 	/**
 	 * Hint path delimiter value.

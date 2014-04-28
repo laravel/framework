@@ -133,7 +133,7 @@ class BelongsTo extends Relation {
 		// be what this developer is expecting in a case where this happens to them.
 		if (count($keys) == 0)
 		{
-			return array(0);
+			return [0];
 		}
 
 		return array_values(array_unique($keys));

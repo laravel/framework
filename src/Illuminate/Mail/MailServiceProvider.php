@@ -235,7 +235,7 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('mailer', 'swift.mailer', 'swift.transport');
+		return ['mailer', 'swift.mailer', 'swift.transport'];
 	}
 
 }

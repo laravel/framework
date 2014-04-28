@@ -16,7 +16,7 @@ class ControllerGenerator {
 	 *
 	 * @var array
 	 */
-	protected $defaults = array(
+	protected $defaults = [
 		'index',
 		'create',
 		'store',
@@ -24,7 +24,7 @@ class ControllerGenerator {
 		'edit',
 		'update',
 		'destroy'
-	);
+	];
 
 	/**
 	 * Create a new controller generator instance.

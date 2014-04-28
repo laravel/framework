@@ -114,7 +114,7 @@ class Factory {
 	 */
 	public function getPaginationView(Paginator $paginator, $view = null)
 	{
-		$data = array('environment' => $this, 'paginator' => $paginator);
+		$data = ['environment' => $this, 'paginator' => $paginator];
 
 		return $this->view->make($this->getViewName($view), $data);
 	}

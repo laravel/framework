@@ -37,7 +37,7 @@ class PaginationServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('paginator');
+		return ['paginator'];
 	}
 
 }

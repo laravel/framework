@@ -55,7 +55,7 @@ class Factory {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array('blade.php' => 'blade', 'php' => 'php');
+	protected $extensions = ['blade.php' => 'blade', 'php' => 'php'];
 
 	/**
 	 * The view composer events.
@@ -196,7 +196,7 @@ class Factory {
 		{
 			foreach ($data as $key => $value)
 			{
-				$data = array('key' => $key, $iterator => $value);
+				$data = ['key' => $key, $iterator => $value];
 
 				$result .= $this->make($view, $data)->render();
 			}
@@ -403,7 +403,7 @@ class Factory {
 		// given arguments that are passed to the Closure as the composer's data.
 		return function() use ($class, $method, $container)
 		{
-			$callable = array($container->make($class), $method);
+			$callable = [$container->make($class), $method];
 
 			return call_user_func_array($callable, func_get_args());
 		};
@@ -426,7 +426,7 @@ class Factory {
 		{
 			$method = str_contains($prefix, 'composing') ? 'compose' : 'create';
 
-			return array($class, $method);
+			return [$class, $method];
 		}
 	}
 
@@ -438,7 +438,7 @@ class Factory {
 	 */
 	public function callComposer(View $view)
 	{
-		$this->events->fire('composing: '.$view->getName(), array($view));
+		$this->events->fire('composing: '.$view->getName(), [$view]);
 	}
 
 	/**
@@ -449,7 +449,7 @@ class Factory {
 	 */
 	public function callCreator(View $view)
 	{
-		$this->events->fire('creating: '.$view->getName(), array($view));
+		$this->events->fire('creating: '.$view->getName(), [$view]);
 	}
 
 	/**
@@ -675,7 +675,7 @@ class Factory {
 
 		unset($this->extensions[$extension]);
 
-		$this->extensions = array_merge(array($extension => $engine), $this->extensions);
+		$this->extensions = array_merge([$extension => $engine], $this->extensions);
 	}
 
 	/**

@@ -56,7 +56,7 @@ class ValidationServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('validator', 'validation.presence');
+		return ['validator', 'validation.presence'];
 	}
 
 }

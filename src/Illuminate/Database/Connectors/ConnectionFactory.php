@@ -141,7 +141,7 @@ class ConnectionFactory {
 	 */
 	protected function mergeReadWriteConfig(array $config, array $merge)
 	{
-		return array_except(array_merge($config, $merge), array('read', 'write'));
+		return array_except(array_merge($config, $merge), ['read', 'write']);
 	}
 
 	/**
@@ -210,7 +210,7 @@ class ConnectionFactory {
 	{
 		if ($this->container->bound($key = "db.connection.{$driver}"))
 		{
-			return $this->container->make($key, array($connection, $database, $prefix, $config));
+			return $this->container->make($key, [$connection, $database, $prefix, $config]);
 		}
 
 		switch ($driver)

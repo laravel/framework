@@ -120,7 +120,7 @@ class Blueprint {
 	{
 		foreach ($this->columns as $column)
 		{
-			foreach (array('primary', 'unique', 'index') as $index)
+			foreach (['primary', 'unique', 'index'] as $index)
 			{
 				// If the index has been specified on the given column, but is simply
 				// equal to "true" (boolean), no name has been specified for this
@@ -669,7 +669,7 @@ class Blueprint {
 
 		$this->string("{$name}_type");
 
-		$this->index(array("{$name}_id", "{$name}_type"));
+		$this->index(["{$name}_id", "{$name}_type"]);
 	}
 
 	/**
@@ -731,7 +731,7 @@ class Blueprint {
 	{
 		$index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
 
-		return str_replace(array('-', '.'), '_', $index);
+		return str_replace(['-', '.'], '_', $index);
 	}
 
 	/**

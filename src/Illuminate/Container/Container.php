@@ -327,7 +327,7 @@ class Container implements ArrayAccess {
 	 */
 	protected function extractAlias(array $definition)
 	{
-		return array(key($definition), current($definition));
+		return [key($definition), current($definition)];
 	}
 
 	/**

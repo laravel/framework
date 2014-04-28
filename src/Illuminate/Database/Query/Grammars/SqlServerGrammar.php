@@ -9,11 +9,11 @@ class SqlServerGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $operators = array(
+	protected $operators = [
 		'=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
 		'like', 'not like', 'between', 'ilike',
 		'&', '&=', '|', '|=', '^', '^=',
-	);
+	];
 
 	/**
 	 * The keyword identifier wrapper format.
@@ -204,7 +204,7 @@ class SqlServerGrammar extends Grammar {
 	 */
 	public function compileTruncate(Builder $query)
 	{
-		return array('truncate table '.$this->wrapTable($query->from) => []);
+		return ['truncate table '.$this->wrapTable($query->from) => []];
 	}
 
 	/**

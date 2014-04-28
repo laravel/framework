@@ -167,7 +167,7 @@ class RedisQueue extends Queue implements QueueInterface {
 		{
 			$this->removeExpiredJobs($from, $time);
 
-			call_user_func_array(array($this->redis, 'rpush'), array_merge(array($to), $jobs));
+			call_user_func_array([$this->redis, 'rpush'], array_merge([$to], $jobs));
 		}
 	}
 

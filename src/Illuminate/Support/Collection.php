@@ -42,7 +42,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		if ($items instanceof Collection) return $items;
 
-		return new static(is_array($items) ? $items : array($items));
+		return new static(is_array($items) ? $items : [$items]);
 	}
 
 	/**

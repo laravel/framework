@@ -50,7 +50,7 @@ abstract class Facade {
 			$mock = static::createFreshMockInstance($name);
 		}
 
-		return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
+		return call_user_func_array([$mock, 'shouldReceive'], func_get_args());
 	}
 
 	/**
@@ -217,7 +217,7 @@ abstract class Facade {
 				return $instance->$method($args[0], $args[1], $args[2], $args[3]);
 
 			default:
-				return call_user_func_array(array($instance, $method), $args);
+				return call_user_func_array([$instance, $method], $args);
 		}
 	}
 

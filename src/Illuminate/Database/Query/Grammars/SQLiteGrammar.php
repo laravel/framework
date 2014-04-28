@@ -9,11 +9,11 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $operators = array(
+	protected $operators = [
 		'=', '<', '>', '<=', '>=', '<>', '!=',
 		'like', 'not like', 'between', 'ilike',
 		'&', '|', '<<', '>>',
-	);
+	];
 
 	/**
 	 * Compile an insert statement into SQL.
@@ -31,7 +31,7 @@ class SQLiteGrammar extends Grammar {
 
 		if ( ! is_array(reset($values)))
 		{
-			$values = array($values);
+			$values = [$values];
 		}
 
 		// If there is only one record being inserted, we will just use the usual query
@@ -67,7 +67,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	public function compileTruncate(Builder $query)
 	{
-		$sql = array('delete from sqlite_sequence where name = ?' => array($query->from));
+		$sql = ['delete from sqlite_sequence where name = ?' => [$query->from]];
 
 		$sql['delete from '.$this->wrapTable($query->from)] = [];
 

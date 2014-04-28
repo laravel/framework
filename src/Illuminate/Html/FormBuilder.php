@@ -55,21 +55,21 @@ class FormBuilder {
 	 *
 	 * @var array
 	 */
-	protected $reserved = array('method', 'url', 'route', 'action', 'files');
+	protected $reserved = ['method', 'url', 'route', 'action', 'files'];
 
 	/**
 	 * The form methods that should be spoofed, in uppercase.
 	 *
 	 * @var array
 	 */
-	protected $spoofedMethods = array('DELETE', 'PATCH', 'PUT');
+	protected $spoofedMethods = ['DELETE', 'PATCH', 'PUT'];
 
 	/**
 	 * The types of inputs to not fill values on by default.
 	 *
 	 * @var array
 	 */
-	protected $skipValueTypes = array('file', 'password', 'checkbox', 'radio');
+	protected $skipValueTypes = ['file', 'password', 'checkbox', 'radio'];
 
 	/**
 	 * Create a new form builder instance.
@@ -385,7 +385,7 @@ class FormBuilder {
 	{
 		$segments = explode('x', $options['size']);
 
-		return array_merge($options, array('cols' => $segments[0], 'rows' => $segments[1]));
+		return array_merge($options, ['cols' => $segments[0], 'rows' => $segments[1]]);
 	}
 
 	/**
@@ -457,7 +457,7 @@ class FormBuilder {
 	 */
 	public function selectYear()
 	{
-		return call_user_func_array(array($this, 'selectRange'), func_get_args());
+		return call_user_func_array([$this, 'selectRange'], func_get_args());
 	}
 
 	/**
@@ -530,7 +530,7 @@ class FormBuilder {
 	{
 		$selected = $this->getSelectedValue($value, $selected);
 
-		$options = array('value' => e($value), 'selected' => $selected);
+		$options = ['value' => e($value), 'selected' => $selected];
 
 		return '<option'.$this->html->attributes($options).'>'.e($display).'</option>';
 	}
@@ -827,7 +827,7 @@ class FormBuilder {
 	 */
 	protected function getAppendage($method)
 	{
-		list($method, $appendage) = array(strtoupper($method), '');
+		list($method, $appendage) = [strtoupper($method), ''];
 
 		// If the HTTP method is in this list of spoofed methods, we will attach the
 		// method spoofer hidden input to the form. This allows us to use regular
@@ -942,7 +942,7 @@ class FormBuilder {
 	 */
 	protected function transformKey($key)
 	{
-		return str_replace(array('.', '[]', '[', ']'), array('_', '', '.', ''), $key);
+		return str_replace(['.', '[]', '[', ']'], ['_', '', '.', ''], $key);
 	}
 
 	/**

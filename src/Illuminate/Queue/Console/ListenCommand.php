@@ -115,9 +115,9 @@ class ListenCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('connection', InputArgument::OPTIONAL, 'The name of connection'),
-		);
+		return [
+			['connection', InputArgument::OPTIONAL, 'The name of connection'],
+		];
 	}
 
 	/**
@@ -127,19 +127,19 @@ class ListenCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', null),
+		return [
+			['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', null],
 
-			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
+			['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
 
-			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
+			['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
-			array('timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60),
+			['timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60],
 
-			array('sleep', null, InputOption::VALUE_OPTIONAL, 'Seconds to wait before checking queue for jobs', 3),
+			['sleep', null, InputOption::VALUE_OPTIONAL, 'Seconds to wait before checking queue for jobs', 3],
 
-			array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
-		);
+			['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
+		];
 	}
 
 }

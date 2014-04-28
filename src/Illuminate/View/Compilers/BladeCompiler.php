@@ -23,14 +23,14 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $contentTags = array('{{', '}}');
+	protected $contentTags = ['{{', '}}'];
 
 	/**
 	 * Array of opening and closing tags for escaped echos.
 	 *
 	 * @var array
 	 */
-	protected $escapedTags = array('{{{', '}}}');
+	protected $escapedTags = ['{{{', '}}}'];
 
 	/**
 	 * Array of footer lines to be added to template.
@@ -617,7 +617,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$property = ($escaped === true) ? 'escapedTags' : 'contentTags';
 
-		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
+		$this->{$property} = [preg_quote($openTag), preg_quote($closeTag)];
 	}
 
 	/**

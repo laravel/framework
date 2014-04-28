@@ -40,7 +40,7 @@ class ComposerServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('composer', 'command.dump-autoload');
+		return ['composer', 'command.dump-autoload'];
 	}
 
 }

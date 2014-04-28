@@ -287,7 +287,7 @@ class Message {
 	 */
 	public function __call($method, $parameters)
 	{
-		$callable = array($this->swift, $method);
+		$callable = [$this->swift, $method];
 
 		return call_user_func_array($callable, $parameters);
 	}

@@ -121,7 +121,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function createNewRequest()
 	{
-		return forward_static_call(array(static::$requestClass, 'createFromGlobals'));
+		return forward_static_call([static::$requestClass, 'createFromGlobals']);
 	}
 
 	/**
@@ -144,7 +144,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function registerBaseServiceProviders()
 	{
-		foreach (array('Event', 'Exception', 'Routing') as $name)
+		foreach (['Event', 'Exception', 'Routing'] as $name)
 		{
 			$this->{"register{$name}Provider"}();
 		}
@@ -193,7 +193,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		// Here we will bind the install paths into the container as strings that can be
 		// accessed from any point in the system. Each path key is prefixed with path
 		// so that they have the consistent naming convention inside the container.
-		foreach (array_except($paths, array('app')) as $key => $value)
+		foreach (array_except($paths, ['app']) as $key => $value)
 		{
 			$this->instance("path.{$key}", realpath($value));
 		}
@@ -373,7 +373,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function markAsRegistered($provider)
 	{
-		$this['events']->fire($class = get_class($provider), array($provider));
+		$this['events']->fire($class = get_class($provider), [$provider]);
 
 		$this->serviceProviders[] = $provider;
 
@@ -590,7 +590,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$this->bootedCallbacks[] = $callback;
 
-		if ($this->isBooted()) $this->fireAppCallbacks(array($callback));
+		if ($this->isBooted()) $this->fireAppCallbacks([$callback]);
 	}
 
 	/**
@@ -643,7 +643,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
 			array_unshift($parameters, $class);
 
-			call_user_func_array(array($stack, 'push'), $parameters);
+			call_user_func_array([$stack, 'push'], $parameters);
 		}
 	}
 
@@ -1012,7 +1012,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$url = $this['config']->get('app.url', 'http://localhost');
 
-		$parameters = array($url, 'GET', [], [], [], $_SERVER);
+		$parameters = [$url, 'GET', [], [], [], $_SERVER];
 
 		$this->refreshRequest(static::onRequest('create', $parameters));
 	}
@@ -1026,7 +1026,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public static function onRequest($method, $parameters = [])
 	{
-		return forward_static_call_array(array(static::requestClass(), $method), $parameters);
+		return forward_static_call_array([static::requestClass(), $method], $parameters);
 	}
 
 	/**
@@ -1051,7 +1051,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
 		$this['translator']->setLocale($locale);
 
-		$this['events']->fire('locale.changed', array($locale));
+		$this['events']->fire('locale.changed', [$locale]);
 	}
 
 	/**
@@ -1061,7 +1061,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function registerCoreContainerAliases()
 	{
-		$aliases = array(
+		$aliases = [
 			'app'            => 'Illuminate\Foundation\Application',
 			'artisan'        => 'Illuminate\Console\Application',
 			'auth'           => 'Illuminate\Auth\AuthManager',
@@ -1094,7 +1094,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'url'            => 'Illuminate\Routing\UrlGenerator',
 			'validator'      => 'Illuminate\Validation\Factory',
 			'view'           => 'Illuminate\View\Factory',
-		);
+		];
 
 		foreach ($aliases as $key => $alias)
 		{

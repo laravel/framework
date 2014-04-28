@@ -9,11 +9,11 @@ class PostgresGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $operators = array(
+	protected $operators = [
 		'=', '<', '>', '<=', '>=', '<>', '!=',
 		'like', 'not like', 'between', 'ilike',
 		'&', '|', '#', '<<', '>>',
-	);
+	];
 
 	/**
 	 * Compile the lock into SQL.
@@ -170,7 +170,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	public function compileTruncate(Builder $query)
 	{
-		return array('truncate '.$this->wrapTable($query->from).' restart identity' => []);
+		return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
 	}
 
 }

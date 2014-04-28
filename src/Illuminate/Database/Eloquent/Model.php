@@ -120,7 +120,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @var array
 	 */
-	protected $guarded = array('*');
+	protected $guarded = ['*'];
 
 	/**
 	 * The attributes that should be mutated to dates.
@@ -211,7 +211,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @var array
 	 */
-	public static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
+	public static $manyMethods = ['belongsToMany', 'morphToMany', 'morphedByMany'];
 
 	/**
 	 * The name of the "created at" column.
@@ -603,7 +603,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */
-	public static function all($columns = array('*'))
+	public static function all($columns = ['*'])
 	{
 		$instance = new static;
 
@@ -617,7 +617,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
 	 */
-	public static function find($id, $columns = array('*'))
+	public static function find($id, $columns = ['*'])
 	{
 		if (is_array($id) && empty($id)) return new Collection;
 
@@ -633,7 +633,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
 	 */
-	public static function findOrNew($id, $columns = array('*'))
+	public static function findOrNew($id, $columns = ['*'])
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
@@ -649,7 +649,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @throws ModelNotFoundException
 	 */
-	public static function findOrFail($id, $columns = array('*'))
+	public static function findOrFail($id, $columns = ['*'])
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
@@ -668,7 +668,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$query = $this->newQuery()->with($relations);
 
-		$query->eagerLoadRelations(array($this));
+		$query->eagerLoadRelations([$this]);
 
 		return $this;
 	}
@@ -1019,7 +1019,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$related = snake_case(class_basename($related));
 
-		$models = array($related, $base);
+		$models = [$related, $base];
 
 		// Now that we have the model names in an array we can just sort them and
 		// use the implode function to join them together with an underscores,
@@ -1233,11 +1233,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function getObservableEvents()
 	{
 		return array_merge(
-			array(
+			[
 				'creating', 'created', 'updating', 'updated',
 				'deleting', 'deleted', 'saving', 'saved',
 				'restoring', 'restored',
-			),
+			],
 			$this->observables
 		);
 	}
@@ -1850,7 +1850,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$id = $id ?: $name.'_id';
 
-		return array($type, $id);
+		return [$type, $id];
 	}
 
 	/**
@@ -2022,7 +2022,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function isGuarded($key)
 	{
-		return in_array($key, $this->guarded) || $this->guarded == array('*');
+		return in_array($key, $this->guarded) || $this->guarded == ['*'];
 	}
 
 	/**
@@ -2032,7 +2032,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function totallyGuarded()
 	{
-		return count($this->fillable) == 0 && $this->guarded == array('*');
+		return count($this->fillable) == 0 && $this->guarded == ['*'];
 	}
 
 	/**
@@ -2416,7 +2416,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getDates()
 	{
-		$defaults = array(static::CREATED_AT, static::UPDATED_AT);
+		$defaults = [static::CREATED_AT, static::UPDATED_AT];
 
 		return array_merge($this->dates, $defaults);
 	}
@@ -2520,7 +2520,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function replicate()
 	{
-		$attributes = array_except($this->attributes, array($this->getKeyName()));
+		$attributes = array_except($this->attributes, [$this->getKeyName()]);
 
 		with($instance = new static)->setRawAttributes($attributes);
 
@@ -2898,14 +2898,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __call($method, $parameters)
 	{
-		if (in_array($method, array('increment', 'decrement')))
+		if (in_array($method, ['increment', 'decrement']))
 		{
-			return call_user_func_array(array($this, $method), $parameters);
+			return call_user_func_array([$this, $method], $parameters);
 		}
 
 		$query = $this->newQuery();
 
-		return call_user_func_array(array($query, $method), $parameters);
+		return call_user_func_array([$query, $method], $parameters);
 	}
 
 	/**
@@ -2919,7 +2919,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$instance = new static;
 
-		return call_user_func_array(array($instance, $method), $parameters);
+		return call_user_func_array([$instance, $method], $parameters);
 	}
 
 	/**

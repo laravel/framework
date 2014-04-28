@@ -240,7 +240,7 @@ class Route {
 	 */
 	public static function parseFilter($filter)
 	{
-		if ( ! str_contains($filter, ':')) return array($filter, []);
+		if ( ! str_contains($filter, ':')) return [$filter, []];
 
 		return static::parseParameterFilter($filter);
 	}
@@ -255,7 +255,7 @@ class Route {
 	{
 		list($name, $parameters) = explode(':', $filter, 2);
 
-		return array($name, explode(',', $parameters));
+		return [$name, explode(',', $parameters)];
 	}
 
 	/**
@@ -482,7 +482,7 @@ class Route {
 		// it is available. Otherwise we will need to find it in the action list.
 		if ($action instanceof Closure)
 		{
-			return array('uses' => $action);
+			return ['uses' => $action];
 		}
 
 		// If no "uses" property has been set, we will dig through the array to find a
@@ -522,10 +522,10 @@ class Route {
 		// To match the route, we will use a chain of responsibility pattern with the
 		// validator implementations. We will spin through each one making sure it
 		// passes and then we will know if the route as a whole matches request.
-		return static::$validators = array(
+		return static::$validators = [
 			new MethodValidator, new SchemeValidator,
 			new HostValidator, new UriValidator,
-		);
+		];
 	}
 
 	/**
@@ -611,7 +611,7 @@ class Route {
 	 */
 	protected function parseWhere($name, $expression)
 	{
-		return is_array($name) ? $name : array($name => $expression);
+		return is_array($name) ? $name : [$name => $expression];
 	}
 
 	/**

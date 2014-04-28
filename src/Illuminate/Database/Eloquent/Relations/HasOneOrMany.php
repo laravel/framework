@@ -176,7 +176,7 @@ abstract class HasOneOrMany extends Relation {
 	 */
 	public function saveMany(array $models)
 	{
-		array_walk($models, array($this, 'save'));
+		array_walk($models, [$this, 'save']);
 
 		return $models;
 	}

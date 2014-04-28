@@ -107,7 +107,7 @@ class BelongsToMany extends Relation {
 	 * @param  array   $columns
 	 * @return mixed
 	 */
-	public function first($columns = array('*'))
+	public function first($columns = ['*'])
 	{
 		$results = $this->take(1)->get($columns);
 
@@ -122,7 +122,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	public function firstOrFail($columns = array('*'))
+	public function firstOrFail($columns = ['*'])
 	{
 		if ( ! is_null($model = $this->first($columns))) return $model;
 
@@ -135,7 +135,7 @@ class BelongsToMany extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public function get($columns = array('*'))
+	public function get($columns = ['*'])
 	{
 		// First we'll add the proper select columns onto the query so it is run with
 		// the proper columns. Then, we will get the results and hydrate out pivot
@@ -164,7 +164,7 @@ class BelongsToMany extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = null, $columns = array('*'))
+	public function paginate($perPage = null, $columns = ['*'])
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
@@ -291,11 +291,11 @@ class BelongsToMany extends Relation {
 	 *
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
-	protected function getSelectColumns(array $columns = array('*'))
+	protected function getSelectColumns(array $columns = ['*'])
 	{
-		if ($columns == array('*'))
+		if ($columns == ['*'])
 		{
-			$columns = array($this->related->getTable().'.*');
+			$columns = [$this->related->getTable().'.*'];
 		}
 
 		return array_merge($columns, $this->getAliasedPivotColumns());
@@ -308,7 +308,7 @@ class BelongsToMany extends Relation {
 	 */
 	protected function getAliasedPivotColumns()
 	{
-		$defaults = array($this->foreignKey, $this->otherKey);
+		$defaults = [$this->foreignKey, $this->otherKey];
 
 		// We need to alias all of the pivot columns with the "pivot_" prefix so we
 		// can easily extract them out of the models and put them into the pivot
@@ -486,7 +486,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function save(Model $model, array $joining = [], $touch = true)
 	{
-		$model->save(array('touch' => false));
+		$model->save(['touch' => false]);
 
 		$this->attach($model->getKey(), $joining, $touch);
 
@@ -527,7 +527,7 @@ class BelongsToMany extends Relation {
 		// Once we save the related model, we need to attach it to the base model via
 		// through intermediate table so we'll use the existing "attach" method to
 		// accomplish this which will insert the record and any more attributes.
-		$instance->save(array('touch' => false));
+		$instance->save(['touch' => false]);
 
 		$this->attach($instance->getKey(), $joining, $touch);
 
@@ -564,9 +564,9 @@ class BelongsToMany extends Relation {
 	 */
 	public function sync($ids, $detaching = true)
 	{
-		$changes = array(
+		$changes = [
 			'attached' => [], 'detached' => [], 'updated' => []
-		);
+		];
 
 		if ($ids instanceof Collection) $ids = $ids->modelKeys();
 
@@ -615,7 +615,7 @@ class BelongsToMany extends Relation {
 		{
 			if ( ! is_array($attributes))
 			{
-				list($id, $attributes) = array($attributes, []);
+				list($id, $attributes) = [$attributes, []];
 			}
 
 			$results[$id] = $attributes;
@@ -634,7 +634,7 @@ class BelongsToMany extends Relation {
 	 */
 	protected function attachNew(array $records, array $current, $touch = true)
 	{
-		$changes = array('attached' => [], 'updated' => []);
+		$changes = ['attached' => [], 'updated' => []];
 
 		foreach ($records as $id => $attributes)
 		{
@@ -752,11 +752,11 @@ class BelongsToMany extends Relation {
 	{
 		if (is_array($value))
 		{
-			return array($key, array_merge($value, $attributes));
+			return [$key, array_merge($value, $attributes)];
 		}
 		else
 		{
-			return array($value, $attributes);
+			return [$value, $attributes];
 		}
 	}
 
@@ -961,7 +961,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function getRelatedFreshUpdate()
 	{
-		return array($this->related->getUpdatedAtColumn() => $this->related->freshTimestamp());
+		return [$this->related->getUpdatedAtColumn() => $this->related->freshTimestamp()];
 	}
 
 	/**

@@ -68,7 +68,7 @@ class AutoloadCommand extends Command {
 
 		foreach ($this->getWorkbenchComposers() as $file)
 		{
-			$results[] = array('name' => $file->getRelativePath(), 'path' => $file->getPath());
+			$results[] = ['name' => $file->getRelativePath(), 'path' => $file->getPath()];
 		}
 
 		return $results;

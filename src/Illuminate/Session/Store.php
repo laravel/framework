@@ -100,7 +100,7 @@ class Store implements SessionInterface {
 	{
 		$this->attributes = $this->readFromHandler();
 
-		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
+		foreach (array_merge($this->bags, [$this->metaBag]) as $bag)
 		{
 			$this->initializeLocalBag($bag);
 
@@ -229,7 +229,7 @@ class Store implements SessionInterface {
 	 */
 	protected function addBagDataToSession()
 	{
-		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
+		foreach (array_merge($this->bags, [$this->metaBag]) as $bag)
 		{
 			$this->put($bag->getStorageKey(), $this->bagData[$bag->getStorageKey()]);
 		}
@@ -330,7 +330,7 @@ class Store implements SessionInterface {
 	 */
 	public function put($key, $value)
 	{
-		if ( ! is_array($key)) $key = array($key => $value);
+		if ( ! is_array($key)) $key = [$key => $value];
 
 		foreach ($key as $arrayKey => $arrayValue)
 		{
@@ -367,7 +367,7 @@ class Store implements SessionInterface {
 
 		$this->push('flash.new', $key);
 
-		$this->removeFromOldFlashData(array($key));
+		$this->removeFromOldFlashData([$key]);
 	}
 
 	/**

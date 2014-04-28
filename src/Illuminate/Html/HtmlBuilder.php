@@ -72,7 +72,7 @@ class HtmlBuilder {
 	 */
 	public function style($url, $attributes = [], $secure = null)
 	{
-		$defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
+		$defaults = ['media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet'];
 
 		$attributes = $attributes + $defaults;
 

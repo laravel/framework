@@ -37,9 +37,9 @@ class Database {
 	 */
 	protected function createAggregateClient(array $servers)
 	{
-		$servers = array_except($servers, array('cluster'));
+		$servers = array_except($servers, ['cluster']);
 
-		return array('default' => new Client(array_values($servers)));
+		return ['default' => new Client(array_values($servers))];
 	}
 
 	/**
@@ -80,7 +80,7 @@ class Database {
 	 */
 	public function command($method, array $parameters = [])
 	{
-		return call_user_func_array(array($this->clients['default'], $method), $parameters);
+		return call_user_func_array([$this->clients['default'], $method], $parameters);
 	}
 
 	/**
