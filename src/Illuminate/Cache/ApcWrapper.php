@@ -71,7 +71,7 @@ class ApcWrapper {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return array|bool
+	 * @return bool
 	 */
 	public function delete($key)
 	{
