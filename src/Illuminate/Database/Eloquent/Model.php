@@ -1301,6 +1301,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		return $this->fill($attributes)->save();
 	}
+	
+    	/**
+	* Check if the model has been updated
+	* 
+	* @return bool
+	*/
+	public function isUpdated()
+	{
+	if ($this->timestamps)
+	{
+	    if ($this->{static::CREATED_AT} != $this->{static::UPDATED_AT})
+	        return true;
+	    else
+	        return false;
+	}
+	else
+	    return false;
+	}
 
 	/**
 	 * Save the model and all of its relationships.
