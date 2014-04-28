@@ -48,6 +48,17 @@ class Repository implements ArrayAccess {
 	}
 
 	/**
+	 * Remove an item from the cache.
+	 *
+	 * @param  string $key
+	 * @return bool
+	 */
+	public function forget($key)
+	{
+		return $this->store->forget($key);
+	}
+
+	/**
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key

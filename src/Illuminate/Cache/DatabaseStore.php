@@ -161,11 +161,11 @@ class DatabaseStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		$this->table()->where('key', '=', $this->prefix.$key)->delete();
+		return (bool) $this->table()->where('key', '=', $this->prefix.$key)->delete();
 	}
 
 	/**
