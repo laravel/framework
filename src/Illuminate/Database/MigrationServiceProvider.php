@@ -66,7 +66,7 @@ class MigrationServiceProvider extends ServiceProvider {
 		{
 			$repository = $app['migration.repository'];
 
-			return new Migrator($repository, $app['db'], $app['files']);
+			return new Migrator($app, $repository, $app['db'], $app['files']);
 		});
 	}
 
