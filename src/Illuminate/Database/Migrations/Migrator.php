@@ -7,7 +7,7 @@ use Illuminate\Foundation\Application;
 class Migrator {
 
 	/**
-	* The application container.
+	* The application instance.
 	*
 	* @var \Illuminate\Foundation\Application
 	*/
