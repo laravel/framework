@@ -237,7 +237,7 @@ class Middleware implements HttpKernelInterface {
 		// session cookies will not need to get set on any responses in those cases.
 		$config = $config ?: $this->manager->getSessionConfig();
 
-		return ! in_array($config['driver'], array(null, 'array'));
+		return ! in_array($config['driver'], [null, 'array']);
 	}
 
 	/**

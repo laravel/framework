@@ -24,7 +24,7 @@ class UrlGenerator {
 	 *
 	 * @var array
 	 */
-	protected $dontEncode = array(
+	protected $dontEncode = [
 		'%2F' => '/',
 		'%40' => '@',
 		'%3A' => ':',
@@ -35,7 +35,7 @@ class UrlGenerator {
 		'%21' => '!',
 		'%2A' => '*',
 		'%7C' => '|',
-	);
+	];
 
 	/**
 	 * Create a new URL Generator instance.
@@ -89,7 +89,7 @@ class UrlGenerator {
 	 * @param  bool  $secure
 	 * @return string
 	 */
-	public function to($path, $extra = array(), $secure = null)
+	public function to($path, $extra = [], $secure = null)
 	{
 		// First we will check if the URL is already a valid URL. If it is we will not
 		// try to generate a new one but will simply return the URL as is, which is
@@ -117,7 +117,7 @@ class UrlGenerator {
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	public function secure($path, $parameters = array())
+	public function secure($path, $parameters = [])
 	{
 		return $this->to($path, $parameters, true);
 	}
@@ -194,7 +194,7 @@ class UrlGenerator {
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function route($name, $parameters = array(), $absolute = true, $route = null)
+	public function route($name, $parameters = [], $absolute = true, $route = null)
 	{
 		$route = $route ?: $this->routes->getByName($name);
 
@@ -373,7 +373,7 @@ class UrlGenerator {
 	 */
 	protected function addPortToDomain($domain)
 	{
-		if (in_array($this->request->getPort(), array('80', '443')))
+		if (in_array($this->request->getPort(), ['80', '443']))
 		{
 			return $domain;
 		}
@@ -425,7 +425,7 @@ class UrlGenerator {
 	 * @param  bool    $absolute
 	 * @return string
 	 */
-	public function action($action, $parameters = array(), $absolute = true)
+	public function action($action, $parameters = [], $absolute = true)
 	{
 		return $this->route($action, $parameters, $absolute, $this->routes->getByAction($action));
 	}
@@ -454,7 +454,7 @@ class UrlGenerator {
 	 */
 	public function isValidUrl($path)
 	{
-		if (starts_with($path, array('#', '//', 'mailto:', 'tel:'))) return true;
+		if (starts_with($path, ['#', '//', 'mailto:', 'tel:'])) return true;
 
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
 	}

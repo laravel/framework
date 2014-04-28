@@ -50,7 +50,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$stub = new ContainerDependentStub($mock = $this->getMock('IContainerContractStub'));
-		$resolved = $container->make('ContainerNestedDependentStub', array($stub));
+		$resolved = $container->make('ContainerNestedDependentStub', [$stub]);
 		$this->assertTrue($resolved instanceof ContainerNestedDependentStub);
 		$this->assertEquals($mock, $resolved->inner->impl);
 	}
@@ -114,10 +114,10 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->alias('foo', 'baz');
 		$this->assertEquals('bar', $container->make('foo'));
 		$this->assertEquals('bar', $container->make('baz'));
-		$container->bind(array('bam' => 'boom'), function() { return 'pow'; });
+		$container->bind(['bam' => 'boom'], function() { return 'pow'; });
 		$this->assertEquals('pow', $container->make('bam'));
 		$this->assertEquals('pow', $container->make('boom'));
-		$container->instance(array('zoom' => 'zing'), 'wow');
+		$container->instance(['zoom' => 'zing'], 'wow');
 		$this->assertEquals('wow', $container->make('zoom'));
 		$this->assertEquals('wow', $container->make('zing'));
 	}
@@ -158,7 +158,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 		$container['foo'] = $container->share(function()
 		{
-			return (object) array('name' => 'taylor');
+			return (object) ['name' => 'taylor'];
 		});
 		$container->extend('foo', function($old, $container)
 		{
@@ -211,7 +211,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 			return $parameters;
 		});
 
-		$this->assertEquals(array(1, 2, 3), $container->make('foo', array(1, 2, 3)));
+		$this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
 	}
 
 
@@ -283,14 +283,14 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testPassingSomePrimitiveParameters()
 	{
 		$container = new Container;
-		$value = $container->make('ContainerMixedPrimitiveStub', array('first' => 'taylor', 'last' => 'otwell'));
+		$value = $container->make('ContainerMixedPrimitiveStub', ['first' => 'taylor', 'last' => 'otwell']);
 		$this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
 		$this->assertEquals('taylor', $value->first);
 		$this->assertEquals('otwell', $value->last);
 		$this->assertInstanceOf('ContainerConcreteStub', $value->stub);
 
 		$container = new Container;
-		$value = $container->make('ContainerMixedPrimitiveStub', array(0 => 'taylor', 2 => 'otwell'));
+		$value = $container->make('ContainerMixedPrimitiveStub', [0 => 'taylor', 2 => 'otwell']);
 		$this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
 		$this->assertEquals('taylor', $value->first);
 		$this->assertEquals('otwell', $value->last);
@@ -300,7 +300,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testCreatingBoundConcreteClassPassesParameters() {
 		$container = new Container;
 		$container->bind('TestAbstractClass', 'ContainerConstructorParameterLoggingStub');
-		$parameters = array('First', 'Second');
+		$parameters = ['First', 'Second'];
 		$instance = $container->make('TestAbstractClass', $parameters);
 		$this->assertEquals($parameters, $instance->receivedParameters);
 	}

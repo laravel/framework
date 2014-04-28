@@ -83,7 +83,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @var array
 	 */
-	protected $queryLog = array();
+	protected $queryLog = [];
 
 	/**
 	 * Indicates whether queries are being logged.
@@ -118,7 +118,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @var array
 	 */
-	protected $config = array();
+	protected $config = [];
 
 	/**
 	 * Create a new database connection instance.
@@ -129,7 +129,7 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $config
 	 * @return void
 	 */
-	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = array())
+	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = [])
 	{
 		$this->pdo = $pdo;
 
@@ -252,7 +252,7 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return mixed
 	 */
-	public function selectOne($query, $bindings = array())
+	public function selectOne($query, $bindings = [])
 	{
 		$records = $this->select($query, $bindings);
 
@@ -266,11 +266,11 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return array
 	 */
-	public function select($query, $bindings = array())
+	public function select($query, $bindings = [])
 	{
 		return $this->run($query, $bindings, function($me, $query, $bindings)
 		{
-			if ($me->pretending()) return array();
+			if ($me->pretending()) return [];
 
 			// For select statements, we'll simply execute the query and return an array
 			// of the database result set. Each element in the array will be a single
@@ -290,7 +290,7 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return bool
 	 */
-	public function insert($query, $bindings = array())
+	public function insert($query, $bindings = [])
 	{
 		return $this->statement($query, $bindings);
 	}
@@ -302,7 +302,7 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return int
 	 */
-	public function update($query, $bindings = array())
+	public function update($query, $bindings = [])
 	{
 		return $this->affectingStatement($query, $bindings);
 	}
@@ -314,7 +314,7 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return int
 	 */
-	public function delete($query, $bindings = array())
+	public function delete($query, $bindings = [])
 	{
 		return $this->affectingStatement($query, $bindings);
 	}
@@ -326,7 +326,7 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return bool
 	 */
-	public function statement($query, $bindings = array())
+	public function statement($query, $bindings = [])
 	{
 		return $this->run($query, $bindings, function($me, $query, $bindings)
 		{
@@ -345,7 +345,7 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return int
 	 */
-	public function affectingStatement($query, $bindings = array())
+	public function affectingStatement($query, $bindings = [])
 	{
 		return $this->run($query, $bindings, function($me, $query, $bindings)
 		{
@@ -370,7 +370,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function unprepared($query)
 	{
-		return $this->run($query, array(), function($me, $query)
+		return $this->run($query, [], function($me, $query)
 		{
 			if ($me->pretending()) return true;
 
@@ -513,7 +513,7 @@ class Connection implements ConnectionInterface {
 	{
 		$this->pretending = true;
 
-		$this->queryLog = array();
+		$this->queryLog = [];
 
 		// Basically to make the database connection "pretend", we will just return
 		// the default values for all the query methods, then we will return an
@@ -577,7 +577,7 @@ class Connection implements ConnectionInterface {
 	{
 		if (isset($this->events))
 		{
-			$this->events->fire('illuminate.query', array($query, $bindings, $time, $this->getName()));
+			$this->events->fire('illuminate.query', [$query, $bindings, $time, $this->getName()]);
 		}
 
 		if ( ! $this->loggingQueries) return;
@@ -657,7 +657,7 @@ class Connection implements ConnectionInterface {
 	{
 		$driver = $this->getDoctrineDriver();
 
-		$data = array('pdo' => $this->pdo, 'dbname' => $this->getConfig('database'));
+		$data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
 
 		return new DoctrineConnection($data, $driver);
 	}
@@ -925,7 +925,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function flushQueryLog()
 	{
-		$this->queryLog = array();
+		$this->queryLog = [];
 	}
 
 	/**

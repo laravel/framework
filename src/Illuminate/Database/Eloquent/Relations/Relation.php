@@ -112,7 +112,7 @@ abstract class Relation {
 	{
 		$column = $this->getRelated()->getUpdatedAtColumn();
 
-		$this->rawUpdate(array($column => $this->getRelated()->freshTimestampString()));
+		$this->rawUpdate([$column => $this->getRelated()->freshTimestampString()]);
 	}
 
 	/**
@@ -121,7 +121,7 @@ abstract class Relation {
 	 * @param  array  $attributes
 	 * @return int
 	 */
-	public function rawUpdate(array $attributes = array())
+	public function rawUpdate(array $attributes = [])
 	{
 		return $this->query->update($attributes);
 	}
@@ -278,7 +278,7 @@ abstract class Relation {
 	 */
 	public function __call($method, $parameters)
 	{
-		$result = call_user_func_array(array($this->query, $method), $parameters);
+		$result = call_user_func_array([$this->query, $method], $parameters);
 
 		if ($result === $this->query) return $this;
 

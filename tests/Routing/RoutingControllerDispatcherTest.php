@@ -25,7 +25,7 @@ class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testBasicDispatchToMethod()
 	{
 		$request = Request::create('controller');
-		$route = new Route(array('GET'), 'controller', array('uses' => function() {}));
+		$route = new Route(['GET'], 'controller', ['uses' => function() {}]);
 		$route->bind($request);
 		$dispatcher = new ControllerDispatcher(m::mock('Illuminate\Routing\RouteFiltererInterface'), new Container);
 

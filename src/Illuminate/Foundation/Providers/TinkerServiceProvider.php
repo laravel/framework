@@ -34,7 +34,7 @@ class TinkerServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.tinker');
+		return ['command.tinker'];
 	}
 
 }

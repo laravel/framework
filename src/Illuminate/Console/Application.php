@@ -68,7 +68,7 @@ class Application extends \Symfony\Component\Console\Application {
 		if (isset($this->laravel['events']))
 		{
 			$this->laravel['events']
-					->fire('artisan.start', array($this));
+					->fire('artisan.start', [$this]);
 		}
 
 		return $this;
@@ -82,7 +82,7 @@ class Application extends \Symfony\Component\Console\Application {
 	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return void
 	 */
-	public function call($command, array $parameters = array(), OutputInterface $output = null)
+	public function call($command, array $parameters = [], OutputInterface $output = null)
 	{
 		$parameters['command'] = $command;
 

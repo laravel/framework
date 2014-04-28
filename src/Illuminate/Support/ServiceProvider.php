@@ -166,7 +166,7 @@ abstract class ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -176,7 +176,7 @@ abstract class ServiceProvider {
 	 */
 	public function when()
 	{
-		return array();
+		return [];
 	}
 
 	/**

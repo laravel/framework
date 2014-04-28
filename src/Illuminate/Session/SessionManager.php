@@ -96,7 +96,7 @@ class SessionManager extends Manager {
 	 */
 	protected function getDatabaseOptions($table)
 	{
-		return array('db_table' => $table, 'db_id_col' => 'id', 'db_data_col' => 'payload', 'db_time_col' => 'last_activity');
+		return ['db_table' => $table, 'db_id_col' => 'id', 'db_data_col' => 'payload', 'db_time_col' => 'last_activity'];
 	}
 
 	/**

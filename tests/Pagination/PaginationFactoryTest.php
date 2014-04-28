@@ -23,7 +23,7 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 		$request = Illuminate\Http\Request::create('http://foo.com', 'GET');
 		$env->setRequest($request);
 
-		$this->assertInstanceOf('Illuminate\Pagination\Paginator', $env->make(array('foo', 'bar'), 2, 2));
+		$this->assertInstanceOf('Illuminate\Pagination\Paginator', $env->make(['foo', 'bar'], 2, 2));
 	}
 
 
@@ -31,7 +31,7 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 	{
 		$env = $this->getFactory();
 		$paginator = m::mock('Illuminate\Pagination\Paginator');
-		$env->getViewFactory()->shouldReceive('make')->once()->with('pagination::slider', array('environment' => $env, 'paginator' => $paginator))->andReturn('foo');
+		$env->getViewFactory()->shouldReceive('make')->once()->with('pagination::slider', ['environment' => $env, 'paginator' => $paginator])->andReturn('foo');
 
 		$this->assertEquals('foo', $env->getPaginationView($paginator));
 	}

@@ -25,21 +25,21 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	 *
 	 * @var array
 	 */
-	protected $items = array();
+	protected $items = [];
 
 	/**
 	 * All of the registered packages.
 	 *
 	 * @var array
 	 */
-	protected $packages = array();
+	protected $packages = [];
 
 	/**
 	 * The after load callbacks for namespaces.
 	 *
 	 * @var array
 	 */
-	protected $afterLoad = array();
+	protected $afterLoad = [];
 
 	/**
 	 * Create a new configuration repository.
@@ -215,7 +215,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 		// of the namespace. Generally packages should use one type or another.
 		if ( ! $this->loader->exists($itemSegments[0], $namespace))
 		{
-			return array($namespace, 'config', $item);
+			return [$namespace, 'config', $item];
 		}
 
 		return parent::parseNamespacedSegments($key);

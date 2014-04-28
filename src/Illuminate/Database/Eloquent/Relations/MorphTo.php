@@ -26,7 +26,7 @@ class MorphTo extends BelongsTo {
 	 *
 	 * @var array
 	 */
-	protected $dictionary = array();
+	protected $dictionary = [];
 
 	/**
 	 * Create a new belongs to relationship instance.

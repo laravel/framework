@@ -48,9 +48,9 @@ class RoutesCommand extends Command {
 	 *
 	 * @var array
 	 */
-	protected $headers = array(
+	protected $headers = [
 		'Domain', 'URI', 'Name', 'Action', 'Before Filters', 'After Filters'
-	);
+	];
 
 	/**
 	 * Create a new route command instance.
@@ -90,7 +90,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function getRoutes()
 	{
-		$results = array();
+		$results = [];
 
 		foreach($this->routes as $route)
 		{
@@ -111,14 +111,14 @@ class RoutesCommand extends Command {
 	{
 		$uri = implode('|', $route->methods()).' '.$route->uri();
 
-		return $this->filterRoute(array(
+		return $this->filterRoute([
 			'host'   => $route->domain(),
 			'uri'    => $uri,
 			'name'   => $route->getName(),
 			'action' => $route->getActionName(),
 			'before' => $this->getBeforeFilters($route),
 			'after'  => $this->getAfterFilters($route)
-		));
+		]);
 	}
 
 	/**
@@ -157,7 +157,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function getPatternFilters($route)
 	{
-		$patterns = array();
+		$patterns = [];
 
 		foreach ($route->methods() as $method)
 		{
@@ -221,11 +221,11 @@ class RoutesCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'),
+		return [
+			['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
-		);
+			['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
+		];
 	}
 
 }

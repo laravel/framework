@@ -84,11 +84,11 @@ class AssetPublishCommand extends Command {
 	{
 		if ( ! is_null($package = $this->input->getArgument('package')))
 		{
-			return array($package);
+			return [$package];
 		}
 		elseif ( ! is_null($bench = $this->input->getOption('bench')))
 		{
-			return array($bench);
+			return [$bench];
 		}
 
 		return $this->findAllAssetPackages();
@@ -103,7 +103,7 @@ class AssetPublishCommand extends Command {
 	{
 		$vendor = $this->laravel['path.base'].'/vendor';
 
-		$packages = array();
+		$packages = [];
 
 		foreach (Finder::create()->directories()->in($vendor)->name('public')->depth('< 3') as $package)
 		{
@@ -148,9 +148,9 @@ class AssetPublishCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('package', InputArgument::OPTIONAL, 'The name of package being published.'),
-		);
+		return [
+			['package', InputArgument::OPTIONAL, 'The name of package being published.'],
+		];
 	}
 
 	/**
@@ -160,11 +160,11 @@ class AssetPublishCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to publish.', null),
+		return [
+			['bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to publish.', null],
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the asset files.', null),
-		);
+			['path', null, InputOption::VALUE_OPTIONAL, 'The path to the asset files.', null],
+		];
 	}
 
 }

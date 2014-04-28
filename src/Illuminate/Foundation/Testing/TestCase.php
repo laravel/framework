@@ -71,7 +71,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function call()
 	{
-		call_user_func_array(array($this->client, 'request'), func_get_args());
+		call_user_func_array([$this->client, 'request'], func_get_args());
 
 		return $this->client->getResponse();
 	}
@@ -94,7 +94,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 		$parameters[1] = 'https://localhost/'.ltrim($parameters[1], '/');
 
-		return call_user_func_array(array($this, 'call'), $parameters);
+		return call_user_func_array([$this, 'call'], $parameters);
 	}
 
 	/**
@@ -110,7 +110,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  bool    $changeHistory
 	 * @return \Illuminate\Http\Response
 	 */
-	public function action($method, $action, $wildcards = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
+	public function action($method, $action, $wildcards = [], $parameters = [], $files = [], $server = [], $content = null, $changeHistory = true)
 	{
 		$uri = $this->app['url']->action($action, $wildcards, true);
 
@@ -130,7 +130,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  bool    $changeHistory
 	 * @return \Illuminate\Http\Response
 	 */
-	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
+	public function route($method, $name, $routeParameters = [], $parameters = [], $files = [], $server = [], $content = null, $changeHistory = true)
 	{
 		$uri = $this->app['url']->route($name, $routeParameters);
 
@@ -236,7 +236,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedTo($uri, $with = array())
+	public function assertRedirectedTo($uri, $with = [])
 	{
 		$response = $this->client->getResponse();
 
@@ -255,7 +255,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
+	public function assertRedirectedToRoute($name, $parameters = [], $with = [])
 	{
 		$this->assertRedirectedTo($this->app['url']->route($name, $parameters), $with);
 	}
@@ -268,7 +268,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToAction($name, $parameters = array(), $with = array())
+	public function assertRedirectedToAction($name, $parameters = [], $with = [])
 	{
 		$this->assertRedirectedTo($this->app['url']->action($name, $parameters), $with);
 	}
@@ -322,7 +322,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  mixed  $format
 	 * @return void
 	 */
-	public function assertSessionHasErrors($bindings = array(), $format = null)
+	public function assertSessionHasErrors($bindings = [], $format = null)
 	{
 		$this->assertSessionHas('errors');
 
@@ -414,7 +414,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app['artisan']->call('db:seed', array('--class' => $class));
+		$this->app['artisan']->call('db:seed', ['--class' => $class]);
 	}
 
 	/**
@@ -423,7 +423,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  array  $server
 	 * @return \Symfony\Component\HttpKernel\Client
 	 */
-	protected function createClient(array $server = array())
+	protected function createClient(array $server = [])
 	{
 		return new Client($this->app, $server);
 	}

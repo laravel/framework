@@ -42,14 +42,14 @@ class Handler {
 	 *
 	 * @var array
 	 */
-	protected $handlers = array();
+	protected $handlers = [];
 
 	/**
 	 * All of the handled error messages.
 	 *
 	 * @var array
 	 */
-	protected $handled = array();
+	protected $handled = [];
 
 	/**
 	 * Create a new error handler instance.
@@ -92,7 +92,7 @@ class Handler {
 	 */
 	protected function registerErrorHandler()
 	{
-		set_error_handler(array($this, 'handleError'));
+		set_error_handler([$this, 'handleError']);
 	}
 
 	/**
@@ -102,7 +102,7 @@ class Handler {
 	 */
 	protected function registerExceptionHandler()
 	{
-		set_exception_handler(array($this, 'handleUncaughtException'));
+		set_exception_handler([$this, 'handleUncaughtException']);
 	}
 
 	/**
@@ -112,7 +112,7 @@ class Handler {
 	 */
 	protected function registerShutdownHandler()
 	{
-		register_shutdown_function(array($this, 'handleShutdown'));
+		register_shutdown_function([$this, 'handleShutdown']);
 	}
 
 	/**
@@ -126,7 +126,7 @@ class Handler {
 	 *
 	 * @throws \ErrorException
 	 */
-	public function handleError($level, $message, $file = '', $line = 0, $context = array())
+	public function handleError($level, $message, $file = '', $line = 0, $context = [])
 	{
 		if (error_reporting() & $level)
 		{
@@ -199,7 +199,7 @@ class Handler {
 	 */
 	protected function isFatal($type)
 	{
-        return in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE));
+        return in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
 	}
 
 	/**

@@ -7,7 +7,7 @@ class ClassLoader {
 	 *
 	 * @var array
 	 */
-	protected static $directories = array();
+	protected static $directories = [];
 
 	/**
 	 * Indicates if a ClassLoader has been registered.
@@ -48,7 +48,7 @@ class ClassLoader {
 	{
 		if ($class[0] == '\\') $class = substr($class, 1);
 
-		return str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $class).'.php';
+		return str_replace(['\\', '_'], DIRECTORY_SEPARATOR, $class).'.php';
 	}
 
 	/**
@@ -60,7 +60,7 @@ class ClassLoader {
 	{
 		if ( ! static::$registered)
 		{
-			static::$registered = spl_autoload_register(array('\Illuminate\Support\ClassLoader', 'load'));
+			static::$registered = spl_autoload_register(['\Illuminate\Support\ClassLoader', 'load']);
 		}
 	}
 
@@ -87,7 +87,7 @@ class ClassLoader {
 	{
 		if (is_null($directories))
 		{
-			static::$directories = array();
+			static::$directories = [];
 		}
 		else
 		{

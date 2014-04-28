@@ -29,7 +29,7 @@ class AliasLoader {
 	 * @param  array  $aliases
 	 * @return void
 	 */
-	public function __construct(array $aliases = array())
+	public function __construct(array $aliases = [])
 	{
 		$this->aliases = $aliases;
 	}
@@ -40,7 +40,7 @@ class AliasLoader {
 	 * @param  array  $aliases
 	 * @return \Illuminate\Foundation\AliasLoader
 	 */
-	public static function getInstance(array $aliases = array())
+	public static function getInstance(array $aliases = [])
 	{
 		if (is_null(static::$instance)) static::$instance = new static($aliases);
 
@@ -99,7 +99,7 @@ class AliasLoader {
 	 */
 	protected function prependToLoaderStack()
 	{
-		spl_autoload_register(array($this, 'load'), true, true);
+		spl_autoload_register([$this, 'load'], true, true);
 	}
 
 	/**

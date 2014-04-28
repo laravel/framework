@@ -73,14 +73,14 @@ class Mailer {
 	 *
 	 * @var array
 	 */
-	protected $failedRecipients = array();
+	protected $failedRecipients = [];
 
 	/**
 	 * Array of parsed views containing html and text view name.
 	 *
 	 * @var array
 	 */
-	protected $parsedViews = array();
+	protected $parsedViews = [];
 
 	/**
 	 * Create a new Mailer instance.
@@ -118,7 +118,7 @@ class Mailer {
 	 */
 	public function plain($view, array $data, $callback)
 	{
-		return $this->send(array('text' => $view), $data, $callback);
+		return $this->send(['text' => $view], $data, $callback);
 	}
 
 	/**
@@ -287,7 +287,7 @@ class Mailer {
 	 */
 	protected function parseView($view)
 	{
-		if (is_string($view)) return array($view, null);
+		if (is_string($view)) return [$view, null];
 
 		// If the given view is an array with numeric keys, we will just assume that
 		// both a "pretty" and "plain" view were provided, so we will return this
@@ -302,9 +302,9 @@ class Mailer {
 		// named keys instead, allowing the developers to use one or the other.
 		elseif (is_array($view))
 		{
-			return array(
+			return [
 				array_get($view, 'html'), array_get($view, 'text')
-			);
+			];
 		}
 
 		throw new \InvalidArgumentException("Invalid view.");
@@ -320,7 +320,7 @@ class Mailer {
 	{
 		if ($this->events)
 		{
-			$this->events->fire('mailer.sending', array($message));
+			$this->events->fire('mailer.sending', [$message]);
 		}
 
 		if ( ! $this->pretending)

@@ -13,7 +13,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextIsSetupCorrectly()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
 		$p->setupPaginationContext();
 
@@ -24,7 +24,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextIsSetupCorrectlyInCursorMode()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
 		$p->setupPaginationContext();
 
@@ -35,7 +35,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextSetsUpRangeCorrectly()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
 		$p->setupPaginationContext();
 
@@ -46,7 +46,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextHandlesHugeCurrentPage()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn(15);
 		$p->setupPaginationContext();
 
@@ -57,7 +57,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextHandlesPageLessThanOne()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn(-1);
 		$p->setupPaginationContext();
 
@@ -68,7 +68,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextHandlesPageLessThanOneAsString()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn('-1');
 		$p->setupPaginationContext();
 
@@ -79,7 +79,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextHandlesPageInvalidFormat()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn('abc');
 		$p->setupPaginationContext();
 
@@ -90,7 +90,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginationContextHandlesPageMissing()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getCurrentPage')->once()->andReturn(null);
 		$p->setupPaginationContext();
 
@@ -101,7 +101,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetLinksCallsEnvironmentProperly()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$factory->shouldReceive('getPaginationView')->once()->with($p, null)->andReturn('foo');
 
 		$this->assertEquals('foo', $p->links());
@@ -110,7 +110,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetUrlProperlyFormatsUrl()
 	{
-		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$env->shouldReceive('getCurrentUrl')->times(3)->andReturn('http://foo.com');
 		$env->shouldReceive('getPageName')->andReturn('page');
 
@@ -124,14 +124,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testEnvironmentAccess()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$this->assertInstanceOf('Illuminate\Pagination\Factory', $p->getFactory());
 	}
 
 
 	public function testPaginatorIsCountable()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 
 		$this->assertEquals(3, count($p));
 	}
@@ -139,16 +139,16 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginatorIsIterable()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 
 		$this->assertInstanceOf('ArrayIterator', $p->getIterator());
-		$this->assertEquals(array('foo', 'bar', 'baz'), $p->getIterator()->getArrayCopy());
+		$this->assertEquals(['foo', 'bar', 'baz'], $p->getIterator()->getArrayCopy());
 	}
 
 
 	public function testGetUrlAddsFragment()
 	{
-		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3, 2);
 		$env->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
 		$env->shouldReceive('getPageName')->andReturn('page');
 
@@ -162,7 +162,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginatorDecoratesCollection()
 	{
-		$p = new Paginator(m::mock('Illuminate\Pagination\Factory'), array('a', 'b', 'c'), 3, 2);
+		$p = new Paginator(m::mock('Illuminate\Pagination\Factory'), ['a', 'b', 'c'], 3, 2);
 		$last = $p->last();
 
 		$this->assertEquals('c', $last);

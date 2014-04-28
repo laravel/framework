@@ -40,7 +40,7 @@ class MaintenanceServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.up', 'command.down');
+		return ['command.up', 'command.down'];
 	}
 
 }

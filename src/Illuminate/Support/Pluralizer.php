@@ -7,7 +7,7 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	public static $plural = array(
+	public static $plural = [
 		'/(quiz)$/i' => "$1zes",
 		'/^(ox)$/i' => "$1en",
 		'/([m|l])ouse$/i' => "$1ice",
@@ -27,14 +27,14 @@ class Pluralizer {
 		'/(us)$/i' => "$1es",
 		'/s$/i' => "s",
 		'/$/' => "s",
-	);
+	];
 
 	/**
 	 * Singular word form rules.
 	 *
 	 * @var array
 	 */
-	public static $singular = array(
+	public static $singular = [
 		'/(quiz)zes$/i' => "$1",
 		'/(matr)ices$/i' => "$1ix",
 		'/(vert|ind)ices$/i' => "$1ex",
@@ -64,14 +64,14 @@ class Pluralizer {
 		'/(us)es$/i' => "$1",
 		'/(us|ss)$/i' => "$1",
 		'/s$/i' => "",
-	);
+	];
 
 	/**
 	 * Irregular word forms.
 	 *
 	 * @var array
 	 */
-	public static $irregular = array(
+	public static $irregular = [
 		'child' => 'children',
 		'criterion' => 'criteria',
 		'foot' => 'feet',
@@ -89,14 +89,14 @@ class Pluralizer {
 		'syllabus' => 'syllabi',
 		'tax' => 'taxes',
 		'tooth' => 'teeth',
-	);
+	];
 
 	/**
 	 * Uncountable word forms.
 	 *
 	 * @var array
 	 */
-	public static $uncountable = array(
+	public static $uncountable = [
 		'audio',
 		'equipment',
 		'deer',
@@ -113,21 +113,21 @@ class Pluralizer {
 		'chassis',
 		'traffic',
 		'coreopsis',
-	);
+	];
 
 	/**
 	 * The cached copies of the plural inflections.
 	 *
 	 * @var array
 	 */
-	protected static $pluralCache = array();
+	protected static $pluralCache = [];
 
 	/**
 	 * The cached copies of the singular inflections.
 	 *
 	 * @var array
 	 */
-	protected static $singularCache = array();
+	protected static $singularCache = [];
 
 	/**
 	 * Get the singular form of the given word.
@@ -237,7 +237,7 @@ class Pluralizer {
 	 */
 	protected static function matchCase($value, $comparison)
 	{
-		$functions = array('mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords');
+		$functions = ['mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords'];
 
 		foreach ($functions as $function)
 		{

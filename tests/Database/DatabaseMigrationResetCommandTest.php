@@ -17,7 +17,7 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
 		$command->setLaravel(new AppDatabaseMigrationStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('rollback')->twice()->with(false)->andReturn(true, false);
-		$migrator->shouldReceive('getNotes')->andReturn(array());
+		$migrator->shouldReceive('getNotes')->andReturn([]);
 
 		$this->runCommand($command);
 	}
@@ -29,13 +29,13 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
 		$command->setLaravel(new AppDatabaseMigrationStub());
 		$migrator->shouldReceive('setConnection')->once()->with('foo');
 		$migrator->shouldReceive('rollback')->twice()->with(true)->andReturn(true, false);
-		$migrator->shouldReceive('getNotes')->andReturn(array());
+		$migrator->shouldReceive('getNotes')->andReturn([]);
 
-		$this->runCommand($command, array('--pretend' => true, '--database' => 'foo'));
+		$this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
 	}
 
 
-	protected function runCommand($command, $input = array())
+	protected function runCommand($command, $input = [])
 	{
 		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
 	}

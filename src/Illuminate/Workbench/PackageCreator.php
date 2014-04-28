@@ -16,24 +16,24 @@ class PackageCreator {
 	 *
 	 * @param  array
 	 */
-	protected $basicBlocks = array(
+	protected $basicBlocks = [
 		'SupportFiles',
 		'TestDirectory',
 		'ServiceProvider',
-	);
+	];
 
 	/**
 	 * The building blocks of the package.
 	 *
 	 * @param  array
 	 */
-	protected $blocks = array(
+	protected $blocks = [
 		'SupportFiles',
 		'SupportDirectories',
 		'PublicDirectory',
 		'TestDirectory',
 		'ServiceProvider',
-	);
+	];
 
 	/**
 	 * Create a new package creator instance.
@@ -101,7 +101,7 @@ class PackageCreator {
 	 */
 	public function writeSupportFiles(Package $package, $directory, $plain)
 	{
-		foreach (array('PhpUnit', 'Travis', 'Composer', 'Ignore') as $file)
+		foreach (['PhpUnit', 'Travis', 'Composer', 'Ignore'] as $file)
 		{
 			$this->{"write{$file}File"}($package, $directory, $plain);
 		}
@@ -185,7 +185,7 @@ class PackageCreator {
 	 */
 	public function writeSupportDirectories(Package $package, $directory)
 	{
-		foreach (array('config', 'controllers', 'lang', 'migrations', 'views') as $support)
+		foreach (['config', 'controllers', 'lang', 'migrations', 'views'] as $support)
 		{
 			$this->writeSupportDirectory($package, $support, $directory);
 		}

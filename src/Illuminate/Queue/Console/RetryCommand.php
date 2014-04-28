@@ -66,9 +66,9 @@ class RetryCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('id', InputArgument::REQUIRED, 'The ID of the failed job'),
-		);
+		return [
+			['id', InputArgument::REQUIRED, 'The ID of the failed job'],
+		];
 	}
 
 }

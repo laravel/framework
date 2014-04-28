@@ -41,42 +41,42 @@ class Factory {
 	 *
 	 * @var array
 	 */
-	protected $shared = array();
+	protected $shared = [];
 
 	/**
 	 * All of the registered view names.
 	 *
 	 * @var array
 	 */
-	protected $names = array();
+	protected $names = [];
 
 	/**
 	 * The extension to engine bindings.
 	 *
 	 * @var array
 	 */
-	protected $extensions = array('blade.php' => 'blade', 'php' => 'php');
+	protected $extensions = ['blade.php' => 'blade', 'php' => 'php'];
 
 	/**
 	 * The view composer events.
 	 *
 	 * @var array
 	 */
-	protected $composers = array();
+	protected $composers = [];
 
 	/**
 	 * All of the finished, captured sections.
 	 *
 	 * @var array
 	 */
-	protected $sections = array();
+	protected $sections = [];
 
 	/**
 	 * The stack of in-progress sections.
 	 *
 	 * @var array
 	 */
-	protected $sectionStack = array();
+	protected $sectionStack = [];
 
 	/**
 	 * The number of active rendering operations.
@@ -110,7 +110,7 @@ class Factory {
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function make($view, $data = array(), $mergeData = array())
+	public function make($view, $data = [], $mergeData = [])
 	{
 		$path = $this->finder->find($view);
 
@@ -139,7 +139,7 @@ class Factory {
 	 * @param mixed $data
 	 * @return \Illuminate\View\View
 	 */
-	public function of($view, $data = array())
+	public function of($view, $data = [])
 	{
 		return $this->make($this->names[$view], $data);
 	}
@@ -196,7 +196,7 @@ class Factory {
 		{
 			foreach ($data as $key => $value)
 			{
-				$data = array('key' => $key, $iterator => $value);
+				$data = ['key' => $key, $iterator => $value];
 
 				$result .= $this->make($view, $data)->render();
 			}
@@ -275,7 +275,7 @@ class Factory {
 	 */
 	public function creator($views, $callback)
 	{
-		$creators = array();
+		$creators = [];
 
 		foreach ((array) $views as $view)
 		{
@@ -293,7 +293,7 @@ class Factory {
 	 */
 	public function composers(array $composers)
 	{
-		$registered = array();
+		$registered = [];
 
 		foreach ($composers as $callback => $views)
 		{
@@ -312,7 +312,7 @@ class Factory {
 	 */
 	public function composer($views, $callback, $priority = null)
 	{
-		$composers = array();
+		$composers = [];
 
 		foreach ((array) $views as $view)
 		{
@@ -403,7 +403,7 @@ class Factory {
 		// given arguments that are passed to the Closure as the composer's data.
 		return function() use ($class, $method, $container)
 		{
-			$callable = array($container->make($class), $method);
+			$callable = [$container->make($class), $method];
 
 			return call_user_func_array($callable, func_get_args());
 		};
@@ -426,7 +426,7 @@ class Factory {
 		{
 			$method = str_contains($prefix, 'composing') ? 'compose' : 'create';
 
-			return array($class, $method);
+			return [$class, $method];
 		}
 	}
 
@@ -438,7 +438,7 @@ class Factory {
 	 */
 	public function callComposer(View $view)
 	{
-		$this->events->fire('composing: '.$view->getName(), array($view));
+		$this->events->fire('composing: '.$view->getName(), [$view]);
 	}
 
 	/**
@@ -449,7 +449,7 @@ class Factory {
 	 */
 	public function callCreator(View $view)
 	{
-		$this->events->fire('creating: '.$view->getName(), array($view));
+		$this->events->fire('creating: '.$view->getName(), [$view]);
 	}
 
 	/**
@@ -576,9 +576,9 @@ class Factory {
 	 */
 	public function flushSections()
 	{
-		$this->sections = array();
+		$this->sections = [];
 
-		$this->sectionStack = array();
+		$this->sectionStack = [];
 	}
 
 	/**
@@ -675,7 +675,7 @@ class Factory {
 
 		unset($this->extensions[$extension]);
 
-		$this->extensions = array_merge(array($extension => $engine), $this->extensions);
+		$this->extensions = array_merge([$extension => $engine], $this->extensions);
 	}
 
 	/**

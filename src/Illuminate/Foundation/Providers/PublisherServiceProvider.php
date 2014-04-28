@@ -186,7 +186,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array(
+		return [
 			'asset.publisher',
 			'command.asset.publish',
 			'config.publisher',
@@ -195,7 +195,7 @@ class PublisherServiceProvider extends ServiceProvider {
 			'command.view.publish',
 			'migration.publisher',
 			'command.migrate.publish',
-		);
+		];
 	}
 
 }

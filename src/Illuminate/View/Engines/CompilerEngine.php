@@ -16,7 +16,7 @@ class CompilerEngine extends PhpEngine {
 	 *
 	 * @var array
 	 */
-	protected $lastCompiled = array();
+	protected $lastCompiled = [];
 
 	/**
 	 * Create a new Blade view engine instance.
@@ -36,7 +36,7 @@ class CompilerEngine extends PhpEngine {
 	 * @param  array   $data
 	 * @return string
 	 */
-	public function get($path, array $data = array())
+	public function get($path, array $data = [])
 	{
 		$this->lastCompiled[] = $path;
 

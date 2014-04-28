@@ -29,10 +29,10 @@ class Client extends BaseClient {
 	 */
 	protected function getRequestParameters(DomRequest $request)
 	{
-		return array(
+		return [
 			$request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(),
 			$request->getFiles(), $request->getServer(), $request->getContent()
-		);
+		];
 	}
 
 }

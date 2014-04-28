@@ -54,7 +54,7 @@ class Artisan {
 	 */
 	public function __call($method, $parameters)
 	{
-		return call_user_func_array(array($this->getArtisan(), $method), $parameters);
+		return call_user_func_array([$this->getArtisan(), $method], $parameters);
 	}
 
 }

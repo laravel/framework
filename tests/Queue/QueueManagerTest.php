@@ -13,17 +13,17 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 
 	public function testDefaultConnectionCanBeResolved()
 	{
-		$app = array(
-			'config' => array(
+		$app = [
+			'config' => [
 				'queue.default' => 'sync',
-				'queue.connections.sync' => array('driver' => 'sync'),
-			),
-		);
+				'queue.connections.sync' => ['driver' => 'sync'],
+			],
+		];
 
 		$manager = new QueueManager($app);
 		$connector = m::mock('StdClass');
 		$queue = m::mock('StdClass');
-		$connector->shouldReceive('connect')->once()->with(array('driver' => 'sync'))->andReturn($queue);
+		$connector->shouldReceive('connect')->once()->with(['driver' => 'sync'])->andReturn($queue);
 		$manager->addConnector('sync', function() use ($connector) { return $connector; });
 		$queue->shouldReceive('setContainer')->once()->with($app);
 
@@ -33,17 +33,17 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 
 	public function testOtherConnectionCanBeResolved()
 	{
-		$app = array(
-			'config' => array(
+		$app = [
+			'config' => [
 				'queue.default' => 'sync',
-				'queue.connections.foo' => array('driver' => 'bar'),
-			),
-		);
+				'queue.connections.foo' => ['driver' => 'bar'],
+			],
+		];
 
 		$manager = new QueueManager($app);
 		$connector = m::mock('StdClass');
 		$queue = m::mock('StdClass');
-		$connector->shouldReceive('connect')->once()->with(array('driver' => 'bar'))->andReturn($queue);
+		$connector->shouldReceive('connect')->once()->with(['driver' => 'bar'])->andReturn($queue);
 		$manager->addConnector('bar', function() use ($connector) { return $connector; });
 		$queue->shouldReceive('setContainer')->once()->with($app);
 

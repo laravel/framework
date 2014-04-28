@@ -26,14 +26,14 @@ class Store implements SessionInterface {
 	 *
 	 * @var array
 	 */
-	protected $attributes = array();
+	protected $attributes = [];
 
 	/**
 	 * The session bags.
 	 *
 	 * @var array
 	 */
-	protected $bags = array();
+	protected $bags = [];
 
 	/**
 	 * The meta-data bag instance.
@@ -47,7 +47,7 @@ class Store implements SessionInterface {
 	 *
 	 * @var array
 	 */
-	protected $bagData = array();
+	protected $bagData = [];
 
 	/**
 	 * The session handler implementation.
@@ -100,7 +100,7 @@ class Store implements SessionInterface {
 	{
 		$this->attributes = $this->readFromHandler();
 
-		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
+		foreach (array_merge($this->bags, [$this->metaBag]) as $bag)
 		{
 			$this->initializeLocalBag($bag);
 
@@ -117,7 +117,7 @@ class Store implements SessionInterface {
 	{
 		$data = $this->handler->read($this->getId());
 
-		return $data ? unserialize($data) : array();
+		return $data ? unserialize($data) : [];
 	}
 
 	/**
@@ -128,7 +128,7 @@ class Store implements SessionInterface {
 	 */
 	protected function initializeLocalBag($bag)
 	{
-		$this->bagData[$bag->getStorageKey()] = $this->get($bag->getStorageKey(), array());
+		$this->bagData[$bag->getStorageKey()] = $this->get($bag->getStorageKey(), []);
 
 		$this->forget($bag->getStorageKey());
 	}
@@ -180,7 +180,7 @@ class Store implements SessionInterface {
 	 */
 	public function invalidate($lifetime = null)
 	{
-		$this->attributes = array();
+		$this->attributes = [];
 
 		$this->migrate();
 
@@ -229,7 +229,7 @@ class Store implements SessionInterface {
 	 */
 	protected function addBagDataToSession()
 	{
-		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
+		foreach (array_merge($this->bags, [$this->metaBag]) as $bag)
 		{
 			$this->put($bag->getStorageKey(), $this->bagData[$bag->getStorageKey()]);
 		}
@@ -242,11 +242,11 @@ class Store implements SessionInterface {
 	 */
 	public function ageFlashData()
 	{
-		foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
+		foreach ($this->get('flash.old', []) as $old) { $this->forget($old); }
 
-		$this->put('flash.old', $this->get('flash.new', array()));
+		$this->put('flash.old', $this->get('flash.new', []));
 
-		$this->put('flash.new', array());
+		$this->put('flash.new', []);
 	}
 
 	/**
@@ -303,7 +303,7 @@ class Store implements SessionInterface {
 	 */
 	public function getOldInput($key = null, $default = null)
 	{
-		$input = $this->get('_old_input', array());
+		$input = $this->get('_old_input', []);
 
 		// Input that is flashed to the session can be easily retrieved by the
 		// developer, making repopulating old forms and the like much more
@@ -330,7 +330,7 @@ class Store implements SessionInterface {
 	 */
 	public function put($key, $value)
 	{
-		if ( ! is_array($key)) $key = array($key => $value);
+		if ( ! is_array($key)) $key = [$key => $value];
 
 		foreach ($key as $arrayKey => $arrayValue)
 		{
@@ -347,7 +347,7 @@ class Store implements SessionInterface {
 	 */
 	public function push($key, $value)
 	{
-		$array = $this->get($key, array());
+		$array = $this->get($key, []);
 
 		$array[] = $value;
 
@@ -367,7 +367,7 @@ class Store implements SessionInterface {
 
 		$this->push('flash.new', $key);
 
-		$this->removeFromOldFlashData(array($key));
+		$this->removeFromOldFlashData([$key]);
 	}
 
 	/**
@@ -388,9 +388,9 @@ class Store implements SessionInterface {
 	 */
 	public function reflash()
 	{
-		$this->mergeNewFlashes($this->get('flash.old', array()));
+		$this->mergeNewFlashes($this->get('flash.old', []));
 
-		$this->put('flash.old', array());
+		$this->put('flash.old', []);
 	}
 
 	/**
@@ -416,7 +416,7 @@ class Store implements SessionInterface {
 	 */
 	protected function mergeNewFlashes(array $keys)
 	{
-		$values = array_unique(array_merge($this->get('flash.new', array()), $keys));
+		$values = array_unique(array_merge($this->get('flash.new', []), $keys));
 
 		$this->put('flash.new', $values);
 	}
@@ -429,7 +429,7 @@ class Store implements SessionInterface {
 	 */
 	protected function removeFromOldFlashData(array $keys)
 	{
-		$this->put('flash.old', array_diff($this->get('flash.old', array()), $keys));
+		$this->put('flash.old', array_diff($this->get('flash.old', []), $keys));
 	}
 
 	/**
@@ -475,7 +475,7 @@ class Store implements SessionInterface {
 	 */
 	public function clear()
 	{
-		$this->attributes = array();
+		$this->attributes = [];
 
 		foreach ($this->bags as $bag)
 		{
@@ -536,7 +536,7 @@ class Store implements SessionInterface {
 	 */
 	public function getBagData($name)
 	{
-		return array_get($this->bagData, $name, array());
+		return array_get($this->bagData, $name, []);
 	}
 
 	/**
