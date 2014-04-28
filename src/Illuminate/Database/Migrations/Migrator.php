@@ -7,17 +7,17 @@ use Illuminate\Container\Container;
 class Migrator {
 
 	/**
-	* The application container.
-	*
-	* @var \Illuminate\Container\Container
-	*/
+	 * The application container.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
 	protected $app;
 
 	/**
-	* The migration repository implementation.
-	*
-	* @var \Illuminate\Database\Migrations\MigrationRepositoryInterface
-	*/
+	 * The migration repository implementation.
+	 *
+	 * @var \Illuminate\Database\Migrations\MigrationRepositoryInterface
+	 */
 	protected $repository;
 
 	/**
