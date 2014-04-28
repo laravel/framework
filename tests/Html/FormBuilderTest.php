@@ -225,7 +225,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->formBuilder->label('select-name-id');
 		$select = $this->formBuilder->select(
 			'select-name-id',
-			array(),
+			[],
 			null,
 			array('name' => 'select-name')
 		);
@@ -290,7 +290,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->formBuilder->setSessionStore($session = m::mock('Illuminate\Session\Store'));
 
-		$session->shouldReceive('getOldInput')->withNoArgs()->andReturn(array());
+		$session->shouldReceive('getOldInput')->withNoArgs()->andReturn([]);
 		$session->shouldReceive('getOldInput')->with('foo')->andReturn(null);
 
 		$form1 = $this->formBuilder->input('checkbox', 'foo');
@@ -404,7 +404,7 @@ class FormBuilderModelStub {
 
 	protected $data;
 
-	public function __construct(array $data = array())
+	public function __construct(array $data = [])
 	{
 		foreach ($data as $key => $val)
 		{

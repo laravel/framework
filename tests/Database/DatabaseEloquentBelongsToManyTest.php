@@ -104,7 +104,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	public function testRelationIsProperlyInitialized()
 	{
 		$relation = $this->getRelation();
-		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = array()) { return new Collection($array); });
+		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = []) { return new Collection($array); });
 		$model = m::mock('Illuminate\Database\Eloquent\Model');
 		$model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
 		$models = $relation->initRelation(array($model), 'foo');
@@ -230,12 +230,12 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
 		$query->shouldReceive('lists')->once()->with('role_id')->andReturn(array(1, 2, 3));
-		$relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo(array()), $this->equalTo(false));
+		$relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo([]), $this->equalTo(false));
 		$relation->expects($this->once())->method('detach')->with($this->equalTo(array(1)));
 		$relation->getRelated()->shouldReceive('touches')->andReturn(false);
 		$relation->getParent()->shouldReceive('touches')->andReturn(false);
 
-		$this->assertEquals(array('attached' => array(4), 'detached' => array(1), 'updated' => array()), $relation->sync($list));
+		$this->assertEquals(array('attached' => array(4), 'detached' => array(1), 'updated' => []), $relation->sync($list));
 	}
 
 
@@ -306,7 +306,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 
 		$collection = m::mock('Illuminate\Database\Eloquent\Collection');
 		$collection->shouldReceive('modelKeys')->once()->andReturn(array(1, 2, 3));
-		$relation->expects($this->once())->method('formatSyncList')->with(array(1, 2, 3))->will($this->returnValue(array(1 => array(),2 => array(),3 => array())));
+		$relation->expects($this->once())->method('formatSyncList')->with(array(1, 2, 3))->will($this->returnValue(array(1 => [],2 => [],3 => [])));
 		$relation->sync($collection);
 	}
 
@@ -347,7 +347,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentBelongsToManyModelStub extends Illuminate\Database\Eloquent\Model {
-	protected $guarded = array();
+	protected $guarded = [];
 }
 
 class EloquentBelongsToManyModelPivotStub extends Illuminate\Database\Eloquent\Model {

@@ -29,7 +29,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
 	public function testArraySet()
 	{
-		$array = array();
+		$array = [];
 		array_set($array, 'names.developer', 'taylor');
 		$this->assertEquals('taylor', $array['names']['developer']);
 	}

@@ -53,7 +53,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	protected function runCommand($command, $input = array())
+	protected function runCommand($command, $input = [])
 	{
 		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
 	}
@@ -64,7 +64,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 class DatabaseMigrationMakeCommandTestStub extends MigrateMakeCommand
 {
-	public function call($command, array $arguments = array())
+	public function call($command, array $arguments = [])
 	{
 		//
 	}

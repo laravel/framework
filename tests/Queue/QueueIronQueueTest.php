@@ -14,7 +14,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), m::mock('Illuminate\Http\Request'), 'default', true);
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'foo', 'data' => array(1, 2, 3), 'attempts' => 1, 'queue' => 'default')))->andReturn('encrypted');
-		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array())->andReturn((object) array('id' => 1));
+		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', [])->andReturn((object) array('id' => 1));
 		$queue->push('foo', array(1, 2, 3));
 	}
 
@@ -23,7 +23,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ'), $crypt = m::mock('Illuminate\Encryption\Encrypter'), m::mock('Illuminate\Http\Request'), 'default');
 		$crypt->shouldReceive('encrypt')->never();
-		$iron->shouldReceive('postMessage')->once()->with('default', json_encode(['job' => 'foo', 'data' => [1, 2, 3], 'attempts' => 1, 'queue' => 'default']), array())->andReturn((object) array('id' => 1));
+		$iron->shouldReceive('postMessage')->once()->with('default', json_encode(['job' => 'foo', 'data' => [1, 2, 3], 'attempts' => 1, 'queue' => 'default']), [])->andReturn((object) array('id' => 1));
 		$queue->push('foo', array(1, 2, 3));
 	}
 
@@ -36,7 +36,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array(
 			'job' => 'IlluminateQueueClosure', 'data' => array('closure' => serialize($closure)), 'attempts' => 1, 'queue' => 'default'
 		)))->andReturn('encrypted');
-		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array())->andReturn((object) array('id' => 1));
+		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', [])->andReturn((object) array('id' => 1));
 		$queue->push($innerClosure);
 	}
 

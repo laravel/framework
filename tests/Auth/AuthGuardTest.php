@@ -17,7 +17,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$guard = m::mock('Illuminate\Auth\Guard[check,attempt]', array($provider, $session));
 		$guard->shouldReceive('check')->once()->andReturn(false);
 		$guard->shouldReceive('attempt')->once()->with(array('email' => 'foo@bar.com', 'password' => 'secret'))->andReturn(true);
-		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
 
 		$guard->basic('email', $request);
 	}
@@ -29,7 +29,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$guard = m::mock('Illuminate\Auth\Guard[check]', array($provider, $session));
 		$guard->shouldReceive('check')->once()->andReturn(true);
 		$guard->shouldReceive('attempt')->never();
-		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
 
 		$guard->basic('email', $request);
 	}
@@ -41,7 +41,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$guard = m::mock('Illuminate\Auth\Guard[check,attempt]', array($provider, $session));
 		$guard->shouldReceive('check')->once()->andReturn(false);
 		$guard->shouldReceive('attempt')->once()->with(array('email' => 'foo@bar.com', 'password' => 'secret'))->andReturn(false);
-		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
 		$response = $guard->basic('email', $request);
 
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
@@ -249,7 +249,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	{
 		$guard = $this->getGuard();
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => 'id|recaller'));
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], array($guard->getRecallerName() => 'id|recaller'));
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
 		$user = m::mock('Illuminate\Auth\UserInterface');

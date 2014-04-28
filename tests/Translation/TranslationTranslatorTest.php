@@ -14,11 +14,11 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
 	{
 		$t = $this->getMock('Illuminate\Translation\Translator', array('get'), array($this->getLoader(), 'en'));
-		$t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array()), $this->equalTo('bar'))->will($this->returnValue('foo'));
+		$t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->will($this->returnValue('foo'));
 		$this->assertFalse($t->has('foo', 'bar'));
 
 		$t = $this->getMock('Illuminate\Translation\Translator', array('get'), array($this->getLoader(), 'en', 'sp'));
-		$t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array()), $this->equalTo('bar'))->will($this->returnValue('bar'));
+		$t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->will($this->returnValue('bar'));
 		$this->assertTrue($t->has('foo', 'bar'));
 	}
 

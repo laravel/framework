@@ -28,7 +28,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 	{
 		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
 		$parent->shouldReceive('getConnectionName')->andReturn('connection');
-		$parent->shouldReceive('getDates')->andReturn(array());
+		$parent->shouldReceive('getDates')->andReturn([]);
 		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
 		$this->assertTrue($pivot->timestamps);
 
@@ -52,7 +52,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 	public function testDeleteMethodDeletesModelByKeys()
 	{
 		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
-		$parent->guard(array());
+		$parent->guard([]);
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 		$pivot = $this->getMock('Illuminate\Database\Eloquent\Relations\Pivot', array('newQuery'), array($parent, array('foo' => 'bar'), 'table'));
 		$pivot->setPivotKeys('foreign', 'other');
@@ -75,6 +75,6 @@ class DatabaseEloquentPivotTestModelStub extends Illuminate\Database\Eloquent\Mo
 class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot {
 	public function getDates()
 	{
-		return array();
+		return [];
 	}
 }

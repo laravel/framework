@@ -105,5 +105,5 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentMorphToManyModelStub extends Illuminate\Database\Eloquent\Model {
-	protected $guarded = array();
+	protected $guarded = [];
 }

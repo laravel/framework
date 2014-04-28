@@ -157,7 +157,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	public function testTransactionMethodRunsSuccessfully()
 	{
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO', array('beginTransaction', 'commit'));
-		$mock = $this->getMockConnection(array(), $pdo);
+		$mock = $this->getMockConnection([], $pdo);
 		$pdo->expects($this->once())->method('beginTransaction');
 		$pdo->expects($this->once())->method('commit');
 		$result = $mock->transaction(function($db) { return $db; });
@@ -168,7 +168,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	public function testTransactionMethodRollsbackAndThrows()
 	{
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO', array('beginTransaction', 'commit', 'rollBack'));
-		$mock = $this->getMockConnection(array(), $pdo);
+		$mock = $this->getMockConnection([], $pdo);
 		$pdo->expects($this->once())->method('beginTransaction');
 		$pdo->expects($this->once())->method('rollBack');
 		$pdo->expects($this->never())->method('commit');
@@ -211,10 +211,10 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	public function testLogQueryFiresEventsIfSet()
 	{
 		$connection = $this->getMockConnection();
-		$connection->logQuery('foo', array(), time());
+		$connection->logQuery('foo', [], time());
 		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-		$events->shouldReceive('fire')->once()->with('illuminate.query', array('foo', array(), null, null));
-		$connection->logQuery('foo', array(), null);
+		$events->shouldReceive('fire')->once()->with('illuminate.query', array('foo', [], null, null));
+		$connection->logQuery('foo', [], null);
 	}
 
 
@@ -263,7 +263,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	protected function getMockConnection($methods = array(), $pdo = null)
+	protected function getMockConnection($methods = [], $pdo = null)
 	{
 		$pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
 		$defaults = array('getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar');

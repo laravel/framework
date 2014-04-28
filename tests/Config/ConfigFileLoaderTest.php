@@ -13,7 +13,7 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testEmptyArrayIsReturnedOnNullPath()
 	{
 		$loader = $this->getLoader();
-		$this->assertEquals(array(), $loader->load('local', 'group', 'namespace'));
+		$this->assertEquals([], $loader->load('local', 'group', 'namespace'));
 	}
 
 

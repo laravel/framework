@@ -28,7 +28,7 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
 		$factory->extendImplicit('implicit', $noop2);
 		$factory->replacer('replacer', $noop3);
 		$factory->setPresenceVerifier($presence);
-		$validator = $factory->make(array(), array());
+		$validator = $factory->make([], []);
 		$this->assertEquals(array('foo' => $noop1, 'implicit' => $noop2), $validator->getExtensions());
 		$this->assertEquals(array('replacer' => $noop3), $validator->getReplacers());
 		$this->assertEquals($presence, $validator->getPresenceVerifier());
@@ -37,7 +37,7 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
 		$factory->extend('foo', $noop1, 'foo!');
 		$factory->extendImplicit('implicit', $noop2, 'implicit!');
 		$factory->setPresenceVerifier($presence);
-		$validator = $factory->make(array(), array());
+		$validator = $factory->make([], []);
 		$this->assertEquals(array('foo' => $noop1, 'implicit' => $noop2), $validator->getExtensions());
 		$this->assertEquals(array('foo' => 'foo!', 'implicit' => 'implicit!'), $validator->getFallbackMessages());
 		$this->assertEquals($presence, $validator->getPresenceVerifier());

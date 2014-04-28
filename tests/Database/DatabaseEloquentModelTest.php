@@ -460,7 +460,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
 		$this->assertEquals(null, $array['group']);
-		$this->assertEquals(array(), $array['multi']);
+		$this->assertEquals([], $array['multi']);
 		$this->assertFalse(isset($array['password']));
 
 		$model->setAppends(array('appendable'));
@@ -551,7 +551,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelStub;
 		$model->fill(array('_method' => 'PUT'));
-		$this->assertEquals(array(), $model->getAttributes());
+		$this->assertEquals([], $model->getAttributes());
 	}
 
 
@@ -781,7 +781,7 @@ class EloquentTestObserverStub {
 
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
-	protected $guarded = array();
+	protected $guarded = [];
 	protected $morph_to_stub_type = 'EloquentModelSaveStub';
 	public function getListItemsAttribute($value)
 	{
@@ -817,7 +817,7 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	}
 	public function getDates()
 	{
-		return array();
+		return [];
 	}
 	public function getAppendableAttribute()
 	{
@@ -838,8 +838,8 @@ class EloquentDateModelStub extends EloquentModelStub {
 
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'save_stub';
-	protected $guarded = array();
-	public function save(array $options = array()) { $_SERVER['__eloquent.saved'] = true; }
+	protected $guarded = [];
+	public function save(array $options = []) { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{
 		$this->incrementing = $value;
@@ -880,7 +880,7 @@ class EloquentModelHydrateRawStub extends Illuminate\Database\Eloquent\Model {
 	public function getConnection()
 	{
 		$mock = m::mock('Illuminate\Database\Connection');
-		$mock->shouldReceive('select')->once()->with('SELECT ?', array('foo'))->andReturn(array());
+		$mock->shouldReceive('select')->once()->with('SELECT ?', array('foo'))->andReturn([]);
 		return $mock;
 	}
 }

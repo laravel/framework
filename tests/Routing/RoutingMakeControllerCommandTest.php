@@ -13,7 +13,7 @@ class RoutingMakeControllerCommandTest extends PHPUnit_Framework_TestCase {
 	public function testGeneratorIsCalledWithProperOptions()
 	{
 		$command = new Illuminate\Routing\Console\MakeControllerCommand($gen = m::mock('Illuminate\Routing\Generators\ControllerGenerator'), __DIR__);
-		$gen->shouldReceive('make')->once()->with('FooController', __DIR__, array('only' => array(), 'except' => array()));
+		$gen->shouldReceive('make')->once()->with('FooController', __DIR__, array('only' => [], 'except' => []));
 		$this->runCommand($command, array('name' => 'FooController'));
 	}
 
@@ -27,7 +27,7 @@ class RoutingMakeControllerCommandTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function runCommand($command, $input = array(), $output = null)
+	public function runCommand($command, $input = [], $output = null)
 	{
 		$output = $output ?: new Symfony\Component\Console\Output\NullOutput;
 

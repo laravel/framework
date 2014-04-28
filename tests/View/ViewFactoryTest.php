@@ -62,7 +62,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		$factory->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock('StdClass'));
 		$mockView->shouldReceive('render')->once()->andReturn('empty');
 
-		$this->assertEquals('empty', $factory->renderEach('view', array(), 'iterator', 'foo'));
+		$this->assertEquals('empty', $factory->renderEach('view', [], 'iterator', 'foo'));
 	}
 
 
@@ -92,7 +92,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testRawStringsMayBeReturnedFromRenderEach()
 	{
-		$this->assertEquals('foo', $this->getFactory()->renderEach('foo', array(), 'item', 'raw|foo'));
+		$this->assertEquals('foo', $this->getFactory()->renderEach('foo', [], 'item', 'raw|foo'));
 	}
 
 

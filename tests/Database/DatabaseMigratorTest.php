@@ -186,7 +186,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
-		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array());
+		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn([]);
 
 		$migrator->rollback();
 	}

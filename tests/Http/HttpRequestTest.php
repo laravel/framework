@@ -76,7 +76,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	public function segmentsProvider()
 	{
 		return array(
-			array('', array()),
+			array('', []),
 			array('foo/bar', array('foo', 'bar')),
 			array('foo/bar//baz', array('foo', 'bar', 'baz'))
 		);
@@ -121,7 +121,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET');
 		$this->assertFalse($request->ajax());
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'), '{}');
+		$request = Request::create('/', 'GET', [], [], [], array('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'), '{}');
 		$this->assertTrue($request->ajax());
 	}
 
@@ -172,7 +172,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 25));
 		$this->assertEquals(array('name' => 'Taylor'), $request->except('age'));
-		$this->assertEquals(array(), $request->except('age', 'name'));
+		$this->assertEquals([], $request->except('age', 'name'));
 	}
 
 
@@ -188,7 +188,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function testCookieMethod()
 	{
-		$request = Request::create('/', 'GET', array(), array('name' => 'Taylor'));
+		$request = Request::create('/', 'GET', [], array('name' => 'Taylor'));
 		$this->assertEquals('Taylor', $request->cookie('name'));
 		$this->assertEquals('Bob', $request->cookie('foo', 'Bob'));
 		$all = $request->cookie(null);
@@ -198,7 +198,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function testHasCookieMethod()
 	{
-		$request = Request::create('/', 'GET', array(), array('foo' => 'bar'));
+		$request = Request::create('/', 'GET', [], array('foo' => 'bar'));
 		$this->assertTrue($request->hasCookie('foo'));
 		$this->assertFalse($request->hasCookie('qu'));
 	}
@@ -215,14 +215,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 				'error' => null,
 			),
 		);
-		$request = Request::create('/', 'GET', array(), array(), $files);
+		$request = Request::create('/', 'GET', [], [], $files);
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request->file('foo'));
 	}
 
 
 	public function testHasFileMethod()
 	{
-		$request = Request::create('/', 'GET', array(), array(), array());
+		$request = Request::create('/', 'GET', [], [], []);
 		$this->assertFalse($request->hasFile('foo'));
 
 		$files = array(
@@ -234,14 +234,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 				'error' => null,
 			),
 		);
-		$request = Request::create('/', 'GET', array(), array(), $files);
+		$request = Request::create('/', 'GET', [], [], $files);
 		$this->assertTrue($request->hasFile('foo'));
 	}
 
 
 	public function testServerMethod()
 	{
-		$request = Request::create('/', 'GET', array(), array(), array(), array('foo' => 'bar'));
+		$request = Request::create('/', 'GET', [], [], [], array('foo' => 'bar'));
 		$this->assertEquals('bar', $request->server('foo'));
 		$this->assertEquals('bar', $request->server('foo.doesnt.exist', 'bar'));
 		$all = $request->server(null);
@@ -271,7 +271,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function testHeaderMethod()
 	{
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_DO_THIS' => 'foo'));
+		$request = Request::create('/', 'GET', [], [], [], array('HTTP_DO_THIS' => 'foo'));
 		$this->assertEquals('foo', $request->header('do-this'));
 		$all = $request->header(null);
 		$this->assertEquals('foo', $all['do-this'][0]);
@@ -281,7 +281,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	public function testJSONMethod()
 	{
 		$payload = array('name' => 'taylor');
-		$request = Request::create('/', 'GET', array(), array(), array(), array('CONTENT_TYPE' => 'application/json'), json_encode($payload));
+		$request = Request::create('/', 'GET', [], [], [], array('CONTENT_TYPE' => 'application/json'), json_encode($payload));
 		$this->assertEquals('taylor', $request->json('name'));
 		$this->assertEquals('taylor', $request->input('name'));
 		$data = $request->json()->all();
@@ -294,7 +294,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$content = json_encode($payload);
 		// The built in PHP 5.4 webserver incorrectly provides HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH,
 		// rather than CONTENT_TYPE and CONTENT_LENGTH
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json', 'HTTP_CONTENT_LENGTH' => strlen($content)), $content);
+		$request = Request::create('/', 'GET', [], [], [], array('HTTP_CONTENT_TYPE' => 'application/json', 'HTTP_CONTENT_LENGTH' => strlen($content)), $content);
 		$this->assertTrue($request->isJson());
 		$data = $request->json()->all();
 		$this->assertEquals($payload, $data);
@@ -308,7 +308,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	public function testAllInputReturnsInputAndFiles()
 	{
 		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, array(__FILE__, 'photo.jpg'));
-		$request = Request::create('/?boom=breeze', 'GET', array('foo' => 'bar'), array(), array('baz' => $file));
+		$request = Request::create('/?boom=breeze', 'GET', array('foo' => 'bar'), [], array('baz' => $file));
 		$this->assertEquals(array('foo' => 'bar', 'baz' => $file, 'boom' => 'breeze'), $request->all());
 	}
 
@@ -316,7 +316,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	public function testAllInputReturnsNestedInputAndFiles()
 	{
 		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, array(__FILE__, 'photo.jpg'));
-		$request = Request::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), array('foo' => array('photo' => $file)));
+		$request = Request::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), [], array('foo' => array('photo' => $file)));
 		$this->assertEquals(array('foo' => array('bar' => 'baz', 'photo' => $file), 'boom' => 'breeze'), $request->all());
 	}
 
@@ -343,15 +343,15 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function testFormatReturnsAcceptableFormat()
 	{
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
+		$request = Request::create('/', 'GET', [], [], [], array('HTTP_ACCEPT' => 'application/json'));
 		$this->assertEquals('json', $request->format());
 		$this->assertTrue($request->wantsJson());
 
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/atom+xml'));
+		$request = Request::create('/', 'GET', [], [], [], array('HTTP_ACCEPT' => 'application/atom+xml'));
 		$this->assertEquals('atom', $request->format());
 		$this->assertFalse($request->wantsJson());
 
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'is/not/known'));
+		$request = Request::create('/', 'GET', [], [], [], array('HTTP_ACCEPT' => 'is/not/known'));
 		$this->assertEquals('html', $request->format());
 		$this->assertEquals('foo', $request->format('foo'));
 	}

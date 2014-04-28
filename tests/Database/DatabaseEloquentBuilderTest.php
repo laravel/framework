@@ -116,13 +116,13 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', array($this->getMockQueryBuilder()));
-		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn(array());
+		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn([]);
 		$builder->shouldReceive('eagerLoadRelations')->never();
 		$builder->setModel($this->getMockModel());
-		$builder->getModel()->shouldReceive('newCollection')->with(array())->andReturn(new Collection(array()));
+		$builder->getModel()->shouldReceive('newCollection')->with([])->andReturn(new Collection([]));
 
 		$results = $builder->get(array('foo'));
-		$this->assertEquals(array(), $results->all());
+		$this->assertEquals([], $results->all());
 	}
 
 
@@ -151,7 +151,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
 		$builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
 		$builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
-		$builder->shouldReceive('get')->times(3)->andReturn(array('foo1', 'foo2'), array('foo3'), array());
+		$builder->shouldReceive('get')->times(3)->andReturn(array('foo1', 'foo2'), array('foo3'), []);
 
 		$callbackExecutionAssertor = m::mock('StdClass');
 		$callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->once();

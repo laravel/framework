@@ -368,7 +368,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNull('id');
 		$this->assertEquals('select * from "users" where "id" is null', $builder->toSql());
-		$this->assertEquals(array(), $builder->getBindings());
+		$this->assertEquals([], $builder->getBindings());
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereNull('id');
@@ -382,7 +382,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNotNull('id');
 		$this->assertEquals('select * from "users" where "id" is not null', $builder->toSql());
-		$this->assertEquals(array(), $builder->getBindings());
+		$this->assertEquals([], $builder->getBindings());
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '>', 1)->orWhereNotNull('id');
@@ -674,7 +674,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		unset($_SERVER['orders']);
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [])->andReturn(array(array('aggregate' => 1)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($query, $results)
 		{
 			$_SERVER['orders'] = $query->orders;
@@ -721,31 +721,31 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testAggregateFunctions()
 	{
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [])->andReturn(array(array('aggregate' => 1)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->count();
 		$this->assertEquals(1, $results);
 
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [])->andReturn(array(array('aggregate' => 1)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->exists();
 		$this->assertTrue($results);
 
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate from "users"', [])->andReturn(array(array('aggregate' => 1)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->max('id');
 		$this->assertEquals(1, $results);
 
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users"', [])->andReturn(array(array('aggregate' => 1)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->min('id');
 		$this->assertEquals(1, $results);
 
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', [])->andReturn(array(array('aggregate' => 1)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->sum('id');
 		$this->assertEquals(1, $results);
@@ -791,7 +791,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testInsertMethodRespectsRawBindings()
 	{
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (CURRENT TIMESTAMP)', array())->andReturn(true);
+		$builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (CURRENT TIMESTAMP)', [])->andReturn(true);
 		$result = $builder->from('users')->insert(array('email' => new Raw('CURRENT TIMESTAMP')));
 		$this->assertTrue($result);
 	}
@@ -864,7 +864,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testTruncateMethod()
 	{
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', array());
+		$builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', []);
 		$builder->from('users')->truncate();
 
 		$sqlite = new Illuminate\Database\Query\Grammars\SQLiteGrammar;
@@ -872,7 +872,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->from('users');
 		$this->assertEquals(array(
 			'delete from sqlite_sequence where name = ?' => array('users'),
-			'delete from "users"' => array(),
+			'delete from "users"' => [],
 		), $sqlite->compileTruncate($builder));
 	}
 

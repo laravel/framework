@@ -53,7 +53,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/en/foo.php')->andReturn(false);
 		$files->shouldReceive('getRequire')->never();
 
-		$this->assertEquals(array(), $loader->load('en', 'foo', null));
+		$this->assertEquals([], $loader->load('en', 'foo', null));
 	}
 
 
@@ -62,7 +62,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('getRequire')->never();
 
-		$this->assertEquals(array(), $loader->load('en', 'foo', 'bar'));
+		$this->assertEquals([], $loader->load('en', 'foo', 'bar'));
 	}
 
 }

@@ -81,7 +81,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSessionIsProperlySaved()
 	{
 		$session = $this->getSession();
-		$session->getHandler()->shouldReceive('read')->once()->andReturn(serialize(array()));
+		$session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
 		$session->start();
 		$session->put('foo', 'bar');
 		$session->flash('baz', 'boom');
@@ -90,7 +90,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 			'foo' => 'bar',
 			'baz' => 'boom',
 			'flash' => array(
-				'new' => array(),
+				'new' => [],
 				'old' => array('baz'),
 			),
 			'_sf2_meta' => $session->getBagData('_sf2_meta'),

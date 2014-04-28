@@ -20,11 +20,11 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 
 		$this->url = m::mock('Illuminate\Routing\UrlGenerator');
 		$this->url->shouldReceive('getRequest')->andReturn($this->request);
-		$this->url->shouldReceive('to')->with('bar', array(), null)->andReturn('http://foo.com/bar');
-		$this->url->shouldReceive('to')->with('bar', array(), true)->andReturn('https://foo.com/bar');
-		$this->url->shouldReceive('to')->with('login', array(), null)->andReturn('http://foo.com/login');
-		$this->url->shouldReceive('to')->with('http://foo.com/bar', array(), null)->andReturn('http://foo.com/bar');
-		$this->url->shouldReceive('to')->with('/', array(), null)->andReturn('http://foo.com/');
+		$this->url->shouldReceive('to')->with('bar', [], null)->andReturn('http://foo.com/bar');
+		$this->url->shouldReceive('to')->with('bar', [], true)->andReturn('https://foo.com/bar');
+		$this->url->shouldReceive('to')->with('login', [], null)->andReturn('http://foo.com/login');
+		$this->url->shouldReceive('to')->with('http://foo.com/bar', [], null)->andReturn('http://foo.com/bar');
+		$this->url->shouldReceive('to')->with('/', [], null)->andReturn('http://foo.com/');
 
 		$this->session = m::mock('Illuminate\Session\Store');
 
@@ -128,7 +128,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testAction()
 	{
-		$this->url->shouldReceive('action')->with('bar@index', array())->andReturn('http://foo.com/bar');
+		$this->url->shouldReceive('action')->with('bar@index', [])->andReturn('http://foo.com/bar');
 		$response = $this->redirect->action('bar@index');
 		$this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
 	}
@@ -137,7 +137,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 	public function testRoute()
 	{
 		$this->url->shouldReceive('route')->with('home')->andReturn('http://foo.com/bar');
-		$this->url->shouldReceive('route')->with('home', array())->andReturn('http://foo.com/bar');
+		$this->url->shouldReceive('route')->with('home', [])->andReturn('http://foo.com/bar');
 
 		$response = $this->redirect->route('home');
 		$this->assertEquals('http://foo.com/bar', $response->getTargetUrl());

@@ -13,7 +13,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
 	{
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('when' => array(), 'eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('when' => [], 'eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
@@ -22,14 +22,14 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$app->shouldReceive('runningInConsole')->andReturn(false);
 		$app->shouldReceive('setDeferredServices')->once()->with(array('deferred'));
 
-		$repo->load($app, array());
+		$repo->load($app, []);
 	}
 
 
 	public function testServicesAreNeverLazyLoadedWhenRunningInConsole()
 	{
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('when' => array(), 'eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('when' => [], 'eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
@@ -38,7 +38,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$app->shouldReceive('runningInConsole')->andReturn(true);
 		$app->shouldReceive('setDeferredServices')->once()->with(array('deferred'));
 
-		$repo->load($app, array());
+		$repo->load($app, []);
 	}
 
 
@@ -47,7 +47,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,writeManifest,shouldRecompile]', array(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__)));
 		$app = m::mock('Illuminate\Foundation\Application');
 
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array(), 'deferred' => array('deferred')));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => [], 'deferred' => array('deferred')));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(true);
 
 		// foo mock is just a deferred provider
@@ -82,7 +82,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testShouldRecompileReturnsCorrectValue()
 	{
 		$repo = new Illuminate\Foundation\ProviderRepository(new Illuminate\Filesystem\Filesystem, __DIR__);
-		$this->assertTrue($repo->shouldRecompile(null, array()));
+		$this->assertTrue($repo->shouldRecompile(null, []));
 		$this->assertTrue($repo->shouldRecompile(array('providers' => array('foo')), array('foo', 'bar')));
 		$this->assertFalse($repo->shouldRecompile(array('providers' => array('foo')), array('foo')));
 	}
@@ -93,7 +93,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/services.json')->andReturn(true);
 		$files->shouldReceive('get')->once()->with(__DIR__.'/services.json')->andReturn(json_encode($array = array('users' => array('dayle' => true))));
-		$array['when'] = array();
+		$array['when'] = [];
 
 		$this->assertEquals($array, $repo->loadManifest());
 	}

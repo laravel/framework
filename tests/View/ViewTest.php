@@ -14,13 +14,13 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testDataCanBeSetOnView()
 	{
-		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', []);
 		$view->with('foo', 'bar');
 		$view->with(array('baz' => 'boom'));
 		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
 
 
-		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', []);
 		$view->withFoo('bar')->withBaz('boom');
 		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
 	}
@@ -54,7 +54,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 			m::mock('Illuminate\View\Engines\EngineInterface'),
 			'view',
 			'path',
-			array()
+			[]
 		));
 
 		$view->shouldReceive('render')->with(m::type('Closure'))->once()->andReturn($sections = array('foo' => 'bar'));
