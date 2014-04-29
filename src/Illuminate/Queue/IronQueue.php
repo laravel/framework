@@ -51,7 +51,6 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
 	 * @param  bool  $shouldEncrypt
-	 * @return void
 	 */
 	public function __construct(IronMQ $iron, Encrypter $crypt, Request $request, $default, $shouldEncrypt = false)
 	{

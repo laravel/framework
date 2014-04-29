@@ -33,7 +33,6 @@ class MailgunTransport implements Swift_Transport {
 	 *
 	 * @param  string  $key
 	 * @param  string  $domain
-	 * @return void
 	 */
 	public function __construct($key, $domain)
 	{

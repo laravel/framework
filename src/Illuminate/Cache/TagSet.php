@@ -21,7 +21,6 @@ class TagSet {
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
 	 * @param  array  $names
-	 * @return void
 	 */
 	public function __construct(StoreInterface $store, array $names = array())
 	{

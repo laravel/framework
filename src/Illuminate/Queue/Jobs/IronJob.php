@@ -34,7 +34,6 @@ class IronJob extends Job {
 	 * @param  object  $job
 	 * @param  string  $queue
 	 * @param  bool    $pushed
-	 * @return void
 	 */
 	public function __construct(Container $container,
                                 IronQueue $iron,

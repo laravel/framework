@@ -40,7 +40,6 @@ class MakeControllerCommand extends Command {
 	 *
 	 * @param  \Illuminate\Routing\Generators\ControllerGenerator  $generator
 	 * @param  string  $path
-	 * @return void
 	 */
 	public function __construct(ControllerGenerator $generator, $path)
 	{

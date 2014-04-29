@@ -31,7 +31,6 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	 * @param  \Illuminate\Redis\Database  $redis
 	 * @param  string  $prefix
 	 * @param  string  $connection
-	 * @return void
 	 */
 	public function __construct(Redis $redis, $prefix = '', $connection = 'default')
 	{

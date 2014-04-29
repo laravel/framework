@@ -87,7 +87,6 @@ class Mailer {
 	 *
 	 * @param  \Illuminate\View\Factory  $views
 	 * @param  \Swift_Mailer  $swift
-	 * @return void
 	 */
 	public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
 	{

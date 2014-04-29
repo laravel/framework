@@ -79,7 +79,6 @@ class Route {
 	 * @param  array   $methods
 	 * @param  string  $uri
 	 * @param  \Closure|array  $action
-	 * @return void
 	 */
 	public function __construct($methods, $uri, $action)
 	{

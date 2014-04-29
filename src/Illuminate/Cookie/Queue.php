@@ -24,7 +24,6 @@ class Queue implements HttpKernelInterface {
 	 *
 	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface  $app
 	 * @param  \Illuminate\Cookie\CookieJar  $cookies
-	 * @return void
 	 */
 	public function __construct(HttpKernelInterface $app, CookieJar $cookies)
 	{
