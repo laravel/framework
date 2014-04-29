@@ -506,7 +506,7 @@ class Route {
 	{
 		return array_first($action, function($key, $value)
 		{
-			return $value instanceof Closure;
+			return is_callable($value);
 		});
 	}
 
