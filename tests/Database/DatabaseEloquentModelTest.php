@@ -29,6 +29,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDirtyAttributes()
+	{
+		$model = new EloquentModelStub(array('foo' => '1'));
+		$model->syncOriginal();
+		$model->foo = 1;
+		$this->assertFalse($model->isDirty('foo'));
+	}
+
+
 	public function testCalculatedAttributes()
 	{
 		$model = new EloquentModelStub;

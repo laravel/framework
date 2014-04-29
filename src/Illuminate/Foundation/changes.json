@@ -15,7 +15,12 @@
 		{"message": "Added Mailgun API transport for Mail::send. Depends on new 'services' configuration file.", "backport": null},
 		{"message": "Added Mandrill API transport for Mail::send. Depends on new 'services' configuration file.", "backport": null},
 		{"message": "Added 'log' mail transport for Mail::send. Writes raw MIME string to log files.", "backport": null},
-		{"message": "Added simplePaginate method to query and Eloquent builder.", "backport": null}
+		{"message": "Added simplePaginate method to query and Eloquent builder.", "backport": null},
+		{"message": "Destructive migration operations now require confirmation or --force when being run in production.", "backport": null},
+		{"message": "Added Cache::pull method for retrieving a value and then deleting it.", "backport": null},
+		{"message": "Added Session::pull method for retrieving a value and then deleting it.", "backport": null},
+		{"message": "Added rel attribute to basic pagination links.", "backport": null},
+		{"message": "The 'page' query variable is now ignored when calling the paginator 'appends' method.", "backport": null}
 	],
 	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
@@ -120,7 +125,9 @@
 		{"message": "Added 'whereYear', 'whereMonth', and 'whereDay'.", "backport": null},
 		{"message": "Added events for committing, rolling back, and starting transactions on databsae connections.", "backport": null},
 		{"message": "Added 'Auth::id' method to just get the authenticate user ID from the session / recaller cookie.", "backport": null},
-		{"message": "New 'Input::exists' function for checking for the mere presence of input items.", "backport": null}
+		{"message": "New 'Input::exists' function for checking for the mere presence of input items.", "backport": null},
+		{"message": "New system for invalidating remember me cookies on logout.", "backport": null},
+		{"message": "Iron queue now accepts ssl_verifypeer configuration option.", "backport": null}
 	],
 	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

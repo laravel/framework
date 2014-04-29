@@ -375,7 +375,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  array   $models
 	 * @param  string  $relation
-	 * @return void
+	 * @return array
 	 */
 	public function initRelation(array $models, $relation)
 	{
@@ -700,7 +700,7 @@ class BelongsToMany extends Relation {
 	 * Create an array of records to insert into the pivot table.
 	 *
 	 * @param  array  $ids
-	 * @return void
+	 * @return array
 	 */
 	protected function createAttachRecords($ids, array $attributes)
 	{
@@ -785,7 +785,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Set the creation and update timstamps on an attach record.
+	 * Set the creation and update timestamps on an attach record.
 	 *
 	 * @param  array  $record
 	 * @param  bool   $exists
@@ -965,7 +965,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Get the key for comparing against the pareny key in "has" query.
+	 * Get the key for comparing against the parent key in "has" query.
 	 *
 	 * @return string
 	 */
@@ -995,7 +995,7 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Get the fully qualified parent key naem.
+	 * Get the fully qualified parent key name.
 	 *
 	 * @return string
 	 */

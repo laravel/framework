@@ -8,6 +8,7 @@
         }
     ],
     "require": {
+        "php": ">=5.4.0",
         "illuminate/container": "4.2.*",
         "illuminate/http": "4.2.*",
         "illuminate/session": "4.2.*",

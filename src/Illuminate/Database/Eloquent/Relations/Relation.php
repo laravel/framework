@@ -72,7 +72,7 @@ abstract class Relation {
 	 *
 	 * @param  array   $models
 	 * @param  string  $relation
-	 * @return void
+	 * @return array
 	 */
 	abstract public function initRelation(array $models, $relation);
 
@@ -209,7 +209,7 @@ abstract class Relation {
 	}
 
 	/**
-	 * Get the fully qualified parent key naem.
+	 * Get the fully qualified parent key name.
 	 *
 	 * @return string
 	 */

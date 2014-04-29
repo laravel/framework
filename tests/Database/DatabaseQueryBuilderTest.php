@@ -406,9 +406,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" order by "email" asc, "age" desc', $builder->toSql());
 
 		$builder = $this->getBuilder();
-		$builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', array('foo' => 'bar'));
+		$builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', array('foo'));
 		$this->assertEquals('select * from "users" order by "email" asc, "age" ? desc', $builder->toSql());
-		$this->assertEquals(array('foo' => 'bar'), $builder->getBindings());
+		$this->assertEquals(array('foo'), $builder->getBindings());
 	}
 
 
@@ -1041,6 +1041,65 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
 		$this->assertEquals('select * from [foo] with(rowlock,holdlock) where [bar] = ?', $builder->toSql());
 		$this->assertEquals(array('baz'), $builder->getBindings());
+	}
+
+
+	public function testBindingOrder()
+	{
+		$expectedSql = 'select * from "users" inner join "othertable" on "bar" = ? where "registered" = ? group by "city" having "population" > ? order by match ("foo") against(?)';
+		$expectedBindings = array('foo', 1, 3, 'bar');
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->join('othertable', function($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', array('bar'));
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
+
+		// order of statements reversed
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', array('bar'))->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', function($join) { $join->where('bar', '=', 'foo'); });
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
+	}
+
+
+	public function testAddBindingWithArrayMergesBindings()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('foo', 'bar'));
+		$builder->addBinding(array('baz'));
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testAddBindingWithArrayMergesBindingsInCorrectOrder()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('bar', 'baz'), 'having');
+		$builder->addBinding(array('foo'), 'where');
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testMergeBuilders()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('foo', 'bar'));
+		$otherBuilder = $this->getBuilder();
+		$otherBuilder->addBinding(array('baz'));
+		$builder->mergeBindings($otherBuilder);
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testMergeBuildersBindingOrder()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding('foo', 'where');
+		$builder->addBinding('baz', 'having');
+		$otherBuilder = $this->getBuilder();
+		$otherBuilder->addBinding('bar', 'where');
+		$builder->mergeBindings($otherBuilder);
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
 	}
 
 

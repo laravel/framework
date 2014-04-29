@@ -110,12 +110,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetUrlProperlyFormatsUrl()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
-		$factory->shouldReceive('getPageName')->twice()->andReturn('page');
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$env->shouldReceive('getCurrentUrl')->times(3)->andReturn('http://foo.com');
+		$env->shouldReceive('getPageName')->andReturn('page');
 
 		$this->assertEquals('http://foo.com?page=1', $p->getUrl(1));
 		$p->addQuery('foo', 'bar');
+		$this->assertEquals('http://foo.com?page=1&foo=bar', $p->getUrl(1));
+		$p->addQuery('page', 99);
 		$this->assertEquals('http://foo.com?page=1&foo=bar', $p->getUrl(1));
 	}
 
@@ -146,9 +148,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetUrlAddsFragment()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
-		$factory->shouldReceive('getPageName')->twice()->andReturn('page');
+		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
+		$env->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
+		$env->shouldReceive('getPageName')->andReturn('page');
 
 		$p->fragment("a-fragment");
 

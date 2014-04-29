@@ -126,10 +126,10 @@ class Validator implements MessageProviderInterface {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
-	 * @param  array $customAttributes
+	 * @param  array  $customAttributes
 	 * @return void
 	 */
-	public function __construct(TranslatorInterface $translator, $data, $rules, $messages = array(), $customAttributes = array())
+	public function __construct(TranslatorInterface $translator, array $data, array $rules, array $messages = array(), array $customAttributes = array())
 	{
 		$this->translator = $translator;
 		$this->customMessages = $messages;
@@ -152,7 +152,7 @@ class Validator implements MessageProviderInterface {
 		{
 			// If this value is an instance of the HttpFoundation File class we will
 			// remove it from the data array and add it to the files array, which
-			// is used to conveniently separate out the files from other datas.
+			// we use to conveniently separate out these files from other data.
 			if ($value instanceof File)
 			{
 				$this->files[$key] = $value;
@@ -1709,9 +1709,11 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
 	{
-		$parameters[0] = $this->getAttribute($parameters[0]);
+		$other = $this->getAttribute($parameters[0]);
 
-		return str_replace(array(':other', ':value'), $parameters, $message);
+		$replace = array($other, implode(' / ', array_slice($parameters, 1)));
+
+		return str_replace(array(':other', ':value'), $replace, $message);
 	}
 
 	/**

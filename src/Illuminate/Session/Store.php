@@ -266,6 +266,22 @@ class Store implements SessionInterface {
 	}
 
 	/**
+	 * Get the value of a given key and then forget it.
+	 *
+	 * @param  string  $key
+	 * @param  string  $default
+	 * @return mixed
+	 */
+	public function pull($key, $default = null)
+	{
+		$value = $this->get($key, $default);
+
+		$this->forget($key);
+
+		return $value;
+	}
+
+	/**
 	 * Determine if the session contains old input.
 	 *
 	 * @param  string  $key
