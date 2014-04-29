@@ -587,8 +587,6 @@ if ( ! function_exists('dd'))
 	 */
 	function dd()
 	{
-		ob_end_clean();
-		if(!headers_sent()) header('Content-Type: text/plain');
 		array_map(function($x) { var_dump($x); }, func_get_args()); die;
 	}
 }
