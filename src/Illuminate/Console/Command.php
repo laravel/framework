@@ -45,7 +45,6 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Create a new console command instance.
 	 *
-	 * @return void
 	 */
 	public function __construct()
 	{

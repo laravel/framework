@@ -32,7 +32,6 @@ class ViewPublishCommand extends Command {
 	 * Create a new view publish command instance.
 	 *
 	 * @param  \Illuminate\Foundation\ViewPublisher  $view
-	 * @return void
 	 */
 	public function __construct(ViewPublisher $view)
 	{

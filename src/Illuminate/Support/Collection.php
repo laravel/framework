@@ -23,7 +23,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Create a new collection.
 	 *
 	 * @param  array  $items
-	 * @return void
 	 */
 	public function __construct(array $items = array())
 	{

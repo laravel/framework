@@ -39,7 +39,6 @@ class MigrateCommand extends BaseCommand {
 	 *
 	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
 	 * @param  string  $packagePath
-	 * @return void
 	 */
 	public function __construct(Migrator $migrator, $packagePath)
 	{

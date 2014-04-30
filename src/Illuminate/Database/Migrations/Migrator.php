@@ -46,7 +46,6 @@ class Migrator {
 	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
 	 */
 	public function __construct(MigrationRepositoryInterface $repository,
 								Resolver $resolver,

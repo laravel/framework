@@ -30,7 +30,6 @@ class ViewPublisher {
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $publishPath
-	 * @return void
 	 */
 	public function __construct(Filesystem $files, $publishPath)
 	{

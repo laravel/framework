@@ -57,7 +57,6 @@ class Handler {
 	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface  $responsePreparer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
-	 * @return void
 	 */
 	public function __construct(ResponsePreparerInterface $responsePreparer,
                                 ExceptionDisplayerInterface $plainDisplayer,

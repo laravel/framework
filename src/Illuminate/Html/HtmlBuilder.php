@@ -18,7 +18,6 @@ class HtmlBuilder {
 	 * Create a new HTML builder instance.
 	 *
 	 * @param  \Illuminate\Routing\UrlGenerator  $url
-	 * @return void
 	 */
 	public function __construct(UrlGenerator $url = null)
 	{

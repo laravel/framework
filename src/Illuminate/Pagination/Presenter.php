@@ -27,7 +27,6 @@ abstract class Presenter {
 	 * Create a new Presenter instance.
 	 *
 	 * @param  \Illuminate\Pagination\Paginator  $paginator
-	 * @return void
 	 */
 	public function __construct(Paginator $paginator)
 	{

@@ -32,7 +32,6 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  \Illuminate\Redis\Database  $redis
 	 * @param  string  $default
 	 * @param  string  $connection
-	 * @return void
 	 */
 	public function __construct(Database $redis, $default = 'default', $connection = null)
 	{

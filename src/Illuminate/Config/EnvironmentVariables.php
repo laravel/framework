@@ -18,7 +18,6 @@ class EnvironmentVariables {
 	 * The server environment instance.
 	 *
 	 * @param  \Illuminate\Config\EnvironmentLoaderInterface  $loader
-	 * @return void
 	 */
 	public function __construct(EnvironmentVariablesLoaderInterface $loader)
 	{

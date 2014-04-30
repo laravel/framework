@@ -51,7 +51,6 @@ class Listener {
 	 * Create a new queue listener.
 	 *
 	 * @param  string  $commandPath
-	 * @return void
 	 */
 	public function __construct($commandPath)
 	{

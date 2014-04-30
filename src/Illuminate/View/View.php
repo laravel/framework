@@ -53,7 +53,6 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $view
 	 * @param  string  $path
 	 * @param  array   $data
-	 * @return void
 	 */
 	public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = array())
 	{

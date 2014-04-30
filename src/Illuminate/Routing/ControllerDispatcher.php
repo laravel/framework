@@ -25,7 +25,6 @@ class ControllerDispatcher {
 	 *
 	 * @param  \Illuminate\Routing\RouteFiltererInterface  $filterer
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(RouteFiltererInterface $filterer,
 								Container $container = null)
