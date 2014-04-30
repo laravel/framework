@@ -1918,6 +1918,8 @@ class Builder {
 	 * @param  array   $bindings
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Query\Builder
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function setBindings(array $bindings, $type = 'where')
 	{
@@ -1937,6 +1939,8 @@ class Builder {
 	 * @param  mixed   $value
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Query\Builder
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function addBinding($value, $type = 'where')
 	{
