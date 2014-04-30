@@ -465,6 +465,21 @@ if ( ! function_exists('array_where'))
 	}
 }
 
+if ( ! function_exists('create_slug'))
+{
+    /**
+     * Generate a URL friendly "slug" from a given string.
+     *
+     * @param  string  $title
+     * @param  string  $separator
+     * @return string
+     */
+    function create_slug($title, $separator = '-')
+    {
+        return Illuminate\Support\Str::slug($title, $separator);
+    }
+}
+
 if ( ! function_exists('asset'))
 {
 	/**
