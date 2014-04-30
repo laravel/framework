@@ -178,7 +178,6 @@ class Builder {
 	 * @param  \Illuminate\Database\ConnectionInterface  $connection
 	 * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
 	 * @param  \Illuminate\Database\Query\Processors\Processor  $processor
-	 * @return void
 	 */
 	public function __construct(ConnectionInterface $connection,
                                 Grammar $grammar,
@@ -1919,6 +1918,8 @@ class Builder {
 	 * @param  array   $bindings
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Query\Builder
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function setBindings(array $bindings, $type = 'where')
 	{
@@ -1938,6 +1939,8 @@ class Builder {
 	 * @param  mixed   $value
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Query\Builder
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function addBinding($value, $type = 'where')
 	{

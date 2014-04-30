@@ -24,7 +24,6 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 *
 	 * @param  \Illuminate\Cookie\CookieJar  $cookie
 	 * @param  int  $minutes
-	 * @return void
 	 */
 	public function __construct(CookieJar $cookie, $minutes)
 	{

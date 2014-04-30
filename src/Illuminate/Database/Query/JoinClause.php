@@ -36,7 +36,6 @@ class JoinClause {
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  string  $type
 	 * @param  string  $table
-	 * @return void
 	 */
 	public function __construct(Builder $query, $type, $table)
 	{

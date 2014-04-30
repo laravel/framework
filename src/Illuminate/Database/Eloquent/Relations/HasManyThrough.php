@@ -35,7 +35,6 @@ class HasManyThrough extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $firstKey
 	 * @param  string  $secondKey
-	 * @return void
 	 */
 	public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey)
 	{

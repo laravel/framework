@@ -30,7 +30,6 @@ class Builder {
 	 * Create a new database Schema manager.
 	 *
 	 * @param  \Illuminate\Database\Connection  $connection
-	 * @return void
 	 */
 	public function __construct(Connection $connection)
 	{

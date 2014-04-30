@@ -36,7 +36,6 @@ class BelongsTo extends Relation {
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  string  $relation
-	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $relation)
 	{

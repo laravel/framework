@@ -122,7 +122,6 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 *
 	 * @param  \Illuminate\Events\Dispatcher  $events
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(Dispatcher $events, Container $container = null)
 	{

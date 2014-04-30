@@ -12,7 +12,6 @@ class ApcWrapper {
 	/**
 	 * Create a new APC wrapper instance.
 	 *
-	 * @return void
 	 */
 	public function __construct()
 	{

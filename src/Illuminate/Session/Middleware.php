@@ -36,7 +36,6 @@ class Middleware implements HttpKernelInterface {
 	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface  $app
 	 * @param  \Illuminate\Session\SessionManager  $manager
 	 * @param  \Closure|null  $reject
-	 * @return void
 	 */
 	public function __construct(HttpKernelInterface $app, SessionManager $manager, Closure $reject = null)
 	{

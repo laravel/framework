@@ -23,7 +23,6 @@ class TaggedCache implements StoreInterface {
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
 	 * @param  \Illuminate\Cache\TagSet  $tags
-	 * @return void
 	 */
 	public function __construct(StoreInterface $store, TagSet $tags)
 	{

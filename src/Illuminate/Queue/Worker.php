@@ -33,7 +33,6 @@ class Worker {
 	 * @param  \Illuminate\Queue\QueueManager  $manager
 	 * @param  \Illuminate\Queue\Failed\FailedJobProviderInterface  $failer
 	 * @param  \Illuminate\Events\Dispatcher  $events
-	 * @return void
 	 */
 	public function __construct(QueueManager $manager,
                                 FailedJobProviderInterface $failer = null,

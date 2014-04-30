@@ -231,7 +231,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Create a new Eloquent model instance.
 	 *
 	 * @param  array  $attributes
-	 * @return void
 	 */
 	public function __construct(array $attributes = array())
 	{
@@ -1063,6 +1062,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Delete the model from the database.
 	 *
 	 * @return bool|null
+	 *
+	 * @throws \Exception
 	 */
 	public function delete()
 	{
