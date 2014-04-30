@@ -107,6 +107,18 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	}
 
 	/**
+	 * Delete a message from the Beanstalk queue.
+	 *
+	 * @param  string  $queue
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function deleteMessage($queue, $id)
+	{
+		$this->pheanstalk->useTube($this->getQueue($queue))->delete($id);
+	}
+
+	/**
 	 * Get the queue or return the default.
 	 *
 	 * @param  string|null  $queue
