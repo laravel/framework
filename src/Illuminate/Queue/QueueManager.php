@@ -69,6 +69,8 @@ class QueueManager {
 			$this->connections[$name] = $this->resolve($name);
 
 			$this->connections[$name]->setContainer($this->app);
+
+			$this->connections[$name]->setEncrypter($this->app['encrypter']);
 		}
 
 		return $this->connections[$name];

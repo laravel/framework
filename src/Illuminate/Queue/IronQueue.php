@@ -4,7 +4,6 @@ use IronMQ;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
-use Illuminate\Encryption\Encrypter;
 
 class IronQueue extends Queue implements QueueInterface {
 
@@ -14,13 +13,6 @@ class IronQueue extends Queue implements QueueInterface {
 	 * @var IronMQ
 	 */
 	protected $iron;
-
-	/**
-	 * The encrypter instance.
-	 *
-	 * @var \Illuminate\Encryption\Encrypter
-	 */
-	protected $crypt;
 
 	/**
 	 * The current request instance.
@@ -47,16 +39,14 @@ class IronQueue extends Queue implements QueueInterface {
 	 * Create a new IronMQ queue instance.
 	 *
 	 * @param  \IronMQ  $iron
-	 * @param  \Illuminate\Encryption\Encrypter  $crypt
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
 	 * @param  bool  $shouldEncrypt
 	 * @return void
 	 */
-	public function __construct(IronMQ $iron, Encrypter $crypt, Request $request, $default, $shouldEncrypt = false)
+	public function __construct(IronMQ $iron, Request $request, $default, $shouldEncrypt = false)
 	{
 		$this->iron = $iron;
-		$this->crypt = $crypt;
 		$this->request = $request;
 		$this->default = $default;
 		$this->shouldEncrypt = $shouldEncrypt;

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue;
 
+use IlluminateQueueClosure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
@@ -36,6 +37,8 @@ class QueueServiceProvider extends ServiceProvider {
 		$this->registerSubscriber();
 
 		$this->registerFailedJobServices();
+
+		$this->registerQueueClosure();
 	}
 
 	/**
@@ -251,6 +254,19 @@ class QueueServiceProvider extends ServiceProvider {
 			$config = $app['config']['queue.failed'];
 
 			return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
+		});
+	}
+
+	/**
+	 * Register the Illuminate queued closure job.
+	 *
+	 * @return void
+	 */
+	protected function registerQueueClosure()
+	{
+		$this->app->bindShared('IlluminateQueueClosure', function($app)
+		{
+			return new IlluminateQueueClosure($app['encrypter']);
 		});
 	}
 
