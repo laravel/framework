@@ -85,7 +85,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 
 		$pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
 
-		return $pheanstalk->put($payload, Pheanstalk::DEFAULT_PRIORITY, $this->getSeconds($delay));
+		return $pheanstalk->put($payload, Pheanstalk::DEFAULT_PRIORITY, $this->getSeconds($delay), $this->timeToRun);
 	}
 
 	/**
