@@ -84,14 +84,14 @@ class Response {
 	 */
 	public static function download($file, $name = null, array $headers = array(), $disposition = 'attachment')
 	{
-		$response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
+		$response = new BinaryFileResponse($file, 200, $headers, true);
 
 		if ( ! is_null($name))
 		{
 			return $response->setContentDisposition($disposition, $name, Str::ascii($name));
 		}
 
-		return $response;
+		return $response->setContentDisposition($disposition);
 	}
 
 }
