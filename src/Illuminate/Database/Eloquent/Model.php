@@ -677,15 +677,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Being querying a model with eager loading.
 	 *
 	 * @param  array|string  $relations
+	 * @param  string  $connection
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public static function with($relations)
+	public static function with($relations, $connection = null)
 	{
 		if (is_string($relations)) $relations = func_get_args();
 
 		$instance = new static;
+		if(!is_null($connection))
+		{
+			$instance->setConnection($connection);
+		}
 
-		return $instance->newQuery()->with($relations);
+		return $instance->newQuery()->with($relations, $connection);
 	}
 
 	/**
@@ -694,17 +699,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $related
 	 * @param  string  $foreignKey
 	 * @param  string  $localKey
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
 	 */
-	public function hasOne($related, $foreignKey = null, $localKey = null)
+	public function hasOne($related, $foreignKey = null, $localKey = null, $database = null)
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
+		if(!is_null($database))
+		{
+			$instance->setConnection($database);
+		}
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+		$query = $instance->newQuery();
+
+		return new HasOne($query, $this, $instance->getTable().'.'.$foreignKey, $localKey);
 	}
 
 	/**
@@ -715,11 +727,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $type
 	 * @param  string  $id
 	 * @param  string  $localKey
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphOne
 	 */
-	public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
+	public function morphOne($related, $name, $type = null, $id = null, $localKey = null, $database = null)
 	{
 		$instance = new $related;
+		if(!is_null($database))
+		{
+			$instance->setConnection($database);
+		}
 
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
@@ -727,7 +744,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$query = $instance->newQuery();
+
+		return new MorphOne($query, $this, $table.'.'.$type, $table.'.'.$id, $localKey);
 	}
 
 	/**
@@ -737,9 +756,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  string  $relation
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
+	public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null, $database = null)
 	{
 		// If no relation name was given, we will use this debug backtrace to extract
 		// the calling method's name and use that as the relationship name as most
@@ -760,6 +780,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		$instance = new $related;
+		if(!is_null($database))
+		{
+			$instance->setConnection($database);
+		}
 
 		// Once we have the foreign key names, we'll just create a new Eloquent query
 		// for the related models and returns the relationship instance which will
@@ -777,9 +801,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphTo
 	 */
-	public function morphTo($name = null, $type = null, $id = null)
+	public function morphTo($name = null, $type = null, $id = null, $database = null)
 	{
 		// If no name is provided, we will use the backtrace to get the function name
 		// since that is most likely the name of the polymorphic interface. We can
@@ -798,8 +823,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// there are multiple types in the morph and we can't use single queries.
 		if (is_null($class = $this->$type))
 		{
+
+			if(!is_null($database))
+			{
+				$this->setConnection($database);
+			}
+
+			$query = $this->newQuery();
+
 			return new MorphTo(
-				$this->newQuery(), $this, $id, null, $type, $name
+				$query, $this, $id, null, $type, $name
 			);
 		}
 
@@ -809,9 +842,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		else
 		{
 			$instance = new $class;
+			
+			if(!is_null($database))
+			{
+				$instance->setConnection($database);
+			}
+
+			$query = with($instance, $database)->newQuery();
 
 			return new MorphTo(
-				with($instance)->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+				$query, $this, $id, $instance->getKeyName(), $type, $name
 			);
 		}
 	}
@@ -822,17 +862,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $related
 	 * @param  string  $foreignKey
 	 * @param  string  $localKey
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
 	 */
-	public function hasMany($related, $foreignKey = null, $localKey = null)
+	public function hasMany($related, $foreignKey = null, $localKey = null, $database = null)
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
+		if(!is_null($database))
+		{
+			$instance->setConnection($database);
+		}
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+		$query = $instance->newQuery();
+
+		return new HasMany($query, $this, $instance->getTable().'.'.$foreignKey, $localKey);
 	}
 
 	/**
@@ -842,17 +889,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $through
 	 * @param  string|null  $firstKey
 	 * @param  string|null  $secondKey
+	 * @param  string|null  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
 	 */
-	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
+	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $database = null)
 	{
 		$through = new $through;
+		$instance = new $related;
+		if(!is_null($database))
+		{
+			$through->setConnection($database);
+			$instance->setConnection($database);
+		}
 
 		$firstKey = $firstKey ?: $this->getForeignKey();
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough(with(new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		$query = with($instance, $database)->newQuery();
+
+		return new HasManyThrough($query, $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
@@ -863,11 +919,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $type
 	 * @param  string  $id
 	 * @param  string  $localKey
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphMany
 	 */
-	public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
+	public function morphMany($related, $name, $type = null, $id = null, $localKey = null, $database = null)
 	{
 		$instance = new $related;
+		if(!is_null($database))
+		{
+			$instance->setConnection($database);
+		}
 
 		// Here we will gather up the morph type and ID for the relationship so that we
 		// can properly query the intermediate table of a relation. Finally, we will
@@ -878,7 +939,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$localKey = $localKey ?: $this->getKeyName();
 
-		return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+		$query = $instance->newQuery();
+
+		return new MorphMany($query, $this, $table.'.'.$type, $table.'.'.$id, $localKey);
 	}
 
 	/**
@@ -889,9 +952,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  string  $relation
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
-	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
+	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null, $database = null)
 	{
 		// If no relationship name was passed, we will pull backtraces to get the
 		// name of the calling function. We will use that function name as the
@@ -907,6 +971,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
+		if(!is_null($database))
+		{
+			$instance->setConnection($database);
+		}
 
 		$otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -935,9 +1003,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  bool    $inverse
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
 	 */
-	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
+	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false, $database = null)
 	{
 		$caller = $this->getBelongsToManyCaller();
 
@@ -947,6 +1016,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$foreignKey = $foreignKey ?: $name.'_id';
 
 		$instance = new $related;
+		if(!is_null($database))
+		{
+			$instance->setConnection($database);
+		}
 
 		$otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -971,9 +1044,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
+	 * @param  string  $database
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
 	 */
-	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
+	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $database = null)
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
@@ -982,7 +1056,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// of the morph-to-many method since we're figuring out these inverses.
 		$otherKey = $otherKey ?: $name.'_id';
 
-		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
+		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true, $database);
 	}
 
 	/**
