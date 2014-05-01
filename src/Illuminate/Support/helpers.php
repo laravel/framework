@@ -98,7 +98,7 @@ if ( ! function_exists('array_build'))
 	 * Build a new array using a callback.
 	 *
 	 * @param  array  $array
-	 * @param  \Closure  $callback
+	 * @param  Closure  $callback
 	 * @return array
 	 */
 	function array_build($array, Closure $callback)
@@ -139,7 +139,7 @@ if ( ! function_exists('array_dot'))
 	 * @param  string  $prepend
 	 * @return array
 	 */
-	function array_dot($array, $prepend = '')
+	function array_dot(array $array, $prepend = '')
 	{
 		$results = array();
 
@@ -168,7 +168,7 @@ if ( ! function_exists('array_except'))
 	 * @param  array  $keys
 	 * @return array
 	 */
-	function array_except($array, $keys)
+	function array_except(array $array, $keys)
 	{
 		return array_diff_key($array, array_flip((array) $keys));
 	}
@@ -183,7 +183,7 @@ if ( ! function_exists('array_fetch'))
 	 * @param  string  $key
 	 * @return array
 	 */
-	function array_fetch($array, $key)
+	function array_fetch(array $array, $key)
 	{
 		foreach (explode('.', $key) as $segment)
 		{
@@ -213,7 +213,7 @@ if ( ! function_exists('array_first'))
 	 * @param  mixed    $default
 	 * @return mixed
 	 */
-	function array_first($array, $callback, $default = null)
+	function array_first(array $array, Closure $callback, $default = null)
 	{
 		foreach ($array as $key => $value)
 		{
@@ -234,7 +234,7 @@ if ( ! function_exists('array_last'))
 	 * @param  mixed    $default
 	 * @return mixed
 	 */
-	function array_last($array, $callback, $default = null)
+	function array_last(array $array, CLosure $callback, $default = null)
 	{
 		return array_first(array_reverse($array), $callback, $default);
 	}
@@ -248,7 +248,7 @@ if ( ! function_exists('array_flatten'))
 	 * @param  array  $array
 	 * @return array
 	 */
-	function array_flatten($array)
+	function array_flatten(array $array)
 	{
 		$return = array();
 
@@ -267,7 +267,7 @@ if ( ! function_exists('array_forget'))
 	 * @param  string  $key
 	 * @return void
 	 */
-	function array_forget(&$array, $key)
+	function array_forget(array &$array, $key)
 	{
 		$keys = explode('.', $key);
 
@@ -297,7 +297,7 @@ if ( ! function_exists('array_get'))
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	function array_get($array, $key, $default = null)
+	function array_get(array $array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
 
@@ -326,7 +326,7 @@ if ( ! function_exists('array_only'))
 	 * @param  array  $keys
 	 * @return array
 	 */
-	function array_only($array, $keys)
+	function array_only(array $array, $keys)
 	{
 		return array_intersect_key($array, array_flip((array) $keys));
 	}
@@ -342,7 +342,7 @@ if ( ! function_exists('array_pluck'))
 	 * @param  string  $key
 	 * @return array
 	 */
-	function array_pluck($array, $value, $key = null)
+	function array_pluck(array $array, $value, $key = null)
 	{
 		$results = array();
 
@@ -379,7 +379,7 @@ if ( ! function_exists('array_pull'))
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	function array_pull(&$array, $key, $default = null)
+	function array_pull(array &$array, $key, $default = null)
 	{
 		$value = array_get($array, $key, $default);
 
@@ -401,7 +401,7 @@ if ( ! function_exists('array_set'))
 	 * @param  mixed   $value
 	 * @return array
 	 */
-	function array_set(&$array, $key, $value)
+	function array_set(array &$array, $key, $value)
 	{
 		if (is_null($key)) return $array = $value;
 
@@ -434,10 +434,10 @@ if ( ! function_exists('array_sort'))
 	 * Sort the array using the given Closure.
 	 *
 	 * @param  array  $array
-	 * @param  \Closure  $callback
+	 * @param  Closure  $callback
 	 * @return array
 	 */
-	function array_sort($array, Closure $callback)
+	function array_sort(array $array, Closure $callback)
 	{
 		return Illuminate\Support\Collection::make($array)->sortBy($callback)->all();
 	}
@@ -449,10 +449,10 @@ if ( ! function_exists('array_where'))
 	 * Filter the array using the given Closure.
 	 *
 	 * @param  array  $array
-	 * @param  \Closure  $callback
+	 * @param  Closure  $callback
 	 * @return array
 	 */
-	function array_where($array, Closure $callback)
+	function array_where(array $array, Closure $callback)
 	{
 		$filtered = array();
 
