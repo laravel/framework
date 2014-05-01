@@ -56,7 +56,9 @@ class Filesystem {
 	 */
 	public function requireOnce($file)
 	{
-		require_once $file;
+		if ($this->isFile($path)) require_once $file;
+
+		throw new FileNotFoundException("File does not exist at path {$path}");
 	}
 
 	/**
