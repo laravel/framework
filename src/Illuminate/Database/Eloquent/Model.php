@@ -685,7 +685,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$instance = new static;
 		
-		return $instance->newQuery()->with($relations, $connection);
+		return $instance->newQuery()->with($relations);
 	}
 
 	/**
@@ -843,7 +843,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 				$instance->setConnection($database);
 			}
 
-			$query = with($instance, $database)->newQuery();
+			$query = with($instance)->newQuery();
 
 			return new MorphTo(
 				$query, $this, $id, $instance->getKeyName(), $type, $name
@@ -901,7 +901,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		$query = with($instance, $database)->newQuery();
+		$query = with($instance)->newQuery();
 
 		return new HasManyThrough($query, $this, $through, $firstKey, $secondKey);
 	}
