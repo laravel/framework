@@ -159,6 +159,39 @@ if ( ! function_exists('array_dot'))
 	}
 }
 
+if ( ! function_exists('array_expand'))
+{
+	/**
+	 * Expand a flattened array with dots to a multi-dimensional associative array.
+	 *
+	 * @param  array   $array
+	 * @param  string  $prepend
+	 * @return array
+	 */
+	function array_expand($array, $prepend = '')
+	{
+		$results = array();
+
+		if ($prepend) $prepend .= '.';
+
+		foreach ($array as $key => $value)
+		{
+			if ($prepend)
+			{
+				$pos = strpos($key, $prepend);
+				if ($pos === 0)
+				{
+					$key = substr($key, strlen($prepend));
+				}
+			}
+
+			array_set($results, $key, $value);
+		}
+
+		return $results;
+	}
+}
+
 if ( ! function_exists('array_except'))
 {
 	/**
