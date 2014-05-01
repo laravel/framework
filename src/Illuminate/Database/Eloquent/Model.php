@@ -677,19 +677,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Being querying a model with eager loading.
 	 *
 	 * @param  array|string  $relations
-	 * @param  string  $connection
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public static function with($relations, $connection = null)
+	public static function with($relations)
 	{
 		if (is_string($relations)) $relations = func_get_args();
 
 		$instance = new static;
-		if(!is_null($connection))
-		{
-			$instance->setConnection($connection);
-		}
-
+		
 		return $instance->newQuery()->with($relations, $connection);
 	}
 
