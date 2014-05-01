@@ -28,7 +28,12 @@ class Filesystem {
 	 */
 	public function get($path)
 	{
-		if ($this->isFile($path)) return file_get_contents($path);
+		if ($this->isFile($path))
+		{
+			if ($this->isReadable($path)) return file_get_contents($path);
+
+			throw new FileNotFoundException("File is not readable at path {$path}");
+		}
 
 		throw new FileNotFoundException("File does not exist at path {$path}");
 	}
@@ -43,7 +48,12 @@ class Filesystem {
 	 */
 	public function getRequire($path)
 	{
-		if ($this->isFile($path)) return require $path;
+		if ($this->isFile($path))
+		{
+			if ($this->isReadable($path)) return require $path;
+
+			throw new FileNotFoundException("File is not readable at path {$path}");
+		}
 
 		throw new FileNotFoundException("File does not exist at path {$path}");
 	}
@@ -56,7 +66,12 @@ class Filesystem {
 	 */
 	public function requireOnce($file)
 	{
-		if ($this->isFile($path)) require_once $file;
+		if ($this->isFile($path))
+		{
+			if ($this->isReadable($path)) require_once $file;
+
+			throw new FileNotFoundException("File is not readable at path {$path}");
+		}
 
 		throw new FileNotFoundException("File does not exist at path {$path}");
 	}
