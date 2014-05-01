@@ -221,6 +221,28 @@ class Filesystem {
 	}
 
 	/**
+	* Determine if the given path exists and is readable.
+	*
+	* @param string $path
+	* @return bool
+	*/
+	public function isReadable($path)
+	{
+		return is_readable($path);
+	}
+
+	/**
+	* Determine if the given path is executable.
+	*
+	* @param string $path
+	* @return bool
+	*/
+	public function isExecutable($path)
+	{
+		return is_executable($path);
+	}
+
+	/**
 	 * Find path names matching a given pattern.
 	 *
 	 * @param  string  $pattern
