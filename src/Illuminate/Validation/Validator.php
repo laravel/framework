@@ -83,6 +83,13 @@ class Validator implements MessageProviderInterface {
 	protected $customAttributes = array();
 
 	/**
+	 * The array of custom displayabled values.
+	 *
+	 * @var array
+	 */
+	protected $customValues = array();
+
+	/**
 	 * All of the custom validator extensions.
 	 *
 	 * @var array
@@ -1529,6 +1536,32 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Get the displayable name of the value.
+	 *
+	 * @param  string $attribute
+	 * @param  mixed  $value
+	 * @return string
+	 */
+	public function getDisplayableValue($attribute, $value)
+	{
+		if (isset($this->customValues[$attribute][$value]))
+		{
+			return $this->customValues[$attribute][$value];
+		}
+
+		$key = "validation.values.{$attribute}.{$value}";
+
+		if (($line = $this->translator->trans($key)) !== $key)
+		{
+			return $line;
+		}
+		else
+		{
+			return $value;
+		}
+	}
+
+	/**
 	 * Replace all place-holders for the between rule.
 	 *
 	 * @param  string  $message
@@ -1623,6 +1656,11 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceIn($message, $attribute, $rule, $parameters)
 	{
+		foreach ($parameters as &$parameter)
+		{
+			$parameter = $this->getDisplayableValue($attribute, $parameter);
+		}
+
 		return str_replace(':values', implode(', ', $parameters), $message);
 	}
 
@@ -1637,6 +1675,11 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceNotIn($message, $attribute, $rule, $parameters)
 	{
+		foreach ($parameters as &$parameter)
+		{
+			$parameter = $this->getDisplayableValue($attribute, $parameter);
+		}
+
 		return str_replace(':values', implode(', ', $parameters), $message);
 	}
 
@@ -1713,7 +1756,9 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
 	{
-		$other = $this->getAttribute($parameters[0]);
+		$parameters[1] = $this->getDisplayableValue($parameters[0], $parameters[1]);
+
+		$parameters[0] = $this->getAttribute($parameters[0]);
 
 		$replace = array($other, implode(' / ', array_slice($parameters, 1)));
 
