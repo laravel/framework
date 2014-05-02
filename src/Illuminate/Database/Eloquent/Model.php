@@ -233,18 +233,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $attributes
 	 * @return void
 	 */
-	public function __construct(array $attributes = array(), $connection = null)
+	public function __construct(array $attributes = array())
 	{
 		$this->bootIfNotBooted();
 
 		$this->syncOriginal();
 
 		$this->fill($attributes);
-
-		if(!is_null($connection))
-		{
-			$this->setConnection($connection);
-		}
 	}
 
 	/**
