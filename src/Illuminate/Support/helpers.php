@@ -86,7 +86,7 @@ if ( ! function_exists('array_add'))
 	 */
 	function array_add($array, $key, $value)
 	{
-		if (array_get($array, $key) === null)
+		if (is_null(array_get($array, $key)))
 		{
 			array_set($array, $key, $value);
 		}
