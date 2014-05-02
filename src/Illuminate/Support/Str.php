@@ -14,7 +14,7 @@ class Str {
 	 */
 	public static function ascii($value)
 	{
-		return \Patchwork\Utf8::toAscii($value);
+		return \Stringy\StaticStringy::toAscii($value);
 	}
 
 	/**
