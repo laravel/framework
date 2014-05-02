@@ -253,7 +253,7 @@ class Repository implements ArrayAccess {
 	{
 		if ($duration instanceof DateTime)
 		{
-			return max(0, Carbon::instance($duration)->diffInMinutes(null, true));
+			return max(0, Carbon::instance($duration)->diffInMinutes());
 		}
 
 		return is_string($duration) ? intval($duration) : $duration;
