@@ -649,9 +649,10 @@ class BelongsToMany extends Relation {
 			}
 			elseif (count($attributes) > 0)
 			{
-				$this->updateExistingPivot($id, $attributes, $touch);
-
-				$changes['updated'][] = (int) $id;
+				if ($this->updateExistingPivot($id, $attributes, $touch))
+				{
+					$changes['updated'][] = (int) $id;
+				}
 			}
 		}
 		return $changes;
@@ -672,9 +673,11 @@ class BelongsToMany extends Relation {
 			$attributes = $this->setTimestampsOnAttach($attributes, true);
 		}
 
-		$this->newPivotStatementForId($id)->update($attributes);
+		$updated = $this->newPivotStatementForId($id)->update($attributes);
 
 		if ($touch) $this->touchIfTouching();
+
+		return $updated;
 	}
 
 	/**
