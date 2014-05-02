@@ -341,18 +341,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		return array_reduce($this->items, $callback, $initial);
 	}
 
-    /**
-     * Get one or more items randomly from the collection.
-     *
-     * @param  int $amount
-     * @return mixed
-     */
-    public function random($amount = 1)
-    {
-        $keys = array_rand($this->items, $amount);
+	/**
+	 * Get one or more items randomly from the collection.
+	 *
+	 * @param  int $amount
+	 * @return mixed
+	 */
+	public function random($amount = 1)
+	{
+		$keys = array_rand($this->items, $amount);
 
-        return is_array($keys) ? array_intersect_key($this->items, array_flip($keys)) : $this->items[$keys];
-    }
+		return is_array($keys) ? array_intersect_key($this->items, array_flip($keys)) : $this->items[$keys];
+	}
 
 	/**
 	 * Reverse items order.
