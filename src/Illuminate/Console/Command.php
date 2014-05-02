@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Console;
 
-use Symfony\Component\Helper\Table;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Question\Question;
