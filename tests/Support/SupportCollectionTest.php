@@ -325,6 +325,28 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
 	}
 
+
+	public function testGetListValueWithAccessorsAndDot()
+	{
+		$model = new TestAccessorEloquentTestStub(array(
+			'some' => (object)array(
+				'name' => 'taylor',
+				'age' => 25
+			)
+		));
+
+		$modelTwo = new TestAccessorEloquentTestStub(array(
+			'some' => (object)array(
+				'name' => 'dayle',
+				'age' => 20
+			)
+		));
+
+		$data = new Collection(array($model, $modelTwo));
+
+		$this->assertEquals(array('taylor' => 25, 'dayle' => 20), $data->lists('some.age', 'some.name'));
+	}
+
 	public function testTransform()
 	{
 		$data = new Collection(array('taylor', 'colin', 'shawn'));
