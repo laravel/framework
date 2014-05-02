@@ -359,7 +359,7 @@ if ( ! function_exists('array_pluck'))
 			}
 			else
 			{
-				$itemKey = data_get($item, $value);
+				$itemKey = data_get($item, $key);
 
 				$results[$itemKey] = $itemValue;
 			}
