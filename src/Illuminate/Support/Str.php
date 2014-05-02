@@ -10,11 +10,12 @@ class Str {
 	 * Transliterate a UTF-8 value to ASCII.
 	 *
 	 * @param  string  $value
+	 * @param  string  $lang
 	 * @return string
 	 */
-	public static function ascii($value)
+	public static function ascii($value, $lang = '')
 	{
-		return \Patchwork\Utf8::toAscii($value);
+		return \URLify::downcode($value, $lang = '');
 	}
 
 	/**
@@ -255,11 +256,12 @@ class Str {
 	 *
 	 * @param  string  $title
 	 * @param  string  $separator
+	 * @param  string  $lang
 	 * @return string
 	 */
-	public static function slug($title, $separator = '-')
+	public static function slug($title, $separator = '-', $lang = '')
 	{
-		$title = static::ascii($title);
+		$title = static::ascii($title, $lang);
 
 		// Convert all dashes/underscores into separator
 		$flip = $separator == '-' ? '_' : '-';
