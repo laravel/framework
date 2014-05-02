@@ -2187,9 +2187,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			if ( ! array_key_exists($key, $attributes)) continue;
 
-			$attributes[$key] = $this->mutateAttribute(
+			$value = $this->mutateAttribute(
 				$key, $attributes[$key]
 			);
+			
+			$attributes[$key] = $value instanceof ArrayableInterface ? $value->toArray() : $value;
 		}
 
 		// Here we will grab all of the appended, calculated attributes to this model
@@ -2197,7 +2199,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// when we need to array or JSON the model for convenience to the coder.
 		foreach ($this->appends as $key)
 		{
-			$attributes[$key] = $this->mutateAttribute($key, null);
+			$value = $this->mutateAttribute($key, null);
+			
+			$attributes[$key] = $value instanceof ArrayableInterface ? $value->toArray() : $value;
 		}
 
 		return $attributes;
