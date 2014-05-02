@@ -17,6 +17,17 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($array, array('name' => 'taylor', 'languages.php' => true));
 	}
 
+	public function testArrayExpand()
+	{
+		$array = array_expand(array('name' => 'taylor', 'languages.php' => true));
+		$this->assertEquals($array, array('name' => 'taylor', 'languages' => array('php' => true)));
+
+		$array = array_expand(array('foo.name' => 'taylor', 'foo.languages.php' => true), 'foo');
+		$this->assertEquals($array, array('name' => 'taylor', 'languages' => array('php' => true)));
+
+		$array = array_expand(array('foo.name' => 'taylor', 'foo.languages.php' => true), 'bar');
+		$this->assertEquals($array, array('foo' => array('name' => 'taylor', 'languages' => array('php' => true))));
+	}
 
 	public function testArrayGet()
 	{
