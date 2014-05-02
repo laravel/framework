@@ -50,4 +50,14 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Illuminate\Queue\Jobs\BeanstalkdJob', $result);
 	}
 
+	public function testDeleteProperlyRemoveJobsOffBeanstalkd()
+	{
+		$queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk_Pheanstalk'), 'default', 60);
+		$pheanstalk = $queue->getPheanstalk();
+		$pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
+		$pheanstalk->shouldReceive('delete')->once()->with(1);
+
+		$queue->deleteMessage('default', 1);
+	}
+
 }
