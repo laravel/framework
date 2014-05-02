@@ -33,7 +33,7 @@
         "symfony/http-kernel": "2.5.*",
         "symfony/process": "2.5.*",
         "symfony/routing": "2.5.*",
-        "symfony/security": "2.5.*",
+        "symfony/security-core": "2.5.*",
         "symfony/translation": "2.5.*"
     },
     "replace": {
