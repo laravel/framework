@@ -203,7 +203,7 @@ class Guard {
 	}
 
 	/**
-	 * Deteremine if the recaller cookie is in a valid format.
+	 * Determine if the recaller cookie is in a valid format.
 	 *
 	 * @param  string  $recaller
 	 * @return bool

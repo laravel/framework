@@ -1864,7 +1864,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Set the number of models ot return per page.
+	 * Set the number of models to return per page.
 	 *
 	 * @param  int   $perPage
 	 * @return void
@@ -2139,7 +2139,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			if ( ! array_key_exists($key, $attributes)) continue;
 
-			$attributes[$key] = $this->mutateAttribute(
+			$attributes[$key] = $this->mutateAttributeForArray(
 				$key, $attributes[$key]
 			);
 		}
@@ -2149,7 +2149,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// when we need to array or JSON the model for convenience to the coder.
 		foreach ($this->appends as $key)
 		{
-			$attributes[$key] = $this->mutateAttribute($key, null);
+			$attributes[$key] = $this->mutateAttributeForArray($key, null);
 		}
 
 		return $attributes;
@@ -2363,6 +2363,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected function mutateAttribute($key, $value)
 	{
 		return $this->{'get'.studly_case($key).'Attribute'}($value);
+	}
+
+	/**
+	 * Get the value of an attribute using its mutator for array conversion.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return mixed
+	 */
+	protected function mutateAttributeForArray($key, $value)
+	{
+		$value = $this->mutateAttribute($key, $value);
+
+		return $value instanceof ArrayableInterface ? $value->toArray() : $value;
 	}
 
 	/**
