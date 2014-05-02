@@ -153,9 +153,17 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$env->shouldReceive('getCurrentUrl')->twice()->andReturn('http://foo.com');
 		$env->shouldReceive('getPageName')->twice()->andReturn('page');
 
-		$this->assertEquals('http://foo.com?page=1', $p->getUrl(1));
-		$p->addQuery('page', '2');
-		$this->assertEquals('http://foo.com?page=1', $p->getUrl(1));
+		$p->appends(array(
+			'sort' => 'asc',
+			'page' => 2,
+		));
+		$this->assertEquals('http://foo.com?sort=asc&page=1', $p->getUrl(1));
+
+		$p->appends(array(
+			'sort' => 'desc',
+			'page' => '2'
+		));
+		$this->assertEquals('http://foo.com?sort=desc&page=1', $p->getUrl(1));
 	}
 
 
