@@ -222,9 +222,28 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getQuery()->shouldReceive('getConnection')->once()->andReturn($conn);
 		$builder->getQuery()->shouldReceive('forPage')->once()->with(1, 15);
 		$builder->shouldReceive('get')->with(array('*'))->andReturn(new Collection(array('results')));
-		$paginator->shouldReceive('make')->once()->with(array('results'), 10, 15)->andReturn(array('results'));
+		$paginator->shouldReceive('make')->once()->with(array('results'), 10, 15, 'page')->andReturn(array('results'));
 
 		$this->assertEquals(array('results'), $builder->paginate());
+	}
+
+
+	public function testPaginateMethodWithPageArgument()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
+		$builder->setModel($this->getMockModel());
+		$builder->getModel()->shouldReceive('getPerPage')->once()->andReturn(15);
+		$builder->getQuery()->shouldReceive('getPaginationCount')->once()->andReturn(10);
+		$conn = m::mock('stdClass');
+		$paginator = m::mock('stdClass');
+		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
+		$conn->shouldReceive('getPaginator')->once()->andReturn($paginator);
+		$builder->getQuery()->shouldReceive('getConnection')->once()->andReturn($conn);
+		$builder->getQuery()->shouldReceive('forPage')->once()->with(1, 15);
+		$builder->shouldReceive('get')->with(array('*'))->andReturn(new Collection(array('results')));
+		$paginator->shouldReceive('make')->once()->with(array('results'), 10, 15, 'foo')->andReturn(array('results'));
+
+		$this->assertEquals(array('results'), $builder->paginate(null, array('*'), 'foo'));
 	}
 
 
@@ -245,7 +264,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$conn->shouldReceive('getPaginator')->once()->andReturn($paginator);
 		$query->expects($this->once())->method('getConnection')->will($this->returnValue($conn));
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(new Collection(array('foo', 'bar', 'baz'))));
-		$paginator->shouldReceive('make')->once()->with(array('baz'), 3, 2)->andReturn(array('results'));
+		$paginator->shouldReceive('make')->once()->with(array('baz'), 3, 2, 'page')->andReturn(array('results'));
 
 		$this->assertEquals(array('results'), $builder->groupBy('foo')->paginate());
 	}

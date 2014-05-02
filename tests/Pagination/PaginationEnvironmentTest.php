@@ -80,15 +80,6 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testOverridingPageParam()
-	{
-		$env = $this->getEnvironment();
-		$this->assertEquals('page', $env->getPageName());
-		$env->setPageName('foo');
-		$this->assertEquals('foo', $env->getPageName());
-	}
-
-
 	protected function getEnvironment()
 	{
 		$request = m::mock('Illuminate\Http\Request');
@@ -96,7 +87,7 @@ class PaginationEnvironmentTest extends PHPUnit_Framework_TestCase {
 		$trans = m::mock('Symfony\Component\Translation\TranslatorInterface');
 		$view->shouldReceive('addNamespace')->once()->with('pagination', realpath(__DIR__.'/../../src/Illuminate/Pagination').'/views');
 
-		return new Environment($request, $view, $trans, 'page');
+		return new Environment($request, $view, $trans);
 	}
 
 }

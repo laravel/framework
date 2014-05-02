@@ -56,27 +56,18 @@ class Environment {
 	protected $baseUrl;
 
 	/**
-	 * The input parameter used for the current page.
-	 *
-	 * @var string
-	 */
-	protected $pageName;
-
-	/**
 	 * Create a new pagination environment.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  \Illuminate\View\Environment  $view
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
-	 * @param  string  $pageName
 	 * @return void
 	 */
-	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageName = 'page')
+	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans)
 	{
 		$this->view = $view;
 		$this->trans = $trans;
 		$this->request = $request;
-		$this->pageName = $pageName;
 		$this->setupPaginationEnvironment();
 	}
 
@@ -96,11 +87,12 @@ class Environment {
 	 * @param  array  $items
 	 * @param  int    $total
 	 * @param  int    $perPage
+	 * @param  string $pageName
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function make(array $items, $total, $perPage)
+	public function make(array $items, $total, $perPage, $pageName = 'page')
 	{
-		$paginator = new Paginator($this, $items, $total, $perPage);
+		$paginator = new Paginator($this, $items, $total, $perPage, $pageName);
 
 		return $paginator->setupPaginationContext();
 	}
@@ -122,11 +114,12 @@ class Environment {
 	/**
 	 * Get the number of the current page.
 	 *
+	 * @param  string $pageName
 	 * @return int
 	 */
-	public function getCurrentPage()
+	public function getCurrentPage($pageName = 'page')
 	{
-		$page = (int) $this->currentPage ?: $this->request->query->get($this->pageName, 1);
+		$page = (int) $this->currentPage ?: $this->request->query->get($pageName, 1);
 
 		if ($page < 1 || filter_var($page, FILTER_VALIDATE_INT) === false)
 		{
@@ -166,27 +159,6 @@ class Environment {
 	public function setBaseUrl($baseUrl)
 	{
 		$this->baseUrl = $baseUrl;
-	}
-
-	/**
-	 * Set the input page parameter name used by the paginator.
-	 *
-	 * @param  string  $pageName
-	 * @return void
-	 */
-	public function setPageName($pageName)
-	{
-		$this->pageName = $pageName;
-	}
-
-	/**
-	 * Get the input page parameter name used by the paginator.
-	 *
-	 * @return string
-	 */
-	public function getPageName()
-	{
-		return $this->pageName;
 	}
 
 	/**
