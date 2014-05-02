@@ -476,7 +476,7 @@ class Container implements ArrayAccess {
 	 */
 	protected function missingLeadingSlash($abstract)
 	{
-		return is_string($abstract) && ! starts_with($abstract, '\\');
+		return is_string($abstract) && strpos($abstract, '\\') !== 0;
 	}
 
 	/**
