@@ -358,17 +358,27 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testGettingSumFromCollection()
 	{
-			$c = new Collection(array((object) array('foo' => 50), (object) array('foo' => 50)));
-			$this->assertEquals(100, $c->sum('foo'));
+		$c = new Collection(array((object) array('foo' => 50), (object) array('foo' => 50)));
+		$this->assertEquals(100, $c->sum('foo'));
 
-			$c = new Collection(array((object) array('foo' => 50), (object) array('foo' => 50)));
-			$this->assertEquals(100, $c->sum(function($i) { return $i->foo; }));
+		$c = new Collection(array((object) array('foo' => 50), (object) array('foo' => 50)));
+		$this->assertEquals(100, $c->sum(function($i) { return $i->foo; }));
 	}
 
 	public function testGettingSumFromEmptyCollection()
 	{
-			$c = new Collection();
-			$this->assertEquals(0, $c->sum('foo'));
+		$c = new Collection();
+		$this->assertEquals(0, $c->sum('foo'));
+	}
+
+	public function testValueRetrieverAcceptsDotNotation()
+	{
+		$c = new Collection(array(
+			(object) array('id' => 1, 'foo' => array('bar' => 'B')), (object) array('id' => 2, 'foo' => array('bar' => 'A'))
+		));
+
+		$c = $c->sortBy('foo.bar');
+		$this->assertEquals(array(2, 1), $c->lists('id'));
 	}
 
 }
