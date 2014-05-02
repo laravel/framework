@@ -348,7 +348,7 @@ if ( ! function_exists('array_pluck'))
 
 		foreach ($array as $item)
 		{
-			$itemValue = is_object($item) ? object_get($item, $value) : array_get($item, $value);
+			$itemValue = data_get($item, $value);
 
 			// If the key is "null", we will just append the value to the array and keep
 			// looping. Otherwise we will key the array using the value of the key we
@@ -359,7 +359,7 @@ if ( ! function_exists('array_pluck'))
 			}
 			else
 			{
-				$itemKey = is_object($item) ? object_get($item, $key) : array_get($item, $key);
+				$itemKey = data_get($item, $value);
 
 				$results[$itemKey] = $itemValue;
 			}
