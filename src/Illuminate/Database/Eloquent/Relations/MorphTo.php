@@ -88,6 +88,21 @@ class MorphTo extends BelongsTo {
 	}
 
 	/**
+	 * Associate the model instance to the given parent.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function associate(Model $model)
+	{
+		$this->parent->setAttribute($this->foreignKey, $model->getKey());
+
+		$this->parent->setAttribute($this->morphType, get_class($model));
+
+		return $this->parent->setRelation($this->relation, $model);
+	}
+
+	/**
 	 * Get the results of the relationship.
 	 *
 	 * Called via eager load method of Eloquent query builder.

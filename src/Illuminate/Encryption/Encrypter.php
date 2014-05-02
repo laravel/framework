@@ -190,7 +190,7 @@ class Encrypter {
 	{
 		$pad = ord($value[($len = strlen($value)) - 1]);
 
-		return $this->paddingIsValid($pad, $value) ? substr($value, 0, strlen($value) - $pad) : $value;
+		return $this->paddingIsValid($pad, $value) ? substr($value, 0, $len - $pad) : $value;
 	}
 
 	/**

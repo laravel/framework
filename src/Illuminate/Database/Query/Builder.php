@@ -134,6 +134,13 @@ class Builder {
 	public $lock;
 
 	/**
+	 * The backups of fields while doing a pagination count.
+	 *
+	 * @var array
+	 */
+	protected $backups = array();
+
+	/**
 	 * The key that should be used when caching the query.
 	 *
 	 * @var string
@@ -1567,7 +1574,7 @@ class Builder {
 	 */
 	public function getPaginationCount()
 	{
-		list($orders, $this->orders) = array($this->orders, null);
+		$this->backupFieldsForCount();
 
 		$columns = $this->columns;
 
@@ -1576,7 +1583,7 @@ class Builder {
 		// the query. Once we have the count we will put them back onto this.
 		$total = $this->count();
 
-		$this->orders = $orders;
+		$this->restoreFieldsForCount();
 
 		// Once the query is run we need to put the old select columns back on the
 		// instance so that the select query will run properly. Otherwise, they
@@ -1606,6 +1613,37 @@ class Builder {
 		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
 		return $paginator->make($this->get($columns), $perPage);
+	}
+
+	/**
+	 * Backup certain fields for a pagination count.
+	 *
+	 * @return void
+	 */
+	protected function backupFieldsForCount()
+	{
+		foreach (array('orders', 'limit', 'offset') as $field)
+		{
+			$this->backups[$field] = $this->{$field};
+
+			$this->{$field} = null;
+		}
+
+	}
+
+	/**
+	 * Restore certain fields for a pagination count.
+	 *
+	 * @return void
+	 */
+	protected function restoreFieldsForCount()
+	{
+		foreach (array('orders', 'limit', 'offset') as $field)
+		{
+			$this->{$field} = $this->backups[$field];
+		}
+
+		$this->backups = array();
 	}
 
 	/**
