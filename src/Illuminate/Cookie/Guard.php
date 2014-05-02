@@ -28,7 +28,6 @@ class Guard implements HttpKernelInterface {
 	 *
 	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface  $app
 	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
-	 * @return void
 	 */
 	public function __construct(HttpKernelInterface $app, Encrypter $encrypter)
 	{

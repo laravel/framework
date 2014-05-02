@@ -16,7 +16,6 @@ class FrameGuard implements HttpKernelInterface {
 	 * Create a new FrameGuard instance.
 	 *
 	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface  $app
-	 * @return void
 	 */
 	public function __construct(HttpKernelInterface $app)
 	{

@@ -39,7 +39,6 @@ class Encrypter {
 	 * Create a new encrypter instance.
 	 *
 	 * @param  string  $key
-	 * @return void
 	 */
 	public function __construct($key)
 	{

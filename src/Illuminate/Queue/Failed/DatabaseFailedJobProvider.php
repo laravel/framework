@@ -32,7 +32,6 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
 	 * @param  string  $database
 	 * @param  string  $table
-	 * @return void
 	 */
 	public function __construct(ConnectionResolverInterface $resolver, $database, $table)
 	{

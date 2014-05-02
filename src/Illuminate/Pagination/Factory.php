@@ -69,7 +69,6 @@ class Factory {
 	 * @param  \Illuminate\View\Factory  $view
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
-	 * @return void
 	 */
 	public function __construct(Request $request, ViewFactory $view, TranslatorInterface $trans, $pageName = 'page')
 	{

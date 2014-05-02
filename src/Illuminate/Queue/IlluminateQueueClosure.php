@@ -15,7 +15,6 @@ class IlluminateQueueClosure {
 	 * Create a new queued Closure job.
 	 *
 	 * @param  \Illuminate\Encryption\Encrypter  $crypt
-	 * @return void
 	 */
 	public function __construct(Encrypter $crypt)
 	{

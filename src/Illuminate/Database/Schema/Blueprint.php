@@ -40,7 +40,6 @@ class Blueprint {
 	 *
 	 * @param  string   $table
 	 * @param  Closure  $callback
-	 * @return void
 	 */
 	public function __construct($table, Closure $callback = null)
 	{

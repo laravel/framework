@@ -24,10 +24,10 @@ class Manager {
 	 * @var \Illuminate\Database\DatabaseManager
 	 */
 	protected $manager;
-	
+
 	/**
 	 * The container instance.
-	 * 
+	 *
 	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
@@ -36,7 +36,6 @@ class Manager {
 	 * Create a new database capsule manager.
 	 *
 	 * @param  \Illuminate\Container\Container|null  $container
-	 * @return void
 	 */
 	public function __construct(Container $container = null)
 	{

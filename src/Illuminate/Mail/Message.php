@@ -16,7 +16,6 @@ class Message {
 	 * Create a new message instance.
 	 *
 	 * @param  \Swift_Message  $swift
-	 * @return void
 	 */
 	public function __construct($swift)
 	{

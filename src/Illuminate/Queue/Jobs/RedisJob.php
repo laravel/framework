@@ -26,7 +26,6 @@ class RedisJob extends Job {
 	 * @param  \Illuminate\Queue\RedisQueue  $redis
 	 * @param  string  $job
 	 * @param  string  $queue
-	 * @return void
 	 */
 	public function __construct(Container $container, RedisQueue $redis, $job, $queue)
 	{

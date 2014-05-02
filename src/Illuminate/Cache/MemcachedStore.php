@@ -23,7 +23,6 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @param  \Memcached  $memcached
 	 * @param  string     $prefix
-	 * @return void
 	 */
 	public function __construct(Memcached $memcached, $prefix = '')
 	{

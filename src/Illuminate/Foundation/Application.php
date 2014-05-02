@@ -103,7 +103,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * Create a new Illuminate application instance.
 	 *
 	 * @param  \Illuminate\Http\Request
-	 * @return void
 	 */
 	public function __construct(Request $request = null)
 	{

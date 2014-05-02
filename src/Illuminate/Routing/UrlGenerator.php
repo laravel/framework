@@ -42,7 +42,6 @@ class UrlGenerator {
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
 	 * @param  \Symfony\Component\HttpFoundation\Request   $request
-	 * @return void
 	 */
 	public function __construct(RouteCollection $routes, Request $request)
 	{

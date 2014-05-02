@@ -24,7 +24,6 @@ class RedisConnector implements ConnectorInterface {
 	 *
 	 * @param  \Illuminate\Redis\Database  $redis
 	 * @param  string|null  $connection
-	 * @return void
 	 */
 	public function __construct(Database $redis, $connection = null)
 	{

@@ -43,7 +43,6 @@ class Dispatcher {
 	 * Create a new event dispatcher instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
 	 */
 	public function __construct(Container $container = null)
 	{

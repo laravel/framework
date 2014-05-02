@@ -33,7 +33,6 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 * @param  Pheanstalk  $pheanstalk
 	 * @param  string  $default
 	 * @param  int  $timeToRun
-	 * @return void
 	 */
 	public function __construct(Pheanstalk $pheanstalk, $default, $timeToRun)
 	{
