@@ -440,6 +440,10 @@ class Validator implements MessageProviderInterface {
 		{
 			return false;
 		}
+		elseif (is_array($value) && count($value) < 1)
+		{
+			return false;
+		}
 		elseif ($value instanceof File)
 		{
 			return (string) $value->getPath() != '';
