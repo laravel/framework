@@ -327,7 +327,17 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input name="multicheck[]" type="checkbox" value="2">', $check2);
 		$this->assertEquals('<input checked="checked" name="multicheck[]" type="checkbox" value="3">', $check3);
 	}
+	
+	
+	public function testFormCheckboxWithoutSession()
+	{
+	    $form1 = $this->formBuilder->checkbox('foo');
+	    $form2 = $this->formBuilder->checkbox('foo', 'foobar', true);
 
+	    $this->assertEquals('<input name="foo" type="checkbox" value="1">', $form1);
+	    $this->assertEquals('<input checked="checked" name="foo" type="checkbox" value="foobar">', $form2);
+	}
+	
 
 	public function testFormRadio()
 	{
