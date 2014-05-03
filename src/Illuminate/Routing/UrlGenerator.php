@@ -202,16 +202,17 @@ class UrlGenerator {
 	 */
 	protected function toRoute($route, array $parameters, $absolute)
 	{
-	        $domain = $this->getRouteDomain($route, $parameters);
-	        $queryString = $this->getRouteQueryString($parameters);
-	        $parameters = array_map('rawurlencode', $parameters);
-	
-	        $uri = $this->trimUrl(
-			$root = $this->replaceRoot($route, $domain, $parameters),
-			$this->replaceRouteParameters($route->uri(), $parameters)
-	        ).$queryString;
-	
-	        return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
+		$domain = $this->getRouteDomain($route, $parameters);
+		// rawurlencode the parameters, the rest should be good
+		// this will allow slashes in the parameters!
+		$parameters = array_map('rawurlencode', $parameters);
+		
+		$uri = $this->trimUrl(
+				$root = $this->replaceRoot($route, $domain, $parameters),
+				$this->replaceRouteParameters($route->uri(), $parameters)
+			).$this->getRouteQueryString(array_map('rawurldecode', $parameters));;
+		
+		return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
 	}
 
 	/**
