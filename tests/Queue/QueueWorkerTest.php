@@ -44,9 +44,9 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
 		$connection->shouldReceive('pop')->once()->with('queue')->andReturn(null);
 		$worker->expects($this->never())->method('process');
-		$worker->expects($this->once())->method('sleep')->with($this->equalTo(1));
+		$worker->expects($this->once())->method('sleep')->with($this->equalTo(3));
 
-		$worker->pop('connection', 'queue', 0, 128, true);
+		$worker->pop('connection', 'queue', 0, 3);
 	}
 
 

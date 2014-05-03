@@ -64,7 +64,7 @@ class WorkCommand extends Command {
 		$connection = $this->argument('connection');
 
 		$response = $this->worker->pop(
-			$connection, $queue, $delay, $memory,
+			$connection, $queue, $delay,
 			$this->option('sleep'), $this->option('tries')
 		);
 
