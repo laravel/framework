@@ -63,9 +63,8 @@ class WorkCommand extends Command {
 
 		$connection = $this->argument('connection');
 
-		$response = $this->worker->pop(
-			$connection, $queue, $delay,
-			$this->option('sleep'), $this->option('tries')
+		$response = $this->runWorker(
+			$connection, $queue, $delay, $memory, $this->option('daemon')
 		);
 
 		// If a job was fired by the worker, we'll write the output out to the console
@@ -74,6 +73,34 @@ class WorkCommand extends Command {
 		if ( ! is_null($response['job']))
 		{
 			$this->writeOutput($response['job'], $response['failed']);
+		}
+	}
+
+	/**
+	 * Run the worker instance.
+	 *
+	 * @param  string  $connection
+	 * @param  string  $queue
+	 * @param  int  $delay
+	 * @param  int  $memory
+	 * @param  bool  $daemon
+	 * @return array
+	 */
+	protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
+	{
+		if ($daemon)
+		{
+			return $this->worker->daemon(
+				$connection, $queue, $delay, $memory,
+				$this->option('sleep'), $this->option('tries')
+			);
+		}
+		else
+		{
+			return $this->worker->pop(
+				$connection, $queue, $delay,
+				$this->option('sleep'), $this->option('tries')
+			);
 		}
 	}
 
@@ -131,6 +158,8 @@ class WorkCommand extends Command {
 	{
 		return array(
 			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'),
+
+			array('daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode'),
 
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
 

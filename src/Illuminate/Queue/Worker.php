@@ -45,6 +45,32 @@ class Worker {
 	}
 
 	/**
+	 * Listen to the given queue in a loop.
+	 *
+	 * @param  string  $connectionName
+	 * @param  string  $queue
+	 * @param  int     $delay
+	 * @param  int     $memory
+	 * @param  int     $sleep
+	 * @param  int     $maxTries
+	 * @return array
+	 */
+	public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
+	{
+		while (true)
+		{
+			$this->events->fire('queue.daemon.next');
+
+			$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
+
+			if ($this->memoryExceeded($memory))
+			{
+				$this->stop();
+			}
+		}
+	}
+
+	/**
 	 * Listen to the given queue.
 	 *
 	 * @param  string  $connectionName
@@ -171,6 +197,27 @@ class Worker {
 
 			$this->events->fire('illuminate.queue.failed', array($connection, $job, $data));
 		}
+	}
+
+	/**
+	 * Determine if the memory limit has been exceeded.
+	 *
+	 * @param  int   $memoryLimit
+	 * @return bool
+	 */
+	public function memoryExceeded($memoryLimit)
+	{
+		return (memory_get_usage() / 1024 / 1024) >= $memoryLimit;
+	}
+
+	/**
+	 * Stop listening and bail out of the script.
+	 *
+	 * @return void
+	 */
+	public function stop()
+	{
+		die;
 	}
 
 	/**
