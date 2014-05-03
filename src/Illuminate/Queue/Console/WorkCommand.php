@@ -50,7 +50,7 @@ class WorkCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ($this->downForMaintenance()) return;
+		if ($this->downForMaintenance() && ! $this->option('daemon')) return;
 
 		$queue = $this->option('queue');
 
