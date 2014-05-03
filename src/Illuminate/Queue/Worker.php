@@ -232,6 +232,8 @@ class Worker {
 	 */
 	public function stop()
 	{
+		$this->events->fire('illuminate.queue.stopping');
+
 		die;
 	}
 
