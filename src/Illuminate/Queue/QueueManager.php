@@ -52,6 +52,17 @@ class QueueManager {
 	}
 
 	/**
+	 * Register an event listener for the daemon queue stopping.
+	 *
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function stopping($callback)
+	{
+		$this->app['events']->listen('illuminate.queue.stopping', $callback);
+	}
+
+	/**
 	 * Determine if the driver is connected.
 	 *
 	 * @param  string  $name
