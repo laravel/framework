@@ -59,15 +59,30 @@ class Worker {
 	{
 		while (true)
 		{
-			$this->events->fire('queue.daemon.next');
-
-			$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
+			if ($this->daemonShouldRun())
+			{
+				$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
+			}
+			else
+			{
+				$this->sleep($sleep);
+			}
 
 			if ($this->memoryExceeded($memory))
 			{
 				$this->stop();
 			}
 		}
+	}
+
+	/**
+	 * Deteremine if the daemon should process on this iteration.
+	 *
+	 * @return bool
+	 */
+	protected function daemonShouldRun()
+	{
+		return $this->events->until('illuminate.queue.looping') !== false;
 	}
 
 	/**
