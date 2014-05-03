@@ -50,20 +50,19 @@ class Worker {
 	 * @param  string  $connectionName
 	 * @param  string  $queue
 	 * @param  int     $delay
-	 * @param  int     $memory
 	 * @param  int     $sleep
 	 * @param  int     $maxTries
 	 * @return array
 	 */
-	public function pop($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
+	public function pop($connectionName, $queue = null, $delay = 0, $sleep = 3, $maxTries = 0)
 	{
 		$connection = $this->manager->connection($connectionName);
 
 		$job = $this->getNextJob($connection, $queue);
 
 		// If we're able to pull a job off of the stack, we will process it and
-		// then make sure we are not exceeding our memory limits for the run
-		// which is to protect against run-away memory leakages from here.
+		// then immediately return back out. If there is no job on the queue
+		// we will "sleep" the worker for the specified number of seconds.
 		if ( ! is_null($job))
 		{
 			return $this->process(
