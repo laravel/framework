@@ -1065,7 +1065,7 @@ class Builder {
 	 */
 	public function limit($value)
 	{
-		if ($value > 0) $this->limit = $value;
+		if ($value >= 0) $this->limit = $value;
 
 		return $this;
 	}
