@@ -28,6 +28,13 @@ class Worker {
 	protected $events;
 
 	/**
+	 * The exception handler instance.
+	 *
+	 * @var \Illuminate\Exception\Handler
+	 */
+	protected $exceptions;
+
+	/**
 	 * Create a new queue worker.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
@@ -61,7 +68,9 @@ class Worker {
 		{
 			if ($this->daemonShouldRun())
 			{
-				$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
+				$this->runNextJobForDaemon(
+					$connectionName, $queue, $delay, $sleep, $maxTries
+				);
 			}
 			else
 			{
@@ -72,6 +81,28 @@ class Worker {
 			{
 				$this->stop();
 			}
+		}
+	}
+
+	/**
+	 * Run the next job for the daemon worker.
+	 *
+	 * @param  string  $connectionName
+	 * @param  string  $queue
+	 * @param  int  $delay
+	 * @param  int  $sleep
+	 * @param  int  $maxTries
+	 * @return void
+	 */
+	protected function runNextJobForDaemon($connectionName, $queue, $delay, $sleep, $maxTries)
+	{
+		try
+		{
+			$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
+		}
+		catch (\Exception $e)
+		{
+			if ($this->exceptions) $this->exceptions->handleException($e);
 		}
 	}
 
@@ -246,6 +277,17 @@ class Worker {
 	public function sleep($seconds)
 	{
 		sleep($seconds);
+	}
+
+	/**
+	 * Set the exception handler to use in Daemon mode.
+	 *
+	 * @param  \Illuminate\Exception\Handler  $handler
+	 * @return void
+	 */
+	public function setDaemonExceptionHandler($handler)
+	{
+		$this->exceptions = $handler;
 	}
 
 	/**

@@ -90,6 +90,8 @@ class WorkCommand extends Command {
 	{
 		if ($daemon)
 		{
+			$this->worker->setDaemonExceptionHandler($this->laravel['exception']);
+
 			return $this->worker->daemon(
 				$connection, $queue, $delay, $memory,
 				$this->option('sleep'), $this->option('tries')
