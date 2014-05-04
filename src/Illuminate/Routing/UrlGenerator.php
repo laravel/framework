@@ -20,24 +20,6 @@ class UrlGenerator {
 	protected $request;
 
 	/**
-	 * Characters that should not be URL encoded.
-	 *
-	 * @var array
-	 */
-	protected $dontEncode = array(
-		'%2F' => '/',
-		'%40' => '@',
-		'%3A' => ':',
-		'%3B' => ';',
-		'%2C' => ',',
-		'%3D' => '=',
-		'%2B' => '+',
-		'%21' => '!',
-		'%2A' => '*',
-		'%7C' => '|',
-	);
-
-	/**
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
@@ -221,13 +203,44 @@ class UrlGenerator {
 	protected function toRoute($route, array $parameters, $absolute)
 	{
 		$domain = $this->getRouteDomain($route, $parameters);
-
-		$uri = strtr(rawurlencode($this->trimUrl(
-			$root = $this->replaceRoot($route, $domain, $parameters),
-			$this->replaceRouteParameters($route->uri(), $parameters)
-		)), $this->dontEncode).$this->getRouteQueryString($parameters);
-
+		$parameters = array_map(array($this,'encode'), $parameters);
+		
+		$uri = $this->trimUrl(
+				$root = $this->replaceRoot($route, $domain, $parameters),
+				$this->replaceRouteParameters($route->uri(), $parameters)
+			).$this->getRouteQueryString(array_map(array($this,'decode'), $parameters));
+		
 		return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
+	}
+
+	/**
+	* encode callback
+	* don't decode multi-dimensional arrays, they are query string params
+	*
+	* @param $param
+	* @return string
+	*/
+	function encode($param){
+		if(!is_array($param)){
+			return rawurlencode($param);
+		}
+		
+		return $param;
+	}
+	
+	/**
+	* decode callback
+	* don't decode multi-dimensional arrays, they are query string params
+	* 
+	* @param $param
+	* @return string
+	*/
+	function decode(&$param){
+		if(!is_array($param) && !is_object($param)){
+			return rawurldecode($param);
+		}
+		
+		return $param;
 	}
 
 	/**
