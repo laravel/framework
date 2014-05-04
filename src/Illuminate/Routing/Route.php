@@ -417,9 +417,9 @@ class Route {
 	 */
 	protected function bindPathParameters(Request $request)
 	{
-		preg_match($this->compiled->getRegex(), '/'.$request->decodedPath(), $matches);
-
-		return $matches;
+        	preg_match($this->compiled->getRegex(), '/'.$request->path(), $matches);
+        	
+        	return array_map('rawurldecode', $matches);
 	}
 
 	/**
