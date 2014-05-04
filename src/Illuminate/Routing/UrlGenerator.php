@@ -20,6 +20,38 @@ class UrlGenerator {
 	protected $request;
 
 	/**
+	 * The force URL root.
+	 *
+	 * @var string
+	 */
+	protected $forcedRoot;
+
+	/**
+	 * The forced schema for URLs.
+	 *
+	 * @var string
+	 */
+	protected $forceSchema;
+
+	/**
+	 * Characters that should not be URL encoded.
+	 *
+	 * @var array
+	 */
+	protected $dontEncode = array(
+		'%2F' => '/',
+		'%40' => '@',
+		'%3A' => ':',
+		'%3B' => ';',
+		'%2C' => ',',
+		'%3D' => '=',
+		'%2B' => '+',
+		'%21' => '!',
+		'%2A' => '*',
+		'%7C' => '|',
+	);
+
+	/**
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
@@ -157,12 +189,23 @@ class UrlGenerator {
 	{
 		if (is_null($secure))
 		{
-			return $this->request->getScheme().'://';
+			return $this->forceSchema ?: $this->request->getScheme().'://';
 		}
 		else
 		{
 			return $secure ? 'https://' : 'http://';
 		}
+	}
+
+	/**
+	 * Force the schema for URLs.
+	 *
+	 * @param  string  $schema
+	 * @return void
+	 */
+	public function forceSchema($schema)
+	{
+		$this->forceSchema = $schema.'://';
 	}
 
 	/**
@@ -452,11 +495,25 @@ class UrlGenerator {
 	 */
 	protected function getRootUrl($scheme, $root = null)
 	{
-		$root = $root ?: $this->request->root();
+		if (is_null($root))
+		{
+			$root = $this->forcedRoot ?: $this->request->root();
+		}
 
 		$start = starts_with($root, 'http://') ? 'http://' : 'https://';
 
 		return preg_replace('~'.$start.'~', $scheme, $root, 1);
+	}
+
+	/**
+	 * Set the forced root URL.
+	 *
+	 * @param  string  $root
+	 * @return void
+	 */
+	public function forceRootUrl($root)
+	{
+		$this->forcedRoot = $root;
 	}
 
 	/**
