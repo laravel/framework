@@ -208,7 +208,7 @@ abstract class Facade {
 	 */
 	public function __call($method, $args)
 	{
-	   return static::callMethod($method, $args);
+		return static::callMethod($method, $args);
 	}
 
 	/**
