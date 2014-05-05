@@ -188,37 +188,58 @@ abstract class Facade {
 		static::$app = $app;
 	}
 
-	/**
-	 * Handle dynamic, static calls to the object.
-	 *
-	 * @param  string  $method
-	 * @param  array   $args
-	 * @return mixed
-	 */
-	public static function __callStatic($method, $args)
-	{
-		$instance = static::getFacadeRoot();
+	 /**
+     * static calls handling.
+     *
+     * @param  string $method
+     * @param  array  $args
+     * @return mixed
+     */
+    public static function __callStatic($method, $args)
+    {
+        return static::callMethod($method, $args);
+    }
 
-		switch (count($args))
-		{
-			case 0:
-				return $instance->$method();
+    /**
+     * None static calls, such as Facade Instance through DI.
+     * @param  string $method
+     * @param  array  $args
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+       return static::callMethod($method, $args);
+    }
 
-			case 1:
-				return $instance->$method($args[0]);
+    /**
+     * Access the object methods.
+     * @param  string $method
+     * @param  array  $args
+     * @return mixed
+     */
+    private static function callMethod($method, $args)
+    {
+        $instance = static::resolveFacadeInstance(static::getFacadeAccessor());
 
-			case 2:
-				return $instance->$method($args[0], $args[1]);
+        switch (count($args)) {
+            case 0:
+                return $instance->$method();
 
-			case 3:
-				return $instance->$method($args[0], $args[1], $args[2]);
+            case 1:
+                return $instance->$method($args[0]);
 
-			case 4:
-				return $instance->$method($args[0], $args[1], $args[2], $args[3]);
+            case 2:
+                return $instance->$method($args[0], $args[1]);
 
-			default:
-				return call_user_func_array(array($instance, $method), $args);
-		}
-	}
+            case 3:
+                return $instance->$method($args[0], $args[1], $args[2]);
+
+            case 4:
+                return $instance->$method($args[0], $args[1], $args[2], $args[3]);
+
+            default:
+                return call_user_func_array(array($instance, $method), $args);
+        }
+    }
 
 }
