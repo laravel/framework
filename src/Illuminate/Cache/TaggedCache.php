@@ -39,7 +39,7 @@ class TaggedCache implements StoreInterface {
 	 */
 	public function has($key)
 	{
-		return ! is_null($this->get($key));
+		return $this->store->has($key);
 	}
 
 	/**

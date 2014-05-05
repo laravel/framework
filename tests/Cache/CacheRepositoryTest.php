@@ -39,8 +39,8 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testHasMethod()
 	{
 		$repo = $this->getRepository();
-		$repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
-		$repo->getStore()->shouldReceive('get')->once()->with('bar')->andReturn('bar');
+		$repo->getStore()->shouldReceive('has')->once()->with('foo')->andReturn(false);
+		$repo->getStore()->shouldReceive('has')->once()->with('bar')->andReturn(true);
 
 		$this->assertTrue($repo->has('bar'));
 		$this->assertFalse($repo->has('foo'));
