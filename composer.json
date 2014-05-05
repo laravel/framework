@@ -14,7 +14,7 @@
         "classpreloader/classpreloader": "~1.0",
         "d11wtq/boris": "~1.0",
         "ircmaxell/password-compat": "~1.0",
-        "filp/whoops": "1.0.10",
+        "filp/whoops": "1.1",
         "jeremeamia/superclosure": "~1.0",
         "monolog/monolog": "~1.6",
         "nesbot/carbon": "~1.0",
@@ -70,7 +70,7 @@
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~2.1",
         "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "4.0.*"
+        "phpunit/phpunit": "4.1.*"
     },
     "autoload": {
         "classmap": [
