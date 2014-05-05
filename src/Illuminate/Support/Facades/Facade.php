@@ -188,58 +188,58 @@ abstract class Facade {
 		static::$app = $app;
 	}
 
-	 /**
-     * static calls handling.
-     *
-     * @param  string $method
-     * @param  array  $args
-     * @return mixed
-     */
-    public static function __callStatic($method, $args)
-    {
-        return static::callMethod($method, $args);
-    }
+	/**
+	 * static calls handling.
+	 *
+	 * @param  string $method
+	 * @param  array  $args
+	 * @return mixed
+	 */
+	public static function __callStatic($method, $args)
+	{
+		return static::callMethod($method, $args);
+	}
 
-    /**
-     * None static calls, such as Facade Instance through DI.
-     * @param  string $method
-     * @param  array  $args
-     * @return mixed
-     */
-    public function __call($method, $args)
-    {
-       return static::callMethod($method, $args);
-    }
+	/**
+	 * None static calls, such as Facade Instance through DI.
+	 * @param  string $method
+	 * @param  array  $args
+	 * @return mixed
+	 */
+	public function __call($method, $args)
+	{
+	   return static::callMethod($method, $args);
+	}
 
-    /**
-     * Access the object methods.
-     * @param  string $method
-     * @param  array  $args
-     * @return mixed
-     */
-    private static function callMethod($method, $args)
-    {
-        $instance = static::resolveFacadeInstance(static::getFacadeAccessor());
+	/**
+	 * Access the object methods.
+	 * @param  string $method
+	 * @param  array  $args
+	 * @return mixed
+	 */
+	private static function callMethod($method, $args)
+	{
+		$instance = static::resolveFacadeInstance(static::getFacadeAccessor());
 
-        switch (count($args)) {
-            case 0:
-                return $instance->$method();
+		switch (count($args)) {
+			case 0:
+				return $instance->$method();
 
-            case 1:
-                return $instance->$method($args[0]);
+			case 1:
+				return $instance->$method($args[0]);
 
-            case 2:
-                return $instance->$method($args[0], $args[1]);
+			case 2:
+				return $instance->$method($args[0], $args[1]);
 
-            case 3:
-                return $instance->$method($args[0], $args[1], $args[2]);
+			case 3:
+				return $instance->$method($args[0], $args[1], $args[2]);
 
-            case 4:
-                return $instance->$method($args[0], $args[1], $args[2], $args[3]);
+			case 4:
+				return $instance->$method($args[0], $args[1], $args[2], $args[3]);
 
-            default:
-                return call_user_func_array(array($instance, $method), $args);
-        }
-    }
+			default:
+				return call_user_func_array(array($instance, $method), $args);
+		}
+	}
 
 }
