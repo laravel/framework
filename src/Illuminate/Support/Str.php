@@ -189,32 +189,41 @@ class Str {
 	{
 		if (function_exists('openssl_random_pseudo_bytes'))
 		{
-			$bytes = openssl_random_pseudo_bytes($length * 2);
+            do {
+                $bytes = openssl_random_pseudo_bytes($length * 2);
 
-			if ($bytes === false)
-			{
-				throw new \RuntimeException('Unable to generate random string.');
-			}
+                if($bytes === false) {
+                    throw new \RuntimeException('Unable to generate random string.');
+                }
 
-			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+                $result = substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+            } while(strlen($result) < $length);
+
+            return $result;
 		}
 
-		return static::quickRandom($length);
+		return static::quickRandom($length, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	}
 
-	/**
-	 * Generate a "random" alpha-numeric string.
-	 *
-	 * Should not be considered sufficient for cryptography, etc.
-	 *
-	 * @param  int     $length
-	 * @return string
-	 */
-	public static function quickRandom($length = 16)
+    /**
+     * Generate a "random" string.
+     *
+     * Should not be considered sufficient for cryptography, etc.
+     *
+     * @param  int $length String length
+     * @param string $pool Pool of characters to choose from
+     * @return string
+     */
+	public static function quickRandom($length = 16, $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 	{
-		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $str = '';
+        $randMax = strlen($pool) - 1;
 
-		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
+        for($i = 0; $i < $length; ++$i) {
+            $str .= $pool[mt_rand(0, $randMax)];
+        }
+
+        return $str;
 	}
 
 	/**
