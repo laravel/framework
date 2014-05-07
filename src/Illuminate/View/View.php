@@ -3,6 +3,7 @@
 use ArrayAccess;
 use Closure;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\Engines\EngineInterface;
 use Illuminate\Support\Contracts\MessageProviderInterface;
 use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
@@ -73,16 +74,22 @@ class View implements ArrayAccess, Renderable {
 	 */
 	public function render(Closure $callback = null)
 	{
-		$contents = $this->renderContents();
+		try {
+			$contents = $this->renderContents();
 
-		$response = isset($callback) ? $callback($this, $contents) : null;
+			$response = isset($callback) ? $callback($this, $contents) : null;
 
-		// Once we have the contents of the view, we will flush the sections if we are
-		// done rendering all views so that there is nothing left hanging over when
-		// another view is rendered in the future via the application developers.
-		$this->environment->flushSectionsIfDoneRendering();
+			// Once we have the contents of the view, we will flush the sections if we are
+			// done rendering all views so that there is nothing left hanging over when
+			// another view is rendered in the future via the application developers.
+			$this->environment->flushSectionsIfDoneRendering();
 
-		return $response ?: $contents;
+			return $response ?: $contents;
+
+		} catch (Exception $e) {
+			Log::error("There was an exception when rendering view", array($e));
+			return isset($callback) ? $callback($this, "") : "";
+		}
 	}
 
 	/**
