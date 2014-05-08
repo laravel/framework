@@ -323,9 +323,9 @@ class Migrator {
 	 *
 	 * @return \Illuminate\Database\Connection
 	 */
-	public function resolveConnection()
+	public function resolveConnection($connection)
 	{
-		return $this->resolver->connection($this->connection);
+		return $this->resolver->connection($connection);
 	}
 
 	/**
