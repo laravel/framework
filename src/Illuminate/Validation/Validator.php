@@ -1129,7 +1129,7 @@ class Validator implements MessageProviderInterface {
 	{
 		if ( ! $value instanceof File)
 		{
-			return true;
+			return false;
 		}
 
 		// The Symfony File class should do a decent job of guessing the extension
