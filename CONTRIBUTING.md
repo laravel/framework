@@ -14,7 +14,7 @@ Pull requests for bugs may be sent without creating any proposal issue. If you b
 
 ### Feature Requests
 
-If you have an idea for a new feature you would like to see added to Laravel, you may create an issue on GitHub with `[Request]` in the title. The feature request will then be reviewed by a core contributor.
+If you have an idea for a new feature you would like to see added to Laravel, you may create an issue on GitHub with `[Request]` in the title. The feature request will then be reviewed by @taylorotwell.
 
 ## Coding Guidelines
 
