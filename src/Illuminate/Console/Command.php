@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-class Command extends \Symfony\Component\Console\Command\Command {
+abstract class Command extends \Symfony\Component\Console\Command\Command {
 
 	/**
 	 * The Laravel application instance.
@@ -382,4 +382,5 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		$this->laravel = $laravel;
 	}
 
+	abstract public function fire();
 }
