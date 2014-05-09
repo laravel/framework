@@ -45,7 +45,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		$this->inverse = $inverse;
 		$this->morphType = $name.'_type';
-		$this->morphClass = $inverse ? get_class($query->getModel()) : get_class($parent);
+		$this->morphClass = $inverse ? get_class($query->getModel()) : str_replace('\\','-',  get_class($parent) );
 
 		parent::__construct($query, $parent, $table, $foreignKey, $otherKey, $relationName);
 	}
