@@ -101,9 +101,10 @@ class PasswordBroker {
 	 *
 	 * @param  array    $credentials
 	 * @param  Closure  $callback
+	 * @param  mixed    $queue
 	 * @return string
 	 */
-	public function remind(array $credentials, Closure $callback = null)
+	public function remind(array $credentials, Closure $callback = null, $queue = null)
 	{
 		// First we will check to see if we found a user at the given credentials and
 		// if we did not we will redirect back to this current URI with a piece of
@@ -120,7 +121,7 @@ class PasswordBroker {
 		// the current URI having nothing set in the session to indicate errors.
 		$token = $this->reminders->create($user);
 
-		$this->sendReminder($user, $token, $callback);
+		$this->sendReminder($user, $token, $callback, $queue);
 
 		return self::REMINDER_SENT;
 	}
@@ -131,21 +132,39 @@ class PasswordBroker {
 	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string   $token
 	 * @param  Closure  $callback
+	 * @param  mixed    $queue
 	 * @return int
 	 */
-	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null)
+	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null, $queue = null)
 	{
 		// We will use the reminder view that was given to the broker to display the
 		// password reminder e-mail. We'll pass a "token" variable into the views
 		// so that it may be displayed for an user to click for password reset.
 		$view = $this->reminderView;
 
-		return $this->mailer->send($view, compact('token', 'user'), function($m) use ($user, $token, $callback)
+		$mailerCallback = function($m) use ($user, $token, $callback)
 		{
 			$m->to($user->getReminderEmail());
 
 			if ( ! is_null($callback)) call_user_func($callback, $m, $user, $token);
-		});
+		};
+
+		$variables = compact('token', 'user');
+
+		if ($queue) {
+			if (is_string($queue))
+			{
+				return $this->mailer->queueOn($queue, $view, $variables, $mailerCallback);
+			}
+			else
+			{
+				return $this->mailer->queue($view, $variables, $mailerCallback);
+			}
+		}
+		else
+		{
+			return $this->mailer->send($view, $variables, $mailerCallback);
+		}
 	}
 
 	/**
