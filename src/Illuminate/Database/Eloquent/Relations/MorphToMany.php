@@ -59,7 +59,7 @@ class MorphToMany extends BelongsToMany {
 	{
 		parent::setWhere();
 
-		$this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
+		$this->query->where($this->table.'.'.$this->morphType, str_replace('\\','-', $this->morphClass ));
 
 		return $this;
 	}
