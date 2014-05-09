@@ -91,5 +91,5 @@
     "suggest": {
         "doctrine/dbal": "Allow renaming columns and dropping SQLite columns."
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "beta"
 }
