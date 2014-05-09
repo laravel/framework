@@ -5,7 +5,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Command extends \Symfony\Component\Console\Command\Command {
+abstract class Command extends \Symfony\Component\Console\Command\Command {
 
 	/**
 	 * The Laravel application instance.
@@ -315,4 +315,5 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		$this->laravel = $laravel;
 	}
 
+	abstract public function fire();
 }
