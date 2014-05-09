@@ -1415,9 +1415,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->setKeysForSaveQuery($query)->update($dirty);
 
 			$this->fireModelEvent('updated', false);
+
+			// Return true to indicate that a save operation did occur
+			return true;
 		}
 
-		return true;
+		// Return false to indicate that a save operation did not occur, relations should
+		// not be touched, and the 'saved' event should not be fired.
+		return false;
 	}
 
 	/**
