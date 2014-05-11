@@ -67,6 +67,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public $timestamps = true;
 
 	/**
+	 * The model's attributes for which timestamps are not updated.
+	 *
+	 * @var array
+	 */
+	public $untouchables = array();
+
+	/**
 	 * The model's attributes.
 	 *
 	 * @var array
@@ -1402,7 +1409,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// First we need to create a fresh query instance and touch the creation and
 			// update timestamp on the model which are maintained by us for developer
 			// convenience. Then we will just continue saving the model instances.
-			if ($this->timestamps)
+			if ($this->timestamps && count(array_diff(array_keys($dirty), $this->untouchables)) > 0)
 			{
 				$this->updateTimestamps();
 			}

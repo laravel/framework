@@ -222,6 +222,66 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($model->save());
 	}
 
+	public function testUpdateProcessWithTimestampsWithoutUntouchables()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps', 'fireModelEvent'));
+		$model->timestamps = true;
+		$model->untouchables = array();
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('name' => 'taylor', 'logged_at' => '2014-05-09 23:59:59'));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+		$model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
+
+		$model->id = 1;
+		$model->syncOriginal();
+		$model->name = 'taylor';
+		$model->logged_at = '2014-05-09 23:59:59';
+		$model->exists = true;
+		$this->assertTrue($model->save());
+	}
+
+	public function testUpdateProcessWithTimestampsWithSomeUntouchables()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps', 'fireModelEvent'));
+		$model->timestamps = true;
+		$model->untouchables = array('logged_at');
+		$model->logged_at = '2012-01-01 00:00:00';
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('name' => 'taylor', 'logged_at' => '2014-05-09 23:59:59'));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+		$model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
+
+		$model->id = 1;
+		$model->syncOriginal();
+		$model->name = 'taylor';
+		$model->logged_at = '2014-05-09 23:59:59';
+		$model->exists = true;
+		$this->assertTrue($model->save());
+	}
+
+	public function testUpdateProcessWithTimestampsWithOnlyUntouchables()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps', 'fireModelEvent'));
+		$model->timestamps = true;
+		$model->untouchables = array('logged_at');
+		$model->logged_at = '2012-01-01 00:00:00';
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('logged_at' => '2014-05-09 23:59:59'));
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->never())->method('updateTimestamps');
+		$model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
+
+		$model->id = 1;
+		$model->syncOriginal();
+		$model->logged_at = '2014-05-09 23:59:59';
+		$model->exists = true;
+		$this->assertTrue($model->save());
+	}
 
 	public function testUpdateUsesOldPrimaryKey()
 	{
