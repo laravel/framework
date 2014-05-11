@@ -9,8 +9,8 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/container": "4.2.*",
-        "illuminate/support": "4.2.*"
+        "illuminate/container": "4.3.*",
+        "illuminate/support": "4.3.*"
     },
     "require-dev": {
         "mockery/mockery": "0.9.*",

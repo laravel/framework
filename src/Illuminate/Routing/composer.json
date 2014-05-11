@@ -9,17 +9,17 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/container": "4.2.*",
-        "illuminate/http": "4.2.*",
-        "illuminate/session": "4.2.*",
-        "illuminate/support": "4.2.*",
+        "illuminate/container": "4.3.*",
+        "illuminate/http": "4.3.*",
+        "illuminate/session": "4.3.*",
+        "illuminate/support": "4.3.*",
         "symfony/http-foundation": "2.5.*",
         "symfony/http-kernel": "2.5.*",
         "symfony/routing": "2.5.*"
     },
     "require-dev": {
-        "illuminate/console": "4.2.*",
-        "illuminate/filesystem": "4.2.*",
+        "illuminate/console": "4.3.*",
+        "illuminate/filesystem": "4.3.*",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
     },

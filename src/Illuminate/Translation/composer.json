@@ -9,8 +9,8 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/filesystem": "4.2.*",
-        "illuminate/support": "4.2.*",
+        "illuminate/filesystem": "4.3.*",
+        "illuminate/support": "4.3.*",
         "symfony/translation": "2.5.*"
     },
     "require-dev": {
