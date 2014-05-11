@@ -9,14 +9,14 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/console": "4.2.*",
-        "illuminate/container": "4.2.*",
-        "illuminate/http": "4.2.*",
-        "illuminate/support": "4.2.*",
+        "illuminate/console": "4.3.*",
+        "illuminate/container": "4.3.*",
+        "illuminate/http": "4.3.*",
+        "illuminate/support": "4.3.*",
         "symfony/process": "2.5.*"
     },
     "require-dev": {
-        "illuminate/events": "4.2.*",
+        "illuminate/events": "4.3.*",
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~2.1",
