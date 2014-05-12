@@ -9,15 +9,15 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
+        "illuminate/support": "4.3.*",
         "nesbot/carbon": "~1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "4.0.*",
-        "illuminate/database": "4.2.*",
-        "illuminate/encryption": "4.2.*",
-        "illuminate/filesystem": "4.2.*",
-        "illuminate/redis": "4.2.*"
+        "illuminate/database": "4.3.*",
+        "illuminate/encryption": "4.3.*",
+        "illuminate/filesystem": "4.3.*",
+        "illuminate/redis": "4.3.*"
     },
     "autoload": {
         "psr-0": {"Illuminate\\Cache": ""}
