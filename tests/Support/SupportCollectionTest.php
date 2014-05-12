@@ -374,7 +374,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testValueRetrieverAcceptsDotNotation()
 	{
 		$c = new Collection(array(
-			(object) array('id' => 1, 'foo' => array('bar' => 'B')), (object) array('id' => 2, 'foo' => array('bar' => 'A'))
+			(object) array('id' => 1, 'foo' => (object) array('bar' => 'B')), (object) array('id' => 2, 'foo' => (object) array('bar' => 'A'))
 		));
 
 		$c = $c->sortBy('foo.bar');
