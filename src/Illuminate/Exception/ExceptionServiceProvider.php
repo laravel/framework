@@ -4,6 +4,7 @@ use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 
 class ExceptionServiceProvider extends ServiceProvider {
 
@@ -78,7 +79,9 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 		$this->app['exception.debug'] = $this->app->share(function($app)
 		{
-			return new WhoopsDisplayer($app['whoops'], $app->runningInConsole());
+			return new SymfonyDisplayer(new SymfonyExceptionHandler(true));
+
+			//return new WhoopsDisplayer($app['whoops'], $app->runningInConsole());
 		});
 	}
 
