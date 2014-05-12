@@ -1184,6 +1184,27 @@ class Validator implements MessageProviderInterface {
 
 		return preg_match($parameters[0], $value);
 	}
+	
+	/**
+	 * Validate that an attribute is a valid timestamp.
+	 *
+	 * @param string $attribute
+	 * @param mixed $value
+	 * @return bool
+	 */
+	protected function validateTimezone($attribute, $value)
+	{
+		try 
+		{
+			new DateTimeZone($value);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Validate that an attribute is a valid date.
