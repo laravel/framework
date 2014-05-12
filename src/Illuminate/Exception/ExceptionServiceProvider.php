@@ -160,7 +160,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 			// displayed back to the developer. Otherwise, the default pages are run.
 			if ( ! is_null($path = $this->resourcePath()))
 			{
-				$handler->setResourcesPath($path);
+				$handler->addResourcePath($path);
 			}
 
 			return $handler;
