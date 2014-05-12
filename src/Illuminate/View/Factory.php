@@ -44,6 +44,13 @@ class Factory {
 	protected $shared = array();
 
 	/**
+	 * Array of registered view name aliases.
+	 *
+	 * @var array
+	 */
+	protected $aliases = array();
+
+	/**
 	 * All of the registered view names.
 	 *
 	 * @var array
@@ -103,6 +110,18 @@ class Factory {
 	}
 
 	/**
+	 * Add an alias for a view.
+	 *
+	 * @param  string $view  The real view name
+	 * @param  string $alias
+	 * @return void
+	 */
+	public function alias($view, $alias)
+	{
+		$this->aliases[$alias] = $view;
+	}
+
+	/**
 	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
@@ -112,6 +131,8 @@ class Factory {
 	 */
 	public function make($view, $data = array(), $mergeData = array())
 	{
+		if (isset($this->aliases[$view])) $view = $this->aliases[$view];
+
 		$path = $this->finder->find($view);
 
 		$data = array_merge($mergeData, $this->parseData($data));

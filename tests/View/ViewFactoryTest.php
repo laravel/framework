@@ -332,6 +332,20 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMakeWithAlias()
+	{
+		$factory = $this->getFactory();
+		$factory->alias('real', 'alias');
+		$factory->getFinder()->shouldReceive('find')->once()->with('real')->andReturn('path.php');
+		$factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn(m::mock('Illuminate\View\Engines\EngineInterface'));
+		$factory->getDispatcher()->shouldReceive('fire');
+
+		$view = $factory->make('alias');
+
+		$this->assertEquals('real', $view->getName());
+	}
+
+
 	protected function getFactory()
 	{
 		return new Factory(
