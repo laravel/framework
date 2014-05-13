@@ -466,7 +466,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
+		return '/(?<!\w)(\s*)@'.$function.'(\s*\([^@<]*\))/';
 	}
 
 	/**
@@ -477,7 +477,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createOpenMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
+		return '/(?<!\w)(\s*)@'.$function.'(\s*\([^@<]*)\)/';
 	}
 
 	/**
