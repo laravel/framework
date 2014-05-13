@@ -62,6 +62,8 @@ class MandrillTransport implements Swift_Transport {
 				'async' => true,
 			],
 		]);
+
+		return count(array_unique(array_merge($message->getTo(), $message->getCc(), $message->getBcc())));
 	}
 
 	/**
