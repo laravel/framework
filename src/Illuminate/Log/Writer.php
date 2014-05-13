@@ -5,6 +5,7 @@ use Illuminate\Events\Dispatcher;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
@@ -88,7 +89,7 @@ class Writer {
 
 		$this->monolog->pushHandler($handler = new StreamHandler($path, $level));
 
-		$handler->setFormatter(new LineFormatter(null, null, true));
+		$handler->setFormatter($this->getDefaultFormatter());
 	}
 
 	/**
@@ -105,7 +106,33 @@ class Writer {
 
 		$this->monolog->pushHandler($handler = new RotatingFileHandler($path, $days, $level));
 
-		$handler->setFormatter(new LineFormatter(null, null, true));
+		$handler->setFormatter($this->getDefaultFormatter());
+	}
+
+	/**
+	 * Register an error_log handler.
+	 *
+	 * @param  integer $messageType
+	 * @param  string  $level
+	 * @return void
+	 */
+	public function useErrorLog($level = 'debug', $messageType = ErrorLogHandler::OPERATING_SYSTEM)
+	{
+		$level = $this->parseLevel($level);
+
+		$this->monolog->pushHandler($handler = new ErrorLogHandler($messageType, $level));
+
+		$handler->setFormatter($this->getDefaultFormatter());
+	}
+
+	/**
+	 * Get a defaut Monolog formatter instance.
+	 *
+	 * @return \Monolog\Formatters\LineFormatter
+	 */
+	protected function getDefaultFormatter()
+	{
+		return new LineFormatter(null, null, true);
 	}
 
 	/**

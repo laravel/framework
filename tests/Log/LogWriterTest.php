@@ -27,6 +27,14 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testErrorLogHandlerCanBeAdded()
+	{
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
+		$monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\ErrorLogHandler'));
+		$writer->useErrorLog();
+	}
+
+
 	public function testMagicMethodsPassErrorAdditionsToMonolog()
 	{
 		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
