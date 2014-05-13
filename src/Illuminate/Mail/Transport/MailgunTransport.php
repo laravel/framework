@@ -75,10 +75,12 @@ class MailgunTransport implements Swift_Transport {
 
 		$client->post($this->url, ['auth' => ['api', $this->key],
 			'body' => [
-	    		'to' => $this->getTo($message),
-	    		'message' => new PostFile('message', (string) $message),
-	    	],
-    	]);
+				'to' => $this->getTo($message),
+				'message' => new PostFile('message', (string) $message),
+			],
+		]);
+
+		return count(array_unique(array_merge($message->getTo(), $message->getCc(), $message->getBcc())));
 	}
 
 	/**

@@ -331,7 +331,7 @@ class Mailer {
 		{
 			$this->logMessage($message);
 
-			return 1;
+			return count(array_unique(array_merge($message->getTo(), $message->getCc(), $message->getBcc())));
 		}
 	}
 

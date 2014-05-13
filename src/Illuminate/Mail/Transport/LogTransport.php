@@ -55,6 +55,8 @@ class LogTransport implements Swift_Transport {
 	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
 	{
 		$this->logger->debug((string) $message);
+
+		return count(array_unique(array_merge($message->getTo(), $message->getCc(), $message->getBcc())));
 	}
 
 	/**
