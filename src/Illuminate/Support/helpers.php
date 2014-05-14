@@ -1010,6 +1010,20 @@ if ( ! function_exists('studly_case'))
 	}
 }
 
+if ( ! function_exists('lower_case'))
+{
+	/**
+	 * Convert a value to lower case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	function lower_case($value)
+	{
+		return Illuminate\Support\Str::lower($value);
+	}
+}
+
 if ( ! function_exists('trans'))
 {
 	/**
