@@ -51,6 +51,55 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), array_pluck($array, 'email', 'name'));
 	}
 
+	public function testArrayPluckDotWithArray()
+	{
+		$array = array(
+			array(
+				'info' => array(
+					'name' => 'taylor'
+				),
+				'contact' => array(
+					'email' => 'foo'
+				)
+			),
+			array(
+				'info' => array(
+					'name' => 'dayle'
+				),
+				'contact' => array(
+					'email' => 'bar'
+				)
+			),
+		);
+
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), array_pluck($array, 'contact.email', 'info.name'));
+	}
+
+
+	public function testArrayPluckDotWithObject()
+	{
+		$array = (object)array(
+			(object)array(
+				'info' => (object)array(
+						'name' => 'taylor'
+					),
+				'contact' => (object)array(
+						'email' => 'foo'
+					)
+			),
+			(object)array(
+				'info' => (object)array(
+						'name' => 'dayle'
+					),
+				'contact' => (object)array(
+						'email' => 'bar'
+					)
+			),
+		);
+
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), array_pluck($array, 'contact.email', 'info.name'));
+	}
+
 
 	public function testArrayExcept()
 	{
