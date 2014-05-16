@@ -77,7 +77,7 @@
         "aws/aws-sdk-php": "Enable the use of the aws sqs queue driver.",
         "iron-io/iron_mq": "Enable the use of the iron queue driver.",
         "pda/pheanstalk": "Enable the use of the beanstalk queue driver.",
-        "egulias/email-validator": "Enable strict (RFC compliant) email validation.",
+        "egulias/email-validator": "Enable strict (RFC compliant) email validation."
     },
     "autoload": {
         "classmap": [
