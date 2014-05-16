@@ -314,7 +314,7 @@ class Mailer {
 	 * Send a Swift Message instance.
 	 *
 	 * @param  \Swift_Message  $message
-	 * @return int
+	 * @return void
 	 */
 	protected function sendSwiftMessage($message)
 	{
@@ -325,13 +325,11 @@ class Mailer {
 
 		if ( ! $this->pretending)
 		{
-			return $this->swift->send($message, $this->failedRecipients);
+			$this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
 		{
 			$this->logMessage($message);
-
-			return 1;
 		}
 	}
 

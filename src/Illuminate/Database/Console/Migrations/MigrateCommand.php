@@ -82,7 +82,7 @@ class MigrateCommand extends BaseCommand {
 		// a migration and a seed at the same time, as it is only this command.
 		if ($this->input->getOption('seed'))
 		{
-			$this->call('db:seed');
+			$this->call('db:seed', ['--force' => true]);
 		}
 	}
 
