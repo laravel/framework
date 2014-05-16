@@ -69,8 +69,15 @@
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~2.1",
+        "egulias/email-validator": "~1.1",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
+    },
+    "suggest": {
+        "aws/aws-sdk-php": "Enable the use of the aws sqs queue driver.",
+        "iron-io/iron_mq": "Enable the use of the iron queue driver.",
+        "pda/pheanstalk": "Enable the use of the beanstalk queue driver.",
+        "egulias/email-validator": "Enable strict (RFC compliant) email validation.",
     },
     "autoload": {
         "classmap": [
