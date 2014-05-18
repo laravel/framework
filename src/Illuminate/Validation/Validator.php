@@ -341,7 +341,7 @@ class Validator implements MessageProviderInterface {
 	protected function isValidatable($rule, $attribute, $value)
 	{
 		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
-               $this->passesOptionalCheck($attribute);
+		$this->passesOptionalCheck($attribute);
 	}
 
 	/**
@@ -743,7 +743,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'digits');
 
-		return $this->validateNumeric($attribute, $value)
+		return $this->validateNumeric($attribute, $value) 
 			&& strlen((string) $value) == $parameters[0];
 	}
 
@@ -1268,8 +1268,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateBeforeWithFormat($format, $value, $parameters)
 	{
-		return DateTime::createFromFormat($format, $value) <
-               DateTime::createFromFormat($format, $parameters[0]);
+		return DateTime::createFromFormat($format, $value) < 
+		DateTime::createFromFormat($format, $parameters[0]);
 	}
 
 	/**
@@ -1309,8 +1309,8 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAfterWithFormat($format, $value, $parameters)
 	{
-		return DateTime::createFromFormat($format, $value) >
-               DateTime::createFromFormat($format, $parameters[0]);
+		return DateTime::createFromFormat($format, $value) > 
+		DateTime::createFromFormat($format, $parameters[0]);
 	}
 
 	/**
@@ -2003,7 +2003,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Register an array of custom validator message replacers.
 	 *
-	 * @param  array  $replacers
+	 * @param  array  $replacersreturn $this->presentOrRuleIsImplicit($rule, $attribute
 	 * @return void
 	 */
 	public function addReplacers(array $replacers)
