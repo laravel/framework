@@ -340,8 +340,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function isValidatable($rule, $attribute, $value)
 	{
-		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
-               $this->passesOptionalCheck($attribute);
+		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) && $this->passesOptionalCheck($attribute);
 	}
 
 	/**
@@ -1076,7 +1075,14 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateEmail($attribute, $value)
 	{
-		return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+		if (class_exists('\Egulias\EmailValidator\EmailValidator'))
+		{
+			return with(new \Egulias\EmailValidator\EmailValidator())->isValid($value);
+		}
+		else
+		{
+			return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+		}
 	}
 
 	/**
@@ -1268,8 +1274,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateBeforeWithFormat($format, $value, $parameters)
 	{
-		return DateTime::createFromFormat($format, $value) <
-               DateTime::createFromFormat($format, $parameters[0]);
+		return DateTime::createFromFormat($format, $value) < DateTime::createFromFormat($format, $parameters[0]);
 	}
 
 	/**
@@ -1309,8 +1314,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAfterWithFormat($format, $value, $parameters)
 	{
-		return DateTime::createFromFormat($format, $value) >
-               DateTime::createFromFormat($format, $parameters[0]);
+		return DateTime::createFromFormat($format, $value) > DateTime::createFromFormat($format, $parameters[0]);
 	}
 
 	/**

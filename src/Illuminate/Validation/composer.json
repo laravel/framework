@@ -16,6 +16,7 @@
     },
     "require-dev": {
         "illuminate/database": "4.2.*",
+        "egulias/email-validator": "~1.1",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
     },
