@@ -135,7 +135,7 @@ class BelongsToMany extends Relation {
 	 */
 	protected function generateFilters()
 	{
-		$filters = [];
+		$filters = array();
 		foreach ($this->pivotFilters as $column => $value)
 		{
 			if (is_callable($value)) {
@@ -161,7 +161,7 @@ class BelongsToMany extends Relation {
 	{
 		$this->setFilter($column, $value);
 		$this->wherePivot($column, $value);
-		$this->withPivot([$column]);
+		$this->withPivot(array($column));
 
 		return $this;
 	}
