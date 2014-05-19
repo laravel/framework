@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
@@ -26,6 +27,10 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$relation->getQuery()->shouldReceive('getModels')->once()->andReturn($models);
 		$relation->getQuery()->shouldReceive('eagerLoadRelations')->once()->with($models)->andReturn($models);
 		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array) { return new Collection($array); });
+
+		$baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+		$relation->getQuery()->shouldReceive('getQuery')->once()->andReturn($baseBuilder);
+
 		$results = $relation->get();
 
 		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $results);
@@ -67,6 +72,10 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$relation->getQuery()->shouldReceive('getModels')->once()->andReturn($models);
 		$relation->getQuery()->shouldReceive('eagerLoadRelations')->once()->with($models)->andReturn($models);
 		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array) { return new Collection($array); });
+
+		$baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+		$relation->getQuery()->shouldReceive('getQuery')->once()->andReturn($baseBuilder);
+
 		$results = $relation->get();
 	}
 
