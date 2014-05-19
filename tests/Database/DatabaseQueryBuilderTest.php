@@ -406,9 +406,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" order by "email" asc, "age" desc', $builder->toSql());
 
 		$builder = $this->getBuilder();
-		$builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', array('foo' => 'bar'));
+		$builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', array('foo'));
 		$this->assertEquals('select * from "users" order by "email" asc, "age" ? desc', $builder->toSql());
-		$this->assertEquals(array('foo' => 'bar'), $builder->getBindings());
+		$this->assertEquals(array('foo'), $builder->getBindings());
 	}
 
 
@@ -642,7 +642,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getPaginationCount', 'forPage', 'get'), array($connection, $grammar, $processor));
-		$paginator = m::mock('Illuminate\Pagination\Environment');
+		$paginator = m::mock('Illuminate\Pagination\Factory');
 		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
 		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
 		$builder->expects($this->once())->method('forPage')->with($this->equalTo(1), $this->equalTo(15))->will($this->returnValue($builder));
@@ -660,7 +660,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('get'), array($connection, $grammar, $processor));
-		$paginator = m::mock('Illuminate\Pagination\Environment');
+		$paginator = m::mock('Illuminate\Pagination\Factory');
 		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(2);
 		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo', 'bar', 'baz')));
@@ -687,6 +687,24 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(array(0 => array('column' => 'foo', 'direction' => 'desc')), $builder->orders);
 		$this->assertEquals(1, $results);
+	}
+
+
+	public function testQuickPaginateCorrectlyCreatesPaginatorInstance()
+	{
+		$connection = m::mock('Illuminate\Database\ConnectionInterface');
+		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
+		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('skip', 'take', 'get'), array($connection, $grammar, $processor));
+		$paginator = m::mock('Illuminate\Pagination\Environment');
+		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
+		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
+		$builder->expects($this->once())->method('skip')->with($this->equalTo(0))->will($this->returnValue($builder));
+		$builder->expects($this->once())->method('take')->with($this->equalTo(16))->will($this->returnValue($builder));
+		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo')));
+		$paginator->shouldReceive('make')->once()->with(array('foo'), 15)->andReturn(array('results'));
+
+		$this->assertEquals(array('results'), $builder->simplePaginate(15, array('*')));
 	}
 
 
@@ -1023,6 +1041,65 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
 		$this->assertEquals('select * from [foo] with(rowlock,holdlock) where [bar] = ?', $builder->toSql());
 		$this->assertEquals(array('baz'), $builder->getBindings());
+	}
+
+
+	public function testBindingOrder()
+	{
+		$expectedSql = 'select * from "users" inner join "othertable" on "bar" = ? where "registered" = ? group by "city" having "population" > ? order by match ("foo") against(?)';
+		$expectedBindings = array('foo', 1, 3, 'bar');
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->join('othertable', function($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', array('bar'));
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
+
+		// order of statements reversed
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', array('bar'))->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', function($join) { $join->where('bar', '=', 'foo'); });
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
+	}
+
+
+	public function testAddBindingWithArrayMergesBindings()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('foo', 'bar'));
+		$builder->addBinding(array('baz'));
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testAddBindingWithArrayMergesBindingsInCorrectOrder()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('bar', 'baz'), 'having');
+		$builder->addBinding(array('foo'), 'where');
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testMergeBuilders()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding(array('foo', 'bar'));
+		$otherBuilder = $this->getBuilder();
+		$otherBuilder->addBinding(array('baz'));
+		$builder->mergeBindings($otherBuilder);
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testMergeBuildersBindingOrder()
+	{
+		$builder = $this->getBuilder();
+		$builder->addBinding('foo', 'where');
+		$builder->addBinding('baz', 'having');
+		$otherBuilder = $this->getBuilder();
+		$otherBuilder->addBinding('bar', 'where');
+		$builder->mergeBindings($otherBuilder);
+		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
 	}
 
 

@@ -242,7 +242,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	public function testResolvingPaginatorThroughClosure()
 	{
 		$connection = $this->getMockConnection();
-		$paginator  = m::mock('Illuminate\Pagination\Environment');
+		$paginator  = m::mock('Illuminate\Pagination\Factory');
 		$connection->setPaginator(function() use ($paginator)
 		{
 			return $paginator;

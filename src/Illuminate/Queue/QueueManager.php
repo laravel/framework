@@ -30,6 +30,17 @@ class QueueManager {
 	}
 
 	/**
+	 * Register an event listener for the daemon queue loop.
+	 *
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function looping($callback)
+	{
+		$this->app['events']->listen('illuminate.queue.looping', $callback);
+	}
+
+	/**
 	 * Register an event listener for the failed job event.
 	 *
 	 * @param  mixed  $callback
@@ -38,6 +49,17 @@ class QueueManager {
 	public function failing($callback)
 	{
 		$this->app['events']->listen('illuminate.queue.failed', $callback);
+	}
+
+	/**
+	 * Register an event listener for the daemon queue stopping.
+	 *
+	 * @param  mixed  $callback
+	 * @return void
+	 */
+	public function stopping($callback)
+	{
+		$this->app['events']->listen('illuminate.queue.stopping', $callback);
 	}
 
 	/**
@@ -69,6 +91,8 @@ class QueueManager {
 			$this->connections[$name] = $this->resolve($name);
 
 			$this->connections[$name]->setContainer($this->app);
+
+			$this->connections[$name]->setEncrypter($this->app['encrypter']);
 		}
 
 		return $this->connections[$name];

@@ -139,9 +139,10 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('flash')->once()->with('errors', array('foo' => 'bar'));
+        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
         $provider = m::mock('Illuminate\Support\Contracts\MessageProviderInterface');
-        $provider->shouldReceive('getMessageBag')->once()->andReturn(array('foo' => 'bar'));
+        $provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
         $response->withErrors($provider);
     }
 
@@ -166,7 +167,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\MessageBag'));
+        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
         $provider = array('foo' => 'bar');
         $response->withErrors($provider);
     }

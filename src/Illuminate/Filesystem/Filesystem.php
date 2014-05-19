@@ -68,7 +68,7 @@ class Filesystem {
 	 */
 	public function put($path, $contents)
 	{
-		return file_put_contents($path, $contents);
+		return file_put_contents($path, $contents, LOCK_EX);
 	}
 
 	/**
@@ -99,7 +99,7 @@ class Filesystem {
 	 */
 	public function append($path, $data)
 	{
-		return file_put_contents($path, $data, FILE_APPEND);
+		return file_put_contents($path, $data, FILE_APPEND | LOCK_EX);
 	}
 
 	/**
@@ -291,7 +291,7 @@ class Filesystem {
 	 * @param  bool    $force
 	 * @return bool
 	 */
-	public function makeDirectory($path, $mode = 0777, $recursive = false, $force = false)
+	public function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
 	{
 		if ($force)
 		{

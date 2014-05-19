@@ -77,7 +77,7 @@ if ( ! function_exists('append_config'))
 if ( ! function_exists('array_add'))
 {
 	/**
-	 * Add an element to an array if it doesn't exist.
+	 * Add an element to an array using "dot" notation if it doesn't exist.
 	 *
 	 * @param  array   $array
 	 * @param  string  $key
@@ -86,7 +86,10 @@ if ( ! function_exists('array_add'))
 	 */
 	function array_add($array, $key, $value)
 	{
-		if ( ! isset($array[$key])) $array[$key] = $value;
+		if (is_null(array_get($array, $key)))
+		{
+			array_set($array, $key, $value);
+		}
 
 		return $array;
 	}

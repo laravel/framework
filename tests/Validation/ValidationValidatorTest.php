@@ -113,6 +113,28 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Name is required!', $v->messages()->first('name'));
 	}
 
+	public function testDisplayableValuesAreReplaced()
+	{
+		//required_if:foo,bar
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.required_if' => 'The :attribute field is required when :other is :value.'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.color.1' => 'red'), 'en', 'messages');
+		$v = new Validator($trans, array('color' => '1', 'bar' => ''), array('bar' => 'RequiredIf:color,1'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('The bar field is required when color is red.', $v->messages()->first('bar'));
+
+		//in:foo,bar,...
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.in' => ':attribute must be included in :values.'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.type.5' => 'Short'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.type.300' => 'Long'), 'en', 'messages');
+		$v = new Validator($trans, array('type' => '4'), array('type' => 'in:5,300'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
+
+	}
 
 	public function testCustomValidationLinesAreRespected()
 	{
@@ -342,6 +364,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('first' => 'taylor', 'last' => 'otwell'), array('last' => 'required_if:first,taylor'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor', 'last' => 'otwell'), array('last' => 'required_if:first,taylor,dayle'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'dayle', 'last' => 'rees'), array('last' => 'required_if:first,taylor,dayle'));
 		$this->assertTrue($v->passes());
 	}
 
@@ -856,6 +886,28 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('x' => 'http://google.com'), array('x' => 'Alpha'));
 		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('x' => 'ユニコードを基盤技術と'), array('x' => 'Alpha'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => 'ユニコード を基盤技術と'), array('x' => 'Alpha'));
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('x' => 'नमस्कार'), array('x' => 'Alpha'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => 'आपका स्वागत है'), array('x' => 'Alpha'));
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('x' => 'Continuación'), array('x' => 'Alpha'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => 'ofreció su dimisión'), array('x' => 'Alpha'));
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('x' => '❤'), array('x' => 'Alpha'));
+		$this->assertFalse($v->passes());
+
 	}
 
 
@@ -867,6 +919,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('x' => 'http://g232oogle.com'), array('x' => 'AlphaNum'));
 		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('x' => '१२३'), array('x' => 'AlphaNum'));//numbers in Hindi
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaNum'));//eastern arabic numerals
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => 'नमस्कार'), array('x' => 'AlphaNum'));
+		$this->assertTrue($v->passes());
 	}
 
 
@@ -878,6 +939,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('x' => 'http://-g232oogle.com'), array('x' => 'AlphaDash'));
 		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, array('x' => 'नमस्कार-_'), array('x' => 'AlphaDash'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaDash'));//eastern arabic numerals
+		$this->assertTrue($v->passes());
+
 	}
 
 
@@ -932,6 +1000,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('start' => '2012-01-01', 'ends' => '2000-01-01'), array('start' => 'Before:ends', 'ends' => 'After:start'));
 		$this->assertTrue($v->fails());
+	}
+
+
+	public function testBeforeAndAfterWithFormat()
+	{
+		date_default_timezone_set('UTC');
+		$trans = $this->getRealTranslator();
+
+		$v = new Validator($trans, array('x' => '02/04/2012'), array('x' => 'After:03/03/2012|Before:01/05/2012'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('x' => '02/04/2012'), array('x' => 'date_format:d/m/Y|After:03/03/2012|Before:01/05/2012'));
+		$this->assertTrue($v->passes());
 	}
 
 
@@ -1027,6 +1108,42 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = $this->getTranslator();
 		$v = new Validator($trans, array(), array('foo' => 'required_if:foo'));
 		$v->passes();
+	}
+
+
+	public function testValidateEach()
+	{
+		$trans = $this->getRealTranslator();
+		$data = ['foo' => [5, 10, 15]];
+
+		$v = new Validator($trans, $data, ['foo' => 'Array']);
+		$v->each('foo', ['field' => 'numeric|min:6|max:14']);
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, $data, ['foo' => 'Array']);
+		$v->each('foo', ['field' => 'numeric|min:4|max:16']);
+		$this->assertTrue($v->passes());
+	}
+
+
+	public function testValidateEachWithNonArrayWithArrayRule()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, ['foo' => 'string'], ['foo' => 'Array']);
+		$v->each('foo', ['min:7|max:13']);
+		$this->assertFalse($v->passes());
+	}
+
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testValidateEachWithNonArrayWithoutArrayRule()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, ['foo' => 'string'], ['foo' => 'numeric']);
+		$v->each('foo', ['min:7|max:13']);
+		$this->assertFalse($v->passes());
 	}
 
 

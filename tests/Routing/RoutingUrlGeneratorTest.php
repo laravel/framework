@@ -205,4 +205,34 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
 	}
 
+
+	public function testForceRootUrl()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$url->forceRootUrl('https://www.bar.com');
+		$this->assertEquals('http://www.bar.com/foo/bar', $url->to('foo/bar'));
+
+
+		/**
+		 * Route Based...
+		 */
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$url->forceSchema('https');
+		$route = new Illuminate\Routing\Route(array('GET'), '/foo', array('as' => 'plain'));
+		$routes->add($route);
+
+		$this->assertEquals('https://www.foo.com/foo', $url->route('plain'));
+
+		$url->forceRootUrl('https://www.bar.com');
+		$this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
+	}
+
 }

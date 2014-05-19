@@ -1,11 +1,12 @@
 <?php namespace Illuminate\Support;
 
 use Countable;
+use JsonSerializable;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Support\Contracts\MessageProviderInterface;
 
-class MessageBag implements ArrayableInterface, Countable, JsonableInterface, MessageProviderInterface {
+class MessageBag implements ArrayableInterface, Countable, JsonableInterface, MessageProviderInterface, JsonSerializable {
 
 	/**
 	 * All of the registered messages.
@@ -268,6 +269,16 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	public function toArray()
 	{
 		return $this->getMessages();
+	}
+
+	/**
+	 * Convert the object into something JSON serializable.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->toArray();
 	}
 
 	/**

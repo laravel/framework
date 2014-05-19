@@ -98,7 +98,7 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile a create table command.
+	 * Compile an add column command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Illuminate\Support\Fluent  $command

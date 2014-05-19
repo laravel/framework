@@ -13,7 +13,14 @@ class EncryptionServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('encrypter', function($app)
 		{
-			return new Encrypter($app['config']['app.key']);
+			$encrypter =  new Encrypter($app['config']['app.key']);
+
+			if ($app['config']->has('app.cipher'))
+			{
+				$encrypter->setCipher($app['config']['app.cipher']);
+			}
+
+			return $encrypter;
 		});
 	}
 

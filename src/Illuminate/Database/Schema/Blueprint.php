@@ -526,7 +526,6 @@ class Blueprint {
 	 * @param  int|null	$total
 	 * @param  int|null $places
 	 * @return \Illuminate\Support\Fluent
-	 *
 	 */
 	public function double($column, $total = null, $places = null)
 	{
@@ -669,6 +668,8 @@ class Blueprint {
 		$this->unsignedInteger("{$name}_id");
 
 		$this->string("{$name}_type");
+
+		$this->index(array("{$name}_id", "{$name}_type"));
 	}
 
 	/**

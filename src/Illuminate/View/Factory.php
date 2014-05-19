@@ -6,7 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
 
-class Environment {
+class Factory {
 
 	/**
 	 * The engine implementation.
@@ -86,7 +86,7 @@ class Environment {
 	protected $renderCount = 0;
 
 	/**
-	 * Create a new view environment instance.
+	 * Create a new view factory instance.
 	 *
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
 	 * @param  \Illuminate\View\ViewFinderInterface  $finder

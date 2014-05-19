@@ -8,14 +8,14 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "filp/whoops": "1.0.10",
-        "illuminate/support": "4.1.*",
-        "symfony/http-foundation": "2.4.*",
-        "symfony/http-kernel": "2.4.*"
+        "php": ">=5.4.0",
+        "filp/whoops": "1.1.*",
+        "illuminate/support": "4.3.*",
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*"
     },
     "require-dev": {
-        "monolog/monolog": "1.*",
+        "monolog/monolog": "~1.6",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
     },
@@ -27,7 +27,7 @@
     "target-dir": "Illuminate/Exception",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

@@ -23,24 +23,19 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(' Taylor...', Str::words(' Taylor Otwell ', 1));
 	}
 
+
 	public function testStringTitle()
 	{
 		$this->assertEquals('Jefferson Costella', Str::title('jefferson costella'));
 		$this->assertEquals('Jefferson Costella', Str::title('jefFErson coSTella'));
 	}
 
+
 	public function testStringWithoutWordsDoesntProduceError()
 	{
 		$nbsp = chr(0xC2).chr(0xA0);
 		$this->assertEquals(' ', Str::words(' '));
 		$this->assertEquals($nbsp, Str::words($nbsp));
-	}
-
-
-	public function testStringMacros()
-	{
-		Illuminate\Support\Str::macro(__CLASS__, function() { return 'foo'; });
-		$this->assertEquals('foo', Str::SupportStrTest());
 	}
 
 

@@ -40,6 +40,13 @@ class FileViewFinder implements ViewFinderInterface {
 	protected $extensions = array('blade.php', 'php');
 
 	/**
+	 * Hint path delimiter value.
+	 *
+	 * @var string
+	 */
+	const HINT_PATH_DELIMITER = '::';
+
+	/**
 	 * Create a new file view loader instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -68,7 +75,7 @@ class FileViewFinder implements ViewFinderInterface {
 	{
 		if (isset($this->views[$name])) return $this->views[$name];
 
-		if (strpos($name, '::') !== false)
+		if ($this->hasHintInformation($name = trim($name)))
 		{
 			return $this->views[$name] = $this->findNamedPathView($name);
 		}
@@ -99,7 +106,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	protected function getNamespaceSegments($name)
 	{
-		$segments = explode('::', $name);
+		$segments = explode(static::HINT_PATH_DELIMITER, $name);
 
 		if (count($segments) != 2)
 		{
@@ -217,6 +224,17 @@ class FileViewFinder implements ViewFinderInterface {
 		}
 
 		array_unshift($this->extensions, $extension);
+	}
+
+	/**
+	 * Returns whether or not the view specify a hint information
+	 *
+	 * @param  string  $name
+	 * @return boolean
+	 */
+	public function hasHintInformation($name)
+	{
+		return strpos($name, static::HINT_PATH_DELIMITER) > 0;
 	}
 
 	/**

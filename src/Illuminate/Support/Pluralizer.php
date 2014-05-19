@@ -73,14 +73,21 @@ class Pluralizer {
 	 */
 	public static $irregular = array(
 		'child' => 'children',
+		'criterion' => 'criteria',
 		'foot' => 'feet',
 		'freshman' => 'freshmen',
 		'goose' => 'geese',
+		'genus' => 'genera',
 		'human' => 'humans',
 		'man' => 'men',
 		'move' => 'moves',
+		'nucleus' => 'nuclei',
 		'person' => 'people',
+		'radius' => 'radii',
 		'sex' => 'sexes',
+		'stimulus' => 'stimuli',
+		'syllabus' => 'syllabi',
+		'tax' => 'taxes',
 		'tooth' => 'teeth',
 	);
 

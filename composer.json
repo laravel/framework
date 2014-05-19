@@ -10,31 +10,31 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "classpreloader/classpreloader": "1.0.*",
-        "d11wtq/boris": "1.0.*",
-        "ircmaxell/password-compat": "1.0.*",
-        "filp/whoops": "1.0.10",
-        "jeremeamia/superclosure": "1.0.*",
-        "monolog/monolog": "1.*",
-        "nesbot/carbon": "1.*",
+        "php": ">=5.4.0",
+        "classpreloader/classpreloader": "~1.0",
+        "d11wtq/boris": "~1.0",
+        "ircmaxell/password-compat": "~1.0",
+        "filp/whoops": "1.1.*",
+        "jeremeamia/superclosure": "~1.0",
+        "monolog/monolog": "~1.6",
+        "nesbot/carbon": "~1.0",
         "patchwork/utf8": "1.1.*",
         "phpseclib/phpseclib": "0.3.*",
         "predis/predis": "0.8.*",
-        "stack/builder": "1.0.*",
-        "swiftmailer/swiftmailer": "~5.0",
-        "symfony/browser-kit": "2.4.*",
-        "symfony/console": "2.4.*",
-        "symfony/css-selector": "2.4.*",
-        "symfony/debug": "2.4.*",
-        "symfony/dom-crawler": "2.4.*",
-        "symfony/finder": "2.4.*",
-        "symfony/http-foundation": "2.4.*",
-        "symfony/http-kernel": "2.4.*",
-        "symfony/process": "2.4.*",
-        "symfony/routing": "2.4.*",
-        "symfony/security-core": "2.4.*",
-        "symfony/translation": "2.4.*"
+        "stack/builder": "~1.0",
+        "swiftmailer/swiftmailer": "~5.1",
+        "symfony/browser-kit": "2.5.*",
+        "symfony/console": "2.5.*",
+        "symfony/css-selector": "2.5.*",
+        "symfony/debug": "2.5.*",
+        "symfony/dom-crawler": "2.5.*",
+        "symfony/finder": "2.5.*",
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*",
+        "symfony/process": "2.5.*",
+        "symfony/routing": "2.5.*",
+        "symfony/security-core": "2.5.*",
+        "symfony/translation": "2.5.*"
     },
     "replace": {
         "illuminate/auth": "self.version",
@@ -66,9 +66,9 @@
         "illuminate/workbench": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "2.6.*",
-        "iron-io/iron_mq": "1.5.*",
-        "pda/pheanstalk": "2.1.*",
+        "aws/aws-sdk-php": "~2.6",
+        "iron-io/iron_mq": "~1.5",
+        "pda/pheanstalk": "~2.1",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
     },
@@ -85,7 +85,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "suggest": {

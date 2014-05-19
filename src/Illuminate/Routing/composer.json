@@ -8,18 +8,18 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/container": "4.1.*",
-        "illuminate/http": "4.1.*",
-        "illuminate/session": "4.1.*",
-        "illuminate/support": "4.1.*",
-        "symfony/http-foundation": "2.4.*",
-        "symfony/http-kernel": "2.4.*",
-        "symfony/routing": "2.4.*"
+        "php": ">=5.4.0",
+        "illuminate/container": "4.3.*",
+        "illuminate/http": "4.3.*",
+        "illuminate/session": "4.3.*",
+        "illuminate/support": "4.3.*",
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*",
+        "symfony/routing": "2.5.*"
     },
     "require-dev": {
-        "illuminate/console": "4.1.*",
-        "illuminate/filesystem": "4.1.*",
+        "illuminate/console": "4.3.*",
+        "illuminate/filesystem": "4.3.*",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
     },
@@ -31,7 +31,7 @@
     "target-dir": "Illuminate/Routing",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

@@ -5,11 +5,12 @@ use Countable;
 use ArrayAccess;
 use ArrayIterator;
 use CachingIterator;
+use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 
-class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface {
+class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface, JsonSerializable {
 
 	/**
 	 * The items contained in the collection.
@@ -340,18 +341,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		return array_reduce($this->items, $callback, $initial);
 	}
 
-    /**
-     * Get one or more items randomly from the collection.
-     *
-     * @param  int $amount
-     * @return mixed
-     */
-    public function random($amount = 1)
-    {
-        $keys = array_rand($this->items, $amount);
+	/**
+	 * Get one or more items randomly from the collection.
+	 *
+	 * @param  int $amount
+	 * @return mixed
+	 */
+	public function random($amount = 1)
+	{
+		$keys = array_rand($this->items, $amount);
 
-        return is_array($keys) ? array_intersect_key($this->items, array_flip($keys)) : $this->items[$keys];
-    }
+		return is_array($keys) ? array_intersect_key($this->items, array_flip($keys)) : $this->items[$keys];
+	}
 
 	/**
 	 * Reverse items order.
@@ -577,6 +578,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 			return $value instanceof ArrayableInterface ? $value->toArray() : $value;
 
 		}, $this->items);
+	}
+
+	/**
+	 * Convert the object into something JSON serializable.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->toArray();
 	}
 
 	/**

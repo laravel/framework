@@ -213,9 +213,7 @@ class Connection implements ConnectionInterface {
 	{
 		if ( ! is_null($callback)) return $callback;
 
-		$me = $this;
-
-		return function($line) use ($me) { $me->display($line); };
+		return function($line) { $this->display($line); };
 	}
 
 	/**

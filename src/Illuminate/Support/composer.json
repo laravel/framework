@@ -8,10 +8,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.4.0"
     },
     "require-dev": {
-        "jeremeamia/superclosure": "1.0.*",
+        "jeremeamia/superclosure": "~1.0",
         "patchwork/utf8": "1.1.*",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
@@ -27,7 +27,7 @@
     "target-dir": "Illuminate/Support",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

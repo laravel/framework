@@ -1,9 +1,11 @@
 <?php namespace Illuminate\Queue\Console;
 
 use Illuminate\Queue\Worker;
+use Illuminate\Queue\Jobs\Job;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class WorkCommand extends Command {
 
@@ -48,7 +50,7 @@ class WorkCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ($this->downForMaintenance()) return;
+		if ($this->downForMaintenance() && ! $this->option('daemon')) return;
 
 		$queue = $this->option('queue');
 
@@ -61,7 +63,68 @@ class WorkCommand extends Command {
 
 		$connection = $this->argument('connection');
 
-		$this->worker->pop($connection, $queue, $delay, $memory, $this->option('sleep'), $this->option('tries'));
+		$response = $this->runWorker(
+			$connection, $queue, $delay, $memory, $this->option('daemon')
+		);
+
+		// If a job was fired by the worker, we'll write the output out to the console
+		// so that the developer can watch live while the queue runs in the console
+		// window, which will also of get logged if stdout is logged out to disk.
+		if ( ! is_null($response['job']))
+		{
+			$this->writeOutput($response['job'], $response['failed']);
+		}
+	}
+
+	/**
+	 * Run the worker instance.
+	 *
+	 * @param  string  $connection
+	 * @param  string  $queue
+	 * @param  int  $delay
+	 * @param  int  $memory
+	 * @param  bool  $daemon
+	 * @return array
+	 */
+	protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
+	{
+		if ($daemon)
+		{
+			$this->worker->setDaemonExceptionHandler($this->laravel['exception']);
+
+			return $this->worker->daemon(
+				$connection, $queue, $delay, $memory,
+				$this->option('sleep'), $this->option('tries')
+			);
+		}
+		else
+		{
+			return $this->worker->pop(
+				$connection, $queue, $delay,
+				$this->option('sleep'), $this->option('tries')
+			);
+		}
+	}
+
+	/**
+	 * Write the status output for the queue worker.
+	 *
+	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  bool  $failed
+	 * @return void
+	 */
+	protected function writeOutput(Job $job, $failed)
+	{
+		$options = OutputInterface::OUTPUT_RAW;
+
+		if ($failed)
+		{
+			$this->output->writeln('<error>Failed:</error> '.$job->getName(), $options);
+		}
+		else
+		{
+			$this->output->writeln('<info>Processed:</info> '.$job->getName(), $options);
+		}
 	}
 
 	/**
@@ -97,6 +160,8 @@ class WorkCommand extends Command {
 	{
 		return array(
 			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'),
+
+			array('daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode'),
 
 			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
 

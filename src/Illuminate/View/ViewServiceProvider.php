@@ -1,6 +1,6 @@
 <?php namespace Illuminate\View;
 
-use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\CompilerEngine;
@@ -23,7 +23,7 @@ class ViewServiceProvider extends ServiceProvider {
 		// Once the other components have been registered we're ready to include the
 		// view environment and session binder. The session binder will bind onto
 		// the "before" application event and add errors into shared view data.
-		$this->registerEnvironment();
+		$this->registerFactory();
 
 		$this->registerSessionBinder();
 	}
@@ -35,9 +35,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerEngineResolver()
 	{
-		$me = $this;
-
-		$this->app->bindShared('view.engine.resolver', function($app) use ($me)
+		$this->app->bindShared('view.engine.resolver', function($app)
 		{
 			$resolver = new EngineResolver;
 
@@ -46,7 +44,7 @@ class ViewServiceProvider extends ServiceProvider {
 			// on the extension of view files. We call a method for each engines.
 			foreach (array('php', 'blade') as $engine)
 			{
-				$me->{'register'.ucfirst($engine).'Engine'}($resolver);
+				$this->{'register'.ucfirst($engine).'Engine'}($resolver);
 			}
 
 			return $resolver;
@@ -110,7 +108,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	public function registerEnvironment()
+	public function registerFactory()
 	{
 		$this->app->bindShared('view', function($app)
 		{
@@ -121,7 +119,7 @@ class ViewServiceProvider extends ServiceProvider {
 
 			$finder = $app['view.finder'];
 
-			$env = new Environment($resolver, $finder, $app['events']);
+			$env = new Factory($resolver, $finder, $app['events']);
 
 			// We will also set the container instance on this view environment since the
 			// view composers may be classes registered in the container, which allows
@@ -160,7 +158,7 @@ class ViewServiceProvider extends ServiceProvider {
 			// they don't have to continually run checks for the presence of errors.
 			else
 			{
-				$app['view']->share('errors', new MessageBag);
+				$app['view']->share('errors', new ViewErrorBag);
 			}
 		});
 	}

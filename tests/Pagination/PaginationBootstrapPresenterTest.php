@@ -90,7 +90,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 		$presenter->setCurrentPage(2);
 		$output = $presenter->getPrevious();
 
-		$this->assertEquals('<li><a href="http://foo.com?page=1">&laquo;</a></li>', $output);
+		$this->assertEquals('<li><a href="http://foo.com?page=1" rel="prev">&laquo;</a></li>', $output);
 	}
 
 
@@ -106,7 +106,7 @@ class PaginationBootstrapPresenterTest extends PHPUnit_Framework_TestCase {
 		$presenter->setCurrentPage(1);
 		$output = $presenter->getNext();
 
-		$this->assertEquals('<li><a href="http://foo.com?page=2">&raquo;</a></li>', $output);
+		$this->assertEquals('<li><a href="http://foo.com?page=2" rel="next">&raquo;</a></li>', $output);
 	}
 
 

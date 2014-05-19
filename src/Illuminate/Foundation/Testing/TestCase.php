@@ -326,7 +326,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		$this->assertSessionHas('errors');
 
-		$bindings = (array)$bindings;
+		$bindings = (array) $bindings;
 
 		$errors = $this->app['session.store']->get('errors');
 

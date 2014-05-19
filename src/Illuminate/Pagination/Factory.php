@@ -1,10 +1,10 @@
 <?php namespace Illuminate\Pagination;
 
 use Illuminate\Http\Request;
-use Illuminate\View\Environment as ViewEnvironment;
+use Illuminate\View\Factory as ViewFactory;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class Environment {
+class Factory {
 
 	/**
 	 * The request instance.
@@ -14,9 +14,9 @@ class Environment {
 	protected $request;
 
 	/**
-	 * The view environment instance.
+	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Environment
+	 * @var \Illuminate\View\Factory
 	 */
 	protected $view;
 
@@ -63,15 +63,15 @@ class Environment {
 	protected $pageName;
 
 	/**
-	 * Create a new pagination environment.
+	 * Create a new pagination factory.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Illuminate\View\Environment  $view
+	 * @param  \Illuminate\View\Factory  $view
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
 	 * @return void
 	 */
-	public function __construct(Request $request, ViewEnvironment $view, TranslatorInterface $trans, $pageName = 'page')
+	public function __construct(Request $request, ViewFactory $view, TranslatorInterface $trans, $pageName = 'page')
 	{
 		$this->view = $view;
 		$this->trans = $trans;
@@ -95,10 +95,10 @@ class Environment {
 	 *
 	 * @param  array  $items
 	 * @param  int    $total
-	 * @param  int    $perPage
+	 * @param  int|null  $perPage
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function make(array $items, $total, $perPage)
+	public function make(array $items, $total, $perPage = null)
 	{
 		$paginator = new Paginator($this, $items, $total, $perPage);
 
@@ -256,22 +256,22 @@ class Environment {
 	}
 
 	/**
-	 * Get the current view driver.
+	 * Get the current view factory.
 	 *
-	 * @return \Illuminate\View\Environment
+	 * @return \Illuminate\View\Factory
 	 */
-	public function getViewDriver()
+	public function getViewFactory()
 	{
 		return $this->view;
 	}
 
 	/**
-	 * Set the current view driver.
+	 * Set the current view factory.
 	 *
-	 * @param  \Illuminate\View\Environment  $view
+	 * @param  \Illuminate\View\Factory  $view
 	 * @return void
 	 */
-	public function setViewDriver(ViewEnvironment $view)
+	public function setViewFactory(ViewFactory $view)
 	{
 		$this->view = $view;
 	}

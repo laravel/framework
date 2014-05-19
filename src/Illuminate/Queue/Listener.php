@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue;
 
+use Closure;
 use Symfony\Component\Process\Process;
 
 class Listener {
@@ -40,16 +41,21 @@ class Listener {
 	protected $workerCommand = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
 
 	/**
+	 * The output handler callback.
+	 *
+	 * @var \Closure|null
+	 */
+	protected $outputHandler;
+
+	/**
 	 * Create a new queue listener.
 	 *
 	 * @param  string  $commandPath
-	 * @param  string  $environment
 	 * @return void
 	 */
-	public function __construct($commandPath, $environment = null)
+	public function __construct($commandPath)
 	{
 		$this->commandPath = $commandPath;
-		$this->environment = $environment;
 	}
 
 	/**
@@ -81,7 +87,10 @@ class Listener {
 	 */
 	public function runProcess(Process $process, $memory)
 	{
-		$process->run();
+		$process->run(function($type, $line)
+		{
+			$this->handleWorkerOutput($type, $line);
+		});
 
 		// Once we have run the job we'll go check if the memory limit has been
 		// exceeded for the script. If it has, we will kill this script so a
@@ -126,6 +135,21 @@ class Listener {
 	}
 
 	/**
+	 * Handle output from the worker process.
+	 *
+	 * @param  int  $type
+	 * @param  string  $line
+	 * @return void
+	 */
+	protected function handleWorkerOutput($type, $line)
+	{
+		if (isset($this->outputHandler))
+		{
+			call_user_func($this->outputHandler, $type, $line);
+		}
+	}
+
+	/**
 	 * Determine if the memory limit has been exceeded.
 	 *
 	 * @param  int   $memoryLimit
@@ -144,6 +168,17 @@ class Listener {
 	public function stop()
 	{
 		die;
+	}
+
+	/**
+	 * Set the output handler callback.
+	 *
+	 * @param  \Closure  $outputHandler
+	 * @return void
+	 */
+	public function setOutputHandler(Closure $outputHandler)
+	{
+		$this->outputHandler = $outputHandler;
 	}
 
 	/**
