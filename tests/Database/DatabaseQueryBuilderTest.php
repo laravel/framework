@@ -20,6 +20,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBasicTableWrappingProtectsQuotationMarks()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('some"table');
+		$this->assertEquals('select * from "some""table"', $builder->toSql());
+	}
+
+
 	public function testAddingSelects()
 	{
 		$builder = $this->getBuilder();
@@ -124,6 +132,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$this->assertEquals('select * from "users" where "id" = ?', $builder->toSql());
 		$this->assertEquals(array(0 => 1), $builder->getBindings());
+	}
+
+
+	public function testMySqlWrappingProtectsQuotationMarks()
+	{
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->From('some`table');
+		$this->assertEquals('select * from `some``table`', $builder->toSql());
 	}
 
 
