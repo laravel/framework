@@ -104,7 +104,8 @@
 		{"message": "Added 'Auth::id' method to just get the authenticate user ID from the session / recaller cookie.", "backport": null},
 		{"message": "New 'Input::exists' function for checking for the mere presence of input items.", "backport": null},
 		{"message": "New system for invalidating remember me cookies on logout.", "backport": null},
-		{"message": "Iron queue now accepts ssl_verifypeer configuration option.", "backport": null}
+		{"message": "Iron queue now accepts ssl_verifypeer configuration option.", "backport": null},
+		{"message": "Make column quoting more robust for greater security when passing an array of user input into update methods.", "backport": null}
 	],
 	"4.0.*": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},
