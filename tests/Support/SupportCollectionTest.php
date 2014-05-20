@@ -381,6 +381,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(2, 1), $c->lists('id'));
 	}
 
+	public function testPullRetrievesItemFromCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+
+		$this->assertEquals('foo', $c->pull(0));
+	}
+
+	public function testPullRemovesItemFromCollection()
+	{
+		$c = new Collection(array('foo', 'bar'));
+		
+		$c->pull(0);
+
+		$this->assertEquals(array(1 => 'bar'), $c->all());
+	}
+
 }
 
 class TestAccessorEloquentTestStub

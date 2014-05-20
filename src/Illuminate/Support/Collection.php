@@ -317,6 +317,20 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Pulls an item from the collection.
+	 *
+	 * @param mixed $key
+	 * @return mixed
+	 */
+	public function pull($key)
+	{
+		$value = $this->get($key);
+
+		$this->forget($key);
+		return $value;
+	}
+
+	/**
 	 * Put an item in the collection by key.
 	 *
 	 * @param  mixed  $key
