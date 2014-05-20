@@ -319,14 +319,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Pulls an item from the collection.
 	 *
-	 * @param mixed $key
+	 * @param  mixed  $key
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function pull($key)
+	public function pull($key, $default = null)
 	{
-		$value = $this->get($key);
+		$value = $this->get($key, $default);
 
 		$this->forget($key);
+
 		return $value;
 	}
 

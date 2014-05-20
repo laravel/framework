@@ -391,10 +391,19 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testPullRemovesItemFromCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
-		
+
 		$c->pull(0);
 
 		$this->assertEquals(array(1 => 'bar'), $c->all());
+	}
+
+	public function testPullReturnsDefault()
+	{
+		$c = new Collection(array());
+
+		$value = $c->pull(0, 'foo');
+
+		$this->assertEquals('foo', $value);
 	}
 
 }
