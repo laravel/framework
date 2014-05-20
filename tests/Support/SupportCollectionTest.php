@@ -381,6 +381,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(2, 1), $c->lists('id'));
 	}
 
+
+	public function testPullReturnsAndRemovesInCollection()
+	{
+		$c = new Collection(array('foo' => 'fooValue', 'bar' => 'barValue', 'baz' => 'bazValue'));
+		$item = $c->pull('foo');
+		$nonexistentItem = $c->pull('foobar');
+		$nonexistentItemDefaultValue = $c->pull('foobar', 'missing');
+
+		$this->assertEquals('fooValue', $item);
+		$this->assertEquals(null, $nonexistentItem);
+		$this->assertEquals('missing', $nonexistentItemDefaultValue);
+		$this->assertEquals(array('bar' => 'barValue', 'baz' => 'bazValue'), $c->toArray());
+	}
+
 }
 
 class TestAccessorEloquentTestStub
