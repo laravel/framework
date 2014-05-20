@@ -325,11 +325,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function pull($key, $default = null)
 	{
-		$value = $this->get($key, $default);
-
-		$this->forget($key);
-
-		return $value;
+		return array_pull($this->items, $key, $default);
 	}
 
 	/**
