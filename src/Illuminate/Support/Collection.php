@@ -306,6 +306,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Get an value from the collection, and remove it.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	public function pull($key, $default = null)
+	{
+		return array_pull($this->items, $key, $default);
+	}
+
+	/**
 	 * Push an item onto the end of the collection.
 	 *
 	 * @param  mixed  $value
