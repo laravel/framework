@@ -29,7 +29,7 @@
         "symfony/debug": "2.5.*",
         "symfony/dom-crawler": "2.5.*",
         "symfony/finder": "2.5.*",
-        "symfony/http-foundation": "2.5.*",
+        "symfony/http-foundation": "2.4.*@stable",
         "symfony/http-kernel": "2.5.*",
         "symfony/process": "2.5.*",
         "symfony/routing": "2.5.*",
