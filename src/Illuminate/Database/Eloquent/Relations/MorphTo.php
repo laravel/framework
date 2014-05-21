@@ -157,7 +157,7 @@ class MorphTo extends BelongsTo {
 	{
 		$instance = $this->createModelByType($type);
 
-		if ($this->withTrashed)
+		if ($this->withTrashed && $instance->query()->getMacro('withTrashed') !== null)
 		{
 			$instance = $instance->withTrashed();
 		}
