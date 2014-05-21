@@ -48,7 +48,7 @@ class HtmlBuilder {
 	}
 
 	/**
-	 * Generate a link to a JavaScript file.
+	 * Generate (a) link(s) to a JavaScript file(s).
 	 *
 	 * @param  string  $url
 	 * @param  array   $attributes
@@ -57,6 +57,10 @@ class HtmlBuilder {
 	 */
 	public function script($url, $attributes = array(), $secure = null)
 	{
+		if (is_array($url))
+		{
+			return $this->melements($url, $attributes, $secure, 'script');
+		}
 		$attributes['src'] = $this->url->asset($url, $secure);
 
 		return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
@@ -72,6 +76,10 @@ class HtmlBuilder {
 	 */
 	public function style($url, $attributes = array(), $secure = null)
 	{
+		if (is_array($url))
+		{
+			return $this->melements($url, $attributes, $secure, 'style');
+		}
 		$defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
 
 		$attributes = $attributes + $defaults;
@@ -93,6 +101,11 @@ class HtmlBuilder {
 	public function image($url, $alt = null, $attributes = array(), $secure = null)
 	{
 		$attributes['alt'] = $alt;
+
+		if (is_array($url))
+		{
+			return $this->melements($url, $attributes, $secure, 'image');
+		}
 
 		return '<img src="'.$this->url->asset($url, $secure).'"'.$this->attributes($attributes).'>';
 	}
@@ -374,6 +387,41 @@ class HtmlBuilder {
 		}
 
 		return $safe;
+	}
+
+	/**
+	 * Returns multiple elements with the specified URLs and attribute sets. The elements are create with the specified
+	 * function.
+	 *
+	 * @param array $urls urls to load
+	 * @param array $attributes to bind to elements
+	 * @param bool $secure true if secure
+	 * @param string $func function name to create elements with
+	 * @return array of elements
+	 */
+	protected function melements($urls = array(), $attributes = array(), $secure = null, $func) {
+		$elements = array();
+		foreach ($urls as $url)
+		{
+			$result;
+			if ($func == 'image')
+			{
+				if (isset($attributes['alt']))
+				{
+					$result = $this->$func($url, $attributes['alt'], $attributes, $secure);
+				}
+				else
+				{
+					$result = $this->$func($url, null, $attributes, $secure);
+				}
+			}
+			else
+			{
+				$result = $this->$func($url, $attributes, $secure);
+			}
+			array_push($elements, $result);
+		}
+		return implode(PHP_EOL, $elements);
 	}
 
 }
