@@ -9,12 +9,12 @@
     ],
     "require": {
         "php": ">=5.3.0",
+        "illuminate/filesystem": "4.1.*",
         "illuminate/support": "4.1.*",
         "phpseclib/phpseclib": "0.3.*"
     },
     "require-dev": {
         "illuminate/console": "4.1.*",
-        "illuminate/filesystem": "4.1.*",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.0.*"
     },
