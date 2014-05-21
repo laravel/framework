@@ -1072,7 +1072,7 @@ class Validator implements MessageProviderInterface {
 	  */
 	protected function validateDomain($attribute,$value)
 	{
-		return preg_match('/^ (?: [a-z0-9] (?:[a-z0-9\-]* [a-z0-9])? \. )*[a-z0-9] (?:[a-z0-9\-]* [a-z0-9])?\. [a-z]{2,6} $/ix', $value)
+		return preg_match('/^ (?: [a-z0-9] (?:[a-z0-9\-]* [a-z0-9])? \. )*[a-z0-9] (?:[a-z0-9\-]* [a-z0-9])?\. [a-z]{2,6} $/ix', $value);
 	}
 
 	/**
