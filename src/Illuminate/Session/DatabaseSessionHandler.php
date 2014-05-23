@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Session;
 
+use Illuminate\Database\Connection;
+
 class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAwareInterface {
 
 	/**
@@ -63,11 +65,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAware
 		{
 			$this->exists = true;
 
-			$session = unserialize($session);
-
-			$session['data'] = base64_decode($data);
-
-			return serialize($session);
+			return base64_decode($session->payload);
 		}
 	}
 
