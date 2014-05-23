@@ -596,7 +596,11 @@ class BelongsToMany extends Relation {
 			$changes, $this->attachNew($records, $current, false)
 		);
 
-		$this->touchIfTouching();
+		// Only going to touch if something was attached or updated
+		if (count($changes['attached']) || count($changes['updated']))
+		{
+			$this->touchIfTouching();
+		}
 
 		return $changes;
 	}
