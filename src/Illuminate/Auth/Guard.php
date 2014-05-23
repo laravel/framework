@@ -72,6 +72,13 @@ class Guard {
 	protected $loggedOut = false;
 
 	/**
+	 * Indicates if a token user retrieval has been attempted.
+	 *
+	 * @var bool
+	 */
+	protected $tokenRetrievalAttempted = false;
+
+	/**
 	 * Create a new authentication guard.
 	 *
 	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
@@ -169,8 +176,10 @@ class Guard {
 	 */
 	protected function getUserByRecaller($recaller)
 	{
-		if ($this->validRecaller($recaller))
+		if ($this->validRecaller($recaller) && ! $this->tokenRetrievalAttempted)
 		{
+			$this->tokenRetrievalAttempted = true;
+
 			list($id, $token) = explode('|', $recaller, 2);
 
 			$this->viaRemember = ! is_null($user = $this->provider->retrieveByToken($id, $token));
