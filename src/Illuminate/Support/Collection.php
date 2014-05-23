@@ -723,7 +723,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
   	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return array
 	 */
-	private function getArrayableItems($items)
+	protected function getArrayableItems($items)
 	{
 		if ($items instanceof Collection)
 		{
