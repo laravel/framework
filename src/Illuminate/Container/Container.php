@@ -165,7 +165,7 @@ class Container implements ArrayAccess {
 	 * @param  string               $abstract
 	 * @param  Closure|string|null  $concrete
 	 * @param  bool                 $shared
-	 * @return bool
+	 * @return void
 	 */
 	public function bindIf($abstract, $concrete = null, $shared = false)
 	{
