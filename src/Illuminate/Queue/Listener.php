@@ -38,7 +38,7 @@ class Listener {
 	 *
 	 * @var string
 	 */
-	protected $workerCommand = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
+	protected $workerCommand = '"'.PHP_BINARY.'" artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
 
 	/**
 	 * The output handler callback.

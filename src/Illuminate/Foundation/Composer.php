@@ -66,7 +66,7 @@ class Composer {
 	{
 		if ($this->files->exists($this->workingPath.'/composer.phar'))
 		{
-			return 'php composer.phar';
+			return '"'.PHP_BINARY.'" composer.phar';
 		}
 
 		return 'composer';
