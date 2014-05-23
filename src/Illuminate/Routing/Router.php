@@ -1508,6 +1508,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Alias for the "currentRouteNamed" method.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function is($name)
+	{
+		return $this->currentRouteNamed($name);
+	}
+
+	/**
 	 * Determine if the current route matches a given name.
 	 *
 	 * @param  string  $name
@@ -1528,6 +1539,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		$action = $this->current()->getAction();
 
 		return isset($action['controller']) ? $action['controller'] : null;
+	}
+
+	/**
+	 * Alias for the "currentRouteUses" method.
+	 *
+	 * @param  string  $action
+	 * @return bool
+	 */
+	public function isAction($action)
+	{
+		return $this->currentRouteUses($action);
 	}
 
 	/**
