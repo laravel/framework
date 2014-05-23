@@ -1510,12 +1510,20 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Alias for the "currentRouteNamed" method.
 	 *
-	 * @param  string  $name
+	 * @param  dynamic  string
 	 * @return bool
 	 */
-	public function is($name)
+	public function is()
 	{
-		return $this->currentRouteNamed($name);
+		foreach (func_get_args() as $pattern)
+		{
+			if (str_is($pattern, $this->currentRouteName()))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -1544,12 +1552,20 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Alias for the "currentRouteUses" method.
 	 *
-	 * @param  string  $action
+	 * @param  dynamic  string
 	 * @return bool
 	 */
-	public function isAction($action)
+	public function isAction()
 	{
-		return $this->currentRouteUses($action);
+		foreach (func_get_args() as $pattern)
+		{
+			if (str_is($pattern, $this->currentRouteAction()))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
