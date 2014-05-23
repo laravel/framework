@@ -5,13 +5,6 @@ use Illuminate\Database\Query\Builder;
 class MySqlGrammar extends Grammar {
 
 	/**
-	 * The keyword identifier wrapper format.
-	 *
-	 * @var string
-	 */
-	protected $wrapper = '`%s`';
-
-	/**
 	 * The components that make up a select clause.
 	 *
 	 * @var array
@@ -97,6 +90,19 @@ class MySqlGrammar extends Grammar {
 		}
 
 		return rtrim($sql);
+	}
+
+	/**
+	 * Wrap a single string in keyword identifiers.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function wrapValue($value)
+	{
+		if ($value === '*') return $value;
+
+		return '`'.str_replace('`', '``', $value).'`';
 	}
 
 }

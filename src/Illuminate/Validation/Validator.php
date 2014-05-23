@@ -1531,7 +1531,7 @@ class Validator implements MessageProviderInterface {
 		// used as default versions of the attribute's displayable names.
 		else
 		{
-			return str_replace('_', ' ', $attribute);
+			return str_replace('_', ' ', snake_case($attribute));
 		}
 	}
 
