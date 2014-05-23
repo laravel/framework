@@ -140,7 +140,7 @@ class RemoteManager {
 	 */
 	protected function getAuth(array $config)
 	{
-		if ((isset($config['agent']) && $config['agent'] === true) || (isset($this->auth['key']) && $this->auth['key'] === true))
+		if (isset($config['agent']) && $config['agent'] === true)
 		{
 			return array('agent' => true);
 		}
