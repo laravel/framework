@@ -57,6 +57,7 @@
         "illuminate/pagination": "self.version",
         "illuminate/queue": "self.version",
         "illuminate/redis": "self.version",
+        "illuminate/remote": "self.version",
         "illuminate/routing": "self.version",
         "illuminate/session": "self.version",
         "illuminate/support": "self.version",
