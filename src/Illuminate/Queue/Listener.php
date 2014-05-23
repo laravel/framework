@@ -38,7 +38,7 @@ class Listener {
 	 *
 	 * @var string
 	 */
-	protected $workerCommand = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
+	protected $workerCommand;
 
 	/**
 	 * The output handler callback.
@@ -56,6 +56,7 @@ class Listener {
 	public function __construct($commandPath)
 	{
 		$this->commandPath = $commandPath;
+		$this->workerCommand =  '"'.PHP_BINARY.'" artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
 	}
 
 	/**
