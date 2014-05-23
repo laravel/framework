@@ -194,6 +194,8 @@ class Store implements SessionInterface {
 	{
 		if ($destroy) $this->handler->destroy($this->getId());
 
+		$this->setExists(false);
+
 		$this->id = $this->generateSessionId(); return true;
 	}
 
@@ -567,6 +569,20 @@ class Store implements SessionInterface {
 	public function regenerateToken()
 	{
 		$this->put('_token', str_random(40));
+	}
+
+	/**
+	 * Set the existence of the session on the handler if applicable.
+	 *
+	 * @param  bool  $value
+	 * @return void
+	 */
+	public function setExists($value)
+	{
+		if ($this->handler instanceof ExistenceAwareInterface)
+		{
+			$this->handler->setExists($value);
+		}
 	}
 
 	/**
