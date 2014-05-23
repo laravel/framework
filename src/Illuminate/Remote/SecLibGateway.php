@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Remote;
 
-use Net_SFTP, Crypt_RSA;
 use Illuminate\Filesystem\Filesystem;
+use Net_SFTP, Crypt_RSA, System_SSH_Agent;
 
 class SecLibGateway implements GatewayInterface {
 
@@ -168,15 +168,17 @@ class SecLibGateway implements GatewayInterface {
 	/**
 	 * Get the authentication object for login.
 	 *
-	 * @return \Crypt_RSA|string
+	 * @return \Crypt_RSA|\System_SSH_Agent|string
 	 * @throws \InvalidArgumentException
 	 */
 	protected function getAuthForLogin()
 	{
+		if ($this->useAgent()) return $this->getAgent();
+
 		// If a "key" was specified in the auth credentials, we will load it into a
 		// secure RSA key instance, which will be used to connect to the servers
 		// in place of a password, and avoids the developer specifying a pass.
-		if ($this->hasRsaKey())
+		elseif ($this->hasRsaKey())
 		{
 			return $this->loadRsaKey($this->auth);
 		}
@@ -241,6 +243,26 @@ class SecLibGateway implements GatewayInterface {
 		with($key = $this->getNewKey())->setPassword(array_get($auth, 'keyphrase'));
 
 		return $key;
+	}
+
+	/**
+	 * Determine if the SSH Agent should provide an RSA key.
+	 *
+	 * @return bool
+	 */
+	protected function useAgent()
+	{
+		return isset($this->auth['agent']) && $this->auth['agent'] === true;
+	}
+
+	/**
+	 * Get a new SSH Agent instance.
+	 *
+	 * @return \System_SSH_Agent
+	 */
+	public function getAgent()
+	{
+		return new System_SSH_Agent;
 	}
 
 	/**

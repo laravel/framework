@@ -552,7 +552,7 @@ class Connection implements ConnectionInterface {
 		// lot more helpful to the developer instead of just the database's errors.
 		catch (\Exception $e)
 		{
-			throw new QueryException($query, $bindings, $e);
+			throw new QueryException($query, $this->prepareBindings($bindings), $e);
 		}
 
 		// Once we have run the query we will calculate the time that it took to run and
