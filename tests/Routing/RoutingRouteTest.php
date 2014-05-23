@@ -651,6 +651,14 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
 		$this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
+
+		$router = $this->getRouter();
+		$router->resource('foo', 'FooController', array('create' => 'make', 'edit' => 'change'));
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();
+
+		$this->assertEquals('foo/make', $routes[1]->getUri());
+		$this->assertEquals('foo/{foo}/change', $routes[4]->getUri());
 	}
 
 

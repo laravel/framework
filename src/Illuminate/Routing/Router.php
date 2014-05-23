@@ -545,8 +545,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addResourceCreate($name, $base, $controller, $options)
 	{
 		$action = $this->getResourceAction($name, $controller, 'create', $options);
+		$segment = '/'.(isset($options['create']) ? $options['create'] : 'create');
 
-		return $this->get($this->getResourceUri($name).'/create', $action);
+		return $this->get($this->getResourceUri($name).$segment, $action);
 	}
 
 	/**
@@ -592,7 +593,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addResourceEdit($name, $base, $controller, $options)
 	{
-		$uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
+		$segment = isset($options['edit']) ? $options['edit'] : 'edit';
+		$uri = $this->getResourceUri($name).'/{'.$base.'}/'.$segment;
 
 		return $this->get($uri, $this->getResourceAction($name, $controller, 'edit', $options));
 	}
