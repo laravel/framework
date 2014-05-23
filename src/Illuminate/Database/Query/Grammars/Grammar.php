@@ -6,13 +6,6 @@ use Illuminate\Database\Grammar as BaseGrammar;
 class Grammar extends BaseGrammar {
 
 	/**
-	 * The keyword identifier wrapper format.
-	 *
-	 * @var string
-	 */
-	protected $wrapper = '"%s"';
-
-	/**
 	 * The components that make up a select clause.
 	 *
 	 * @var array
