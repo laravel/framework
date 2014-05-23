@@ -223,4 +223,67 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		array_values(array_sort($array, function($v) { return $v['name']; })));
 	}
 
+
+	public function testDataGetWithArrayAndDotNotation()
+	{
+		$array = array(
+			'user' => array(
+				'id' => 1,
+				'name' => array(
+					'first' => 'foo',
+				),
+			),
+		);
+
+		$this->assertEquals(1, data_get($array, 'user.id'));
+		$this->assertEquals('foo', data_get($array, 'user.name.first'));
+		$this->assertEquals(null, data_get($array, 'post'));
+		$this->assertEquals(null, data_get($array, 'user.age'));
+	}
+
+
+	public function testDataGetWithObjectAndDotNotation()
+	{
+		$object = new StdClass();
+		$object->user = new StdClass();
+		$object->user->id = 1;
+		$object->user->name = new StdClass();
+		$object->user->name->first = 'foo';
+
+		$this->assertEquals(1, data_get($object, 'user.id'));
+		$this->assertEquals('foo', data_get($object, 'user.name.first'));
+		$this->assertEquals(null, data_get($object, 'post'));
+		$this->assertEquals(null, data_get($object, 'user.age'));
+	}
+
+
+	public function testDataGetWithInvalidArgument()
+	{
+		$this->setExpectedException('InvalidArgumentException', 'Array or object must be passed to data_get.');
+		$this->assertEquals(null, data_get('foo', 'bar'));
+	}
+
+
+	public function testDataGetWithMixedArrayAndObject()
+	{
+		$object = new StdClass();
+		$object->name = 'foo';
+
+		$array = array(
+			'user' => $object,
+		);
+
+		$this->assertEquals(null, data_get($array, 'user.name'));
+	}
+
+
+	public function testDataGetWithMixedObjectAndArray()
+	{
+		$object = new StdClass();
+		$object->user = array(
+			'name' => 'foo',
+		);
+
+		$this->assertEquals(null, data_get($object, 'user.name'));
+	}
 }
