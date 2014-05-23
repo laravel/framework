@@ -377,7 +377,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Search the collection for a given item and returns the corresponding key if successful
+	 * Search the collection for a given value and return the corresponding key if successful.
 	 *
 	 * @param  mixed  $value
 	 * @param  bool   $strict
