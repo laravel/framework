@@ -12,9 +12,6 @@
         "illuminate/support": "4.2.*",
         "symfony/security-core": "2.5.*"
     },
-    "require-dev": {
-        "phpunit/phpunit": "4.0.*"
-    },
     "autoload": {
         "psr-0": {
             "Illuminate\\Encryption": ""

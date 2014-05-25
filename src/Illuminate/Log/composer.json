@@ -13,9 +13,7 @@
         "monolog/monolog": "~1.6"
     },
     "require-dev": {
-        "illuminate/events": "4.2.*",
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "4.0.*"
+        "illuminate/events": "4.2.*"
     },
     "autoload": {
         "psr-0": {
