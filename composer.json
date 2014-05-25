@@ -71,7 +71,7 @@
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~2.1",
         "mockery/mockery": "~0.9",
-        "phpunit/phpunit": "~4.0"
+        "phpunit/phpunit": "~4.1"
     },
     "autoload": {
         "classmap": [
@@ -86,7 +86,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "suggest": {
