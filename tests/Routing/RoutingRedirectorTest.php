@@ -32,6 +32,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 		$this->redirect->setSession($this->session);
 	}
 
+
 	public function tearDown()
 	{
 		m::close();
@@ -47,6 +48,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(302, $response->getStatusCode());
 		$this->assertEquals($this->session, $response->getSession());
 	}
+
 
 	public function testComplexRedirectTo()
 	{
@@ -69,6 +71,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foo.com/login', $response->getTargetUrl());
 	}
 
+
 	public function testIntendedRedirectToIntendedUrlInSession()
 	{
 		$this->session->shouldReceive('get')->with('url.intended', '/')->andReturn('http://foo.com/bar');
@@ -78,6 +81,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
 	}
+
 
 	public function testIntendedWithoutIntendedUrlInSession()
 	{

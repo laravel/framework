@@ -51,10 +51,12 @@ class ControllerDispatcherTestControllerStub extends Controller {
 		$_SERVER['ControllerDispatcherTestControllerStub'] = __FUNCTION__;
 	}
 
+
 	public function getIndex()
 	{
 		return __FUNCTION__;
 	}
+
 
 	public function getFoo()
 	{

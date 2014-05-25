@@ -23,11 +23,13 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(' Taylor...', Str::words(' Taylor Otwell ', 1));
 	}
 
+
 	public function testStringTitle()
 	{
 		$this->assertEquals('Jefferson Costella', Str::title('jefferson costella'));
 		$this->assertEquals('Jefferson Costella', Str::title('jefFErson coSTella'));
 	}
+
 
 	public function testStringWithoutWordsDoesntProduceError()
 	{
