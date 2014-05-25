@@ -19,9 +19,7 @@
     },
     "require-dev": {
         "illuminate/console": "4.3.*",
-        "illuminate/filesystem": "4.3.*",
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "4.0.*"
+        "illuminate/filesystem": "4.3.*"
     },
     "autoload": {
         "psr-0": {

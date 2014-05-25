@@ -19,9 +19,7 @@
         "illuminate/events": "4.3.*",
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",
-        "pda/pheanstalk": "~2.1",
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "4.0.*"
+        "pda/pheanstalk": "~2.1"
     },
     "autoload": {
         "psr-0": {
