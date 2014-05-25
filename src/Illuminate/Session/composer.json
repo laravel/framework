@@ -18,9 +18,7 @@
         "symfony/http-foundation": "2.5.*"
     },
     "require-dev": {
-        "illuminate/console": "4.2.*",
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "4.0.*"
+        "illuminate/console": "4.2.*"
     },
     "autoload": {
         "psr-0": {
