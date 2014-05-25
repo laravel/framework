@@ -1551,7 +1551,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  dynamic  string
 	 * @return bool
 	 */
-	public function isAction()
+	public function uses()
 	{
 		foreach (func_get_args() as $pattern)
 		{
