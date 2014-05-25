@@ -377,6 +377,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Search the collection for a given value and return the corresponding key if successful.
+	 *
+	 * @param  mixed  $value
+	 * @param  bool   $strict
+	 * @return mixed
+	 */
+	public function search($value, $strict = false)
+	{
+		return array_search($value, $this->items, $strict);
+	}
+
+	/**
 	 * Get and remove the first item from the collection.
 	 *
 	 * @return mixed|null
@@ -711,7 +723,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
   	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
 	 * @return array
 	 */
-	private function getArrayableItems($items)
+	protected function getArrayableItems($items)
 	{
 		if ($items instanceof Collection)
 		{
