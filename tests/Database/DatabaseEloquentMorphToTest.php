@@ -82,12 +82,12 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase {
 	{
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
-		
+
 		$relation = $this->getRelationAssociate($parent);
-		
+
 		$associate = m::mock('Illuminate\Database\Eloquent\Model');
 		$associate->shouldReceive('getKey')->once()->andReturn(1);
-		
+
 		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 		$parent->shouldReceive('setAttribute')->once()->with('morph_type', get_class($associate));
 		$parent->shouldReceive('setRelation')->once()->with('relation', $associate);

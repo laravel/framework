@@ -50,6 +50,7 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Illuminate\Queue\Jobs\BeanstalkdJob', $result);
 	}
 
+
 	public function testDeleteProperlyRemoveJobsOffBeanstalkd()
 	{
 		$queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk_Pheanstalk'), 'default', 60);

@@ -11,6 +11,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $c->first());
 	}
 
+
 	public function testLastReturnsLastItemInCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
@@ -300,6 +301,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo'), $collection->all());
 	}
 
+
 	public function testSplice()
 	{
 		$data = new Collection(array('foo', 'baz'));
@@ -316,6 +318,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('baz'), $cut->all());
 	}
 
+
 	public function testGetListValueWithAccessors()
 	{
 		$model    = new TestAccessorEloquentTestStub(array('some' => 'foo'));
@@ -324,6 +327,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
 	}
+
 
 	public function testTransform()
 	{
@@ -348,6 +352,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('default', $result);
 	}
 
+
 	public function testGroupByAttribute()
 	{
 		$data = new Collection(array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2'), array('rating' => 2, 'name' => '3')));
@@ -365,11 +370,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(100, $c->sum(function($i) { return $i->foo; }));
 	}
 
+
 	public function testGettingSumFromEmptyCollection()
 	{
 		$c = new Collection();
 		$this->assertEquals(0, $c->sum('foo'));
 	}
+
 
 	public function testValueRetrieverAcceptsDotNotation()
 	{
@@ -381,12 +388,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(2, 1), $c->lists('id'));
 	}
 
+
 	public function testPullRetrievesItemFromCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
 
 		$this->assertEquals('foo', $c->pull(0));
 	}
+
 
 	public function testPullRemovesItemFromCollection()
 	{
@@ -396,6 +405,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(array(1 => 'bar'), $c->all());
 	}
+
 
 	public function testPullReturnsDefault()
 	{
@@ -417,6 +427,7 @@ class TestAccessorEloquentTestStub
 		$this->attributes = $attributes;
 	}
 
+
 	public function __get($attribute)
 	{
 		$accessor = 'get' .lcfirst($attribute). 'Attribute';
@@ -426,6 +437,7 @@ class TestAccessorEloquentTestStub
 
 		return $this->$attribute;
 	}
+
 
 	public function getSomeAttribute()
 	{
