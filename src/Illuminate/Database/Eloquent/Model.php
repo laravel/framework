@@ -2802,6 +2802,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Unset the connection resolver for models.
+	 *
+	 * @return void
+	 */
+	public static function unsetConnectionResolver()
+	{
+		static::$resolver = null;
+	}
+
+	/**
 	 * Get the event dispatcher instance.
 	 *
 	 * @return \Illuminate\Events\Dispatcher
