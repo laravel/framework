@@ -1230,6 +1230,23 @@ class Validator implements MessageProviderInterface {
 
 		return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
 	}
+	
+	/**
+	 * Validate that an attribute is a valid timestamp.
+	 *
+	 * @param string $attribute
+	 * @param mixed $value
+	 * @return bool
+	 */
+	protected function validateTimezone($attribute, $value)
+	{
+		try {
+			new DateTimeZone($value);
+		}catch (Exception $e){
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Validate the date is before a given date.
