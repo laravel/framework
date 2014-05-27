@@ -483,7 +483,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// the resource action. Otherwise we'll just use an empty string for here.
 		$prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-		if (count($this->groupStack) == 0)
+		if ($prefix || count($this->groupStack) == 0)
 		{
 			return $prefix.$resource.'.'.$method;
 		}
@@ -1551,7 +1551,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  dynamic  string
 	 * @return bool
 	 */
-	public function isAction()
+	public function uses()
 	{
 		foreach (func_get_args() as $pattern)
 		{
