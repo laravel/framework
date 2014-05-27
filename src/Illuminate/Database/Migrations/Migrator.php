@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator {
@@ -15,7 +15,7 @@ class Migrator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -45,12 +45,12 @@ class Migrator {
 	 *
 	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
 	public function __construct(MigrationRepositoryInterface $repository,
 								Resolver $resolver,
-                                Filesystem $files)
+                                FilesystemInterface $files)
 	{
 		$this->files = $files;
 		$this->resolver = $resolver;
@@ -369,7 +369,7 @@ class Migrator {
 	/**
 	 * Get the file system instance.
 	 *
-	 * @return \Illuminate\Filesystem\Filesystem
+	 * @return \Illuminate\Filesystem\FilesystemInterface
 	 */
 	public function getFilesystem()
 	{

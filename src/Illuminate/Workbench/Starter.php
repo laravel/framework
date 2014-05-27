@@ -2,6 +2,7 @@
 
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class Starter {
 
@@ -10,10 +11,10 @@ class Starter {
 	 *
 	 * @param  string  $path
 	 * @param  \Symfony\Component\Finder\Finder  $finder
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
-	public static function start($path, Finder $finder = null, Filesystem $files = null)
+	public static function start($path, Finder $finder = null, FilesystemInterface $files = null)
 	{
 		$finder = $finder ?: new Finder;
 

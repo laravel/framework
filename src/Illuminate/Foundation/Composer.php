@@ -1,14 +1,14 @@
 <?php namespace Illuminate\Foundation;
 
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class Composer {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -22,11 +22,11 @@ class Composer {
 	/**
 	 * Create a new Composer manager instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @param  string  $workingPath
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $workingPath = null)
+	public function __construct(FilesystemInterface $files, $workingPath = null)
 	{
 		$this->files = $files;
 		$this->workingPath = $workingPath;

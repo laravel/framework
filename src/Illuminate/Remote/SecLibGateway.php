@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Remote;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 use Net_SFTP, Crypt_RSA, System_SSH_Agent;
 
 class SecLibGateway implements GatewayInterface {
@@ -29,7 +29,7 @@ class SecLibGateway implements GatewayInterface {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -47,7 +47,7 @@ class SecLibGateway implements GatewayInterface {
 	 * @param  array   $auth
 	 * @return void
 	 */
-	public function __construct($host, array $auth, Filesystem $files)
+	public function __construct($host, array $auth, FilesystemInterface $files)
 	{
 		$this->auth = $auth;
 		$this->files = $files;

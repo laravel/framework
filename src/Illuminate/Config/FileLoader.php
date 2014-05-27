@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Config;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class FileLoader implements LoaderInterface {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -35,11 +35,11 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Create a new file configuration loader.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @param  string  $defaultPath
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $defaultPath)
+	public function __construct(FilesystemInterface $files, $defaultPath)
 	{
 		$this->files = $files;
 		$this->defaultPath = $defaultPath;
@@ -245,7 +245,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Get the Filesystem instance.
 	 *
-	 * @return \Illuminate\Filesystem\Filesystem
+	 * @return \Illuminate\Filesystem\FilesystemInterface
 	 */
 	public function getFilesystem()
 	{
