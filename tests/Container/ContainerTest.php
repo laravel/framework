@@ -245,6 +245,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor', $instance->name);
 	}
 
+
 	public function testUnsetRemoveBoundInstances()
 	{
 		$container = new Container;
@@ -280,6 +281,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($_SERVER['__test.rebind']);
 	}
 
+
 	public function testPassingSomePrimitiveParameters()
 	{
 		$container = new Container;
@@ -296,6 +298,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('otwell', $value->last);
 		$this->assertInstanceOf('ContainerConcreteStub', $value->stub);
 	}
+
 
 	public function testCreatingBoundConcreteClassPassesParameters() {
 		$container = new Container;
