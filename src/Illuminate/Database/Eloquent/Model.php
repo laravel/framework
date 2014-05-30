@@ -206,6 +206,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $mutatorCache = array();
 
 	/**
+	 * The class name to be used in polymorphic relations
+	 *
+	 * @var string
+	 */
+	protected $morphClass;
+
+	/**
 	 * The many to many relationship methods.
 	 *
 	 * @var array
@@ -1808,6 +1815,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function newPivot(Model $parent, array $attributes, $table, $exists)
 	{
 		return new Pivot($parent, $attributes, $table, $exists);
+	}
+
+	/**
+	 * Get the class name for polymorphic relations.
+	 *
+	 * @return string
+	 */
+	public function getMorphClass()
+	{
+		return $this->morphClass ?: get_class($this);
 	}
 
 	/**
