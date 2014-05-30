@@ -32,6 +32,45 @@ class FileStore implements StoreInterface {
 	}
 
 	/**
+	 * Determine if an item exists in the cache.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function has($key)
+	{
+		$path = $this->path($key);
+
+		// If the file doesn't exists, we obviously can't return the cache so we will
+		// just return null. Otherwise, we'll get the contents of the file and get
+		// the expiration UNIX timestamps from the start of the file's contents.
+		if ($this->files->exists($path))
+		{
+			try
+			{
+				$expire = substr($contents = $this->files->get($path), 0, 10);
+			}
+			catch (\Exception $e)
+			{
+				return false;
+			}
+
+			// If the current time is greater than expiration timestamps we will delete
+			// the file and return null. This helps clean up the old files and keeps
+			// this directory much cleaner for us as old files aren't hanging out.
+			if (time() >= $expire)
+			{
+				$this->forget($key);
+			} else
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key

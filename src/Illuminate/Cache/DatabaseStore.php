@@ -51,6 +51,38 @@ class DatabaseStore implements StoreInterface {
 	}
 
 	/**
+	 * Determine if an item exists in the cache.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function has($key)
+	{
+		$prefixed = $this->prefix.$key;
+
+		$cache = $this->table()->where('key', '=', $prefixed)->first();
+
+		if (is_null($cache))
+		{
+			return false;
+		}
+
+		// If we have a cache record we will check the expiration time against current
+		// time on the system and see if the record has expired. If it has, we will
+		// remove the records from the database table so it isn't returned again.
+		if (is_array($cache)) $cache = (object)$cache;
+
+		if (time() >= $cache->expiration)
+		{
+			$this->forget($key);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key

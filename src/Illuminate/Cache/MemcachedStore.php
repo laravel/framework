@@ -32,6 +32,19 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	}
 
 	/**
+	 * Determine if an item exists in the cache.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function has($key)
+	{
+		$value = $this->memcached->get($this->prefix.$key);
+
+		return $this->memcached->getResultCode() == 0;
+	}
+
+	/**
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key

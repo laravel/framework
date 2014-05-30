@@ -21,6 +21,17 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	}
 
 	/**
+	 * Determine if an item exists in the cache.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function has($key)
+	{
+		return wincache_ucache_exists($this->prefix.$key);
+	}
+
+	/**
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key
