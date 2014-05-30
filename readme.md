@@ -24,6 +24,16 @@ Documentation for the entire framework can be found on the [Laravel website](htt
 
 Thank you for considering contributing to the Laravel framework. If you are submitting a bug-fix, or an enhancement that is **not** a breaking change, submit your pull request to the branch corresponding to the latest stable release of the framework, such as the `4.1` branch. If you are submitting a breaking change or an entirely new component, submit your pull request to the `master` branch.
 
+### Installation
+
+```sh
+git clone https://github.com/laravel/framework.git
+cd framework
+composer install --dev
+# run tests
+phpunit
+```
+
 ### License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
