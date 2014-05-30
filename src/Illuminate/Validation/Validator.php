@@ -1326,6 +1326,27 @@ class Validator implements MessageProviderInterface {
 			return $result[1][0];
 		}
 	}
+	
+	/**
+	 * Validate that an attribute is a valid timestamp.
+	 *
+	 * @param string $attribute
+	 * @param mixed $value
+	 * @return bool
+	 */
+	protected function validateTimezone($attribute, $value)
+	{
+		try
+		{
+			new DateTimeZone($value);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	
+		return true;
+	}
 
 	/**
 	 * Get the validation message for an attribute and rule.
