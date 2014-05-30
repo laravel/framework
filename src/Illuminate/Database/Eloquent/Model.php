@@ -1443,7 +1443,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// models are updated, giving them a chance to do any special processing.
 			$dirty = $this->getDirty();
 
-			if (count($dirty) > 0) {
+			if (count($dirty) > 0)
+			{
 				$this->setKeysForSaveQuery($query)->update($dirty);
 
 				$this->fireModelEvent('updated', false);
