@@ -49,6 +49,18 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetMethodReturnsKeyForMissingItems()
+	{
+		$t = $this->getMock('Illuminate\Translation\Translator', null, array($this->getLoader(), 'en'));
+		$t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(null);
+		$this->assertEquals('foo', $t->get('foo'));
+
+		// Parameters should also be included in the returned key
+		$t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', '*')->andReturn(null);
+		$this->assertEquals('bar (key1:value1,key2:value2)', $t->get('bar', array('key1' => 'value1', 'key2' => 'value2')));
+	}
+
+
 	public function testChoiceMethodProperlyLoadsAndRetrievesItem()
 	{
 		$t = $this->getMock('Illuminate\Translation\Translator', array('get'), array($this->getLoader(), 'en'));
