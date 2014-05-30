@@ -89,7 +89,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 		// If the line doesn't exist, we will return back the key which was requested as
 		// that will be quick to spot in the UI if language keys are wrong or missing
 		// from the application's language files. Otherwise we can return the line.
-		if ( ! isset($line)) return $key;
+		if ( ! isset($line)) return $this->parameterizeKey($key, $replace);
 
 		return $line;
 	}
@@ -149,6 +149,25 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 		{
 			return mb_strlen($r) * -1;
 		});
+	}
+
+	/**
+	 * Return the key (with parameters) as a fallback message.
+	 *
+	 * @param  string  $key
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function parameterizeKey($key, $parameters)
+	{
+		if (empty($parameters)) return $key;
+
+		array_walk($parameters, function(&$value, $key) {
+			$value = "$key:$value";
+		});
+		$parameters = implode(',', $parameters);
+
+		return "$key ($parameters)";
 	}
 
 	/**
