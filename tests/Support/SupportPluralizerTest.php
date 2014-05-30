@@ -12,6 +12,7 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('deer', str_singular('deer'));
 	}
 
+
 	public function testCaseSensitiveUsage()
 	{
 		$this->assertEquals('Children', str_plural('Child'));

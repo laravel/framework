@@ -23,6 +23,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($created, $relation->create(array('name' => 'taylor')));
 	}
 
+
 	public function testUpdateMethodUpdatesModelsWithTimestamps()
 	{
 		$relation = $this->getRelation();

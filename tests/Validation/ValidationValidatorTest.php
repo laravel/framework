@@ -162,6 +162,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 	}
 
+
 	public function testValidateRequiredWith()
 	{
 		$trans = $this->getRealTranslator();
@@ -894,6 +895,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 	}
 
+
 	public function testValidateDateAndFormat()
 	{
 		date_default_timezone_set('UTC');
@@ -910,6 +912,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => '01/01/2001'), array('x' => 'date_format:Y-m-d'));
 		$this->assertTrue($v->fails());
 	}
+
 
 	public function testBeforeAndAfter()
 	{

@@ -9,6 +9,7 @@ class PaginationCustomPresenterTest extends PHPUnit_Framework_TestCase {
 		m::close();
 	}
 
+
 	public function testGetPageLinkWrapper()
 	{
 		$customPresenter = m::mock('Illuminate\Pagination\Presenter');
@@ -20,6 +21,7 @@ class PaginationCustomPresenterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<a href="http://laravel.com?page=1">1</a>', $customPresenter->getPageLinkWrapper('http://laravel.com?page=1', '1'));
 	}
 
+
 	public function testGetDisabledTextWrapper()
 	{
 		$customPresenter = m::mock('Illuminate\Pagination\Presenter');
@@ -30,6 +32,7 @@ class PaginationCustomPresenterTest extends PHPUnit_Framework_TestCase {
 			});
 		$this->assertEquals('<li class="bar">foo</li>', $customPresenter->getDisabledTextWrapper('foo'));
 	}
+
 
 	public function testGetActiveTextWrapper()
 	{
