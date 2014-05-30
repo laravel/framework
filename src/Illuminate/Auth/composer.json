@@ -23,9 +23,10 @@
         "illuminate/routing": "4.3.*"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Auth": ""}
+        "psr-4": {
+            "Illuminate\\Auth\\": ""
+        }
     },
-    "target-dir": "Illuminate/Auth",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

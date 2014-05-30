@@ -16,11 +16,10 @@
         "illuminate/events": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Log": ""
+        "psr-4": {
+            "Illuminate\\Log\\": ""
         }
     },
-    "target-dir": "Illuminate/Log",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"
