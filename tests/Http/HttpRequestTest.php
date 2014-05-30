@@ -78,7 +78,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		return array(
 			array('', array()),
 			array('foo/bar', array('foo', 'bar')),
-			array('foo/bar//baz', array('foo', 'bar', 'baz'))
+			array('foo/bar//baz', array('foo', 'bar', 'baz')),
+			array('foo/0/bar', array('foo', '0', 'bar'))
 		);
 	}
 

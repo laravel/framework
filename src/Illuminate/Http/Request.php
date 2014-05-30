@@ -114,7 +114,7 @@ class Request extends SymfonyRequest {
 	{
 		$segments = explode('/', $this->path());
 
-		return array_values(array_filter($segments));
+		return array_values(array_filter($segments, function($v) { return $v != ''; }));
 	}
 
 	/**
