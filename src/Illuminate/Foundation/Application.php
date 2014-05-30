@@ -1085,6 +1085,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'auth.reminder'  => 'Illuminate\Auth\Reminders\PasswordBroker',
 			'queue'          => 'Illuminate\Queue\QueueManager',
 			'redirect'       => 'Illuminate\Routing\Redirector',
+			'response'       => 'Illuminate\Http\ResponseFactory',
 			'redis'          => 'Illuminate\Redis\Database',
 			'request'        => 'Illuminate\Http\Request',
 			'router'         => 'Illuminate\Routing\Router',
