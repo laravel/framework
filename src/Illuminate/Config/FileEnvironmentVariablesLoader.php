@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Config;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterface {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -21,10 +21,10 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 	/**
 	 * Create a new file environment loader instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $path = null)
+	public function __construct(FilesystemInterface $files, $path = null)
 	{
 		$this->files = $files;
 		$this->path = $path ?: base_path();

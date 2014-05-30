@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class FailedTableCommand extends Command {
 
@@ -22,17 +22,17 @@ class FailedTableCommand extends Command {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
 	/**
 	 * Create a new session table command instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
-	public function __construct(Filesystem $files)
+	public function __construct(FilesystemInterface $files)
 	{
 		parent::__construct();
 

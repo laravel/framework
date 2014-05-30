@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Foundation;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class ConfigPublisher {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -28,11 +28,11 @@ class ConfigPublisher {
 	/**
 	 * Create a new configuration publisher instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @param  string  $publishPath
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $publishPath)
+	public function __construct(FilesystemInterface $files, $publishPath)
 	{
 		$this->files = $files;
 		$this->publishPath = $publishPath;

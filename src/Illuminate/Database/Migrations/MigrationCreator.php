@@ -1,14 +1,14 @@
 <?php namespace Illuminate\Database\Migrations;
 
 use Closure;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class MigrationCreator {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -22,10 +22,10 @@ class MigrationCreator {
 	/**
 	 * Create a new migration creator instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
-	public function __construct(Filesystem $files)
+	public function __construct(FilesystemInterface $files)
 	{
 		$this->files = $files;
 	}
@@ -161,7 +161,7 @@ class MigrationCreator {
 	/**
 	 * Get the filesystem instance.
 	 *
-	 * @return \Illuminate\Filesystem\Filesystem
+	 * @return \Illuminate\Filesystem\FilesystemInterface
 	 */
 	public function getFilesystem()
 	{

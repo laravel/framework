@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Routing\Generators;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class ControllerGenerator {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -29,10 +29,10 @@ class ControllerGenerator {
 	/**
 	 * Create a new controller generator instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
-	public function __construct(Filesystem $files)
+	public function __construct(FilesystemInterface $files)
 	{
 		$this->files = $files;
 	}

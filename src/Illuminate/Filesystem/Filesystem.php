@@ -5,7 +5,7 @@ use Symfony\Component\Finder\Finder;
 
 class FileNotFoundException extends \Exception {}
 
-class Filesystem {
+class Filesystem implements FilesystemInterface {
 
 	/**
 	 * Determine if a file exists.
@@ -199,7 +199,7 @@ class Filesystem {
 	}
 
 	/**
-	 * Determine if the given path is writable.
+	 * Determine if the given path is writeable.
 	 *
 	 * @param  string  $path
 	 * @return bool

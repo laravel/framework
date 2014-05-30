@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Foundation;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class ProviderRepository {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -28,11 +28,11 @@ class ProviderRepository {
 	/**
 	 * Create a new service repository instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @param  string  $manifestPath
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $manifestPath)
+	public function __construct(FilesystemInterface $files, $manifestPath)
 	{
 		$this->files = $files;
 		$this->manifestPath = $manifestPath;
@@ -221,7 +221,7 @@ class ProviderRepository {
 	/**
 	 * Get the filesystem instance.
 	 *
-	 * @return \Illuminate\Filesystem\Filesystem
+	 * @return \Illuminate\Filesystem\FilesystemInterface
 	 */
 	public function getFilesystem()
 	{

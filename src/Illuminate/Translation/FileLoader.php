@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Translation;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class FileLoader implements LoaderInterface {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -28,11 +28,11 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Create a new file loader instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @param  string  $path
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $path)
+	public function __construct(FilesystemInterface $files, $path)
 	{
 		$this->path = $path;
 		$this->files = $files;

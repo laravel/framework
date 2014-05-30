@@ -40,6 +40,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Config/EnvironmentVariablesLoaderInterface.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Config/FileEnvironmentVariablesLoader.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Config/EnvironmentVariables.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Filesystem/FilesystemInterface.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/AliasLoader.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php',

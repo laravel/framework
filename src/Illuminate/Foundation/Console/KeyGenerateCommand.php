@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class KeyGenerateCommand extends Command {
 
@@ -23,10 +23,10 @@ class KeyGenerateCommand extends Command {
 	/**
 	 * Create a new key generator command.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
-	public function __construct(Filesystem $files)
+	public function __construct(FilesystemInterface $files)
 	{
 		parent::__construct();
 

@@ -1,13 +1,13 @@
 <?php namespace Illuminate\View;
 
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class FileViewFinder implements ViewFinderInterface {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\FilesystemInterface
 	 */
 	protected $files;
 
@@ -49,12 +49,12 @@ class FileViewFinder implements ViewFinderInterface {
 	/**
 	 * Create a new file view loader instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @param  array  $paths
 	 * @param  array  $extensions
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, array $paths, array $extensions = null)
+	public function __construct(FilesystemInterface $files, array $paths, array $extensions = null)
 	{
 		$this->files = $files;
 		$this->paths = $paths;
@@ -240,7 +240,7 @@ class FileViewFinder implements ViewFinderInterface {
 	/**
 	 * Get the filesystem instance.
 	 *
-	 * @return \Illuminate\Filesystem\Filesystem
+	 * @return \Illuminate\Filesystem\FilesystemInterface
 	 */
 	public function getFilesystem()
 	{

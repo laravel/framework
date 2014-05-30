@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation;
 
 use Carbon\Carbon;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemInterface;
 
 class MigrationPublisher {
 
@@ -15,10 +15,10 @@ class MigrationPublisher {
 	/**
 	 * Create a new migration publisher instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\FilesystemInterface  $files
 	 * @return void
 	 */
-	public function __construct(Filesystem $files)
+	public function __construct(FilesystemInterface $files)
 	{
 		$this->files = $files;
 	}
