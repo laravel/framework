@@ -189,7 +189,7 @@ abstract class Facade {
 	}
 
 	/**
-	 * Handle dynamic, static calls to the object.
+	 * static calls handling.
 	 *
 	 * @param  string  $method
 	 * @param  array   $args
@@ -197,10 +197,31 @@ abstract class Facade {
 	 */
 	public static function __callStatic($method, $args)
 	{
-		$instance = static::getFacadeRoot();
+		return static::callMethod($method, $args);
+	}
 
-		switch (count($args))
-		{
+	/**
+	 * None static calls, such as Facade Instance through DI.
+	 * @param  string  $method
+	 * @param  array   $args
+	 * @return mixed
+	 */
+	public function __call($method, $args)
+	{
+		return static::callMethod($method, $args);
+	}
+
+	/**
+	 * Access the object methods.
+	 * @param  string  $method
+	 * @param  array   $args
+	 * @return mixed
+	 */
+	private static function callMethod($method, $args)
+	{
+		$instance = static::resolveFacadeInstance(static::getFacadeAccessor());
+
+		switch (count($args)) {
 			case 0:
 				return $instance->$method();
 
