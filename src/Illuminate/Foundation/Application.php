@@ -1074,7 +1074,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'encrypter'      => 'Illuminate\Encryption\Encrypter',
 			'db'             => 'Illuminate\Database\DatabaseManager',
 			'events'         => 'Illuminate\Events\Dispatcher',
-			'files'          => 'Illuminate\Filesystem\Filesystem',
+			'files'          => 'Illuminate\Filesystem\FilesystemInterface',
 			'form'           => 'Illuminate\Html\FormBuilder',
 			'hash'           => 'Illuminate\Hashing\HasherInterface',
 			'html'           => 'Illuminate\Html\HtmlBuilder',
