@@ -2200,9 +2200,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$attributes = $this->getArrayableAttributes();
 
-		// Convert all attributes listed as dates to DateTime instances, then back
-		// to a string. This allows us to output date attributes in the same format
-		// as if we were to access them directly on the object.
+		// If an attribute is a date, we will cast it to a string after converting it
+		// to a DateTime / Carbon instance. This is so we will get some consistent
+		// formatting while accessing attributes vs. arraying / JSONing a model.
 		foreach ($this->getDates() as $key)
 		{
 			if ( ! array_key_exists($key, $attributes)) continue;
