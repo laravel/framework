@@ -37,7 +37,7 @@ class ResponseFactory {
 	 * @param  array   $headers
 	 * @return \Illuminate\Http\Response
 	 */
-	public static function make($content = '', $status = 200, array $headers = array())
+	public function make($content = '', $status = 200, array $headers = array())
 	{
 		return new Response($content, $status, $headers);
 	}
@@ -51,7 +51,7 @@ class ResponseFactory {
 	 * @param  array   $headers
 	 * @return \Illuminate\Http\Response
 	 */
-	public static function view($view, $data = array(), $status = 200, array $headers = array())
+	public function view($view, $data = array(), $status = 200, array $headers = array())
 	{
 		return $this->make($this->view->make($view, $data), $status, $headers);
 	}
@@ -65,7 +65,7 @@ class ResponseFactory {
 	 * @param  int    $options
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public static function json($data = array(), $status = 200, array $headers = array(), $options = 0)
+	public function json($data = array(), $status = 200, array $headers = array(), $options = 0)
 	{
 		if ($data instanceof ArrayableInterface)
 		{
@@ -83,7 +83,7 @@ class ResponseFactory {
 	 * @param  array    $headers
 	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
-	public static function stream($callback, $status = 200, array $headers = array())
+	public function stream($callback, $status = 200, array $headers = array())
 	{
 		return new StreamedResponse($callback, $status, $headers);
 	}
@@ -97,7 +97,7 @@ class ResponseFactory {
 	 * @param  null|string  $disposition
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
-	public static function download($file, $name = null, array $headers = array(), $disposition = 'attachment')
+	public function download($file, $name = null, array $headers = array(), $disposition = 'attachment')
 	{
 		$response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
