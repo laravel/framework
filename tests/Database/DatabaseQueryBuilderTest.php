@@ -780,6 +780,51 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAggregateResetFollowedByGet()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 2)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select "column1", "column2" from "users"', array())->andReturn(array(array('column1' => 'foo', 'column2' => 'bar')));
+		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('users')->select('column1', 'column2');
+		$count = $builder->count();
+		$this->assertEquals(1, $count);
+		$sum = $builder->sum('id');
+		$this->assertEquals(2, $sum);
+		$result = $builder->get();
+		$this->assertEquals(array(array('column1' => 'foo', 'column2' => 'bar')), $result);
+	}
+
+
+	public function testAggregateResetFollowedBySelectGet()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', array())->andReturn(array(array('column2' => 'foo', 'column3' => 'bar')));
+		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('users');
+		$count = $builder->count('column1');
+		$this->assertEquals(1, $count);
+		$result = $builder->select('column2', 'column3')->get();
+		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result);
+	}
+
+
+	public function testAggregateResetFollowedByGetWithColumns()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', array())->andReturn(array(array('column2' => 'foo', 'column3' => 'bar')));
+		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('users');
+		$count = $builder->count('column1');
+		$this->assertEquals(1, $count);
+		$result = $builder->get(array('column2', 'column3'));
+		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result);
+	}
+
+
 	public function testInsertMethod()
 	{
 		$builder = $this->getBuilder();
