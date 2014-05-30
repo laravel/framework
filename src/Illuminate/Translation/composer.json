@@ -14,11 +14,10 @@
         "symfony/translation": "2.5.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Translation": ""
+        "psr-4": {
+            "Illuminate\\Translation\\": ""
         }
     },
-    "target-dir": "Illuminate/Translation",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

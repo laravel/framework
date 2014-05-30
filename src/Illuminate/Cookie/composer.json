@@ -15,11 +15,10 @@
         "symfony/http-foundation": "2.5.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Cookie": ""
+        "psr-4": {
+            "Illuminate\\Cookie\\": ""
         }
     },
-    "target-dir": "Illuminate/Cookie",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

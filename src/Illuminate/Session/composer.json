@@ -21,11 +21,10 @@
         "illuminate/console": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Session": ""
+        "psr-4": {
+            "Illuminate\\Session\\": ""
         }
     },
-    "target-dir": "Illuminate/Session",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

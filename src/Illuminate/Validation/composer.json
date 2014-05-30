@@ -18,11 +18,10 @@
         "illuminate/database": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Validation": ""
+        "psr-4": {
+            "Illuminate\\Validation\\": ""
         }
     },
-    "target-dir": "Illuminate/Validation",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

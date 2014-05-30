@@ -16,11 +16,10 @@
         "symfony/translation": "2.5.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Pagination": ""
+        "psr-4": {
+            "Illuminate\\Pagination\\": ""
         }
     },
-    "target-dir": "Illuminate/Pagination",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"
