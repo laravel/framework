@@ -81,6 +81,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('hydrated', $collection);
 	}
 
+
 	public function testCreateMethodSavesNewModel()
 	{
 		$_SERVER['__eloquent.saved'] = false;

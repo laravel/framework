@@ -11,6 +11,7 @@ class WhoopsDisplayerTest extends PHPUnit_Framework_TestCase {
 		m::close();
 	}
 
+
 	public function testStatusAndHeadersAreSetInResponse()
 	{
 		$mockWhoops = m::mock('Whoops\Run[handleException]');
