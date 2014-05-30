@@ -76,6 +76,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+		$parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
 		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 		return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
 	}
@@ -89,6 +90,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+		$parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
 		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 		return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
 	}
