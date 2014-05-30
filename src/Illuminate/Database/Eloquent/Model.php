@@ -150,6 +150,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $with = array();
 
 	/**
+	 * The class name to be used in polymorphic relations.
+	 *
+	 * @var string
+	 */
+	protected $morphClass;
+
+	/**
 	 * Indicates if the model exists.
 	 *
 	 * @var bool
@@ -204,13 +211,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var array
 	 */
 	protected static $mutatorCache = array();
-
-	/**
-	 * The class name to be used in polymorphic relations
-	 *
-	 * @var string
-	 */
-	protected $morphClass;
 
 	/**
 	 * The many to many relationship methods.
@@ -1818,16 +1818,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get the class name for polymorphic relations.
-	 *
-	 * @return string
-	 */
-	public function getMorphClass()
-	{
-		return $this->morphClass ?: get_class($this);
-	}
-
-	/**
 	 * Get the table associated with the model.
 	 *
 	 * @return string
@@ -1926,6 +1916,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$id = $id ?: $name.'_id';
 
 		return array($type, $id);
+	}
+
+	/**
+	 * Get the class name for polymorphic relations.
+	 *
+	 * @return string
+	 */
+	public function getMorphClass()
+	{
+		return $this->morphClass ?: get_class($this);
 	}
 
 	/**
