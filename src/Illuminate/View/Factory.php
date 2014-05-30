@@ -110,18 +110,6 @@ class Factory {
 	}
 
 	/**
-	 * Add an alias for a view.
-	 *
-	 * @param  string $view  The real view name
-	 * @param  string $alias
-	 * @return void
-	 */
-	public function alias($view, $alias)
-	{
-		$this->aliases[$alias] = $view;
-	}
-
-	/**
 	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
@@ -175,6 +163,18 @@ class Factory {
 	public function name($view, $name)
 	{
 		$this->names[$name] = $view;
+	}
+
+	/**
+	 * Add an alias for a view.
+	 *
+	 * @param  string  $view
+	 * @param  string  $alias
+	 * @return void
+	 */
+	public function alias($view, $alias)
+	{
+		$this->aliases[$alias] = $view;
 	}
 
 	/**
