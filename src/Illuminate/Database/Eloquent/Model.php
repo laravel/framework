@@ -2152,6 +2152,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$attributes = $this->getArrayableAttributes();
 
+		// If an attribute is a date, we will cast it to a string after converting it
+		// to a DateTime / Carbon instance. This is so we will get some consistent
+		// formatting while accessing attributes vs. arraying / JSONing a model.
+		foreach ($this->getDates() as $key)
+		{
+			if ( ! array_key_exists($key, $attributes)) continue;
+
+			$attributes[$key] = (string) $this->asDateTime($attributes[$key]);
+		}
+
 		// We want to spin through all the mutated attributes for this model and call
 		// the mutator for the attribute. We cache off every mutated attributes so
 		// we don't have to constantly check on attributes that actually change.
