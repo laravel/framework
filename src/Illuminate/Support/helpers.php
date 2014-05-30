@@ -557,23 +557,38 @@ if ( ! function_exists('data_get'))
 	 * @param  string  $key
 	 * @param  mixed   $default
 	 * @return mixed
-	 *
-	 * @throws \InvalidArgumentException
 	 */
 	function data_get($target, $key, $default = null)
 	{
-		if (is_array($target))
+		if (is_null($key)) return $target;
+
+		foreach (explode('.', $key) as $segment)
 		{
-			return array_get($target, $key, $default);
+			if (is_array($target))
+			{
+				if ( ! array_key_exists($segment, $target))
+				{
+					return value($default);
+				}
+
+				$target = $target[$segment];
+			}
+			elseif (is_object($target))
+			{
+				if ( ! isset($target->{$segment}))
+				{
+					return value($default);
+				}
+
+				$target = $target->{$segment};
+			}
+			else
+			{
+				return value($default);
+			}
 		}
-		elseif (is_object($target))
-		{
-			return object_get($target, $key, $default);
-		}
-		else
-		{
-			throw new \InvalidArgumentException("Array or object must be passed to data_get.");
-		}
+
+		return $target;
 	}
 }
 
