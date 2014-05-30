@@ -13,6 +13,7 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('criterion', str_singular('criteria'));
 	}
 
+
 	public function testCaseSensitiveUsage()
 	{
 		$this->assertEquals('Children', str_plural('Child'));
