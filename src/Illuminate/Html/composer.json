@@ -14,11 +14,10 @@
         "illuminate/support": "4.2.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Html": ""
+        "psr-4": {
+            "Illuminate\\Html\\": ""
         }
     },
-    "target-dir": "Illuminate/Html",
     "extra": {
         "branch-alias": {
             "dev-master": "4.2-dev"

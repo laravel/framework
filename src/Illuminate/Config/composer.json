@@ -13,9 +13,10 @@
         "illuminate/support": "4.2.*"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Config": ""}
+        "psr-4": {
+            "Illuminate\\Config\\": ""
+        }
     },
-    "target-dir": "Illuminate/Config",
     "extra": {
         "branch-alias": {
             "dev-master": "4.2-dev"
