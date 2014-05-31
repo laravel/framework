@@ -6,10 +6,10 @@ use Illuminate\Http\ResponseFactory;
 
 class HttpJsonResponseTest extends PHPUnit_Framework_TestCase {
 
-    public function tearDown()
-    {
-        m::close();
-    }
+	public function tearDown()
+	{
+		m::close();
+	}
 
 
 	public function testSetAndRetrieveData()
@@ -21,15 +21,15 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-    public function testArrayableSendAsJson()
-    {
-        $data = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
-        $data->shouldReceive('toArray')->andReturn(array('foo' => 'bar'));
+	public function testArrayableSendAsJson()
+	{
+		$data = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$data->shouldReceive('toArray')->andReturn(array('foo' => 'bar'));
 
-        $factory = new ResponseFactory(m::mock('Illuminate\View\Factory'));
+		$factory = new ResponseFactory(m::mock('Illuminate\View\Factory'));
 
-        $response = $factory->json($data);
-        $this->assertEquals('{"foo":"bar"}', $response->getContent());
-    }
+		$response = $factory->json($data);
+		$this->assertEquals('{"foo":"bar"}', $response->getContent());
+	}
 
 }
