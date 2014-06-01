@@ -2157,7 +2157,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// formatting while accessing attributes vs. arraying / JSONing a model.
 		foreach ($this->getDates() as $key)
 		{
-			if ( ! array_key_exists($key, $attributes)) continue;
+			if ( ! isset($attributes[$key])) continue;
 
 			$attributes[$key] = (string) $this->asDateTime($attributes[$key]);
 		}
