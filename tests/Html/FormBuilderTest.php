@@ -332,11 +332,11 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFormCheckboxWithoutSession()
 	{
-	    $form1 = $this->formBuilder->checkbox('foo');
-	    $form2 = $this->formBuilder->checkbox('foo', 'foobar', true);
+		$form1 = $this->formBuilder->checkbox('foo');
+		$form2 = $this->formBuilder->checkbox('foo', 'foobar', true);
 
-	    $this->assertEquals('<input name="foo" type="checkbox" value="1">', $form1);
-	    $this->assertEquals('<input checked="checked" name="foo" type="checkbox" value="foobar">', $form2);
+		$this->assertEquals('<input name="foo" type="checkbox" value="1">', $form1);
+		$this->assertEquals('<input checked="checked" name="foo" type="checkbox" value="foobar">', $form2);
 	}
 
 

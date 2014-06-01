@@ -59,7 +59,7 @@ class ClearCommand extends Command {
 		$this->cache->flush();
 
 		$this->files->delete($this->laravel['config']['app.manifest'].'/services.json');
-		
+
 		$this->laravel['events']->fire('cache:cleared');
 
 		$this->info('Application cache cleared!');
