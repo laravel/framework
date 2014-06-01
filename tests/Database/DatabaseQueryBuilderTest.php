@@ -736,27 +736,6 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testGetPaginationCountGetsResultCountWithSelectDistinct()
-	{
-		unset($_SERVER['orders']);
-		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select count(distinct "foo", "bar") as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
-		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($query, $results)
-		{
-			$_SERVER['orders'] = $query->orders;
-			return $results;
-		});
-		$results = $builder->distinct()->select('foo', 'bar')->from('users')->orderBy('foo', 'desc')->getPaginationCount();
-
-		$this->assertNull($_SERVER['orders']);
-		unset($_SERVER['orders']);
-
-		$this->assertEquals(array('foo', 'bar'), $builder->columns);
-		$this->assertEquals(array(0 => array('column' => 'foo', 'direction' => 'desc')), $builder->orders);
-		$this->assertEquals(1, $results);
-	}
-
-
 	public function testPluckMethodReturnsSingleColumn()
 	{
 		$builder = $this->getBuilder();
