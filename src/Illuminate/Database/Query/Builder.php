@@ -1558,26 +1558,12 @@ class Builder {
 	{
 		$this->backupFieldsForCount();
 
-		$columns = $this->columns;
-
-		// We have to check if the value is "null" so that the count function does
-		// not attempt to count an invalid string. Checking the value is better
-		// here because the count function already has an optional parameter.
-		if (is_null($columns))
-		{
-			$total = $this->count();
-		}
-		else
-		{
-			$total = $this->count($columns);
-		}
+		// Because some database engines may throw errors if we leave the ordering
+		// statements on the query, we will "back them up" and remove them from
+		// the query. Once we have the count we will put them back onto this.
+		$total = $this->count();
 
 		$this->restoreFieldsForCount();
-
-		// Once the query is run we need to put the old select columns back on the
-		// instance so that the select query will run properly. Otherwise, they
-		// will be cleared, then the query will fire with all of the columns.
-		$this->columns = $columns;
 
 		return $total;
 	}
