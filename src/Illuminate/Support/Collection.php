@@ -46,6 +46,28 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Create a new collection instance from a JSON string if the value isn't one already.
+	 *
+	 * @param string $string
+	 * @param bool   $strict
+	 * @return \Illuminate\Support\Collection
+	 * @throws \InvalidArgumentException
+	 */
+	public static function fromJson($string, $strict = false)
+	{
+		$items = @json_decode($string, true);
+
+		if (json_last_error())
+		{
+			if ($strict) throw new \InvalidArgumentException('Argument must be a valid JSON string.');
+
+			$items = [];
+		}
+
+		return static::make($items);
+	}
+
+	/**
 	 * Get all of the items in the collection.
 	 *
 	 * @return array
