@@ -301,6 +301,25 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo'), $collection->all());
 	}
 
+	public function testFromJsonMethod()
+	{
+		$collection = Collection::fromJson('["foo"]');
+		$this->assertEquals(array('foo'), $collection->all());
+	}
+
+	public function testFromJsonNotStrictMethod()
+	{
+		$collection = Collection::fromJson('invalid_json_string', false);
+		$this->assertEquals(array(), $collection->all());
+	}
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testFromJsonWithStrictMethod()
+	{
+		$collection = Collection::fromJson('invalid_json_string', true);
+	}
 
 	public function testSplice()
 	{
