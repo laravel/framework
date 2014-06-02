@@ -20,7 +20,6 @@ class Collection extends BaseCollection {
 		}
 
 		return $relatedInstances;
-
 	}
 
 	/**
