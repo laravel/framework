@@ -5,6 +5,24 @@ use Illuminate\Support\Collection as BaseCollection;
 class Collection extends BaseCollection {
 
 	/**
+	 * Combine a relation from each instance into a collection.
+	 *
+	 * @param string $related
+	 * @return \Illuminate\Database\Eloquent\Collection
+	 */
+	public function related($related)
+	{
+		$relatedInstances = new static();
+
+		foreach($this->items as $item)
+		{
+			$relatedInstances->merge($item->getRelation($related));
+		}
+
+		return $relatedInstances;
+	}
+
+	/**
 	 * Find a model in the collection by key.
 	 *
 	 * @param  mixed  $key
