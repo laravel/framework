@@ -154,7 +154,7 @@ trait SoftDeletingTrait {
 	 */
 	public function getDeletedAtColumn()
 	{
-		return 'deleted_at';
+		return defined('static::DELETED_AT') ? static::DELETED_AT : 'deleted_at';
 	}
 
 	/**
