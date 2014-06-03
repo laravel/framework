@@ -244,6 +244,25 @@ class SecLibGateway implements GatewayInterface {
 
 		return $key;
 	}
+/**
+	 * Determine if the SSH Agent should provide an RSA key.
+	 *
+	 * @return bool
+	 */
+	protected function useAgent()
+	{
+		return isset($this->auth['agent']) && $this->auth['agent'] === true;
+	}
+
+	/**
+	 * Get a new SSH Agent instance.
+	 *
+	 * @return \System_SSH_Agent
+	 */
+	public function getAgent()
+	{
+		return new System_SSH_Agent;
+	}
 
 	/**
 	 * Get a new RSA key instance.
