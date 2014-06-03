@@ -400,9 +400,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testPullRemovesItemFromCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
-
 		$c->pull(0);
-
 		$this->assertEquals(array(1 => 'bar'), $c->all());
 	}
 
@@ -410,10 +408,27 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testPullReturnsDefault()
 	{
 		$c = new Collection(array());
-
 		$value = $c->pull(0, 'foo');
-
 		$this->assertEquals('foo', $value);
+	}
+
+
+	public function testRejectRemovesElementsPassingTruthTest()
+	{
+		$c = new Collection(['foo', 'bar']);
+		$this->assertEquals(['foo'], $c->reject('bar')->values()->all());
+
+		$c = new Collection(['foo', 'bar']);
+		$this->assertEquals(['foo'], $c->reject(function($v) { return $v == 'bar'; })->values()->all());
+
+		$c = new Collection(['foo', null]);
+		$this->assertEquals(['foo'], $c->reject(null)->values()->all());
+
+		$c = new Collection(['foo', 'bar']);
+		$this->assertEquals(['foo', 'bar'], $c->reject('baz')->values()->all());
+
+		$c = new Collection(['foo', 'bar']);
+		$this->assertEquals(['foo', 'bar'], $c->reject(function($v) { return $v == 'baz'; })->values()->all());
 	}
 
 }
