@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Remote;
 
-use Net_SFTP,Net_SSH2, Crypt_RSA;
 use Illuminate\Filesystem\Filesystem;
+use Net_SFTP, Net_SSH2, Crypt_RSA, System_SSH_Agent;
 
 class SecLibGateway implements GatewayInterface {
 
@@ -36,7 +36,7 @@ class SecLibGateway implements GatewayInterface {
 	/**
 	 * The SecLib connection instance.
 	 *
-	 * @var \Net_SFTP or Net_SSH2
+	 * @var \Net_SFTP | Net_SSH2
 	 */
 	protected $connection;
 
@@ -168,15 +168,17 @@ class SecLibGateway implements GatewayInterface {
 	/**
 	 * Get the authentication object for login.
 	 *
-	 * @return \Crypt_RSA|string
+	 * @return \Crypt_RSA|\System_SSH_Agent|string
 	 * @throws \InvalidArgumentException
 	 */
 	protected function getAuthForLogin()
 	{
+		if ($this->useAgent()) return $this->getAgent();
+
 		// If a "key" was specified in the auth credentials, we will load it into a
 		// secure RSA key instance, which will be used to connect to the servers
 		// in place of a password, and avoids the developer specifying a pass.
-		if ($this->hasRsaKey())
+		elseif ($this->hasRsaKey())
 		{
 			return $this->loadRsaKey($this->auth);
 		}
@@ -288,7 +290,7 @@ class SecLibGateway implements GatewayInterface {
 	 * whichever is minimal for the above function.
 	 * Once created, it will 'upgrade' itself if needed.
 	 *
-	 * @return \Net_SFTP or Net_SSH2
+	 * @return \Net_SFTP | \Net_SSH2
 	 */
 	public function getConnection($type='Net_SSH2')
 	{
