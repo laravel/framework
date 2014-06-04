@@ -887,25 +887,25 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => 'http://google.com'), array('x' => 'Alpha'));
 		$this->assertFalse($v->passes());
 
-		$v = new Validator($trans, array('x' => 'ユニコードを基盤技術と'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã‚’åŸºç›¤æŠ€è¡“ã�¨'), array('x' => 'Alpha'));
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('x' => 'ユニコード を基盤技術と'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ ã‚’åŸºç›¤æŠ€è¡“ã�¨'), array('x' => 'Alpha'));
 		$this->assertFalse($v->passes());
 
-		$v = new Validator($trans, array('x' => 'नमस्कार'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'à¤¨à¤®à¤¸à¥�à¤•à¤¾à¤°'), array('x' => 'Alpha'));
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('x' => 'आपका स्वागत है'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'à¤†à¤ªà¤•à¤¾ à¤¸à¥�à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆ'), array('x' => 'Alpha'));
 		$this->assertFalse($v->passes());
 
-		$v = new Validator($trans, array('x' => 'Continuación'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'ContinuaciÃ³n'), array('x' => 'Alpha'));
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('x' => 'ofreció su dimisión'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'ofreciÃ³ su dimisiÃ³n'), array('x' => 'Alpha'));
 		$this->assertFalse($v->passes());
 
-		$v = new Validator($trans, array('x' => '❤'), array('x' => 'Alpha'));
+		$v = new Validator($trans, array('x' => 'â�¤'), array('x' => 'Alpha'));
 		$this->assertFalse($v->passes());
 
 	}
@@ -920,13 +920,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => 'http://g232oogle.com'), array('x' => 'AlphaNum'));
 		$this->assertFalse($v->passes());
 
-		$v = new Validator($trans, array('x' => '१२३'), array('x' => 'AlphaNum'));//numbers in Hindi
+		$v = new Validator($trans, array('x' => 'à¥§à¥¨à¥©'), array('x' => 'AlphaNum'));//numbers in Hindi
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaNum'));//eastern arabic numerals
+		$v = new Validator($trans, array('x' => 'Ù§Ù¨Ù©'), array('x' => 'AlphaNum'));//eastern arabic numerals
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('x' => 'नमस्कार'), array('x' => 'AlphaNum'));
+		$v = new Validator($trans, array('x' => 'à¤¨à¤®à¤¸à¥�à¤•à¤¾à¤°'), array('x' => 'AlphaNum'));
 		$this->assertTrue($v->passes());
 	}
 
@@ -940,14 +940,32 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('x' => 'http://-g232oogle.com'), array('x' => 'AlphaDash'));
 		$this->assertFalse($v->passes());
 
-		$v = new Validator($trans, array('x' => 'नमस्कार-_'), array('x' => 'AlphaDash'));
+		$v = new Validator($trans, array('x' => 'à¤¨à¤®à¤¸à¥�à¤•à¤¾à¤°-_'), array('x' => 'AlphaDash'));
 		$this->assertTrue($v->passes());
 
-		$v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaDash'));//eastern arabic numerals
+		$v = new Validator($trans, array('x' => 'Ù§Ù¨Ù©'), array('x' => 'AlphaDash'));//eastern arabic numerals
 		$this->assertTrue($v->passes());
 
 	}
-
+	
+	public function testValidateTimezone()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'India'), array('foo' => 'Timezone'));
+		$this->assertFalse($v->passes());
+	
+		$v = new Validator($trans, array('foo' => 'Cairo'), array('foo' => 'Timezone'));
+		$this->assertFalse($v->passes());
+		
+		$v = new Validator($trans, array('foo' => 'UTC'), array('foo' => 'Timezone'));
+		$this->assertTrue($v->passes());
+	
+		$v = new Validator($trans, array('foo' => 'Africa/Windhoek'), array('foo' => 'Timezone'));
+		$this->assertTrue($v->passes());
+	
+		$v = new Validator($trans, array('foo' => 'GMT'), array('foo' => 'Timezone'));
+		$this->assertTrue($v->passes());
+	}
 
 	public function testValidateRegex()
 	{
