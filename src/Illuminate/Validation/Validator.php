@@ -1315,7 +1315,7 @@ class Validator implements MessageProviderInterface {
 	}
 	
 	/**
-	 * Validate that an attribute is a valid timestamp.
+	 * Validate that an attribute is a valid timezone.
 	 *
 	 * @param string $attribute
 	 * @param mixed $value
