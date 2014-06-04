@@ -51,9 +51,9 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 
 		$events->listen('illuminate.log', function($level, $message, array $context = array())
 		{
-			$_SERVER['__log.level']      = $level;
+			$_SERVER['__log.level']   = $level;
 			$_SERVER['__log.message'] = $message;
-			$_SERVER['__log.context']    = $context;
+			$_SERVER['__log.context'] = $context;
 		});
 
 		$writer->error('foo');
