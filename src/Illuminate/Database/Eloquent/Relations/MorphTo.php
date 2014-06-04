@@ -159,12 +159,14 @@ class MorphTo extends BelongsTo {
 
 		$key = $instance->getKeyName();
 
-		if ($this->withTrashed && $instance->newQuery()->getMacro('withTrashed') !== null)
+		$query = $instance->newQuery();
+
+		if ($this->withTrashed && $query->getMacro('withTrashed') !== null)
 		{
-			$instance = $instance->withTrashed();
+			$query = $query->withTrashed();
 		}
 
-		return $instance->whereIn($key, $this->gatherKeysByType($type)->all())->get();
+		return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
 	}
 
 	/**
