@@ -287,7 +287,57 @@ if ( ! function_exists('array_where'))
 	 */
 	function array_where($array, Closure $callback)
 	{
-		return Arr::where($array, $callback);
+		$filtered = array();
+
+		foreach ($array as $key => $value)
+		{
+			if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
+		}
+
+		return $filtered;
+	}
+}
+
+if ( ! function_exists('is_assoc'))
+{
+	/**
+	 * Determine if the given array is associative.
+	 *
+	 * @param  array  $array
+	 * @return bool
+	 */
+	function is_assoc($array)
+	{
+		return (bool) count(array_filter(array_keys($array), 'is_string'));
+	}
+}
+
+if ( ! function_exists('asset'))
+{
+	/**
+	 * Generate an asset path for the application.
+	 *
+	 * @param  string  $path
+	 * @param  bool    $secure
+	 * @return string
+	 */
+	function asset($path, $secure = null)
+	{
+		return app('url')->asset($path, $secure);
+	}
+}
+
+if ( ! function_exists('base_path'))
+{
+	/**
+	 * Get the path to the base of the install.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	function base_path($path = '')
+	{
+		return app()->make('path.base').($path ? '/'.$path : $path);
 	}
 }
 
@@ -592,7 +642,7 @@ if ( ! function_exists('str_limit'))
 	 */
 	function str_limit($value, $limit = 100, $end = '...')
 	{
-		return Str::limit($value, $limit, $end);
+		return Illuminate\Support\Str::limit($value, $limit, $end);
 	}
 }
 
