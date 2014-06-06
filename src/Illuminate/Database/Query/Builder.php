@@ -241,13 +241,14 @@ class Builder {
 		if ($query instanceof Closure)
 		{
 			$callback = $query;
-			$query = $this->newQuery();
-			$callback($query);
+
+			$callback($query = $this->newQuery());
 		}
 
 		if ($query instanceof Builder)
 		{
 			$bindings = $query->getBindings();
+
 			$query = $query->toSql();
 		}
 		elseif (is_string($query))
@@ -256,16 +257,10 @@ class Builder {
 		}
 		else
 		{
-			$type = is_object($query) ? get_class($query) : gettype($query);
-			$message = "Argument #1 passed to selectSub must be an SQL string, query builder or closure, {$type} given";
-			throw new \InvalidArgumentException($message);
+			throw new \InvalidArgumentException;
 		}
 
-		$as = $this->grammar->wrap($as);
-
-		$query = '(' . $query . ') as ' . $as;
-
-		return $this->selectRaw($query, $bindings);
+		return $this->selectRaw('('.$query.') as '.$this->grammar->wrap($as), $bindings);
 	}
 
 	/**
