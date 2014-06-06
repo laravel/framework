@@ -109,10 +109,12 @@ class Encrypter {
 	 */
 	protected function mcryptDecrypt($value, $iv)
 	{
-		try {
+		try
+		{
 			return mcrypt_decrypt($this->cipher, $this->key, $value, $this->mode, $iv);
 		}
-		catch (\Exception $e) {
+		catch (\Exception $e)
+		{
 			throw new DecryptException($e->getMessage());
 		}
 	}
