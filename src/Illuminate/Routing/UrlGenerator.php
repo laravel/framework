@@ -52,16 +52,24 @@ class UrlGenerator {
 	);
 
 	/**
+	 * The host for asset URLs
+	 *
+	 * @var string
+	 */
+	protected $assetHost;
+	
+	/**
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
 	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  string  $assetHost
 	 * @return void
 	 */
-	public function __construct(RouteCollection $routes, Request $request)
+	public function __construct(RouteCollection $routes, Request $request, $assetHost = null)
 	{
 		$this->routes = $routes;
-
+		$this->assetHost = $assetHost;
 		$this->setRequest($request);
 	}
 
@@ -147,12 +155,19 @@ class UrlGenerator {
 	{
 		if ($this->isValidUrl($path)) return $path;
 
-		// Once we get the root URL, we will check to see if it contains an index.php
-		// file in the paths. If it does, we will remove it since it is not needed
-		// for asset paths, but only for routes to endpoints in the application.
-		$root = $this->getRootUrl($this->getScheme($secure));
-
-		return $this->removeIndex($root).'/'.trim($path, '/');
+		// Check if we have a custom asset host set.
+		if ($this->assetHost)
+		{
+			return trim($this->assetHost, '/').'/'.trim($path, '/');
+		}
+		else
+		{
+			// Once we get the root URL, we will check to see if it contains an index.php
+			// file in the paths. If it does, we will remove it since it is not needed
+			// for asset paths, but only for routes to endpoints in the application.
+			$root = $this->getRootUrl($this->getScheme($secure));
+			return $this->removeIndex($root).'/'.trim($path, '/');
+		}
 	}
 
 	/**
