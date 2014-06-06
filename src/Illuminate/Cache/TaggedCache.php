@@ -127,11 +127,11 @@ class TaggedCache implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		$this->store->forget($this->taggedItemKey($key));
+		return $this->store->forget($this->taggedItemKey($key));
 	}
 
 	/**

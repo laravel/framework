@@ -9,7 +9,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
+        "illuminate/support": "4.3.*",
         "symfony/security-core": "2.5.*"
     },
     "autoload": {
@@ -20,7 +20,7 @@
     "target-dir": "Illuminate/Encryption",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"
