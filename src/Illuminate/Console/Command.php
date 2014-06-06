@@ -64,6 +64,13 @@ abstract class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
+	 * Execute the console command.
+	 *
+	 * @return void
+	 */
+	abstract public function fire();
+
+	/**
 	 * Specify the arguments and options on the command.
 	 *
 	 * @return void
@@ -382,5 +389,4 @@ abstract class Command extends \Symfony\Component\Console\Command\Command {
 		$this->laravel = $laravel;
 	}
 
-	abstract public function fire();
 }
