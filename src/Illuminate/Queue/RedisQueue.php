@@ -219,7 +219,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	protected function getRandomId()
 	{
-		return str_random(20);
+		return str_random(32);
 	}
 
 	/**
