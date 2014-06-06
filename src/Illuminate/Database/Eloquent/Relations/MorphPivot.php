@@ -7,6 +7,8 @@ class MorphPivot extends Pivot {
 	/**
 	 * The type of the polymorphic relation.
 	 *
+	 * Explicitly define this so it's not included in saved attributes.
+	 *
 	 * @var string
 	 */
 	protected $morphType;
