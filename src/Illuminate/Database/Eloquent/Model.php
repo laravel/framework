@@ -565,9 +565,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param array $values
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public static function updateOrCreate(array $attributes, array $values = [])
+	public static function updateOrCreate(array $attributes, array $values = array())
 	{
 		$instance = static::firstOrNew($attributes);
+
 		$instance->fill($values)->save();
 
 		return $instance;
