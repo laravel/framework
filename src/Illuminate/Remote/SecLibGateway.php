@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Remote;
 
 use Illuminate\Filesystem\Filesystem;
-use Net_SFTP, Crypt_RSA, System_SSH_Agent;
+use Net_SFTP, Net_SSH2, Crypt_RSA, System_SSH_Agent;
 
 class SecLibGateway implements GatewayInterface {
 
@@ -36,7 +36,7 @@ class SecLibGateway implements GatewayInterface {
 	/**
 	 * The SecLib connection instance.
 	 *
-	 * @var \Net_SFTP
+	 * @var \Net_SFTP | Net_SSH2
 	 */
 	protected $connection;
 
@@ -115,7 +115,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function get($remote, $local)
 	{
-		$this->getConnection()->get($remote, $local);
+		$this->getConnection('Net_SFTP')->get($remote, $local);
 	}
 
 	/**
@@ -126,7 +126,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function getString($remote)
 	{
-		return $this->getConnection()->get($remote);
+		return $this->getConnection('Net_SFTP')->get($remote);
 	}
 
 	/**
@@ -138,7 +138,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function put($local, $remote)
 	{
-		$this->getConnection()->put($remote, $local, NET_SFTP_LOCAL_FILE);
+		$this->getConnection('Net_SFTP')->put($remote, $local, NET_SFTP_LOCAL_FILE);
 	}
 
 	/**
@@ -150,7 +150,7 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	public function putString($remote, $contents)
 	{
-		$this->getConnection()->put($remote, $contents);
+		$this->getConnection('Net_SFTP')->put($remote, $contents);
 	}
 
 	/**
@@ -244,8 +244,7 @@ class SecLibGateway implements GatewayInterface {
 
 		return $key;
 	}
-
-	/**
+/**
 	 * Determine if the SSH Agent should provide an RSA key.
 	 *
 	 * @return bool
@@ -306,15 +305,17 @@ class SecLibGateway implements GatewayInterface {
 	}
 
 	/**
-	 * Get the underlying Net_SFTP connection.
+	 * Get the underlying Net_SFTP or Net_SSH2 connection,
+	 * whichever is minimal for the above function.
+	 * Once created, it will 'upgrade' itself if needed.
 	 *
-	 * @return \Net_SFTP
+	 * @return \Net_SFTP | \Net_SSH2
 	 */
-	public function getConnection()
+	public function getConnection($type='Net_SSH2')
 	{
-		if ($this->connection) return $this->connection;
+		if ($this->connection &&(is_a($this->connection, 'Net_SFTP')||get_class($this->connection)==$type)) return $this->connection;
 
-		return $this->connection = new Net_SFTP($this->host, $this->port);
+		return $this->connection = new $type($this->host, $this->port);
 	}
 
 }
