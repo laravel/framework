@@ -20,7 +20,6 @@ interface ConnectionInterface {
 	 */
 	public function raw($value);
 
-
 	/**
 	 * Run a select statement and return a single result.
 	 *
