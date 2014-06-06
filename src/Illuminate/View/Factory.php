@@ -247,7 +247,7 @@ class Factory {
 	 * @param  string  $path
 	 * @return \Illuminate\View\Engines\EngineInterface
 	 */
-	protected function getEngineFromPath($path)
+	public function getEngineFromPath($path)
 	{
 		$engine = $this->extensions[$this->getExtension($path)];
 
