@@ -156,7 +156,7 @@ class Store implements SessionInterface {
 	 */
 	protected function generateSessionId()
 	{
-		return sha1(uniqid(true).str_random(25).microtime(true));
+		return sha1(uniqid('', true).str_random(25).microtime(true));
 	}
 
 	/**
