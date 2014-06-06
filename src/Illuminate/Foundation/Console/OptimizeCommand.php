@@ -125,20 +125,15 @@ class OptimizeCommand extends Command {
 	 */
 	protected function compileViews()
 	{
-		$paths = $this->laravel['view']->getFinder()
-			->getPaths();
-
-		foreach ($paths as $dir)
+		foreach ($this->laravel['view']->getFinder()->getPaths() as $path)
 		{
-			$files = $this->laravel['files']->allFiles($dir);
-
-			foreach ($files as $path)
+			foreach ($this->laravel['files']->allFiles($path) as $file)
 			{
-				$engine = $this->laravel['view']->getEngineFromPath($path);
+				$engine = $this->laravel['view']->getEngineFromPath($file);
 
 				if ($engine instanceof CompilerEngine)
 				{
-					$engine->getCompiler()->compile($path);
+					$engine->getCompiler()->compile($file);
 				}
 			}
 		}
