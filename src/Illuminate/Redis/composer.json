@@ -13,11 +13,10 @@
         "predis/predis": "0.8.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Redis": ""
+        "psr-4": {
+            "Illuminate\\Redis\\": ""
         }
     },
-    "target-dir": "Illuminate/Redis",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

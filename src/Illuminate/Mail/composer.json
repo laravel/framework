@@ -19,11 +19,10 @@
         "illuminate/queue": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Mail": ""
+        "psr-4": {
+            "Illuminate\\Mail\\": ""
         }
     },
-    "target-dir": "Illuminate/Mail",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

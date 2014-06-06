@@ -17,11 +17,10 @@
         "illuminate/console": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Workbench": ""
+        "psr-4": {
+            "Illuminate\\Workbench\\": ""
         }
     },
-    "target-dir": "Illuminate/Workbench",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

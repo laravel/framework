@@ -22,14 +22,13 @@
         "pda/pheanstalk": "~2.1"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Queue": ""
+        "psr-4": {
+            "Illuminate\\Queuing\\": ""
         },
         "classmap": [
             "IlluminateQueueClosure.php"
         ]
     },
-    "target-dir": "Illuminate/Queue",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"
