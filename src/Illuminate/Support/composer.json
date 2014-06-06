@@ -15,14 +15,13 @@
         "patchwork/utf8": "1.1.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Support": ""
+        "psr-4": {
+            "Illuminate\\Support\\": ""
         },
         "files": [
-            "Illuminate/Support/helpers.php"
+            "helpers.php"
         ]
     },
-    "target-dir": "Illuminate/Support",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

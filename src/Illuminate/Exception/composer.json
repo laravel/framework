@@ -18,11 +18,10 @@
         "monolog/monolog": "~1.6"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Exception": ""
+        "psr-4": {
+            "Illuminate\\Exception\\": ""
         }
     },
-    "target-dir": "Illuminate/Exception",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

@@ -22,11 +22,10 @@
         "illuminate/filesystem": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Routing": ""
+        "psr-4": {
+            "Illuminate\\Routing\\": ""
         }
     },
-    "target-dir": "Illuminate/Routing",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

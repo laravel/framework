@@ -15,11 +15,10 @@
         "symfony/http-kernel": "2.5.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Http": ""
+        "psr-4": {
+            "Illuminate\\Http\\": ""
         }
     },
-    "target-dir": "Illuminate/Http",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"

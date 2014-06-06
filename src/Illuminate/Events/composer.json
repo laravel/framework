@@ -13,11 +13,10 @@
         "illuminate/support": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Events": ""
+        "psr-4": {
+            "Illuminate\\Events\\": ""
         }
     },
-    "target-dir": "Illuminate/Events",
     "extra": {
         "branch-alias": {
             "dev-master": "4.3-dev"
