@@ -1379,9 +1379,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function finishSave(array $options)
 	{
-		$this->syncOriginal();
-
 		$this->fireModelEvent('saved', false);
+
+		$this->syncOriginal();
 
 		if (array_get($options, 'touch', true)) $this->touchOwners();
 	}
