@@ -221,7 +221,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		// to the URL. This allows for extra information like sortings storage.
 		if (count($this->query) > 0)
 		{
-			$parameters = array_merge($parameters, $this->query);
+			$parameters = array_merge($this->query, $parameters);
 		}
 
 		$fragment = $this->buildFragment();
