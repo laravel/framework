@@ -460,6 +460,44 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testValidateBoolean()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, array('foo' => 'no'), array('foo' => 'Boolean'));
+        $this->assertFalse($v->passes());
+        
+        $v = new Validator($trans, array('foo' => 'yes'), array('foo' => 'Boolean'));
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, array('foo' => 'false'), array('foo' => 'Boolean'));
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, array('foo' => 'true'), array('foo' => 'Boolean'));
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, array(), array('foo' => 'Boolean'));
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, array('foo' => false), array('foo' => 'Boolean'));
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, array('foo' => true), array('foo' => 'Boolean'));
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, array('foo' => '1'), array('foo' => 'Boolean'));
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, array('foo' => 1), array('foo' => 'Boolean'));
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, array('foo' => '0'), array('foo' => 'Boolean'));
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, array('foo' => 0), array('foo' => 'Boolean'));
+        $this->assertTrue($v->passes());
+    }
+    
+
 	public function testValidateNumeric()
 	{
 		$trans = $this->getRealTranslator();
