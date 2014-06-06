@@ -343,6 +343,34 @@ class Builder {
 	}
 
 	/**
+	 * Add a right join to the query.
+	 *
+	 * @param  string  $table
+	 * @param  string  $first
+	 * @param  string  $operator
+	 * @param  string  $second
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function rightJoin($table, $first, $operator = null, $second = null)
+	{
+		return $this->join($table, $first, $operator, $second, 'right');
+	}
+
+	/**
+	 * Add a "right join where" clause to the query.
+	 *
+	 * @param  string  $table
+	 * @param  string  $first
+	 * @param  string  $operator
+	 * @param  string  $two
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function rightJoinWhere($table, $one, $operator, $two)
+	{
+		return $this->joinWhere($table, $one, $operator, $two, 'right');
+	}
+
+	/**
 	 * Add a basic where clause to the query.
 	 *
 	 * @param  string  $column
