@@ -2,6 +2,7 @@
 
 use Closure;
 use DateTime;
+use DateTimeZone;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
@@ -1325,6 +1326,27 @@ class Validator implements MessageProviderInterface {
 	{
 		return DateTime::createFromFormat($format, $value) >
                DateTime::createFromFormat($format, $parameters[0]);
+	}
+	
+	/**
+	 * Validate that an attribute is a valid timezone.
+	 *
+	 * @param string $attribute
+	 * @param mixed $value
+	 * @return bool
+	 */
+	protected function validateTimezone($attribute, $value)
+	{
+		try
+		{
+			new DateTimeZone($value);
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+	
+		return true;
 	}
 
 	/**
