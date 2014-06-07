@@ -2,7 +2,7 @@
 
 use Illuminate\Console\Command;
 
-abstract class BaseCommand extends Command {
+class BaseCommand extends Command {
 
 	/**
 	 * Get the path to the migration directory.
