@@ -671,6 +671,16 @@ class Blueprint {
 
 		$this->index(array("{$name}_id", "{$name}_type"));
 	}
+	
+	/**
+	 * Add the proper column for a user `remember_token`
+	 * 
+	 * @return void
+	 */
+	public function remember_token()
+	{
+		$this->string('remember_token', 100)->nullable();
+	}
 
 	/**
 	 * Create a new drop index command on the blueprint.
