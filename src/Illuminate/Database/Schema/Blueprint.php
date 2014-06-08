@@ -672,6 +672,11 @@ class Blueprint {
 		$this->index(array("{$name}_id", "{$name}_type"));
 	}
 
+	/**
+	 * Adds `remember_token` column to the table.
+	 * 
+	 * @return void
+	 */
 	public function rememberToken()
 	{
 	  $this->string('remember_token', 100)->nullable();
