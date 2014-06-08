@@ -10,9 +10,9 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	/**
 	 * All of the attributes set on the container.
 	 *
-	 * @var array
+	 * @var \Illuminate\Support\Collection
 	 */
-	protected $attributes = array();
+	protected $attributes;
 
 	/**
 	 * Create a new fluent container instance.
@@ -22,10 +22,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function __construct($attributes = array())
 	{
-		foreach ($attributes as $key => $value)
-		{
-			$this->attributes[$key] = $value;
-		}
+		$this->attributes = Collection::make($attributes);
 	}
 
 	/**
@@ -37,12 +34,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function get($key, $default = null)
 	{
-		if (array_key_exists($key, $this->attributes))
-		{
-			return $this->attributes[$key];
-		}
-
-		return value($default);
+		return $this->attributes->get($key, $default);
 	}
 
 	/**
@@ -52,7 +44,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function getAttributes()
 	{
-		return $this->attributes;
+		return $this->toArray();
 	}
 
 	/**
@@ -62,7 +54,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function toArray()
 	{
-		return $this->attributes;
+		return $this->attributes->toArray();
 	}
 
 	/**
@@ -94,7 +86,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function offsetExists($offset)
 	{
-		return isset($this->{$offset});
+		return $this->attributes->offsetExists($offset);
 	}
 
 	/**
@@ -105,7 +97,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function offsetGet($offset)
 	{
-		return $this->{$offset};
+		return $this->attributes->offsetGet($offset);
 	}
 
 	/**
@@ -117,7 +109,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function offsetSet($offset, $value)
 	{
-		$this->{$offset} = $value;
+		$this->attributes->offsetSet($offset, $value);
 	}
 
 	/**
@@ -128,7 +120,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function offsetUnset($offset)
 	{
-		unset($this->{$offset});
+		$this->attributes->offsetUnset($offset);
 	}
 
 	/**
@@ -165,7 +157,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function __set($key, $value)
 	{
-		$this->attributes[$key] = $value;
+		$this->attributes->offsetSet($key, $value);
 	}
 
 	/**
@@ -176,7 +168,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function __isset($key)
 	{
-		return isset($this->attributes[$key]);
+		return $this->attributes->has($key);
 	}
 
 	/**
@@ -187,7 +179,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function __unset($key)
 	{
-		unset($this->attributes[$key]);
+		$this->offsetUnset($key);
 	}
 
 }
