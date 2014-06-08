@@ -231,6 +231,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFlip()
+	{
+		$data = new Collection(array('name' => 'taylor', 'framework' => 'laravel'));
+		$this->assertEquals(array('taylor' => 'name', 'laravel' => 'framework'), $data->flip()->toArray());
+	}
+
+
 	public function testChunk ()
 	{
 		$data = new Collection(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
