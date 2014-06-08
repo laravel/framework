@@ -672,6 +672,11 @@ class Blueprint {
 		$this->index(array("{$name}_id", "{$name}_type"));
 	}
 
+	public function rememberToken()
+	{
+	  $this->string('remember_token', 100)->nullable();
+	}
+
 	/**
 	 * Create a new drop index command on the blueprint.
 	 *
