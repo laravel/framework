@@ -673,6 +673,21 @@ class Blueprint {
 	}
 
 	/**
+	 * Add nullable proper columns for a polymorphic table.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function nullableMorphs($name)
+	{
+		$this->unsignedInteger("{$name}_id")->nullable();
+
+		$this->string("{$name}_type")->nullable();
+
+		$this->index(array("{$name}_id", "{$name}_type"));
+	}
+
+	/**
 	 * Create a new drop index command on the blueprint.
 	 *
 	 * @param  string  $command
