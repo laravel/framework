@@ -6,13 +6,11 @@ use Illuminate\Support\Contracts\ArrayableInterface;
 
 class ViewTest extends PHPUnit_Framework_TestCase {
 
-	public function __construct()
-	{
+	public function tearDown() {
 		m::close();
 	}
 
-
-	public function testDataCanBeSetOnView()
+		public function testDataCanBeSetOnView()
 	{
 		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
 		$view->with('foo', 'bar');
