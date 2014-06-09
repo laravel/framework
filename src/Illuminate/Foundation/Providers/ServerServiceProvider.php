@@ -34,7 +34,7 @@ class ServerServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.serve');
+		return ['command.serve'];
 	}
 
 }

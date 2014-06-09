@@ -36,14 +36,14 @@ class Route {
 	 *
 	 * @var array
 	 */
-	protected $defaults = array();
+	protected $defaults = [];
 
 	/**
 	 * The regular expression requirements.
 	 *
 	 * @var array
 	 */
-	protected $wheres = array();
+	protected $wheres = [];
 
 	/**
 	 * The array of matched parameters.
@@ -139,7 +139,7 @@ class Route {
 
 		$this->compiled = with(
 
-			new SymfonyRoute($uri, $optionals, $this->wheres, array(), $this->domain() ?: '')
+			new SymfonyRoute($uri, $optionals, $this->wheres, [], $this->domain() ?: '')
 
 		)->compile();
 	}
@@ -153,7 +153,7 @@ class Route {
 	{
 		preg_match_all('/\{(\w+?)\?\}/', $this->uri, $matches);
 
-		$optional = array();
+		$optional = [];
 
 		if (isset($matches[1]))
 		{
@@ -170,7 +170,7 @@ class Route {
 	 */
 	public function beforeFilters()
 	{
-		if ( ! isset($this->action['before'])) return array();
+		if ( ! isset($this->action['before'])) return [];
 
 		return $this->parseFilters($this->action['before']);
 	}
@@ -182,7 +182,7 @@ class Route {
 	 */
 	public function afterFilters()
 	{
-		if ( ! isset($this->action['after'])) return array();
+		if ( ! isset($this->action['after'])) return [];
 
 		return $this->parseFilters($this->action['after']);
 	}
@@ -222,7 +222,7 @@ class Route {
 	 */
 	protected static function explodeArrayFilters(array $filters)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($filters as $filter)
 		{
@@ -240,7 +240,7 @@ class Route {
 	 */
 	public static function parseFilter($filter)
 	{
-		if ( ! str_contains($filter, ':')) return array($filter, array());
+		if ( ! str_contains($filter, ':')) return [$filter, []];
 
 		return static::parseParameterFilter($filter);
 	}
@@ -255,7 +255,7 @@ class Route {
 	{
 		list($name, $parameters) = explode(':', $filter, 2);
 
-		return array($name, explode(',', $parameters));
+		return [$name, explode(',', $parameters)];
 	}
 
 	/**
@@ -443,7 +443,7 @@ class Route {
 	 */
 	protected function matchToKeys(array $matches)
 	{
-		if (count($this->parameterNames()) == 0) return array();
+		if (count($this->parameterNames()) == 0) return [];
 
 		$parameters = array_intersect_key($matches, array_flip($this->parameterNames()));
 
@@ -482,7 +482,7 @@ class Route {
 		// it is available. Otherwise we will need to find it in the action list.
 		if (is_callable($action))
 		{
-			return array('uses' => $action);
+			return ['uses' => $action];
 		}
 
 		// If no "uses" property has been set, we will dig through the array to find a
@@ -522,10 +522,10 @@ class Route {
 		// To match the route, we will use a chain of responsibility pattern with the
 		// validator implementations. We will spin through each one making sure it
 		// passes and then we will know if the route as a whole matches request.
-		return static::$validators = array(
+		return static::$validators = [
 			new MethodValidator, new SchemeValidator,
 			new HostValidator, new UriValidator,
-		);
+		];
 	}
 
 	/**
@@ -611,7 +611,7 @@ class Route {
 	 */
 	protected function parseWhere($name, $expression)
 	{
-		return is_array($name) ? $name : array($name => $expression);
+		return is_array($name) ? $name : [$name => $expression];
 	}
 
 	/**

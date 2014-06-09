@@ -9,7 +9,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 *
 	 * @var array
 	 */
-	protected $providers = array(
+	protected $providers = [
 		'Illuminate\Foundation\Providers\CommandCreatorServiceProvider',
 		'Illuminate\Foundation\Providers\ComposerServiceProvider',
 		'Illuminate\Foundation\Providers\KeyGeneratorServiceProvider',
@@ -20,14 +20,14 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 		'Illuminate\Foundation\Providers\ServerServiceProvider',
 		'Illuminate\Foundation\Providers\TinkerServiceProvider',
 		'Illuminate\Queue\FailConsoleServiceProvider',
-	);
+	];
 
 	/**
 	 * An array of the service provider instances.
 	 *
 	 * @var array
 	 */
-	protected $instances = array();
+	protected $instances = [];
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -43,7 +43,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->instances = array();
+		$this->instances = [];
 
 		foreach ($this->providers as $provider)
 		{
@@ -58,7 +58,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		$provides = array();
+		$provides = [];
 
 		foreach ($this->providers as $provider)
 		{

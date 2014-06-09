@@ -34,13 +34,13 @@ class Builder {
 	 *
 	 * @var array
 	 */
-	protected $bindings = array(
+	protected $bindings = [
 		'select' => [],
 		'join'   => [],
 		'where'  => [],
 		'having' => [],
 		'order'  => [],
-	);
+	];
 
 	/**
 	 * An aggregate function and column to be run.
@@ -138,7 +138,7 @@ class Builder {
 	 *
 	 * @var array
 	 */
-	protected $backups = array();
+	protected $backups = [];
 
 	/**
 	 * The key that should be used when caching the query.
@@ -173,12 +173,12 @@ class Builder {
 	 *
 	 * @var array
 	 */
-	protected $operators = array(
+	protected $operators = [
 		'=', '<', '>', '<=', '>=', '<>', '!=',
 		'like', 'not like', 'between', 'ilike',
 		'&', '|', '^', '<<', '>>',
 		'rlike', 'regexp', 'not regexp',
-	);
+	];
 
 	/**
 	 * Create a new query builder instance.
@@ -203,7 +203,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function select($columns = array('*'))
+	public function select($columns = ['*'])
 	{
 		$this->columns = is_array($columns) ? $columns : func_get_args();
 
@@ -217,7 +217,7 @@ class Builder {
 	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function selectRaw($expression, array $bindings = array())
+	public function selectRaw($expression, array $bindings = [])
 	{
 		$this->addSelect(new Expression($expression));
 
@@ -427,7 +427,7 @@ class Builder {
 	{
 		if (func_num_args() == 2)
 		{
-			list($value, $operator) = array($operator, '=');
+			list($value, $operator) = [$operator, '='];
 		}
 		elseif ($this->invalidOperatorAndValue($operator, $value))
 		{
@@ -447,7 +447,7 @@ class Builder {
 		// we will set the operators to '=' and set the values appropriately.
 		if ( ! in_array(strtolower($operator), $this->operators, true))
 		{
-			list($value, $operator) = array($operator, '=');
+			list($value, $operator) = [$operator, '='];
 		}
 
 		// If the value is a Closure, it means the developer is performing an entire
@@ -516,7 +516,7 @@ class Builder {
 	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function whereRaw($sql, array $bindings = array(), $boolean = 'and')
+	public function whereRaw($sql, array $bindings = [], $boolean = 'and')
 	{
 		$type = 'raw';
 
@@ -534,7 +534,7 @@ class Builder {
 	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orWhereRaw($sql, array $bindings = array())
+	public function orWhereRaw($sql, array $bindings = [])
 	{
 		return $this->whereRaw($sql, $bindings, 'or');
 	}
@@ -1045,7 +1045,7 @@ class Builder {
 	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function havingRaw($sql, array $bindings = array(), $boolean = 'and')
+	public function havingRaw($sql, array $bindings = [], $boolean = 'and')
 	{
 		$type = 'raw';
 
@@ -1063,7 +1063,7 @@ class Builder {
 	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orHavingRaw($sql, array $bindings = array())
+	public function orHavingRaw($sql, array $bindings = [])
 	{
 		return $this->havingRaw($sql, $bindings, 'or');
 	}
@@ -1113,7 +1113,7 @@ class Builder {
 	 * @param  array  $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orderByRaw($sql, $bindings = array())
+	public function orderByRaw($sql, $bindings = [])
 	{
 		$type = 'raw';
 
@@ -1266,7 +1266,7 @@ class Builder {
 	 */
 	public function remember($minutes, $key = null)
 	{
-		list($this->cacheMinutes, $this->cacheKey) = array($minutes, $key);
+		list($this->cacheMinutes, $this->cacheKey) = [$minutes, $key];
 
 		return $this;
 	}
@@ -1315,7 +1315,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return mixed|static
 	 */
-	public function find($id, $columns = array('*'))
+	public function find($id, $columns = ['*'])
 	{
 		return $this->where('id', '=', $id)->first($columns);
 	}
@@ -1328,7 +1328,7 @@ class Builder {
 	 */
 	public function pluck($column)
 	{
-		$result = (array) $this->first(array($column));
+		$result = (array) $this->first([$column]);
 
 		return count($result) > 0 ? reset($result) : null;
 	}
@@ -1339,7 +1339,7 @@ class Builder {
 	 * @param  array   $columns
 	 * @return mixed|static
 	 */
-	public function first($columns = array('*'))
+	public function first($columns = ['*'])
 	{
 		$results = $this->take(1)->get($columns);
 
@@ -1352,7 +1352,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return array|static[]
 	 */
-	public function get($columns = array('*'))
+	public function get($columns = ['*'])
 	{
 		if ( ! is_null($this->cacheMinutes)) return $this->getCached($columns);
 
@@ -1365,7 +1365,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return array|static[]
 	 */
-	public function getFresh($columns = array('*'))
+	public function getFresh($columns = ['*'])
 	{
 		if (is_null($this->columns)) $this->columns = $columns;
 
@@ -1388,7 +1388,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return array
 	 */
-	public function getCached($columns = array('*'))
+	public function getCached($columns = ['*'])
 	{
 		if (is_null($this->columns)) $this->columns = $columns;
 
@@ -1433,7 +1433,7 @@ class Builder {
 	 */
 	protected function getCacheInfo()
 	{
-		return array($this->getCacheKey(), $this->cacheMinutes);
+		return [$this->getCacheKey(), $this->cacheMinutes];
 	}
 
 	/**
@@ -1533,7 +1533,7 @@ class Builder {
 	 */
 	protected function getListSelect($column, $key)
 	{
-		$select = is_null($key) ? array($column) : array($column, $key);
+		$select = is_null($key) ? [$column] : [$column, $key];
 
 		// If the selected column contains a "dot", we will remove it so that the list
 		// operation can run normally. Specifying the table is not needed, since we
@@ -1567,7 +1567,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = 15, $columns = array('*'))
+	public function paginate($perPage = 15, $columns = ['*'])
 	{
 		$paginator = $this->connection->getPaginator();
 
@@ -1666,7 +1666,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function simplePaginate($perPage = null, $columns = array('*'))
+	public function simplePaginate($perPage = null, $columns = ['*'])
 	{
 		$paginator = $this->connection->getPaginator();
 
@@ -1686,7 +1686,7 @@ class Builder {
 	 */
 	protected function backupFieldsForCount()
 	{
-		foreach (array('orders', 'limit', 'offset') as $field)
+		foreach (['orders', 'limit', 'offset'] as $field)
 		{
 			$this->backups[$field] = $this->{$field};
 
@@ -1702,12 +1702,12 @@ class Builder {
 	 */
 	protected function restoreFieldsForCount()
 	{
-		foreach (array('orders', 'limit', 'offset') as $field)
+		foreach (['orders', 'limit', 'offset'] as $field)
 		{
 			$this->{$field} = $this->backups[$field];
 		}
 
-		$this->backups = array();
+		$this->backups = [];
 	}
 
 	/**
@@ -1730,7 +1730,7 @@ class Builder {
 	{
 		if ( ! is_array($columns))
 		{
-			$columns = array($columns);
+			$columns = [$columns];
 		}
 
 		return (int) $this->aggregate(__FUNCTION__, $columns);
@@ -1744,7 +1744,7 @@ class Builder {
 	 */
 	public function min($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
@@ -1755,7 +1755,7 @@ class Builder {
 	 */
 	public function max($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
@@ -1766,7 +1766,7 @@ class Builder {
 	 */
 	public function sum($column)
 	{
-		$result = $this->aggregate(__FUNCTION__, array($column));
+		$result = $this->aggregate(__FUNCTION__, [$column]);
 
 		return $result ?: 0;
 	}
@@ -1779,7 +1779,7 @@ class Builder {
 	 */
 	public function avg($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
@@ -1789,7 +1789,7 @@ class Builder {
 	 * @param  array   $columns
 	 * @return mixed
 	 */
-	public function aggregate($function, $columns = array('*'))
+	public function aggregate($function, $columns = ['*'])
 	{
 		$this->aggregate = compact('function', 'columns');
 
@@ -1825,7 +1825,7 @@ class Builder {
 		// inserts statements by verifying the elements are actually an array.
 		if ( ! is_array(reset($values)))
 		{
-			$values = array($values);
+			$values = [$values];
 		}
 
 		// Since every insert gets treated like a batch insert, we will make sure the
@@ -1842,7 +1842,7 @@ class Builder {
 		// We'll treat every insert like a batch insert so we can easily insert each
 		// of the records into the database consistently. This will make it much
 		// easier on the grammars to just handle one type of record insertion.
-		$bindings = array();
+		$bindings = [];
 
 		foreach ($values as $record)
 		{
@@ -1901,11 +1901,11 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function increment($column, $amount = 1, array $extra = array())
+	public function increment($column, $amount = 1, array $extra = [])
 	{
 		$wrapped = $this->grammar->wrap($column);
 
-		$columns = array_merge(array($column => $this->raw("$wrapped + $amount")), $extra);
+		$columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
 
 		return $this->update($columns);
 	}
@@ -1918,11 +1918,11 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function decrement($column, $amount = 1, array $extra = array())
+	public function decrement($column, $amount = 1, array $extra = [])
 	{
 		$wrapped = $this->grammar->wrap($column);
 
-		$columns = array_merge(array($column => $this->raw("$wrapped - $amount")), $extra);
+		$columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);
 
 		return $this->update($columns);
 	}

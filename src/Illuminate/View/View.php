@@ -55,7 +55,7 @@ class View implements ArrayAccess, Renderable {
 	 * @param  array   $data
 	 * @return void
 	 */
-	public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = array())
+	public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = [])
 	{
 		$this->view = $view;
 		$this->path = $path;
@@ -183,7 +183,7 @@ class View implements ArrayAccess, Renderable {
 	 * @param  array   $data
 	 * @return \Illuminate\View\View
 	 */
-	public function nest($key, $view, array $data = array())
+	public function nest($key, $view, array $data = [])
 	{
 		return $this->with($key, $this->factory->make($view, $data));
 	}

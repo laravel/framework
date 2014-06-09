@@ -9,7 +9,7 @@ class Subscriber {
 	 */
 	public static function subscribes()
 	{
-		return array();
+		return [];
 	}
 
 	/**

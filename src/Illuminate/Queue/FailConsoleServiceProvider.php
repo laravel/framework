@@ -61,9 +61,9 @@ class FailConsoleServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array(
+		return [
 			'command.queue.failed', 'command.queue.retry', 'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
-		);
+		];
 	}
 
 }

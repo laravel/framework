@@ -39,7 +39,7 @@ class WorkbenchServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('package.creator', 'command.workbench');
+		return ['package.creator', 'command.workbench'];
 	}
 
 }

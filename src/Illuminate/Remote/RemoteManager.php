@@ -73,7 +73,7 @@ class RemoteManager {
 	 */
 	public function multiple(array $names)
 	{
-		return new MultiConnection(array_map(array($this, 'resolve'), $names));
+		return new MultiConnection(array_map([$this, 'resolve'], $names));
 	}
 
 	/**
@@ -130,19 +130,19 @@ class RemoteManager {
 	{
 		if (isset($config['agent']) && $config['agent'] === true)
 		{
-			return array('agent' => true);
+			return ['agent' => true];
 		}
 		elseif (isset($config['key']) && trim($config['key']) != '')
 		{
-			return array('key' => $config['key'], 'keyphrase' => $config['keyphrase']);
+			return ['key' => $config['key'], 'keyphrase' => $config['keyphrase']];
 		}
 		elseif (isset($config['keytext']) && trim($config['keytext']) != '')
 		{
-			return array('keytext' => $config['keytext']);
+			return ['keytext' => $config['keytext']];
 		}
 		elseif (isset($config['password']))
 		{
-			return array('password' => $config['password']);
+			return ['password' => $config['password']];
 		}
 
 		throw new \InvalidArgumentException('Password / key is required.');
@@ -195,7 +195,7 @@ class RemoteManager {
 	 */
 	public function __call($method, $parameters)
 	{
-		return call_user_func_array(array($this->connection(), $method), $parameters);
+		return call_user_func_array([$this->connection(), $method], $parameters);
 	}
 
 }
