@@ -12,7 +12,7 @@ class WorkbenchMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @expectedException PHPUnit_Framework_Error_Warning
-	 * @expectedExceptionMessage chdir(): No such file or directory (errno 2)
+	 * @expectedExceptionCode 2
 	 */
 	public function testCreatePackageSuccess() {
 		$creator = $this->getMock('\Illuminate\Workbench\PackageCreator', [], [new Filesystem()]);
