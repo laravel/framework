@@ -42,7 +42,7 @@ class RoutesCommand extends Command {
 	 * @var array
 	 */
 	protected $headers = array(
-		'Domain', 'URI', 'Name', 'Action', 'Before Filters', 'After Filters'
+		'Subomain', 'Domain', 'URI', 'Name', 'Action', 'Before Filters', 'After Filters'
 	);
 
 	/**
@@ -103,12 +103,13 @@ class RoutesCommand extends Command {
 		$uri = implode('|', $route->methods()).' '.$route->uri();
 
 		return $this->filterRoute(array(
-			'host'   => $route->domain(),
-			'uri'    => $uri,
-			'name'   => $route->getName(),
-			'action' => $route->getActionName(),
-			'before' => $this->getBeforeFilters($route),
-			'after'  => $this->getAfterFilters($route)
+			'subdomain' => $route->subdomain(),
+			'domain'    => $route->domain(),
+			'uri'       => $uri,
+			'name'      => $route->getName(),
+			'action'    => $route->getActionName(),
+			'before'    => $this->getBeforeFilters($route),
+			'after'     => $this->getAfterFilters($route)
 		));
 	}
 

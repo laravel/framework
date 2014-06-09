@@ -19,7 +19,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('dayle', $router->dispatch(Request::create('http://api.dayle.baz/foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
+		$route = $router->get('foo/bar', array('domain' => '{name}.bar', 'subdomain' => 'api', function($name) { return $name; }));
+		$route = $router->get('foo/bar', array('domain' => '{name}.baz', 'subdomain' => 'api', function($name) { return $name; }));
+		$this->assertEquals('taylor', $router->dispatch(Request::create('http://api.taylor.bar/foo/bar', 'GET'))->getContent());
+		$this->assertEquals('dayle', $router->dispatch(Request::create('http://api.dayle.baz/foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
 		$route = $router->get('foo/{age}', array('domain' => 'api.{name}.bar', function($name, $age) { return $name.$age; }));
+		$this->assertEquals('taylor25', $router->dispatch(Request::create('http://api.taylor.bar/foo/25', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$route = $router->get('foo/{age}', array('domain' => '{name}.bar', 'subdomain' => 'api', function($name, $age) { return $name.$age; }));
 		$this->assertEquals('taylor25', $router->dispatch(Request::create('http://api.taylor.bar/foo/25', 'GET'))->getContent());
 
 		$router = $this->getRouter();
@@ -423,6 +433,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 		$request = Request::create('http://something.bar.com/foo/bar', 'GET');
 		$route = new Route('GET', 'foo/{bar}', array('domain' => '{foo}.foo.com', function() {}));
+		$this->assertFalse($route->matches($request));
+
+		/**
+		 * Subdomain checks
+		 */
+		$request = Request::create('http://something.foo.com/foo/bar', 'GET');
+		$route = new Route('GET', 'foo/{bar}', array('domain' => 'foo.com', 'subdomain' => 'something', function() {}));
+		$this->assertTrue($route->matches($request));
+
+		$request = Request::create('http://something.bar.com/foo/bar', 'GET');
+		$route = new Route('GET', 'foo/{bar}', array('domain' => 'foo.com', 'subdomain' => 'something', function() {}));
 		$this->assertFalse($route->matches($request));
 
 		/**
