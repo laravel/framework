@@ -75,12 +75,12 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		// passed into these commands as "parameters" to control the execution.
 		foreach ($this->getArguments() as $arguments)
 		{
-			call_user_func_array(array($this, 'addArgument'), $arguments);
+			call_user_func_array([$this, 'addArgument'], $arguments);
 		}
 
 		foreach ($this->getOptions() as $options)
 		{
-			call_user_func_array(array($this, 'addOption'), $options);
+			call_user_func_array([$this, 'addOption'], $options);
 		}
 	}
 
@@ -119,7 +119,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  array   $arguments
 	 * @return integer
 	 */
-	public function call($command, array $arguments = array())
+	public function call($command, array $arguments = [])
 	{
 		$instance = $this->getApplication()->find($command);
 
@@ -135,7 +135,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  array   $arguments
 	 * @return integer
 	 */
-	public function callSilent($command, array $arguments = array())
+	public function callSilent($command, array $arguments = [])
 	{
 		$instance = $this->getApplication()->find($command);
 
@@ -338,7 +338,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	protected function getArguments()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -348,7 +348,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	protected function getOptions()
 	{
-		return array();
+		return [];
 	}
 
 	/**

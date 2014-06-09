@@ -10,14 +10,14 @@ class SqlServerGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Increment', 'Nullable', 'Default');
+	protected $modifiers = ['Increment', 'Nullable', 'Default'];
 
 	/**
 	 * The columns available as serials.
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer');
+	protected $serials = ['bigInteger', 'integer'];
 
 	/**
 	 * Compile the query to determine if a table exists.

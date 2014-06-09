@@ -81,11 +81,11 @@ class ChangesCommand extends Command {
 		{
 			$latest = head(array_keys($changes));
 
-			return array($latest, $changes[$latest]);
+			return [$latest, $changes[$latest]];
 		}
 		else
 		{
-			return array($version, array_get($changes, $version, array()));
+			return [$version, array_get($changes, $version, [])];
 		}
 	}
 
@@ -106,9 +106,9 @@ class ChangesCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('version', InputArgument::OPTIONAL, 'The version to list changes for.'),
-		);
+		return [
+			['version', InputArgument::OPTIONAL, 'The version to list changes for.'],
+		];
 	}
 
 }

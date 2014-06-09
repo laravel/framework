@@ -7,7 +7,7 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @var array
 	 */
-	protected $storage = array();
+	protected $storage = [];
 
 	/**
 	 * Retrieve an item from the cache by key.
@@ -80,11 +80,13 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
 		unset($this->storage[$key]);
+
+		return true;
 	}
 
 	/**
@@ -94,7 +96,7 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 	 */
 	public function flush()
 	{
-		$this->storage = array();
+		$this->storage = [];
 	}
 
 	/**

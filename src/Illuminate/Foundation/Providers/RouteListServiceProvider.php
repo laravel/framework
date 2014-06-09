@@ -34,7 +34,7 @@ class RouteListServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.routes');
+		return ['command.routes'];
 	}
 
 }

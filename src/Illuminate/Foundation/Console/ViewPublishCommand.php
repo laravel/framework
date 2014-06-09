@@ -84,9 +84,9 @@ class ViewPublishCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('package', InputArgument::REQUIRED, 'The name of the package being published.'),
-		);
+		return [
+            ['package', InputArgument::REQUIRED, 'The name of the package being published.'],
+		];
 	}
 
 	/**
@@ -96,9 +96,9 @@ class ViewPublishCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the source view files.', null),
-		);
+		return [
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The path to the source view files.', null],
+		];
 	}
 
 }

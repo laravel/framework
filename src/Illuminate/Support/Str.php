@@ -162,7 +162,7 @@ class Str {
 	 */
 	public static function parseCallback($callback, $default)
 	{
-		return static::contains($callback, '@') ? explode('@', $callback, 2) : array($callback, $default);
+		return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
 	}
 
 	/**
@@ -196,7 +196,7 @@ class Str {
 				throw new \RuntimeException('Unable to generate random string.');
 			}
 
-			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+			return substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
 		}
 
 		return static::quickRandom($length);
@@ -314,7 +314,7 @@ class Str {
 	 */
 	public static function studly($value)
 	{
-		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
+		$value = ucwords(str_replace(['-', '_'], ' ', $value));
 
 		return str_replace(' ', '', $value);
 	}

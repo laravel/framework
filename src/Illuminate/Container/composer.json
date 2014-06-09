@@ -11,14 +11,13 @@
         "php": ">=5.4.0"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Container": ""
+        "psr-4": {
+            "Illuminate\\Container\\": ""
         }
     },
-    "target-dir": "Illuminate/Container",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"
