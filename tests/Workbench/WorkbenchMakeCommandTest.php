@@ -7,7 +7,6 @@ use Mockery as m;
 class WorkbenchMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 	protected function tearDown() {
-		parent::tearDown();
 		m::close();
 	}
 
