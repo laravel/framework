@@ -250,6 +250,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if application is in production environment.
+	 *
+	 * @return bool
+	 */
+	public function isProduction()
+	{
+		return $this['env'] == 'production';
+	}
+
+	/**
 	 * Detect the application's current environment.
 	 *
 	 * @param  array|string  $envs
