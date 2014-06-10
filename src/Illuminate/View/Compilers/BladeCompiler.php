@@ -34,9 +34,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * Echos matching patterns.
 	 */
 	const ECHO_REGULAR_DEFAULT = '/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s';
-	const ECHO_DOTTED          = '/^(?=\$)(.+?)\.(.+?)$/s';
-	const ECHO_DOTTED_DEFAULT  = '/^(?=\$)(.+?)\.(.+?)(?:\s+or\s+)(.+?)$/s';
-
+	const ECHO_DOTTED          = '/^(?=\$)(.+?)\.([^\$]+?)$/s';
+	const ECHO_DOTTED_DEFAULT  = '/^(?=\$)(.+?)\.([^\$]+?)(?:\s+or\s+)(.+?)$/s';
+	
 	/**
 	 * Array of opening and closing tags for escaped echos.
 	 *

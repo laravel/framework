@@ -138,6 +138,14 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 			$user.name
 		}}'));
 
+		// ensure concatenated strings are not interpreted as dotted variables
+		$this->assertEquals('<?php echo e($user.$name); ?>', $compiler->compileString('{{{$user.$name}}}'));
+		$this->assertEquals('<?php echo $user.$name; ?>', $compiler->compileString('{{$user.$name}}'));
+		$this->assertEquals('<?php echo $user.$name; ?>', $compiler->compileString('{{ $user.$name }}'));
+		$this->assertEquals('<?php echo $user.$name; ?>', $compiler->compileString('{{
+			$user.$name
+		}}'));
+
 		$this->assertEquals('<?php echo data_get($user, "name", "foo"); ?>', $compiler->compileString('{{ $user.name or "foo" }}'));
 		$this->assertEquals('<?php echo data_get($user, "name", "foo"); ?>', $compiler->compileString('{{$user.name or "foo"}}'));
 		$this->assertEquals('<?php echo data_get($user, "name", "foo"); ?>', $compiler->compileString('{{
