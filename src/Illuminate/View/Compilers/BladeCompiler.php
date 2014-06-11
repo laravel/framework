@@ -19,6 +19,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $path;
 
 	/**
+	 * All of the available compiler functions.
+	 *
+	 * @var array
+	 */
+	protected $compilers = array(
+		'Extensions',
+		'Statements',
+		'Comments',
+		'Echos'
+	);
+
+	/**
 	 * Array of opening and closing tags for escaped echos.
 	 *
 	 * @var array
@@ -125,7 +137,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		if ($id == T_INLINE_HTML)
 		{
-			foreach (['Extensions', 'Statements', 'Comments', 'Echos'] as $type)
+			foreach ($this->compilers as $type)
 			{
 				$content = $this->{"compile{$type}"}($content);
 			}
