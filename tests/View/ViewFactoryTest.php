@@ -213,6 +213,19 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testObjectCallbacks()
+	{
+		$factory = $this->getFactory();
+		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$composer = m::mock('StdClass');
+		$composer->shouldReceive('compose')->once()->with('view')->andReturn('composed');
+		$callback = $factory->composer('foo', $composer);
+		$callback = $callback[0];
+
+		$this->assertEquals('composed', $callback('view'));
+	}
+
+
 	public function testCallComposerCallsProperEvent()
 	{
 		$factory = $this->getFactory();
