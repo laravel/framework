@@ -79,7 +79,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 
 		$this->app['exception.debug'] = $this->app->share(function($app)
 		{
-			return new SymfonyDisplayer(new SymfonyExceptionHandler);
+			return new SymfonyDisplayer(new SymfonyExceptionHandler, $this->shouldReturnJson());
 		});
 	}
 
