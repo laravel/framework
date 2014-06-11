@@ -9,7 +9,7 @@ trait ConfirmableTrait {
 	 */
 	public function confirmToProceed()
 	{
-		if ($this->getLaravel()->environment() == 'production')
+		if ($this->getLaravel()->isProduction())
 		{
 			if ($this->option('force')) return true;
 
