@@ -41,8 +41,6 @@ class SymfonyDisplayer implements ExceptionDisplayerInterface {
 	 */
 	public function display(Exception $exception)
 	{
-		$this->returnJson = true;
-
 		if ($this->returnJson)
 		{
 			return new JsonResponse(array(
