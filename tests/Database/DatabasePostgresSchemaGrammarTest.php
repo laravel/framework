@@ -188,6 +188,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "id" serial primary key not null', $statements[0]);
 	}
 
+
 	public function testAddingBigIncrementingID()
 	{
 		$blueprint = new Blueprint('users');
@@ -355,7 +356,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" varchar(255) check (foo in (\'bar\', \'baz\')) not null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" varchar(255) check ("foo" in (\'bar\', \'baz\')) not null', $statements[0]);
 	}
 
 

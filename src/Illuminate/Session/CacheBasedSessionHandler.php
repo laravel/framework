@@ -21,7 +21,7 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	/**
 	 * Create a new cache driven handler instance.
 	 *
-	 * @param  Illuminate\Cache\Repository  $cache
+	 * @param  \Illuminate\Cache\Repository  $cache
 	 * @param  int  $minutes
 	 * @return void
 	 */

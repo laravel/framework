@@ -53,7 +53,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new reminder record and token.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @return string
 	 */
 	public function create(RemindableInterface $user)
@@ -85,7 +85,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Determine if a reminder record exists and is valid.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @param  string  $token
 	 * @return bool
 	 */
@@ -93,20 +93,20 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	{
 		$email = $user->getReminderEmail();
 
-		$reminder = $this->getTable()->where('email', $email)->where('token', $token)->first();
+		$reminder = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
-		return $reminder and ! $this->reminderExpired($reminder);
+		return $reminder && ! $this->reminderExpired($reminder);
 	}
 
 	/**
 	 * Determine if the reminder has expired.
 	 *
-	 * @param  object  $reminder
+	 * @param  array  $reminder
 	 * @return bool
 	 */
 	protected function reminderExpired($reminder)
 	{
-		$createdPlusHour = strtotime($reminder->created_at) + $this->expires;
+		$createdPlusHour = strtotime($reminder['created_at']) + $this->expires;
 
 		return $createdPlusHour < $this->getCurrentTime();
 	}
@@ -147,7 +147,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new token for the user.
 	 *
-	 * @param  \Illuminate\Auth\RemindableInterface  $user
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
 	 * @return string
 	 */
 	public function createNewToken(RemindableInterface $user)

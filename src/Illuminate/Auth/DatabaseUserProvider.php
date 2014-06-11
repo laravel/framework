@@ -58,6 +58,40 @@ class DatabaseUserProvider implements UserProviderInterface {
 	}
 
 	/**
+	 * Retrieve a user by by their unique identifier and "remember me" token.
+	 *
+	 * @param  mixed  $identifier
+	 * @param  string  $token
+	 * @return \Illuminate\Auth\UserInterface|null
+	 */
+	public function retrieveByToken($identifier, $token)
+	{
+		$user = $this->conn->table($this->table)
+                                ->where('id', $identifier)
+                                ->where('remember_token', $token)
+                                ->first();
+
+		if ( ! is_null($user))
+		{
+			return new GenericUser((array) $user);
+		}
+	}
+
+	/**
+	 * Update the "remember me" token for the given user in storage.
+	 *
+	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  string  $token
+	 * @return void
+	 */
+	public function updateRememberToken(UserInterface $user, $token)
+	{
+		$this->conn->table($this->table)
+                            ->where('id', $user->getAuthIdentifier())
+                            ->update(array('remember_token' => $token));
+	}
+
+	/**
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials

@@ -1,10 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
-use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Eloquent\Collection;
 
 class MorphToMany extends BelongsToMany {
 
@@ -68,6 +65,20 @@ class MorphToMany extends BelongsToMany {
 	}
 
 	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query, Builder $parent)
+	{
+		$query = parent::getRelationCountQuery($query, $parent);
+
+		return $query->where($this->table.'.'.$this->morphType, $this->morphClass);
+	}
+
+	/**
 	 * Set the constraints for an eager load of the relation.
 	 *
 	 * @param  array  $models
@@ -111,7 +122,7 @@ class MorphToMany extends BelongsToMany {
 	 *
 	 * @param  array  $attributes
 	 * @param  bool   $exists
-	 * @return \Illuminate\Database\Eloquent\Relation\Pivot
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
 	 */
 	public function newPivot(array $attributes = array(), $exists = false)
 	{
@@ -122,6 +133,26 @@ class MorphToMany extends BelongsToMany {
 		$pivot->setMorphType($this->morphType);
 
 		return $pivot;
+	}
+
+	/**
+	 * Get the foreign key "type" name.
+	 *
+	 * @return string
+	 */
+	public function getMorphType()
+	{
+		return $this->morphType;
+	}
+
+	/**
+	 * Get the class name of the parent model.
+	 *
+	 * @return string
+	 */
+	public function getMorphClass()
+	{
+		return $this->morphClass;
 	}
 
 }

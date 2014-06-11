@@ -26,7 +26,7 @@ error_reporting(-1);
 
 if ( ! extension_loaded('mcrypt'))
 {
-	echo 'Laravel requires the Mcrypt PHP extension.'.PHP_EOL;
+	echo 'Mcrypt PHP extension required.'.PHP_EOL;
 
 	exit(1);
 }
@@ -43,9 +43,9 @@ if ( ! extension_loaded('mcrypt'))
 */
 
 use Illuminate\Http\Request;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Config\EnvironmentVariables;
 use Illuminate\Config\Repository as Config;
 
 /*
@@ -94,6 +94,33 @@ Facade::setFacadeApplication($app);
 
 /*
 |--------------------------------------------------------------------------
+| Register Facade Aliases To Full Classes
+|--------------------------------------------------------------------------
+|
+| By default, we use short keys in the container for each of the core
+| pieces of the framework. Here we will register the aliases for a
+| list of all of the fully qualified class names making DI easy.
+|
+*/
+
+$app->registerCoreContainerAliases();
+
+/*
+|--------------------------------------------------------------------------
+| Register The Environment Variables
+|--------------------------------------------------------------------------
+|
+| Here we will register all of the $_ENV and $_SERVER variables into the
+| process so that they're globally available configuration options so
+| sensitive configuration information can be swept out of the code.
+|
+*/
+
+with($envVariables = new EnvironmentVariables(
+	$app->getEnvironmentVariablesLoader()))->load($env);
+
+/*
+|--------------------------------------------------------------------------
 | Register The Configuration Repository
 |--------------------------------------------------------------------------
 |
@@ -103,9 +130,11 @@ Facade::setFacadeApplication($app);
 |
 */
 
-$config = new Config($app->getConfigLoader(), $env);
+$app->instance('config', $config = new Config(
 
-$app->instance('config', $config);
+	$app->getConfigLoader(), $env
+
+));
 
 /*
 |--------------------------------------------------------------------------
@@ -121,22 +150,6 @@ $app->instance('config', $config);
 $app->startExceptionHandling();
 
 if ($env != 'testing') ini_set('display_errors', 'Off');
-
-/*
-|--------------------------------------------------------------------------
-| Set The Console Request If Necessary
-|--------------------------------------------------------------------------
-|
-| If we're running in a console context, we won't have a host on this
-| request so we'll need to re-bind a new request with a URL from a
-| configuration file. This will help the URL generator generate.
-|
-*/
-
-if ($app->runningInConsole())
-{
-	$app->setRequestForConsoleEnvironment();
-}
 
 /*
 |--------------------------------------------------------------------------
@@ -164,7 +177,9 @@ date_default_timezone_set($config['timezone']);
 |
 */
 
-AliasLoader::getInstance($config['aliases'])->register();
+$aliases = $config['aliases'];
+
+AliasLoader::getInstance($aliases)->register();
 
 /*
 |--------------------------------------------------------------------------
@@ -196,23 +211,24 @@ $app->getProviderRepository()->load($app, $providers);
 
 /*
 |--------------------------------------------------------------------------
-| Boot The Application
+| Register Booted Start Files
 |--------------------------------------------------------------------------
 |
-| Before we handle the requests we need to make sure the application has
-| been booted up. The boot process will call the "boot" method on all
-| service provider giving all a chance to register their overrides.
+| Once the application has been booted there are several "start" files
+| we will want to include. We'll register our "booted" handler here
+| so the files are included after the application gets booted up.
 |
 */
 
-$app->boot();
+$app->booted(function() use ($app, $env)
+{
 
 /*
 |--------------------------------------------------------------------------
 | Load The Application Start Script
 |--------------------------------------------------------------------------
 |
-| The start script gives us the application the opportunity to override
+| The start scripts gives this application the opportunity to override
 | any of the existing IoC bindings, as well as register its own new
 | bindings for things like repositories, etc. We'll load it here.
 |
@@ -248,7 +264,8 @@ if (file_exists($path)) require $path;
 |
 */
 
-if (file_exists($path = $app['path'].'/routes.php'))
-{
-	require $path;
-}
+$routes = $app['path'].'/routes.php';
+
+if (file_exists($routes)) require $routes;
+
+});

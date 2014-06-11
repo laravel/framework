@@ -1,13 +1,10 @@
 <?php namespace Illuminate\Support;
 
+use Illuminate\Support\Traits\MacroableTrait;
+
 class Str {
 
-	/**
-	 * The registered string macros.
-	 *
-	 * @var array
-	 */
-	protected static $macros = array();
+	use MacroableTrait;
 
 	/**
 	 * Transliterate a UTF-8 value to ASCII.
@@ -32,34 +29,34 @@ class Str {
 	}
 
 	/**
-	 * Determine if a given string contains a given sub-string.
+	 * Determine if a given string contains a given substring.
 	 *
-	 * @param  string        $haystack
-	 * @param  string|array  $needle
+	 * @param  string  $haystack
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
-	public static function contains($haystack, $needle)
+	public static function contains($haystack, $needles)
 	{
-		foreach ((array) $needle as $n)
+		foreach ((array) $needles as $needle)
 		{
-			if (strpos($haystack, $n) !== false) return true;
+			if ($needle != '' && strpos($haystack, $needle) !== false) return true;
 		}
 
 		return false;
 	}
 
 	/**
-	 * Determine if a given string ends with a given needle.
+	 * Determine if a given string ends with a given substring.
 	 *
-	 * @param string $haystack
-	 * @param string|array $needles
+	 * @param string  $haystack
+	 * @param string|array  $needles
 	 * @return bool
 	 */
 	public static function endsWith($haystack, $needles)
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle == substr($haystack, strlen($haystack) - strlen($needle))) return true;
+			if ($needle == substr($haystack, -strlen($needle))) return true;
 		}
 
 		return false;
@@ -74,7 +71,9 @@ class Str {
 	 */
 	public static function finish($value, $cap)
 	{
-		return rtrim($value, $cap).$cap;
+		$quoted = preg_quote($cap, '/');
+
+		return preg_replace('/(?:'.$quoted.')+$/', '', $value).$cap;
 	}
 
 	/**
@@ -93,14 +92,7 @@ class Str {
 		// Asterisks are translated into zero-or-more regular expression wildcards
 		// to make it convenient to check if the strings starts with the given
 		// pattern such as "library/*", making any string check convenient.
-		if ($pattern !== '/')
-		{
-			$pattern = str_replace('\*', '.*', $pattern).'\z';
-		}
-		else
-		{
-			$pattern = '/$';
-		}
+		$pattern = str_replace('\*', '.*', $pattern).'\z';
 
 		return (bool) preg_match('#^'.$pattern.'#', $value);
 	}
@@ -128,7 +120,7 @@ class Str {
 	{
 		if (mb_strlen($value) <= $limit) return $value;
 
-		return mb_substr($value, 0, $limit, 'UTF-8').$end;
+		return rtrim(mb_substr($value, 0, $limit, 'UTF-8')).$end;
 	}
 
 	/**
@@ -190,6 +182,8 @@ class Str {
 	 *
 	 * @param  int     $length
 	 * @return string
+	 *
+	 * @throws \RuntimeException
 	 */
 	public static function random($length = 16)
 	{
@@ -267,7 +261,7 @@ class Str {
 	{
 		$title = static::ascii($title);
 
-		// Convert all dashes/undescores into separator
+		// Convert all dashes/underscores into separator
 		$flip = $separator == '-' ? '_' : '-';
 
 		$title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
@@ -296,7 +290,7 @@ class Str {
 	}
 
 	/**
-	 * Determine if a string starts with a given needle.
+	 * Determine if a given string starts with a given substring.
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needles
@@ -306,7 +300,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if (strpos($haystack, $needle) === 0) return true;
+			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
 		}
 
 		return false;
@@ -323,35 +317,6 @@ class Str {
 		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
 
 		return str_replace(' ', '', $value);
-	}
-
-	/**
-	 * Register a custom string macro.
-	 *
-	 * @param  string    $name
-	 * @param  callable  $macro
-	 * @return void
-	 */
-	public static function macro($name, $macro)
-	{
-		static::$macros[$name] = $macro;
-	}
-
-	/**
-	 * Dynamically handle calls to the string class.
-	 *
-	 * @param  string  $method
-	 * @param  array   $parameters
-	 * @return mixed
-	 */
-	public static function __callStatic($method, $parameters)
-	{
-		if (isset(static::$macros[$method]))
-		{
-			return call_user_func_array(static::$macros[$method], $parameters);
-		}
-
-		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

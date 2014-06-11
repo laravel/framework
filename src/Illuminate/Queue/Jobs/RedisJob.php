@@ -8,7 +8,7 @@ class RedisJob extends Job {
 	/**
 	 * The Redis queue instance.
 	 *
-	 * @var \Illuminate\Queues\RedisQueue
+	 * @var \Illuminate\Queue\RedisQueue
 	 */
 	protected $redis;
 
@@ -20,17 +20,10 @@ class RedisJob extends Job {
 	protected $job;
 
 	/**
-	 * The queue the job belongs to.
-	 *
-	 * @var string
-	 */
-	protected $queue;
-
-	/**
 	 * Create a new job instance.
 	 *
-	 * @param  \Illuminate\Container  $container
-	 * @param  \Illuminate\Redis\Queue  $redis
+	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Queue\RedisQueue  $redis
 	 * @param  string  $job
 	 * @param  string  $queue
 	 * @return void
@@ -50,7 +43,17 @@ class RedisJob extends Job {
 	 */
 	public function fire()
 	{
-		$this->resolveAndFire(json_decode($this->job, true));
+		$this->resolveAndFire(json_decode($this->getRawBody(), true));
+	}
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	public function getRawBody()
+	{
+		return $this->job;
 	}
 
 	/**
@@ -60,6 +63,8 @@ class RedisJob extends Job {
 	 */
 	public function delete()
 	{
+		parent::delete();
+
 		$this->redis->deleteReserved($this->queue, $this->job);
 	}
 
@@ -99,7 +104,7 @@ class RedisJob extends Job {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container
+	 * @return \Illuminate\Container\Container
 	 */
 	public function getContainer()
 	{

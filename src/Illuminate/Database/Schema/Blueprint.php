@@ -103,7 +103,7 @@ class Blueprint {
 	 */
 	protected function addImpliedCommands()
 	{
-		if (count($this->columns) > 0 and ! $this->creating())
+		if (count($this->columns) > 0 && ! $this->creating())
 		{
 			array_unshift($this->commands, $this->createCommand('add'));
 		}
@@ -361,6 +361,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new char column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  int  $length
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function char($column, $length = 255)
+	{
+		return $this->addColumn('char', $column, compact('length'));
+	}
+
+	/**
 	 * Create a new string column on the table.
 	 *
 	 * @param  string  $column
@@ -514,7 +526,6 @@ class Blueprint {
 	 * @param  int|null	$total
 	 * @param  int|null $places
 	 * @return \Illuminate\Support\Fluent
-	 *
 	 */
 	public function double($column, $total = null, $places = null)
 	{
@@ -602,6 +613,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Add nullable creation and update timestamps to the table.
+	 *
+	 * @return void
+	 */
+	public function nullableTimestamps()
+	{
+		$this->timestamp('created_at')->nullable();
+
+		$this->timestamp('updated_at')->nullable();
+	}
+
+	/**
 	 * Add creation and update timestamps to the table.
 	 *
 	 * @return void
@@ -642,9 +665,11 @@ class Blueprint {
 	 */
 	public function morphs($name)
 	{
-		$this->integer("{$name}_id");
+		$this->unsignedInteger("{$name}_id");
 
 		$this->string("{$name}_type");
+
+		$this->index(array("{$name}_id", "{$name}_type"));
 	}
 
 	/**
@@ -704,9 +729,9 @@ class Blueprint {
 	 */
 	protected function createIndexName($type, array $columns)
 	{
-		$table = str_replace(array('-', '.'), '_', $this->table);
+		$index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
 
-		return strtolower($table.'_'.implode('_', $columns).'_'.$type);
+		return str_replace(array('-', '.'), '_', $index);
 	}
 
 	/**
@@ -724,6 +749,22 @@ class Blueprint {
 		$this->columns[] = $column = new Fluent($attributes);
 
 		return $column;
+	}
+
+	/**
+	 * Remove a column from the schema blueprint.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Database\Schema\Blueprint
+	 */
+	public function removeColumn($name)
+	{
+		$this->columns = array_values(array_filter($this->columns, function($c) use ($name)
+		{
+			return $c['attributes']['name'] != $name;
+		}));
+
+		return $this;
 	}
 
 	/**

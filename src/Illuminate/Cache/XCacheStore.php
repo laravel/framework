@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class XCacheStore implements StoreInterface {
+class XCacheStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * A string that should be prepended to keys.
@@ -104,17 +104,6 @@ class XCacheStore implements StoreInterface {
 	public function flush()
 	{
 		xcache_clear_cache(XC_TYPE_VAR);
-	}
-
-	/**
-	 * Begin executing a new section operation.
-	 *
-	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
-	 */
-	public function section($name)
-	{
-		return new Section($this, $name);
 	}
 
 	/**

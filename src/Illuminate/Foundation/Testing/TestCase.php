@@ -3,7 +3,7 @@
 use Illuminate\View\View;
 use Illuminate\Auth\UserInterface;
 
-class TestCase extends \PHPUnit_Framework_TestCase {
+abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * The Illuminate application instance.
@@ -26,7 +26,10 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->refreshApplication();
+		if ( ! $this->app)
+		{
+			$this->refreshApplication();
+		}
 	}
 
 	/**
@@ -39,7 +42,20 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		$this->app = $this->createApplication();
 
 		$this->client = $this->createClient();
+
+		$this->app->setRequestForConsoleEnvironment();
+
+		$this->app->boot();
 	}
+
+	/**
+	 * Creates the application.
+	 *
+	 * Needs to be implemented by subclasses.
+	 *
+	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+	 */
+	abstract public function createApplication();
 
 	/**
 	 * Call the given URI and return the Response.
@@ -116,7 +132,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
-		$uri = $this->app['url']->route($name, $routeParameters, true);
+		$uri = $this->app['url']->route($name, $routeParameters);
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
@@ -157,20 +173,20 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		if (is_array($key)) return $this->assertViewHasAll($key);
 
-		$response = $this->client->getResponse()->original;
+		$response = $this->client->getResponse();
 
-		if ( ! $response instanceof View)
+		if ( ! isset($response->original) || ! $response->original instanceof View)
 		{
 			return $this->assertTrue(false, 'The response was not a view.');
 		}
 
 		if (is_null($value))
 		{
-			$this->assertArrayHasKey($key, $response->getData());
+			$this->assertArrayHasKey($key, $response->original->getData());
 		}
 		else
 		{
-			$this->assertEquals($value, $response->$key);
+			$this->assertEquals($value, $response->original->$key);
 		}
 	}
 
@@ -193,6 +209,24 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 				$this->assertViewHas($key, $value);
 			}
 		}
+	}
+
+	/**
+	 * Assert that the response view is missing a piece of bound data.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function assertViewMissing($key)
+	{
+		$response = $this->client->getResponse();
+
+		if ( ! isset($response->original) || ! $response->original instanceof View)
+		{
+			return $this->assertTrue(false, 'The response was not a view.');
+		}
+
+		$this->assertArrayNotHasKey($key, $response->original->getData());
 	}
 
 	/**
@@ -252,7 +286,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 		if (is_null($value))
 		{
-			$this->assertTrue($this->app['session.store']->has($key));
+			$this->assertTrue($this->app['session.store']->has($key), "Session missing key: $key");
 		}
 		else
 		{
@@ -283,7 +317,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Assert that the session has errors bound.
-	 * 
+	 *
 	 * @param  string|array  $bindings
 	 * @param  mixed  $format
 	 * @return void
@@ -292,7 +326,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		$this->assertSessionHas('errors');
 
-		$bindings = (array)$bindings;
+		$bindings = (array) $bindings;
 
 		$errors = $this->app['session.store']->get('errors');
 
@@ -300,7 +334,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		{
 			if (is_int($key))
 			{
-				$this->assertTrue($errors->has($value));
+				$this->assertTrue($errors->has($value), "Session missing error: $value");
 			}
 			else
 			{
@@ -317,6 +351,47 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	public function assertHasOldInput()
 	{
 		$this->assertSessionHas('_old_input');
+	}
+
+	/**
+	 * Set the session to the given array.
+	 *
+	 * @param  array  $data
+	 * @return void
+	 */
+	public function session(array $data)
+	{
+		$this->startSession();
+
+		foreach ($data as $key => $value)
+		{
+			$this->app['session']->put($key, $value);
+		}
+	}
+
+	/**
+	 * Flush all of the current session data.
+	 *
+	 * @return void
+	 */
+	public function flushSession()
+	{
+		$this->startSession();
+
+		$this->app['session']->flush();
+	}
+
+	/**
+	 * Start the session for the application.
+	 *
+	 * @return void
+	 */
+	protected function startSession()
+	{
+		if ( ! $this->app['session']->isStarted())
+		{
+			$this->app['session']->start();
+		}
 	}
 
 	/**
@@ -339,7 +414,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app[$class]->run();
+		$this->app['artisan']->call('db:seed', array('--class' => $class));
 	}
 
 	/**

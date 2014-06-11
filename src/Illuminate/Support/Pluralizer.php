@@ -7,11 +7,12 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $plural = array(
+	public static $plural = array(
 		'/(quiz)$/i' => "$1zes",
 		'/^(ox)$/i' => "$1en",
 		'/([m|l])ouse$/i' => "$1ice",
 		'/(matr|vert|ind)ix|ex$/i' => "$1ices",
+		'/(stoma|epo|monar|matriar|patriar|oligar|eunu)ch$/i' => "$1chs",
 		'/(x|ch|ss|sh)$/i' => "$1es",
 		'/([^aeiouy]|qu)y$/i' => "$1ies",
 		'/(hive)$/i' => "$1s",
@@ -19,10 +20,10 @@ class Pluralizer {
 		'/(shea|lea|loa|thie)f$/i' => "$1ves",
 		'/sis$/i' => "ses",
 		'/([ti])um$/i' => "$1a",
-		'/(tomat|potat|ech|her|vet)o$/i' => "$1oes",
+		'/(torped|embarg|tomat|potat|ech|her|vet)o$/i' => "$1oes",
 		'/(bu)s$/i' => "$1ses",
 		'/(alias)$/i' => "$1es",
-		'/(octop)us$/i' => "$1i",
+		'/(fung)us$/i' => "$1i",
 		'/(ax|test)is$/i' => "$1es",
 		'/(us)$/i' => "$1es",
 		'/s$/i' => "s",
@@ -34,13 +35,13 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $singular = array(
+	public static $singular = array(
 		'/(quiz)zes$/i' => "$1",
 		'/(matr)ices$/i' => "$1ix",
-		'/(vert|ind)ices$/i' => "$1ex",
+		'/(vert|vort|ind)ices$/i' => "$1ex",
 		'/^(ox)en$/i' => "$1",
 		'/(alias)es$/i' => "$1",
-		'/(octop|vir)i$/i' => "$1us",
+		'/(octop|vir|fung)i$/i' => "$1us",
 		'/(cris|ax|test)es$/i' => "$1is",
 		'/(shoe)s$/i' => "$1",
 		'/(o)es$/i' => "$1",
@@ -61,6 +62,7 @@ class Pluralizer {
 		'/(n)ews$/i' => "$1ews",
 		'/(h|bl)ouses$/i' => "$1ouse",
 		'/(corpse)s$/i' => "$1",
+		'/(gallows|headquarters)$/i' => "$1",
 		'/(us)es$/i' => "$1",
 		'/(us|ss)$/i' => "$1",
 		'/s$/i' => "",
@@ -71,15 +73,29 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $irregular = array(
+	public static $irregular = array(
 		'child' => 'children',
+		'corpus' => 'corpora',
+		'criterion' => 'criteria',
 		'foot' => 'feet',
+		'freshman' => 'freshmen',
 		'goose' => 'geese',
+		'genus' => 'genera',
+		'human' => 'humans',
 		'man' => 'men',
 		'move' => 'moves',
+		'nucleus' => 'nuclei',
+		'ovum' => 'ova',
 		'person' => 'people',
+		'phenomenon' => 'phenomena',
+		'radius' => 'radii',
 		'sex' => 'sexes',
+		'stimulus' => 'stimuli',
+		'syllabus' => 'syllabi',
+		'tax' => 'taxes',
+		'tech' => 'techs',
 		'tooth' => 'teeth',
+		'viscus' => 'viscera',
 	);
 
 	/**
@@ -87,21 +103,27 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $uncountable = array(
+	public static $uncountable = array(
 		'audio',
-		'equipment',
+		'bison',
+		'chassis',
+		'coreopsis',
+		'data',
 		'deer',
+		'equipment',
 		'fish',
 		'gold',
 		'information',
 		'money',
-		'rice',
+		'moose',
+		'offspring',
+		'plankton',
 		'police',
+		'rice',
 		'series',
 		'sheep',
 		'species',
-		'moose',
-		'chassis',
+		'swine',
 		'traffic',
 	);
 
@@ -188,7 +210,7 @@ class Pluralizer {
 			if (preg_match($pattern = '/'.$pattern.'$/i', $value))
 			{
 				$irregular = static::matchCase($irregular, $value);
-				
+
 				return preg_replace($pattern, $irregular, $value);
 			}
 		}

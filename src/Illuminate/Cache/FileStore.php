@@ -96,7 +96,7 @@ class FileStore implements StoreInterface {
 	{
 		try
 		{
-			$this->files->makeDirectory(dirname($path), 0777, true);
+			$this->files->makeDirectory(dirname($path), 0777, true, true);
 		}
 		catch (\Exception $e)
 		{
@@ -110,6 +110,8 @@ class FileStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 *
+	 * @throws \LogicException
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -117,15 +119,17 @@ class FileStore implements StoreInterface {
 	}
 
 	/**
-	 * Increment the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 *
+	 * @throws \LogicException
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		throw new \LogicException("Decrement operations not supported by this driver.");
 	}
 
 	/**
@@ -148,7 +152,12 @@ class FileStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->files->delete($this->path($key));
+		$file = $this->path($key);
+
+		if ($this->files->exists($file))
+		{
+			$this->files->delete($file);
+		}
 	}
 
 	/**

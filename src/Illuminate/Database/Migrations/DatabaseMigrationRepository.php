@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Closure;
-use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface {
@@ -84,7 +82,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 */
 	public function delete($migration)
 	{
-		$query = $this->table()->where('migration', $migration->migration)->delete();
+		$this->table()->where('migration', $migration->migration)->delete();
 	}
 
 	/**
@@ -121,7 +119,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 			// The migrations table is responsible for keeping track of which of the
 			// migrations have actually run for the application. We'll create the
 			// table to hold the migration file's path as well as the batch ID.
-			$table->string('migration')->unique();
+			$table->string('migration');
 
 			$table->integer('batch');
 		});

@@ -126,6 +126,30 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPassingViewWithHintReturnsTrue()
+	{
+		$finder = $this->getFinder();
+
+		$this->assertTrue($finder->hasHintInformation('hint::foo.bar'));
+	}
+
+
+	public function testPassingViewWithoutHintReturnsFalse()
+	{
+		$finder = $this->getFinder();
+
+		$this->assertFalse($finder->hasHintInformation('foo.bar'));
+	}
+
+
+	public function testPassingViewWithFalseHintReturnsFalse()
+	{
+		$finder = $this->getFinder();
+
+		$this->assertFalse($finder->hasHintInformation('::foo.bar'));
+	}
+
+
 	protected function getFinder()
 	{
 		return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__));

@@ -53,21 +53,26 @@ class Dispatcher {
 	/**
 	 * Register an event listener with the dispatcher.
 	 *
-	 * @param  string  $event
+	 * @param  string|array  $event
 	 * @param  mixed   $listener
 	 * @param  int     $priority
 	 * @return void
 	 */
-	public function listen($event, $listener, $priority = 0)
+	public function listen($events, $listener, $priority = 0)
 	{
-		if (str_contains($event, '*'))
+		foreach ((array) $events as $event)
 		{
-			return $this->setupWildcardListen($event, $listener);
+			if (str_contains($event, '*'))
+			{
+				$this->setupWildcardListen($event, $listener);
+			}
+			else
+			{
+				$this->listeners[$event][$priority][] = $this->makeListener($listener);
+
+				unset($this->sorted[$event]);
+			}
 		}
-
-		$this->listeners[$event][$priority][] = $this->makeListener($listener);
-
-		unset($this->sorted[$event]);
 	}
 
 	/**
@@ -102,11 +107,9 @@ class Dispatcher {
 	 */
 	public function queue($event, $payload = array())
 	{
-		$me = $this;
-
-		$this->listen($event.'_queue', function() use ($me, $event, $payload)
+		$this->listen($event.'_queue', function() use ($event, $payload)
 		{
-			$me->fire($event, $payload);
+			$this->fire($event, $payload);
 		});
 	}
 
@@ -198,7 +201,7 @@ class Dispatcher {
 			// If a response is returned from the listener and event halting is enabled
 			// we will just return this response, and not call the rest of the event
 			// listeners. Otherwise we will add the response on the response list.
-			if ( ! is_null($response) and $halt)
+			if ( ! is_null($response) && $halt)
 			{
 				array_pop($this->firing);
 

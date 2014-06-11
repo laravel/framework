@@ -8,20 +8,19 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/cookie": "4.1.x",
-        "illuminate/encryption": "4.1.x",
-        "illuminate/events": "4.1.x",
-        "illuminate/hashing": "4.1.x",
-        "illuminate/http": "4.1.x",
-        "illuminate/session": "4.1.x",
-        "illuminate/support": "4.1.x",
-        "nesbot/carbon": "1.*"
+        "php": ">=5.4.0",
+        "illuminate/cookie": "4.2.*",
+        "illuminate/encryption": "4.2.*",
+        "illuminate/events": "4.2.*",
+        "illuminate/hashing": "4.2.*",
+        "illuminate/http": "4.2.*",
+        "illuminate/session": "4.2.*",
+        "illuminate/support": "4.2.*",
+        "nesbot/carbon": "~1.0"
     },
     "require-dev": {
-        "illuminate/console": "4.1.x",
-        "illuminate/routing": "4.1.x",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/console": "4.2.*",
+        "illuminate/routing": "4.2.*"
     },
     "autoload": {
         "psr-0": {"Illuminate\\Auth": ""}
@@ -29,7 +28,7 @@
     "target-dir": "Illuminate/Auth",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "minimum-stability": "dev"

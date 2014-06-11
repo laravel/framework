@@ -1,17 +1,213 @@
 <?php namespace Illuminate\Session;
 
-use Symfony\Component\HttpFoundation\Session\Session as SymfonySession;
+use SessionHandlerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
-class Store extends SymfonySession {
+class Store implements SessionInterface {
+
+	/**
+	 * The session ID.
+	 *
+	 * @var string
+	 */
+	protected $id;
+
+	/**
+	 * The session name.
+	 *
+	 * @var string
+	 */
+	protected $name;
+
+	/**
+	 * The session attributes.
+	 *
+	 * @var array
+	 */
+	protected $attributes = array();
+
+	/**
+	 * The session bags.
+	 *
+	 * @var array
+	 */
+	protected $bags = array();
+
+	/**
+	 * The meta-data bag instance.
+	 *
+	 * @var \Symfony\Component\Session\Storage\MetadataBag
+	 */
+	protected $metaBag;
+
+	/**
+	 * Local copies of the session bag data.
+	 *
+	 * @var array
+	 */
+	protected $bagData = array();
+
+	/**
+	 * The session handler implementation.
+	 *
+	 * @var \SessionHandlerInterface
+	 */
+	protected $handler;
+
+	/**
+	 * Session store started status.
+	 *
+	 * @var bool
+	 */
+	protected $started = false;
+
+	/**
+	 * Create a new session instance.
+	 *
+	 * @param  string  $name
+	 * @param  \SessionHandlerInterface  $handler
+	 * @param  string|null $id
+	 * @return void
+	 */
+	public function __construct($name, SessionHandlerInterface $handler, $id = null)
+	{
+		$this->name = $name;
+		$this->handler = $handler;
+		$this->metaBag = new MetadataBag;
+		$this->setId($id ?: $this->generateSessionId());
+	}
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function start()
 	{
-		parent::start();
+		$this->loadSession();
 
-		if ( ! $this->has('_token')) $this->put('_token', str_random(40));
+		if ( ! $this->has('_token')) $this->regenerateToken();
+
+		return $this->started = true;
+	}
+
+	/**
+	 * Load the session data from the handler.
+	 *
+	 * @return void
+	 */
+	protected function loadSession()
+	{
+		$this->attributes = $this->readFromHandler();
+
+		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
+		{
+			$this->initializeLocalBag($bag);
+
+			$bag->initialize($this->bagData[$bag->getStorageKey()]);
+		}
+	}
+
+	/**
+	 * Read the session data from the handler.
+	 *
+	 * @return array
+	 */
+	protected function readFromHandler()
+	{
+		$data = $this->handler->read($this->getId());
+
+		return $data ? unserialize($data) : array();
+	}
+
+	/**
+	 * Initialize a bag in storage if it doesn't exist.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Session\SessionBagInterface  $bag
+	 * @return void
+	 */
+	protected function initializeLocalBag($bag)
+	{
+		$this->bagData[$bag->getStorageKey()] = $this->get($bag->getStorageKey(), array());
+
+		$this->forget($bag->getStorageKey());
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setId($id)
+	{
+		$this->id = $id ?: $this->generateSessionId();
+	}
+
+	/**
+	 * Get a new, random session ID.
+	 *
+	 * @return string
+	 */
+	protected function generateSessionId()
+	{
+		return sha1(uniqid('', true).str_random(25).microtime(true));
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function invalidate($lifetime = null)
+	{
+		$this->attributes = array();
+
+		$this->migrate();
+
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function migrate($destroy = false, $lifetime = null)
+	{
+		if ($destroy) $this->handler->destroy($this->getId());
+
+		$this->setExists(false);
+
+		$this->id = $this->generateSessionId(); return true;
+	}
+
+	/**
+	 * Generate a new session identifier.
+	 *
+	 * @param  bool  $destroy
+	 * @return bool
+	 */
+	public function regenerate($destroy = false)
+	{
+		return $this->migrate($destroy);
 	}
 
 	/**
@@ -19,9 +215,26 @@ class Store extends SymfonySession {
 	 */
 	public function save()
 	{
+		$this->addBagDataToSession();
+
 		$this->ageFlashData();
 
-		return parent::save();
+		$this->handler->write($this->getId(), serialize($this->attributes));
+
+		$this->started = false;
+	}
+
+	/**
+	 * Merge all of the bag data into the session.
+	 *
+	 * @return void
+	 */
+	protected function addBagDataToSession()
+	{
+		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
+		{
+			$this->put($bag->getStorageKey(), $this->bagData[$bag->getStorageKey()]);
+		}
 	}
 
 	/**
@@ -29,7 +242,7 @@ class Store extends SymfonySession {
 	 *
 	 * @return void
 	 */
-	protected function ageFlashData()
+	public function ageFlashData()
 	{
 		foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
 
@@ -51,7 +264,23 @@ class Store extends SymfonySession {
 	 */
 	public function get($name, $default = null)
 	{
-		return array_get($this->all(), $name, $default);
+		return array_get($this->attributes, $name, $default);
+	}
+
+	/**
+	 * Get the value of a given key and then forget it.
+	 *
+	 * @param  string  $key
+	 * @param  string  $default
+	 * @return mixed
+	 */
+	public function pull($key, $default = null)
+	{
+		$value = $this->get($key, $default);
+
+		$this->forget($key);
+
+		return $value;
 	}
 
 	/**
@@ -62,7 +291,9 @@ class Store extends SymfonySession {
 	 */
 	public function hasOldInput($key = null)
 	{
-		return ! is_null($this->getOldInput($key));
+		$old = $this->getOldInput($key);
+
+		return is_null($key) ? count($old) > 0 : ! is_null($old);
 	}
 
 	/**
@@ -85,39 +316,28 @@ class Store extends SymfonySession {
 	}
 
 	/**
-	 * Get the CSRF token value.
-	 *
-	 * @return string
+	 * {@inheritdoc}
 	 */
-	public function getToken()
+	public function set($name, $value)
 	{
-		return $this->token();
+		array_set($this->attributes, $name, $value);
 	}
 
 	/**
-	 * Get the CSRF token value.
+	 * Put a key / value pair or array of key / value pairs in the session.
 	 *
-	 * @return string
-	 */
-	public function token()
-	{
-		return $this->get('_token');
-	}
-
-	/**
-	 * Put a key / value pair in the session.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  string|array  $key
+	 * @param  mixed|null  	 $value
 	 * @return void
 	 */
 	public function put($key, $value)
 	{
-		$all = $this->all();
+		if ( ! is_array($key)) $key = array($key => $value);
 
-		array_set($all, $key, $value);
-
-		$this->replace($all);
+		foreach ($key as $arrayKey => $arrayValue)
+		{
+			$this->set($arrayKey, $arrayValue);
+		}
 	}
 
 	/**
@@ -215,6 +435,33 @@ class Store extends SymfonySession {
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function all()
+	{
+		return $this->attributes;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function replace(array $attributes)
+	{
+		foreach ($attributes as $key => $value)
+		{
+			$this->put($key, $value);
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function remove($name)
+	{
+		return array_pull($this->attributes, $name);
+	}
+
+	/**
 	 * Remove an item from the session.
 	 *
 	 * @param  string  $key
@@ -222,11 +469,20 @@ class Store extends SymfonySession {
 	 */
 	public function forget($key)
 	{
-		$all = $this->all();
+		array_forget($this->attributes, $key);
+	}
 
-		array_forget($all, $key);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function clear()
+	{
+		$this->attributes = array();
 
-		$this->replace($all);
+		foreach ($this->bags as $bag)
+		{
+			$bag->clear();
+		}
 	}
 
 	/**
@@ -240,13 +496,127 @@ class Store extends SymfonySession {
 	}
 
 	/**
-	 * Generate a new session identifier.
+	 * {@inheritdoc}
+	 */
+	public function isStarted()
+	{
+		return $this->started;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function registerBag(SessionBagInterface $bag)
+	{
+		$this->bags[$bag->getStorageKey()] = $bag;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getBag($name)
+	{
+		return array_get($this->bags, $name, function()
+		{
+			throw new \InvalidArgumentException("Bag not registered.");
+		});
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getMetadataBag()
+	{
+		return $this->metaBag;
+	}
+
+	/**
+	 * Get the raw bag data array for a given bag.
+	 *
+	 * @param  string  $name
+	 * @return array
+	 */
+	public function getBagData($name)
+	{
+		return array_get($this->bagData, $name, array());
+	}
+
+	/**
+	 * Get the CSRF token value.
 	 *
 	 * @return string
 	 */
-	public function regenerate()
+	public function token()
 	{
-		return $this->migrate();
+		return $this->get('_token');
+	}
+
+	/**
+	 * Get the CSRF token value.
+	 *
+	 * @return string
+	 */
+	public function getToken()
+	{
+		return $this->token();
+	}
+
+	/**
+	 * Regenerate the CSRF token value.
+	 *
+	 * @return void
+	 */
+	public function regenerateToken()
+	{
+		$this->put('_token', str_random(40));
+	}
+
+	/**
+	 * Set the existence of the session on the handler if applicable.
+	 *
+	 * @param  bool  $value
+	 * @return void
+	 */
+	public function setExists($value)
+	{
+		if ($this->handler instanceof ExistenceAwareInterface)
+		{
+			$this->handler->setExists($value);
+		}
+	}
+
+	/**
+	 * Get the underlying session handler implementation.
+	 *
+	 * @return \SessionHandlerInterface
+	 */
+	public function getHandler()
+	{
+		return $this->handler;
+	}
+
+	/**
+	 * Determine if the session handler needs a request.
+	 *
+	 * @return bool
+	 */
+	public function handlerNeedsRequest()
+	{
+		return $this->handler instanceof CookieSessionHandler;
+	}
+
+	/**
+	 * Set the request on the handler instance.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function setRequestOnHandler(Request $request)
+	{
+		if ($this->handlerNeedsRequest())
+		{
+			$this->handler->setRequest($request);
+		}
 	}
 
 }

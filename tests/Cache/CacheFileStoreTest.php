@@ -75,14 +75,27 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRemoveDeletesFileDoesntExist()
+	{
+		$files = $this->mockFilesystem();
+		$md5 = md5('foobull');
+		$cache_dir = substr($md5, 0, 2).'/'.substr($md5, 2, 2);
+		$files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5))->will($this->returnValue(false));
+		$store = new FileStore($files, __DIR__);
+		$store->forget('foobull');
+	}
+
+
 	public function testRemoveDeletesFile()
 	{
 		$files = $this->mockFilesystem();
-		$md5 = md5('foo');
+		$md5 = md5('foobar');
 		$cache_dir = substr($md5, 0, 2).'/'.substr($md5, 2, 2);
-		$files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5));
 		$store = new FileStore($files, __DIR__);
-		$store->forget('foo');
+		$store->put('foobar', 'Hello Baby', 10);
+		$files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5))->will($this->returnValue(true));
+		$files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5));
+		$store->forget('foobar');
 	}
 
 

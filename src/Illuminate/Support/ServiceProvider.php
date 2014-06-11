@@ -105,39 +105,9 @@ abstract class ServiceProvider {
 	 */
 	public function guessPackagePath()
 	{
-		$reflect = new ReflectionClass($this);
-
-		// We want to get the class that is closest to this base class in the chain of
-		// classes extending it. That should be the original service provider given
-		// by the package and should allow us to guess the location of resources.
-		$chain = $this->getClassChain($reflect);
-
-		$path = $chain[count($chain) - 2]->getFileName();
+		$path = with(new ReflectionClass($this))->getFileName();
 
 		return realpath(dirname($path).'/../../');
-	}
-
-	/**
-	 * Get a class from the ReflectionClass inheritance chain.
-	 *
-	 * @param  ReflectionClass  $reflection
-	 * @return array
-	 */
-	protected function getClassChain(ReflectionClass $reflect)
-	{
-		$classes = array();
-
-		// This loop essentially walks the inheritance chain of the classes starting
-		// at the most "childish" class and walks back up to this class. Once we
-		// get to the end of the chain we will bail out and return the offset.
-		while ($reflect !== false)
-		{
-			$classes[] = $reflect;
-
-			$reflect = $reflect->getParentClass();
-		}
-
-		return $classes;
 	}
 
 	/**
@@ -195,6 +165,16 @@ abstract class ServiceProvider {
 	 * @return array
 	 */
 	public function provides()
+	{
+		return array();
+	}
+
+	/**
+	 * Get the events that trigger this service provider to register.
+	 *
+	 * @return array
+	 */
+	public function when()
 	{
 		return array();
 	}

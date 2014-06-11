@@ -43,11 +43,11 @@ class ConfigPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $source
-	 * @return void
+	 * @return bool
 	 */
 	public function publish($package, $source)
 	{
-		$destination = $this->publishPath."/packages/{$package}";		
+		$destination = $this->publishPath."/packages/{$package}";
 
 		$this->makeDestination($destination);
 
@@ -59,18 +59,16 @@ class ConfigPublisher {
 	 *
 	 * @param  string  $package
 	 * @param  string  $packagePath
-	 * @return void
+	 * @return bool
 	 */
 	public function publishPackage($package, $packagePath = null)
 	{
-		list($vendor, $name) = explode('/', $package);
-
 		// First we will figure out the source of the package's configuration location
 		// which we do by convention. Once we have that we will move the files over
 		// to the "main" configuration directory for this particular application.
 		$path = $packagePath ?: $this->packagePath;
 
-		$source = $this->getSource($package, $name, $path);
+		$source = $this->getSource($package, $path);
 
 		return $this->publish($package, $source);
 	}
@@ -79,11 +77,12 @@ class ConfigPublisher {
 	 * Get the source configuration directory to publish.
 	 *
 	 * @param  string  $package
-	 * @param  string  $name
 	 * @param  string  $packagePath
 	 * @return string
+	 *
+	 * @throws \InvalidArgumentException
 	 */
-	protected function getSource($package, $name, $packagePath)
+	protected function getSource($package, $packagePath)
 	{
 		$source = $packagePath."/{$package}/src/config";
 

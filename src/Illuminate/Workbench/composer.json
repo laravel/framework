@@ -8,14 +8,13 @@
         }
     ],
     "require": {
-        "illuminate/filesystem": "4.1.x",
-        "illuminate/support": "4.1.x",
-        "symfony/finder": "2.4.*"
+        "php": ">=5.4.0",
+        "illuminate/filesystem": "4.2.*",
+        "illuminate/support": "4.2.*",
+        "symfony/finder": "2.5.*"
     },
     "require-dev": {
-        "illuminate/console": "4.1.x",
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/console": "4.2.*"
     },
     "autoload": {
         "psr-0": {
@@ -25,7 +24,7 @@
     "target-dir": "Illuminate/Workbench",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "minimum-stability": "dev"

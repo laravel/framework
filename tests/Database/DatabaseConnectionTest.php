@@ -41,11 +41,14 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	public function testSelectProperlyCallsPDO()
 	{
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO', array('prepare'));
+		$writePdo = $this->getMock('DatabaseConnectionTestMockPDO', array('prepare'));
+		$writePdo->expects($this->never())->method('prepare');
 		$statement = $this->getMock('PDOStatement', array('execute', 'fetchAll'));
 		$statement->expects($this->once())->method('execute')->with($this->equalTo(array('foo' => 'bar')));
 		$statement->expects($this->once())->method('fetchAll')->will($this->returnValue(array('boom')));
 		$pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue($statement));
-		$mock = $this->getMockConnection(array('prepareBindings'), $pdo);
+		$mock = $this->getMockConnection(array('prepareBindings'), $writePdo);
+		$mock->setReadPdo($pdo);
 		$mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(array('foo' => 'bar')))->will($this->returnValue(array('foo' => 'bar')));
 		$results = $mock->select('foo', array('foo' => 'bar'));
 		$this->assertEquals(array('boom'), $results);
@@ -115,6 +118,39 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $log[0]['query']);
 		$this->assertEquals(array('foo' => 'bar'), $log[0]['bindings']);
 		$this->assertTrue(is_numeric($log[0]['time']));
+	}
+
+
+	public function testBeganTransactionFiresEventsIfSet()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+		$connection = $this->getMockConnection(array('getName'), $pdo);
+		$connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
+		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('connection.name.beganTransaction', $connection);
+		$connection->beginTransaction();
+	}
+
+
+	public function testCommitedFiresEventsIfSet()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+		$connection = $this->getMockConnection(array('getName'), $pdo);
+		$connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
+		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('connection.name.committed', $connection);
+		$connection->commit();
+	}
+
+
+	public function testRollBackedFiresEventsIfSet()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+		$connection = $this->getMockConnection(array('getName'), $pdo);
+		$connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
+		$connection->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$events->shouldReceive('fire')->once()->with('connection.name.rollingBack', $connection);
+		$connection->rollBack();
 	}
 
 
@@ -206,7 +242,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	public function testResolvingPaginatorThroughClosure()
 	{
 		$connection = $this->getMockConnection();
-		$paginator  = m::mock('Illuminate\Pagination\Environment');
+		$paginator  = m::mock('Illuminate\Pagination\Factory');
 		$connection->setPaginator(function() use ($paginator)
 		{
 			return $paginator;

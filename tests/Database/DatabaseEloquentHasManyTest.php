@@ -15,13 +15,14 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	public function testCreateMethodProperlyCreatesNewModel()
 	{
 		$relation = $this->getRelation();
-		$created = $this->getMock('Illuminate\Database\Eloquent\Model', array('save', 'getKey', 'setRawAttributes'));
+		$created = $this->getMock('Illuminate\Database\Eloquent\Model', array('save', 'getKey', 'setAttribute'));
 		$created->expects($this->once())->method('save')->will($this->returnValue(true));
-		$relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($created);
-		$created->expects($this->once())->method('setRawAttributes')->with($this->equalTo(array('name' => 'taylor', 'foreign_key' => 1)));
+		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('name' => 'taylor'))->andReturn($created);
+		$created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
 
 		$this->assertEquals($created, $relation->create(array('name' => 'taylor')));
 	}
+
 
 	public function testUpdateMethodUpdatesModelsWithTimestamps()
 	{
@@ -96,10 +97,10 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		return new HasMany($builder, $parent, 'table.foreign_key');
+		return new HasMany($builder, $parent, 'table.foreign_key', 'id');
 	}
 
 }

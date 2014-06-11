@@ -6,6 +6,7 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route {
 
@@ -59,25 +60,11 @@ class Route {
 	protected $parameterNames;
 
 	/**
-	 * The regular expression for a wildcard.
+	 * The compiled version of the route.
 	 *
-	 * @var string
+	 * @var \Symfony\Component\Routing\CompiledRoute
 	 */
-	protected static $wildcard = '(?P<$1>([a-zA-Z0-9\.\-_%=]+))';
-
-	/**
-	 * The regular expression for an optional wildcard.
-	 *
-	 * @var string
-	 */
-	protected static $optional = '(?:/(?P<$1>([a-zA-Z0-9\.\-_%=]+))';
-
-	/**
-	 * The regular expression for a leading optional wildcard.
-	 *
-	 * @var string
-	 */
-	protected static $leadingOptional = '(\/$|^(?:(?P<$2>([a-zA-Z0-9\.\-_%=]+)))';
+	protected $compiled;
 
 	/**
 	 * The validators used by the routes.
@@ -122,16 +109,58 @@ class Route {
 	 * Determine if the route matches given request.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
+	 * @param  bool  $includingMethod
 	 * @return bool
 	 */
-	public function matches(Request $request)
+	public function matches(Request $request, $includingMethod = true)
 	{
+		$this->compileRoute();
+
 		foreach ($this->getValidators() as $validator)
 		{
+			if ( ! $includingMethod && $validator instanceof MethodValidator) continue;
+
 			if ( ! $validator->matches($this, $request)) return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Compile the route into a Symfony CompiledRoute instance.
+	 *
+	 * @return void
+	 */
+	protected function compileRoute()
+	{
+		$optionals = $this->extractOptionalParameters();
+
+		$uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri);
+
+		$this->compiled = with(
+
+			new SymfonyRoute($uri, $optionals, $this->wheres, array(), $this->domain() ?: '')
+
+		)->compile();
+	}
+
+	/**
+	 * Get the optional parameters for the route.
+	 *
+	 * @return array
+	 */
+	protected function extractOptionalParameters()
+	{
+		preg_match_all('/\{(\w+?)\?\}/', $this->uri, $matches);
+
+		$optional = array();
+
+		if (isset($matches[1]))
+		{
+			foreach ($matches[1] as $key) { $optional[$key] = null; }
+		}
+
+		return $optional;
 	}
 
 	/**
@@ -236,6 +265,18 @@ class Route {
 	 * @param  mixed  $default
 	 * @return string
 	 */
+	public function getParameter($name, $default = null)
+	{
+		return $this->parameter($name, $default);
+	}
+
+	/**
+	 * Get a given parameter from the route.
+	 *
+	 * @param  string  $name
+	 * @param  mixed  $default
+	 * @return string
+	 */
 	public function parameter($name, $default = null)
 	{
 		return array_get($this->parameters(), $name) ?: $default;
@@ -256,13 +297,35 @@ class Route {
 	}
 
 	/**
+	 * Unset a parameter on the route if it is set.
+	 *
+	 * @param  string $name
+	 * @return void
+	 */
+	public function forgetParameter($name)
+	{
+		$this->parameters();
+
+		unset($this->parameters[$name]);
+	}
+
+	/**
 	 * Get the key / value list of parameters for the route.
 	 *
 	 * @return array
+	 *
+	 * @throws \LogicException
 	 */
 	public function parameters()
 	{
-		if (isset($this->parameters)) return $this->parameters;
+		if (isset($this->parameters))
+		{
+			return array_map(function($value)
+			{
+				return is_string($value) ? rawurldecode($value) : $value;
+
+			}, $this->parameters);
+		}
 
 		throw new \LogicException("Route is not bound.");
 	}
@@ -274,7 +337,7 @@ class Route {
 	 */
 	public function parametersWithoutNulls()
 	{
-        return array_filter($this->parameters(), function($p) { return ! is_null($p); });
+		return array_filter($this->parameters(), function($p) { return ! is_null($p); });
 	}
 
 	/**
@@ -309,6 +372,8 @@ class Route {
 	 */
 	public function bind(Request $request)
 	{
+		$this->compileRoute();
+
 		$this->bindParameters($request);
 
 		return $this;
@@ -322,11 +387,52 @@ class Route {
 	 */
 	public function bindParameters(Request $request)
 	{
-		preg_match($this->fullMatchExpression(), $this->fullMatchPath($request), $matches);
+		// If the route has a regular expression for the host part of the URI, we will
+		// compile that and get the parameter matches for this domain. We will then
+		// merge them into this parameters array so that this array is completed.
+		$params = $this->matchToKeys(
 
-		$parameters = $this->combineMatchesWithKeys(array_slice($matches, 1));
+			array_slice($this->bindPathParameters($request), 1)
 
-		return $this->parameters = $this->replaceDefaults($parameters);
+		);
+
+		// If the route has a regular expression for the host part of the URI, we will
+		// compile that and get the parameter matches for this domain. We will then
+		// merge them into this parameters array so that this array is completed.
+		if ( ! is_null($this->compiled->getHostRegex()))
+		{
+			$params = $this->bindHostParameters(
+				$request, $params
+			);
+		}
+
+		return $this->parameters = $this->replaceDefaults($params);
+	}
+
+	/**
+	 * Get the parameter matches for the path portion of the URI.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return array
+	 */
+	protected function bindPathParameters(Request $request)
+	{
+		preg_match($this->compiled->getRegex(), '/'.$request->decodedPath(), $matches);
+
+		return $matches;
+	}
+
+	/**
+	 * Extract the parameter list from the host part of the request.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return array
+	 */
+	protected function bindHostParameters(Request $request, $parameters)
+	{
+		preg_match($this->compiled->getHostRegex(), $request->getHost(), $matches);
+
+		return array_merge($this->matchToKeys(array_slice($matches, 1)), $parameters);
 	}
 
 	/**
@@ -335,22 +441,16 @@ class Route {
 	 * @param  array  $matches
 	 * @return array
 	 */
-	protected function combineMatchesWithKeys(array $matches)
+	protected function matchToKeys(array $matches)
 	{
 		if (count($this->parameterNames()) == 0) return array();
 
-		return array_filter(array_intersect_key($matches, array_flip($this->parameterNames())));
-	}
+		$parameters = array_intersect_key($matches, array_flip($this->parameterNames()));
 
-	/**
-	 * Pad an array to the number of keys.
-	 *
-	 * @param  array  $matches
-	 * @return array
-	 */
-	protected function padMatches(array $matches)
-	{
-		return array_pad($matches, count($this->parameterNames()), null);
+		return array_filter($parameters, function($value)
+		{
+			return is_string($value) && strlen($value) > 0;
+		});
 	}
 
 	/**
@@ -370,174 +470,6 @@ class Route {
 	}
 
 	/**
-	 * Get the full match expression for the route.
-	 *
-	 * @return string
-	 */
-	protected function fullMatchExpression()
-	{
-		$value = trim($this->hostExpression(false).'/'.$this->uriExpression(false), '/');
-
-		return $this->delimit($value ?: '/');
-	}
-
-	/**
-	 * Get the full match path for the request.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return string
-	 */
-	protected function fullMatchPath($request)
-	{
-		if (isset($this->action['domain']))
-		{
-			return trim($request->getHost().'/'.$request->path(), '/');			
-		}
-		else
-		{
-			return $request->path();
-		}
-	}
-
-	/**
-	 * Get the regular expression for the host.
-	 *
-	 * @param  bool  $delimit
-	 * @return string|null
-	 */
-	public function hostExpression($delimit = true)
-	{
-		if ( ! isset($this->action['domain'])) return;
-
-		return $this->compileString($this->action['domain'], $delimit, $this->wheres);
-	}
-
-	/**
-	 * Get the regular expression for the URI.
-	 *
-	 * @param  bool  $delimit
-	 * @return string|null
-	 */
-	public function uriExpression($delimit = true)
-	{
-		return $this->compileString($this->uri, $delimit, $this->wheres);
-	}
-
-	/**
-	 * Compile the given route string as a regular expression.
-	 *
-	 * @param  string  $value
-	 * @param  bool  $delimit
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	public static function compileString($value, $delimit = true, array $wheres = array())
-	{
-		$value = static::compileOptional(static::compileParameters($value, $wheres), $wheres);
-
-		return $delimit ? static::delimit($value) : $value;
-	}
-
-	/**
-	 * Compile the wildcards for a given string.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	protected static function compileParameters($value, array $wheres = array())
-	{
-		$value = static::compileWhereParameters($value, $wheres);
-
-		return preg_replace('/\{((.*?)[^?])\}/', static::$wildcard, $value);
-	}
-
-	/**
-	 * Compile the defined "where" parameters.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	protected static function compileWhereParameters($value, array $wheres)
-	{
-		foreach ($wheres as $key => $pattern)
-		{
-			$value = str_replace('{'.$key.'}', '(?P<'.$key.'>('.$pattern.'))', $value);
-		}
-
-		return $value;
-	}
-
-	/**
-	 * Compile the optional wildcards for a given string.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @return string
-	 */
-	protected static function compileOptional($value, $wheres = array())
-	{
-		list($value, $custom) = static::compileWhereOptional($value, $wheres);
-
-		return static::compileStandardOptional($value, $custom);
-	}
-
-	/**
-	 * Compile the standard optional wildcards for a given string.
-	 *
-	 * @param  string  $value
-	 * @param  int  $custom
-	 * @return string
-	 */
-	protected static function compileStandardOptional($value, $custom = 0)
-	{
-		$value = preg_replace('/\/\{(.*?)\?\}/', static::$optional, $value, -1, $count);
-
-		$value = preg_replace('/^(\{(.*?)\?\})/', static::$leadingOptional, $value, -1, $leading);
-
-		$total = $leading + $count + $custom;
-
-		return $total > 0 ? $value .= str_repeat(')?', $total) : $value;
-	}
-
-	/**
-	 * Compile the defined optional "where" parameters.
-	 *
-	 * @param  string  $value
-	 * @param  array  $wheres
-	 * @param  int  $total
-	 * @return string
-	 */
-	protected static function compileWhereOptional($value, $wheres, $total = 0)
-	{
-		foreach ($wheres as $key => $pattern)
-		{
-			$pattern = "(?:/({$pattern})";
-
-			// Here we will need to replace the optional parameters while keeping track of the
-			// count we are replacing. This will let us properly close this finished regular
-			// expressions with the proper number of parenthesis so that it is valid code.
-			$value = str_replace('/{'.$key.'?}', $pattern, $value, $count);
-
-			$total = $total + $count;
-		}
-
-		return array($value, $total);
-	}
-
-	/**
-	 * Delimit a regular expression.
-	 *
-	 * @param   string  $value
-	 * @return  string
-	 */
-	protected static function delimit($value)
-	{
-		return trim($value) == '' ? null : '#^'.$value.'$#u';
-	}
-
-	/**
 	 * Parse the route action into a standard array.
 	 *
 	 * @param  \Closure|array  $action
@@ -548,7 +480,7 @@ class Route {
 		// If the action is already a Closure instance, we will just set that instance
 		// as the "uses" property, because there is nothing else we need to do when
 		// it is available. Otherwise we will need to find it in the action list.
-		if ($action instanceof Closure)
+		if (is_callable($action))
 		{
 			return array('uses' => $action);
 		}
@@ -574,7 +506,7 @@ class Route {
 	{
 		return array_first($action, function($key, $value)
 		{
-			return $value instanceof Closure;
+			return is_callable($value);
 		});
 	}
 
@@ -716,9 +648,29 @@ class Route {
 	 *
 	 * @return string
 	 */
+	public function getPath()
+	{
+		return $this->uri();
+	}
+
+	/**
+	 * Get the URI associated with the route.
+	 *
+	 * @return string
+	 */
 	public function uri()
 	{
 		return $this->uri;
+	}
+
+	/**
+	 * Get the HTTP verbs the route responds to.
+	 *
+	 * @return array
+	 */
+	public function getMethods()
+	{
+		return $this->methods();
 	}
 
 	/**
@@ -732,13 +684,33 @@ class Route {
 	}
 
 	/**
+	 * Determine if the route only responds to HTTP requests.
+	 *
+	 * @return bool
+	 */
+	public function httpOnly()
+	{
+		return in_array('http', $this->action, true);
+	}
+
+	/**
+	 * Determine if the route only responds to HTTPS requests.
+	 *
+	 * @return bool
+	 */
+	public function httpsOnly()
+	{
+		return $this->secure();
+	}
+
+	/**
 	 * Determine if the route only responds to HTTPS requests.
 	 *
 	 * @return bool
 	 */
 	public function secure()
 	{
-		return in_array('https', $this->action);
+		return in_array('https', $this->action, true);
 	}
 
 	/**
@@ -749,6 +721,39 @@ class Route {
 	public function domain()
 	{
 		return array_get($this->action, 'domain');
+	}
+
+	/**
+	 * Get the URI that the route responds to.
+	 *
+	 * @return string
+	 */
+	public function getUri()
+	{
+		return $this->uri;
+	}
+
+	/**
+	 * Set the URI that the route responds to.
+	 *
+	 * @param  string  $uri
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function setUri($uri)
+	{
+		$this->uri = $uri;
+
+		return $this;
+	}
+
+	/**
+	 * Get the prefix of the route instance.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return array_get($this->action, 'prefix');
 	}
 
 	/**
@@ -792,6 +797,16 @@ class Route {
 		$this->action = $action;
 
 		return $this;
+	}
+
+	/**
+	 * Get the compiled version of the route.
+	 *
+	 * @return \Symfony\Component\Routing\CompiledRoute
+	 */
+	public function getCompiled()
+	{
+		return $this->compiled;
 	}
 
 }

@@ -51,9 +51,22 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
+		return $this->pushRaw($this->createPayload($job, $data), $queue);
+	}
 
+	/**
+	 * Push a raw payload onto the queue.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  array   $options
+	 * @return mixed
+	 */
+	public function pushRaw($payload, $queue = null, array $options = array())
+	{
 		$this->redis->rpush($this->getQueue($queue), $payload);
+
+		return array_get(json_decode($payload, true), 'id');
 	}
 
 	/**
@@ -61,7 +74,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
-	 * @param  mixed  $data
+	 * @param  mixed   $data
 	 * @param  string  $queue
 	 * @return void
 	 */
@@ -69,7 +82,11 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->createPayload($job, $data);
 
+		$delay = $this->getSeconds($delay);
+
 		$this->redis->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
+
+		return array_get(json_decode($payload, true), 'id');
 	}
 
 	/**
@@ -77,7 +94,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 *
 	 * @param  string  $queue
 	 * @param  string  $payload
-	 * @param  string  $delay
+	 * @param  int  $delay
 	 * @param  int  $attempts
 	 * @return void
 	 */
@@ -85,7 +102,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$payload = $this->setMeta($payload, 'attempts', $attempts);
 
-		$this->redis->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);	
+		$this->redis->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
 	}
 
 	/**
@@ -96,6 +113,8 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function pop($queue = null)
 	{
+		$original = $queue ?: $this->default;
+
 		$this->migrateAllExpiredJobs($queue = $this->getQueue($queue));
 
 		$job = $this->redis->lpop($queue);
@@ -104,7 +123,7 @@ class RedisQueue extends Queue implements QueueInterface {
 		{
 			$this->redis->zadd($queue.':reserved', $this->getTime() + 60, $job);
 
-			return new RedisJob($this->container, $this, $job, $queue);
+			return new RedisJob($this->container, $this, $job, $original);
 		}
 	}
 
@@ -117,7 +136,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function deleteReserved($queue, $job)
 	{
-		$this->redis->zrem($queue.':reserved', $job);
+		$this->redis->zrem($this->getQueue($queue).':reserved', $job);
 	}
 
 	/**
@@ -136,7 +155,8 @@ class RedisQueue extends Queue implements QueueInterface {
 	/**
 	 * Migrate the delayed jobs that are ready to the regular queue.
 	 *
-	 * @param  string  $queue
+	 * @param  string  $from
+	 * @param  string  $to
 	 * @return void
 	 */
 	public function migrateExpiredJobs($from, $to)
@@ -155,7 +175,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Get the delayed jobs that are ready.
 	 *
 	 * @param  string  $queue
-	 * @param  int  $time
+	 * @param  int     $time
 	 * @return array
 	 */
 	protected function getExpiredJobs($queue, $time)
@@ -167,7 +187,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Remove the delayed jobs that are ready for processing.
 	 *
 	 * @param  string  $queue
-	 * @param  int  $time
+	 * @param  int     $time
 	 * @return void
 	 */
 	protected function removeExpiredJobs($queue, $time)
@@ -179,10 +199,11 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Create a payload string from the given job and data.
 	 *
 	 * @param  string  $job
-	 * @param  mixed  $data
+	 * @param  mixed   $data
+	 * @param  string  $queue
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '')
+	protected function createPayload($job, $data = '', $queue = null)
 	{
 		$payload = parent::createPayload($job, $data);
 
@@ -192,28 +213,13 @@ class RedisQueue extends Queue implements QueueInterface {
 	}
 
 	/**
-	 * Set the attempts variable on a payload string.
-	 *
-	 * @param  string  $payload
-	 * @param  string  $key
-	 * @param  int  $attempts
-	 * @return string
-	 */
-	protected function setMeta($payload, $key, $attempts)
-	{
-		$payload = json_decode($payload, true);
-
-		return json_encode(array_set($payload, $key, $attempts));
-	}
-
-	/**
 	 * Get a random ID string.
 	 *
 	 * @return string
 	 */
 	protected function getRandomId()
 	{
-		return str_random(20);
+		return str_random(32);
 	}
 
 	/**

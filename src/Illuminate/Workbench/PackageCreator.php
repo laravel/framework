@@ -7,7 +7,7 @@ class PackageCreator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -38,7 +38,7 @@ class PackageCreator {
 	/**
 	 * Create a new package creator instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)
@@ -173,7 +173,7 @@ class PackageCreator {
 	 */
 	public function writeIgnoreFile(Package $package, $directory, $plain)
 	{
-		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');	
+		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');
 	}
 
 	/**
@@ -203,7 +203,7 @@ class PackageCreator {
 	{
 		// Once we create the source directory, we will write an empty file to the
 		// directory so that it will be kept in source control allowing the dev
-		// to go ahead and push these components to Github right on creation.
+		// to go ahead and push these components to GitHub right on creation.
 		$path = $directory.'/src/'.$support;
 
 		$this->files->makeDirectory($path, 0777, true);
@@ -340,7 +340,7 @@ class PackageCreator {
 		{
 			$stub = str_replace('{{'.snake_case($key).'}}', $value, $stub);
 		}
-		
+
 		return $stub;
 	}
 
@@ -350,6 +350,8 @@ class PackageCreator {
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $path
 	 * @return string
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function createDirectory(Package $package, $path)
 	{

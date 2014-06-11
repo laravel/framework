@@ -21,7 +21,9 @@ class PostgresProcessor extends Processor {
 
 		$result = (array) $results[0];
 
-		return (int) $result[$sequence];
+		$id = $result[$sequence];
+
+		return is_numeric($id) ? (int) $id : $id;
 	}
 
 	/**

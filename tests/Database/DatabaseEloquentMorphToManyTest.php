@@ -34,7 +34,7 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
 		$relation->expects($this->once())->method('touchIfTouching');
-		
+
 		$relation->attach(2, array('foo' => 'bar'));
 	}
 

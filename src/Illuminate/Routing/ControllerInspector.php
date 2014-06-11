@@ -10,7 +10,7 @@ class ControllerInspector {
 	 * @var array
 	 */
 	protected $verbs = array(
-		'any', 'get', 'post', 'put', 
+		'any', 'get', 'post', 'put', 'patch',
 		'delete', 'head', 'options'
 	);
 
@@ -70,7 +70,7 @@ class ControllerInspector {
 	{
 		if ($method->class == 'Illuminate\Routing\Controller') return false;
 
-		return $method->isPublic() and starts_with($method->name, $this->verbs);
+		return $method->isPublic() && starts_with($method->name, $this->verbs);
 	}
 
 	/**
@@ -131,7 +131,7 @@ class ControllerInspector {
 	 */
 	public function addUriWildcards($uri)
 	{
-		return $uri.'/{v1?}/{v2?}/{v3?}/{v4?}/{v5?}';
+		return $uri.'/{one?}/{two?}/{three?}/{four?}/{five?}';
 	}
 
 }

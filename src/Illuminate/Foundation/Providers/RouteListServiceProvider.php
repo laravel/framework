@@ -19,7 +19,7 @@ class RouteListServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app['command.routes'] = $this->app->share(function($app)
+		$this->app->bindShared('command.routes', function($app)
 		{
 			return new RoutesCommand($app['router']);
 		});

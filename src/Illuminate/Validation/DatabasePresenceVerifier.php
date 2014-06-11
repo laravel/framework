@@ -44,14 +44,14 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	{
 		$query = $this->table($collection)->where($column, '=', $value);
 
-		if ( ! is_null($excludeId) and $excludeId != 'NULL')
+		if ( ! is_null($excludeId) && $excludeId != 'NULL')
 		{
 			$query->where($idColumn ?: 'id', '<>', $excludeId);
 		}
 
 		foreach ($extra as $key => $extraValue)
 		{
-			$query->where($key, $extraValue == 'NULL' ? null : $extraValue);
+			$this->addWhere($query, $key, $extraValue);
 		}
 
 		return $query->count();
@@ -72,10 +72,34 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 
 		foreach ($extra as $key => $extraValue)
 		{
-			$query->where($key, $extraValue == 'NULL' ? null : $extraValue);
+			$this->addWhere($query, $key, $extraValue);
 		}
 
 		return $query->count();
+	}
+
+	/**
+	 * Add a "where" clause to the given query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  string  $key
+	 * @param  string  $extraValue
+	 * @return void
+	 */
+	protected function addWhere($query, $key, $extraValue)
+	{
+		if ($extraValue === 'NULL')
+		{
+			$query->whereNull($key);
+		}
+		elseif ($extraValue === 'NOT_NULL')
+		{
+			$query->whereNotNull($key);
+		}
+		else
+		{
+			$query->where($key, $extraValue);
+		}
 	}
 
 	/**

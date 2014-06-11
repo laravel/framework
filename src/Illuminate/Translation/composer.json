@@ -8,14 +8,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/filesystem": "4.1.x",
-        "illuminate/support": "4.1.x",
-        "symfony/translation": "2.4.*"
-    },
-    "require-dev": {
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "php": ">=5.4.0",
+        "illuminate/filesystem": "4.2.*",
+        "illuminate/support": "4.2.*",
+        "symfony/translation": "2.5.*"
     },
     "autoload": {
         "psr-0": {
@@ -25,7 +21,7 @@
     "target-dir": "Illuminate/Translation",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "minimum-stability": "dev"

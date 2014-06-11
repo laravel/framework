@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Validation\Factory
+ */
 class Validator extends Facade {
 
 	/**

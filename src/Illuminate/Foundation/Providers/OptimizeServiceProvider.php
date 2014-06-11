@@ -34,7 +34,7 @@ class OptimizeServiceProvider extends ServiceProvider {
 	 */
 	protected function registerOptimizeCommand()
 	{
-		$this->app['command.optimize'] = $this->app->share(function($app)
+		$this->app->bindShared('command.optimize', function($app)
 		{
 			return new OptimizeCommand($app['composer']);
 		});
@@ -47,7 +47,7 @@ class OptimizeServiceProvider extends ServiceProvider {
 	 */
 	protected function registerClearCompiledCommand()
 	{
-		$this->app['command.clear-compiled'] = $this->app->share(function()
+		$this->app->bindShared('command.clear-compiled', function()
 		{
 			return new ClearCompiledCommand;
 		});

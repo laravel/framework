@@ -3,8 +3,6 @@
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class AutoloadCommand extends Command {
 
@@ -87,7 +85,7 @@ class AutoloadCommand extends Command {
 
 		if ( ! is_dir($workbench)) return array();
 
-		return Finder::create()->files()->in($workbench)->name('composer.json')->depth('< 3');		
+		return Finder::create()->files()->in($workbench)->name('composer.json')->depth('< 3');
 	}
 
 }

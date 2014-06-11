@@ -6,7 +6,7 @@ interface ConnectorInterface {
 	 * Establish a database connection.
 	 *
 	 * @param  array  $config
-	 * @return PDO
+	 * @return \PDO
 	 */
 	public function connect(array $config);
 

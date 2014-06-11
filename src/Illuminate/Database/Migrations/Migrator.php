@@ -1,10 +1,6 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Closure;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator {
@@ -76,7 +72,7 @@ class Migrator {
 
 		// Once we grab all of the migration files for the path, we will compare them
 		// against the migrations that have already been run for this package then
-		// run all of the oustanding migrations against the database connection.
+		// run each of the outstanding migrations against a database connection.
 		$ran = $this->repository->getRan();
 
 		$migrations = array_diff($files, $ran);
@@ -325,11 +321,12 @@ class Migrator {
 	/**
 	 * Resolve the database connection instance.
 	 *
+	 * @param  string  $connection
 	 * @return \Illuminate\Database\Connection
 	 */
-	public function resolveConnection()
+	public function resolveConnection($connection)
 	{
-		return $this->resolver->connection($this->connection);
+		return $this->resolver->connection($connection);
 	}
 
 	/**

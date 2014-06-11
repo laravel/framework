@@ -13,7 +13,12 @@ class Collection extends BaseCollection {
 	 */
 	public function find($key, $default = null)
 	{
-		return array_first($this->items, function($key, $model) use ($key)
+		if ($key instanceof Model)
+		{
+			$key = $key->getKey();
+		}
+
+		return array_first($this->items, function($itemKey, $model) use ($key)
 		{
 			return $model->getKey() == $key;
 
@@ -85,7 +90,7 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) or $item->{$key} > $result) ? $item->{$key} : $result;
+			return (is_null($result) || $item->{$key} > $result) ? $item->{$key} : $result;
 		});
 	}
 
@@ -99,7 +104,7 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) or $item->{$key} < $result) ? $item->{$key} : $result;
+			return (is_null($result) || $item->{$key} < $result) ? $item->{$key} : $result;
 		});
 	}
 
@@ -111,6 +116,138 @@ class Collection extends BaseCollection {
 	public function modelKeys()
 	{
 		return array_map(function($m) { return $m->getKey(); }, $this->items);
+	}
+
+	/**
+	 * Merge the collection with the given items.
+	 *
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function merge($collection)
+	{
+		$dictionary = $this->getDictionary();
+
+		foreach ($collection as $item)
+		{
+			$dictionary[$item->getKey()] = $item;
+		}
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Diff the collection with the given items.
+	 *
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function diff($collection)
+	{
+		$diff = new static;
+
+		$dictionary = $this->getDictionary($collection);
+
+		foreach ($this->items as $item)
+		{
+			if ( ! isset($dictionary[$item->getKey()]))
+			{
+				$diff->add($item);
+			}
+		}
+
+		return $diff;
+	}
+
+	/**
+	 * Intersect the collection with the given items.
+	 *
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function intersect($collection)
+	{
+		$intersect = new static;
+
+		$dictionary = $this->getDictionary($collection);
+
+		foreach ($this->items as $item)
+		{
+			if (isset($dictionary[$item->getKey()]))
+			{
+				$intersect->add($item);
+			}
+		}
+
+		return $intersect;
+	}
+
+	/**
+	 * Return only unique items from the collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function unique()
+	{
+		$dictionary = $this->getDictionary();
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Returns only the models from the collection with the specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function only($keys)
+	{
+		$dictionary = array_only($this->getDictionary($this), $keys);
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Returns all models in the collection except the models with specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function except($keys)
+	{
+	    $dictionary = array_except($this->getDictionary($this), $keys);
+
+	    return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Get a dictionary keyed by primary keys.
+	 *
+	 * @param  \Illuminate\Support\Collection  $collection
+	 * @return array
+	 */
+	public function getDictionary($collection = null)
+	{
+		$collection = $collection ?: $this;
+
+		$dictionary = array();
+
+		foreach ($collection as $value)
+		{
+			$dictionary[$value->getKey()] = $value;
+		}
+
+		return $dictionary;
+	}
+
+	/**
+	 * Get a base Support collection instance from this collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function toBase()
+	{
+		return new BaseCollection($this->items);
 	}
 
 }

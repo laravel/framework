@@ -7,13 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 class MySqlGrammar extends Grammar {
 
 	/**
-	 * The keyword identifier wrapper format.
-	 *
-	 * @var string
-	 */
-	protected $wrapper = '`%s`';
-
-	/**
 	 * The possible column modifiers.
 	 *
 	 * @var array
@@ -25,7 +18,7 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer');
+	protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
 
 	/**
 	 * Compile the query to determine the list of tables.
@@ -43,9 +36,9 @@ class MySqlGrammar extends Grammar {
 	 * @param  string  $table
 	 * @return string
 	 */
-	public function compileColumnExists($table)
+	public function compileColumnExists()
 	{
-		return "select column_name from information_schema.columns where table_name = '$table'";
+		return "select column_name from information_schema.columns where table_schema = ? and table_name = ?";
 	}
 
 	/**
@@ -98,7 +91,7 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile a create table command.
+	 * Compile an add column command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Illuminate\Support\Fluent  $command
@@ -277,6 +270,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a char type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeChar(Fluent $column)
+	{
+		return "char({$column->length})";
+	}
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -361,7 +365,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTinyInteger(Fluent $column)
 	{
-		return 'tinyint(1)';
+		return 'tinyint';
 	}
 
 	/**
@@ -394,7 +398,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeDouble(Fluent $column)
 	{
-		if ($column->total and $column->places)
+		if ($column->total && $column->places)
 		{
 			return "double({$column->total}, {$column->places})";
 		}
@@ -427,7 +431,7 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
-	 * Create the column definition for a enum type.
+	 * Create the column definition for an enum type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
@@ -542,7 +546,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if (in_array($column->type, $this->serials) and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) && $column->autoIncrement)
 		{
 			return ' auto_increment primary key';
 		}
@@ -561,6 +565,19 @@ class MySqlGrammar extends Grammar {
 		{
 			return ' after '.$this->wrap($column->after);
 		}
+	}
+
+	/**
+	 * Wrap a single string in keyword identifiers.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function wrapValue($value)
+	{
+		if ($value === '*') return $value;
+
+		return '`'.str_replace('`', '``', $value).'`';
 	}
 
 }

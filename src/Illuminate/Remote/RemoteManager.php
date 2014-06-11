@@ -13,13 +13,6 @@ class RemoteManager {
 	protected $app;
 
 	/**
-	 * The active connection instances.
-	 *
-	 * @var array
-	 */
-	protected $connections = array();
-
-	/**
 	 * Create a new remote manager instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
@@ -38,7 +31,7 @@ class RemoteManager {
 	 */
 	public function into($name)
 	{
-		if (is_string($name) or is_array($name))
+		if (is_string($name) || is_array($name))
 		{
 			return $this->connection($name);
 		}
@@ -91,12 +84,7 @@ class RemoteManager {
 	 */
 	public function resolve($name)
 	{
-		if ( ! isset($this->connections[$name]))
-		{
-			$this->connections[$name] = $this->makeConnection($name, $this->getConfig($name));
-		}
-
-		return $this->connections[$name];
+		return $this->makeConnection($name, $this->getConfig($name));
 	}
 
 	/**
@@ -135,12 +123,22 @@ class RemoteManager {
 	 *
 	 * @param  array  $config
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getAuth(array $config)
 	{
-		if (isset($config['key']) and trim($config['key']) != '')
+		if (isset($config['agent']) && $config['agent'] === true)
 		{
-			return array('key' => $config['key']);
+			return array('agent' => true);
+		}
+		elseif (isset($config['key']) && trim($config['key']) != '')
+		{
+			return array('key' => $config['key'], 'keyphrase' => $config['keyphrase']);
+		}
+		elseif (isset($config['keytext']) && trim($config['keytext']) != '')
+		{
+			return array('keytext' => $config['keytext']);
 		}
 		elseif (isset($config['password']))
 		{
@@ -155,6 +153,8 @@ class RemoteManager {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getConfig($name)
 	{
@@ -170,9 +170,20 @@ class RemoteManager {
 	 *
 	 * @return string
 	 */
-	protected function getDefaultConnection()
+	public function getDefaultConnection()
 	{
 		return $this->app['config']['remote.default'];
+	}
+
+	/**
+	 * Set the default connection name.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setDefaultConnection($name)
+	{
+		$this->app['config']['remote.default'] = $name;
 	}
 
 	/**

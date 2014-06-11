@@ -4,9 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
-use Illuminate\Routing\RouteCollection;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class RoutesCommand extends Command {
 
@@ -39,14 +37,7 @@ class RoutesCommand extends Command {
 	protected $routes;
 
 	/**
-	 * The table helper set.
-	 *
-	 * @var \Symfony\Component\Console\Helper\TableHelper
-	 */
-	protected $table;
-
-	/**
-	 * The table headeers for the command.
+	 * The table headers for the command.
 	 *
 	 * @var array
 	 */
@@ -75,8 +66,6 @@ class RoutesCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->table = $this->getHelperSet()->get('table');
-
 		if (count($this->routes) == 0)
 		{
 			return $this->error("Your application doesn't have any routes.");
@@ -111,7 +100,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function getRouteInformation(Route $route)
 	{
-		$uri = head($route->methods()).' '.$route->uri();
+		$uri = implode('|', $route->methods()).' '.$route->uri();
 
 		return $this->filterRoute(array(
 			'host'   => $route->domain(),
@@ -131,9 +120,7 @@ class RoutesCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$this->table->setHeaders($this->headers)->setRows($routes);
-
-		$this->table->render($this->getOutput());
+		$this->table($this->headers, $routes);
 	}
 
 	/**
@@ -168,7 +155,7 @@ class RoutesCommand extends Command {
 			// we have already gathered up then return them back out to these consumers.
 			$inner = $this->getMethodPatterns($route->uri(), $method);
 
-			$patterns = array_merge($patterns, $inner);
+			$patterns = array_merge($patterns, array_keys($inner));
 		}
 
 		return $patterns;
@@ -205,8 +192,8 @@ class RoutesCommand extends Command {
 	 */
 	protected function filterRoute(array $route)
 	{
-		if (($this->option('name') and ! str_contains($route['name'], $this->option('name'))) or
-			 $this->option('path') and ! str_contains($route['uri'], $this->option('path')))
+		if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
+			 $this->option('path') && ! str_contains($route['uri'], $this->option('path')))
 		{
 			return null;
 		}

@@ -8,14 +8,12 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.1.x",
-        "monolog/monolog": "1.6.*"
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
+        "monolog/monolog": "~1.6"
     },
     "require-dev": {
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*",
-        "illuminate/events": "4.1.x"
+        "illuminate/events": "4.2.*"
     },
     "autoload": {
         "psr-0": {
@@ -25,7 +23,7 @@
     "target-dir": "Illuminate/Log",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     },
     "minimum-stability": "dev"

@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
-use DateTime;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -30,13 +29,27 @@ class Builder {
 	protected $eagerLoad = array();
 
 	/**
+	 * All of the registered builder macros.
+	 *
+	 * @var array
+	 */
+	protected $macros = array();
+
+	/**
+	 * A replacement for the typical delete function.
+	 *
+	 * @var \Closure
+	 */
+	protected $onDelete;
+
+	/**
 	 * The methods that should be returned from query builder.
 	 *
 	 * @var array
 	 */
 	protected $passthru = array(
-		'toSql', 'lists', 'insert', 'insertGetId', 'pluck',
-		'count', 'min', 'max', 'avg', 'sum', 'exists',
+		'toSql', 'lists', 'insert', 'insertGetId', 'pluck', 'count',
+		'min', 'max', 'avg', 'sum', 'exists', 'getBindings',
 	);
 
 	/**
@@ -78,6 +91,8 @@ class Builder {
 	 */
 	public function findMany($id, $columns = array('*'))
 	{
+		if (empty($id)) return $this->model->newCollection();
+
 		$this->query->whereIn($this->model->getKeyName(), $id);
 
 		return $this->get($columns);
@@ -89,12 +104,14 @@ class Builder {
 	 * @param  mixed  $id
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 *
+	 * @throws ModelNotFoundException
 	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
 		if ( ! is_null($model = $this->find($id, $columns))) return $model;
 
-		throw new ModelNotFoundException;
+		throw with(new ModelNotFoundException)->setModel(get_class($this->model));
 	}
 
 	/**
@@ -113,12 +130,14 @@ class Builder {
 	 *
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 *
+	 * @throws ModelNotFoundException
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
 		if ( ! is_null($model = $this->first($columns))) return $model;
 
-		throw new ModelNotFoundException;
+		throw with(new ModelNotFoundException)->setModel(get_class($this->model));
 	}
 
 	/**
@@ -232,7 +251,7 @@ class Builder {
 	/**
 	 * Get a paginator for a grouped statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -247,7 +266,7 @@ class Builder {
 	/**
 	 * Get a paginator for an ungrouped statement.
 	 *
-	 * @param  \Illuminate\Pagination\Environment  $paginator
+	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
@@ -264,6 +283,29 @@ class Builder {
 		$this->query->forPage($page, $perPage);
 
 		return $paginator->make($this->get($columns)->all(), $total, $perPage);
+	}
+
+	/**
+	 * Get a paginator only supporting simple next and previous links.
+	 *
+	 * This is more efficient on larger data-sets, etc.
+	 *
+	 * @param  \Illuminate\Pagination\Factory  $paginator
+	 * @param  int    $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	public function simplePaginate($perPage = null, $columns = array('*'))
+	{
+		$paginator = $this->query->getConnection()->getPaginator();
+
+		$page = $paginator->getCurrentPage();
+
+		$perPage = $perPage ?: $this->model->getPerPage();
+
+		$this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
+
+		return $paginator->make($this->get($columns)->all(), $perPage);
 	}
 
 	/**
@@ -325,13 +367,13 @@ class Builder {
 	/**
 	 * Delete a record from the database.
 	 *
-	 * @return int
+	 * @return mixed
 	 */
 	public function delete()
 	{
-		if ($this->model->isSoftDeleting())
+		if (isset($this->onDelete))
 		{
-			return $this->softDelete();
+			return call_user_func($this->onDelete, $this);
 		}
 		else
 		{
@@ -340,21 +382,9 @@ class Builder {
 	}
 
 	/**
-	 * Soft delete the record in the database.
+	 * Run the default delete function on the builder.
 	 *
-	 * @return int
-	 */
-	protected function softDelete()
-	{
-		$column = $this->model->getDeletedAtColumn();
-
-		return $this->update(array($column => $this->model->freshTimestampString()));
-	}
-
-	/**
-	 * Force a delete on a set of soft deleted models.
-	 *
-	 * @return int
+	 * @return mixed
 	 */
 	public function forceDelete()
 	{
@@ -362,72 +392,14 @@ class Builder {
 	}
 
 	/**
-	 * Restore the soft-deleted model instances.
+	 * Register a replacement for the default delete function.
 	 *
-	 * @return int
+	 * @param  \Closure  $callback
+	 * @return void
 	 */
-	public function restore()
+	public function onDelete(Closure $callback)
 	{
-		if ($this->model->isSoftDeleting())
-		{
-			$column = $this->model->getDeletedAtColumn();
-
-			return $this->update(array($column => null));
-		}
-	}
-
-	/**
-	 * Include the soft deleted models in the results.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|static
-	 */
-	public function withTrashed()
-	{
-		$column = $this->model->getQualifiedDeletedAtColumn();
-
-		foreach ($this->query->wheres as $key => $where)
-		{
-			// If the where clause is a soft delete date constraint, we will remove it from
-			// the query and reset the keys on the wheres. This allows this developer to
-			// include deleted model in a relationship result set that is lazy loaded.
-			if ($this->isSoftDeleteConstraint($where, $column))
-			{
-				unset($this->query->wheres[$key]);
-
-				$this->query->wheres = array_values($this->query->wheres);
-			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Force the result set to only included soft deletes.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|static
-	 */
-	public function onlyTrashed()
-	{
-		$this->withTrashed();
-
-		$this->query->whereNotNull($this->model->getQualifiedDeletedAtColumn());
-
-		return $this;
-	}
-
-	/**
-	 * Determine if the given where clause is a soft delete constraint.
-	 *
-	 * @param  array   $where
-	 * @param  string  $column
-	 * @return bool
-	 */
-	protected function isSoftDeleteConstraint(array $where, $column)
-	{
-		if ( isset($where['column']) )
-		{
-			return $where['column'] == $column and $where['type'] == 'Null';
-		}
+		$this->onDelete = $callback;
 	}
 
 	/**
@@ -506,7 +478,7 @@ class Builder {
 		// Once we have the results, we just match those back up to their parent models
 		// using the relationship instance. Then we just return the finished arrays
 		// of models which have been eagerly hydrated and are readied for return.
-		$results = $relation->get();
+		$results = $relation->getEager();
 
 		return $relation->match($models, $results, $name);
 	}
@@ -519,14 +491,12 @@ class Builder {
 	 */
 	public function getRelation($relation)
 	{
-		$me = $this;
-
 		// We want to run a relationship query without any constrains so that we will
 		// not have to remove these where clauses manually which gets really hacky
 		// and is error prone while we remove the developer's own where clauses.
-		$query = Relation::noConstraints(function() use ($me, $relation)
+		$query = Relation::noConstraints(function() use ($relation)
 		{
-			return $me->getModel()->$relation();			
+			return $this->getModel()->$relation();
 		});
 
 		$nested = $this->nestedRelations($relation);
@@ -577,7 +547,47 @@ class Builder {
 	{
 		$dots = str_contains($name, '.');
 
-		return $dots and starts_with($name, $relation) and $name != $relation;
+		return $dots && starts_with($name, $relation.'.');
+	}
+
+	/**
+	 * Add a basic where clause to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  mixed   $value
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function where($column, $operator = null, $value = null, $boolean = 'and')
+	{
+		if ($column instanceof Closure)
+		{
+			$query = $this->model->newQueryWithoutScopes();
+
+			call_user_func($column, $query);
+
+			$this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+		}
+		else
+		{
+			call_user_func_array(array($this->query, 'where'), func_get_args());
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add an "or where" clause to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string  $operator
+	 * @param  mixed   $value
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orWhere($column, $operator = null, $value = null)
+	{
+		return $this->where($column, $operator, $value, 'or');
 	}
 
 	/**
@@ -587,17 +597,32 @@ class Builder {
 	 * @param  string  $operator
 	 * @param  int     $count
 	 * @param  string  $boolean
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and')
+	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
 	{
-		$instance = $this->model->$relation();
+		$relation = $this->getHasRelationQuery($relation);
 
-		$query = $instance->getRelationCountQuery($instance->getRelated()->newQuery());
+		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
-		$this->query->mergeBindings($query->getQuery());
+		if ($callback) call_user_func($callback, $query);
 
-		return $this->where(new Expression('('.$query->toSql().')'), $operator, $count, $boolean);
+		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
+	}
+
+	/**
+	 * Add a relationship count condition to the query with where clauses.
+	 *
+	 * @param  string  $relation
+	 * @param  \Closure  $callback
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
+	{
+		return $this->has($relation, $operator, $count, 'and', $callback);
 	}
 
 	/**
@@ -611,6 +636,77 @@ class Builder {
 	public function orHas($relation, $operator = '>=', $count = 1)
 	{
 		return $this->has($relation, $operator, $count, 'or');
+	}
+
+	/**
+	 * Add a relationship count condition to the query with where clauses and an "or".
+	 *
+	 * @param  string  $relation
+	 * @param  \Closure  $callback
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
+	{
+		return $this->has($relation, $operator, $count, 'or', $callback);
+	}
+
+	/**
+	 * Add the "has" condition where clause to the query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
+	 * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+	 * @param  string  $operator
+	 * @param  int  $count
+	 * @param  string  $boolean
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
+	{
+		$this->mergeWheresToHas($hasQuery, $relation);
+
+		if (is_numeric($count))
+		{
+			$count = new Expression($count);
+		}
+
+		return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
+	}
+
+	/**
+	 * Merge the "wheres" from a relation query to a has query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
+	 * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+	 * @return void
+	 */
+	protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
+	{
+		// Here we have the "has" query and the original relation. We need to copy over any
+		// where clauses the developer may have put in the relationship function over to
+		// the has query, and then copy the bindings from the "has" query to the main.
+		$relationQuery = $relation->getBaseQuery();
+
+		$hasQuery->mergeWheres(
+			$relationQuery->wheres, $relationQuery->getBindings()
+		);
+
+		$this->query->mergeBindings($hasQuery->getQuery());
+	}
+
+	/**
+	 * Get the "has relation" base query instance.
+	 *
+	 * @param  string  $relation
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	protected function getHasRelationQuery($relation)
+	{
+		return Relation::noConstraints(function() use ($relation)
+		{
+			return $this->getModel()->$relation();
+		});
 	}
 
 	/**
@@ -691,6 +787,20 @@ class Builder {
 	}
 
 	/**
+	 * Call the given model scope on the underlying model.
+	 *
+	 * @param  string  $scope
+	 * @param  array  $parameters
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	protected function callScope($scope, $parameters)
+	{
+		array_unshift($parameters, $this);
+
+		return call_user_func_array(array($this->model, $scope), $parameters) ?: $this;
+	}
+
+	/**
 	 * Get the underlying query builder instance.
 	 *
 	 * @return \Illuminate\Database\Query\Builder|static
@@ -758,6 +868,29 @@ class Builder {
 	}
 
 	/**
+	 * Extend the builder with a given callback.
+	 *
+	 * @param  string  $name
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function macro($name, Closure $callback)
+	{
+		$this->macros[$name] = $callback;
+	}
+
+	/**
+	 * Get the given macro by name.
+	 *
+	 * @param  string  $name
+	 * @return \Closure
+	 */
+	public function getMacro($name)
+	{
+		return array_get($this->macros, $name);
+	}
+
+	/**
 	 * Dynamically handle calls into the query instance.
 	 *
 	 * @param  string  $method
@@ -766,11 +899,15 @@ class Builder {
 	 */
 	public function __call($method, $parameters)
 	{
-		if (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
+		if (isset($this->macros[$method]))
 		{
 			array_unshift($parameters, $this);
 
-			call_user_func_array(array($this->model, $scope), $parameters);
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+		elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
+		{
+			return $this->callScope($scope, $parameters);
 		}
 		else
 		{
@@ -778,6 +915,16 @@ class Builder {
 		}
 
 		return in_array($method, $this->passthru) ? $result : $this;
+	}
+
+	/**
+	 * Force a clone of the underlying query builder when cloning.
+	 *
+	 * @return void
+	 */
+	public function __clone()
+	{
+		$this->query = clone $this->query;
 	}
 
 }

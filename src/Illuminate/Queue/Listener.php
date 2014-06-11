@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue;
 
+use Closure;
 use Symfony\Component\Process\Process;
 
 class Listener {
@@ -26,16 +27,36 @@ class Listener {
 	protected $sleep = 3;
 
 	/**
+	 * The amount of times to try a job before logging it failed.
+	 *
+	 * @var  int
+	 */
+	protected $maxTries = 0;
+
+	/**
+	 * The queue worker command line.
+	 *
+	 * @var string
+	 */
+	protected $workerCommand;
+
+	/**
+	 * The output handler callback.
+	 *
+	 * @var \Closure|null
+	 */
+	protected $outputHandler;
+
+	/**
 	 * Create a new queue listener.
 	 *
 	 * @param  string  $commandPath
-	 * @param  string  $environment
 	 * @return void
 	 */
-	public function __construct($commandPath, $environment = null)
+	public function __construct($commandPath)
 	{
 		$this->commandPath = $commandPath;
-		$this->environment = $environment;
+		$this->workerCommand =  '"'.PHP_BINARY.'" artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
 	}
 
 	/**
@@ -67,7 +88,10 @@ class Listener {
 	 */
 	public function runProcess(Process $process, $memory)
 	{
-		$process->run();
+		$process->run(function($type, $line)
+		{
+			$this->handleWorkerOutput($type, $line);
+		});
 
 		// Once we have run the job we'll go check if the memory limit has been
 		// exceeded for the script. If it has, we will kill this script so a
@@ -90,7 +114,7 @@ class Listener {
 	 */
 	public function makeProcess($connection, $queue, $delay, $memory, $timeout)
 	{
-		$string = 'php artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s';
+		$string = $this->workerCommand;
 
 		// If the environment is set, we will append it to the command string so the
 		// workers will run under the specified environment. Otherwise, they will
@@ -100,9 +124,30 @@ class Listener {
 			$string .= ' --env='.$this->environment;
 		}
 
-		$command = sprintf($string, $connection, $queue, $delay, $memory, $this->sleep);
+		// Next, we will just format out the worker commands with all of the various
+		// options available for the command. This will produce the final command
+		// line that we will pass into a Symfony process object for processing.
+		$command = sprintf(
+			$string, $connection, $queue, $delay,
+			$memory, $this->sleep, $this->maxTries
+		);
 
 		return new Process($command, $this->commandPath, null, null, $timeout);
+	}
+
+	/**
+	 * Handle output from the worker process.
+	 *
+	 * @param  int  $type
+	 * @param  string  $line
+	 * @return void
+	 */
+	protected function handleWorkerOutput($type, $line)
+	{
+		if (isset($this->outputHandler))
+		{
+			call_user_func($this->outputHandler, $type, $line);
+		}
 	}
 
 	/**
@@ -124,6 +169,17 @@ class Listener {
 	public function stop()
 	{
 		die;
+	}
+
+	/**
+	 * Set the output handler callback.
+	 *
+	 * @param  \Closure  $outputHandler
+	 * @return void
+	 */
+	public function setOutputHandler(Closure $outputHandler)
+	{
+		$this->outputHandler = $outputHandler;
 	}
 
 	/**
@@ -166,6 +222,17 @@ class Listener {
 	public function setSleep($sleep)
 	{
 		$this->sleep = $sleep;
+	}
+
+	/**
+	 * Set the amount of times to try a job before logging it failed.
+	 *
+	 * @param  int  $tries
+	 * @return void
+	 */
+	public function setMaxTries($tries)
+	{
+		$this->maxTries = $tries;
 	}
 
 }

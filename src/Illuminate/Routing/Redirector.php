@@ -92,7 +92,7 @@ class Redirector {
 	 * @param  bool    $secure
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
-	public function intended($default, $status = 302, $headers = array(), $secure = null)
+	public function intended($default = '/', $status = 302, $headers = array(), $secure = null)
 	{
 		$path = $this->session->get('url.intended', $default);
 

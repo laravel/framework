@@ -2,7 +2,6 @@
 
 use Closure;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Grammars\Grammar;
 
 class Builder {
 
@@ -19,6 +18,13 @@ class Builder {
 	 * @var \Illuminate\Database\Schema\Grammars\Grammar
 	 */
 	protected $grammar;
+
+	/**
+	 * The Blueprint resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $resolver;
 
 	/**
 	 * Create a new database Schema manager.
@@ -67,7 +73,7 @@ class Builder {
 	 * @param  string  $table
 	 * @return array
 	 */
-	protected function getColumnListing($table)
+	public function getColumnListing($table)
 	{
 		$table = $this->connection->getTablePrefix().$table;
 
@@ -172,7 +178,14 @@ class Builder {
 	 */
 	protected function createBlueprint($table, Closure $callback = null)
 	{
-		return new Blueprint($table, $callback);
+		if (isset($this->resolver))
+		{
+			return call_user_func($this->resolver, $table, $callback);
+		}
+		else
+		{
+			return new Blueprint($table, $callback);
+		}
 	}
 
 	/**
@@ -196,6 +209,17 @@ class Builder {
 		$this->connection = $connection;
 
 		return $this;
+	}
+
+	/**
+	 * Set the Schema Blueprint resolver callback.
+	 *
+	 * @param  \Closure  $resolver
+	 * @return void
+	 */
+	public function blueprintResolver(Closure $resolver)
+	{
+		$this->resolver = $resolver;
 	}
 
 }

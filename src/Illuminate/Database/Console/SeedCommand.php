@@ -1,11 +1,13 @@
 <?php namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class SeedCommand extends Command {
+
+	use ConfirmableTrait;
 
 	/**
 	 * The console command name.
@@ -48,11 +50,11 @@ class SeedCommand extends Command {
 	 */
 	public function fire()
 	{
+		if ( ! $this->confirmToProceed()) return;
+
 		$this->resolver->setDefaultConnection($this->getDatabase());
 
 		$this->getSeeder()->run();
-
-		$this->info('Database seeded!');
 	}
 
 	/**
@@ -90,6 +92,8 @@ class SeedCommand extends Command {
 			array('class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'),
 
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'),
+
+			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 		);
 	}
 

@@ -27,9 +27,16 @@ abstract class Controller {
 	protected static $filterer;
 
 	/**
-	 * Register a "before" filter on the controler.
+	 * The layout used by the controller.
 	 *
-	 * @param  \Closure|string  $name
+	 * @var \Illuminate\View\View
+	 */
+	protected $layout;
+
+	/**
+	 * Register a "before" filter on the controller.
+	 *
+	 * @param  \Closure|string  $filter
 	 * @param  array  $options
 	 * @return void
 	 */
@@ -39,9 +46,9 @@ abstract class Controller {
 	}
 
 	/**
-	 * Register an "after" filter on the controler.
+	 * Register an "after" filter on the controller.
 	 *
-	 * @param  \Closure|string  $name
+	 * @param  \Closure|string  $filter
 	 * @param  array  $options
 	 * @return void
 	 */
@@ -53,7 +60,7 @@ abstract class Controller {
 	/**
 	 * Parse the given filter and options.
 	 *
-	 * @param  \Closure|string  $name
+	 * @param  \Closure|string  $filter
 	 * @param  array  $options
 	 * @return array
 	 */
@@ -61,16 +68,22 @@ abstract class Controller {
 	{
 		$parameters = array();
 
+		$original = $filter;
+
 		if ($filter instanceof Closure)
 		{
 			$filter = $this->registerClosureFilter($filter);
+		}
+		elseif ($this->isInstanceFilter($filter))
+		{
+			$filter = $this->registerInstanceFilter($filter);
 		}
 		else
 		{
 			list($filter, $parameters) = Route::parseFilter($filter);
 		}
 
-		return compact('filter', 'parameters', 'options');
+		return compact('original', 'filter', 'parameters', 'options');
 	}
 
 	/**
@@ -84,6 +97,76 @@ abstract class Controller {
 		$this->getFilterer()->filter($name = spl_object_hash($filter), $filter);
 
 		return $name;
+	}
+
+	/**
+	 * Register a controller instance method as a filter.
+	 *
+	 * @param  string  $filter
+	 * @return string
+	 */
+	protected function registerInstanceFilter($filter)
+	{
+		$this->getFilterer()->filter($filter, array($this, substr($filter, 1)));
+
+		return $filter;
+	}
+
+	/**
+	 * Determine if a filter is a local method on the controller.
+	 *
+	 * @param  mixed  $filter
+	 * @return boolean
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	protected function isInstanceFilter($filter)
+	{
+		if (is_string($filter) && starts_with($filter, '@'))
+		{
+			if (method_exists($this, substr($filter, 1))) return true;
+
+			throw new \InvalidArgumentException("Filter method [$filter] does not exist.");
+		}
+
+		return false;
+	}
+
+	/**
+	 * Remove the given before filter.
+	 *
+	 * @param  string  $filter
+	 * @return void
+	 */
+	public function forgetBeforeFilter($filter)
+	{
+		$this->beforeFilters = $this->removeFilter($filter, $this->getBeforeFilters());
+	}
+
+	/**
+	 * Remove the given after filter.
+	 *
+	 * @param  string  $filter
+	 * @return void
+	 */
+	public function forgetAfterFilter($filter)
+	{
+		$this->afterFilters = $this->removeFilter($filter, $this->getAfterFilters());
+	}
+
+	/**
+	 * Remove the given controller filter from the provided filter array.
+	 *
+	 * @param  string  $removing
+	 * @param  array  $current
+	 * @return array
+	 */
+	protected function removeFilter($removing, $current)
+	{
+		return array_filter($current, function($filter) use ($removing)
+		{
+			return $filter['original'] != $removing;
+		});
 	}
 
 	/**
@@ -128,12 +211,45 @@ abstract class Controller {
 	}
 
 	/**
+	 * Create the layout used by the controller.
+	 *
+	 * @return void
+	 */
+	protected function setupLayout() {}
+
+	/**
+	 * Execute an action on the controller.
+	 *
+	 * @param string  $method
+	 * @param array   $parameters
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function callAction($method, $parameters)
+	{
+		$this->setupLayout();
+
+		$response = call_user_func_array(array($this, $method), $parameters);
+
+		// If no response is returned from the controller action and a layout is being
+		// used we will assume we want to just return the layout view as any nested
+		// views were probably bound on this view during this controller actions.
+		if (is_null($response) && ! is_null($this->layout))
+		{
+			$response = $this->layout;
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Handle calls to missing methods on the controller.
 	 *
-	 * @param  array  $parameters
+	 * @param  array   $parameters
 	 * @return mixed
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
-	public function missingMethod($parameters)
+	public function missingMethod($parameters = array())
 	{
 		throw new NotFoundHttpException("Controller method not found.");
 	}
@@ -144,10 +260,12 @@ abstract class Controller {
 	 * @param  string  $method
 	 * @param  array   $parameters
 	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
 	 */
 	public function __call($method, $parameters)
 	{
-		return $this->missingMethod($parameters);
+		throw new \BadMethodCallException("Method [$method] does not exist.");
 	}
 
 }

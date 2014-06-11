@@ -9,6 +9,8 @@ class MemcachedConnector {
 	 *
 	 * @param array  $servers
 	 * @return \Memcached
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function connect(array $servers)
 	{
@@ -19,7 +21,9 @@ class MemcachedConnector {
 		// servers we'll verify the connection is successful and return it back.
 		foreach ($servers as $server)
 		{
-			$memcached->addServer($server['host'], $server['port'], $server['weight']);
+			$memcached->addServer(
+				$server['host'], $server['port'], $server['weight']
+			);
 		}
 
 		if ($memcached->getVersion() === false)

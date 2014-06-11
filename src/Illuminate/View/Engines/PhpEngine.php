@@ -1,7 +1,6 @@
 <?php namespace Illuminate\View\Engines;
 
 use Illuminate\View\Exception;
-use Illuminate\View\Environment;
 
 class PhpEngine implements EngineInterface {
 
@@ -48,8 +47,10 @@ class PhpEngine implements EngineInterface {
 	/**
 	 * Handle a view exception.
 	 *
-	 * @param  Exception  $e
+	 * @param  \Exception  $e
 	 * @return void
+	 *
+	 * @throws $e
 	 */
 	protected function handleViewException($e)
 	{

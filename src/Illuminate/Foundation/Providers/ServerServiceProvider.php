@@ -19,7 +19,7 @@ class ServerServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app['command.serve'] = $this->app->share(function()
+		$this->app->bindShared('command.serve', function()
 		{
 			return new ServeCommand;
 		});

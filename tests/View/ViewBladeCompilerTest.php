@@ -53,6 +53,24 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCompileCompilesAndGetThePath()
+	{
+		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+		$files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+		$files->shouldReceive('put')->once()->with(__DIR__.'/'.md5('foo'), 'Hello World');
+		$compiler->compile('foo');
+		$this->assertEquals('foo', $compiler->getPath());
+	}
+
+
+	public function testCompileSetAndGetThePath()
+	{
+		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+		$compiler->setPath('foo');
+		$this->assertEquals('foo', $compiler->getPath());
+	}
+
+
 	public function testCompileDoesntStoreFilesWhenCachePathIsNull()
 	{
 		$compiler = new BladeCompiler($files = $this->getFiles(), null);
@@ -68,9 +86,45 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{$name}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ 
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
 			$name
 		}}'));
+
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name or "foo" }}'));
+		$this->assertEquals('<?php echo isset($user->name) ? $user->name : "foo"; ?>', $compiler->compileString('{{ $user->name or "foo" }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{$name or "foo"}}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{
+			$name or "foo"
+		}}'));
+
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{ $name or \'foo\' }}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{$name or \'foo\'}}'));
+		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{{
+			$name or \'foo\'
+		}}'));
+
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{ $age or 90 }}'));
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{$age or 90}}'));
+		$this->assertEquals('<?php echo isset($age) ? $age : 90; ?>', $compiler->compileString('{{
+			$age or 90
+		}}'));
+
+		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{ "Hello world or foo" }}'));
+		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{"Hello world or foo"}}'));
+		$this->assertEquals('<?php echo $foo + $or + $baz; ?>', $compiler->compileString('{{$foo + $or + $baz}}'));
+		$this->assertEquals('<?php echo "Hello world or foo"; ?>', $compiler->compileString('{{
+			"Hello world or foo"
+		}}'));
+
+		$this->assertEquals('<?php echo \'Hello world or foo\'; ?>', $compiler->compileString('{{ \'Hello world or foo\' }}'));
+		$this->assertEquals('<?php echo \'Hello world or foo\'; ?>', $compiler->compileString('{{\'Hello world or foo\'}}'));
+		$this->assertEquals('<?php echo \'Hello world or foo\'; ?>', $compiler->compileString('{{
+			\'Hello world or foo\'
+		}}'));
+
+		$this->assertEquals('<?php echo myfunc(\'foo or bar\'); ?>', $compiler->compileString('{{ myfunc(\'foo or bar\') }}'));
+		$this->assertEquals('<?php echo myfunc("foo or bar"); ?>', $compiler->compileString('{{ myfunc("foo or bar") }}'));
+		$this->assertEquals('<?php echo myfunc("$name or \'foo\'"); ?>', $compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
 	}
 
 
@@ -81,7 +135,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('{{ $name }}', $compiler->compileString('@{{ $name }}'));
 		$this->assertEquals('{{
 			$name
-		}}', 
+		}}',
 		$compiler->compileString('@{{
 			$name
 		}}'));
@@ -96,24 +150,46 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{$name}}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ $name }}}'));
-		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ 
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{
 			$name
 		}}}'));
 	}
+
 
 	public function testExtendsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '@extends(\'foo\')
 test';
-		$expected = "test\r\n".'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 
 
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@extends(name(foo))
-test';
-		$expected = "test\r\n".'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$string = '@extends(name(foo))'.PHP_EOL.'test';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testPushIsCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@push(\'foo\')
+test
+@endpush';
+		$expected = '<?php $__env->startSection(\'foo\'); ?>
+test
+<?php $__env->appendSection(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testStackIsCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@stack(\'foo\')';;
+		$expected = '<?php echo $__env->yieldContent(\'foo\'); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
@@ -122,16 +198,16 @@ test';
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '{{--this is a comment--}}';
-		$expected = '<?php /* this is a comment */ ?>';
+		$expected = '<?php /*this is a comment*/ ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 
 
 		$string = '{{--
 this is a comment
 --}}';
-		$expected = '<?php /* 
+		$expected = '<?php /*
 this is a comment
- */ ?>';
+*/ ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
@@ -142,7 +218,7 @@ this is a comment
 		$string = '@if (name(foo(bar)))
 breeze
 @endif';
-		$expected = '<?php if (name(foo(bar))): ?>
+		$expected = '<?php if(name(foo(bar))): ?>
 breeze
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
@@ -157,7 +233,7 @@ breeze
 @else
 boom
 @endif';
-		$expected = '<?php if (name(foo(bar))): ?>
+		$expected = '<?php if(name(foo(bar))): ?>
 breeze
 <?php else: ?>
 boom
@@ -169,14 +245,14 @@ boom
 	public function testElseIfStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@if (name(foo(bar)))
+		$string = '@if(name(foo(bar)))
 breeze
-@elseif (boom(breeze))
+@elseif(boom(breeze))
 boom
 @endif';
-		$expected = '<?php if (name(foo(bar))): ?>
+		$expected = '<?php if(name(foo(bar))): ?>
 breeze
-<?php elseif (boom(breeze)): ?>
+<?php elseif(boom(breeze)): ?>
 boom
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
@@ -192,6 +268,15 @@ breeze
 		$expected = '<?php if ( ! (name(foo(bar)))): ?>
 breeze
 <?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = "Foo @lang(function_call('foo(blah)')) bar";
+		$expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
@@ -251,6 +336,34 @@ breeze
 	}
 
 
+	public function testEndSectionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php $__env->stopSection(); ?>', $compiler->compileString('@endsection'));
+	}
+
+
+	public function testAppendSectionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php $__env->appendSection(); ?>', $compiler->compileString('@append'));
+	}
+
+
+	public function testCustomPhpCodeIsCorrectlyHandled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php if($test): ?> <?php @show(\'test\'); ?> <?php endif; ?>', $compiler->compileString("@if(\$test) <?php @show('test'); ?> @endif"));
+	}
+
+
+	public function testMixingYieldAndEcho()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo Config::get(\'site.title\'); ?>', $compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
+	}
+
+
 	public function testCustomExtensionsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -270,6 +383,22 @@ breeze
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('[[
 			$name
 		]]'));
+	}
+
+
+	public function testExpressionsOnTheSameLine()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo \Illuminate\Support\Facades\Lang::get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
+	}
+
+
+	public function testExpressionWithinHTML()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<html <?php echo $foo; ?>>', $compiler->compileString('<html {{ $foo }}>'));
+		$this->assertEquals('<html<?php echo $foo; ?>>', $compiler->compileString('<html{{ $foo }}>'));
+		$this->assertEquals('<html <?php echo $foo; ?> <?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
 	}
 
 

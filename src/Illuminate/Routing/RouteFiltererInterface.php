@@ -1,8 +1,5 @@
 <?php namespace Illuminate\Routing;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-
 interface RouteFiltererInterface {
 
 	/**

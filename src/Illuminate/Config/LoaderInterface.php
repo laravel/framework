@@ -29,7 +29,7 @@ interface LoaderInterface {
 	 * @return void
 	 */
 	public function addNamespace($namespace, $hint);
-	
+
 	/**
 	 * Returns all registered namespaces with the config
 	 * loader.
