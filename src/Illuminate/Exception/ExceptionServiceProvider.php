@@ -115,7 +115,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			$this->app['whoops.handler'] = $this->app->share(function()
 			{
-					return new JsonResponseHandler;
+				return new JsonResponseHandler;
 			});
 		}
 		else
