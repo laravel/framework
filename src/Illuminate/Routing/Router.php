@@ -668,9 +668,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  string  $controller
 	 * @return void
 	 */
-	protected function addResourceDescribe($name, $base, $controller)
+	protected function addResourceDescribe($name, $base, $controller, $options)
 	{
-		$action = $this->getResourceAction($name, $controller, 'describe');
+		$action = $this->getResourceAction($name, $controller, 'describe', $options);
 
 		return $this->options($this->getResourceUri($name), $action);
 	}
