@@ -1113,7 +1113,7 @@ if ( ! function_exists('class_uses_recursive'))
 	 * @see    http://www.php.net/manual/en/function.class-uses.php#112671
 	 * @param  mixed  $class
 	 * @param  bool   $autoload
-	 * @return mixed
+	 * @return array
 	 */
 	function class_uses_recursive($class, $autoload = true)
 	{
