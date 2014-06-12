@@ -31,6 +31,17 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCacheCanBeSetWithDatetimeArgument()
+	{
+		$store = new ArrayStore;
+		$tags = array('bop', 'zap');
+		$duration = new DateTime();
+		$duration->add(new DateInterval("PT10M"));
+		$store->tags($tags)->put('foo', 'bar', $duration);
+		$this->assertEquals('bar', $store->tags($tags)->get('foo'));
+	}
+
+
 	public function testCacheSavedWithMultipleTagsCanBeFlushed()
 	{
 		$store = new ArrayStore;
