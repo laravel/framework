@@ -296,17 +296,33 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Boot all of the bootable traits on the model.
+	 * Boot all of the boot-able traits on the model, as well as the inherited ones.
+	 *
+	 * Some functionality borrowed from http://www.php.net/manual/en/function.class-uses.php#110752
 	 *
 	 * @return void
 	 */
 	protected static function bootTraits()
 	{
-		foreach (class_uses(get_called_class()) as $trait)
+		$traits = [];
+		$class = $current_class = get_called_class();
+
+		do
 		{
-			if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
+			$traits = array_merge(class_uses($class), $traits);
+		}
+		while ($class = get_parent_class($class));
+
+		foreach ($traits as $trait => $same)
+		{
+			$traits = array_merge(class_uses($trait), $traits);
+		}
+
+		foreach (array_unique($traits) as $trait)
+		{
+			if (method_exists($current_class, $method = 'boot'.class_basename($trait)))
 			{
-				forward_static_call([get_called_class(), $method]);
+				forward_static_call([$current_class, $method]);
 			}
 		}
 	}
