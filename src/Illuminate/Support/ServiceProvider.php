@@ -58,22 +58,33 @@ abstract class ServiceProvider {
 		// In this method we will register the configuration package for the package
 		// so that the configuration options cleanly cascade into the application
 		// folder to make the developers lives much easier in maintaining them.
-		$path = $path ?: $this->guessPackagePath();
+		if (is_array($path))
+		{
+			$paths = $path;
+			$path = $this->guessPackagePath();
+		}
+		else
+		{
+			$path = $path ?: $this->guessPackagePath();
+			$paths = [];
+		}
 
-		$config = $path.'/config';
+		$config = isset($paths['config']) ? $paths['config'] : $path.'/config';
 
 		if ($this->app['files']->isDirectory($config))
 		{
+			$paths['config'] = $config;
 			$this->app['config']->package($package, $config, $namespace);
 		}
 
 		// Next we will check for any "language" components. If language files exist
 		// we will register them with this given package's namespace so that they
 		// may be accessed using the translation facilities of the application.
-		$lang = $path.'/lang';
+		$lang = isset($paths['lang']) ? $paths['lang'] : $path.'/lang';
 
 		if ($this->app['files']->isDirectory($lang))
 		{
+			$paths['lang'] = $lang;
 			$this->app['translator']->addNamespace($namespace, $lang);
 		}
 
@@ -90,12 +101,29 @@ abstract class ServiceProvider {
 		// Finally we will register the view namespace so that we can access each of
 		// the views available in this package. We use a standard convention when
 		// registering the paths to every package's views and other components.
-		$view = $path.'/views';
+		$view = isset($paths['view']) ? $paths['view'] : $path.'/view';
 
 		if ($this->app['files']->isDirectory($view))
 		{
+			$paths['view'] = $view;
 			$this->app['view']->addNamespace($namespace, $view);
 		}
+
+		$asset = isset($paths['asset']) ? $paths['asset'] : $path.'/public';
+
+		if ($this->app['files']->isDirectory($asset))
+		{
+			$paths['asset'] = $asset;
+		}
+
+		$migrations = isset($paths['migrations']) ? $paths['migrations'] : $path.'/migrations';
+
+		if ($this->app['files']->isDirectory($migrations))
+		{
+			$paths['migrations'] = $migrations;
+		}
+
+		$this->app->registerPackage($package, $paths);
 	}
 
 	/**
