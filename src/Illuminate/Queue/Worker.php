@@ -7,7 +7,7 @@ use Illuminate\Queue\Failed\FailedJobProviderInterface;
 class Worker {
 
 	/**
-	 * THe queue manager instance.
+	 * The queue manager instance.
 	 *
 	 * @var \Illuminate\Queue\QueueManager
 	 */
