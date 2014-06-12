@@ -431,6 +431,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(['foo', 'bar'], $c->reject(function($v) { return $v == 'baz'; })->values()->all());
 	}
 
+
+	public function testKeys()
+	{
+		$c = new Collection(array('name' => 'taylor', 'framework' => 'laravel'));
+		$this->assertEquals(array('name', 'framework'), $c->keys());
+	}
+
 }
 
 class TestAccessorEloquentTestStub
