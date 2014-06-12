@@ -592,7 +592,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
+		return '/(?<!\w)(\s*)@'.$function.'(\s*(\((?:(?>[^()"\']+)|(["\'])(?:(?!\4).|\\\\\4)*\4|(?3))*\)))/';
 	}
 
 	/**
@@ -603,8 +603,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createOpenMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
-	}
+		return '/(?<!\w)(\s*)@'.$function.'(\s*(?:\((?:(?>[^()"\']+)|(["\'])(?:(?!\3).|\\\\\3)*\3|(\((?:(?>[^()"\']+)|(["\'])(?:(?!\5).|\\\\\5)*\5|(?4))*\)))*))\)/'
 
 	/**
 	 * Create a plain Blade matcher.
