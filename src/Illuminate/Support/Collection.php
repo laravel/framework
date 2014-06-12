@@ -242,6 +242,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Get the keys of the collection items.
+	 *
+	 * @return array
+	 */
+	public function keys()
+	{
+		return array_keys($this->items);
+	}
+
+	/**
 	* Get the last item from the collection.
 	*
 	* @return mixed|null
