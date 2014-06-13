@@ -188,14 +188,22 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function bindInstallPaths(array $paths)
 	{
-		$this->instance('path', realpath($paths['app']));
+		$realpath = realpath($paths['app']);
+		if ($realpath === false) {
+			throw new \Exception("Path not found for path: $value");
+		}
+		$this->instance('path', $realpath);
 
 		// Here we will bind the install paths into the container as strings that can be
 		// accessed from any point in the system. Each path key is prefixed with path
 		// so that they have the consistent naming convention inside the container.
 		foreach (array_except($paths, array('app')) as $key => $value)
 		{
-			$this->instance("path.{$key}", realpath($value));
+			$realpath = realpath($value);
+			if ($realpath === false) {
+				throw new \Exception("Path not found for path.$key: $value");
+			}
+			$this->instance("path.{$key}", $realpath);
 		}
 	}
 
