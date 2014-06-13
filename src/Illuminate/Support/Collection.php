@@ -148,6 +148,16 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * FLip items.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function flip()
+	{
+		return new static(array_flip($this->items));
+	}
+
+	/**
 	 * Remove an item from the collection by key.
 	 *
 	 * @param  mixed  $key
