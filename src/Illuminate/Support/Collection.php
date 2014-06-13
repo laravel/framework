@@ -148,7 +148,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * FLip items.
+	 * Flip the items in the collection.
 	 *
 	 * @return \Illuminate\Support\Collection
 	 */
