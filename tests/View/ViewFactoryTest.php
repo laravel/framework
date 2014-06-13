@@ -346,6 +346,15 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExceptionIsThrownForUnknownExtension()
+	{
+		$this->setExpectedException('InvalidArgumentException');
+		$factory = $this->getFactory();
+		$factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('view.foo');
+		$factory->make('view');
+	}
+
+
 	protected function getFactory()
 	{
 		return new Factory(

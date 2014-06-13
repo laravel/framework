@@ -129,7 +129,14 @@ class OptimizeCommand extends Command {
 		{
 			foreach ($this->laravel['files']->allFiles($path) as $file)
 			{
-				$engine = $this->laravel['view']->getEngineFromPath($file);
+				try
+				{
+					$engine = $this->laravel['view']->getEngineFromPath($file);
+				}
+				catch (\InvalidArgumentException $e)
+				{
+					continue;
+				}
 
 				if ($engine instanceof CompilerEngine)
 				{
