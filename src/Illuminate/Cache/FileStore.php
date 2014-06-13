@@ -113,7 +113,7 @@ class FileStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		$int = $this->getInt($key) + $value;
+		$int = ((int) $this->get($key)) + $value;
 
 		$this->put($key, $int, 0);
 
@@ -129,7 +129,7 @@ class FileStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		$int = $this->getInt($key) - $value;
+		$int = ((int) $this->get($key)) - $value;
 
 		$this->put($key, $int, 0);
 
@@ -188,21 +188,6 @@ class FileStore implements StoreInterface {
 		$parts = array_slice(str_split($hash = md5($key), 2), 0, 2);
 
 		return $this->directory.'/'.join('/', $parts).'/'.$hash;
-	}
-
-	/**
-	 * Get the integer value for given cache key.
-	 *
-	 * @param  string  $key
-	 * @return int
-	 */
-	protected function getInt($key)
-	{
-		$value = $this->get($key);
-
-		$int = $value ? $value : 0;
-
-		return (int) $int;
 	}
 
 	/**
