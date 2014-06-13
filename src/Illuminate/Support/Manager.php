@@ -37,6 +37,13 @@ abstract class Manager {
 	}
 
 	/**
+	 * Get the default driver name.
+	 *
+	 * @return string
+	 */
+	abstract public function getDefaultDriver();
+
+	/**
 	 * Get a driver instance.
 	 *
 	 * @param  string  $driver
@@ -118,13 +125,6 @@ abstract class Manager {
 	{
 		return $this->drivers;
 	}
-
-	/**
-	 * Get the default driver name.
-	 *
-	 * @return string
-	 */
-	abstract public function getDefaultDriver();
 
 	/**
 	 * Dynamically call the default driver instance.
