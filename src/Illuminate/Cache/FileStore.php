@@ -109,13 +109,15 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
-	 *
-	 * @throws \LogicException
+	 * @return int
 	 */
 	public function increment($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		$int = ((int) $this->get($key)) + $value;
+
+		$this->put($key, $int, 0);
+
+		return $int;
 	}
 
 	/**
@@ -123,13 +125,15 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
-	 *
-	 * @throws \LogicException
+	 * @return int
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Decrement operations not supported by this driver.");
+		$int = ((int) $this->get($key)) - $value;
+
+		$this->put($key, $int, 0);
+
+		return $int;
 	}
 
 	/**
