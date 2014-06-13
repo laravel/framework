@@ -19,7 +19,7 @@ trait UserTrait {
 	 */
 	public function getAuthPassword()
 	{
-		return $this->password;
+		return $this->getAttribute('password');
 	}
 
 	/**
@@ -29,7 +29,7 @@ trait UserTrait {
 	 */
 	public function getRememberToken()
 	{
-		return $this->remember_token;
+		return $this->getAttribute($this->getRememberTokenName());
 	}
 
 	/**
@@ -40,7 +40,7 @@ trait UserTrait {
 	 */
 	public function setRememberToken($value)
 	{
-		$this->remember_token = $value;
+		$this->setAttribute($this->getRememberTokenName(), $value);
 	}
 
 	/**
