@@ -482,6 +482,15 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table `users` add `created_at` timestamp default 0 not null, add `updated_at` timestamp default 0 not null', $statements[0]);
 	}
 
+	public function testAddingRememberToken()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->rememberToken();
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `remember_token` varchar(100) null', $statements[0]);
+	}
 
 	public function testAddingBinary()
 	{
