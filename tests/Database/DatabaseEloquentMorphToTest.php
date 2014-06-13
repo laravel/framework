@@ -62,6 +62,9 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase {
 		$firstQuery->shouldReceive('getKeyName')->andReturn('id');
 		$secondQuery->shouldReceive('getKeyName')->andReturn('id');
 
+		$firstQuery->shouldReceive('newQuery')->once()->andReturn($firstQuery);
+		$secondQuery->shouldReceive('newQuery')->once()->andReturn($secondQuery);
+
 		$firstQuery->shouldReceive('whereIn')->once()->with('id', array('foreign_key_1'))->andReturn($firstQuery);
 		$firstQuery->shouldReceive('get')->once()->andReturn(Collection::make(array($resultOne = m::mock('StdClass'))));
 		$resultOne->shouldReceive('getKey')->andReturn('foreign_key_1');
