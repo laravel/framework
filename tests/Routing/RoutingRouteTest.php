@@ -632,7 +632,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->resource('foo', 'FooController', array('except' => array('show', 'destroy')));
 		$routes = $router->getRoutes();
 
-		$this->assertEquals(6, count($routes));
+		$this->assertEquals(7, count($routes));
 
 		$router = $this->getRouter();
 		$router->resource('foo-bars', 'FooController', array('only' => array('show')));
