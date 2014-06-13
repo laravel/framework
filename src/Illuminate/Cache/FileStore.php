@@ -200,7 +200,7 @@ class FileStore implements StoreInterface {
 	{
 		$value = $this->get($key);
 
-		$int = ! $value ? $value : 0;
+		$int = $value ? $value : 0;
 
 		return (int) $int;
 	}
