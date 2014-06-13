@@ -673,8 +673,8 @@ class Blueprint {
 	}
 
 	/**
-	 * Adds `remember_token` column to the table.
-	 * 
+	 * Adds the `remember_token` column to the table.
+	 *
 	 * @return void
 	 */
 	public function rememberToken()
