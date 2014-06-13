@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 if ( ! function_exists('action'))
 {
 	/**
@@ -507,7 +509,7 @@ if ( ! function_exists('camel_case'))
 	 */
 	function camel_case($value)
 	{
-		return Illuminate\Support\Str::camel($value);
+		return Str::camel($value);
 	}
 }
 
@@ -634,7 +636,7 @@ if ( ! function_exists('ends_with'))
 	 */
 	function ends_with($haystack, $needle)
 	{
-		return Illuminate\Support\Str::endsWith($haystack, $needle);
+		return Str::endsWith($haystack, $needle);
 	}
 }
 
@@ -851,7 +853,7 @@ if ( ! function_exists('snake_case'))
 	 */
 	function snake_case($value, $delimiter = '_')
 	{
-		return Illuminate\Support\Str::snake($value, $delimiter);
+		return Str::snake($value, $delimiter);
 	}
 }
 
@@ -866,7 +868,7 @@ if ( ! function_exists('starts_with'))
 	 */
 	function starts_with($haystack, $needle)
 	{
-		return Illuminate\Support\Str::startsWith($haystack, $needle);
+		return Str::startsWith($haystack, $needle);
 	}
 }
 
@@ -895,7 +897,7 @@ if ( ! function_exists('str_contains'))
 	 */
 	function str_contains($haystack, $needle)
 	{
-		return Illuminate\Support\Str::contains($haystack, $needle);
+		return Str::contains($haystack, $needle);
 	}
 }
 
@@ -910,7 +912,7 @@ if ( ! function_exists('str_finish'))
 	 */
 	function str_finish($value, $cap)
 	{
-		return Illuminate\Support\Str::finish($value, $cap);
+		return Str::finish($value, $cap);
 	}
 }
 
@@ -925,24 +927,24 @@ if ( ! function_exists('str_is'))
 	 */
 	function str_is($pattern, $value)
 	{
-		return Illuminate\Support\Str::is($pattern, $value);
+		return Str::is($pattern, $value);
 	}
 }
 
 if ( ! function_exists('str_limit'))
 {
-		/**
-		 * Limit the number of characters in a string.
-		 *
-		 * @param  string  $value
-		 * @param  int     $limit
-		 * @param  string  $end
-		 * @return string
-		 */
-		function str_limit($value, $limit = 100, $end = '...')
-		{
-				return Illuminate\Support\Str::limit($value, $limit, $end);
-		}
+	/**
+	 * Limit the number of characters in a string.
+	 *
+	 * @param  string $value
+	 * @param  int    $limit
+	 * @param  string $end
+	 * @return string
+	 */
+	function str_limit($value, $limit = 100, $end = '...')
+	{
+		return Str::limit($value, $limit, $end);
+	}
 }
 
 if ( ! function_exists('str_plural'))
@@ -956,7 +958,7 @@ if ( ! function_exists('str_plural'))
 	 */
 	function str_plural($value, $count = 2)
 	{
-		return Illuminate\Support\Str::plural($value, $count);
+		return Str::plural($value, $count);
 	}
 }
 
@@ -972,7 +974,7 @@ if ( ! function_exists('str_random'))
 	 */
 	function str_random($length = 16)
 	{
-		return Illuminate\Support\Str::random($length);
+		return Str::random($length);
 	}
 }
 
@@ -1007,7 +1009,7 @@ if ( ! function_exists('str_singular'))
 	 */
 	function str_singular($value)
 	{
-		return Illuminate\Support\Str::singular($value);
+		return Str::singular($value);
 	}
 }
 
@@ -1021,7 +1023,7 @@ if ( ! function_exists('studly_case'))
 	 */
 	function studly_case($value)
 	{
-		return Illuminate\Support\Str::studly($value);
+		return Str::studly($value);
 	}
 }
 
