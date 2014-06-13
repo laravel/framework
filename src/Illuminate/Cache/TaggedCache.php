@@ -59,13 +59,15 @@ class TaggedCache implements StoreInterface {
 	/**
 	 * Store an item in the cache for a given number of minutes.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  string        $key
+	 * @param  mixed         $value
+	 * @param  \DateTime|int $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
 	{
+		$minutes = $this->getMinutes($minutes);
+
 		return $this->store->put($this->taggedItemKey($key), $value, $minutes);
 	}
 
@@ -147,9 +149,9 @@ class TaggedCache implements StoreInterface {
 	/**
 	 * Get an item from the cache, or store the default value.
 	 *
-	 * @param  string   $key
-	 * @param  int      $minutes
-	 * @param  Closure  $callback
+	 * @param  string        $key
+	 * @param  \DateTime|int $minutes
+	 * @param  Closure       $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -214,6 +216,22 @@ class TaggedCache implements StoreInterface {
 	public function getPrefix()
 	{
 		return $this->store->getPrefix();
+	}
+
+	/**
+	 * Calculate the number of minutes with the given duration.
+	 *
+	 * @param  \DateTime|int  $duration
+	 * @return int
+	 */
+	protected function getMinutes($duration)
+	{
+		if ($duration instanceof DateTime)
+		{
+			return max(0, Carbon::instance($duration)->diffInMinutes());
+		}
+
+		return is_string($duration) ? intval($duration) : $duration;
 	}
 
 }
