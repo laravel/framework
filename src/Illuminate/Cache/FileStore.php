@@ -109,13 +109,15 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
-	 *
-	 * @throws \LogicException
+	 * @return int
 	 */
 	public function increment($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		$int = $this->getInt($key) + $value;
+
+		$this->put($key, $int, 0);
+
+		return $int;
 	}
 
 	/**
@@ -123,13 +125,15 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
-	 *
-	 * @throws \LogicException
+	 * @return int
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Decrement operations not supported by this driver.");
+		$int = $this->getInt($key) - $value;
+
+		$this->put($key, $int, 0);
+
+		return $int;
 	}
 
 	/**
@@ -184,6 +188,21 @@ class FileStore implements StoreInterface {
 		$parts = array_slice(str_split($hash = md5($key), 2), 0, 2);
 
 		return $this->directory.'/'.join('/', $parts).'/'.$hash;
+	}
+
+	/**
+	 * Get the integer value for given cache key.
+	 *
+	 * @param  string  $key
+	 * @return int
+	 */
+	protected function getInt($key)
+	{
+		$value = $this->get($key);
+
+		$int = ! $value ? $value : 0;
+
+		return (int) $int;
 	}
 
 	/**
