@@ -123,7 +123,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	 */
 	protected function getForeignAttributesForCreate()
 	{
-		$foreign = array($this->getPlainForeignKey() => $this->getParentKey());
+		$foreign = [$this->getPlainForeignKey() => $this->getParentKey()];
 
 		$foreign[last(explode('.', $this->morphType))] = $this->morphClass;
 

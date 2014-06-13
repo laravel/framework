@@ -52,7 +52,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('artisan', 'command.changes', 'command.environment');
+		return ['artisan', 'command.changes', 'command.environment'];
 	}
 
 }

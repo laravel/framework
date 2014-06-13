@@ -23,14 +23,14 @@ class FileLoader implements LoaderInterface {
 	 *
 	 * @var array
 	 */
-	protected $hints = array();
+	protected $hints = [];
 
 	/**
 	 * A cache of whether namespaces and groups exists.
 	 *
 	 * @var array
 	 */
-	protected $exists = array();
+	protected $exists = [];
 
 	/**
 	 * Create a new file configuration loader.
@@ -55,7 +55,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	public function load($environment, $group, $namespace = null)
 	{
-		$items = array();
+		$items = [];
 
 		// First we'll get the root configuration path for the environment which is
 		// where all of the configuration files live for that namespace, as well

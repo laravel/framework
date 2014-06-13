@@ -49,7 +49,7 @@ class SyncJob extends Job {
 		}
 		else
 		{
-			$this->resolveAndFire(array('job' => $this->job, 'data' => $data));
+			$this->resolveAndFire(['job' => $this->job, 'data' => $data]);
 		}
 	}
 

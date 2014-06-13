@@ -117,9 +117,9 @@ class WorkbenchMakeCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('package', InputArgument::REQUIRED, 'The name (vendor/name) of the package.'),
-		);
+		return [
+            ['package', InputArgument::REQUIRED, 'The name (vendor/name) of the package.'],
+		];
 	}
 
 	/**
@@ -129,9 +129,9 @@ class WorkbenchMakeCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('resources', null, InputOption::VALUE_NONE, 'Create Laravel specific directories.'),
-		);
+		return [
+			['resources', null, InputOption::VALUE_NONE, 'Create Laravel specific directories.'],
+		];
 	}
 
 }

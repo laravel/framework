@@ -11,14 +11,14 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Nullable', 'Default', 'Increment');
+	protected $modifiers = ['Nullable', 'Default', 'Increment'];
 
 	/**
 	 * The columns available as serials.
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer');
+	protected $serials = ['bigInteger', 'integer'];
 
 	/**
 	 * Compile the query to determine if a table exists.

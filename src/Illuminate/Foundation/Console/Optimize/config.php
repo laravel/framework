@@ -2,7 +2,7 @@
 
 $basePath = $app['path.base'];
 
-return array_map('realpath', array(
+return array_map('realpath', [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/ClassLoader.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Container/Container.php',
     $basePath.'/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/HttpKernelInterface.php',
@@ -113,4 +113,4 @@ return array_map('realpath', array(
     $basePath.'/vendor/filp/whoops/src/Whoops/Handler/JsonResponseHandler.php',
     $basePath.'/vendor/stack/builder/src/Stack/Builder.php',
     $basePath.'/vendor/stack/builder/src/Stack/StackedHttpKernel.php',
-));
+]);
