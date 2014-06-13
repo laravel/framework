@@ -1258,11 +1258,6 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'before');
 
-		if ($format = $this->getDateFormat($attribute))
-		{
-			return $this->validateBeforeWithFormat($format, $value, $parameters);
-		}
-
 		if ( ! ($date = strtotime($parameters[0])))
 		{
 			return strtotime($value) < strtotime($this->getValue($parameters[0]));
@@ -1271,20 +1266,6 @@ class Validator implements MessageProviderInterface {
 		{
 			return strtotime($value) < $date;
 		}
-	}
-
-	/**
-	 * Validate the date is before a given date with a given format.
-	 *
-	 * @param  string  $format
-	 * @param  mixed   $value
-	 * @param  array   $parameters
-	 * @return bool
-	 */
-	protected function validateBeforeWithFormat($format, $value, $parameters)
-	{
-		return DateTime::createFromFormat($format, $value) <
-               DateTime::createFromFormat($format, $parameters[0]);
 	}
 
 	/**
@@ -1299,11 +1280,6 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'after');
 
-		if ($format = $this->getDateFormat($attribute))
-		{
-			return $this->validateAfterWithFormat($format, $value, $parameters);
-		}
-
 		if ( ! ($date = strtotime($parameters[0])))
 		{
 			return strtotime($value) > strtotime($this->getValue($parameters[0]));
@@ -1314,20 +1290,6 @@ class Validator implements MessageProviderInterface {
 		}
 	}
 
-	/**
-	 * Validate the date is after a given date with a given format.
-	 *
-	 * @param  string  $format
-	 * @param  mixed   $value
-	 * @param  array   $parameters
-	 * @return bool
-	 */
-	protected function validateAfterWithFormat($format, $value, $parameters)
-	{
-		return DateTime::createFromFormat($format, $value) >
-               DateTime::createFromFormat($format, $parameters[0]);
-	}
-	
 	/**
 	 * Validate that an attribute is a valid timezone.
 	 *
@@ -1345,22 +1307,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return false;
 		}
-	
-		return true;
-	}
 
-	/**
-	 * Get the date format for an attribute if it has one.
-	 *
-	 * @param  string $attribute
-	 * @return string|null
-	 */
-	protected function getDateFormat($attribute)
-	{
-		if ($result = $this->getRule($attribute, 'DateFormat'))
-		{
-			return $result[1][0];
-		}
+		return true;
 	}
 
 	/**
@@ -1915,7 +1863,7 @@ class Validator implements MessageProviderInterface {
 		{
 			list($rule, $parameters) = $this->parseRule($rule);
 
-			if (in_array($rule, $rules)) return [$rule, $parameters];
+			if (in_array($rule, $rules)) return true;
 		}
 	}
 
