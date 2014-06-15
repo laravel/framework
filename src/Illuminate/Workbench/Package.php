@@ -52,10 +52,16 @@ class Package {
 	 * @param  string  $author
 	 * @param  string  $email
 	 * @return void
+ 	 * 
+ 	 * @throws \UnexpectedValueException
 	 */
 	public function __construct($vendor, $name, $author, $email)
 	{
-		$this->name = $name;
+		if (filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_NULL_ON_FAILURE) === null) {
+			throw new \UnexpectedValueException("Please set the author's email for in app/config/workbench.php.");
+		}
+
+ 		$this->name = $name;
 		$this->email = $email;
 		$this->vendor = $vendor;
 		$this->author = $author;
