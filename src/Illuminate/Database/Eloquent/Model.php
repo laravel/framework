@@ -578,9 +578,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get the first model for the given attributes.
 	 *
 	 * @param  array  $attributes
+	 * @param  bool   $fail
 	 * @return \Illuminate\Database\Eloquent\Model|null
 	 */
-	protected static function firstByAttributes($attributes)
+	public static function firstByAttributes($attributes, $fail = false)
 	{
 		$query = static::query();
 
@@ -588,6 +589,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$query->where($key, $value);
 		}
+
+		if ($fail) return $query->firstOrFail();
 
 		return $query->first() ?: null;
 	}
