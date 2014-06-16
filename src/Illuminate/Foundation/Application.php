@@ -3,7 +3,7 @@
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Config\FileLoader;
+use Illuminate\Config\ConfigManager;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
@@ -100,13 +100,22 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	protected static $requestClass = 'Illuminate\Http\Request';
 
 	/**
+	 * The config default loader name
+	 *
+	 * @var string
+	 */
+	protected $configDefaultLoader = 'array';
+
+	/**
 	 * Create a new Illuminate application instance.
 	 *
 	 * @param  \Illuminate\Http\Request
 	 * @return void
 	 */
-	public function __construct(Request $request = null)
+	public function __construct(Request $request = null, $configDefaultLoader = null)
 	{
+		$this->configDefaultLoader = $configDefaultLoader ?: $this->configDefaultLoader;
+
 		$this->registerBaseBindings($request ?: $this->createNewRequest());
 
 		$this->registerBaseServiceProviders();
@@ -929,11 +938,11 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Get the configuration loader instance.
 	 *
-	 * @return \Illuminate\Config\LoaderInterface
+	 * @return \Illuminate\Config\ConfigManager
 	 */
 	public function getConfigLoader()
 	{
-		return new FileLoader(new Filesystem, $this['path'].'/config');
+		return new ConfigManager($app, $this->configDefaultLoader);
 	}
 
 	/**
