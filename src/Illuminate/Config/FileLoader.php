@@ -74,7 +74,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($file))
 		{
-			$items = $this->files->getRequire($file);
+			$items = $this->getRequire($file);
 		}
 
 		// Finally we're ready to check for the environment specific configuration
@@ -99,7 +99,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function mergeEnvironment(array $items, $file)
 	{
-		return array_replace_recursive($items, $this->files->getRequire($file));
+		return array_replace_recursive($items, $this->getRequire($file));
 	}
 
 	/**
