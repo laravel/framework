@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Collection;
+
 class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
 	public function testArrayBuild()
@@ -218,6 +220,19 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
 		$this->assertEquals('Not found', data_get($array, '0.users.3', function (){ return 'Not found'; }));
 	}
+
+
+	public function testDataGetOnCollection()
+	{
+		$collection = Collection::make([
+			'taylor' => ['languages' => ['Java', 'PHP'], 'lastname' => 'Otwell'],
+		]);
+
+		$this->assertEquals('Otwell', data_get($collection, 'taylor.lastname'));
+		$this->assertEquals('PHP', data_get($collection, 'taylor.languages.1'));
+		$this->assertEquals('Not found', data_get($collection, 'taylor.languages.9', 'Not found'));
+	}
+
 
 	public function testArraySort()
 	{

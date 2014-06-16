@@ -565,35 +565,7 @@ if ( ! function_exists('data_get'))
 	 */
 	function data_get($target, $key, $default = null)
 	{
-		if (is_null($key)) return $target;
-
-		foreach (explode('.', $key) as $segment)
-		{
-			if (is_array($target))
-			{
-				if ( ! array_key_exists($segment, $target))
-				{
-					return value($default);
-				}
-
-				$target = $target[$segment];
-			}
-			elseif (is_object($target))
-			{
-				if ( ! isset($target->{$segment}))
-				{
-					return value($default);
-				}
-
-				$target = $target->{$segment};
-			}
-			else
-			{
-				return value($default);
-			}
-		}
-
-		return $target;
+		return array_get(json_decode(json_encode($target), true), $key, $default);
 	}
 }
 

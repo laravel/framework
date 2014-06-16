@@ -30,6 +30,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAttributeAccessWithDataGet()
+	{
+		$model = new EloquentModelStub;
+		$model->name = 'foo';
+		$model->list_items = [
+			'name' => 'taylor',
+			'lastname' => 'taylor',
+			'skills' => ['Java', 'PHP'],
+		];
+		$model->password = 'secret';
+
+		$this->assertEquals('taylor', data_get($model, 'list_items.name'));
+		$this->assertEquals('Not found', data_get($model, 'list_items.foo', 'Not found'));
+		$this->assertEquals('PHP', data_get($model, 'list_items.skills.1'));
+		$this->assertEquals('Not found', data_get($model, 'list_items.skills.9', 'Not found'));
+
+		$this->assertEquals('5ebe2294ecd0e0f08eab7690d2a6ee69', data_get($model, 'password_hash'));
+	}
+
+
 	public function testDirtyAttributes()
 	{
 		$model = new EloquentModelStub(array('foo' => '1'));
