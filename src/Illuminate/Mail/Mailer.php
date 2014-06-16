@@ -127,7 +127,7 @@ class Mailer {
 	 * @param  string|array  $view
 	 * @param  array  $data
 	 * @param  Closure|string  $callback
-	 * @return int
+	 * @return void
 	 */
 	public function send($view, array $data, $callback)
 	{
@@ -147,7 +147,7 @@ class Mailer {
 
 		$message = $message->getSwiftMessage();
 
-		return $this->sendSwiftMessage($message);
+		$this->sendSwiftMessage($message);
 	}
 
 	/**
