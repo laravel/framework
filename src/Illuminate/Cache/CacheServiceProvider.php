@@ -28,8 +28,7 @@ class CacheServiceProvider extends ServiceProvider {
 			return $app['cache']->driver();
 		});
 
-		$app = $this->app;
-		$this->app->bindShared('memcached.connector', function() use ($app)
+		$this->app->bindShared('memcached.connector', function($app)
 		{
 			return new MemcachedConnector($app);
 		});
