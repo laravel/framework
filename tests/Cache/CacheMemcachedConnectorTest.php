@@ -1,4 +1,9 @@
 <?php
+if (!class_exists('Memcached')) {
+	class Memcached {
+		const OPT_BINARY_PROTOCOL = 18;
+	}
+}
 
 use Mockery as m;
 
@@ -67,7 +72,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
 		$memcached = m::mock('stdClass');
 		$memcached->shouldReceive('addServer')->once()->with('localhost', 11211, 100);
 		$memcached->shouldReceive('getVersion')->once()->andReturn(true);
-		$memcached->shouldReceive('setOptions')->once();
+		$memcached->shouldReceive('setOptions')->once()->with([Memcached::OPT_BINARY_PROTOCOL => true]);
 		$memcached->shouldReceive('setSaslAuthData')->never();
 		$connector->expects($this->once())->method('getMemcached')->will($this->returnValue($memcached));
 		$result = $connector->connect(array(array('host' => 'localhost', 'port' => 11211, 'weight' => 100)));
