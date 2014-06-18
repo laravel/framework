@@ -2,7 +2,7 @@
 
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Cache\StoreInterface;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 
 class Worker {
@@ -27,6 +27,13 @@ class Worker {
 	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
+
+	/**
+	 * The cache repository implementation.
+	 *
+	 * @var \Illuminate\Cache\Repository
+	 */
+	protected $cache;
 
 	/**
 	 * The exception handler instance.
@@ -318,12 +325,12 @@ class Worker {
 	}
 
 	/**
-	 * Set the cache store implementation.
+	 * Set the cache repository implementation.
 	 *
-	 * @param  \Illuminate\Cache\StoreInterface  $cache
+	 * @param  \Illuminate\Cache\Repository  $cache
 	 * @return void
 	 */
-	public function setCache(StoreInterface $cache)
+	public function setCache(CacheRepository $cache)
 	{
 		$this->cache = $cache;
 	}
