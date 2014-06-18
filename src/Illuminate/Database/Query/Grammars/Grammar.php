@@ -550,6 +550,16 @@ class Grammar extends BaseGrammar {
 			$sql .= $this->compileUnion($union);
 		}
 
+		if (isset($query->unionOrders))
+		{
+			$sql .= ' '.$this->compileOrders($query, $query->unionOrders);
+		}
+
+		if (isset($query->unionLimit))
+		{
+			$sql .= ' '.$this->compileLimit($query, $query->unionLimit);
+		}
+
 		return ltrim($sql);
 	}
 
