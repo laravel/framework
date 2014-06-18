@@ -107,7 +107,7 @@ class Worker {
 	}
 
 	/**
-	 * Deteremine if the daemon should process on this iteration.
+	 * Determine if the daemon should process on this iteration.
 	 *
 	 * @return bool
 	 */
