@@ -413,6 +413,16 @@ class Mailer {
 	}
 
 	/**
+	 * Check if the mailer is pretending to send messages.
+	 *
+	 * @return bool
+	 */
+	public function isPretending()
+	{
+		return $this->pretending;
+	}
+
+	/**
 	 * Get the view factory instance.
 	 *
 	 * @return \Illuminate\View\Factory
