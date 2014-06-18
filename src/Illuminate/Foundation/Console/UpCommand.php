@@ -27,6 +27,8 @@ class UpCommand extends Command {
 	{
 		@unlink($this->laravel['config']['app.manifest'].'/down');
 
+		$this->laravel['cache']->forever('illuminate:changed', time());
+
 		$this->info('Application is now live.');
 	}
 
