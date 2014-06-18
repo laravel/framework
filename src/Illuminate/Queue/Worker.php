@@ -2,6 +2,7 @@
 
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Cache\StoreInterface;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 
 class Worker {
@@ -64,6 +65,8 @@ class Worker {
 	 */
 	public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
 	{
+		$lastChange = $this->getLastCodeChangeTimestamp();
+
 		while (true)
 		{
 			if ($this->daemonShouldRun())
@@ -77,7 +80,7 @@ class Worker {
 				$this->sleep($sleep);
 			}
 
-			if ($this->memoryExceeded($memory))
+			if ($this->memoryExceeded($memory) || $this->freshCodeDeployed($lastChange))
 			{
 				$this->stop();
 			}
@@ -280,6 +283,30 @@ class Worker {
 	}
 
 	/**
+	 * Get the last code change timestamp, or null.
+	 *
+	 * @return int|null
+	 */
+	protected function getLastCodeChangeTimestamp()
+	{
+		if ($this->cache)
+		{
+			return $this->cache->get('illuminate:changed');
+		}
+	}
+
+	/**
+	 * Determine if fresh code has been deployed to the application.
+	 *
+	 * @param  int|null  $lastChange
+	 * @return bool
+	 */
+	protected function freshCodeDeployed($lastChange)
+	{
+		return $this->getLastCodeChangeTimestamp() != $lastChange;
+	}
+
+	/**
 	 * Set the exception handler to use in Daemon mode.
 	 *
 	 * @param  \Illuminate\Exception\Handler  $handler
@@ -288,6 +315,17 @@ class Worker {
 	public function setDaemonExceptionHandler($handler)
 	{
 		$this->exceptions = $handler;
+	}
+
+	/**
+	 * Set the cache store implementation.
+	 *
+	 * @param  \Illuminate\Cache\StoreInterface  $cache
+	 * @return void
+	 */
+	public function setCache(StoreInterface $cache)
+	{
+		$this->cache = $cache;
 	}
 
 	/**
