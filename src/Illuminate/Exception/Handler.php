@@ -199,7 +199,7 @@ class Handler {
 	 */
 	protected function isFatal($type)
 	{
-        return in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE));
+        	return in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE));
 	}
 
 	/**
