@@ -95,7 +95,7 @@ class MigrationServiceProvider extends ServiceProvider {
 			'command.migrate', 'command.migrate.make',
 			'command.migrate.install', 'command.migrate.rollback',
 			'command.migrate.reset', 'command.migrate.refresh',
-            'command.migrate.status'
+			'command.migrate.status'
 		);
 	}
 
@@ -153,13 +153,13 @@ class MigrationServiceProvider extends ServiceProvider {
 		});
 	}
 
-    protected function registerStatusCommand()
-    {
-        $this->app->bindShared('command.migrate.status', function($app)
-        {
-            return new StatusCommand($app['migrator']);
-        });
-    }
+	protected function registerStatusCommand()
+	{
+		$this->app->bindShared('command.migrate.status', function($app)
+		{
+			return new StatusCommand($app['migrator']);
+		});
+	}
 
 	/**
 	 * Register the "install" migration command.
@@ -210,8 +210,8 @@ class MigrationServiceProvider extends ServiceProvider {
 			'migrator', 'migration.repository', 'command.migrate',
 			'command.migrate.rollback', 'command.migrate.reset',
 			'command.migrate.refresh', 'command.migrate.install',
-            'command.migrate.status', 'migration.creator',
-            'command.migrate.make',
+			'command.migrate.status', 'migration.creator',
+			'command.migrate.make',
 		);
 	}
 
