@@ -8,7 +8,7 @@ use Illuminate\Queue\Failed\FailedJobProviderInterface;
 class Worker {
 
 	/**
-	 * THe queue manager instance.
+	 * The queue manager instance.
 	 *
 	 * @var \Illuminate\Queue\QueueManager
 	 */
@@ -72,7 +72,7 @@ class Worker {
 	 */
 	public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
 	{
-		$lastChange = $this->getLastCodeChangeTimestamp();
+		$lastRestart = $this->getTimestampOfLastQueueRestart();
 
 		while (true)
 		{
@@ -87,7 +87,7 @@ class Worker {
 				$this->sleep($sleep);
 			}
 
-			if ($this->memoryExceeded($memory) || $this->freshCodeDeployed($lastChange))
+			if ($this->memoryExceeded($memory) || $this->queueShouldRestart($lastRestart))
 			{
 				$this->stop();
 			}
@@ -290,27 +290,27 @@ class Worker {
 	}
 
 	/**
-	 * Get the last code change timestamp, or null.
+	 * Get the last queue restart timestamp, or null.
 	 *
 	 * @return int|null
 	 */
-	protected function getLastCodeChangeTimestamp()
+	protected function getTimestampOfLastQueueRestart()
 	{
 		if ($this->cache)
 		{
-			return $this->cache->get('illuminate:changed');
+			return $this->cache->get('illuminate:queue:restart');
 		}
 	}
 
 	/**
-	 * Determine if fresh code has been deployed to the application.
+	 * Determine if the queue worker should restart.
 	 *
-	 * @param  int|null  $lastChange
+	 * @param  int|null  $lastRestart
 	 * @return bool
 	 */
-	protected function freshCodeDeployed($lastChange)
+	protected function queueShouldRestart($lastRestart)
 	{
-		return $this->getLastCodeChangeTimestamp() != $lastChange;
+		return $this->getTimestampOfLastQueueRestart() != $lastRestart;
 	}
 
 	/**
