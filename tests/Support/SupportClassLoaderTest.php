@@ -10,7 +10,7 @@ class SupportClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$php53Class      = 'Foo\Bar\Baz\Bat';
 		$prefixed53Class = '\Foo\Bar\Baz\Bat';
 		$php52Class      = 'Foo_Bar_Baz_Bat';
-		$expected = 'Foo'.DIRECTORY_SEPARATOR.'Bar'.DIRECTORY_SEPARATOR.'Baz'.DIRECTORY_SEPARATOR.'Bat.php';
+		$expected        = 'Foo'.DIRECTORY_SEPARATOR.'Bar'.DIRECTORY_SEPARATOR.'Baz'.DIRECTORY_SEPARATOR.'Bat.php';
 
 		$this->assertEquals($expected, ClassLoader::normalizeClass($php53Class));
 		$this->assertEquals($expected, ClassLoader::normalizeClass($prefixed53Class));
