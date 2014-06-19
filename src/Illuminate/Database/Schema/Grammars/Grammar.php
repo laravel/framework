@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
@@ -108,14 +111,15 @@ abstract class Grammar extends BaseGrammar {
 	/**
 	 * Compile the blueprint's column definitions.
 	 *
-	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+	 * @param bool $change Filter added/changed columns
 	 * @return array
 	 */
-	protected function getColumns(Blueprint $blueprint)
+	protected function getColumns(Blueprint $blueprint, $change = false)
 	{
 		$columns = array();
 
-		foreach ($blueprint->getColumns() as $column)
+		foreach ( !$change ? $blueprint->addedColumns() : $blueprint->changedColumns() as $column)
 		{
 			// Each of the column types have their own compiler functions which are tasked
 			// with turning the column definition into its SQL format for this platform
@@ -264,6 +268,120 @@ abstract class Grammar extends BaseGrammar {
 		$tableDiff->fromTable = $schema->listTableDetails($table);
 
 		return $tableDiff;
+	}
+
+	/**
+	 * @param Blueprint $blueprint
+	 * @param Fluent $command
+	 * @param Connection $connection
+	 * @return array
+	 */
+	public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+	{
+		$schema = $connection->getDoctrineSchemaManager();
+
+		$tableDiff = $this->getChangedDiff($blueprint, $schema);
+
+		if($tableDiff !== false)
+		{
+			return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+		}
+
+		return [];
+	}
+
+	/**
+	 * @param Blueprint $blueprint
+	 * @param SchemaManager $schema
+	 * @return bool|TableDiff
+	 */
+	protected function getChangedDiff(Blueprint $blueprint, SchemaManager $schema)
+	{
+		$tableName = $this->getTablePrefix().$blueprint->getTable();
+
+		$table = $schema->listTableDetails($tableName);
+
+		$tableClone = $this->getChangedColumnsClone($blueprint, $table);
+
+		$comparator = new Comparator;
+
+		$tableDiff = $comparator->diffTable($table, $tableClone);
+
+		return $tableDiff;
+	}
+
+	/**
+	 * Clone Doctrine table and update column definitions based on blueprint.
+	 *
+	 * @param Blueprint $blueprint
+	 * @param Table $table
+	 * @return Table
+	 */
+	protected function getChangedColumnsClone(Blueprint $blueprint, Table $table)
+	{
+		$tableClone = clone $table;
+
+		foreach($blueprint->changedColumns() as $fluentColumn)
+		{
+			$tableClone = $tableClone->changeColumn($fluentColumn['name'], array('type' => Type::getType($fluentColumn['type'])));
+
+			$column = $tableClone->getColumn($fluentColumn['name']);
+
+			//Skipable boolean attributes must be reset
+			$column->setNotnull(true);
+			$column->setUnsigned(false);
+
+			foreach ($fluentColumn->getAttributes() as $key => $value)
+			{
+
+				$option = $this->getFluentAttributeDoctrineColumnOptionName($key);
+
+				//Behavior of notnull is opposite of nullable
+				if($option == 'notnull') $value = !$value;
+
+				if( ! is_null($option) )
+				{
+					$method = 'set'.ucfirst($option);
+
+					if (method_exists($column, $method))
+					{
+						$column->{$method}($value);
+					}
+				}
+			}
+		}
+
+		return $tableClone;
+	}
+
+	/**
+	 * Returns comparable doctrine option for fluent attribute name.
+	 *
+	 * @param $attribute
+	 * @return string
+	 */
+	protected function getFluentAttributeDoctrineColumnOptionName($attribute) {
+		$option = null;
+		switch($attribute)
+		{
+			case 'type':
+			case 'name':
+				//No option for type and name
+				break;
+			case 'nullable':
+				$option = 'notnull';
+				break;
+			case 'total':
+				$option = 'precision';
+				break;
+			case 'places':
+				$option = 'scale';
+				break;
+			default:
+				$option = $attribute;
+				break;
+		}
+		return $option;
 	}
 
 }
