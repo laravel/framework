@@ -134,7 +134,7 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerStatusCommand()
 	{
-		$this->app['command.migrate.status'] = $this->app->share(function($app)
+		$this->app->bindShared('command.migrate.status', function($app)
 		{
 			return new StatusCommand($app['migrator']);
 		});
