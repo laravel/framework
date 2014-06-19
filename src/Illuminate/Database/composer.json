@@ -1,6 +1,6 @@
 {
     "name": "illuminate/database",
-    "description": "An elegant database abstraction library.",
+    "license": "MIT",
     "keywords": ["laravel", "database", "sql", "orm"],
     "authors": [
         {
@@ -9,29 +9,27 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/container": "4.0.x",
-        "illuminate/events": "4.0.x",
-        "illuminate/support": "4.0.x",
-        "nesbot/carbon": "1.*"
+        "php": ">=5.4.0",
+        "illuminate/container": "4.3.*",
+        "illuminate/events": "4.3.*",
+        "illuminate/support": "4.3.*",
+        "nesbot/carbon": "~1.0"
     },
     "require-dev": {
-        "illuminate/console": "4.0.x",
-        "illuminate/filesystem": "4.0.x",
-        "illuminate/pagination": "4.0.x",
-        "illuminate/support": "4.0.x",
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/cache": "4.3.*",
+        "illuminate/console": "4.3.*",
+        "illuminate/filesystem": "4.3.*",
+        "illuminate/pagination": "4.3.*",
+        "illuminate/support": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Database": ""
+        "psr-4": {
+            "Illuminate\\Database\\": ""
         }
     },
-    "target-dir": "Illuminate/Database",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

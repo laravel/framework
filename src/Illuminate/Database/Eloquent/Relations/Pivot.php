@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Pivot extends Model {
 
@@ -43,10 +44,12 @@ class Pivot extends Model {
 	 */
 	public function __construct(Model $parent, $attributes, $table, $exists = false)
 	{
+		parent::__construct();
+
 		// The pivot model is a "dynamic" model since we will set the tables dynamically
 		// for the instance. This allows it work for any intermediate tables for the
 		// many to many relationship that are defined by this developer's classes.
-		parent::__construct($attributes);
+		$this->setRawAttributes($attributes, true);
 
 		$this->setTable($table);
 
@@ -68,7 +71,7 @@ class Pivot extends Model {
 	 * @param  \Illuminate\Database\Eloquent\Builder
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	protected function setKeysForSaveQuery($query)
+	protected function setKeysForSaveQuery(Builder $query)
 	{
 		$query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
@@ -82,11 +85,21 @@ class Pivot extends Model {
 	 */
 	public function delete()
 	{
+		return $this->getDeleteQuery()->delete();
+	}
+
+	/**
+	 * Get the query builder for a delete operation on the pivot.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	protected function getDeleteQuery()
+	{
 		$foreign = $this->getAttribute($this->foreignKey);
 
 		$query = $this->newQuery()->where($this->foreignKey, $foreign);
 
-		return $query->where($this->otherKey, $this->getAttribute($this->otherKey))->delete();
+		return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
 	}
 
 	/**
@@ -114,13 +127,15 @@ class Pivot extends Model {
 	 *
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
 	 */
 	public function setPivotKeys($foreignKey, $otherKey)
 	{
 		$this->foreignKey = $foreignKey;
 
 		$this->otherKey = $otherKey;
+
+		return $this;
 	}
 
 	/**

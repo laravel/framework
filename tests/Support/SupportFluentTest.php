@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Illuminate\Support\Fluent;
 
@@ -71,5 +71,24 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		unset($fluent->name);
 
 		$this->assertFalse(isset($fluent->name));
+	}
+
+
+	public function testToArrayReturnsAttribute()
+	{
+		$array  = array('name' => 'Taylor', 'age' => 25);
+		$fluent = new Fluent($array);
+
+		$this->assertEquals($array, $fluent->toArray());
+	}
+
+
+	public function testToJsonEncodesTheToArrayResult()
+	{
+		$fluent = $this->getMock('Illuminate\Support\Fluent', array('toArray'));
+		$fluent->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+		$results = $fluent->toJson();
+
+		$this->assertEquals(json_encode('foo'), $results);
 	}
 }

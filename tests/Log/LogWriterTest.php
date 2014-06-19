@@ -27,6 +27,14 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testErrorLogHandlerCanBeAdded()
+	{
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
+		$monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\ErrorLogHandler'));
+		$writer->useErrorLog();
+	}
+
+
 	public function testMagicMethodsPassErrorAdditionsToMonolog()
 	{
 		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
@@ -43,9 +51,9 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 
 		$events->listen('illuminate.log', function($level, $message, array $context = array())
 		{
-			$_SERVER['__log.level']      = $level;
+			$_SERVER['__log.level']   = $level;
 			$_SERVER['__log.message'] = $message;
-			$_SERVER['__log.context']    = $context;
+			$_SERVER['__log.context'] = $context;
 		});
 
 		$writer->error('foo');

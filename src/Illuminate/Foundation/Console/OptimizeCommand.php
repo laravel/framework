@@ -2,10 +2,9 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
-use Illuminate\Foundation\AssetPublisher;
+use Illuminate\View\Engines\CompilerEngine;
 use ClassPreloader\Command\PreCompileCommand;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class OptimizeCommand extends Command {
 
@@ -50,13 +49,31 @@ class OptimizeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->info('Generating optimized class loader...');
+		$this->info('Generating optimized class loader');
 
-		$this->composer->dumpOptimized();
+		if ($this->option('psr'))
+		{
+			$this->composer->dumpAutoloads();
+		}
+		else
+		{
+			$this->composer->dumpOptimized();
+		}
 
-		$this->info('Compiling common classes...');
+		if ($this->option('force') || ! $this->laravel['config']['app.debug'])
+		{
+			$this->info('Compiling common classes');
 
-		$this->compileClasses();
+			$this->compileClasses();
+
+			$this->info('Compiling views');
+
+			$this->compileViews();
+		}
+		else
+		{
+			$this->call('clear-compiled');
+		}
 	}
 
 	/**
@@ -70,7 +87,11 @@ class OptimizeCommand extends Command {
 
 		$outputPath = $this->laravel['path.base'].'/bootstrap/compiled.php';
 
-		$this->callSilent('compile', array('--output' => $outputPath, '--config' => implode(',', $this->getClassFiles())));
+		$this->callSilent('compile', array(
+			'--config' => implode(',', $this->getClassFiles()),
+			'--output' => $outputPath,
+			'--strip_comments' => 1,
+		));
 	}
 
 	/**
@@ -94,7 +115,49 @@ class OptimizeCommand extends Command {
 	 */
 	protected function registerClassPreloaderCommand()
 	{
-		$this->laravel['artisan']->add(new PreCompileCommand);
+		$this->getApplication()->add(new PreCompileCommand);
+	}
+
+	/**
+	 * Compile all view files.
+	 *
+	 * @return void
+	 */
+	protected function compileViews()
+	{
+		foreach ($this->laravel['view']->getFinder()->getPaths() as $path)
+		{
+			foreach ($this->laravel['files']->allFiles($path) as $file)
+			{
+				try
+				{
+					$engine = $this->laravel['view']->getEngineFromPath($file);
+				}
+				catch (\InvalidArgumentException $e)
+				{
+					continue;
+				}
+
+				if ($engine instanceof CompilerEngine)
+				{
+					$engine->getCompiler()->compile($file);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
+
+			array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
+		);
 	}
 
 }

@@ -29,6 +29,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
 		$connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($connection);
 		$connection->shouldReceive('execute')->once();
+		$connection->shouldReceive('exec')->zeroOrMoreTimes();
 		$result = $connector->connect($config);
 
 		$this->assertTrue($result === $connection);
@@ -39,8 +40,8 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 	{
 		return array(
 			array('mysql:host=foo;dbname=bar', array('host' => 'foo', 'database' => 'bar', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8')),
-			array('mysql:host=foo;dbname=bar;port=111', array('host' => 'foo', 'database' => 'bar', 'port' => 111, 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8')),
-			array('mysql:host=foo;dbname=bar;port=111;unix_socket=baz', array('host' => 'foo', 'database' => 'bar', 'port' => 111, 'unix_socket' => 'baz', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8')),
+			array('mysql:host=foo;port=111;dbname=bar', array('host' => 'foo', 'database' => 'bar', 'port' => 111, 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8')),
+			array('mysql:unix_socket=baz;dbname=bar', array('host' => 'foo', 'database' => 'bar', 'port' => 111, 'unix_socket' => 'baz', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8')),
 		);
 	}
 
@@ -108,8 +109,8 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testSqlServerConnectCallsCreateConnectionWithProperArguments()
 	{
-		$dsn = 'sqlsrv:Server=foo,111;Database=bar';
 		$config = array('host' => 'foo', 'database' => 'bar', 'port' => 111);
+		$dsn = $this->getDsn($config);
 		$connector = $this->getMock('Illuminate\Database\Connectors\SqlServerConnector', array('createConnection', 'getOptions'));
 		$connection = m::mock('stdClass');
 		$connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(array('options')));
@@ -117,6 +118,22 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$result = $connector->connect($config);
 
 		$this->assertTrue($result === $connection);
+	}
+
+	protected function getDsn(array $config)
+	{
+		extract($config);
+
+		$port = isset($config['port']) ? ','.$port : '';
+
+		if (in_array('dblib', PDO::getAvailableDrivers()))
+		{
+			return "dblib:host={$host}{$port};dbname={$database}";
+		}
+		else
+		{
+			return "sqlsrv:Server={$host}{$port};Database={$database}";
+		}
 	}
 
 }

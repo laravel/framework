@@ -37,6 +37,13 @@ abstract class Manager {
 	}
 
 	/**
+	 * Get the default driver name.
+	 *
+	 * @return string
+	 */
+	abstract public function getDefaultDriver();
+
+	/**
 	 * Get a driver instance.
 	 *
 	 * @param  string  $driver
@@ -47,7 +54,7 @@ abstract class Manager {
 		$driver = $driver ?: $this->getDefaultDriver();
 
 		// If the given driver has not been created before, we will create the instances
-		// here and cache it so we can return it next time very quickly. If their is
+		// here and cache it so we can return it next time very quickly. If there is
 		// already a driver created by this name, we'll just return that instance.
 		if ( ! isset($this->drivers[$driver]))
 		{
@@ -62,6 +69,8 @@ abstract class Manager {
 	 *
 	 * @param  string  $driver
 	 * @return mixed
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function createDriver($driver)
 	{
@@ -98,11 +107,13 @@ abstract class Manager {
 	 *
 	 * @param  string   $driver
 	 * @param  Closure  $callback
-	 * @return void
+	 * @return \Illuminate\Support\Manager|static
 	 */
 	public function extend($driver, Closure $callback)
 	{
 		$this->customCreators[$driver] = $callback;
+
+		return $this;
 	}
 
 	/**

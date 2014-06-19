@@ -8,7 +8,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	/**
 	 * The Amazon SQS instance.
 	 *
-	 * @var Aws\Sqs\SqsClient
+	 * @var \Aws\Sqs\SqsClient
 	 */
 	protected $sqs;
 
@@ -22,7 +22,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new Amazon SQS queue instance.
 	 *
-	 * @param  Aws\Sqs\SqsClient  $sqs
+	 * @param  \Aws\Sqs\SqsClient  $sqs
 	 * @param  string  $default
 	 * @return void
 	 */
@@ -38,33 +38,48 @@ class SqsQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
+		return $this->pushRaw($this->createPayload($job, $data), $queue);
+	}
 
-		return $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
+	/**
+	 * Push a raw payload onto the queue.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  array   $options
+	 * @return mixed
+	 */
+	public function pushRaw($payload, $queue = null, array $options = array())
+	{
+		$response = $this->sqs->sendMessage(array('QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload));
+
+		return $response->get('MessageId');
 	}
 
 	/**
 	 * Push a new job onto the queue after a delay.
 	 *
-	 * @param  int     $delay
+	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
 	{
 		$payload = $this->createPayload($job, $data);
 
+		$delay = $this->getSeconds($delay);
+
 		return $this->sqs->sendMessage(array(
 
 			'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, 'DelaySeconds' => $delay,
 
-		));
+		))->get('MessageId');
 	}
 
 	/**
@@ -77,7 +92,9 @@ class SqsQueue extends Queue implements QueueInterface {
 	{
 		$queue = $this->getQueue($queue);
 
-		$response = $this->sqs->receiveMessage(array('QueueUrl' => $queue));
+		$response = $this->sqs->receiveMessage(
+			array('QueueUrl' => $queue, 'AttributeNames' => array('ApproximateReceiveCount'))
+		);
 
 		if (count($response['Messages']) > 0)
 		{
@@ -91,7 +108,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	 * @param  string|null  $queue
 	 * @return string
 	 */
-	protected function getQueue($queue)
+	public function getQueue($queue)
 	{
 		return $queue ?: $this->default;
 	}
@@ -99,7 +116,7 @@ class SqsQueue extends Queue implements QueueInterface {
 	/**
 	 * Get the underlying SQS instance.
 	 *
-	 * @return Aws\Sqs\SqsClient
+	 * @return \Aws\Sqs\SqsClient
 	 */
 	public function getSqs()
 	{

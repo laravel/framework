@@ -20,7 +20,7 @@ class TranslationServiceProvider extends ServiceProvider {
 	{
 		$this->registerLoader();
 
-		$this->app['translator'] = $this->app->share(function($app)
+		$this->app->bindShared('translator', function($app)
 		{
 			$loader = $app['translation.loader'];
 
@@ -29,9 +29,9 @@ class TranslationServiceProvider extends ServiceProvider {
 			// configuration so we can easily get both of these values from there.
 			$locale = $app['config']['app.locale'];
 
-			$fallback = $app['config']['app.fallback_locale'];
+			$trans = new Translator($loader, $locale);
 
-			$trans = new Translator($loader, $locale, $fallback);
+			$trans->setFallback($app['config']['app.fallback_locale']);
 
 			return $trans;
 		});
@@ -44,7 +44,7 @@ class TranslationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerLoader()
 	{
-		$this->app['translation.loader'] = $this->app->share(function($app)
+		$this->app->bindShared('translation.loader', function($app)
 		{
 			return new FileLoader($app['files'], $app['path'].'/lang');
 		});

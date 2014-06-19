@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class ArrayStore implements StoreInterface {
+class ArrayStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * The array of stored values.
@@ -80,11 +80,13 @@ class ArrayStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
 		unset($this->storage[$key]);
+
+		return true;
 	}
 
 	/**
@@ -98,14 +100,13 @@ class ArrayStore implements StoreInterface {
 	}
 
 	/**
-	 * Begin executing a new section operation.
+	 * Get the cache key prefix.
 	 *
-	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
+	 * @return string
 	 */
-	public function section($name)
+	public function getPrefix()
 	{
-		return new Section($this, $name);
+		return '';
 	}
 
 }

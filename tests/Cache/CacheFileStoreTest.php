@@ -19,7 +19,6 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 		$files = $this->mockFilesystem();
 		$md5 = md5('foo');
 		$full_dir = __DIR__.'/'.substr($md5, 0, 2).'/'.substr($md5, 2, 2);
-		$files->expects($this->once())->method('isDirectory')->with($this->equalTo($full_dir))->will($this->returnValue(false));
 		$files->expects($this->once())->method('makeDirectory')->with($this->equalTo($full_dir), $this->equalTo(0777), $this->equalTo(true));
 		$files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$md5));
 		$store = new FileStore($files, __DIR__);
@@ -76,21 +75,35 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRemoveDeletesFileDoesntExist()
+	{
+		$files = $this->mockFilesystem();
+		$md5 = md5('foobull');
+		$cache_dir = substr($md5, 0, 2).'/'.substr($md5, 2, 2);
+		$files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5))->will($this->returnValue(false));
+		$store = new FileStore($files, __DIR__);
+		$store->forget('foobull');
+	}
+
+
 	public function testRemoveDeletesFile()
 	{
 		$files = $this->mockFilesystem();
-		$md5 = md5('foo');
+		$md5 = md5('foobar');
 		$cache_dir = substr($md5, 0, 2).'/'.substr($md5, 2, 2);
-		$files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5));
 		$store = new FileStore($files, __DIR__);
-		$store->forget('foo');
+		$store->put('foobar', 'Hello Baby', 10);
+		$files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5))->will($this->returnValue(true));
+		$files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$md5));
+		$store->forget('foobar');
 	}
 
 
 	public function testFlushCleansDirectory()
 	{
 		$files = $this->mockFilesystem();
-		$files->expects($this->once())->method('cleanDirectory')->with($this->equalTo(__DIR__));
+		$files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue(array('foo')));
+		$files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'));
 
 		$store = new FileStore($files, __DIR__);
 		$store->flush();

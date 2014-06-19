@@ -32,6 +32,15 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetMethodProperlyLoadsAndRetrievesItemWithLongestReplacementsFirst()
+	{
+		$t = $this->getMock('Illuminate\Translation\Translator', null, array($this->getLoader(), 'en'));
+		$t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(array('foo' => 'foo', 'baz' => 'breeze :foo :foobar'));
+		$this->assertEquals('breeze bar taylor', $t->get('foo::bar.baz', array('foo' => 'bar', 'foobar' => 'taylor'), 'en'));
+		$this->assertEquals('foo', $t->get('foo::bar.foo'));
+	}
+
+
 	public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
 	{
 		$t = $this->getMock('Illuminate\Translation\Translator', null, array($this->getLoader(), 'en'));

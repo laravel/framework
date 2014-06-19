@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Filesystem;
 
 use FilesystemIterator;
+use Symfony\Component\Finder\Finder;
 
 class FileNotFoundException extends \Exception {}
 
@@ -22,6 +23,8 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @return string
+	 *
+	 * @throws FileNotFoundException
 	 */
 	public function get($path)
 	{
@@ -31,21 +34,12 @@ class Filesystem {
 	}
 
 	/**
-	 * Get the contents of a remote file.
-	 *
-	 * @param  string  $path
-	 * @return string
-	 */
-	public function getRemote($path)
-	{
-		return file_get_contents($path);
-	}
-
-	/**
 	 * Get the returned value of a file.
 	 *
 	 * @param  string  $path
 	 * @return mixed
+	 *
+	 * @throws FileNotFoundException
 	 */
 	public function getRequire($path)
 	{
@@ -58,7 +52,7 @@ class Filesystem {
 	 * Require the given file once.
 	 *
 	 * @param  string  $file
-	 * @return void
+	 * @return mixed
 	 */
 	public function requireOnce($file)
 	{
@@ -78,6 +72,25 @@ class Filesystem {
 	}
 
 	/**
+	 * Prepend to a file.
+	 *
+	 * @param  string  $path
+	 * @param  string  $data
+	 * @return int
+	 */
+	public function prepend($path, $data)
+	{
+		if ($this->exists($path))
+		{
+			return $this->put($path, $data.$this->get($path));
+		}
+		else
+		{
+			return $this->put($path, $data);
+		}
+	}
+
+	/**
 	 * Append to a file.
 	 *
 	 * @param  string  $path
@@ -92,12 +105,18 @@ class Filesystem {
 	/**
 	 * Delete the file at a given path.
 	 *
-	 * @param  string  $path
+	 * @param  string|array  $paths
 	 * @return bool
 	 */
-	public function delete($path)
+	public function delete($paths)
 	{
-		return @unlink($path);
+		$paths = is_array($paths) ? $paths : func_get_args();
+
+		$success = true;
+
+		foreach ($paths as $path) { if ( ! @unlink($path)) $success = false; }
+
+		return $success;
 	}
 
 	/**
@@ -105,7 +124,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function move($path, $target)
 	{
@@ -117,7 +136,7 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $target
-	 * @return void
+	 * @return bool
 	 */
 	public function copy($path, $target)
 	{
@@ -126,7 +145,7 @@ class Filesystem {
 
 	/**
 	 * Extract the file extension from a file path.
-	 * 
+	 *
 	 * @param  string  $path
 	 * @return string
 	 */
@@ -235,16 +254,53 @@ class Filesystem {
 	}
 
 	/**
+	 * Get all of the files from the given directory (recursive).
+	 *
+	 * @param  string  $directory
+	 * @return array
+	 */
+	public function allFiles($directory)
+	{
+		return iterator_to_array(Finder::create()->files()->in($directory), false);
+	}
+
+	/**
+	 * Get all of the directories within a given directory.
+	 *
+	 * @param  string  $directory
+	 * @return array
+	 */
+	public function directories($directory)
+	{
+		$directories = array();
+
+		foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir)
+		{
+			$directories[] = $dir->getPathname();
+		}
+
+		return $directories;
+	}
+
+	/**
 	 * Create a directory.
 	 *
 	 * @param  string  $path
 	 * @param  int     $mode
 	 * @param  bool    $recursive
+	 * @param  bool    $force
 	 * @return bool
 	 */
-	public function makeDirectory($path, $mode = 0777, $recursive = false)
+	public function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
 	{
-		return mkdir($path, $mode, $recursive);
+		if ($force)
+		{
+			return @mkdir($path, $mode, $recursive);
+		}
+		else
+		{
+			return mkdir($path, $mode, $recursive);
+		}
 	}
 
 	/**
@@ -253,7 +309,7 @@ class Filesystem {
 	 * @param  string  $directory
 	 * @param  string  $destination
 	 * @param  int     $options
-	 * @return void
+	 * @return bool
 	 */
 	public function copyDirectory($directory, $destination, $options = null)
 	{
@@ -280,7 +336,7 @@ class Filesystem {
 
 			if ($item->isDir())
 			{
-				$path = $item->getRealPath();
+				$path = $item->getPathname();
 
 				if ( ! $this->copyDirectory($path, $target, $options)) return false;
 			}
@@ -290,7 +346,7 @@ class Filesystem {
 			// and return false, so the developer is aware that the copy process failed.
 			else
 			{
-				if ( ! $this->copy($item->getRealPath(), $target)) return false;
+				if ( ! $this->copy($item->getPathname(), $target)) return false;
 			}
 		}
 
@@ -304,11 +360,11 @@ class Filesystem {
 	 *
 	 * @param  string  $directory
 	 * @param  bool    $preserve
-	 * @return void
+	 * @return bool
 	 */
 	public function deleteDirectory($directory, $preserve = false)
 	{
-		if ( ! $this->isDirectory($directory)) return;
+		if ( ! $this->isDirectory($directory)) return false;
 
 		$items = new FilesystemIterator($directory);
 
@@ -319,7 +375,7 @@ class Filesystem {
 			// keep iterating through each file until the directory is cleaned.
 			if ($item->isDir())
 			{
-				$this->deleteDirectory($item->getRealPath());
+				$this->deleteDirectory($item->getPathname());
 			}
 
 			// If the item is just a file, we can go ahead and delete it since we're
@@ -327,18 +383,20 @@ class Filesystem {
 			// and calling directories recursively, so we delete the real path.
 			else
 			{
-				$this->delete($item->getRealPath());
+				$this->delete($item->getPathname());
 			}
 		}
 
 		if ( ! $preserve) @rmdir($directory);
+
+		return true;
 	}
 
 	/**
 	 * Empty the specified directory of all files and folders.
 	 *
 	 * @param  string  $directory
-	 * @return void
+	 * @return bool
 	 */
 	public function cleanDirectory($directory)
 	{

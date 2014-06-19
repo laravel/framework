@@ -22,9 +22,9 @@ class ConfigPublishCommand extends Command {
 	protected $description = "Publish a package's configuration to the application";
 
 	/**
-	 * The asset publisher instance.
+	 * The config publisher instance.
 	 *
-	 * @var \Illuminate\Foundation\AssetPublisher
+	 * @var \Illuminate\Foundation\ConfigPublisher
 	 */
 	protected $config;
 
@@ -85,7 +85,7 @@ class ConfigPublishCommand extends Command {
 	protected function getArguments()
 	{
 		return array(
-			array('package', InputArgument::REQUIRED, 'The name of package being published.'),
+			array('package', InputArgument::REQUIRED, 'The name of the package being published.'),
 		);
 	}
 

@@ -6,18 +6,18 @@ use Illuminate\Database\Schema\Blueprint;
 class PostgresGrammar extends Grammar {
 
 	/**
-	 * The keyword identifier wrapper format.
-	 *
-	 * @var string
-	 */
-	protected $wrapper = '"%s"';
-
-	/**
 	 * The possible column modifiers.
 	 *
 	 * @var array
 	 */
 	protected $modifiers = array('Increment', 'Nullable', 'Default');
+
+	/**
+	 * The columns available as serials.
+	 *
+	 * @var array
+	 */
+	protected $serials = array('bigInteger', 'integer');
 
 	/**
 	 * Compile the query to determine if a table exists.
@@ -27,6 +27,17 @@ class PostgresGrammar extends Grammar {
 	public function compileTableExists()
 	{
 		return 'select * from information_schema.tables where table_name = ?';
+	}
+
+	/**
+	 * Compile the query to determine the list of columns.
+	 *
+	 * @param  string  $table
+	 * @return string
+	 */
+	public function compileColumnExists($table)
+	{
+		return "select column_name from information_schema.columns where table_name = '$table'";
 	}
 
 	/**
@@ -212,6 +223,17 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a char type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeChar(Fluent $column)
+	{
+		return "char({$column->length})";
+	}
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -234,6 +256,28 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a medium text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumText(Fluent $column)
+	{
+		return 'text';
+	}
+
+	/**
+	 * Create the column definition for a long text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeLongText(Fluent $column)
+	{
+		return 'text';
+	}
+
+	/**
 	 * Create the column definition for a integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -242,6 +286,28 @@ class PostgresGrammar extends Grammar {
 	protected function typeInteger(Fluent $column)
 	{
 		return $column->autoIncrement ? 'serial' : 'integer';
+	}
+
+	/**
+	 * Create the column definition for a big integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeBigInteger(Fluent $column)
+	{
+		return $column->autoIncrement ? 'bigserial' : 'bigint';
+	}
+
+	/**
+	 * Create the column definition for a medium integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumInteger(Fluent $column)
+	{
+		return 'integer';
 	}
 
 	/**
@@ -256,6 +322,17 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a small integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSmallInteger(Fluent $column)
+	{
+		return 'smallint';
+	}
+
+	/**
 	 * Create the column definition for a float type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -264,6 +341,17 @@ class PostgresGrammar extends Grammar {
 	protected function typeFloat(Fluent $column)
 	{
 		return 'real';
+	}
+
+	/**
+	 * Create the column definition for a double type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDouble(Fluent $column)
+	{
+		return 'double precision';
 	}
 
 	/**
@@ -296,7 +384,9 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeEnum(Fluent $column)
 	{
-		return 'varchar(255)';
+		$allowed = array_map(function($a) { return "'".$a."'"; }, $column->allowed);
+
+		return "varchar(255) check (\"{$column->name}\" in (".implode(', ', $allowed)."))";
 	}
 
 	/**
@@ -390,7 +480,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) && $column->autoIncrement)
 		{
 			return ' primary key';
 		}

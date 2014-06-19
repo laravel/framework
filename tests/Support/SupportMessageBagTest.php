@@ -5,6 +5,12 @@ use Mockery as m;
 
 class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 
+	public function tearDown()
+	{
+		m::close();
+	}
+
+
 	public function testUniqueness()
 	{
 		$container = new MessageBag;
@@ -33,6 +39,15 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$container = new MessageBag(array('username' => array('foo')));
 		$container->merge(array('username' => array('bar')));
 		$this->assertEquals(array('username' => array('foo', 'bar')), $container->getMessages());
+	}
+
+
+	public function testMessageBagsCanBeMerged()
+	{
+		$container = new MessageBag(array('foo' => array('bar')));
+		$otherContainer = new MessageBag(array('foo' => array('baz'), 'bar' => array('foo')));
+		$container->merge($otherContainer);
+		$this->assertEquals(array('foo' => array('bar', 'baz'), 'bar' => array('foo')), $container->getMessages());
 	}
 
 
@@ -117,11 +132,16 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCastingAsStringReturnsBagAsJson()
+	public function testCountReturnsCorrectValue()
 	{
-		$container = m::mock('Illuminate\Support\MessageBag[toJson]');
-		$container->shouldReceive('toJson')->once()->andReturn('foo');
-		$this->assertEquals('foo', $container->__toString());
+		$container = new MessageBag;
+		$this->assertEquals(0, $container->count());
+
+		$container->add('foo', 'bar');
+		$container->add('foo', 'baz');
+		$container->add('boom', 'baz');
+
+		$this->assertEquals(3, $container->count());
 	}
 
 }

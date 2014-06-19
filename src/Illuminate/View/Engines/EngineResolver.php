@@ -21,6 +21,8 @@ class EngineResolver {
 	/**
 	 * Register a new engine resolver.
 	 *
+	 * The engine string typically corresponds to a file extension.
+	 *
 	 * @param  string   $engine
 	 * @param  Closure  $resolver
 	 * @return void
@@ -35,15 +37,21 @@ class EngineResolver {
 	 *
 	 * @param  string  $engine
 	 * @return \Illuminate\View\Engines\EngineInterface
+	 * @throws \InvalidArgumentException
 	 */
 	public function resolve($engine)
 	{
-		if ( ! isset($this->resolved[$engine]))
+		if (isset($this->resolved[$engine]))
 		{
-			$this->resolved[$engine] = call_user_func($this->resolvers[$engine]);
+			return $this->resolved[$engine];
 		}
 
-		return $this->resolved[$engine];
+		if (isset($this->resolvers[$engine]))
+		{
+			return $this->resolved[$engine] = call_user_func($this->resolvers[$engine]);
+		}
+
+		throw new \InvalidArgumentException("Engine $engine not found.");
 	}
 
 }

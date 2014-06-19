@@ -21,7 +21,7 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	/**
 	 * Create a new cache driven handler instance.
 	 *
-	 * @param  Illuminate\Cache\Repository  $cache
+	 * @param  \Illuminate\Cache\Repository  $cache
 	 * @param  int  $minutes
 	 * @return void
 	 */
@@ -77,6 +77,16 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	public function gc($lifetime)
 	{
 		return true;
+	}
+
+	/**
+	 * Get the underlying cache repository.
+	 *
+	 * @return \Illuminate\Cache\Repository
+	 */
+	public function getCache()
+	{
+		return $this->cache;
 	}
 
 }

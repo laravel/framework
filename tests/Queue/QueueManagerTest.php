@@ -18,6 +18,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 				'queue.default' => 'sync',
 				'queue.connections.sync' => array('driver' => 'sync'),
 			),
+			'encrypter' => $encrypter = m::mock('Illuminate\Encryption\Encrypter'),
 		);
 
 		$manager = new QueueManager($app);
@@ -26,6 +27,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 		$connector->shouldReceive('connect')->once()->with(array('driver' => 'sync'))->andReturn($queue);
 		$manager->addConnector('sync', function() use ($connector) { return $connector; });
 		$queue->shouldReceive('setContainer')->once()->with($app);
+		$queue->shouldReceive('setEncrypter')->once()->with($encrypter);
 
 		$this->assertTrue($queue === $manager->connection('sync'));
 	}
@@ -38,6 +40,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 				'queue.default' => 'sync',
 				'queue.connections.foo' => array('driver' => 'bar'),
 			),
+			'encrypter' => $encrypter = m::mock('Illuminate\Encryption\Encrypter'),
 		);
 
 		$manager = new QueueManager($app);
@@ -46,6 +49,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 		$connector->shouldReceive('connect')->once()->with(array('driver' => 'bar'))->andReturn($queue);
 		$manager->addConnector('bar', function() use ($connector) { return $connector; });
 		$queue->shouldReceive('setContainer')->once()->with($app);
+		$queue->shouldReceive('setEncrypter')->once()->with($encrypter);
 
 		$this->assertTrue($queue === $manager->connection('foo'));
 	}

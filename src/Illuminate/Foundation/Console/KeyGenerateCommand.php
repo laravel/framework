@@ -40,20 +40,31 @@ class KeyGenerateCommand extends Command {
 	 */
 	public function fire()
 	{
-		$contents = $this->files->get($path = $this->laravel['path'].'/config/app.php');
+		list($path, $contents) = $this->getKeyFile();
 
-		$contents = str_replace('YourSecretKey!!!', $key = $this->getRandomKey(), $contents, $count);
+		$key = $this->getRandomKey();
 
-		if ($count == 0)
-		{
-			$this->comment('Application key has already been set.');
-		}
-		else
-		{
-			$this->files->put($path, $contents);
+		$contents = str_replace($this->laravel['config']['app.key'], $key, $contents);
 
-			$this->info("Application key [$key] set successfully.");
-		}
+		$this->files->put($path, $contents);
+
+		$this->laravel['config']['app.key'] = $key;
+
+		$this->info("Application key [$key] set successfully.");
+	}
+
+	/**
+	 * Get the key file and contents.
+	 *
+	 * @return array
+	 */
+	protected function getKeyFile()
+	{
+		$env = $this->option('env') ? $this->option('env').'/' : '';
+
+		$contents = $this->files->get($path = $this->laravel['path']."/config/{$env}app.php");
+
+		return array($path, $contents);
 	}
 
 	/**

@@ -1,18 +1,21 @@
 <?php namespace Illuminate\View;
 
 use ArrayAccess;
+use Closure;
+use Illuminate\Support\MessageBag;
 use Illuminate\View\Engines\EngineInterface;
+use Illuminate\Support\Contracts\MessageProviderInterface;
 use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
 use Illuminate\Support\Contracts\RenderableInterface as Renderable;
 
 class View implements ArrayAccess, Renderable {
 
 	/**
-	 * The view environment instance.
+	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Environment
+	 * @var \Illuminate\View\Factory
 	 */
-	protected $environment;
+	protected $factory;
 
 	/**
 	 * The engine implementation.
@@ -45,19 +48,19 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Create a new view instance.
 	 *
-	 * @param  \Illuminate\View\Environment  $environment
+	 * @param  \Illuminate\View\Factory  $factory
 	 * @param  \Illuminate\View\Engines\EngineInterface  $engine
 	 * @param  string  $view
 	 * @param  string  $path
 	 * @param  array   $data
 	 * @return void
 	 */
-	public function __construct(Environment $environment, EngineInterface $engine, $view, $path, $data = array())
+	public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = array())
 	{
 		$this->view = $view;
 		$this->path = $path;
 		$this->engine = $engine;
-		$this->environment = $environment;
+		$this->factory = $factory;
 
 		$this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
 	}
@@ -65,29 +68,60 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Get the string contents of the view.
 	 *
+	 * @param  \Closure  $callback
 	 * @return string
 	 */
-	public function render()
+	public function render(Closure $callback = null)
 	{
-		$env = $this->environment;
+		$contents = $this->renderContents();
 
+		$response = isset($callback) ? $callback($this, $contents) : null;
+
+		// Once we have the contents of the view, we will flush the sections if we are
+		// done rendering all views so that there is nothing left hanging over when
+		// anothoer view is rendered in the future by the application developers.
+		$this->factory->flushSectionsIfDoneRendering();
+
+		return $response ?: $contents;
+	}
+
+	/**
+	 * Get the contents of the view instance.
+	 *
+	 * @return string
+	 */
+	protected function renderContents()
+	{
 		// We will keep track of the amount of views being rendered so we can flush
 		// the section after the complete rendering operation is done. This will
 		// clear out the sections for any separate views that may be rendered.
-		$env->incrementRender();
+		$this->factory->incrementRender();
 
-		$env->callComposer($this);
+		$this->factory->callComposer($this);
 
-		$contents = trim($this->getContents());
+		$contents = $this->getContents();
 
 		// Once we've finished rendering the view, we'll decrement the render count
-		// then if we are at the bottom of the stack we'll flush out sections as
-		// they might interfere with totally separate view's evaluations later.
-		$env->decrementRender();
-
-		if ($env->doneRendering()) $env->flushSections();
+		// so that each sections get flushed out next time a view is created and
+		// no old sections are staying around in the memory of an environment.
+		$this->factory->decrementRender();
 
 		return $contents;
+	}
+
+	/**
+	 * Get the sections of the rendered view.
+	 *
+	 * @return array
+	 */
+	public function renderSections()
+	{
+		$env = $this->factory;
+
+		return $this->render(function($view) use ($env)
+		{
+			return $env->getSections();
+		});
 	}
 
 	/**
@@ -107,7 +141,7 @@ class View implements ArrayAccess, Renderable {
 	 */
 	protected function gatherData()
 	{
-		$data = array_merge($this->environment->getShared(), $this->data);
+		$data = array_merge($this->factory->getShared(), $this->data);
 
 		foreach ($data as $key => $value)
 		{
@@ -151,17 +185,37 @@ class View implements ArrayAccess, Renderable {
 	 */
 	public function nest($key, $view, array $data = array())
 	{
-		return $this->with($key, $this->environment->make($view, $data));
+		return $this->with($key, $this->factory->make($view, $data));
 	}
 
 	/**
-	 * Get the view environment instance.
+	 * Add validation errors to the view.
 	 *
-	 * @return \Illuminate\View\Environment
+	 * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
+	 * @return \Illuminate\View\View
 	 */
-	public function getEnvironment()
+	public function withErrors($provider)
 	{
-		return $this->environment;
+		if ($provider instanceof MessageProviderInterface)
+		{
+			$this->with('errors', $provider->getMessageBag());
+		}
+		else
+		{
+			$this->with('errors', new MessageBag((array) $provider));
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Get the view factory instance.
+	 *
+	 * @return \Illuminate\View\Factory
+	 */
+	public function getFactory()
+	{
+		return $this->factory;
 	}
 
 	/**
@@ -265,7 +319,7 @@ class View implements ArrayAccess, Renderable {
 	 *
 	 * @return mixed
 	 */
-	public function __get($key)
+	public function &__get($key)
 	{
 		return $this->data[$key];
 	}
@@ -302,6 +356,25 @@ class View implements ArrayAccess, Renderable {
 	public function __unset($key)
 	{
 		unset($this->data[$key]);
+	}
+
+	/**
+	 * Dynamically bind parameters to the view.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return \Illuminate\View\View
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, $parameters)
+	{
+		if (starts_with($method, 'with'))
+		{
+			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
+		}
+
+		throw new \BadMethodCallException("Method [$method] does not exist on view.");
 	}
 
 	/**

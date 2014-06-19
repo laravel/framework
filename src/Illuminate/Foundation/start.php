@@ -2,6 +2,19 @@
 
 /*
 |--------------------------------------------------------------------------
+| Set PHP Error Reporting Options
+|--------------------------------------------------------------------------
+|
+| Here we will set the strictest error reporting options, and also turn
+| off PHP's error reporting, since all errors will be handled by the
+| framework and we don't want any output leaking back to the user.
+|
+*/
+
+error_reporting(-1);
+
+/*
+|--------------------------------------------------------------------------
 | Check Extensions
 |--------------------------------------------------------------------------
 |
@@ -13,7 +26,7 @@
 
 if ( ! extension_loaded('mcrypt'))
 {
-	die('Laravel requires the Mcrypt PHP extension.'.PHP_EOL);
+	echo 'Mcrypt PHP extension required.'.PHP_EOL;
 
 	exit(1);
 }
@@ -30,11 +43,10 @@ if ( ! extension_loaded('mcrypt'))
 */
 
 use Illuminate\Http\Request;
-use Illuminate\Config\FileLoader;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Foundation\AliasLoader;
+use Illuminate\Config\EnvironmentVariables;
 use Illuminate\Config\Repository as Config;
-use Illuminate\Foundation\ProviderRepository;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +59,7 @@ use Illuminate\Foundation\ProviderRepository;
 |
 */
 
-$app['app'] = $app->share(function($app) { return $app; });
+$app->instance('app', $app);
 
 /*
 |--------------------------------------------------------------------------
@@ -67,21 +79,6 @@ if (isset($unitTesting))
 
 /*
 |--------------------------------------------------------------------------
-| Set PHP Error Reporting Options
-|--------------------------------------------------------------------------
-|
-| Here we will set the strictest error reporting options, and also turn
-| off PHP's error reporting, since all errors will be handled by the
-| framework and we don't want any output leaking back to the user.
-|
-*/
-
-if ($env != 'testing') ini_set('display_errors', 'Off');
-
-error_reporting(-1);
-
-/*
-|--------------------------------------------------------------------------
 | Load The Illuminate Facades
 |--------------------------------------------------------------------------
 |
@@ -97,20 +94,47 @@ Facade::setFacadeApplication($app);
 
 /*
 |--------------------------------------------------------------------------
-| Register The Configuration Loader
+| Register Facade Aliases To Full Classes
 |--------------------------------------------------------------------------
 |
-| The configuration loader is responsible for loading the configuration
-| options for the application. By default we'll use the "file" loader
-| but you are free to use any custom loaders with your application.
+| By default, we use short keys in the container for each of the core
+| pieces of the framework. Here we will register the aliases for a
+| list of all of the fully qualified class names making DI easy.
 |
 */
 
-$app->bindIf('config.loader', function($app)
-{
-	return new FileLoader(new Filesystem, $app['path'].'/config');
+$app->registerCoreContainerAliases();
 
-}, true);
+/*
+|--------------------------------------------------------------------------
+| Register The Environment Variables
+|--------------------------------------------------------------------------
+|
+| Here we will register all of the $_ENV and $_SERVER variables into the
+| process so that they're globally available configuration options so
+| sensitive configuration information can be swept out of the code.
+|
+*/
+
+with($envVariables = new EnvironmentVariables(
+	$app->getEnvironmentVariablesLoader()))->load($env);
+
+/*
+|--------------------------------------------------------------------------
+| Register The Configuration Repository
+|--------------------------------------------------------------------------
+|
+| The configuration repository is used to lazily load in the options for
+| this application from the configuration files. The files are easily
+| separated by their concerns so they do not become really crowded.
+|
+*/
+
+$app->instance('config', $config = new Config(
+
+	$app->getConfigLoader(), $env
+
+));
 
 /*
 |--------------------------------------------------------------------------
@@ -125,36 +149,7 @@ $app->bindIf('config.loader', function($app)
 
 $app->startExceptionHandling();
 
-/*
-|--------------------------------------------------------------------------
-| Register The Configuration Repository
-|--------------------------------------------------------------------------
-|
-| The configuration repository is used to lazily load in the options for
-| this application from the configuration files. The files are easily
-| separated by their concerns so they do not become really crowded.
-|
-*/
-
-$config = new Config($app['config.loader'], $env);
-
-$app->instance('config', $config);
-
-/*
-|--------------------------------------------------------------------------
-| Set The Console Request If Necessary
-|--------------------------------------------------------------------------
-|
-| If we're running in a console context, we won't have a host on this
-| request so we'll need to re-bind a new request with a URL from a
-| configuration file. This will help the URL generator generate.
-|
-*/
-
-if ($app->runningInConsole())
-{
-	$app->setRequestForConsoleEnvironment();
-}
+if ($env != 'testing') ini_set('display_errors', 'Off');
 
 /*
 |--------------------------------------------------------------------------
@@ -182,7 +177,9 @@ date_default_timezone_set($config['timezone']);
 |
 */
 
-$app->registerAliasLoader($config['aliases']);
+$aliases = $config['aliases'];
+
+AliasLoader::getInstance($aliases)->register();
 
 /*
 |--------------------------------------------------------------------------
@@ -208,64 +205,67 @@ Request::enableHttpMethodParameterOverride();
 |
 */
 
-$manifestPath = $config['manifest'];
+$providers = $config['providers'];
 
-$services = new ProviderRepository(new Filesystem, $manifestPath);
-
-$services->load($app, $config['providers']);
+$app->getProviderRepository()->load($app, $providers);
 
 /*
 |--------------------------------------------------------------------------
-| Boot The Application
+| Register Booted Start Files
 |--------------------------------------------------------------------------
 |
-| Before we handle the requests we need to make sure the application has
-| been booted up. The boot process will call the "boot" method on all
-| service provider giving all a chance to register their overrides.
+| Once the application has been booted there are several "start" files
+| we will want to include. We'll register our "booted" handler here
+| so the files are included after the application gets booted up.
 |
 */
 
-$app->boot();
+$app->booted(function() use ($app, $env)
+{
 
-/*
-|--------------------------------------------------------------------------
-| Load The Application Start Script
-|--------------------------------------------------------------------------
-|
-| The start script gives us the application the opportunity to override
-| any of the existing IoC bindings, as well as register its own new
-| bindings for things like repositories, etc. We'll load it here.
-|
-*/
+	/*
+	|--------------------------------------------------------------------------
+	| Load The Application Start Script
+	|--------------------------------------------------------------------------
+	|
+	| The start scripts gives this application the opportunity to override
+	| any of the existing IoC bindings, as well as register its own new
+	| bindings for things like repositories, etc. We'll load it here.
+	|
+	*/
 
-$path = $app['path'].'/start/global.php';
+	$path = $app['path'].'/start/global.php';
 
-if (file_exists($path)) require $path;
+	if (file_exists($path)) require $path;
 
-/*
-|--------------------------------------------------------------------------
-| Load The Environment Start Script
-|--------------------------------------------------------------------------
-|
-| The environment start script is only loaded if it exists for the app
-| environment currently active, which allows some actions to happen
-| in one environment while not in the other, keeping things clean.
-|
-*/
+	/*
+	|--------------------------------------------------------------------------
+	| Load The Environment Start Script
+	|--------------------------------------------------------------------------
+	|
+	| The environment start script is only loaded if it exists for the app
+	| environment currently active, which allows some actions to happen
+	| in one environment while not in the other, keeping things clean.
+	|
+	*/
 
-$path = $app['path']."/start/{$env}.php";
+	$path = $app['path']."/start/{$env}.php";
 
-if (file_exists($path)) require $path;
+	if (file_exists($path)) require $path;
+	
+	/*
+	|--------------------------------------------------------------------------
+	| Load The Application Routes
+	|--------------------------------------------------------------------------
+	|
+	| The Application routes are kept separate from the application starting
+	| just to keep the file a little cleaner. We'll go ahead and load in
+	| all of the routes now and return the application to the callers.
+	|
+	*/
 
-/*
-|--------------------------------------------------------------------------
-| Load The Application Routes
-|--------------------------------------------------------------------------
-|
-| The Application routes are kept separate from the application starting
-| just to keep the file a little cleaner. We'll go ahead and load in
-| all of the routes now and return the application to the callers.
-|
-*/
+	$routes = $app['path'].'/routes.php';
 
-require $app['path'].'/routes.php';
+	if (file_exists($routes)) require $routes;
+
+});

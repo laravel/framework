@@ -14,10 +14,10 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$sync = $this->getMock('Illuminate\Queue\SyncQueue', array('resolveJob'));
 		$job = m::mock('StdClass');
-		$sync->expects($this->once())->method('resolveJob')->with($this->equalTo('Foo'), $this->equalTo(''))->will($this->returnValue($job));
+		$sync->expects($this->once())->method('resolveJob')->with($this->equalTo('Foo'), $this->equalTo('{"foo":"foobar"}'))->will($this->returnValue($job));
 		$job->shouldReceive('fire')->once();
 
-		$sync->push('Foo');
+		$sync->push('Foo', array('foo' => 'foobar'));
 	}
 
 }

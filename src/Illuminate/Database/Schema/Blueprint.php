@@ -103,7 +103,7 @@ class Blueprint {
 	 */
 	protected function addImpliedCommands()
 	{
-		if (count($this->columns) > 0 and ! $this->creating())
+		if (count($this->columns) > 0 && ! $this->creating())
 		{
 			array_unshift($this->commands, $this->createCommand('add'));
 		}
@@ -223,7 +223,7 @@ class Blueprint {
 	 */
 	public function dropPrimary($index = null)
 	{
-		return $this->dropIndexCommand('dropPrimary', $index);
+		return $this->dropIndexCommand('dropPrimary', 'primary', $index);
 	}
 
 	/**
@@ -234,7 +234,7 @@ class Blueprint {
 	 */
 	public function dropUnique($index)
 	{
-		return $this->dropIndexCommand('dropUnique', $index);
+		return $this->dropIndexCommand('dropUnique', 'unique', $index);
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Blueprint {
 	 */
 	public function dropIndex($index)
 	{
-		return $this->dropIndexCommand('dropIndex', $index);
+		return $this->dropIndexCommand('dropIndex', 'index', $index);
 	}
 
 	/**
@@ -256,7 +256,7 @@ class Blueprint {
 	 */
 	public function dropForeign($index)
 	{
-		return $this->dropIndexCommand('dropForeign', $index);
+		return $this->dropIndexCommand('dropForeign', 'foreign', $index);
 	}
 
 	/**
@@ -267,6 +267,16 @@ class Blueprint {
 	public function dropTimestamps()
 	{
 		$this->dropColumn('created_at', 'updated_at');
+	}
+
+	/**
+	* Indicate that the soft delete column should be dropped.
+	*
+	* @return void
+	*/
+	public function dropSoftDeletes()
+	{
+		$this->dropColumn('deleted_at');
 	}
 
 	/**
@@ -329,7 +339,7 @@ class Blueprint {
 	}
 
 	/**
-	 * Create a new auto-incrementing column on the table.
+	 * Create a new auto-incrementing integer column on the table.
 	 *
 	 * @param  string  $column
 	 * @return \Illuminate\Support\Fluent
@@ -337,6 +347,29 @@ class Blueprint {
 	public function increments($column)
 	{
 		return $this->unsignedInteger($column, true);
+	}
+
+	/**
+	 * Create a new auto-incrementing big integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function bigIncrements($column)
+	{
+		return $this->unsignedBigInteger($column, true);
+	}
+
+	/**
+	 * Create a new char column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  int  $length
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function char($column, $length = 255)
+	{
+		return $this->addColumn('char', $column, compact('length'));
 	}
 
 	/**
@@ -363,6 +396,28 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new medium text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function mediumText($column)
+	{
+		return $this->addColumn('mediumText', $column);
+	}
+
+	/**
+	 * Create a new long text column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function longText($column)
+	{
+		return $this->addColumn('longText', $column);
+	}
+
+	/**
 	 * Create a new integer column on the table.
 	 *
 	 * @param  string  $column
@@ -376,14 +431,55 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new big integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function bigInteger($column, $autoIncrement = false, $unsigned = false)
+	{
+		return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
+	}
+
+	/**
+	 * Create a new medium integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function mediumInteger($column, $autoIncrement = false, $unsigned = false)
+	{
+		return $this->addColumn('mediumInteger', $column, compact('autoIncrement', 'unsigned'));
+	}
+
+	/**
 	 * Create a new tiny integer column on the table.
 	 *
 	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
 	 * @return \Illuminate\Support\Fluent
 	 */
-	public function tinyInteger($column)
+	public function tinyInteger($column, $autoIncrement = false, $unsigned = false)
 	{
-		return $this->addColumn('tinyInteger', $column);
+		return $this->addColumn('tinyInteger', $column, compact('autoIncrement', 'unsigned'));
+	}
+
+	/**
+	 * Create a new small integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @param  bool  $unsigned
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function smallInteger($column, $autoIncrement = false, $unsigned = false)
+	{
+		return $this->addColumn('smallInteger', $column, compact('autoIncrement', 'unsigned'));
 	}
 
 	/**
@@ -391,12 +487,23 @@ class Blueprint {
 	 *
 	 * @param  string  $column
 	 * @param  bool  $autoIncrement
-	 * @param  bool  $unsigned
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function unsignedInteger($column, $autoIncrement = false)
 	{
 		return $this->integer($column, $autoIncrement, true);
+	}
+
+	/**
+	 * Create a new unsigned big integer column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  bool  $autoIncrement
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function unsignedBigInteger($column, $autoIncrement = false)
+	{
+		return $this->bigInteger($column, $autoIncrement, true);
 	}
 
 	/**
@@ -410,6 +517,19 @@ class Blueprint {
 	public function float($column, $total = 8, $places = 2)
 	{
 		return $this->addColumn('float', $column, compact('total', 'places'));
+	}
+
+	/**
+	 * Create a new double column on the table.
+	 *
+	 * @param  string   $column
+	 * @param  int|null	$total
+	 * @param  int|null $places
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function double($column, $total = null, $places = null)
+	{
+		return $this->addColumn('double', $column, compact('total', 'places'));
 	}
 
 	/**
@@ -493,6 +613,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Add nullable creation and update timestamps to the table.
+	 *
+	 * @return void
+	 */
+	public function nullableTimestamps()
+	{
+		$this->timestamp('created_at')->nullable();
+
+		$this->timestamp('updated_at')->nullable();
+	}
+
+	/**
 	 * Add creation and update timestamps to the table.
 	 *
 	 * @return void
@@ -502,6 +634,16 @@ class Blueprint {
 		$this->timestamp('created_at');
 
 		$this->timestamp('updated_at');
+	}
+
+	/**
+	 * Add a "deleted at" timestamp for the table.
+	 *
+	 * @return void
+	 */
+	public function softDeletes()
+	{
+		$this->timestamp('deleted_at')->nullable();
 	}
 
 	/**
@@ -516,13 +658,39 @@ class Blueprint {
 	}
 
 	/**
+	 * Add the proper columns for a polymorphic table.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function morphs($name)
+	{
+		$this->unsignedInteger("{$name}_id");
+
+		$this->string("{$name}_type");
+
+		$this->index(array("{$name}_id", "{$name}_type"));
+	}
+
+	/**
+	 * Adds the `remember_token` column to the table.
+	 *
+	 * @return void
+	 */
+	public function rememberToken()
+	{
+	  $this->string('remember_token', 100)->nullable();
+	}
+
+	/**
 	 * Create a new drop index command on the blueprint.
 	 *
-	 * @param  string        $type
+	 * @param  string  $command
+	 * @param  string  $type
 	 * @param  string|array  $index
 	 * @return \Illuminate\Support\Fluent
 	 */
-	protected function dropIndexCommand($type, $index)
+	protected function dropIndexCommand($command, $type, $index)
 	{
 		$columns = array();
 
@@ -533,10 +701,10 @@ class Blueprint {
 		{
 			$columns = $index;
 
-			$index = null;
+			$index = $this->createIndexName($type, $columns);
 		}
 
-		return $this->indexCommand($type, $columns, $index);
+		return $this->indexCommand($command, $columns, $index);
 	}
 
 	/**
@@ -571,9 +739,9 @@ class Blueprint {
 	 */
 	protected function createIndexName($type, array $columns)
 	{
-		$table = str_replace(array('-', '.'), '_', $this->table);
+		$index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
 
-		return strtolower($table.'_'.implode('_', $columns).'_'.$type);
+		return str_replace(array('-', '.'), '_', $index);
 	}
 
 	/**
@@ -591,6 +759,22 @@ class Blueprint {
 		$this->columns[] = $column = new Fluent($attributes);
 
 		return $column;
+	}
+
+	/**
+	 * Remove a column from the schema blueprint.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Database\Schema\Blueprint
+	 */
+	public function removeColumn($name)
+	{
+		$this->columns = array_values(array_filter($this->columns, function($c) use ($name)
+		{
+			return $c['attributes']['name'] != $name;
+		}));
+
+		return $this;
 	}
 
 	/**

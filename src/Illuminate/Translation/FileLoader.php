@@ -7,7 +7,7 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -28,7 +28,8 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Create a new file loader instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  string  $path
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $path)
@@ -41,11 +42,13 @@ class FileLoader implements LoaderInterface {
 	 * Load the messages for the given locale.
 	 *
 	 * @param  string  $locale
+	 * @param  string  $group
+	 * @param  string  $namespace
 	 * @return array
 	 */
 	public function load($locale, $group, $namespace = null)
 	{
-		if (is_null($namespace) or $namespace == '*')
+		if (is_null($namespace) || $namespace == '*')
 		{
 			return $this->loadPath($this->path, $locale, $group);
 		}
@@ -67,10 +70,33 @@ class FileLoader implements LoaderInterface {
 	{
 		if (isset($this->hints[$namespace]))
 		{
-			return $this->loadPath($this->hints[$namespace], $locale, $group);
+			$lines = $this->loadPath($this->hints[$namespace], $locale, $group);
+
+			return $this->loadNamespaceOverrides($lines, $locale, $group, $namespace);
 		}
 
 		return array();
+	}
+
+	/**
+	 * Load a local namespaced translation group for overrides.
+	 *
+	 * @param  array  $lines
+	 * @param  string  $locale
+	 * @param  string  $group
+	 * @param  string  $namespace
+	 * @return array
+	 */
+	protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
+	{
+		$file = "{$this->path}/packages/{$locale}/{$namespace}/{$group}.php";
+
+		if ($this->files->exists($file))
+		{
+			return array_replace_recursive($lines, $this->files->getRequire($file));
+		}
+
+		return $lines;
 	}
 
 	/**

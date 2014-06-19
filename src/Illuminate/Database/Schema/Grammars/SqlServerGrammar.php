@@ -6,18 +6,18 @@ use Illuminate\Database\Schema\Blueprint;
 class SqlServerGrammar extends Grammar {
 
 	/**
-	 * The keyword identifier wrapper format.
-	 *
-	 * @var string
-	 */
-	protected $wrapper = '"%s"';
-
-	/**
 	 * The possible column modifiers.
 	 *
 	 * @var array
 	 */
 	protected $modifiers = array('Increment', 'Nullable', 'Default');
+
+	/**
+	 * The columns available as serials.
+	 *
+	 * @var array
+	 */
+	protected $serials = array('bigInteger', 'integer');
 
 	/**
 	 * Compile the query to determine if a table exists.
@@ -27,6 +27,19 @@ class SqlServerGrammar extends Grammar {
 	public function compileTableExists()
 	{
 		return "select * from sysobjects where type = 'U' and name = ?";
+	}
+
+	/**
+	 * Compile the query to determine the list of columns.
+	 *
+	 * @param  string  $table
+	 * @return string
+	 */
+	public function compileColumnExists($table)
+	{
+		return "select col.name from sys.columns as col
+                join sys.objects as obj on col.object_id = obj.object_id
+                where obj.type = 'U' and obj.name = '$table'";
 	}
 
 	/**
@@ -208,6 +221,18 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a char type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeChar(Fluent $column)
+	{
+		return "nchar({$column->length})";
+	}
+
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -230,12 +255,56 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a medium text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumText(Fluent $column)
+	{
+		return 'nvarchar(max)';
+	}
+
+	/**
+	 * Create the column definition for a long text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeLongText(Fluent $column)
+	{
+		return 'nvarchar(max)';
+	}
+
+	/**
 	 * Create the column definition for a integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
 	protected function typeInteger(Fluent $column)
+	{
+		return 'int';
+	}
+
+	/**
+	 * Create the column definition for a big integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeBigInteger(Fluent $column)
+	{
+		return 'bigint';
+	}
+
+	/**
+	 * Create the column definition for a medium integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumInteger(Fluent $column)
 	{
 		return 'int';
 	}
@@ -252,12 +321,34 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a small integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSmallInteger(Fluent $column)
+	{
+		return 'smallint';
+	}
+
+	/**
 	 * Create the column definition for a float type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
 	protected function typeFloat(Fluent $column)
+	{
+		return 'float';
+	}
+
+	/**
+	 * Create the column definition for a double type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDouble(Fluent $column)
 	{
 		return 'float';
 	}
@@ -281,11 +372,11 @@ class SqlServerGrammar extends Grammar {
 	 */
 	protected function typeBoolean(Fluent $column)
 	{
-		return 'tinyint';
+		return 'bit';
 	}
 
 	/**
-	 * Create the column definition for a enum type.
+	 * Create the column definition for an enum type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
@@ -386,7 +477,7 @@ class SqlServerGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) && $column->autoIncrement)
 		{
 			return ' identity primary key';
 		}

@@ -1,11 +1,13 @@
-<?php namespace Illuminate\Cache; use Memcached;
+<?php namespace Illuminate\Cache;
 
-class MemcachedStore implements StoreInterface {
+use Memcached;
+
+class MemcachedStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * The Memcached instance.
 	 *
-	 * @var Memcached
+	 * @var \Memcached
 	 */
 	protected $memcached;
 
@@ -19,14 +21,14 @@ class MemcachedStore implements StoreInterface {
 	/**
 	 * Create a new Memcached store.
 	 *
-	 * @param  Memcached  $memcached
+	 * @param  \Memcached  $memcached
 	 * @param  string     $prefix
 	 * @return void
 	 */
 	public function __construct(Memcached $memcached, $prefix = '')
 	{
-		$this->prefix = $prefix.':';
 		$this->memcached = $memcached;
+		$this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
 	}
 
 	/**
@@ -71,7 +73,7 @@ class MemcachedStore implements StoreInterface {
 	}
 
 	/**
-	 * Increment the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
@@ -98,11 +100,11 @@ class MemcachedStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		$this->memcached->delete($this->prefix.$key);
+		return $this->memcached->delete($this->prefix.$key);
 	}
 
 	/**
@@ -116,24 +118,23 @@ class MemcachedStore implements StoreInterface {
 	}
 
 	/**
-	 * Begin executing a new section operation.
-	 *
-	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
-	 */
-	public function section($name)
-	{
-		return new Section($this, $name);
-	}
-
-	/**
 	 * Get the underlying Memcached connection.
 	 *
-	 * @return Memcached
+	 * @return \Memcached
 	 */
 	public function getMemcached()
 	{
 		return $this->memcached;
+	}
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return $this->prefix;
 	}
 
 }

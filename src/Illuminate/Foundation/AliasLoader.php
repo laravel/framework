@@ -43,7 +43,7 @@ class AliasLoader {
 	public static function getInstance(array $aliases = array())
 	{
 		if (is_null(static::$instance)) static::$instance = new static($aliases);
-		
+
 		$aliases = array_merge(static::$instance->getAliases(), $aliases);
 
 		static::$instance->setAliases($aliases);

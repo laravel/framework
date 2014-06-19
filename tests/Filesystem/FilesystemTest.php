@@ -32,6 +32,25 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPrependExistingFiles()
+	{
+		$files = new Filesystem;
+		$files->put(__DIR__.'/file.txt', 'World');
+		$files->prepend(__DIR__.'/file.txt', 'Hello ');
+		$this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
+		@unlink(__DIR__.'/file.txt');
+	}
+
+
+	public function testPrependNewFiles()
+	{
+		$files = new Filesystem;
+		$files->prepend(__DIR__.'/file.txt', 'Hello World');
+		$this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
+		@unlink(__DIR__.'/file.txt');
+	}
+
+
 	public function testDeleteDirectory()
 	{
 		mkdir(__DIR__.'/foo');

@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class WinCacheStore implements StoreInterface {
+class WinCacheStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * A string that should be prepended to keys.
@@ -46,7 +46,7 @@ class WinCacheStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		wincache_ucache_add($this->prefix.$key, $value, $minutes * 60);
+		wincache_ucache_set($this->prefix.$key, $value, $minutes * 60);
 	}
 
 	/**
@@ -89,11 +89,11 @@ class WinCacheStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		wincache_ucache_delete($this->prefix.$key);
+		return wincache_ucache_delete($this->prefix.$key);
 	}
 
 	/**
@@ -107,14 +107,13 @@ class WinCacheStore implements StoreInterface {
 	}
 
 	/**
-	 * Begin executing a new section operation.
+	 * Get the cache key prefix.
 	 *
-	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
+	 * @return string
 	 */
-	public function section($name)
+	public function getPrefix()
 	{
-		return new Section($this, $name);
+		return $this->prefix;
 	}
 
 }

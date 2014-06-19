@@ -27,7 +27,7 @@ class RoutingServiceProvider extends ServiceProvider {
 	{
 		$this->app['router'] = $this->app->share(function($app)
 		{
-			$router = new Router($app);
+			$router = new Router($app['events'], $app);
 
 			// If the current application environment is "testing", we will disable the
 			// routing filters, since they can be tested independently of the routes
@@ -55,7 +55,10 @@ class RoutingServiceProvider extends ServiceProvider {
 			// and all the registered routes will be available to the generator.
 			$routes = $app['router']->getRoutes();
 
-			return new UrlGenerator($routes, $app['request']);
+			return new UrlGenerator($routes, $app->rebinding('request', function($app, $request)
+			{
+				$app['url']->setRequest($request);
+			}));
 		});
 	}
 
@@ -73,9 +76,9 @@ class RoutingServiceProvider extends ServiceProvider {
 			// If the session is set on the application instance, we'll inject it into
 			// the redirector instance. This allows the redirect responses to allow
 			// for the quite convenient "with" methods that flash to the session.
-			if (isset($app['session']))
+			if (isset($app['session.store']))
 			{
-				$redirector->setSession($app['session']);
+				$redirector->setSession($app['session.store']);
 			}
 
 			return $redirector;

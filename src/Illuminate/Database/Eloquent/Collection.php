@@ -5,13 +5,6 @@ use Illuminate\Support\Collection as BaseCollection;
 class Collection extends BaseCollection {
 
 	/**
-	 * A dictionary of available primary keys.
-	 *
-	 * @var array
-	 */
-	protected $dictionary = array();
-
-	/**
 	 * Find a model in the collection by key.
 	 *
 	 * @param  mixed  $key
@@ -20,28 +13,36 @@ class Collection extends BaseCollection {
 	 */
 	public function find($key, $default = null)
 	{
-		if (count($this->dictionary) == 0)
+		if ($key instanceof Model)
 		{
-			$this->buildDictionary();
+			$key = $key->getKey();
 		}
 
-		return array_get($this->dictionary, $key, $default);
+		return array_first($this->items, function($itemKey, $model) use ($key)
+		{
+			return $model->getKey() == $key;
+
+		}, $default);
 	}
 
 	/**
 	 * Load a set of relationships onto the collection.
 	 *
-	 * @param  dynamic  string
-	 * @return void
+	 * @param  dynamic  $relations
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public function load()
+	public function load($relations)
 	{
 		if (count($this->items) > 0)
 		{
-			$query = $this->first()->newQuery()->with(func_get_args());
+			if (is_string($relations)) $relations = func_get_args();
+
+			$query = $this->first()->newQuery()->with($relations);
 
 			$this->items = $query->eagerLoadRelations($this->items);
 		}
+
+		return $this;
 	}
 
 	/**
@@ -54,22 +55,6 @@ class Collection extends BaseCollection {
 	{
 		$this->items[] = $item;
 
-		// If the dictionary is empty, we will re-build it upon adding the item so
-		// we can quickly search it from the "contains" method. This dictionary
-		// will give us faster look-up times while searching for given items.
-		if (count($this->dictionary) == 0)
-		{
-			$this->buildDictionary();
-		}
-
-		// If this dictionary has already been initially hydrated, we just need to
-		// add an entry for the added item, which we will do here so that we'll
-		// be able to quickly determine it is in the array when asked for it.
-		elseif ($item instanceof Model)
-		{
-			$this->dictionary[$item->getKey()] = true;
-		}
-
 		return $this;
 	}
 
@@ -81,33 +66,188 @@ class Collection extends BaseCollection {
 	 */
 	public function contains($key)
 	{
-		if (count($this->dictionary) == 0)
-		{
-			$this->buildDictionary();
-		}
-
-		return isset($this->dictionary[$key]);
+		return ! is_null($this->find($key));
 	}
 
 	/**
-	 * Build the dictionary of primary keys.
+	 * Fetch a nested element of the collection.
 	 *
-	 * @return void
+	 * @param  string  $key
+	 * @return \Illuminate\Support\Collection
 	 */
-	protected function buildDictionary()
+	public function fetch($key)
 	{
-		$this->dictionary = array();
+		return new static(array_fetch($this->toArray(), $key));
+	}
 
-		// By building the dictionary of items by key, we are able to more quickly
-		// access the array and examine it for certain items. This is useful on
-		// the contain method which searches through the list by primary key.
+	/**
+	 * Get the max value of a given key.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function max($key)
+	{
+		return $this->reduce(function($result, $item) use ($key)
+		{
+			return (is_null($result) || $item->{$key} > $result) ? $item->{$key} : $result;
+		});
+	}
+
+	/**
+	 * Get the min value of a given key.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function min($key)
+	{
+		return $this->reduce(function($result, $item) use ($key)
+		{
+			return (is_null($result) || $item->{$key} < $result) ? $item->{$key} : $result;
+		});
+	}
+
+	/**
+	 * Get the array of primary keys
+	 *
+	 * @return array
+	 */
+	public function modelKeys()
+	{
+		return array_map(function($m) { return $m->getKey(); }, $this->items);
+	}
+
+	/**
+	 * Merge the collection with the given items.
+	 *
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function merge($collection)
+	{
+		$dictionary = $this->getDictionary();
+
+		foreach ($collection as $item)
+		{
+			$dictionary[$item->getKey()] = $item;
+		}
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Diff the collection with the given items.
+	 *
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function diff($collection)
+	{
+		$diff = new static;
+
+		$dictionary = $this->getDictionary($collection);
+
 		foreach ($this->items as $item)
 		{
-			if ($item instanceof Model)
+			if ( ! isset($dictionary[$item->getKey()]))
 			{
-				$this->dictionary[$item->getKey()] = $item;
+				$diff->add($item);
 			}
 		}
+
+		return $diff;
+	}
+
+	/**
+	 * Intersect the collection with the given items.
+	 *
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function intersect($collection)
+	{
+		$intersect = new static;
+
+		$dictionary = $this->getDictionary($collection);
+
+		foreach ($this->items as $item)
+		{
+			if (isset($dictionary[$item->getKey()]))
+			{
+				$intersect->add($item);
+			}
+		}
+
+		return $intersect;
+	}
+
+	/**
+	 * Return only unique items from the collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function unique()
+	{
+		$dictionary = $this->getDictionary();
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Returns only the models from the collection with the specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function only($keys)
+	{
+		$dictionary = array_only($this->getDictionary($this), $keys);
+
+		return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Returns all models in the collection except the models with specified keys.
+	 *
+	 * @param  mixed  $keys
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function except($keys)
+	{
+	    $dictionary = array_except($this->getDictionary($this), $keys);
+
+	    return new static(array_values($dictionary));
+	}
+
+	/**
+	 * Get a dictionary keyed by primary keys.
+	 *
+	 * @param  \Illuminate\Support\Collection  $collection
+	 * @return array
+	 */
+	public function getDictionary($collection = null)
+	{
+		$collection = $collection ?: $this;
+
+		$dictionary = array();
+
+		foreach ($collection as $value)
+		{
+			$dictionary[$value->getKey()] = $value;
+		}
+
+		return $dictionary;
+	}
+
+	/**
+	 * Get a base Support collection instance from this collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function toBase()
+	{
+		return new BaseCollection($this->items);
 	}
 
 }

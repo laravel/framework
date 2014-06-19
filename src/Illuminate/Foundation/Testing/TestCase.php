@@ -3,7 +3,7 @@
 use Illuminate\View\View;
 use Illuminate\Auth\UserInterface;
 
-class TestCase extends \PHPUnit_Framework_TestCase {
+abstract class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * The Illuminate application instance.
@@ -26,7 +26,10 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->refreshApplication();
+		if ( ! $this->app)
+		{
+			$this->refreshApplication();
+		}
 	}
 
 	/**
@@ -39,7 +42,20 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		$this->app = $this->createApplication();
 
 		$this->client = $this->createClient();
+
+		$this->app->setRequestForConsoleEnvironment();
+
+		$this->app->boot();
 	}
+
+	/**
+	 * Creates the application.
+	 *
+	 * Needs to be implemented by subclasses.
+	 *
+	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+	 */
+	abstract public function createApplication();
 
 	/**
 	 * Call the given URI and return the Response.
@@ -96,7 +112,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function action($method, $action, $wildcards = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
-		$uri = $this->app['url']->action($action, $wildcards, false);
+		$uri = $this->app['url']->action($action, $wildcards, true);
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
@@ -116,7 +132,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function route($method, $name, $routeParameters = array(), $parameters = array(), $files = array(), $server = array(), $content = null, $changeHistory = true)
 	{
-		$uri = $this->app['url']->route($name, $routeParameters, false);
+		$uri = $this->app['url']->route($name, $routeParameters);
 
 		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
@@ -136,6 +152,17 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the client response has a given code.
+	 *
+	 * @param  int  $code
+	 * @return void
+	 */
+	public function assertResponseStatus($code)
+	{
+		return $this->assertEquals($code, $this->client->getResponse()->getStatusCode());
+	}
+
+	/**
 	 * Assert that the response view has a given piece of bound data.
 	 *
 	 * @param  string|array  $key
@@ -146,20 +173,20 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		if (is_array($key)) return $this->assertViewHasAll($key);
 
-		$response = $this->client->getResponse()->original;
+		$response = $this->client->getResponse();
 
-		if ( ! $response instanceof View)
+		if ( ! isset($response->original) || ! $response->original instanceof View)
 		{
 			return $this->assertTrue(false, 'The response was not a view.');
 		}
 
 		if (is_null($value))
 		{
-			$this->assertArrayHasKey($key, $response->getData());
+			$this->assertArrayHasKey($key, $response->original->getData());
 		}
 		else
 		{
-			$this->assertEquals($value, $response->$key);
+			$this->assertEquals($value, $response->original->$key);
 		}
 	}
 
@@ -185,6 +212,24 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Assert that the response view is missing a piece of bound data.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function assertViewMissing($key)
+	{
+		$response = $this->client->getResponse();
+
+		if ( ! isset($response->original) || ! $response->original instanceof View)
+		{
+			return $this->assertTrue(false, 'The response was not a view.');
+		}
+
+		$this->assertArrayNotHasKey($key, $response->original->getData());
+	}
+
+	/**
 	 * Assert whether the client was redirected to a given URI.
 	 *
 	 * @param  string  $uri
@@ -206,24 +251,26 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 * Assert whether the client was redirected to a given route.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToRoute($name, $with = array())
+	public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->route($name), $with);
+		$this->assertRedirectedTo($this->app['url']->route($name, $parameters), $with);
 	}
 
 	/**
 	 * Assert whether the client was redirected to a given action.
 	 *
 	 * @param  string  $name
+	 * @param  array   $parameters
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToAction($name, $with = array())
+	public function assertRedirectedToAction($name, $parameters = array(), $with = array())
 	{
-		$this->assertRedirectedTo($this->app['url']->action($name), $with);
+		$this->assertRedirectedTo($this->app['url']->action($name, $parameters), $with);
 	}
 
 	/**
@@ -239,11 +286,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 		if (is_null($value))
 		{
-			$this->assertTrue($this->app['session']->has($key));
+			$this->assertTrue($this->app['session.store']->has($key), "Session missing key: $key");
 		}
 		else
 		{
-			$this->assertEquals($value, $this->app['session']->get($key));
+			$this->assertEquals($value, $this->app['session.store']->get($key));
 		}
 	}
 
@@ -270,7 +317,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Assert that the session has errors bound.
-	 * 
+	 *
 	 * @param  string|array  $bindings
 	 * @param  mixed  $format
 	 * @return void
@@ -279,20 +326,71 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	{
 		$this->assertSessionHas('errors');
 
-		$bindings = (array)$bindings;
+		$bindings = (array) $bindings;
 
-		$errors = $this->app['session']->get('errors');
+		$errors = $this->app['session.store']->get('errors');
 
 		foreach ($bindings as $key => $value)
 		{
 			if (is_int($key))
 			{
-				$this->assertTrue($errors->has($value));
+				$this->assertTrue($errors->has($value), "Session missing error: $value");
 			}
 			else
 			{
 				$this->assertContains($value, $errors->get($key, $format));
 			}
+		}
+	}
+
+	/**
+	 * Assert that the session has old input.
+	 *
+	 * @return void
+	 */
+	public function assertHasOldInput()
+	{
+		$this->assertSessionHas('_old_input');
+	}
+
+	/**
+	 * Set the session to the given array.
+	 *
+	 * @param  array  $data
+	 * @return void
+	 */
+	public function session(array $data)
+	{
+		$this->startSession();
+
+		foreach ($data as $key => $value)
+		{
+			$this->app['session']->put($key, $value);
+		}
+	}
+
+	/**
+	 * Flush all of the current session data.
+	 *
+	 * @return void
+	 */
+	public function flushSession()
+	{
+		$this->startSession();
+
+		$this->app['session']->flush();
+	}
+
+	/**
+	 * Start the session for the application.
+	 *
+	 * @return void
+	 */
+	protected function startSession()
+	{
+		if ( ! $this->app['session']->isStarted())
+		{
+			$this->app['session']->start();
 		}
 	}
 
@@ -316,14 +414,14 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->app[$class]->run();
+		$this->app['artisan']->call('db:seed', array('--class' => $class));
 	}
 
 	/**
 	 * Create a new HttpKernel client instance.
 	 *
 	 * @param  array  $server
-	 * @return Symfony\Component\HttpKernel\Client
+	 * @return \Symfony\Component\HttpKernel\Client
 	 */
 	protected function createClient(array $server = array())
 	{

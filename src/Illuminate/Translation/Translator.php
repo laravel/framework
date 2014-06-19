@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Translation;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -18,7 +19,14 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 *
 	 * @var string
 	 */
-	protected $default;
+	protected $locale;
+
+	/**
+	 * The fallback locale used by the translator.
+	 *
+	 * @var string
+	 */
+	protected $fallback;
 
 	/**
 	 * The array of loaded translation groups.
@@ -60,25 +68,28 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 * @param  string  $locale
 	 * @return string
 	 */
-	public function get($key, $replace = array(), $locale = null)
+	public function get($key, array $replace = array(), $locale = null)
 	{
 		list($namespace, $group, $item) = $this->parseKey($key);
 
 		// Here we will get the locale that should be used for the language line. If one
 		// was not passed, we will use the default locales which was given to us when
 		// the translator was instantiated. Then, we can load the lines and return.
-		$locale = $locale ?: $this->getLocale();
+		foreach ($this->parseLocale($locale) as $locale)
+		{
+			$this->load($namespace, $group, $locale);
 
-		$this->load($namespace, $group, $locale);
+			$line = $this->getLine(
+				$namespace, $group, $locale, $item, $replace
+			);
 
-		$line = $this->getLine(
-			$namespace, $group, $locale, $item, $replace
-		);
+			if ( ! is_null($line)) break;
+		}
 
 		// If the line doesn't exist, we will return back the key which was requested as
 		// that will be quick to spot in the UI if language keys are wrong or missing
 		// from the application's language files. Otherwise we can return the line.
-		if (is_null($line)) return $key;
+		if ( ! isset($line)) return $key;
 
 		return $line;
 	}
@@ -93,11 +104,18 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 * @param  array   $replace
 	 * @return string|null
 	 */
-	protected function getLine($namespace, $group, $locale, $item, $replace)
+	protected function getLine($namespace, $group, $locale, $item, array $replace)
 	{
 		$line = array_get($this->loaded[$namespace][$group][$locale], $item);
 
-		if ($line) return $this->makeReplacements($line, $replace);
+		if (is_string($line))
+		{
+			return $this->makeReplacements($line, $replace);
+		}
+		elseif (is_array($line) && count($line) > 0)
+		{
+			return $line;
+		}
 	}
 
 	/**
@@ -107,14 +125,30 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 * @param  array   $replace
 	 * @return string
 	 */
-	protected function makeReplacements($line, $replace)
+	protected function makeReplacements($line, array $replace)
 	{
+		$replace = $this->sortReplacements($replace);
+
 		foreach ($replace as $key => $value)
 		{
 			$line = str_replace(':'.$key, $value, $line);
 		}
 
 		return $line;
+	}
+
+	/**
+	 * Sort the replacements array.
+	 *
+	 * @param  array  $replace
+	 * @return array
+	 */
+	protected function sortReplacements(array $replace)
+	{
+		return with(new Collection($replace))->sortBy(function($r)
+		{
+			return mb_strlen($r) * -1;
+		});
 	}
 
 	/**
@@ -126,11 +160,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 * @param  string  $locale
 	 * @return string
 	 */
-	public function choice($key, $number, $replace = array(), $locale = null)
+	public function choice($key, $number, array $replace = array(), $locale = null)
 	{
 		$line = $this->get($key, $replace, $locale = $locale ?: $this->locale);
 
-		array_unshift($replace, $number);
+		$replace['count'] = $number;
 
 		return $this->makeReplacements($this->getSelector()->choose($line, $number, $locale), $replace);
 	}
@@ -170,7 +204,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 * @param  string  $namespace
 	 * @param  string  $group
 	 * @param  string  $locale
-	 * @return string
+	 * @return void
 	 */
 	public function load($namespace, $group, $locale)
 	{
@@ -225,9 +259,26 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	}
 
 	/**
+	 * Get the array of locales to be checked.
+	 *
+	 * @return array
+	 */
+	protected function parseLocale($locale)
+	{
+		if ( ! is_null($locale))
+		{
+			return array_filter(array($locale, $this->fallback));
+		}
+		else
+		{
+			return array_filter(array($this->locale, $this->fallback));
+		}
+	}
+
+	/**
 	 * Get the message selector instance.
 	 *
-	 * @return Symfony\Component\Translation\MessageSelector
+	 * @return \Symfony\Component\Translation\MessageSelector
 	 */
 	public function getSelector()
 	{
@@ -242,7 +293,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Set the message selector instance.
 	 *
-	 * @param  Symfony\Component\Translation\MessageSelector  $selector
+	 * @param  \Symfony\Component\Translation\MessageSelector  $selector
 	 * @return void
 	 */
 	public function setSelector(MessageSelector $selector)
@@ -289,6 +340,27 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	public function setLocale($locale)
 	{
 		$this->locale = $locale;
+	}
+
+	/**
+	 * Get the fallback locale being used.
+	 *
+	 * @return string
+	 */
+	public function getFallback()
+	{
+		return $this->fallback;
+	}
+
+	/**
+	 * Set the fallback locale being used.
+	 *
+	 * @param  string  $fallback
+	 * @return void
+	 */
+	public function setFallback($fallback)
+	{
+		$this->fallback = $fallback;
 	}
 
 }

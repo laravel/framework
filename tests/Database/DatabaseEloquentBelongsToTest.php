@@ -48,21 +48,35 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	{
 		$relation = $this->getRelation();
 		$result1 = m::mock('stdClass');
-		$result1->shouldReceive('getKey')->andReturn(1);
+		$result1->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$result2 = m::mock('stdClass');
-		$result2->shouldReceive('getKey')->andReturn(2);
+		$result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
 		$model1 = new EloquentBelongsToModelStub;
 		$model1->foreign_key = 1;
 		$model2 = new EloquentBelongsToModelStub;
 		$model2->foreign_key = 2;
 		$models = $relation->match(array($model1, $model2), new Collection(array($result1, $result2)), 'foo');
 
-		$this->assertEquals(1, $models[0]->foo->getKey());
-		$this->assertEquals(2, $models[1]->foo->getKey());
+		$this->assertEquals(1, $models[0]->foo->getAttribute('id'));
+		$this->assertEquals(2, $models[1]->foo->getAttribute('id'));
 	}
 
 
-	protected function getRelation()
+	public function testAssociateMethodSetsForeignKeyOnModel()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+		$relation = $this->getRelation($parent);
+		$associate = m::mock('Illuminate\Database\Eloquent\Model');
+		$associate->shouldReceive('getAttribute')->once()->with('id')->andReturn(1);
+		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
+		$parent->shouldReceive('setRelation')->once()->with('relation', $associate);
+
+		$relation->associate($associate);
+	}
+
+
+	protected function getRelation($parent = null)
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
@@ -70,8 +84,8 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 		$related->shouldReceive('getKeyName')->andReturn('id');
 		$related->shouldReceive('getTable')->andReturn('relation');
 		$builder->shouldReceive('getModel')->andReturn($related);
-		$parent = new EloquentBelongsToModelStub;
-		return new BelongsTo($builder, $parent, 'foreign_key');
+		$parent = $parent ?: new EloquentBelongsToModelStub;
+		return new BelongsTo($builder, $parent, 'foreign_key', 'id', 'relation');
 	}
 
 }

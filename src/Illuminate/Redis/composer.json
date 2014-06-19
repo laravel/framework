@@ -1,6 +1,6 @@
 {
     "name": "illuminate/redis",
-    "keywords": ["laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,23 +8,18 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.0.x",
-        "predis/predis": "0.*"
-    },
-    "require-dev": {
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "php": ">=5.4.0",
+        "illuminate/support": "4.3.*",
+        "predis/predis": "0.8.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Redis": ""
+        "psr-4": {
+            "Illuminate\\Redis\\": ""
         }
     },
-    "target-dir": "Illuminate/Redis",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

@@ -11,44 +11,30 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testWhereClausesCanBeRemoved()
-	{
-		// For this test it doesn't matter what type of relationship we have, so we'll just use HasOne
-		$builder = new EloquentRelationResetStub;
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
-		$relation = new HasOne($builder, $parent, 'foreign_key');
-		$relation->where('foo', '=', 'bar');
-		list($wheres, $bindings) = $relation->getAndResetWheres();
-
-		$this->assertEquals('bar', $bindings[0]);
-		$this->assertEquals('Basic', $wheres[0]['type']);
-		$this->assertEquals('foo', $wheres[0]['column']);
-		$this->assertEquals('bar', $wheres[0]['value']);
-	}
-
-
 	public function testTouchMethodUpdatesRelatedTimestamps()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getKey')->andReturn(1);
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$builder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
 		$builder->shouldReceive('where');
-		$relation = new HasOne($builder, $parent, 'foreign_key');
+		$relation = new HasOne($builder, $parent, 'foreign_key', 'id');
 		$related->shouldReceive('getTable')->andReturn('table');
 		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		$builder->shouldReceive('update')->once()->with(array('table.updated_at' => new DateTime));
+		$related->shouldReceive('freshTimestampString')->andReturn(Carbon\Carbon::now());
+		$builder->shouldReceive('update')->once()->with(array('updated_at' => Carbon\Carbon::now()));
 
 		$relation->touch();
 	}
 
 }
 
+class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model {}
+
 
 class EloquentRelationResetStub extends Illuminate\Database\Eloquent\Builder {
 	public function __construct() { $this->query = new EloquentRelationQueryStub; }
-	public function getModel() {}
+	public function getModel() { return new EloquentRelationResetModelStub; }
 }
 
 

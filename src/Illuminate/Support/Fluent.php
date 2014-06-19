@@ -1,8 +1,11 @@
 <?php namespace Illuminate\Support;
 
-use Closure;
+use ArrayAccess;
+use JsonSerializable;
+use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\ArrayableInterface;
 
-class Fluent {
+class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, JsonSerializable {
 
 	/**
 	 * All of the attributes set on the container.
@@ -50,6 +53,82 @@ class Fluent {
 	public function getAttributes()
 	{
 		return $this->attributes;
+	}
+
+	/**
+	 * Convert the Fluent instance to an array.
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return $this->attributes;
+	}
+
+	/**
+	 * Convert the object into something JSON serializable.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->toArray();
+	}
+
+	/**
+	 * Convert the Fluent instance to JSON.
+	 *
+	 * @param  int  $options
+	 * @return string
+	 */
+	public function toJson($options = 0)
+	{
+		return json_encode($this->toArray(), $options);
+	}
+
+	/**
+	 * Determine if the given offset exists.
+	 *
+	 * @param  string  $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset)
+	{
+		return isset($this->{$offset});
+	}
+
+	/**
+	 * Get the value for a given offset.
+	 *
+	 * @param  string  $offset
+	 * @return mixed
+	 */
+	public function offsetGet($offset)
+	{
+		return $this->{$offset};
+	}
+
+	/**
+	 * Set the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		$this->{$offset} = $value;
+	}
+
+	/**
+	 * Unset the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @return void
+	 */
+	public function offsetUnset($offset)
+	{
+		unset($this->{$offset});
 	}
 
 	/**

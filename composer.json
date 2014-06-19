@@ -10,28 +10,31 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "classpreloader/classpreloader": "1.0.*",
-        "doctrine/dbal": "2.4.x",
-        "ircmaxell/password-compat": "1.0.*",
-        "filp/whoops": "1.0.4",
-        "monolog/monolog": "1.5.*",
-        "nesbot/carbon": "1.*",
+        "php": ">=5.4.0",
+        "classpreloader/classpreloader": "~1.0",
+        "d11wtq/boris": "~1.0",
+        "ircmaxell/password-compat": "~1.0",
+        "filp/whoops": "1.1.*",
+        "jeremeamia/superclosure": "~1.0",
+        "monolog/monolog": "~1.6",
+        "nesbot/carbon": "~1.0",
         "patchwork/utf8": "1.1.*",
+        "phpseclib/phpseclib": "0.3.*",
         "predis/predis": "0.8.*",
-        "swiftmailer/swiftmailer": "4.3.*",
-        "symfony/browser-kit": "2.3.*",
-        "symfony/console": "2.3.*",
-        "symfony/css-selector": "2.3.*",
-        "symfony/debug": "2.3.*",
-        "symfony/dom-crawler": "2.3.*",
-        "symfony/event-dispatcher": "2.3.*",
-        "symfony/finder": "2.3.*",
-        "symfony/http-foundation": "2.3.*",
-        "symfony/http-kernel": "2.3.*",
-        "symfony/process": "2.3.*",
-        "symfony/routing": "2.3.*",
-        "symfony/translation": "2.3.*"
+        "stack/builder": "~1.0",
+        "swiftmailer/swiftmailer": "~5.1",
+        "symfony/browser-kit": "2.5.*",
+        "symfony/console": "2.5.*",
+        "symfony/css-selector": "2.5.*",
+        "symfony/debug": "2.5.*",
+        "symfony/dom-crawler": "2.5.*",
+        "symfony/finder": "2.5.*",
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*",
+        "symfony/process": "2.5.*",
+        "symfony/routing": "2.5.*",
+        "symfony/security-core": "2.5.*",
+        "symfony/translation": "2.5.*"
     },
     "replace": {
         "illuminate/auth": "self.version",
@@ -54,6 +57,7 @@
         "illuminate/pagination": "self.version",
         "illuminate/queue": "self.version",
         "illuminate/redis": "self.version",
+        "illuminate/remote": "self.version",
         "illuminate/routing": "self.version",
         "illuminate/session": "self.version",
         "illuminate/support": "self.version",
@@ -63,27 +67,30 @@
         "illuminate/workbench": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "2.2.*",
-        "iron-io/iron_mq": "1.4.4",
-        "pda/pheanstalk": "2.0.*",
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "aws/aws-sdk-php": "~2.6",
+        "iron-io/iron_mq": "~1.5",
+        "pda/pheanstalk": "~2.1",
+        "mockery/mockery": "~0.9",
+        "phpunit/phpunit": "~4.0"
     },
     "autoload": {
         "classmap": [
-            ["src/Illuminate/Queue/IlluminateQueueClosure.php"]
+            "src/Illuminate/Queue/IlluminateQueueClosure.php"
         ],
-    	"files": [
+        "files": [
             "src/Illuminate/Support/helpers.php"
-    	],
+        ],
         "psr-0": {
             "Illuminate": "src/"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
+    },
+    "suggest": {
+        "doctrine/dbal": "Allow renaming columns and dropping SQLite columns."
     },
     "minimum-stability": "dev"
 }

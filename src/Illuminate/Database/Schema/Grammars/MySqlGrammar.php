@@ -7,13 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 class MySqlGrammar extends Grammar {
 
 	/**
-	 * The keyword identifier wrapper format.
-	 *
-	 * @var string
-	 */
-	protected $wrapper = '`%s`';
-
-	/**
 	 * The possible column modifiers.
 	 *
 	 * @var array
@@ -21,13 +14,31 @@ class MySqlGrammar extends Grammar {
 	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After');
 
 	/**
-	 * Compile the query to determine if a table exists.
+	 * The possible column serials
+	 *
+	 * @var array
+	 */
+	protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
+
+	/**
+	 * Compile the query to determine the list of tables.
 	 *
 	 * @return string
 	 */
 	public function compileTableExists()
 	{
 		return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
+	}
+
+	/**
+	 * Compile the query to determine the list of columns.
+	 *
+	 * @param  string  $table
+	 * @return string
+	 */
+	public function compileColumnExists()
+	{
+		return "select column_name from information_schema.columns where table_schema = ? and table_name = ?";
 	}
 
 	/**
@@ -80,7 +91,7 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile a create table command.
+	 * Compile an add column command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Illuminate\Support\Fluent  $command
@@ -259,6 +270,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a char type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeChar(Fluent $column)
+	{
+		return "char({$column->length})";
+	}
+
+	/**
 	 * Create the column definition for a string type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -281,6 +303,39 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a medium text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumText(Fluent $column)
+	{
+		return 'mediumtext';
+	}
+
+	/**
+	 * Create the column definition for a long text type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeLongText(Fluent $column)
+	{
+		return 'longtext';
+	}
+
+	/**
+	 * Create the column definition for a big integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeBigInteger(Fluent $column)
+	{
+		return 'bigint';
+	}
+
+	/**
 	 * Create the column definition for a integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -292,6 +347,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a medium integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeMediumInteger(Fluent $column)
+	{
+		return 'mediumint';
+	}
+
+	/**
 	 * Create the column definition for a tiny integer type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -299,7 +365,18 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTinyInteger(Fluent $column)
 	{
-		return 'tinyint(1)';
+		return 'tinyint';
+	}
+
+	/**
+	 * Create the column definition for a small integer type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeSmallInteger(Fluent $column)
+	{
+		return 'smallint';
 	}
 
 	/**
@@ -311,6 +388,24 @@ class MySqlGrammar extends Grammar {
 	protected function typeFloat(Fluent $column)
 	{
 		return "float({$column->total}, {$column->places})";
+	}
+
+	/**
+	 * Create the column definition for a double type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDouble(Fluent $column)
+	{
+		if ($column->total && $column->places)
+		{
+			return "double({$column->total}, {$column->places})";
+		}
+		else
+		{
+			return 'double';
+		}
 	}
 
 	/**
@@ -332,11 +427,11 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeBoolean(Fluent $column)
 	{
-		return 'tinyint';
+		return 'tinyint(1)';
 	}
 
 	/**
-	 * Create the column definition for a enum type.
+	 * Create the column definition for an enum type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
@@ -387,7 +482,9 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
-		return 'timestamp default 0';
+		if ( ! $column->nullable) return 'timestamp default 0';
+
+		return 'timestamp';
 	}
 
 	/**
@@ -449,7 +546,7 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
 	{
-		if ($column->type == 'integer' and $column->autoIncrement)
+		if (in_array($column->type, $this->serials) && $column->autoIncrement)
 		{
 			return ' auto_increment primary key';
 		}
@@ -468,6 +565,19 @@ class MySqlGrammar extends Grammar {
 		{
 			return ' after '.$this->wrap($column->after);
 		}
+	}
+
+	/**
+	 * Wrap a single string in keyword identifiers.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function wrapValue($value)
+	{
+		if ($value === '*') return $value;
+
+		return '`'.str_replace('`', '``', $value).'`';
 	}
 
 }

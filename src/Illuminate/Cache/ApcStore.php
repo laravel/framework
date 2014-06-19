@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class ApcStore implements StoreInterface {
+class ApcStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * The APC wrapper instance.
@@ -20,7 +20,7 @@ class ApcStore implements StoreInterface {
 	 * Create a new APC store.
 	 *
 	 * @param  \Illuminate\Cache\ApcWrapper  $apc
-	 * @param  string                       $prefix
+	 * @param  string  $prefix
 	 * @return void
 	 */
 	public function __construct(ApcWrapper $apc, $prefix = '')
@@ -51,7 +51,7 @@ class ApcStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @param  int     $minutes
-	 * @return void
+	 * @return array|bool
 	 */
 	public function put($key, $value, $minutes)
 	{
@@ -63,7 +63,7 @@ class ApcStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array|bool
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -71,11 +71,11 @@ class ApcStore implements StoreInterface {
 	}
 
 	/**
-	 * Increment the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array|bool
 	 */
 	public function decrement($key, $value = 1)
 	{
@@ -87,7 +87,7 @@ class ApcStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
+	 * @return array|bool
 	 */
 	public function forever($key, $value)
 	{
@@ -98,11 +98,11 @@ class ApcStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		$this->apc->delete($this->prefix.$key);
+		return $this->apc->delete($this->prefix.$key);
 	}
 
 	/**
@@ -116,14 +116,13 @@ class ApcStore implements StoreInterface {
 	}
 
 	/**
-	 * Begin executing a new section operation.
+	 * Get the cache key prefix.
 	 *
-	 * @param  string  $name
-	 * @return \Illuminate\Cache\Section
+	 * @return string
 	 */
-	public function section($name)
+	public function getPrefix()
 	{
-		return new Section($this, $name);
+		return $this->prefix;
 	}
 
 }

@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
-use DateTime;
-use Carbon\Carbon;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
 abstract class Relation {
@@ -30,10 +30,17 @@ abstract class Relation {
 	protected $related;
 
 	/**
+	 * Indicates if the relation is adding constraints.
+	 *
+	 * @var bool
+	 */
+	protected static $constraints = true;
+
+	/**
 	 * Create a new relation instance.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
-	 * @param  \Illuminate\Database\Eloquent\Model
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent)
@@ -65,7 +72,7 @@ abstract class Relation {
 	 *
 	 * @param  array   $models
 	 * @param  string  $relation
-	 * @return void
+	 * @return array
 	 */
 	abstract public function initRelation(array $models, $relation);
 
@@ -87,17 +94,25 @@ abstract class Relation {
 	abstract public function getResults();
 
 	/**
+	 * Get the relationship for eager loading.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Collection
+	 */
+	public function getEager()
+	{
+		return $this->get();
+	}
+
+	/**
 	 * Touch all of the related models for the relationship.
 	 *
 	 * @return void
 	 */
 	public function touch()
 	{
-		$table = $this->getRelated()->getTable();
-
 		$column = $this->getRelated()->getUpdatedAtColumn();
 
-		$this->rawUpdate(array($table.'.'.$column => new DateTime));
+		$this->rawUpdate(array($column => $this->getRelated()->freshTimestampString()));
 	}
 
 	/**
@@ -112,54 +127,55 @@ abstract class Relation {
 	}
 
 	/**
-	 * Remove the original where clause set by the relationship.
+	 * Add the constraints for a relationship count query.
 	 *
-	 * The remaining constraints on the query will be reset and returned.
-	 *
-	 * @return array
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function getAndResetWheres()
+	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
-		$this->removeFirstWhereClause();
+		$query->select(new Expression('count(*)'));
 
-		return $this->getBaseQuery()->getAndResetWheres();
+		$key = $this->wrap($this->getQualifiedParentKeyName());
+
+		return $query->where($this->getHasCompareKey(), '=', new Expression($key));
 	}
 
 	/**
-	 * Remove the first where clause from the relationship query.
+	 * Run a callback with constraints disabled on the relation.
 	 *
-	 * @return void
+	 * @param  \Closure  $callback
+	 * @return mixed
 	 */
-	public function removeFirstWhereClause()
+	public static function noConstraints(Closure $callback)
 	{
-		$first = array_shift($this->getBaseQuery()->wheres);
-
-		$bindings = $this->getBaseQuery()->getBindings();
+		static::$constraints = false;
 
 		// When resetting the relation where clause, we want to shift the first element
 		// off of the bindings, leaving only the constraints that the developers put
 		// as "extra" on the relationships, and not original relation constraints.
-		if (array_key_exists('value', $first))
-		{
-			$bindings = array_slice($bindings, 1);
-		}
+		$results = call_user_func($callback);
 
-		$this->getBaseQuery()->setBindings(array_values($bindings));
+		static::$constraints = true;
+
+		return $results;
 	}
 
 	/**
 	 * Get all of the primary keys for an array of models.
 	 *
-	 * @param  array  $models
+	 * @param  array   $models
+	 * @param  string  $key
 	 * @return array
 	 */
-	protected function getKeys(array $models)
+	protected function getKeys(array $models, $key = null)
 	{
-		return array_values(array_map(function($value)
+		return array_unique(array_values(array_map(function($value) use ($key)
 		{
-			return $value->getKey();
+			return $key ? $value->getAttribute($key) : $value->getKey();
 
-		}, $models));
+		}, $models)));
 	}
 
 	/**
@@ -193,6 +209,16 @@ abstract class Relation {
 	}
 
 	/**
+	 * Get the fully qualified parent key name.
+	 *
+	 * @return string
+	 */
+	protected function getQualifiedParentKeyName()
+	{
+		return $this->parent->getQualifiedKeyName();
+	}
+
+	/**
 	 * Get the related model of the relation.
 	 *
 	 * @return \Illuminate\Database\Eloquent\Model
@@ -220,6 +246,27 @@ abstract class Relation {
 	public function updatedAt()
 	{
 		return $this->parent->getUpdatedAtColumn();
+	}
+
+	/**
+	 * Get the name of the related model's "updated at" column.
+	 *
+	 * @return string
+	 */
+	public function relatedUpdatedAt()
+	{
+		return $this->related->getUpdatedAtColumn();
+	}
+
+	/**
+	 * Wrap the given value with the parent query's grammar.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	public function wrap($value)
+	{
+		return $this->parent->getQuery()->getGrammar()->wrap($value);
 	}
 
 	/**

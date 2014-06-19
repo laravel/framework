@@ -1,9 +1,13 @@
 <?php namespace Illuminate\Console;
 
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class Command extends \Symfony\Component\Console\Command\Command {
 
@@ -17,14 +21,14 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * The input interface implementation.
 	 *
-	 * @var Symfony\Component\Console\Input\InputInterface
+	 * @var \Symfony\Component\Console\Input\InputInterface
 	 */
 	protected $input;
 
 	/**
 	 * The output interface implementation.
 	 *
-	 * @var Symfony\Component\Console\Output\OutputInterface
+	 * @var \Symfony\Component\Console\Output\OutputInterface
 	 */
 	protected $output;
 
@@ -83,8 +87,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Run the console command.
 	 *
-	 * @param  Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return integer
 	 */
 	public function run(InputInterface $input, OutputInterface $output)
@@ -99,8 +103,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Execute the console command.
 	 *
-	 * @param  Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  Symfony\Component\Console\Output\OutputInterface  $output
+	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
+	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
 	 * @return mixed
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -137,7 +141,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 
 		$arguments['command'] = $command;
 
-		return $instance->run(new ArrayInput($arguments), new NullOutput);	
+		return $instance->run(new ArrayInput($arguments), new NullOutput);
 	}
 
 	/**
@@ -175,9 +179,11 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function confirm($question, $default = true)
 	{
-		$dialog = $this->getHelperSet()->get('dialog');
+		$helper = $this->getHelperSet()->get('question');
 
-		return $dialog->askConfirmation($this->output, "<question>$question</question>", $default);
+		$question = new ConfirmationQuestion("<question>{$question}</question> ", $default);
+
+		return $helper->ask($this->input, $this->output, $question);
 	}
 
 	/**
@@ -189,34 +195,85 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function ask($question, $default = null)
 	{
-		$dialog = $this->getHelperSet()->get('dialog');
+		$helper = $this->getHelperSet()->get('question');
 
-		return $dialog->ask($this->output, "<question>$question</question>", $default);
+		$question = new Question("<question>$question</question>", $default);
+
+		return $helper->ask($this->input, $this->output, $question);
 	}
+
+	/**
+	 * Prompt the user for input with auto completion.
+	 *
+	 * @param  string $question
+	 * @param  array  $choices
+	 * @param  string $default
+	 * @return string
+	 */
+	public function askWithCompletion($question, array $choices, $default = null)
+	{
+		$helper = $this->getHelperSet()->get('question');
+
+		$question = new Question("<question>$question</question>", $default);
+
+		$question->setAutocompleterValues($choices);
+
+		return $helper->ask($this->input, $this->output, $question);
+	}
+
 
 	/**
 	 * Prompt the user for input but hide the answer from the console.
 	 *
 	 * @param  string  $question
-	 * @param  string  $default
+	 * @param  bool    $fallback
 	 * @return string
 	 */
-	public function secret($question, $default = null)
+	public function secret($question, $fallback = true)
 	{
-		$dialog = $this->getHelperSet()->get('dialog');
+		$helper = $this->getHelperSet()->get('question');
 
-		return $dialog->askHiddenResponse($this->output, "<question>$question</question>", $default);
+		$question = new Question("<question>$question</question>");
+
+		$question->setHidden(true)->setHiddenFallback($fallback);
+
+		return $helper->ask($this->input, $this->output, $question);
 	}
 
 	/**
-	 * Write a string as standard output.
+	 * Give the user a single choice from an array of answers.
 	 *
-	 * @param  string  $string
-	 * @return void
+	 * @param  string $question
+	 * @param  array  $choices
+	 * @param  string $default
+	 * @param  bool   $multiple
+	 * @param  mixed  $attempts
+	 * @return bool
 	 */
-	public function line($string)
+	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
 	{
-		$this->output->writeln($string);
+		$helper = $this->getHelperSet()->get('question');
+
+		$question = new ChoiceQuestion("<question>$question</question>", $choices, $default);
+
+		$question->setMaxAttempts($attempts)->setMultiselect($multiple);
+
+		return $helper->ask($this->input, $this->output, $question);
+	}
+
+    /**
+     * Format input to textual table
+     *
+     * @param  array $headers
+     * @param  array $rows
+     * @param string $style
+     * @return void
+     */
+	public function table(array $headers, array $rows, $style = 'default')
+	{
+		$table = new Table($this->output);
+
+		$table->setHeaders($headers)->setRows($rows)->setStyle($style)->render();
 	}
 
 	/**
@@ -228,6 +285,17 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	public function info($string)
 	{
 		$this->output->writeln("<info>$string</info>");
+	}
+
+	/**
+	 * Write a string as standard output.
+	 *
+	 * @param  string  $string
+	 * @return void
+	 */
+	public function line($string)
+	{
+		$this->output->writeln($string);
 	}
 
 	/**
@@ -286,7 +354,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Get the output implementation.
 	 *
-	 * @return Symfony\Component\Console\Output\OutputInterface
+	 * @return \Symfony\Component\Console\Output\OutputInterface
 	 */
 	public function getOutput()
 	{

@@ -1,11 +1,13 @@
-<?php namespace Illuminate\Cache; use Illuminate\Filesystem\Filesystem;
+<?php namespace Illuminate\Cache;
+
+use Illuminate\Filesystem\Filesystem;
 
 class FileStore implements StoreInterface {
 
 	/**
 	 * The Illuminate Filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -19,8 +21,8 @@ class FileStore implements StoreInterface {
 	/**
 	 * Create a new file cache store instance.
 	 *
-	 * @param  \Illuminate\Filesystem  $files
-	 * @param  string                 $directory
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  string  $directory
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $directory)
@@ -47,7 +49,14 @@ class FileStore implements StoreInterface {
 			return null;
 		}
 
-		$expire = substr($contents = $this->files->get($path), 0, 10);
+		try
+		{
+			$expire = substr($contents = $this->files->get($path), 0, 10);
+		}
+		catch (\Exception $e)
+		{
+			return null;
+		}
 
 		// If the current time is greater than expiration timestamps we will delete
 		// the file and return null. This helps clean up the old files and keeps
@@ -72,14 +81,27 @@ class FileStore implements StoreInterface {
 	{
 		$value = $this->expiration($minutes).serialize($value);
 
-		$path = $this->path($key);
-
-		if ( ! $this->files->isDirectory($directory = dirname($path)))
-		{
-			$this->files->makeDirectory($directory, 0777, true);
-		}
+		$this->createCacheDirectory($path = $this->path($key));
 
 		$this->files->put($path, $value);
+	}
+
+	/**
+	 * Create the file cache directory if necessary.
+	 *
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function createCacheDirectory($path)
+	{
+		try
+		{
+			$this->files->makeDirectory(dirname($path), 0777, true, true);
+		}
+		catch (\Exception $e)
+		{
+			//
+		}
 	}
 
 	/**
@@ -88,6 +110,8 @@ class FileStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 *
+	 * @throws \LogicException
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -95,15 +119,17 @@ class FileStore implements StoreInterface {
 	}
 
 	/**
-	 * Increment the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 *
+	 * @throws \LogicException
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		throw new \LogicException("Decrement operations not supported by this driver.");
 	}
 
 	/**
@@ -122,11 +148,18 @@ class FileStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		$this->files->delete($this->path($key));
+		$file = $this->path($key);
+
+		if ($this->files->exists($file))
+		{
+			return $this->files->delete($file);
+		}
+
+		return false;
 	}
 
 	/**
@@ -136,7 +169,10 @@ class FileStore implements StoreInterface {
 	 */
 	public function flush()
 	{
-		$this->files->cleanDirectory($this->directory);
+		foreach ($this->files->directories($this->directory) as $directory)
+		{
+			$this->files->deleteDirectory($directory);
+		}
 	}
 
 	/**
@@ -168,7 +204,7 @@ class FileStore implements StoreInterface {
 	/**
 	 * Get the Filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{
@@ -183,6 +219,16 @@ class FileStore implements StoreInterface {
 	public function getDirectory()
 	{
 		return $this->directory;
+	}
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix()
+	{
+		return '';
 	}
 
 }

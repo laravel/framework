@@ -1,6 +1,6 @@
 {
     "name": "illuminate/exception",
-    "keywords": ["laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,25 +8,23 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "filp/whoops": "1.0.1",
-        "illuminate/support": "4.0.x",
-        "symfony/http-foundation": "2.3.x",
-        "symfony/http-kernel": "2.3.*"
+        "php": ">=5.4.0",
+        "filp/whoops": "1.1.*",
+        "illuminate/support": "4.3.*",
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*"
     },
     "require-dev": {
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "monolog/monolog": "~1.6"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Exception": ""
+        "psr-4": {
+            "Illuminate\\Exception\\": ""
         }
     },
-    "target-dir": "Illuminate/Exception",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

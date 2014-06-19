@@ -1,6 +1,6 @@
 {
     "name": "illuminate/session",
-    "description": "A tidy, simple session library.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,27 +8,26 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/cache": "4.0.x",
-        "illuminate/cookie": "4.0.x",
-        "illuminate/encryption": "4.0.x",
-        "illuminate/support": "4.0.x",
-        "symfony/http-foundation": "2.3.*"
+        "php": ">=5.4.0",
+        "illuminate/cache": "4.3.*",
+        "illuminate/cookie": "4.3.*",
+        "illuminate/encryption": "4.3.*",
+        "illuminate/support": "4.3.*",
+        "nesbot/carbon": "~1.0",
+        "symfony/finder": "2.5.*",
+        "symfony/http-foundation": "2.5.*"
     },
     "require-dev": {
-        "illuminate/console": "4.0.x",
-        "mockery/mockery": ">=0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/console": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Session": ""
+        "psr-4": {
+            "Illuminate\\Session\\": ""
         }
     },
-    "target-dir": "Illuminate/Session",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

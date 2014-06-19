@@ -38,6 +38,24 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSlashesAreHandled()
+	{
+		$container = new Container;
+		$container->bind('\Foo', function() { return 'hello'; });
+		$this->assertEquals('hello', $container->make('Foo'));
+	}
+
+
+	public function testParametersCanOverrideDependencies()
+	{
+		$container = new Container;
+		$stub = new ContainerDependentStub($mock = $this->getMock('IContainerContractStub'));
+		$resolved = $container->make('ContainerNestedDependentStub', array($stub));
+		$this->assertTrue($resolved instanceof ContainerNestedDependentStub);
+		$this->assertEquals($mock, $resolved->inner->impl);
+	}
+
+
 	public function testSharedConcreteResolution()
 	{
 		$container = new Container;
@@ -173,6 +191,18 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExtendInstancesArePreserved()
+	{
+		$container = new Container;
+		$container->bind('foo', function() { $obj = new StdClass; $obj->foo = 'bar'; return $obj; });
+		$obj = new StdClass; $obj->foo = 'foo';
+		$container->instance('foo', $obj);
+		$container->extend('foo', function($obj, $container) { $obj->bar = 'baz'; return $obj; });
+		$container->extend('foo', function($obj, $container) { $obj->baz = 'foo'; return $obj; });
+		$this->assertEquals('foo', $container->make('foo')->foo);
+	}
+
+
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
@@ -194,14 +224,88 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testResolvingCallbacksAreCalled()
+	public function testResolvingCallbacksAreCalledForSpecificAbstracts()
 	{
 		$container = new Container;
-		$container->resolving(function($object) { return $object->name = 'taylor'; });
+		$container->resolving('foo', function($object) { return $object->name = 'taylor'; });
 		$container->bind('foo', function() { return new StdClass; });
 		$instance = $container->make('foo');
 
 		$this->assertEquals('taylor', $instance->name);
+	}
+
+
+	public function testResolvingCallbacksAreCalled()
+	{
+		$container = new Container;
+		$container->resolvingAny(function($object) { return $object->name = 'taylor'; });
+		$container->bind('foo', function() { return new StdClass; });
+		$instance = $container->make('foo');
+
+		$this->assertEquals('taylor', $instance->name);
+	}
+
+
+	public function testUnsetRemoveBoundInstances()
+	{
+		$container = new Container;
+		$container->instance('object', new StdClass);
+		unset($container['object']);
+
+		$this->assertFalse($container->bound('object'));
+	}
+
+
+	public function testReboundListeners()
+	{
+		unset($_SERVER['__test.rebind']);
+
+		$container = new Container;
+		$container->bind('foo', function() {});
+		$container->rebinding('foo', function() { $_SERVER['__test.rebind'] = true; });
+		$container->bind('foo', function() {});
+
+		$this->assertTrue($_SERVER['__test.rebind']);
+	}
+
+
+	public function testReboundListenersOnInstances()
+	{
+		unset($_SERVER['__test.rebind']);
+
+		$container = new Container;
+		$container->instance('foo', function() {});
+		$container->rebinding('foo', function() { $_SERVER['__test.rebind'] = true; });
+		$container->instance('foo', function() {});
+
+		$this->assertTrue($_SERVER['__test.rebind']);
+	}
+
+
+	public function testPassingSomePrimitiveParameters()
+	{
+		$container = new Container;
+		$value = $container->make('ContainerMixedPrimitiveStub', array('first' => 'taylor', 'last' => 'otwell'));
+		$this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
+		$this->assertEquals('taylor', $value->first);
+		$this->assertEquals('otwell', $value->last);
+		$this->assertInstanceOf('ContainerConcreteStub', $value->stub);
+
+		$container = new Container;
+		$value = $container->make('ContainerMixedPrimitiveStub', array(0 => 'taylor', 2 => 'otwell'));
+		$this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
+		$this->assertEquals('taylor', $value->first);
+		$this->assertEquals('otwell', $value->last);
+		$this->assertInstanceOf('ContainerConcreteStub', $value->stub);
+	}
+
+
+	public function testCreatingBoundConcreteClassPassesParameters() {
+		$container = new Container;
+		$container->bind('TestAbstractClass', 'ContainerConstructorParameterLoggingStub');
+		$parameters = array('First', 'Second');
+		$instance = $container->make('TestAbstractClass', $parameters);
+		$this->assertEquals($parameters, $instance->receivedParameters);
 	}
 
 }
@@ -236,3 +340,23 @@ class ContainerDefaultValueStub {
 		$this->default = $default;
 	}
 }
+
+class ContainerMixedPrimitiveStub {
+	public $first; public $last; public $stub;
+	public function __construct($first, ContainerConcreteStub $stub, $last)
+	{
+		$this->stub = $stub;
+		$this->last = $last;
+		$this->first = $first;
+	}
+}
+
+class ContainerConstructorParameterLoggingStub {
+	public $receivedParameters;
+
+	public function __construct($first, $second)
+	{
+		$this->receivedParameters = func_get_args();
+	}
+}
+

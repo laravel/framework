@@ -1,10 +1,6 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Closure;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator {
@@ -19,7 +15,7 @@ class Migrator {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -49,7 +45,7 @@ class Migrator {
 	 *
 	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-	 * @param  \Illuminate\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(MigrationRepositoryInterface $repository,
@@ -76,7 +72,7 @@ class Migrator {
 
 		// Once we grab all of the migration files for the path, we will compare them
 		// against the migrations that have already been run for this package then
-		// run all of the oustanding migrations against the database connection.
+		// run each of the outstanding migrations against a database connection.
 		$ran = $this->repository->getRan();
 
 		$migrations = array_diff($files, $ran);
@@ -87,8 +83,8 @@ class Migrator {
 	/**
 	 * Run an array of migrations.
 	 *
-	 * @param  array   $migrations
-	 * @param  bool    $pretend
+	 * @param  array  $migrations
+	 * @param  bool   $pretend
 	 * @return void
 	 */
 	public function runMigrationList($migrations, $pretend = false)
@@ -147,7 +143,7 @@ class Migrator {
 	/**
 	 * Rollback the last migration operation.
 	 *
-	 * @param  bool   $pretend
+	 * @param  bool  $pretend
 	 * @return int
 	 */
 	public function rollback($pretend = false)
@@ -180,8 +176,8 @@ class Migrator {
 	/**
 	 * Run "down" a migration instance.
 	 *
-	 * @param  StdClass  $migration
-	 * @param  bool  $pretend
+	 * @param  object  $migration
+	 * @param  bool    $pretend
 	 * @return void
 	 */
 	protected function runDown($migration, $pretend)
@@ -325,11 +321,12 @@ class Migrator {
 	/**
 	 * Resolve the database connection instance.
 	 *
+	 * @param  string  $connection
 	 * @return \Illuminate\Database\Connection
 	 */
-	public function resolveConnection()
+	public function resolveConnection($connection)
 	{
-		return $this->resolver->connection($this->connection);
+		return $this->resolver->connection($connection);
 	}
 
 	/**
@@ -373,7 +370,7 @@ class Migrator {
 	/**
 	 * Get the file system instance.
 	 *
-	 * @return \Illuminate\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{

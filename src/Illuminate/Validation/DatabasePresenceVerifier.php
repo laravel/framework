@@ -37,15 +37,21 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 * @param  string  $value
 	 * @param  int     $excludeId
 	 * @param  string  $idColumn
+	 * @param  array   $extra
 	 * @return int
 	 */
-	public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null)
+	public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = array())
 	{
 		$query = $this->table($collection)->where($column, '=', $value);
 
-		if ( ! is_null($excludeId))
+		if ( ! is_null($excludeId) && $excludeId != 'NULL')
 		{
 			$query->where($idColumn ?: 'id', '<>', $excludeId);
+		}
+
+		foreach ($extra as $key => $extraValue)
+		{
+			$this->addWhere($query, $key, $extraValue);
 		}
 
 		return $query->count();
@@ -57,11 +63,43 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 * @param  string  $collection
 	 * @param  string  $column
 	 * @param  array   $values
+	 * @param  array   $extra
 	 * @return int
 	 */
-	public function getMultiCount($collection, $column, array $values)
+	public function getMultiCount($collection, $column, array $values, array $extra = array())
 	{
-		return $this->table($collection)->whereIn($column, $values)->count();
+		$query = $this->table($collection)->whereIn($column, $values);
+
+		foreach ($extra as $key => $extraValue)
+		{
+			$this->addWhere($query, $key, $extraValue);
+		}
+
+		return $query->count();
+	}
+
+	/**
+	 * Add a "where" clause to the given query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  string  $key
+	 * @param  string  $extraValue
+	 * @return void
+	 */
+	protected function addWhere($query, $key, $extraValue)
+	{
+		if ($extraValue === 'NULL')
+		{
+			$query->whereNull($key);
+		}
+		elseif ($extraValue === 'NOT_NULL')
+		{
+			$query->whereNotNull($key);
+		}
+		else
+		{
+			$query->where($key, $extraValue);
+		}
 	}
 
 	/**

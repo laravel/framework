@@ -1,5 +1,6 @@
 {
     "name": "illuminate/html",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -7,24 +8,19 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/http": "4.0.x",
-        "illuminate/session": "4.0.x",
-        "illuminate/support": "4.0.x"
-    },
-    "require-dev": {
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "php": ">=5.4.0",
+        "illuminate/http": "4.3.*",
+        "illuminate/session": "4.3.*",
+        "illuminate/support": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Html": ""
+        "psr-4": {
+            "Illuminate\\Html\\": ""
         }
     },
-    "target-dir": "Illuminate/Html",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

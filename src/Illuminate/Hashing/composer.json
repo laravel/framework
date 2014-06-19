@@ -1,7 +1,6 @@
 {
     "name": "illuminate/hashing",
-    "description": "A password hashing library.",
-    "keywords": ["hashing", "password", "bcrypt"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -9,22 +8,18 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.0.x",
-        "ircmaxell/password-compat": "1.0.*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "3.7.*"
+        "php": ">=5.4.0",
+        "illuminate/support": "4.3.*",
+        "ircmaxell/password-compat": "~1.0"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Hashing": ""
+        "psr-4": {
+            "Illuminate\\Hashing\\": ""
         }
     },
-    "target-dir": "Illuminate/Hashing",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

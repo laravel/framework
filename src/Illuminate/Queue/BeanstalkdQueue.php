@@ -21,15 +21,24 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	protected $default;
 
 	/**
+	 * The "time to run" for all pushed jobs.
+	 *
+	 * @var int
+	 */
+	protected $timeToRun;
+
+	/**
 	 * Create a new Beanstalkd queue instance.
 	 *
 	 * @param  Pheanstalk  $pheanstalk
 	 * @param  string  $default
+	 * @param  int  $timeToRun
 	 * @return void
 	 */
-	public function __construct(Pheanstalk $pheanstalk, $default)
+	public function __construct(Pheanstalk $pheanstalk, $default, $timeToRun)
 	{
 		$this->default = $default;
+		$this->timeToRun = $timeToRun;
 		$this->pheanstalk = $pheanstalk;
 	}
 
@@ -39,23 +48,36 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$payload = $this->createPayload($job, $data);
+		return $this->pushRaw($this->createPayload($job, $data), $queue);
+	}
 
-		$this->pheanstalk->useTube($this->getQueue($queue))->put($payload);
+	/**
+	 * Push a raw payload onto the queue.
+	 *
+	 * @param  string  $payload
+	 * @param  string  $queue
+	 * @param  array   $options
+	 * @return mixed
+	 */
+	public function pushRaw($payload, $queue = null, array $options = array())
+	{
+		return $this->pheanstalk->useTube($this->getQueue($queue))->put(
+			$payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
+		);
 	}
 
 	/**
 	 * Push a new job onto the queue after a delay.
 	 *
-	 * @param  int     $delay
+	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function later($delay, $job, $data = '', $queue = null)
 	{
@@ -63,7 +85,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 
 		$pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
 
-		$pheanstalk->put($payload, Pheanstalk::DEFAULT_PRIORITY, $delay);
+		return $pheanstalk->put($payload, Pheanstalk::DEFAULT_PRIORITY, $this->getSeconds($delay), $this->timeToRun);
 	}
 
 	/**
@@ -74,12 +96,26 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 */
 	public function pop($queue = null)
 	{
-		$job = $this->pheanstalk->watchOnly($this->getQueue($queue))->reserve(0);
+		$queue = $this->getQueue($queue);
+
+		$job = $this->pheanstalk->watchOnly($queue)->reserve(0);
 
 		if ($job instanceof Pheanstalk_Job)
 		{
-			return new BeanstalkdJob($this->container, $this->pheanstalk, $job);
+			return new BeanstalkdJob($this->container, $this->pheanstalk, $job, $queue);
 		}
+	}
+
+	/**
+	 * Delete a message from the Beanstalk queue.
+	 *
+	 * @param  string  $queue
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function deleteMessage($queue, $id)
+	{
+		$this->pheanstalk->useTube($this->getQueue($queue))->delete($id);
 	}
 
 	/**
@@ -88,7 +124,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 * @param  string|null  $queue
 	 * @return string
 	 */
-	protected function getQueue($queue)
+	public function getQueue($queue)
 	{
 		return $queue ?: $this->default;
 	}

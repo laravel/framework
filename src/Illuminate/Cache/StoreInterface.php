@@ -30,7 +30,7 @@ interface StoreInterface {
 	public function increment($key, $value = 1);
 
 	/**
-	 * Increment the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
@@ -51,7 +51,7 @@ interface StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key);
 
@@ -61,5 +61,12 @@ interface StoreInterface {
 	 * @return void
 	 */
 	public function flush();
+
+	/**
+	 * Get the cache key prefix.
+	 *
+	 * @return string
+	 */
+	public function getPrefix();
 
 }

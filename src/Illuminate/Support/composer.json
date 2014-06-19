@@ -1,6 +1,6 @@
 {
     "name": "illuminate/support",
-    "description": "Various utilities and support functions.",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,25 +8,23 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.4.0"
     },
     "require-dev": {
-        "patchwork/utf8": "1.1.*",
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "jeremeamia/superclosure": "~1.0",
+        "patchwork/utf8": "1.1.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Support": ""
+        "psr-4": {
+            "Illuminate\\Support\\": ""
         },
         "files": [
-            "Illuminate/Support/helpers.php"
+            "helpers.php"
         ]
     },
-    "target-dir": "Illuminate/Support",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

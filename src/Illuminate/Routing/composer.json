@@ -1,7 +1,6 @@
 {
     "name": "illuminate/routing",
-    "description": "A swift routing and dispatch component.",
-    "keywords": ["laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -9,29 +8,27 @@
         }
     ],
     "require": {
-        "illuminate/container": "4.0.x",
-        "illuminate/http": "4.0.x",
-        "illuminate/session": "4.0.x",
-        "illuminate/support": "4.0.x",
-        "symfony/http-foundation": "2.3.*",
-        "symfony/http-kernel": "2.3.*",
-        "symfony/routing": "2.3.*"
+        "php": ">=5.4.0",
+        "illuminate/container": "4.3.*",
+        "illuminate/http": "4.3.*",
+        "illuminate/session": "4.3.*",
+        "illuminate/support": "4.3.*",
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*",
+        "symfony/routing": "2.5.*"
     },
     "require-dev": {
-        "illuminate/console": "4.0.x",
-        "illuminate/filesystem": "4.0.x",
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/console": "4.3.*",
+        "illuminate/filesystem": "4.3.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Routing": ""
+        "psr-4": {
+            "Illuminate\\Routing\\": ""
         }
     },
-    "target-dir": "Illuminate/Routing",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

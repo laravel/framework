@@ -10,19 +10,9 @@ abstract class Engine {
 	protected $lastRendered;
 
 	/**
-	 * Determine if the engine is sectionable.
-	 *
-	 * @return bool
-	 */
-	public function isSectionable()
-	{
-		return $this instanceof SectionableInterface;
-	}
-
-	/**
 	 * Get the last view that was rendered.
 	 *
-	 * @var string
+	 * @return string
 	 */
 	public function getLastRendered()
 	{

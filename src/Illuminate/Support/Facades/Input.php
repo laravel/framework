@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Facades;
 
+/**
+ * @see \Illuminate\Http\Request
+ */
 class Input extends Facade {
 
 	/**

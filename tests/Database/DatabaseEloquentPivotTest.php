@@ -24,14 +24,36 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
+	public function testPropertiesUnchangedAreNotDirty()
 	{
 		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+		$pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
+
+		$this->assertEquals(array(), $pivot->getDirty());
+	}
+
+
+	public function testPropertiesChangedAreDirty()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+		$pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
+		$pivot->shimy = 'changed';
+
+		$this->assertEquals(array('shimy' => 'changed'), $pivot->getDirty());
+	}
+
+
+	public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
 		$parent->shouldReceive('getConnectionName')->andReturn('connection');
-		$pivot = new Pivot($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
+		$parent->shouldReceive('getDates')->andReturn(array());
+		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
 		$this->assertTrue($pivot->timestamps);
 
-		$pivot = new Pivot($parent, array('foo' => 'bar'), 'table');
+		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar'), 'table');
 		$this->assertFalse($pivot->timestamps);
 	}
 
@@ -62,7 +84,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('other', 'other.value')->andReturn($query);
 		$query->shouldReceive('delete')->once()->andReturn(true);
 		$pivot->expects($this->once())->method('newQuery')->will($this->returnValue($query));
-		
+
 		$this->assertTrue($pivot->delete());
 	}
 
@@ -70,3 +92,10 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 
 class DatabaseEloquentPivotTestModelStub extends Illuminate\Database\Eloquent\Model {}
+
+class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot {
+	public function getDates()
+	{
+		return array();
+	}
+}

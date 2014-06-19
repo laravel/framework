@@ -77,6 +77,16 @@ abstract class ServiceProvider {
 			$this->app['translator']->addNamespace($namespace, $lang);
 		}
 
+		// Next, we will see if the application view folder contains a folder for the
+		// package and namespace. If it does, we'll give that folder precedence on
+		// the loader list for the views so the package views can be overridden.
+		$appView = $this->getAppViewPath($package);
+
+		if ($this->app['files']->isDirectory($appView))
+		{
+			$this->app['view']->addNamespace($namespace, $appView);
+		}
+
 		// Finally we will register the view namespace so that we can access each of
 		// the views available in this package. We use a standard convention when
 		// registering the paths to every package's views and other components.
@@ -95,39 +105,9 @@ abstract class ServiceProvider {
 	 */
 	public function guessPackagePath()
 	{
-		$reflect = new ReflectionClass($this);
-
-		// We want to get the class that is closest to this base class in the chain of
-		// classes extending it. That should be the original service provider given
-		// by the package and should allow us to guess the location of resources.
-		$chain = $this->getClassChain($reflect);
-
-		$path = $chain[count($chain) - 2]->getFileName();
+		$path = with(new ReflectionClass($this))->getFileName();
 
 		return realpath(dirname($path).'/../../');
-	}
-
-	/**
-	 * Get a class from the ReflectionClass inheritance chain.
-	 *
-	 * @param  ReflectionClass  $reflection
-	 * @return array
-	 */
-	protected function getClassChain(ReflectionClass $reflect)
-	{
-		$lastName = null;
-
-		// This loop essentially walks the inheritance chain of the classes starting
-		// at the most "childish" class and walks back up to this class. Once we
-		// get to the end of the chain we will bail out and return the offset.
-		while ($reflect !== false)
-		{
-			$classes[] = $reflect;
-
-			$reflect = $reflect->getParentClass();
-		}
-
-		return $classes;
 	}
 
 	/**
@@ -150,12 +130,12 @@ abstract class ServiceProvider {
 	/**
 	 * Register the package's custom Artisan commands.
 	 *
-	 * @param  dynamic  string
+	 * @param  array  $commands
 	 * @return void
 	 */
-	public function commands()
+	public function commands($commands)
 	{
-		$commands = func_get_args();
+		$commands = is_array($commands) ? $commands : func_get_args();
 
 		// To register the commands with Artisan, we will grab each of the arguments
 		// passed into the method and listen for Artisan "start" event which will
@@ -169,11 +149,32 @@ abstract class ServiceProvider {
 	}
 
 	/**
+	 * Get the application package view path.
+	 *
+	 * @param  string  $package
+	 * @return string
+	 */
+	protected function getAppViewPath($package)
+	{
+		return $this->app['path']."/views/packages/{$package}";
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
 	 */
 	public function provides()
+	{
+		return array();
+	}
+
+	/**
+	 * Get the events that trigger this service provider to register.
+	 *
+	 * @return array
+	 */
+	public function when()
 	{
 		return array();
 	}

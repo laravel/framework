@@ -21,7 +21,22 @@ class AuthManager extends Manager {
 
 		$guard->setDispatcher($this->app['events']);
 
-		return $guard->setRequest($this->app['request']);
+		return $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
+	}
+
+	/**
+	 * Call a custom driver creator.
+	 *
+	 * @param  string  $driver
+	 * @return mixed
+	 */
+	protected function callCustomCreator($driver)
+	{
+		$custom = parent::callCustomCreator($driver);
+
+		if ($custom instanceof Guard) return $custom;
+
+		return new Guard($custom, $this->app['session.store']);
 	}
 
 	/**
@@ -29,11 +44,11 @@ class AuthManager extends Manager {
 	 *
 	 * @return \Illuminate\Auth\Guard
 	 */
-	protected function createDatabaseDriver()
+	public function createDatabaseDriver()
 	{
 		$provider = $this->createDatabaseProvider();
 
-		return new Guard($provider, $this->app['session']);
+		return new Guard($provider, $this->app['session.store']);
 	}
 
 	/**
@@ -62,7 +77,7 @@ class AuthManager extends Manager {
 	{
 		$provider = $this->createEloquentProvider();
 
-		return new Guard($provider, $this->app['session']);
+		return new Guard($provider, $this->app['session.store']);
 	}
 
 	/**
@@ -82,9 +97,20 @@ class AuthManager extends Manager {
 	 *
 	 * @return string
 	 */
-	protected function getDefaultDriver()
+	public function getDefaultDriver()
 	{
 		return $this->app['config']['auth.driver'];
+	}
+
+	/**
+	 * Set the default authentication driver name.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setDefaultDriver($name)
+	{
+		$this->app['config']['auth.driver'] = $name;
 	}
 
 }

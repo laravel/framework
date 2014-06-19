@@ -4,7 +4,8 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Log\Writer;
-use Illuminate\View\Environment;
+use Illuminate\View\Factory;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
@@ -12,18 +13,25 @@ use Illuminate\Support\SerializableClosure;
 class Mailer {
 
 	/**
-	 * The view environment instance.
+	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Environment
+	 * @var \Illuminate\View\Factory
 	 */
 	protected $views;
 
 	/**
 	 * The Swift Mailer instance.
 	 *
-	 * @var Swift_Mailer
+	 * @var \Swift_Mailer
 	 */
 	protected $swift;
+
+	/**
+	 * The event dispatcher instance.
+	 *
+	 * @var \Illuminate\Events\Dispatcher
+	 */
+	protected $events;
 
 	/**
 	 * The global from address and name.
@@ -42,9 +50,16 @@ class Mailer {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
+
+	/*
+	 * The QueueManager instance.
+	 *
+	 * @var \Illuminate\Queue\QueueManager
+	 */
+	protected $queue;
 
 	/**
 	 * Indicates if the actual sending is disabled.
@@ -54,16 +69,31 @@ class Mailer {
 	protected $pretending = false;
 
 	/**
+	 * Array of failed recipients.
+	 *
+	 * @var array
+	 */
+	protected $failedRecipients = array();
+
+	/**
+	 * Array of parsed views containing html and text view name.
+	 *
+	 * @var array
+	 */
+	protected $parsedViews = array();
+
+	/**
 	 * Create a new Mailer instance.
 	 *
-	 * @param  \Illuminate\View\Environment  $views
-	 * @param  Swift_Mailer  $swift
+	 * @param  \Illuminate\View\Factory  $views
+	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
-	public function __construct(Environment $views, Swift_Mailer $swift)
+	public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
 	{
 		$this->views = $views;
 		$this->swift = $swift;
+		$this->events = $events;
 	}
 
 	/**
@@ -83,8 +113,8 @@ class Mailer {
 	 *
 	 * @param  string  $view
 	 * @param  array   $data
-	 * @param  mixed  $callback
-	 * @return void
+	 * @param  mixed   $callback
+	 * @return int
 	 */
 	public function plain($view, array $data, $callback)
 	{
@@ -117,7 +147,7 @@ class Mailer {
 
 		$message = $message->getSwiftMessage();
 
-		return $this->sendSwiftMessage($message);
+		$this->sendSwiftMessage($message);
 	}
 
 	/**
@@ -139,15 +169,15 @@ class Mailer {
 	/**
 	 * Queue a new e-mail message for sending on the given queue.
 	 *
+	 * @param  string  $queue
 	 * @param  string|array  $view
 	 * @param  array   $data
 	 * @param  Closure|string  $callback
-	 * @param  string  $queue
 	 * @return void
 	 */
 	public function queueOn($queue, $view, array $data, $callback)
 	{
-		return $this->queue($view, $data, $callback, $queue);
+		$this->queue($view, $data, $callback, $queue);
 	}
 
 	/**
@@ -179,7 +209,7 @@ class Mailer {
 	 */
 	public function laterOn($queue, $delay, $view, array $data, $callback)
 	{
-		return $this->later($delay, $view, $data, $callback, $queue);
+		$this->later($delay, $view, $data, $callback, $queue);
 	}
 
 	/**
@@ -252,6 +282,8 @@ class Mailer {
 	 *
 	 * @param  string|array  $view
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseView($view)
 	{
@@ -260,7 +292,7 @@ class Mailer {
 		// If the given view is an array with numeric keys, we will just assume that
 		// both a "pretty" and "plain" view were provided, so we will return this
 		// array as is, since must should contain both views with numeric keys.
-		if (is_array($view) and isset($view[0]))
+		if (is_array($view) && isset($view[0]))
 		{
 			return $view;
 		}
@@ -274,21 +306,26 @@ class Mailer {
 				array_get($view, 'html'), array_get($view, 'text')
 			);
 		}
-		
+
 		throw new \InvalidArgumentException("Invalid view.");
 	}
 
 	/**
 	 * Send a Swift Message instance.
 	 *
-	 * @param  Swift_Message  $message
+	 * @param  \Swift_Message  $message
 	 * @return void
 	 */
 	protected function sendSwiftMessage($message)
 	{
+		if ($this->events)
+		{
+			$this->events->fire('mailer.sending', array($message));
+		}
+
 		if ( ! $this->pretending)
 		{
-			return $this->swift->send($message);
+			$this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
 		{
@@ -299,12 +336,12 @@ class Mailer {
 	/**
 	 * Log that a message was sent.
 	 *
-	 * @param  Swift_Message  $message
+	 * @param  \Swift_Message  $message
 	 * @return void
 	 */
 	protected function logMessage($message)
 	{
-		$emails = implode(', ', array_keys($message->getTo()));
+		$emails = implode(', ', array_keys((array) $message->getTo()));
 
 		$this->logger->info("Pretending to mail message to: {$emails}");
 	}
@@ -314,7 +351,9 @@ class Mailer {
 	 *
 	 * @param  Closure|string  $callback
 	 * @param  \Illuminate\Mail\Message  $message
-	 * @return void
+	 * @return mixed
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function callMessageBuilder($callback, $message)
 	{
@@ -374,11 +413,21 @@ class Mailer {
 	}
 
 	/**
-	 * Get the view environment instance.
+	 * Check if the mailer is pretending to send messages.
 	 *
-	 * @return \Illuminate\View\Environment
+	 * @return bool
 	 */
-	public function getViewEnvironment()
+	public function isPretending()
+	{
+		return $this->pretending;
+	}
+
+	/**
+	 * Get the view factory instance.
+	 *
+	 * @return \Illuminate\View\Factory
+	 */
+	public function getViewFactory()
 	{
 		return $this->views;
 	}
@@ -386,7 +435,7 @@ class Mailer {
 	/**
 	 * Get the Swift Mailer instance.
 	 *
-	 * @return Swift_Mailer
+	 * @return \Swift_Mailer
 	 */
 	public function getSwiftMailer()
 	{
@@ -394,9 +443,19 @@ class Mailer {
 	}
 
 	/**
+	 * Get the array of failed recipients.
+	 *
+	 * @return array
+	 */
+	public function failures()
+	{
+		return $this->failedRecipients;
+	}
+
+	/**
 	 * Set the Swift Mailer instance.
 	 *
-	 * @param  Swift_Mailer  $swift
+	 * @param  \Swift_Mailer  $swift
 	 * @return void
 	 */
 	public function setSwiftMailer($swift)
@@ -408,7 +467,7 @@ class Mailer {
 	 * Set the log writer instance.
 	 *
 	 * @param  \Illuminate\Log\Writer  $logger
-	 * @return \Illumiante\Mail\Mailer
+	 * @return \Illuminate\Mail\Mailer
 	 */
 	public function setLogger(Writer $logger)
 	{

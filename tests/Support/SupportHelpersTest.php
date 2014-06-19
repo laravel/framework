@@ -2,6 +2,15 @@
 
 class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
+	public function testArrayBuild()
+	{
+		$this->assertEquals(array('foo' => 'bar'), array_build(array('foo' => 'bar'), function($key, $value)
+		{
+			return array($key, $value);
+		}));
+	}
+
+
 	public function testArrayDot()
 	{
 		$array = array_dot(array('name' => 'taylor', 'languages' => array('php' => true)));
@@ -35,10 +44,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testArrayPluck()
+	public function testArrayPluckWithArrayAndObjectValues()
 	{
-		$array = array(array('name' => 'taylor'), array('name' => 'dayle'));
+		$array = array((object) array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar'));
 		$this->assertEquals(array('taylor', 'dayle'), array_pluck($array, 'name'));
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), array_pluck($array, 'email', 'name'));
 	}
 
 
@@ -120,29 +130,40 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(str_is('a', 'a'));
 		$this->assertTrue(str_is('/', '/'));
 		$this->assertTrue(str_is('*dev*', 'localhost.dev'));
+		$this->assertTrue(str_is('foo?bar', 'foo?bar'));
 		$this->assertFalse(str_is('*something', 'foobar'));
 		$this->assertFalse(str_is('foo', 'bar'));
+		$this->assertFalse(str_is('foo.*', 'foobar'));
+		$this->assertFalse(str_is('foo.ar', 'foobar'));
+		$this->assertFalse(str_is('foo?bar', 'foobar'));
+		$this->assertFalse(str_is('foo?bar', 'fobar'));
 	}
 
 
 	public function testStartsWith()
 	{
 		$this->assertTrue(starts_with('jason', 'jas'));
+		$this->assertTrue(starts_with('jason', array('jas')));
 		$this->assertFalse(starts_with('jason', 'day'));
+		$this->assertFalse(starts_with('jason', array('day')));
 	}
 
 
 	public function testEndsWith()
 	{
 		$this->assertTrue(ends_with('jason', 'on'));
+		$this->assertTrue(ends_with('jason', array('on')));
 		$this->assertFalse(ends_with('jason', 'no'));
+		$this->assertFalse(ends_with('jason', array('no')));
 	}
 
 
 	public function testStrContains()
 	{
 		$this->assertTrue(str_contains('taylor', 'ylo'));
+		$this->assertTrue(str_contains('taylor', array('ylo')));
 		$this->assertFalse(str_contains('taylor', 'xxx'));
+		$this->assertFalse(str_contains('taylor', array('xxx')));
 	}
 
 
@@ -174,6 +195,43 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals('foo', value('foo'));
 		$this->assertEquals('foo', value(function() { return 'foo'; }));
+	}
+
+
+	public function testObjectGet()
+	{
+		$class = new StdClass;
+		$class->name = new StdClass;
+		$class->name->first = 'Taylor';
+
+		$this->assertEquals('Taylor', object_get($class, 'name.first'));
+	}
+
+	public function testDataGet()
+	{
+		$object = (object) array('users' => array('name' => array('Taylor', 'Otwell')));
+		$array = array((object) array('users' => array((object) array('name' => 'Taylor'))));
+
+		$this->assertEquals('Taylor', data_get($object, 'users.name.0'));
+		$this->assertEquals('Taylor', data_get($array, '0.users.0.name'));
+		$this->assertNull(data_get($array, '0.users.3'));
+		$this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
+		$this->assertEquals('Not found', data_get($array, '0.users.3', function (){ return 'Not found'; }));
+	}
+
+	public function testArraySort()
+	{
+		$array = array(
+			array('name' => 'baz'),
+			array('name' => 'foo'),
+			array('name' => 'bar'),
+		);
+
+		$this->assertEquals(array(
+			array('name' => 'bar'),
+			array('name' => 'baz'),
+			array('name' => 'foo')),
+		array_values(array_sort($array, function($v) { return $v['name']; })));
 	}
 
 }

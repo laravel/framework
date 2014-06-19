@@ -1,14 +1,14 @@
 <?php namespace Illuminate\Foundation\Console;
 
+use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class RoutesCommand extends Command {
 
-	/**
+    	/**
 	 * The console command name.
 	 *
 	 * @var string
@@ -23,30 +23,40 @@ class RoutesCommand extends Command {
 	protected $description = 'List all registered routes';
 
 	/**
-	 * An array o fall registered routes.
+	 * The router instance.
 	 *
-	 * @var array
+	 * @var \Illuminate\Routing\Router
+	 */
+	protected $router;
+
+	/**
+	 * An array of all the registered routes.
+	 *
+	 * @var \Illuminate\Routing\RouteCollection
 	 */
 	protected $routes;
 
 	/**
-	 * Only desired route info
+	 * The table headers for the command.
 	 *
 	 * @var array
 	 */
-	protected $routesInfo;
+	protected $headers = array(
+		'Domain', 'URI', 'Name', 'Action', 'Before Filters', 'After Filters'
+	);
 
 	/**
 	 * Create a new route command instance.
 	 *
-	 * @param  Symfony\Component\Routing\RouteCollection  $routes
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @return void
 	 */
-	public function __construct(RouteCollection $routes)
+	public function __construct(Router $router)
 	{
 		parent::__construct();
 
-		$this->routes = $routes;
+		$this->router = $router;
+		$this->routes = $router->getRoutes();
 	}
 
 	/**
@@ -73,28 +83,33 @@ class RoutesCommand extends Command {
 	{
 		$results = array();
 
-		foreach($this->routes as $name => $route)
+		foreach($this->routes as $route)
 		{
-			$results[] = $this->getRouteInformation($name, $route);
+			$results[] = $this->getRouteInformation($route);
 		}
 
-		return $results;
+		return array_filter($results);
 	}
 
 	/**
 	 * Get the route information for a given route.
 	 *
 	 * @param  string  $name
-	 * @param  Symfony\Component\Routing\Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return array
 	 */
-	protected function getRouteInformation($name, Route $route)
+	protected function getRouteInformation(Route $route)
 	{
-		$uri = head($route->getMethods()).' '.$route->getPath();
+		$uri = implode('|', $route->methods()).' '.$route->uri();
 
-		$action = $route->getAction() ?: 'Closure';
-
-		return array('uri' => $uri, 'name' => $this->getRouteName($name), 'action' => $action);
+		return $this->filterRoute(array(
+			'host'   => $route->domain(),
+			'uri'    => $uri,
+			'name'   => $route->getName(),
+			'action' => $route->getActionName(),
+			'before' => $this->getBeforeFilters($route),
+			'after'  => $this->getAfterFilters($route)
+		));
 	}
 
 	/**
@@ -105,90 +120,101 @@ class RoutesCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$widths = $this->getCellWidths($routes);
-
-		$this->displayHeadings($widths);
-
-		foreach($routes as $route)
-		{
-			$this->displayRoute($route, $widths);
-		}
+		$this->table($this->headers, $routes);
 	}
 
 	/**
-	 * Display the route table headings.
+	 * Get before filters
 	 *
-	 * @param  array  $widths
-	 * @return void
-	 */
-	protected function displayHeadings(array $widths)
-	{
-		extract($widths);
-
-		$this->comment(str_pad('URI', $uris).str_pad('Name', $names).str_pad('Action', $actions));
-	}
-
-	/**
-	 * Display a route in the route table.
-	 *
-	 * @param  array  $route
-	 * @param  array  $widths
-	 * @return void
-	 */
-	protected function displayRoute(array $route, array $widths)
-	{
-		extract($widths);
-
-		$this->info(
-			str_pad($route['uri'], $uris).str_pad($route['name'], $names).str_pad($route['action'], $actions)
-		);
-	}
-
-	/**
-	 * Get the correct cell spacing per column.
-	 *
-	 * @param  array  $routes
-	 * @return array
-	 */
-	protected function getCellWidths($routes, $padding = 10)
-	{
-		$widths = array();
-
-		foreach($this->getColumns($routes) as $key => $column)
-		{
-			$widths[$key] = max(array_map('strlen', $column)) + $padding;
-		}
-
-		return $widths;
-	}
-
-	/**
-	 * Get the columns for the route table.
-	 *
-	 * @param  array  $routes
-	 * @return array
-	 */
-	protected function getColumns(array $routes)
-	{
-		$columns = array();
-
-		foreach (array('uris', 'actions', 'names') as $key)
-		{
-			$columns[$key] = array_pluck($routes, str_singular($key));
-		}
-
-		return $columns;
-	}
-
-	/**
-	 * Get the route name for the given name.
-	 *
-	 * @param  string  $name
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
-	protected function getRouteName($name)
+	protected function getBeforeFilters($route)
 	{
-		return str_contains($name, ' ') ? '' : $name;
+		$before = array_keys($route->beforeFilters());
+
+		$before = array_unique(array_merge($before, $this->getPatternFilters($route)));
+
+		return implode(', ', $before);
+	}
+
+	/**
+	 * Get all of the pattern filters matching the route.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return array
+	 */
+	protected function getPatternFilters($route)
+	{
+		$patterns = array();
+
+		foreach ($route->methods() as $method)
+		{
+			// For each method supported by the route we will need to gather up the patterned
+			// filters for that method. We will then merge these in with the other filters
+			// we have already gathered up then return them back out to these consumers.
+			$inner = $this->getMethodPatterns($route->uri(), $method);
+
+			$patterns = array_merge($patterns, array_keys($inner));
+		}
+
+		return $patterns;
+	}
+
+	/**
+	 * Get the pattern filters for a given URI and method.
+	 *
+	 * @param  string  $uri
+	 * @param  string  $method
+	 * @return array
+	 */
+	protected function getMethodPatterns($uri, $method)
+	{
+		return $this->router->findPatternFilters(Request::create($uri, $method));
+	}
+
+	/**
+	 * Get after filters
+	 *
+	 * @param  Route  $route
+	 * @return string
+	 */
+	protected function getAfterFilters($route)
+	{
+		return implode(', ', array_keys($route->afterFilters()));
+	}
+
+	/**
+	 * Filter the route by URI and / or name.
+	 *
+	 * @param  array  $route
+	 * @return array|null
+	 */
+	protected function filterRoute(array $route)
+	{
+		if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
+			 $this->option('path') && ! str_contains($route['uri'], $this->option('path')))
+		{
+			return null;
+		}
+		else
+		{
+			return $route;
+		}
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'),
+
+			array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
+		);
 	}
 
 }

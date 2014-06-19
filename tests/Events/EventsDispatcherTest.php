@@ -56,4 +56,41 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor', $_SERVER['__event.test']);
 	}
 
+
+	public function testWildcardListeners()
+	{
+		unset($_SERVER['__event.test']);
+		$d = new Dispatcher;
+		$d->listen('foo.bar', function() { $_SERVER['__event.test'] = 'regular'; });
+		$d->listen('foo.*', function() { $_SERVER['__event.test'] = 'wildcard'; });
+		$d->listen('bar.*', function() { $_SERVER['__event.test'] = 'nope'; });
+		$d->fire('foo.bar');
+
+		$this->assertEquals('wildcard', $_SERVER['__event.test']);
+	}
+
+
+	public function testListenersCanBeRemoved()
+	{
+		unset($_SERVER['__event.test']);
+		$d = new Dispatcher;
+		$d->listen('foo', function() { $_SERVER['__event.test'] = 'foo'; });
+		$d->forget('foo');
+		$d->fire('foo');
+
+		$this->assertFalse(isset($_SERVER['__event.test']));
+	}
+
+
+	public function testFiringReturnsCurrentlyFiredEvent()
+	{
+		unset($_SERVER['__event.test']);
+		$d = new Dispatcher;
+		$d->listen('foo', function() use ($d) { $_SERVER['__event.test'] = $d->firing(); $d->fire('bar'); });
+		$d->listen('bar', function() use ($d) { $_SERVER['__event.test'] = $d->firing(); });
+		$d->fire('foo');
+
+		$this->assertEquals('bar', $_SERVER['__event.test']);
+	}
+
 }

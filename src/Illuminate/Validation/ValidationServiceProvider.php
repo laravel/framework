@@ -20,9 +20,9 @@ class ValidationServiceProvider extends ServiceProvider {
 	{
 		$this->registerPresenceVerifier();
 
-		$this->app['validator'] = $this->app->share(function($app)
+		$this->app->bindShared('validator', function($app)
 		{
-			$validator = new Factory($app['translator']);
+			$validator = new Factory($app['translator'], $app);
 
 			// The validation presence verifier is responsible for determining the existence
 			// of values in a given data collection, typically a relational database or
@@ -43,7 +43,7 @@ class ValidationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerPresenceVerifier()
 	{
-		$this->app['validation.presence'] = $this->app->share(function($app)
+		$this->app->bindShared('validation.presence', function($app)
 		{
 			return new DatabasePresenceVerifier($app['db']);
 		});

@@ -1,5 +1,6 @@
 {
     "name": "illuminate/queue",
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -7,31 +8,35 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/console": "4.0.x",
-        "illuminate/container": "4.0.x",
-        "illuminate/http": "4.0.x",
-        "illuminate/support": "4.0.x",
-        "symfony/process": "2.3.*"
+        "php": ">=5.4.0",
+        "illuminate/console": "4.3.*",
+        "illuminate/container": "4.3.*",
+        "illuminate/http": "4.3.*",
+        "illuminate/support": "4.3.*",
+        "symfony/process": "2.5.*"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "2.1.*",
-        "mockery/mockery": "0.7.2",
-        "phpunit/phpunit": "3.7.*"
+        "illuminate/cache": "4.3.*",
+        "illuminate/events": "4.3.*",
+        "aws/aws-sdk-php": "~2.6",
+        "iron-io/iron_mq": "~1.5",
+        "pda/pheanstalk": "~2.1"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Queue": ""
+        "psr-4": {
+            "Illuminate\\Queuing\\": ""
         },
         "classmap": [
             "IlluminateQueueClosure.php"
         ]
     },
-    "target-dir": "Illuminate/Queue",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.3-dev"
         }
+    },
+    "suggest": {
+        "illuminate/redis": "Allows use of the Redis queue driver."
     },
     "minimum-stability": "dev"
 }

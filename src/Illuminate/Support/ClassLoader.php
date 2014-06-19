@@ -20,7 +20,7 @@ class ClassLoader {
 	 * Load the given class file.
 	 *
 	 * @param  string  $class
-	 * @return void
+	 * @return bool
 	 */
 	public static function load($class)
 	{
@@ -35,6 +35,7 @@ class ClassLoader {
 				return true;
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -59,9 +60,7 @@ class ClassLoader {
 	{
 		if ( ! static::$registered)
 		{
-			spl_autoload_register(array('\Illuminate\Support\ClassLoader', 'load'));
-
-			static::$registered = true;
+			static::$registered = spl_autoload_register(array('\Illuminate\Support\ClassLoader', 'load'));
 		}
 	}
 
