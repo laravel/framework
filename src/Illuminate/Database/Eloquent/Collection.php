@@ -215,9 +215,9 @@ class Collection extends BaseCollection {
 	 */
 	public function except($keys)
 	{
-	    $dictionary = array_except($this->getDictionary($this), $keys);
+		$dictionary = array_except($this->getDictionary($this), $keys);
 
-	    return new static(array_values($dictionary));
+		return new static(array_values($dictionary));
 	}
 
 	/**

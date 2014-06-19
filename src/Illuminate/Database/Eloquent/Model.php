@@ -2670,8 +2670,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			{
 				$dirty[$key] = $value;
 			}
-			elseif ($value !== $this->original[$key] &&
-                                 ! $this->originalIsNumericallyEquivalent($key))
+			elseif ($value !== $this->original[$key] && ! $this->originalIsNumericallyEquivalent($key))
 			{
 				$dirty[$key] = $value;
 			}
