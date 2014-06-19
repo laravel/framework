@@ -703,11 +703,11 @@ class Validator implements MessageProviderInterface {
      * @param  mixed   $value
      * @return bool
      */
-    protected function validateBoolean($attribute, $value)
-    {
-        $acceptable = array(true, false, 0, 1, '0', '1');
+	protected function validateBoolean($attribute, $value)
+	{
+		$acceptable = array(true, false, 0, 1, '0', '1');
 
-        return in_array($value, $acceptable, true);
+		return in_array($value, $acceptable, true);
     }
 
 	/**

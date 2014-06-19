@@ -304,8 +304,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function register($provider, $options = array(), $force = false)
 	{
-		if ($registered = $this->getRegistered($provider) && ! $force)
-                                     return $registered;
+		if ($registered = $this->getRegistered($provider) && ! $force)  return $registered;
 
 		// If the given "provider" is a string, we will resolve it, passing in the
 		// application instance automatically for the developer. This is simply
@@ -1062,38 +1061,38 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function registerCoreContainerAliases()
 	{
 		$aliases = array(
-			'app'            => 'Illuminate\Foundation\Application',
-			'artisan'        => 'Illuminate\Console\Application',
-			'auth'           => 'Illuminate\Auth\AuthManager',
+			'app'                      => 'Illuminate\Foundation\Application',
+			'artisan'                  => 'Illuminate\Console\Application',
+			'auth'                     => 'Illuminate\Auth\AuthManager',
 			'auth.reminder.repository' => 'Illuminate\Auth\Reminders\ReminderRepositoryInterface',
-			'blade.compiler' => 'Illuminate\View\Compilers\BladeCompiler',
-			'cache'          => 'Illuminate\Cache\CacheManager',
-			'cache.store'    => 'Illuminate\Cache\Repository',
-			'config'         => 'Illuminate\Config\Repository',
-			'cookie'         => 'Illuminate\Cookie\CookieJar',
-			'encrypter'      => 'Illuminate\Encryption\Encrypter',
-			'db'             => 'Illuminate\Database\DatabaseManager',
-			'events'         => 'Illuminate\Events\Dispatcher',
-			'files'          => 'Illuminate\Filesystem\Filesystem',
-			'form'           => 'Illuminate\Html\FormBuilder',
-			'hash'           => 'Illuminate\Hashing\HasherInterface',
-			'html'           => 'Illuminate\Html\HtmlBuilder',
-			'translator'     => 'Illuminate\Translation\Translator',
-			'log'            => 'Illuminate\Log\Writer',
-			'mailer'         => 'Illuminate\Mail\Mailer',
-			'paginator'      => 'Illuminate\Pagination\Factory',
-			'auth.reminder'  => 'Illuminate\Auth\Reminders\PasswordBroker',
-			'queue'          => 'Illuminate\Queue\QueueManager',
-			'redirect'       => 'Illuminate\Routing\Redirector',
-			'redis'          => 'Illuminate\Redis\Database',
-			'request'        => 'Illuminate\Http\Request',
-			'router'         => 'Illuminate\Routing\Router',
-			'session'        => 'Illuminate\Session\SessionManager',
-			'session.store'  => 'Illuminate\Session\Store',
-			'remote'         => 'Illuminate\Remote\RemoteManager',
-			'url'            => 'Illuminate\Routing\UrlGenerator',
-			'validator'      => 'Illuminate\Validation\Factory',
-			'view'           => 'Illuminate\View\Factory',
+			'blade.compiler'           => 'Illuminate\View\Compilers\BladeCompiler',
+			'cache'                    => 'Illuminate\Cache\CacheManager',
+			'cache.store'              => 'Illuminate\Cache\Repository',
+			'config'                   => 'Illuminate\Config\Repository',
+			'cookie'                   => 'Illuminate\Cookie\CookieJar',
+			'encrypter'                => 'Illuminate\Encryption\Encrypter',
+			'db'                       => 'Illuminate\Database\DatabaseManager',
+			'events'                   => 'Illuminate\Events\Dispatcher',
+			'files'                    => 'Illuminate\Filesystem\Filesystem',
+			'form'                     => 'Illuminate\Html\FormBuilder',
+			'hash'                     => 'Illuminate\Hashing\HasherInterface',
+			'html'                     => 'Illuminate\Html\HtmlBuilder',
+			'translator'               => 'Illuminate\Translation\Translator',
+			'log'                      => 'Illuminate\Log\Writer',
+			'mailer'                   => 'Illuminate\Mail\Mailer',
+			'paginator'                => 'Illuminate\Pagination\Factory',
+			'auth.reminder'            => 'Illuminate\Auth\Reminders\PasswordBroker',
+			'queue'                    => 'Illuminate\Queue\QueueManager',
+			'redirect'                 => 'Illuminate\Routing\Redirector',
+			'redis'                    => 'Illuminate\Redis\Database',
+			'request'                  => 'Illuminate\Http\Request',
+			'router'                   => 'Illuminate\Routing\Router',
+			'session'                  => 'Illuminate\Session\SessionManager',
+			'session.store'            => 'Illuminate\Session\Store',
+			'remote'                   => 'Illuminate\Remote\RemoteManager',
+			'url'                      => 'Illuminate\Routing\UrlGenerator',
+			'validator'                => 'Illuminate\Validation\Factory',
+			'view'                     => 'Illuminate\View\Factory',
 		);
 
 		foreach ($aliases as $key => $alias)

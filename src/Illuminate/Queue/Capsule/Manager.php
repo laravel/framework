@@ -7,12 +7,12 @@ use Illuminate\Queue\QueueServiceProvider;
 
 class Manager {
 
-    /**
-     * The current globally used instance.
-     *
-     * @var \Illuminate\Queue\Capsule\Manager
-     */
-    protected static $instance;
+	/**
+	 * The current globally used instance.
+	 *
+	 * @var \Illuminate\Queue\Capsule\Manager
+	 */
+	protected static $instance;
 
     /**
      * The queue manager instance.
