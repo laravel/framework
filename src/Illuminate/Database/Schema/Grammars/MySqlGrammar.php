@@ -567,20 +567,20 @@ class MySqlGrammar extends Grammar {
 		}
 	}
 
-  /**
-   * Get the SQL for an "comment" column modifier.
-   *
-   * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-   * @param  \Illuminate\Support\Fluent  $column
-   * @return string|null
-   */
-  protected function modifyComment(Blueprint $blueprint, Fluent $column)
-  {
-    if ( ! is_null($column->comment))
-    {
-      return ' comment "' . $column->comment . '"';
-    }
-  }
+	/**
+	 * Get the SQL for an "comment" column modifier.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string|null
+	 */
+	protected function modifyComment(Blueprint $blueprint, Fluent $column)
+	{
+		if ( ! is_null($column->comment))
+		{
+			return ' comment "' . $column->comment . '"';
+		}
+	}
 
 	/**
 	 * Wrap a single string in keyword identifiers.
