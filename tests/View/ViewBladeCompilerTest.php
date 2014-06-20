@@ -83,7 +83,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	public function testEchosAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
+		$this->assertEquals("<?php echo \$app['html']->entities(\$name); ?>", $compiler->compileString('{{{$name}}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{$name}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
@@ -147,7 +147,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$compiler->setEscapedContentTags('{{', '}}');
 		$compiler->setContentTags('{{{', '}}}');
-		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name}}'));
+		$this->assertEquals("<?php echo \$app['html']->entities(\$name); ?>", $compiler->compileString('{{$name}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{$name}}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ $name }}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{
@@ -378,7 +378,7 @@ breeze
 		$compiler->setContentTags('[[', ']]');
 		$compiler->setEscapedContentTags('[[[', ']]]');
 
-		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[[ $name ]]]'));
+		$this->assertEquals("<?php echo \$app['html']->entities(\$name); ?>", $compiler->compileString('[[[ $name ]]]'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('[[ $name ]]'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('[[
 			$name
