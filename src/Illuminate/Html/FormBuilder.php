@@ -195,7 +195,7 @@ class FormBuilder {
 
 		$options = $this->html->attributes($options);
 
-		$value = e($this->formatLabel($name, $value));
+		$value = $this->html->entities($this->formatLabel($name, $value));
 
 		return '<label for="'.$name.'"'.$options.'>'.$value.'</label>';
 	}
@@ -349,7 +349,7 @@ class FormBuilder {
 		// the element. Then we'll create the final textarea elements HTML for us.
 		$options = $this->html->attributes($options);
 
-		return '<textarea'.$options.'>'.e($value).'</textarea>';
+		return '<textarea'.$options.'>'.$this->html->entities($value).'</textarea>';
 	}
 
 	/**
@@ -516,7 +516,7 @@ class FormBuilder {
 			$html[] = $this->option($display, $value, $selected);
 		}
 
-		return '<optgroup label="'.e($label).'">'.implode('', $html).'</optgroup>';
+		return '<optgroup label="'.$this->html->entities($label).'">'.implode('', $html).'</optgroup>';
 	}
 
 	/**
@@ -531,9 +531,9 @@ class FormBuilder {
 	{
 		$selected = $this->getSelectedValue($value, $selected);
 
-		$options = array('value' => e($value), 'selected' => $selected);
+		$options = array('value' => $this->html->entities($value), 'selected' => $selected);
 
-		return '<option'.$this->html->attributes($options).'>'.e($display).'</option>';
+		return '<option'.$this->html->attributes($options).'>'.$this->html->entities($display).'</option>';
 	}
 
 	/**

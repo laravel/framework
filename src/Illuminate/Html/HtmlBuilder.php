@@ -282,7 +282,7 @@ class HtmlBuilder {
 		}
 		else
 		{
-			return '<li>'.e($value).'</li>';
+			return '<li>'.$this->entities($value).'</li>';
 		}
 	}
 
@@ -340,7 +340,7 @@ class HtmlBuilder {
 	{
 		if (is_numeric($key)) $key = $value;
 
-		if ( ! is_null($value)) return $key.'="'.e($value).'"';
+		if ( ! is_null($value)) return $key.'="'.$this->entities($value).'"';
 	}
 
 	/**
