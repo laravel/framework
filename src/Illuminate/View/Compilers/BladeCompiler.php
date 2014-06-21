@@ -245,7 +245,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		$callback = function($matches)
 		{
-			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>';
+			return "<?php echo \$app['html']->entities(".$this->compileEchoDefaults($matches[1]).'); ?>';
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
