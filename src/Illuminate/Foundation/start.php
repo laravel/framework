@@ -236,7 +236,7 @@ $app->booted(function() use ($app, $env)
 
 	$path = $app['path'].'/start/global.php';
 
-	if (file_exists($path)) require $path;
+	if (file_exists($path)) require_once $path;
 
 	/*
 	|--------------------------------------------------------------------------
@@ -251,7 +251,7 @@ $app->booted(function() use ($app, $env)
 
 	$path = $app['path']."/start/{$env}.php";
 
-	if (file_exists($path)) require $path;
+	if (file_exists($path)) require_once $path;
 	
 	/*
 	|--------------------------------------------------------------------------
@@ -266,6 +266,6 @@ $app->booted(function() use ($app, $env)
 
 	$routes = $app['path'].'/routes.php';
 
-	if (file_exists($routes)) require $routes;
+	if (file_exists($routes)) require_once $routes;
 
 });
