@@ -71,7 +71,9 @@ class DatabaseStore implements StoreInterface {
 
 			if (time() >= $cache->expiration)
 			{
-				return $this->forget($key);
+				$this->forget($key);
+
+				return null;
 			}
 
 			return $this->encrypter->decrypt($cache->value);
