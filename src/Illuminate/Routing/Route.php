@@ -763,7 +763,13 @@ class Route {
 	 */
 	public function getName()
 	{
-		return array_get($this->action, 'as');
+		$names = array_get($this->action, 'as');
+		if(is_array($names)) {
+			$names = array_map(function($name) { return trim($name, ". \t\n\r\0\x0B"); }, $names);
+			return implode('.', $names);
+		} else {
+			return $names;
+		}
 	}
 
 	/**

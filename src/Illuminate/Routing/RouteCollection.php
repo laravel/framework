@@ -84,7 +84,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 
 		if (isset($action['as']))
 		{
-			$this->nameList[$action['as']] = $route;
+			$this->addToNameList($action, $route);
 		}
 
 		// When the route is routing to a controller we will also store the action that
@@ -108,6 +108,23 @@ class RouteCollection implements Countable, IteratorAggregate {
 		if ( ! isset($this->actionList[$action['controller']]))
 		{
 			$this->actionList[$action['controller']] = $route;
+		}
+	}
+
+	/**
+	 * Add a route to the named route dictionary.
+	 *
+	 * @param  array  $action
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return void
+	 */
+	protected function addToNameList($action, $route)
+	{
+		$name = $route->getName();
+
+		if ( ! isset($this->nameList[$name]))
+		{
+			$this->nameList[$name] = $route;
 		}
 	}
 
