@@ -1646,6 +1646,16 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Get the global "where" patterns.
+	 *
+	 * @return array
+	 */
+	public function getPatterns()
+	{
+		return $this->patterns;
+	}
+
+	/**
 	 * Get the response for a given request.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
@@ -1656,11 +1666,4 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		return $this->dispatch(Request::createFromBase($request));
 	}
 
-	/**
-	 * Get the global where patterns associated with this Router
-	 * @return array
-	 */
-	public function getPatterns() {
-		return $this->patterns;
-	}
 }
