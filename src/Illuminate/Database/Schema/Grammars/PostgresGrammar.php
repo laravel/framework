@@ -401,7 +401,8 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
-	 * Create the column definition for a date-time type.
+	 * Create the column definition for a date-time type with milliseconds.
+	 * Format in database: Y-m-d H:i:s.u
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
@@ -409,6 +410,18 @@ class PostgresGrammar extends Grammar {
 	protected function typeDateTime(Fluent $column)
 	{
 		return 'timestamp';
+	}
+
+	/**
+	 * Create the column definition for a date-time type without milliseconds.
+	 * Format in database: Y-m-d H:i:s
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDateTimeWithoutMillis(Fluent $column)
+	{
+		return 'timestamp(0)';
 	}
 
 	/**
@@ -423,7 +436,8 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
-	 * Create the column definition for a timestamp type.
+	 * Create the column definition for a timestamp type with milliseconds.
+	 * Format in database: Y-m-d H:i:s.u
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
@@ -431,6 +445,18 @@ class PostgresGrammar extends Grammar {
 	protected function typeTimestamp(Fluent $column)
 	{
 		return 'timestamp';
+	}
+
+	/**
+	 * Create the column definition for a timestamp type without milliseconds.
+	 * Format in database: Y-m-d H:i:s
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimestampWithoutMillis(Fluent $column)
+	{
+		return 'timestamp(0)';
 	}
 
 	/**
