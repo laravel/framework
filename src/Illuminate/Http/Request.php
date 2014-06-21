@@ -241,7 +241,16 @@ class Request extends SymfonyRequest {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_only($this->all(), $keys) + array_fill_keys($keys, null);
+		$results = [];
+
+		$input = $this->all();
+
+		foreach ($keys as $key)
+		{
+			array_set($results, $key, array_get($input, $key, null));
+		}
+
+		return $results;
 	}
 
 	/**
