@@ -392,6 +392,8 @@ class Builder {
 			{
 				$this->where($innerKey, '=', $innerValue, $boolean);
 			}
+
+			return $this;
 		}
 
 		// Here we will make some assumptions about the operator. If only 2 values are
