@@ -1652,7 +1652,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$routes = $this->getRoutes();
 		$names = [];
-		foreach($routes as $route) {
+		foreach ($routes as $route)
+		{
 			array_push($names, $route->getName());
 		}
 		return in_array($name, array_unique($names));
