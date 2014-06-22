@@ -9,18 +9,17 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
+        "illuminate/support": "4.3.*",
         "ircmaxell/password-compat": "~1.0"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Hashing": ""
+        "psr-4": {
+            "Illuminate\\Hashing\\": ""
         }
     },
-    "target-dir": "Illuminate/Hashing",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

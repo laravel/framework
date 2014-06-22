@@ -150,7 +150,7 @@ class FileStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
@@ -158,8 +158,10 @@ class FileStore implements StoreInterface {
 
 		if ($this->files->exists($file))
 		{
-			$this->files->delete($file);
+			return $this->files->delete($file);
 		}
+
+		return false;
 	}
 
 	/**
