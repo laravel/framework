@@ -1669,7 +1669,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Check if a route with the given name exists.
 	 *
-	 * @param string
+	 * @param string $name
 	 * @return bool
 	 */
 	public function hasName($name)
