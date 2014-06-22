@@ -85,7 +85,7 @@ class AutoloadCommand extends Command {
 
 		if ( ! is_dir($workbench)) return array();
 
-		return Finder::create()->files()->in($workbench)->name('composer.json')->depth('< 3');
+		return Finder::create()->files()->followLinks()->in($workbench)->name('composer.json')->depth('< 3');
 	}
 
 }
