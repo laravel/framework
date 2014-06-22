@@ -1642,4 +1642,20 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		return $this->dispatch(Request::createFromBase($request));
 	}
 
+	/**
+	 * Check if a route with the given name exists.
+	 *
+	 * @param string
+	 * @return bool
+	 */
+	public function hasName($name)
+	{
+		$routes = $this->getRoutes();
+		$names = [];
+		foreach($routes as $route) {
+			array_push($names, $route->getName());
+		}
+		return in_array($name, array_unique($names));
+	}
+
 }
