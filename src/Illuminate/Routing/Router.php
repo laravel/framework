@@ -958,6 +958,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$this->currentRequest = $request;
 
+		$app = app();
+		$mainRequest = $app['request'];
+		$app['request'] = $request;
+
 		// If no response was returned from the before filter, we will call the proper
 		// route instance to get the response. If no route is found a response will
 		// still get returned based on why no routes were found for this request.
@@ -967,6 +971,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		{
 			$response = $this->dispatchToRoute($request);
 		}
+
+		$app['request'] = $mainRequest;
 
 		$response = $this->prepareResponse($request, $response);
 
