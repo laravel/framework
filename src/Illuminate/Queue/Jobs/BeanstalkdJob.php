@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use Pheanstalk_Job;
 use Illuminate\Container\Container;
-use Pheanstalk_Pheanstalk as Pheanstalk;
+use Pheanstalk\Job as Pheanstalk_Job;
+use Pheanstalk\Pheanstalk as Pheanstalk;
 
 class BeanstalkdJob extends Job {
 
