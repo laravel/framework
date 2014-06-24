@@ -387,7 +387,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Create a colleciton of all elements that do not pass a given truth test.
+	 * Create a collection of all elements that do not pass a given truth test.
 	 *
 	 * @param  \Closure|mixed  $callback
 	 * @return \Illuminate\Support\Collection
