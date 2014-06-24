@@ -307,7 +307,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$instance = $container->make('TestAbstractClass', $parameters);
 		$this->assertEquals($parameters, $instance->receivedParameters);
 	}
-
+	
+	public function testInternalClassWithDefaultParameters() {
+		if(!class_exists('http\Client')) {
+			$this->markTestSkipped('http extension >= 2.0.0 not found');
+		}
+		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <optional> $driver ]] in class http\Client');
+		$container = new Container;
+		$parameters = array();
+		$container->make('http\Client', $parameters);
+	}
 }
 
 class ContainerConcreteStub {}
