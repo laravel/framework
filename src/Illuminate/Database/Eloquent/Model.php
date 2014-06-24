@@ -1414,7 +1414,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Perform a model update operation.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
-	 * @return bool
+	 * @return bool|null
 	 */
 	protected function performUpdate(Builder $query)
 	{
@@ -1449,11 +1449,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 				$this->fireModelEvent('updated', false);
 			}
-			
+
 			return true;
 		}
-
-		return false;
 	}
 
 	/**
