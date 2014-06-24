@@ -79,7 +79,7 @@ class MandrillTransport implements Swift_Transport {
 	 */
 	protected function getHttpClient()
 	{
-		return new \GuzzleHttp\Client;
+		return new \Guzzle\Http\Client;
 	}
 
 	/**
