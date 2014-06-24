@@ -37,7 +37,7 @@ class ApcStore extends TaggableStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		$value = $this->apc->get($this->prefix.$key);
+		$value = $this->apc->get($this->getPrefix().$key);
 
 		if ($value !== false)
 		{
@@ -55,7 +55,7 @@ class ApcStore extends TaggableStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$this->apc->put($this->prefix.$key, $value, $minutes * 60);
+		$this->apc->put($this->getPrefix().$key, $value, $minutes * 60);
 	}
 
 	/**
@@ -67,7 +67,7 @@ class ApcStore extends TaggableStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		return $this->apc->increment($this->prefix.$key, $value);
+		return $this->apc->increment($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class ApcStore extends TaggableStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return $this->apc->decrement($this->prefix.$key, $value);
+		return $this->apc->decrement($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -102,7 +102,7 @@ class ApcStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->apc->delete($this->prefix.$key);
+		$this->apc->delete($this->getPrefix().$key);
 	}
 
 	/**

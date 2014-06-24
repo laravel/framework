@@ -39,7 +39,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		$value = $this->memcached->get($this->prefix.$key);
+		$value = $this->memcached->get($this->getPrefix().$key);
 
 		if ($this->memcached->getResultCode() == 0)
 		{
@@ -57,7 +57,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$this->memcached->set($this->prefix.$key, $value, $minutes * 60);
+		$this->memcached->set($this->getPrefix().$key, $value, $minutes * 60);
 	}
 
 	/**
@@ -69,7 +69,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		return $this->memcached->increment($this->prefix.$key, $value);
+		return $this->memcached->increment($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return $this->memcached->decrement($this->prefix.$key, $value);
+		return $this->memcached->decrement($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -104,7 +104,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->memcached->delete($this->prefix.$key);
+		$this->memcached->delete($this->getPrefix().$key);
 	}
 
 	/**

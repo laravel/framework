@@ -58,7 +58,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		$prefixed = $this->prefix.$key;
+		$prefixed = $this->getPrefix().$key;
 
 		$cache = $this->table()->where('key', '=', $prefixed)->first();
 
@@ -90,7 +90,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		$key = $this->prefix.$key;
+		$key = $this->getPrefix().$key;
 
 		// All of the cached values in the database are encrypted in case this is used
 		// as a session data store by the consumer. We'll also calculate the expire
@@ -167,7 +167,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->table()->where('key', '=', $this->prefix.$key)->delete();
+		$this->table()->where('key', '=', $this->getPrefix().$key)->delete();
 	}
 
 	/**
