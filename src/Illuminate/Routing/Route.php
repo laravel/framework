@@ -680,6 +680,11 @@ class Route {
 	 */
 	public function methods()
 	{
+		if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods))
+		{
+			$this->methods[] = 'HEAD';
+		}
+
 		return $this->methods;
 	}
 
