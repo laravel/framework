@@ -1554,7 +1554,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteAction()
 	{
-		if (!$this->current()) return null;
+		if (!$this->current()) return;
 		
 		$action = $this->current()->getAction();
 
