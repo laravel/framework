@@ -309,13 +309,10 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testInternalClassWithDefaultParameters() {
-		if(!class_exists('http\Client')) {
-			$this->markTestSkipped('http extension >= 2.0.0 not found');
-		}
-		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <optional> $driver ]] in class http\Client');
+		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
 		$container = new Container;
 		$parameters = array();
-		$container->make('http\Client', $parameters);
+		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 }
 
