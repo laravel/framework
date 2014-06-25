@@ -2885,7 +2885,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (isset(static::$mutatorCache[$class]))
 		{
-			return static::$mutatorCache[get_class($this)];
+			return static::$mutatorCache[$class];
 		}
 
 		return array();
