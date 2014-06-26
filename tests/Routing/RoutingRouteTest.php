@@ -722,6 +722,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRouterPatternSetting()
+	{
+		$router = $this->getRouter();
+		$router->pattern('test', 'pattern');
+		$this->assertEquals(array('test' => 'pattern'), $router->getPatterns());
+
+		$router = $this->getRouter();
+		$router->patterns(array('test' => 'pattern', 'test2' => 'pattern2'));
+		$this->assertEquals(array('test' => 'pattern', 'test2' => 'pattern2'), $router->getPatterns());
+	}
+
+
 	protected function getRouter()
 	{
 		return new Router(new Illuminate\Events\Dispatcher);
