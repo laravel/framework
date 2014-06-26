@@ -1216,6 +1216,20 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Set a group of global where patterns on all routes
+	 *
+	 * @param  array  $patterns
+	 * @return void
+	 */
+	public function patterns($patterns)
+	{
+		foreach ($patterns as $key => $pattern)
+		{
+			$this->pattern($key, $pattern);
+		}
+	}
+
+	/**
 	 * Call the given filter with the request and response.
 	 *
 	 * @param  string  $filter
@@ -1629,6 +1643,16 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	public function getInspector()
 	{
 		return $this->inspector ?: $this->inspector = new ControllerInspector;
+	}
+
+	/**
+	 * Get the global "where" patterns.
+	 *
+	 * @return array
+	 */
+	public function getPatterns()
+	{
+		return $this->patterns;
 	}
 
 	/**
