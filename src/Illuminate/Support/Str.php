@@ -120,7 +120,7 @@ class Str {
 	{
 		if (mb_strlen($value) <= $limit) return $value;
 
-		return rtrim(mb_substr($value, 0, $limit, 'UTF-8')).$end;
+		return rtrim(mb_substr(strip_tags($value), 0, $limit, 'UTF-8')).$end;
 	}
 
 	/**
