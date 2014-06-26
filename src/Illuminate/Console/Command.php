@@ -280,6 +280,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as information output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
 	public function info($string, $newLine = true)
@@ -302,6 +303,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as comment output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
 	public function comment($string, $newLine = true)
@@ -313,6 +315,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as question output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
 	public function question($string, $newLine = true)
@@ -324,6 +327,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as error output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
 	public function error($string, $newLine = true)
