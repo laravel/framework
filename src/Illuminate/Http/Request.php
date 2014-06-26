@@ -177,7 +177,7 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Determine if the request contains a non-emtpy value for an input item.
+	 * Determine if the request contains a non-empty value for an input item.
 	 *
 	 * @param  string|array  $key
 	 * @return bool
@@ -241,7 +241,16 @@ class Request extends SymfonyRequest {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		return array_only($this->input(), $keys) + array_fill_keys($keys, null);
+		$results = [];
+
+		$input = $this->all();
+
+		foreach ($keys as $key)
+		{
+			array_set($results, $key, array_get($input, $key, null));
+		}
+
+		return $results;
 	}
 
 	/**
@@ -254,7 +263,7 @@ class Request extends SymfonyRequest {
 	{
 		$keys = is_array($keys) ? $keys : func_get_args();
 
-		$results = $this->input();
+		$results = $this->all();
 
 		foreach ($keys as $key) array_forget($results, $key);
 
