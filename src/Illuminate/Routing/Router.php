@@ -142,7 +142,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function get($uri, $action)
 	{
-		return $this->addRoute(array('GET', 'HEAD'), $uri, $action);
+		return $this->addRoute('GET', $uri, $action);
 	}
 
 	/**
