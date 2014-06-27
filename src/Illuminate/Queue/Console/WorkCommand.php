@@ -117,15 +117,13 @@ class WorkCommand extends Command {
 	 */
 	protected function writeOutput(Job $job, $failed)
 	{
-		$options = OutputInterface::OUTPUT_RAW;
-
 		if ($failed)
 		{
-			$this->output->writeln('<error>Failed:</error> '.$job->getName(), $options);
+			$this->output->writeln('<error>Failed:</error> '.$job->getName());
 		}
 		else
 		{
-			$this->output->writeln('<info>Processed:</info> '.$job->getName(), $options);
+			$this->output->writeln('<info>Processed:</info> '.$job->getName());
 		}
 	}
 
