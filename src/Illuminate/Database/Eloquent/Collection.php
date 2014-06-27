@@ -202,7 +202,7 @@ class Collection extends BaseCollection {
 	 */
 	public function only($keys)
 	{
-		$dictionary = array_only($this->getDictionary($this), $keys);
+		$dictionary = array_only($this->getDictionary(), $keys);
 
 		return new static(array_values($dictionary));
 	}
@@ -215,7 +215,7 @@ class Collection extends BaseCollection {
 	 */
 	public function except($keys)
 	{
-	    $dictionary = array_except($this->getDictionary($this), $keys);
+	    $dictionary = array_except($this->getDictionary(), $keys);
 
 	    return new static(array_values($dictionary));
 	}
