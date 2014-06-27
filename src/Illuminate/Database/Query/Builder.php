@@ -973,7 +973,10 @@ class Builder {
 	 */
 	public function groupBy()
 	{
-		$this->groups = array_merge((array) $this->groups, func_get_args());
+		foreach(func_get_args() as $arg)
+		{
+			$this->groups = array_merge((array) $this->groups, ((is_array($arg)) ? $arg:[$arg]));
+		}
 
 		return $this;
 	}
