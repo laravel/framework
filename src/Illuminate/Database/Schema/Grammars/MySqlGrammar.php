@@ -578,7 +578,7 @@ class MySqlGrammar extends Grammar {
 	{
 		if ( ! is_null($column->comment))
 		{
-			return ' comment "' . $column->comment . '"';
+			return ' comment "'.$column->comment.'"';
 		}
 	}
 
