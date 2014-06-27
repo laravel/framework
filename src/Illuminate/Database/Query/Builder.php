@@ -388,7 +388,7 @@ class Builder {
 		// received when the method was called and pass it into the nested where.
 		if (is_array($column))
 		{
-			$this->whereNested(function($query) use($column)
+			$this->whereNested(function($query) use ($column)
 			{
 				foreach ($column as $key => $value)
 				{
