@@ -1006,10 +1006,10 @@ class Builder {
 	 * @param  string  $value
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-    public function orHaving($column, $operator = null, $value = null)
-    {
-        return $this->having($column, $operator, $value, 'or');
-    }
+	public function orHaving($column, $operator = null, $value = null)
+	{
+		return $this->having($column, $operator, $value, 'or');
+	}
 
 	/**
 	 * Add a raw having clause to the query.
