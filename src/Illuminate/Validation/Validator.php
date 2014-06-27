@@ -318,7 +318,7 @@ class Validator implements MessageProviderInterface {
  	 *
 	 * @return array
 	 */
-	public function dataValidated(){
+	public function passed(){
  		return array_diff_key($this->data, $this->messages()->toArray());
 	}
 
