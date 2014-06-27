@@ -394,7 +394,6 @@ class Builder {
 				{
 					$query->where($key, '=', $value);
 				}
-
 			}, $boolean);
 
 			return $this;
