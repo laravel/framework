@@ -206,6 +206,26 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Key an associative array by a field.
+	 *
+	 * @param  string  $keyBy
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function keyBy($keyBy)
+	{
+		$results = [];
+
+		foreach ($this->items as $item)
+		{
+			$key = data_get($item, $keyBy);
+
+			$results[$key] = $item;
+		}
+
+		return new static($results);
+	}
+
+	/**
 	 * Determine if an item exists in the collection by key.
 	 *
 	 * @param  mixed  $key
