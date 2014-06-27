@@ -6,13 +6,11 @@ use Illuminate\Support\Contracts\ArrayableInterface;
 
 class ViewTest extends PHPUnit_Framework_TestCase {
 
-	public function __construct()
-	{
+	public function tearDown() {
 		m::close();
 	}
 
-
-	public function testDataCanBeSetOnView()
+		public function testDataCanBeSetOnView()
 	{
 		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
 		$view->with('foo', 'bar');
@@ -58,7 +56,6 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		));
 
 		$view->shouldReceive('render')->with(m::type('Closure'))->once()->andReturn($sections = array('foo' => 'bar'));
-		$view->getFactory()->shouldReceive('getSections')->once()->andReturn($sections);
 
 		$this->assertEquals($sections, $view->renderSections());
 	}
@@ -75,7 +72,6 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
 		$this->assertEquals('contents', $view->render());
-		$this->assertEquals('contents', (string)$view);
 	}
 
 

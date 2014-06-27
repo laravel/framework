@@ -106,8 +106,15 @@ class WorkbenchMakeCommand extends Command {
 	protected function getPackageSegments()
 	{
 		$package = $this->argument('package');
-
-		return array_map('studly_case', explode('/', $package, 2));
+		
+		$segments = explode('/', $package, 2);
+		
+		if (count($segments) != 2)
+		{
+			throw new \InvalidArgumentException('Package name must respect the vendor/name format. Supplied name was "' . $segments[0] . '"');
+		}
+		
+		return array_map('studly_case', $segments);
 	}
 
 	/**
