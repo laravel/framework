@@ -1508,6 +1508,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Check if a route with the given name exists.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function has($name)
+	{
+		return $this->routes->hasNamedRoute($name);
+	}
+
+	/**
 	 * Get the current route name.
 	 *
 	 * @return string|null
@@ -1666,17 +1677,6 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
 		return $this->dispatch(Request::createFromBase($request));
-	}
-
-	/**
-	 * Check if a route with the given name exists.
-	 *
-	 * @param  string  $name
-	 * @return bool
-	 */
-	public function hasName($name)
-	{
-		return $this->routes->hasNamedRoute($name);
 	}
 
 }
