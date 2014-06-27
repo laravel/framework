@@ -385,13 +385,17 @@ class Builder {
 	{
 		// If the column is an array, we will assume it is an array of key-value pairs
 		// and can add them each as a where clause. We will maintain the boolean we
-		// received when the method was called and pass it onto the other wheres.
+		// received when the method was called and pass it into the nested where.
 		if (is_array($column))
 		{
-			foreach ($column as $innerKey => $innerValue)
+			$this->whereNested(function($query) use($column)
 			{
-				$this->where($innerKey, '=', $innerValue, $boolean);
-			}
+				foreach ($column as $key => $value)
+				{
+					$query->where($key, '=', $value);
+				}
+
+			}, $boolean);
 
 			return $this;
 		}
