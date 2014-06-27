@@ -230,14 +230,9 @@ class Collection extends BaseCollection {
 	{
 		$collection = $collection ?: $this;
 
-		$dictionary = array();
+		if ($collection->isEmpty()) return [];
 
-		foreach ($collection as $value)
-		{
-			$dictionary[$value->getKey()] = $value;
-		}
-
-		return $dictionary;
+		return $collection->keyBy($collection->first()->getKeyName())->all();
 	}
 
 	/**
