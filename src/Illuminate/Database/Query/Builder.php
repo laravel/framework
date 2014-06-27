@@ -975,7 +975,7 @@ class Builder {
 	{
 		foreach(func_get_args() as $arg)
 		{
-			$this->groups = array_merge((array) $this->groups, ((is_array($arg)) ? $arg:[$arg]));
+			$this->groups = array_merge((array) $this->groups, is_array($arg) ? $arg : [$arg]);
 		}
 
 		return $this;
