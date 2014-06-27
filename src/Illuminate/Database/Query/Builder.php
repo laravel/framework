@@ -388,15 +388,13 @@ class Builder {
 		// received when the method was called and pass it into the nested where.
 		if (is_array($column))
 		{
-			$this->whereNested(function($query) use ($column)
+			return $this->whereNested(function($query) use ($column)
 			{
 				foreach ($column as $key => $value)
 				{
 					$query->where($key, '=', $value);
 				}
 			}, $boolean);
-
-			return $this;
 		}
 
 		// Here we will make some assumptions about the operator. If only 2 values are
