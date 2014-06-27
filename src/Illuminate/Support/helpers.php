@@ -266,29 +266,30 @@ if ( ! function_exists('array_flatten'))
 if ( ! function_exists('array_forget'))
 {
 	/**
-	 * Remove an array item from a given array using "dot" notation.
+	 * Remove one or many array items from a given array using "dot" notation.
 	 *
-	 * @param  array   $array
-	 * @param  string  $key
+	 * @param  array        $array
+	 * @param  array|string $keys
 	 * @return void
 	 */
-	function array_forget(&$array, $key)
+	function array_forget(&$array, $keys)
 	{
-		$keys = explode('.', $key);
-
-		while (count($keys) > 1)
+		foreach ((array) $keys as $key)
 		{
-			$key = array_shift($keys);
+			$parts = explode('.', $key);
 
-			if ( ! isset($array[$key]) || ! is_array($array[$key]))
+			while (count($parts) > 1)
 			{
-				return;
+				$part = array_shift($parts);
+
+				if (isset($array[$part]) && is_array($array[$part]))
+				{
+					$array =& $array[$part];
+				}
 			}
 
-			$array =& $array[$key];
+			unset($array[array_shift($parts)]);
 		}
-
-		unset($array[array_shift($keys)]);
 	}
 }
 
