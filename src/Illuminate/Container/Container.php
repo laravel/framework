@@ -587,7 +587,7 @@ class Container implements ArrayAccess {
 		}
 		else
 		{
-			$message = "Unresolvable dependency resolving [$parameter].";
+			$message = "Unresolvable dependency resolving [$parameter] in class {$parameter->getDeclaringClass()->getName()}";
 
 			throw new BindingResolutionException($message);
 		}
