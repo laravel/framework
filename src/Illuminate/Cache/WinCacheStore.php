@@ -28,7 +28,7 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		$value = wincache_ucache_get($this->prefix.$key);
+		$value = wincache_ucache_get($this->getPrefix().$key);
 
 		if ($value !== false)
 		{
@@ -46,7 +46,7 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		wincache_ucache_set($this->prefix.$key, $value, $minutes * 60);
+		wincache_ucache_set($this->getPrefix().$key, $value, $minutes * 60);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		return wincache_ucache_inc($this->prefix.$key, $value);
+		return wincache_ucache_inc($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -70,7 +70,7 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return wincache_ucache_dec($this->prefix.$key, $value);
+		return wincache_ucache_dec($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -93,7 +93,7 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		wincache_ucache_delete($this->prefix.$key);
+		wincache_ucache_delete($this->getPrefix().$key);
 	}
 
 	/**

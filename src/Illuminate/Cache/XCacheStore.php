@@ -28,7 +28,7 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		$value = xcache_get($this->prefix.$key);
+		$value = xcache_get($this->getPrefix().$key);
 
 		if (isset($value))
 		{
@@ -46,7 +46,7 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
-		xcache_set($this->prefix.$key, $value, $minutes * 60);
+		xcache_set($this->getPrefix().$key, $value, $minutes * 60);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		return xcache_inc($this->prefix.$key, $value);
+		return xcache_inc($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -70,7 +70,7 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return xcache_dec($this->prefix.$key, $value);
+		return xcache_dec($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -93,7 +93,7 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		xcache_unset($this->prefix.$key);
+		xcache_unset($this->getPrefix().$key);
 	}
 
 	/**

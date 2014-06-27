@@ -48,7 +48,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		if ( ! is_null($value = $this->connection()->get($this->prefix.$key)))
+		if ( ! is_null($value = $this->connection()->get($this->getPrefix().$key)))
 		{
 			return is_numeric($value) ? $value : unserialize($value);
 		}
@@ -66,7 +66,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	{
 		$value = is_numeric($value) ? $value : serialize($value);
 
-		$this->connection()->setex($this->prefix.$key, $minutes * 60, $value);
+		$this->connection()->setex($this->getPrefix().$key, $minutes * 60, $value);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		return $this->connection()->incrby($this->prefix.$key, $value);
+		return $this->connection()->incrby($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -90,7 +90,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return $this->connection()->decrby($this->prefix.$key, $value);
+		return $this->connection()->decrby($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -104,7 +104,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	{
 		$value = is_numeric($value) ? $value : serialize($value);
 
-		$this->connection()->set($this->prefix.$key, $value);
+		$this->connection()->set($this->getPrefix().$key, $value);
 	}
 
 	/**
@@ -115,7 +115,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
-		$this->connection()->del($this->prefix.$key);
+		$this->connection()->del($this->getPrefix().$key);
 	}
 
 	/**
