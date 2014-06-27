@@ -368,6 +368,10 @@ class Factory {
 		{
 			return $this->addClassEvent($view, $callback, $prefix, $priority);
 		}
+		else
+		{
+			return $this->addObjectEvent($view, $callback, $prefix, $priority);
+		}
 	}
 
 	/**
@@ -386,6 +390,34 @@ class Factory {
 		// classes from the application IoC container then call the compose method
 		// on the instance. This allows for convenient, testable view composers.
 		$callback = $this->buildClassEventCallback($class, $prefix);
+
+		$this->addEventListener($name, $callback, $priority);
+
+		return $callback;
+	}
+
+	/**
+	 * Register a object based view composer.
+	 *
+	 * @param  string     $view
+	 * @param  \stdObject $class
+	 * @param  string     $prefix
+	 * @return \Closure
+	 */
+	protected function addObjectEvent($view, $object, $prefix, $priority = null)
+	{
+		$name = $prefix.$view;
+
+		$method = str_contains($prefix, 'composing') ? 'compose' : 'create';
+
+		// When registering a object based view "composer", we will simply call
+		// the compose method on the instance.
+		$callback = function() use ($object, $method)
+		{
+			$callable = array($object, $method);
+
+			return call_user_func_array($callable, func_get_args());
+		};
 
 		$this->addEventListener($name, $callback, $priority);
 
