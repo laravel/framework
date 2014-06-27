@@ -140,7 +140,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Get a flattened array of the items in the collection.
 	 *
-	 * @return array
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function flatten()
 	{
