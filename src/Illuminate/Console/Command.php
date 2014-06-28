@@ -362,7 +362,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
-	 * Set the Laravel application instance.
+	 * Get the Laravel application instance.
 	 *
 	 * @return \Illuminate\Foundation\Application
 	 */
