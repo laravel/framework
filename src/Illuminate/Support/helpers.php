@@ -752,6 +752,16 @@ if ( ! function_exists('object_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
+			if ($object instanceof \Illuminate\Database\Eloquent\Collection)
+			{
+				$object = $object->find($segment);
+				if ( ! $object )
+				{
+					return value($default);
+				}
+				continue;
+			}
+
 			if ( ! is_object($object) || ! isset($object->{$segment}))
 			{
 				return value($default);
@@ -1103,5 +1113,50 @@ if ( ! function_exists('with'))
 	function with($object)
 	{
 		return $object;
+	}
+}
+
+if ( ! function_exists('class_uses_deep'))
+{
+	/**
+	 * Returns all traits used by a class, it's subclasses and trait of their traits
+	 *
+	 * @param string $class
+	 * @param bool   $classDeep
+	 * @param bool   $traitDeep
+	 *
+	 * @return array
+	 */
+	function class_uses_deep($class, $classDeep = true, $traitDeep = true)
+	{
+		$result        = [];
+		$searchClasses = [$class => $class] + ($classDeep ? class_parents($class) : []);
+		foreach ($searchClasses as $class)
+		{
+			$result = $result + ($traitDeep ? trait_uses_deep($class) : class_uses($class));
+		}
+
+		return $result;
+	}
+}
+
+if ( ! function_exists('trait_uses_deep'))
+{
+
+	/**
+	 * Returns all traits used by a trait and its traits
+	 *
+	 * @param $trait
+	 *
+	 * @return array
+	 */
+	function trait_uses_deep($trait)
+	{
+		$result = class_uses($trait);
+		foreach ($result as $trait)
+		{
+			$result += trait_uses_deep($trait);
+		}
+		return $result;
 	}
 }
