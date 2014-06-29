@@ -530,6 +530,27 @@ if ( ! function_exists('class_basename'))
 	}
 }
 
+if ( ! function_exists('class_uses_recursive'))
+{
+	/**
+	 * Returns all traits used by a class, it's subclasses and trait of their traits
+	 *
+	 * @param  string $class
+	 * @return array
+	 */
+	function class_uses_recursive($class)
+	{
+		$results = [];
+
+		foreach (array_merge([$class => $class], class_parents($class)) as $class)
+		{
+			$results += trait_uses_recursive($class);
+		}
+
+		return array_unique($results);
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
@@ -1025,6 +1046,27 @@ if ( ! function_exists('studly_case'))
 	function studly_case($value)
 	{
 		return Str::studly($value);
+	}
+}
+
+if ( ! function_exists('trait_uses_recursive'))
+{
+	/**
+	 * Returns all traits used by a trait and its traits
+	 *
+	 * @param  $trait
+	 * @return array
+	 */
+	function trait_uses_recursive($trait)
+	{
+		$traits = class_uses($trait);
+
+		foreach ($traits as $trait)
+		{
+			$traits += trait_uses_recursive($trait);
+		}
+
+		return $traits;
 	}
 }
 
