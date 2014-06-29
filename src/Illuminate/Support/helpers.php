@@ -530,6 +530,27 @@ if ( ! function_exists('class_basename'))
 	}
 }
 
+if ( ! function_exists('class_uses_recursive'))
+{
+	/**
+	 * Returns all traits used by a class, it's subclasses and trait of their traits
+	 *
+	 * @param  string $class
+	 * @return array
+	 */
+	function class_uses_recursive($class)
+	{
+		$results = [];
+
+		foreach (array_merge([$class => $class], class_parents($class)) as $class)
+		{
+			$results += trait_uses_recursive($class);
+		}
+
+		return array_unique($results);
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
@@ -1028,6 +1049,27 @@ if ( ! function_exists('studly_case'))
 	}
 }
 
+if ( ! function_exists('trait_uses_recursive'))
+{
+	/**
+	 * Returns all traits used by a trait and its traits
+	 *
+	 * @param  $trait
+	 * @return array
+	 */
+	function trait_uses_recursive($trait)
+	{
+		$traits = class_uses($trait);
+
+		foreach ($traits as $trait)
+		{
+			$traits += trait_uses_recursive($trait);
+		}
+
+		return $traits;
+	}
+}
+
 if ( ! function_exists('trans'))
 {
 	/**
@@ -1104,50 +1146,5 @@ if ( ! function_exists('with'))
 	function with($object)
 	{
 		return $object;
-	}
-}
-
-if ( ! function_exists('class_uses_deep'))
-{
-	/**
-	 * Returns all traits used by a class, it's subclasses and trait of their traits
-	 *
-	 * @param string $class
-	 * @param bool   $classDeep
-	 * @param bool   $traitDeep
-	 *
-	 * @return array
-	 */
-	function class_uses_deep($class, $classDeep = true, $traitDeep = true)
-	{
-		$result        = [];
-		$searchClasses = [$class => $class] + ($classDeep ? class_parents($class) : []);
-		foreach ($searchClasses as $class)
-		{
-			$result = $result + ($traitDeep ? trait_uses_deep($class) : class_uses($class));
-		}
-
-		return $result;
-	}
-}
-
-if ( ! function_exists('trait_uses_deep'))
-{
-
-	/**
-	 * Returns all traits used by a trait and its traits
-	 *
-	 * @param $trait
-	 *
-	 * @return array
-	 */
-	function trait_uses_deep($trait)
-	{
-		$result = class_uses($trait);
-		foreach ($result as $trait)
-		{
-			$result += trait_uses_deep($trait);
-		}
-		return $result;
 	}
 }
