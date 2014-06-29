@@ -222,4 +222,15 @@ class Builder {
 		$this->resolver = $resolver;
 	}
 
+	/**
+	 * Function to register custom column type handlers
+	 *
+	 * @param string $name
+	 * @param array $handlers
+	 */
+	public function registerCustomType($name, array $handlers)
+	{
+		$this->grammar->registerCustomType($name, $handlers);
+	}
+
 }

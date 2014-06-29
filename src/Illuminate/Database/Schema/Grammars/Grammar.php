@@ -12,6 +12,11 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 abstract class Grammar extends BaseGrammar {
 
 	/**
+	 * @var array Custom type handlers for this particular grammar
+	 */
+	protected $customTypeHandlers = [];
+
+	/**
 	 * Compile a rename column command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -200,7 +205,32 @@ abstract class Grammar extends BaseGrammar {
 	 */
 	protected function typeCustom(Fluent $column)
 	{
-		return call_user_func($column->callback, $column);
+		return call_user_func_array($this->customTypeHandlers[$column->type_name],
+			$column['params']);
+	}
+
+	/**
+	 * Function to register custom column type handlers
+	 *
+	 * @param string $name
+	 * @param array  $handlers
+	 */
+	public function registerCustomType($name, array $handlers)
+	{
+		$className = get_class($this);
+		do
+		{
+			$thisGrammarName =
+				ends_with($className, 'Grammar') ? substr($className, 0, strlen($className) - 7) : $className;
+
+			foreach ($handlers as $grammarName => $handler)
+			{
+				if (ends_with($thisGrammarName, $grammarName))
+				{
+					$this->customTypeHandlers[$name] = $handler;
+				}
+			}
+		} while ($className = get_parent_class($className));
 	}
 
 	/**
