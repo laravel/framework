@@ -25,7 +25,8 @@
 		{"message": "Added --daemon option to the queue:work command.", "backport": null},
 		{"message": "Added convenient traits for authentication and password reminding.", "backport": null},
 		{"message": "Added 'reject' method to Collection.", "backport": null},
-		{"message": "Added 'updateOrCreate' method to Eloquent model.", "backport": null}
+		{"message": "Added 'updateOrCreate' method to Eloquent model.", "backport": null},
+		{"message": "Added 'keyBy' method to Collection.", "backport": null}
 	],
 	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
