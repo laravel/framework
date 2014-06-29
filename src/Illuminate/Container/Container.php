@@ -853,7 +853,7 @@ class Container implements ArrayAccess {
 	}
 
 	/**
-	 * Dynamically access application services.
+	 * Dynamically access container services.
 	 *
 	 * @param  string  $key
 	 * @return mixed
@@ -864,7 +864,7 @@ class Container implements ArrayAccess {
 	}
 
 	/**
-	 * Dynamically set application services.
+	 * Dynamically set container services.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
