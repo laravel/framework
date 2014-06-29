@@ -10,7 +10,7 @@ class SQLiteProcessor extends Processor {
 	 */
 	public function processColumnListing($results)
 	{
-		return array_values(array_map(function($r) { return $r->name; }, $results));
+		return array_values(array_map(function($r) { data_get($r, 'column_name'); }, $results));
 	}
 
 }
