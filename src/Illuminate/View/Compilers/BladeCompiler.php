@@ -227,7 +227,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		$callback = function($matches)
 		{
-			// PHP eats newlines after closing tags, which isn't desirable for echo statements
 			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
 			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
@@ -248,7 +247,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 		$callback = function($matches)
 		{
-			// PHP eats newlines after closing tags, which isn't desirable for echo statements
 			$whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
 
 			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
