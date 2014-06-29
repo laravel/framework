@@ -385,6 +385,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Create new column of custom type on the table
+	 *
+	 * @param string   $column
+	 * @param callable $callback
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function custom ($column, Closure $callback)
+	{
+		$this->addColumn('custom', $column, compact('callback'));
+	}
+
+	/**
 	 * Create a new text column on the table.
 	 *
 	 * @param  string  $column
