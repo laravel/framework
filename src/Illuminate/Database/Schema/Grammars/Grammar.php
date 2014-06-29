@@ -192,6 +192,18 @@ abstract class Grammar extends BaseGrammar {
 	}
 
 	/**
+	 * Custom column type
+	 *
+	 * @param Fluent $column
+	 *
+	 * @return mixed
+	 */
+	protected function typeCustom(Fluent $column)
+	{
+		return call_user_func($column->callback, $column);
+	}
+
+	/**
 	 * Add a prefix to an array of values.
 	 *
 	 * @param  string  $prefix

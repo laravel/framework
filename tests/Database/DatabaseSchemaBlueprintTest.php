@@ -52,4 +52,19 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCustomType()
+	{
+		$conn      = m::mock('Illuminate\Database\Connection');
+		$grammar   = new \Illuminate\Database\Schema\Grammars\MySqlGrammar();
+		$blueprint = new Blueprint('user');
+		$blueprint->string('teststr', 200);
+		$blueprint->custom('mycolumn', function ($column)
+		{
+			return 'MY_CUSTOM_COLUMN_TYPE';
+		});
+
+		$this->assertEquals('alter table `user` add `teststr` varchar(200) not null, add `mycolumn` MY_CUSTOM_COLUMN_TYPE not null',
+			$blueprint->toSql($conn, $grammar)[0]);
+	}
+
 }
