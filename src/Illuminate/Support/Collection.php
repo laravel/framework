@@ -407,31 +407,25 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Create a colleciton of all elements that do not pass a given truth test.
+	 * Create a collection of all elements that do not pass a given truth test.
 	 *
 	 * @param  \Closure|mixed  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function reject($callback)
 	{
-		$results = [];
-
-		foreach ($this->items as $key => $value)
+		if ($callback instanceof Closure)
 		{
-			if ($callback instanceof Closure)
+			return $this->filter(function($item) use ($callback)
 			{
-				if ( ! $callback($value))
-				{
-					$results[$key] = $value;
-				}
-			}
-			elseif ($callback != $value)
-			{
-				$results[$key] = $value;
-			}
+				return ! $callback($item);
+			});
 		}
 
-		return new static($results);
+		return $this->filter(function($item) use ($callback)
+		{
+			return $item != $callback;
+		});
 	}
 
 	/**
