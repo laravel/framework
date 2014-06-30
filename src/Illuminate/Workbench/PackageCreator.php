@@ -95,8 +95,9 @@ class PackageCreator {
 	/**
 	 * Write the support files to the package root.
 	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
+	 * @param \Illuminate\Workbench\Package $package
+	 * @param string                        $directory
+	 * @param bool                          $plain
 	 * @return void
 	 */
 	public function writeSupportFiles(Package $package, $directory, $plain)
@@ -138,8 +139,9 @@ class PackageCreator {
 	/**
 	 * Write the Composer.json stub file.
 	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
+	 * @param \Illuminate\Workbench\Package $package
+	 * @param string                        $directory
+	 * @param bool                          $plain
 	 * @return void
 	 */
 	protected function writeComposerFile(Package $package, $directory, $plain)
@@ -167,8 +169,9 @@ class PackageCreator {
 	/**
 	 * Write the stub .gitignore file for the package.
 	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
+	 * @param  \Illuminate\Workbench\Package $package
+	 * @param  string                        $directory
+	 * @param bool                           $plain
 	 * @return void
 	 */
 	public function writeIgnoreFile(Package $package, $directory, $plain)
@@ -214,8 +217,9 @@ class PackageCreator {
 	/**
 	 * Create the public directory for the package.
 	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
+	 * @param \Illuminate\Workbench\Package $package
+	 * @param string                        $directory
+	 * @param bool                          $plain
 	 * @return void
 	 */
 	public function writePublicDirectory(Package $package, $directory, $plain)
@@ -244,8 +248,9 @@ class PackageCreator {
 	/**
 	 * Write the stub ServiceProvider for the package.
 	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
+	 * @param \Illuminate\Workbench\Package $package
+	 * @param string                        $directory
+	 * @param bool                          $plain
 	 * @return void
 	 */
 	public function writeServiceProvider(Package $package, $directory, $plain)
