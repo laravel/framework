@@ -95,8 +95,9 @@ class PackageCreator {
 	/**
 	 * Write the support files to the package root.
 	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
+	 * @param \Illuminate\Workbench\Package $package
+	 * @param string                        $directory
+	 * @param bool                          $plain
 	 * @return void
 	 */
 	public function writeSupportFiles(Package $package, $directory, $plain)
