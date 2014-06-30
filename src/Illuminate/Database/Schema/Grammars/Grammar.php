@@ -215,7 +215,7 @@ abstract class Grammar extends BaseGrammar {
 	 * @param string $name
 	 * @param array  $handlers
 	 */
-	public function registerCustomType($name, array $handlers)
+	public function columnType($name, array $handlers)
 	{
 		$className = get_class($this);
 		do

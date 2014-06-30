@@ -228,9 +228,9 @@ class Builder {
 	 * @param string $name
 	 * @param array $handlers
 	 */
-	public function registerCustomType($name, array $handlers)
+	public function columnType($name, array $handlers)
 	{
-		$this->grammar->registerCustomType($name, $handlers);
+		$this->grammar->columnType($name, $handlers);
 	}
 
 }

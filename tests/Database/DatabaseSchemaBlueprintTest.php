@@ -61,7 +61,7 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
 		$conn->shouldReceive('getSchemaGrammar')->andReturnValues([$grammar]);
 
 		/** @var $conn Illuminate\Database\Connection $conn */
-		$conn->getSchemaGrammar()->registerCustomType('my_custom_type', [
+		$conn->getSchemaGrammar()->columnType('my_custom_type', [
 			'MySql' => function ($param1, $param2)
 				{
 					return sprintf('MY_TEST_TYPE (%s, %s)', $param1, $param2);
