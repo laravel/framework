@@ -182,20 +182,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array($object1, $object2), $data->collapse()->all());
 	}
 
+
 	public function testClear()
 	{
 		$c = new Collection(array('Hello', 'World', 'World'));
 		$this->assertEmpty($c->clear()->all());
-	}
-
-
-	public function testCopy()
-	{
-		$collection = new Collection(array('Hello', 'World', 'World'));
-		$copy       = $collection->copy();
-		$this->assertEquals(array('Hello', 'World', 'World'), $copy->all());
-		$collection->push('Foo');
-		$this->assertEquals(array('Hello', 'World', 'World'), $copy->all());
 	}
 
 

@@ -68,16 +68,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Get a copy of the collection.
-	 *
-	 * @return \Illuminate\Support\Collection
-	 */
-	public function copy()
-	{
-		return clone($this);
-	}
-
-	/**
 	 * Collapse the collection items into a single array.
 	 *
 	 * @return \Illuminate\Support\Collection
