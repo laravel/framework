@@ -1258,11 +1258,6 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'before');
 
-		if ($format = $this->getDateFormat($attribute))
-		{
-			return $this->validateBeforeWithFormat($format, $value, $parameters);
-		}
-
 		if ( ! ($date = strtotime($parameters[0])))
 		{
 			return strtotime($value) < strtotime($this->getValue($parameters[0]));
@@ -1271,20 +1266,6 @@ class Validator implements MessageProviderInterface {
 		{
 			return strtotime($value) < $date;
 		}
-	}
-
-	/**
-	 * Validate the date is before a given date with a given format.
-	 *
-	 * @param  string  $format
-	 * @param  mixed   $value
-	 * @param  array   $parameters
-	 * @return bool
-	 */
-	protected function validateBeforeWithFormat($format, $value, $parameters)
-	{
-		return DateTime::createFromFormat($format, $value) <
-               DateTime::createFromFormat($format, $parameters[0]);
 	}
 
 	/**
@@ -1299,11 +1280,6 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'after');
 
-		if ($format = $this->getDateFormat($attribute))
-		{
-			return $this->validateAfterWithFormat($format, $value, $parameters);
-		}
-
 		if ( ! ($date = strtotime($parameters[0])))
 		{
 			return strtotime($value) > strtotime($this->getValue($parameters[0]));
@@ -1312,20 +1288,6 @@ class Validator implements MessageProviderInterface {
 		{
 			return strtotime($value) > $date;
 		}
-	}
-
-	/**
-	 * Validate the date is after a given date with a given format.
-	 *
-	 * @param  string  $format
-	 * @param  mixed   $value
-	 * @param  array   $parameters
-	 * @return bool
-	 */
-	protected function validateAfterWithFormat($format, $value, $parameters)
-	{
-		return DateTime::createFromFormat($format, $value) >
-               DateTime::createFromFormat($format, $parameters[0]);
 	}
 	
 	/**
