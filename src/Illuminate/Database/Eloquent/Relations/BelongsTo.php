@@ -208,6 +208,18 @@ class BelongsTo extends Relation {
 	}
 
 	/**
+	 * Dissociate previously associated model from the given parent.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function dissociate()
+	{
+		$this->parent->setAttribute($this->foreignKey, null);
+
+		return $this->parent->setRelation($this->relation, null);
+	}
+
+	/**
 	 * Update the parent model on the relationship.
 	 *
 	 * @param  array  $attributes
