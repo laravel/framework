@@ -529,6 +529,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addResourceIndex($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name);
+
 		$action = $this->getResourceAction($name, $controller, 'index', $options);
 
 		return $this->get($uri, $action);
@@ -546,6 +547,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addResourceCreate($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name).'/create';
+
 		$action = $this->getResourceAction($name, $controller, 'create', $options);
 
 		return $this->get($uri, $action);
@@ -563,6 +565,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addResourceStore($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name);
+
 		$action = $this->getResourceAction($name, $controller, 'store', $options);
 
 		return $this->post($uri, $action);
@@ -580,6 +583,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addResourceShow($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
 		$action = $this->getResourceAction($name, $controller, 'show', $options);
 
 		return $this->get($uri, $action);
@@ -597,6 +601,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addResourceEdit($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
+
 		$action = $this->getResourceAction($name, $controller, 'edit', $options);
 
 		return $this->get($uri, $action);
@@ -630,6 +635,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addPutResourceUpdate($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
 		$action = $this->getResourceAction($name, $controller, 'update', $options);
 
 		return $this->put($uri, $action);
@@ -662,6 +668,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function addResourceDestroy($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
 		$action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
 		return $this->delete($uri, $action);
