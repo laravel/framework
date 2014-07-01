@@ -1284,11 +1284,12 @@ class Validator implements MessageProviderInterface {
 	protected function validateBeforeWithFormat($format, $value, $parameters)
 	{
 		$param = $this->getValue($parameters[0]) ?: $parameters[0];
-		$date_value = DateTime::createFromFormat($format, $value);
-		$date_param = DateTime::createFromFormat($format, $param)
-			?: new DateTime($param);
 
-		return ($date_value && $date_param) && ($date_value < $date_param);
+		$dateValue = DateTime::createFromFormat($format, $value);
+
+		$dateParam = DateTime::createFromFormat($format, $param) ?: new DateTime($param);
+
+		return ($dateValue && $dateParam) && ($dateValue < $dateParam);
 	}
 
 	/**
@@ -1329,13 +1330,14 @@ class Validator implements MessageProviderInterface {
 	protected function validateAfterWithFormat($format, $value, $parameters)
 	{
 		$param = $this->getValue($parameters[0]) ?: $parameters[0];
-		$date_value = DateTime::createFromFormat($format, $value);
-		$date_param = DateTime::createFromFormat($format, $param)
-			?: new DateTime($param);
 
-		return ($date_value && $date_param) && ($date_value > $date_param);
+		$dateValue = DateTime::createFromFormat($format, $value);
+
+		$dateParam = DateTime::createFromFormat($format, $param) ?: new DateTime($param);
+
+		return ($dateValue && $dateParam) && ($dateValue > $dateParam);
 	}
-	
+
 	/**
 	 * Validate that an attribute is a valid timezone.
 	 *
@@ -1353,7 +1355,7 @@ class Validator implements MessageProviderInterface {
 		{
 			return false;
 		}
-	
+
 		return true;
 	}
 
