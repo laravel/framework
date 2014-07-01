@@ -22,9 +22,9 @@ trait ConfirmableTrait {
 
 			if ( ! $confirmed)
 			{
-			    $this->comment('Command Cancelled!');
+				$this->comment('Command Cancelled!');
 
-			    return false;
+				return false;
 			}
 		}
 
