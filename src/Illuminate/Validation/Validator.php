@@ -1283,8 +1283,12 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateBeforeWithFormat($format, $value, $parameters)
 	{
-		return DateTime::createFromFormat($format, $value) <
-               DateTime::createFromFormat($format, $parameters[0]);
+		$param = $this->getValue($parameters[0]) ?: $parameters[0];
+		$date_value = DateTime::createFromFormat($format, $value);
+		$date_param = DateTime::createFromFormat($format, $param)
+			?: new DateTime($param);
+
+		return ($date_value && $date_param) && ($date_value < $date_param);
 	}
 
 	/**
@@ -1324,8 +1328,12 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateAfterWithFormat($format, $value, $parameters)
 	{
-		return DateTime::createFromFormat($format, $value) >
-               DateTime::createFromFormat($format, $parameters[0]);
+		$param = $this->getValue($parameters[0]) ?: $parameters[0];
+		$date_value = DateTime::createFromFormat($format, $value);
+		$date_param = DateTime::createFromFormat($format, $param)
+			?: new DateTime($param);
+
+		return ($date_value && $date_param) && ($date_value > $date_param);
 	}
 	
 	/**
