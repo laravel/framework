@@ -56,6 +56,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Clear the collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function clear()
+	{
+		$this->items = [];
+
+		return $this;
+	}
+
+	/**
 	 * Collapse the collection items into a single array.
 	 *
 	 * @return \Illuminate\Support\Collection

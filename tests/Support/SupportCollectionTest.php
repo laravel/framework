@@ -183,6 +183,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testClear()
+	{
+		$c = new Collection(array('Hello', 'World', 'World'));
+		$this->assertEmpty($c->clear()->all());
+	}
+
+
 	public function testSort()
 	{
 		$data = new Collection(array(5, 3, 1, 2, 4));
