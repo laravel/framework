@@ -19,14 +19,14 @@ class RedisConnector implements ConnectorInterface {
 	 */
 	protected $connection;
 
-	/**
-	 * Create a new Redis queue connector instance.
-	 *
-	 * @param  \Illuminate\Redis\Database  $redis
-	 * @param  string|null  $connection
-	 * @return void
-	 */
-	public function __construct(Database $redis, $connection = null)
+    /**
+     * Create a new Redis queue connector instance.
+     *
+     * @param mixed $redis
+     * @param string|null $connection
+     * @return void
+     */
+    public function __construct($redis, $connection = null)
 	{
 		$this->redis = $redis;
 		$this->connection = $connection;

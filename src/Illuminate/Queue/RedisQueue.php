@@ -5,12 +5,11 @@ use Illuminate\Queue\Jobs\RedisJob;
 
 class RedisQueue extends Queue implements QueueInterface {
 
-	/**
-	* The Redis database instance.
-	*
-	 * @var \Illuminate\Redis\Database
-	 */
-	protected $redis;
+    /**
+     * The Redis database instance.
+     * @var mixed
+     */
+    protected $redis;
 
 	/**
 	 * The connection name.
@@ -29,12 +28,12 @@ class RedisQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new Redis queue instance.
 	 *
-	 * @param  \Illuminate\Redis\Database  $redis
+	 * @param  mixed $redis
 	 * @param  string  $default
 	 * @param  string  $connection
 	 * @return void
 	 */
-	public function __construct(Database $redis, $default = 'default', $connection = null)
+	public function __construct($redis, $default = 'default', $connection = null)
 	{
 		$this->redis = $redis;
 		$this->default = $default;
