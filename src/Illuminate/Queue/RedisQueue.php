@@ -161,38 +161,23 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	public function migrateExpiredJobs($from, $to)
 	{
-		$jobs = $this->getExpiredJobs($from, $time = $this->getTime());
+		$options = array('cas' => true, 'watch' => $from, 'retry' => 10);
 
-		if (count($jobs) > 0)
-		{
-			$this->removeExpiredJobs($from, $time);
+		$this->redis->transaction($options, function ($tx) use ($from, $to) {
 
-			call_user_func_array(array($this->redis, 'rpush'), array_merge(array($to), $jobs));
-		}
-	}
+			$time = $this->getTime();
 
-	/**
-	 * Get the delayed jobs that are ready.
-	 *
-	 * @param  string  $queue
-	 * @param  int     $time
-	 * @return array
-	 */
-	protected function getExpiredJobs($queue, $time)
-	{
-		return $this->redis->zrangebyscore($queue, '-inf', $time);
-	}
+			@list($jobs) = $tx->zrangebyscore($from, '-inf', $time);
 
-	/**
-	 * Remove the delayed jobs that are ready for processing.
-	 *
-	 * @param  string  $queue
-	 * @param  int     $time
-	 * @return void
-	 */
-	protected function removeExpiredJobs($queue, $time)
-	{
-		$this->redis->zremrangebyscore($queue, '-inf', $time);
+			if (isset($jobs) && count($jobs) > 0)
+			{
+				$tx->multi();
+				$tx->zremrangebyscore($from, '-inf', $time);
+			}
+
+			call_user_func_array(array($tx, 'rpush'), array_merge(array($to), $jobs));
+
+		});
 	}
 
 	/**
