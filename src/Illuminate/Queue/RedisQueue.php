@@ -7,6 +7,7 @@ class RedisQueue extends Queue implements QueueInterface {
 
     /**
      * The Redis database instance.
+	 *
      * @var mixed
      */
     protected $redis;
