@@ -42,8 +42,8 @@ abstract class Presenter {
 	 * @param  string  $url
 	 * @param  int  $page
 	 * @param  string  $rel
-     * @param  int  $goto
-     * @return string
+        * @param  int  $goto
+        * @return string
 	 */
 	abstract public function getPageLinkWrapper($url, $page, $rel = null, $goto);
 
@@ -205,11 +205,11 @@ abstract class Presenter {
 		}
 		else
 		{
-            // Present same page info to user as the url gets
-            $goto = $this->currentPage - 1;
-            $url = $this->paginator->getUrl($goto);
+			// Present same page info to user as the url gets
+			$goto = $this->currentPage - 1;
+			$url = $this->paginator->getUrl($goto);
 
-            return $this->getPageLinkWrapper($url, $text, 'prev', $goto);
+			return $this->getPageLinkWrapper($url, $text, 'prev', $goto);
 		}
 	}
 
@@ -230,11 +230,11 @@ abstract class Presenter {
 		}
 		else
 		{
-            // Present same page info to user as the url gets
-            $goto = $this->currentPage + 1;
-            $url = $this->paginator->getUrl($goto);
+			// Present same page info to user as the url gets
+			$goto = $this->currentPage + 1;
+			$url = $this->paginator->getUrl($goto);
 
-            return $this->getPageLinkWrapper($url, $text, 'next', $goto);
+			return $this->getPageLinkWrapper($url, $text, 'next', $goto);
 		}
 	}
 
