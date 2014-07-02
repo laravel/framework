@@ -37,12 +37,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function get($key, $default = null)
 	{
-		if (array_key_exists($key, $this->attributes))
-		{
-			return $this->attributes[$key];
-		}
-
-		return value($default);
+		return array_get($this->attributes, $key, $default);
 	}
 
 	/**
