@@ -119,7 +119,7 @@ class RedisQueue extends Queue implements QueueInterface {
 
 		$job = $this->redis->lpop($queue);
 
-		if ( ! is_null($job))
+		if ( ! is_null($job) && $job !== false)
 		{
 			$this->redis->zadd($queue.':reserved', $this->getTime() + 60, $job);
 
