@@ -19,7 +19,7 @@ class PaginationCustomPresenterTest extends PHPUnit_Framework_TestCase {
 				return '<a href="' . $url . '">' . $page . '</a>';
 			});
 
-		$this->assertEquals('<a href="http://laravel.com?page=1">1</a>', $customPresenter->getPageLinkWrapper('http://laravel.com?page=1', '1', null));
+		$this->assertEquals('<a href="http://laravel.com?page=1">1</a>', $customPresenter->getPageLinkWrapper('http://laravel.com?page=1', '1', null, '1'));
 	}
 
 
