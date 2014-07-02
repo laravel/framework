@@ -829,7 +829,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$instance = new $class;
 
 			return new MorphTo(
-				with($instance)->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+				$instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
 			);
 		}
 	}
@@ -870,7 +870,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough(with(new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**

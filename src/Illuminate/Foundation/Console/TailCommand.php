@@ -71,7 +71,7 @@ class TailCommand extends Command {
 
 		$lines = $this->option('lines');
 
-		with(new Process('tail -f -n '.$lines.' '.escapeshellarg($path)))->setTimeout(null)->run(function($type, $line) use ($output)
+		(new Process('tail -f -n '.$lines.' '.escapeshellarg($path)))->setTimeout(null)->run(function($type, $line) use ($output)
 		{
 			$output->write($line);
 		});
