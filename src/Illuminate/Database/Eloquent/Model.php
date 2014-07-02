@@ -130,6 +130,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $dates = array();
 
 	/**
+	 * Attributes that are to be casted to a different type.
+	 *
+	 * @var array
+	 */
+	protected $cast = array();
+
+	/**
 	 * The relationships that should be touched on save.
 	 *
 	 * @var array
@@ -2164,14 +2171,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$attributes = $this->getArrayableAttributes();
 
-		// If an attribute is a date, we will cast it to a string after converting it
-		// to a DateTime / Carbon instance. This is so we will get some consistent
-		// formatting while accessing attributes vs. arraying / JSONing a model.
-		foreach ($this->getDates() as $key)
+		// PLACEHOLDER FOR TAYLOR COMMENT
+		// Iterate the castable fields, and if the field is present
+		// cast the attribute and replace within the array.
+		foreach ($this->getCasts() as $key => $type)
 		{
 			if ( ! isset($attributes[$key])) continue;
 
-			$attributes[$key] = (string) $this->asDateTime($attributes[$key]);
+			$attributes[$key] = $this->castAttribute($type, $attributes[$key]);
 		}
 
 		// We want to spin through all the mutated attributes for this model and call
@@ -2337,13 +2344,35 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $this->mutateAttribute($key, $value);
 		}
 
-		// If the attribute is listed as a date, we will convert it to a DateTime
-		// instance on retrieval, which makes it quite convenient to work with
-		// date fields without having to create a mutator for each property.
-		elseif (in_array($key, $this->getDates()))
+		// PLACEHOLDER FOR TAYLOR COMMENT
+		// If the field is present in the castable array, then
+		// retrieve the intended type, and return the casted
+		// value.
+		elseif (array_key_exists($key, $casts = $this->getCasts()))
 		{
-			if ($value) return $this->asDateTime($value);
+			$type = strtolower($casts[$key]);
+
+			if ($value) return $this->castAttribute($type, $value);
 		}
+
+		return $value;
+	}
+
+	/**
+	 * Cast an attribute to a new type.
+	 *
+	 * @param  string $type
+	 * @param  mixed  $value
+	 * @return mixed
+	 */
+	protected function castAttribute($type, $value)
+	{
+		if ($type === 'date')
+		{
+			return $this->asDateTime($value);
+		}
+
+		settype($value, $type);
 
 		return $value;
 	}
@@ -2440,14 +2469,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $this->{$method}($value);
 		}
 
-		// If an attribute is listed as a "date", we'll convert it from a DateTime
-		// instance into a form proper for storage on the database tables using
-		// the connection grammar's date format. We will auto set the values.
-		elseif (in_array($key, $this->getDates()))
+		// PLACEHOLDER FOR TAYLOR COMMENT
+		// If the attribute being set is held within the castable array
+		// then cast before setting the attribute. Date types are handled
+		// seperately due to being complex objects.
+		elseif (array_key_exists($key, $casts = $this->getCasts()))
 		{
 			if ($value)
 			{
-				$value = $this->fromDateTime($value);
+				if ($casts[$key] === 'date')
+				{
+					$value = $this->fromDateTime($value);
+				}
+				else
+				{
+					$value = $this->castAttribute($casts[$key], $value);
+				}
 			}
 		}
 
@@ -2466,15 +2503,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Get the attributes that should be converted to dates.
+	 * Get the attributes that should be cast upon retrieval.
 	 *
 	 * @return array
 	 */
-	public function getDates()
+	public function getCasts()
 	{
-		$defaults = array(static::CREATED_AT, static::UPDATED_AT);
+		// PLACEHOLDER FOR TAYLOR COMMENT
+		// This block allows for backwards compatibility with $dates by
+		// merging values present in the original date array with our
+		// defaults.
+		$originals = array();
+		foreach ($this->dates as $key)
+		{
+			$originals[$key] = 'date';
+		}
 
-		return array_merge($this->dates, $defaults);
+		$defaults = array(static::CREATED_AT => 'date', static::UPDATED_AT => 'date');
+
+		return array_merge($this->cast, $originals, $defaults);
 	}
 
 	/**
@@ -2667,7 +2714,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 				$dirty[$key] = $value;
 			}
 			elseif ($value !== $this->original[$key] &&
-                                 ! $this->originalIsNumericallyEquivalent($key))
+								 ! $this->originalIsNumericallyEquivalent($key))
 			{
 				$dirty[$key] = $value;
 			}

@@ -294,6 +294,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAttributesInCastingArrayAreReturnedAsCorrectType()
+	{
+		$model = new EloquentModelWithCastsStub;
+		$model->first = 1337;
+		$model->second = 1;
+		$model->third = '13.77';
+		$this->assertTrue(is_string($model->first));
+		$this->assertTrue(is_bool($model->second));
+		$this->assertTrue(is_float($model->third));
+	}
+
 	public function testDateTimeAttributesReturnNullIfSetToNull()
 	{
 		$timestamps = array(
@@ -849,7 +860,7 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return 'foo';
 	}
-	public function getDates()
+	public function getCasts()
 	{
 		return array();
 	}
@@ -864,9 +875,9 @@ class EloquentModelCamelStub extends EloquentModelStub {
 }
 
 class EloquentDateModelStub extends EloquentModelStub {
-	public function getDates()
+	public function getCasts()
 	{
-		return array('created_at', 'updated_at');
+		return array('created_at' => 'date', 'updated_at' => 'date');
 	}
 }
 
@@ -948,4 +959,12 @@ class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return array_key_exists(get_called_class(), static::$booted);
 	}
+}
+
+class EloquentModelWithCastsStub extends Illuminate\Database\Eloquent\Model {
+	protected $cast = array(
+		'first' 	=> 'string',
+		'second' 	=> 'bool',
+		'third' 	=> 'float',
+	);
 }
