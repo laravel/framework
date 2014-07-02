@@ -42,8 +42,8 @@ abstract class Presenter {
 	 * @param  string  $url
 	 * @param  int  $page
 	 * @param  string  $rel
-        * @param  int  $goto
-        * @return string
+	 * @param  int  $goto
+	 * @return string
 	 */
 	abstract public function getPageLinkWrapper($url, $page, $rel = null, $goto);
 
