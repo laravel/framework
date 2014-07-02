@@ -177,12 +177,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function get($key, $default = null)
 	{
-		if (array_key_exists($key, $this->items))
-		{
-			return $this->items[$key];
-		}
-
-		return value($default);
+		return array_get($this->items, $key, $default);
 	}
 
 	/**
