@@ -95,16 +95,18 @@ class Writer {
 	/**
 	 * Register a daily file log handler.
 	 *
-	 * @param  string  $path
-	 * @param  int     $days
-	 * @param  string  $level
+	 * @param  string    $path
+	 * @param  int       $days
+	 * @param  string    $level
+	 * @param  bool      $bubble
+	 * @param  null|int  $filePermission
 	 * @return void
 	 */
-	public function useDailyFiles($path, $days = 0, $level = 'debug')
+	public function useDailyFiles($path, $days = 0, $level = 'debug', $bubble = true, $filePermission = null)
 	{
 		$level = $this->parseLevel($level);
 
-		$this->monolog->pushHandler($handler = new RotatingFileHandler($path, $days, $level));
+		$this->monolog->pushHandler($handler = new RotatingFileHandler($path, $days, $level, $bubble, $filePermission));
 
 		$handler->setFormatter($this->getDefaultFormatter());
 	}
