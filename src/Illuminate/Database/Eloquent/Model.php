@@ -2350,9 +2350,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// value.
 		elseif (array_key_exists($key, $casts = $this->getCasts()))
 		{
-			$type = strtolower($casts[$key]);
-
-			if ($value) return $this->castAttribute($type, $value);
+			if ($value) return $this->castAttribute($casts[$key], $value);
 		}
 
 		return $value;
@@ -2367,6 +2365,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function castAttribute($type, $value)
 	{
+		$type = strtolower($type);
+
 		if ($type === 'date')
 		{
 			return $this->asDateTime($value);
