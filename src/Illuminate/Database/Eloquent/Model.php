@@ -2369,10 +2369,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if ($type === 'date')
 		{
-			return $this->asDateTime($value);
+			if ($value) return $this->asDateTime($value);
 		}
 
-		settype($value, $type);
+		if ($value !== null) settype($value, $type);
 
 		return $value;
 	}
