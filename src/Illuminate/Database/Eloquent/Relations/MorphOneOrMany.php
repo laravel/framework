@@ -55,7 +55,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	}
 
 	/**
-	 * Add the constraints for a relationship count query.
+	 * Get the relationship count query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
