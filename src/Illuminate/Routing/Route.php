@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Routing;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
