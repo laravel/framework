@@ -655,7 +655,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		return new static($columns);
+		return new static;
 	}
 
 	/**
