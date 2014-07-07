@@ -376,6 +376,17 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testContains()
+	{
+		$c = new Collection([1, 3, 5]);
+
+		$this->assertEquals(true,  $c->contains(1));
+		$this->assertEquals(false, $c->contains(2));
+		$this->assertEquals(true,  $c->contains(function($value) { return $value < 5; }));
+		$this->assertEquals(false, $c->contains(function($value) { return $value > 5; }));
+	}
+
+
 	public function testGettingSumFromCollection()
 	{
 		$c = new Collection(array((object) array('foo' => 50), (object) array('foo' => 50)));
