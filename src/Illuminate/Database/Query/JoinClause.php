@@ -108,8 +108,8 @@ class JoinClause {
 	/**
 	 * Add an "on where is null" clause to the join
 	 *
-	 * @param $first
-	 * @param string $boolean
+	 * @param  string $first
+	 * @param  string $boolean
 	 * @return JoinClause
 	 */
 	public function whereNull($first, $boolean = 'and')
