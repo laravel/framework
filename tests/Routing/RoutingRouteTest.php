@@ -522,6 +522,24 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRouteClassBinding()
+	{
+		$router = $this->getRouter();
+		$router->get('foo/{bar}', function($name) { return $name; });
+		$router->bind('bar', 'RouteBindingStub');
+		$this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+	}
+
+
+	public function testRouteClassMethodBinding()
+	{
+		$router = $this->getRouter();
+		$router->get('foo/{bar}', function($name) { return $name; });
+		$router->bind('bar', 'RouteBindingStub@find');
+		$this->assertEquals('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
+	}
+
+
 	public function testModelBinding()
 	{
 		$router = $this->getRouter();
@@ -831,6 +849,10 @@ class RouteTestControllerRemoveFilterStub extends \Illuminate\Routing\Controller
 	}
 }
 
+class RouteBindingStub {
+	public function bind($value, $route) { return strtoupper($value); }
+	public function find($value, $route) { return strtolower($value); }
+}
 
 class RouteModelBindingStub {
 	public function find($value) { return strtoupper($value); }
