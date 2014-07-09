@@ -74,7 +74,7 @@ class Builder {
 	{
 		if (is_array($id))
 		{
-		    return $this->findMany($id, $columns);
+			return $this->findMany($id, $columns);
 		}
 
 		$this->query->where($this->model->getKeyName(), '=', $id);

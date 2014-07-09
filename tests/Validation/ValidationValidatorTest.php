@@ -1066,12 +1066,53 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	{
 		date_default_timezone_set('UTC');
 		$trans = $this->getRealTranslator();
-
-		$v = new Validator($trans, array('x' => '02/04/2012'), array('x' => 'After:03/03/2012|Before:01/05/2012'));
+		$v = new Validator($trans, array('x' => '31/12/2000'), array('x' => 'before:31/02/2012'));
 		$this->assertTrue($v->fails());
 
-		$v = new Validator($trans, array('x' => '02/04/2012'), array('x' => 'date_format:d/m/Y|After:03/03/2012|Before:01/05/2012'));
+		$v = new Validator($trans, array('x' => '31/12/2000'), array('x' => 'date_format:d/m/Y|before:31/12/2012'));
 		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => '31/12/2012'), array('x' => 'after:31/12/2000'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('x' => '31/12/2012'), array('x' => 'date_format:d/m/Y|after:31/12/2000'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2013'), array('start' => 'after:01/01/2000', 'ends' => 'after:start'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2013'), array('start' => 'date_format:d/m/Y|after:31/12/2000', 'ends' => 'date_format:d/m/Y|after:start'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2000'), array('start' => 'after:31/12/2000', 'ends' => 'after:start'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2000'), array('start' => 'date_format:d/m/Y|after:31/12/2000', 'ends' => 'date_format:d/m/Y|after:start'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2013'), array('start' => 'before:ends', 'ends' => 'after:start'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2013'), array('start' => 'date_format:d/m/Y|before:ends', 'ends' => 'date_format:d/m/Y|after:start'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2000'), array('start' => 'before:ends', 'ends' => 'after:start'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('start' => '31/12/2012', 'ends' => '31/12/2000'), array('start' => 'date_format:d/m/Y|before:ends', 'ends' => 'date_format:d/m/Y|after:start'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('x' => date('d/m/Y')), array('x' => 'date_format:d/m/Y|after:yesterday|before:tomorrow'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => date('d/m/Y')), array('x' => 'date_format:d/m/Y|after:tomorrow|before:yesterday'));
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, array('x' => date('Y-m-d')), array('x' => 'after:yesterday|before:tomorrow'));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => date('Y-m-d')), array('x' => 'after:tomorrow|before:yesterday'));
+		$this->assertTrue($v->fails());
 	}
 
 

@@ -266,29 +266,30 @@ if ( ! function_exists('array_flatten'))
 if ( ! function_exists('array_forget'))
 {
 	/**
-	 * Remove an array item from a given array using "dot" notation.
+	 * Remove one or many array items from a given array using "dot" notation.
 	 *
-	 * @param  array   $array
-	 * @param  string  $key
+	 * @param  array        $array
+	 * @param  array|string $keys
 	 * @return void
 	 */
-	function array_forget(&$array, $key)
+	function array_forget(&$array, $keys)
 	{
-		$keys = explode('.', $key);
-
-		while (count($keys) > 1)
+		foreach ((array) $keys as $key)
 		{
-			$key = array_shift($keys);
+			$parts = explode('.', $key);
 
-			if ( ! isset($array[$key]) || ! is_array($array[$key]))
+			while (count($parts) > 1)
 			{
-				return;
+				$part = array_shift($parts);
+
+				if (isset($array[$part]) && is_array($array[$part]))
+				{
+					$array =& $array[$part];
+				}
 			}
 
-			$array =& $array[$key];
+			unset($array[array_shift($parts)]);
 		}
-
-		unset($array[array_shift($keys)]);
 	}
 }
 
@@ -526,6 +527,27 @@ if ( ! function_exists('class_basename'))
 		$class = is_object($class) ? get_class($class) : $class;
 
 		return basename(str_replace('\\', '/', $class));
+	}
+}
+
+if ( ! function_exists('class_uses_recursive'))
+{
+	/**
+	 * Returns all traits used by a class, it's subclasses and trait of their traits
+	 *
+	 * @param  string $class
+	 * @return array
+	 */
+	function class_uses_recursive($class)
+	{
+		$results = [];
+
+		foreach (array_merge([$class => $class], class_parents($class)) as $class)
+		{
+			$results += trait_uses_recursive($class);
+		}
+
+		return array_unique($results);
 	}
 }
 
@@ -1024,6 +1046,27 @@ if ( ! function_exists('studly_case'))
 	function studly_case($value)
 	{
 		return Str::studly($value);
+	}
+}
+
+if ( ! function_exists('trait_uses_recursive'))
+{
+	/**
+	 * Returns all traits used by a trait and its traits
+	 *
+	 * @param  $trait
+	 * @return array
+	 */
+	function trait_uses_recursive($trait)
+	{
+		$traits = class_uses($trait);
+
+		foreach ($traits as $trait)
+		{
+			$traits += trait_uses_recursive($trait);
+		}
+
+		return $traits;
 	}
 }
 

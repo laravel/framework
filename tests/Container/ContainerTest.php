@@ -300,12 +300,22 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCreatingBoundConcreteClassPassesParameters() {
+	public function testCreatingBoundConcreteClassPassesParameters()
+	{
 		$container = new Container;
 		$container->bind('TestAbstractClass', 'ContainerConstructorParameterLoggingStub');
 		$parameters = array('First', 'Second');
 		$instance = $container->make('TestAbstractClass', $parameters);
 		$this->assertEquals($parameters, $instance->receivedParameters);
+	}
+
+
+	public function testInternalClassWithDefaultParameters()
+	{
+		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
+		$container = new Container;
+		$parameters = array();
+		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 
 }

@@ -265,7 +265,7 @@ class Request extends SymfonyRequest {
 
 		$results = $this->all();
 
-		foreach ($keys as $key) array_forget($results, $key);
+		array_forget($results, $keys);
 
 		return $results;
 	}
