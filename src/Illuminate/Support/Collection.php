@@ -226,6 +226,22 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Determine if an item exists in the collection.
+	 *
+	 * @param  mixed  $value
+	 * @return bool
+	 */
+	public function contains($value)
+	{
+		if ($value instanceof Closure)
+		{
+			return ! is_null($this->first($value));
+		}
+
+		return in_array($value, $this->items);
+	}
+
+	/**
 	 * Determine if an item exists in the collection by key.
 	 *
 	 * @param  mixed  $key
