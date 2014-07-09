@@ -2193,7 +2193,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			if (in_array($key, $this->hidden)) continue;
 
-			if (count($this->visible) > 0 && !in_array($key, $this->visible)) continue;
+			if (count($this->visible) > 0 && ! in_array($key, $this->visible)) continue;
 
 			$attributes[$key] = $this->mutateAttributeForArray($key, null);
 		}
