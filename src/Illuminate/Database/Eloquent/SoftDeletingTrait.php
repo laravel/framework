@@ -17,6 +17,10 @@ trait SoftDeletingTrait {
 	public static function bootSoftDeletingTrait()
 	{
 		static::addGlobalScope(new SoftDeletingScope);
+
+		$instance = new static;
+
+		$instance->addCast($instance->getDeletedAtColumn(), 'date');
 	}
 
 	/**
