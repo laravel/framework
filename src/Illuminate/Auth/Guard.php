@@ -152,6 +152,13 @@ class Guard {
 		{
 			$user = $this->getUserByRecaller($recaller);
 		}
+		
+		// If at this point the user is null, we need to logout in order to clear
+		// any data leftover and assure consistency.
+		if (is_null($user))
+		{
+			$this->logout();
+		}
 
 		return $this->user = $user;
 	}
