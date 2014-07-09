@@ -41,6 +41,12 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		array_forget($array, 'names.developer');
 		$this->assertFalse(isset($array['names']['developer']));
 		$this->assertTrue(isset($array['names']['otherDeveloper']));
+
+		$array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle', 'thirdDeveloper' => 'Lucas']];
+		array_forget($array, ['names.developer', 'names.otherDeveloper']);
+		$this->assertFalse(isset($array['names']['developer']));
+		$this->assertFalse(isset($array['names']['otherDeveloper']));
+		$this->assertTrue(isset($array['names']['thirdDeveloper']));
 	}
 
 
@@ -234,4 +240,26 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		array_values(array_sort($array, function($v) { return $v['name']; })));
 	}
 
+
+	public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
+	{
+		$this->assertEquals([
+			'SupportTestTraitOne' => 'SupportTestTraitOne',
+			'SupportTestTraitTwo' => 'SupportTestTraitTwo',
+		],
+		class_uses_recursive('SupportTestClassTwo'));
+	}
+
 }
+
+trait SupportTestTraitOne {}
+
+trait SupportTestTraitTwo {
+	use SupportTestTraitOne;
+}
+
+class SupportTestClassOne {
+	use SupportTestTraitTwo;
+}
+
+class SupportTestClassTwo extends SupportTestClassOne {}

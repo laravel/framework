@@ -223,11 +223,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s/s', $this->contentTags[0], $this->contentTags[1]);
+		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
 
 		$callback = function($matches)
 		{
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>';
+			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
+
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -241,11 +243,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$pattern = sprintf('/%s\s*(.+?)\s*%s/s', $this->escapedTags[0], $this->escapedTags[1]);
+		$pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
 
 		$callback = function($matches)
 		{
-			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>';
+			$whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
+
+			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);

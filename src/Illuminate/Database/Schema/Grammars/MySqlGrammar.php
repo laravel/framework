@@ -11,7 +11,7 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After');
+	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After', 'Comment');
 
 	/**
 	 * The possible column serials
@@ -564,6 +564,21 @@ class MySqlGrammar extends Grammar {
 		if ( ! is_null($column->after))
 		{
 			return ' after '.$this->wrap($column->after);
+		}
+	}
+
+	/**
+	 * Get the SQL for an "comment" column modifier.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string|null
+	 */
+	protected function modifyComment(Blueprint $blueprint, Fluent $column)
+	{
+		if ( ! is_null($column->comment))
+		{
+			return ' comment "'.$column->comment.'"';
 		}
 	}
 

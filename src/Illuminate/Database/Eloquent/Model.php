@@ -256,9 +256,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function bootIfNotBooted()
 	{
-		if ( ! isset(static::$booted[get_class($this)]))
+		$class = get_class($this);
+
+		if ( ! isset(static::$booted[$class]))
 		{
-			static::$booted[get_class($this)] = true;
+			static::$booted[$class] = true;
 
 			$this->fireModelEvent('booting', false);
 
@@ -302,7 +304,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected static function bootTraits()
 	{
-		foreach (class_uses(get_called_class()) as $trait)
+		foreach (class_uses_recursive(get_called_class()) as $trait)
 		{
 			if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
 			{
@@ -534,7 +536,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function firstOrCreate(array $attributes)
 	{
-		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		if ( ! is_null($instance = static::where($attributes)->first()))
 		{
 			return $instance;
 		}
@@ -550,7 +552,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function firstOrNew(array $attributes)
 	{
-		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		if ( ! is_null($instance = static::where($attributes)->first()))
 		{
 			return $instance;
 		}
@@ -582,14 +584,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected static function firstByAttributes($attributes)
 	{
-		$query = static::query();
-
-		foreach ($attributes as $key => $value)
-		{
-			$query->where($key, $value);
-		}
-
-		return $query->first() ?: null;
+		return static::where($attributes)->first();
 	}
 
 	/**
@@ -660,7 +655,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		return new static($columns);
+		return new static;
 	}
 
 	/**
@@ -834,7 +829,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$instance = new $class;
 
 			return new MorphTo(
-				with($instance)->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+				$instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
 			);
 		}
 	}
@@ -875,7 +870,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough(with(new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
@@ -1086,6 +1081,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Delete the model from the database.
 	 *
 	 * @return bool|null
+	 * @throws \Exception
 	 */
 	public function delete()
 	{
@@ -1450,9 +1446,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 				$this->fireModelEvent('updated', false);
 			}
-
-			return true;
 		}
+
+		return true;
 	}
 
 	/**
@@ -2869,7 +2865,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (isset(static::$mutatorCache[$class]))
 		{
-			return static::$mutatorCache[get_class($this)];
+			return static::$mutatorCache[$class];
 		}
 
 		return array();

@@ -142,7 +142,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function get($uri, $action)
 	{
-		return $this->addRoute(array('GET', 'HEAD'), $uri, $action);
+		return $this->addRoute(['GET', 'HEAD'], $uri, $action);
 	}
 
 	/**
@@ -528,9 +528,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addResourceIndex($name, $base, $controller, $options)
 	{
+		$uri = $this->getResourceUri($name);
+
 		$action = $this->getResourceAction($name, $controller, 'index', $options);
 
-		return $this->get($this->getResourceUri($name), $action);
+		return $this->get($uri, $action);
 	}
 
 	/**
@@ -544,9 +546,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addResourceCreate($name, $base, $controller, $options)
 	{
+		$uri = $this->getResourceUri($name).'/create';
+
 		$action = $this->getResourceAction($name, $controller, 'create', $options);
 
-		return $this->get($this->getResourceUri($name).'/create', $action);
+		return $this->get($uri, $action);
 	}
 
 	/**
@@ -560,9 +564,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addResourceStore($name, $base, $controller, $options)
 	{
+		$uri = $this->getResourceUri($name);
+
 		$action = $this->getResourceAction($name, $controller, 'store', $options);
 
-		return $this->post($this->getResourceUri($name), $action);
+		return $this->post($uri, $action);
 	}
 
 	/**
@@ -578,7 +584,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
-		return $this->get($uri, $this->getResourceAction($name, $controller, 'show', $options));
+		$action = $this->getResourceAction($name, $controller, 'show', $options);
+
+		return $this->get($uri, $action);
 	}
 
 	/**
@@ -594,7 +602,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
 
-		return $this->get($uri, $this->getResourceAction($name, $controller, 'edit', $options));
+		$action = $this->getResourceAction($name, $controller, 'edit', $options);
+
+		return $this->get($uri, $action);
 	}
 
 	/**
@@ -626,7 +636,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$uri = $this->getResourceUri($name).'/{'.$base.'}';
 
-		return $this->put($uri, $this->getResourceAction($name, $controller, 'update', $options));
+		$action = $this->getResourceAction($name, $controller, 'update', $options);
+
+		return $this->put($uri, $action);
 	}
 
 	/**
@@ -655,9 +667,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addResourceDestroy($name, $base, $controller, $options)
 	{
+		$uri = $this->getResourceUri($name).'/{'.$base.'}';
+
 		$action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
-		return $this->delete($this->getResourceUri($name).'/{'.$base.'}', $action);
+		return $this->delete($uri, $action);
 	}
 
 	/**
@@ -1508,6 +1522,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Check if a route with the given name exists.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function has($name)
+	{
+		return $this->routes->hasNamedRoute($name);
+	}
+
+	/**
 	 * Get the current route name.
 	 *
 	 * @return string|null
@@ -1554,6 +1579,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteAction()
 	{
+		if ( ! $this->current()) return;
+
 		$action = $this->current()->getAction();
 
 		return isset($action['controller']) ? $action['controller'] : null;

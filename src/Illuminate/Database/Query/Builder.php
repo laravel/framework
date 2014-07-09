@@ -427,15 +427,16 @@ class Builder {
 	{
 		// If the column is an array, we will assume it is an array of key-value pairs
 		// and can add them each as a where clause. We will maintain the boolean we
-		// received when the method was called and pass it onto the other wheres.
+		// received when the method was called and pass it into the nested where.
 		if (is_array($column))
 		{
-			foreach ($column as $innerKey => $innerValue)
+			return $this->whereNested(function($query) use ($column)
 			{
-				$this->where($innerKey, '=', $innerValue, $boolean);
-			}
-
-			return $this;
+				foreach ($column as $key => $value)
+				{
+					$query->where($key, '=', $value);
+				}
+			}, $boolean);
 		}
 
 		// Here we will make some assumptions about the operator. If only 2 values are
@@ -1015,7 +1016,10 @@ class Builder {
 	 */
 	public function groupBy()
 	{
-		$this->groups = array_merge((array) $this->groups, func_get_args());
+		foreach(func_get_args() as $arg)
+		{
+			$this->groups = array_merge((array) $this->groups, is_array($arg) ? $arg : [$arg]);
+		}
 
 		return $this;
 	}
@@ -1048,10 +1052,10 @@ class Builder {
 	 * @param  string  $value
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-    public function orHaving($column, $operator = null, $value = null)
-    {
-        return $this->having($column, $operator, $value, 'or');
-    }
+	public function orHaving($column, $operator = null, $value = null)
+	{
+		return $this->having($column, $operator, $value, 'or');
+	}
 
 	/**
 	 * Add a raw having clause to the query.

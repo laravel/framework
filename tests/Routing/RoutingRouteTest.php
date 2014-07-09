@@ -89,6 +89,35 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHeadDispatcher()
+	{
+		$router = $this->getRouter();
+		$router->match(['GET', 'POST'], 'foo', function () { return 'bar'; });
+
+		$response = $router->dispatch(Request::create('foo', 'OPTIONS'));
+		$this->assertEquals(200, $response->getStatusCode());
+		$this->assertEquals('GET,HEAD,POST', $response->headers->get('Allow'));
+
+		$response = $router->dispatch(Request::create('foo', 'HEAD'));
+		$this->assertEquals(200, $response->getStatusCode());
+		$this->assertEquals('', $response->getContent());
+
+		$router = $this->getRouter();
+		$router->match(['GET'], 'foo', function () { return 'bar'; });
+
+		$response = $router->dispatch(Request::create('foo', 'OPTIONS'));
+		$this->assertEquals(200, $response->getStatusCode());
+		$this->assertEquals('GET,HEAD', $response->headers->get('Allow'));
+
+		$router = $this->getRouter();
+		$router->match(['POST'], 'foo', function () { return 'bar'; });
+
+		$response = $router->dispatch(Request::create('foo', 'OPTIONS'));
+		$this->assertEquals(200, $response->getStatusCode());
+		$this->assertEquals('POST', $response->headers->get('Allow'));
+	}
+
+
 	public function testNonGreedyMatches()
 	{
 		$route = new Route('GET', 'images/{id}.{ext}', function() {});
