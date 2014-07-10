@@ -103,8 +103,8 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		if (is_null($perPage))
 		{
 			$this->perPage = (int) $total;
-			$this->items = array_slice($items, 0, $perPage);
-			$this->hasMore = count(array_slice($items, $this->perPage, 1)) > 0;
+			$this->items = array_slice($items, 0, $this->perPage);
+			$this->hasMore = count($items) > $this->perPage;
 		}
 		else
 		{
