@@ -377,6 +377,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the set statements into valid PHP.
+	 *
+	 * @param string  $expression
+	 * @return string
+	 */
+	protected function compileSet($expression)
+	{
+		return "<?php echo \\Illuminate\\Support\\Facades\\View::share$expression; ?>";
+	}
+
+	/**
 	 * Compile the lang statements into valid PHP.
 	 *
 	 * @param string  $expression
