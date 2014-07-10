@@ -50,6 +50,15 @@ class ConfigPublishCommand extends Command {
 	{
 		$package = $this->input->getArgument('package');
 
+		if($this->config->alreadyExists($package))
+		{
+			if( ! $this->confirmOverwrite())
+			{
+				$this->output->writeln('<info>Configuration not published for package: </info>'.$package);
+				return;
+			}
+		}
+
 		if ( ! is_null($path = $this->getPath()))
 		{
 			$this->config->publish($package, $path);
@@ -78,6 +87,31 @@ class ConfigPublishCommand extends Command {
 	}
 
 	/**
+	 * Confirm before overwriting the configuration
+	 *
+	 * @return bool
+	 */
+	protected function confirmOverwrite()
+	{
+		$force = $this->input->getOption('force');
+		$production = strtolower($this->getLaravel()->environment()) == 'production';
+		$silent = $this->input->getOption('no-interaction');
+
+		if($silent and $production)
+		{
+			return $force;
+		}
+		elseif($production)
+		{
+			return $this->confirm('Package Config Already Published. Overwrite previous configuration ?');
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
 	 * Get the console command arguments.
 	 *
 	 * @return array
@@ -98,6 +132,7 @@ class ConfigPublishCommand extends Command {
 	{
 		return array(
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the configuration files.', null),
+			array('force', null, InputOption::VALUE_OPTIONAL, 'Force overwrite already published configuration. Valid with --no-interaction', null),
 		);
 	}
 
