@@ -1188,7 +1188,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			// For model binders, we will attempt to retrieve the models using the find
 			// method on the model instance. If we cannot retrieve the models we'll
 			// throw a not found exception otherwise we will return the instance.
-			if ($model = with(new $class)->find($value))
+			if ($model = (new $class)->find($value))
 			{
 				return $model;
 			}

@@ -155,7 +155,7 @@ class Encrypter {
 	 */
 	protected function validMac(array $payload)
 	{
-		$bytes = with(new SecureRandom)->nextBytes(16);
+		$bytes = (new SecureRandom)->nextBytes(16);
 
 		$calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 
