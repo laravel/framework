@@ -290,7 +290,6 @@ class Builder {
 	 *
 	 * This is more efficient on larger data-sets, etc.
 	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
