@@ -129,11 +129,11 @@ class FileStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		extract($this->rawGet($key));
+		$raw = $this->rawGet($key);
 
-		$int = ((int) $data) + $value;
+		$int = ((int) $raw['data']) + $value;
 
-		$this->put($key, $int, (int) $time);
+		$this->put($key, $int, (int) $raw['time']);
 
 		return $int;
 	}
