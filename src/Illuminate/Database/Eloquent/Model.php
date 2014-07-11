@@ -2593,7 +2593,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function replicate()
 	{
-		$attributes = array_except($this->attributes, array($this->getKeyName()));
+		$except = [
+			$this->getKeyName(),
+			$this->getCreatedAtColumn(),
+			$this->getUpdatedAtColumn(),
+		];
+
+		$attributes = array_except($this->attributes, $except);
 
 		with($instance = new static)->setRawAttributes($attributes);
 
