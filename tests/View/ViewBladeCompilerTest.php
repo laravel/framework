@@ -280,6 +280,23 @@ breeze
 	}
 
 
+	public function testForelseStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@foreach ($this->getUsers() as $user)
+breeze
+@forelse
+empty
+@endforelse';
+		$expected = '<?php $__empty = true; foreach($this->getUsers() as $user): $__empty = false; ?>
+breeze
+<?php endforeach; if ($__empty): ?>
+empty
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
