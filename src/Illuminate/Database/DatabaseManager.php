@@ -216,7 +216,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 * @param  callable  $resolver
 	 * @return void
 	 */
-	public function extend($name, $resolver)
+	public function extend($name, callable $resolver)
 	{
 		$this->extensions[$name] = $resolver;
 	}

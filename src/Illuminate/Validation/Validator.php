@@ -196,7 +196,7 @@ class Validator implements MessageProviderInterface {
 	 * @param  callable  $callback
 	 * @return void
 	 */
-	public function sometimes($attribute, $rules, $callback)
+	public function sometimes($attribute, $rules, callable $callback)
 	{
 		$payload = new Fluent(array_merge($this->data, $this->files));
 
