@@ -428,7 +428,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileForeach($expression)
 	{
-		return "<?php foreach{$expression}: ?>";
+		return "<?php \$__empty = true; foreach{$expression}: \$__empty = false; ?>";
 	}
 
 	/**
@@ -451,6 +451,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected function compileElseif($expression)
 	{
 		return "<?php elseif{$expression}: ?>";
+	}
+
+	/**
+	 * Compile the forelse statements into valid PHP.
+	 *
+	 * @param string  $expression
+	 * @return string
+	 */
+	protected function compileForelse($expression)
+	{
+		return "<?php endforeach; if (\$__empty): ?>";
 	}
 
 	/**
@@ -504,6 +515,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @return string
 	 */
 	protected function compileEndif($expression)
+	{
+		return "<?php endif; ?>";
+	}
+
+	/**
+	 * Compile the end-for-else statements into valid PHP.
+	 *
+	 * @param string  $expression
+	 * @return string
+	 */
+	protected function compileEndforelse($expression)
 	{
 		return "<?php endif; ?>";
 	}
