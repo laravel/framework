@@ -1209,10 +1209,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Add a new route parameter binder.
 	 *
 	 * @param  string  $key
-	 * @param  callable  $binder
+	 * @param  string|callable  $binder
 	 * @return void
 	 */
-	public function bind($key, callable $binder)
+	public function bind($key, $binder)
 	{
 		if (is_string($binder))
 		{
