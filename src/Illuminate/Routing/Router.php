@@ -1068,7 +1068,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Register a route matched event listener.
 	 *
-	 * @param  callable  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function matched($callback)
@@ -1079,7 +1079,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Register a new "before" filter with the router.
 	 *
-	 * @param  mixed  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function before($callback)
@@ -1090,7 +1090,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Register a new "after" filter with the router.
 	 *
-	 * @param  mixed  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function after($callback)
@@ -1102,7 +1102,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Register a new global filter with the router.
 	 *
 	 * @param  string  $filter
-	 * @param  mixed   $callback
+	 * @param  string|callable   $callback
 	 * @return void
 	 */
 	protected function addGlobalFilter($filter, $callback)
@@ -1114,7 +1114,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Register a new filter with the router.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function filter($name, $callback)
@@ -1125,7 +1125,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Parse the registered filter.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable|string  $callback
 	 * @return mixed
 	 */
 	protected function parseFilter($callback)
@@ -1212,7 +1212,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  callable  $binder
 	 * @return void
 	 */
-	public function bind($key, $binder)
+	public function bind($key, callable $binder)
 	{
 		$this->binders[str_replace('-', '_', $key)] = $binder;
 	}
@@ -1460,7 +1460,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  callable  $callback
 	 * @return void
 	 */
-	public function withoutFilters($callback)
+	public function withoutFilters(callable $callback)
 	{
 		$this->disableFilters();
 
