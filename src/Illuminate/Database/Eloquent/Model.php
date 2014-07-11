@@ -2189,7 +2189,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// Here we will grab all of the appended, calculated attributes to this model
 		// as these attributes are not really in the attributes array, but are run
 		// when we need to array or JSON the model for convenience to the coder.
-		foreach ($this->appends as $key)
+		foreach ($this->getArrayableAppends() as $key)
 		{
 			$attributes[$key] = $this->mutateAttributeForArray($key, null);
 		}
@@ -2205,6 +2205,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected function getArrayableAttributes()
 	{
 		return $this->getArrayableItems($this->attributes);
+	}
+
+	/**
+	 * Get all of the appendable values that are arrayable.
+	 *
+	 * @return array
+	 */
+	protected function getArrayableAppends()
+	{
+		if (count($this->appends) > 0)
+		{
+			return $this->getArrayableItems(
+				array_combine($this->appends, $this->appends)
+			);
+		}
+
+		return [];
 	}
 
 	/**

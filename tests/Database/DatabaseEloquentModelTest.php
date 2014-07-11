@@ -798,6 +798,19 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAppendingOfAttributes()
+	{
+		$model = new EloquentModelAppendsStub;
+		$this->assertEquals('admin', $model->is_admin);
+
+		$model->setHidden(['is_admin']);
+		$this->assertEquals([], $model->toArray());
+
+		$model->setVisible([]);
+		$this->assertEquals([], $model->toArray());
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -947,5 +960,13 @@ class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
 	public static function isBooted()
 	{
 		return array_key_exists(get_called_class(), static::$booted);
+	}
+}
+
+class EloquentModelAppendsStub extends Illuminate\Database\Eloquent\Model {
+	protected $appends = array('is_admin');
+	public function getIsAdminAttribute()
+	{
+		return 'admin';
 	}
 }
