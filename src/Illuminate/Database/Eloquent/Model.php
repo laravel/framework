@@ -2454,7 +2454,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// the connection grammar's date format. We will auto set the values.
 		elseif (in_array($key, $this->getDates()))
 		{
-			if ($value)
+			if ($value && !($value instanceof Expression))
 			{
 				$value = $this->fromDateTime($value);
 			}
