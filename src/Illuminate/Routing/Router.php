@@ -1214,7 +1214,35 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function bind($key, callable $binder)
 	{
+		if (is_string($binder))
+		{
+			$binder = $this->createClassBinding($binder);
+		}
+
 		$this->binders[str_replace('-', '_', $key)] = $binder;
+	}
+
+	/**
+	 * Create a class based binding using the IoC container.
+	 *
+	 * @param  string    $binding
+	 * @return \Closure
+	 */
+	public function createClassBinding($binding)
+	{
+		return function($value, $route) use ($binding)
+		{
+			// If the binding has an @ sign, we will assume it's being used to delimit
+			// the class name from the bind method name. This allows for bindings
+			// to run multiple bind methods in a single class for convenience.
+			$segments = explode('@', $binding);
+
+			$method = count($segments) == 2 ? $segments[1] : 'bind';
+
+			$callable = [$this->container->make($segments[0]), $method];
+
+			return call_user_func($callable, $value, $route);
+		};
 	}
 
 	/**
