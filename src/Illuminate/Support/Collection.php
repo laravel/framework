@@ -409,6 +409,18 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		return is_array($keys) ? array_intersect_key($this->items, array_flip($keys)) : $this->items[$keys];
 	}
+	
+	/**
+	 * Shuffle the items in the collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function shuffle()
+	{
+		shuffle($this->items);
+	
+		return $this;
+	}	
 
 	/**
 	 * Reduce the collection to a single value.
