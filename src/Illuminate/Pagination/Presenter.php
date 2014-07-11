@@ -42,9 +42,10 @@ abstract class Presenter {
 	 * @param  string  $url
 	 * @param  int  $page
 	 * @param  string  $rel
+	 * @param  int  $goto
 	 * @return string
 	 */
-	abstract public function getPageLinkWrapper($url, $page, $rel = null);
+	abstract public function getPageLinkWrapper($url, $page, $rel = null, $goto);
 
 	/**
 	 * Get HTML wrapper for disabled text.
@@ -204,9 +205,11 @@ abstract class Presenter {
 		}
 		else
 		{
-			$url = $this->paginator->getUrl($this->currentPage - 1);
+			// Present same page info to user as the url gets
+			$goto = $this->currentPage - 1;
+			$url = $this->paginator->getUrl($goto);
 
-			return $this->getPageLinkWrapper($url, $text, 'prev');
+			return $this->getPageLinkWrapper($url, $text, 'prev', $goto);
 		}
 	}
 
@@ -227,9 +230,11 @@ abstract class Presenter {
 		}
 		else
 		{
-			$url = $this->paginator->getUrl($this->currentPage + 1);
+			// Present same page info to user as the url gets
+			$goto = $this->currentPage + 1;
+			$url = $this->paginator->getUrl($goto);
 
-			return $this->getPageLinkWrapper($url, $text, 'next');
+			return $this->getPageLinkWrapper($url, $text, 'next', $goto);
 		}
 	}
 
@@ -253,7 +258,7 @@ abstract class Presenter {
 	{
 		$url = $this->paginator->getUrl($page);
 
-		return $this->getPageLinkWrapper($url, $page);
+		return $this->getPageLinkWrapper($url, $page, null, $page);
 	}
 
 	/**
