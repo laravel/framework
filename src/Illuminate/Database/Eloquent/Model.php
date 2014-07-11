@@ -594,7 +594,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function query()
 	{
-		return with(new static)->newQuery();
+		return (new static)->newQuery();
 	}
 
 	/**
@@ -671,7 +671,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		throw with(new ModelNotFoundException)->setModel(get_called_class());
+		throw (new ModelNotFoundException)->setModel(get_called_class());
 	}
 
 	/**

@@ -259,7 +259,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
 
-		return $this['env'] = with(new EnvironmentDetector())->detect($envs, $args);
+		return $this['env'] = (new EnvironmentDetector())->detect($envs, $args);
 	}
 
 	/**
@@ -502,7 +502,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  callable  $callback
 	 * @return void
 	 */
-	public function shutdown($callback = null)
+	public function shutdown(callable $callback = null)
 	{
 		if (is_null($callback))
 		{
@@ -619,10 +619,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
 
-		$client = with(new \Stack\Builder)
-						->push('Illuminate\Cookie\Guard', $this['encrypter'])
-						->push('Illuminate\Cookie\Queue', $this['cookie'])
-						->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
+		$client = (new \Stack\Builder)
+                    ->push('Illuminate\Cookie\Guard', $this['encrypter'])
+                    ->push('Illuminate\Cookie\Queue', $this['cookie'])
+                    ->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
 
 		$this->mergeCustomMiddlewares($client);
 

@@ -471,7 +471,7 @@ class Route {
 	/**
 	 * Parse the route action into a standard array.
 	 *
-	 * @param  \Closure|array  $action
+	 * @param  callable|array  $action
 	 * @return array
 	 */
 	protected function parseAction($action)
