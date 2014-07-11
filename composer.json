@@ -89,7 +89,8 @@
         }
     },
     "suggest": {
-        "doctrine/dbal": "Allow renaming columns and dropping SQLite columns."
+        "doctrine/dbal": "Allow renaming columns and dropping SQLite columns.",
+        "guzzlehttp/guzzle": "Required for Mailgun and Mandrill mail drivers."
     },
     "minimum-stability": "dev"
 }
