@@ -1311,7 +1311,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $query->{$method}($column, $amount);
 		}
 
-		return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+		
+		$affectedRows = $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+
+		// sync column values ​​in the model
+		if ($affectedRows) 
+		{
+			$amount *= $method === 'decrement' ? -1 : 1;
+
+			$this->setAttribute($column, $this->getAttribute($column) + $amount);
+		}
+		
+		return $affectedRows;
 	}
 
 	/**
