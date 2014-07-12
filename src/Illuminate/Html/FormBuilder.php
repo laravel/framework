@@ -917,9 +917,9 @@ class FormBuilder {
 	 * Cycle through the Eloquent Collection to see if any
 	 * relationship models include the given input value
 	 *
-	 * @param \Illuminate\Database\Eloquent\Collection $collection
-	 * @param string $value
-	 * @param string $attribute
+	 * @param  \Illuminate\Database\Eloquent\Collection $collection
+	 * @param  string $value
+	 * @param  string $attribute
 	 * @return bool
 	 */
 	protected function checkRelationship($collection, $value, $attribute = 'id')
