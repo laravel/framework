@@ -751,6 +751,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$class->exists = true;
 		$class->first = 'taylor';
 		$class->last = 'otwell';
+		$class->created_at = $class->freshTimestamp();
+		$class->updated_at = $class->freshTimestamp();
 		$class->setRelation('foo', array('bar'));
 
 		$clone = $class->replicate();
@@ -759,6 +761,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($clone->exists);
 		$this->assertEquals('taylor', $clone->first);
 		$this->assertEquals('otwell', $clone->last);
+		$this->assertObjectNotHasAttribute('created_at', $clone);
+		$this->assertObjectNotHasAttribute('updated_at', $clone);
 		$this->assertEquals(array('bar'), $clone->foo);
 	}
 
