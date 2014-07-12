@@ -920,7 +920,6 @@ class FormBuilder {
 	 * @param \Illuminate\Database\Eloquent\Collection $collection
 	 * @param string $value
 	 * @param string $attribute
-	 *
 	 * @return bool
 	 */
 	protected function checkRelationship($collection, $value, $attribute = 'id')
