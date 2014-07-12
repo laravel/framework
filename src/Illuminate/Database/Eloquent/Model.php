@@ -2586,11 +2586,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Clone the model into a new, non-existing instance.
 	 *
+	 * @param  array  $except
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function replicate()
+	public function replicate(array $except = null)
 	{
-		$except = [
+		$except = $except ?: [
 			$this->getKeyName(),
 			$this->getCreatedAtColumn(),
 			$this->getUpdatedAtColumn(),
