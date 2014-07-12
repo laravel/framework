@@ -250,7 +250,7 @@ class Mailer {
 	{
 		if (str_contains($data['callback'], 'SerializableClosure'))
 		{
-			return with(unserialize($data['callback']))->getClosure();
+			return (unserialize($data['callback']))->getClosure();
 		}
 
 		return $data['callback'];

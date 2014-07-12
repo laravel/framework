@@ -43,7 +43,7 @@ class Application extends \Symfony\Component\Console\Application {
 	{
 		$app->boot();
 
-		$console = with($console = new static('Laravel Framework', $app::VERSION))
+		$console = ($console = new static('Laravel Framework', $app::VERSION))
 								->setLaravel($app)
 								->setExceptionHandler($app['exception'])
 								->setAutoExit(false);
