@@ -2589,9 +2589,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $except
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function replicate(array $except = [])
+	public function replicate(array $except = null)
 	{
-		$except = count($except) > 0 ? $except : [
+		$except = $except ?: [
 			$this->getKeyName(),
 			$this->getCreatedAtColumn(),
 			$this->getUpdatedAtColumn(),

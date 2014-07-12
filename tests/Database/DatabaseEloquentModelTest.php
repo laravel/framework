@@ -815,6 +815,22 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
+	{
+		$model = new EloquentModelStub;
+		$model->id = 'id';
+		$model->foo = 'bar';
+		$model->created_at = new DateTime;
+		$model->updated_at = new DateTime;
+		$replicated = $model->replicate();
+
+		$this->assertNull($replicated->id);
+		$this->assertEquals('bar', $replicated->foo);
+		$this->assertNull($replicated->created_at);
+		$this->assertNull($replicated->updated_at);
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
