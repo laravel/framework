@@ -595,9 +595,7 @@ class Factory {
 			$sectionContent = $this->sections[$section];
 		}
 
-		$sectionContent = str_replace('@parent', '', $sectionContent);
-
-		return $sectionContent;
+		return str_replace('@parent', '', $sectionContent);
 	}
 
 	/**
