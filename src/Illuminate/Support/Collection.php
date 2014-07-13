@@ -102,10 +102,10 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Execute a callback over each item.
 	 *
-	 * @param  Closure  $callback
+	 * @param  callable  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function each(Closure $callback)
+	public function each(callable $callback)
 	{
 		array_map($callback, $this->items);
 
@@ -126,10 +126,10 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Run a filter over each of the items.
 	 *
-	 * @param  Closure  $callback
+	 * @param  callable  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function filter(Closure $callback)
+	public function filter(callable $callback)
 	{
 		return new static(array_filter($this->items, $callback));
 	}
@@ -137,11 +137,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Get the first item from the collection.
 	 *
-	 * @param  \Closure   $callback
+	 * @param  callable   $callback
 	 * @param  mixed      $default
 	 * @return mixed|null
 	 */
-	public function first(Closure $callback = null, $default = null)
+	public function first(callable $callback = null, $default = null)
 	{
 		if (is_null($callback))
 		{
@@ -322,10 +322,10 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Run a map over each of the items.
 	 *
-	 * @param  Closure  $callback
+	 * @param  callable  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function map(Closure $callback)
+	public function map(callable $callback)
 	{
 		return new static(array_map($callback, $this->items, array_keys($this->items)));
 	}
@@ -434,7 +434,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		foreach ($this->items as $key => $value)
 		{
-			if ($callback instanceof Closure)
+			if (is_callable($callback))
 			{
 				if ( ! $callback($value))
 				{
@@ -529,10 +529,10 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Sort through each item with a callback.
 	 *
-	 * @param  Closure  $callback
+	 * @param  callable  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function sort(Closure $callback)
+	public function sort(callable $callback)
 	{
 		uasort($this->items, $callback);
 
@@ -606,8 +606,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Get the sum of the given values.
 	 *
-	 * @param  \Closure  $callback
-	 * @param  string    $callback
+	 * @param  string|callable    $callback
 	 * @return mixed
 	 */
 	public function sum($callback)
@@ -640,10 +639,10 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Transform each item in the collection using a callback.
 	 *
-	 * @param  Closure  $callback
+	 * @param  callable  $callback
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function transform(Closure $callback)
+	public function transform(callable $callback)
 	{
 		$this->items = array_map($callback, $this->items);
 
