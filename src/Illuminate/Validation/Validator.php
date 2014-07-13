@@ -342,7 +342,7 @@ class Validator implements MessageProviderInterface {
 	protected function isValidatable($rule, $attribute, $value)
 	{
 		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
-			$this->passesOptionalCheck($attribute);
+               $this->passesOptionalCheck($attribute);
 	}
 
 	/**
