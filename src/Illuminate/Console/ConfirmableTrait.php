@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Console;
 
+use Closure;
+
 trait ConfirmableTrait {
 
 	/**
