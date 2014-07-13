@@ -52,6 +52,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $footer = array();
 
 	/**
+	 * Counter to keep track of nested forelse statements.
+	 *
+	 * @var int
+	 */
+	protected $forelseCounter = 0;
+
+	/**
 	 * Compile the view at the given path.
 	 *
 	 * @param  string  $path
@@ -428,7 +435,20 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileForeach($expression)
 	{
-		return "<?php \$__empty = true; foreach{$expression}: \$__empty = false; ?>";
+		return "<?php foreach{$expression}: ?>";
+	}
+
+	/**
+	 * Compile the forelse statements into valid PHP.
+	 *
+	 * @param string  $expression
+	 * @return string
+	 */
+	protected function compileForelse($expression)
+	{
+		$empty = '$__empty_' . ++$this->forelseCounter;
+
+		return "<?php {$empty} = true; foreach{$expression}: {$empty} = false; ?>";
 	}
 
 	/**
@@ -459,9 +479,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @param string  $expression
 	 * @return string
 	 */
-	protected function compileForelse($expression)
+	protected function compileEmpty($expression)
 	{
-		return "<?php endforeach; if (\$__empty): ?>";
+		$empty = '$__empty_' . $this->forelseCounter--;
+
+		return "<?php endforeach; if ({$empty}): ?>";
 	}
 
 	/**

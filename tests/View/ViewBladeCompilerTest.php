@@ -283,14 +283,39 @@ breeze
 	public function testForelseStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@foreach ($this->getUsers() as $user)
+		$string = '@forelse ($this->getUsers() as $user)
 breeze
-@forelse
+@empty
 empty
 @endforelse';
-		$expected = '<?php $__empty = true; foreach($this->getUsers() as $user): $__empty = false; ?>
+		$expected = '<?php $__empty_1 = true; foreach($this->getUsers() as $user): $__empty_1 = false; ?>
 breeze
-<?php endforeach; if ($__empty): ?>
+<?php endforeach; if ($__empty_1): ?>
+empty
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testNestedForelseStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@forelse ($this->getUsers() as $user)
+@forelse ($user->tags as $tag)
+breeze
+@empty
+tag empty
+@endforelse
+@empty
+empty
+@endforelse';
+		$expected = '<?php $__empty_1 = true; foreach($this->getUsers() as $user): $__empty_1 = false; ?>
+<?php $__empty_2 = true; foreach($user->tags as $tag): $__empty_2 = false; ?>
+breeze
+<?php endforeach; if ($__empty_2): ?>
+tag empty
+<?php endif; ?>
+<?php endforeach; if ($__empty_1): ?>
 empty
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
