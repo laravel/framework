@@ -45,6 +45,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $escapedTags = array('{{{', '}}}');
 
 	/**
+	 * The depth of the nested foreach statements.
+	 *
+	 * @var integer
+	 */
+	protected $foreachDepth = 0;
+
+	/**
 	 * Array of footer lines to be added to template.
 	 *
 	 * @var array
@@ -428,7 +435,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileForeach($expression)
 	{
-		return "<?php \$__empty = true; foreach{$expression}: \$__empty = false; ?>";
+		$empty = '$__empty_' . ++$this->foreachDepth;
+
+		return "<?php $empty = true; foreach{$expression}: $empty = false; ?>";
 	}
 
 	/**
@@ -461,7 +470,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileForelse($expression)
 	{
-		return "<?php endforeach; if (\$__empty): ?>";
+		$empty = '$__empty_' . $this->foreachDepth--;
+
+		return "<?php endforeach; if ($empty): ?>";
 	}
 
 	/**
@@ -505,9 +516,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEndforeach($expression)
 	{
+		$this->foreachDepth--;
+
 		return "<?php endforeach; ?>";
 	}
-
 	/**
 	 * Compile the end-if statements into valid PHP.
 	 *

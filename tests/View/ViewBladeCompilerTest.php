@@ -280,18 +280,34 @@ breeze
 	}
 
 
-	public function testForelseStatementsAreCompiled()
+	public function testNestedForelseStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '@foreach ($this->getUsers() as $user)
-breeze
+breeze1
+@foreach ($nested1 as $nest1)
+breeze2
+@foreach ($nested2 as $nest2)
+breeze3
 @forelse
-empty
+empty3
+@endforelse
+@endforeach
+@forelse
+empty1
 @endforelse';
-		$expected = '<?php $__empty = true; foreach($this->getUsers() as $user): $__empty = false; ?>
-breeze
-<?php endforeach; if ($__empty): ?>
-empty
+		$expected = '<?php $__empty_1 = true; foreach($this->getUsers() as $user): $__empty_1 = false; ?>
+breeze1
+<?php $__empty_2 = true; foreach($nested1 as $nest1): $__empty_2 = false; ?>
+breeze2
+<?php $__empty_3 = true; foreach($nested2 as $nest2): $__empty_3 = false; ?>
+breeze3
+<?php endforeach; if ($__empty_3): ?>
+empty3
+<?php endif; ?>
+<?php endforeach; ?>
+<?php endforeach; if ($__empty_1): ?>
+empty1
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
