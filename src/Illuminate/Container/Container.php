@@ -574,7 +574,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Resolve a non-class hinted dependency.
 	 *
-	 * @param  ReflectionParameter  $parameter
+	 * @param  \ReflectionParameter  $parameter
 	 * @return mixed
 	 *
 	 * @throws BindingResolutionException
@@ -629,7 +629,6 @@ class Container implements ArrayAccess {
 	 *
 	 * @param  array  $dependencies
 	 * @param  array  $parameters
-	 * @param  array
 	 * @return array
 	 */
 	protected function keyParametersByArgument(array $dependencies, array $parameters)
