@@ -16,9 +16,9 @@ class LogTransport implements Swift_Transport {
 	protected $logger;
 
 	/**
-	 * Create a new Mandrill transport instance.
+	 * Create a new log transport instance.
 	 *
-	 * @param  string  $key
+	 * @param  \Psr\Log\LoggerInterface  $logger
 	 * @return void
 	 */
 	public function __construct(LoggerInterface $logger)
