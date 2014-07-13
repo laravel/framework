@@ -53,7 +53,7 @@ class ConfigPublishCommand extends Command {
 	{
 		$package = $this->input->getArgument('package');
 
-		$proceed = $this->confirmToProceed('File Already Exists!', function() use ($package)
+		$proceed = $this->confirmToProceed('Config Already Published!', function() use ($package)
 		{
 			return $this->config->alreadyPublished($package);
 		});
