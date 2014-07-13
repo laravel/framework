@@ -1262,6 +1262,54 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Set the observable event names.
+	 *
+	 * @return void
+	 */
+	public function setObservableEvents(array $observables)
+	{
+		$this->observables = $observables;
+	}
+
+	/**
+	 * Add an observable event name.
+	 *
+	 * @param  mixed  $observables
+	 * @return void
+	 */
+	public function addObservableEvents($observables)
+	{
+		$observables = is_array($observables) ? $observables : func_get_args();
+
+		foreach ($observables as $observable)
+		{	
+			if ( ! in_array($observable, $this->observables))
+			{
+				$this->observables[] = $observable;
+			}			
+		}
+	}
+
+	/**
+	 * Remove an observable event name.
+	 *
+	 * @param  mixed  $observables
+	 * @return void
+	 */
+	public function removeObservableEvents($observables)
+	{
+		$observables = is_array($observables) ? $observables : func_get_args();
+
+		foreach ($observables as $observable)
+		{
+			if ($index = array_search($observable, $this->observables) !== false)
+			{
+				unset($this->observables[$index]);
+			}	
+		}
+	}
+
+	/**
 	 * Increment a column's value by a given amount.
 	 *
 	 * @param  string  $column
