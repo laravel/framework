@@ -214,26 +214,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testObjectFetch()
-	{
-		$class1 = new StdClass;
-		$class1->name = 'foo';
-		$class2 = new StdClass;
-		$class2->name = 'bar';
-
-		$this->assertEquals(['foo', 'bar'], object_fetch([$class1, $class2], 'name'));
-
-		$class1 = new StdClass;
-		$class1->person = new StdClass;
-		$class1->person->age = 25;
-		$class2 = new StdClass;
-		$class2->person = new StdClass;
-		$class2->person->age = 28;
-
-		$this->assertEquals([25, 28], object_fetch([$class1, $class2], 'person.age'));
-	}
-
-
 	public function testDataGet()
 	{
 		$object = (object) array('users' => array('name' => array('Taylor', 'Otwell')));

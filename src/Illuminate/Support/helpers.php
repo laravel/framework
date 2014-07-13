@@ -758,33 +758,6 @@ if ( ! function_exists('link_to_action'))
 	}
 }
 
-if ( ! function_exists('object_fetch'))
-{
-	/**
-	 * Fetch a flattened array of a nested object element.
-	 *
-	 * @param  array   $array
-	 * @param  string  $key
-	 * @return array
-	 */
-	function object_fetch($array, $key)
-	{
-		foreach (explode('.', $key) as $segment)
-		{
-			$results = array();
-
-			foreach ($array as $value)
-			{
-				$results[] = $value->{$segment};
-			}
-
-			$array = array_values($results);
-		}
-
-		return array_values($results);
-	}
-}
-
 if ( ! function_exists('object_get'))
 {
 	/**
