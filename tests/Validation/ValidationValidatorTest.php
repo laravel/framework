@@ -12,6 +12,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSometimesWorksOnNestedArrays()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => array('bar' => array('baz' => ''))), array('foo.bar.baz' => 'sometimes|required'));
+		$this->assertFalse($v->passes());
+		$this->assertEquals(array('foo.bar.baz' => array('Required' => array())), $v->failed());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => array('bar' => array('baz' => 'nonEmpty'))), array('foo.bar.baz' => 'sometimes|required'));
+		$this->assertTrue($v->passes());
+	}
+	
+
 	public function testHasFailedValidationRules()
 	{
 		$trans = $this->getRealTranslator();
