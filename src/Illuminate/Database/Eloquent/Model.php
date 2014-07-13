@@ -1302,10 +1302,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($observables as $observable)
 		{
-			if ($index = array_search($observable, $this->observables) !== false)
+			if (($index = array_search($observable, $this->observables)) !== false)
 			{
 				unset($this->observables[$index]);
-			}	
+			}
 		}
 	}
 
