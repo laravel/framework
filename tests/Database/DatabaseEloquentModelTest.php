@@ -774,6 +774,32 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSetObservableEvents()
+	{
+		$class = new EloquentModelStub;
+		$class->setObservableEvents(array('foo'));
+
+		$this->assertContains('foo', $class->getObservableEvents());
+	}
+
+	public function testAddObservableEvent()
+	{
+		$class = new EloquentModelStub;
+		$class->addObservableEvents('foo');
+
+		$this->assertContains('foo', $class->getObservableEvents());
+	}
+
+	public function testRemoveObservableEvent()
+	{
+		$class = new EloquentModelStub;
+		$class->setObservableEvents(array('foo', 'bar'));
+		$class->removeObservableEvents('bar');
+
+		$this->assertNotContains('bar', $class->getObservableEvents());
+	}
+
+
 	/**
 	 * @expectedException LogicException
 	 */
