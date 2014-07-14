@@ -31,9 +31,9 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		// This is how the modified getQueue builds the queueUrl
 		$this->queueUrl = $this->baseUrl . '/' . $this->account . '/' . $this->queueName;
 
-		// Get a mock of the SqsClient 
+		// Get a mock of the SqsClient
 		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('deleteMessage'), array($this->credentials, $this->signature, $this->config));
-		
+
 		// Use Mockery to mock the IoC Container
 		$this->mockedContainer = m::mock('Illuminate\Container\Container');
 
@@ -72,7 +72,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
 		$job = $this->getJob();
-		$job->getSqs()->expects($this->once())->method('deleteMessage')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle));	
+		$job->getSqs()->expects($this->once())->method('deleteMessage')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle));
 		$job->delete();
 	}
 
