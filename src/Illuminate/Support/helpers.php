@@ -41,8 +41,8 @@ if ( ! function_exists('app_path'))
 	/**
 	 * Get the path to the application folder.
 	 *
-	 * @param   string  $path
-	 * @return  string
+	 * @param  string  $path
+	 * @return string
 	 */
 	function app_path($path = '')
 	{
@@ -213,9 +213,9 @@ if ( ! function_exists('array_first'))
 	/**
 	 * Return the first element in an array passing a given truth test.
 	 *
-	 * @param  array    $array
-	 * @param  Closure  $callback
-	 * @param  mixed    $default
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	function array_first($array, $callback, $default = null)
@@ -234,9 +234,9 @@ if ( ! function_exists('array_last'))
 	/**
 	 * Return the last element in an array passing a given truth test.
 	 *
-	 * @param  array    $array
-	 * @param  Closure  $callback
-	 * @param  mixed    $default
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	function array_last($array, $callback, $default = null)
@@ -268,7 +268,7 @@ if ( ! function_exists('array_forget'))
 	/**
 	 * Remove one or many array items from a given array using "dot" notation.
 	 *
-	 * @param  array        $array
+	 * @param  array  $array
 	 * @param  array|string $keys
 	 * @return void
 	 */
@@ -535,7 +535,7 @@ if ( ! function_exists('class_uses_recursive'))
 	/**
 	 * Returns all traits used by a class, it's subclasses and trait of their traits
 	 *
-	 * @param  string $class
+	 * @param  string  $class
 	 * @return array
 	 */
 	function class_uses_recursive($class)
@@ -652,8 +652,8 @@ if ( ! function_exists('ends_with'))
 	/**
 	 * Determine if a given string ends with a given substring.
 	 *
-	 * @param string  $haystack
-	 * @param string|array  $needle
+	 * @param  string  $haystack
+	 * @param  string|array  $needle
 	 * @return bool
 	 */
 	function ends_with($haystack, $needle)
@@ -958,9 +958,9 @@ if ( ! function_exists('str_limit'))
 	/**
 	 * Limit the number of characters in a string.
 	 *
-	 * @param  string $value
-	 * @param  int    $limit
-	 * @param  string $end
+	 * @param  string  $value
+	 * @param  int     $limit
+	 * @param  string  $end
 	 * @return string
 	 */
 	function str_limit($value, $limit = 100, $end = '...')
@@ -975,7 +975,7 @@ if ( ! function_exists('str_plural'))
 	 * Get the plural form of an English word.
 	 *
 	 * @param  string  $value
-	 * @param  int  $count
+	 * @param  int     $count
 	 * @return string
 	 */
 	function str_plural($value, $count = 2)
@@ -989,7 +989,7 @@ if ( ! function_exists('str_random'))
 	/**
 	 * Generate a more truly "random" alpha-numeric string.
 	 *
-	 * @param  int     $length
+	 * @param  int  $length
 	 * @return string
 	 *
 	 * @throws \RuntimeException
@@ -1054,7 +1054,7 @@ if ( ! function_exists('trait_uses_recursive'))
 	/**
 	 * Returns all traits used by a trait and its traits
 	 *
-	 * @param  $trait
+	 * @param  string  $trait
 	 * @return array
 	 */
 	function trait_uses_recursive($trait)
