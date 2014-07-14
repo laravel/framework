@@ -246,8 +246,8 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  string $question
 	 * @param  array  $choices
 	 * @param  string $default
-	 * @param  bool   $multiple
 	 * @param  mixed  $attempts
+	 * @param  bool   $multiple
 	 * @return bool
 	 */
 	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
