@@ -362,9 +362,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testGroupByAttribute()
 	{
-		$data = new Collection(array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2'), array('rating' => 2, 'name' => '3')));
+		$data = new Collection(array(array('rating' => 1, 'url' => '1'), array('rating' => 1, 'url' => '1'), array('rating' => 2, 'url' => '2')));
+
 		$result = $data->groupBy('rating');
-		$this->assertEquals(array(1 => array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2')), 2 => array(array('rating' => 2, 'name' => '3'))), $result->toArray());
+		$this->assertEquals(array(1 => array(array('rating' => 1, 'url' => '1'), array('rating' => 1, 'url' => '1')), 2 => array(array('rating' => 2, 'url' => '2'))), $result->toArray());
+
+		$result = $data->groupBy('url');
+		$this->assertEquals(array(1 => array(array('rating' => 1, 'url' => '1'), array('rating' => 1, 'url' => '1')), 2 => array(array('rating' => 2, 'url' => '2'))), $result->toArray());
 	}
 
 
