@@ -2096,6 +2096,8 @@ class Validator implements MessageProviderInterface {
 	public function setData(array $data)
 	{
 		$this->data = $this->parseData($data);
+
+		return $this;
 	}
 
 	/**
@@ -2183,6 +2185,8 @@ class Validator implements MessageProviderInterface {
 	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
 	{
 		$this->presenceVerifier = $presenceVerifier;
+
+		return $this;
 	}
 
 	/**
@@ -2204,6 +2208,8 @@ class Validator implements MessageProviderInterface {
 	public function setTranslator(TranslatorInterface $translator)
 	{
 		$this->translator = $translator;
+
+		return $this;
 	}
 
 	/**
@@ -2225,6 +2231,8 @@ class Validator implements MessageProviderInterface {
 	public function setCustomMessages(array $messages)
 	{
 		$this->customMessages = array_merge($this->customMessages, $messages);
+
+		return $this;
 	}
 
 	/**
@@ -2246,6 +2254,8 @@ class Validator implements MessageProviderInterface {
 	public function setFallbackMessages(array $messages)
 	{
 		$this->fallbackMessages = $messages;
+
+		return $this;
 	}
 
 	/**
@@ -2301,6 +2311,8 @@ class Validator implements MessageProviderInterface {
 	public function setContainer(Container $container)
 	{
 		$this->container = $container;
+
+		return $this;
 	}
 
 	/**
