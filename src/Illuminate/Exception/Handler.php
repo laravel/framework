@@ -282,7 +282,7 @@ class Handler {
 	/**
 	 * Determine if the given handler handles this exception.
 	 *
-	 * @param  Closure    $handler
+	 * @param  \Closure    $handler
 	 * @param  \Exception  $exception
 	 * @return bool
 	 */
@@ -330,7 +330,7 @@ class Handler {
 	/**
 	 * Register an application error handler.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function error(Closure $callback)
@@ -341,7 +341,7 @@ class Handler {
 	/**
 	 * Register an application error handler at the bottom of the stack.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function pushError(Closure $callback)

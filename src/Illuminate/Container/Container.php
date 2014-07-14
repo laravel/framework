@@ -94,9 +94,9 @@ class Container implements ArrayAccess {
 	/**
 	 * Register a binding with the container.
 	 *
-	 * @param  string               $abstract
-	 * @param  Closure|string|null  $concrete
-	 * @param  bool                 $shared
+	 * @param  string  $abstract
+	 * @param  \Closure|string|null  $concrete
+	 * @param  bool  $shared
 	 * @return void
 	 */
 	public function bind($abstract, $concrete = null, $shared = false)
@@ -162,9 +162,9 @@ class Container implements ArrayAccess {
 	/**
 	 * Register a binding if it hasn't already been registered.
 	 *
-	 * @param  string               $abstract
-	 * @param  Closure|string|null  $concrete
-	 * @param  bool                 $shared
+	 * @param  string  $abstract
+	 * @param  \Closure|string|null  $concrete
+	 * @param  bool  $shared
 	 * @return void
 	 */
 	public function bindIf($abstract, $concrete = null, $shared = false)
@@ -178,8 +178,8 @@ class Container implements ArrayAccess {
 	/**
 	 * Register a shared binding in the container.
 	 *
-	 * @param  string               $abstract
-	 * @param  Closure|string|null  $concrete
+	 * @param  string  $abstract
+	 * @param  \Closure|string|null  $concrete
 	 * @return void
 	 */
 	public function singleton($abstract, $concrete = null)
@@ -190,7 +190,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Wrap a Closure such that it is shared.
 	 *
-	 * @param  Closure  $closure
+	 * @param  \Closure  $closure
 	 * @return Closure
 	 */
 	public function share(Closure $closure)
@@ -214,7 +214,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Bind a shared Closure into the container.
 	 *
-	 * @param  string  $abstract
+	 * @param  string    $abstract
 	 * @param  \Closure  $closure
 	 * @return void
 	 */
@@ -226,8 +226,8 @@ class Container implements ArrayAccess {
 	/**
 	 * "Extend" an abstract type in the container.
 	 *
-	 * @param  string   $abstract
-	 * @param  Closure  $closure
+	 * @param  string    $abstract
+	 * @param  \Closure  $closure
 	 * @return void
 	 *
 	 * @throws \InvalidArgumentException
@@ -256,7 +256,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Get an extender Closure for resolving a type.
 	 *
-	 * @param  string  $abstract
+	 * @param  string    $abstract
 	 * @param  \Closure  $closure
 	 * @return \Closure
 	 */
@@ -333,7 +333,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Bind a new callback to an abstract's rebind event.
 	 *
-	 * @param  string  $abstract
+	 * @param  string    $abstract
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
@@ -348,7 +348,7 @@ class Container implements ArrayAccess {
 	 * Refresh an instance on the given target and method.
 	 *
 	 * @param  string  $abstract
-	 * @param  mixed  $target
+	 * @param  mixed   $target
 	 * @param  string  $method
 	 * @return mixed
 	 */
@@ -649,7 +649,7 @@ class Container implements ArrayAccess {
 	/**
 	 * Register a new resolving callback.
 	 *
-	 * @param  string  $abstract
+	 * @param  string    $abstract
 	 * @param  \Closure  $callback
 	 * @return void
 	 */
