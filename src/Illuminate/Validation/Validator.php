@@ -2091,7 +2091,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the data under validation.
 	 *
 	 * @param  array  $data
-	 * @return void
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setData(array $data)
 	{
@@ -2180,7 +2180,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the Presence Verifier implementation.
 	 *
 	 * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
-	 * @return void
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
 	{
@@ -2203,7 +2203,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the Translator implementation.
 	 *
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
-	 * @return void
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setTranslator(TranslatorInterface $translator)
 	{
@@ -2226,7 +2226,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the custom messages for the validator
 	 *
 	 * @param  array  $messages
-	 * @return void
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setCustomMessages(array $messages)
 	{
@@ -2249,7 +2249,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the fallback messages for the validator.
 	 *
 	 * @param  array  $messages
-	 * @return void
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setFallbackMessages(array $messages)
 	{
@@ -2306,7 +2306,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the IoC container instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @return void
+	 * @return \Illuminate\Validation\Validator
 	 */
 	public function setContainer(Container $container)
 	{
