@@ -7,7 +7,7 @@ class MemcachedConnector {
 	/**
 	 * Create a new Memcached connection.
 	 *
-	 * @param array  $servers
+	 * @param  array  $servers
 	 * @return \Memcached
 	 *
 	 * @throws \RuntimeException
