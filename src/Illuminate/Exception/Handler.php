@@ -54,9 +54,10 @@ class Handler {
 	/**
 	 * Create a new error handler instance.
 	 *
-	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface  $responsePreparer
-	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
-	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
+	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface $responsePreparer
+	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface       $plainDisplayer
+	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface       $debugDisplayer
+	 * @param  bool                                                    $debug
 	 * @return void
 	 */
 	public function __construct(ResponsePreparerInterface $responsePreparer,
