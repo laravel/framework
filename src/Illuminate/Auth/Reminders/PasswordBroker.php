@@ -99,8 +99,8 @@ class PasswordBroker {
 	/**
 	 * Send a password reminder to a user.
 	 *
-	 * @param  array    $credentials
-	 * @param  Closure  $callback
+	 * @param  array     $credentials
+	 * @param  \Closure  $callback
 	 * @return string
 	 */
 	public function remind(array $credentials, Closure $callback = null)
@@ -129,8 +129,8 @@ class PasswordBroker {
 	 * Send the password reminder e-mail.
 	 *
 	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
-	 * @param  string   $token
-	 * @param  Closure  $callback
+	 * @param  string    $token
+	 * @param  \Closure  $callback
 	 * @return int
 	 */
 	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null)
@@ -151,8 +151,8 @@ class PasswordBroker {
 	/**
 	 * Reset the password for the given token.
 	 *
-	 * @param  array    $credentials
-	 * @param  Closure  $callback
+	 * @param  array     $credentials
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function reset(array $credentials, Closure $callback)
