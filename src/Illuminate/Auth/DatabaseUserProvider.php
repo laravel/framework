@@ -8,7 +8,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * The active database connection.
 	 *
-	 * @param  \Illuminate\Database\Connection
+	 * @var \Illuminate\Database\Connection
 	 */
 	protected $conn;
 
@@ -60,7 +60,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * Retrieve a user by by their unique identifier and "remember me" token.
 	 *
-	 * @param  mixed  $identifier
+	 * @param  mixed   $identifier
 	 * @param  string  $token
 	 * @return \Illuminate\Auth\UserInterface|null
 	 */
