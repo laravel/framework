@@ -118,7 +118,7 @@ class MigrationCreator {
 	/**
 	 * Register a post migration create hook.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function afterCreate(Closure $callback)
