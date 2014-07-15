@@ -1000,6 +1000,24 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+
+	public function testValidateHexadecimal()
+	{
+		$trans = $this->getRealTranslator();
+		$v     = new Validator($trans, ['x' => 'asls1-_3dlks'], ['x' => 'Hexadecimal']);
+		$this->assertTrue($v->fails());
+
+		$v = new Validator($trans, ['x' => 'abcde'], ['x' => 'Hexadecimal']);
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, ['x' => '12345'], ['x' => 'Hexadecimal']);
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, ['x' => '12345ABCDEF'], ['x' => 'Hexadecimal']);
+		$this->assertTrue($v->passes());
+	}
+
+
 	public function testValidateTimezone()
 	{
 		$trans = $this->getRealTranslator();

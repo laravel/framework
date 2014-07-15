@@ -1198,6 +1198,18 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Validate that an attribute contains only hexadecimal characters.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateHexadecimal($attribute, $value)
+	{
+		return ctype_xdigit($value);
+	}
+
+	/**
 	 * Validate that an attribute passes a regular expression check.
 	 *
 	 * @param  string  $attribute
