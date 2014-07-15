@@ -409,7 +409,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Execute a Closure within a transaction.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
 	 * @throws \Exception
@@ -506,7 +506,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Execute the given callback in "dry run" mode.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return array
 	 */
 	public function pretend(Closure $callback)
@@ -528,9 +528,9 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Run a SQL statement and log its execution context.
 	 *
-	 * @param  string   $query
-	 * @param  array    $bindings
-	 * @param  Closure  $callback
+	 * @param  string    $query
+	 * @param  array     $bindings
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
 	 * @throws QueryException
@@ -588,7 +588,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Register a database query listener with the connection.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function listen(Closure $callback)

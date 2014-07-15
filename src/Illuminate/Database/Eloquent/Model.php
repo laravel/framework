@@ -563,8 +563,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Create or update a record matching the attributes, and fill it with values.
 	 *
-	 * @param array $attributes
-	 * @param array $values
+	 * @param  array  $attributes
+	 * @param  array  $values
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public static function updateOrCreate(array $attributes, array $values = array())
