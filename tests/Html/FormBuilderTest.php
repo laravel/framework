@@ -403,6 +403,31 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input src="'. $url .'" type="image">', $image);
 	}
 
+
+	public function testNestedObjectsAndArrays()
+	{
+		$obj = new \StdClass;
+		$obj->stuff = new \Illuminate\Support\Collection([5 => ['bar' => 'baz']]);
+		$model = ['foo' => $obj];
+		$this->formBuilder->setModel($model);
+		$input = $this->formBuilder->text('foo[stuff][5][bar]');
+		$this->assertContains('value="baz"', $input);
+	}
+
+
+	public function testEloquentRelationshipValues()
+	{
+		$model = new \StdClass;
+		$related = [new FormBuilderModelStub(['id' => 1, 'name' => 'foo']), new FormBuilderModelStub(['id' => 2, 'name' => 'bar'])];
+		$model->related = new \Illuminate\Database\Eloquent\Collection($related);
+		$this->formBuilder->setModel($model);
+		$this->assertNotContains('value=', $this->formBuilder->text('related[0][name]'));
+		$this->assertContains('value="foo"', $this->formBuilder->text('related[1][name]'));
+		$this->assertContains('value="bar"', $this->formBuilder->text('related[2][name]'));
+		$this->assertNotContains('value=', $this->formBuilder->text('related[3][name]'));
+	}
+
+
 	protected function setModel(array $data, $object = true)
 	{
 		if ($object) $data = new FormBuilderModelStub($data);
@@ -435,5 +460,11 @@ class FormBuilderModelStub {
 	public function __isset($key)
 	{
 		return isset($this->data[$key]);
+	}
+
+
+	public function getKey()
+	{
+		return isset($this->data['id']) ? $this->data['id'] : null;
 	}
 }
