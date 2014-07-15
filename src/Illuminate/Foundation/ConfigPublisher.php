@@ -122,6 +122,7 @@ class ConfigPublisher {
 	/**
 	 * Get the target destination path for the configuration files.
 	 *
+	 * @param  string  $package
 	 * @return string
 	 */
 	public function getDestinationPath($package)
