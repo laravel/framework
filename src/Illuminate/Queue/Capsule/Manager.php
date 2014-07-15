@@ -1,18 +1,13 @@
 <?php namespace Illuminate\Queue\Capsule;
 
-use Illuminate\Support\Fluent;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Support\Traits\CapsuleManagerTrait;
 
 class Manager {
 
-    /**
-     * The current globally used instance.
-     *
-     * @var \Illuminate\Queue\Capsule\Manager
-     */
-    protected static $instance;
+    use CapsuleManagerTrait;
 
     /**
      * The queue manager instance.
@@ -39,22 +34,6 @@ class Manager {
         $this->setupManager();
 
         $this->registerConnectors();
-    }
-
-    /**
-     * Setup the IoC container instance.
-     *
-     * @param  \Illuminate\Container\Container  $container
-     * @return void
-     */
-    protected function setupContainer($container)
-    {
-        $this->container = $container ?: new Container;
-
-        if ( ! $this->container->bound('config'))
-        {
-            $this->container->instance('config', new Fluent);
-        }
     }
 
     /**
@@ -167,16 +146,6 @@ class Manager {
     }
 
     /**
-     * Make this capsule instance available globally.
-     *
-     * @return void
-     */
-    public function setAsGlobal()
-    {
-        static::$instance = $this;
-    }
-
-    /**
      * Get the queue manager instance.
      *
      * @return \Illuminate\Queue\Manager
@@ -184,27 +153,6 @@ class Manager {
     public function getQueueManager()
     {
         return $this->manager;
-    }
-
-    /**
-     * Get the IoC container instance.
-     *
-     * @return \Illuminate\Container\Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    /**
-     * Set the IoC container instance.
-     *
-     * @param  \Illuminate\Container\Container  $container
-     * @return void
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
     }
 
     /**
