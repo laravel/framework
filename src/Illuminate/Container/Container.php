@@ -672,7 +672,8 @@ class Container implements ArrayAccess {
 	/**
 	 * Fire all of the resolving callbacks.
 	 *
-	 * @param  mixed  $object
+	 * @param  string  $abstract
+	 * @param  mixed   $object
 	 * @return void
 	 */
 	protected function fireResolvingCallbacks($abstract, $object)

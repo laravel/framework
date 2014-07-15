@@ -91,9 +91,9 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	 * Create a new Paginator instance.
 	 *
 	 * @param  \Illuminate\Pagination\Factory  $factory
-	 * @param  array  $items
-	 * @param  int    $total
-	 * @param  mixed  $perPage
+	 * @param  array     $items
+	 * @param  int       $total
+	 * @param  int|null  $perPage
 	 * @return void
 	 */
 	public function __construct(Factory $factory, array $items, $total, $perPage = null)
