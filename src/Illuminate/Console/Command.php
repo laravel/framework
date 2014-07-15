@@ -221,7 +221,6 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		return $helper->ask($this->input, $this->output, $question);
 	}
 
-
 	/**
 	 * Prompt the user for input but hide the answer from the console.
 	 *
