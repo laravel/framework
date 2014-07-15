@@ -70,7 +70,7 @@ class LogTransport implements Swift_Transport {
 
 		foreach ($entity->getChildren() as $children)
 		{
-			$string .= PHP_EOL.PHP_EOL.$this->getMimeEntityString($entity);
+			$string .= PHP_EOL.PHP_EOL.$this->getMimeEntityString($children);
 		}
 
 		return $string;
