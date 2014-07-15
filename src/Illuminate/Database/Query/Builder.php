@@ -2030,6 +2030,8 @@ class Builder {
 	 * @param  mixed   $value
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Query\Builder
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function addBinding($value, $type = 'where')
 	{
