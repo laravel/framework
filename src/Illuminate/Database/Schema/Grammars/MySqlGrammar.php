@@ -33,7 +33,6 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Compile the query to determine the list of columns.
 	 *
-	 * @param  string  $table
 	 * @return string
 	 */
 	public function compileColumnExists()

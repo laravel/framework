@@ -97,7 +97,6 @@ class JoinClause {
 	 * @param  string  $first
 	 * @param  string  $operator
 	 * @param  string  $second
-	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\JoinClause
 	 */
 	public function orWhere($first, $operator, $second)
