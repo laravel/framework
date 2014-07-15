@@ -1342,8 +1342,8 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Validate that an attribute is a valid timezone.
 	 *
-	 * @param string $attribute
-	 * @param mixed $value
+	 * @param  string  $attribute
+	 * @param  mixed   $value
 	 * @return bool
 	 */
 	protected function validateTimezone($attribute, $value)
@@ -1363,7 +1363,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the date format for an attribute if it has one.
 	 *
-	 * @param  string $attribute
+	 * @param  string  $attribute
 	 * @return string|null
 	 */
 	protected function getDateFormat($attribute)
@@ -1585,8 +1585,8 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get the displayable name of the value.
 	 *
-	 * @param  string $attribute
-	 * @param  mixed  $value
+	 * @param  string  $attribute
+	 * @param  mixed   $value
 	 * @return string
 	 */
 	public function getDisplayableValue($attribute, $value)
@@ -2383,7 +2383,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @param  int    $count
 	 * @param  array  $parameters
-	 * @param  string $rule
+	 * @param  string  $rule
 	 * @return void
 	 * @throws \InvalidArgumentException
 	 */

@@ -466,7 +466,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register a "before" application filter.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function before($callback)
@@ -477,7 +477,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register an "after" application filter.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function after($callback)
@@ -488,7 +488,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register a "finish" application filter.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function finish($callback)
@@ -879,7 +879,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register a 404 error handler.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function missing(Closure $callback)
@@ -915,7 +915,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register an error handler for fatal errors.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function fatal(Closure $callback)

@@ -677,8 +677,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Create a route group with shared attributes.
 	 *
-	 * @param  array    $attributes
-	 * @param  Closure  $callback
+	 * @param  array     $attributes
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function group(array $attributes, Closure $callback)
