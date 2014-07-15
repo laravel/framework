@@ -38,7 +38,7 @@ class Store implements SessionInterface {
 	/**
 	 * The meta-data bag instance.
 	 *
-	 * @var \Symfony\Component\Session\Storage\MetadataBag
+	 * @var \Symfony\Component\HttpFoundation\Session\Storage\MetadataBag
 	 */
 	protected $metaBag;
 

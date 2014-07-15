@@ -115,7 +115,7 @@ class Repository implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  \DateTime|int  $minutes
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -137,7 +137,7 @@ class Repository implements ArrayAccess {
 	 * Get an item from the cache, or store the default value forever.
 	 *
 	 * @param  string   $key
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function sear($key, Closure $callback)
@@ -149,7 +149,7 @@ class Repository implements ArrayAccess {
 	 * Get an item from the cache, or store the default value forever.
 	 *
 	 * @param  string   $key
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function rememberForever($key, Closure $callback)

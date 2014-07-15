@@ -105,8 +105,8 @@ abstract class Manager {
 	/**
 	 * Register a custom driver creator Closure.
 	 *
-	 * @param  string   $driver
-	 * @param  Closure  $callback
+	 * @param  string    $driver
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Support\Manager|static
 	 */
 	public function extend($driver, Closure $callback)

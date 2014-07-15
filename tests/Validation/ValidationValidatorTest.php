@@ -23,7 +23,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => array('bar' => array('baz' => 'nonEmpty'))), array('foo.bar.baz' => 'sometimes|required'));
 		$this->assertTrue($v->passes());
 	}
-	
+
 
 	public function testHasFailedValidationRules()
 	{
@@ -478,7 +478,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('foo' => 'no'), array('foo' => 'Boolean'));
         $this->assertFalse($v->passes());
-        
+
         $v = new Validator($trans, array('foo' => 'yes'), array('foo' => 'Boolean'));
         $this->assertFalse($v->passes());
 
@@ -509,7 +509,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         $v = new Validator($trans, array('foo' => 0), array('foo' => 'Boolean'));
         $this->assertTrue($v->passes());
     }
-    
+
 
 	public function testValidateNumeric()
 	{
@@ -999,22 +999,22 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 
 	}
-	
+
 	public function testValidateTimezone()
 	{
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('foo' => 'India'), array('foo' => 'Timezone'));
 		$this->assertFalse($v->passes());
-	
+
 		$v = new Validator($trans, array('foo' => 'Cairo'), array('foo' => 'Timezone'));
 		$this->assertFalse($v->passes());
-	
+
 		$v = new Validator($trans, array('foo' => 'UTC'), array('foo' => 'Timezone'));
 		$this->assertTrue($v->passes());
-	
+
 		$v = new Validator($trans, array('foo' => 'Africa/Windhoek'), array('foo' => 'Timezone'));
 		$this->assertTrue($v->passes());
-	
+
 		$v = new Validator($trans, array('foo' => 'GMT'), array('foo' => 'Timezone'));
 		$this->assertTrue($v->passes());
 	}

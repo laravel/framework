@@ -252,7 +252,7 @@ $app->booted(function() use ($app, $env)
 	$path = $app['path']."/start/{$env}.php";
 
 	if (file_exists($path)) require $path;
-	
+
 	/*
 	|--------------------------------------------------------------------------
 	| Load The Application Routes
