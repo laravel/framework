@@ -22,7 +22,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 * Create a new Memcached store.
 	 *
 	 * @param  \Memcached  $memcached
-	 * @param  string     $prefix
+	 * @param  string      $prefix
 	 * @return void
 	 */
 	public function __construct(Memcached $memcached, $prefix = '')
