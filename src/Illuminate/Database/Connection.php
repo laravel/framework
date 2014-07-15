@@ -123,10 +123,10 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Create a new database connection instance.
 	 *
-	 * @param  PDO     $pdo
-	 * @param  string  $database
-	 * @param  string  $tablePrefix
-	 * @param  array   $config
+	 * @param  \PDO     $pdo
+	 * @param  string   $database
+	 * @param  string   $tablePrefix
+	 * @param  array    $config
 	 * @return void
 	 */
 	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = array())
@@ -687,7 +687,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the PDO connection.
 	 *
-	 * @param  PDO  $pdo
+	 * @param  \PDO  $pdo
 	 * @return \Illuminate\Database\Connection
 	 */
 	public function setPdo(PDO $pdo)
@@ -700,7 +700,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the PDO connection used for reading.
 	 *
-	 * @param  PDO  $pdo
+	 * @param  \PDO  $pdo
 	 * @return \Illuminate\Database\Connection
 	 */
 	public function setReadPdo(PDO $pdo)

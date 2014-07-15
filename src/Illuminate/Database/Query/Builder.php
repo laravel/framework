@@ -265,11 +265,11 @@ class Builder {
 	 * Add a join clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @param  string  $type
-	 * @param  bool  $where
+	 * @param  bool    $where
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
 	public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
@@ -303,7 +303,7 @@ class Builder {
 	 * Add a "join where" clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @param  string  $type
@@ -332,7 +332,7 @@ class Builder {
 	 * Add a "join where" clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @return \Illuminate\Database\Query\Builder|static
@@ -360,7 +360,7 @@ class Builder {
 	 * Add a "right join where" clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @return \Illuminate\Database\Query\Builder|static
