@@ -127,7 +127,7 @@ class Mailer {
 	 *
 	 * @param  string|array  $view
 	 * @param  array  $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function send($view, array $data, $callback)
@@ -156,7 +156,7 @@ class Mailer {
 	 *
 	 * @param  string|array  $view
 	 * @param  array   $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @param  string  $queue
 	 * @return void
 	 */
@@ -173,7 +173,7 @@ class Mailer {
 	 * @param  string  $queue
 	 * @param  string|array  $view
 	 * @param  array   $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function queueOn($queue, $view, array $data, $callback)
@@ -187,7 +187,7 @@ class Mailer {
 	 * @param  int  $delay
 	 * @param  string|array  $view
 	 * @param  array  $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @param  string  $queue
 	 * @return void
 	 */
@@ -205,7 +205,7 @@ class Mailer {
 	 * @param  int  $delay
 	 * @param  string|array  $view
 	 * @param  array  $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function laterOn($queue, $delay, $view, array $data, $callback)
@@ -350,7 +350,7 @@ class Mailer {
 	/**
 	 * Call the provided message builder.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @param  \Illuminate\Mail\Message  $message
 	 * @return mixed
 	 *

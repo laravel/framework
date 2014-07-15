@@ -180,7 +180,7 @@ class Writer {
 	 * Register a new callback handler for when
 	 * a log event is triggered.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 *
 	 * @throws \RuntimeException

@@ -197,7 +197,7 @@ class Factory {
 	/**
 	 * Set the Validator instance resolver.
 	 *
-	 * @param  Closure  $resolver
+	 * @param  \Closure  $resolver
 	 * @return void
 	 */
 	public function resolver(Closure $resolver)

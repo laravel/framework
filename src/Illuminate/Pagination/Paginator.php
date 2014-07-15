@@ -207,7 +207,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	/**
 	 * Get a URL for a given page number.
 	 *
-	 * @param  int     $page
+	 * @param  int  $page
 	 * @return string
 	 */
 	public function getUrl($page)
@@ -532,8 +532,8 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	/**
 	 * Call a method on the underlying Collection
 	 *
-	 * @param string $method
-	 * @param array  $arguments
+	 * @param  string  $method
+	 * @param  array   $arguments
 	 * @return mixed
 	 */
 	public function __call($method, $arguments)
