@@ -801,14 +801,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	// public function testRemoveObservableEvent()
-	// {
-	// 	$class = new EloquentModelStub;
-	// 	$class->setObservableEvents(array('foo', 'bar'));
-	// 	$class->removeObservableEvents('bar');
+	public function testRemoveObservableEvent()
+	{
+		$class = new EloquentModelStub;
+		$class->setObservableEvents(array('foo', 'bar'));
+		$class->removeObservableEvents('bar');
 
-	// 	$this->assertNotContains('bar', $class->getObservableEvents());
-	// }
+		$this->assertNotContains('bar', $class->getObservableEvents());
+	}
 
 	public function testRemoveMultipleObservableEvents()
 	{
