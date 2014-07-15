@@ -2,7 +2,7 @@
 
 use Illuminate\Filesystem\Filesystem;
 
-class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterface {
+abstract class AbstractFileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterface {
 
 	/**
 	 * The filesystem instance.
@@ -17,6 +17,13 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 	 * @var string
 	 */
 	protected $path;
+
+	/**
+	 * The file extension used.
+	 *
+	 * @var string
+	 */
+	protected $fileExtension;
 
 	/**
 	 * Create a new file environment loader instance.
@@ -46,7 +53,7 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 		}
 		else
 		{
-			return array_dot($this->files->getRequire($path));
+			return array_dot($this->loadFile($path));
 		}
 	}
 
@@ -60,12 +67,20 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 	{
 		if ($environment)
 		{
-			return $this->path.'/.env.'.$environment.'.php';
+			return $this->path.'/.env.'.$environment.'.'.$this->fileExtension;
 		}
 		else
 		{
-			return $this->path.'/.env.php';
+			return $this->path.'/.env.'.$this->fileExtension;
 		}
 	}
+
+	/**
+	 * Load a file's contents.
+	 *
+	 * @param  string  $path
+	 * @return mixed
+	 */
+	abstract protected function loadFile($path);
 
 }

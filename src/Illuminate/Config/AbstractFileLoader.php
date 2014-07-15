@@ -2,7 +2,7 @@
 
 use Illuminate\Filesystem\Filesystem;
 
-class FileLoader implements LoaderInterface {
+abstract class AbstractFileLoader implements LoaderInterface {
 
 	/**
 	 * The filesystem instance.
@@ -10,6 +10,13 @@ class FileLoader implements LoaderInterface {
 	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
+
+	/**
+	 * The file extension used.
+	 *
+	 * @var string
+	 */
+	protected $fileExtension;
 
 	/**
 	 * The default configuration path.
@@ -70,17 +77,17 @@ class FileLoader implements LoaderInterface {
 		// First we'll get the main configuration file for the groups. Once we have
 		// that we can check for any environment specific files, which will get
 		// merged on top of the main arrays to make the environments cascade.
-		$file = "{$path}/{$group}.php";
+		$file = "{$path}/{$group}.{$this->fileExtension}";
 
 		if ($this->files->exists($file))
 		{
-			$items = $this->files->getRequire($file);
+			$items = $this->loadFile($file);
 		}
 
 		// Finally we're ready to check for the environment specific configuration
 		// file which will be merged on top of the main arrays so that they get
 		// precedence over them if we are currently in an environments setup.
-		$file = "{$path}/{$environment}/{$group}.php";
+		$file = "{$path}/{$environment}/{$group}.{$this->fileExtension}";
 
 		if ($this->files->exists($file))
 		{
@@ -99,7 +106,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function mergeEnvironment(array $items, $file)
 	{
-		return array_replace_recursive($items, $this->files->getRequire($file));
+		return array_replace_recursive($items, $this->loadFile($file));
 	}
 
 	/**
@@ -131,7 +138,7 @@ class FileLoader implements LoaderInterface {
 			return $this->exists[$key] = false;
 		}
 
-		$file = "{$path}/{$group}.php";
+		$file = "{$path}/{$group}.{$this->fileExtension}";
 
 		// Finally, we can simply check if this file exists. We will also cache
 		// the value in an array so we don't have to go through this process
@@ -155,11 +162,11 @@ class FileLoader implements LoaderInterface {
 		// First we will look for a configuration file in the packages configuration
 		// folder. If it exists, we will load it and merge it with these original
 		// options so that we will easily "cascade" a package's configurations.
-		$file = "packages/{$package}/{$group}.php";
+		$file = "packages/{$package}/{$group}.{$this->fileExtension}";
 
 		if ($this->files->exists($path = $this->defaultPath.'/'.$file))
 		{
-			$items = array_merge($items, $this->getRequire($path));
+			$items = array_merge($items, $this->loadFile($path));
 		}
 
 		// Once we have merged the regular package configuration we need to look for
@@ -169,7 +176,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path))
 		{
-			$items = array_merge($items, $this->getRequire($path));
+			$items = array_merge($items, $this->loadFile($path));
 		}
 
 		return $items;
@@ -185,7 +192,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function getPackagePath($env, $package, $group)
 	{
-		$file = "packages/{$package}/{$env}/{$group}.php";
+		$file = "packages/{$package}/{$env}/{$group}.{$this->fileExtension}";
 
 		return $this->defaultPath.'/'.$file;
 	}
@@ -232,15 +239,12 @@ class FileLoader implements LoaderInterface {
 	}
 
 	/**
-	 * Get a file's contents by requiring it.
+	 * Load a file's contents.
 	 *
 	 * @param  string  $path
 	 * @return mixed
 	 */
-	protected function getRequire($path)
-	{
-		return $this->files->getRequire($path);
-	}
+	abstract protected function loadFile($path);
 
 	/**
 	 * Get the Filesystem instance.
