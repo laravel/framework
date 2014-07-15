@@ -215,6 +215,8 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $attribute
 	 * @param  string|array  $rules
 	 * @return void
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function each($attribute, $rules)
 	{
