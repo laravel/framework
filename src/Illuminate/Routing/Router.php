@@ -1361,8 +1361,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Filter pattern filters that don't apply to the request verb.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  array  $filters
+	 * @param  string  $method
+	 * @param  array   $filters
 	 * @return array
 	 */
 	protected function patternsByMethod($method, $filters)
@@ -1714,6 +1714,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Get the response for a given request.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  int   $type
+	 * @param  bool  $catch
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
