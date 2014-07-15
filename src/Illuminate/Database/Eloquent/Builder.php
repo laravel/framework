@@ -238,14 +238,7 @@ class Builder {
 
 		$paginator = $this->query->getConnection()->getPaginator();
 
-		if (isset($this->query->groups))
-		{
-			return $this->groupedPaginate($paginator, $perPage, $columns);
-		}
-		else
-		{
-			return $this->ungroupedPaginate($paginator, $perPage, $columns);
-		}
+		return $this->ungroupedPaginate($paginator, $perPage, $columns);
 	}
 
 	/**
