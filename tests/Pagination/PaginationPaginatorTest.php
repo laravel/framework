@@ -21,6 +21,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $p->getCurrentPage());
 	}
 
+
 	public function testSimplePagination()
 	{
 		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 2);

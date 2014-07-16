@@ -13,6 +13,7 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 		$this->handler = new Handler($this->responsePreparer, $this->plainDisplayer, $this->debugDisplayer);
 	}
 
+
 	public function testHandleErrorExceptionArguments()
 	{
 		$error = null;
@@ -27,6 +28,7 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 		$this->assertSame(111, $error->getLine(), 'error handler should not modify line number');
 		$this->assertSame(0, $error->getCode(), 'error handler should use 0 exception code');
 	}
+
 
 	public function testHandleErrorOptionalArguments()
 	{
