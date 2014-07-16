@@ -106,6 +106,8 @@ class Encrypter {
 	 * @param  string  $value
 	 * @param  string  $iv
 	 * @return string
+	 *
+	 * @throws \Exception
 	 */
 	protected function mcryptDecrypt($value, $iv)
 	{
@@ -125,7 +127,7 @@ class Encrypter {
 	 * @param  string  $payload
 	 * @return array
 	 *
-	 * @throws DecryptException
+	 * @throws \Illuminate\Encryption\DecryptException
 	 */
 	protected function getJsonPayload($payload)
 	{
