@@ -44,6 +44,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 						     						'MessageId' => $this->mockedMessageId))));
 	}
 
+
 	public function testPopProperlyPopsJobOffOfSqs()
 	{
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->sqs, $this->queueName, $this->account));
@@ -53,6 +54,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$result = $queue->pop($this->queueName);
 		$this->assertInstanceOf('Illuminate\Queue\Jobs\SqsJob', $result);
 	}
+
 
 	public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
 	{
@@ -66,6 +68,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->mockedMessageId, $id);
 	}
 
+
 	public function testDelayedPushProperlyPushesJobOntoSqs()
 	{
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('createPayload', 'getSeconds', 'getQueue'), array($this->sqs, $this->queueName, $this->account));
@@ -76,6 +79,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->queueName);
 		$this->assertEquals($this->mockedMessageId, $id);
 	}
+
 
 	public function testPushProperlyPushesJobOntoSqs()
 	{
