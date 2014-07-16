@@ -330,7 +330,7 @@ class Store implements SessionInterface {
 	 * @param  mixed|null  	 $value
 	 * @return void
 	 */
-	public function put($key, $value)
+	public function put($key, $value = null)
 	{
 		if ( ! is_array($key)) $key = array($key => $value);
 
