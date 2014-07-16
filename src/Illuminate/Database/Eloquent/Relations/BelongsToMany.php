@@ -93,7 +93,6 @@ class BelongsToMany extends Relation {
 	 * @param  string  $column
 	 * @param  string  $operator
 	 * @param  mixed   $value
-	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	public function orWherePivot($column, $operator = null, $value = null)
@@ -289,6 +288,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the select clause for the relation query.
 	 *
+	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
@@ -710,6 +710,7 @@ class BelongsToMany extends Relation {
 	 * Create an array of records to insert into the pivot table.
 	 *
 	 * @param  array  $ids
+	 * @param  array  $attributes
 	 * @return array
 	 */
 	protected function createAttachRecords($ids, array $attributes)
@@ -957,6 +958,8 @@ class BelongsToMany extends Relation {
 	/**
 	 * Specify that the pivot table has creation and update timestamps.
 	 *
+	 * @param  mixed  $createdAt
+	 * @param  mixed  $updatedAt
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	public function withTimestamps($createdAt = null, $updatedAt = null)
