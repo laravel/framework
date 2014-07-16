@@ -231,7 +231,6 @@ class SqlServerGrammar extends Grammar {
 		return "nchar({$column->length})";
 	}
 
-
 	/**
 	 * Create the column definition for a string type.
 	 *
