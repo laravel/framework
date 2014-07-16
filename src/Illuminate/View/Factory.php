@@ -246,6 +246,8 @@ class Factory {
 	 *
 	 * @param  string  $path
 	 * @return \Illuminate\View\Engines\EngineInterface
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function getEngineFromPath($path)
 	{
