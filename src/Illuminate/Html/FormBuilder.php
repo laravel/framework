@@ -391,9 +391,9 @@ class FormBuilder {
     /**
      * Create a data data list field
      *
-     * @param string $listName
-     * @param string $name
-     * @param array $list
+     * @param  string  $listName
+     * @param  string  $name
+     * @param  array   $list
      * @return string
      */
     public function dataList($listName, $name, $list)
