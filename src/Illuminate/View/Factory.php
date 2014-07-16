@@ -332,8 +332,9 @@ class Factory {
 	/**
 	 * Register a view composer event.
 	 *
-	 * @param  array|string     $views
+	 * @param  array|string  $views
 	 * @param  \Closure|string  $callback
+	 * @param  int|null  $priority
 	 * @return array
 	 */
 	public function composer($views, $callback, $priority = null)
@@ -354,6 +355,7 @@ class Factory {
 	 * @param  string  $view
 	 * @param  \Closure|string  $callback
 	 * @param  string  $prefix
+	 * @param  int|null  $priority
 	 * @return Closure
 	 */
 	protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
@@ -373,9 +375,10 @@ class Factory {
 	/**
 	 * Register a class based view composer.
 	 *
-	 * @param  string   $view
-	 * @param  string   $class
-	 * @param  string   $prefix
+	 * @param  string    $view
+	 * @param  string    $class
+	 * @param  string    $prefix
+	 * @param  int|null  $priority
 	 * @return \Closure
 	 */
 	protected function addClassEvent($view, $class, $prefix, $priority = null)
@@ -741,6 +744,7 @@ class Factory {
 	/**
 	 * Set the view finder instance.
 	 *
+	 * @param  \Illuminate\View\ViewFinderInterface  $finder
 	 * @return void
 	 */
 	public function setFinder(ViewFinderInterface $finder)

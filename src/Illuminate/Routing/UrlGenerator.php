@@ -524,7 +524,7 @@ class UrlGenerator {
 	/**
 	 * Set the current request instance.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
 	public function setRequest(Request $request)

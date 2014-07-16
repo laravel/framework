@@ -607,7 +607,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Get the sum of the given values.
 	 *
 	 * @param  \Closure  $callback
-	 * @param  string    $callback
 	 * @return mixed
 	 */
 	public function sum($callback)

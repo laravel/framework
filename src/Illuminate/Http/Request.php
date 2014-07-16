@@ -514,6 +514,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Get the data format expected in the response.
 	 *
+	 * @param  string  $default
 	 * @return string
 	 */
 	public function format($default = 'html')
