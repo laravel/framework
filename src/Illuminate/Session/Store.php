@@ -68,7 +68,7 @@ class Store implements SessionInterface {
 	 *
 	 * @param  string  $name
 	 * @param  \SessionHandlerInterface  $handler
-	 * @param  string|null $id
+	 * @param  string|null  $id
 	 * @return void
 	 */
 	public function __construct($name, SessionHandlerInterface $handler, $id = null)

@@ -261,6 +261,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get the array of locales to be checked.
 	 *
+	 * @param  string|null  $locale
 	 * @return array
 	 */
 	protected function parseLocale($locale)
