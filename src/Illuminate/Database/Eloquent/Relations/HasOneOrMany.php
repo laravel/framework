@@ -26,6 +26,7 @@ abstract class HasOneOrMany extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $foreignKey
+	 * @param  string  $localKey
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent, $foreignKey, $localKey)
