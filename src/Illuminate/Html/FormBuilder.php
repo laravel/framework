@@ -396,7 +396,6 @@ class FormBuilder {
      * @param array $list
      * @return string
      */
-
     public function dataList($listName, $name, $list)
     {
         foreach ($list as $display)
