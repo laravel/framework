@@ -226,6 +226,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Not found', data_get($array, '0.users.3', function (){ return 'Not found'; }));
 	}
 
+
 	public function testArraySort()
 	{
 		$array = array(
