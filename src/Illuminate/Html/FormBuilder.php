@@ -719,7 +719,7 @@ class FormBuilder {
 	 */
 	public function button($value = null, $options = array())
 	{
-		if ( ! array_key_exists('type', $options) )
+		if ( ! array_key_exists('type', $options))
 		{
 			$options['type'] = 'button';
 		}
