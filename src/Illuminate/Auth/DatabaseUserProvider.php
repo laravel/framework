@@ -104,13 +104,9 @@ class DatabaseUserProvider implements UserProviderInterface {
 		// generic "user" object that will be utilized by the Guard instances.
 		$query = $this->conn->table($this->table);
 
-		foreach ($credentials as $key => $value)
-		{
-			if ( ! str_contains($key, 'password'))
-			{
-				$query->where($key, $value);
-			}
-		}
+		array_forget($credentials, 'password');
+
+		$query->where($credentials);
 
 		// Now we are ready to execute the query to see if we have an user matching
 		// the given credentials. If not, we will just return nulls and indicate
