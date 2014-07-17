@@ -128,7 +128,7 @@ class Writer {
 	/**
 	 * Get a defaut Monolog formatter instance.
 	 *
-	 * @return \Monolog\Formatters\LineFormatter
+	 * @return \Monolog\Formatter\LineFormatter
 	 */
 	protected function getDefaultFormatter()
 	{
