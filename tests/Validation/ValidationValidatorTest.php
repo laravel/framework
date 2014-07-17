@@ -126,6 +126,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Name is required!', $v->messages()->first('name'));
 	}
 
+
 	public function testDisplayableValuesAreReplaced()
 	{
 		//required_if:foo,bar
@@ -148,6 +149,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
 
 	}
+
 
 	public function testCustomValidationLinesAreRespected()
 	{
@@ -1000,6 +1002,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+
 	public function testValidateTimezone()
 	{
 		$trans = $this->getRealTranslator();
@@ -1018,6 +1021,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => 'GMT'), array('foo' => 'Timezone'));
 		$this->assertTrue($v->passes());
 	}
+
 
 	public function testValidateRegex()
 	{
