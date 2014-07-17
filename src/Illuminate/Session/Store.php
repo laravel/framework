@@ -128,9 +128,7 @@ class Store implements SessionInterface {
 	 */
 	protected function initializeLocalBag($bag)
 	{
-		$this->bagData[$bag->getStorageKey()] = $this->get($bag->getStorageKey(), array());
-
-		$this->forget($bag->getStorageKey());
+		$this->bagData[$bag->getStorageKey()] = $this->pull($bag->getStorageKey(), []);
 	}
 
 	/**
