@@ -52,7 +52,7 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function read($sessionId)
 	{
-		return $this->cache->get($sessionId) ?: '';
+		return $this->cache->get($sessionId, '');
 	}
 
 	/**
