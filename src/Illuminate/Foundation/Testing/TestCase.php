@@ -69,9 +69,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  bool    $changeHistory
 	 * @return \Illuminate\Http\Response
 	 */
-	public function call()
+	public function call($method, $uri, $parameters = [], $files = [], $server = [], $content = null, $changeHistory = true)
 	{
-		call_user_func_array(array($this->client, 'request'), func_get_args());
+		$this->client->request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 
 		return $this->client->getResponse();
 	}
@@ -88,13 +88,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 * @param  bool    $changeHistory
 	 * @return \Illuminate\Http\Response
 	 */
-	public function callSecure()
+	public function callSecure($method, $uri, $parameters = [], $files = [], $server = [], $content = null, $changeHistory = true)
 	{
-		$parameters = func_get_args();
+		$uri = 'https://localhost/'.ltrim($uri, '/');
 
-		$parameters[1] = 'https://localhost/'.ltrim($parameters[1], '/');
-
-		return call_user_func_array(array($this, 'call'), $parameters);
+		return $this->call($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 	}
 
 	/**
