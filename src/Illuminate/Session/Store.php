@@ -276,11 +276,7 @@ class Store implements SessionInterface {
 	 */
 	public function pull($key, $default = null)
 	{
-		$value = $this->get($key, $default);
-
-		$this->forget($key);
-
-		return $value;
+		return array_pull($this->attributes, $key, $default);
 	}
 
 	/**
