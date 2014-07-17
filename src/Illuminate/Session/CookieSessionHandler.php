@@ -53,7 +53,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function read($sessionId)
 	{
-		return $this->request->cookies->get($sessionId) ?: '';
+		return $this->request->cookies->get($sessionId, '');
 	}
 
 	/**
