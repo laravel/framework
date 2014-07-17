@@ -389,6 +389,28 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a data data list field
+	 *
+	 * @param  string  $listName
+	 * @param  string  $name
+	 * @param  array   $list
+	 * @return string
+	 */
+	public function dataList($listName, $name, $list)
+	{
+		foreach ($list as $display)
+		{
+			$html[] = $this->option(null, $display, null);
+		}
+
+		$list = implode('', $html);
+
+		$input = $this->input(null, $name, null, array('list' => $listName));
+
+		return $input . '<datalist id="' . e($listName) . '">' . $list . '</datalist>';
+	}
+
+	/**
 	 * Create a select box field.
 	 *
 	 * @param  string  $name
