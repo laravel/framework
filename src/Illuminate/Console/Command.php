@@ -117,15 +117,16 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 *
 	 * @param  string  $command
 	 * @param  array   $arguments
+	 * @param  bool    $silent
 	 * @return integer
 	 */
-	public function call($command, array $arguments = array())
+	public function call($command, array $arguments = array(), $silent = false)
 	{
 		$instance = $this->getApplication()->find($command);
 
 		$arguments['command'] = $command;
 
-		return $instance->run(new ArrayInput($arguments), $this->output);
+		return $instance->run(new ArrayInput($arguments), $silent ? new NullOutput : $this->output);
 	}
 
 	/**
@@ -137,11 +138,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function callSilent($command, array $arguments = array())
 	{
-		$instance = $this->getApplication()->find($command);
-
-		$arguments['command'] = $command;
-
-		return $instance->run(new ArrayInput($arguments), new NullOutput);
+		return $this->call($command, $arguments, true);
 	}
 
 	/**

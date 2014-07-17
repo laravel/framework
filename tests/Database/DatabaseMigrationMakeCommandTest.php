@@ -64,7 +64,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 class DatabaseMigrationMakeCommandTestStub extends MigrateMakeCommand
 {
-	public function call($command, array $arguments = array())
+	public function call($command, array $arguments = array(), $silent = false)
 	{
 		//
 	}
