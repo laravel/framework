@@ -211,7 +211,7 @@ class Route {
 		if (is_array($filters)) return static::explodeArrayFilters($filters);
 		
 		
-		return array_map('trim', explode('|', $filters);
+		return array_map('trim', explode('|', $filters));
 	}
 
 	/**
