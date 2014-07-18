@@ -24,7 +24,9 @@ class AliasLoader {
 	protected static $instance;
 
 	/**
-	 * Singleton shouln't allow instantiation
+	 * Create a new AliasLoader instance.
+	 *
+	 * @param  array  $aliases
 	 */
 	private function __construct($aliases)
 	{
