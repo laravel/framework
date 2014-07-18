@@ -679,6 +679,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$action = $routes[0]->getAction();
 
 		$this->assertEquals('Namespace\\Nested\\Controller', $action['controller']);
+
+
+		$router = $this->getRouter();
+		$router->group(array('prefix' => 'baz'), function() use ($router)
+		{
+			$router->group(array('namespace' => 'Namespace'), function() use ($router)
+			{
+				$router->get('foo/bar', 'Controller');
+			});
+		});
+		$routes = $router->getRoutes()->getRoutes();
+		$action = $routes[0]->getAction();
+
+		$this->assertEquals('Namespace\\Controller', $action['controller']);
 	}
 
 
