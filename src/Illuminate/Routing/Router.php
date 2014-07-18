@@ -261,7 +261,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// First, we will check to see if a controller prefix has been registered in
 		// the route group. If it has, we will need to prefix it before trying to
 		// reflect into the class instance and pull out the method for routing.
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$prepended = $this->prependGroupUses($controller);
 		}
@@ -388,7 +388,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// last segment, which will be considered the final resources name we use.
 		$prefix = implode('/', array_slice($segments, 0, -1));
 
-		return array($segments[count($segments) - 1], $prefix);
+		return array(end($segments), $prefix);
 	}
 
 	/**
@@ -483,7 +483,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// the resource action. Otherwise we'll just use an empty string for here.
 		$prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-		if (count($this->groupStack) == 0)
+		if (empty($this->groupStack))
 		{
 			return $prefix.$resource.'.'.$method;
 		}
@@ -701,7 +701,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function updateGroupStack(array $attributes)
 	{
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$attributes = $this->mergeGroup($attributes, last($this->groupStack));
 		}
@@ -785,9 +785,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function getLastGroupPrefix()
 	{
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
-			return array_get(last($this->groupStack), 'prefix', '');
+			$last = end($this->groupStack);
+			return isset($last['prefix']) ? $last['prefix'] : '';
 		}
 
 		return '';
@@ -831,7 +832,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
 		// the merge we will be ready to return the route back out to the caller.
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$this->mergeController($route);
 		}
@@ -919,7 +920,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// Here we'll get an instance of this controller dispatcher and hand it off to
 		// the Closure so it will be used to resolve the class instances out of our
 		// IoC container instance and call the appropriate methods on the class.
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$action['uses'] = $this->prependGroupUses($action['uses']);
 		}
@@ -1198,7 +1199,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function model($key, $class, Closure $callback = null)
 	{
-		return $this->bind($key, function($value) use ($class, $callback)
+		$this->bind($key, function($value) use ($class, $callback)
 		{
 			if (is_null($value)) return null;
 
