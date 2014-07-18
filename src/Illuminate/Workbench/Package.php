@@ -52,12 +52,10 @@ class Package {
 	 * @param  string  $author
 	 * @param  string  $email
 	 * @return void
- 	 *
- 	 * @throws \UnexpectedValueException
 	 */
 	public function __construct($vendor, $name, $author, $email)
 	{
- 		$this->name = $name;
+		$this->name = $name;
 		$this->email = $email;
 		$this->vendor = $vendor;
 		$this->author = $author;
