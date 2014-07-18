@@ -735,14 +735,16 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected static function formatUsesPrefix($new, $old)
 	{
-		if (isset($new['namespace']))
+		if (isset($new['namespace']) && isset($old['namespace']))
 		{
 			return trim(array_get($old, 'namespace'), '\\').'\\'.trim($new['namespace'], '\\');
 		}
-		else
+		elseif (isset($new['namespace']))
 		{
-			return array_get($old, 'namespace');
+			return trim($new['namespace'], '\\');
 		}
+
+		return array_get($old, 'namespace');
 	}
 
 	/**
@@ -758,10 +760,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		{
 			return trim(array_get($old, 'prefix'), '/').'/'.trim($new['prefix'], '/');
 		}
-		else
-		{
-			return array_get($old, 'prefix');
-		}
+
+		return array_get($old, 'prefix');
 	}
 
 	/**
