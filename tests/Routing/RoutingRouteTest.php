@@ -583,10 +583,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	public function testGroupMerging()
 	{
 		$old = array('prefix' => 'foo/bar/');
-		$this->assertEquals(array('prefix' => 'foo/bar/baz', 'namespace' => null), Router::mergeGroup(array('prefix' => 'baz'), $old));
+		$this->assertEquals(array('prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []), Router::mergeGroup(array('prefix' => 'baz'), $old));
 
 		$old = array('domain' => 'foo');
-		$this->assertEquals(array('domain' => 'baz', 'prefix' => null, 'namespace' => null), Router::mergeGroup(array('domain' => 'baz'), $old));
+		$this->assertEquals(array('domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []), Router::mergeGroup(array('domain' => 'baz'), $old));
+
+		$old = array('where' => ['var1' => 'foo', 'var2' => 'bar']);
+		$this->assertEquals(array('prefix' => null, 'namespace' => null, 'where' => [
+			'var1' => 'foo', 'var2' => 'baz', 'var3' => 'qux',
+		]), Router::mergeGroup(['where' => ['var2' => 'baz', 'var3' => 'qux']], $old));
+
+		$old = [];
+		$this->assertEquals(array('prefix' => null, 'namespace' => null, 'where' => [
+			'var1' => 'foo', 'var2' => 'bar',
+		]), Router::mergeGroup(['where' => ['var1' => 'foo', 'var2' => 'bar']], $old));
 	}
 
 
