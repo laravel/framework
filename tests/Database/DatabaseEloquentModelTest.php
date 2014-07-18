@@ -831,6 +831,25 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
+	{
+		$model = m::mock('EloquentModelStub[newQuery]');
+		$model->exists = true;
+		$model->id = 1;
+		$model->syncOriginalAttribute('id');
+		$model->foo = 2;
+
+		$model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
+		$query->shouldReceive('where')->andReturn($query);
+		$query->shouldReceive('increment');
+
+		$model->publicIncrement('foo');
+
+		$this->assertEquals(3, $model->foo);
+		$this->assertFalse($model->isDirty());
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -865,6 +884,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	public function setPasswordAttribute($value)
 	{
 		$this->attributes['password_hash'] = md5($value);
+	}
+	public function publicIncrement($column, $amount = 1)
+	{
+		return $this->increment($column, $amount);
 	}
 	public function belongsToStub()
 	{

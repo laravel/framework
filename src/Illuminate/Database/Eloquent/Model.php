@@ -1302,7 +1302,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $query->{$method}($column, $amount);
 		}
 
+		$this->incrementOrDecrementAttributeValue($column, $amount, $method);
+
 		return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+	}
+
+	/**
+	 * Increment the underlying attribute value and sync with original.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @param  string  $method
+	 * @return void
+	 */
+	protected function incrementOrDecrementAttributeValue($column, $amount, $method)
+	{
+		$this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
+
+		$this->syncOriginalAttribute($column);
 	}
 
 	/**
@@ -2648,6 +2665,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function syncOriginal()
 	{
 		$this->original = $this->attributes;
+
+		return $this;
+	}
+
+	/**
+	 * Sync a single original attribute with its current value.
+	 *
+	 * @param  string  $attribute
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function syncOriginalAttribute($attribute)
+	{
+		$this->original[$attribute] = $this->attributes[$attribute];
 
 		return $this;
 	}
