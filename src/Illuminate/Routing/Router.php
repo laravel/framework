@@ -826,8 +826,6 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			$methods, $uri = $this->prefix($uri), $action
 		);
 
-		$this->addWhereClausesToRoute($route);
-
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
 		// the merge we will be ready to return the route back out to the caller.
@@ -835,6 +833,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		{
 			$this->mergeController($route);
 		}
+
+		$this->addWhereClausesToRoute($route);
 
 		return $route;
 	}
