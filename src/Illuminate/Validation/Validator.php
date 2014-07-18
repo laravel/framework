@@ -1932,11 +1932,16 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Extract the rule name and parameters from a rule.
 	 *
-	 * @param  string  $rule
+	 * @param  string|array  $rule
 	 * @return array
 	 */
 	protected function parseRule($rule)
 	{
+		// If the rule is an array then it should not be parsed.
+		if (is_array($rule)) {
+			return array(studly_case($rule[0]), array_slice($rule, 1));
+		}
+
 		$parameters = array();
 
 		// The format for specifying validation rules and parameters follows an
