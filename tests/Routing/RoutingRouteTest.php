@@ -469,11 +469,21 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$route->where('bar', '[0-9]+');
 		$this->assertFalse($route->matches($request));
 
+		$request = Request::create('foo/123abc', 'GET');
+		$route = new Route('GET', 'foo/{bar}', ['where' => ['bar' => '[0-9]+'], function() {}]);
+		$route->where('bar', '[0-9]+');
+		$this->assertFalse($route->matches($request));
+
 		/**
 		 * Optional
 		 */
 		$request = Request::create('foo/123', 'GET');
 		$route = new Route('GET', 'foo/{bar?}', function() {});
+		$route->where('bar', '[0-9]+');
+		$this->assertTrue($route->matches($request));
+
+		$request = Request::create('foo/123', 'GET');
+		$route = new Route('GET', 'foo/{bar?}', ['where' => ['bar' => '[0-9]+'], function() {}]);
 		$route->where('bar', '[0-9]+');
 		$this->assertTrue($route->matches($request));
 
