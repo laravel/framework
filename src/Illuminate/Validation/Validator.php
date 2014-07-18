@@ -1929,8 +1929,8 @@ class Validator implements MessageProviderInterface {
 		// If the rule is an array then it should not be parsed.
 		if (is_array($rule))
 		{
-			$rule = array_get($rule, 0, '');
 			$parameters = array_slice($rule, 1);
+			$rule = array_get($rule, 0, '');
 		}
 		else
 		{
