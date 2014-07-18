@@ -826,7 +826,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			$methods, $uri = $this->prefix($uri), $action
 		);
 
-		$route->where($this->patterns);
+		$this->addWhereClausesToRoute($route);
 
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
@@ -861,6 +861,21 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function prefix($uri)
 	{
 		return trim(trim($this->getLastGroupPrefix(), '/').'/'.trim($uri, '/'), '/') ?: '/';
+	}
+
+	/**
+	 * Add the necessary where clauses to the route based on its initial registration.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return \Illuminate\Routing\Route
+	 */
+	protected function addWhereClausesToRoute($route)
+	{
+		$route->where(
+			array_merge($this->patterns, array_get($route->getAction(), 'where', []))
+		);
+
+		return $route;
 	}
 
 	/**
