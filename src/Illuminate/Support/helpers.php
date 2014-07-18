@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 if ( ! function_exists('action'))
@@ -88,12 +89,7 @@ if ( ! function_exists('array_add'))
 	 */
 	function array_add($array, $key, $value)
 	{
-		if (is_null(array_get($array, $key)))
-		{
-			array_set($array, $key, $value);
-		}
-
-		return $array;
+		return Arr::add($array, $key, $value);
 	}
 }
 
@@ -108,16 +104,7 @@ if ( ! function_exists('array_build'))
 	 */
 	function array_build($array, Closure $callback)
 	{
-		$results = array();
-
-		foreach ($array as $key => $value)
-		{
-			list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
-
-			$results[$innerKey] = $innerValue;
-		}
-
-		return $results;
+		return Arr::build($array, $callback);
 	}
 }
 
@@ -131,7 +118,7 @@ if ( ! function_exists('array_divide'))
 	 */
 	function array_divide($array)
 	{
-		return array(array_keys($array), array_values($array));
+		return Arr::divide($array);
 	}
 }
 
@@ -146,21 +133,7 @@ if ( ! function_exists('array_dot'))
 	 */
 	function array_dot($array, $prepend = '')
 	{
-		$results = array();
-
-		foreach ($array as $key => $value)
-		{
-			if (is_array($value))
-			{
-				$results = array_merge($results, array_dot($value, $prepend.$key.'.'));
-			}
-			else
-			{
-				$results[$prepend.$key] = $value;
-			}
-		}
-
-		return $results;
+		return Arr::dot($array, $prepend);
 	}
 }
 
@@ -175,7 +148,7 @@ if ( ! function_exists('array_except'))
 	 */
 	function array_except($array, $keys)
 	{
-		return array_diff_key($array, array_flip((array) $keys));
+		return Arr::except($array, $keys);
 	}
 }
 
@@ -190,21 +163,7 @@ if ( ! function_exists('array_fetch'))
 	 */
 	function array_fetch($array, $key)
 	{
-		foreach (explode('.', $key) as $segment)
-		{
-			$results = array();
-
-			foreach ($array as $value)
-			{
-				$value = (array) $value;
-
-				$results[] = $value[$segment];
-			}
-
-			$array = array_values($results);
-		}
-
-		return array_values($results);
+		return Arr::fetch($array, $key);
 	}
 }
 
@@ -220,12 +179,7 @@ if ( ! function_exists('array_first'))
 	 */
 	function array_first($array, $callback, $default = null)
 	{
-		foreach ($array as $key => $value)
-		{
-			if (call_user_func($callback, $key, $value)) return $value;
-		}
-
-		return value($default);
+		return Arr::first($array, $callback, $default);
 	}
 }
 
@@ -241,7 +195,7 @@ if ( ! function_exists('array_last'))
 	 */
 	function array_last($array, $callback, $default = null)
 	{
-		return array_first(array_reverse($array), $callback, $default);
+		return Arr::last($array, $callback, $default);
 	}
 }
 
@@ -255,11 +209,7 @@ if ( ! function_exists('array_flatten'))
 	 */
 	function array_flatten($array)
 	{
-		$return = array();
-
-		array_walk_recursive($array, function($x) use (&$return) { $return[] = $x; });
-
-		return $return;
+		return Arr::flatten($array);
 	}
 }
 
@@ -274,22 +224,7 @@ if ( ! function_exists('array_forget'))
 	 */
 	function array_forget(&$array, $keys)
 	{
-		foreach ((array) $keys as $key)
-		{
-			$parts = explode('.', $key);
-
-			while (count($parts) > 1)
-			{
-				$part = array_shift($parts);
-
-				if (isset($array[$part]) && is_array($array[$part]))
-				{
-					$array =& $array[$part];
-				}
-			}
-
-			unset($array[array_shift($parts)]);
-		}
+		return Arr::forget($array, $keys);
 	}
 }
 
@@ -305,21 +240,7 @@ if ( ! function_exists('array_get'))
 	 */
 	function array_get($array, $key, $default = null)
 	{
-		if (is_null($key)) return $array;
-
-		if (isset($array[$key])) return $array[$key];
-
-		foreach (explode('.', $key) as $segment)
-		{
-			if ( ! is_array($array) || ! array_key_exists($segment, $array))
-			{
-				return value($default);
-			}
-
-			$array = $array[$segment];
-		}
-
-		return $array;
+		return Arr::get($array, $key, $default);
 	}
 }
 
@@ -334,7 +255,7 @@ if ( ! function_exists('array_only'))
 	 */
 	function array_only($array, $keys)
 	{
-		return array_intersect_key($array, array_flip((array) $keys));
+		return Arr::only($array, $keys);
 	}
 }
 
@@ -350,28 +271,7 @@ if ( ! function_exists('array_pluck'))
 	 */
 	function array_pluck($array, $value, $key = null)
 	{
-		$results = array();
-
-		foreach ($array as $item)
-		{
-			$itemValue = is_object($item) ? $item->{$value} : $item[$value];
-
-			// If the key is "null", we will just append the value to the array and keep
-			// looping. Otherwise we will key the array using the value of the key we
-			// received from the developer. Then we'll return the final array form.
-			if (is_null($key))
-			{
-				$results[] = $itemValue;
-			}
-			else
-			{
-				$itemKey = is_object($item) ? $item->{$key} : $item[$key];
-
-				$results[$itemKey] = $itemValue;
-			}
-		}
-
-		return $results;
+		return Arr::pluck($array, $value, $key);
 	}
 }
 
@@ -387,11 +287,7 @@ if ( ! function_exists('array_pull'))
 	 */
 	function array_pull(&$array, $key, $default = null)
 	{
-		$value = array_get($array, $key, $default);
-
-		array_forget($array, $key);
-
-		return $value;
+		return Arr::pull($array, $key, $default);
 	}
 }
 
@@ -409,28 +305,7 @@ if ( ! function_exists('array_set'))
 	 */
 	function array_set(&$array, $key, $value)
 	{
-		if (is_null($key)) return $array = $value;
-
-		$keys = explode('.', $key);
-
-		while (count($keys) > 1)
-		{
-			$key = array_shift($keys);
-
-			// If the key doesn't exist at this depth, we will just create an empty array
-			// to hold the next value, allowing us to create the arrays to hold final
-			// values at the correct depth. Then we'll keep digging into the array.
-			if ( ! isset($array[$key]) || ! is_array($array[$key]))
-			{
-				$array[$key] = array();
-			}
-
-			$array =& $array[$key];
-		}
-
-		$array[array_shift($keys)] = $value;
-
-		return $array;
+		return Arr::set($array, $key, $value);
 	}
 }
 
@@ -445,7 +320,7 @@ if ( ! function_exists('array_sort'))
 	 */
 	function array_sort($array, Closure $callback)
 	{
-		return Illuminate\Support\Collection::make($array)->sortBy($callback)->all();
+		return Arr::sort($array, $callback);
 	}
 }
 
@@ -460,14 +335,7 @@ if ( ! function_exists('array_where'))
 	 */
 	function array_where($array, Closure $callback)
 	{
-		$filtered = array();
-
-		foreach ($array as $key => $value)
-		{
-			if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
-		}
-
-		return $filtered;
+		return Arr::where($array, $callback);
 	}
 }
 
