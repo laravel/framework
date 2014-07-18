@@ -720,13 +720,27 @@ class Route {
 	}
 
 	/**
+	 * Get the subdomain defined for the route.
+	 *
+	 * @return string|null
+	 */
+	public function subdomain()
+	{
+		return array_get($this->action, 'subdomain');
+	}
+
+	/**
 	 * Get the domain defined for the route.
 	 *
 	 * @return string|null
 	 */
 	public function domain()
 	{
-		return array_get($this->action, 'domain');
+		$subdomain = $this->subdomain();
+
+		$domain = array_get($this->action, 'domain');
+
+		return $subdomain ? $subdomain.'.'.$domain : $domain;
 	}
 
 	/**

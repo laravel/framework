@@ -735,6 +735,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		if (isset($new['domain'])) unset($old['domain']);
 
+		if (isset($new['domain']) || isset($new['subdomain'])) unset($old['subdomain']);
+
 		$new['where'] = array_merge(array_get($old, 'where', []), array_get($new, 'where', []));
 
 		return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'where')), $new);
