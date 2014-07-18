@@ -39,7 +39,7 @@ class FileStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
-		return array_get($this->rawGet($key), 'data', null);
+		return array_get($this->getPayload($key), 'data', null);
 	}
 
 	/**
@@ -48,7 +48,7 @@ class FileStore implements StoreInterface {
 	 * @param  string  $key
 	 * @return array
 	 */
-	protected function rawGet($key)
+	protected function getPayload($key)
 	{
 		$path = $this->path($key);
 
@@ -75,11 +75,15 @@ class FileStore implements StoreInterface {
 		if (time() >= $expire)
 		{
 			$this->forget($key);
+
 			return array('data' => null, 'time' => null);
 		}
 
 		$data = unserialize(substr($contents, 10));
 
+		// Next, we'll extract the number of minutes that are remaining for a cache
+		// so that we can properly retain the time for things like the increment
+		// operation that may be performed on the cache. We'll round this out.
 		$time = ceil(($expire - time()) / 60);
 
 		return compact('data', 'time');
@@ -129,7 +133,7 @@ class FileStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		$raw = $this->rawGet($key);
+		$raw = $this->getPayload($key);
 
 		$int = ((int) $raw['data']) + $value;
 
@@ -147,7 +151,7 @@ class FileStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		return $this->increment($key, - $value);
+		return $this->increment($key, $value * -1);
 	}
 
 	/**
