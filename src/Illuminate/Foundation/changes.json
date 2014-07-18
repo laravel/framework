@@ -1,6 +1,7 @@
 {
 	"4.3.*": [
-		{"message": "Allow passing a priority to Eloquent event listeners.", "backport": null}
+		{"message": "Allow passing a priority to Eloquent event listeners.", "backport": null},
+		{"message": "Tweak 'compile' configuration file for 'files' and 'providers' support.", "backport": null}
 	],
 	"4.2.*": [
 		{"message": "View and Pagination 'Environment' classes renamed to 'Factory'.", "backport": null},
