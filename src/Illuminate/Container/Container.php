@@ -77,7 +77,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bound($abstract)
 	{
-		return isset($this[$abstract]) || isset($this->instances[$abstract]);
+		return isset($this->bindings[$abstract]) || isset($this->instances[$abstract]);
 	}
 
 	/**
@@ -193,7 +193,7 @@ class Container implements ArrayAccess {
 	 */
 	public function singleton($abstract, $concrete = null)
 	{
-		return $this->bind($abstract, $concrete, true);
+		$this->bind($abstract, $concrete, true);
 	}
 
 	/**
@@ -229,7 +229,7 @@ class Container implements ArrayAccess {
 	 */
 	public function bindShared($abstract, Closure $closure)
 	{
-		return $this->bind($abstract, $this->share($closure), true);
+		$this->bind($abstract, $this->share($closure), true);
 	}
 
 	/**
