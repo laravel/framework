@@ -5,6 +5,7 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 
+
 	public function tearDown()
 	{
 		m::close();
@@ -455,6 +456,120 @@ empty
 	protected function getFiles()
 	{
 		return m::mock('Illuminate\Filesystem\Filesystem');
+	}
+
+
+	/**
+	 *  @dataProvider matcherCases
+	 */
+	public function testMatcher($str, $succeed)
+	{
+		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+		$fauxCall = "some text @function($str) some other text with Parentheses()";
+		preg_match($compiler->createMatcher('function'), $fauxCall, $matches);
+		if ($succeed) {
+			$this->assertEquals("($str)", $matches[2]);
+		} else {
+			$this->assertNotEquals("($str)", isset($matches[2])?$matches[2]:null);
+		}
+	}
+
+
+	/**
+	 *  @dataProvider matcherCases
+	 */
+	public function testOpenMatcher($str, $succeed) 
+	{
+		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+		$fauxCall = "some text @function($str) some other text with Parentheses()";
+		preg_match($compiler->createOpenMatcher('function'), $fauxCall, $matches);
+		if ($succeed) {
+			$this->assertEquals("($str", isset($matches[2])?$matches[2]:null);
+		} else {
+			$this->assertNotEquals("($str", isset($matches[2])?$matches[2]:null);
+		}
+	}
+
+
+	public function matcherCases() 
+	{
+		return [
+			/**
+			 *  Cases which should match correctly.
+			 */
+			['', true] //Empty
+			, ['     ', true] //WhiteSpace
+			, ['$var', true] //variable
+			, ['$var->prop', true] //Property
+			, ['$var->method()', true]//<Method
+			, ['$arg, $list', true] //Arg list
+			, ['$multiline
+				, $arg
+				, $list', true] //Multiline Arg list
+			, ['"string"', true] //doubleQuoted String
+			, ["'string'", true] //Single Quoted String
+			, ['"String
+				Multiline"', true] //Multiline String
+			, ['"String \" with escape"', true] //Escaped Quotes
+			, ['"String with false paren)"', true]  //Parentheses within string
+			, ['((()(()(()))))', true] //Arbitrarily nested parentheses
+			, ['(-b + sqrt(($b*$b) - (4* $a * $c))) / (2*$a)', true] //Quadratic Equations.
+			, ['<<<Heredoc
+Heredoc
+',true] //empty HereDoc
+			, ['<<<Heredoc
+Huzzah, some data!
+Heredoc
+',true] //non-empty HereDoc
+			, ['<<<"Heredoc"
+Huzzah, some data!
+Heredoc
+',true] //Quoted HereDoc
+			, ['<<<"Heredoc"
+Huzzah, some data!
+Heredoc;
+',true] //Semicolon terminated Heredoc.
+			, ["<<<'Nowdoc'
+Huzzah, some data!
+Nowdoc;
+",true] //Semicolon terminated Nowdoc.
+			, ["<<<'Nowdoc'
+Unmatchable quote: '
+Nowdoc;
+",true] //Nowdoc with unmatchable Quote.
+			, ["<<<'Nowdoc'
+Unmatchable paren: (
+Nowdoc;
+",true] //Nowdoc with unmatchable open Parenthesis.
+			, ["<<<'Nowdoc'
+Early closing paren: )
+Nowdoc;
+",true] //Nowdoc with early closing parenthesis..
+			/**
+			 *  Cases which should fail.
+			 */
+			, [')', false] //Premature closure
+			, ['(', false]//unclosed Open
+			, ['())((()())()', false] //Improperly nested parentheses
+			, ['"', false] //Unterminated Strings
+			, ["'", false] //Unterminated Strings
+			, ["<<<'Nowdoc'
+Nowdoc;
+Early closing paren: )
+Nowdoc;
+",false] //Nowdoc followed by premature closure, and succeeding re-use of Identifier.
+			, ["<<<'Nowdoc'
+Nowdoc;
+Unmatchable quote: '
+Nowdoc;
+",false] //Nowdoc followed by unmatchable quote, and succeeding re-use of Identifier.
+			, ["<<<'Nowdoc'
+Nowdoc;
+Unmatchable paren: (
+Nowdoc;
+",false] //Nowdoc followed by unmatchable open parenthesis, and succeeding re-use of Identifier.
+		];
+
 	}
 
 }

@@ -632,6 +632,70 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 *  Generate a regular expression matching a single or double quoted
+	 *  string for inclusion in a larger regular expression.
+	 *  
+	 *  CONSUMES ONE MATCHING GROUP
+	 *  
+	 *  @param int $nextGroup The number which will be assigned to the next
+	 *      capturing group in the regular expression.
+	 *  @param boolean singleLine Wether the larger regex will be compiled 
+	 *      with the 's' flag.  Defaults to false.
+	 *  @return string
+	 */
+	private function stringRegex($nextGroup, $singleLine = false) 
+	{
+		return $singleLine ?
+			'([\'"])(?:\\\\\\'.$nextGroup.'|(?!\\'.$nextGroup.').)*\\'.$nextGroup
+			:
+			'([\'"])(?:\\\\\\'.$nextGroup.'|(?!\\'.$nextGroup.')(?:.|'."\n".'))*\\'.$nextGroup
+			;
+	}
+
+	/**
+	 *  Generate a regular expression matching a Heredoc or a Nowdoc for 
+	 *  inclusion in a larger regular expression.
+	 *  
+	 *  CONSUMES TWO MATCHING GROUPS
+	 *  
+	 *  @param int $nextGroup The number which will be assigned to the next
+	 *      capturing group in the regular expression.
+	 *  @param boolean singleLine Wether the larger regex will be compiled 
+	 *      with the 's' flag.  Defaults to false.
+	 *  @return string
+	 */
+	private function hereNowDocRegex($nextGroup, $singleLine = false) 
+	{
+		return '<<<(["\']?)([a-zA-Z_]\w*)\\'.$nextGroup.PHP_EOL //Opening Identifier
+			.'(?>' .($singleLine?'.':'[\s\S]').'*?'.PHP_EOL.')?' //Closing Identifier
+			.'\\' . ($nextGroup + 1) . ';?'.PHP_EOL;  
+	}
+
+	/**
+	 *  Generate a regular expression matching a properly nested set of parentheses.
+	 *  Currently accounts for single and double quoted strings, as well as Heredocs
+	 *  and nowdocs.
+	 *  
+	 *  CONSUMES FOUR MATCHING GROUPS
+	 *  
+	 *  @param int $nextGroup The number which will be assigned to the next
+	 *      capturing group in the regular expression.
+	 *  @param boolean singleLine Wether the larger regex will be compiled 
+	 *      with the 's' flag.  Defaults to false.
+	 *  @return string
+	 */
+	private function parenRegex($nextGroup, $singleLine) 
+	{
+		return '(\((?:'
+			.$this->hereNowDocRegex($nextGroup+1, $singleLine) //Match the heredoc first, as it is complicated, but clearly marked.
+			.'|' //OR
+			.'(?>[^()"\']+)'///Any String of non paren/quote characters.
+			.'|' //OR
+			.$this->stringRegex($nextGroup + 3,$singleLine)
+			.'|(?'.$nextGroup.'))*\))';
+	}
+
+	/**
 	 * Get the regular expression for a generic Blade function.
 	 *
 	 * @param  string  $function
@@ -639,7 +703,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
+		return '/(?<!\w)(\s*)@'.preg_quote($function).'(\s*'.$this->parenRegex(3, true).')/s';
 	}
 
 	/**
@@ -650,7 +714,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createOpenMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
+		return '/(?<!\w)(\s*)@'
+			.preg_quote($function)
+			.'(\s*(?:\((?:'
+			.$this->hereNowDocRegex(3,true)  //Match the heredoc first, as it is complicated, but clearly marked.
+			.'|' //Or
+			.'(?>[^()"\']+)' //Any non-paren, non-string character.
+			.'|' //Or
+			.$this->stringRegex(5,true)
+			.'|' //OR
+			.$this->parenRegex(6, true).')*))\)/s';
 	}
 
 	/**
@@ -661,7 +734,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createPlainMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
+		return '/(?<!\w)(\s*)@'.preg_quote($function).'(\s*)/';
 	}
 
 	/**
