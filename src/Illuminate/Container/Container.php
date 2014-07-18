@@ -142,7 +142,7 @@ class Container implements ArrayAccess {
 
 		$this->bindings[$abstract] = compact('concrete', 'shared');
 
-		// If the abstract type was already resolved in this container, we will fire the
+		// If the abstract type was already resolved in this container we'll fire the
 		// rebound listener so that any objects which have already gotten resolved
 		// can have their copy of the object updated via the listener callbacks.
 		if ($this->resolved($abstract))
