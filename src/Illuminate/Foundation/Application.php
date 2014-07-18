@@ -464,6 +464,42 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if the given abstract type has been bound.
+	 *
+	 * (Overriding Container::bound)
+	 *
+	 * @param  string  $abstract
+	 * @return bool
+	 */
+	public function bound($abstract)
+	{
+		return isset($this->deferredServices[$abstract]) || parent::bound($abstract);
+	}
+
+	/**
+	 * "Extend" an abstract type in the container.
+	 *
+	 * (Overriding Container::extend)
+	 *
+	 * @param  string   $abstract
+	 * @param  Closure  $closure
+	 * @return void
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function extend($abstract, Closure $closure)
+	{
+		$abstract = $this->getAlias($abstract);
+
+		if (isset($this->deferredServices[$abstract]))
+		{
+			$this->loadDeferredProvider($abstract);
+		}
+
+		return parent::extend($abstract, $closure);
+	}
+
+	/**
 	 * Register a "before" application filter.
 	 *
 	 * @param  \Closure|string  $callback
