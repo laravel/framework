@@ -926,6 +926,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testEmptyRulesSkipped()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => array('alpha', array(), '')));
+		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => '|||required|'));
+		$this->assertTrue($v->passes());
+	}
+
+	public function testAlternativeFormat()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => array('alpha', array('min', 3), array('max', 10))));
+		$this->assertTrue($v->passes());
+	}
+
 	public function testValidateAlpha()
 	{
 		$trans = $this->getRealTranslator();
