@@ -76,7 +76,7 @@ class Store implements SessionInterface {
 		$this->name = $name;
 		$this->handler = $handler;
 		$this->metaBag = new MetadataBag;
-		$this->setId($id ?: $this->generateSessionId());
+		$this->setId($id);
 	}
 
 	/**
