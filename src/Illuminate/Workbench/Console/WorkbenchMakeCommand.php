@@ -88,6 +88,8 @@ class WorkbenchMakeCommand extends Command {
 	 * Build the package details from user input.
 	 *
 	 * @return \Illuminate\Workbench\Package
+	 *
+	 * @throws \UnexpectedValueException
 	 */
 	protected function buildPackage()
 	{
