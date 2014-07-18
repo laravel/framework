@@ -130,6 +130,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected $dates = array();
 
 	/**
+	 * Attributes to cast to their proper type.
+	 *
+	 * @var array
+	 */
+	protected $casts = array();
+
+	/**
 	 * The relationships that should be touched on save.
 	 *
 	 * @var array
@@ -214,6 +221,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $mutatorCache = array();
 
 	/**
+	 * The cache of the cast array for each class.
+	 *
+	 * @var array
+	 */
+	protected static $castsCache = array();
+
+	/**
 	 * The many to many relationship methods.
 	 *
 	 * @var array
@@ -295,6 +309,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		static::bootTraits();
+
+		static::cacheCasts();
 	}
 
 	/**
@@ -2184,11 +2200,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If an attribute is a date, we will cast it to a string after converting it
 		// to a DateTime / Carbon instance. This is so we will get some consistent
 		// formatting while accessing attributes vs. arraying / JSONing a model.
-		foreach ($this->getDates() as $key)
+		foreach ($attributes as $key => $value)
 		{
-			if ( ! isset($attributes[$key])) continue;
-
-			$attributes[$key] = (string) $this->asDateTime($attributes[$key]);
+			if ($value instanceof DateTime)
+			{
+				$attributes[$key] = (string) $value;
+			}
 		}
 
 		// We want to spin through all the mutated attributes for this model and call
@@ -2368,14 +2385,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $this->mutateAttribute($key, $value);
 		}
 
-		// If the attribute is listed as a date, we will convert it to a DateTime
-		// instance on retrieval, which makes it quite convenient to work with
-		// date fields without having to create a mutator for each property.
-		elseif (in_array($key, $this->getDates()))
-		{
-			if ($value) return $this->asDateTime($value);
-		}
-
 		return $value;
 	}
 
@@ -2471,18 +2480,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $this->{$method}($value);
 		}
 
-		// If an attribute is listed as a "date", we'll convert it from a DateTime
-		// instance into a form proper for storage on the database tables using
-		// the connection grammar's date format. We will auto set the values.
-		elseif (in_array($key, $this->getDates()))
-		{
-			if ($value)
-			{
-				$value = $this->fromDateTime($value);
-			}
-		}
-
-		$this->attributes[$key] = $value;
+		$this->setRawAttribute($key, $value);
 	}
 
 	/**
@@ -2494,6 +2492,62 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function hasSetMutator($key)
 	{
 		return method_exists($this, 'set'.studly_case($key).'Attribute');
+	}
+
+	/**
+	 * Cache the cast array for legacy support.
+	 *
+	 * @return void
+	 */
+	static protected function cacheCasts()
+	{
+		$class = get_class($instance = new static);
+
+		static::$castsCache[$class] = $instance->casts;
+
+		foreach ($instance->getDates() as $key)
+		{
+			static::$castsCache[$class][$key] = 'date';
+		}
+	}
+
+	/**
+	 * Add an attribute to the cast array.
+	 *
+	 * @param string  $attribute
+	 * @param string  $type
+	 */
+	protected function addCast($attribute, $type)
+	{
+		$class = get_class($this);
+
+		static::$castsCache[$class][$attribute] = $type;
+	}
+
+	/**
+	 * Get the cast type for a given attribute.
+	 *
+	 * @param  string  $attribute
+	 * @return string|null
+	 */
+	protected function getCastType($attribute)
+	{
+		$casts = $this->getCasts();
+
+		if (array_key_exists($attribute, $casts))
+		{
+			return $casts[$attribute];
+		}
+	}
+
+	/**
+	 * Get the casts array for the current class.
+	 *
+	 * @return array
+	 */
+	protected function getCasts()
+	{
+		return static::$castsCache[get_class($this)];
 	}
 
 	/**
@@ -2632,7 +2686,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
-	 * Set the array of model attributes. No checking is done.
+	 * Set the array of model attributes. No mutators are called.
 	 *
 	 * @param  array  $attributes
 	 * @param  bool   $sync
@@ -2640,9 +2694,46 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function setRawAttributes(array $attributes, $sync = false)
 	{
-		$this->attributes = $attributes;
+		$this->attributes = [];
+
+		foreach ($attributes as $key => $value)
+		{
+			$this->setRawAttribute($key, $value);
+		}
 
 		if ($sync) $this->syncOriginal();
+	}
+
+	/**
+	 * Set a given attribute on the model. No mutators are called.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	protected function setRawAttribute($key, $value)
+	{
+		$this->attributes[$key] = $this->castAttribute($key, $value);
+	}
+
+	/**
+	 * Cast an attribute to its proper type.
+	 *
+	 * @param  string $key
+	 * @param  mixed  $value
+	 * @return mixed
+	 */
+	protected function castAttribute($key, $value)
+	{
+		if (is_null($value)) return null;
+
+		if (is_null($type = $this->getCastType($key))) return $value;
+
+		if ($type == 'date') return $this->asDateTime($value);
+
+		settype($value, $type);
+
+		return $value;
 	}
 
 	/**
