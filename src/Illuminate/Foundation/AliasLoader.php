@@ -31,10 +31,6 @@ class AliasLoader {
 		$this->aliases = $aliases;
 	}
 
-	private function __clone()
-	{
-	}
-
 	/**
 	 * Get or create the singleton alias loader instance.
 	 *
@@ -154,6 +150,16 @@ class AliasLoader {
 	public static function setInstance($loader)
 	{
 		static::$instance = $loader;
+	}
+
+	/**
+	 * Clone method.
+	 *
+	 * @return void
+	 */
+	private function __clone()
+	{
+		//
 	}
 
 }
