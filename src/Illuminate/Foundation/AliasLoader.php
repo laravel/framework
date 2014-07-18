@@ -24,14 +24,15 @@ class AliasLoader {
 	protected static $instance;
 
 	/**
-	 * Create a new class alias loader instance.
-	 *
-	 * @param  array  $aliases
-	 * @return void
+	 * Singleton shouln't allow instantiation
 	 */
-	public function __construct(array $aliases = array())
+	private function __construct($aliases)
 	{
 		$this->aliases = $aliases;
+	}
+
+	private function __clone()
+	{
 	}
 
 	/**
