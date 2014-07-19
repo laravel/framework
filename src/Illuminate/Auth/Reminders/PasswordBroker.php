@@ -244,7 +244,7 @@ class PasswordBroker {
 	 */
 	protected function validatePasswordWithDefaults(array $credentials)
 	{
-		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
+		list($password, $confirm) = [$credentials['password'], $credentials['password_confirmation']];
 
 		return $password === $confirm && mb_strlen($password) >= 6;
 	}
