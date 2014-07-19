@@ -210,7 +210,6 @@ class Route {
 	{
 		if (is_array($filters)) return static::explodeArrayFilters($filters);
 
-
 		return array_map('trim', explode('|', $filters));
 	}
 
@@ -262,7 +261,7 @@ class Route {
 	 * Get a given parameter from the route.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $default
+	 * @param  mixed   $default
 	 * @return string
 	 */
 	public function getParameter($name, $default = null)
@@ -274,7 +273,7 @@ class Route {
 	 * Get a given parameter from the route.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $default
+	 * @param  mixed   $default
 	 * @return string
 	 */
 	public function parameter($name, $default = null)
@@ -286,7 +285,7 @@ class Route {
 	 * Set a parameter to the given value.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $value
+	 * @param  mixed   $value
 	 * @return void
 	 */
 	public function setParameter($name, $value)
@@ -299,7 +298,7 @@ class Route {
 	/**
 	 * Unset a parameter on the route if it is set.
 	 *
-	 * @param  string $name
+	 * @param  string  $name
 	 * @return void
 	 */
 	public function forgetParameter($name)
