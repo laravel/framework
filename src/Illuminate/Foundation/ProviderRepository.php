@@ -94,7 +94,7 @@ class ProviderRepository {
 	 */
 	protected function registerLoadEvents(Application $app, $provider, array $events)
 	{
-		if (count($events) < 1) return;
+		if (empty($events)) return;
 
 		$app->make('events')->listen($events, function() use ($app, $provider)
 		{
@@ -212,9 +212,7 @@ class ProviderRepository {
 	 */
 	protected function freshManifest(array $providers)
 	{
-		list($eager, $deferred) = array(array(), array());
-
-		return compact('providers', 'eager', 'deferred');
+		return array('providers' => $providers, 'eager' => array(), 'deferred' => array());
 	}
 
 	/**
