@@ -379,6 +379,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $statements);
 	}
 
+
 	public function testAddingRememberToken()
 	{
 		$blueprint = new Blueprint('users');

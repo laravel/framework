@@ -213,6 +213,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Taylor', object_get($class, 'name.first'));
 	}
 
+
 	public function testDataGet()
 	{
 		$object = (object) array('users' => array('name' => array('Taylor', 'Otwell')));
@@ -224,6 +225,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
 		$this->assertEquals('Not found', data_get($array, '0.users.3', function (){ return 'Not found'; }));
 	}
+
 
 	public function testArraySort()
 	{

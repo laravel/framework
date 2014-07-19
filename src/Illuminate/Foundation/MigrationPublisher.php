@@ -71,6 +71,7 @@ class MigrationPublisher {
 	 * Determine if the migration is already published.
 	 *
 	 * @param  string  $migration
+	 * @param  string  $destination
 	 * @return bool
 	 */
 	public function migrationExists($migration, $destination)

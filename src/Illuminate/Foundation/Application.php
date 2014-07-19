@@ -102,7 +102,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Create a new Illuminate application instance.
 	 *
-	 * @param  \Illuminate\Http\Request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
 	public function __construct(Request $request = null)
@@ -259,7 +259,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
 
-		return $this['env'] = with(new EnvironmentDetector())->detect($envs, $args);
+		return $this['env'] = (new EnvironmentDetector())->detect($envs, $args);
 	}
 
 	/**
@@ -464,9 +464,45 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if the given abstract type has been bound.
+	 *
+	 * (Overriding Container::bound)
+	 *
+	 * @param  string  $abstract
+	 * @return bool
+	 */
+	public function bound($abstract)
+	{
+		return isset($this->deferredServices[$abstract]) || parent::bound($abstract);
+	}
+
+	/**
+	 * "Extend" an abstract type in the container.
+	 *
+	 * (Overriding Container::extend)
+	 *
+	 * @param  string   $abstract
+	 * @param  Closure  $closure
+	 * @return void
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function extend($abstract, Closure $closure)
+	{
+		$abstract = $this->getAlias($abstract);
+
+		if (isset($this->deferredServices[$abstract]))
+		{
+			$this->loadDeferredProvider($abstract);
+		}
+
+		return parent::extend($abstract, $closure);
+	}
+
+	/**
 	 * Register a "before" application filter.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function before($callback)
@@ -477,7 +513,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register an "after" application filter.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function after($callback)
@@ -488,7 +524,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register a "finish" application filter.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function finish($callback)
@@ -502,7 +538,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  callable  $callback
 	 * @return void
 	 */
-	public function shutdown($callback = null)
+	public function shutdown(callable $callback = null)
 	{
 		if (is_null($callback))
 		{
@@ -619,10 +655,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
 
-		$client = with(new \Stack\Builder)
-						->push('Illuminate\Cookie\Guard', $this['encrypter'])
-						->push('Illuminate\Cookie\Queue', $this['cookie'])
-						->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
+		$client = (new \Stack\Builder)
+                    ->push('Illuminate\Cookie\Guard', $this['encrypter'])
+                    ->push('Illuminate\Cookie\Queue', $this['cookie'])
+                    ->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
 
 		$this->mergeCustomMiddlewares($client);
 
@@ -696,6 +732,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * @param  int   $type
 	 * @param  bool  $catch
 	 * @return \Symfony\Component\HttpFoundation\Response
+	 *
+	 * @throws \Exception
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
@@ -783,6 +821,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Call the booting callbacks for the application.
 	 *
+	 * @param  array  $callbacks
 	 * @return void
 	 */
 	protected function fireAppCallbacks(array $callbacks)
@@ -879,7 +918,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register a 404 error handler.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function missing(Closure $callback)
@@ -915,7 +954,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register an error handler for fatal errors.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function fatal(Closure $callback)
