@@ -875,21 +875,8 @@ class Validator implements MessageProviderInterface {
 		}
 		else
 		{
-			return $this->getStringSize($value);
+			return mb_strlen($value);
 		}
-	}
-
-	/**
-	 * Get the size of a string.
-	 *
-	 * @param  string  $value
-	 * @return int
-	 */
-	protected function getStringSize($value)
-	{
-		if (function_exists('mb_strlen')) return mb_strlen($value);
-
-		return strlen($value);
 	}
 
 	/**
