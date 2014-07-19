@@ -261,7 +261,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// First, we will check to see if a controller prefix has been registered in
 		// the route group. If it has, we will need to prefix it before trying to
 		// reflect into the class instance and pull out the method for routing.
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$prepended = $this->prependGroupUses($controller);
 		}
@@ -388,7 +388,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// last segment, which will be considered the final resources name we use.
 		$prefix = implode('/', array_slice($segments, 0, -1));
 
-		return array($segments[count($segments) - 1], $prefix);
+		return array(end($segments), $prefix);
 	}
 
 	/**
@@ -483,7 +483,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// the resource action. Otherwise we'll just use an empty string for here.
 		$prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-		if (count($this->groupStack) == 0)
+		if (empty($this->groupStack))
 		{
 			return $prefix.$resource.'.'.$method;
 		}
@@ -677,8 +677,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Create a route group with shared attributes.
 	 *
-	 * @param  array    $attributes
-	 * @param  Closure  $callback
+	 * @param  array     $attributes
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function group(array $attributes, Closure $callback)
@@ -701,7 +701,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function updateGroupStack(array $attributes)
 	{
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$attributes = $this->mergeGroup($attributes, last($this->groupStack));
 		}
@@ -735,7 +735,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		if (isset($new['domain'])) unset($old['domain']);
 
-		return array_merge_recursive(array_except($old, array('namespace', 'prefix')), $new);
+		$new['where'] = array_merge(array_get($old, 'where', []), array_get($new, 'where', []));
+
+		return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'where')), $new);
 	}
 
 	/**
@@ -747,14 +749,16 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected static function formatUsesPrefix($new, $old)
 	{
-		if (isset($new['namespace']))
+		if (isset($new['namespace']) && isset($old['namespace']))
 		{
 			return trim(array_get($old, 'namespace'), '\\').'\\'.trim($new['namespace'], '\\');
 		}
-		else
+		elseif (isset($new['namespace']))
 		{
-			return array_get($old, 'namespace');
+			return trim($new['namespace'], '\\');
 		}
+
+		return array_get($old, 'namespace');
 	}
 
 	/**
@@ -770,10 +774,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		{
 			return trim(array_get($old, 'prefix'), '/').'/'.trim($new['prefix'], '/');
 		}
-		else
-		{
-			return array_get($old, 'prefix');
-		}
+
+		return array_get($old, 'prefix');
 	}
 
 	/**
@@ -783,9 +785,10 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function getLastGroupPrefix()
 	{
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
-			return array_get(last($this->groupStack), 'prefix', '');
+			$last = end($this->groupStack);
+			return isset($last['prefix']) ? $last['prefix'] : '';
 		}
 
 		return '';
@@ -826,15 +829,15 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			$methods, $uri = $this->prefix($uri), $action
 		);
 
-		$route->where($this->patterns);
-
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
 		// the merge we will be ready to return the route back out to the caller.
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$this->mergeController($route);
 		}
+
+		$this->addWhereClausesToRoute($route);
 
 		return $route;
 	}
@@ -861,6 +864,21 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function prefix($uri)
 	{
 		return trim(trim($this->getLastGroupPrefix(), '/').'/'.trim($uri, '/'), '/') ?: '/';
+	}
+
+	/**
+	 * Add the necessary where clauses to the route based on its initial registration.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return \Illuminate\Routing\Route
+	 */
+	protected function addWhereClausesToRoute($route)
+	{
+		$route->where(
+			array_merge($this->patterns, array_get($route->getAction(), 'where', []))
+		);
+
+		return $route;
 	}
 
 	/**
@@ -902,7 +920,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// Here we'll get an instance of this controller dispatcher and hand it off to
 		// the Closure so it will be used to resolve the class instances out of our
 		// IoC container instance and call the appropriate methods on the class.
-		if (count($this->groupStack) > 0)
+		if ( ! empty($this->groupStack))
 		{
 			$action['uses'] = $this->prependGroupUses($action['uses']);
 		}
@@ -1068,7 +1086,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Register a route matched event listener.
 	 *
-	 * @param  callable  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function matched($callback)
@@ -1079,7 +1097,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Register a new "before" filter with the router.
 	 *
-	 * @param  mixed  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function before($callback)
@@ -1090,7 +1108,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Register a new "after" filter with the router.
 	 *
-	 * @param  mixed  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function after($callback)
@@ -1102,7 +1120,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Register a new global filter with the router.
 	 *
 	 * @param  string  $filter
-	 * @param  mixed   $callback
+	 * @param  string|callable   $callback
 	 * @return void
 	 */
 	protected function addGlobalFilter($filter, $callback)
@@ -1114,7 +1132,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Register a new filter with the router.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $callback
+	 * @param  string|callable  $callback
 	 * @return void
 	 */
 	public function filter($name, $callback)
@@ -1125,7 +1143,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Parse the registered filter.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable|string  $callback
 	 * @return mixed
 	 */
 	protected function parseFilter($callback)
@@ -1181,14 +1199,14 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function model($key, $class, Closure $callback = null)
 	{
-		return $this->bind($key, function($value) use ($class, $callback)
+		$this->bind($key, function($value) use ($class, $callback)
 		{
 			if (is_null($value)) return null;
 
 			// For model binders, we will attempt to retrieve the models using the find
 			// method on the model instance. If we cannot retrieve the models we'll
 			// throw a not found exception otherwise we will return the instance.
-			if ($model = with(new $class)->find($value))
+			if ($model = (new $class)->find($value))
 			{
 				return $model;
 			}
@@ -1209,12 +1227,40 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Add a new route parameter binder.
 	 *
 	 * @param  string  $key
-	 * @param  callable  $binder
+	 * @param  string|callable  $binder
 	 * @return void
 	 */
 	public function bind($key, $binder)
 	{
+		if (is_string($binder))
+		{
+			$binder = $this->createClassBinding($binder);
+		}
+
 		$this->binders[str_replace('-', '_', $key)] = $binder;
+	}
+
+	/**
+	 * Create a class based binding using the IoC container.
+	 *
+	 * @param  string    $binding
+	 * @return \Closure
+	 */
+	public function createClassBinding($binding)
+	{
+		return function($value, $route) use ($binding)
+		{
+			// If the binding has an @ sign, we will assume it's being used to delimit
+			// the class name from the bind method name. This allows for bindings
+			// to run multiple bind methods in a single class for convenience.
+			$segments = explode('@', $binding);
+
+			$method = count($segments) == 2 ? $segments[1] : 'bind';
+
+			$callable = [$this->container->make($segments[0]), $method];
+
+			return call_user_func($callable, $value, $route);
+		};
 	}
 
 	/**
@@ -1333,8 +1379,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Filter pattern filters that don't apply to the request verb.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  array  $filters
+	 * @param  string  $method
+	 * @param  array   $filters
 	 * @return array
 	 */
 	protected function patternsByMethod($method, $filters)
@@ -1460,7 +1506,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  callable  $callback
 	 * @return void
 	 */
-	public function withoutFilters($callback)
+	public function withoutFilters(callable $callback)
 	{
 		$this->disableFilters();
 
@@ -1686,6 +1732,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Get the response for a given request.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  int   $type
+	 * @param  bool  $catch
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

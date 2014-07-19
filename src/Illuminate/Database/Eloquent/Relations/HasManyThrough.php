@@ -220,6 +220,7 @@ class HasManyThrough extends Relation {
 	/**
 	 * Set the select clause for the relation query.
 	 *
+	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
@@ -230,6 +231,22 @@ class HasManyThrough extends Relation {
 		}
 
 		return array_merge($columns, array($this->parent->getTable().'.'.$this->firstKey));
+	}
+
+	/**
+	 * Get a paginator for the "select" statement.
+	 *
+	 * @param  int    $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	public function paginate($perPage = null, $columns = array('*'))
+	{
+		$this->query->addSelect($this->getSelectColumns($columns));
+
+		$pager = $this->query->paginate($perPage, $columns);
+
+		return $pager;
 	}
 
 	/**

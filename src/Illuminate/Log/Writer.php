@@ -128,7 +128,7 @@ class Writer {
 	/**
 	 * Get a defaut Monolog formatter instance.
 	 *
-	 * @return \Monolog\Formatters\LineFormatter
+	 * @return \Monolog\Formatter\LineFormatter
 	 */
 	protected function getDefaultFormatter()
 	{
@@ -180,7 +180,7 @@ class Writer {
 	 * Register a new callback handler for when
 	 * a log event is triggered.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 *
 	 * @throws \RuntimeException

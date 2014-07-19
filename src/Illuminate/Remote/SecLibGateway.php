@@ -45,6 +45,7 @@ class SecLibGateway implements GatewayInterface {
 	 *
 	 * @param  string  $host
 	 * @param  array   $auth
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct($host, array $auth, Filesystem $files)
