@@ -246,7 +246,7 @@ class PasswordBroker {
 	{
 		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
 
-		return strcmp($password, $confirm) === 0 && $credentials['password'] && mb_strlen($password) >= 6;
+		return strcmp($password, $confirm) === 0 && mb_strlen($password) >= 6;
 	}
 
 	/**
