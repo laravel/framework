@@ -654,12 +654,9 @@ class BelongsToMany extends Relation {
 			// Now we'll try to update an existing pivot record with the attributes that were
 			// given to the method. If the model is actually updated we will add it to the
 			// list of updated pivot records so we return them back out to the consumer.
-			elseif (count($attributes) > 0)
+			elseif (count($attributes) > 0 && $this->updateExistingPivot($id, $attributes, $touch))
 			{
-				if ($this->updateExistingPivot($id, $attributes, $touch))
-				{
-					$changes['updated'][] = (int) $id;
-				}
+				$changes['updated'][] = (int) $id;
 			}
 		}
 		return $changes;
