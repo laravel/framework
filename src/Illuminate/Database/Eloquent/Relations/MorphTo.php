@@ -161,10 +161,7 @@ class MorphTo extends BelongsTo {
 
 		$query = $instance->newQuery();
 
-		if ($this->withTrashed && $query->getMacro('withTrashed') !== null)
-		{
-			$query = $query->withTrashed();
-		}
+		$query = $this->useWithTrashed($query);
 
 		return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
 	}
@@ -216,7 +213,24 @@ class MorphTo extends BelongsTo {
 	{
 		$this->withTrashed = true;
 
+		$this->query = $this->useWithTrashed($this->query);
+
 		return $this;
+	}
+
+	/**
+	 * Return trashed models with query if told so
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	protected function useWithTrashed(Builder $query)
+	{
+		if ($this->withTrashed && $query->getMacro('withTrashed') !== null)
+		{
+			return $query->withTrashed();
+		}
+		return $query;
 	}
 
 }
