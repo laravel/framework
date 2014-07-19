@@ -2474,12 +2474,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If an attribute is listed as a "date", we'll convert it from a DateTime
 		// instance into a form proper for storage on the database tables using
 		// the connection grammar's date format. We will auto set the values.
-		elseif (in_array($key, $this->getDates()))
+		elseif (in_array($key, $this->getDates()) && $value)
 		{
-			if ($value)
-			{
-				$value = $this->fromDateTime($value);
-			}
+			$value = $this->fromDateTime($value);
 		}
 
 		$this->attributes[$key] = $value;
