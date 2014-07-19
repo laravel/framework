@@ -84,11 +84,24 @@ class Route {
 	{
 		$this->uri = $uri;
 		$this->methods = (array) $methods;
+		$this->correctMethods();
 		$this->action = $this->parseAction($action);
 
 		if (isset($this->action['prefix']))
 		{
 			$this->prefix($this->action['prefix']);
+		}
+	}
+
+	/**
+	 * Add HEAD HTTP verb to methods if not specified with GET.
+	 *
+	 * @return void
+	 */
+	protected function correctMethods()
+	{
+		if (in_array('GET', $this->methods) && !in_array('HEAD', $this->methods)) {
+			$this->methods[] = 'HEAD';
 		}
 	}
 
@@ -680,11 +693,6 @@ class Route {
 	 */
 	public function methods()
 	{
-		if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods))
-		{
-			$this->methods[] = 'HEAD';
-		}
-
 		return $this->methods;
 	}
 
@@ -725,7 +733,7 @@ class Route {
 	 */
 	public function domain()
 	{
-		return array_get($this->action, 'domain');
+		return isset($this->action['domain']) ? $this->action['domain'] : null;
 	}
 
 	/**
@@ -758,7 +766,7 @@ class Route {
 	 */
 	public function getPrefix()
 	{
-		return array_get($this->action, 'prefix');
+		return isset($this->action['prefix']) ? $this->action['prefix'] : null;
 	}
 
 	/**
@@ -768,7 +776,7 @@ class Route {
 	 */
 	public function getName()
 	{
-		return array_get($this->action, 'as');
+		return isset($this->action['as']) ? $this->action['as'] : null;
 	}
 
 	/**
@@ -778,7 +786,7 @@ class Route {
 	 */
 	public function getActionName()
 	{
-		return array_get($this->action, 'controller', 'Closure');
+		return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
 	}
 
 	/**
