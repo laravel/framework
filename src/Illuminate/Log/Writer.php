@@ -25,14 +25,14 @@ class Writer {
 	 * @var array
 	 */
 	protected $levels = array(
-		'debug',
-		'info',
-		'notice',
-		'warning',
-		'error',
-		'critical',
-		'alert',
-		'emergency',
+		'debug'     => MonologLogger::DEBUG,
+		'info'      => MonologLogger::INFO,
+		'notice'    => MonologLogger::NOTICE,
+		'warning'   => MonologLogger::WARNING,
+		'error'     => MonologLogger::ERROR,
+		'critical'  => MonologLogger::CRITICAL,
+		'alert'     => MonologLogger::ALERT,
+		'emergency' => MonologLogger::EMERGENCY,
 	);
 
 	/**
@@ -145,23 +145,12 @@ class Writer {
 	 */
 	protected function parseLevel($level)
 	{
-		$map = array(
-			'debug'     => MonologLogger::DEBUG,
-			'info'      => MonologLogger::INFO,
-			'notice'    => MonologLogger::NOTICE,
-			'warning'   => MonologLogger::WARNING,
-			'error'     => MonologLogger::ERROR,
-			'critical'  => MonologLogger::CRITICAL,
-			'alert'     => MonologLogger::ALERT,
-			'emergency' => MonologLogger::EMERGENCY,
-		);
-
-		if ( ! isset($map[$level]))
+		if ( ! isset($this->levels[$level]))
 		{
 			throw new \InvalidArgumentException("Invalid log level.");
 		}
 
-		return $map[$level];
+		return $this->levels[$level];
 	}
 
 	/**
@@ -259,7 +248,7 @@ class Writer {
 	{
 		$this->formatParameters($parameters);
 
-		if (in_array($method, $this->levels))
+		if (in_array($method, array_keys($this->levels)))
 		{
 			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
 
