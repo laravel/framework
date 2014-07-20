@@ -79,7 +79,7 @@ class Factory {
 	 * @param  \Illuminate\View\Factory  $view
 	 * @return void
 	 */
-	public function setupPaginationEnvironment($view)
+	public function setupPaginationEnvironment(ViewFactory $view)
 	{
 		$view->addNamespace('pagination', __DIR__.'/views');
 
