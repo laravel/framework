@@ -93,7 +93,12 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals("<?php echo \$name; ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
 		$this->assertEquals("<?php echo \$name; ?>\n\n", $compiler->compileString("{{ \$name }}\n"));
 		$this->assertEquals("<?php echo \$name; ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
+	}
 
+
+	public function testEchosWithDefaultsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name or "foo" }}'));
 		$this->assertEquals('<?php echo isset($user->name) ? $user->name : "foo"; ?>', $compiler->compileString('{{ $user->name or "foo" }}'));
 		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{$name or "foo"}}'));
@@ -129,6 +134,46 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo myfunc(\'foo or bar\'); ?>', $compiler->compileString('{{ myfunc(\'foo or bar\') }}'));
 		$this->assertEquals('<?php echo myfunc("foo or bar"); ?>', $compiler->compileString('{{ myfunc("foo or bar") }}'));
 		$this->assertEquals('<?php echo myfunc("$name or \'foo\'"); ?>', $compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
+	}
+
+	public function testEchosWithConditionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php echo $condition ? $name : \'\'; ?>', $compiler->compileString('{{ $name if $condition }}'));
+		$this->assertEquals('<?php echo $condition ? $user->name : \'\'; ?>', $compiler->compileString('{{ $user->name if $condition }}'));
+		$this->assertEquals('<?php echo $condition ? $name : \'\'; ?>', $compiler->compileString('{{$name if $condition}}'));
+		$this->assertEquals('<?php echo $condition ? $name : \'\'; ?>', $compiler->compileString('{{
+			$name if $condition
+		}}'));
+
+		$this->assertEquals('<?php echo \'foo\' ? $name : \'\'; ?>', $compiler->compileString('{{ $name if \'foo\' }}'));
+		$this->assertEquals('<?php echo \'foo\' ? $name : \'\'; ?>', $compiler->compileString('{{$name if \'foo\'}}'));
+		$this->assertEquals('<?php echo \'foo\' ? $name : \'\'; ?>', $compiler->compileString('{{
+			$name if \'foo\'
+		}}'));
+
+		$this->assertEquals('<?php echo 90 ? $age : \'\'; ?>', $compiler->compileString('{{ $age if 90 }}'));
+		$this->assertEquals('<?php echo 90 ? $age : \'\'; ?>', $compiler->compileString('{{$age if 90}}'));
+		$this->assertEquals('<?php echo 90 ? $age : \'\'; ?>', $compiler->compileString('{{
+			$age if 90
+		}}'));
+
+		$this->assertEquals('<?php echo "Hello world if foo"; ?>', $compiler->compileString('{{ "Hello world if foo" }}'));
+		$this->assertEquals('<?php echo "Hello world if foo"; ?>', $compiler->compileString('{{"Hello world if foo"}}'));
+		$this->assertEquals('<?php echo $foo + $if + $baz; ?>', $compiler->compileString('{{$foo + $if + $baz}}'));
+		$this->assertEquals('<?php echo "Hello world if foo"; ?>', $compiler->compileString('{{
+			"Hello world if foo"
+		}}'));
+
+		$this->assertEquals('<?php echo \'Hello world if foo\'; ?>', $compiler->compileString('{{ \'Hello world if foo\' }}'));
+		$this->assertEquals('<?php echo \'Hello world if foo\'; ?>', $compiler->compileString('{{\'Hello world if foo\'}}'));
+		$this->assertEquals('<?php echo \'Hello world if foo\'; ?>', $compiler->compileString('{{
+			\'Hello world if foo\'
+		}}'));
+
+		$this->assertEquals('<?php echo myfunc(\'foo if bar\'); ?>', $compiler->compileString('{{ myfunc(\'foo if bar\') }}'));
+		$this->assertEquals('<?php echo myfunc("foo if bar"); ?>', $compiler->compileString('{{ myfunc("foo if bar") }}'));
+		$this->assertEquals('<?php echo myfunc("$name if \'foo\'"); ?>', $compiler->compileString('{{ myfunc("$name if \'foo\'") }}'));
 	}
 
 

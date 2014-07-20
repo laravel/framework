@@ -235,7 +235,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		{
 			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaultsAndConditionals($matches[2]).'; ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -255,10 +255,21 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		{
 			$whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
 
-			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
+			return '<?php echo e('.$this->compileEchoDefaultsAndConditionals($matches[1]).'); ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
+	}
+
+	/**
+	 * Compile the default and conditional values for the echo statement
+	 *
+	 * @param  string $value
+	 * @return string
+	 */
+	public function compileEchoDefaultsAndConditionals($value)
+	{
+		return $this->compileEchoDefaults($this->compileEchoConditionals($value));
 	}
 
 	/**
@@ -270,6 +281,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function compileEchoDefaults($value)
 	{
 		return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
+	}
+
+	/**
+	 * Compile the conditional values for the echo statement.
+	 *
+	 * @param  string $value
+	 * @return string
+	 */
+	public function compileEchoConditionals($value)
+	{
+		return preg_replace('/^(?=\$)(.+?)(?:\s+if\s+)(.+?)$/s', '$2 ? $1 : \'\'', $value);
 	}
 
 	/**
