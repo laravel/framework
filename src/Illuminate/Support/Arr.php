@@ -15,7 +15,7 @@ class Arr {
 	 * @param  mixed   $value
 	 * @return array
 	 */
-	static function add($array, $key, $value)
+	public static function add($array, $key, $value)
 	{
 		if (is_null(static::get($array, $key)))
 		{
@@ -32,7 +32,7 @@ class Arr {
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
-	static function build($array, Closure $callback)
+	public static function build($array, Closure $callback)
 	{
 		$results = array();
 
@@ -52,7 +52,7 @@ class Arr {
 	 * @param  array  $array
 	 * @return array
 	 */
-	static function divide($array)
+	public static function divide($array)
 	{
 		return array(array_keys($array), array_values($array));
 	}
@@ -64,7 +64,7 @@ class Arr {
 	 * @param  string  $prepend
 	 * @return array
 	 */
-	static function dot($array, $prepend = '')
+	public static function dot($array, $prepend = '')
 	{
 		$results = array();
 
@@ -90,7 +90,7 @@ class Arr {
 	 * @param  array|string  $keys
 	 * @return array
 	 */
-	static function except($array, $keys)
+	public static function except($array, $keys)
 	{
 		return array_diff_key($array, array_flip((array) $keys));
 	}
@@ -102,7 +102,7 @@ class Arr {
 	 * @param  string  $key
 	 * @return array
 	 */
-	static function fetch($array, $key)
+	public static function fetch($array, $key)
 	{
 		foreach (explode('.', $key) as $segment)
 		{
@@ -129,7 +129,7 @@ class Arr {
 	 * @param  mixed     $default
 	 * @return mixed
 	 */
-	static function first($array, $callback, $default = null)
+	public static function first($array, $callback, $default = null)
 	{
 		foreach ($array as $key => $value)
 		{
@@ -147,7 +147,7 @@ class Arr {
 	 * @param  mixed     $default
 	 * @return mixed
 	 */
-	static function last($array, $callback, $default = null)
+	public static function last($array, $callback, $default = null)
 	{
 		return static::first(array_reverse($array), $callback, $default);
 	}
@@ -158,7 +158,7 @@ class Arr {
 	 * @param  array  $array
 	 * @return array
 	 */
-	static function flatten($array)
+	public static function flatten($array)
 	{
 		$return = array();
 
@@ -174,7 +174,7 @@ class Arr {
 	 * @param  array|string  $keys
 	 * @return void
 	 */
-	static function forget(&$array, $keys)
+	public static function forget(&$array, $keys)
 	{
 		foreach ((array) $keys as $key)
 		{
@@ -202,7 +202,7 @@ class Arr {
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	static function get($array, $key, $default = null)
+	public static function get($array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
 
@@ -228,7 +228,7 @@ class Arr {
 	 * @param  array|string  $keys
 	 * @return array
 	 */
-	static function only($array, $keys)
+	public static function only($array, $keys)
 	{
 		return array_intersect_key($array, array_flip((array) $keys));
 	}
@@ -241,7 +241,7 @@ class Arr {
 	 * @param  string  $key
 	 * @return array
 	 */
-	static function pluck($array, $value, $key = null)
+	public static function pluck($array, $value, $key = null)
 	{
 		$results = array();
 
@@ -275,7 +275,7 @@ class Arr {
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	static function pull(&$array, $key, $default = null)
+	public static function pull(&$array, $key, $default = null)
 	{
 		$value = static::get($array, $key, $default);
 
@@ -294,7 +294,7 @@ class Arr {
 	 * @param  mixed   $value
 	 * @return array
 	 */
-	static function set(&$array, $key, $value)
+	public static function set(&$array, $key, $value)
 	{
 		if (is_null($key)) return $array = $value;
 
@@ -327,7 +327,7 @@ class Arr {
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
-	static function sort($array, Closure $callback)
+	public static function sort($array, Closure $callback)
 	{
 		return Collection::make($array)->sortBy($callback)->all();
 	}
@@ -339,7 +339,7 @@ class Arr {
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
-	static function where($array, Closure $callback)
+	public static function where($array, Closure $callback)
 	{
 		$filtered = array();
 
