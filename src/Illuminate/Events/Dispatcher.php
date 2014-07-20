@@ -64,12 +64,14 @@ class Dispatcher {
 		{
 			if (str_contains($event, '*'))
 			{
-				return $this->setupWildcardListen($event, $listener);
+				$this->setupWildcardListen($event, $listener);
 			}
+			else
+			{
+				$this->listeners[$event][$priority][] = $this->makeListener($listener);
 
-			$this->listeners[$event][$priority][] = $this->makeListener($listener);
-
-			unset($this->sorted[$event]);
+				unset($this->sorted[$event]);
+			}
 		}
 	}
 

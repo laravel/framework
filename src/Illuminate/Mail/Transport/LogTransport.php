@@ -2,6 +2,7 @@
 
 use Swift_Transport;
 use Swift_Mime_Message;
+use Swift_Mime_MimeEntity;
 use Psr\Log\LoggerInterface;
 use Swift_Events_EventListener;
 
@@ -15,9 +16,9 @@ class LogTransport implements Swift_Transport {
 	protected $logger;
 
 	/**
-	 * Create a new Mandrill transport instance.
+	 * Create a new log transport instance.
 	 *
-	 * @param  string  $key
+	 * @param  \Psr\Log\LoggerInterface  $logger
 	 * @return void
 	 */
 	public function __construct(LoggerInterface $logger)
@@ -54,7 +55,25 @@ class LogTransport implements Swift_Transport {
 	 */
 	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
 	{
-		$this->logger->debug((string) $message);
+		$this->logger->debug($this->getMimeEntityString($message));
+	}
+
+	/**
+	 * Get a loggable string out of a Swiftmailer entity.
+	 *
+	 * @param  \Swift_Mime_MimeEntity $entity
+	 * @return string
+	 */
+	protected function getMimeEntityString(Swift_Mime_MimeEntity $entity)
+	{
+		$string = (string) $entity->getHeaders().PHP_EOL.$entity->getBody();
+
+		foreach ($entity->getChildren() as $children)
+		{
+			$string .= PHP_EOL.PHP_EOL.$this->getMimeEntityString($children);
+		}
+
+		return $string;
 	}
 
 	/**

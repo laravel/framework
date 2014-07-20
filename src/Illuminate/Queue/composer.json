@@ -13,9 +13,11 @@
         "illuminate/container": "4.2.*",
         "illuminate/http": "4.2.*",
         "illuminate/support": "4.2.*",
-        "symfony/process": "2.5.*"
+        "symfony/process": "2.5.*",
+        "nesbot/carbon": "~1.0"
     },
     "require-dev": {
+        "illuminate/cache": "4.2.*",
         "illuminate/events": "4.2.*",
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",

@@ -5,7 +5,6 @@ use Illuminate\Queue\Jobs\Job;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class WorkCommand extends Command {
 
@@ -90,6 +89,8 @@ class WorkCommand extends Command {
 	{
 		if ($daemon)
 		{
+			$this->worker->setCache($this->laravel['cache']->driver());
+
 			$this->worker->setDaemonExceptionHandler($this->laravel['exception']);
 
 			return $this->worker->daemon(
@@ -115,15 +116,13 @@ class WorkCommand extends Command {
 	 */
 	protected function writeOutput(Job $job, $failed)
 	{
-		$options = OutputInterface::OUTPUT_RAW;
-
 		if ($failed)
 		{
-			$this->output->writeln('<error>Failed:</error> '.$job->getName(), $options);
+			$this->output->writeln('<error>Failed:</error> '.$job->getName());
 		}
 		else
 		{
-			$this->output->writeln('<info>Processed:</info> '.$job->getName(), $options);
+			$this->output->writeln('<info>Processed:</info> '.$job->getName());
 		}
 	}
 

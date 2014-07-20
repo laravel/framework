@@ -145,7 +145,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	protected function sortReplacements(array $replace)
 	{
-		return with(new Collection($replace))->sortBy(function($r)
+		return (new Collection($replace))->sortBy(function($r)
 		{
 			return mb_strlen($r) * -1;
 		});
@@ -261,6 +261,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get the array of locales to be checked.
 	 *
+	 * @param  string|null  $locale
 	 * @return array
 	 */
 	protected function parseLocale($locale)

@@ -2,12 +2,13 @@
 
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 
 class Worker {
 
 	/**
-	 * THe queue manager instance.
+	 * The queue manager instance.
 	 *
 	 * @var \Illuminate\Queue\QueueManager
 	 */
@@ -26,6 +27,13 @@ class Worker {
 	 * @var \Illuminate\Events\Dispatcher
 	 */
 	protected $events;
+
+	/**
+	 * The cache repository implementation.
+	 *
+	 * @var \Illuminate\Cache\Repository
+	 */
+	protected $cache;
 
 	/**
 	 * The exception handler instance.
@@ -64,6 +72,8 @@ class Worker {
 	 */
 	public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
 	{
+		$lastRestart = $this->getTimestampOfLastQueueRestart();
+
 		while (true)
 		{
 			if ($this->daemonShouldRun())
@@ -77,7 +87,7 @@ class Worker {
 				$this->sleep($sleep);
 			}
 
-			if ($this->memoryExceeded($memory))
+			if ($this->memoryExceeded($memory) || $this->queueShouldRestart($lastRestart))
 			{
 				$this->stop();
 			}
@@ -107,7 +117,7 @@ class Worker {
 	}
 
 	/**
-	 * Deteremine if the daemon should process on this iteration.
+	 * Determine if the daemon should process on this iteration.
 	 *
 	 * @return bool
 	 */
@@ -280,6 +290,30 @@ class Worker {
 	}
 
 	/**
+	 * Get the last queue restart timestamp, or null.
+	 *
+	 * @return int|null
+	 */
+	protected function getTimestampOfLastQueueRestart()
+	{
+		if ($this->cache)
+		{
+			return $this->cache->get('illuminate:queue:restart');
+		}
+	}
+
+	/**
+	 * Determine if the queue worker should restart.
+	 *
+	 * @param  int|null  $lastRestart
+	 * @return bool
+	 */
+	protected function queueShouldRestart($lastRestart)
+	{
+		return $this->getTimestampOfLastQueueRestart() != $lastRestart;
+	}
+
+	/**
 	 * Set the exception handler to use in Daemon mode.
 	 *
 	 * @param  \Illuminate\Exception\Handler  $handler
@@ -288,6 +322,17 @@ class Worker {
 	public function setDaemonExceptionHandler($handler)
 	{
 		$this->exceptions = $handler;
+	}
+
+	/**
+	 * Set the cache repository implementation.
+	 *
+	 * @param  \Illuminate\Cache\Repository  $cache
+	 * @return void
+	 */
+	public function setCache(CacheRepository $cache)
+	{
+		$this->cache = $cache;
 	}
 
 	/**

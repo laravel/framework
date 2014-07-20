@@ -74,7 +74,7 @@ class Builder {
 	{
 		if (is_array($id))
 		{
-		    return $this->findMany($id, $columns);
+			return $this->findMany($id, $columns);
 		}
 
 		$this->query->where($this->model->getKeyName(), '=', $id);
@@ -111,7 +111,7 @@ class Builder {
 	{
 		if ( ! is_null($model = $this->find($id, $columns))) return $model;
 
-		throw with(new ModelNotFoundException)->setModel(get_class($this->model));
+		throw (new ModelNotFoundException)->setModel(get_class($this->model));
 	}
 
 	/**
@@ -137,7 +137,7 @@ class Builder {
 	{
 		if ( ! is_null($model = $this->first($columns))) return $model;
 
-		throw with(new ModelNotFoundException)->setModel(get_class($this->model));
+		throw (new ModelNotFoundException)->setModel(get_class($this->model));
 	}
 
 	/**
@@ -181,7 +181,7 @@ class Builder {
 	 * @param  callable  $callback
 	 * @return void
 	 */
-	public function chunk($count, $callback)
+	public function chunk($count, callable $callback)
 	{
 		$results = $this->forPage($page = 1, $count)->get();
 
@@ -290,7 +290,6 @@ class Builder {
 	 *
 	 * This is more efficient on larger data-sets, etc.
 	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
 	 * @param  int    $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator

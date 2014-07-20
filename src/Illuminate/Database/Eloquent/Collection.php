@@ -73,7 +73,7 @@ class Collection extends BaseCollection {
 	 * Fetch a nested element of the collection.
 	 *
 	 * @param  string  $key
-	 * @return \Illuminate\Support\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function fetch($key)
 	{
@@ -121,14 +121,14 @@ class Collection extends BaseCollection {
 	/**
 	 * Merge the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
-	 * @return \Illuminate\Support\Collection
+	 * @param  \ArrayAccess|array  $items
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public function merge($collection)
+	public function merge($items)
 	{
 		$dictionary = $this->getDictionary();
 
-		foreach ($collection as $item)
+		foreach ($items as $item)
 		{
 			$dictionary[$item->getKey()] = $item;
 		}
@@ -139,14 +139,14 @@ class Collection extends BaseCollection {
 	/**
 	 * Diff the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
-	 * @return \Illuminate\Support\Collection
+	 * @param  \ArrayAccess|array  $items
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public function diff($collection)
+	public function diff($items)
 	{
 		$diff = new static;
 
-		$dictionary = $this->getDictionary($collection);
+		$dictionary = $this->getDictionary($items);
 
 		foreach ($this->items as $item)
 		{
@@ -162,14 +162,14 @@ class Collection extends BaseCollection {
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
-	 * @return \Illuminate\Support\Collection
+ 	 * @param  \ArrayAccess|array  $items
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public function intersect($collection)
+	public function intersect($items)
 	{
 		$intersect = new static;
 
-		$dictionary = $this->getDictionary($collection);
+		$dictionary = $this->getDictionary($items);
 
 		foreach ($this->items as $item)
 		{
@@ -185,7 +185,7 @@ class Collection extends BaseCollection {
 	/**
 	 * Return only unique items from the collection.
 	 *
-	 * @return \Illuminate\Support\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function unique()
 	{
@@ -198,11 +198,11 @@ class Collection extends BaseCollection {
 	 * Returns only the models from the collection with the specified keys.
 	 *
 	 * @param  mixed  $keys
-	 * @return \Illuminate\Support\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function only($keys)
 	{
-		$dictionary = array_only($this->getDictionary($this), $keys);
+		$dictionary = array_only($this->getDictionary(), $keys);
 
 		return new static(array_values($dictionary));
 	}
@@ -211,11 +211,11 @@ class Collection extends BaseCollection {
 	 * Returns all models in the collection except the models with specified keys.
 	 *
 	 * @param  mixed  $keys
-	 * @return \Illuminate\Support\Collection
+	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public function except($keys)
 	{
-	    $dictionary = array_except($this->getDictionary($this), $keys);
+	    $dictionary = array_except($this->getDictionary(), $keys);
 
 	    return new static(array_values($dictionary));
 	}
@@ -223,16 +223,16 @@ class Collection extends BaseCollection {
 	/**
 	 * Get a dictionary keyed by primary keys.
 	 *
-	 * @param  \Illuminate\Support\Collection  $collection
+	 * @param  \ArrayAccess|array  $items
 	 * @return array
 	 */
-	public function getDictionary($collection = null)
+	public function getDictionary($items = null)
 	{
-		$collection = $collection ?: $this;
+		$items = is_null($items) ? $this->items : $items;
 
 		$dictionary = array();
 
-		foreach ($collection as $value)
+		foreach ($items as $value)
 		{
 			$dictionary[$value->getKey()] = $value;
 		}

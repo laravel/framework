@@ -46,7 +46,7 @@ class TinkerCommand extends Command {
 	{
 		$this->setupBorisErrorHandling();
 
-		with(new \Boris\Boris('> '))->start();
+		(new \Boris\Boris('> '))->start();
 	}
 
 	/**

@@ -39,7 +39,7 @@ class Blueprint {
 	 * Create a new schema blueprint.
 	 *
 	 * @param  string   $table
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function __construct($table, Closure $callback = null)
@@ -670,6 +670,16 @@ class Blueprint {
 		$this->string("{$name}_type");
 
 		$this->index(array("{$name}_id", "{$name}_type"));
+	}
+
+	/**
+	 * Adds the `remember_token` column to the table.
+	 *
+	 * @return void
+	 */
+	public function rememberToken()
+	{
+	  $this->string('remember_token', 100)->nullable();
 	}
 
 	/**

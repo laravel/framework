@@ -22,6 +22,7 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 	 * Create a new file environment loader instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  string  $path
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $path = null)
@@ -46,7 +47,7 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 		}
 		else
 		{
-			return $this->files->getRequire($path);
+			return array_dot($this->files->getRequire($path));
 		}
 	}
 

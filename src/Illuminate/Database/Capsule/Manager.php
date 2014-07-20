@@ -60,7 +60,10 @@ class Manager {
 	{
 		$this->container = $container ?: new Container;
 
-		$this->container->instance('config', new Fluent);
+		if ( ! $this->container->bound('config'))
+		{
+			$this->container->instance('config', new Fluent);
+		}
 	}
 
 	/**

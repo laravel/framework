@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Routing;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
@@ -85,11 +84,24 @@ class Route {
 	{
 		$this->uri = $uri;
 		$this->methods = (array) $methods;
+		$this->correctMethods();
 		$this->action = $this->parseAction($action);
 
 		if (isset($this->action['prefix']))
 		{
 			$this->prefix($this->action['prefix']);
+		}
+	}
+
+	/**
+	 * Add HEAD HTTP verb to methods if not specified with GET.
+	 *
+	 * @return void
+	 */
+	protected function correctMethods()
+	{
+		if (in_array('GET', $this->methods) && !in_array('HEAD', $this->methods)) {
+			$this->methods[] = 'HEAD';
 		}
 	}
 
@@ -211,7 +223,7 @@ class Route {
 	{
 		if (is_array($filters)) return static::explodeArrayFilters($filters);
 
-		return explode('|', $filters);
+		return array_map('trim', explode('|', $filters));
 	}
 
 	/**
@@ -226,7 +238,7 @@ class Route {
 
 		foreach ($filters as $filter)
 		{
-			$results = array_merge($results, explode('|', $filter));
+			$results = array_merge($results, array_map('trim', explode('|', $filter)));
 		}
 
 		return $results;
@@ -262,7 +274,7 @@ class Route {
 	 * Get a given parameter from the route.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $default
+	 * @param  mixed   $default
 	 * @return string
 	 */
 	public function getParameter($name, $default = null)
@@ -274,7 +286,7 @@ class Route {
 	 * Get a given parameter from the route.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $default
+	 * @param  mixed   $default
 	 * @return string
 	 */
 	public function parameter($name, $default = null)
@@ -286,7 +298,7 @@ class Route {
 	 * Set a parameter to the given value.
 	 *
 	 * @param  string  $name
-	 * @param  mixed  $value
+	 * @param  mixed   $value
 	 * @return void
 	 */
 	public function setParameter($name, $value)
@@ -299,7 +311,7 @@ class Route {
 	/**
 	 * Unset a parameter on the route if it is set.
 	 *
-	 * @param  string $name
+	 * @param  string  $name
 	 * @return void
 	 */
 	public function forgetParameter($name)
@@ -426,6 +438,7 @@ class Route {
 	 * Extract the parameter list from the host part of the request.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
+	 * @param  array  $parameters
 	 * @return array
 	 */
 	protected function bindHostParameters(Request $request, $parameters)
@@ -472,7 +485,7 @@ class Route {
 	/**
 	 * Parse the route action into a standard array.
 	 *
-	 * @param  \Closure|array  $action
+	 * @param  callable|array  $action
 	 * @return array
 	 */
 	protected function parseAction($action)
@@ -480,7 +493,7 @@ class Route {
 		// If the action is already a Closure instance, we will just set that instance
 		// as the "uses" property, because there is nothing else we need to do when
 		// it is available. Otherwise we will need to find it in the action list.
-		if ($action instanceof Closure)
+		if (is_callable($action))
 		{
 			return array('uses' => $action);
 		}
@@ -506,7 +519,7 @@ class Route {
 	{
 		return array_first($action, function($key, $value)
 		{
-			return $value instanceof Closure;
+			return is_callable($value);
 		});
 	}
 
@@ -720,7 +733,7 @@ class Route {
 	 */
 	public function domain()
 	{
-		return array_get($this->action, 'domain');
+		return isset($this->action['domain']) ? $this->action['domain'] : null;
 	}
 
 	/**
@@ -753,7 +766,7 @@ class Route {
 	 */
 	public function getPrefix()
 	{
-		return array_get($this->action, 'prefix');
+		return isset($this->action['prefix']) ? $this->action['prefix'] : null;
 	}
 
 	/**
@@ -763,7 +776,7 @@ class Route {
 	 */
 	public function getName()
 	{
-		return array_get($this->action, 'as');
+		return isset($this->action['as']) ? $this->action['as'] : null;
 	}
 
 	/**
@@ -773,7 +786,7 @@ class Route {
 	 */
 	public function getActionName()
 	{
-		return array_get($this->action, 'controller', 'Closure');
+		return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
 	}
 
 	/**

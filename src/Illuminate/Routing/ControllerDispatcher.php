@@ -144,7 +144,7 @@ class ControllerDispatcher {
 	/**
 	 * Get the assignable after filter for the route.
 	 *
-	 * @param  Closure|string  $filter
+	 * @param  \Closure|string  $filter
 	 * @return string
 	 */
 	protected function getAssignableAfter($filter)

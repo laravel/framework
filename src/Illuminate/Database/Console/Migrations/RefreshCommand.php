@@ -33,12 +33,18 @@ class RefreshCommand extends Command {
 
 		$database = $this->input->getOption('database');
 
-		$this->call('migrate:reset', array('--database' => $database));
+		$force = $this->input->getOption('force');
+
+		$this->call('migrate:reset', array(
+			'--database' => $database, '--force' => $force
+		));
 
 		// The refresh command is essentially just a brief aggregate of a few other of
 		// the migration commands and just provides a convenient wrapper to execute
 		// them in succession. We'll also see if we need to re-seed the database.
-		$this->call('migrate', array('--database' => $database));
+		$this->call('migrate', array(
+			'--database' => $database, '--force' => $force
+		));
 
 		if ($this->needsSeeding())
 		{

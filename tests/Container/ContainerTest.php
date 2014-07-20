@@ -203,6 +203,17 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExtendIsLazyInitialized()
+	{
+		$container = new Container;
+		$container->bind('ContainerLazyExtendStub');
+		$container->extend('ContainerLazyExtendStub', function($obj, $container) { $obj->init(); return $obj; });
+		$this->assertEquals(false, ContainerLazyExtendStub::$initialized);
+		$container->make('ContainerLazyExtendStub');
+		$this->assertEquals(true, ContainerLazyExtendStub::$initialized);
+	}
+
+
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
@@ -300,12 +311,22 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCreatingBoundConcreteClassPassesParameters() {
+	public function testCreatingBoundConcreteClassPassesParameters()
+	{
 		$container = new Container;
 		$container->bind('TestAbstractClass', 'ContainerConstructorParameterLoggingStub');
 		$parameters = array('First', 'Second');
 		$instance = $container->make('TestAbstractClass', $parameters);
 		$this->assertEquals($parameters, $instance->receivedParameters);
+	}
+
+
+	public function testInternalClassWithDefaultParameters()
+	{
+		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
+		$container = new Container;
+		$parameters = array();
+		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 
 }
@@ -360,3 +381,7 @@ class ContainerConstructorParameterLoggingStub {
 	}
 }
 
+class ContainerLazyExtendStub {
+	public static $initialized = false;
+	public function init() { static::$initialized = true; }
+}

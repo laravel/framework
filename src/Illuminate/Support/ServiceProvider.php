@@ -105,7 +105,7 @@ abstract class ServiceProvider {
 	 */
 	public function guessPackagePath()
 	{
-		$path = with(new ReflectionClass($this))->getFileName();
+		$path = (new ReflectionClass($this))->getFileName();
 
 		return realpath(dirname($path).'/../../');
 	}

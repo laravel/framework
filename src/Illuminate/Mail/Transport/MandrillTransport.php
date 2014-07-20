@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
+use GuzzleHttp\Client;
 use Swift_Mime_Message;
 use Swift_Events_EventListener;
 
@@ -75,11 +76,11 @@ class MandrillTransport implements Swift_Transport {
 	/**
 	 * Get a new HTTP client instance.
 	 *
-	 * @return \Guzzle\Http\Client
+	 * @return \GuzzleHttp\Client
 	 */
 	protected function getHttpClient()
 	{
-		return new \GuzzleHttp\Client;
+		return new Client;
 	}
 
 	/**

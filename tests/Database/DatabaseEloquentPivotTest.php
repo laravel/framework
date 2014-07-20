@@ -24,6 +24,27 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPropertiesUnchangedAreNotDirty()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+		$pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
+
+		$this->assertEquals(array(), $pivot->getDirty());
+	}
+
+
+	public function testPropertiesChangedAreDirty()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+		$pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
+		$pivot->shimy = 'changed';
+
+		$this->assertEquals(array('shimy' => 'changed'), $pivot->getDirty());
+	}
+
+
 	public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
 	{
 		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');

@@ -115,7 +115,7 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			$this->app['whoops.handler'] = $this->app->share(function()
 			{
-					return new JsonResponseHandler;
+				return new JsonResponseHandler;
 			});
 		}
 		else
@@ -155,38 +155,8 @@ class ExceptionServiceProvider extends ServiceProvider {
 		{
 			with($handler = new PrettyPageHandler)->setEditor('sublime');
 
-			// If the resource path exists, we will register the resource path with Whoops
-			// so our custom Laravel branded exception pages will be used when they are
-			// displayed back to the developer. Otherwise, the default pages are run.
-			if ( ! is_null($path = $this->resourcePath()))
-			{
-				$handler->addResourcePath($path);
-			}
-
 			return $handler;
 		});
-	}
-
-	/**
-	 * Get the resource path for Whoops.
-	 *
-	 * @return string
-	 */
-	public function resourcePath()
-	{
-		if (is_dir($path = $this->getResourcePath())) return $path;
-	}
-
-	/**
-	 * Get the Whoops custom resource path.
-	 *
-	 * @return string
-	 */
-	protected function getResourcePath()
-	{
-		$base = $this->app['path.base'];
-
-		return $base.'/vendor/laravel/framework/src/Illuminate/Exception/resources';
 	}
 
 }

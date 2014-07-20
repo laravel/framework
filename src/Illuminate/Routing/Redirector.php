@@ -94,9 +94,7 @@ class Redirector {
 	 */
 	public function intended($default = '/', $status = 302, $headers = array(), $secure = null)
 	{
-		$path = $this->session->get('url.intended', $default);
-
-		$this->session->forget('url.intended');
+		$path = $this->session->pull('url.intended', $default);
 
 		return $this->to($path, $status, $headers, $secure);
 	}
