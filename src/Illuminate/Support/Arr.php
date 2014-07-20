@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Support;
 
+use Closure;
 use Illuminate\Support\Traits\MacroableTrait;
 
 class Arr {
@@ -27,11 +28,11 @@ class Arr {
 	/**
 	 * Build a new array using a callback.
 	 *
-	 * @param         $array
-	 * @param \Closure $callback
+	 * @param  array     $array
+	 * @param  \Closure  $callback
 	 * @return array
 	 */
-	static function build($array, \Closure $callback)
+	static function build($array, Closure $callback)
 	{
 		$results = array();
 
@@ -86,7 +87,7 @@ class Arr {
 	 * Get all of the given array except for a specified array of items.
 	 *
 	 * @param  array  $array
-	 * @param  array  $keys
+	 * @param  array|string  $keys
 	 * @return array
 	 */
 	static function except($array, $keys)
@@ -123,9 +124,9 @@ class Arr {
 	/**
 	 * Return the first element in an array passing a given truth test.
 	 *
-	 * @param  array    $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
-	 * @param  mixed    $default
+	 * @param  mixed     $default
 	 * @return mixed
 	 */
 	static function first($array, $callback, $default = null)
@@ -141,9 +142,9 @@ class Arr {
 	/**
 	 * Return the last element in an array passing a given truth test.
 	 *
-	 * @param  array    $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
-	 * @param  mixed    $default
+	 * @param  mixed     $default
 	 * @return mixed
 	 */
 	static function last($array, $callback, $default = null)
@@ -169,8 +170,8 @@ class Arr {
 	/**
 	 * Remove one or many array items from a given array using "dot" notation.
 	 *
-	 * @param  array        $array
-	 * @param  array|string $keys
+	 * @param  array  $array
+	 * @param  array|string  $keys
 	 * @return void
 	 */
 	static function forget(&$array, $keys)
@@ -224,7 +225,7 @@ class Arr {
 	 * Get a subset of the items from the given array.
 	 *
 	 * @param  array  $array
-	 * @param  array  $keys
+	 * @param  array|string  $keys
 	 * @return array
 	 */
 	static function only($array, $keys)
@@ -320,25 +321,25 @@ class Arr {
 	}
 
 	/**
-	 * Sort the array using the given \Closure.
+	 * Sort the array using the given Closure.
 	 *
-	 * @param  array  $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
-	static function sort($array, \Closure $callback)
+	static function sort($array, Closure $callback)
 	{
 		return Collection::make($array)->sortBy($callback)->all();
 	}
 
 	/**
-	 * Filter the array using the given \Closure.
+	 * Filter the array using the given Closure.
 	 *
-	 * @param  array  $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
-	static function where($array, \Closure $callback)
+	static function where($array, Closure $callback)
 	{
 		$filtered = array();
 
