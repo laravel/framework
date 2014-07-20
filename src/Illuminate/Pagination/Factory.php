@@ -122,7 +122,13 @@ class Factory {
 	 */
 	public function getCurrentPage()
 	{
-		$page = (int) $this->currentPage ?: $this->request->input($this->pageName, 1);
+		if ($this->currentPage) {
+			$page = (int) $this->currentPage;
+		} elseif ( ! is_null($this->request)) {
+			$page = (int) $this->request->input($this->pageName, 1);
+		} else {
+			throw new \Exception('No currentPage was provided, and request information is not available');
+		}
 
 		if ($page < 1 || filter_var($page, FILTER_VALIDATE_INT) === false)
 		{

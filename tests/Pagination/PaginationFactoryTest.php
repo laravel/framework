@@ -88,6 +88,60 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $factory->getPageName());
 	}
 
+	public function testInteractionWithoutRequest()
+	{
+		$factory = $this->getFactoryWithoutRequest();
+
+		$perPage = 2;
+        $total = 10;
+
+        // 2 Items, because perPage is 2. Normally the paginate() method would have that covered
+        $items = array(
+            'Item 1',
+            'Item 2',
+        );
+
+        $factory->setBaseUrl('http://example.com/foo');
+        $factory->setCurrentPage(2);
+
+        $paginator = $factory->make($items, $total, $perPage);
+
+        $this->assertEquals(2, $paginator->getCurrentPage());
+        $this->assertEquals(5, $paginator->getLastPage());
+        $this->assertEquals($total, $paginator->getTotal());
+        $this->assertEquals($perPage, $paginator->getPerPage());
+        $this->assertEquals($perPage, $paginator->count());
+	}
+
+	/**
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage No currentPage was provided, and request information is not available
+	 */
+	public function testUnprovidedCurrentPageWithoutRequest()
+	{
+		$factory = $this->getFactoryWithoutRequest();
+
+		$perPage = 2;
+        $total = 10;
+
+        // 2 Items, because perPage is 2. Normally the paginate() method would have that covered
+        $items = array(
+            'Item 1',
+            'Item 2',
+        );
+
+        $factory->setBaseUrl('http://example.com/foo');
+
+        $paginator = $factory->make($items, $total, $perPage);
+
+        $paginator->getCurrentPage();
+	}
+
+	protected function getFactoryWithoutRequest()
+	{
+		$factory = new Factory('page');
+		return $factory;
+	}
 
 	protected function getFactoryProper()
 	{
