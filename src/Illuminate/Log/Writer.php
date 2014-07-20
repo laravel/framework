@@ -145,35 +145,23 @@ class Writer {
 	 */
 	protected function parseLevel($level)
 	{
-		switch ($level)
+		$map = array(
+			'debug'     => MonologLogger::DEBUG,
+			'info'      => MonologLogger::INFO,
+			'notice'    => MonologLogger::NOTICE,
+			'warning'   => MonologLogger::WARNING,
+			'error'     => MonologLogger::ERROR,
+			'critical'  => MonologLogger::CRITICAL,
+			'alert'     => MonologLogger::ALERT,
+			'emergency' => MonologLogger::EMERGENCY,
+		);
+
+		if ( ! isset($map[$level]))
 		{
-			case 'debug':
-				return MonologLogger::DEBUG;
-
-			case 'info':
-				return MonologLogger::INFO;
-
-			case 'notice':
-				return MonologLogger::NOTICE;
-
-			case 'warning':
-				return MonologLogger::WARNING;
-
-			case 'error':
-				return MonologLogger::ERROR;
-
-			case 'critical':
-				return MonologLogger::CRITICAL;
-
-			case 'alert':
-				return MonologLogger::ALERT;
-
-			case 'emergency':
-				return MonologLogger::EMERGENCY;
-
-			default:
-				throw new \InvalidArgumentException("Invalid log level.");
+			throw new \InvalidArgumentException("Invalid log level.");
 		}
+
+		return $map[$level];
 	}
 
 	/**
