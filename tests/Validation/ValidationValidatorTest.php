@@ -1242,6 +1242,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 	}
 
+    public function testValidateImei()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['imei' => '123456789012347'], ['imei' => 'imei']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['imei' => '123456789012345'], ['imei' => 'imei']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['imei' => '123456789012345'], ['imei' => 'imei:false']);
+        $this->assertFalse($v->passes());
+    }
+
 
 	public function testValidateEachWithNonArrayWithArrayRule()
 	{

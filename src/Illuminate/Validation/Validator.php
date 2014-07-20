@@ -1017,6 +1017,32 @@ class Validator implements MessageProviderInterface {
 		return $this->getExistCount($table, $column, $value, $parameters) >= $expected;
 	}
 
+    /**
+     * Validate IMEI number. First and only parameter does strict checksum check (enabled by default).
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateImei($attribute, $value, $parameters)
+    {
+        $useChecksum = isset($parameters[0]) ? (bool)$parameters[0] : true;
+
+        if (is_string($value)) {
+            if (preg_match('/^[0-9]{15}$/', $value)) {
+                if (!$useChecksum) return true;
+                for ($i = 0, $sum = 0; $i < 14; $i++) {
+                    $tmp = $value[$i] * (($i%2) + 1 );
+                    $sum += ($tmp%10) + intval($tmp/10);
+                }
+                return (((10 - ($sum%10)) %10) == $value[14]);
+            }
+        }
+
+        return false;
+    }
+
 	/**
 	 * Get the number of records that exist in storage.
 	 *
