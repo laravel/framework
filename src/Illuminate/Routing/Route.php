@@ -8,6 +8,7 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
+use Illuminate\Routing\Exception\HttpResponseException;
 
 class Route {
 
@@ -110,11 +111,18 @@ class Route {
 	{
 		$parameters = array_filter($this->parameters(), function($p) { return isset($p); });
 
-		$parameters = $this->resolveMethodDependencies(
-			$parameters, new ReflectionFunction($this->action['uses'])
-		);
+		try
+		{
+			$parameters = $this->resolveMethodDependencies(
+				$parameters, new ReflectionFunction($this->action['uses'])
+			);
 
-		return call_user_func_array($this->action['uses'], $parameters);
+			return call_user_func_array($this->action['uses'], $parameters);
+		}
+		catch (HttpResponseException $e)
+		{
+			return $e->getResponse();
+		}
 	}
 
 	/**
