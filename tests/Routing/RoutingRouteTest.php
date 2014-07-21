@@ -77,6 +77,23 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testClassesCanBeInjectedIntoRoutes()
+	{
+		unset($_SERVER['__test.route_inject']);
+		$router = $this->getRouter();
+		$router->get('foo/{var}', function(stdClass $foo, $var) {
+			$_SERVER['__test.route_inject'] = func_get_args();
+			return 'hello';
+		});
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][0]);
+		$this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
+
+		unset($_SERVER['__test.route_inject']);
+	}
+
+
 	public function testOptionsResponsesAreGeneratedByDefault()
 	{
 		$router = $this->getRouter();

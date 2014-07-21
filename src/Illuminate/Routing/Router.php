@@ -852,7 +852,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function newRoute($methods, $uri, $action)
 	{
-		return new Route($methods, $uri, $action);
+		return (new Route($methods, $uri, $action))->setContainer($this->container);
 	}
 
 	/**
