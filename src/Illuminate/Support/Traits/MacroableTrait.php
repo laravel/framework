@@ -52,7 +52,7 @@ trait MacroableTrait {
 	}
 
 	/**
-	 * Dynamically handle calls to the form builder.
+	 * Dynamically handle calls to the class.
 	 *
 	 * @param  string  $method
 	 * @param  array   $parameters
