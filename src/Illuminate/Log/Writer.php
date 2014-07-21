@@ -269,10 +269,10 @@ class Writer {
 	 */
 	public function __call($method, $parameters)
 	{
-		$this->formatParameters($parameters);
-
 		if (in_array($method, $this->levels))
 		{
+			$this->formatParameters($parameters);
+
 			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
 
 			$method = 'add'.ucfirst($method);
