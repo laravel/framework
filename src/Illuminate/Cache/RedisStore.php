@@ -142,7 +142,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	/**
 	 * Get the Redis connection instance.
 	 *
-	 * @return \Predis\Connection\SingleConnectionInterface
+	 * @return \Predis\ClientInterface
 	 */
 	public function connection()
 	{

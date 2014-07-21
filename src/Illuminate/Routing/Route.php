@@ -84,24 +84,16 @@ class Route {
 	{
 		$this->uri = $uri;
 		$this->methods = (array) $methods;
-		$this->correctMethods();
 		$this->action = $this->parseAction($action);
+
+		if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods))
+		{
+			$this->methods[] = 'HEAD';
+		}
 
 		if (isset($this->action['prefix']))
 		{
 			$this->prefix($this->action['prefix']);
-		}
-	}
-
-	/**
-	 * Add HEAD HTTP verb to methods if not specified with GET.
-	 *
-	 * @return void
-	 */
-	protected function correctMethods()
-	{
-		if (in_array('GET', $this->methods) && !in_array('HEAD', $this->methods)) {
-			$this->methods[] = 'HEAD';
 		}
 	}
 
