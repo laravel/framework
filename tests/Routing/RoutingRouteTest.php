@@ -133,7 +133,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$route->bind($request2);
 		$this->assertEquals('12', $route->parameter('id'));
 		$this->assertEquals('png', $route->parameter('ext'));
-                
+
 		// Test parameter() default value
 		$route = new Route('GET', 'foo/{foo?}', function() {});
 
@@ -141,7 +141,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($route->matches($request3));
 		$route->bind($request3);
 		$this->assertEquals('bar', $route->parameter('foo', 'bar'));
-                
 	}
 
 
