@@ -67,6 +67,25 @@ class Builder {
 		return in_array($column, array_map('strtolower', $this->getColumnListing($table)));
 	}
 
+/**
+	 * Determine if the given table has given columns.
+	 *
+	 * @param  string  $table
+	 * @param  array  $columns
+	 * @return bool
+	 */
+	public function hasColumns($table, $columns)
+	{
+		foreach ($columns as $column)
+		{
+			$column = strtolower($column);
+			if (! in_array($column, array_map('strtolower', $this->getColumnListing($table))))
+				return false;
+		}
+		
+		return true;
+	}
+
 	/**
 	 * Get the column listing for a given table.
 	 *
