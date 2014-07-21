@@ -98,7 +98,7 @@ if ( ! function_exists('array_build'))
 	/**
 	 * Build a new array using a callback.
 	 *
-	 * @param  array  $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
@@ -143,7 +143,7 @@ if ( ! function_exists('array_except'))
 	 * Get all of the given array except for a specified array of items.
 	 *
 	 * @param  array  $array
-	 * @param  array  $keys
+	 * @param  array|string  $keys
 	 * @return array
 	 */
 	function array_except($array, $keys)
@@ -172,9 +172,9 @@ if ( ! function_exists('array_first'))
 	/**
 	 * Return the first element in an array passing a given truth test.
 	 *
-	 * @param  array  $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
-	 * @param  mixed  $default
+	 * @param  mixed     $default
 	 * @return mixed
 	 */
 	function array_first($array, $callback, $default = null)
@@ -188,9 +188,9 @@ if ( ! function_exists('array_last'))
 	/**
 	 * Return the last element in an array passing a given truth test.
 	 *
-	 * @param  array  $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
-	 * @param  mixed  $default
+	 * @param  mixed     $default
 	 * @return mixed
 	 */
 	function array_last($array, $callback, $default = null)
@@ -219,7 +219,7 @@ if ( ! function_exists('array_forget'))
 	 * Remove one or many array items from a given array using "dot" notation.
 	 *
 	 * @param  array  $array
-	 * @param  array|string $keys
+	 * @param  array|string  $keys
 	 * @return void
 	 */
 	function array_forget(&$array, $keys)
@@ -250,7 +250,7 @@ if ( ! function_exists('array_only'))
 	 * Get a subset of the items from the given array.
 	 *
 	 * @param  array  $array
-	 * @param  array  $keys
+	 * @param  array|string  $keys
 	 * @return array
 	 */
 	function array_only($array, $keys)
@@ -314,7 +314,7 @@ if ( ! function_exists('array_sort'))
 	/**
 	 * Sort the array using the given Closure.
 	 *
-	 * @param  array  $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
@@ -329,7 +329,7 @@ if ( ! function_exists('array_where'))
 	/**
 	 * Filter the array using the given Closure.
 	 *
-	 * @param  array  $array
+	 * @param  array     $array
 	 * @param  \Closure  $callback
 	 * @return array
 	 */
@@ -521,7 +521,7 @@ if ( ! function_exists('ends_with'))
 	 * Determine if a given string ends with a given substring.
 	 *
 	 * @param  string  $haystack
-	 * @param  string|array  $needle
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
 	function ends_with($haystack, $needle)
@@ -753,7 +753,7 @@ if ( ! function_exists('starts_with'))
 	 * Determine if a given string starts with a given substring.
 	 *
 	 * @param  string  $haystack
-	 * @param  string|array  $needle
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
 	function starts_with($haystack, $needle)
@@ -782,7 +782,7 @@ if ( ! function_exists('str_contains'))
 	 * Determine if a given string contains a given substring.
 	 *
 	 * @param  string  $haystack
-	 * @param  string|array  $needle
+	 * @param  string|array  $needles
 	 * @return bool
 	 */
 	function str_contains($haystack, $needle)
