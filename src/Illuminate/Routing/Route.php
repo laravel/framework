@@ -283,7 +283,7 @@ class Route {
 	 */
 	public function parameter($name, $default = null)
 	{
-		return array_get($this->parameters(), $name) ?: $default;
+		return array_get($this->parameters(), $name, $default);
 	}
 
 	/**
