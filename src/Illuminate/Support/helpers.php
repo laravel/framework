@@ -524,9 +524,9 @@ if ( ! function_exists('ends_with'))
 	 * @param  string|array  $needles
 	 * @return bool
 	 */
-	function ends_with($haystack, $needle)
+	function ends_with($haystack, $needles)
 	{
-		return Str::endsWith($haystack, $needle);
+		return Str::endsWith($haystack, $needles);
 	}
 }
 
@@ -756,9 +756,9 @@ if ( ! function_exists('starts_with'))
 	 * @param  string|array  $needles
 	 * @return bool
 	 */
-	function starts_with($haystack, $needle)
+	function starts_with($haystack, $needles)
 	{
-		return Str::startsWith($haystack, $needle);
+		return Str::startsWith($haystack, $needles);
 	}
 }
 
@@ -785,9 +785,9 @@ if ( ! function_exists('str_contains'))
 	 * @param  string|array  $needles
 	 * @return bool
 	 */
-	function str_contains($haystack, $needle)
+	function str_contains($haystack, $needles)
 	{
-		return Str::contains($haystack, $needle);
+		return Str::contains($haystack, $needles);
 	}
 }
 
