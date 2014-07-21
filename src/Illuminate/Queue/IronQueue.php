@@ -110,7 +110,7 @@ class IronQueue extends Queue implements QueueInterface {
 
 		$payload = $this->createPayload($job, $data, $queue);
 
-		return $this->pushRaw($payload, $this->getQueue($queue), compact('delay'));
+		return $this->pushRaw($payload, $queue, compact('delay'));
 	}
 
 	/**
