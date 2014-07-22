@@ -163,8 +163,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = $this->getRealTranslator();
 		$trans->addResource('array', array('validation.in' => ':attribute must be included in :values.'), 'en', 'messages');
 		$customValues = array(
-				 '5'   => 'Short',
-				 '300' => 'Long',
+				 'type' => 
+					array(
+					 '5'   => 'Short',
+					 '300' => 'Long',
+					)
 				);
 		$v = new Validator($trans, array('type' => '4'), array('type' => 'in:5,300'));
 		$v->setCustomValues($customValues);
