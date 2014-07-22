@@ -594,6 +594,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testJoinWhereNull()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->join('contacts', function($j)
+		{
+			$j->on('users.id', '=', 'contacts.id')->whereNull('contacts.deleted_at');
+		});
+		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is null', $builder->toSql());
+	}
+
+
 	public function testRawExpressionsInSelect()
 	{
 		$builder = $this->getBuilder();
