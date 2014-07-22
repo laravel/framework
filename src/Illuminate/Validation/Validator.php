@@ -2212,6 +2212,28 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->customMessages = array_merge($this->customMessages, $messages);
 	}
+	
+	/**
+	 * Set the custom attributes for the validator
+	 *
+	 * @param  array  $customAttributes
+	 * @return void
+	 */
+	public function setCustomAttributes(array $customAttributes)
+	{
+		$this->customAttributes = array_merge($this->customAttributes, $customAttributes);
+	}
+	
+	/**
+	 * Set the custom values for the validator
+	 *
+	 * @param  array  $customValues
+	 * @return void
+	 */
+	public function setCustomValues(array $customValues)
+	{
+		$this->customValues = array_merge($this->customValues, $customValues);
+	}
 
 	/**
 	 * Get the fallback messages for the validator.
