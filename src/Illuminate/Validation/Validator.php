@@ -2214,6 +2214,16 @@ class Validator implements MessageProviderInterface {
 	}
 	
 	/**
+	 * Get the custom attributes for the validator
+	 *
+	 * @return array
+	 */
+	public function getCustomAttributes()
+	{
+		return $this->customAttributes;
+	}
+	
+	/**
 	 * Set the custom attributes for the validator
 	 *
 	 * @param  array  $customAttributes
@@ -2222,6 +2232,16 @@ class Validator implements MessageProviderInterface {
 	public function setCustomAttributes(array $customAttributes)
 	{
 		$this->customAttributes = array_merge($this->customAttributes, $customAttributes);
+	}
+	
+	/**
+	 * Get the custom values for the validator
+	 *
+	 * @return array
+	 */
+	public function getCustomValues()
+	{
+		return $this->customValues;
 	}
 	
 	/**
