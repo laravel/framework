@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Routing\Exception;
+<?php namespace Illuminate\Http\Exception;
 
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;

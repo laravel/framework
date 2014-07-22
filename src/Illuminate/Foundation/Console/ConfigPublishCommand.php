@@ -2,9 +2,9 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Foundation\ConfigPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Foundation\Publishing\ConfigPublisher;
 
 class ConfigPublishCommand extends Command {
 
@@ -27,14 +27,14 @@ class ConfigPublishCommand extends Command {
 	/**
 	 * The config publisher instance.
 	 *
-	 * @var \Illuminate\Foundation\ConfigPublisher
+	 * @var \Illuminate\Foundation\Publishing\ConfigPublisher
 	 */
 	protected $config;
 
 	/**
 	 * Create a new configuration publish command instance.
 	 *
-	 * @param  \Illuminate\Foundation\ConfigPublisher  $config
+	 * @param  \Illuminate\Foundation\Publishing\ConfigPublisher  $config
 	 * @return void
 	 */
 	public function __construct(ConfigPublisher $config)
