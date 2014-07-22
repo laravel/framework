@@ -160,7 +160,6 @@ class MakeControllerCommand extends Command {
 		);
 	}
 
-
 	/**
 	 * Get the console command options.
 	 *

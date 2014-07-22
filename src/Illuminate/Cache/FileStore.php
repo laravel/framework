@@ -39,6 +39,17 @@ class FileStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
+		return array_get($this->getPayload($key), 'data', null);
+	}
+
+	/**
+	 * Retrieve an item and expiry time from the cache by key.
+	 *
+	 * @param  string  $key
+	 * @return array
+	 */
+	protected function getPayload($key)
+	{
 		$path = $this->path($key);
 
 		// If the file doesn't exists, we obviously can't return the cache so we will
@@ -46,7 +57,7 @@ class FileStore implements StoreInterface {
 		// the expiration UNIX timestamps from the start of the file's contents.
 		if ( ! $this->files->exists($path))
 		{
-			return null;
+			return array('data' => null, 'time' => null);
 		}
 
 		try
@@ -55,7 +66,7 @@ class FileStore implements StoreInterface {
 		}
 		catch (\Exception $e)
 		{
-			return null;
+			return array('data' => null, 'time' => null);
 		}
 
 		// If the current time is greater than expiration timestamps we will delete
@@ -65,10 +76,17 @@ class FileStore implements StoreInterface {
 		{
 			$this->forget($key);
 
-			return null;
+			return array('data' => null, 'time' => null);
 		}
 
-		return unserialize(substr($contents, 10));
+		$data = unserialize(substr($contents, 10));
+
+		// Next, we'll extract the number of minutes that are remaining for a cache
+		// so that we can properly retain the time for things like the increment
+		// operation that may be performed on the cache. We'll round this out.
+		$time = ceil(($expire - time()) / 60);
+
+		return compact('data', 'time');
 	}
 
 	/**
@@ -111,13 +129,17 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
-	 *
-	 * @throws \LogicException
+	 * @return int
 	 */
 	public function increment($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		$raw = $this->getPayload($key);
+
+		$int = ((int) $raw['data']) + $value;
+
+		$this->put($key, $int, (int) $raw['time']);
+
+		return $int;
 	}
 
 	/**
@@ -125,13 +147,11 @@ class FileStore implements StoreInterface {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return void
-	 *
-	 * @throws \LogicException
+	 * @return int
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Decrement operations not supported by this driver.");
+		return $this->increment($key, $value * -1);
 	}
 
 	/**

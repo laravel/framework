@@ -64,7 +64,7 @@ class Database {
 	 * Get a specific Redis connection instance.
 	 *
 	 * @param  string  $name
-	 * @return \Predis\Connection\SingleConnectionInterface
+	 * @return \Predis\ClientInterface
 	 */
 	public function connection($name = 'default')
 	{

@@ -106,6 +106,8 @@ class Encrypter {
 	 * @param  string  $value
 	 * @param  string  $iv
 	 * @return string
+	 *
+	 * @throws \Exception
 	 */
 	protected function mcryptDecrypt($value, $iv)
 	{
@@ -125,7 +127,7 @@ class Encrypter {
 	 * @param  string  $payload
 	 * @return array
 	 *
-	 * @throws DecryptException
+	 * @throws \Illuminate\Encryption\DecryptException
 	 */
 	protected function getJsonPayload($payload)
 	{
@@ -155,7 +157,7 @@ class Encrypter {
 	 */
 	protected function validMac(array $payload)
 	{
-		$bytes = with(new SecureRandom)->nextBytes(16);
+		$bytes = (new SecureRandom)->nextBytes(16);
 
 		$calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 

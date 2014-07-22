@@ -130,7 +130,6 @@ class SessionManager extends Manager {
 		return $this->buildSession($handler);
 	}
 
-
 	/**
 	 * Create an instance of a cache driven driver.
 	 *

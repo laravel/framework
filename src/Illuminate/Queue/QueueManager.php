@@ -132,8 +132,8 @@ class QueueManager {
 	/**
 	 * Add a queue connection resolver.
 	 *
-	 * @param  string   $driver
-	 * @param  Closure  $resolver
+	 * @param  string    $driver
+	 * @param  \Closure  $resolver
 	 * @return void
 	 */
 	public function extend($driver, Closure $resolver)
@@ -144,8 +144,8 @@ class QueueManager {
 	/**
 	 * Add a queue connection resolver.
 	 *
-	 * @param  string   $driver
-	 * @param  Closure  $resolver
+	 * @param  string    $driver
+	 * @param  \Closure  $resolver
 	 * @return void
 	 */
 	public function addConnector($driver, Closure $resolver)

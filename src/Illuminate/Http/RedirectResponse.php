@@ -178,7 +178,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Set the session store implementation.
 	 *
-	 * @param  \Illuminate\Session\Store  $store
+	 * @param  \Illuminate\Session\Store  $session
 	 * @return void
 	 */
 	public function setSession(SessionStore $session)

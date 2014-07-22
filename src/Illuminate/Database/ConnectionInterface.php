@@ -102,7 +102,7 @@ interface ConnectionInterface {
 	/**
 	 * Execute a Closure within a transaction.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
 	 * @throws \Exception
@@ -140,7 +140,7 @@ interface ConnectionInterface {
 	/**
 	 * Execute the given callback in "dry run" mode.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return array
 	 */
 	public function pretend(Closure $callback);

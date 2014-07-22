@@ -751,6 +751,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$class->exists = true;
 		$class->first = 'taylor';
 		$class->last = 'otwell';
+		$class->created_at = $class->freshTimestamp();
+		$class->updated_at = $class->freshTimestamp();
 		$class->setRelation('foo', array('bar'));
 
 		$clone = $class->replicate();
@@ -759,6 +761,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($clone->exists);
 		$this->assertEquals('taylor', $clone->first);
 		$this->assertEquals('otwell', $clone->last);
+		$this->assertObjectNotHasAttribute('created_at', $clone);
+		$this->assertObjectNotHasAttribute('updated_at', $clone);
 		$this->assertEquals(array('bar'), $clone->foo);
 	}
 
@@ -798,6 +802,54 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAppendingOfAttributes()
+	{
+		$model = new EloquentModelAppendsStub;
+		$this->assertEquals('admin', $model->is_admin);
+
+		$model->setHidden(['is_admin']);
+		$this->assertEquals([], $model->toArray());
+
+		$model->setVisible([]);
+		$this->assertEquals([], $model->toArray());
+	}
+
+
+	public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
+	{
+		$model = new EloquentModelStub;
+		$model->id = 'id';
+		$model->foo = 'bar';
+		$model->created_at = new DateTime;
+		$model->updated_at = new DateTime;
+		$replicated = $model->replicate();
+
+		$this->assertNull($replicated->id);
+		$this->assertEquals('bar', $replicated->foo);
+		$this->assertNull($replicated->created_at);
+		$this->assertNull($replicated->updated_at);
+	}
+
+
+	public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
+	{
+		$model = m::mock('EloquentModelStub[newQuery]');
+		$model->exists = true;
+		$model->id = 1;
+		$model->syncOriginalAttribute('id');
+		$model->foo = 2;
+
+		$model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
+		$query->shouldReceive('where')->andReturn($query);
+		$query->shouldReceive('increment');
+
+		$model->publicIncrement('foo');
+
+		$this->assertEquals(3, $model->foo);
+		$this->assertFalse($model->isDirty());
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -832,6 +884,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	public function setPasswordAttribute($value)
 	{
 		$this->attributes['password_hash'] = md5($value);
+	}
+	public function publicIncrement($column, $amount = 1)
+	{
+		return $this->increment($column, $amount);
 	}
 	public function belongsToStub()
 	{
@@ -947,5 +1003,13 @@ class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
 	public static function isBooted()
 	{
 		return array_key_exists(get_called_class(), static::$booted);
+	}
+}
+
+class EloquentModelAppendsStub extends Illuminate\Database\Eloquent\Model {
+	protected $appends = array('is_admin');
+	public function getIsAdminAttribute()
+	{
+		return 'admin';
 	}
 }

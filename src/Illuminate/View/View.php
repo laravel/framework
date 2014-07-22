@@ -317,6 +317,7 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Get a piece of data from the view.
 	 *
+	 * @param  string  $key
 	 * @return mixed
 	 */
 	public function &__get($key)

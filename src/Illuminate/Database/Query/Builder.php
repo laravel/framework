@@ -265,11 +265,11 @@ class Builder {
 	 * Add a join clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @param  string  $type
-	 * @param  bool  $where
+	 * @param  bool    $where
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
 	public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
@@ -303,7 +303,7 @@ class Builder {
 	 * Add a "join where" clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @param  string  $type
@@ -332,7 +332,7 @@ class Builder {
 	 * Add a "join where" clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @return \Illuminate\Database\Query\Builder|static
@@ -360,7 +360,7 @@ class Builder {
 	 * Add a "right join where" clause to the query.
 	 *
 	 * @param  string  $table
-	 * @param  string  $first
+	 * @param  string  $one
 	 * @param  string  $operator
 	 * @param  string  $two
 	 * @return \Illuminate\Database\Query\Builder|static
@@ -1454,7 +1454,7 @@ class Builder {
 	 * @param  callable  $callback
 	 * @return void
 	 */
-	public function chunk($count, $callback)
+	public function chunk($count, callable $callback)
 	{
 		$results = $this->forPage($page = 1, $count)->get();
 
@@ -2011,6 +2011,8 @@ class Builder {
 	 * @param  array   $bindings
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Query\Builder
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function setBindings(array $bindings, $type = 'where')
 	{
@@ -2030,6 +2032,8 @@ class Builder {
 	 * @param  mixed   $value
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Query\Builder
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function addBinding($value, $type = 'where')
 	{

@@ -329,7 +329,7 @@ class Repository extends NamespacedItemResolver implements ArrayAccess {
 	/**
 	 * Set the loader implementation.
 	 *
-	 * @param \Illuminate\Config\LoaderInterface  $loader
+	 * @param  \Illuminate\Config\LoaderInterface  $loader
 	 * @return void
 	 */
 	public function setLoader(LoaderInterface $loader)

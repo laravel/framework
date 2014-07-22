@@ -123,10 +123,10 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Create a new database connection instance.
 	 *
-	 * @param  PDO     $pdo
-	 * @param  string  $database
-	 * @param  string  $tablePrefix
-	 * @param  array   $config
+	 * @param  \PDO     $pdo
+	 * @param  string   $database
+	 * @param  string   $tablePrefix
+	 * @param  array    $config
 	 * @return void
 	 */
 	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = array())
@@ -409,7 +409,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Execute a Closure within a transaction.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
 	 * @throws \Exception
@@ -506,7 +506,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Execute the given callback in "dry run" mode.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return array
 	 */
 	public function pretend(Closure $callback)
@@ -528,9 +528,9 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Run a SQL statement and log its execution context.
 	 *
-	 * @param  string   $query
-	 * @param  array    $bindings
-	 * @param  Closure  $callback
+	 * @param  string    $query
+	 * @param  array     $bindings
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
 	 * @throws QueryException
@@ -588,7 +588,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Register a database query listener with the connection.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function listen(Closure $callback)
@@ -687,7 +687,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the PDO connection.
 	 *
-	 * @param  PDO  $pdo
+	 * @param  \PDO  $pdo
 	 * @return \Illuminate\Database\Connection
 	 */
 	public function setPdo(PDO $pdo)
@@ -700,7 +700,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the PDO connection used for reading.
 	 *
-	 * @param  PDO  $pdo
+	 * @param  \PDO  $pdo
 	 * @return \Illuminate\Database\Connection
 	 */
 	public function setReadPdo(PDO $pdo)
