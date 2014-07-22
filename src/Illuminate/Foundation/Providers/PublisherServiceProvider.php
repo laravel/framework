@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\ViewPublisher;
-use Illuminate\Foundation\AssetPublisher;
-use Illuminate\Foundation\ConfigPublisher;
-use Illuminate\Foundation\MigrationPublisher;
+use Illuminate\Foundation\Publishing\ViewPublisher;
+use Illuminate\Foundation\Publishing\AssetPublisher;
+use Illuminate\Foundation\Publishing\ConfigPublisher;
 use Illuminate\Foundation\Console\ViewPublishCommand;
 use Illuminate\Foundation\Console\AssetPublishCommand;
 use Illuminate\Foundation\Console\ConfigPublishCommand;
+use Illuminate\Foundation\Publishing\MigrationPublisher;
 use Illuminate\Foundation\Console\MigratePublishCommand;
 
 class PublisherServiceProvider extends ServiceProvider {

@@ -8,7 +8,7 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
-use Illuminate\Routing\Exception\HttpResponseException;
+use Illuminate\Http\Exception\HttpResponseException;
 
 class Route {
 

@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Foundation;
+<?php namespace Illuminate\Foundation\Publishing;
 
 use Carbon\Carbon;
 use Illuminate\Filesystem\Filesystem;
