@@ -1508,7 +1508,7 @@ class Builder {
 			$return = call_user_func($callback, $results);
 
 			if ($return === false)
-				continue;
+				break;
 
 			$page++;
 
