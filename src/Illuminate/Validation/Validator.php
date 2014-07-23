@@ -2128,7 +2128,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	public function setValueNames(array $values)
 	{
-		$this->customAttributes = $values;
+		$this->customValues = $values;
 
 		return $this;
 	}
