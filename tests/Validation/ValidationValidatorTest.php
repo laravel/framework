@@ -159,7 +159,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
 		
-		// set custom values by setter
+		// test addCustomValues
 		$trans = $this->getRealTranslator();
 		$trans->addResource('array', array('validation.in' => ':attribute must be included in :values.'), 'en', 'messages');
 		$customValues = array(
