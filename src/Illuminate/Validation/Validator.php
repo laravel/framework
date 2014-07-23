@@ -2119,6 +2119,19 @@ class Validator implements MessageProviderInterface {
 
 		return $this;
 	}
+	
+	/**
+	 * Set the custom values on the validator.
+	 *
+	 * @param  array  $values
+	 * @return \Illuminate\Validation\Validator
+	 */
+	public function setValueNames(array $values)
+	{
+		$this->customAttributes = $values;
+
+		return $this;
+	}
 
 	/**
 	 * Get the files under validation.
@@ -2224,12 +2237,12 @@ class Validator implements MessageProviderInterface {
 	}
 	
 	/**
-	 * Set the custom attributes for the validator
+	 * Add the custom attributes for the validator
 	 *
 	 * @param  array  $customAttributes
 	 * @return void
 	 */
-	public function setCustomAttributes(array $customAttributes)
+	public function addCustomAttributes(array $customAttributes)
 	{
 		$this->customAttributes = array_merge($this->customAttributes, $customAttributes);
 	}
@@ -2245,12 +2258,12 @@ class Validator implements MessageProviderInterface {
 	}
 	
 	/**
-	 * Set the custom values for the validator
+	 * Add the custom values for the validator
 	 *
 	 * @param  array  $customValues
 	 * @return void
 	 */
-	public function setCustomValues(array $customValues)
+	public function addCustomValues(array $customValues)
 	{
 		$this->customValues = array_merge($this->customValues, $customValues);
 	}
