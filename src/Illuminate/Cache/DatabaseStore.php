@@ -168,7 +168,7 @@ class DatabaseStore implements StoreInterface {
 	public function forget($key)
 	{
 		$this->table()->where('key', '=', $this->prefix.$key)->delete();
-		
+
 		return true;
 	}
 
