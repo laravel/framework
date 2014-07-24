@@ -1,3 +1,6 @@
+filter:
+    excluded_paths: [tests/*]
+
 checks:
     php:
         code_rating: true
