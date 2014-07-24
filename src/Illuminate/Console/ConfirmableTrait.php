@@ -7,8 +7,8 @@ trait ConfirmableTrait {
 	/**
 	 * Confirm before proceeding with the action
 	 *
-	 * @param  bool      $warning
-	 * @param  \Closure  $callback
+	 * @param  string|null  $warning
+	 * @param  \Closure     $callback
 	 * @return bool
 	 */
 	public function confirmToProceed($warning = null, Closure $callback = null)
@@ -19,10 +19,13 @@ trait ConfirmableTrait {
 		{
 			if ($this->option('force')) return true;
 
-			$this->comment(str_repeat('*', strlen($warning) + 12));
-			$this->comment('*     '.$warning.'     *');
-			$this->comment(str_repeat('*', strlen($warning) + 12));
-			$this->output->writeln('');
+			if ($warning)
+			{
+				$this->comment(str_repeat('*', strlen($warning) + 12));
+				$this->comment('*     '.$warning.'     *');
+				$this->comment(str_repeat('*', strlen($warning) + 12));
+				$this->output->writeln('');
+			}
 
 			$confirmed = $this->confirm('Do you really wish to run this command?');
 
