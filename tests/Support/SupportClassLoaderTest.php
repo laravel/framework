@@ -28,6 +28,9 @@ class SupportClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array_merge($directories, array('baz')), ClassLoader::getDirectories());
 		ClassLoader::removeDirectories('baz');
 		$this->assertEquals($directories, ClassLoader::getDirectories());
+		ClassLoader::addDirectories($directories = array('foo', 'bar', 'baz'));
+		ClassLoader::removeDirectories(array('bar', 'baz'));
+		$this->assertEquals(array('foo'), ClassLoader::getDirectories());
 		ClassLoader::removeDirectories($directories);
 		$this->assertEmpty(ClassLoader::getDirectories());
 	}
