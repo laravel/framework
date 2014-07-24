@@ -298,9 +298,7 @@ class Validator implements MessageProviderInterface {
 	{
 		list($rule, $parameters) = $this->parseRule($rule);
 
-		if ($rule == '') {
-			return;
-		}
+		if ($rule == '') return;
 
 		// We will get the value for the given attribute from the array of data and then
 		// verify that the attribute is indeed validatable. Unless the rule implies
@@ -1921,16 +1919,16 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Extract the rule name and parameters from a rule.
 	 *
-	 * @param  string|array  $rule
+	 * @param  string|array  $rules
 	 * @return array
 	 */
-	protected function parseRule($rule)
+	protected function parseRule($rules)
 	{
 		// If the rule is an array then it should not be parsed.
-		if (is_array($rule))
+		if (is_array($rules))
 		{
-			$parameters = array_slice($rule, 1);
-			$rule = array_get($rule, 0, '');
+			$parameters = array_slice($rules, 1);
+			$rules = array_get($rules, 0, '');
 		}
 		else
 		{
@@ -1939,15 +1937,15 @@ class Validator implements MessageProviderInterface {
 			// The format for specifying validation rules and parameters follows an
 			// easy {rule}:{parameters} formatting convention. For instance the
 			// rule "Max:3" states that the value may only be three letters.
-			if (strpos($rule, ':') !== false)
+			if (strpos($rules, ':') !== false)
 			{
-				list($rule, $parameter) = explode(':', $rule, 2);
+				list($rules, $parameter) = explode(':', $rules, 2);
 
-				$parameters = $this->parseParameters($rule, $parameter);
+				$parameters = $this->parseParameters($rules, $parameter);
 			}
 		}
 
-		return array(studly_case(trim($rule)), $parameters);
+		return array(studly_case(trim($rules)), $parameters);
 	}
 
 	/**
