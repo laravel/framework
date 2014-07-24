@@ -1,10 +1,10 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Publishing\AssetPublisher;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Illuminate\Foundation\Publishing\AssetPublisher;
 
 class AssetPublishCommand extends Command {
 
