@@ -7,11 +7,11 @@ trait ConfirmableTrait {
 	/**
 	 * Confirm before proceeding with the action
 	 *
-	 * @param  bool      $warning
+	 * @param  string    $warning
 	 * @param  \Closure  $callback
 	 * @return bool
 	 */
-	public function confirmToProceed($warning = null, Closure $callback = null)
+	public function confirmToProceed($warning = 'Application In Production!', Closure $callback = null)
 	{
 		$shouldConfirm = $callback ?: $this->getDefaultConfirmCallback();
 
