@@ -39,6 +39,17 @@ abstract class Publisher {
     }
 
     /**
+     * Get the source directory to publish.
+     *
+     * @param  string  $package
+     * @param  string  $packagePath
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    abstract protected function getSource($package, $packagePath);
+
+    /**
      * Publish files from a given path.
      *
      * @param  string  $package
@@ -114,16 +125,5 @@ abstract class Publisher {
     {
         $this->packagePath = $packagePath;
     }
-
-    /**
-     * Get the source directory to publish.
-     *
-     * @param  string  $package
-     * @param  string  $packagePath
-     * @return string
-     *
-     * @throws \InvalidArgumentException
-     */
-    abstract protected function getSource($package, $packagePath);
 
 }
