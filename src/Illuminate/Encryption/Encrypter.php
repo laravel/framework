@@ -36,14 +36,26 @@ class Encrypter {
 	protected $block = 16;
 
 	/**
+	 * Seed file to be used when open SSL is not installed
+	 *
+	 * @var string
+	 */
+	protected $seedFile = null;
+
+	/**
 	 * Create a new encrypter instance.
 	 *
 	 * @param  string  $key
+	 * @param  string  $seedFile Optional seed file to be used when OpenSSL is not installed.
 	 * @return void
 	 */
-	public function __construct($key)
+	public function __construct($key, $seedFile = null)
 	{
 		$this->key = $key;
+		if (is_string($seedFile))
+		{
+			$this->seedFile = $seedFile;
+		}
 	}
 
 	/**
@@ -157,7 +169,7 @@ class Encrypter {
 	 */
 	protected function validMac(array $payload)
 	{
-		$bytes = (new SecureRandom)->nextBytes(16);
+		$bytes = (new SecureRandom($this->seedFile))->nextBytes(16);
 
 		$calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 

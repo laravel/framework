@@ -13,7 +13,9 @@ class EncryptionServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('encrypter', function($app)
 		{
-			$encrypter =  new Encrypter($app['config']['app.key']);
+			$fileName = isset($app['config']['app.seedfile'])? $app['config']['app.seedfile'] : 'seed-file';
+			$seedFullPath = $app['path.storage'] . DIRECTORY_SEPARATOR . $fileName;
+			$encrypter =  new Encrypter($app['config']['app.key'], $seedFullPath);
 
 			if ($app['config']->has('app.cipher'))
 			{
