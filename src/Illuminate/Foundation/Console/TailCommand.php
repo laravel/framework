@@ -134,7 +134,7 @@ class TailCommand extends Command {
 	 */
 	protected function getLocalPath()
 	{
-		if ($dailyLogs = File::glob(base_path().'/app/storage/logs/log-*.txt'))
+		if ($dailyLogs = $this->laravel['file']->glob(base_path().'/app/storage/logs/log-*.txt'))
 		{
 			return last($dailyLogs);
 		}
