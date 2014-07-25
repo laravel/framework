@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "ext-mcrypt": "*",
         "classpreloader/classpreloader": "~1.0",
         "d11wtq/boris": "~1.0",
         "ircmaxell/password-compat": "~1.0",
