@@ -120,11 +120,23 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		$this->connection->beginTransaction();
+
+		try 
+		{
+			$this->table()->where('key', $key)->lockForUpdate()->increment('value', $value);
+		}
+		catch(\Exception $e) 
+		{
+			$this->connection->rollback();
+			throw $e;
+		}
+
+		$this->connection->commit();
 	}
 
 	/**
-	 * Increment the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
@@ -134,7 +146,19 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Decrement operations not supported by this driver.");
+		$this->connection->beginTransaction();
+		
+		try 
+		{
+			$this->table()->where('key', $key)->lockForUpdate()->decrement('value', $value);
+		}
+		catch(\Exception $e) 
+		{
+			$this->connection->rollback();
+			throw $e;
+		}
+
+		$this->connection->commit();
 	}
 
 	/**
