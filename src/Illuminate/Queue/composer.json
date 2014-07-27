@@ -13,7 +13,7 @@
         "illuminate/container": "4.3.*",
         "illuminate/http": "4.3.*",
         "illuminate/support": "4.3.*",
-        "symfony/process": "2.5.*",
+        "symfony/process": "2.6.*",
         "nesbot/carbon": "~1.0"
     },
     "require-dev": {

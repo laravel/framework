@@ -11,8 +11,8 @@
         "php": ">=5.4.0",
         "illuminate/container": "4.3.*",
         "illuminate/support": "4.3.*",
-        "symfony/http-foundation": "2.5.*",
-        "symfony/translation": "2.5.*"
+        "symfony/http-foundation": "2.6.*",
+        "symfony/translation": "2.6.*"
     },
     "require-dev": {
         "illuminate/database": "4.3.*"
