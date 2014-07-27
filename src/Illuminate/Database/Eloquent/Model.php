@@ -1326,7 +1326,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Update the model in the database.
 	 *
 	 * @param  array  $attributes
-	 * @return mixed
+	 * @return bool|int
 	 */
 	public function update(array $attributes = array())
 	{
