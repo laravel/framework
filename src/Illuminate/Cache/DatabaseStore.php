@@ -159,7 +159,7 @@ class DatabaseStore implements StoreInterface {
 		$existingValue = $this->encrypter->decrypt($cache->value);
 
 		if( ! is_numeric($existingValue))
-			throw \LogicException('Increment and Decrement works only with numeric values.');
+			throw new \LogicException('Increment and Decrement works only with numeric values.');
 
 		$newValue = $this->encrypter->encrypt($existingValue + $fraction);
 		$expiration = $cache->expiration + $this->time();
