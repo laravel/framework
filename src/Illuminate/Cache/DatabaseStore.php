@@ -115,24 +115,10 @@ class DatabaseStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
-	 *
-	 * @throws \LogicException
 	 */
 	public function increment($key, $value = 1)
 	{
-		$this->connection->beginTransaction();
-
-		try 
-		{
-			$this->table()->where('key', $key)->lockForUpdate()->increment('value', $value);
-		}
-		catch(\Exception $e) 
-		{
-			$this->connection->rollback();
-			throw $e;
-		}
-
-		$this->connection->commit();
+		$this->update($key, $value);
 	}
 
 	/**
@@ -141,16 +127,47 @@ class DatabaseStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
-	 *
-	 * @throws \LogicException
 	 */
 	public function decrement($key, $value = 1)
 	{
-		$this->connection->beginTransaction();
+		$this->update($key, 0 - $value);
+	}
+
+	/**
+	 * Update the value in cache by adding or subtracting
+	 * @param  string $key
+	 * @param  numeric $fraction
+	 * @return void|null
+	 */
+	protected function update($key, $fraction)
+	{
+		$prefixed = $this->prefix . $key;
 		
+		$this->connection->beginTransaction();
+
+		$cache = $this->table()->where('key', $prefixed)->lockForUpdate()->first();
+
+		if (is_null($cache)) return null;
+
+		if (is_array($cache)) $cache = (object) $cache;
+
+		if (time() >= $cache->expiration)
+		{
+			return $this->forget($key);
+		}
+
+		$existingValue = $this->encrypter->decrypt($cache->value);
+
+		if( ! is_numeric($existingValue))
+			throw \LogicException('Increment and Decrement works only with numeric values.');
+
+		$newValue = $this->encrypter->encrypt($existingValue + $fraction);
+		$expiration = $cache->expiration + $this->time();
+
 		try 
 		{
-			$this->table()->where('key', $key)->lockForUpdate()->decrement('value', $value);
+			$this->table()->where('key', $prefixed)
+				->update(array('key' => $prefixed, 'value' => $newValue, 'expiration' => $expiration));
 		}
 		catch(\Exception $e) 
 		{
