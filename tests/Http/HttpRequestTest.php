@@ -327,6 +327,26 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), array('foo' => array('photo' => $file)));
 		$this->assertEquals(array('foo' => array('bar' => 'baz', 'photo' => $file), 'boom' => 'breeze'), $request->all());
 	}
+	
+
+	public function testAllInputReturnsInputAfterReplace()
+	{
+		$request = Request::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')));
+		$request->replace(array('foo' => array('bar' => 'baz'), 'boom' => 'breeze'));
+		$this->assertEquals(array('foo' => array('bar' => 'baz'), 'boom' => 'breeze'), $request->all());
+	}
+	
+	
+	public function testAllInputWithNumericKeysReturnsInputAfterReplace()
+	{
+		$request1 = Request::create('/', 'POST', array(0 => 'A', 1 => 'B', 2 => 'C'));
+		$request1->replace(array(0 => 'A', 1 => 'B', 2 => 'C'));
+		$this->assertEquals(array(0 => 'A', 1 => 'B', 2 => 'C'), $request1->all());
+	
+		$request2 = Request::create('/', 'POST', array(1 => 'A', 2 => 'B', 3 => 'C'));
+		$request2->replace(array(1 => 'A', 2 => 'B', 3 => 'C'));
+		$this->assertEquals(array(1 => 'A', 2 => 'B', 3 => 'C'), $request2->all());
+	}
 
 
 	public function testOldMethodCallsSession()
