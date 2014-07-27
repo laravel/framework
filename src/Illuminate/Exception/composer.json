@@ -11,6 +11,7 @@
         "php": ">=5.4.0",
         "filp/whoops": "1.1.*",
         "illuminate/support": "4.2.*",
+        "symfony/debug": "2.5.*",
         "symfony/http-foundation": "2.5.*",
         "symfony/http-kernel": "2.5.*"
     },
