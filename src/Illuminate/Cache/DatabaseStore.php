@@ -167,7 +167,7 @@ class DatabaseStore implements StoreInterface {
 		try 
 		{
 			$this->table()->where('key', $prefixed)
-				->update(array('key' => $prefixed, 'value' => $newValue, 'expiration' => $expiration));
+				->update(array('value' => $newValue, 'expiration' => $expiration));
 		}
 		catch(\Exception $e) 
 		{
