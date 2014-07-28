@@ -162,7 +162,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		$this->increment($key, 0 - $value);
+		$this->increment($key, $value * -1);
 	}
 
 	/**
