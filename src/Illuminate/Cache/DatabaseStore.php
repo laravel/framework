@@ -115,6 +115,8 @@ class DatabaseStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 *
+	 * @throws LogicException If value to be incremented is not numeric
 	 */
 	public function increment($key, $value = 1)
 	{
@@ -159,6 +161,8 @@ class DatabaseStore implements StoreInterface {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
+	 *
+	 * @throws LogicException If value to be decremented is not numeric
 	 */
 	public function decrement($key, $value = 1)
 	{
