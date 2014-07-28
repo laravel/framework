@@ -155,6 +155,38 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGettingMaxItemsFromCollection()
+	{
+		$c = new Collection(array((object) array('foo' => 10), (object) array('foo' => 20)));
+		$this->assertEquals(20, $c->max('foo'));
+
+		$c = new Collection(array(array('foo' => 10), array('foo' => 20)));
+		$this->assertEquals(20, $c->max('foo'));
+
+		$c = new Collection([1, 2, 3, 4]);
+		$this->assertEquals(4, $c->max());
+
+		$c = new Collection();
+		$this->assertNull($c->max());
+	}
+
+
+	public function testGettingMinItemsFromCollection()
+	{
+		$c = new Collection(array((object) array('foo' => 10), (object) array('foo' => 20)));
+		$this->assertEquals(10, $c->min('foo'));
+
+		$c = new Collection(array(array('foo' => 10), array('foo' => 20)));
+		$this->assertEquals(10, $c->min('foo'));
+
+		$c = new Collection([1, 2, 3, 4]);
+		$this->assertEquals(1, $c->min());
+
+		$c = new Collection();
+		$this->assertNull($c->min());
+	}
+
+
 	public function testDiffCollection()
 	{
 		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
