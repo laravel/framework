@@ -118,36 +118,11 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		$this->update($key, $value);
-	}
-
-	/**
-	 * Decrement the value of an item in the cache.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
-	public function decrement($key, $value = 1)
-	{
-		$this->update($key, 0 - $value);
-	}
-
-	/**
-	 * Update the value in cache by adding or subtracting
-	 * @param  string $key
-	 * @param  numeric $fraction
-	 * @return void|null
-	 */
-	protected function update($key, $fraction)
-	{
 		$prefixed = $this->prefix . $key;
 		
 		$this->connection->beginTransaction();
 
 		$cache = $this->table()->where('key', $prefixed)->lockForUpdate()->first();
-
-		if (is_null($cache)) return null;
 
 		if (is_array($cache)) $cache = (object) $cache;
 
@@ -176,6 +151,18 @@ class DatabaseStore implements StoreInterface {
 		}
 
 		$this->connection->commit();
+	}
+
+	/**
+	 * Decrement the value of an item in the cache.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function decrement($key, $value = 1)
+	{
+		$this->increment($key, 0 - $value);
 	}
 
 	/**
