@@ -13,7 +13,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSessionIsLoadedFromHandler()
 	{
 		$session = $this->getSession();
-		$session->getHandler()->shouldReceive('read')->once()->with(1)->andReturn(serialize(array('foo' => 'bar', 'bagged' => array('name' => 'taylor'))));
+		$session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(array('foo' => 'bar', 'bagged' => array('name' => 'taylor'))));
 		$session->registerBag(new Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag('bagged'));
 		$session->start();
 
@@ -65,6 +65,21 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCantSetInvalidId()
+	{
+		$session = $this->getSession();
+
+		$session->setId(null);
+		$this->assertFalse(null == $session->getId());
+
+		$session->setId(array('a'));
+		$this->assertFalse(array('a') == $session->getId());
+
+		$session->setId('wrong');
+		$this->assertFalse('wrong' == $session->getId());
+	}
+
+
 	public function testSessionInvalidate()
 	{
 		$session = $this->getSession();
@@ -85,16 +100,19 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session->start();
 		$session->put('foo', 'bar');
 		$session->flash('baz', 'boom');
-		$session->getHandler()->shouldReceive('write')->once()->with(1, serialize(array(
-			'_token' => $session->token(),
-			'foo' => 'bar',
-			'baz' => 'boom',
-			'flash' => array(
-				'new' => array(),
-				'old' => array('baz'),
-			),
-			'_sf2_meta' => $session->getBagData('_sf2_meta'),
-		)));
+		$session->getHandler()->shouldReceive('write')->once()->with(
+			$this->getSessionId(),
+			serialize(array(
+				'_token' => $session->token(),
+				'foo' => 'bar',
+				'baz' => 'boom',
+				'flash' => array(
+					'new' => array(),
+					'old' => array('baz'),
+				),
+				'_sf2_meta' => $session->getBagData('_sf2_meta'),
+			))
+		);
 		$session->save();
 
 		$this->assertFalse($session->isStarted());
@@ -276,8 +294,14 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		return array(
 			$this->getSessionName(),
 			m::mock('SessionHandlerInterface'),
-			'1'
+			$this->getSessionId()
 		);
+	}
+
+
+	public function getSessionId()
+	{
+		return 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 	}
 
 
