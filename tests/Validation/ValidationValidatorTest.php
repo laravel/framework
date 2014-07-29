@@ -137,6 +137,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('The bar field is required when color is red.', $v->messages()->first('bar'));
+		
+		//required_if:foo,bar,baz
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.required_if' => 'The :attribute field is required when :other is :value.'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.color.1' => 'red'), 'en', 'messages');
+		$trans->addResource('array', array('validation.values.color.2' => 'blue'), 'en', 'messages');
+		$v = new Validator($trans, array('color' => '2', 'bar' => ''), array('bar' => 'RequiredIf:color,1,2'));
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('The bar field is required when color is blue.', $v->messages()->first('bar'));
 
 		//in:foo,bar,...
 		$trans = $this->getRealTranslator();
