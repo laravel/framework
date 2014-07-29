@@ -13,7 +13,7 @@
         "illuminate/support": "4.3.*",
         "illuminate/view": "4.3.*",
         "symfony/http-foundation": "2.6.*",
-        "symfony/translation": "2.6.*"
+        "symfony/translation": "~2.3"
     },
     "autoload": {
         "psr-4": {
