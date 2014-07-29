@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Http;
 
+use SplFileInfo;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -329,13 +330,13 @@ class Request extends SymfonyRequest {
 		{
 			foreach ($file as $f)
 			{
-				if ($f instanceof \SplFileInfo && $f->getPath() != '') return true;
+				if ($f instanceof SplFileInfo && $f->getPath() != '') return true;
 			}
 
 			return false;
 		}
 
-		return $file instanceof \SplFileInfo && $file->getPath() != '';
+		return $file instanceof SplFileInfo && $file->getPath() != '';
 	}
 
 	/**
