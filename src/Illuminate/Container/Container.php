@@ -397,10 +397,8 @@ class Container implements ArrayAccess {
 		{
 			return $this->reboundCallbacks[$abstract];
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**
@@ -471,10 +469,8 @@ class Container implements ArrayAccess {
 
 			return $abstract;
 		}
-		else
-		{
-			return $this->bindings[$abstract]['concrete'];
-		}
+
+		return $this->bindings[$abstract]['concrete'];
 	}
 
 	/**
@@ -594,12 +590,10 @@ class Container implements ArrayAccess {
 		{
 			return $parameter->getDefaultValue();
 		}
-		else
-		{
-			$message = "Unresolvable dependency resolving [$parameter] in class {$parameter->getDeclaringClass()->getName()}";
 
-			throw new BindingResolutionException($message);
-		}
+		$message = "Unresolvable dependency resolving [$parameter] in class {$parameter->getDeclaringClass()->getName()}";
+
+		throw new BindingResolutionException($message);
 	}
 
 	/**
@@ -626,10 +620,8 @@ class Container implements ArrayAccess {
 			{
 				return $parameter->getDefaultValue();
 			}
-			else
-			{
-				throw $e;
-			}
+
+			throw $e;
 		}
 	}
 
