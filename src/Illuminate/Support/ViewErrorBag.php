@@ -61,6 +61,7 @@ class ViewErrorBag implements Countable {
 	/**
 	 * Dynamically access a view error bag.
 	 *
+	 * @param  string  $key
 	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function __get($key)
