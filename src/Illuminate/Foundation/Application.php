@@ -640,6 +640,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$request = $request ?: $this['request'];
 
 		$response = with($stack = $this->getStackedClient())->handle($request);
+		
+		if (!runningInConsole() && !runningUnitTests() && $this['config']->get('app.gzip')) ob_start('ob_gzhandler');
 
 		$response->send();
 
