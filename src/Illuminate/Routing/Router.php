@@ -1048,6 +1048,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$this->current = $route = $this->routes->match($request);
 
+		$this->container->instance('Illuminate\Routing\Route', $route);
+
 		return $this->substituteBindings($route);
 	}
 
