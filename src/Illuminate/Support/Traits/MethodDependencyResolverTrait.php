@@ -12,7 +12,7 @@ trait MethodDependencyResolverTrait {
 	 * @param  string  $method
 	 * @return mixed
 	 */
-	protected function callClassMethodWithDependencies($instance, $method)
+	protected function callWithDependencies($instance, $method)
 	{
 		return call_user_func_array(
 			[$instance, $method], $this->resolveClassMethodDependencies([], $instance, $method)
