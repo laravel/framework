@@ -240,7 +240,7 @@ class Filesystem {
 	 */
 	public function files($directory)
 	{
-		$glob = glob($directory.'/*');
+		$glob = glob($directory.DIRECTORY_SEPARATOR.'*');
 
 		if ($glob === false) return array();
 
