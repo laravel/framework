@@ -4,6 +4,7 @@ use Closure;
 use ReflectionMethod;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
+use Illuminate\Support\Traits\MethodDependencyResolverTrait;
 
 class ControllerDispatcher {
 

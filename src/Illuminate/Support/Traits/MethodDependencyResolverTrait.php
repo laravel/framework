@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Routing;
+<?php namespace Illuminate\Support\Traits;
 
 use ReflectionMethod;
 use ReflectionFunctionAbstract;
@@ -6,10 +6,24 @@ use ReflectionFunctionAbstract;
 trait MethodDependencyResolverTrait {
 
 	/**
-	 * Resolve the controller method's type-hinted dependencies.
+	 * Call a class method with the resolved dependencies.
+	 *
+	 * @param  object  $instance
+	 * @param  string  $method
+	 * @return mixed
+	 */
+	protected function callClassMethodWithDependencies($instance, $method)
+	{
+		return call_user_func_array(
+			[$instance, $method], $this->resolveClassMethodDependencies([], $instance, $method)
+		);
+	}
+
+	/**
+	 * Resolve the object method's type-hinted dependencies.
 	 *
 	 * @param  array  $parameters
-	 * @param  \Illuminate\Routing\Controller  $instance
+	 * @param  object  $instance
 	 * @param  string  $method
 	 * @return array
 	 */
