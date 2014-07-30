@@ -5,9 +5,16 @@ php:
   - 5.5
   - 5.6
   - hhvm
+  - hhvm-nightly
 
 before_script:
   - travis_retry composer self-update
   - travis_retry composer install --prefer-source --no-interaction --dev
 
 script: vendor/bin/phpunit --verbose
+
+matrix:
+  allow_failures:
+    - php: hhvm
+    - php: hhvm-nightly
+  fast_finish: true
