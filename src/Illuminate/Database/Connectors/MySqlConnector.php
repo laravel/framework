@@ -55,7 +55,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getDsn(array $config)
 	{
-		return isset($config['unix_socket']) ? $this->getSocketDsn($config) : $this->getHostDsn($config);
+		return isset($config['unix_socket']) && !empty($config['unix_socket']) ? $this->getSocketDsn($config) : $this->getHostDsn($config);
 	}
 
 	/**
