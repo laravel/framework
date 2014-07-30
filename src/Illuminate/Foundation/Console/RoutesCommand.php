@@ -83,7 +83,7 @@ class RoutesCommand extends Command {
 	{
 		$results = array();
 
-		foreach($this->routes as $route)
+		foreach ($this->routes as $route)
 		{
 			$results[] = $this->getRouteInformation($route);
 		}
