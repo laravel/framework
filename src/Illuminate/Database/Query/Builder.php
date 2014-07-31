@@ -1797,6 +1797,20 @@ class Builder {
 	 * @return bool
 	 */
 	public function insert(array $values)
+	{	
+		$sql = $this->grammar->compileInsert($this, $values);
+
+		$bindings = $this->structureBindings($values);
+
+		// Once we have compiled the insert statement's SQL we can execute it on the
+		// connection and return a result as a boolean success indicator as that
+		// is the same type of result returned by the raw connection instance.
+		$bindings = $this->cleanBindings($bindings);
+
+		return $this->connection->insert($sql, $bindings);
+	}
+
+	protected function structureBindings(array $values)
 	{
 		// Since every insert gets treated like a batch insert, we will make sure the
 		// bindings are structured in a way that is convenient for building these
@@ -1830,14 +1844,7 @@ class Builder {
 			}
 		}
 
-		$sql = $this->grammar->compileInsert($this, $values);
-
-		// Once we have compiled the insert statement's SQL we can execute it on the
-		// connection and return a result as a boolean success indicator as that
-		// is the same type of result returned by the raw connection instance.
-		$bindings = $this->cleanBindings($bindings);
-
-		return $this->connection->insert($sql, $bindings);
+		return $bindings;
 	}
 
 	/**
@@ -1851,9 +1858,11 @@ class Builder {
 	{
 		$sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
-		$values = $this->cleanBindings($values);
+		$bindings = $this->structureBindings($values);
 
-		return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
+		$bindings = $this->cleanBindings($bindings);
+
+		return $this->processor->processInsertGetId($this, $sql, $bindings, $sequence);
 	}
 
 	/**
