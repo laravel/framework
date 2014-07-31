@@ -9,11 +9,11 @@ use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
-use Illuminate\Support\Traits\MethodDependencyResolverTrait;
+use Illuminate\Routing\RouteDependencyResolverTrait;
 
 class Route {
 
-	use MethodDependencyResolverTrait;
+	use RouteDependencyResolverTrait;
 
 	/**
 	 * The URI pattern the route responds to.

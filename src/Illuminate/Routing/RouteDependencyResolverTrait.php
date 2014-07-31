@@ -1,9 +1,9 @@
-<?php namespace Illuminate\Support\Traits;
+<?php namespace Illuminate\Routing;
 
 use ReflectionMethod;
 use ReflectionFunctionAbstract;
 
-trait MethodDependencyResolverTrait {
+trait RouteDependencyResolverTrait {
 
 	/**
 	 * Call a class method with the resolved dependencies.
