@@ -3,6 +3,8 @@
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
+use ReflectionMethod;
+use ReflectionFunction;
 use ReflectionParameter;
 
 class BindingResolutionException extends \Exception {}
@@ -400,6 +402,81 @@ class Container implements ArrayAccess {
 		else
 		{
 			return array();
+		}
+	}
+
+	/**
+	 * Wrap the given closure such that its dependencies will be injected when executed.
+	 *
+	 * @param  \Closure  $callback
+	 * @param  array  $parameters
+	 * @return \Closure
+	 */
+	public function wrap(Closure $callback, array $parameters = array())
+	{
+		return function() use ($callback, $parameters)
+		{
+			return $this->call($callback, $parameters);
+		};
+	}
+
+	/**
+	 * Call the given Closure and inject its dependencies.
+	 *
+	 * @param  callable  $callback
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function call($callback, array $parameters = array())
+	{
+		$dependencies = [];
+
+		foreach ($this->getCallReflector($callback)->getParameters() as $key => $parameter)
+		{
+			$dependencies[] = $this->getDependencyForCallParameter($parameter, $parameters);
+		}
+
+		return call_user_func_array($callback, $dependencies);
+	}
+
+	/**
+	 * Get the proper reflection instance for the given callback.
+	 *
+	 * @param  \Closure|array  $callback
+	 * @return \ReflectionFunctionAbstract
+	 */
+	protected function getCallReflector($callback)
+	{
+		if (is_array($callback))
+		{
+			return new ReflectionMethod($callback[0], $callback[1]);
+		}
+		else
+		{
+			return new ReflectionFunction($callback);
+		}
+	}
+
+	/**
+	 * Get the dependency for the given call parameter.
+	 *
+	 * @param  \ReflectionParameter  $parameter
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	protected function getDependencyForCallParameter(ReflectionParameter $parameter, array $parameters)
+	{
+		if (array_key_exists($parameter->name, $parameters))
+		{
+			return $parameters[$parameter->name];
+		}
+		elseif ($parameter->getClass())
+		{
+			return $this->make($parameter->getClass()->name);
+		}
+		elseif ($parameter->isDefaultValueAvailable())
+		{
+			return $parameter->getDefaultValue();
 		}
 	}
 
