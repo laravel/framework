@@ -8,6 +8,8 @@ use Illuminate\Support\Contracts\MessageProviderInterface;
 
 class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectResponse {
 
+	use ResponseTrait;
+
 	/**
 	 * The request instance.
 	 *
@@ -21,21 +23,6 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 * @var \Illuminate\Session\Store
 	 */
 	protected $session;
-
-	/**
-	 * Set a header on the Response.
-	 *
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @param  bool  $replace
-	 * @return \Illuminate\Http\RedirectResponse
-	 */
-	public function header($key, $value, $replace = true)
-	{
-		$this->headers->set($key, $value, $replace);
-
-		return $this;
-	}
 
 	/**
 	 * Flash a piece of data to the session.
@@ -54,19 +41,6 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 		{
 			$this->session->flash($key, $value);
 		}
-
-		return $this;
-	}
-
-	/**
-	 * Add a cookie to the response.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return \Illuminate\Http\RedirectResponse
-	 */
-	public function withCookie(Cookie $cookie)
-	{
-		$this->headers->setCookie($cookie);
 
 		return $this;
 	}
