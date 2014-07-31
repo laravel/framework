@@ -329,6 +329,38 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 
+
+	public function testCallWithDependencies()
+	{
+		$container = new Container;
+		$result = $container->call(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		});
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals([], $result[1]);
+
+		$result = $container->call(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		}, ['bar' => 'taylor']);
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+
+		/**
+		 * Wrap a function...
+		 */
+		$result = $container->wrap(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		}, ['bar' => 'taylor']);
+
+		$this->assertInstanceOf('Closure', $result);
+		$result = $result();
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+	}
+
 }
 
 class ContainerConcreteStub {}
