@@ -4,11 +4,11 @@ use Closure;
 use ReflectionMethod;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
-use Illuminate\Support\Traits\MethodDependencyResolverTrait;
+use Illuminate\Routing\RouteDependencyResolverTrait;
 
 class ControllerDispatcher {
 
-	use MethodDependencyResolverTrait;
+	use RouteDependencyResolverTrait;
 
 	/**
 	 * The routing filterer implementation.
