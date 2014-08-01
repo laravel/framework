@@ -229,7 +229,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function match($methods, $uri, $action)
 	{
-		return $this->addRoute($methods, $uri, $action);
+		return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
 	}
 
 	/**
