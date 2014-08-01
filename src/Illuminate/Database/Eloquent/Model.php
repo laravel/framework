@@ -2682,32 +2682,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Determine if the model or given attribute(s) have been modified.
 	 *
-	 * @param  string|array|null  $attribute
+	 * @param  string|array|null  $attributes
 	 * @return bool
 	 */
-	public function isDirty($attribute = null)
+	public function isDirty($attributes = null)
 	{
 		$dirty = $this->getDirty();
 
-		if (func_num_args() > 1) $attribute = func_get_args();
+		if (is_null($attributes)) return count($dirty) > 0;
 
-		if (is_null($attribute))
+		if ( ! is_array($attributes)) $attributes = func_get_args();
+		
+		foreach ($attributes as $attr)
 		{
-			return count($dirty) > 0;
+			if (array_key_exists($attr, $dirty)) return true;
 		}
-		elseif (is_array($attribute))
-		{
-			foreach ($attribute as $attr)
-			{
-				if (array_key_exists($attr, $dirty)) return true;
-			}
 
-			return false;
-		}
-		else
-		{
-			return array_key_exists($attribute, $dirty);
-		}
+		return false;
 	}
 
 	/**
