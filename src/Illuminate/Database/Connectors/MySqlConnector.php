@@ -48,7 +48,8 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	}
 
 	/**
-	 * Create a DSN string from a configuration.
+	 * Create a DSN string from a configuration. Chooses socket or host/port based on
+	 * the 'unix_socket' config value
 	 *
 	 * @param  array   $config
 	 * @return string
