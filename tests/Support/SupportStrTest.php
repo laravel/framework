@@ -58,6 +58,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(Str::endsWith('jason', 'no'));
 		$this->assertFalse(Str::endsWith('jason', array('no')));
 		$this->assertFalse(Str::endsWith('jason', ''));
+		$this->assertFalse(Str::endsWith('7', ' 7'));
 	}
 
 
