@@ -371,7 +371,7 @@ class Filesystem {
 		foreach ($items as $item)
 		{
 			// If the item is a directory, we can just recurse into the function and
-			// delete that sub-director, otherwise we'll just delete the file and
+			// delete that sub-directory otherwise we'll just delete the file and
 			// keep iterating through each file until the directory is cleaned.
 			if ($item->isDir())
 			{
