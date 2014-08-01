@@ -698,7 +698,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @param  string  $class
 	 * @param  array  $parameters
-	 * @return \Illuminate\Foundation\Application
+	 * @return $this
 	 */
 	public function middleware($class, array $parameters = array())
 	{

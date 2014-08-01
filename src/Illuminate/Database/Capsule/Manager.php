@@ -173,7 +173,7 @@ class Manager {
 	 * Set the fetch mode for the database connections.
 	 *
 	 * @param  int  $fetchMode
-	 * @return \Illuminate\Database\Capsule\Manager
+	 * @return $this
 	 */
 	public function setFetchMode($fetchMode)
 	{

@@ -372,7 +372,7 @@ class Route {
 	 * Bind the route to a given request for execution.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	public function bind(Request $request)
 	{
@@ -537,7 +537,7 @@ class Route {
 	 * Add before filters to the route.
 	 *
 	 * @param  string  $filters
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	public function before($filters)
 	{
@@ -548,7 +548,7 @@ class Route {
 	 * Add after filters to the route.
 	 *
 	 * @param  string  $filters
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	public function after($filters)
 	{
@@ -560,7 +560,7 @@ class Route {
 	 *
 	 * @param  string  $type
 	 * @param  string  $filters
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	protected function addFilters($type, $filters)
 	{
@@ -581,7 +581,7 @@ class Route {
 	 *
 	 * @param  string  $key
 	 * @param  mixed  $value
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	public function defaults($key, $value)
 	{
@@ -595,7 +595,7 @@ class Route {
 	 *
 	 * @param  array|string  $name
 	 * @param  string  $expression
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	public function where($name, $expression = null)
 	{
@@ -612,7 +612,7 @@ class Route {
 	 *
 	 * @param  array|string  $name
 	 * @param  string  $expression
-	 * @return \Illuminate\Routing\Route
+	 * @return array
 	 */
 	protected function parseWhere($name, $expression)
 	{
@@ -623,7 +623,7 @@ class Route {
 	 * Set a list of regular expression requirements on the route.
 	 *
 	 * @param  array  $wheres
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	protected function whereArray(array $wheres)
 	{
@@ -639,7 +639,7 @@ class Route {
 	 * Add a prefix to the route URI.
 	 *
 	 * @param  string  $prefix
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	public function prefix($prefix)
 	{
@@ -795,7 +795,7 @@ class Route {
 	 * Set the action array for the route.
 	 *
 	 * @param  array  $action
-	 * @return \Illuminate\Routing\Route
+	 * @return $this
 	 */
 	public function setAction(array $action)
 	{
