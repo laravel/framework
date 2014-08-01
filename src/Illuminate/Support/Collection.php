@@ -34,7 +34,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Create a new collection instance if the value isn't one already.
 	 *
 	 * @param  mixed  $items
-	 * @return \Illuminate\Support\Collection
+	 * @return static
 	 */
 	public static function make($items)
 	{
@@ -58,7 +58,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Collapse the collection items into a single array.
 	 *
-	 * @return \Illuminate\Support\Collection
+	 * @return static
 	 */
 	public function collapse()
 	{
@@ -92,7 +92,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Diff the collection with the given items.
 	 *
 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
-	 * @return \Illuminate\Support\Collection
+	 * @return static
 	 */
 	public function diff($items)
 	{
@@ -426,7 +426,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Create a colleciton of all elements that do not pass a given truth test.
 	 *
 	 * @param  \Closure|mixed  $callback
-	 * @return \Illuminate\Support\Collection
+	 * @return static
 	 */
 	public function reject($callback)
 	{
