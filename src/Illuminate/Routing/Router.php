@@ -1734,7 +1734,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
