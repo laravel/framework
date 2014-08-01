@@ -225,36 +225,6 @@ $app->booted(function() use ($app, $env)
 
 	/*
 	|--------------------------------------------------------------------------
-	| Load The Application Start Script
-	|--------------------------------------------------------------------------
-	|
-	| The start scripts gives this application the opportunity to override
-	| any of the existing IoC bindings, as well as register its own new
-	| bindings for things like repositories, etc. We'll load it here.
-	|
-	*/
-
-	$path = $app['path'].'/start/global.php';
-
-	if (file_exists($path)) require $path;
-
-	/*
-	|--------------------------------------------------------------------------
-	| Load The Environment Start Script
-	|--------------------------------------------------------------------------
-	|
-	| The environment start script is only loaded if it exists for the app
-	| environment currently active, which allows some actions to happen
-	| in one environment while not in the other, keeping things clean.
-	|
-	*/
-
-	$path = $app['path']."/start/{$env}.php";
-
-	if (file_exists($path)) require $path;
-
-	/*
-	|--------------------------------------------------------------------------
 	| Load The Application Routes
 	|--------------------------------------------------------------------------
 	|
@@ -264,7 +234,7 @@ $app->booted(function() use ($app, $env)
 	|
 	*/
 
-	$routes = $app['path'].'/routes.php';
+	$routes = $app['path'].'/routing/routes.php';
 
 	if (file_exists($routes)) require $routes;
 

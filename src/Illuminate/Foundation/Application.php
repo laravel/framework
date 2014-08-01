@@ -761,13 +761,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function dispatch(Request $request)
 	{
-		if ($this->isDownForMaintenance())
-		{
-			$response = $this['events']->until('illuminate.app.down');
-
-			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
-		}
-
 		if ($this->runningUnitTests() && ! $this['session']->isStarted())
 		{
 			$this['session']->start();
