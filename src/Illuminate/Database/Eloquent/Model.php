@@ -387,7 +387,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Fill the model with an array of attributes.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return $this
 	 *
 	 * @throws MassAssignmentException
 	 */
@@ -436,7 +436,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  array  $attributes
 	 * @param  bool   $exists
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return static
 	 */
 	public function newInstance($attributes = array(), $exists = false)
 	{
@@ -454,7 +454,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Create a new model instance that is existing.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return static
 	 */
 	public function newFromBuilder($attributes = array())
 	{
@@ -517,7 +517,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Save a new model and return the instance.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return static
 	 */
 	public static function create(array $attributes)
 	{
@@ -532,7 +532,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get the first record matching the attributes or create it.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return static
 	 */
 	public static function firstOrCreate(array $attributes)
 	{
@@ -548,7 +548,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get the first record matching the attributes or instantiate it.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return static
 	 */
 	public static function firstOrNew(array $attributes)
 	{
@@ -565,7 +565,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  array  $attributes
 	 * @param  array  $values
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return static
 	 */
 	public static function updateOrCreate(array $attributes, array $values = array())
 	{
@@ -580,7 +580,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get the first model for the given attributes.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|null
+	 * @return static|null
 	 */
 	protected static function firstByAttributes($attributes)
 	{
@@ -633,7 +633,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 * @return \Illuminate\Support\Collection|static
 	 */
 	public static function find($id, $columns = array('*'))
 	{
@@ -649,7 +649,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 * @return \Illuminate\Support\Collection|static
 	 */
 	public static function findOrNew($id, $columns = array('*'))
 	{
@@ -663,7 +663,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 * @return \Illuminate\Support\Collection|static
 	 *
 	 * @throws ModelNotFoundException
 	 */
@@ -678,7 +678,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function load($relations)
 	{
@@ -1990,7 +1990,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the fillable attributes for the model.
 	 *
 	 * @param  array  $fillable
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function fillable(array $fillable)
 	{
@@ -2003,7 +2003,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the guarded attributes for the model.
 	 *
 	 * @param  array  $guarded
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function guard(array $guarded)
 	{
@@ -2657,7 +2657,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Sync the original attributes with the current.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function syncOriginal()
 	{
@@ -2670,7 +2670,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Sync a single original attribute with its current value.
 	 *
 	 * @param  string  $attribute
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function syncOriginalAttribute($attribute)
 	{
@@ -2765,7 +2765,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $relation
 	 * @param  mixed   $value
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setRelation($relation, $value)
 	{
@@ -2778,7 +2778,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the entire relations array on the model.
 	 *
 	 * @param  array  $relations
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setRelations(array $relations)
 	{
@@ -2811,7 +2811,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the connection associated with the model.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setConnection($name)
 	{

@@ -207,7 +207,7 @@ class MorphTo extends BelongsTo {
 	/**
 	 * Fetch soft-deleted model instances with query
 	 *
-	 * @return MorphTo
+	 * @return $this
 	 */
 	public function withTrashed()
 	{
