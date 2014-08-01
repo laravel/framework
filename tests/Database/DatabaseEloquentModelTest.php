@@ -114,18 +114,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-    public function testModelReloadData()
-    {
-        $model = EloquentModelReloadStub::find(1);
-        $model->foo = 1;
-        $this->assertTrue($model->isDirty('foo'));
-        $model->reload();
-        $this->assertEquals('bar', $model->foo);
-        $this->assertFalse($model->isDirty('foo'));
-    }
+	public function testModelReloadData()
+	{
+		$model = EloquentModelReloadStub::find(1);
+		$model->foo = 1;
+		$this->assertTrue($model->isDirty('foo'));
+		$model->reload();
+		$this->assertEquals('bar', $model->foo);
+		$this->assertFalse($model->isDirty('foo'));
+	}
 
 
-    public function testDestroyMethodCallsQueryBuilderCorrectly()
+	public function testDestroyMethodCallsQueryBuilderCorrectly()
 	{
 		$result = EloquentModelDestroyStub::destroy(1, 2, 3);
 	}

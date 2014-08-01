@@ -674,24 +674,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		throw (new ModelNotFoundException)->setModel(get_called_class());
 	}
 
-    /**
-     * Reload attributes of model instance
-     *
-     * @return void
-     */
-    public function reload()
-    {
-        if (!$this->exists) { 
-            return;
-        }
+	/**
+	 * Reload attributes of model instance
+	 *
+	 * @return void
+	 */
+	public function reload()
+	{
+		if (!$this->exists) { 
+			return;
+		}
 
-        // Get new instance
-        $model = static::find($this->getKey(), array_keys($this->attributes));
-        
-        // Reload attributes
-        $this->attributes = $model->getAttributes();
-        $this->syncOriginal();
-    }
+		// Get new instance
+		$model = static::find($this->getKey(), array_keys($this->attributes));
+
+		// Reload attributes
+		$this->attributes = $model->getAttributes();
+		$this->syncOriginal();
+	}
 
 	/**
 	 * Eager load relations on the model.
