@@ -28,8 +28,8 @@ class Collection extends BaseCollection {
 	/**
 	 * Load a set of relationships onto the collection.
 	 *
-	 * @param  dynamic  $relations
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @param  mixed  $relations
+	 * @return $this
 	 */
 	public function load($relations)
 	{
@@ -49,7 +49,7 @@ class Collection extends BaseCollection {
 	 * Add an item to the collection.
 	 *
 	 * @param  mixed  $item
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return $this
 	 */
 	public function add($item)
 	{

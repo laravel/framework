@@ -127,7 +127,7 @@ class Pivot extends Model {
 	 *
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
-	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
+	 * @return $this
 	 */
 	public function setPivotKeys($foreignKey, $otherKey)
 	{

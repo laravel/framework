@@ -468,7 +468,7 @@ class Mailer {
 	 * Set the log writer instance.
 	 *
 	 * @param  \Illuminate\Log\Writer  $logger
-	 * @return \Illuminate\Mail\Mailer
+	 * @return $this
 	 */
 	public function setLogger(Writer $logger)
 	{
@@ -481,7 +481,7 @@ class Mailer {
 	 * Set the queue manager instance.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $queue
-	 * @return \Illuminate\Mail\Mailer
+	 * @return $this
 	 */
 	public function setQueue(QueueManager $queue)
 	{

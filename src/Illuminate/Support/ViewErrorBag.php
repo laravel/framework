@@ -27,7 +27,7 @@ class ViewErrorBag implements Countable {
 	 *
 	 * @param  string  $key
 	 * @param  \Illuminate\Support\MessageBag  $bag
-	 * @return \Illuminate\Support\ViewErrorBag
+	 * @return $this
 	 */
 	public function put($key, MessageBag $bag)
 	{

@@ -2130,7 +2130,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the validation rules.
 	 *
 	 * @param  array  $rules
-	 * @return \Illuminate\Validation\Validator
+	 * @return $this
 	 */
 	public function setRules(array $rules)
 	{
@@ -2143,7 +2143,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the custom attributes on the validator.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Validation\Validator
+	 * @return $this
 	 */
 	public function setAttributeNames(array $attributes)
 	{
@@ -2166,7 +2166,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the files under validation.
 	 *
 	 * @param  array  $files
-	 * @return \Illuminate\Validation\Validator
+	 * @return $this
 	 */
 	public function setFiles(array $files)
 	{
