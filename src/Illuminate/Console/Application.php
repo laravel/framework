@@ -56,7 +56,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Boot the Console application.
 	 *
-	 * @return \Illuminate\Console\Application
+	 * @return $this
 	 */
 	public function boot()
 	{
@@ -198,7 +198,7 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Set the exception handler instance.
 	 *
 	 * @param  \Illuminate\Exception\Handler  $handler
-	 * @return \Illuminate\Console\Application
+	 * @return $this
 	 */
 	public function setExceptionHandler($handler)
 	{
@@ -211,7 +211,7 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Set the Laravel application instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $laravel
-	 * @return \Illuminate\Console\Application
+	 * @return $this
 	 */
 	public function setLaravel($laravel)
 	{
@@ -224,7 +224,7 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Set whether the Console app should auto-exit when done.
 	 *
 	 * @param  bool  $boolean
-	 * @return \Illuminate\Console\Application
+	 * @return $this
 	 */
 	public function setAutoExit($boolean)
 	{

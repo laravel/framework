@@ -22,7 +22,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Return the Request instance.
 	 *
-	 * @return \Illuminate\Http\Request
+	 * @return $this
 	 */
 	public function instance()
 	{

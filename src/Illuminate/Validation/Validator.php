@@ -1288,11 +1288,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$param = $this->getValue($parameters[0]) ?: $parameters[0];
 
-		$dateValue = DateTime::createFromFormat($format, $value);
-
-		$dateParam = DateTime::createFromFormat($format, $param) ?: new DateTime($param);
-
-		return ($dateValue && $dateParam) && ($dateValue < $dateParam);
+		return $this->checkDateTimeOrder($format, $value, $param);
 	}
 
 	/**
@@ -1334,11 +1330,47 @@ class Validator implements MessageProviderInterface {
 	{
 		$param = $this->getValue($parameters[0]) ?: $parameters[0];
 
-		$dateValue = DateTime::createFromFormat($format, $value);
+		return $this->checkDateTimeOrder($format, $param, $value);
+	}
 
-		$dateParam = DateTime::createFromFormat($format, $param) ?: new DateTime($param);
+	/**
+	 * Given two date/time strings, check that one is after the other.
+	 *
+	 * @param  string $format
+	 * @param  string $before
+	 * @param  string $after
+	 * @return bool
+	 */
+	protected function checkDateTimeOrder($format, $before, $after)
+	{
+		$before = $this->getDateTimeWithOptionalFormat($format, $before);
 
-		return ($dateValue && $dateParam) && ($dateValue > $dateParam);
+		$after = $this->getDateTimeWithOptionalFormat($format, $after);
+
+		return ($before && $after) && ($after > $before);
+	}
+
+	/**
+	 * Get a DateTime instance from a string.
+	 *
+	 * @param  string $format
+	 * @param  string $value
+	 * @return \DateTime|null
+	 */
+	protected function getDateTimeWithOptionalFormat($format, $value)
+	{
+		$date = DateTime::createFromFormat($format, $value);
+
+		if ($date) return $date;
+
+		try
+		{
+			return new DateTime($value);
+		}
+		catch (\Exception $e)
+		{
+			return null;
+		}
 	}
 
 	/**
@@ -2098,7 +2130,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the validation rules.
 	 *
 	 * @param  array  $rules
-	 * @return \Illuminate\Validation\Validator
+	 * @return $this
 	 */
 	public function setRules(array $rules)
 	{
@@ -2111,7 +2143,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the custom attributes on the validator.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Validation\Validator
+	 * @return $this
 	 */
 	public function setAttributeNames(array $attributes)
 	{
@@ -2134,7 +2166,7 @@ class Validator implements MessageProviderInterface {
 	 * Set the files under validation.
 	 *
 	 * @param  array  $files
-	 * @return \Illuminate\Validation\Validator
+	 * @return $this
 	 */
 	public function setFiles(array $files)
 	{

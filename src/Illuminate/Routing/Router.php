@@ -229,7 +229,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function match($methods, $uri, $action)
 	{
-		return $this->addRoute($methods, $uri, $action);
+		return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
 	}
 
 	/**
@@ -1736,7 +1736,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  int   $type
 	 * @param  bool  $catch
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
