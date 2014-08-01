@@ -28,8 +28,8 @@ class Collection extends BaseCollection {
 	/**
 	 * Load a set of relationships onto the collection.
 	 *
-	 * @param  dynamic  $relations
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @param  mixed  $relations
+	 * @return $this
 	 */
 	public function load($relations)
 	{
@@ -49,7 +49,7 @@ class Collection extends BaseCollection {
 	 * Add an item to the collection.
 	 *
 	 * @param  mixed  $item
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return $this
 	 */
 	public function add($item)
 	{
@@ -73,7 +73,7 @@ class Collection extends BaseCollection {
 	 * Fetch a nested element of the collection.
 	 *
 	 * @param  string  $key
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return static
 	 */
 	public function fetch($key)
 	{
@@ -122,7 +122,7 @@ class Collection extends BaseCollection {
 	 * Merge the collection with the given items.
 	 *
 	 * @param  \ArrayAccess|array  $items
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return static
 	 */
 	public function merge($items)
 	{
@@ -140,7 +140,7 @@ class Collection extends BaseCollection {
 	 * Diff the collection with the given items.
 	 *
 	 * @param  \ArrayAccess|array  $items
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return static
 	 */
 	public function diff($items)
 	{
@@ -163,7 +163,7 @@ class Collection extends BaseCollection {
 	 * Intersect the collection with the given items.
 	 *
  	 * @param  \ArrayAccess|array  $items
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return static
 	 */
 	public function intersect($items)
 	{
@@ -185,7 +185,7 @@ class Collection extends BaseCollection {
 	/**
 	 * Return only unique items from the collection.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return static
 	 */
 	public function unique()
 	{
@@ -198,7 +198,7 @@ class Collection extends BaseCollection {
 	 * Returns only the models from the collection with the specified keys.
 	 *
 	 * @param  mixed  $keys
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return static
 	 */
 	public function only($keys)
 	{
@@ -211,7 +211,7 @@ class Collection extends BaseCollection {
 	 * Returns all models in the collection except the models with specified keys.
 	 *
 	 * @param  mixed  $keys
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return static
 	 */
 	public function except($keys)
 	{

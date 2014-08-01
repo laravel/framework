@@ -145,7 +145,7 @@ class CookieJar {
 	 *
 	 * @param  string  $path
 	 * @param  string  $domain
-	 * @return self
+	 * @return $this
 	 */
 	public function setDefaultPathAndDomain($path, $domain)
 	{

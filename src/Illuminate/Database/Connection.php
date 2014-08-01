@@ -688,7 +688,7 @@ class Connection implements ConnectionInterface {
 	 * Set the PDO connection.
 	 *
 	 * @param  \PDO  $pdo
-	 * @return \Illuminate\Database\Connection
+	 * @return $this
 	 */
 	public function setPdo(PDO $pdo)
 	{
@@ -701,7 +701,7 @@ class Connection implements ConnectionInterface {
 	 * Set the PDO connection used for reading.
 	 *
 	 * @param  \PDO  $pdo
-	 * @return \Illuminate\Database\Connection
+	 * @return $this
 	 */
 	public function setReadPdo(PDO $pdo)
 	{

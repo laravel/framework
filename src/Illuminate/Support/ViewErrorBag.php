@@ -27,7 +27,7 @@ class ViewErrorBag implements Countable {
 	 *
 	 * @param  string  $key
 	 * @param  \Illuminate\Support\MessageBag  $bag
-	 * @return \Illuminate\Support\ViewErrorBag
+	 * @return $this
 	 */
 	public function put($key, MessageBag $bag)
 	{
@@ -61,6 +61,7 @@ class ViewErrorBag implements Countable {
 	/**
 	 * Dynamically access a view error bag.
 	 *
+	 * @param  string  $key
 	 * @return \Illuminate\Support\MessageBag
 	 */
 	public function __get($key)
