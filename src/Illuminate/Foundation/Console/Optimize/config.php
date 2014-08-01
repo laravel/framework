@@ -3,7 +3,6 @@
 $basePath = $app['path.base'];
 
 return array_map('realpath', array(
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Support/ClassLoader.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Container/Container.php',
     $basePath.'/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/HttpKernelInterface.php',
     $basePath.'/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/TerminableInterface.php',
