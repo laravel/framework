@@ -974,7 +974,7 @@ class Builder {
 	 */
 	public function groupBy()
 	{
-		foreach(func_get_args() as $arg)
+		foreach (func_get_args() as $arg)
 		{
 			$this->groups = array_merge((array) $this->groups, is_array($arg) ? $arg : [$arg]);
 		}
