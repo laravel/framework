@@ -690,7 +690,7 @@ class Guard {
 	 * Set the current request instance.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request
-	 * @return \Illuminate\Auth\Guard
+	 * @return $this
 	 */
 	public function setRequest(Request $request)
 	{

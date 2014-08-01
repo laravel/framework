@@ -107,7 +107,7 @@ abstract class Manager {
 	 *
 	 * @param  string    $driver
 	 * @param  \Closure  $callback
-	 * @return \Illuminate\Support\Manager|static
+	 * @return $this
 	 */
 	public function extend($driver, Closure $callback)
 	{

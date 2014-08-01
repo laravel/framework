@@ -387,7 +387,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Fill the model with an array of attributes.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return $this
 	 *
 	 * @throws MassAssignmentException
 	 */
@@ -678,7 +678,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function load($relations)
 	{
@@ -1990,7 +1990,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the fillable attributes for the model.
 	 *
 	 * @param  array  $fillable
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function fillable(array $fillable)
 	{
@@ -2003,7 +2003,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the guarded attributes for the model.
 	 *
 	 * @param  array  $guarded
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function guard(array $guarded)
 	{
@@ -2657,7 +2657,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Sync the original attributes with the current.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function syncOriginal()
 	{
@@ -2670,7 +2670,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Sync a single original attribute with its current value.
 	 *
 	 * @param  string  $attribute
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function syncOriginalAttribute($attribute)
 	{
@@ -2765,7 +2765,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $relation
 	 * @param  mixed   $value
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setRelation($relation, $value)
 	{
@@ -2778,7 +2778,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the entire relations array on the model.
 	 *
 	 * @param  array  $relations
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setRelations(array $relations)
 	{
@@ -2811,7 +2811,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the connection associated with the model.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setConnection($name)
 	{

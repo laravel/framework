@@ -136,7 +136,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 *
 	 * @param  string  $method
 	 * @param  array   $parameters
-	 * @return \Illuminate\Support\Fluent
+	 * @return $this
 	 */
 	public function __call($method, $parameters)
 	{

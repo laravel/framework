@@ -86,7 +86,7 @@ class Composer {
 	 * Set the working path used by the class.
 	 *
 	 * @param  string  $path
-	 * @return \Illuminate\Foundation\Composer
+	 * @return $this
 	 */
 	public function setWorkingPath($path)
 	{

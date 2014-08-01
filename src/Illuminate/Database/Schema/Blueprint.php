@@ -765,7 +765,7 @@ class Blueprint {
 	 * Remove a column from the schema blueprint.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Database\Schema\Blueprint
+	 * @return $this
 	 */
 	public function removeColumn($name)
 	{
