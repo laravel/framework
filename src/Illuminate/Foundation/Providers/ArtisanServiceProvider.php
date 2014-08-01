@@ -22,6 +22,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		// This Artisan class is a lightweight wrapper for calling into the Artisan
+		// command line. If a call to this class is executed we will boot up the
+		// entire Artisan command line then pass the method into the main app.
 		$this->app->bindShared('artisan', function($app)
 		{
 			return new Artisan($app);
