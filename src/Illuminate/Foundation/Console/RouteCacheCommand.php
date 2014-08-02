@@ -73,7 +73,7 @@ class RouteCacheCommand extends Command {
 
 		if ($this->laravel->routesAreCached())
 		{
-			return $this->error("Route cache file already exists!");
+			return $this->error("Route cache already exists!");
 		}
 
 		foreach ($this->routes as $route)
