@@ -675,6 +675,22 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Reload model data from the database.
+	 *
+	 * @return void
+	 */
+	public function reload()
+	{
+		if ($this->exists)
+		{
+			$model = static::find($this->getKey(), array_keys($this->getAttributes()));
+
+			// Update the current model and sync with original attributes.
+			$this->setRawAttributes($model->getAttributes(), true);
+		}
+	}
+
+	/**
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
