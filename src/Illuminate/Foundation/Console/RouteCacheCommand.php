@@ -7,14 +7,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Routing\Generators\ControllerGenerator;
 
-class RoutesCacheCommand extends Command {
+class RouteCacheCommand extends Command {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'routes:cache';
+	protected $name = 'route:cache';
 
 	/**
 	 * The console command description.
