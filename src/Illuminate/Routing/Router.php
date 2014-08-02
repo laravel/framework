@@ -1685,6 +1685,17 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	}
 
 	/**
+	 * Set the route collection instance.
+	 *
+	 * @param  \Illuminate\Routing\RouteCollection  $routes
+	 * @return void
+	 */
+	public function setRoutes(RouteCollection $routes)
+	{
+		$this->routes = $routes;
+	}
+
+	/**
 	 * Get the controller dispatcher instance.
 	 *
 	 * @return \Illuminate\Routing\ControllerDispatcher

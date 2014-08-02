@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Routing;
 
+use Closure;
 use ReflectionFunction;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
@@ -70,6 +71,13 @@ class Route {
 	 * @var \Symfony\Component\Routing\CompiledRoute
 	 */
 	protected $compiled;
+
+	/**
+	 * The container instance used by the route.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
 
 	/**
 	 * The validators used by the routes.
@@ -863,6 +871,23 @@ class Route {
 	public function getCompiled()
 	{
 		return $this->compiled;
+	}
+
+	/**
+	 * Prepare the route instance for serialization.
+	 *
+	 * @return void
+	 */
+	public function prepareForSerialization()
+	{
+		if ($this->action['uses'] instanceof Closure)
+		{
+			throw new \LogicException("Unable to prepare route [{$this->route}] for serialization. Uses Closure.");
+		}
+
+		unset($this->container);
+
+		unset($this->compiled);
 	}
 
 }

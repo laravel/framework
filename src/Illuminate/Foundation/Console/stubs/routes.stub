@@ -1,0 +1,10 @@
+
+$routes = unserialize('{{routes}}');
+
+foreach ($routes as $route)
+{
+	$route->setContainer($app);
+}
+
+$app->make('router')->setRoutes($routes);
+
