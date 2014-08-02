@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Console\RoutesCacheCommand;
+use Illuminate\Foundation\Console\RouteCacheCommand;
 
 class RouteCacheServiceProvider extends ServiceProvider {
 

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Console\RoutesListCommand;
+use Illuminate\Foundation\Console\RouteListCommand;
 
 class RouteListServiceProvider extends ServiceProvider {
 
