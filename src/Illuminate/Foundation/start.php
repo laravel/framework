@@ -236,7 +236,7 @@ $app->booted(function() use ($app, $env)
 
 	if ($app->routesAreCached())
 	{
-		require $app['path'].'/routing/cached.php';
+		require $app['path'].'/routing/cache.php';
 	}
 	else
 	{
