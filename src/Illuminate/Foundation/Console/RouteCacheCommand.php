@@ -71,6 +71,11 @@ class RouteCacheCommand extends Command {
 			return $this->error("Your application doesn't have any routes.");
 		}
 
+		if ($this->laravel->routesAreCached())
+		{
+			return $this->error("Route cache file already exists!");
+		}
+
 		foreach ($this->routes as $route)
 		{
 			$route->prepareForSerialization();
