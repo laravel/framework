@@ -722,6 +722,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if the application routes are cached.
+	 *
+	 * @return bool
+	 */
+	public function routesAreCached()
+	{
+		return $this['files']->exists($this['path'].'/routing/cached.php');
+	}
+
+	/**
 	 * Handle the given request and get the response.
 	 *
 	 * Provides compatibility with BrowserKit functional testing.
