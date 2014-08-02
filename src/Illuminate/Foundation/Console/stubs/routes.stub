@@ -1,5 +1,6 @@
+<?php
 
-$routes = unserialize('{{routes}}');
+$routes = unserialize(base64_decode('{{routes}}'));
 
 foreach ($routes as $route)
 {
