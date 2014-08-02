@@ -19,12 +19,12 @@ class RouteCacheServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->bindShared('command.routes.cache', function($app)
+		$this->app->bindShared('command.route.cache', function($app)
 		{
-			return new RoutesCacheCommand($app['router'], $app['files']);
+			return new RouteCacheCommand($app['router'], $app['files']);
 		});
 
-		$this->commands('command.routes.cache');
+		$this->commands('command.route.cache');
 	}
 
 	/**
@@ -34,7 +34,7 @@ class RouteCacheServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.routes.cache');
+		return array('command.route.cache');
 	}
 
 }

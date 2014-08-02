@@ -19,12 +19,12 @@ class RouteListServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->bindShared('command.routes.list', function($app)
+		$this->app->bindShared('command.route.list', function($app)
 		{
-			return new RoutesListCommand($app['router']);
+			return new RouteListCommand($app['router']);
 		});
 
-		$this->commands('command.routes.list');
+		$this->commands('command.route.list');
 	}
 
 	/**
@@ -34,7 +34,7 @@ class RouteListServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.routes.list');
+		return array('command.route.list');
 	}
 
 }
