@@ -850,6 +850,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelReloadData()
+	{
+		$model = EloquentModelReloadStub::find(1);
+		$model->foo = 1;
+		$this->assertTrue($model->isDirty('foo'));
+		$model->reload();
+		$this->assertEquals('bar', $model->foo);
+ 		$this->assertFalse($model->isDirty('foo'));
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -941,6 +952,19 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
+		return $mock;
+	}
+}
+
+class EloquentModelReloadStub extends Illuminate\Database\Eloquent\Model {
+	protected $attributes = array('foo' => 'bar');
+	protected $original = array('foo' => 'bar');
+	public $exists = true;
+	public function getKey() { return 1; }
+	public function newQuery()
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn($this);
 		return $mock;
 	}
 }
