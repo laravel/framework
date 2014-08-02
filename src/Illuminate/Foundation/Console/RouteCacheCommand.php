@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Routing\RouteCollection;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -23,20 +23,6 @@ class RouteCacheCommand extends Command {
 	protected $description = 'Create a route cache file for faster route registration.';
 
 	/**
-	 * The router instance.
-	 *
-	 * @var \Illuminate\Routing\Router
-	 */
-	protected $router;
-
-	/**
-	 * An array of all the registered routes.
-	 *
-	 * @var \Illuminate\Routing\RouteCollection
-	 */
-	protected $routes;
-
-	/**
 	 * The filesystem instance.
 	 *
 	 * @var \Illuminate\Filesystem\Filesystem
@@ -46,17 +32,14 @@ class RouteCacheCommand extends Command {
 	/**
 	 * Create a new route command instance.
 	 *
-	 * @param  \Illuminate\Routing\Router  $router
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(Router $router, Filesystem $files)
+	public function __construct(Filesystem $files)
 	{
 		parent::__construct();
 
 		$this->files = $files;
-		$this->router = $router;
-		$this->routes = $router->getRoutes();
 	}
 
 	/**
@@ -66,38 +49,52 @@ class RouteCacheCommand extends Command {
 	 */
 	public function fire()
 	{
-		if (count($this->routes) == 0)
+		$this->call('route:clear');
+
+		$routes = $this->getFreshApplicationRoutes();
+
+		if (count($routes) == 0)
 		{
 			return $this->error("Your application doesn't have any routes.");
 		}
 
-		if ($this->laravel->routesAreCached())
-		{
-			return $this->error("Route cache already exists!");
-		}
-
-		foreach ($this->routes as $route)
+		foreach ($routes as $route)
 		{
 			$route->prepareForSerialization();
 		}
 
 		$this->files->put(
-			$this->laravel['path'].'/routing/cache.php', $this->buildRouteCacheFile()
+			$this->laravel['path'].'/routing/cache.php', $this->buildRouteCacheFile($routes)
 		);
 
 		$this->info('Routes cached successfully!');
 	}
 
 	/**
+	 * Boot a fresh copy of the application and get the routes.
+	 *
+	 * @return \Illuminate\Routing\RouteCollection
+	 */
+	protected function getFreshApplicationRoutes()
+	{
+		$app = require $this->laravel['path.base'].'/bootstrap/start.php';
+
+		$app->boot();
+
+		return $app['router']->getRoutes();
+	}
+
+	/**
 	 * Built the route cache file.
 	 *
+	 * @param  \Illuminate\Routing\RouteCollection  $routes
 	 * @return string
 	 */
-	protected function buildRouteCacheFile()
+	protected function buildRouteCacheFile(RouteCollection $routes)
 	{
 		$stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-		return str_replace('{{routes}}', base64_encode(serialize($this->routes)), $stub);
+		return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
 	}
 
 }

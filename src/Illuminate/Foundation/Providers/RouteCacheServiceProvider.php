@@ -22,7 +22,7 @@ class RouteCacheServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.route.cache', function($app)
 		{
-			return new RouteCacheCommand($app['router'], $app['files']);
+			return new RouteCacheCommand($app['files']);
 		});
 
 		$this->app->bindShared('command.route.clear', function($app)
