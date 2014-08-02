@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Queue;
 
-use Illuminate\Redis\Database;
+use Illuminate\Redis\RedisInterface;
 use Illuminate\Queue\Jobs\RedisJob;
 
 class RedisQueue extends Queue implements QueueInterface {
@@ -8,7 +8,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	/**
 	* The Redis database instance.
 	*
-	 * @var \Illuminate\Redis\Database
+	 * @var \Illuminate\Redis\RedisInterface
 	 */
 	protected $redis;
 
@@ -29,12 +29,12 @@ class RedisQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new Redis queue instance.
 	 *
-	 * @param  \Illuminate\Redis\Database  $redis
+	 * @param  \Illuminate\Redis\RedisInterface  $redis
 	 * @param  string  $default
 	 * @param  string  $connection
 	 * @return void
 	 */
-	public function __construct(Database $redis, $default = 'default', $connection = null)
+	public function __construct(RedisInterface $redis, $default = 'default', $connection = null)
 	{
 		$this->redis = $redis;
 		$this->default = $default;
@@ -119,7 +119,7 @@ class RedisQueue extends Queue implements QueueInterface {
 
 		$job = $this->redis->lpop($queue);
 
-		if ( ! is_null($job))
+		if ( ! is_null($job) && $job !== false)
 		{
 			$this->redis->zadd($queue.':reserved', $this->getTime() + 60, $job);
 
@@ -236,7 +236,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	/**
 	 * Get the underlying Redis instance.
 	 *
-	 * @return \Illuminate\Redis\Database
+	 * @return \Illuminate\Redis\RedisInterface
 	 */
 	public function getRedis()
 	{
