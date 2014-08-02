@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Console\RoutesCommand;
+use Illuminate\Foundation\Console\RoutesListCommand;
 
 class RouteListServiceProvider extends ServiceProvider {
 
@@ -19,12 +19,12 @@ class RouteListServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->bindShared('command.routes', function($app)
+		$this->app->bindShared('command.routes.list', function($app)
 		{
-			return new RoutesCommand($app['router']);
+			return new RoutesListCommand($app['router']);
 		});
 
-		$this->commands('command.routes');
+		$this->commands('command.routes.list');
 	}
 
 	/**
@@ -34,7 +34,7 @@ class RouteListServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.routes');
+		return array('command.routes.list');
 	}
 
 }

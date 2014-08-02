@@ -6,14 +6,14 @@ use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
-class RoutesCommand extends Command {
+class RoutesListCommand extends Command {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'routes';
+	protected $name = 'routes:list';
 
 	/**
 	 * The console command description.
