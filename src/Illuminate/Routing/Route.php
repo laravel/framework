@@ -882,7 +882,7 @@ class Route {
 	{
 		if ($this->action['uses'] instanceof Closure)
 		{
-			throw new \LogicException("Unable to prepare route [{$this->route}] for serialization. Uses Closure.");
+			throw new \LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
 		}
 
 		unset($this->container);

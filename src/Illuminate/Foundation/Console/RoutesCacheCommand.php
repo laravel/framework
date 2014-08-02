@@ -76,8 +76,8 @@ class RoutesCacheCommand extends Command {
 			$route->prepareForSerialization();
 		}
 
-		$this->files->write(
-			$this->app['path'].'/routing/cache.php', $this->buildRouteCacheFile()
+		$this->files->put(
+			$this->laravel['path'].'/routing/cache.php', $this->buildRouteCacheFile()
 		);
 
 		$this->info('Routes Cached!');
@@ -92,7 +92,7 @@ class RoutesCacheCommand extends Command {
 	{
 		$stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-		return str_replace('{{routes}}', serialize($this->routes), $stub);
+		return str_replace('{{routes}}', base64_encode(serialize($this->routes)), $stub);
 	}
 
 }
