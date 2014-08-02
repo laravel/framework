@@ -106,14 +106,21 @@ class Route {
 	/**
 	 * Run the route action and return the response.
 	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Routing\ControllerDispatcher  $controllerDispatcher
 	 * @return mixed
 	 */
-	public function run()
+	public function run(Request $request, ControllerDispatcher $controllerDispatcher = null)
 	{
 		$parameters = array_filter($this->parameters(), function($p) { return isset($p); });
 
 		try
 		{
+			if (is_string($this->action['uses']))
+			{
+				return $this->dispatchToController($request, $controllerDispatcher);
+			}
+
 			$parameters = $this->resolveMethodDependencies(
 				$parameters, new ReflectionFunction($this->action['uses'])
 			);
@@ -124,6 +131,20 @@ class Route {
 		{
 			return $e->getResponse();
 		}
+	}
+
+	/**
+	 * Dispatch the request to the route to a controller class.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Routing\ControllerDispatacher  $controllerDispatcher
+	 * @return mixed
+	 */
+	protected function dispatchToController(Request $request, ControllerDispatcher $controllerDispatcher)
+	{
+		list($class, $method) = explode('@', $this->action['controller']);
+
+		return $controllerDispatcher->dispatch($this, $request, $class, $method);
 	}
 
 	/**
