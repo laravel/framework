@@ -5,7 +5,6 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Illuminate\Routing\Generators\ControllerGenerator;
 
 class RouteCacheCommand extends Command {
 
@@ -48,6 +47,7 @@ class RouteCacheCommand extends Command {
 	 * Create a new route command instance.
 	 *
 	 * @param  \Illuminate\Routing\Router  $router
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Router $router, Filesystem $files)

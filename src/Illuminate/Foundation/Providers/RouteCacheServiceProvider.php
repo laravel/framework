@@ -2,6 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\RouteCacheCommand;
+use Illuminate\Foundation\Console\RouteClearCommand;
 
 class RouteCacheServiceProvider extends ServiceProvider {
 
@@ -24,7 +25,12 @@ class RouteCacheServiceProvider extends ServiceProvider {
 			return new RouteCacheCommand($app['router'], $app['files']);
 		});
 
-		$this->commands('command.route.cache');
+		$this->app->bindShared('command.route.clear', function($app)
+		{
+			return new RouteClearCommand($app['files']);
+		});
+
+		$this->commands('command.route.cache', 'command.route.clear');
 	}
 
 	/**
@@ -34,7 +40,7 @@ class RouteCacheServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.route.cache');
+		return array('command.route.cache', 'command.route.clear');
 	}
 
 }
