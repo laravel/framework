@@ -85,7 +85,7 @@ class RouteCacheCommand extends Command {
 			$this->laravel['path'].'/routing/cache.php', $this->buildRouteCacheFile()
 		);
 
-		$this->info('Routes Cached!');
+		$this->info('Routes cached successfully!');
 	}
 
 	/**
