@@ -677,7 +677,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Reload model data from the database.
 	 *
-	 * @return void
+	 * @return $this
 	 */
 	public function reload()
 	{
@@ -688,6 +688,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// Update the current model and sync with original attributes.
 			$this->setRawAttributes($model->getAttributes(), true);
 		}
+
+		return $this;
 	}
 
 	/**

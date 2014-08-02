@@ -119,8 +119,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->foo = 'baz';
 		$this->assertTrue($model->isDirty('foo'));
 
-		$model->reload();
+		$result = $model->reload();
 		$this->assertFalse($model->isDirty('foo'));
+
+		$this->assertEquals($model, $result);
 	}
 
 
