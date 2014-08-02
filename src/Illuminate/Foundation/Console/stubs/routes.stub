@@ -1,11 +1,16 @@
 <?php
 
-$routes = unserialize(base64_decode('{{routes}}'));
+/*
+|--------------------------------------------------------------------------
+| Load The Cached Routes
+|--------------------------------------------------------------------------
+|
+| Here we will decode and unserialize the RouteCollection instance that
+| holds all of the route information for an application. This allows
+| us to quickly load the entire route map into the router quickly.
+|
+*/
 
-foreach ($routes as $route)
-{
-	$route->setContainer($app);
-}
-
-$app->make('router')->setRoutes($routes);
-
+$app->make('router')->setRoutes(
+	unserialize(base64_decode('{{routes}}'))
+);
