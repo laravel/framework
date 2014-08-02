@@ -1692,6 +1692,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function setRoutes(RouteCollection $routes)
 	{
+		foreach ($routes as $route)
+		{
+			$route->setContainer($this->container);
+		}
+
 		$this->routes = $routes;
 	}
 
