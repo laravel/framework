@@ -234,8 +234,16 @@ $app->booted(function() use ($app, $env)
 	|
 	*/
 
-	$routes = $app['path'].'/routing/routes.php';
+	if ($app->routesAreCached())
+	{
+		require $app['path'].'/routing/cached.php';
+	}
+	else
+	{
+		$routes = $app['path'].'/routing/routes.php';
 
-	if (file_exists($routes)) require $routes;
+		if (file_exists($routes)) require $routes;
+	}
+
 
 });
