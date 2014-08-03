@@ -1126,7 +1126,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a saving model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function saving($callback, $priority = 0)
@@ -1138,7 +1138,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a saved model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function saved($callback, $priority = 0)
@@ -1150,7 +1150,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register an updating model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function updating($callback, $priority = 0)
@@ -1162,7 +1162,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register an updated model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function updated($callback, $priority = 0)
@@ -1174,7 +1174,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a creating model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function creating($callback, $priority = 0)
@@ -1186,7 +1186,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a created model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function created($callback, $priority = 0)
@@ -1198,7 +1198,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a deleting model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function deleting($callback, $priority = 0)
@@ -1210,7 +1210,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a deleted model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function deleted($callback, $priority = 0)
