@@ -573,6 +573,18 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		return $this->booted;
 	}
+	
+	/**
+	 * Reboots application in unit testing mode.
+	 * Allows multi-request testing of controllers
+	 * 
+	 * @return void
+	 */
+	public function reboot()
+	{
+		if ($this->runningUnitTests() and $this->booted) $this->booted = false;
+		$this->boot();
+	}
 
 	/**
 	 * Boot the application's service providers.
