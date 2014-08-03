@@ -583,6 +583,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function reboot()
 	{
 		if ($this->runningUnitTests() and $this->booted) $this->booted = false;
+		
 		$this->boot();
 	}
 
