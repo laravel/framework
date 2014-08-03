@@ -487,6 +487,21 @@ if ( ! function_exists('data_get'))
 	}
 }
 
+if ( ! function_exists('delete'))
+{
+	/**
+	 * Register a new DELETE route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function delete($uri, $action)
+	{
+		return app('router')->delete($uri, $action);
+	}
+}
+
 if ( ! function_exists('dd'))
 {
 	/**
@@ -527,6 +542,21 @@ if ( ! function_exists('ends_with'))
 	function ends_with($haystack, $needles)
 	{
 		return Str::endsWith($haystack, $needles);
+	}
+}
+
+if ( ! function_exists('get'))
+{
+	/**
+	 * Register a new GET route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function get($uri, $action)
+	{
+		return app('router')->get($uri, $action);
 	}
 }
 
@@ -651,6 +681,36 @@ if ( ! function_exists('object_get'))
 		}
 
 		return $object;
+	}
+}
+
+if ( ! function_exists('post'))
+{
+	/**
+	 * Register a new POST route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function post($uri, $action)
+	{
+		return app('router')->post($uri, $action);
+	}
+}
+
+if ( ! function_exists('put'))
+{
+	/**
+	 * Register a new PUT route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function put($uri, $action)
+	{
+		return app('router')->put($uri, $action);
 	}
 }
 
@@ -1000,6 +1060,22 @@ if ( ! function_exists('value'))
 	function value($value)
 	{
 		return $value instanceof Closure ? $value() : $value;
+	}
+}
+
+if ( ! function_exists('view'))
+{
+	/**
+	 * Get the evaluated view contents for the given view.
+	 *
+	 * @param  string  $view
+	 * @param  array   $data
+	 * @param  array   $mergeData
+	 * @return \Illuminate\View\View
+	 */
+	function view($view, $data = array(), $mergeData = array())
+	{
+		return app('view')->make($view, $data, $mergeData);
 	}
 }
 
