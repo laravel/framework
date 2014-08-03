@@ -444,6 +444,26 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRandom()
+	{
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('users')->random();
+		$this->assertEquals('select * from `users` order by rand()', $builder->toSql());
+
+		$builder = $this->getPostgresBuilder();
+		$builder->select('*')->from('users')->random();
+		$this->assertEquals('select * from "users" order by random()', $builder->toSql());
+
+		$builder = $this->getSQLiteBuilder();
+		$builder->select('*')->from('users')->random();
+		$this->assertEquals('select * from "users" order by random()', $builder->toSql());
+
+		$builder = $this->getSqlServerBuilder();
+		$builder->select('*')->from('users')->random();
+		$this->assertEquals('select * from [users] order by newid()', $builder->toSql());
+	}
+
+
 	public function testHavings()
 	{
 		$builder = $this->getBuilder();

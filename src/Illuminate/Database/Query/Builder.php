@@ -1102,6 +1102,16 @@ class Builder {
 	}
 
 	/**
+	 * Add an "order by random" clause to the query.
+	 *
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function random()
+	{
+		return $this->orderByRaw($this->grammar->getRandomFunction());
+	}
+
+	/**
 	 * Set the "offset" value of the query.
 	 *
 	 * @param  int  $value
