@@ -76,11 +76,13 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function reconnect($name = null)
 	{
-		$name = $name ?: $this->getDefaultConnection();
+		$this->disconnect($name = $name ?: $this->getDefaultConnection());
 
-		$this->disconnect($name);
+		$fresh = $this->makeConnection($name);
 
-		return $this->connection($name);
+		return $this->connections[$name]
+                                ->setPdo($fresh->getPdo())
+                                ->setReadPdo($fresh->getReadPdo());
 	}
 
 	/**
@@ -93,7 +95,10 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		$name = $name ?: $this->getDefaultConnection();
 
-		unset($this->connections[$name]);
+		if (isset($this->connections[$name]))
+		{
+			$this->connections[$name]->setPdo(null)->setReadPdo(null);
+		}
 	}
 
 	/**
@@ -158,6 +163,14 @@ class DatabaseManager implements ConnectionResolverInterface {
 		$connection->setPaginator(function() use ($app)
 		{
 			return $app['paginator'];
+		});
+
+		// Here we'll set a reconnector callback. This reconnector can be any callable
+		// so we will set a Closure to reconnect from this manager with the name of
+		// the connection, which will allow us to reconnect from the connections.
+		$connection->setReconnector(function($connection)
+		{
+			$this->reconnect($connection->getName());
 		});
 
 		return $connection;
