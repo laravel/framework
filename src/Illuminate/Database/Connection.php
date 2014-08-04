@@ -638,6 +638,16 @@ class Connection implements ConnectionInterface {
 	}
 
 	/**
+	 * Disconnect from the underlying PDO connection.
+	 *
+	 * @return void
+	 */
+	public function disconnect()
+	{
+		$this->setPdo(null)->setReadPdo(null);
+	}
+
+	/**
 	 * Reconnect to the database.
 	 *
 	 * @return void
