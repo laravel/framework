@@ -616,7 +616,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @throws \Illuminate\Database\QueryException
 	 */
-	protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, $callback)
+	protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
 	{
 		if ($this->causedByLostConnection($e))
 		{
