@@ -69,6 +69,20 @@ class DatabaseManager implements ConnectionResolverInterface {
 	}
 
 	/**
+	 * Disconnect from the given database.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function disconnect($name = null)
+	{
+		if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()]))
+		{
+			$this->connections[$name]->disconnect();
+		}
+	}
+
+	/**
 	 * Reconnect to the given database.
 	 *
 	 * @param  string  $name
@@ -78,27 +92,29 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		$this->disconnect($name = $name ?: $this->getDefaultConnection());
 
+		if ( ! isset($this->connections[$name]))
+		{
+			return $this->connection($name);
+		}
+		else
+		{
+			return $this->refreshPdoConnections($name);
+		}
+	}
+
+	/**
+	 * Refresh the PDO connections on a given connection.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Database\Connection
+	 */
+	protected function refreshPdoConnections($name)
+	{
 		$fresh = $this->makeConnection($name);
 
 		return $this->connections[$name]
                                 ->setPdo($fresh->getPdo())
                                 ->setReadPdo($fresh->getReadPdo());
-	}
-
-	/**
-	 * Disconnect from the given database.
-	 *
-	 * @param  string  $name
-	 * @return void
-	 */
-	public function disconnect($name = null)
-	{
-		$name = $name ?: $this->getDefaultConnection();
-
-		if (isset($this->connections[$name]))
-		{
-			$this->connections[$name]->setPdo(null)->setReadPdo(null);
-		}
 	}
 
 	/**
