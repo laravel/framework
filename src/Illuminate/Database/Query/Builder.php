@@ -1106,7 +1106,7 @@ class Builder {
 	 *
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function random()
+	public function orderByRandom()
 	{
 		return $this->orderByRaw($this->grammar->getRandomFunction());
 	}
