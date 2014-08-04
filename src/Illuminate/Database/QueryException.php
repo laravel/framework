@@ -28,6 +28,8 @@ class QueryException extends PDOException {
 	 */
 	public function __construct($sql, array $bindings, $previous)
 	{
+		parent::__construct('', 0, $previous);
+
 		$this->sql = $sql;
 		$this->bindings = $bindings;
 		$this->previous = $previous;
