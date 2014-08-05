@@ -140,7 +140,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session->ageFlashData();
 
 		$this->assertFalse($session->has('foo'));
-		$this->assertEquals(null, $session->get('foo'));
+		$this->assertNull($session->get('foo'));
 	}
 
 
