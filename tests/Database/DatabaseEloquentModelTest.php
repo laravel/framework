@@ -744,12 +744,19 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRouteKeyIsPrimaryKey()
+	{
+		$model = new EloquentModelStub;
+		$model->id = 'foo';
+		$this->assertEquals('foo', $model->getRouteKey());
+	}
+
+
 	public function testRouteNameIsPrimaryKeyName()
 	{
 		$model = new EloquentModelStub;
 		$this->assertEquals('id', $model->getRouteKeyName());
 	}
-
 
 
 	public function testCloneModelMakesAFreshCopyOfTheModel()
