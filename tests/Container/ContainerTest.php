@@ -210,7 +210,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->extend('ContainerLazyExtendStub', function($obj, $container) { $obj->init(); return $obj; });
 		$this->assertEquals(false, ContainerLazyExtendStub::$initialized);
 		$container->make('ContainerLazyExtendStub');
-		$this->assertEquals(true, ContainerLazyExtendStub::$initialized);
+		$this->assertTrue(ContainerLazyExtendStub::$initialized);
 	}
 
 
