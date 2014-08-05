@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Contracts\RouteableInterface;
 
 class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
@@ -95,6 +96,21 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('taylor', 'otwell', 'wall', 'woz')));
 		$this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', array('baz' => 'åαф')));
 
+	}
+
+	public function testRouteableInterfaceRouting()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/{bar}', array('as' => 'routeable'));
+		$routes->add($route);
+
+		$model = new RouteableInterfaceStub;
+
+		$this->assertEquals('/foo/routeable', $url->route('routeable', array($model), false));
 	}
 
 
@@ -235,4 +251,9 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
 	}
 
+}
+
+class RouteableInterfaceStub implements RouteableInterface {
+	public function getRouteKey() { return 'routeable'; }
+	public function getRouteKeyName() {}
 }
