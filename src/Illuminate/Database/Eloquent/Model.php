@@ -1882,7 +1882,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getRouteKey()
 	{
-	    $this->getAttribute($this->getRouteKeyName());
+	    return $this->getAttribute($this->getRouteKeyName());
 	}
 
 	/**
