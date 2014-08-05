@@ -461,7 +461,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $array['names'][0]['bar']);
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
-		$this->assertEquals(null, $array['group']);
+		$this->assertNull($array['group']);
 		$this->assertEquals(array(), $array['multi']);
 		$this->assertFalse(isset($array['password']));
 
