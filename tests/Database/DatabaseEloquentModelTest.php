@@ -461,7 +461,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('baz', $array['names'][0]['bar']);
 		$this->assertEquals('boom', $array['names'][1]['bam']);
 		$this->assertEquals('abby', $array['partner']['name']);
-		$this->assertNull($array['group']);
+		$this->assertEquals(null, $array['group']);
 		$this->assertEquals(array(), $array['multi']);
 		$this->assertFalse(isset($array['password']));
 
@@ -634,8 +634,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->addMockConnection($model);
 		$relation = $model->hasOne('EloquentModelSaveStub', 'foo');
 		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
-		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 
@@ -661,8 +661,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->addMockConnection($model);
 		$relation = $model->hasMany('EloquentModelSaveStub', 'foo');
 		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
-		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 
@@ -683,8 +683,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->addMockConnection($model);
 		$relation = $model->belongsToStub();
 		$this->assertEquals('belongs_to_stub_id', $relation->getForeignKey());
-		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
@@ -699,8 +699,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->addMockConnection($model);
 		$relation = $model->morphToStub();
 		$this->assertEquals('morph_to_stub_id', $relation->getForeignKey());
-		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 
@@ -711,8 +711,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$relation = $model->belongsToMany('EloquentModelSaveStub');
 		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getForeignKey());
 		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getOtherKey());
-		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 		$this->assertEquals(__FUNCTION__, $relation->getRelationName());
 
 		$model = new EloquentModelStub;
@@ -720,8 +720,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$relation = $model->belongsToMany('EloquentModelSaveStub', 'table', 'foreign', 'other');
 		$this->assertEquals('table.foreign', $relation->getForeignKey());
 		$this->assertEquals('table.other', $relation->getOtherKey());
-		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertTrue($relation->getParent() === $model);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 

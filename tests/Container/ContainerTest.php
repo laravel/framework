@@ -34,7 +34,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testAutoConcreteResolution()
 	{
 		$container = new Container;
-		$this->assertTrue($container->make('ContainerConcreteStub') instanceof ContainerConcreteStub);
+		$this->assertInstanceOf('ContainerConcreteStub', $container->make('ContainerConcreteStub'));
 	}
 
 
@@ -51,7 +51,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$stub = new ContainerDependentStub($mock = $this->getMock('IContainerContractStub'));
 		$resolved = $container->make('ContainerNestedDependentStub', array($stub));
-		$this->assertTrue($resolved instanceof ContainerNestedDependentStub);
+		$this->assertInstanceOf('ContainerNestedDependentStub', $resolved);
 		$this->assertEquals($mock, $resolved->inner->impl);
 	}
 
@@ -73,7 +73,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$container->bind('IContainerContractStub', 'ContainerImplementationStub');
 		$class = $container->make('ContainerDependentStub');
-		$this->assertTrue($class->impl instanceof ContainerImplementationStub);
+		$this->assertInstanceOf('ContainerImplementationStub', $class->impl);
 	}
 
 
@@ -82,8 +82,8 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$container->bind('IContainerContractStub', 'ContainerImplementationStub');
 		$class = $container->make('ContainerNestedDependentStub');
-		$this->assertTrue($class->inner instanceof ContainerDependentStub);
-		$this->assertTrue($class->inner->impl instanceof ContainerImplementationStub);
+		$this->assertInstanceOf('ContainerDependentStub', $class->inner);
+		$this->assertInstanceOf('ContainerImplementationStub', $class->inner->impl);
 	}
 
 
