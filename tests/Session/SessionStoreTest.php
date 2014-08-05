@@ -150,13 +150,13 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session->flash('foo', 'bar');
 		$session->set('fu', 'baz');
 		$session->set('flash.old', array('qu'));
-		$this->assertTrue(array_search('foo', $session->get('flash.new')) !== false);
-		$this->assertTrue(array_search('fu', $session->get('flash.new')) === false);
+		$this->assertNotFalse(array_search('foo', $session->get('flash.new')));
+		$this->assertFalse(array_search('fu', $session->get('flash.new')));
 		$session->keep(array('fu','qu'));
-		$this->assertTrue(array_search('foo', $session->get('flash.new')) !== false);
-		$this->assertTrue(array_search('fu', $session->get('flash.new')) !== false);
-		$this->assertTrue(array_search('qu', $session->get('flash.new')) !== false);
-		$this->assertTrue(array_search('qu', $session->get('flash.old')) === false);
+		$this->assertNotFalse(array_search('foo', $session->get('flash.new')));
+		$this->assertNotFalse(array_search('fu', $session->get('flash.new')));
+		$this->assertNotFalse(array_search('qu', $session->get('flash.new')));
+		$this->assertFalse(array_search('qu', $session->get('flash.old')));
 	}
 
 
@@ -166,8 +166,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session->flash('foo', 'bar');
 		$session->set('flash.old', array('foo'));
 		$session->reflash();
-		$this->assertTrue(array_search('foo', $session->get('flash.new')) !== false);
-		$this->assertTrue(array_search('foo', $session->get('flash.old')) === false);
+		$this->assertNotFalse(array_search('foo', $session->get('flash.new')));
+		$this->assertFalse(array_search('foo', $session->get('flash.old')));
 	}
 
 
