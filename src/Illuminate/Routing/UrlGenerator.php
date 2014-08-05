@@ -322,7 +322,7 @@ class UrlGenerator {
 		{
 			if ($parameter instanceof RouteableInterface)
 			{
-				$parameter = $parameter->getRouteParameter();
+				$parameter = $parameter->getRouteKey();
 			}
 		}
 
