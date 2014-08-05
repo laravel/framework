@@ -191,14 +191,14 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	{
 		$view = $this->getView();
 		$errors = array('foo'=>'bar','qu'=>'ux');
-		$this->assertTrue($view->withErrors($errors) === $view);
+		$this->assertSame($view, $view->withErrors($errors));
 		$this->assertTrue($view->errors instanceof \Illuminate\Support\MessageBag);
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'bar');
 		$qu = $view->errors->get('qu');
 		$this->assertEquals($qu[0], 'ux');
 		$data = array('foo'=>'baz');
-		$this->assertTrue($view->withErrors(new \Illuminate\Support\MessageBag($data)) === $view);
+		$this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'baz');
 	}

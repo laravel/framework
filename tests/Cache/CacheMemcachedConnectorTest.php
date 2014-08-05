@@ -19,7 +19,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('getMemcached')->will($this->returnValue($memcached));
 		$result = $connector->connect(array(array('host' => 'localhost', 'port' => 11211, 'weight' => 100)));
 
-		$this->assertTrue($result === $memcached);
+		$this->assertSame($result, $memcached);
 	}
 
 
