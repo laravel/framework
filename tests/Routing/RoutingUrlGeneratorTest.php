@@ -109,6 +109,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$routes->add($route);
 
 		$model = new RouteableInterfaceStub;
+		$model->key = 'routeable';
 
 		$this->assertEquals('/foo/routeable', $url->route('routeable', array($model), false));
 	}
@@ -254,6 +255,6 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 }
 
 class RouteableInterfaceStub implements RouteableInterface {
-	public function getRouteKey() { return 'routeable'; }
-	public function getRouteKeyName() {}
+	public function getRouteKey() { return $this->{$this->getRouteKeyName()}; }
+	public function getRouteKeyName() { return 'key'; }
 }
