@@ -38,6 +38,14 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTraitResolution()
+	{
+		$container = new Container;
+		$stub = $container->make('ContainerConcreteTraitStub');
+		$this->assertInstanceOf('ContainerConcreteStub', $stub->container);
+	}
+
+
 	public function testSlashesAreHandled()
 	{
 		$container = new Container;
@@ -384,4 +392,16 @@ class ContainerConstructorParameterLoggingStub {
 class ContainerLazyExtendStub {
 	public static $initialized = false;
 	public function init() { static::$initialized = true; }
+}
+
+trait ContainerTraitStub {
+	public $container;
+	public function constructContainerTraitStub(ContainerConcreteStub $container)
+	{
+		$this->container = $container;
+	}
+}
+
+class ContainerConcreteTraitStub {
+	use ContainerTraitStub;
 }
