@@ -919,11 +919,13 @@ class RouteBindingStub {
 }
 
 class RouteModelBindingStub {
-	public function find($value) { return strtoupper($value); }
+	public function firstByAttributes($attributes) { return strtoupper($attributes[$this->getRouteKeyName()]); }
+	public function getRouteKeyName() { return 'foo'; }
 }
 
 class RouteModelBindingNullStub {
-	public function find($value) {}
+	public function firstByAttributes($attributes) {}
+	public function getRouteKeyName() {}
 }
 
 class RouteTestFilterStub {

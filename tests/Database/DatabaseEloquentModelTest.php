@@ -744,6 +744,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRouteNameIsPrimaryKeyName()
+	{
+		$model = new EloquentModelStub;
+		$this->assertEquals('id', $model->getRouteKeyName());
+	}
+
+
+
 	public function testCloneModelMakesAFreshCopyOfTheModel()
 	{
 		$class = new EloquentModelStub;
@@ -868,6 +876,7 @@ class EloquentTestObserverStub {
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'stub';
 	protected $guarded = array();
+	protected $primaryKey = 'id';
 	protected $morph_to_stub_type = 'EloquentModelSaveStub';
 	public function getListItemsAttribute($value)
 	{
