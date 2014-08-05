@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Contracts\RouteableInterface;
 use InvalidArgumentException;
 
 class UrlGenerator {
@@ -111,6 +112,8 @@ class UrlGenerator {
 		if ($this->isValidUrl($path)) return $path;
 
 		$scheme = $this->getScheme($secure);
+
+		$extra = $this->replaceRouteableParameters($extra);
 
 		$tail = implode('/', array_map(
 			'rawurlencode', (array) $extra)
@@ -223,7 +226,7 @@ class UrlGenerator {
 	{
 		$route = $route ?: $this->routes->getByName($name);
 
-		$parameters = (array) $parameters;
+		$parameters = $this->replaceRouteableParameters($parameters);
 
 		if ( ! is_null($route))
 		{
@@ -246,6 +249,8 @@ class UrlGenerator {
 	protected function toRoute($route, array $parameters, $absolute)
 	{
 		$domain = $this->getRouteDomain($route, $parameters);
+
+		$parameters = $this->replaceRouteableParameters($parameters);
 
 		$uri = strtr(rawurlencode($this->trimUrl(
 			$root = $this->replaceRoot($route, $domain, $parameters),
@@ -301,6 +306,27 @@ class UrlGenerator {
 			return isset($parameters[$m[1]]) ? array_pull($parameters, $m[1]) : $m[0];
 
 		}, $path);
+	}
+
+	/**
+	 * Replace RouteableInterface parameters with their route parameter.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function replaceRouteableParameters($parameters = array())
+	{
+		$parameters = is_array($parameters) ? $parameters : array($parameters);
+
+		foreach ($parameters as &$parameter)
+		{
+			if ($parameter instanceof RouteableInterface)
+			{
+				$parameter = $parameter->getRouteParameter();
+			}
+		}
+
+		return $parameters;
 	}
 
 	/**

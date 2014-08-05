@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Support\Contracts\RouteableInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -1205,10 +1206,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		{
 			if (is_null($value)) return null;
 
-			// For model binders, we will attempt to retrieve the models using the find
+			// For model binders, we will attempt to retrieve the models using the first
 			// method on the model instance. If we cannot retrieve the models we'll
 			// throw a not found exception otherwise we will return the instance.
-			if ($model = (new $class)->find($value))
+			$instance = (new $class);
+
+			if ($model = $instance->firstByAttributes([$instance->getRouteKeyName() => $value]))
 			{
 				return $model;
 			}
