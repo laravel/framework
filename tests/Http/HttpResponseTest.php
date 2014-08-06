@@ -65,7 +65,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$arr = array('foo'=>'bar');
 		$response = new Illuminate\Http\Response();
 		$response->setContent($arr);
-		$this->assertTrue($arr === $response->getOriginalContent());
+		$this->assertSame($arr, $response->getOriginalContent());
 	}
 
 
@@ -157,8 +157,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$session = m::mock('Illuminate\Session\Store');
 		$response->setRequest($request);
 		$response->setSession($session);
-		$this->assertTrue($request === $response->getRequest());
-		$this->assertTrue($session === $response->getSession());
+		$this->assertSame($request, $response->getRequest());
+		$this->assertSame($session, $response->getSession());
 	}
 
 
