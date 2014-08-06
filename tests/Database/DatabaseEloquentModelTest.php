@@ -235,7 +235,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), array($model))->andReturn(true);
-		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), array$model))->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), array($model))->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), array($model))->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), array($model))->andReturn(true);
 
