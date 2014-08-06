@@ -1607,9 +1607,9 @@ class Builder {
 	 */
 	protected function ungroupedPaginate($paginator, $perPage, $columns)
 	{
-		$total = $this->getPaginationCount();
-
 		$this->connection->continueOnWritePdo();
+
+		$total = $this->getPaginationCount();
 
 		// Once we have the total number of records to be paginated, we can grab the
 		// current page and the result array. Then we are ready to create a brand
