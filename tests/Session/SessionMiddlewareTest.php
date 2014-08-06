@@ -41,7 +41,7 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase {
 
 		$middleResponse = $middle->handle($request);
 
-		$this->assertTrue($response === $middleResponse);
+		$this->assertSame($response, $middleResponse);
 		$this->assertEquals(1, head($response->headers->getCookies())->getValue());
 	}
 
@@ -60,7 +60,7 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase {
 		$app->shouldReceive('handle')->once()->with($request, Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST, true)->andReturn($response);
 		$middleResponse = $middle->handle($request);
 
-		$this->assertTrue($response === $middleResponse);
+		$this->assertSame($response, $middleResponse);
 	}
 
 
