@@ -1557,8 +1557,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $event
 	 * @param  bool    $halt
-         * @param  mixed   $payload     Data to be added to the payload of the event.
-         * @param  mixed   $payload,... unlimited OPTIONAL number of additional parameters.
+	 * @param  mixed   $payload     Optional data to be added to the payload of the event.
+	 * @param  mixed   $payload,... unlimited OPTIONAL number of additional parameters.
 	 * @return mixed
 	 */
 	protected function fireModelEvent($event, $halt = true)
