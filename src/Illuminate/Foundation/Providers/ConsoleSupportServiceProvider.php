@@ -16,6 +16,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 		'Illuminate\Foundation\Providers\MaintenanceServiceProvider',
 		'Illuminate\Foundation\Providers\OptimizeServiceProvider',
 		'Illuminate\Foundation\Providers\PublisherServiceProvider',
+		'Illuminate\Foundation\Providers\RequestCreatorServiceProvider',
 		'Illuminate\Foundation\Providers\RouteCacheServiceProvider',
 		'Illuminate\Foundation\Providers\RouteListServiceProvider',
 		'Illuminate\Foundation\Providers\ServerServiceProvider',
