@@ -18,7 +18,7 @@ class RequestMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a new FormRequest class.';
+	protected $description = 'Create a new form request class.';
 
 	/**
 	 * The filesystem instance.
@@ -47,12 +47,18 @@ class RequestMakeCommand extends Command {
 	 */
 	public function fire()
 	{
+		$path = $this->getPath($name = $this->argument('name'));
+
+		if ($this->files->exists($path))
+		{
+			return $this->error('Request already exists!');
+		}
+
 		$this->files->put(
-			$this->getPath($this->argument('name')),
-			$this->buildRequestClass($this->argument('name'))
+			$path, $this->buildRequestClass($name)
 		);
 
-		$this->info('Done!');
+		$this->info('Request created successfully.');
 	}
 
 	/**
