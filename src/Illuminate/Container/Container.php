@@ -200,7 +200,7 @@ class Container implements ArrayAccess {
 	 * Wrap a Closure such that it is shared.
 	 *
 	 * @param  \Closure  $closure
-	 * @return Closure
+	 * @return \Closure
 	 */
 	public function share(Closure $closure)
 	{

@@ -62,7 +62,7 @@ class ControllerInspector {
 	/**
 	 * Determine if the given controller method is routable.
 	 *
-	 * @param  ReflectionMethod  $method
+	 * @param  \ReflectionMethod  $method
 	 * @param  string  $controller
 	 * @return bool
 	 */
@@ -76,7 +76,7 @@ class ControllerInspector {
 	/**
 	 * Get the method data for a given method.
 	 *
-	 * @param  ReflectionMethod  $method
+	 * @param  \ReflectionMethod  $method
 	 * @param  string  $prefix
 	 * @return array
 	 */
