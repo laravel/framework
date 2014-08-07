@@ -156,7 +156,7 @@ class Factory {
 	 * Register a custom validator extension.
 	 *
 	 * @param  string  $rule
-	 * @param  \Closure|string  $extension
+	 * @param  callable  $extension
 	 * @param  string  $message
 	 * @return void
 	 */
@@ -171,7 +171,7 @@ class Factory {
 	 * Register a custom implicit validator extension.
 	 *
 	 * @param  string   $rule
-	 * @param  \Closure|string  $extension
+	 * @param  callable  $extension
 	 * @param  string  $message
 	 * @return void
 	 */
@@ -186,7 +186,7 @@ class Factory {
 	 * Register a custom implicit validator message replacer.
 	 *
 	 * @param  string   $rule
-	 * @param  \Closure|string  $replacer
+	 * @param  callable  $replacer
 	 * @return void
 	 */
 	public function replacer($rule, $replacer)

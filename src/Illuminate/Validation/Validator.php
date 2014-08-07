@@ -2033,7 +2033,7 @@ class Validator implements MessageProviderInterface {
 	 * Register a custom validator extension.
 	 *
 	 * @param  string  $rule
-	 * @param  \Closure|string  $extension
+	 * @param  callable  $extension
 	 * @return void
 	 */
 	public function addExtension($rule, $extension)
@@ -2045,7 +2045,7 @@ class Validator implements MessageProviderInterface {
 	 * Register a custom implicit validator extension.
 	 *
 	 * @param  string   $rule
-	 * @param  \Closure|string  $extension
+	 * @param  callable  $extension
 	 * @return void
 	 */
 	public function addImplicitExtension($rule, $extension)
@@ -2087,7 +2087,7 @@ class Validator implements MessageProviderInterface {
 	 * Register a custom validator message replacer.
 	 *
 	 * @param  string  $rule
-	 * @param  \Closure|string  $replacer
+	 * @param  callable  $replacer
 	 * @return void
 	 */
 	public function addReplacer($rule, $replacer)

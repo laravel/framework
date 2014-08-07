@@ -36,7 +36,7 @@ abstract class Controller {
 	/**
 	 * Register a "before" filter on the controller.
 	 *
-	 * @param  \Closure|string  $filter
+	 * @param  callable  $filter
 	 * @param  array  $options
 	 * @return void
 	 */
@@ -48,7 +48,7 @@ abstract class Controller {
 	/**
 	 * Register an "after" filter on the controller.
 	 *
-	 * @param  \Closure|string  $filter
+	 * @param  callable  $filter
 	 * @param  array  $options
 	 * @return void
 	 */
@@ -60,7 +60,7 @@ abstract class Controller {
 	/**
 	 * Parse the given filter and options.
 	 *
-	 * @param  \Closure|string  $filter
+	 * @param  callable  $filter
 	 * @param  array  $options
 	 * @return array
 	 */

@@ -1125,7 +1125,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a saving model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function saving($callback)
@@ -1136,7 +1136,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a saved model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function saved($callback)
@@ -1147,7 +1147,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register an updating model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function updating($callback)
@@ -1158,7 +1158,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register an updated model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function updated($callback)
@@ -1169,7 +1169,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a creating model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function creating($callback)
@@ -1180,7 +1180,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a created model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function created($callback)
@@ -1191,7 +1191,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a deleting model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function deleting($callback)
@@ -1202,7 +1202,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a deleted model event with the dispatcher.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public static function deleted($callback)
@@ -1231,7 +1231,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a model event with the dispatcher.
 	 *
 	 * @param  string  $event
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	protected static function registerModelEvent($event, $callback)

@@ -482,7 +482,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * (Overriding Container::extend)
 	 *
 	 * @param  string   $abstract
-	 * @param  Closure  $closure
+	 * @param  \Closure  $closure
 	 * @return void
 	 *
 	 * @throws \InvalidArgumentException
@@ -502,7 +502,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register a "before" application filter.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public function before($callback)
@@ -513,7 +513,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register an "after" application filter.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public function after($callback)
@@ -524,7 +524,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Register a "finish" application filter.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return void
 	 */
 	public function finish($callback)

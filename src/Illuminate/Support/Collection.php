@@ -542,7 +542,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Sort the collection using the given Closure.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @param  int   $options
 	 * @param  bool  $descending
 	 * @return $this
@@ -581,7 +581,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Sort the collection in descending order using the given Closure.
 	 *
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @param  int  $options
 	 * @return $this
 	 */
