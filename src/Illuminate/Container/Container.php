@@ -106,7 +106,7 @@ class Container implements ArrayAccess {
 	 * Register a binding with the container.
 	 *
 	 * @param  string  $abstract
-	 * @param  \Closure|string|null  $concrete
+	 * @param  callable|null  $concrete
 	 * @param  bool  $shared
 	 * @return void
 	 */
@@ -172,7 +172,7 @@ class Container implements ArrayAccess {
 	 * Register a binding if it hasn't already been registered.
 	 *
 	 * @param  string  $abstract
-	 * @param  \Closure|string|null  $concrete
+	 * @param  callable|null  $concrete
 	 * @param  bool  $shared
 	 * @return void
 	 */
@@ -188,7 +188,7 @@ class Container implements ArrayAccess {
 	 * Register a shared binding in the container.
 	 *
 	 * @param  string  $abstract
-	 * @param  \Closure|string|null  $concrete
+	 * @param  callable|null  $concrete
 	 * @return void
 	 */
 	public function singleton($abstract, $concrete = null)
@@ -200,7 +200,7 @@ class Container implements ArrayAccess {
 	 * Wrap a Closure such that it is shared.
 	 *
 	 * @param  \Closure  $closure
-	 * @return Closure
+	 * @return \Closure
 	 */
 	public function share(Closure $closure)
 	{

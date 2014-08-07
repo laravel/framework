@@ -298,7 +298,7 @@ class Factory {
 	 * Register a view creator event.
 	 *
 	 * @param  array|string     $views
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @return array
 	 */
 	public function creator($views, $callback)
@@ -335,7 +335,7 @@ class Factory {
 	 * Register a view composer event.
 	 *
 	 * @param  array|string  $views
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @param  int|null  $priority
 	 * @return array
 	 */
@@ -355,10 +355,10 @@ class Factory {
 	 * Add an event for a given view.
 	 *
 	 * @param  string  $view
-	 * @param  \Closure|string  $callback
+	 * @param  callable  $callback
 	 * @param  string  $prefix
 	 * @param  int|null  $priority
-	 * @return Closure
+	 * @return \Closure
 	 */
 	protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
 	{
