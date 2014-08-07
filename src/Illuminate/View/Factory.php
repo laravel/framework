@@ -110,6 +110,19 @@ class Factory {
 	}
 
 	/**
+	 * Remove all data contained within the factory.
+	 */
+	public function reset()
+	{
+		$this->shared = [];
+		$this->aliases = [];
+		$this->names = [];
+		$this->composers = [];
+		$this->sections = [];
+		$this->sectionStack = [];
+	}
+
+	/**
 	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param  string  $view

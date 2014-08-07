@@ -17,6 +17,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function tearDown()
+	{
+		parent::tearDown();
+
+		$this->app->reset();
+
+		$this->app = null;
+	}
+
 	/**
 	 * Creates the application.
 	 *
