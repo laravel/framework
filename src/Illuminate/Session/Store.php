@@ -392,7 +392,7 @@ class Store implements SessionInterface {
 	/**
 	 * Reflash a subset of the current flash data.
 	 *
-	 * @param  array|dynamic  $keys
+	 * @param  array|mixed  $keys
 	 * @return void
 	 */
 	public function keep($keys = null)
