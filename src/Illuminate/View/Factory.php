@@ -495,10 +495,10 @@ class Factory {
 	{
 		if ($content === '')
 		{
-            if (ob_start())
-            {
-                $this->sectionStack[] = $section;
-            }
+			if (ob_start())
+			{
+				$this->sectionStack[] = $section;
+			}
 		}
 		else
 		{
