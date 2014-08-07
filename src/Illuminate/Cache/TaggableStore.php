@@ -16,7 +16,7 @@ abstract class TaggableStore {
 	/**
 	 * Begin executing a new tags operation.
 	 *
-	 * @param  array|dynamic  $names
+	 * @param  array|mixed  $names
 	 * @return \Illuminate\Cache\TaggedCache
 	 */
 	public function tags($names)

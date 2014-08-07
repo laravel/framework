@@ -1262,7 +1262,7 @@ class Builder {
 	/**
 	 * Indicate that the results, if cached, should use the given cache tags.
 	 *
-	 * @param  array|dynamic  $cacheTags
+	 * @param  array|mixed  $cacheTags
 	 * @return $this
 	 */
 	public function cacheTags($cacheTags)

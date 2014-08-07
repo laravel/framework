@@ -1592,7 +1592,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Alias for the "currentRouteNamed" method.
 	 *
-	 * @param  dynamic  string
+	 * @param  mixed  string
 	 * @return bool
 	 */
 	public function is()
@@ -1636,7 +1636,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Alias for the "currentRouteUses" method.
 	 *
-	 * @param  dynamic  string
+	 * @param  mixed  string
 	 * @return bool
 	 */
 	public function uses()
