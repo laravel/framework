@@ -227,7 +227,7 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Get the underlying IronMQ instance.
 	 *
-	 * @return IronMQ
+	 * @return \IronMQ
 	 */
 	public function getIron()
 	{
