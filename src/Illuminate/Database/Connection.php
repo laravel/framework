@@ -775,7 +775,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the current PDO connection.
 	 *
-	 * @return PDO
+	 * @return \PDO
 	 */
 	public function getPdo()
 	{
@@ -785,7 +785,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the current PDO connection used for reading.
 	 *
-	 * @return PDO
+	 * @return \PDO
 	 */
 	public function getReadPdo()
 	{

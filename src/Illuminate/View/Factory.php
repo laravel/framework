@@ -358,7 +358,7 @@ class Factory {
 	 * @param  \Closure|string  $callback
 	 * @param  string  $prefix
 	 * @param  int|null  $priority
-	 * @return Closure
+	 * @return \Closure
 	 */
 	protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
 	{

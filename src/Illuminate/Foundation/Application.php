@@ -224,7 +224,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	/**
 	 * Get or check the current application environment.
 	 *
-	 * @param  dynamic
+	 * @param  mixed
 	 * @return string
 	 */
 	public function environment()
@@ -482,7 +482,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 * (Overriding Container::extend)
 	 *
 	 * @param  string   $abstract
-	 * @param  Closure  $closure
+	 * @param  \Closure  $closure
 	 * @return void
 	 *
 	 * @throws \InvalidArgumentException

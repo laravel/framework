@@ -36,7 +36,7 @@ class Connector {
 	 * @param  string  $dsn
 	 * @param  array   $config
 	 * @param  array   $options
-	 * @return PDO
+	 * @return \PDO
 	 */
 	public function createConnection($dsn, array $config, array $options)
 	{
