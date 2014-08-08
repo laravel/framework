@@ -81,7 +81,7 @@ class MakeControllerCommand extends Command {
 		// place based on the namespace of this controller specified by commands.
 		$this->generator->make($controller, $path, $options);
 
-		$this->info('Controller created successfully!');
+		$this->info('Controller created successfully.');
 	}
 
 	/**
