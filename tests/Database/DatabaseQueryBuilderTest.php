@@ -737,7 +737,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('skip', 'take', 'get'), array($connection, $grammar, $processor));
-		$paginator = m::mock('Illuminate\Pagination\Environment');
+		$paginator = m::mock('Illuminate\Pagination\Factory');
 		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
 		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
 		$builder->expects($this->once())->method('skip')->with($this->equalTo(0))->will($this->returnValue($builder));
