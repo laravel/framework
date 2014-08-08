@@ -49,7 +49,7 @@ class RouteClearCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->files->delete($this->laravel['path'].'/routing/cache.php');
+		$this->files->delete($this->laravel->getRouteCachePath());
 
 		$this->info('Route cache cleared!');
 	}
