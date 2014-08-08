@@ -9,7 +9,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	/**
 	 * The Pheanstalk instance.
 	 *
-	 * @var Pheanstalk
+	 * @var \Pheanstalk_Pheanstalk
 	 */
 	protected $pheanstalk;
 
@@ -30,7 +30,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	/**
 	 * Create a new Beanstalkd queue instance.
 	 *
-	 * @param  Pheanstalk  $pheanstalk
+	 * @param  \Pheanstalk_Pheanstalk  $pheanstalk
 	 * @param  string  $default
 	 * @param  int  $timeToRun
 	 * @return void
@@ -132,7 +132,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	/**
 	 * Get the underlying Pheanstalk instance.
 	 *
-	 * @return Pheanstalk
+	 * @return \Pheanstalk_Pheanstalk
 	 */
 	public function getPheanstalk()
 	{
