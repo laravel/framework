@@ -736,7 +736,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @return string
 	 */
-	protected function getRouteCachePath()
+	public function getRouteCachePath()
 	{
 		return $this['path'].'/routing/cache.php';
 	}
