@@ -82,7 +82,7 @@ class RequestMakeCommand extends Command {
 	 */
 	protected function getPath($name)
 	{
-		return $this->laravel['path'].'/src/Requests/'.$name.'.php';
+		return $this->laravel['path'].'/src/Web/Requests/'.$name.'.php';
 	}
 
 	/**
