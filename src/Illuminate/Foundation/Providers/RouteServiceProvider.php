@@ -2,7 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class RoutingServiceProvider extends ServiceProvider {
+class RouteServiceProvider extends ServiceProvider {
 
 	/**
 	 * Register the service provider.
