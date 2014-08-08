@@ -11,6 +11,6 @@
 |
 */
 
-$app->make('router')->setRoutes(
+app('router')->setRoutes(
 	unserialize(base64_decode('{{routes}}'))
 );
