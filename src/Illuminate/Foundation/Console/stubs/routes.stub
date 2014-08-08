@@ -11,11 +11,6 @@
 |
 */
 
-if (file_exists(__DIR__.'/filters.php'))
-{
-	require __DIR__.'/filters.php';
-}
-
 $app->make('router')->setRoutes(
 	unserialize(base64_decode('{{routes}}'))
 );

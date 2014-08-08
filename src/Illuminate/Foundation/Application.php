@@ -728,7 +728,17 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function routesAreCached()
 	{
-		return $this['files']->exists($this['path'].'/routing/cache.php');
+		return $this['files']->exists($this->getRouteCachePath());
+	}
+
+	/**
+	 * Get the path to the routes cache file.
+	 *
+	 * @return string
+	 */
+	protected function getRouteCachePath()
+	{
+		return $this['path'].'/routing/cache.php';
 	}
 
 	/**

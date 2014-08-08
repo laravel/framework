@@ -121,7 +121,7 @@ class CommandMakeCommand extends Command {
 
 		if (is_null($path))
 		{
-			return $this->laravel['path'].'/commands';
+			return $this->laravel['path'].'/src/Console';
 		}
 		else
 		{
