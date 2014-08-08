@@ -37,11 +37,11 @@ class ControllerServiceProvider extends ServiceProvider {
 			// The controller generator is responsible for building resourceful controllers
 			// quickly and easily for the developers via the Artisan CLI. We'll go ahead
 			// and register this command instances in this container for registration.
-			$path = $app['path'].'/src/Web/Controllers';
-
 			$generator = new ControllerGenerator($app['files']);
 
-			return new MakeControllerCommand($generator, $path);
+			return new MakeControllerCommand(
+				$generator, $app['path.controllers']
+			);
 		});
 	}
 
