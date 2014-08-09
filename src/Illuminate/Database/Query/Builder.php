@@ -127,6 +127,13 @@ class Builder {
 	public $unions;
 
 	/**
+	 * The ordering for the union of the queries.
+	 *
+	 * @var array
+	 */
+	public $unionsOrders;
+
+	/**
 	 * Indicates whether row locking is being used.
 	 *
 	 * @var string|bool
@@ -1178,6 +1185,22 @@ class Builder {
 		$this->unions[] = compact('query', 'all');
 
 		return $this->mergeBindings($query);
+	}
+
+	/**
+	 * Add an "order by" clause to the union of queries.
+	 *
+	 * @param  string  $column
+	 * @param  string  $direction
+	 * @return $this
+	 */
+	public function unionOrderBy($column, $direction = 'asc')
+	{
+		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
+
+		$this->unionsOrders[] = compact('column', 'direction');
+
+		return $this;
 	}
 
 	/**
