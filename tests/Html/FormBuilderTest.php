@@ -135,6 +135,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($input1, $input2);
 	}
 
+
 	public function testFormNumber()
 	{
 		$form1 = $this->formBuilder->input('number', 'foo');
@@ -147,6 +148,7 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<input name="foo" type="number" value="foobar">', $form3);
 		$this->assertEquals('<input class="span2" name="foo" type="number">', $form4);
 	}
+
 
 	public function testFormPassword()
 	{
