@@ -259,7 +259,7 @@ class FormBuilder {
 	}
 
 	/**
-	 * Create a text input field.
+	 * Create a number input field.
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
