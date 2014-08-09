@@ -18,7 +18,7 @@ class FilterMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a new route filter class.';
+	protected $description = 'Create a new route filter class';
 
 	/**
 	 * The filesystem instance.

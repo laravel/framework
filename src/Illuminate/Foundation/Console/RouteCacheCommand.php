@@ -20,7 +20,7 @@ class RouteCacheCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a route cache file for faster route registration.';
+	protected $description = 'Create a route cache file for faster route registration';
 
 	/**
 	 * The filesystem instance.
