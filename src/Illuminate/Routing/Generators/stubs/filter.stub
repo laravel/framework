@@ -1,0 +1,18 @@
+<?php
+
+use Illuminate\Http\Request;
+
+class {{class}} {
+
+	/**
+	 * Run the request filter.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return mixed
+	 */
+	public function filter(Request $request)
+	{
+		//
+	}
+
+}

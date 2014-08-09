@@ -69,7 +69,7 @@ class FilterMakeCommand extends Command {
 	 */
 	protected function buildFilterClass($name)
 	{
-		$stub = $this->files->get(__DIR__.'/stubs/filter.stub');
+		$stub = $this->files->get(__DIR__.'/../Generators/stubs/filter.stub');
 
 		return str_replace('{{class}}', $name, $stub);
 	}
