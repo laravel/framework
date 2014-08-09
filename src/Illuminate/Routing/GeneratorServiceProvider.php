@@ -1,10 +1,11 @@
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Routing\Console\MakeControllerCommand;
+use Illuminate\Routing\Console\FilterMakeCommand;
+use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Generators\ControllerGenerator;
 
-class ControllerServiceProvider extends ServiceProvider {
+class GeneratorServiceProvider extends ServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -20,9 +21,11 @@ class ControllerServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->registerGenerator();
+		$this->registerControllerGenerator();
 
-		$this->commands('command.controller.make');
+		$this->registerFilterGenerator();
+
+		$this->commands('command.controller.make', 'command.filter.make');
 	}
 
 	/**
@@ -30,7 +33,7 @@ class ControllerServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerGenerator()
+	protected function registerControllerGenerator()
 	{
 		$this->app->bindShared('command.controller.make', function($app)
 		{
@@ -39,9 +42,22 @@ class ControllerServiceProvider extends ServiceProvider {
 			// and register this command instances in this container for registration.
 			$generator = new ControllerGenerator($app['files']);
 
-			return new MakeControllerCommand(
+			return new ControllerMakeCommand(
 				$generator, $app['path.controllers']
 			);
+		});
+	}
+
+	/**
+	 * Register the filter generator command.
+	 *
+	 * @return void
+	 */
+	protected function registerFilterGenerator()
+	{
+		$this->app->bindShared('command.filter.make', function($app)
+		{
+			return new FilterMakeCommand($app['files']);
 		});
 	}
 
@@ -53,7 +69,7 @@ class ControllerServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return array(
-			'command.controller.make'
+			'command.controller.make', 'command.filter.make',
 		);
 	}
 
