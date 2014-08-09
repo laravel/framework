@@ -19,7 +19,7 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 * Set the content on the response.
 	 *
 	 * @param  mixed  $content
-	 * @return self
+	 * @return $this
 	 */
 	public function setContent($content)
 	{
