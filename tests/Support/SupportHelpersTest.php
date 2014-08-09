@@ -69,6 +69,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$array = array('name' => 'taylor', 'age' => 26);
 		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
+		$this->assertSame(array(), array_only($array, array('nonExistingKey')));
 	}
 
 
@@ -250,6 +251,21 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 			'SupportTestTraitTwo' => 'SupportTestTraitTwo',
 		],
 		class_uses_recursive('SupportTestClassTwo'));
+	}
+
+
+	public function testArrayAdd()
+	{
+		$this->assertEquals(array('surname' => 'Mövsümov'), array_add(array(), 'surname', 'Mövsümov'));
+		$this->assertEquals(array('developer' => array('name' => 'Ferid')), array_add(array(), 'developer.name', 'Ferid'));
+	}
+
+
+	public function testArrayPull()
+	{
+		$developer = array('firstname' => 'Ferid', 'surname' => 'Mövsümov');
+		$this->assertEquals('Mövsümov', array_pull($developer, 'surname'));
+		$this->assertEquals(array('firstname' => 'Ferid'), $developer);
 	}
 
 }
