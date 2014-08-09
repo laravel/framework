@@ -259,6 +259,19 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a text input field.
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function number($name, $value = null, $options = array())
+	{
+		return $this->input('number', $name, $value, $options);
+	}
+
+	/**
 	 * Create a password input field.
 	 *
 	 * @param  string  $name
