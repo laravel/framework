@@ -22,6 +22,9 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 		'Illuminate\Foundation\Providers\ServerServiceProvider',
 		'Illuminate\Foundation\Providers\TinkerServiceProvider',
 		'Illuminate\Queue\FailConsoleServiceProvider',
+		'Illuminate\Routing\GeneratorServiceProvider',
+		'Illuminate\Session\CommandsServiceProvider',
+		'Illuminate\Workbench\WorkbenchServiceProvider',
 	);
 
 	/**
