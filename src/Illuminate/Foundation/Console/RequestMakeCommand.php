@@ -18,7 +18,7 @@ class RequestMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a new form request class.';
+	protected $description = 'Create a new form request class';
 
 	/**
 	 * The filesystem instance.

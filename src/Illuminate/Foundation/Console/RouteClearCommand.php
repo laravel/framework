@@ -20,7 +20,7 @@ class RouteClearCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Remove the route cache file.';
+	protected $description = 'Remove the route cache file';
 
 	/**
 	 * The filesystem instance.
