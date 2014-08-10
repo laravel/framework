@@ -3,8 +3,6 @@
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
 
-class FileNotFoundException extends \Exception {}
-
 class Filesystem {
 
 	/**
