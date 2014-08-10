@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
-use InvalidArgumentException;
 
 class UrlGenerator {
 
@@ -231,7 +230,7 @@ class UrlGenerator {
 		}
 		else
 		{
-			throw new InvalidArgumentException("Route [{$name}] not defined.");
+			throw new \InvalidArgumentException("Route [{$name}] not defined.");
 		}
 	}
 

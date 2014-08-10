@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Exception;
 
 use Closure;
-use ErrorException;
 use ReflectionFunction;
 use Illuminate\Support\Contracts\ResponsePreparerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -131,7 +130,7 @@ class Handler {
 	{
 		if (error_reporting() & $level)
 		{
-			throw new ErrorException($message, 0, $level, $file, $line);
+			throw new \ErrorException($message, 0, $level, $file, $line);
 		}
 	}
 
