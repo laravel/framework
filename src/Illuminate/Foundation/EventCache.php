@@ -18,7 +18,7 @@ class EventCache {
 	 *
 	 * @var string
 	 */
-	protected $stub = "$events->listen('{{event}}', '{{handler}}');";
+	protected $stub = '$events->listen(\'{{event}}\', \'{{handler}}\');';
 
 	/**
 	 * Create a new event cache instance.
