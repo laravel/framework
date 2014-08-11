@@ -27,4 +27,12 @@ abstract class EventServiceProvider extends ServiceProvider {
 		}
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function register()
+	{
+		//
+	}
+
 }
