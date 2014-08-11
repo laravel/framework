@@ -5,19 +5,34 @@ use Illuminate\Support\ServiceProvider;
 abstract class EventServiceProvider extends ServiceProvider {
 
 	/**
-	 * Get the directories to scan for events.
+	 * Create a new service provider instance.
 	 *
-	 * @return array
+	 * @param  \Illuminate\Foundation\Application  $app
+	 * @return void
 	 */
-	public function scan()
+	public function __construct($app)
 	{
-		return [];
+		parent::__construct($app);
+
+		$app->booted(function() { $this->loadCachedEvents(); });
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * Register the service provider.
+	 *
+	 * @return void
 	 */
-	public function boot()
+	public function register()
+	{
+		//
+	}
+
+	/**
+	 * Load the cached events.
+	 *
+	 * @return void
+	 */
+	protected function loadCachedEvents()
 	{
 		$this->app['config']->set('app.events.scan', $this->scan());
 
@@ -28,11 +43,13 @@ abstract class EventServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * Get the directories to scan for events.
+	 *
+	 * @return array
 	 */
-	public function register()
+	public function scan()
 	{
-		//
+		return [];
 	}
 
 }
