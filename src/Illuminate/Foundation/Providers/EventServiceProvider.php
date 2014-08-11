@@ -2,7 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class EventServiceProvider extends ServiceProvider {
+abstract class EventServiceProvider extends ServiceProvider {
 
 	/**
 	 * Set the paths to be scanned for events by "event:cache".
