@@ -3,6 +3,7 @@
 use Illuminate\Console\Command;
 use Illuminate\Foundation\EventCache;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\ClassFinder;
 
 class EventCacheCommand extends Command {
 
@@ -47,8 +48,8 @@ class EventCacheCommand extends Command {
 	 */
 	public function fire()
 	{
-		$cache = (new EventCache)->get(
-			$this->laravel['config']['app.events.scan']
+		$cache = (new EventCache(new ClassFinder))->get(
+			$this->laravel['config']->get('app.events.scan', [])
 		);
 
 		$this->files->put(

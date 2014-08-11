@@ -4,6 +4,7 @@ use Illuminate\Foundation\Artisan;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\TailCommand;
 use Illuminate\Foundation\Console\ChangesCommand;
+use Illuminate\Foundation\Console\EventCacheCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 
 class ArtisanServiceProvider extends ServiceProvider {
@@ -15,6 +16,11 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = true;
 
+	/**
+	 * The commands to be registered.
+	 *
+	 * @var array
+	 */
 	protected $commands = [
 		'Tail',
 		'Changes',
@@ -43,7 +49,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		}
 
 		$this->commands(
-			'command.tail', 'command.changes', 'command.environment', 'command.event.cache',
+			'command.tail', 'command.changes', 'command.environment', 'command.event.cache'
 		);
 	}
 
