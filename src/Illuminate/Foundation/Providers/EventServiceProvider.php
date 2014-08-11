@@ -21,7 +21,7 @@ abstract class EventServiceProvider extends ServiceProvider {
 	{
 		$this->app['config']->set('app.events.scan', $this->scan());
 
-		if ($this->app->eventsAreCached()))
+		if ($this->app->eventsAreCached())
 		{
 			require $this->app->getEventCachePath();
 		}
