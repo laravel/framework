@@ -3,7 +3,6 @@
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
-use LogicException;
 use JsonSerializable;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -2408,7 +2407,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if ( ! $relations instanceof Relation)
 		{
-			throw new LogicException('Relationship method must return an object of type '
+			throw new \LogicException('Relationship method must return an object of type '
 				. 'Illuminate\Database\Eloquent\Relations\Relation');
 		}
 

@@ -107,7 +107,7 @@ class Encrypter {
 	 * @param  string  $iv
 	 * @return string
 	 *
-	 * @throws \Exception
+	 * @throws \Illuminate\Encryption\DecryptException
 	 */
 	protected function mcryptDecrypt($value, $iv)
 	{

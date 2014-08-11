@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Queue\Console;
 
-use RuntimeException;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -42,7 +41,7 @@ class SubscribeCommand extends Command {
 
 		if ( ! $iron instanceof IronQueue)
 		{
-			throw new RuntimeException("Iron.io based queue must be default.");
+			throw new \RuntimeException("Iron.io based queue must be default.");
 		}
 
 		$iron->getIron()->updateQueue($this->argument('queue'), $this->getQueueOptions());
