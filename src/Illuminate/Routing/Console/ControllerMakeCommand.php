@@ -82,6 +82,8 @@ class ControllerMakeCommand extends Command {
 		$this->generator->make($controller, $path, $options);
 
 		$this->info('Controller created successfully.');
+
+		$this->call('dump-autoload');
 	}
 
 	/**
