@@ -10,14 +10,14 @@ class ViewErrorBag implements Countable {
 	 * @var array
 	 */
 	protected $bags = [];
-	
+
 	/**
-	 * Checks if a MessageBag exists.
+	 * Checks if a named MessageBag exists in the bags.
 	 *
 	 * @param  string  $key
-	 * @return boolean
+	 * @return bool
 	 */
-	public function hasBag($key = "default")
+	public function hasBag($key = 'default')
 	{
 		return isset($this->bags[$key]);
 	}
