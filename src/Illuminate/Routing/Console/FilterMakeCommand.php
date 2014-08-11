@@ -59,6 +59,8 @@ class FilterMakeCommand extends Command {
 		);
 
 		$this->info('Filter created successfully.');
+
+		$this->call('dump-autoload');
 	}
 
 	/**

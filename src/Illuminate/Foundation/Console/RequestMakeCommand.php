@@ -59,6 +59,8 @@ class RequestMakeCommand extends Command {
 		);
 
 		$this->info('Request created successfully.');
+
+		$this->call('dump-autoload');
 	}
 
 	/**
