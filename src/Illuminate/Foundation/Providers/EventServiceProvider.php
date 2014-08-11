@@ -34,7 +34,10 @@ abstract class EventServiceProvider extends ServiceProvider {
 	 */
 	protected function loadCachedEvents()
 	{
-		$this->app['config']->set('app.events.scan', $this->scan());
+		if ($this->app->runningInConsole())
+		{
+			$this->app['config']->set('app.events.scan', $this->scan());
+		}
 
 		if ($this->app->eventsAreCached())
 		{
