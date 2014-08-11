@@ -5,14 +5,26 @@ use Illuminate\Support\ServiceProvider;
 abstract class EventServiceProvider extends ServiceProvider {
 
 	/**
-	 * Set the paths to be scanned for events by "event:cache".
+	 * Get the directories to scan for events.
 	 *
-	 * @param  array  $paths
-	 * @return void
+	 * @return array
 	 */
-	public function scan(array $paths)
+	public function scan()
 	{
-		$this->app['config']->set('app.events.scan', $paths);
+		return [];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function boot()
+	{
+		$this->app['config']->set('app.events.scan', $this->scan());
+
+		if ($this->app->eventsAreCached()))
+		{
+			require $this->app->getEventCachePath();
+		}
 	}
 
 }
