@@ -15,6 +15,13 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = true;
 
+	protected $commands = [
+		'Tail',
+		'Changes',
+		'Environment',
+		'EventCache',
+	];
+
 	/**
 	 * Register the service provider.
 	 *
@@ -30,22 +37,66 @@ class ArtisanServiceProvider extends ServiceProvider {
 			return new Artisan($app);
 		});
 
+		foreach ($this->commands as $command)
+		{
+			$this->{"register{$command}Command"}();
+		}
+
+		$this->commands(
+			'command.tail', 'command.changes', 'command.environment', 'command.event.cache',
+		);
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerTailCommand()
+	{
 		$this->app->bindShared('command.tail', function($app)
 		{
 			return new TailCommand;
 		});
+	}
 
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerChangesCommand()
+	{
 		$this->app->bindShared('command.changes', function($app)
 		{
 			return new ChangesCommand;
 		});
+	}
 
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerEnvironmentCommand()
+	{
 		$this->app->bindShared('command.environment', function($app)
 		{
 			return new EnvironmentCommand;
 		});
+	}
 
-		$this->commands('command.tail', 'command.changes', 'command.environment');
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerEventCacheCommand()
+	{
+		$this->app->bindShared('command.event.cache', function($app)
+		{
+			return new EventCacheCommand($app['files']);
+		});
 	}
 
 	/**
@@ -55,7 +106,10 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('artisan', 'command.changes', 'command.environment');
+		return [
+			'artisan', 'command.changes', 'command.tail', 'command.environment',
+			'command.event.cache',
+		];
 	}
 
 }
