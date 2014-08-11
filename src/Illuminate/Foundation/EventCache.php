@@ -18,7 +18,7 @@ class EventCache {
 	 *
 	 * @var string
 	 */
-	protected $stub = "Event::listen('{{event}}', '{{handler}}');";
+	protected $stub = "$events->listen('{{event}}', '{{handler}}');";
 
 	/**
 	 * Create a new event cache instance.
@@ -39,7 +39,7 @@ class EventCache {
 	 */
 	public function get(array $paths)
 	{
-		$cache = '<?php '.PHP_EOL.PHP_EOL;
+		$cache = '<?php $events = app(\'events\');'.PHP_EOL.PHP_EOL;
 
 		foreach ($paths as $path)
 		{
