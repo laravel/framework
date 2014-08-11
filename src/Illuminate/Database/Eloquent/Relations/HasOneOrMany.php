@@ -269,7 +269,7 @@ abstract class HasOneOrMany extends Relation {
 	}
 
 	/**
-	 * Get the key value of the paren's local key.
+	 * Get the key value of the parent's local key.
 	 *
 	 * @return mixed
 	 */
