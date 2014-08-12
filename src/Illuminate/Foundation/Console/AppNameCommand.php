@@ -71,7 +71,7 @@ class AppNameCommand extends Command {
 		$contents = $this->files->get($this->getUserClassPath());
 
 		$contents = str_replace(
-			'namespace App;', 'namespace '.$this->argument('name'), $contents
+			'namespace App', 'namespace '.$this->argument('name'), $contents
 		);
 
 		$this->files->put($this->getUserClassPath(), $contents);
