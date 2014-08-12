@@ -103,10 +103,14 @@ class EventCache {
 			$events = array_map('trim', $matches[1]);
 		}
 
+		$cache = '';
+
 		foreach ($events as $event)
 		{
-			return $this->formatEventStub($method, $event);
+			$cache .= $this->formatEventStub($method, $event);
 		}
+
+		return $cache;
 	}
 
 	/**
