@@ -317,6 +317,80 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMakeMethodFromNull()
+	{
+		$collection = Collection::make(null);
+		$this->assertEquals([], $collection->all());
+
+		$collection = Collection::make();
+		$this->assertEquals([], $collection->all());
+	}
+
+
+	public function testMakeMethodFromCollection()
+	{
+		$firstCollection = Collection::make(['foo' => 'bar']);
+		$secondCollection = Collection::make($firstCollection);
+		$this->assertEquals(['foo' => 'bar'], $secondCollection->all());
+	}
+
+
+	public function testMakeMethodFromArray()
+	{
+		$collection = Collection::make(['foo' => 'bar']);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+	public function testConstructMakeFromObject()
+	{
+		$object = new stdClass();
+		$object->foo = 'bar';
+		$collection = Collection::make($object);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
+	public function testConstructMethod()
+	{
+		$collection = new Collection('foo');
+		$this->assertEquals(array('foo'), $collection->all());
+	}
+
+
+	public function testConstructMethodFromNull()
+	{
+		$collection = new Collection(null);
+		$this->assertEquals([], $collection->all());
+
+		$collection = new Collection();
+		$this->assertEquals([], $collection->all());
+	}
+
+
+	public function testConstructMethodFromCollection()
+	{
+		$firstCollection = new Collection(['foo' => 'bar']);
+		$secondCollection = new Collection($firstCollection);
+		$this->assertEquals(['foo' => 'bar'], $secondCollection->all());
+	}
+
+
+	public function testConstructMethodFromArray()
+	{
+		$collection = new Collection(['foo' => 'bar']);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
+	public function testConstructMethodFromObject()
+	{
+		$object = new stdClass();
+		$object->foo = 'bar';
+		$collection = new Collection($object);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
 	public function testSplice()
 	{
 		$data = new Collection(array('foo', 'baz'));
