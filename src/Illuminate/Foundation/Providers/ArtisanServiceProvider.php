@@ -44,6 +44,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'EventCache',
 		'KeyGenerate',
 		'Optimize',
+		'ProviderMake',
 		'RequestMake',
 		'RouteCache',
 		'RouteClear',
@@ -79,7 +80,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 			'command.route.cache', 'command.route.clear', 'command.route.list',
 			'command.request.make', 'command.tinker', 'command.command.make',
 			'command.key.generate', 'command.down', 'command.up', 'command.clear-compiled',
-			'command.optimize', 'command.serve', 'command.app.name'
+			'command.optimize', 'command.serve', 'command.app.name', 'command.provider.make'
 		);
 	}
 
@@ -205,6 +206,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
+	protected function registerProviderMakeCommand()
+	{
+		$this->app->bindShared('command.provider.make', function($app)
+		{
+			return new ProviderMakeCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
 	protected function registerRequestMakeCommand()
 	{
 		$this->app->bindShared('command.request.make', function($app)
@@ -317,7 +331,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 			'command.route.list', 'command.request.make', 'command.tinker',
 			'command.command.make', 'command.key.generate', 'command.down',
 			'command.up', 'command.clear-compiled', 'command.optimize',
-			'command.serve', 'command.app.name',
+			'command.serve', 'command.app.name', 'command.provider.make',
 		];
 	}
 
