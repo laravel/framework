@@ -18,6 +18,7 @@ use Illuminate\Foundation\Console\CommandMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
+use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 
 class ArtisanServiceProvider extends ServiceProvider {
