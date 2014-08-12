@@ -445,7 +445,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileForelse($expression)
 	{
-		$empty = '$__empty_' . ++$this->forelseCounter;
+		$empty = '$__empty_'.++$this->forelseCounter;
 
 		return "<?php {$empty} = true; foreach{$expression}: {$empty} = false; ?>";
 	}
@@ -480,7 +480,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEmpty($expression)
 	{
-		$empty = '$__empty_' . $this->forelseCounter--;
+		$empty = '$__empty_'.$this->forelseCounter--;
 
 		return "<?php endforeach; if ({$empty}): ?>";
 	}
