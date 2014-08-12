@@ -63,10 +63,9 @@ class ControllerInspector {
 	 * Determine if the given controller method is routable.
 	 *
 	 * @param  \ReflectionMethod  $method
-	 * @param  string  $controller
 	 * @return bool
 	 */
-	public function isRoutable(ReflectionMethod $method, $controller)
+	public function isRoutable(ReflectionMethod $method)
 	{
 		if ($method->class == 'Illuminate\Routing\Controller') return false;
 
