@@ -2409,7 +2409,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		if ( ! $relations instanceof Relation)
 		{
 			throw new LogicException('Relationship method must return an object of type '
-				. 'Illuminate\Database\Eloquent\Relations\Relation');
+				.'Illuminate\Database\Eloquent\Relations\Relation');
 		}
 
 		return $this->relations[$key] = $relations->getResults();

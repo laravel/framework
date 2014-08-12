@@ -15,7 +15,7 @@ trait AssertionsTrait {
 
         $actual = $response->getStatusCode();
 
-        return $this->assertTrue($response->isOk(), 'Expected status code 200, got ' .$actual);
+		return $this->assertTrue($response->isOk(), 'Expected status code 200, got '.$actual);
     }
 
     /**

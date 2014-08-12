@@ -47,7 +47,7 @@ class RemindersControllerCommand extends Command {
 	 */
 	public function fire()
 	{
-		$destination = $this->getPath() . '/RemindersController.php';
+		$destination = $this->getPath().'/RemindersController.php';
 
 		if ( ! $this->files->exists($destination))
 		{

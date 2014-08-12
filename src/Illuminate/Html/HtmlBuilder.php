@@ -199,7 +199,7 @@ class HtmlBuilder {
 
 		$title = $title ?: $email;
 
-		$email = $this->obfuscate('mailto:') . $email;
+		$email = $this->obfuscate('mailto:').$email;
 
 		return '<a href="'.$email.'"'.$this->attributes($attributes).'>'.$this->entities($title).'</a>';
 	}
