@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\TailCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
+use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\ChangesCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
@@ -34,6 +35,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 * @var array
 	 */
 	protected $commands = [
+		'AppName',
 		'Changes',
 		'ClearCompiled',
 		'CommandMake',
@@ -77,8 +79,21 @@ class ArtisanServiceProvider extends ServiceProvider {
 			'command.route.cache', 'command.route.clear', 'command.route.list',
 			'command.request.make', 'command.tinker', 'command.command.make',
 			'command.key.generate', 'command.down', 'command.up', 'command.clear-compiled',
-			'command.optimize', 'command.serve'
+			'command.optimize', 'command.serve', 'command.app.name'
 		);
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerAppNameCommand()
+	{
+		$this->app->bindShared('command.app.name', function($app)
+		{
+			return new AppNameCommand($app['files']);
+		});
 	}
 
 	/**
@@ -302,7 +317,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 			'command.route.list', 'command.request.make', 'command.tinker',
 			'command.command.make', 'command.key.generate', 'command.down',
 			'command.up', 'command.clear-compiled', 'command.optimize',
-			'command.serve',
+			'command.serve', 'command.app.name',
 		];
 	}
 

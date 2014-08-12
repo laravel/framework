@@ -21,6 +21,13 @@ class KeyGenerateCommand extends Command {
 	protected $description = "Set the application key";
 
 	/**
+	 * The filesystem instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
 	 * Create a new key generator command.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
