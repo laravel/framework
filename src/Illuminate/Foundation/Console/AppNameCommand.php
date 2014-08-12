@@ -100,7 +100,7 @@ class AppNameCommand extends Command {
 	{
 		$contents = $this->files->get($path = $this->getAuthConfigPath());
 
-		$this->files->put($path, str_replace('App\\User', $this->argument('name').'\\User'), $contents);
+		$this->files->put($path, str_replace('App\\User', $this->argument('name').'\\User', $contents));
 	}
 
 	/**
