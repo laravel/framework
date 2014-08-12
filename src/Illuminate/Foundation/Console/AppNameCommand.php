@@ -59,6 +59,8 @@ class AppNameCommand extends Command {
 		$this->setAuthConfigNamespace();
 
 		$this->info('Application namespace set!');
+
+		$this->call('dump-autoload');
 	}
 
 	/**
