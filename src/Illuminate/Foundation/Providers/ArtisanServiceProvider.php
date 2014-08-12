@@ -257,7 +257,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerServerCommand()
+	protected function registerServeCommand()
 	{
 		$this->app->bindShared('command.serve', function()
 		{
