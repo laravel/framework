@@ -58,7 +58,7 @@ class AppNameCommand extends Command {
 
 		$this->setAuthConfigNamespace();
 
-		$this->comment('Application namespace set!');
+		$this->info('Application namespace set!');
 	}
 
 	/**
