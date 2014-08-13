@@ -147,7 +147,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function getAuthConfigPath()
 	{
-		return $this->laravel['path'].'/config/auth.php';
+		return $this->laravel['path.config'].'/auth.php';
 	}
 
 	/**
