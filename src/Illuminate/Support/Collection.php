@@ -103,10 +103,15 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * Execute a callback over each item.
 	 *
 	 * @param  \Closure  $callback
-	 * @return $this
+	 * @return $this OR \Illuminate\Support\Collection_Each
 	 */
-	public function each(Closure $callback)
+	public function each(Closure $callback = null)
 	{
+		if ($callback === null)
+		{
+			return new \Illuminate\Support\Collection_Each($this);
+		}
+
 		array_map($callback, $this->items);
 
 		return $this;
