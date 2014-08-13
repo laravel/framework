@@ -24,15 +24,33 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * Test the Fluent constructor.
+	 * Test the Fluent constructor when given \stdClass/object.
 	 *
 	 * @test
 	 */
 	public function testAttributesAreSetByConstructorGivenStdClass()
 	{
 		$array  = array('name' => 'Taylor', 'age' => 25);
-
 		$fluent = new Fluent((object) $array);
+
+		$refl = new \ReflectionObject($fluent);
+		$attributes = $refl->getProperty('attributes');
+		$attributes->setAccessible(true);
+
+		$this->assertEquals($array, $attributes->getValue($fluent));
+		$this->assertEquals($array, $fluent->getAttributes());
+	}
+
+
+	/**
+	 * Test the Fluent constructor when given ArrayIterator interface.
+	 *
+	 * @test
+	 */
+	public function testAttributesAreSetByConstructorGivenArrayIterator()
+	{
+		$array  = array('name' => 'Taylor', 'age' => 25);
+		$fluent = new Fluent(new FluentArrayIteratorStub($array));
 
 		$refl = new \ReflectionObject($fluent);
 		$attributes = $refl->getProperty('attributes');
@@ -112,5 +130,20 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$results = $fluent->toJson();
 
 		$this->assertEquals(json_encode('foo'), $results);
+	}
+}
+
+
+class FluentArrayIteratorStub implements \IteratorAggregate {
+	protected $items = array();
+
+	public function __construct(array $items = array())
+	{
+		$this->items = (array) $items;
+	}
+
+	public function getIterator()
+	{
+		return new \ArrayIterator($this->items);
 	}
 }
