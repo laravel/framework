@@ -69,7 +69,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetMinutes()
 	{
-		$repo = new ClassReflector($this->getRepository());
+		$repo = new ObjectReflector($this->getRepository());
 
 		$this->assertSame(1, $repo->getMinutes(1));
 		$this->assertSame(1, $repo->getMinutes(- 1));
@@ -113,7 +113,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class ClassReflector {
+class ObjectReflector {
 
 	protected $object;
 
