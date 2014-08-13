@@ -72,6 +72,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo = new ObjectReflector($this->getRepository());
 
 		$this->assertSame(1, $repo->getMinutes(1));
+		$this->assertSame(1, $repo->getMinutes(0));
 		$this->assertSame(1, $repo->getMinutes(- 1));
 		$this->assertSame(1, $repo->getMinutes(- 2));
 		$this->assertSame(1, $repo->getMinutes(0.5));
