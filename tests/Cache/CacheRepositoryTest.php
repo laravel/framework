@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Carbon\Carbon;
 use Illuminate\Cache\ArrayStore;
 
 class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
@@ -61,8 +62,29 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo = $this->getRepository();
 		$repo->getStore()->shouldReceive('get')->andReturn(null);
 		$repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
-		$result = $repo->remember('foo', Carbon\Carbon::now()->addMinutes(10), function() { return 'bar'; });
+		$result = $repo->remember('foo', Carbon::now()->addMinutes(10), function() { return 'bar'; });
 		$this->assertEquals('bar', $result);
+	}
+
+
+	public function testGetMinutes()
+	{
+		$repo = new ClassReflector($this->getRepository());
+
+		$this->assertSame(1, $repo->getMinutes(1));
+		$this->assertSame(1, $repo->getMinutes(- 1));
+		$this->assertSame(1, $repo->getMinutes(- 2));
+		$this->assertSame(1, $repo->getMinutes(0.5));
+		$this->assertSame(1, $repo->getMinutes(1.5));
+		$this->assertSame(2, $repo->getMinutes(2));
+
+		$this->assertSame(1, $repo->getMinutes(Carbon::now()->addMinute()));
+		$this->assertSame(1, $repo->getMinutes(Carbon::now()));
+		$this->assertSame(1, $repo->getMinutes(Carbon::now()->subMinute()));
+		$this->assertSame(1, $repo->getMinutes(Carbon::now()->subMinutes(2)));
+		$this->assertSame(1, $repo->getMinutes(Carbon::now()->addSeconds(30)));
+		$this->assertSame(1, $repo->getMinutes(Carbon::now()->addSeconds(90)));
+		$this->assertSame(2, $repo->getMinutes(Carbon::now()->addMinutes(2)));
 	}
 
 
@@ -89,4 +111,23 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 		return new Illuminate\Cache\Repository(m::mock('Illuminate\Cache\StoreInterface'));
 	}
 
+}
+
+class ClassReflector {
+
+	protected $object;
+
+	public function __construct($object)
+	{
+		$this->object = $object;
+	}
+
+	public function __call($method, $parameters)
+	{
+		$class  = new \ReflectionClass($this->object);
+		$method = $class->getMethod($method);
+		$method->setAccessible(true);
+
+		return $method->invokeArgs($this->object, $parameters);
+	}
 }
