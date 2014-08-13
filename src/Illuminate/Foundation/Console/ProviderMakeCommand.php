@@ -84,7 +84,7 @@ class ProviderMakeCommand extends Command {
 	 */
 	protected function getPath($name)
 	{
-		return $this->laravel['path.src'].'/Providers/'.$name.'.php';
+		return $this->laravel['path.providers'].'/'.$name.'.php';
 	}
 
 	/**
