@@ -127,7 +127,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function getUserClassPath()
 	{
-		return $this->laravel['path.src'].'/Core/User.php';
+		return $this->laravel['path'].'/Core/User.php';
 	}
 
 	/**
