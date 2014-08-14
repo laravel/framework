@@ -32,10 +32,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 	{
 		$array  = array('name' => 'Taylor', 'age' => 25);
 
-		$object = new \stdClass;
-		$object->name = $array['name'];
-		$object->age  = $array['age'];
-		$fluent = new Fluent($object);
+		$fluent = new Fluent((object) $array);
 
 		$refl = new \ReflectionObject($fluent);
 		$attributes = $refl->getProperty('attributes');
