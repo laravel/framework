@@ -304,8 +304,6 @@ class Store implements SessionInterface {
 		// Input that is flashed to the session can be easily retrieved by the
 		// developer, making repopulating old forms and the like much more
 		// convenient, since the request's previous input is available.
-		if (is_null($key)) return $input;
-
 		return array_get($input, $key, $default);
 	}
 
