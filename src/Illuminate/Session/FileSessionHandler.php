@@ -32,6 +32,7 @@ class FileSessionHandler implements \SessionHandlerInterface {
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $path
+	 * @param  string|int $lifetime The session lifetime in minutes
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $path, $lifetime)
