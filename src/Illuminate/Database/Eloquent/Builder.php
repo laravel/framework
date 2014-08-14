@@ -77,7 +77,7 @@ class Builder {
 			return $this->findMany($id, $columns);
 		}
 
-		$this->query->where($this->model->getKeyName(), '=', $id);
+		$this->query->where($this->model->getQualifiedKeyName(), '=', $id);
 
 		return $this->first($columns);
 	}
@@ -93,7 +93,7 @@ class Builder {
 	{
 		if (empty($id)) return $this->model->newCollection();
 
-		$this->query->whereIn($this->model->getKeyName(), $id);
+		$this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
 		return $this->get($columns);
     }
