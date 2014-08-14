@@ -27,10 +27,12 @@ class ControllerInspector {
 
 		$reflection = new ReflectionClass($controller);
 
+		$methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+
 		// To get the routable methods, we will simply spin through all methods on the
 		// controller instance checking to see if it belongs to the given class and
 		// is a publicly routable method. If so, we will add it to this listings.
-		foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
+		foreach ($methods as $method)
 		{
 			if ($this->isRoutable($method))
 			{
