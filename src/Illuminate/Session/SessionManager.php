@@ -56,9 +56,8 @@ class SessionManager extends Manager {
 	protected function createNativeDriver()
 	{
 		$path = $this->app['config']['session.files'];
-		$lifetime = $this->app['config']['session.lifetime'];
 
-		return $this->buildSession(new FileSessionHandler($this->app['files'], $path, $lifetime));
+		return $this->buildSession(new FileSessionHandler($this->app['files'], $path));
 	}
 
 	/**
