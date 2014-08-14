@@ -176,7 +176,7 @@ class RouteListCommand extends Command {
 	/**
 	 * Get after filters
 	 *
-	 * @param  Route  $route
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
 	protected function getAfterFilters($route)

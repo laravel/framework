@@ -27,7 +27,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$class = new stdClass;
 		$container->singleton('class', function() use ($class) { return $class; });
-		$this->assertTrue($class === $container->make('class'));
+		$this->assertSame($class, $container->make('class'));
 	}
 
 
@@ -64,7 +64,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 		$var1 = $container->make('ContainerConcreteStub');
 		$var2 = $container->make('ContainerConcreteStub');
-		$this->assertTrue($var1 === $var2);
+		$this->assertSame($var1, $var2);
 	}
 
 
@@ -92,7 +92,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$container->bind('something', function($c) { return $c; });
 		$c = $container->make('something');
-		$this->assertTrue($c === $container);
+		$this->assertSame($c, $container);
 	}
 
 
@@ -129,7 +129,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$closure = $container->share(function() { return new stdClass; });
 		$class1 = $closure($container);
 		$class2 = $closure($container);
-		$this->assertTrue($class1 === $class2);
+		$this->assertSame($class1, $class2);
 	}
 
 
@@ -170,7 +170,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('taylor', $result->name);
 		$this->assertEquals(26, $result->age);
-		$this->assertTrue($result === $container->make('foo'));
+		$this->assertSame($result, $container->make('foo'));
 	}
 
 

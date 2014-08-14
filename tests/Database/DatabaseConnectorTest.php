@@ -32,7 +32,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connection->shouldReceive('exec')->zeroOrMoreTimes();
 		$result = $connector->connect($config);
 
-		$this->assertTrue($result === $connection);
+		$this->assertSame($result, $connection);
 	}
 
 
@@ -58,7 +58,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connection->shouldReceive('execute')->once();
 		$result = $connector->connect($config);
 
-		$this->assertTrue($result === $connection);
+		$this->assertSame($result, $connection);
 	}
 
 
@@ -75,7 +75,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connection->shouldReceive('execute')->twice();
 		$result = $connector->connect($config);
 
-		$this->assertTrue($result === $connection);
+		$this->assertSame($result, $connection);
 	}
 
 
@@ -89,7 +89,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
 		$result = $connector->connect($config);
 
-		$this->assertTrue($result === $connection);
+		$this->assertSame($result, $connection);
 	}
 
 
@@ -103,7 +103,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
 		$result = $connector->connect($config);
 
-		$this->assertTrue($result === $connection);
+		$this->assertSame($result, $connection);
 	}
 
 
@@ -117,7 +117,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
 		$result = $connector->connect($config);
 
-		$this->assertTrue($result === $connection);
+		$this->assertSame($result, $connection);
 	}
 
 	protected function getDsn(array $config)

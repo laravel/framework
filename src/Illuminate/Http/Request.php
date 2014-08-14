@@ -120,7 +120,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Determine if the current request URI matches a pattern.
 	 *
-	 * @param  dynamic  string
+	 * @param  mixed  string
 	 * @return bool
 	 */
 	public function is()
@@ -383,7 +383,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Flash only some of the input to the session.
 	 *
-	 * @param  dynamic  string
+	 * @param  mixed  string
 	 * @return void
 	 */
 	public function flashOnly($keys)
@@ -396,7 +396,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Flash only some of the input to the session.
 	 *
-	 * @param  dynamic  string
+	 * @param  mixed  string
 	 * @return void
 	 */
 	public function flashExcept($keys)

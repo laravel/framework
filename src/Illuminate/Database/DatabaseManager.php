@@ -69,6 +69,19 @@ class DatabaseManager implements ConnectionResolverInterface {
 	}
 
 	/**
+	 * Disconnect from the given database and remove from local cache.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function purge($name = null)
+	{
+		$this->disconnect($name);
+
+		unset($this->connections[$name]);
+	}
+
+	/**
 	 * Disconnect from the given database.
 	 *
 	 * @param  string  $name

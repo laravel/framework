@@ -64,16 +64,6 @@ class SyncJob extends Job {
 	}
 
 	/**
-	 * Delete the job from the queue.
-	 *
-	 * @return void
-	 */
-	public function delete()
-	{
-		parent::delete();
-	}
-
-	/**
 	 * Release the job back into the queue.
 	 *
 	 * @param  int   $delay

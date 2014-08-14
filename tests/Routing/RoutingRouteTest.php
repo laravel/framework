@@ -315,7 +315,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->get('foo/bar', array('before' => 'foo', function() { return 'hello'; }));
 		$router->filter('foo', function($route, $request, $value = null) { $_SERVER['__route.filter'] = $value; });
 		$router->dispatch(Request::create('foo/bar', 'GET'));
-		$this->assertEquals(null, $_SERVER['__route.filter']);
+		$this->assertNull($_SERVER['__route.filter']);
 	}
 
 

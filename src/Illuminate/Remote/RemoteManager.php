@@ -26,7 +26,7 @@ class RemoteManager {
 	/**
 	 * Get a remote connection instance.
 	 *
-	 * @param  string|array|dynamic  $name
+	 * @param  string|array|mixed  $name
 	 * @return \Illuminate\Remote\ConnectionInterface
 	 */
 	public function into($name)

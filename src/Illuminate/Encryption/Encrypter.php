@@ -3,8 +3,6 @@
 use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Core\Util\SecureRandom;
 
-class DecryptException extends \RuntimeException {}
-
 class Encrypter {
 
 	/**

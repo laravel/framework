@@ -432,7 +432,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	/**
 	 * Get an iterator for the items.
 	 *
-	 * @return ArrayIterator
+	 * @return \ArrayIterator
 	 */
 	public function getIterator()
 	{

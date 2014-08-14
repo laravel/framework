@@ -70,8 +70,8 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$mockModel->shouldReceive('getKey')->andReturn(1);
 		$c = new Collection(array($mockModel));
 
-		$this->assertTrue($mockModel === $c->find(1));
-		$this->assertTrue('taylor' === $c->find(2, 'taylor'));
+		$this->assertSame($mockModel, $c->find(1));
+		$this->assertSame('taylor', $c->find(2, 'taylor'));
 	}
 
 

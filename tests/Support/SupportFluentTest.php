@@ -22,6 +22,27 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($array, $fluent->getAttributes());
 	}
 
+
+	/**
+	 * Test the Fluent constructor.
+	 *
+	 * @test
+	 */
+	public function testAttributesAreSetByConstructorGivenStdClass()
+	{
+		$array  = array('name' => 'Taylor', 'age' => 25);
+
+		$fluent = new Fluent((object) $array);
+
+		$refl = new \ReflectionObject($fluent);
+		$attributes = $refl->getProperty('attributes');
+		$attributes->setAccessible(true);
+
+		$this->assertEquals($array, $attributes->getValue($fluent));
+		$this->assertEquals($array, $fluent->getAttributes());
+	}
+
+
 	/**
 	 * Test the Fluent::get() method.
 	 *
@@ -55,6 +76,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(25, $fluent->age);
 		$this->assertInstanceOf('Illuminate\Support\Fluent', $fluent->programmer());
 	}
+
 
 	/**
 	 * Test the Fluent::__isset() method.
