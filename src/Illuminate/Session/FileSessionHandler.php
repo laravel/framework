@@ -2,6 +2,7 @@
 
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Finder\Comparator\DateComparator;
 
 class FileSessionHandler implements \SessionHandlerInterface {
 
