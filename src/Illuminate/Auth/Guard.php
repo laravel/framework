@@ -498,7 +498,10 @@ class Guard {
 	 */
 	protected function createRecaller($value)
 	{
-		return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+		$c = $this->getSessionConfig();
+		$secure = array_get($c, 'secure', false);
+
+		return $this->getCookieJar()->forever($this->getRecallerName(), $value, $c['path'], $c['domain'], $secure);
 	}
 
 	/**
@@ -544,7 +547,10 @@ class Guard {
 
 		$recaller = $this->getRecallerName();
 
-		$this->getCookieJar()->queue($this->getCookieJar()->forget($recaller));
+		$c = $this->getSessionConfig();
+		$secure = array_get($c, 'secure', false);
+
+		$this->getCookieJar()->queue($this->getCookieJar()->make($recaller, null, -2628000, $c['path'], $c['domain'], $secure));
 	}
 
 	/**
@@ -695,6 +701,30 @@ class Guard {
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;
+
+		return $this;
+	}
+
+	/**
+	 * Get the current session configuration.
+	 *
+	 * @param  array
+	 * @return \Illuminate\Auth\Guard
+	 */
+	public function getSessionConfig()
+	{
+		return $this->sessionConfig;
+	}
+
+	/**
+	 * Set the current session configuration.
+	 *
+	 * @param  array
+	 * @return \Illuminate\Auth\Guard
+	 */
+	public function setSessionConfig($config)
+	{
+		$this->sessionConfig = $config;
 
 		return $this;
 	}
