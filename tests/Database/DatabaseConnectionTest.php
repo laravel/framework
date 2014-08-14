@@ -235,7 +235,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$connection = $this->getMockConnection();
 		$schema = $connection->getSchemaBuilder();
 		$this->assertInstanceOf('Illuminate\Database\Schema\Builder', $schema);
-		$this->assertTrue($connection === $schema->getConnection());
+		$this->assertSame($connection, $schema->getConnection());
 	}
 
 

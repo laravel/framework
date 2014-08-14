@@ -7,8 +7,6 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
 
-class BindingResolutionException extends \Exception {}
-
 class Container implements ArrayAccess {
 
 	/**
@@ -202,7 +200,7 @@ class Container implements ArrayAccess {
 	 * Wrap a Closure such that it is shared.
 	 *
 	 * @param  \Closure  $closure
-	 * @return Closure
+	 * @return \Closure
 	 */
 	public function share(Closure $closure)
 	{

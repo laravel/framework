@@ -297,7 +297,7 @@ class Handler {
 	/**
 	 * Determine if the given handler type hints the exception.
 	 *
-	 * @param  ReflectionFunction  $reflection
+	 * @param  \ReflectionFunction  $reflection
 	 * @param  \Exception  $exception
 	 * @return bool
 	 */

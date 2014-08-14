@@ -711,7 +711,7 @@ class Builder {
 	/**
 	 * Set the relationships that should be eager loaded.
 	 *
-	 * @param  dynamic  $relations
+	 * @param  mixed  $relations
 	 * @return $this
 	 */
 	public function with($relations)

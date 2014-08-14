@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Cache\ArrayStore;
 
 class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 

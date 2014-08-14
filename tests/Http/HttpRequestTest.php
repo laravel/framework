@@ -14,7 +14,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	public function testInstanceMethod()
 	{
 		$request = Request::create('', 'GET');
-		$this->assertTrue($request === $request->instance());
+		$this->assertSame($request, $request->instance());
 	}
 
 

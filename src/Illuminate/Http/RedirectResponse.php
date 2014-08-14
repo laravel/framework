@@ -100,7 +100,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Flash an array of input to the session.
 	 *
-	 * @param  dynamic  string
+	 * @param  mixed  string
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function exceptInput()
