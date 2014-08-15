@@ -183,6 +183,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCollapseWithNestedCollactions()
+	{
+		$data = new Collection([new Collection([1, 2, 3]), new Collection([4, 5, 6])]);
+		$this->assertEquals([1, 2, 3, 4, 5, 6], $data->collapse()->all());
+	}
+
+
 	public function testSort()
 	{
 		$data = new Collection(array(5, 3, 1, 2, 4));
