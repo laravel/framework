@@ -1557,6 +1557,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $event
 	 * @param  bool    $halt
+	 * @param  mixed   $payload     Optional data to be added to the payload of the event.
+	 * @param  mixed   $payload,... unlimited OPTIONAL number of additional parameters.
 	 * @return mixed
 	 */
 	protected function fireModelEvent($event, $halt = true)
@@ -1570,7 +1572,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$method = $halt ? 'until' : 'fire';
 
-		return static::$dispatcher->$method($event, $this);
+		// Create the payload argument consisting of the model and any additional
+ 		// `payload` function arguments.
+		$payload = array_slice(func_get_args(), 2);
+		array_unshift($payload, $this);
+
+		return static::$dispatcher->$method($event, $payload);
 	}
 
 	/**
