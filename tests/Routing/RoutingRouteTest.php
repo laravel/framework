@@ -897,10 +897,12 @@ class RouteBindingStub {
 }
 
 class RouteModelBindingStub {
+	public static function newInstance() { return new static; }
 	public function find($value) { return strtoupper($value); }
 }
 
 class RouteModelBindingNullStub {
+	public static function newInstance() { return new static; }
 	public function find($value) {}
 }
 
