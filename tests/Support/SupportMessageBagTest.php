@@ -144,4 +144,11 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(3, $container->count());
 	}
 
+
+	public function testConstructor()
+	{
+		$messageBag = new MessageBag(array('country' => 'Azerbaijan', 'capital' => 'Baku'));
+		$this->assertEquals(array('country' => array('Azerbaijan'), 'capital' => array('Baku')), $messageBag->getMessages());
+	}
+
 }
