@@ -1322,6 +1322,28 @@ class Builder {
 
 		return count($results) > 0 ? reset($results) : null;
 	}
+	
+	/**
+	 * Execute the query as a "select" statement with a associative 
+	 * array using the primary key as key for the array.
+	 *
+	 * @param  array  $columns
+	 * @param  string $primaryKey
+	 * @return array|static[]
+	 */
+	public function getKeyd($columns = array('*'), $primaryKey = 'id')
+	{
+		$results = $this->get($columns);
+
+		$keydResults = array();
+		
+		foreach ($results as $result)
+		{
+			$keydResults[ $result[$primaryKey] ] = $result;
+		}
+		
+		return $keydResults;
+	}
 
 	/**
 	 * Execute the query as a "select" statement.
