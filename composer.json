@@ -75,6 +75,7 @@
             "src/Illuminate/Queue/IlluminateQueueClosure.php"
         ],
         "files": [
+            "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],
         "psr-0": {
