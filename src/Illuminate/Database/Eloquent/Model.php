@@ -438,7 +438,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  bool   $exists
 	 * @return static
 	 */
-	public function newInstance($attributes = array(), $exists = false)
+	public static function newInstance($attributes = array(), $exists = false)
 	{
 		// This method just provides a convenient way for us to generate fresh model
 		// instances of this current model. It is particularly useful during the
