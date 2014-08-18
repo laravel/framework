@@ -74,6 +74,15 @@ class PostgresConnector extends Connector implements ConnectorInterface {
 		{
 			$dsn .= ";port={$port}";
 		}
+		
+		// If sslmode was specified, add it to this Postgres DSN connections
+		// format. This setting will turn on/off the encryption of the connection
+		// between the app and database. For example, set it to 'require' to ensure 
+		// encrypted connection.
+		if (isset($config['sslmode']))
+		{
+			$dsn .= ";sslmode={$sslmode}";
+		}
 
 		return $dsn;
 	}
