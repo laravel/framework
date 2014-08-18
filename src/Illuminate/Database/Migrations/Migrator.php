@@ -68,7 +68,7 @@ class Migrator {
 	{
 		$this->notes = array();
 
-                $files = $this->getMigrationFiles($path);
+		$files = $this->getMigrationFiles($path);
 
 		// Once we grab all of the migration files for the path, we will compare them
 		// against the migrations that have already been run for this package then
