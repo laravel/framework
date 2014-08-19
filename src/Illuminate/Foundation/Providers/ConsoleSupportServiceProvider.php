@@ -12,7 +12,6 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	protected $providers = array(
 		'Illuminate\Foundation\Providers\ComposerServiceProvider',
 		'Illuminate\Foundation\Providers\PublisherServiceProvider',
-		'Illuminate\Queue\FailConsoleServiceProvider',
 		'Illuminate\Routing\GeneratorServiceProvider',
 		'Illuminate\Session\CommandsServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',

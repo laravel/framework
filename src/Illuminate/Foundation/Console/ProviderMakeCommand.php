@@ -11,7 +11,7 @@ class ProviderMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'provider:make';
+	protected $name = 'make:provider';
 
 	/**
 	 * The console command description.

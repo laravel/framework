@@ -12,7 +12,7 @@ class CommandMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'command:make';
+	protected $name = 'make:command';
 
 	/**
 	 * The console command description.

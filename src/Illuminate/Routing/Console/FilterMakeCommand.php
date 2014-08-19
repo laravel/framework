@@ -11,7 +11,7 @@ class FilterMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'filter:make';
+	protected $name = 'make:filter';
 
 	/**
 	 * The console command description.

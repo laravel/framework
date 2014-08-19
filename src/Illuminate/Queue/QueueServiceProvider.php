@@ -273,6 +273,8 @@ class QueueServiceProvider extends ServiceProvider {
 
 			return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
 		});
+
+		$this->app->register('Illuminate\Queue\FailConsoleServiceProvider');
 	}
 
 	/**
