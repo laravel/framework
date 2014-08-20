@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Routing;
 
+use Closure;
 use Illuminate\Support\ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider {
@@ -45,6 +46,19 @@ class RouteServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function map() {}
+
+	/**
+	 * Register the given Closure with the "group" function namespace set.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	protected function namespaced(Closure $callback)
+	{
+		$namespace = $this->app['config']['namespaces.controllers'];
+
+		app('router')->group(['namespace' => $namespace], $callback);
+	}
 
 	/**
 	 * Pass dynamic methods onto the router instance.

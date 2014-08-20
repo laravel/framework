@@ -94,7 +94,25 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor')));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('taylor', 'otwell', 'wall', 'woz')));
 		$this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', array('baz' => 'åαф')));
+	}
 
+
+	public function testControllerRoutesWithADefaultNamespace()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$url->setRootControllerNamespace('namespace');
+
+		/**
+		 * Controller Route Route
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('controller' => 'namespace\foo@bar'));
+		$routes->add($route);
+
+		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
 	}
 
 

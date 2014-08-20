@@ -55,10 +55,14 @@ class RoutingServiceProvider extends ServiceProvider {
 			// and all the registered routes will be available to the generator.
 			$routes = $app['router']->getRoutes();
 
-			return new UrlGenerator($routes, $app->rebinding('request', function($app, $request)
+			$url = new UrlGenerator($routes, $app->rebinding('request', function($app, $request)
 			{
 				$app['url']->setRequest($request);
 			}));
+
+			return $url->setRootControllerNamespace(
+				$app['config']['namespaces.controllers']
+			);
 		});
 	}
 

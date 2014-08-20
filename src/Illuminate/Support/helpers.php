@@ -748,6 +748,19 @@ if ( ! function_exists('public_path'))
 	}
 }
 
+if ( ! function_exists('redirect'))
+{
+	/**
+	 * Get an instance of the redirector.
+	 *
+	 * @return \Illuminate\Routing\Redirector
+	 */
+	function redirect()
+	{
+		return app('redirect');
+	}
+}
+
 if ( ! function_exists('route'))
 {
 	/**
