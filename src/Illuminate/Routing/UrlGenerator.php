@@ -459,7 +459,7 @@ class UrlGenerator {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
-		if ( ! (strpos($action, '\\') === 0) && $this->rootNamespace)
+		if ($this->rootNamespace && ! (strpos($action, '\\') === 0))
 		{
 			$action = $this->rootNamespace.'\\'.$action;
 		}
