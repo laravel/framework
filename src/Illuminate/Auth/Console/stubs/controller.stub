@@ -1,6 +1,8 @@
-<?php
+<?php namespace {{namespace}}Http\Controllers;
 
-class RemindersController extends Controller {
+use App, Hash, Lang, View, Input, Password, Redirect;
+
+class {{class}} extends \Controller {
 
 	/**
 	 * Display the password reminder view.
