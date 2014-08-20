@@ -100,14 +100,7 @@ class CommandMakeCommand extends Command {
 	 */
 	protected function addNamespace($stub)
 	{
-		if ( ! is_null($namespace = $this->input->getOption('namespace')))
-		{
-			return str_replace('{{namespace}}', ' namespace '.$namespace.';', $stub);
-		}
-		else
-		{
-			return str_replace('{{namespace}}', '', $stub);
-		}
+		return str_replace('{{namespace}}', $this->laravel['config']['namespaces.root'], $stub);
 	}
 
 	/**
@@ -152,8 +145,6 @@ class CommandMakeCommand extends Command {
 			array('command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', null),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path where the command should be stored.', null),
-
-			array('namespace', null, InputOption::VALUE_OPTIONAL, 'The command namespace.', null),
 		);
 	}
 

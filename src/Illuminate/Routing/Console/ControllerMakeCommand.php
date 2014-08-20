@@ -70,7 +70,7 @@ class ControllerMakeCommand extends Command {
 		// Once we have the controller and resource that we are going to be generating
 		// we will grab the path and options. We allow the developers to include or
 		// exclude given methods from the resourceful controllers we're building.
-		$controller = $this->input->getArgument('name');
+		$controller = $this->getControllerName();
 
 		$path = $this->getPath();
 
@@ -84,6 +84,18 @@ class ControllerMakeCommand extends Command {
 		$this->info('Controller created successfully.');
 
 		$this->call('dump-autoload');
+	}
+
+	/**
+	 * Get the controller name for the command.
+	 *
+	 * @return string
+	 */
+	protected function getControllerName()
+	{
+		$controller = $this->input->getArgument('name');
+
+		return $this->laravel['config']['namespaces.controllers'].$controller;
 	}
 
 	/**

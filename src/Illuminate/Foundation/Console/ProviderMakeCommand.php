@@ -73,7 +73,9 @@ class ProviderMakeCommand extends Command {
 	{
 		$stub = $this->files->get(__DIR__.'/stubs/provider.stub');
 
-		return str_replace('{{class}}', $name, $stub);
+		$stub = str_replace('{{class}}', $name, $stub);
+
+		return str_replace('{{namespace}}', $this->laravel['config']['namespaces.root'], $stub);
 	}
 
 	/**

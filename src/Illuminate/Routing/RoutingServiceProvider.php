@@ -61,7 +61,7 @@ class RoutingServiceProvider extends ServiceProvider {
 			}));
 
 			return $url->setRootControllerNamespace(
-				$app['config']['namespaces.controllers']
+				trim($app['config']['namespaces.controllers'], '\\')
 			);
 		});
 	}

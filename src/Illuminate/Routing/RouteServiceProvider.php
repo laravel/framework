@@ -55,7 +55,7 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	protected function namespaced(Closure $callback)
 	{
-		$namespace = $this->app['config']['namespaces.controllers'];
+		$namespace = trim($this->app['config']['namespaces.controllers'], '\\');
 
 		app('router')->group(['namespace' => $namespace], $callback);
 	}
