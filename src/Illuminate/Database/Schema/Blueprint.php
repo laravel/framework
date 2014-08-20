@@ -663,13 +663,13 @@ class Blueprint {
 	 * @param  string  $name
 	 * @return void
 	 */
-	public function morphs($name)
+	public function morphs($name, $indexName = null)
 	{
 		$this->unsignedInteger("{$name}_id");
 
 		$this->string("{$name}_type");
 
-		$this->index(array("{$name}_id", "{$name}_type"));
+		$this->index(array("{$name}_id", "{$name}_type"), $indexName);
 	}
 
 	/**
