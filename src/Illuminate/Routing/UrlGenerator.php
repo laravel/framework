@@ -463,6 +463,10 @@ class UrlGenerator {
 		{
 			$action = $this->rootNamespace.'\\'.$action;
 		}
+		else
+		{
+			$action = trim($action, '\\');
+		}
 
 		return $this->route($action, $parameters, $absolute, $this->routes->getByAction($action));
 	}
