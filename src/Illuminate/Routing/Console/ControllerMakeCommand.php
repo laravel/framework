@@ -1,10 +1,10 @@
 <?php namespace Illuminate\Routing\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ControllerMakeCommand extends Command {
+class ControllerMakeCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
@@ -21,60 +21,11 @@ class ControllerMakeCommand extends Command {
 	protected $description = 'Create a new resource controller class';
 
 	/**
-	 * The filesystem instance.
+	 * The type of class being generated.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var string
 	 */
-	protected $files;
-
-	/**
-	 * Create a new controller creator command instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
-	public function __construct(Filesystem $files)
-	{
-		parent::__construct();
-
-		$this->files = $files;
-	}
-
-	/**
-	 * Execute the console command.
-	 *
-	 * @return void
-	 */
-	public function fire()
-	{
-		$path = $this->getPath($name = $this->argument('name'));
-
-		if ($this->files->exists($path))
-		{
-			return $this->error('Controller already exists!');
-		}
-
-		$this->files->put(
-			$path, $this->buildControllerClass($name)
-		);
-
-		$this->info('Controller created successfully.');
-	}
-
-	/**
-	 * Build the controller class with the given name.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function buildControllerClass($name)
-	{
-		$stub = $this->files->get(__DIR__.'/stubs/controller.stub');
-
-		$stub = str_replace('{{class}}', $name, $stub);
-
-		return str_replace('{{namespace}}', $this->laravel['config']['namespaces.root'], $stub);
-	}
+	protected $type = 'Controller';
 
 	/**
 	 * Get the controller class path.
@@ -88,15 +39,13 @@ class ControllerMakeCommand extends Command {
 	}
 
 	/**
-	 * Get the console command arguments.
+	 * Get the stub file for the generator.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	protected function getArguments()
+	protected function getStub()
 	{
-		return array(
-			array('name', InputArgument::REQUIRED, 'The name of the controller class'),
-		);
+		return __DIR__.'/stubs/controller.stub';
 	}
 
 }

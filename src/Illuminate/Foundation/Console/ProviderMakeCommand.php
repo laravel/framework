@@ -1,10 +1,10 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ProviderMakeCommand extends Command {
+class ProviderMakeCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
@@ -21,65 +21,14 @@ class ProviderMakeCommand extends Command {
 	protected $description = 'Create a new service provider class';
 
 	/**
-	 * The filesystem instance.
+	 * The type of class being generated.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var string
 	 */
-	protected $files;
+	protected $type = 'Provider';
 
 	/**
-	 * Create a new provider creator command instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
-	public function __construct(Filesystem $files)
-	{
-		parent::__construct();
-
-		$this->files = $files;
-	}
-
-	/**
-	 * Execute the console command.
-	 *
-	 * @return void
-	 */
-	public function fire()
-	{
-		$path = $this->getPath($name = $this->argument('name'));
-
-		if ($this->files->exists($path))
-		{
-			return $this->error('Provider already exists!');
-		}
-
-		$this->files->put(
-			$path, $this->buildProviderClass($name)
-		);
-
-		$this->info('Provider created successfully.');
-
-		$this->call('dump-autoload');
-	}
-
-	/**
-	 * Build the provider class with the given name.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function buildProviderClass($name)
-	{
-		$stub = $this->files->get(__DIR__.'/stubs/provider.stub');
-
-		$stub = str_replace('{{class}}', $name, $stub);
-
-		return str_replace('{{namespace}}', $this->laravel['config']['namespaces.root'], $stub);
-	}
-
-	/**
-	 * Get the provider class path.
+	 * Get the controller class path.
 	 *
 	 * @param  string  $name
 	 * @return string
@@ -90,15 +39,13 @@ class ProviderMakeCommand extends Command {
 	}
 
 	/**
-	 * Get the console command arguments.
+	 * Get the stub file for the generator.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	protected function getArguments()
+	protected function getStub()
 	{
-		return array(
-			array('name', InputArgument::REQUIRED, 'The name of the provider class'),
-		);
+		return __DIR__.'/stubs/provider.stub';
 	}
 
 }
