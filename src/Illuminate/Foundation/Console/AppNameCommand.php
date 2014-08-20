@@ -154,7 +154,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function root()
 	{
-		return $this->laravel['config']['namespaces.root'];
+		return trim($this->laravel['config']['namespaces.root'], '\\');
 	}
 
 	/**
