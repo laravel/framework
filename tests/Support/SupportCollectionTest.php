@@ -286,6 +286,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRandomOnEmpty()
+	{
+		$data = new Collection();
+		$random = $data->random();
+		$this->assertNull($random);
+	}
+
+
 	public function testTakeLast()
 	{
 		$data = new Collection(array('taylor', 'dayle', 'shawn'));
