@@ -94,7 +94,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.app.name', function($app)
 		{
-			return new AppNameCommand($app['files']);
+			return new AppNameCommand($app['composer'], $app['files']);
 		});
 	}
 
