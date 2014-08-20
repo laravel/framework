@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Composer;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,13 @@ class AppNameCommand extends Command {
 	protected $description = "Set the application namespace";
 
 	/**
+	 * The Composer class instance.
+	 *
+	 * @var \Illuminate\Foundation\Composer
+	 */
+	protected $composer;
+
+	/**
 	 * The filesystem instance.
 	 *
 	 * @var \Illuminate\Filesystem\Filesystem
@@ -34,11 +42,12 @@ class AppNameCommand extends Command {
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(Filesystem $files)
+	public function __construct(Composer $composer, Filesystem $files)
 	{
 		parent::__construct();
 
 		$this->files = $files;
+		$this->composer = $composer;
 	}
 
 	/**
@@ -56,7 +65,7 @@ class AppNameCommand extends Command {
 
 		$this->info('Application namespace set!');
 
-		$this->call('dump-autoload');
+		$this->composer->dumpAutoloads();
 	}
 
 	/**
