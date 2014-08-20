@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -47,16 +48,11 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ( ! $this->coreIsReady())
-		{
-			return $this->error('Core directory has already been modified.');
-		}
-
-		$this->setUserClassNamespace();
+		$this->namespaceAppDirectory();
 
 		$this->setComposerNamespace();
 
-		$this->setAuthConfigNamespace();
+		$this->setConfigNamespaces();
 
 		$this->info('Application namespace set!');
 
@@ -64,19 +60,37 @@ class AppNameCommand extends Command {
 	}
 
 	/**
-	 * Set the namespace in the Core User class.
+	 * Set the namespace on the files in the app directory.
 	 *
 	 * @return void
 	 */
-	protected function setUserClassNamespace()
+	protected function namespaceAppDirectory()
 	{
-		$contents = $this->files->get($this->getUserClassPath());
+		$files = Finder::create()
+                            ->in($this->laravel['path'])
+                            ->exclude($this->laravel['path'].'/Http/Views')
+                            ->name('*.php');
+
+		foreach ($files as $file)
+		{
+			$this->replaceNamespace($file->getRealPath());
+		}
+	}
+
+	/**
+	 * Replace the App namespace at the given path.
+	 *
+	 * @param  string  $path;
+	 */
+	protected function replaceNamespace($path)
+	{
+		$contents = $this->files->get($path);
 
 		$contents = str_replace(
-			'namespace App', 'namespace '.$this->argument('name'), $contents
+			'namespace '.$this->root().'\\', 'namespace '.$this->argument('name').'\\', $contents
 		);
 
-		$this->files->put($this->getUserClassPath(), $contents);
+		$this->files->put($path, $contents);
 	}
 
 	/**
@@ -89,8 +103,20 @@ class AppNameCommand extends Command {
 		$contents = $this->files->get($path = $this->getComposerPath());
 
 		$this->files->put(
-			$path, str_replace('App\\\\', $this->argument('name').'\\\\', $contents)
+			$path, str_replace($this->root().'\\\\', $this->argument('name').'\\\\', $contents)
 		);
+	}
+
+	/**
+	 * Set the namespace in the appropriate configuration files.
+	 *
+	 * @return void
+	 */
+	protected function setConfigNamespaces()
+	{
+		$this->setAuthConfigNamespace();
+
+		$this->setNamespaceConfigNamespace();
 	}
 
 	/**
@@ -102,22 +128,33 @@ class AppNameCommand extends Command {
 	{
 		$contents = $this->files->get($path = $this->getAuthConfigPath());
 
-		$this->files->put($path, str_replace('App\\User', $this->argument('name').'\\User', $contents));
+		$this->files->put($path, str_replace(
+			$this->root().'\\User', $this->argument('name').'\\User', $contents
+		));
 	}
 
 	/**
-	 * Determine if the Core directory User has been modified.
+	 * Set the namespace configuration file namespaces.
 	 *
-	 * @return bool
+	 * @return void
 	 */
-	protected function coreIsReady()
+	protected function setNamespaceConfigNamespace()
 	{
-		if ($this->files->exists($path = $this->getUserClassPath()))
-		{
-			return str_contains($this->files->get($path), 'namespace App;');
-		}
+		$contents = $this->files->get($path = $this->getNamespaceConfigPath());
 
-		return false;
+		$this->files->put($path, str_replace(
+			$this->root().'\\', $this->argument('name').'\\', $contents
+		));
+	}
+
+	/**
+	 * Get the root namespace for the application.
+	 *
+	 * @return string
+	 */
+	protected function root()
+	{
+		return $this->laravel['config']['namespaces.root'];
 	}
 
 	/**
@@ -148,6 +185,16 @@ class AppNameCommand extends Command {
 	protected function getAuthConfigPath()
 	{
 		return $this->laravel['path.config'].'/auth.php';
+	}
+
+	/**
+	 * Get the path to the namespace configuration file.
+	 *
+	 * @return string
+	 */
+	protected function getNamespaceConfigPath()
+	{
+		return $this->laravel['path.config'].'/namespaces.php';
 	}
 
 	/**
