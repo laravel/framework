@@ -73,7 +73,9 @@ class FilterMakeCommand extends Command {
 	{
 		$stub = $this->files->get(__DIR__.'/../Generators/stubs/filter.stub');
 
-		return str_replace('{{class}}', $name, $stub);
+		$stub = str_replace('{{class}}', $name, $stub);
+
+		return str_replace('{{namespace}}', $this->laravel['config']['namespaces.root'], $stub);
 	}
 
 	/**

@@ -1,4 +1,4 @@
-<?php
+<?php namespace {{namespace}}\Http\Filters;
 
 use Illuminate\Http\Request;
 
