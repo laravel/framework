@@ -48,11 +48,11 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->namespaceAppDirectory();
-
-		$this->setComposerNamespace();
+		$this->setAppDirectoryNamespace();
 
 		$this->setConfigNamespaces();
+
+		$this->setComposerNamespace();
 
 		$this->info('Application namespace set!');
 
@@ -64,7 +64,7 @@ class AppNameCommand extends Command {
 	 *
 	 * @return void
 	 */
-	protected function namespaceAppDirectory()
+	protected function setAppDirectoryNamespace()
 	{
 		$files = Finder::create()
                             ->in($this->laravel['path'])
@@ -75,6 +75,8 @@ class AppNameCommand extends Command {
 		{
 			$this->replaceNamespace($file->getRealPath());
 		}
+
+		$this->setServiceProviderNamespaceReferences();
 	}
 
 	/**
@@ -84,13 +86,47 @@ class AppNameCommand extends Command {
 	 */
 	protected function replaceNamespace($path)
 	{
-		$contents = $this->files->get($path);
-
-		$contents = str_replace(
-			'namespace '.$this->root().'\\', 'namespace '.$this->argument('name').'\\', $contents
+		$this->replaceIn(
+			$path, 'namespace '.$this->root().'\\', 'namespace '.$this->argument('name').'\\'
 		);
+	}
 
-		$this->files->put($path, $contents);
+	/**
+	 * Set the referenced namespaces in various service providers.
+	 *
+	 * @return void
+	 */
+	protected function setServiceProviderNamespaceReferences()
+	{
+		$this->setReferencedFilterNamespaces();
+
+		$this->setReferencedConsoleNamespaces();
+	}
+
+	/**
+	 * Set the namespace on the referenced filters in the filter service provider.
+	 *
+	 * @return void
+	 */
+	protected function setReferencedFilterNamespaces()
+	{
+		$this->replaceIn(
+			$this->laravel['path'].'/Providers/FilterServiceProvider.php',
+			$this->root().'\\Http\\Filters', $this->argument('name').'\\Http\\Filters'
+		);
+	}
+
+	/**
+	 * Set the namespace on the referenced commands in the Artisan service provider.
+	 *
+	 * @return void
+	 */
+	protected function setReferencedConsoleNamespaces()
+	{
+		$this->replaceIn(
+			$this->laravel['path'].'/Providers/ArtisanServiceProvider.php',
+			$this->root().'\\Console', $this->argument('name').'\\Console'
+		);
 	}
 
 	/**
@@ -100,10 +136,8 @@ class AppNameCommand extends Command {
 	 */
 	protected function setComposerNamespace()
 	{
-		$contents = $this->files->get($path = $this->getComposerPath());
-
-		$this->files->put(
-			$path, str_replace($this->root().'\\\\', $this->argument('name').'\\\\', $contents)
+		$this->replaceIn(
+			$this->getComposerPath(), $this->root().'\\\\', $this->argument('name').'\\\\'
 		);
 	}
 
@@ -114,9 +148,23 @@ class AppNameCommand extends Command {
 	 */
 	protected function setConfigNamespaces()
 	{
+		$this->setAppProviderConfigNamespace();
+
 		$this->setAuthConfigNamespace();
 
 		$this->setNamespaceConfigNamespace();
+	}
+
+	/**
+	 * Set the application provider namespaces.
+	 *
+	 * @return void
+	 */
+	protected function setAppProviderConfigNamespace()
+	{
+		$this->replaceIn(
+			$this->getConfigPath('app'), $this->root().'\\Providers', $this->argument('name').'\\Providers'
+		);
 	}
 
 	/**
@@ -126,11 +174,9 @@ class AppNameCommand extends Command {
 	 */
 	protected function setAuthConfigNamespace()
 	{
-		$contents = $this->files->get($path = $this->getAuthConfigPath());
-
-		$this->files->put($path, str_replace(
-			$this->root().'\\User', $this->argument('name').'\\User', $contents
-		));
+		$this->replaceIn(
+			$this->getAuthConfigPath(), $this->root().'\\User', $this->argument('name').'\\User'
+		);
 	}
 
 	/**
@@ -140,11 +186,22 @@ class AppNameCommand extends Command {
 	 */
 	protected function setNamespaceConfigNamespace()
 	{
-		$contents = $this->files->get($path = $this->getNamespaceConfigPath());
+		$this->replaceIn(
+			$this->getNamespaceConfigPath(), $this->root().'\\', $this->argument('name').'\\'
+		);
+	}
 
-		$this->files->put($path, str_replace(
-			$this->root().'\\', $this->argument('name').'\\', $contents
-		));
+	/**
+	 * Replace the given string in the given file.
+	 *
+	 * @param  string  $path
+	 * @param  string  $search
+	 * @param  string  $replace
+	 * @return void
+	 */
+	protected function replaceIn($path, $search, $replace)
+	{
+		$this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
 	}
 
 	/**
@@ -178,13 +235,24 @@ class AppNameCommand extends Command {
 	}
 
 	/**
+	 * Get the path to the given configuration file.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getConfigPath($name)
+	{
+		return $this->laravel['path.config'].'/'.$name.'.php';
+	}
+
+	/**
 	 * Get the path to the authentication configuration file.
 	 *
 	 * @return string
 	 */
 	protected function getAuthConfigPath()
 	{
-		return $this->laravel['path.config'].'/auth.php';
+		return $this->getConfigPath('auth');
 	}
 
 	/**
@@ -194,7 +262,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function getNamespaceConfigPath()
 	{
-		return $this->laravel['path.config'].'/namespaces.php';
+		return $this->getConfigPath('namespaces');
 	}
 
 	/**
