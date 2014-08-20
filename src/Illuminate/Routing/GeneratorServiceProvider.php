@@ -3,7 +3,6 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Console\FilterMakeCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
-use Illuminate\Routing\Generators\ControllerGenerator;
 
 class GeneratorServiceProvider extends ServiceProvider {
 
@@ -37,14 +36,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.controller.make', function($app)
 		{
-			// The controller generator is responsible for building resourceful controllers
-			// quickly and easily for the developers via the Artisan CLI. We'll go ahead
-			// and register this command instances in this container for registration.
-			$generator = new ControllerGenerator($app['files']);
-
-			return new ControllerMakeCommand(
-				$generator, $app['path.controllers']
-			);
+			return new ControllerMakeCommand($app['files']);
 		});
 	}
 

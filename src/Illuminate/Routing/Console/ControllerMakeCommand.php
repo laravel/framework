@@ -1,9 +1,8 @@
 <?php namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
-use Illuminate\Routing\Generators\ControllerGenerator;
 
 class ControllerMakeCommand extends Command {
 
@@ -19,35 +18,26 @@ class ControllerMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a new resourceful controller';
+	protected $description = 'Create a new resource controller class';
 
 	/**
-	 * The controller generator instance.
+	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Routing\Generators\ControllerGenerator
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
-	protected $generator;
+	protected $files;
 
 	/**
-	 * The path to the controller directory.
+	 * Create a new controller creator command instance.
 	 *
-	 * @var string
-	 */
-	protected $path;
-
-	/**
-	 * Create a new make controller command instance.
-	 *
-	 * @param  \Illuminate\Routing\Generators\ControllerGenerator  $generator
-	 * @param  string  $path
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(ControllerGenerator $generator, $path)
+	public function __construct(Filesystem $files)
 	{
 		parent::__construct();
 
-		$this->path = $path;
-		$this->generator = $generator;
+		$this->files = $files;
 	}
 
 	/**
@@ -57,109 +47,44 @@ class ControllerMakeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->generateController();
-	}
+		$path = $this->getPath($name = $this->argument('name'));
 
-	/**
-	 * Generate a new resourceful controller file.
-	 *
-	 * @return void
-	 */
-	protected function generateController()
-	{
-		// Once we have the controller and resource that we are going to be generating
-		// we will grab the path and options. We allow the developers to include or
-		// exclude given methods from the resourceful controllers we're building.
-		$controller = $this->getControllerName();
+		if ($this->files->exists($path))
+		{
+			return $this->error('Controller already exists!');
+		}
 
-		$path = $this->getPath();
-
-		$options = $this->getBuildOptions();
-
-		// Finally, we're ready to generate the actual controller file on disk and let
-		// the developer start using it. The controller will be stored in the right
-		// place based on the namespace of this controller specified by commands.
-		$this->generator->make($controller, $path, $options);
+		$this->files->put(
+			$path, $this->buildControllerClass($name)
+		);
 
 		$this->info('Controller created successfully.');
-
-		$this->call('dump-autoload');
 	}
 
 	/**
-	 * Get the controller name for the command.
-	 *
-	 * @return string
-	 */
-	protected function getControllerName()
-	{
-		$controller = $this->input->getArgument('name');
-
-		return $this->laravel['config']['namespaces.controllers'].$controller;
-	}
-
-	/**
-	 * Get the path in which to store the controller.
-	 *
-	 * @return string
-	 */
-	protected function getPath()
-	{
-		if ( ! is_null($this->input->getOption('path')))
-		{
-			return $this->laravel['path.base'].'/'.$this->input->getOption('path');
-		}
-		elseif ($bench = $this->input->getOption('bench'))
-		{
-			return $this->getWorkbenchPath($bench);
-		}
-
-		return $this->path;
-	}
-
-	/**
-	 * Get the workbench path for the controller.
-	 *
-	 * @param  string  $bench
-	 * @return string
-	 */
-	protected function getWorkbenchPath($bench)
-	{
-		$path = $this->laravel['path.base'].'/workbench/'.$bench.'/src/controllers';
-
-		if ( ! $this->laravel['files']->isDirectory($path))
-		{
-			$this->laravel['files']->makeDirectory($path);
-		}
-
-		return $path;
-	}
-
-	/**
-	 * Get the options for controller generation.
-	 *
-	 * @return array
-	 */
-	protected function getBuildOptions()
-	{
-		$only = $this->explodeOption('only');
-
-		$except = $this->explodeOption('except');
-
-		return compact('only', 'except');
-	}
-
-	/**
-	 * Get and explode a given input option.
+	 * Build the controller class with the given name.
 	 *
 	 * @param  string  $name
-	 * @return array
+	 * @return string
 	 */
-	protected function explodeOption($name)
+	protected function buildControllerClass($name)
 	{
-		$option = $this->input->getOption($name);
+		$stub = $this->files->get(__DIR__.'/stubs/controller.stub');
 
-		return is_null($option) ? array() : explode(',', $option);
+		$stub = str_replace('{{class}}', $name, $stub);
+
+		return str_replace('{{namespace}}', $this->laravel['config']['namespaces.root'], $stub);
+	}
+
+	/**
+	 * Get the controller class path.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getPath($name)
+	{
+		return $this->laravel['path.controllers'].'/'.$name.'.php';
 	}
 
 	/**
@@ -171,24 +96,6 @@ class ControllerMakeCommand extends Command {
 	{
 		return array(
 			array('name', InputArgument::REQUIRED, 'The name of the controller class'),
-		);
-	}
-
-	/**
-	 * Get the console command options.
-	 *
-	 * @return array
-	 */
-	protected function getOptions()
-	{
-		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The workbench the controller belongs to'),
-
-			array('only', null, InputOption::VALUE_OPTIONAL, 'The methods that should be included'),
-
-			array('except', null, InputOption::VALUE_OPTIONAL, 'The methods that should be excluded'),
-
-			array('path', null, InputOption::VALUE_OPTIONAL, 'Where to place the controller'),
 		);
 	}
 
