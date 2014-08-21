@@ -4,7 +4,6 @@ use Illuminate\Foundation\Artisan;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
-use Illuminate\Foundation\Console\TailCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
@@ -51,7 +50,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'RouteClear',
 		'RouteList',
 		'Serve',
-		'Tail',
 		'Tinker',
 		'Up',
 	];
@@ -277,19 +275,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->bindShared('command.serve', function()
 		{
 			return new ServeCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerTailCommand()
-	{
-		$this->app->bindShared('command.tail', function($app)
-		{
-			return new TailCommand;
 		});
 	}
 
