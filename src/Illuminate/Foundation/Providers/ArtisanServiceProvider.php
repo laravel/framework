@@ -75,7 +75,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		}
 
 		$this->commands(
-			'command.tail', 'command.changes', 'command.environment', 'command.event.cache',
+			'command.changes', 'command.environment', 'command.event.cache',
 			'command.route.cache', 'command.route.clear', 'command.route.list',
 			'command.request.make', 'command.tinker', 'command.command.make',
 			'command.key.generate', 'command.down', 'command.up', 'command.clear-compiled',
