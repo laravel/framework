@@ -79,7 +79,7 @@ class ControllerDispatcher {
 	{
 		Controller::setFilterer($this->filterer);
 
-		return $this->container->make($controller);
+		return $this->container->make($controller)->setContainer($this->container);
 	}
 
 	/**
