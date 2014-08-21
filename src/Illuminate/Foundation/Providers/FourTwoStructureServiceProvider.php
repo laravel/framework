@@ -2,7 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class SimpleStructureServiceProvider extends ServiceProvider {
+class FourTwoStructureServiceProvider extends ServiceProvider {
 
 	/**
 	 * Register the service provider.
