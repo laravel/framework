@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\NullStore;
 
 class CacheNullStoreTest extends PHPUnit_Framework_TestCase {
 

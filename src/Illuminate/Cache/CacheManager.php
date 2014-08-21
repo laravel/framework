@@ -55,7 +55,7 @@ class CacheManager extends Manager {
 	 *
 	 * @return \Illuminate\Cache\NullStore
 	 */
-	protected function createMemcachedDriver()
+	protected function createNullDriver()
 	{
 		return $this->repository(new NullStore());
 	}

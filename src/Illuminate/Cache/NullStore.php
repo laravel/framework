@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-class ArrayStore extends TaggableStore implements StoreInterface {
+class NullStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * The array of stored values.
