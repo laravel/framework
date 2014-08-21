@@ -196,37 +196,6 @@ class Writer {
 	}
 
 	/**
-	 * Get the underlying Monolog instance.
-	 *
-	 * @return \Monolog\Logger
-	 */
-	public function getMonolog()
-	{
-		return $this->monolog;
-	}
-
-	/**
-	 * Get the event dispatcher instance.
-	 *
-	 * @return \Illuminate\Events\Dispatcher
-	 */
-	public function getEventDispatcher()
-	{
-		return $this->dispatcher;
-	}
-
-	/**
-	 * Set the event dispatcher instance.
-	 *
-	 * @param  \Illuminate\Events\Dispatcher
-	 * @return void
-	 */
-	public function setEventDispatcher(Dispatcher $dispatcher)
-	{
-		$this->dispatcher = $dispatcher;
-	}
-
-	/**
 	 * Fires a log event.
 	 *
 	 * @param  string  $level
@@ -259,31 +228,6 @@ class Writer {
 	}
 
 	/**
-	 * Dynamically handle error additions.
-	 *
-	 * @param  string  $method
-	 * @param  mixed   $parameters
-	 * @return mixed
-	 *
-	 * @throws \BadMethodCallException
-	 */
-	public function __call($method, $parameters)
-	{
-		if (in_array($method, $this->levels))
-		{
-			$this->formatParameters($parameters);
-
-			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
-
-			$method = 'add'.ucfirst($method);
-
-			return $this->callMonolog($method, $parameters);
-		}
-
-		throw new \BadMethodCallException("Method [$method] does not exist.");
-	}
-
-	/**
 	 * Format the parameters for the logger.
 	 *
 	 * @param  mixed  $parameters
@@ -306,6 +250,62 @@ class Writer {
 				$parameters[0] = var_export($parameters[0]->toArray(), true);
 			}
 		}
+	}
+
+	/**
+	 * Get the underlying Monolog instance.
+	 *
+	 * @return \Monolog\Logger
+	 */
+	public function getMonolog()
+	{
+		return $this->monolog;
+	}
+
+	/**
+	 * Get the event dispatcher instance.
+	 *
+	 * @return \Illuminate\Events\Dispatcher
+	 */
+	public function getEventDispatcher()
+	{
+		return $this->dispatcher;
+	}
+
+	/**
+	 * Set the event dispatcher instance.
+	 *
+	 * @param  \Illuminate\Events\Dispatcher
+	 * @return void
+	 */
+	public function setEventDispatcher(Dispatcher $dispatcher)
+	{
+		$this->dispatcher = $dispatcher;
+	}
+
+	/**
+	 * Dynamically handle error additions.
+	 *
+	 * @param  string  $method
+	 * @param  mixed   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, $parameters)
+	{
+		if (in_array($method, $this->levels))
+		{
+			$this->formatParameters($parameters);
+
+			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
+
+			$method = 'add'.ucfirst($method);
+
+			return $this->callMonolog($method, $parameters);
+		}
+
+		throw new \BadMethodCallException("Method [$method] does not exist.");
 	}
 
 }

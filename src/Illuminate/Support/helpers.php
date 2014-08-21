@@ -589,6 +589,21 @@ if ( ! function_exists('head'))
 	}
 }
 
+if ( ! function_exists('info'))
+{
+	/**
+	 * Write some information to the log.
+	 *
+	 * @param  string  $message
+	 * @param  array  $context
+	 * @return void
+	 */
+	function info($message, $context = array())
+	{
+		return app('log')->info($message, $context);
+	}
+}
+
 if ( ! function_exists('link_to'))
 {
 	/**
