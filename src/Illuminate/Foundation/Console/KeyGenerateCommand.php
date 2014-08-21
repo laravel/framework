@@ -11,7 +11,7 @@ class KeyGenerateCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'key:generate';
+	protected $name = 'app:key';
 
 	/**
 	 * The console command description.

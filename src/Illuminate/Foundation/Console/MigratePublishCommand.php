@@ -10,7 +10,7 @@ class MigratePublishCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'migrate:publish';
+	protected $name = 'publish:migration';
 
 	/**
 	 * The console command description.

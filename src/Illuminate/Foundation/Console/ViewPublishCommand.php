@@ -12,7 +12,7 @@ class ViewPublishCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'view:publish';
+	protected $name = 'publish:view';
 
 	/**
 	 * The console command description.
