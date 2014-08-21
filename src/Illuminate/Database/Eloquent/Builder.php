@@ -405,7 +405,7 @@ class Builder {
 	 * Get the hydrated models without eager loading.
 	 *
 	 * @param  array  $columns
-	 * @return array|static[]
+	 * @return \Illuminate\Database\Eloquent\Model[]
 	 */
 	public function getModels($columns = array('*'))
 	{
