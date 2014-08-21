@@ -2,7 +2,7 @@
 
 use App, Hash, Lang, View, Input, Password, Redirect;
 
-class {{class}} extends \Controller {
+class {{class}} extends Controller {
 
 	/**
 	 * Display the password reminder view.
