@@ -11,7 +11,7 @@ git subsplit publish src/Illuminate/Events:git@github.com:illuminate/events.git
 git subsplit publish src/Illuminate/Exception:git@github.com:illuminate/exception.git
 git subsplit publish src/Illuminate/Filesystem:git@github.com:illuminate/filesystem.git
 git subsplit publish src/Illuminate/Hashing:git@github.com:illuminate/hashing.git
-git subsplit publish src/Illuminate/Html:git@github.com:illuminate/html.git
+git subsplit publish --heads="4.1 4.2" src/Illuminate/Html:git@github.com:illuminate/html.git
 git subsplit publish src/Illuminate/Http:git@github.com:illuminate/http.git
 git subsplit publish src/Illuminate/Log:git@github.com:illuminate/log.git
 git subsplit publish src/Illuminate/Mail:git@github.com:illuminate/mail.git
