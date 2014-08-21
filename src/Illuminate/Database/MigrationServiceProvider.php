@@ -171,10 +171,7 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMakeCommand()
 	{
-		$this->app->bindShared('migration.creator', function($app)
-		{
-			return new MigrationCreator($app['files']);
-		});
+		$this->registerCreator();
 
 		$this->app->bindShared('command.migrate.make', function($app)
 		{
@@ -186,6 +183,19 @@ class MigrationServiceProvider extends ServiceProvider {
 			$packagePath = $app['path.base'].'/vendor';
 
 			return new MigrateMakeCommand($creator, $packagePath);
+		});
+	}
+
+	/**
+	 * Register the migration creator.
+	 *
+	 * @return void
+	 */
+	protected function registerCreator()
+	{
+		$this->app->bindShared('migration.creator', function($app)
+		{
+			return new MigrationCreator($app['files']);
 		});
 	}
 
