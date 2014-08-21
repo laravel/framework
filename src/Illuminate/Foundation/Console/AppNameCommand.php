@@ -157,7 +157,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function setConfigNamespaces()
 	{
-		$this->setAppProviderConfigNamespace();
+		$this->setAppConfigNamespaces();
 
 		$this->setAuthConfigNamespace();
 
@@ -169,10 +169,14 @@ class AppNameCommand extends Command {
 	 *
 	 * @return void
 	 */
-	protected function setAppProviderConfigNamespace()
+	protected function setAppConfigNamespaces()
 	{
 		$this->replaceIn(
 			$this->getConfigPath('app'), $this->root().'\\Providers', $this->argument('name').'\\Providers'
+		);
+
+		$this->replaceIn(
+			$this->getConfigPath('app'), $this->root().'\\Http\\Controllers\\', $this->argument('name').'\\Http\\Controllers\\'
 		);
 	}
 
