@@ -34,7 +34,6 @@ class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
 
 		$response = $dispatcher->dispatch($route, $request, 'ControllerDispatcherTestControllerStub', 'getIndex');
 		$this->assertEquals('getIndex', $response);
-		$this->assertEquals('setupLayout', $_SERVER['ControllerDispatcherTestControllerStub']);
 	}
 
 
@@ -77,12 +76,6 @@ class ControllerDispatcherTestControllerStub extends Controller {
 	{
 		// construct shouldn't affect setupLayout.
 	}
-
-	protected function setupLayout()
-	{
-		$_SERVER['ControllerDispatcherTestControllerStub'] = __FUNCTION__;
-	}
-
 
 	public function getIndex()
 	{

@@ -419,6 +419,21 @@ if ( ! function_exists('class_uses_recursive'))
 	}
 }
 
+if ( ! function_exists('config'))
+{
+	/**
+	 * Get the specified configuration value.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	function config($key, $default = null)
+	{
+		return app('config')->get($key, $default);
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
