@@ -1,4 +1,4 @@
-<?php namespace {{namespace}}Http\Controllers;
+<?php namespace {{namespace}};
 
 class {{class}} extends \Controller {
 

@@ -28,6 +28,21 @@ class ControllerMakeCommand extends GeneratorCommand {
 	protected $type = 'Controller';
 
 	/**
+	 * Replace the namespace for the given stub.
+	 *
+	 * @param  string  $stub
+	 * @return $this
+	 */
+	protected function replaceNamespace(&$stub)
+	{
+		$stub = str_replace(
+			'{{namespace}}', trim($this->laravel['config']['namespaces.controllers'], '\\'), $stub
+		);
+
+		return $this;
+	}
+
+	/**
 	 * Get the controller class path.
 	 *
 	 * @param  string  $name
