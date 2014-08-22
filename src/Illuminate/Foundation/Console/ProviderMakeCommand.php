@@ -42,6 +42,8 @@ class ProviderMakeCommand extends GeneratorCommand {
 	 */
 	protected function getPath($name)
 	{
+		$name = str_replace('\\', '/', $name);
+
 		return $this->laravel['path.providers'].'/'.$name.'.php';
 	}
 
