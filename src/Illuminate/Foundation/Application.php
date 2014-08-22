@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
-use Illuminate\Support\Contracts\ResponsePreparerInterface;
+use Illuminate\Contracts\Support\ResponsePreparerInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -1134,43 +1134,44 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function registerCoreContainerAliases()
 	{
 		$aliases = array(
-			'app'            => 'Illuminate\Foundation\Application',
+			'app'            => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container'],
 			'artisan'        => 'Illuminate\Console\Application',
-			'auth'           => 'Illuminate\Auth\AuthManager',
+			'auth'           => ['Illuminate\Auth\AuthManager', 'Illuminate\Contracts\Auth\Authenticator'],
 			'auth.reminder.repository' => 'Illuminate\Auth\Reminders\ReminderRepositoryInterface',
 			'blade.compiler' => 'Illuminate\View\Compilers\BladeCompiler',
 			'cache'          => 'Illuminate\Cache\CacheManager',
-			'cache.store'    => 'Illuminate\Cache\Repository',
-			'config'         => 'Illuminate\Config\Repository',
-			'cookie'         => 'Illuminate\Cookie\CookieJar',
-			'encrypter'      => 'Illuminate\Encryption\Encrypter',
+			'cache.store'    => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Cache'],
+			'config'         => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Repository'],
+			'cookie'         => ['Illuminate\Cookie\CookieJar', 'Illuminate\Contracts\Cookie\Factory', 'Illuminate\Contracts\Cookie\QueueingFactory'],
+			'encrypter'      => ['Illuminate\Encryption\Encrypter', 'Illuminate\Contracts\Encryption\Encrypter'],
 			'db'             => 'Illuminate\Database\DatabaseManager',
-			'events'         => 'Illuminate\Events\Dispatcher',
+			'events'         => ['Illuminate\Events\Dispatcher', 'Illuminate\Contracts\Events\Dispatcher'],
 			'files'          => 'Illuminate\Filesystem\Filesystem',
-			'form'           => 'Illuminate\Html\FormBuilder',
-			'hash'           => 'Illuminate\Hashing\HasherInterface',
-			'html'           => 'Illuminate\Html\HtmlBuilder',
-			'translator'     => 'Illuminate\Translation\Translator',
-			'log'            => 'Illuminate\Log\Writer',
-			'mailer'         => 'Illuminate\Mail\Mailer',
+			'hash'           => 'Illuminate\Contracts\Hashing\Hasher',
+			'translator'     => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
+			'log'            => ['Illuminate\Log\Writer', 'Psr\Log\LoggerInterface'],
+			'mailer'         => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer'],
 			'paginator'      => 'Illuminate\Pagination\Factory',
-			'auth.reminder'  => 'Illuminate\Auth\Reminders\PasswordBroker',
+			'auth.reminder'  => ['Illuminate\Auth\Reminders\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordReminder'],
 			'queue'          => 'Illuminate\Queue\QueueManager',
+			'queue.store'    => 'Illuminate\Contracts\Queue\Queue',
 			'redirect'       => 'Illuminate\Routing\Redirector',
-			'redis'          => 'Illuminate\Redis\Database',
+			'redis'          => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
 			'request'        => 'Illuminate\Http\Request',
 			'router'         => 'Illuminate\Routing\Router',
 			'session'        => 'Illuminate\Session\SessionManager',
-			'session.store'  => 'Illuminate\Session\Store',
-			'remote'         => 'Illuminate\Remote\RemoteManager',
-			'url'            => 'Illuminate\Routing\UrlGenerator',
+			'session.store'  => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
+			'url'            => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Url\Generator'],
 			'validator'      => 'Illuminate\Validation\Factory',
-			'view'           => 'Illuminate\View\Factory',
+			'view'           => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
 		);
 
-		foreach ($aliases as $key => $alias)
+		foreach ($aliases as $key => $aliases)
 		{
-			$this->alias($key, $alias);
+			foreach ((array) $aliases as $alias)
+			{
+				$this->alias($key, $alias);
+			}
 		}
 	}
 

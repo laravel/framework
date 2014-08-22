@@ -1,10 +1,11 @@
 <?php namespace Illuminate\Auth\Reminders;
 
 use Closure;
-use Illuminate\Mail\Mailer;
 use Illuminate\Auth\UserProviderInterface;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Auth\PasswordReminder as PasswordReminderContract;
 
-class PasswordBroker {
+class PasswordBroker implements PasswordReminderContract {
 
 	/**
 	 * Constant representing a successfully sent reminder.
@@ -58,7 +59,7 @@ class PasswordBroker {
 	/**
 	 * The mailer instance.
 	 *
-	 * @var \Illuminate\Mail\Mailer
+	 * @var \Illuminate\Contracts\Mail\Mailer
 	 */
 	protected $mailer;
 
@@ -81,13 +82,13 @@ class PasswordBroker {
 	 *
 	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
 	 * @param  \Illuminate\Auth\UserProviderInterface  $users
-	 * @param  \Illuminate\Mail\Mailer  $mailer
+	 * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
 	 * @return void
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
-                                Mailer $mailer,
+                                MailerContract $mailer,
                                 $reminderView)
 	{
 		$this->users = $users;

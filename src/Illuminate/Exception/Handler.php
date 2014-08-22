@@ -3,7 +3,7 @@
 use Closure;
 use ErrorException;
 use ReflectionFunction;
-use Illuminate\Support\Contracts\ResponsePreparerInterface;
+use Illuminate\Contracts\Support\ResponsePreparerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException as FatalError;
 
@@ -12,7 +12,7 @@ class Handler {
 	/**
 	 * The response preparer implementation.
 	 *
-	 * @var \Illuminate\Support\Contracts\ResponsePreparerInterface
+	 * @var \Illuminate\Contracts\Support\ResponsePreparerInterface
 	 */
 	protected $responsePreparer;
 
@@ -54,7 +54,7 @@ class Handler {
 	/**
 	 * Create a new error handler instance.
 	 *
-	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface  $responsePreparer
+	 * @param  \Illuminate\Contracts\Support\ResponsePreparerInterface  $responsePreparer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
 	 * @param  bool  $debug

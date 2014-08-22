@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Http;
 
-use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
 
 class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 

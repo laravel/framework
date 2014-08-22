@@ -9,10 +9,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/cookie": "4.3.*",
-        "illuminate/encryption": "4.3.*",
-        "illuminate/events": "4.3.*",
-        "illuminate/hashing": "4.3.*",
+        "illuminate/contracts": "4.3.*",
         "illuminate/http": "4.3.*",
         "illuminate/session": "4.3.*",
         "illuminate/support": "4.3.*",

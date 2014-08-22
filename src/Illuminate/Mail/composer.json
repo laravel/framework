@@ -10,13 +10,10 @@
     "require": {
         "php": ">=5.4.0",
         "illuminate/container": "4.3.*",
-        "illuminate/log": "4.3.*",
+        "illuminate/contracts": "4.3.*",
         "illuminate/support": "4.3.*",
-        "illuminate/view": "4.3.*",
+        "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~5.1"
-    },
-    "require-dev": {
-        "illuminate/queue": "4.3.*"
     },
     "autoload": {
         "psr-4": {

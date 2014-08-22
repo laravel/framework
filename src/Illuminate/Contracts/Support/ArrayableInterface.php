@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Support\Contracts;
+<?php namespace Illuminate\Contracts\Support;
 
 interface ArrayableInterface {
 

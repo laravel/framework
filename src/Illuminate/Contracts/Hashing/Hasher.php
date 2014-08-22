@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Hashing;
+<?php namespace Illuminate\Contracts\Hashing;
 
-interface HasherInterface {
+interface Hasher {
 
 	/**
 	 * Hash the given value.
