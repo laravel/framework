@@ -2,7 +2,7 @@
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class ControllerMakeCommand extends GeneratorCommand {
 
@@ -41,7 +41,26 @@ class ControllerMakeCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		return __DIR__.'/stubs/controller.stub';
+		if ($this->option('plain'))
+		{
+			return __DIR__.'/stubs/controller.plain.stub';
+		}
+		else
+		{
+			return __DIR__.'/stubs/controller.stub';
+		}
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('plain', null, InputOption::VALUE_NONE, 'Generate an empty controller class.'),
+		);
 	}
 
 }
