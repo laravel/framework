@@ -113,7 +113,7 @@ abstract class GeneratorCommand extends Command {
 	{
 		$suffix = $this->getNamespaceSuffix($name);
 
-		return trim($this->laravel['config']['namespaces.'.$type].'\\'.$suffix, '\\');
+		return trim($this->laravel['config']['namespaces.'.$type].$suffix, '\\');
 	}
 
 	/**
@@ -136,6 +136,8 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function replaceClass($stub, $name)
 	{
+		$name = str_replace($this->getNamespaceSuffix($name).'\\', '', $name);
+
 		return str_replace('{{class}}', $name, $stub);
 	}
 
