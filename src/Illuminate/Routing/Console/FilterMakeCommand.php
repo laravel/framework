@@ -35,19 +35,6 @@ class FilterMakeCommand extends GeneratorCommand {
 	protected $configKey = 'filters';
 
 	/**
-	 * Get the controller class path.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function getPath($name)
-	{
-		$name = str_replace('\\', '/', $name);
-
-		return $this->laravel['path.filters'].'/'.$name.'.php';
-	}
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string

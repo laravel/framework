@@ -35,19 +35,6 @@ class ProviderMakeCommand extends GeneratorCommand {
 	protected $configKey = 'providers';
 
 	/**
-	 * Get the controller class path.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function getPath($name)
-	{
-		$name = str_replace('\\', '/', $name);
-
-		return $this->laravel['path.providers'].'/'.$name.'.php';
-	}
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string
