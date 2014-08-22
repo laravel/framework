@@ -52,9 +52,25 @@ abstract class GeneratorCommand extends Command {
 			return $this->error($this->type.' already exists!');
 		}
 
+		$this->makeDirectory($path);
+
 		$this->files->put($path, $this->buildClass($name));
 
 		$this->info($this->type.' created successfully.');
+	}
+
+	/**
+	 * Build the directory for the class if necessary.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	protected function makeDirectory($path)
+	{
+		if ( ! $this->files->isDirectory(dirname($path)))
+		{
+			$this->files->makeDirectory(dirname($path), 0777, true, true);
+		}
 	}
 
 	/**
@@ -67,22 +83,48 @@ abstract class GeneratorCommand extends Command {
 	{
 		$stub = $this->files->get($this->getStub());
 
-		return $this->replaceNamespace($stub)->replaceClass($stub, $name);
+		return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
 	}
 
 	/**
 	 * Replace the namespace for the given stub.
 	 *
 	 * @param  string  $stub
+	 * @param  string  $name
 	 * @return $this
 	 */
-	protected function replaceNamespace(&$stub)
+	protected function replaceNamespace(&$stub, $name)
 	{
 		$stub = str_replace(
-			'{{namespace}}', $this->laravel['config']['namespaces.root'], $stub
+			'{{namespace}}', $this->getNamespaceWithSuffix($this->configKey, $name), $stub
 		);
 
 		return $this;
+	}
+
+	/**
+	 * Get the full namespace name by type and suffix.
+	 *
+	 * @param  string  $type
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getNamespaceWithSuffix($type, $name)
+	{
+		$suffix = $this->getNamespaceSuffix($name);
+
+		return trim($this->laravel['config']['namespaces.'.$type].'\\'.$suffix, '\\');
+	}
+
+	/**
+	 * Get the namespace suffix to be added to the root namespace.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getNamespaceSuffix($name)
+	{
+		return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
 	}
 
 	/**

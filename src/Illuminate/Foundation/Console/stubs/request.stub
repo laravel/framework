@@ -1,4 +1,4 @@
-<?php namespace {{namespace}}Http\Requests;
+<?php namespace {{namespace}};
 
 class {{class}} extends FormRequest {
 

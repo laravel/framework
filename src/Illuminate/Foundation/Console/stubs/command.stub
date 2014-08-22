@@ -1,4 +1,4 @@
-<?php namespace {{namespace}}\Console;
+<?php namespace {{namespace}};
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,7 +11,7 @@ class {{class}} extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'command:name';
+	protected $name = '{{command}}';
 
 	/**
 	 * The console command description.
