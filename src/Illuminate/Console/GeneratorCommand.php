@@ -61,7 +61,7 @@ abstract class GeneratorCommand extends Command {
 	{
 		$name = str_replace('\\', '/', $name);
 
-		return $this->laravel['path.'.$this->configType].'/'.$name.'.php';
+		return $this->laravel['path.'.$this->configKey].'/'.$name.'.php';
 	}
 
 	/**
