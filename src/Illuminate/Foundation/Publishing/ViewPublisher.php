@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Foundation\Publishing;
 
-use Illuminate\Filesystem\Filesystem;
-
 class ViewPublisher extends Publisher {
 
 	/**
