@@ -16,7 +16,7 @@ class AuthMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Scaffold auth classes for the application';
+	protected $description = 'Create auth classes for the application';
 
 	/**
 	 * Execute the console command.
