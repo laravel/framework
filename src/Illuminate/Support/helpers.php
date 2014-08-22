@@ -368,6 +368,21 @@ if ( ! function_exists('base_path'))
 	}
 }
 
+if ( ! function_exists('bcrypt'))
+{
+	/**
+	 * Hash the given value.
+	 *
+	 * @param  string  $value
+	 * @param  array   $options
+	 * @return string
+	 */
+	function bcrypt($value, $options = array())
+	{
+		return app('hash')->make($value, $options);
+	}
+}
+
 if ( ! function_exists('camel_case'))
 {
 	/**

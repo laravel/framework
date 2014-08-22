@@ -28,6 +28,13 @@ class RemindersControllerCommand extends GeneratorCommand {
 	protected $type = 'Controller';
 
 	/**
+	 * Set the configuration key for the namespace.
+	 *
+	 * @var string
+	 */
+	protected $configKey = 'controllers';
+
+	/**
 	 * Execute the console command.
 	 *
 	 * @return void
@@ -37,17 +44,6 @@ class RemindersControllerCommand extends GeneratorCommand {
 		parent::fire();
 
 		$this->comment("Route: Route::controller('password', 'RemindersController');");
-	}
-
-	/**
-	 * Get the controller class path.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function getPath($name)
-	{
-		return $this->laravel['path.controllers'].'/'.$name.'.php';
 	}
 
 	/**
