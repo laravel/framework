@@ -26,9 +26,10 @@ class AuthMakeCommand extends Command {
 	public function fire()
 	{
 		$this->call('auth:controller');
-		$this->call('auth:register-request');
-		$this->call('auth:login-request');
 		$this->call('auth:reminders-controller');
+		$this->callSilent('auth:register-request');
+		$this->callSilent('auth:login-request');
+		$this->info('Authentication requests created successfully.');
 		$this->call('auth:reminders-table');
 	}
 
