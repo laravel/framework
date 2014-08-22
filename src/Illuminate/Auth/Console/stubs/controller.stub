@@ -1,84 +1,97 @@
 <?php namespace {{namespace}};
 
-use Password;
-use Illuminate\Http\Request;
+use Illuminate\Auth\Guard;
 use Illuminate\Routing\Controller;
 
-class {{class}} extends Controller {
+use {{request.namespace}}\Auth\LoginRequest;
+use {{request.namespace}}\Auth\RegisterRequest;
+
+class AuthController extends Controller {
 
 	/**
-	 * Display the password reminder view.
+	 * The authenticator implementation.
 	 *
-	 * @return Response
+	 * @var Guard
 	 */
-	public function getRemind()
+	protected $auth;
+
+	/**
+	 * Create a new authentication controller instance.
+	 *
+	 * @param  Guard  $auth
+	 * @return void
+	 */
+	public function __construct(Guard $auth)
 	{
-		return view('password.remind');
+		$this->auth = $auth;
+
+		$this->beforeFilter('csrf', ['on' => ['post']]);
+		$this->beforeFilter('guest', ['except' => ['logout']]);
 	}
 
 	/**
-	 * Handle a POST request to remind a user of their password.
+	 * Show the application registration form.
 	 *
-	 * @param  Request  $request
 	 * @return Response
 	 */
-	public function postRemind(Request $request)
+	public function getRegister()
 	{
-		switch ($response = Password::remind($request->only('email')))
-		{
-			case Password::INVALID_USER:
-				return redirect()->back()->with('error', trans($response));
-
-			case Password::REMINDER_SENT:
-				return redirect()->back()->with('status', trans($response));
-		}
+		return view('auth.register');
 	}
 
 	/**
-	 * Display the password reset view for the given token.
+	 * Handle a registration request for the application.
 	 *
-	 * @param  string  $token
+	 * @param  RegisterRequest  $request
 	 * @return Response
 	 */
-	public function getReset($token = null)
+	public function postRegister(RegisterRequest $request)
 	{
-		if (is_null($token))
-		{
-			throw new NotFoundHttpException;
-		}
+		// Registration form is valid, create user...
 
-		return view('password.reset')->with('token', $token);
+		$this->auth->login($user);
+
+		return redirect('/');
 	}
 
 	/**
-	 * Handle a POST request to reset a user's password.
+	 * Show the application login form.
 	 *
-	 * @param  Request  $request
 	 * @return Response
 	 */
-	public function postReset(Request $request)
+	public function getLogin()
 	{
-		$credentials = $request->only(
-			'email', 'password', 'password_confirmation', 'token'
-		);
+		return view('auth.login');
+	}
 
-		$response = Password::reset($credentials, function($user, $password)
+	/**
+	 * Handle a login request to the application.
+	 *
+	 * @param  LoginRequest  $request
+	 * @return Response
+	 */
+	public function postLogin(LoginRequest $request)
+	{
+		if ($this->auth->attempt($request->only('email', 'password')))
 		{
-			$user->password = bcrypt($password);
-
-			$user->save();
-		});
-
-		switch ($response)
-		{
-			case Password::INVALID_PASSWORD:
-			case Password::INVALID_TOKEN:
-			case Password::INVALID_USER:
-				return redirect()->back()->with('error', trans($response));
-
-			case Password::PASSWORD_RESET:
-				return redirect()->to('/');
+			return redirect('/');
 		}
+
+		return redirect('/login')->withErrors([
+			'email' => 'The credentials you entered did not match our records. Try again?',
+		]);
+	}
+
+	/**
+	 * Log the user out of the application.
+	 *
+	 * @return Response
+	 */
+	public function getLogout()
+	{
+		$this->auth->logout();
+
+		return redirect('/');
 	}
 
 }

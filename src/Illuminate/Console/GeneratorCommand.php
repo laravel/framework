@@ -39,7 +39,7 @@ abstract class GeneratorCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ($this->files->exists($path = $this->getPath($name = $this->argument('name'))))
+		if ($this->files->exists($path = $this->getPath($name = $this->getNameInput())))
 		{
 			return $this->error($this->type.' already exists!');
 		}
@@ -108,6 +108,17 @@ abstract class GeneratorCommand extends Command {
 	}
 
 	/**
+	 * Get the fully qualified class name.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getFullClassName($name)
+	{
+		return trim($this->laravel['config']['namespaces.'.$this->configKey], '\\').'\\'.$name;
+	}
+
+	/**
 	 * Get the full namespace name by type and suffix.
 	 *
 	 * @param  string  $type
@@ -144,6 +155,16 @@ abstract class GeneratorCommand extends Command {
 		$name = str_replace($this->getNamespaceSuffix($name).'\\', '', $name);
 
 		return str_replace('{{class}}', $name, $stub);
+	}
+
+	/**
+	 * Get the desired class name from the input.
+	 *
+	 * @return string
+	 */
+	protected function getNameInput()
+	{
+		return $this->argument('name');
 	}
 
 	/**

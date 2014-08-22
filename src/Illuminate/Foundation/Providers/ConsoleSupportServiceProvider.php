@@ -10,6 +10,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 * @var array
 	 */
 	protected $providers = array(
+		'Illuminate\Auth\GeneratorServiceProvider',
 		'Illuminate\Foundation\Providers\ComposerServiceProvider',
 		'Illuminate\Foundation\Providers\PublisherServiceProvider',
 		'Illuminate\Queue\FailConsoleServiceProvider',

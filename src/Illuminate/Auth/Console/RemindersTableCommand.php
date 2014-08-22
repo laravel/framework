@@ -64,7 +64,7 @@ class RemindersTableCommand extends Command {
 	{
 		$name = 'create_password_reminders_table';
 
-		$path = $this->laravel['path'].'/database/migrations';
+		$path = $this->laravel['path.database'].'/migrations';
 
 		return $this->laravel['migration.creator']->create($name, $path);
 	}

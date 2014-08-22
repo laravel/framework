@@ -4,21 +4,21 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
-class RemindersControllerCommand extends GeneratorCommand {
+class AuthControllerCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'auth:reminders-controller';
+	protected $name = 'auth:controller';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a stub password reminder controller';
+	protected $description = 'Create a stub authentication controller';
 
 	/**
 	 * The type of class being generated.
@@ -43,7 +43,23 @@ class RemindersControllerCommand extends GeneratorCommand {
 	{
 		parent::fire();
 
-		$this->comment("Route: Route::controller('password', '".$this->argument('name').";");
+		$this->comment("Route: Route::controller('auth', '".$this->argument('name').";");
+	}
+
+	/**
+	 * Replace the class name for the given stub.
+	 *
+	 * @param  string  $stub
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function replaceClass($stub, $name)
+	{
+		$stub = parent::replaceClass($stub, $name);
+
+		return str_replace(
+			'{{request.namespace}}', $this->laravel['config']['namespaces.requests'], $stub
+		);
 	}
 
 	/**
@@ -53,7 +69,7 @@ class RemindersControllerCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		return __DIR__.'/stubs/reminders.controller.stub';
+		return __DIR__.'/stubs/controller.stub';
 	}
 
 	/**
@@ -64,7 +80,7 @@ class RemindersControllerCommand extends GeneratorCommand {
 	protected function getArguments()
 	{
 		return array(
-			array('name', InputArgument::OPTIONAL, 'The name of the class', 'Auth\RemindersController'),
+			array('name', InputArgument::OPTIONAL, 'The name of the class', 'Auth\AuthController'),
 		);
 	}
 
