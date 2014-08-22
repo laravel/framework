@@ -9,7 +9,7 @@ class AuthMakeCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'auth:make';
+	protected $name = 'make:auth';
 
 	/**
 	 * The console command description.

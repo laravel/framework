@@ -11,7 +11,7 @@ class ProviderMakeCommand extends GeneratorCommand {
 	 *
 	 * @var string
 	 */
-	protected $name = 'provider:make';
+	protected $name = 'make:provider';
 
 	/**
 	 * The console command description.

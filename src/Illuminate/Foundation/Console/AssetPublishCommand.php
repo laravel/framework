@@ -13,7 +13,7 @@ class AssetPublishCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'asset:publish';
+	protected $name = 'publish:assets';
 
 	/**
 	 * The console command description.

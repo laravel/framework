@@ -15,7 +15,7 @@ class ConfigPublishCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'config:publish';
+	protected $name = 'publish:config';
 
 	/**
 	 * The console command description.
