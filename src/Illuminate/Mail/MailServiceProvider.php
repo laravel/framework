@@ -38,7 +38,15 @@ class MailServiceProvider extends ServiceProvider {
 				$app['view'], $app['swift.mailer'], $app['events']
 			);
 
-			$mailer->setLogger($app['log'])->setQueue($app['queue']);
+			if ($app->bound('log'))
+			{
+				$mailer->setLogger($app['log']);
+			}
+
+			if ($app->bound('queue'))
+			{
+				$mailer->setQueue($app['queue']);
+			}
 
 			$mailer->setContainer($app);
 
