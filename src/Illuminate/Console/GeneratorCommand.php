@@ -13,6 +13,13 @@ abstract class GeneratorCommand extends Command {
 	protected $files;
 
 	/**
+	 * Set the configuration key for the namespace.
+	 *
+	 * @var string
+	 */
+	protected $configKey = '';
+
+	/**
 	 * Create a new controller creator command instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
