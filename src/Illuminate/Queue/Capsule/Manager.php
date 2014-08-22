@@ -93,7 +93,7 @@ class Manager {
 	 * Get a connection instance from the global manager.
 	 *
 	 * @param  string  $connection
-	 * @return \Illuminate\Queue\QueueInterface
+	 * @return \Illuminate\Contracts\Queue\Queue
 	 */
 	public static function connection($connection = null)
 	{
@@ -147,7 +147,7 @@ class Manager {
 	 * Get a registered connection instance.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Queue\QueueInterface
+	 * @return \Illuminate\Contracts\Queue\Queue
 	 */
 	public function getConnection($name = null)
 	{

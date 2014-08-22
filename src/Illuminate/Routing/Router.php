@@ -3,8 +3,8 @@
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -15,7 +15,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -120,7 +120,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	/**
 	 * Create a new Router instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher  $events
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @param  \Illuminate\Container\Container  $container
 	 * @return void
 	 */

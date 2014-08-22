@@ -142,7 +142,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('update')->once()->with(array('name' => 'taylor'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
@@ -165,7 +165,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('id', '=', 1);
 		$query->shouldReceive('update')->once()->with(array('created_at' => 'foo', 'updated_at' => 'bar'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until');
 		$events->shouldReceive('fire');
 
@@ -183,7 +183,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(false);
 		$model->exists = true;
 
@@ -196,7 +196,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
 		$model->exists = true;
@@ -233,7 +233,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('update')->once()->with(array('id' => 2, 'foo' => 'bar'));
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
@@ -336,7 +336,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('updateTimestamps');
 
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
@@ -355,7 +355,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('updateTimestamps');
 		$model->setIncrementing(false);
 
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
@@ -374,7 +374,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = $this->getMock('EloquentModelStub', array('newQuery'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
-		$model->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
 
@@ -769,7 +769,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	public function testModelObserversCanBeAttachedToModels()
 	{
-		EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+		EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('listen')->once()->with('eloquent.creating: EloquentModelStub', 'EloquentTestObserverStub@creating', 0);
 		$events->shouldReceive('listen')->once()->with('eloquent.saved: EloquentModelStub', 'EloquentTestObserverStub@saved', 0);
 		$events->shouldReceive('forget');

@@ -53,7 +53,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -930,7 +930,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the event dispatcher used by the connection.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public function getEventDispatcher()
 	{
@@ -940,10 +940,10 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the event dispatcher instance on the connection.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
-	public function setEventDispatcher(\Illuminate\Events\Dispatcher $events)
+	public function setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
 	{
 		$this->events = $events;
 	}

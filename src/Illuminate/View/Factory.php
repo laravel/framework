@@ -1,12 +1,13 @@
 <?php namespace Illuminate\View;
 
 use Closure;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\View\Factory as FactoryContract;
+use Illuminate\Contracts\Support\ArrayableInterface as Arrayable;
 
-class Factory {
+class Factory implements FactoryContract {
 
 	/**
 	 * The engine implementation.
@@ -25,7 +26,7 @@ class Factory {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -97,7 +98,7 @@ class Factory {
 	 *
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
 	 * @param  \Illuminate\View\ViewFinderInterface  $finder
-	 * @param  \Illuminate\Events\Dispatcher  $events
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
@@ -760,7 +761,7 @@ class Factory {
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public function getDispatcher()
 	{
@@ -770,7 +771,7 @@ class Factory {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
