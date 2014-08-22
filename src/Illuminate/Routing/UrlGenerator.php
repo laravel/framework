@@ -2,8 +2,9 @@
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Contracts\URL\Generator as UrlGeneratorContract;
 
-class UrlGenerator {
+class UrlGenerator implements UrlGeneratorContract {
 
 	/**
 	 * The route collection.

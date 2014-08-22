@@ -7,8 +7,8 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
+use Illuminate\Contracts\Support\ArrayableInterface;
 
 class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface, JsonSerializable {
 
@@ -91,7 +91,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Diff the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
 	 * @return static
 	 */
 	public function diff($items)
@@ -269,7 +269,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
 	 * @return static
 	 */
 	public function intersect($items)
@@ -333,7 +333,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Merge the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
 	 * @return static
 	 */
 	public function merge($items)
@@ -818,7 +818,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Results array of items from Collection or ArrayableInterface.
 	 *
-  	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+  	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
 	 * @return array
 	 */
 	protected function getArrayableItems($items)

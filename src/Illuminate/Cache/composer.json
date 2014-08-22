@@ -9,12 +9,12 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "illuminate/contracts": "4.3.*",
         "illuminate/support": "4.3.*",
         "nesbot/carbon": "~1.0"
     },
     "require-dev": {
         "illuminate/database": "4.3.*",
-        "illuminate/encryption": "4.3.*",
         "illuminate/filesystem": "4.3.*",
         "illuminate/redis": "4.3.*"
     },
