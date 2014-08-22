@@ -405,6 +405,8 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function random($amount = 1)
 	{
+		if ($this->isEmpty()) return null;
+
 		$keys = array_rand($this->items, $amount);
 
 		return is_array($keys) ? array_intersect_key($this->items, array_flip($keys)) : $this->items[$keys];
