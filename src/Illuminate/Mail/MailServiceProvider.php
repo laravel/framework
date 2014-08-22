@@ -79,7 +79,7 @@ class MailServiceProvider extends ServiceProvider {
 
 		if ($app->bound('queue'))
 		{
-			$mailer->setQueue($app['queue']);
+			$mailer->setQueue($app['queue.driver']);
 		}
 	}
 
