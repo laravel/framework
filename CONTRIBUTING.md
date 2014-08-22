@@ -12,6 +12,8 @@ The pull request process differs for new features and bugs. Before sending a pul
 
 Pull requests for bugs may be sent without creating any proposal issue. If you believe that you know of a solution for a bug that has been filed on GitHub, please leave a comment detailing your proposed fix.
 
+You should ensure that the current tests pass, and if you've added something new, add the tests where relevant. Please send a coherent commit history, making sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please squash them before submitting.
+
 ### Feature Requests
 
 If you have an idea for a new feature you would like to see added to Laravel, you may create an issue on GitHub with `[Request]` in the title. The feature request will then be reviewed by [@taylorotwell](https://github.com/taylorotwell).

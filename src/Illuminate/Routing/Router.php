@@ -852,7 +852,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function newRoute($methods, $uri, $action)
 	{
-		return new Route($methods, $uri, $action);
+		return (new Route($methods, $uri, $action))->setContainer($this->container);
 	}
 
 	/**
@@ -917,22 +917,20 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if (is_string($action)) $action = array('uses' => $action);
 
-		// Here we'll get an instance of this controller dispatcher and hand it off to
-		// the Closure so it will be used to resolve the class instances out of our
-		// IoC container instance and call the appropriate methods on the class.
+		// Here we'll merge any group "uses" statement if necessary so that the action
+		// has the proper clause for this property. Then we can simply set the name
+		// of the controller on the action and return the action array for usage.
 		if ( ! empty($this->groupStack))
 		{
 			$action['uses'] = $this->prependGroupUses($action['uses']);
 		}
 
-		// Here we'll get an instance of this controller dispatcher and hand it off to
-		// the Closure so it will be used to resolve the class instances out of our
-		// IoC container instance and call the appropriate methods on the class.
+		// Here we will set this controller name on the action array just so we always
+		// have a copy of it for reference if we need it. This can be used while we
+		// search for a controller name or do some other type of fetch operation.
 		$action['controller'] = $action['uses'];
 
-		$closure = $this->getClassClosure($action['uses']);
-
-		return array_set($action, 'uses', $closure);
+		return $action;
 	}
 
 	/**
@@ -1025,7 +1023,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		if (is_null($response))
 		{
-			$response = $route->run($request);
+			$response = $route->run(
+				$request, $this->getControllerDispatcher()
+			);
 		}
 
 		$response = $this->prepareResponse($request, $response);
@@ -1047,6 +1047,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected function findRoute($request)
 	{
 		$this->current = $route = $this->routes->match($request);
+
+		$this->container->instance('Illuminate\Routing\Route', $route);
 
 		return $this->substituteBindings($route);
 	}
@@ -1681,6 +1683,22 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	public function getRoutes()
 	{
 		return $this->routes;
+	}
+
+	/**
+	 * Set the route collection instance.
+	 *
+	 * @param  \Illuminate\Routing\RouteCollection  $routes
+	 * @return void
+	 */
+	public function setRoutes(RouteCollection $routes)
+	{
+		foreach ($routes as $route)
+		{
+			$route->setContainer($this->container);
+		}
+
+		$this->routes = $routes;
 	}
 
 	/**

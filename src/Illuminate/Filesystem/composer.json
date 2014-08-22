@@ -9,18 +9,17 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
-        "symfony/finder": "2.5.*"
+        "illuminate/support": "4.3.*",
+        "symfony/finder": "2.6.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Filesystem": ""
+        "psr-4": {
+            "Illuminate\\Filesystem\\": ""
         }
     },
-    "target-dir": "Illuminate/Filesystem",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     },
     "minimum-stability": "dev"

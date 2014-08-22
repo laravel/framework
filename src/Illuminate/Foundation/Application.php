@@ -27,7 +27,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.2.8';
+	const VERSION = '4.3-dev';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -722,6 +722,46 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if the application routes are cached.
+	 *
+	 * @return bool
+	 */
+	public function routesAreCached()
+	{
+		return $this['files']->exists($this->getRouteCachePath());
+	}
+
+	/**
+	 * Get the path to the routes cache file.
+	 *
+	 * @return string
+	 */
+	public function getRouteCachePath()
+	{
+		return $this['path.storage'].'/meta/routes.php';
+	}
+
+	/**
+	 * Determine if the application events are cached.
+	 *
+	 * @return bool
+	 */
+	public function eventsAreCached()
+	{
+ 		return $this['files']->exists($this->getEventCachePath());
+	}
+
+	/**
+	 * Get the path to the events cache file.
+	 *
+	 * @return string
+	 */
+	public function getEventCachePath()
+	{
+		return $this['path.storage'].'/meta/events.php';
+	}
+
+	/**
 	 * Handle the given request and get the response.
 	 *
 	 * Provides compatibility with BrowserKit functional testing.
@@ -761,13 +801,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function dispatch(Request $request)
 	{
-		if ($this->isDownForMaintenance())
-		{
-			$response = $this['events']->until('illuminate.app.down');
-
-			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
-		}
-
 		if ($this->runningUnitTests() && ! $this['session']->isStarted())
 		{
 			$this['session']->start();
@@ -972,7 +1005,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function getConfigLoader()
 	{
-		return new FileLoader(new Filesystem, $this['path'].'/config');
+		return new FileLoader(new Filesystem, $this['path.config']);
 	}
 
 	/**

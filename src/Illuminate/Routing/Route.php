@@ -1,13 +1,20 @@
 <?php namespace Illuminate\Routing;
 
+use Closure;
+use ReflectionFunction;
 use Illuminate\Http\Request;
+use Illuminate\Container\Container;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
+use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Routing\RouteDependencyResolverTrait;
 
 class Route {
+
+	use RouteDependencyResolverTrait;
 
 	/**
 	 * The URI pattern the route responds to.
@@ -66,6 +73,13 @@ class Route {
 	protected $compiled;
 
 	/**
+	 * The container instance used by the route.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
+
+	/**
 	 * The validators used by the routes.
 	 *
 	 * @var array
@@ -100,13 +114,45 @@ class Route {
 	/**
 	 * Run the route action and return the response.
 	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Routing\ControllerDispatcher  $controllerDispatcher
 	 * @return mixed
 	 */
-	public function run()
+	public function run(Request $request, ControllerDispatcher $controllerDispatcher = null)
 	{
 		$parameters = array_filter($this->parameters(), function($p) { return isset($p); });
 
-		return call_user_func_array($this->action['uses'], $parameters);
+		try
+		{
+			if (is_string($this->action['uses']))
+			{
+				return $this->dispatchToController($request, $controllerDispatcher);
+			}
+
+			$parameters = $this->resolveMethodDependencies(
+				$parameters, new ReflectionFunction($this->action['uses'])
+			);
+
+			return call_user_func_array($this->action['uses'], $parameters);
+		}
+		catch (HttpResponseException $e)
+		{
+			return $e->getResponse();
+		}
+	}
+
+	/**
+	 * Dispatch the request to the route to a controller class.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Routing\ControllerDispatacher  $controllerDispatcher
+	 * @return mixed
+	 */
+	protected function dispatchToController(Request $request, ControllerDispatcher $controllerDispatcher)
+	{
+		list($class, $method) = explode('@', $this->action['controller']);
+
+		return $controllerDispatcher->dispatch($this, $request, $class, $method);
 	}
 
 	/**
@@ -805,6 +851,19 @@ class Route {
 	}
 
 	/**
+	 * Set the container instance used by the route.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return \Illuminate\Routing\Route
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+
+		return $this;
+	}
+
+	/**
 	 * Get the compiled version of the route.
 	 *
 	 * @return \Symfony\Component\Routing\CompiledRoute
@@ -812,6 +871,23 @@ class Route {
 	public function getCompiled()
 	{
 		return $this->compiled;
+	}
+
+	/**
+	 * Prepare the route instance for serialization.
+	 *
+	 * @return void
+	 */
+	public function prepareForSerialization()
+	{
+		if ($this->action['uses'] instanceof Closure)
+		{
+			throw new \LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
+		}
+
+		unset($this->container);
+
+		unset($this->compiled);
 	}
 
 }

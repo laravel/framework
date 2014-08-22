@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Symfony\Component\HttpFoundation\Response;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
@@ -10,6 +11,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	{
 		$router = $this->getRouter();
 		$router->get('foo/bar', function() { return 'hello'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', function() { throw new Illuminate\Http\Exception\HttpResponseException(new Response('hello')); });
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
@@ -74,6 +79,23 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router = $this->getRouter();
 		$router->get('foo/bar/åαф', function() { return 'hello'; });
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar/%C3%A5%CE%B1%D1%84', 'GET'))->getContent());
+	}
+
+
+	public function testClassesCanBeInjectedIntoRoutes()
+	{
+		unset($_SERVER['__test.route_inject']);
+		$router = $this->getRouter();
+		$router->get('foo/{var}', function(stdClass $foo, $var) {
+			$_SERVER['__test.route_inject'] = func_get_args();
+			return 'hello';
+		});
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][0]);
+		$this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
+
+		unset($_SERVER['__test.route_inject']);
 	}
 
 
