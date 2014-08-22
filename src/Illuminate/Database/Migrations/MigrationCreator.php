@@ -90,7 +90,7 @@ class MigrationCreator {
 	 */
 	protected function populateStub($name, $stub, $table)
 	{
-		$stub = str_replace('{{class}}', studly_case($name), $stub);
+		$stub = str_replace('{{class}}', $this->getClassName($name), $stub);
 
 		// Here we will replace the table place-holders with the table specified by
 		// the developer, which is useful for quickly creating a tables creation
@@ -101,6 +101,17 @@ class MigrationCreator {
 		}
 
 		return $stub;
+	}
+
+	/**
+	 * Get the class name of a migration name.
+	 *
+	 * @param  string $name
+	 * @return string
+	 */
+	protected function getClassName($name)
+	{
+		return studly_case($name);
 	}
 
 	/**
