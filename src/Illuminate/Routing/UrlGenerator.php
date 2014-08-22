@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use Illuminate\Contracts\URL\Generator as UrlGeneratorContract;
+use Illuminate\Contracts\Url\Generator as UrlGeneratorContract;
 
 class UrlGenerator implements UrlGeneratorContract {
 
