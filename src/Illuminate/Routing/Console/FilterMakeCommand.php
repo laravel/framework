@@ -28,6 +28,13 @@ class FilterMakeCommand extends GeneratorCommand {
 	protected $type = 'Filter';
 
 	/**
+	 * Set the configuration key for the namespace.
+	 *
+	 * @var string
+	 */
+	protected $configKey = 'filters';
+
+	/**
 	 * Get the controller class path.
 	 *
 	 * @param  string  $name
@@ -35,6 +42,8 @@ class FilterMakeCommand extends GeneratorCommand {
 	 */
 	protected function getPath($name)
 	{
+		$name = str_replace('\\', '/', $name);
+
 		return $this->laravel['path.filters'].'/'.$name.'.php';
 	}
 

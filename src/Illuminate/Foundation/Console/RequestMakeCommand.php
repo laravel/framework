@@ -28,6 +28,13 @@ class RequestMakeCommand extends GeneratorCommand {
 	protected $type = 'Request';
 
 	/**
+	 * Set the configuration key for the namespace.
+	 *
+	 * @var string
+	 */
+	protected $configKey = 'requests';
+
+	/**
 	 * Get the controller class path.
 	 *
 	 * @param  string  $name
@@ -35,6 +42,8 @@ class RequestMakeCommand extends GeneratorCommand {
 	 */
 	protected function getPath($name)
 	{
+		$name = str_replace('\\', '/', $name);
+
 		return $this->laravel['path.requests'].'/'.$name.'.php';
 	}
 

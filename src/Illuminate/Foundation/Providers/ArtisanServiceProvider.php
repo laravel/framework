@@ -13,7 +13,7 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventCacheCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
-use Illuminate\Foundation\Console\CommandMakeCommand;
+use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
@@ -38,7 +38,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'AppName',
 		'Changes',
 		'ClearCompiled',
-		'CommandMake',
+		'ConsoleMake',
 		'Down',
 		'Environment',
 		'EventCache',
@@ -127,11 +127,11 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerCommandMakeCommand()
+	protected function registerConsoleMakeCommand()
 	{
-		$this->app->bindShared('command.command.make', function($app)
+		$this->app->bindShared('command.console.make', function($app)
 		{
-			return new CommandMakeCommand($app['files']);
+			return new ConsoleMakeCommand($app['files']);
 		});
 	}
 
@@ -315,7 +315,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 			'artisan', 'command.changes', 'command.environment',
 			'command.event.cache', 'command.route.cache', 'command.route.clear',
 			'command.route.list', 'command.request.make', 'command.tinker',
-			'command.command.make', 'command.key.generate', 'command.down',
+			'command.console.make', 'command.key.generate', 'command.down',
 			'command.up', 'command.clear-compiled', 'command.optimize',
 			'command.serve', 'command.app.name', 'command.provider.make',
 		];
