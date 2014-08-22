@@ -57,7 +57,7 @@ class RouteServiceProvider extends ServiceProvider {
 	{
 		$namespace = trim($this->app['config']['namespaces.controllers'], '\\');
 
-		app('router')->group(['namespace' => $namespace], $callback);
+		$this->app['router']->group(['namespace' => $namespace], $callback);
 	}
 
 	/**
@@ -69,9 +69,7 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	public function __call($method, $parameters)
 	{
-		return call_user_func_array(
-			[$this->app->make('router'), $method], $parameters
-		);
+		return call_user_func_array([$this->app['router'], $method], $parameters);
 	}
 
 }
