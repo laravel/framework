@@ -1136,7 +1136,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$aliases = array(
 			'app'            => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container'],
 			'artisan'        => 'Illuminate\Console\Application',
-			'auth'           => ['Illuminate\Auth\AuthManager', 'Illuminate\Contracts\Auth\Authenticator'],
+			'auth'           => 'Illuminate\Auth\AuthManager',
+			'auth.driver'    => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Authenticator'],
 			'auth.reminder.repository' => 'Illuminate\Auth\Reminders\ReminderRepositoryInterface',
 			'blade.compiler' => 'Illuminate\View\Compilers\BladeCompiler',
 			'cache'          => 'Illuminate\Cache\CacheManager',
