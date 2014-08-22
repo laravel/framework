@@ -5,8 +5,9 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use Illuminate\Support\Traits\MacroableTrait;
+use Illuminate\Contracts\Cache\Cache as CacheContract;
 
-class Repository implements ArrayAccess {
+class Repository implements CacheContract, ArrayAccess {
 
 	use MacroableTrait {
 		__call as macroCall;
@@ -45,17 +46,6 @@ class Repository implements ArrayAccess {
 	public function has($key)
 	{
 		return ! is_null($this->get($key));
-	}
-
-	/**
-	 * Remove an item from the cache.
-	 *
-	 * @param  string $key
-	 * @return bool
-	 */
-	public function forget($key)
-	{
-		return $this->store->forget($key);
 	}
 
 	/**
@@ -176,6 +166,17 @@ class Repository implements ArrayAccess {
 		$this->forever($key, $value = $callback());
 
 		return $value;
+	}
+
+	/**
+	 * Remove an item from the cache.
+	 *
+	 * @param  string $key
+	 * @return bool
+	 */
+	public function forget($key)
+	{
+		return $this->store->forget($key);
 	}
 
 	/**

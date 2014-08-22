@@ -81,7 +81,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 
 	public function testListenShortcut()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Events\Dispatcher'));
+		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
 		$callback = function() { return 'success'; };
 		$events->shouldReceive('listen')->with('illuminate.log', $callback)->once();

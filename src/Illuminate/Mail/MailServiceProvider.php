@@ -74,7 +74,7 @@ class MailServiceProvider extends ServiceProvider {
 
 		if ($app->bound('log'))
 		{
-			$mailer->setLogger($app['log']);
+			$mailer->setLogger($app['log']->getMonolog());
 		}
 
 		if ($app->bound('queue'))

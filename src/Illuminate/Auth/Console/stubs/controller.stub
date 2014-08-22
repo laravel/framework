@@ -1,7 +1,7 @@
 <?php namespace {{namespace}};
 
-use Illuminate\Auth\Guard;
 use Illuminate\Routing\Controller;
+use Illuminate\Contracts\Auth\Authenticator;
 
 use {{request.namespace}}Auth\LoginRequest;
 use {{request.namespace}}Auth\RegisterRequest;
@@ -11,17 +11,17 @@ class AuthController extends Controller {
 	/**
 	 * The authenticator implementation.
 	 *
-	 * @var Guard
+	 * @var Authenticator
 	 */
 	protected $auth;
 
 	/**
 	 * Create a new authentication controller instance.
 	 *
-	 * @param  Guard  $auth
+	 * @param  Authenticator  $auth
 	 * @return void
 	 */
-	public function __construct(Guard $auth)
+	public function __construct(Authenticator $auth)
 	{
 		$this->auth = $auth;
 

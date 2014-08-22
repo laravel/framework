@@ -9,9 +9,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/cache": "4.3.*",
-        "illuminate/cookie": "4.3.*",
-        "illuminate/encryption": "4.3.*",
+        "illuminate/contracts": "4.3.*",
         "illuminate/support": "4.3.*",
         "nesbot/carbon": "~1.0",
         "symfony/finder": "2.6.*",

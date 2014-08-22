@@ -7,7 +7,7 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 {
 	protected function setUp()
 	{
-		$this->responsePreparer = m::mock('Illuminate\Support\Contracts\ResponsePreparerInterface');
+		$this->responsePreparer = m::mock('Illuminate\Contracts\Support\ResponsePreparerInterface');
 		$this->plainDisplayer = m::mock('Illuminate\Exception\ExceptionDisplayerInterface');
 		$this->debugDisplayer = m::mock('Illuminate\Exception\ExceptionDisplayerInterface');
 		$this->handler = new Handler($this->responsePreparer, $this->plainDisplayer, $this->debugDisplayer);

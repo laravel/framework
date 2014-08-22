@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Auth;
+<?php namespace Illuminate\Contracts\Auth;
 
-interface UserInterface {
+interface User {
 
 	/**
 	 * Get the unique identifier for the user.

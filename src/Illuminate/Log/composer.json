@@ -9,11 +9,9 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "illuminate/contracts": "4.3.*",
         "illuminate/support": "4.3.*",
         "monolog/monolog": "~1.6"
-    },
-    "require-dev": {
-        "illuminate/events": "4.3.*"
     },
     "autoload": {
         "psr-4": {

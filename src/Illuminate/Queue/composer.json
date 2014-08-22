@@ -10,6 +10,7 @@
     "require": {
         "php": ">=5.4.0",
         "illuminate/console": "4.3.*",
+        "illuminate/contracts": "4.3.*",
         "illuminate/container": "4.3.*",
         "illuminate/http": "4.3.*",
         "illuminate/support": "4.3.*",
@@ -17,8 +18,6 @@
         "nesbot/carbon": "~1.0"
     },
     "require-dev": {
-        "illuminate/cache": "4.3.*",
-        "illuminate/events": "4.3.*",
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~2.1"
