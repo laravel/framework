@@ -1933,12 +1933,12 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function getRule($attribute, $rules)
 	{
-		$rules = (array) $rules;
-
 		if ( ! array_key_exists($attribute, $this->rules))
 		{
 			return;
 		}
+
+		$rules = (array) $rules;
 
 		foreach ($this->rules[$attribute] as $rule)
 		{
