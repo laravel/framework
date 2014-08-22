@@ -8,41 +8,6 @@ use Illuminate\Contracts\Auth\PasswordReminder as PasswordReminderContract;
 class PasswordBroker implements PasswordReminderContract {
 
 	/**
-	 * Constant representing a successfully sent reminder.
-	 *
-	 * @var int
-	 */
-	const REMINDER_SENT = 'reminders.sent';
-
-	/**
-	 * Constant representing a successfully reset password.
-	 *
-	 * @var int
-	 */
-	const PASSWORD_RESET = 'reminders.reset';
-
-	/**
-	 * Constant representing the user not found response.
-	 *
-	 * @var int
-	 */
-	const INVALID_USER = 'reminders.user';
-
-	/**
-	 * Constant representing an invalid password.
-	 *
-	 * @var int
-	 */
-	const INVALID_PASSWORD = 'reminders.password';
-
-	/**
-	 * Constant representing an invalid token.
-	 *
-	 * @var int
-	 */
-	const INVALID_TOKEN = 'reminders.token';
-
-	/**
 	 * The password reminder repository.
 	 *
 	 * @var \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
@@ -113,7 +78,7 @@ class PasswordBroker implements PasswordReminderContract {
 
 		if (is_null($user))
 		{
-			return self::INVALID_USER;
+			return PasswordReminderContract::INVALID_USER;
 		}
 
 		// Once we have the reminder token, we are ready to send a message out to the
@@ -123,7 +88,7 @@ class PasswordBroker implements PasswordReminderContract {
 
 		$this->sendReminder($user, $token, $callback);
 
-		return self::REMINDER_SENT;
+		return PasswordReminderContract::REMINDER_SENT;
 	}
 
 	/**
@@ -177,7 +142,7 @@ class PasswordBroker implements PasswordReminderContract {
 
 		$this->reminders->delete($credentials['token']);
 
-		return self::PASSWORD_RESET;
+		return PasswordReminderContract::PASSWORD_RESET;
 	}
 
 	/**
@@ -190,17 +155,17 @@ class PasswordBroker implements PasswordReminderContract {
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
-			return self::INVALID_USER;
+			return PasswordReminderContract::INVALID_USER;
 		}
 
 		if ( ! $this->validNewPasswords($credentials))
 		{
-			return self::INVALID_PASSWORD;
+			return PasswordReminderContract::INVALID_PASSWORD;
 		}
 
 		if ( ! $this->reminders->exists($user, $credentials['token']))
 		{
-			return self::INVALID_TOKEN;
+			return PasswordReminderContract::INVALID_TOKEN;
 		}
 
 		return $user;
