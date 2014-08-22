@@ -3,8 +3,8 @@
 use Illuminate\Auth\Guard;
 use Illuminate\Routing\Controller;
 
-use {{request.namespace}}\Auth\LoginRequest;
-use {{request.namespace}}\Auth\RegisterRequest;
+use {{request.namespace}}Auth\LoginRequest;
+use {{request.namespace}}Auth\RegisterRequest;
 
 class AuthController extends Controller {
 
