@@ -63,6 +63,16 @@ class ConsoleMakeCommand extends GeneratorCommand {
 	}
 
 	/**
+	 * Get the stub file for the generator.
+	 *
+	 * @return string
+	 */
+	protected function getStub()
+	{
+		return __DIR__.'/stubs/command.stub';
+	}
+
+	/**
 	 * Get the console command arguments.
 	 *
 	 * @return array
