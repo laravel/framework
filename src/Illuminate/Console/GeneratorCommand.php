@@ -26,14 +26,6 @@ abstract class GeneratorCommand extends Command {
 	}
 
 	/**
-	 * Get the destination class path.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	abstract protected function getPath($name);
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string
@@ -57,6 +49,19 @@ abstract class GeneratorCommand extends Command {
 		$this->files->put($path, $this->buildClass($name));
 
 		$this->info($this->type.' created successfully.');
+	}
+
+	/**
+	 * Get the destination class path.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function getPath($name)
+	{
+		$name = str_replace('\\', '/', $name);
+
+		return $this->laravel['path.'.$this->configType].'/'.$name.'.php';
 	}
 
 	/**

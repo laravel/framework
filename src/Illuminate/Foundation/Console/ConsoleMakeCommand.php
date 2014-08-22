@@ -50,19 +50,6 @@ class ConsoleMakeCommand extends GeneratorCommand {
 	}
 
 	/**
-	 * Get the controller class path.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function getPath($name)
-	{
-		$name = str_replace('\\', '/', $name);
-
-		return $this->laravel['path.console'].'/'.$name.'.php';
-	}
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string
