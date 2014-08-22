@@ -819,13 +819,15 @@ if ( ! function_exists('route'))
 	/**
 	 * Generate a URL to a named route.
 	 *
-	 * @param  string  $route
+	 * @param  string  $name
 	 * @param  array   $parameters
+	 * @param  bool  $absolute
+	 * @param  \Illuminate\Routing\Route $route
 	 * @return string
 	 */
-	function route($route, $parameters = array())
+	function route($name, $parameters = array(), $absolute = true, $route = null)
 	{
-		return app('url')->route($route, $parameters);
+		return app('url')->route($name, $parameters, $absolute, $route);
 	}
 }
 
