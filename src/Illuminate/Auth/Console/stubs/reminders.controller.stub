@@ -1,10 +1,31 @@
 <?php namespace {{namespace}};
 
-use Password;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Contracts\Auth\PasswordReminder;
 
 class {{class}} extends Controller {
+
+	/**
+	 * The password reminder implementation.
+	 *
+	 * @var PasswordReminder
+	 */
+	protected $passwords;
+
+	/**
+	 * Create a new password reminder controller isntance.
+	 *
+	 * @param  PasswordReminder  $passwords
+	 * @return void
+	 */
+	public function __construct(PasswordReminder $passwords)
+	{
+		$this->passwords = $passwords;
+
+		$this->beforeFilter('guest');
+		$this->beforeFilter('csrf', ['on' => ['post']]);
+	}
 
 	/**
 	 * Display the password reminder view.
@@ -24,12 +45,12 @@ class {{class}} extends Controller {
 	 */
 	public function postRemind(Request $request)
 	{
-		switch ($response = Password::remind($request->only('email')))
+		switch ($response = $this->passwords->remind($request->only('email')))
 		{
-			case Password::INVALID_USER:
+			case PasswordReminder::INVALID_USER:
 				return redirect()->back()->with('error', trans($response));
 
-			case Password::REMINDER_SENT:
+			case PasswordReminder::REMINDER_SENT:
 				return redirect()->back()->with('status', trans($response));
 		}
 	}
@@ -62,7 +83,7 @@ class {{class}} extends Controller {
 			'email', 'password', 'password_confirmation', 'token'
 		);
 
-		$response = Password::reset($credentials, function($user, $password)
+		$response = $this->passwords->reset($credentials, function($user, $password)
 		{
 			$user->password = bcrypt($password);
 
@@ -71,12 +92,12 @@ class {{class}} extends Controller {
 
 		switch ($response)
 		{
-			case Password::INVALID_PASSWORD:
-			case Password::INVALID_TOKEN:
-			case Password::INVALID_USER:
+			case PasswordReminder::INVALID_PASSWORD:
+			case PasswordReminder::INVALID_TOKEN:
+			case PasswordReminder::INVALID_USER:
 				return redirect()->back()->with('error', trans($response));
 
-			case Password::PASSWORD_RESET:
+			case PasswordReminder::PASSWORD_RESET:
 				return redirect()->to('/');
 		}
 	}
