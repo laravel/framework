@@ -798,11 +798,19 @@ if ( ! function_exists('redirect'))
 	/**
 	 * Get an instance of the redirector.
 	 *
-	 * @return \Illuminate\Routing\Redirector
+	 * @param  string|null  $to
+	 * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
 	 */
-	function redirect()
+	function redirect($to = null)
 	{
-		return app('redirect');
+		if ( ! is_null($to))
+		{
+			return app('redirect')->to($to);
+		}
+		else
+		{
+			return app('redirect');
+		}
 	}
 }
 

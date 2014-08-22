@@ -1,0 +1,84 @@
+<?php namespace {{namespace}};
+
+use Password;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
+class {{class}} extends Controller {
+
+	/**
+	 * Display the password reminder view.
+	 *
+	 * @return Response
+	 */
+	public function getRemind()
+	{
+		return view('password.remind');
+	}
+
+	/**
+	 * Handle a POST request to remind a user of their password.
+	 *
+	 * @param  Request  $request
+	 * @return Response
+	 */
+	public function postRemind(Request $request)
+	{
+		switch ($response = Password::remind($request->only('email')))
+		{
+			case Password::INVALID_USER:
+				return redirect()->back()->with('error', trans($response));
+
+			case Password::REMINDER_SENT:
+				return redirect()->back()->with('status', trans($response));
+		}
+	}
+
+	/**
+	 * Display the password reset view for the given token.
+	 *
+	 * @param  string  $token
+	 * @return Response
+	 */
+	public function getReset($token = null)
+	{
+		if (is_null($token))
+		{
+			throw new NotFoundHttpException;
+		}
+
+		return view('password.reset')->with('token', $token);
+	}
+
+	/**
+	 * Handle a POST request to reset a user's password.
+	 *
+	 * @param  Request  $request
+	 * @return Response
+	 */
+	public function postReset(Request $request)
+	{
+		$credentials = $request->only(
+			'email', 'password', 'password_confirmation', 'token'
+		);
+
+		$response = Password::reset($credentials, function($user, $password)
+		{
+			$user->password = bcrypt($password);
+
+			$user->save();
+		});
+
+		switch ($response)
+		{
+			case Password::INVALID_PASSWORD:
+			case Password::INVALID_TOKEN:
+			case Password::INVALID_USER:
+				return redirect()->back()->with('error', trans($response));
+
+			case Password::PASSWORD_RESET:
+				return redirect()->to('/');
+		}
+	}
+
+}
