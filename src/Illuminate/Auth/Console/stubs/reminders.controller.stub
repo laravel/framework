@@ -2,24 +2,24 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Contracts\Auth\PasswordReminder;
+use Illuminate\Contracts\Auth\PasswordBroker;
 
 class {{class}} extends Controller {
 
 	/**
 	 * The password reminder implementation.
 	 *
-	 * @var PasswordReminder
+	 * @var PasswordBroker
 	 */
 	protected $passwords;
 
 	/**
 	 * Create a new password reminder controller isntance.
 	 *
-	 * @param  PasswordReminder  $passwords
+	 * @param  PasswordBroker  $passwords
 	 * @return void
 	 */
-	public function __construct(PasswordReminder $passwords)
+	public function __construct(PasswordBroker $passwords)
 	{
 		$this->passwords = $passwords;
 
@@ -47,10 +47,10 @@ class {{class}} extends Controller {
 	{
 		switch ($response = $this->passwords->remind($request->only('email')))
 		{
-			case PasswordReminder::INVALID_USER:
+			case PasswordBroker::INVALID_USER:
 				return redirect()->back()->with('error', trans($response));
 
-			case PasswordReminder::REMINDER_SENT:
+			case PasswordBroker::REMINDER_SENT:
 				return redirect()->back()->with('status', trans($response));
 		}
 	}
@@ -92,12 +92,12 @@ class {{class}} extends Controller {
 
 		switch ($response)
 		{
-			case PasswordReminder::INVALID_PASSWORD:
-			case PasswordReminder::INVALID_TOKEN:
-			case PasswordReminder::INVALID_USER:
+			case PasswordBroker::INVALID_PASSWORD:
+			case PasswordBroker::INVALID_TOKEN:
+			case PasswordBroker::INVALID_USER:
 				return redirect()->back()->with('error', trans($response));
 
-			case PasswordReminder::PASSWORD_RESET:
+			case PasswordBroker::PASSWORD_RESET:
 				return redirect()->to('/');
 		}
 	}

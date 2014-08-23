@@ -2,7 +2,7 @@
 
 use Closure;
 
-interface PasswordReminder {
+interface PasswordBroker {
 
 	/**
 	 * Constant representing a successfully sent reminder.

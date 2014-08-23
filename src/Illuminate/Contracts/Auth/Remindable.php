@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Auth\Reminders;
+<?php namespace Illuminate\Contracts\Auth;
 
-interface RemindableInterface {
+interface Remindable {
 
 	/**
 	 * Get the e-mail address where password reminders are sent.
