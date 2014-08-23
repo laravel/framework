@@ -60,6 +60,15 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	{
 		$email = $user->getReminderEmail();
 
+		// Check if user already have a valid and active token
+		// If yes, delete it first before generating new token
+		$existingToken = $this->requested($email);
+
+		if($existingToken){
+
+			$this->delete($existingToken);
+		}
+
 		// We will create a new, random token for the user so that we can e-mail them
 		// a safe link to the password reset form. Then we will insert a record in
 		// the database so that we can verify the token within the actual reset.
@@ -96,6 +105,27 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 		$reminder = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
 		return $reminder && ! $this->reminderExpired($reminder);
+	}
+
+	/**
+	 * Determine if a reminder record already exists user and is valid
+	 * Return the valid token is exist
+	 *
+	 * @param  string $email
+	 * @return mixed
+	 */
+	public function requested($email)
+	{
+
+		$reminder = (array) $this->getTable()->where('email', $email)->first();
+
+		if($reminder && ! $this->reminderExpired($reminder)){
+
+			return $reminder['token'];
+
+		}
+
+		return false;
 	}
 
 	/**
