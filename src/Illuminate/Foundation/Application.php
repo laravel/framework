@@ -1142,7 +1142,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'blade.compiler' => 'Illuminate\View\Compilers\BladeCompiler',
 			'cache'          => ['Illuminate\Cache\CacheManager', 'Illuminate\Contracts\Cache\Factory'],
 			'cache.store'    => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Cache'],
-			'config'         => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Repository'],
+			'config'         => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Config'],
 			'cookie'         => ['Illuminate\Cookie\CookieJar', 'Illuminate\Contracts\Cookie\Factory', 'Illuminate\Contracts\Cookie\QueueingFactory'],
 			'encrypter'      => ['Illuminate\Encryption\Encrypter', 'Illuminate\Contracts\Encryption\Encrypter'],
 			'db'             => 'Illuminate\Database\DatabaseManager',
