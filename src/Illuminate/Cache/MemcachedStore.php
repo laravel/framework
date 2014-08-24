@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Cache;
 
-use Memcached;
-
 class MemcachedStore extends TaggableStore implements StoreInterface {
 
 	/**
@@ -25,7 +23,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	 * @param  string      $prefix
 	 * @return void
 	 */
-	public function __construct(Memcached $memcached, $prefix = '')
+	public function __construct($memcached, $prefix = '')
 	{
 		$this->memcached = $memcached;
 		$this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
