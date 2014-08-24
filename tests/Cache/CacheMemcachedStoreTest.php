@@ -4,7 +4,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetReturnsNullWhenNotFound()
 	{
-		$memcache = $this->getMock('Memcached', array('get', 'getResultCode'));
+		$memcache = $this->getMock('StdClass', array('get', 'getResultCode'));
 		$memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->will($this->returnValue(null));
 		$memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(1));
 		$store = new Illuminate\Cache\MemcachedStore($memcache, 'foo');
@@ -14,7 +14,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testMemcacheValueIsReturned()
 	{
-		$memcache = $this->getMock('Memcached', array('get', 'getResultCode'));
+		$memcache = $this->getMock('StdClass', array('get', 'getResultCode'));
 		$memcache->expects($this->once())->method('get')->will($this->returnValue('bar'));
 		$memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));
 		$store = new Illuminate\Cache\MemcachedStore($memcache);
