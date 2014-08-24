@@ -64,7 +64,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 		// If yes, delete the active token before generating new a token
 		$existingToken = $this->requested($email);
 
-		if($existingToken)
+		if ($existingToken)
 		{
 			$this->delete($existingToken);
 		}
@@ -119,7 +119,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 
 		$reminder = (array) $this->getTable()->where('email', $email)->first();
 
-		if($reminder && ! $this->reminderExpired($reminder))
+		if ($reminder && ! $this->reminderExpired($reminder))
 		{
 			return $reminder['token'];
 		}
