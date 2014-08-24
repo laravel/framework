@@ -16,6 +16,7 @@
         "ircmaxell/password-compat": "~1.0",
         "filp/whoops": "1.1.*",
         "jeremeamia/superclosure": "~1.0",
+        "league/flysystem": "~0.5",
         "monolog/monolog": "~1.6",
         "nesbot/carbon": "~1.0",
         "patchwork/utf8": "~1.1",
