@@ -61,11 +61,11 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 		$email = $user->getReminderEmail();
 
 		// Check if user already have a valid and active token
-		// If yes, delete it first before generating new token
+		// If yes, delete the active token before generating new a token
 		$existingToken = $this->requested($email);
 
-		if($existingToken){
-
+		if($existingToken)
+		{
 			$this->delete($existingToken);
 		}
 
@@ -108,8 +108,8 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	}
 
 	/**
-	 * Determine if a reminder record already exists user and is valid
-	 * Return the valid token is exist
+	 * Determine if a valid reminder record already exists for a specific user
+	 * Return the valid token if exist
 	 *
 	 * @param  string $email
 	 * @return mixed
@@ -119,10 +119,9 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 
 		$reminder = (array) $this->getTable()->where('email', $email)->first();
 
-		if($reminder && ! $this->reminderExpired($reminder)){
-
+		if($reminder && ! $this->reminderExpired($reminder))
+		{
 			return $reminder['token'];
-
 		}
 
 		return false;
