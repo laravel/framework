@@ -111,7 +111,7 @@ class FilesystemManager implements FactoryContract {
 	public function createRackspaceDriver(array $config)
 	{
 		$client = new Rackspace($config['endpoint'], [
-			'username' => $config['username'], 'apiKey' => $config['password'],
+			'username' => $config['username'], 'apiKey' => $config['key'],
 		]);
 
 		return $this->decorate(new Flysystem(
