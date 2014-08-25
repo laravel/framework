@@ -61,7 +61,7 @@ class QueueServiceProvider extends ServiceProvider {
 			return $manager;
 		});
 
-		$this->app->bindShared('queue.driver', function($app)
+		$this->app->bindShared('queue.connection', function($app)
 		{
 			return $app['queue']->connection();
 		});
