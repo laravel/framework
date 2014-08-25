@@ -2,6 +2,7 @@
 
 use Closure;
 use ArrayAccess;
+use Illuminate\Contracts\Support\RenderableInterface;
 use Illuminate\Support\MessageBag;
 use Illuminate\View\Engines\EngineInterface;
 use Illuminate\Contracts\View\View as ViewContract;
@@ -145,7 +146,7 @@ class View implements ArrayAccess, ViewContract {
 
 		foreach ($data as $key => $value)
 		{
-			if ($value instanceof Renderable)
+			if ($value instanceof RenderableInterface)
 			{
 				$data[$key] = $value->render();
 			}
