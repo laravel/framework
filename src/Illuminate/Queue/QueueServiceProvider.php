@@ -63,7 +63,7 @@ class QueueServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('queue.driver', function($app)
 		{
-			return $app['queue']->driver();
+			return $app['queue']->connection();
 		});
 	}
 
