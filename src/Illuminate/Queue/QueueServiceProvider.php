@@ -303,7 +303,7 @@ class QueueServiceProvider extends ServiceProvider {
 		return array(
 			'queue', 'queue.worker', 'queue.listener', 'queue.failer',
 			'command.queue.work', 'command.queue.listen', 'command.queue.restart',
-			'command.queue.subscribe',
+			'command.queue.subscribe', 'queue.connection',
 		);
 	}
 
