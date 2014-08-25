@@ -36,7 +36,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 * Retrieve a user by their unique identifier.
 	 *
 	 * @param  mixed  $identifier
-	 * @return \Illuinate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\User|null
 	 */
 	public function retrieveById($identifier)
 	{
@@ -48,7 +48,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 *
 	 * @param  mixed  $identifier
 	 * @param  string  $token
-	 * @return \Illuinate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\User|null
 	 */
 	public function retrieveByToken($identifier, $token)
 	{
@@ -63,7 +63,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	/**
 	 * Update the "remember me" token for the given user in storage.
 	 *
-	 * @param  \Illuinate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\User  $user
 	 * @param  string  $token
 	 * @return void
 	 */
@@ -78,7 +78,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuinate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\User|null
 	 */
 	public function retrieveByCredentials(array $credentials)
 	{
@@ -98,7 +98,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	/**
 	 * Validate a user against the given credentials.
 	 *
-	 * @param  \Illuinate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\User  $user
 	 * @param  array  $credentials
 	 * @return bool
 	 */
