@@ -48,7 +48,13 @@ class CacheServiceProvider extends ServiceProvider {
 			return new Console\ClearCommand($app['cache'], $app['files']);
 		});
 
+		$this->app->bindShared('command.cache.table', function($app)
+		{
+			return new Console\CacheTableCommand($app['files']);
+		});
+
 		$this->commands('command.cache.clear');
+		$this->commands('command.cache.table');
 	}
 
 	/**
