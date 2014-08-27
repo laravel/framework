@@ -7,6 +7,7 @@ use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
@@ -330,7 +331,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		// If the application has already booted, we will call this boot method on
 		// the provider class so it has an opportunity to do its boot logic and
 		// will be ready for any usage by the developer's application logics.
-		if ($this->booted) $provider->boot();
+		if ($this->booted)
+		{
+			$this->bootProvider($provider);
+		}
 
 		return $provider;
 	}
@@ -437,7 +441,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			$this->booting(function() use ($instance)
 			{
-				$instance->boot();
+				$this->bootProvider($instance);
 			});
 		}
 	}
@@ -583,7 +587,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		if ($this->booted) return;
 
-		array_walk($this->serviceProviders, function($p) { $p->boot(); });
+		array_walk($this->serviceProviders, function($p) { $this->bootProvider($p); });
 
 		$this->bootApplication();
 	}
@@ -627,6 +631,17 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$this->bootedCallbacks[] = $callback;
 
 		if ($this->isBooted()) $this->fireAppCallbacks(array($callback));
+	}
+
+	/**
+	 * Boot the given service provider.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider  $provider
+	 * @return void
+	 */
+	protected function bootProvider(ServiceProvider $provider)
+	{
+		return $this->call([$provider, 'boot']);
 	}
 
 	/**
