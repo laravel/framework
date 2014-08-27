@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Contracts\Logging;
 
-interface Logger {
+interface Log {
 
 	/**
 	 * Log an alert message to the logs.

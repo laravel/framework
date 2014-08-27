@@ -10,9 +10,9 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Illuminate\Contracts\Support\JsonableInterface;
 use Illuminate\Contracts\Support\ArrayableInterface;
-use Illuminate\Contracts\Logging\Logger as LoggerContract;
+use Illuminate\Contracts\Logging\Log as LogContract;
 
-class Writer implements LoggerContract, PsrLoggerInterface {
+class Writer implements LogContract, PsrLoggerInterface {
 
 	/**
 	 * The Monolog logger instance.
