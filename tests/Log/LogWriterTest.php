@@ -35,19 +35,19 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testMagicMethodsPassErrorAdditionsToMonolog()
+	public function testMethodsPassErrorAdditionsToMonolog()
 	{
 		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
-		$monolog->shouldReceive('addError')->once()->with('foo')->andReturn('bar');
+		$monolog->shouldReceive('error')->once()->with('foo', []);
 
-		$this->assertEquals('bar', $writer->error('foo'));
+		$writer->error('foo');
 	}
 
 
 	public function testWriterFiresEventsDispatcher()
 	{
 		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
-		$monolog->shouldReceive('addError')->once()->with('foo');
+		$monolog->shouldReceive('error')->once()->with('foo', array());
 
 		$events->listen('illuminate.log', function($level, $message, array $context = array())
 		{
