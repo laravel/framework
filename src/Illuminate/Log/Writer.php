@@ -7,11 +7,12 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Illuminate\Contracts\Events\Dispatcher;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Illuminate\Contracts\Support\JsonableInterface;
 use Illuminate\Contracts\Support\ArrayableInterface;
 use Illuminate\Contracts\Logging\Logger as LoggerContract;
 
-class Writer implements LoggerContract {
+class Writer implements LoggerContract, PsrLoggerInterface {
 
 	/**
 	 * The Monolog logger instance.
@@ -19,22 +20,6 @@ class Writer implements LoggerContract {
 	 * @var \Monolog\Logger
 	 */
 	protected $monolog;
-
-	/**
-	 * All of the error levels.
-	 *
-	 * @var array
-	 */
-	protected $levels = array(
-		'debug',
-		'info',
-		'notice',
-		'warning',
-		'error',
-		'critical',
-		'alert',
-		'emergency',
-	);
 
 	/**
 	 * The event dispatcher instance.
@@ -58,6 +43,18 @@ class Writer implements LoggerContract {
 		{
 			$this->dispatcher = $dispatcher;
 		}
+	}
+
+	/**
+	 * Log an emergency message to the logs.
+	 *
+	 * @param  string  $message
+	 * @param  array  $context
+	 * @return void
+	 */
+	public function emergency($message, array $context = array())
+	{
+		return $this->writeLog(__FUNCTION__, $message, $context);
 	}
 
 	/**
