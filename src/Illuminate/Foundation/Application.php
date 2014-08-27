@@ -641,7 +641,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	protected function bootProvider(ServiceProvider $provider)
 	{
-		return $this->call([$provider, 'boot']);
+		if (method_exists($provider, 'boot'))
+		{
+			return $this->call([$provider, 'boot']);
+		}
 	}
 
 	/**
@@ -1159,6 +1162,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'cache.store'    => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Cache'],
 			'config'         => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Config'],
 			'cookie'         => ['Illuminate\Cookie\CookieJar', 'Illuminate\Contracts\Cookie\Factory', 'Illuminate\Contracts\Cookie\QueueingFactory'],
+			'exception'      => 'Illuminate\Contracts\Exception\Handler',
 			'encrypter'      => ['Illuminate\Encryption\Encrypter', 'Illuminate\Contracts\Encryption\Encrypter'],
 			'db'             => 'Illuminate\Database\DatabaseManager',
 			'events'         => ['Illuminate\Events\Dispatcher', 'Illuminate\Contracts\Events\Dispatcher'],
