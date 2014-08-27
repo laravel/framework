@@ -3,7 +3,7 @@
 interface Factory {
 
 	/**
-	 * Get an OAuth provider implementation.
+	 * Get a filesystem implementation.
 	 *
 	 * @param  string  $name
 	 * @return \Illuminate\Contracts\Filesystem\Filesystem
