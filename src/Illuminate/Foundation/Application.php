@@ -1184,7 +1184,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'router'         => 'Illuminate\Routing\Router',
 			'session'        => 'Illuminate\Session\SessionManager',
 			'session.store'  => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
-			'url'            => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Url\Generator'],
+			'url'            => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
 			'validator'      => 'Illuminate\Validation\Factory',
 			'view'           => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
 		);
