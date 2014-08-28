@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Contracts\URL;
+<?php namespace Illuminate\Contracts\Routing;
 
-interface Generator {
+interface UrlGenerator {
 
 	/**
 	 * Generate a absolute URL to the given path.
