@@ -21,6 +21,25 @@ interface Factory {
 	public function make($view, $data = array(), $mergeData = array());
 
 	/**
+	 * Register a view composer event.
+	 *
+	 * @param  array|string  $views
+	 * @param  \Closure|string  $callback
+	 * @param  int|null  $priority
+	 * @return array
+	 */
+	public function composer($views, $callback, $priority = null);
+
+	/**
+	 * Register a view creator event.
+	 *
+	 * @param  array|string     $views
+	 * @param  \Closure|string  $callback
+	 * @return array
+	 */
+	public function creator($views, $callback);
+
+	/**
 	 * Add a new namespace to the loader.
 	 *
 	 * @param  string  $namespace

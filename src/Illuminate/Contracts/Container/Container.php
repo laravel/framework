@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Contracts\Container;
 
+use Closure;
+
 interface Container {
 
 	/**
@@ -9,6 +11,15 @@ interface Container {
 	 * @return bool
 	 */
 	public function bound($abstract);
+
+	/**
+	 * Alias a type to a shorter name.
+	 *
+	 * @param  string  $abstract
+	 * @param  string  $alias
+	 * @return void
+	 */
+	public function alias($abstract, $alias);
 
 	/**
 	 * Register a binding with the container.
@@ -40,6 +51,17 @@ interface Container {
 	public function singleton($abstract, $concrete = null);
 
 	/**
+	 * "Extend" an abstract type in the container.
+	 *
+	 * @param  string    $abstract
+	 * @param  \Closure  $closure
+	 * @return void
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function extend($abstract, Closure $closure);
+
+	/**
 	 * Resolve the given type from the container.
 	 *
 	 * @param  string  $abstract
@@ -47,5 +69,13 @@ interface Container {
 	 * @return mixed
 	 */
 	public function make($abstract, $parameters = array());
+
+	/**
+	 * Determine if the given abstract type has been resolved.
+	 *
+	 * @param  string $abstract
+	 * @return bool
+	 */
+	public function resolved($abstract);
 
 }
