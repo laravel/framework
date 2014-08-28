@@ -1,13 +1,14 @@
 <?php namespace Illuminate\Auth;
 
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Auth\Authenticator;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Auth\User as UserContract;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
-class Guard {
+class Guard implements Authenticator {
 
 	/**
 	 * The currently authenticated user.
