@@ -88,6 +88,16 @@ interface Filesystem {
 	public function delete($paths);
 
 	/**
+	 * Touch the file at a given path.
+	 *
+	 * @param  string|array  $paths
+	 * @param  int|null  $time
+	 * @param  int|null  $atime
+	 * @return bool
+	 */
+	public function touch($paths, $time = null, $atime = null);
+
+	/**
 	 * Copy a file to a new location.
 	 *
 	 * @param  string  $from
