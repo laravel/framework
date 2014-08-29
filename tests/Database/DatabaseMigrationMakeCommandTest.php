@@ -16,7 +16,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
 		$app = array('path.database' => __DIR__);
 		$command->setLaravel($app);
-		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/database/migrations', null, false);
+		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
 
 		$this->runCommand($command, array('name' => 'create_foo'));
 	}
@@ -27,7 +27,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
 		$app = array('path.database' => __DIR__);
 		$command->setLaravel($app);
-		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/database/migrations', 'users', true);
+		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', 'users', true);
 
 		$this->runCommand($command, array('name' => 'create_foo', '--create' => 'users'));
 	}
