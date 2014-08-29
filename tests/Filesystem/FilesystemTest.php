@@ -32,6 +32,30 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTouchCreatesFiles()
+	{
+		$files = new Filesystem;
+		$files->touch(__DIR__.'/file.txt');
+		$this->assertTrue(file_exists(__DIR__.'/file.txt'));
+		$this->assertSame('', $files->get(__DIR__.'/file.txt'));
+		@unlink(__DIR__.'/file.txt');
+	}
+
+
+	public function testTouchExistingFiles()
+	{
+		$files = new Filesystem;
+		$files->put(__DIR__.'/file.txt', 'foo');
+		$this->assertTrue(file_exists(__DIR__.'/file.txt'));
+		$this->assertSame('foo', $files->get(__DIR__.'/file.txt'));
+
+		$files->touch(__DIR__.'/file.txt');
+		$this->assertTrue(file_exists(__DIR__.'/file.txt'));
+		$this->assertSame('foo', $files->get(__DIR__.'/file.txt'));
+		@unlink(__DIR__.'/file.txt');
+	}
+
+
 	public function testPrependExistingFiles()
 	{
 		$files = new Filesystem;

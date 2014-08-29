@@ -118,6 +118,25 @@ class Filesystem {
 	}
 
 	/**
+	 * Touch the file at a given path.
+	 *
+	 * @param  string|array  $paths
+	 * @param  int|null  $time
+	 * @param  int|null  $atime
+	 * @return bool
+	 */
+	public function touch($paths, $time = null, $atime = null)
+	{
+		$paths = is_array($paths) ? $paths : func_get_args();
+
+		$success = true;
+
+		foreach ($paths as $path) { if ( ! touch($path, $time, $atime)) $success = false; }
+
+		return $success;
+	}
+
+	/**
 	 * Move a file to a new location.
 	 *
 	 * @param  string  $path
