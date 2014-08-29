@@ -14,7 +14,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 	public function testBasicCreateGivesCreatorProperArguments()
 	{
 		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
-		$app = array('path' => __DIR__);
+		$app = array('path.database' => __DIR__);
 		$command->setLaravel($app);
 		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/database/migrations', null, false);
 
@@ -25,7 +25,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 	public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
 	{
 		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
-		$app = array('path' => __DIR__);
+		$app = array('path.database' => __DIR__);
 		$command->setLaravel($app);
 		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/database/migrations', 'users', true);
 
@@ -36,7 +36,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 	public function testPackagePathsMayBeUsed()
 	{
 		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
-		$app = array('path' => __DIR__);
+		$app = array('path.database' => __DIR__);
 		$command->setLaravel($app);
 		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/vendor/bar/src/migrations', null, false);
 
