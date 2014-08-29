@@ -103,7 +103,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerChangesCommand()
 	{
-		$this->app->bindShared('command.changes', function($app)
+		$this->app->bindShared('command.changes', function()
 		{
 			return new ChangesCommand;
 		});
@@ -142,7 +142,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerDownCommand()
 	{
-		$this->app->bindShared('command.down', function($app)
+		$this->app->bindShared('command.down', function()
 		{
 			return new DownCommand;
 		});
@@ -298,7 +298,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerUpCommand()
 	{
-		$this->app->bindShared('command.up', function($app)
+		$this->app->bindShared('command.up', function()
 		{
 			return new UpCommand;
 		});
