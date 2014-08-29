@@ -146,7 +146,7 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSmtpTransport($config)
 	{
-		$this->app['swift.transport'] = $this->app->share(function($app) use ($config)
+		$this->app['swift.transport'] = $this->app->share(function() use ($config)
 		{
 			extract($config);
 
@@ -182,7 +182,7 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSendmailTransport($config)
 	{
-		$this->app['swift.transport'] = $this->app->share(function($app) use ($config)
+		$this->app['swift.transport'] = $this->app->share(function() use ($config)
 		{
 			return SendmailTransport::newInstance($config['sendmail']);
 		});
