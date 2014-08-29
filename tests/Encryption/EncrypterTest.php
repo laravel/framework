@@ -12,6 +12,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' == $e->decrypt($encrypted));
 	}
 
+
 	public function testEncryptionWithCustomCipher()
 	{
 		$e = $this->getEncrypter();
@@ -22,7 +23,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException Illuminate\Encryption\DecryptException
+	 * @expectedException Illuminate\Contracts\Encryption\DecryptException
 	 */
 	public function testExceptionThrownWhenPayloadIsInvalid()
 	{

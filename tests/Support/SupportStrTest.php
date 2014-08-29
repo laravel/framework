@@ -58,6 +58,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(Str::endsWith('jason', 'no'));
 		$this->assertFalse(Str::endsWith('jason', array('no')));
 		$this->assertFalse(Str::endsWith('jason', ''));
+		$this->assertFalse(Str::endsWith('7', ' 7'));
 	}
 
 
@@ -102,6 +103,24 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(Str::is('/', '/a'));
 		$this->assertTrue(Str::is('foo/*', 'foo/bar/baz'));
 		$this->assertTrue(Str::is('*/foo', 'blah/baz/foo'));
+	}
+
+
+	public function testQuickRandom()
+	{
+		$randomInteger = mt_rand(1, 100);		
+		$this->assertEquals($randomInteger, strlen(Str::quickRandom($randomInteger)));
+		$this->assertInternalType('string', Str::quickRandom());
+		$this->assertEquals(16, strlen(Str::quickRandom()));
+	}
+
+
+	public function testRandom()
+	{
+		$this->assertEquals(16, strlen(Str::random()));
+		$randomInteger = mt_rand(1, 100);
+		$this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
+		$this->assertInternalType('string', Str::random());
 	}
 
 }

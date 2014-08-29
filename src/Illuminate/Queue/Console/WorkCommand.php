@@ -1,11 +1,10 @@
 <?php namespace Illuminate\Queue\Console;
 
 use Illuminate\Queue\Worker;
-use Illuminate\Queue\Jobs\Job;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Queue\Job;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class WorkCommand extends Command {
 
@@ -111,21 +110,19 @@ class WorkCommand extends Command {
 	/**
 	 * Write the status output for the queue worker.
 	 *
-	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  \Illuminate\Contracts\Queue\Job  $job
 	 * @param  bool  $failed
 	 * @return void
 	 */
 	protected function writeOutput(Job $job, $failed)
 	{
-		$options = OutputInterface::OUTPUT_RAW;
-
 		if ($failed)
 		{
-			$this->output->writeln('<error>Failed:</error> '.$job->getName(), $options);
+			$this->output->writeln('<error>Failed:</error> '.$job->getName());
 		}
 		else
 		{
-			$this->output->writeln('<info>Processed:</info> '.$job->getName(), $options);
+			$this->output->writeln('<info>Processed:</info> '.$job->getName());
 		}
 	}
 

@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
 use Closure;
+use DateTime;
+use Carbon\Carbon;
 
 class TaggedCache implements StoreInterface {
 
@@ -59,9 +61,9 @@ class TaggedCache implements StoreInterface {
 	/**
 	 * Store an item in the cache for a given number of minutes.
 	 *
-	 * @param  string        $key
-	 * @param  mixed         $value
-	 * @param  \DateTime|int $minutes
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @param  \DateTime|int  $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -149,9 +151,9 @@ class TaggedCache implements StoreInterface {
 	/**
 	 * Get an item from the cache, or store the default value.
 	 *
-	 * @param  string        $key
-	 * @param  \DateTime|int $minutes
-	 * @param  Closure       $callback
+	 * @param  string  $key
+	 * @param  \DateTime|int  $minutes
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -169,8 +171,8 @@ class TaggedCache implements StoreInterface {
 	/**
 	 * Get an item from the cache, or store the default value forever.
 	 *
-	 * @param  string   $key
-	 * @param  Closure  $callback
+	 * @param  string    $key
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function sear($key, Closure $callback)
@@ -181,8 +183,8 @@ class TaggedCache implements StoreInterface {
 	/**
 	 * Get an item from the cache, or store the default value forever.
 	 *
-	 * @param  string   $key
-	 * @param  Closure  $callback
+	 * @param  string    $key
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function rememberForever($key, Closure $callback)

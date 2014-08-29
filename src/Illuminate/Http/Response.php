@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Http;
 
 use ArrayObject;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\RenderableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
+use Illuminate\Contracts\Support\RenderableInterface;
 
 class Response extends \Symfony\Component\HttpFoundation\Response {
 
@@ -19,7 +19,7 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 * Set the content on the response.
 	 *
 	 * @param  mixed  $content
-	 * @return void
+	 * @return $this
 	 */
 	public function setContent($content)
 	{

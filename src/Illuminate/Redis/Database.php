@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Redis;
 
 use Predis\Client;
+use Illuminate\Contracts\Redis\Database as DatabaseContract;
 
-class Database {
+class Database implements DatabaseContract {
 
 	/**
 	 * The host address of the database.
@@ -64,7 +65,7 @@ class Database {
 	 * Get a specific Redis connection instance.
 	 *
 	 * @param  string  $name
-	 * @return \Predis\Connection\SingleConnectionInterface
+	 * @return \Predis\ClientInterface
 	 */
 	public function connection($name = 'default')
 	{

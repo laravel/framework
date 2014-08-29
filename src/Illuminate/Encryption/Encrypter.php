@@ -1,11 +1,11 @@
 <?php namespace Illuminate\Encryption;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Core\Util\SecureRandom;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class DecryptException extends \RuntimeException {}
-
-class Encrypter {
+class Encrypter implements EncrypterContract {
 
 	/**
 	 * The encryption key.
@@ -106,6 +106,8 @@ class Encrypter {
 	 * @param  string  $value
 	 * @param  string  $iv
 	 * @return string
+	 *
+	 * @throws \Exception
 	 */
 	protected function mcryptDecrypt($value, $iv)
 	{
@@ -125,7 +127,7 @@ class Encrypter {
 	 * @param  string  $payload
 	 * @return array
 	 *
-	 * @throws DecryptException
+	 * @throws \Illuminate\Contracts\Encryption\DecryptException
 	 */
 	protected function getJsonPayload($payload)
 	{
@@ -152,10 +154,17 @@ class Encrypter {
 	 *
 	 * @param  array  $payload
 	 * @return bool
+	 *
+	 * @throws \RuntimeException
 	 */
 	protected function validMac(array $payload)
 	{
-		$bytes = with(new SecureRandom)->nextBytes(16);
+		if ( ! function_exists('openssl_random_pseudo_bytes'))
+		{
+			throw new \RuntimeException('OpenSSL extension is required.');
+		}
+
+		$bytes = (new SecureRandom)->nextBytes(16);
 
 		$calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 

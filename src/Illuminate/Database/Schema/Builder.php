@@ -85,8 +85,8 @@ class Builder {
 	/**
 	 * Modify a table on the schema.
 	 *
-	 * @param  string   $table
-	 * @param  Closure  $callback
+	 * @param  string    $table
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function table($table, Closure $callback)
@@ -97,8 +97,8 @@ class Builder {
 	/**
 	 * Create a new table on the schema.
 	 *
-	 * @param  string   $table
-	 * @param  Closure  $callback
+	 * @param  string    $table
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function create($table, Closure $callback)
@@ -172,8 +172,8 @@ class Builder {
 	/**
 	 * Create a new command set with a Closure.
 	 *
-	 * @param  string   $table
-	 * @param  Closure  $callback
+	 * @param  string    $table
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	protected function createBlueprint($table, Closure $callback = null)
@@ -202,7 +202,7 @@ class Builder {
 	 * Set the database connection instance.
 	 *
 	 * @param  \Illuminate\Database\Connection
-	 * @return \Illuminate\Database\Schema\Builder
+	 * @return $this
 	 */
 	public function setConnection(Connection $connection)
 	{

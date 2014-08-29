@@ -2,7 +2,7 @@
 
 use Mockery as m;
 use Illuminate\View\View;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\ArrayableInterface;
 
 class ViewTest extends PHPUnit_Framework_TestCase {
 
@@ -91,7 +91,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testViewAcceptsArrayableImplementations()
 	{
-		$arrayable = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$arrayable = m::mock('Illuminate\Contracts\Support\ArrayableInterface');
 		$arrayable->shouldReceive('toArray')->once()->andReturn(array('foo' => 'bar', 'baz' => array('qux', 'corge')));
 
 		$view = new View(
@@ -164,7 +164,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
 		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-		$view->renderable = m::mock('Illuminate\Support\Contracts\RenderableInterface');
+		$view->renderable = m::mock('Illuminate\Contracts\Support\RenderableInterface');
 		$view->renderable->shouldReceive('render')->once()->andReturn('text');
 		$view->render();
 	}
@@ -191,14 +191,14 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	{
 		$view = $this->getView();
 		$errors = array('foo'=>'bar','qu'=>'ux');
-		$this->assertTrue($view->withErrors($errors) === $view);
+		$this->assertSame($view, $view->withErrors($errors));
 		$this->assertTrue($view->errors instanceof \Illuminate\Support\MessageBag);
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'bar');
 		$qu = $view->errors->get('qu');
 		$this->assertEquals($qu[0], 'ux');
 		$data = array('foo'=>'baz');
-		$this->assertTrue($view->withErrors(new \Illuminate\Support\MessageBag($data)) === $view);
+		$this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'baz');
 	}

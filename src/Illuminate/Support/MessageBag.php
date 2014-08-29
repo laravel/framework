@@ -2,9 +2,9 @@
 
 use Countable;
 use JsonSerializable;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
-use Illuminate\Support\Contracts\MessageProviderInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
+use Illuminate\Contracts\Support\ArrayableInterface;
+use Illuminate\Contracts\Support\MessageProviderInterface;
 
 class MessageBag implements ArrayableInterface, Countable, JsonableInterface, MessageProviderInterface, JsonSerializable {
 
@@ -41,7 +41,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 *
 	 * @param  string  $key
 	 * @param  string  $message
-	 * @return \Illuminate\Support\MessageBag
+	 * @return $this
 	 */
 	public function add($key, $message)
 	{
@@ -56,8 +56,8 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	/**
 	 * Merge a new array of messages into the bag.
 	 *
-	 * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $messages
-	 * @return \Illuminate\Support\MessageBag
+	 * @param  \Illuminate\Contracts\Support\MessageProviderInterface|array  $messages
+	 * @return $this
 	 */
 	public function merge($messages)
 	{

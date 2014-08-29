@@ -53,7 +53,7 @@ class JoinClause {
 	 * @param  string  $second
 	 * @param  string  $boolean
 	 * @param  bool  $where
-	 * @return \Illuminate\Database\Query\JoinClause
+	 * @return $this
 	 */
 	public function on($first, $operator, $second, $boolean = 'and', $where = false)
 	{
@@ -97,12 +97,23 @@ class JoinClause {
 	 * @param  string  $first
 	 * @param  string  $operator
 	 * @param  string  $second
-	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\JoinClause
 	 */
 	public function orWhere($first, $operator, $second)
 	{
 		return $this->on($first, $operator, $second, 'or', true);
+	}
+
+	/**
+	 * Add an "on where is null" clause to the join
+	 *
+	 * @param  $column
+	 * @param  string $boolean
+	 * @return \Illuminate\Database\Query\JoinClause
+	 */
+	public function whereNull($column, $boolean = 'and')
+	{
+		return $this->on($column, 'is', new Expression('null'), $boolean, false);
 	}
 
 }

@@ -39,7 +39,7 @@ class Blueprint {
 	 * Create a new schema blueprint.
 	 *
 	 * @param  string   $table
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return void
 	 */
 	public function __construct($table, Closure $callback = null)
@@ -639,11 +639,11 @@ class Blueprint {
 	/**
 	 * Add a "deleted at" timestamp for the table.
 	 *
-	 * @return void
+	 * @return \Illuminate\Support\Fluent
 	 */
 	public function softDeletes()
 	{
-		$this->timestamp('deleted_at')->nullable();
+		return $this->timestamp('deleted_at')->nullable();
 	}
 
 	/**
@@ -663,23 +663,23 @@ class Blueprint {
 	 * @param  string  $name
 	 * @return void
 	 */
-	public function morphs($name)
+	public function morphs($name, $indexName = null)
 	{
 		$this->unsignedInteger("{$name}_id");
 
 		$this->string("{$name}_type");
 
-		$this->index(array("{$name}_id", "{$name}_type"));
+		$this->index(array("{$name}_id", "{$name}_type"), $indexName);
 	}
 
 	/**
 	 * Adds the `remember_token` column to the table.
 	 *
-	 * @return void
+	 * @return \Illuminate\Support\Fluent
 	 */
 	public function rememberToken()
 	{
-	  $this->string('remember_token', 100)->nullable();
+		return $this->string('remember_token', 100)->nullable();
 	}
 
 	/**
@@ -765,7 +765,7 @@ class Blueprint {
 	 * Remove a column from the schema blueprint.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Database\Schema\Blueprint
+	 * @return $this
 	 */
 	public function removeColumn($name)
 	{

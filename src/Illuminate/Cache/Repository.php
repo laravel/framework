@@ -5,8 +5,9 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use Illuminate\Support\Traits\MacroableTrait;
+use Illuminate\Contracts\Cache\Cache as CacheContract;
 
-class Repository implements ArrayAccess {
+class Repository implements CacheContract, ArrayAccess {
 
 	use MacroableTrait {
 		__call as macroCall;
@@ -45,17 +46,6 @@ class Repository implements ArrayAccess {
 	public function has($key)
 	{
 		return ! is_null($this->get($key));
-	}
-
-	/**
-	 * Remove an item from the cache.
-	 *
-	 * @param  string $key
-	 * @return bool
-	 */
-	public function forget($key)
-	{
-		return $this->store->forget($key);
 	}
 
 	/**
@@ -126,7 +116,7 @@ class Repository implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  \DateTime|int  $minutes
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -148,7 +138,7 @@ class Repository implements ArrayAccess {
 	 * Get an item from the cache, or store the default value forever.
 	 *
 	 * @param  string   $key
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function sear($key, Closure $callback)
@@ -160,7 +150,7 @@ class Repository implements ArrayAccess {
 	 * Get an item from the cache, or store the default value forever.
 	 *
 	 * @param  string   $key
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function rememberForever($key, Closure $callback)
@@ -176,6 +166,17 @@ class Repository implements ArrayAccess {
 		$this->forever($key, $value = $callback());
 
 		return $value;
+	}
+
+	/**
+	 * Remove an item from the cache.
+	 *
+	 * @param  string $key
+	 * @return bool
+	 */
+	public function forget($key)
+	{
+		return $this->store->forget($key);
 	}
 
 	/**

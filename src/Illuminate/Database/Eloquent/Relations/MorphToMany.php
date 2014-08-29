@@ -38,7 +38,7 @@ class MorphToMany extends BelongsToMany {
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  string  $relationName
-	 * @param  bool  $inverse
+	 * @param  bool   $inverse
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null, $inverse = false)
@@ -53,7 +53,7 @@ class MorphToMany extends BelongsToMany {
 	/**
 	 * Set the where clause for the relation query.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 * @return $this
 	 */
 	protected function setWhere()
 	{

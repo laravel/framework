@@ -11,3 +11,8 @@ before_script:
   - travis_retry composer install --prefer-source --no-interaction --dev
 
 script: vendor/bin/phpunit --verbose
+
+matrix:
+  allow_failures:
+    - php: hhvm
+  fast_finish: true

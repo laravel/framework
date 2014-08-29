@@ -5,13 +5,13 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
+use Illuminate\Contracts\Support\ArrayableInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -181,7 +181,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected static $dispatcher;
 
@@ -256,9 +256,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function bootIfNotBooted()
 	{
-		if ( ! isset(static::$booted[get_class($this)]))
+		$class = get_class($this);
+
+		if ( ! isset(static::$booted[$class]))
 		{
-			static::$booted[get_class($this)] = true;
+			static::$booted[$class] = true;
 
 			$this->fireModelEvent('booting', false);
 
@@ -302,7 +304,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected static function bootTraits()
 	{
-		foreach (class_uses(get_called_class()) as $trait)
+		foreach (class_uses_recursive(get_called_class()) as $trait)
 		{
 			if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
 			{
@@ -350,7 +352,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get the global scopes for this class instance.
 	 *
-	 * @return array
+	 * @return \Illuminate\Database\Eloquent\ScopeInterface[]
 	 */
 	public function getGlobalScopes()
 	{
@@ -385,7 +387,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Fill the model with an array of attributes.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return $this
 	 *
 	 * @throws MassAssignmentException
 	 */
@@ -434,7 +436,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  array  $attributes
 	 * @param  bool   $exists
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return static
 	 */
 	public function newInstance($attributes = array(), $exists = false)
 	{
@@ -452,7 +454,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Create a new model instance that is existing.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return static
 	 */
 	public function newFromBuilder($attributes = array())
 	{
@@ -515,7 +517,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Save a new model and return the instance.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return static
 	 */
 	public static function create(array $attributes)
 	{
@@ -530,11 +532,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get the first record matching the attributes or create it.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return static
 	 */
 	public static function firstOrCreate(array $attributes)
 	{
-		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		if ( ! is_null($instance = static::where($attributes)->first()))
 		{
 			return $instance;
 		}
@@ -546,11 +548,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get the first record matching the attributes or instantiate it.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return static
 	 */
 	public static function firstOrNew(array $attributes)
 	{
-		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		if ( ! is_null($instance = static::where($attributes)->first()))
 		{
 			return $instance;
 		}
@@ -561,9 +563,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Create or update a record matching the attributes, and fill it with values.
 	 *
-	 * @param array $attributes
-	 * @param array $values
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @param  array  $attributes
+	 * @param  array  $values
+	 * @return static
 	 */
 	public static function updateOrCreate(array $attributes, array $values = array())
 	{
@@ -578,35 +580,28 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get the first model for the given attributes.
 	 *
 	 * @param  array  $attributes
-	 * @return \Illuminate\Database\Eloquent\Model|null
+	 * @return static|null
 	 */
 	protected static function firstByAttributes($attributes)
 	{
-		$query = static::query();
-
-		foreach ($attributes as $key => $value)
-		{
-			$query->where($key, $value);
-		}
-
-		return $query->first() ?: null;
+		return static::where($attributes)->first();
 	}
 
 	/**
 	 * Begin querying the model.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public static function query()
 	{
-		return with(new static)->newQuery();
+		return (new static)->newQuery();
 	}
 
 	/**
 	 * Begin querying the model on a given connection.
 	 *
 	 * @param  string  $connection
-	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public static function on($connection = null)
 	{
@@ -638,7 +633,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 * @return \Illuminate\Support\Collection|static
 	 */
 	public static function find($id, $columns = array('*'))
 	{
@@ -654,13 +649,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 * @return \Illuminate\Support\Collection|static
 	 */
 	public static function findOrNew($id, $columns = array('*'))
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		return new static($columns);
+		return new static;
 	}
 
 	/**
@@ -668,7 +663,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 * @return \Illuminate\Support\Collection|static
 	 *
 	 * @throws ModelNotFoundException
 	 */
@@ -676,14 +671,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		throw with(new ModelNotFoundException)->setModel(get_called_class());
+		throw (new ModelNotFoundException)->setModel(get_called_class());
 	}
 
 	/**
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function load($relations)
 	{
@@ -834,7 +829,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$instance = new $class;
 
 			return new MorphTo(
-				with($instance)->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+				$instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
 			);
 		}
 	}
@@ -875,7 +870,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough(with(new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
@@ -1086,6 +1081,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Delete the model from the database.
 	 *
 	 * @return bool|null
+	 * @throws \Exception
 	 */
 	public function delete()
 	{
@@ -1130,7 +1126,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a saving model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function saving($callback, $priority = 0)
@@ -1142,7 +1138,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a saved model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function saved($callback, $priority = 0)
@@ -1154,7 +1150,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register an updating model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function updating($callback, $priority = 0)
@@ -1166,7 +1162,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register an updated model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function updated($callback, $priority = 0)
@@ -1178,7 +1174,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a creating model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function creating($callback, $priority = 0)
@@ -1190,7 +1186,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a created model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function created($callback, $priority = 0)
@@ -1202,7 +1198,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a deleting model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function deleting($callback, $priority = 0)
@@ -1214,7 +1210,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a deleted model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
-	 * @param int $priority
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public static function deleted($callback, $priority = 0)
@@ -1315,14 +1311,31 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return $query->{$method}($column, $amount);
 		}
 
+		$this->incrementOrDecrementAttributeValue($column, $amount, $method);
+
 		return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+	}
+
+	/**
+	 * Increment the underlying attribute value and sync with original.
+	 *
+	 * @param  string  $column
+	 * @param  int     $amount
+	 * @param  string  $method
+	 * @return void
+	 */
+	protected function incrementOrDecrementAttributeValue($column, $amount, $method)
+	{
+		$this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
+
+		$this->syncOriginalAttribute($column);
 	}
 
 	/**
 	 * Update the model in the database.
 	 *
 	 * @param  array  $attributes
-	 * @return mixed
+	 * @return bool|int
 	 */
 	public function update(array $attributes = array())
 	{
@@ -1450,9 +1463,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 				$this->fireModelEvent('updated', false);
 			}
-
-			return true;
 		}
+
+		return true;
 	}
 
 	/**
@@ -1687,7 +1700,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a new query builder for the model's table.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function newQuery()
 	{
@@ -1746,7 +1759,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Remove all of the global scopes from an Eloquent builder.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $builder
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function removeGlobalScopes($builder)
 	{
@@ -1986,7 +1999,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the fillable attributes for the model.
 	 *
 	 * @param  array  $fillable
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function fillable(array $fillable)
 	{
@@ -1999,7 +2012,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the guarded attributes for the model.
 	 *
 	 * @param  array  $guarded
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function guard(array $guarded)
 	{
@@ -2202,7 +2215,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// Here we will grab all of the appended, calculated attributes to this model
 		// as these attributes are not really in the attributes array, but are run
 		// when we need to array or JSON the model for convenience to the coder.
-		foreach ($this->appends as $key)
+		foreach ($this->getArrayableAppends() as $key)
 		{
 			$attributes[$key] = $this->mutateAttributeForArray($key, null);
 		}
@@ -2218,6 +2231,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected function getArrayableAttributes()
 	{
 		return $this->getArrayableItems($this->attributes);
+	}
+
+	/**
+	 * Get all of the appendable values that are arrayable.
+	 *
+	 * @return array
+	 */
+	protected function getArrayableAppends()
+	{
+		if ( ! count($this->appends)) return [];
+
+		return $this->getArrayableItems(
+			array_combine($this->appends, $this->appends)
+		);
 	}
 
 	/**
@@ -2456,12 +2483,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If an attribute is listed as a "date", we'll convert it from a DateTime
 		// instance into a form proper for storage on the database tables using
 		// the connection grammar's date format. We will auto set the values.
-		elseif (in_array($key, $this->getDates()))
+		elseif (in_array($key, $this->getDates()) && $value)
 		{
-			if ($value)
-			{
-				$value = $this->fromDateTime($value);
-			}
+			$value = $this->fromDateTime($value);
 		}
 
 		$this->attributes[$key] = $value;
@@ -2585,11 +2609,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Clone the model into a new, non-existing instance.
 	 *
+	 * @param  array  $except
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function replicate()
+	public function replicate(array $except = null)
 	{
-		$attributes = array_except($this->attributes, array($this->getKeyName()));
+		$except = $except ?: [
+			$this->getKeyName(),
+			$this->getCreatedAtColumn(),
+			$this->getUpdatedAtColumn(),
+		];
+
+		$attributes = array_except($this->attributes, $except);
 
 		with($instance = new static)->setRawAttributes($attributes);
 
@@ -2635,11 +2666,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Sync the original attributes with the current.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function syncOriginal()
 	{
 		$this->original = $this->attributes;
+
+		return $this;
+	}
+
+	/**
+	 * Sync a single original attribute with its current value.
+	 *
+	 * @param  string  $attribute
+	 * @return $this
+	 */
+	public function syncOriginalAttribute($attribute)
+	{
+		$this->original[$attribute] = $this->attributes[$attribute];
 
 		return $this;
 	}
@@ -2730,7 +2774,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $relation
 	 * @param  mixed   $value
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setRelation($relation, $value)
 	{
@@ -2743,7 +2787,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the entire relations array on the model.
 	 *
 	 * @param  array  $relations
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setRelations(array $relations)
 	{
@@ -2776,7 +2820,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the connection associated with the model.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Database\Eloquent\Model
+	 * @return $this
 	 */
 	public function setConnection($name)
 	{
@@ -2830,7 +2874,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public static function getEventDispatcher()
 	{
@@ -2840,7 +2884,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
 	public static function setEventDispatcher(Dispatcher $dispatcher)
@@ -2869,7 +2913,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (isset(static::$mutatorCache[$class]))
 		{
-			return static::$mutatorCache[get_class($this)];
+			return static::$mutatorCache[$class];
 		}
 
 		return array();

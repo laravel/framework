@@ -403,6 +403,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add "created_at" datetime not null, "updated_at" datetime not null', $statements[0]);
 	}
 
+
 	public function testAddingRememberToken()
 	{
 		$blueprint = new Blueprint('users');

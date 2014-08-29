@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Auth;
 
-class GenericUser implements UserInterface {
+use Illuminate\Contracts\Auth\User as UserContract;
+
+class GenericUser implements UserContract {
 
 	/**
 	 * All of the user's attributes.
@@ -47,7 +49,7 @@ class GenericUser implements UserInterface {
 	 */
 	public function getRememberToken()
 	{
-		return $this->attributes['remember_token'];
+		return $this->attributes[$this->getRememberTokenName()];
 	}
 
 	/**
@@ -58,7 +60,7 @@ class GenericUser implements UserInterface {
 	 */
 	public function setRememberToken($value)
 	{
-		$this->attributes['remember_token'] = $value;
+		$this->attributes[$this->getRememberTokenName()] = $value;
 	}
 
 	/**

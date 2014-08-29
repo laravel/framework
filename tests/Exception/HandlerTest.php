@@ -7,11 +7,12 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 {
 	protected function setUp()
 	{
-		$this->responsePreparer = m::mock('Illuminate\Support\Contracts\ResponsePreparerInterface');
+		$this->responsePreparer = m::mock('Illuminate\Contracts\Support\ResponsePreparerInterface');
 		$this->plainDisplayer = m::mock('Illuminate\Exception\ExceptionDisplayerInterface');
 		$this->debugDisplayer = m::mock('Illuminate\Exception\ExceptionDisplayerInterface');
 		$this->handler = new Handler($this->responsePreparer, $this->plainDisplayer, $this->debugDisplayer);
 	}
+
 
 	public function testHandleErrorExceptionArguments()
 	{
@@ -27,6 +28,7 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 		$this->assertSame(111, $error->getLine(), 'error handler should not modify line number');
 		$this->assertSame(0, $error->getCode(), 'error handler should use 0 exception code');
 	}
+
 
 	public function testHandleErrorOptionalArguments()
 	{

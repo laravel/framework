@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
 class SessionManager extends Manager {
@@ -130,7 +129,6 @@ class SessionManager extends Manager {
 
 		return $this->buildSession($handler);
 	}
-
 
 	/**
 	 * Create an instance of a cache driven driver.

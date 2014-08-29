@@ -4,18 +4,20 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Log\Writer;
-use Illuminate\View\Factory;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Queue\QueueManager;
+use Psr\Log\LoggerInterface;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\SerializableClosure;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
 
-class Mailer {
+class Mailer implements MailerContract {
 
 	/**
 	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Factory
+	 * @var \Illuminate\Contracts\View\Factory
 	 */
 	protected $views;
 
@@ -29,7 +31,7 @@ class Mailer {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -43,7 +45,7 @@ class Mailer {
 	/**
 	 * The log writer instance.
 	 *
-	 * @var \Illuminate\Log\Writer
+	 * @var \Psr\Log\LoggerInterface
 	 */
 	protected $logger;
 
@@ -55,9 +57,9 @@ class Mailer {
 	protected $container;
 
 	/*
-	 * The QueueManager instance.
+	 * The queue implementation.
 	 *
-	 * @var \Illuminate\Queue\QueueManager
+	 * @var \Illuminate\Contracts\Queue\Queue
 	 */
 	protected $queue;
 
@@ -85,8 +87,9 @@ class Mailer {
 	/**
 	 * Create a new Mailer instance.
 	 *
-	 * @param  \Illuminate\View\Factory  $views
+	 * @param  \Illuminate\Contracts\View\Factory  $views
 	 * @param  \Swift_Mailer  $swift
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
@@ -126,7 +129,7 @@ class Mailer {
 	 *
 	 * @param  string|array  $view
 	 * @param  array  $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function send($view, array $data, $callback)
@@ -155,7 +158,7 @@ class Mailer {
 	 *
 	 * @param  string|array  $view
 	 * @param  array   $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @param  string  $queue
 	 * @return void
 	 */
@@ -172,7 +175,7 @@ class Mailer {
 	 * @param  string  $queue
 	 * @param  string|array  $view
 	 * @param  array   $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function queueOn($queue, $view, array $data, $callback)
@@ -186,7 +189,7 @@ class Mailer {
 	 * @param  int  $delay
 	 * @param  string|array  $view
 	 * @param  array  $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @param  string  $queue
 	 * @return void
 	 */
@@ -204,7 +207,7 @@ class Mailer {
 	 * @param  int  $delay
 	 * @param  string|array  $view
 	 * @param  array  $data
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
 	public function laterOn($queue, $delay, $view, array $data, $callback)
@@ -228,7 +231,7 @@ class Mailer {
 	/**
 	 * Handle a queued e-mail message job.
 	 *
-	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  \Illuminate\Contracts\Queue\Job  $job
 	 * @param  array  $data
 	 * @return void
 	 */
@@ -349,7 +352,7 @@ class Mailer {
 	/**
 	 * Call the provided message builder.
 	 *
-	 * @param  Closure|string  $callback
+	 * @param  \Closure|string  $callback
 	 * @param  \Illuminate\Mail\Message  $message
 	 * @return mixed
 	 *
@@ -425,7 +428,7 @@ class Mailer {
 	/**
 	 * Get the view factory instance.
 	 *
-	 * @return \Illuminate\View\Factory
+	 * @return \Illuminate\Contracts\View\Factory
 	 */
 	public function getViewFactory()
 	{
@@ -466,10 +469,10 @@ class Mailer {
 	/**
 	 * Set the log writer instance.
 	 *
-	 * @param  \Illuminate\Log\Writer  $logger
-	 * @return \Illuminate\Mail\Mailer
+	 * @param  \Psr\Log\LoggerInterface  $logger
+	 * @return $this
 	 */
-	public function setLogger(Writer $logger)
+	public function setLogger(LoggerInterface $logger)
 	{
 		$this->logger = $logger;
 
@@ -479,10 +482,10 @@ class Mailer {
 	/**
 	 * Set the queue manager instance.
 	 *
-	 * @param  \Illuminate\Queue\QueueManager  $queue
-	 * @return \Illuminate\Mail\Mailer
+	 * @param  \Illuminate\Contracts\Queue\Queue  $queue
+	 * @return $this
 	 */
-	public function setQueue(QueueManager $queue)
+	public function setQueue(QueueContract $queue)
 	{
 		$this->queue = $queue;
 

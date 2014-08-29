@@ -424,6 +424,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy('id', 'email');
 		$this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->groupBy(['id', 'email']);
+		$this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
 	}
 
 
@@ -589,6 +593,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
 	}
 
+	public function testJoinWhereNull()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->join('contacts', function($j)
+		{
+			$j->on('users.id', '=', 'contacts.id')->whereNull('contacts.deleted_at');
+		});
+		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is null', $builder->toSql());
+	}
 
 	public function testRawExpressionsInSelect()
 	{
@@ -724,7 +737,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('skip', 'take', 'get'), array($connection, $grammar, $processor));
-		$paginator = m::mock('Illuminate\Pagination\Environment');
+		$paginator = m::mock('Illuminate\Pagination\Factory');
 		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
 		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
 		$builder->expects($this->once())->method('skip')->with($this->equalTo(0))->will($this->returnValue($builder));

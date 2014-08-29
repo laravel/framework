@@ -11,7 +11,7 @@ class SqlServerConnection extends Connection {
 	/**
 	 * Execute a Closure within a transaction.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
 	 * @throws \Exception

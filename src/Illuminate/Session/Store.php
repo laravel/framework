@@ -38,7 +38,7 @@ class Store implements SessionInterface {
 	/**
 	 * The meta-data bag instance.
 	 *
-	 * @var \Symfony\Component\Session\Storage\MetadataBag
+	 * @var \Symfony\Component\HttpFoundation\Session\Storage\MetadataBag
 	 */
 	protected $metaBag;
 
@@ -68,15 +68,15 @@ class Store implements SessionInterface {
 	 *
 	 * @param  string  $name
 	 * @param  \SessionHandlerInterface  $handler
-	 * @param  string|null $id
+	 * @param  string|null  $id
 	 * @return void
 	 */
 	public function __construct($name, SessionHandlerInterface $handler, $id = null)
 	{
+		$this->setId($id);
 		$this->name = $name;
 		$this->handler = $handler;
 		$this->metaBag = new MetadataBag;
-		$this->setId($id ?: $this->generateSessionId());
 	}
 
 	/**
@@ -128,9 +128,7 @@ class Store implements SessionInterface {
 	 */
 	protected function initializeLocalBag($bag)
 	{
-		$this->bagData[$bag->getStorageKey()] = $this->get($bag->getStorageKey(), array());
-
-		$this->forget($bag->getStorageKey());
+		$this->bagData[$bag->getStorageKey()] = $this->pull($bag->getStorageKey(), []);
 	}
 
 	/**
@@ -276,11 +274,7 @@ class Store implements SessionInterface {
 	 */
 	public function pull($key, $default = null)
 	{
-		$value = $this->get($key, $default);
-
-		$this->forget($key);
-
-		return $value;
+		return array_pull($this->attributes, $key, $default);
 	}
 
 	/**
@@ -310,8 +304,6 @@ class Store implements SessionInterface {
 		// Input that is flashed to the session can be easily retrieved by the
 		// developer, making repopulating old forms and the like much more
 		// convenient, since the request's previous input is available.
-		if (is_null($key)) return $input;
-
 		return array_get($input, $key, $default);
 	}
 
@@ -330,7 +322,7 @@ class Store implements SessionInterface {
 	 * @param  mixed|null  	 $value
 	 * @return void
 	 */
-	public function put($key, $value)
+	public function put($key, $value = null)
 	{
 		if ( ! is_array($key)) $key = array($key => $value);
 
@@ -398,7 +390,7 @@ class Store implements SessionInterface {
 	/**
 	 * Reflash a subset of the current flash data.
 	 *
-	 * @param  array|dynamic  $keys
+	 * @param  array|mixed  $keys
 	 * @return void
 	 */
 	public function keep($keys = null)

@@ -19,12 +19,14 @@ class SupportMacroTraitTest extends \PHPUnit_Framework_TestCase {
 		return $this->getObjectForTrait($traitName);
 	}
 
+
 	public function testRegisterMacro()
 	{
 		$macroTrait = $this->macroTrait;
 		$macroTrait::macro(__CLASS__, function() { return 'Taylor'; });
 		$this->assertEquals('Taylor', $macroTrait::{__CLASS__}());
 	}
+
 
 	public function testResgisterMacroAndCallWithoutStatic()
 	{

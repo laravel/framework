@@ -1,6 +1,11 @@
 {
 	"4.3.*": [
-		{"message": "Allow passing a priority to Eloquent event listeners.", "backport": null}
+		{"message": "Allow passing a priority to Eloquent event listeners.", "backport": null},
+		{"message": "Tweak 'compile' configuration file for 'files' and 'providers' support.", "backport": null},
+		{"message": "Allow method injection via IoC to any controller or route method.", "backport": null},
+		{"message": "Added the 'call' method to the Container to execute a callback with its dependencies.", "backport": null},
+		{"message": "Added 'route:cache' Artisan command for ultra fast route definition.", "backport": null},
+		{"message": "Added new FormRequest class for simpler validation and authorization.", "backport": null}
 	],
 	"4.2.*": [
 		{"message": "View and Pagination 'Environment' classes renamed to 'Factory'.", "backport": null},
@@ -28,7 +33,13 @@
 		{"message": "Added --daemon option to the queue:work command.", "backport": null},
 		{"message": "Added convenient traits for authentication and password reminding.", "backport": null},
 		{"message": "Added 'reject' method to Collection.", "backport": null},
-		{"message": "Added 'updateOrCreate' method to Eloquent model.", "backport": null}
+		{"message": "Added 'updateOrCreate' method to Eloquent model.", "backport": null},
+		{"message": "Added 'keyBy' method to Collection.", "backport": null},
+		{"message": "Added 'contains' method to base Collection.", "backport": null},
+		{"message": "Allow 'where' route constraints to be passed in array definition of Route.", "backport": null},
+		{"message": "Properly support Route 'where' constraints on a Route group.", "backport": null},
+		{"message": "When 'increment' or 'decrement' is called on a single Model instance, the local attribute value is updated as well.", "backport": null},
+		{"message": "Automatically retry queries on database connections that have 'gone away'.", "backport": null}
 	],
 	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},

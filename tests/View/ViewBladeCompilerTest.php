@@ -89,6 +89,10 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
 			$name
 		}}'));
+		$this->assertEquals("<?php echo \$name; ?>\n\n", $compiler->compileString("{{ \$name }}\n"));
+		$this->assertEquals("<?php echo \$name; ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
+		$this->assertEquals("<?php echo \$name; ?>\n\n", $compiler->compileString("{{ \$name }}\n"));
+		$this->assertEquals("<?php echo \$name; ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
 
 		$this->assertEquals('<?php echo isset($name) ? $name : "foo"; ?>', $compiler->compileString('{{ $name or "foo" }}'));
 		$this->assertEquals('<?php echo isset($user->name) ? $user->name : "foo"; ?>', $compiler->compileString('{{ $user->name or "foo" }}'));
@@ -139,6 +143,10 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$compiler->compileString('@{{
 			$name
 		}}'));
+		$this->assertEquals('{{ $name }}
+			',
+		$compiler->compileString('@{{ $name }}
+			'));
 	}
 
 
@@ -267,6 +275,48 @@ breeze
 @endunless';
 		$expected = '<?php if ( ! (name(foo(bar)))): ?>
 breeze
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testForelseStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@forelse ($this->getUsers() as $user)
+breeze
+@empty
+empty
+@endforelse';
+		$expected = '<?php $__empty_1 = true; foreach($this->getUsers() as $user): $__empty_1 = false; ?>
+breeze
+<?php endforeach; if ($__empty_1): ?>
+empty
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testNestedForelseStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@forelse ($this->getUsers() as $user)
+@forelse ($user->tags as $tag)
+breeze
+@empty
+tag empty
+@endforelse
+@empty
+empty
+@endforelse';
+		$expected = '<?php $__empty_1 = true; foreach($this->getUsers() as $user): $__empty_1 = false; ?>
+<?php $__empty_2 = true; foreach($user->tags as $tag): $__empty_2 = false; ?>
+breeze
+<?php endforeach; if ($__empty_2): ?>
+tag empty
+<?php endif; ?>
+<?php endforeach; if ($__empty_1): ?>
+empty
 <?php endif; ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}

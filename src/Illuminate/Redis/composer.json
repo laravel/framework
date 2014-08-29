@@ -9,8 +9,9 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "illuminate/contracts": "4.3.*",
         "illuminate/support": "4.3.*",
-        "predis/predis": "0.8.*"
+        "predis/predis": "~1.0"
     },
     "autoload": {
         "psr-4": {

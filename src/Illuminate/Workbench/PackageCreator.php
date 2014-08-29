@@ -72,8 +72,8 @@ class PackageCreator {
 	/**
 	 * Create a package with all resource directories.
 	 *
-	 * @param  Package  $package
-	 * @param  string   $path
+	 * @param  \Illuminate\Workbench\Package  $package
+	 * @param  string  $path
 	 * @return void
 	 */
 	public function createWithResources(Package $package, $path)
@@ -84,7 +84,7 @@ class PackageCreator {
 	/**
 	 * Get the blocks for a given package.
 	 *
-	 * @param  bool   $plain
+	 * @param  bool $plain
 	 * @return array
 	 */
 	protected function getBlocks($plain)
@@ -97,6 +97,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	public function writeSupportFiles(Package $package, $directory, $plain)
@@ -140,6 +141,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	protected function writeComposerFile(Package $package, $directory, $plain)
@@ -154,7 +156,7 @@ class PackageCreator {
 	/**
 	 * Get the Composer.json stub file contents.
 	 *
-	 * @param  bool    $plain
+	 * @param  bool  $plain
 	 * @return string
 	 */
 	protected function getComposerStub($plain)
@@ -169,6 +171,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	public function writeIgnoreFile(Package $package, $directory, $plain)
@@ -216,6 +219,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	public function writePublicDirectory(Package $package, $directory, $plain)
@@ -246,6 +250,7 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
+	 * @param  bool    $plain
 	 * @return void
 	 */
 	public function writeServiceProvider(Package $package, $directory, $plain)
@@ -282,7 +287,7 @@ class PackageCreator {
 	 * Get the stub for a ServiceProvider.
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  bool    $plain
+	 * @param  bool  $plain
 	 * @return string
 	 */
 	protected function getProviderStub(Package $package, $plain)
@@ -293,7 +298,7 @@ class PackageCreator {
 	/**
 	 * Load the raw service provider file.
 	 *
-	 * @param  bool   $plain
+	 * @param  bool  $plain
 	 * @return string
 	 */
 	protected function getProviderFile($plain)

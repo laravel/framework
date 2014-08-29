@@ -48,9 +48,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
-		$item1 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item1 = m::mock('Illuminate\Contracts\Support\ArrayableInterface');
 		$item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-		$item2 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item2 = m::mock('Illuminate\Contracts\Support\ArrayableInterface');
 		$item2->shouldReceive('toArray')->once()->andReturn('bar.array');
 		$c = new Collection(array($item1, $item2));
 		$results = $c->toArray();
@@ -286,6 +286,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRandomOnEmpty()
+	{
+		$data = new Collection();
+		$random = $data->random();
+		$this->assertNull($random);
+	}
+
+
 	public function testTakeLast()
 	{
 		$data = new Collection(array('taylor', 'dayle', 'shawn'));
@@ -365,6 +373,25 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data = new Collection(array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2'), array('rating' => 2, 'name' => '3')));
 		$result = $data->groupBy('rating');
 		$this->assertEquals(array(1 => array(array('rating' => 1, 'name' => '1'), array('rating' => 1, 'name' => '2')), 2 => array(array('rating' => 2, 'name' => '3'))), $result->toArray());
+	}
+
+
+	public function testKeyByAttribute()
+	{
+		$data = new Collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
+		$result = $data->keyBy('rating');
+		$this->assertEquals([1 => ['rating' => 1, 'name' => '1'], 2 => ['rating' => 2, 'name' => '2'], 3 => ['rating' => 3, 'name' => '3']], $result->all());
+	}
+
+
+	public function testContains()
+	{
+		$c = new Collection([1, 3, 5]);
+
+		$this->assertEquals(true,  $c->contains(1));
+		$this->assertEquals(false, $c->contains(2));
+		$this->assertEquals(true,  $c->contains(function($value) { return $value < 5; }));
+		$this->assertEquals(false, $c->contains(function($value) { return $value > 5; }));
 	}
 
 

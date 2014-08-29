@@ -1,45 +1,12 @@
 <?php namespace Illuminate\Auth\Reminders;
 
 use Closure;
-use Illuminate\Mail\Mailer;
+use Illuminate\Contracts\Auth\Remindable;
 use Illuminate\Auth\UserProviderInterface;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 
-class PasswordBroker {
-
-	/**
-	 * Constant representing a successfully sent reminder.
-	 *
-	 * @var int
-	 */
-	const REMINDER_SENT = 'reminders.sent';
-
-	/**
-	 * Constant representing a successfully reset password.
-	 *
-	 * @var int
-	 */
-	const PASSWORD_RESET = 'reminders.reset';
-
-	/**
-	 * Constant representing the user not found response.
-	 *
-	 * @var int
-	 */
-	const INVALID_USER = 'reminders.user';
-
-	/**
-	 * Constant representing an invalid password.
-	 *
-	 * @var int
-	 */
-	const INVALID_PASSWORD = 'reminders.password';
-
-	/**
-	 * Constant representing an invalid token.
-	 *
-	 * @var int
-	 */
-	const INVALID_TOKEN = 'reminders.token';
+class PasswordBroker implements PasswordBrokerContract {
 
 	/**
 	 * The password reminder repository.
@@ -58,7 +25,7 @@ class PasswordBroker {
 	/**
 	 * The mailer instance.
 	 *
-	 * @var \Illuminate\Mail\Mailer
+	 * @var \Illuminate\Contracts\Mail\Mailer
 	 */
 	protected $mailer;
 
@@ -81,13 +48,13 @@ class PasswordBroker {
 	 *
 	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
 	 * @param  \Illuminate\Auth\UserProviderInterface  $users
-	 * @param  \Illuminate\Mail\Mailer  $mailer
+	 * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
 	 * @param  string  $reminderView
 	 * @return void
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
                                 UserProviderInterface $users,
-                                Mailer $mailer,
+                                MailerContract $mailer,
                                 $reminderView)
 	{
 		$this->users = $users;
@@ -99,8 +66,8 @@ class PasswordBroker {
 	/**
 	 * Send a password reminder to a user.
 	 *
-	 * @param  array    $credentials
-	 * @param  Closure  $callback
+	 * @param  array     $credentials
+	 * @param  \Closure  $callback
 	 * @return string
 	 */
 	public function remind(array $credentials, Closure $callback = null)
@@ -112,7 +79,7 @@ class PasswordBroker {
 
 		if (is_null($user))
 		{
-			return self::INVALID_USER;
+			return PasswordBrokerContract::INVALID_USER;
 		}
 
 		// Once we have the reminder token, we are ready to send a message out to the
@@ -122,18 +89,18 @@ class PasswordBroker {
 
 		$this->sendReminder($user, $token, $callback);
 
-		return self::REMINDER_SENT;
+		return PasswordBrokerContract::REMINDER_SENT;
 	}
 
 	/**
 	 * Send the password reminder e-mail.
 	 *
-	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
-	 * @param  string   $token
-	 * @param  Closure  $callback
+	 * @param  \Illuminate\Contracts\Auth\Remindable  $user
+	 * @param  string    $token
+	 * @param  \Closure  $callback
 	 * @return int
 	 */
-	public function sendReminder(RemindableInterface $user, $token, Closure $callback = null)
+	public function sendReminder(Remindable $user, $token, Closure $callback = null)
 	{
 		// We will use the reminder view that was given to the broker to display the
 		// password reminder e-mail. We'll pass a "token" variable into the views
@@ -151,8 +118,8 @@ class PasswordBroker {
 	/**
 	 * Reset the password for the given token.
 	 *
-	 * @param  array    $credentials
-	 * @param  Closure  $callback
+	 * @param  array     $credentials
+	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
 	public function reset(array $credentials, Closure $callback)
@@ -162,7 +129,7 @@ class PasswordBroker {
 		// the user is properly redirected having an error message on the post.
 		$user = $this->validateReset($credentials);
 
-		if ( ! $user instanceof RemindableInterface)
+		if ( ! $user instanceof Remindable)
 		{
 			return $user;
 		}
@@ -176,30 +143,30 @@ class PasswordBroker {
 
 		$this->reminders->delete($credentials['token']);
 
-		return self::PASSWORD_RESET;
+		return PasswordBrokerContract::PASSWORD_RESET;
 	}
 
 	/**
 	 * Validate a password reset for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Auth\Reminders\RemindableInterface
+	 * @return \Illuminate\Contracts\Auth\Remindable
 	 */
 	protected function validateReset(array $credentials)
 	{
 		if (is_null($user = $this->getUser($credentials)))
 		{
-			return self::INVALID_USER;
+			return PasswordBrokerContract::INVALID_USER;
 		}
 
 		if ( ! $this->validNewPasswords($credentials))
 		{
-			return self::INVALID_PASSWORD;
+			return PasswordBrokerContract::INVALID_PASSWORD;
 		}
 
 		if ( ! $this->reminders->exists($user, $credentials['token']))
 		{
-			return self::INVALID_TOKEN;
+			return PasswordBrokerContract::INVALID_TOKEN;
 		}
 
 		return $user;
@@ -228,7 +195,7 @@ class PasswordBroker {
 
 		if (isset($this->passwordValidator))
 		{
-			return call_user_func($this->passwordValidator, $credentials) && $password == $confirm;
+			return call_user_func($this->passwordValidator, $credentials) && $password === $confirm;
 		}
 		else
 		{
@@ -244,16 +211,16 @@ class PasswordBroker {
 	 */
 	protected function validatePasswordWithDefaults(array $credentials)
 	{
-		$matches = $credentials['password'] == $credentials['password_confirmation'];
+		list($password, $confirm) = [$credentials['password'], $credentials['password_confirmation']];
 
-		return $matches && $credentials['password'] && strlen($credentials['password']) >= 6;
+		return $password === $confirm && mb_strlen($password) >= 6;
 	}
 
 	/**
 	 * Get the user for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Auth\Reminders\RemindableInterface
+	 * @return \Illuminate\Contracts\Auth\Remindable
 	 *
 	 * @throws \UnexpectedValueException
 	 */
@@ -263,7 +230,7 @@ class PasswordBroker {
 
 		$user = $this->users->retrieveByCredentials($credentials);
 
-		if ($user && ! $user instanceof RemindableInterface)
+		if ($user && ! $user instanceof Remindable)
 		{
 			throw new \UnexpectedValueException("User must implement Remindable interface.");
 		}

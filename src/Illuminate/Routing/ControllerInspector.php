@@ -27,31 +27,25 @@ class ControllerInspector {
 
 		$reflection = new ReflectionClass($controller);
 
+		$methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+
 		// To get the routable methods, we will simply spin through all methods on the
 		// controller instance checking to see if it belongs to the given class and
 		// is a publicly routable method. If so, we will add it to this listings.
-		foreach ($reflection->getMethods() as $method)
+		foreach ($methods as $method)
 		{
-			if ($this->isRoutable($method, $reflection->name))
+			if ($this->isRoutable($method))
 			{
 				$data = $this->getMethodData($method, $prefix);
+
+				$routable[$method->name][] = $data;
 
 				// If the routable method is an index method, we will create a special index
 				// route which is simply the prefix and the verb and does not contain any
 				// the wildcard place-holders that each "typical" routes would contain.
 				if ($data['plain'] == $prefix.'/index')
 				{
-					$routable[$method->name][] = $data;
-
 					$routable[$method->name][] = $this->getIndexData($data, $prefix);
-				}
-
-				// If the routable method is not a special index method, we will just add in
-				// the data to the returned results straight away. We do not need to make
-				// any special routes for this scenario but only just add these routes.
-				else
-				{
-					$routable[$method->name][] = $data;
 				}
 			}
 		}
@@ -62,21 +56,21 @@ class ControllerInspector {
 	/**
 	 * Determine if the given controller method is routable.
 	 *
-	 * @param  ReflectionMethod  $method
-	 * @param  string  $controller
+	 * @param  \ReflectionMethod  $method
 	 * @return bool
 	 */
-	public function isRoutable(ReflectionMethod $method, $controller)
+	public function isRoutable(ReflectionMethod $method)
 	{
 		if ($method->class == 'Illuminate\Routing\Controller') return false;
 
-		return $method->isPublic() && starts_with($method->name, $this->verbs);
+		return starts_with($method->name, $this->verbs);
 	}
 
 	/**
 	 * Get the method data for a given method.
 	 *
-	 * @param  ReflectionMethod  $method
+	 * @param  \ReflectionMethod  $method
+	 * @param  string  $prefix
 	 * @return array
 	 */
 	public function getMethodData(ReflectionMethod $method, $prefix)

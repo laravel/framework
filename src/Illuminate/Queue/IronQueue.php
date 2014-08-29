@@ -4,8 +4,9 @@ use IronMQ;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class IronQueue extends Queue implements QueueInterface {
+class IronQueue extends Queue implements QueueContract {
 
 	/**
 	 * The IronMQ instance.
@@ -110,14 +111,14 @@ class IronQueue extends Queue implements QueueInterface {
 
 		$payload = $this->createPayload($job, $data, $queue);
 
-		return $this->pushRaw($payload, $this->getQueue($queue), compact('delay'));
+		return $this->pushRaw($payload, $queue, compact('delay'));
 	}
 
 	/**
 	 * Pop the next job off of the queue.
 	 *
 	 * @param  string  $queue
-	 * @return \Illuminate\Queue\Jobs\Job|null
+	 * @return \Illuminate\Contracts\Queue\Job|null
 	 */
 	public function pop($queue = null)
 	{
@@ -227,7 +228,7 @@ class IronQueue extends Queue implements QueueInterface {
 	/**
 	 * Get the underlying IronMQ instance.
 	 *
-	 * @return IronMQ
+	 * @return \IronMQ
 	 */
 	public function getIron()
 	{

@@ -30,13 +30,6 @@ abstract class ServiceProvider {
 	}
 
 	/**
-	 * Bootstrap the application events.
-	 *
-	 * @return void
-	 */
-	public function boot() {}
-
-	/**
 	 * Register the service provider.
 	 *
 	 * @return void
@@ -105,7 +98,7 @@ abstract class ServiceProvider {
 	 */
 	public function guessPackagePath()
 	{
-		$path = with(new ReflectionClass($this))->getFileName();
+		$path = (new ReflectionClass($this))->getFileName();
 
 		return realpath(dirname($path).'/../../');
 	}
@@ -187,6 +180,30 @@ abstract class ServiceProvider {
 	public function isDeferred()
 	{
 		return $this->defer;
+	}
+
+	/**
+	 * Get a list of files that should be compiled for the package.
+	 *
+	 * @return array
+	 */
+	public static function compiles()
+	{
+		return [];
+	}
+
+	/**
+	 * Dynamically handle missing method calls.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if ($method == 'boot') return;
+
+		throw new \BadMethodCallException("Call to undefined method [{$method}]");
 	}
 
 }

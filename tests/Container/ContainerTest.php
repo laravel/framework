@@ -27,7 +27,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$class = new stdClass;
 		$container->singleton('class', function() use ($class) { return $class; });
-		$this->assertTrue($class === $container->make('class'));
+		$this->assertSame($class, $container->make('class'));
 	}
 
 
@@ -64,7 +64,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 		$var1 = $container->make('ContainerConcreteStub');
 		$var2 = $container->make('ContainerConcreteStub');
-		$this->assertTrue($var1 === $var2);
+		$this->assertSame($var1, $var2);
 	}
 
 
@@ -92,7 +92,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$container->bind('something', function($c) { return $c; });
 		$c = $container->make('something');
-		$this->assertTrue($c === $container);
+		$this->assertSame($c, $container);
 	}
 
 
@@ -129,7 +129,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$closure = $container->share(function() { return new stdClass; });
 		$class1 = $closure($container);
 		$class2 = $closure($container);
-		$this->assertTrue($class1 === $class2);
+		$this->assertSame($class1, $class2);
 	}
 
 
@@ -170,7 +170,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('taylor', $result->name);
 		$this->assertEquals(26, $result->age);
-		$this->assertTrue($result === $container->make('foo'));
+		$this->assertSame($result, $container->make('foo'));
 	}
 
 
@@ -200,6 +200,17 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->extend('foo', function($obj, $container) { $obj->bar = 'baz'; return $obj; });
 		$container->extend('foo', function($obj, $container) { $obj->baz = 'foo'; return $obj; });
 		$this->assertEquals('foo', $container->make('foo')->foo);
+	}
+
+
+	public function testExtendIsLazyInitialized()
+	{
+		$container = new Container;
+		$container->bind('ContainerLazyExtendStub');
+		$container->extend('ContainerLazyExtendStub', function($obj, $container) { $obj->init(); return $obj; });
+		$this->assertEquals(false, ContainerLazyExtendStub::$initialized);
+		$container->make('ContainerLazyExtendStub');
+		$this->assertEquals(true, ContainerLazyExtendStub::$initialized);
 	}
 
 
@@ -300,12 +311,54 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCreatingBoundConcreteClassPassesParameters() {
+	public function testCreatingBoundConcreteClassPassesParameters()
+	{
 		$container = new Container;
 		$container->bind('TestAbstractClass', 'ContainerConstructorParameterLoggingStub');
 		$parameters = array('First', 'Second');
 		$instance = $container->make('TestAbstractClass', $parameters);
 		$this->assertEquals($parameters, $instance->receivedParameters);
+	}
+
+
+	public function testInternalClassWithDefaultParameters()
+	{
+		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
+		$container = new Container;
+		$parameters = array();
+		$container->make('ContainerMixedPrimitiveStub', $parameters);
+	}
+
+
+	public function testCallWithDependencies()
+	{
+		$container = new Container;
+		$result = $container->call(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		});
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals([], $result[1]);
+
+		$result = $container->call(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		}, ['bar' => 'taylor']);
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+
+		/**
+		 * Wrap a function...
+		 */
+		$result = $container->wrap(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		}, ['bar' => 'taylor']);
+
+		$this->assertInstanceOf('Closure', $result);
+		$result = $result();
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
 	}
 
 }
@@ -360,3 +413,7 @@ class ContainerConstructorParameterLoggingStub {
 	}
 }
 
+class ContainerLazyExtendStub {
+	public static $initialized = false;
+	public function init() { static::$initialized = true; }
+}

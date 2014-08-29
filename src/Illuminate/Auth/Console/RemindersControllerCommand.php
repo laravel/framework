@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Auth\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputArgument;
 
-class RemindersControllerCommand extends Command {
+class RemindersControllerCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
@@ -20,24 +20,18 @@ class RemindersControllerCommand extends Command {
 	protected $description = 'Create a stub password reminder controller';
 
 	/**
-	 * The filesystem instance.
+	 * The type of class being generated.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var string
 	 */
-	protected $files;
+	protected $type = 'Controller';
 
 	/**
-	 * Create a new reminder table command instance.
+	 * Set the configuration key for the namespace.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
+	 * @var string
 	 */
-	public function __construct(Filesystem $files)
-	{
-		parent::__construct();
-
-		$this->files = $files;
-	}
+	protected $configKey = 'controllers';
 
 	/**
 	 * Execute the console command.
@@ -46,20 +40,31 @@ class RemindersControllerCommand extends Command {
 	 */
 	public function fire()
 	{
-		$destination = $this->laravel['path'].'/controllers/RemindersController.php';
+		parent::fire();
 
-		if ( ! $this->files->exists($destination))
-		{
-			$this->files->copy(__DIR__.'/stubs/controller.stub', $destination);
+		$this->comment("Route: Route::controller('password', '".$this->argument('name')."');");
+	}
 
-			$this->info('Password reminders controller created successfully!');
+	/**
+	 * Get the stub file for the generator.
+	 *
+	 * @return string
+	 */
+	protected function getStub()
+	{
+		return __DIR__.'/stubs/reminders.controller.stub';
+	}
 
-			$this->comment("Route: Route::controller('password', 'RemindersController');");
-		}
-		else
-		{
-			$this->error('Password reminders controller already exists!');
-		}
+	/**
+	 * Get the console command arguments.
+	 *
+	 * @return array
+	 */
+	protected function getArguments()
+	{
+		return array(
+			array('name', InputArgument::OPTIONAL, 'The name of the class', 'Auth\RemindersController'),
+		);
 	}
 
 }

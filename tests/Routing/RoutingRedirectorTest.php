@@ -74,8 +74,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testIntendedRedirectToIntendedUrlInSession()
 	{
-		$this->session->shouldReceive('get')->with('url.intended', '/')->andReturn('http://foo.com/bar');
-		$this->session->shouldReceive('forget')->with('url.intended');
+		$this->session->shouldReceive('pull')->with('url.intended', '/')->andReturn('http://foo.com/bar');
 
 		$response = $this->redirect->intended();
 
@@ -88,12 +87,12 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 		$this->session->shouldReceive('forget')->with('url.intended');
 
 		// without fallback url
-		$this->session->shouldReceive('get')->with('url.intended', '/')->andReturn('/');
+		$this->session->shouldReceive('pull')->with('url.intended', '/')->andReturn('/');
 		$response = $this->redirect->intended();
 		$this->assertEquals('http://foo.com/', $response->getTargetUrl());
 
 		// with a fallback url
-		$this->session->shouldReceive('get')->with('url.intended', 'bar')->andReturn('bar');
+		$this->session->shouldReceive('pull')->with('url.intended', 'bar')->andReturn('bar');
 		$response = $this->redirect->intended('bar');
 		$this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
 	}

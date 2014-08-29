@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
 
 class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
@@ -28,7 +28,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
 	public function testRenderablesAreRendered()
 	{
-		$mock = m::mock('Illuminate\Support\Contracts\RenderableInterface');
+		$mock = m::mock('Illuminate\Contracts\Support\RenderableInterface');
 		$mock->shouldReceive('render')->once()->andReturn('foo');
 		$response = new Illuminate\Http\Response($mock);
 		$this->assertEquals('foo', $response->getContent());
@@ -65,7 +65,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$arr = array('foo'=>'bar');
 		$response = new Illuminate\Http\Response();
 		$response->setContent($arr);
-		$this->assertTrue($arr === $response->getOriginalContent());
+		$this->assertSame($arr, $response->getOriginalContent());
 	}
 
 
@@ -141,7 +141,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response->setSession($session = m::mock('Illuminate\Session\Store'));
 		$session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
 		$session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
-		$provider = m::mock('Illuminate\Support\Contracts\MessageProviderInterface');
+		$provider = m::mock('Illuminate\Contracts\Support\MessageProviderInterface');
 		$provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
 		$response->withErrors($provider);
 	}
@@ -157,8 +157,8 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$session = m::mock('Illuminate\Session\Store');
 		$response->setRequest($request);
 		$response->setSession($session);
-		$this->assertTrue($request === $response->getRequest());
-		$this->assertTrue($session === $response->getSession());
+		$this->assertSame($request, $response->getRequest());
+		$this->assertSame($session, $response->getSession());
 	}
 
 

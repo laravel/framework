@@ -1,14 +1,15 @@
 <?php namespace Illuminate\View;
 
-use ArrayAccess;
 use Closure;
+use ArrayAccess;
 use Illuminate\Support\MessageBag;
 use Illuminate\View\Engines\EngineInterface;
-use Illuminate\Support\Contracts\MessageProviderInterface;
-use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
-use Illuminate\Support\Contracts\RenderableInterface as Renderable;
+use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Contracts\Support\RenderableInterface;
+use Illuminate\Contracts\Support\MessageProviderInterface;
+use Illuminate\Contracts\Support\ArrayableInterface as Arrayable;
 
-class View implements ArrayAccess, Renderable {
+class View implements ArrayAccess, ViewContract {
 
 	/**
 	 * The view factory instance.
@@ -145,7 +146,7 @@ class View implements ArrayAccess, Renderable {
 
 		foreach ($data as $key => $value)
 		{
-			if ($value instanceof Renderable)
+			if ($value instanceof RenderableInterface)
 			{
 				$data[$key] = $value->render();
 			}
@@ -159,7 +160,7 @@ class View implements ArrayAccess, Renderable {
 	 *
 	 * @param  string|array  $key
 	 * @param  mixed   $value
-	 * @return \Illuminate\View\View
+	 * @return $this
 	 */
 	public function with($key, $value = null)
 	{
@@ -181,7 +182,7 @@ class View implements ArrayAccess, Renderable {
 	 * @param  string  $key
 	 * @param  string  $view
 	 * @param  array   $data
-	 * @return \Illuminate\View\View
+	 * @return $this
 	 */
 	public function nest($key, $view, array $data = array())
 	{
@@ -191,8 +192,8 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Add validation errors to the view.
 	 *
-	 * @param  \Illuminate\Support\Contracts\MessageProviderInterface|array  $provider
-	 * @return \Illuminate\View\View
+	 * @param  \Illuminate\Contracts\Support\MessageProviderInterface|array  $provider
+	 * @return $this
 	 */
 	public function withErrors($provider)
 	{
@@ -317,6 +318,7 @@ class View implements ArrayAccess, Renderable {
 	/**
 	 * Get a piece of data from the view.
 	 *
+	 * @param  string  $key
 	 * @return mixed
 	 */
 	public function &__get($key)

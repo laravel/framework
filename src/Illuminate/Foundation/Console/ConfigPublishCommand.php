@@ -1,18 +1,21 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\ConfigPublisher;
+use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Foundation\Publishing\ConfigPublisher;
 
 class ConfigPublishCommand extends Command {
+
+	use ConfirmableTrait;
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'config:publish';
+	protected $name = 'publish:config';
 
 	/**
 	 * The console command description.
@@ -24,14 +27,14 @@ class ConfigPublishCommand extends Command {
 	/**
 	 * The config publisher instance.
 	 *
-	 * @var \Illuminate\Foundation\ConfigPublisher
+	 * @var \Illuminate\Foundation\Publishing\ConfigPublisher
 	 */
 	protected $config;
 
 	/**
 	 * Create a new configuration publish command instance.
 	 *
-	 * @param  \Illuminate\Foundation\ConfigPublisher  $config
+	 * @param  \Illuminate\Foundation\Publishing\ConfigPublisher  $config
 	 * @return void
 	 */
 	public function __construct(ConfigPublisher $config)
@@ -49,6 +52,13 @@ class ConfigPublishCommand extends Command {
 	public function fire()
 	{
 		$package = $this->input->getArgument('package');
+
+		$proceed = $this->confirmToProceed('Config Already Published!', function() use ($package)
+		{
+			return $this->config->alreadyPublished($package);
+		});
+
+		if ( ! $proceed) return;
 
 		if ( ! is_null($path = $this->getPath()))
 		{
@@ -98,6 +108,8 @@ class ConfigPublishCommand extends Command {
 	{
 		return array(
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the configuration files.', null),
+
+			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when the file already exists.'),
 		);
 	}
 

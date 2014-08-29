@@ -3,13 +3,14 @@
 use Pheanstalk\Pheanstalk;
 use Illuminate\Container\Container;
 use Pheanstalk\Job as PheanstalkJob;
+use Illuminate\Contracts\Queue\Job as JobContract;
 
-class BeanstalkdJob extends Job {
+class BeanstalkdJob extends Job implements JobContract {
 
 	/**
 	 * The Pheanstalk instance.
 	 *
-	 * @var Pheanstalk
+	 * @var \Pheanstalk_Pheanstalk
 	 */
 	protected $pheanstalk;
 
@@ -130,7 +131,7 @@ class BeanstalkdJob extends Job {
 	/**
 	 * Get the underlying Pheanstalk instance.
 	 *
-	 * @return Pheanstalk
+	 * @return \Pheanstalk_Pheanstalk
 	 */
 	public function getPheanstalk()
 	{
