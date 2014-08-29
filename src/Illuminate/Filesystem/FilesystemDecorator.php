@@ -44,7 +44,7 @@ class FilesystemDecorator implements FilesystemContract, CloudFilesystemContract
 	 * @param  string  $path
 	 * @return string
 	 *
-	 * @throws FileNotFoundException
+	 * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
 	 */
 	public function get($path)
 	{
@@ -232,6 +232,7 @@ class FilesystemDecorator implements FilesystemContract, CloudFilesystemContract
 	 * Get all (recursive) of the directories within a given directory.
 	 *
 	 * @param  string|null  $directory
+	 * @param  bool  $recursive
 	 * @return array
 	 */
 	public function allDirectories($directory = null, $recursive = false)
@@ -289,6 +290,7 @@ class FilesystemDecorator implements FilesystemContract, CloudFilesystemContract
 	 *
 	 * @param  string|null  $visibility
 	 * @return string
+	 * @throws \InvalidArgumentException
 	 */
 	protected function parseVisibility($visibility)
 	{
