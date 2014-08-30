@@ -5,12 +5,21 @@ use Illuminate\Support\ServiceProvider;
 class ConsoleSupportServiceProvider extends ServiceProvider {
 
 	/**
+	 * Indicates if loading of the provider is deferred.
+	 *
+	 * @var bool
+	 */
+	protected $defer = true;
+
+	/**
 	 * The provider class names.
 	 *
 	 * @var array
 	 */
 	protected $providers = array(
 		'Illuminate\Auth\GeneratorServiceProvider',
+		'Illuminate\Database\MigrationServiceProvider',
+		'Illuminate\Database\SeedServiceProvider',
 		'Illuminate\Foundation\Providers\ComposerServiceProvider',
 		'Illuminate\Foundation\Providers\PublisherServiceProvider',
 		'Illuminate\Queue\FailConsoleServiceProvider',
@@ -25,13 +34,6 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 * @var array
 	 */
 	protected $instances = array();
-
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = true;
 
 	/**
 	 * Register the service provider.
