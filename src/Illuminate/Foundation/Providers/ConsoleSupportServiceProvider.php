@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\AggregateServiceProvider;
 
-class ConsoleSupportServiceProvider extends ServiceProvider {
+class ConsoleSupportServiceProvider extends AggregateServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -16,7 +16,7 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 	 *
 	 * @var array
 	 */
-	protected $providers = array(
+	protected $providers = [
 		'Illuminate\Auth\GeneratorServiceProvider',
 		'Illuminate\Database\MigrationServiceProvider',
 		'Illuminate\Database\SeedServiceProvider',
@@ -26,47 +26,6 @@ class ConsoleSupportServiceProvider extends ServiceProvider {
 		'Illuminate\Routing\GeneratorServiceProvider',
 		'Illuminate\Session\CommandsServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
-	);
-
-	/**
-	 * An array of the service provider instances.
-	 *
-	 * @var array
-	 */
-	protected $instances = array();
-
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		$this->instances = array();
-
-		foreach ($this->providers as $provider)
-		{
-			$this->instances[] = $this->app->register($provider);
-		}
-	}
-
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		$provides = array();
-
-		foreach ($this->providers as $provider)
-		{
-			$instance = $this->app->resolveProviderClass($provider);
-
-			$provides = array_merge($provides, $instance->provides());
-		}
-
-		return $provides;
-	}
+	];
 
 }
