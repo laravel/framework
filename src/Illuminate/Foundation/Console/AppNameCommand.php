@@ -57,7 +57,7 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
-		if (!$this->isValidAppName())
+		if ( ! $this->isValidAppName())
 		{
 			$this->error('Application name contains invalid characters!');
 
@@ -77,6 +77,7 @@ class AppNameCommand extends Command {
 
 	/**
 	 * Check app name contains valid characters.
+	 * 
 	 * @return bool 
 	 */
 	protected function isValidAppName()
@@ -168,7 +169,7 @@ class AppNameCommand extends Command {
 		$normalizedNewAppName = str_replace('\\', '\\\\', $this->argument('name'));
 
 		$this->replaceIn(
-			$this->getComposerPath(), $this->root() . '\\\\', $normalizedNewAppName . '\\\\'
+			$this->getComposerPath(), $this->root().'\\\\', $normalizedNewAppName.'\\\\'
 		);
 	}
 
