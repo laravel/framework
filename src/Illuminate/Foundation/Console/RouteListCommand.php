@@ -10,30 +10,35 @@ class RouteListCommand extends Command {
 
 	/**
 	 * The console command name.
+	 *
 	 * @var string
 	 */
 	protected $name = 'route:list';
 
 	/**
 	 * The console command description.
+	 *
 	 * @var string
 	 */
 	protected $description = 'List all registered routes';
 
 	/**
 	 * The router instance.
+	 *
 	 * @var \Illuminate\Routing\Router
 	 */
 	protected $router;
 
 	/**
 	 * An array of all the registered routes.
+	 *
 	 * @var \Illuminate\Routing\RouteCollection
 	 */
 	protected $routes;
 
 	/**
 	 * The table headers for the command.
+	 *
 	 * @var array
 	 */
 	protected $headers = [
@@ -48,8 +53,7 @@ class RouteListCommand extends Command {
 	/**
 	 * Create a new route command instance.
 	 *
-	 * @param  \Illuminate\Routing\Router $router
-	 *
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @return void
 	 */
 	public function __construct(Router $router)
@@ -62,11 +66,12 @@ class RouteListCommand extends Command {
 
 	/**
 	 * Execute the console command.
+	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		if(count($this->routes) == 0)
+		if (count($this->routes) == 0)
 		{
 			return $this->error("Your application doesn't have any routes.");
 		}
@@ -76,13 +81,14 @@ class RouteListCommand extends Command {
 
 	/**
 	 * Compile the routes into a displayable format.
+	 *
 	 * @return array
 	 */
 	protected function getRoutes()
 	{
 		$results = [];
 
-		foreach($this->routes as $route)
+		foreach ($this->routes as $route)
 		{
 			$results[] = $this->getRouteInformation($route);
 		}
@@ -93,14 +99,13 @@ class RouteListCommand extends Command {
 	/**
 	 * Get the route information for a given route.
 	 *
-	 * @param  string                    $name
-	 * @param  \Illuminate\Routing\Route $route
-	 *
+	 * @param  string  $name
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return array
 	 */
 	protected function getRouteInformation(Route $route)
 	{
-		$uri = implode('|', $route->methods()) . ' ' . $route->uri();
+		$uri = implode('|', $route->methods()).' '.$route->uri();
 
 		return $this->filterRoute([
 			'domain' => $route->domain(),
@@ -115,8 +120,7 @@ class RouteListCommand extends Command {
 	/**
 	 * Display the route information on the console.
 	 *
-	 * @param  array $routes
-	 *
+	 * @param  array  $routes
 	 * @return void
 	 */
 	protected function displayRoutes(array $routes)
@@ -157,8 +161,7 @@ class RouteListCommand extends Command {
 	/**
 	 * Get before filters
 	 *
-	 * @param  \Illuminate\Routing\Route $route
-	 *
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
 	protected function getBeforeFilters($route)
@@ -173,15 +176,14 @@ class RouteListCommand extends Command {
 	/**
 	 * Get all of the pattern filters matching the route.
 	 *
-	 * @param  \Illuminate\Routing\Route $route
-	 *
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return array
 	 */
 	protected function getPatternFilters($route)
 	{
 		$patterns = [];
 
-		foreach($route->methods() as $method)
+		foreach ($route->methods() as $method)
 		{
 			// For each method supported by the route we will need to gather up the patterned
 			// filters for that method. We will then merge these in with the other filters
@@ -197,9 +199,8 @@ class RouteListCommand extends Command {
 	/**
 	 * Get the pattern filters for a given URI and method.
 	 *
-	 * @param  string $uri
-	 * @param  string $method
-	 *
+	 * @param  string  $uri
+	 * @param  string  $method
 	 * @return array
 	 */
 	protected function getMethodPatterns($uri, $method)
@@ -210,8 +211,7 @@ class RouteListCommand extends Command {
 	/**
 	 * Get after filters
 	 *
-	 * @param  \Illuminate\Routing\Route $route
-	 *
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
 	protected function getAfterFilters($route)
@@ -222,18 +222,17 @@ class RouteListCommand extends Command {
 	/**
 	 * Filter the route by URI and / or name.
 	 *
-	 * @param  array $route
-	 *
+	 * @param  array  $route
 	 * @return array|null
 	 */
 	protected function filterRoute(array $route)
 	{
-		if(($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
-			$this->option('path') && ! str_contains($route['uri'], $this->option('path'))
-		)
+		if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
+			$this->option('path') && ! str_contains($route['uri'], $this->option('path')))
 		{
 			return null;
-		} else
+		}
+		else
 		{
 			return array_only($route, $this->getColumns());
 		}
@@ -241,6 +240,7 @@ class RouteListCommand extends Command {
 
 	/**
 	 * Get the console command options.
+	 *
 	 * @return array
 	 */
 	protected function getOptions()
