@@ -47,7 +47,7 @@ class RouteListCommand extends Command {
 		'name'   => 'Name',
 		'action' => 'Action',
 		'before' => 'Before Filters',
-		'after'  => 'After Filters'
+		'after'  => 'After Filters',
 	];
 
 	/**
@@ -113,7 +113,7 @@ class RouteListCommand extends Command {
 			'name'   => $route->getName(),
 			'action' => $route->getActionName(),
 			'before' => $this->getBeforeFilters($route),
-			'after'  => $this->getAfterFilters($route)
+			'after'  => $this->getAfterFilters($route),
 		]);
 	}
 
@@ -129,7 +129,7 @@ class RouteListCommand extends Command {
 	}
 
 	/**
-	 * Get the specified headers
+	 * Get the specified headers.
 	 *
 	 * @return array
 	 */
@@ -139,27 +139,31 @@ class RouteListCommand extends Command {
 	}
 
 	/**
-	 * Get the specified columns
+	 * Get the specified columns.
 	 *
 	 * @return array
 	 */
 	protected function getColumns()
 	{
 		if($this->option('show'))
+		{
 			$columns = explode(',', $this->option('show'));
+		}
 		elseif($this->option('hide'))
 		{
 			$headers = array_except($this->headers, explode(',', $this->option('hide')));
 			$columns = array_keys($headers);
 		}
 		else
+		{
 			$columns = array_keys($this->headers);
+		}
 
 		return $columns;
 	}
 
 	/**
-	 * Get before filters
+	 * Get before filters.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
@@ -209,7 +213,7 @@ class RouteListCommand extends Command {
 	}
 
 	/**
-	 * Get after filters
+	 * Get after filters.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
