@@ -57,6 +57,13 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
+		if (!$this->isValidAppName())
+		{
+			$this->error('Application name contains invalid characters!');
+
+			return false;
+		}
+
 		$this->setAppDirectoryNamespace();
 
 		$this->setConfigNamespaces();
@@ -66,6 +73,15 @@ class AppNameCommand extends Command {
 		$this->info('Application namespace set!');
 
 		$this->composer->dumpAutoloads();
+	}
+
+	/**
+	 * Check app name contains valid characters.
+	 * @return bool 
+	 */
+	protected function isValidAppName()
+	{
+		return preg_match('~^[A-Za-z0-9_\\\\]+~', $this->argument('name')) != 0;
 	}
 
 	/**
@@ -149,8 +165,10 @@ class AppNameCommand extends Command {
 	 */
 	protected function setComposerNamespace()
 	{
+		$normalizedNewAppName = str_replace('\\', '\\\\', $this->argument('name'));
+
 		$this->replaceIn(
-			$this->getComposerPath(), $this->root().'\\\\', $this->argument('name').'\\\\'
+			$this->getComposerPath(), $this->root() . '\\\\', $normalizedNewAppName . '\\\\'
 		);
 	}
 
