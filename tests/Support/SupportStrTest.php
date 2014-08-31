@@ -108,7 +108,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 
 	public function testQuickRandom()
 	{
-		$randomInteger = mt_rand(1, 100);		
+		$randomInteger = mt_rand(1, 100);
 		$this->assertEquals($randomInteger, strlen(Str::quickRandom($randomInteger)));
 		$this->assertInternalType('string', Str::quickRandom());
 		$this->assertEquals(16, strlen(Str::quickRandom()));
