@@ -22,12 +22,14 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Create a new collection.
 	 *
-	 * @param  array  $items
+	 * @param  mixed  $items
 	 * @return void
 	 */
-	public function __construct(array $items = array())
+	public function __construct($items = array())
 	{
-		$this->items = $items;
+		$items = ! is_null($items) ? $this->getArrayableItems($items) : [];
+
+		$this->items = is_array($items) ? $items : (array) $items;
 	}
 
 	/**
@@ -36,13 +38,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  mixed  $items
 	 * @return static
 	 */
-	public static function make($items)
+	public static function make($items = null)
 	{
-		if (is_null($items)) return new static;
-
-		if ($items instanceof Collection) return $items;
-
-		return new static(is_array($items) ? $items : array($items));
+		return new static($items);
 	}
 
 	/**
