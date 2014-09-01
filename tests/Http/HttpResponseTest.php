@@ -20,7 +20,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
 		$response = new Illuminate\Http\Response();
-		$response->setContent(array('foo'=>'bar'));
+		$response->setContent(array('foo' => 'bar'));
 		$this->assertEquals('{"foo":"bar"}', $response->getContent());
 		$this->assertEquals('application/json', $response->headers->get('Content-Type'));
 	}
@@ -62,7 +62,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetOriginalContent()
 	{
-		$arr = array('foo'=>'bar');
+		$arr = array('foo' => 'bar');
 		$response = new Illuminate\Http\Response();
 		$response->setContent($arr);
 		$this->assertSame($arr, $response->getOriginalContent());

@@ -75,7 +75,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
 		$this->assertEquals('contents', $view->render());
-		$this->assertEquals('contents', (string)$view);
+		$this->assertEquals('contents', (string) $view);
 	}
 
 
@@ -190,14 +190,14 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testWithErrors()
 	{
 		$view = $this->getView();
-		$errors = array('foo'=>'bar','qu'=>'ux');
+		$errors = array('foo' => 'bar','qu' => 'ux');
 		$this->assertSame($view, $view->withErrors($errors));
 		$this->assertTrue($view->errors instanceof \Illuminate\Support\MessageBag);
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'bar');
 		$qu = $view->errors->get('qu');
 		$this->assertEquals($qu[0], 'ux');
-		$data = array('foo'=>'baz');
+		$data = array('foo' => 'baz');
 		$this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'baz');
