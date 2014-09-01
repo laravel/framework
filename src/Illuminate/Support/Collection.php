@@ -27,9 +27,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function __construct($items = array())
 	{
-		$items = ! is_null($items) ? $this->getArrayableItems($items) : [];
+		$items = is_null($items) ? [] : $this->getArrayableItems($items);
 
-		$this->items = is_array($items) ? $items : (array) $items;
+		$this->items = (array) $items;
 	}
 
 	/**
