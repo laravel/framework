@@ -16,7 +16,7 @@ class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
 		$engine = $this->getEngine();
 		$engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
 		$engine->getCompiler()->shouldReceive('isExpired')->once()->with(__DIR__.'/fixtures/foo.php')->andReturn(true);
-		$engine->getCompiler()->shouldReceive('compile')->once()->with(__DIR__.'/fixtures/foo.php');;
+		$engine->getCompiler()->shouldReceive('compile')->once()->with(__DIR__.'/fixtures/foo.php');
 		$results = $engine->get(__DIR__.'/fixtures/foo.php');
 
 		$this->assertEquals('Hello World'.PHP_EOL, $results);

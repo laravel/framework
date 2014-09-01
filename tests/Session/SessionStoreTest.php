@@ -176,7 +176,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session = $this->getSession();
 		$session->set('foo', 'bar');
 		$session->set('qu', 'ux');
-		$session->replace(array('foo'=>'baz'));
+		$session->replace(array('foo' => 'baz'));
 		$this->assertTrue($session->get('foo') == 'baz');
 		$this->assertTrue($session->get('qu') == 'ux');
 	}
