@@ -116,9 +116,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerClearCompiledCommand()
 	{
-		$this->app->bindShared('command.clear-compiled', function()
+		$this->app->bindShared('command.clear-compiled', function($app)
 		{
-			return new ClearCompiledCommand;
+			return new ClearCompiledCommand($app['files']);
 		});
 	}
 
@@ -142,9 +142,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerDownCommand()
 	{
-		$this->app->bindShared('command.down', function()
+		$this->app->bindShared('command.down', function($app)
 		{
-			return new DownCommand;
+			return new DownCommand($app['files']);
 		});
 	}
 
@@ -298,9 +298,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerUpCommand()
 	{
-		$this->app->bindShared('command.up', function()
+		$this->app->bindShared('command.up', function($app)
 		{
-			return new UpCommand;
+			return new UpCommand($app['files']);
 		});
 	}
 

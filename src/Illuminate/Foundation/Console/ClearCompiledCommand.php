@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 
 class ClearCompiledCommand extends Command {
 
@@ -19,21 +20,29 @@ class ClearCompiledCommand extends Command {
 	protected $description = "Remove the compiled class file";
 
 	/**
+	 * Create a new Clear Compiled command.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @return void
+	 */
+	public function __construct(Filesystem $files)
+	{
+		parent::__construct();
+
+		$this->files = $files;
+	}
+
+	/**
 	 * Execute the console command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		if (file_exists($path = $this->laravel['path.storage'].'/meta/compiled.php'))
-		{
-			@unlink($path);
-		}
-
-		if (file_exists($path = $this->laravel['config']['app.manifest'].'/services.json'))
-		{
-			@unlink($path);
-		}
+		$this->files->delete(
+			$this->laravel['path.storage'].'/meta/compiled.php',
+			$this->laravel['config']['app.manifest'].'/services.json'
+		);
 	}
 
 }
