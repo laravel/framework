@@ -23,7 +23,7 @@ class AggregateServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->instances = [];;
+		$this->instances = [];
 
 		foreach ($this->providers as $provider)
 		{
