@@ -27,7 +27,7 @@ class MigratePublishCommand extends Command {
 	public function fire()
 	{
 		$published = $this->laravel['migration.publisher']->publish(
-			$this->getSourcePath(), $this->laravel['path.base'].'/database/migrations'
+			$this->getSourcePath(), $this->laravel['path.database'].'/migrations'
 		);
 
 		foreach ($published as $migration)
