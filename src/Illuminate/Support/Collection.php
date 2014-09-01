@@ -35,7 +35,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Create a new collection instance if the value isn't one already.
 	 *
-	 * @param  mixed $items
+	 * @param  mixed  $items
 	 * @return static
 	 */
 	public static function make($items = null)
