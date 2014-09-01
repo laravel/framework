@@ -256,7 +256,7 @@ class Repository implements ArrayAccess {
 			return max(0, Carbon::instance($duration)->diffInMinutes());
 		}
 
-		return is_string($duration) ? intval($duration) : $duration;
+		return is_string($duration) ? (int) $duration : $duration;
 	}
 
 	/**
