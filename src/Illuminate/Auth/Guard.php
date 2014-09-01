@@ -143,7 +143,7 @@ class Guard implements AuthenticatorContract {
 
 		if ( ! is_null($id))
 		{
-			$user = $this->provider->retrieveByID($id);
+			$user = $this->provider->retrieveById($id);
 		}
 
 		// If the user is null, but we decrypt a "recaller" cookie we can attempt to

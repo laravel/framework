@@ -17,7 +17,7 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase {
 		$mock->shouldReceive('newQuery')->once()->andReturn($mock);
 		$mock->shouldReceive('find')->once()->with(1)->andReturn('bar');
 		$provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
-		$user = $provider->retrieveByID(1);
+		$user = $provider->retrieveById(1);
 
 		$this->assertEquals('bar', $user);
 	}
