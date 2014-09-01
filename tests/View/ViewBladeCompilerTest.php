@@ -196,7 +196,7 @@ test
 	public function testStackIsCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$string = '@stack(\'foo\')';;
+		$string = '@stack(\'foo\')';
 		$expected = '<?php echo $__env->yieldContent(\'foo\'); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
