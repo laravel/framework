@@ -136,7 +136,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function registerRestartCommand()
 	{
-		$this->app->bindShared('command.queue.restart', function($app)
+		$this->app->bindShared('command.queue.restart', function()
 		{
 			return new RestartCommand;
 		});
@@ -151,7 +151,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSubscriber()
 	{
-		$this->app->bindShared('command.queue.subscribe', function($app)
+		$this->app->bindShared('command.queue.subscribe', function()
 		{
 			return new SubscribeCommand;
 		});

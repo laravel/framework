@@ -72,7 +72,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 */
 	protected function registerAuthMakeCommand()
 	{
-		$this->app->bindShared('command.auth.make', function($app)
+		$this->app->bindShared('command.auth.make', function()
 		{
 			return new AuthMakeCommand;
 		});
@@ -85,7 +85,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 */
 	protected function registerClearRemindersCommand()
 	{
-		$this->app->bindShared('command.auth.reminders.clear', function($app)
+		$this->app->bindShared('command.auth.reminders.clear', function()
 		{
 			return new ClearRemindersCommand;
 		});

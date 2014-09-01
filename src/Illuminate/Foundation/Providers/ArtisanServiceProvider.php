@@ -155,7 +155,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerEnvironmentCommand()
 	{
-		$this->app->bindShared('command.environment', function($app)
+		$this->app->bindShared('command.environment', function()
 		{
 			return new EnvironmentCommand;
 		});
