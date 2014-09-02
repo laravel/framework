@@ -1173,7 +1173,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 			'hash'           => 'Illuminate\Contracts\Hashing\Hasher',
 			'translator'     => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
 			'log'            => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
-			'mailer'         => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer'],
+			'mailer'         => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\QueueingMailer'],
 			'paginator'      => 'Illuminate\Pagination\Factory',
 			'auth.reminder'  => ['Illuminate\Auth\Reminders\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
 			'queue'          => 'Illuminate\Queue\QueueManager',

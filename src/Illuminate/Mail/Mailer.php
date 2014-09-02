@@ -10,9 +10,9 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\SerializableClosure;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Mail\QueueingMailer as QueueingMailerContract;
 
-class Mailer implements MailerContract {
+class Mailer implements QueueingMailerContract {
 
 	/**
 	 * The view factory instance.
