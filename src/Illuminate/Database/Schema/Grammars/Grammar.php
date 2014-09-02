@@ -244,7 +244,7 @@ abstract class Grammar extends BaseGrammar {
 	{
 		if ($value instanceof Expression) return $value;
 
-		if (is_bool($value)) return "'".intval($value)."'";
+		if (is_bool($value)) return "'".(int) $value."'";
 
 		return "'".strval($value)."'";
 	}
