@@ -134,7 +134,7 @@ abstract class Job {
 		}
 		else
 		{
-			return intval($delay);
+			return (int) $delay;
 		}
 	}
 
