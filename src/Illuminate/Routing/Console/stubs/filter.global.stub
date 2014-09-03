@@ -1,7 +1,6 @@
 <?php namespace {{namespace}};
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 class {{class}} {
@@ -9,11 +8,11 @@ class {{class}} {
 	/**
 	 * Run the request filter.
 	 *
-	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return mixed
 	 */
-	public function filter(Route $route, Request $request, Response $response = null)
+	public function filter(Request $request, Response $response = null)
 	{
 		//
 	}

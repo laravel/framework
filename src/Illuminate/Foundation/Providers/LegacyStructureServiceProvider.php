@@ -21,37 +21,41 @@ class LegacyStructureServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$env = $this->app->environment();
-
-		// The start scripts gives this application the opportunity to override
-		// any of the existing IoC bindings, as well as register its own new
-		// bindings for things like repositories, etc. We'll load it here.
-		$path = $this->app['path'].'/start/global.php';
-
-		if (file_exists($path))
+		$this->app->booted(function()
 		{
-			require $path;
-		}
+			$env = $this->app->environment();
 
-		// The environment start script is only loaded if it exists for the app
-		// environment currently active, which allows some actions to happen
-		// in one environment while not in the other, keeping things clean.
-		$path = $this->app['path']."/start/{$env}.php";
+			// The start scripts gives this application the opportunity to override
+			// any of the existing IoC bindings, as well as register its own new
+			// bindings for things like repositories, etc. We'll load it here.
+			$path = $this->app['path'].'/start/global.php';
 
-		if (file_exists($path))
-		{
-			require $path;
-		}
+			if (file_exists($path))
+			{
+				require $path;
+			}
 
-		// The Application routes are kept separate from the application starting
-		// just to keep the file a little cleaner. We'll go ahead and load in
-		// all of the routes now and return the application to the callers.
-		$routes = $this->app['path'].'/routes.php';
+			// The environment start script is only loaded if it exists for the app
+			// environment currently active, which allows some actions to happen
+			// in one environment while not in the other, keeping things clean.
+			$path = $this->app['path']."/start/{$env}.php";
 
-		if (file_exists($routes))
-		{
-			require $routes;
-		}
+			if (file_exists($path))
+			{
+				require $path;
+			}
+
+			// The Application routes are kept separate from the application starting
+			// just to keep the file a little cleaner. We'll go ahead and load in
+			// all of the routes now and return the application to the callers.
+			$routes = $this->app['path'].'/routes.php';
+
+			if (file_exists($routes))
+			{
+				require $routes;
+			}
+		});
+
 	}
 
 }
