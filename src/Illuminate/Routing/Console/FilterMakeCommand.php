@@ -60,7 +60,7 @@ class FilterMakeCommand extends GeneratorCommand {
 	protected function getOptions()
 	{
 		return [
-			['global', null, InputOption::VALUE_NONE, 'Indicates the filter should be global.', false],
+			['global', null, InputOption::VALUE_NONE, 'Indicates the filter should be global.'],
 		];
 	}
 
