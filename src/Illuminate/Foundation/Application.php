@@ -20,8 +20,12 @@ use Illuminate\Contracts\Support\ResponsePreparerInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
-class Application extends Container implements HttpKernelInterface, TerminableInterface, ResponsePreparerInterface {
+class Application extends Container implements HttpKernelInterface,
+                                               TerminableInterface,
+                                               ApplicationContract,
+                                               ResponsePreparerInterface {
 
 	/**
 	 * The Laravel framework version.
