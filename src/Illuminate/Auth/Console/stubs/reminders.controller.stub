@@ -14,7 +14,7 @@ class {{class}} extends Controller {
 	protected $passwords;
 
 	/**
-	 * Create a new password reminder controller isntance.
+	 * Create a new password reminder controller instance.
 	 *
 	 * @param  PasswordBroker  $passwords
 	 * @return void
