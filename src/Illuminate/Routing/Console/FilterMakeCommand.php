@@ -41,7 +41,26 @@ class FilterMakeCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		return __DIR__.'/stubs/filter.stub';
+		if ($this->option('global'))
+		{
+			return __DIR__.'/stubs/filter.global.stub';
+		}
+		else
+		{
+			return __DIR__.'/stubs/filter.stub';
+		}
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return [
+			['global', null, InputOption::VALUE_NONE, 'Indicates the filter should be global.', false],
+		];
 	}
 
 }
