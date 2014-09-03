@@ -7,10 +7,11 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Router implements HttpKernelInterface, RouteFiltererInterface {
+class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInterface {
 
 	/**
 	 * The event dispatcher instance.
