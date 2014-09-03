@@ -60,6 +60,13 @@ class Mailer {
 	 * @var \Illuminate\Queue\QueueManager
 	 */
 	protected $queue;
+	
+	/**
+	 * Mail Transport sending response
+	 *
+	 * @var \GuzzleHttp\Message\Response|int
+	 */
+	protected $sendingResponse;
 
 	/**
 	 * Indicates if the actual sending is disabled.
@@ -326,7 +333,7 @@ class Mailer {
 
 		if ( ! $this->pretending)
 		{
-			$this->swift->send($message, $this->failedRecipients);
+			$this->sendingResponse = $this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
 		{
@@ -500,5 +507,14 @@ class Mailer {
 	{
 		$this->container = $container;
 	}
-
+	
+	/**
+	 * Get Mail Transport sending response
+	 *
+	 * @return \GuzzleHttp\Message\Response
+	 */
+	public function getSendingResponse()
+	{
+		return $this->sendingResponse;
+	}
 }
