@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Contracts\Foundation;
 
-interface Application {
+use Illuminate\Contracts\Container\Container;
+
+interface Application extends Container {
 
 	/**
 	 * Register a service provider with the application.
