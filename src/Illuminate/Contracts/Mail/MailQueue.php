@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Contracts\Mail;
 
-interface QueueingMailer extends Mailer {
+interface MailQueue {
 
 	/**
 	 * Queue a new e-mail message for sending.
