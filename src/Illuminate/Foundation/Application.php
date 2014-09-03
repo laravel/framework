@@ -1156,7 +1156,7 @@ class Application extends Container implements HttpKernelInterface,
 	public function registerCoreContainerAliases()
 	{
 		$aliases = array(
-			'app'            => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container'],
+			'app'            => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
 			'artisan'        => 'Illuminate\Console\Application',
 			'auth'           => 'Illuminate\Auth\AuthManager',
 			'auth.driver'    => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Authenticator'],
