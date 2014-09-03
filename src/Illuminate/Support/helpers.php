@@ -1147,6 +1147,21 @@ if ( ! function_exists('view'))
 	}
 }
 
+if ( ! function_exists('share'))
+{
+	/**
+	 * Add a piece of shared data to the environment.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	function share($key, $value = null)
+	{
+		app('view')->share($key, $value);
+	}
+}
+
 if ( ! function_exists('with'))
 {
 	/**
