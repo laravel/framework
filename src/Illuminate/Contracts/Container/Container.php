@@ -42,6 +42,15 @@ interface Container {
 	public function bindIf($abstract, $concrete = null, $shared = false);
 
 	/**
+	 * Bind a shared Closure into the container.
+	 *
+	 * @param  string    $abstract
+	 * @param  \Closure  $closure
+	 * @return void
+	 */
+	public function bindShared($abstract, Closure $closure);
+
+	/**
 	 * Register a shared binding in the container.
 	 *
 	 * @param  string  $abstract
