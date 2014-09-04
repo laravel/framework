@@ -146,7 +146,7 @@ class FormRequest extends Request {
 	 */
 	protected function formatErrors(Validator $validator)
 	{
-		return $validator->errors()->all();
+		return $validator->errors()->getMessages();
 	}
 
 	/**
