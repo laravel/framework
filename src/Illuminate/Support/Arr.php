@@ -292,7 +292,7 @@ class Arr {
 	 */
 	public static function random($array)
 	{
-		return array_rand(array_flip($array));
+		return $array[array_rand($array)];
 	}
 
 
