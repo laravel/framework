@@ -616,6 +616,7 @@ class Guard {
 	 * Set the event dispatcher instance.
 	 *
 	 * @param  \Illuminate\Events\Dispatcher
+	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
 	{
