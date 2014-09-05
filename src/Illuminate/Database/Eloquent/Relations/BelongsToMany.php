@@ -829,9 +829,13 @@ class BelongsToMany extends Relation {
 		// We'll return the numbers of affected rows when we do the deletes.
 		$ids = (array) $ids;
 
-		if (count($ids) > 0)
+		if (count($ids) > 1)
 		{
 			$query->whereIn($this->otherKey, $ids);
+		}
+		elseif (count($ids) === 1)
+		{
+			$query->where($this->otherKey, reset($ids));
 		}
 
 		if ($touch) $this->touchIfTouching();
