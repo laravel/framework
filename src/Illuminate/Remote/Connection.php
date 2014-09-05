@@ -204,9 +204,9 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function getCallback($callback)
 	{
-		if ( ! is_null($callback)) return $callback;
+		if (is_null($callback)) return function($line) { $this->display($line); };
 
-		return function($line) { $this->display($line); };
+		return $callback;
 	}
 
 	/**

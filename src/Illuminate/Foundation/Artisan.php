@@ -36,13 +36,16 @@ class Artisan {
 	 */
 	protected function getArtisan()
 	{
-		if ( ! is_null($this->artisan)) return $this->artisan;
+		if (is_null($this->artisan))
+		{
+			$this->app->loadDeferredProviders();
 
-		$this->app->loadDeferredProviders();
+			$this->artisan = ConsoleApplication::make($this->app);
 
-		$this->artisan = ConsoleApplication::make($this->app);
+			return $this->artisan->boot();
+		}
 
-		return $this->artisan->boot();
+		return $this->artisan;
 	}
 
 	/**

@@ -145,18 +145,18 @@ class Handler {
 	{
 		$response = $this->callCustomHandlers($exception);
 
-		// If one of the custom error handlers returned a response, we will send that
-		// response back to the client after preparing it. This allows a specific
-		// type of exceptions to handled by a Closure giving great flexibility.
-		if ( ! is_null($response))
-		{
-			return $this->prepareResponse($response);
-		}
-
 		// If no response was sent by this custom exception handler, we will call the
 		// default exception displayer for the current application context and let
 		// it show the exception to the user / developer based on the situation.
-		return $this->displayException($exception);
+		if (is_null($response))
+		{
+			return $this->displayException($exception);
+		}
+
+		// If one of the custom error handlers returned a response, we will send that
+		// response back to the client after preparing it. This allows a specific
+		// type of exceptions to handled by a Closure giving great flexibility.
+		return $this->prepareResponse($response);
 	}
 
 	/**

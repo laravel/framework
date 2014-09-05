@@ -109,9 +109,12 @@ class Builder {
 	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
-		if ( ! is_null($model = $this->find($id, $columns))) return $model;
+		if (is_null($model = $this->find($id, $columns)))
+		{
+			throw (new ModelNotFoundException)->setModel(get_class($this->model));
+		}
 
-		throw (new ModelNotFoundException)->setModel(get_class($this->model));
+		return $model;
 	}
 
 	/**
@@ -135,9 +138,12 @@ class Builder {
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
-		if ( ! is_null($model = $this->first($columns))) return $model;
+		if (is_null($model = $this->first($columns)))
+		{
+			throw (new ModelNotFoundException)->setModel(get_class($this->model));
+		}
 
-		throw (new ModelNotFoundException)->setModel(get_class($this->model));
+		return $model;
 	}
 
 	/**

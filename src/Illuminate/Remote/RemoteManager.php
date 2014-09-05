@@ -160,9 +160,12 @@ class RemoteManager {
 	{
 		$config = $this->app['config']['remote.connections.'.$name];
 
-		if ( ! is_null($config)) return $config;
+		if (is_null($config))
+		{
+			throw new \InvalidArgumentException("Remote connection [$name] not defined.");
+		}
 
-		throw new \InvalidArgumentException("Remote connection [$name] not defined.");
+		return $config;
 	}
 
 	/**

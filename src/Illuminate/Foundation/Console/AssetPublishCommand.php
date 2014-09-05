@@ -63,13 +63,13 @@ class AssetPublishCommand extends Command {
 	 */
 	protected function publishAssets($package)
 	{
-		if ( ! is_null($path = $this->getPath()))
+		if (is_null($path = $this->getPath()))
 		{
-			$this->assets->publish($package, $path);
+			$this->assets->publishPackage($package);
 		}
 		else
 		{
-			$this->assets->publishPackage($package);
+			$this->assets->publish($package, $path);
 		}
 
 		$this->output->writeln('<info>Assets published for package:</info> '.$package);
