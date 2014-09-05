@@ -44,11 +44,14 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\MorphToMany', array('touchIfTouching'), $this->getRelationArguments());
 		$query = m::mock('stdClass');
 		$query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
+		$query->shouldReceive('mergeWheres')->once()->andReturn($query);
 		$query->shouldReceive('where')->once()->with('taggable_id', 1)->andReturn($query);
 		$query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
 		$query->shouldReceive('whereIn')->once()->with('tag_id', array(1, 2, 3));
 		$query->shouldReceive('delete')->once()->andReturn(true);
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->wheres = array();
+		$mockQueryBuilder->shouldReceive('getRawBindings')->once()->andReturn(array('where' => array()));
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
 		$relation->expects($this->once())->method('touchIfTouching');
 
@@ -61,11 +64,14 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\MorphToMany', array('touchIfTouching'), $this->getRelationArguments());
 		$query = m::mock('stdClass');
 		$query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
+		$query->shouldReceive('mergeWheres')->once()->andReturn($query);
 		$query->shouldReceive('where')->once()->with('taggable_id', 1)->andReturn($query);
 		$query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
 		$query->shouldReceive('whereIn')->never();
 		$query->shouldReceive('delete')->once()->andReturn(true);
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->wheres = array();
+		$mockQueryBuilder->shouldReceive('getRawBindings')->once()->andReturn(array('where' => array()));
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
 		$relation->expects($this->once())->method('touchIfTouching');
 

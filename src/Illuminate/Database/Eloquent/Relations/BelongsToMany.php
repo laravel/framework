@@ -885,6 +885,11 @@ class BelongsToMany extends Relation {
 	{
 		$query = $this->newPivotStatement();
 
+		// Inherit constraints from the relationship query
+		$builderQuery = $this->query->getQuery();
+		$bindings = $builderQuery->getRawBindings();
+		$query->mergeWheres($builderQuery->wheres, $bindings['where']);
+
 		return $query->where($this->foreignKey, $this->parent->getKey());
 	}
 
