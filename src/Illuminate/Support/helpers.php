@@ -501,6 +501,27 @@ if ( ! function_exists('dd'))
 	}
 }
 
+if( ! function_exists('dot_array')){
+
+	/**
+	* Transform an array with dot notation into a multidimensional array
+	* 
+	* @param array $arrayDotted
+	* @return array
+	*/
+	function dot_array($arrayDotted)
+	{
+
+		$array = array();
+        
+		foreach ($arrayDotted as $key => $value) {
+			array_set($array, $key, $value);
+        	}
+
+		return $array;
+	}
+}
+
 if ( ! function_exists('e'))
 {
 	/**
