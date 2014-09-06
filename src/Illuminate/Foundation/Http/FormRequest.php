@@ -233,6 +233,7 @@ class FormRequest extends Request {
 	public function messages()
 	{
 		return [
+			//
 		];
 	}
 }
