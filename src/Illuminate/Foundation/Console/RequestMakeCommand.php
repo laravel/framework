@@ -3,6 +3,7 @@
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class RequestMakeCommand extends GeneratorCommand {
 
@@ -41,7 +42,15 @@ class RequestMakeCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		return __DIR__.'/stubs/request.stub';
+		return $this->option('messages') ?
+			__DIR__ . '/stubs/request_with_messages.stub' :
+			__DIR__ . '/stubs/request.stub';
 	}
 
+	protected function getOptions()
+	{
+		return [
+			['messages', 'm', InputOption::VALUE_NONE, 'add messages methods to your request']
+		];
+	}
 }
