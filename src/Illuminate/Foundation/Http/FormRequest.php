@@ -63,7 +63,7 @@ class FormRequest extends Request {
 	public function validate(ValidationFactory $factory)
 	{
 		$instance = $factory->make(
-			$this->input(), $this->container->call([$this, 'rules'])
+			$this->input(), $this->container->call([$this, 'rules']), $this->container->call([$this, 'messages'])
 		);
 
 		if ($instance->fails())
@@ -123,8 +123,8 @@ class FormRequest extends Request {
 		else
 		{
 			return $this->redirector->to($this->getRedirectUrl())
-                                            ->withInput($this->except($this->dontFlash))
-                                            ->withErrors($errors);
+											->withInput($this->except($this->dontFlash))
+											->withErrors($errors);
 		}
 	}
 
@@ -225,4 +225,14 @@ class FormRequest extends Request {
 		return $this->input($key);
 	}
 
+	/**
+	 * Get the validation messages that apply to the request
+	 *
+	 * @return array
+	 */
+	public function messages()
+	{
+		return [
+		];
+	}
 }
