@@ -60,13 +60,13 @@ class ConfigPublishCommand extends Command {
 
 		if ( ! $proceed) return;
 
-		if ( ! is_null($path = $this->getPath()))
+		if (is_null($path = $this->getPath()))
 		{
-			$this->config->publish($package, $path);
+			$this->config->publishPackage($package);
 		}
 		else
 		{
-			$this->config->publishPackage($package);
+			$this->config->publish($package, $path);
 		}
 
 		$this->output->writeln('<info>Configuration published for package:</info> '.$package);

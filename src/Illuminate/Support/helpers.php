@@ -28,12 +28,12 @@ if ( ! function_exists('app'))
 	 */
 	function app($make = null)
 	{
-		if ( ! is_null($make))
+		if (is_null($make))
 		{
-			return app()->make($make);
+			return Illuminate\Support\Facades\Facade::getFacadeApplication();
 		}
 
-		return Illuminate\Support\Facades\Facade::getFacadeApplication();
+		return app()->make($make);
 	}
 }
 

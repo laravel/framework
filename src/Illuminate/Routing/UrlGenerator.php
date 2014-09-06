@@ -223,15 +223,15 @@ class UrlGenerator {
 	{
 		$route = $route ?: $this->routes->getByName($name);
 
-		$parameters = (array) $parameters;
-
-		if ( ! is_null($route))
+		if (is_null($route))
 		{
-			return $this->toRoute($route, $parameters, $absolute);
+			throw new InvalidArgumentException("Route [{$name}] not defined.");
 		}
 		else
 		{
-			throw new InvalidArgumentException("Route [{$name}] not defined.");
+			$parameters = (array) $parameters;
+
+			return $this->toRoute($route, $parameters, $absolute);
 		}
 	}
 

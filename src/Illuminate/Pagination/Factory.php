@@ -197,9 +197,9 @@ class Factory {
 	 */
 	public function getViewName($view = null)
 	{
-		if ( ! is_null($view)) return $view;
+		if (is_null($view)) return $this->viewName ?: 'pagination::slider';
 
-		return $this->viewName ?: 'pagination::slider';
+		return $view;
 	}
 
 	/**

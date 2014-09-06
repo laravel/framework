@@ -55,7 +55,7 @@ class TaggedCache implements StoreInterface {
 	{
 		$value = $this->store->get($this->taggedItemKey($key));
 
-		return ! is_null($value) ? $value : value($default);
+		return is_null($value) ? value($default) : $value;
 	}
 
 	/**

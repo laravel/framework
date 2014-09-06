@@ -123,9 +123,12 @@ class BelongsToMany extends Relation {
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
-		if ( ! is_null($model = $this->first($columns))) return $model;
+		if (is_null($model = $this->first($columns)))
+		{
+			throw new ModelNotFoundException;
+		}
 
-		throw new ModelNotFoundException;
+		return $model;
 	}
 
 	/**

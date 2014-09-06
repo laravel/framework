@@ -28,7 +28,11 @@ class RetryCommand extends Command {
 	{
 		$failed = $this->laravel['queue.failer']->find($this->argument('id'));
 
-		if ( ! is_null($failed))
+		if (is_null($failed))
+		{
+			$this->error('No failed job matches the given ID.');
+		}
+		else
 		{
 			$failed->payload = $this->resetAttempts($failed->payload);
 
@@ -37,10 +41,6 @@ class RetryCommand extends Command {
 			$this->laravel['queue.failer']->forget($failed->id);
 
 			$this->info('The failed job has been pushed back onto the queue!');
-		}
-		else
-		{
-			$this->error('No failed job matches the given ID.');
 		}
 	}
 

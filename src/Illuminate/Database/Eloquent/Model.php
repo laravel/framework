@@ -536,12 +536,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function firstOrCreate(array $attributes)
 	{
-		if ( ! is_null($instance = static::where($attributes)->first()))
+		if (is_null($instance = static::where($attributes)->first()))
 		{
-			return $instance;
+			return static::create($attributes);
 		}
 
-		return static::create($attributes);
+		return $instance;
 	}
 
 	/**
@@ -552,12 +552,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function firstOrNew(array $attributes)
 	{
-		if ( ! is_null($instance = static::where($attributes)->first()))
+		if (is_null($instance = static::where($attributes)->first()))
 		{
-			return $instance;
+			return new static($attributes);
 		}
 
-		return new static($attributes);
+		return $instance;
 	}
 
 	/**
@@ -653,9 +653,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function findOrNew($id, $columns = array('*'))
 	{
-		if ( ! is_null($model = static::find($id, $columns))) return $model;
+		if (is_null($model = static::find($id, $columns))) return new static;
 
-		return new static;
+		return $model;
 	}
 
 	/**
@@ -669,9 +669,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function findOrFail($id, $columns = array('*'))
 	{
-		if ( ! is_null($model = static::find($id, $columns))) return $model;
+		if (is_null($model = static::find($id, $columns)))
+		{
+			throw (new ModelNotFoundException)->setModel(get_called_class());
+		}
 
-		throw (new ModelNotFoundException)->setModel(get_called_class());
+		return $model;
 	}
 
 	/**
@@ -1019,7 +1022,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return ( ! in_array($caller, Model::$manyMethods) && $caller != $self);
 		});
 
-		return ! is_null($caller) ? $caller['function'] : null;
+		return is_null($caller) ? null : $caller['function'];
 	}
 
 	/**

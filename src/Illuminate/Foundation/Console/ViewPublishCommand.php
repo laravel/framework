@@ -50,13 +50,13 @@ class ViewPublishCommand extends Command {
 	{
 		$package = $this->input->getArgument('package');
 
-		if ( ! is_null($path = $this->getPath()))
+		if (is_null($path = $this->getPath()))
 		{
-			$this->view->publish($package, $path);
+			$this->view->publishPackage($package);
 		}
 		else
 		{
-			$this->view->publishPackage($package);
+			$this->view->publish($package, $path);
 		}
 
 		$this->output->writeln('<info>Views published for package:</info> '.$package);

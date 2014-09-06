@@ -1331,9 +1331,9 @@ class Builder {
 	 */
 	public function get($columns = array('*'))
 	{
-		if ( ! is_null($this->cacheMinutes)) return $this->getCached($columns);
+		if (is_null($this->cacheMinutes)) return $this->getFresh($columns);
 
-		return $this->getFresh($columns);
+		return $this->getCached($columns);
 	}
 
 	/**
