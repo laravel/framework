@@ -123,8 +123,8 @@ class FormRequest extends Request {
 		else
 		{
 			return $this->redirector->to($this->getRedirectUrl())
-											->withInput($this->except($this->dontFlash))
-											->withErrors($errors);
+						->withInput($this->except($this->dontFlash))
+						->withErrors($errors);
 		}
 	}
 
