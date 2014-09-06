@@ -88,7 +88,7 @@ class Arr {
 	 * 
 	 * @param array $arrayDotted
 	 * @return array
-	 * /
+	 */
 	public static function dot_array($arrayDotted){
 		$array = array();
         
