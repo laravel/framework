@@ -40,6 +40,13 @@ interface Dispatcher {
 	public function fire($event, $payload = array(), $halt = false);
 
 	/**
+	 * Get the event that is currently firing.
+	 *
+	 * @return string
+	 */
+	public function firing();
+
+	/**
 	 * Remove a set of listeners from the dispatcher.
 	 *
 	 * @param  string  $event
