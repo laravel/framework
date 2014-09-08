@@ -41,9 +41,14 @@ class RouteListCommand extends Command {
 	 *
 	 * @var array
 	 */
-	protected $headers = array(
-		'Domain', 'URI', 'Name', 'Action', 'Before Filters', 'After Filters'
-	);
+	protected $headers = [
+		'domain' => 'Domain',
+		'uri'    => 'URI',
+		'name'   => 'Name',
+		'action' => 'Action',
+		'before' => 'Before Filters',
+		'after'  => 'After Filters',
+	];
 
 	/**
 	 * Create a new route command instance.
@@ -81,7 +86,7 @@ class RouteListCommand extends Command {
 	 */
 	protected function getRoutes()
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($this->routes as $route)
 		{
@@ -102,14 +107,14 @@ class RouteListCommand extends Command {
 	{
 		$uri = implode('|', $route->methods()).' '.$route->uri();
 
-		return $this->filterRoute(array(
-			'host'   => $route->domain(),
+		return $this->filterRoute([
+			'domain' => $route->domain(),
 			'uri'    => $uri,
 			'name'   => $route->getName(),
 			'action' => $route->getActionName(),
 			'before' => $this->getBeforeFilters($route),
-			'after'  => $this->getAfterFilters($route)
-		));
+			'after'  => $this->getAfterFilters($route),
+		]);
 	}
 
 	/**
@@ -120,11 +125,45 @@ class RouteListCommand extends Command {
 	 */
 	protected function displayRoutes(array $routes)
 	{
-		$this->table($this->headers, $routes);
+		$this->table($this->getHeaders(), $routes);
 	}
 
 	/**
-	 * Get before filters
+	 * Get the specified headers.
+	 *
+	 * @return array
+	 */
+	protected function getHeaders()
+	{
+		return array_only($this->headers, $this->getColumns());
+	}
+
+	/**
+	 * Get the specified columns.
+	 *
+	 * @return array
+	 */
+	protected function getColumns()
+	{
+		if($this->option('show'))
+		{
+			$columns = explode(',', $this->option('show'));
+		}
+		elseif($this->option('hide'))
+		{
+			$headers = array_except($this->headers, explode(',', $this->option('hide')));
+			$columns = array_keys($headers);
+		}
+		else
+		{
+			$columns = array_keys($this->headers);
+		}
+
+		return $columns;
+	}
+
+	/**
+	 * Get before filters.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
@@ -146,7 +185,7 @@ class RouteListCommand extends Command {
 	 */
 	protected function getPatternFilters($route)
 	{
-		$patterns = array();
+		$patterns = [];
 
 		foreach ($route->methods() as $method)
 		{
@@ -174,7 +213,7 @@ class RouteListCommand extends Command {
 	}
 
 	/**
-	 * Get after filters
+	 * Get after filters.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
@@ -193,13 +232,13 @@ class RouteListCommand extends Command {
 	protected function filterRoute(array $route)
 	{
 		if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
-			 $this->option('path') && ! str_contains($route['uri'], $this->option('path')))
+			$this->option('path') && ! str_contains($route['uri'], $this->option('path')))
 		{
 			return null;
 		}
 		else
 		{
-			return $route;
+			return array_only($route, $this->getColumns());
 		}
 	}
 
@@ -210,11 +249,14 @@ class RouteListCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'),
+		return [
+			['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
-		);
+			['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
+
+			['show', null, InputOption::VALUE_OPTIONAL, 'Only show specified columns (domain, uri, name, action, before, after).'],
+
+			['hide', null, InputOption::VALUE_OPTIONAL, 'Hide specified columns (domain, uri, name, action, before, after).'],
+		];
 	}
-
 }
