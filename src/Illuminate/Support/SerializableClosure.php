@@ -50,7 +50,7 @@ class SerializableClosure extends SuperClosure {
 	 */
 	protected function determineCodeAndVariables()
 	{
-		if (!$this->code)
+		if ( ! $this->code)
 		{
 			list($this->code, $this->variables) = unserialize($this->serialize());
 		}
