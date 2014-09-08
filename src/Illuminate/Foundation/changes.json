@@ -5,7 +5,11 @@
 		{"message": "Allow method injection via IoC to any controller or route method.", "backport": null},
 		{"message": "Added the 'call' method to the Container to execute a callback with its dependencies.", "backport": null},
 		{"message": "Added 'route:cache' Artisan command for ultra fast route definition.", "backport": null},
-		{"message": "Added new FormRequest class for simpler validation and authorization.", "backport": null}
+		{"message": "Added new FormRequest class for simpler validation and authorization.", "backport": null},
+		{"message": "Contracts for most major components of the framework.", "backport": null},
+		{"message": "Flysystem integration now included with framework.", "backport": null},
+		{"message": "Dependency injection now possible on controller methods and route Closures.", "backport": null},
+		{"message": "Passing an Eloquent model to a URL generator method will now automatically pull its ID.", "backport": null}
 	],
 	"4.2.*": [
 		{"message": "View and Pagination 'Environment' classes renamed to 'Factory'.", "backport": null},
