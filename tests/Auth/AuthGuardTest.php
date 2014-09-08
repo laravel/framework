@@ -201,7 +201,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->setCookieJar($cookie);
 		$foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
-		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller')->andReturn($foreverCookie);
+		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller', null, null, false)->andReturn($foreverCookie);
 		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
 		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
 		$session->shouldReceive('migrate')->once();
