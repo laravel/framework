@@ -1356,7 +1356,11 @@ class Builder {
 	 */
 	protected function runSelect()
 	{
-		return $this->connection->select($this->toSql(), $this->getBindings());
+		$result = $this->connection->select($this->toSql(), $this->getBindings());
+
+		$this->connection->resetForceWritePdo();
+
+		return $result;
 	}
 
 	/**
@@ -1603,6 +1607,8 @@ class Builder {
 	 */
 	protected function ungroupedPaginate($paginator, $perPage, $columns)
 	{
+		$this->connection->continueOnWritePdo();
+
 		$total = $this->getPaginationCount();
 
 		// Once we have the total number of records to be paginated, we can grab the

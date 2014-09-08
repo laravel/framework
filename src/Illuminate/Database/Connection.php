@@ -23,6 +23,13 @@ class Connection implements ConnectionInterface {
 	protected $readPdo;
 
 	/**
+	 * Number of active query pending to use write PDO connection for read.
+	 *
+	 * @var int
+	 */
+	protected $forceWritePdo = 0;
+
+	/**
 	 * The reconnector instance for the connection.
 	 *
 	 * @var callable
@@ -789,7 +796,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getReadPdo()
 	{
-		if ($this->transactions >= 1) return $this->getPdo();
+		if ($this->transactions >= 1 || $this->forceWritePdo >= 1) return $this->getPdo();
 
 		return $this->readPdo ?: $this->pdo;
 	}
@@ -816,6 +823,43 @@ class Connection implements ConnectionInterface {
 	public function setReadPdo($pdo)
 	{
 		$this->readPdo = $pdo;
+
+		return $this;
+	}
+
+	/**
+	 * Force to use write PDO on next read query.
+	 *
+	 * @return $this
+	 */
+	public function onWritePdo()
+	{
+		$this->forceWritePdo++;
+
+		return $this;
+	}
+
+	/**
+	 * Force to use write PDO on next read query only if it previously
+	 * declared, useful when running aggregate query for pagination.
+	 *
+	 * @return $this
+	 */
+	public function continueOnWritePdo()
+	{
+		if ($this->forceWritePdo > 0) $this->forceWritePdo++;
+
+		return $this;
+	}
+
+	/**
+	 * Reset use of write PDO on read query.
+	 *
+	 * @return $this
+	 */
+	public function resetForceWritePdo()
+	{
+		if ($this->forceWritePdo > 0) $this->forceWritePdo--;
 
 		return $this;
 	}
