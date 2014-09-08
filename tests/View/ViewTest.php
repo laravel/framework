@@ -122,7 +122,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testViewArrayAccess()
 	{
 		$view = $this->getView();
-		$this->assertTrue($view instanceof ArrayAccess);
+		$this->assertInstanceOf('ArrayAccess', $view);
 		$this->assertTrue($view->offsetExists('foo'));
 		$this->assertEquals($view->offsetGet('foo'), 'bar');
 		$view->offsetSet('foo','baz');
@@ -190,9 +190,9 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testWithErrors()
 	{
 		$view = $this->getView();
-		$errors = array('foo' => 'bar','qu' => 'ux');
+		$errors = array('foo' => 'bar', 'qu' => 'ux');
 		$this->assertSame($view, $view->withErrors($errors));
-		$this->assertTrue($view->errors instanceof \Illuminate\Support\MessageBag);
+		$this->assertInstanceOf('Illuminate\Support\MessageBag', $view->errors);
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'bar');
 		$qu = $view->errors->get('qu');
