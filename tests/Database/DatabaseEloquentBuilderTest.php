@@ -16,7 +16,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($this->getMockModel());
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn('baz');
 
 		$result = $builder->find('bar', array('column'));
@@ -31,7 +31,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($model);
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn('baz');
 
 		$expected = $model->findOrNew('bar', array('column'));
@@ -47,7 +47,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($model);
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn(null);
 
 		$result = $model->findOrNew('bar', array('column'));
@@ -63,7 +63,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($this->getMockModel());
-		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn(null);
 		$result = $builder->findOrFail('bar', array('column'));
 	}
@@ -83,7 +83,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testFindWithMany()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
-		$builder->getQuery()->shouldReceive('whereIn')->once()->with('foo', array(1, 2));
+		$builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', array(1, 2));
 		$builder->setModel($this->getMockModel());
 		$builder->shouldReceive('get')->with(array('column'))->andReturn('baz');
 
@@ -511,6 +511,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$model = m::mock('Illuminate\Database\Eloquent\Model');
 		$model->shouldReceive('getKeyName')->andReturn('foo');
 		$model->shouldReceive('getTable')->andReturn('foo_table');
+		$model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
 		return $model;
 	}
 
