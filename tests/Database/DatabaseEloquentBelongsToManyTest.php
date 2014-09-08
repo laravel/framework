@@ -190,6 +190,22 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDetachWithSingleIDRemovesPivotTableRecord()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+		$query->shouldReceive('whereIn')->once()->with('role_id', [1]);
+		$query->shouldReceive('delete')->once()->andReturn(true);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$relation->expects($this->once())->method('touchIfTouching');
+
+		$this->assertTrue($relation->detach(array(1)));
+	}
+
+
 	public function testDetachMethodClearsAllPivotRecordsWhenNoIDsAreGiven()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
