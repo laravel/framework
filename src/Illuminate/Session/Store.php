@@ -144,7 +144,23 @@ class Store implements SessionInterface {
 	 */
 	public function setId($id)
 	{
-		$this->id = $id ?: $this->generateSessionId();
+		if ( ! $this->isValidId($id))
+		{
+			$id = $this->generateSessionId();
+		}
+
+		$this->id = $id;
+	}
+
+	/**
+	 * Determine if this is a valid session ID.
+	 *
+	 * @param  string  $id
+	 * @return bool
+	 */
+	public function isValidId($id)
+	{
+		return is_string($id) && preg_match('/^[a-f0-9]{40}$/', $id);
 	}
 
 	/**
