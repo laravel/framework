@@ -2551,7 +2551,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If this value is some other type of string, we'll create the DateTime with
 		// the format used by the database connection. Once we get the instance we
 		// can return back the finally formatted DateTime instances to the devs.
-		elseif ( ! $value instanceof DateTime)
+		else
 		{
 			$value = Carbon::createFromFormat($format, $value);
 		}
