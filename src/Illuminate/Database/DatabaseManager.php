@@ -61,8 +61,9 @@ class DatabaseManager implements ConnectionResolverInterface {
 		// set the "fetch mode" for PDO which determines the query return types.
 		if ( ! isset($this->connections[$name]))
 		{
-			$connection = $this->makeConnection($name)
-                               ->setPdoForType($connection, $type);
+			$connection = $this->makeConnection($name);
+
+			$this->setPdoForType($connection, $type);
 
 			$this->connections[$name] = $this->prepare($connection);
 		}
