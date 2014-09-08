@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface, JsonSerializable {
+abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface, UrlRoutable, JsonSerializable {
 
 	/**
 	 * The connection name for the model.
@@ -1874,6 +1875,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function getQualifiedKeyName()
 	{
 		return $this->getTable().'.'.$this->getKeyName();
+	}
+
+	/**
+	 * Get the value of the model's route key.
+	 *
+	 * @return mixed
+	 */
+	public function getRouteKey()
+	{
+	    return $this->getAttribute($this->getRouteKeyName());
+	}
+
+	/**
+	 * Get the route key for the model.
+	 *
+	 * @return string
+	 */
+	public function getRouteKeyName()
+	{
+	    return $this->getKeyName();
 	}
 
 	/**

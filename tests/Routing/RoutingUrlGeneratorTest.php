@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Contracts\Routing\UrlRoutable;
 
 class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
@@ -117,6 +118,22 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
 		$this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
+	}
+
+	public function testRoutableInterfaceRouting()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/{bar}', array('as' => 'routable'));
+		$routes->add($route);
+
+		$model = new RoutableInterfaceStub;
+		$model->key = 'routable';
+
+		$this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
 	}
 
 
@@ -257,4 +274,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
 	}
 
+}
+
+class RoutableInterfaceStub implements UrlRoutable {
+	public $key;
+	public function getRouteKey() { return $this->{$this->getRouteKeyName()}; }
+	public function getRouteKeyName() { return 'key'; }
 }
