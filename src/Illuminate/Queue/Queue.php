@@ -1,12 +1,14 @@
 <?php namespace Illuminate\Queue;
 
 use Closure;
-use DateTime;
 use Illuminate\Container\Container;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\SerializableClosure;
+use Illuminate\Support\Traits\DurationTrait;
 
 abstract class Queue {
+
+	use DurationTrait;
 
 	/**
 	 * The IoC container instance.
@@ -88,34 +90,6 @@ abstract class Queue {
 		$payload = json_decode($payload, true);
 
 		return json_encode(array_set($payload, $key, $value));
-	}
-
-	/**
-	 * Calculate the number of seconds with the given delay.
-	 *
-	 * @param  \DateTime|int  $delay
-	 * @return int
-	 */
-	protected function getSeconds($delay)
-	{
-		if ($delay instanceof DateTime)
-		{
-			return max(0, $delay->getTimestamp() - $this->getTime());
-		}
-		else
-		{
-			return (int) $delay;
-		}
-	}
-
-	/**
-	 * Get the current UNIX timestamp.
-	 *
-	 * @return int
-	 */
-	public function getTime()
-	{
-		return time();
 	}
 
 	/**

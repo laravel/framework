@@ -3,7 +3,7 @@
 use Closure;
 use DateTime;
 use ArrayAccess;
-use Carbon\Carbon;
+use Illuminate\Support\Traits\DurationTrait;
 use Illuminate\Support\Traits\MacroableTrait;
 
 class Repository implements ArrayAccess {
@@ -11,6 +11,8 @@ class Repository implements ArrayAccess {
 	use MacroableTrait {
 		__call as macroCall;
 	}
+
+	use DurationTrait;
 
 	/**
 	 * The cache store implementation.
@@ -246,23 +248,7 @@ class Repository implements ArrayAccess {
 		return $this->forget($key);
 	}
 
-	/**
-	 * Calculate the number of minutes with the given duration.
-	 *
-	 * @param  \DateTime|int  $duration
-	 * @return int|null
-	 */
-	protected function getMinutes($duration)
-	{
-		if ($duration instanceof DateTime)
-		{
-			$fromNow = Carbon::instance($duration)->diffInMinutes();
 
-			return $fromNow > 0 ? $fromNow : null;
-		}
-
-		return is_string($duration) ? (int) $duration : $duration;
-	}
 
 	/**
 	 * Handle dynamic calls into macros or pass missing methods to the store.
