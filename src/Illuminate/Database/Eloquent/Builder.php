@@ -141,14 +141,26 @@ class Builder {
 	}
 
 	/**
+	 * Execute the query as a "select" statement with a associative 
+	 * array using the primary key as key for the array.
+	 *
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
+	 */
+	public function getKeyd($columns = array('*'))
+	{
+		return $this->get($columns, true);
+	}
+
+	/**
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */
-	public function get($columns = array('*'))
+	public function get($columns = array('*'), $keyd = false)
 	{
-		$models = $this->getModels($columns);
+		$models = $this->getModels($columns, $keyd);
 
 		// If we actually found models we will also eager load any relationships that
 		// have been specified as needing to be eager loaded, which will solve the
@@ -407,7 +419,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model[]
 	 */
-	public function getModels($columns = array('*'))
+	public function getModels($columns = array('*'), $keyd = false)
 	{
 		// First, we will simply get the raw results from the query builders which we
 		// can use to populate an array with Eloquent models. We will pass columns
@@ -423,7 +435,16 @@ class Builder {
 		// also set the proper connection name for the model after we create it.
 		foreach ($results as $result)
 		{
-			$models[] = $model = $this->model->newFromBuilder($result);
+			$model = $this->model->newFromBuilder($result);
+			
+			if ($keyd)
+			{
+				$models[ $model[$model->getKeyName()] ] = $model;
+			}
+			else
+			{
+				$models[] = $model;	
+			}
 
 			$model->setConnection($connection);
 		}
