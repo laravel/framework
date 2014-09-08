@@ -60,6 +60,8 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	{
 		$email = $user->getReminderEmail();
 
+		$this->deleteExisting($user);
+
 		// We will create a new, random token for the user so that we can e-mail them
 		// a safe link to the password reset form. Then we will insert a record in
 		// the database so that we can verify the token within the actual reset.
@@ -68,6 +70,17 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 		$this->getTable()->insert($this->getPayload($email, $token));
 
 		return $token;
+	}
+
+	/**
+	 * Delete all existing reset tokens from the database.
+	 *
+	 * @param  \Illuminate\Auth\Reminders\RemindableInterface  $user
+	 * @return string
+	 */
+	protected function deleteExisting(RemindableInterface $user)
+	{
+		return $this->getTable()->where('email', $user->getReminderEmail())->delete();
 	}
 
 	/**
