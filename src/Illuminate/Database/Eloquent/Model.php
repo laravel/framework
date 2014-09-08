@@ -676,6 +676,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Reload a fresh model instance from the database.
+	 *
+	 * @param  array  $with
+	 * @return $this
+	 */
+	public function fresh(array $with = array())
+	{
+		$key = $this->getKeyName();
+
+		return $this->exists ? static::with($with)->where($key, $this->getKey())->first() : null;
+	}
+
+	/**
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
