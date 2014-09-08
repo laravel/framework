@@ -605,6 +605,30 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Extract attributes from the relationship query to apply to new records
+	 *
+	 * @return array
+	 */
+	protected function getConstraintsAsAttributes()
+	{
+		$builderQuery = $this->query->getQuery();
+
+		$inheritedAttributes = array();
+
+		foreach ($builderQuery->wheres as $where)
+		{
+			list($table, $column) = explode('.', $where['column']);
+
+			if ($table == $this->table)
+			{
+				$inheritedAttributes[$column] = $where['value'];
+			}
+		}
+
+		return $inheritedAttributes;
+	}
+
+	/**
 	 * Format the sync list so that it is keyed by ID.
 	 *
 	 * @param  array  $records
@@ -621,7 +645,8 @@ class BelongsToMany extends Relation {
 				list($id, $attributes) = array($attributes, array());
 			}
 
-			$results[$id] = $attributes;
+			// Inherit attributes from relationship query constraint
+			$results[$id] = array_merge($this->getConstraintsAsAttributes(), $attributes);
 		}
 
 		return $results;
@@ -884,6 +909,11 @@ class BelongsToMany extends Relation {
 	protected function newPivotQuery()
 	{
 		$query = $this->newPivotStatement();
+
+		// Inherit constraints from the relationship query
+		$builderQuery = $this->query->getQuery();
+		$bindings = $builderQuery->getRawBindings();
+		$query->mergeWheres($builderQuery->wheres, $bindings['where']);
 
 		return $query->where($this->foreignKey, $this->parent->getKey());
 	}
