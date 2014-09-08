@@ -1529,6 +1529,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		foreach ($this->touches as $relation)
 		{
 			$this->$relation()->touch();
+
 			$this->$relation->touchOwners();
 		}
 	}
