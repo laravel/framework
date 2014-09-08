@@ -549,6 +549,10 @@ class Grammar extends BaseGrammar {
 		{
 			$sql .= $this->compileUnion($union);
 		}
+		if (!is_null($query->unionsOrders))
+		{
+		    $sql .= ' ' . $this->compileUnionsOrders($query, $query->unionsOrders);
+		}
 
 		return ltrim($sql);
 	}
@@ -564,6 +568,26 @@ class Grammar extends BaseGrammar {
 		$joiner = $union['all'] ? ' union all ' : ' union ';
 
 		return $joiner.$union['query']->toSql();
+	}
+
+	/**
+	 * Compile the "order by" portions of the union of queries.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $orders
+	 * @return string
+	 */
+	protected function compileUnionsOrders(Builder $query, $orders)
+	{
+		$me = $this;
+
+		return 'order by '.implode(', ', array_map(function($order) use ($me)
+		{
+			if (isset($order['sql'])) return $order['sql'];
+
+			return $me->wrap($order['column']).' '.$order['direction'];
+		}
+		, $orders));
 	}
 
 	/**
