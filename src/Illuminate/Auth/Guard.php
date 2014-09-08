@@ -5,7 +5,6 @@ use Illuminate\Events\Dispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Config\Repository as ConfigRepository;
 
 class Guard {
 
@@ -66,11 +65,11 @@ class Guard {
 	protected $events;
 
 	/**
-	 * The config repository instance.
+	 * Indicates if the session is secure.
 	 *
-	 * @var \Illuminate\Config\Repository
+	 * @var bool
 	 */
-	protected $config;
+	protected $sessionSecure;
 
 	/**
 	 * Indicates if the logout method has been called.
@@ -97,12 +96,12 @@ class Guard {
 	public function __construct(UserProviderInterface $provider,
 								SessionStore $session,
 								Request $request = null,
-								ConfigRepository $config = null)
+								$sessionSecure = false)
 	{
 		$this->session = $session;
 		$this->request = $request;
 		$this->provider = $provider;
-		$this->config = $config;
+		$this->sessionSecure = $sessionSecure;
 	}
 
 	/**
@@ -508,13 +507,7 @@ class Guard {
 	 */
 	protected function createRecaller($value)
 	{
-		$secure = false;
-		if ( ! is_null($this->config))
-		{
-			$secure = $this->config['session.secure'];
-		}
-
-		return $this->getCookieJar()->forever($this->getRecallerName(), $value, null, null, $secure);
+		return $this->getCookieJar()->forever($this->getRecallerName(), $value, null, null, $this->sessionSecure);
 	}
 
 	/**
