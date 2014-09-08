@@ -20,6 +20,15 @@ interface ReminderRepositoryInterface {
 	public function exists(RemindableInterface $user, $token);
 
 	/**
+	 * Determine if a valid reminder record already exists for a specific user
+	 * Return the valid token if exist
+	 *
+	 * @param  string $email
+	 * @return mixed
+	 */
+	public function requested($email);
+	
+	/**
 	 * Delete a reminder record by token.
 	 *
 	 * @param  string  $token
