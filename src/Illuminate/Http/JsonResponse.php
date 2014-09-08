@@ -28,6 +28,22 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 		parent::__construct($data, $status, $headers);
 	}
 
+
+        /**
+         * Set the json encoding options and re-encode the response
+         *
+         * @param  int  $options
+         * @return mixed
+         */
+        public function setJsonOptions($options)
+        {
+            $this->jsonOptions = $options;
+            $this->setData($this->getData());
+
+            return $this->update();
+        }
+
+
 	/**
 	 * Get the json_decoded data from the response
 	 *
