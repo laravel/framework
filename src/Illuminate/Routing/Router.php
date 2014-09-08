@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Routing\RoutableInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
@@ -1207,7 +1208,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 		{
 			if (is_null($value)) return null;
 
-			// For model binders, we will attempt to retrieve the models using the find
+			// For model binders, we will attempt to retrieve the models using the first
 			// method on the model instance. If we cannot retrieve the models we'll
 			// throw a not found exception otherwise we will return the instance.
 			if ($model = (new $class)->find($value))

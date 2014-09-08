@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
 class UrlGenerator implements UrlGeneratorContract {
@@ -120,6 +121,8 @@ class UrlGenerator implements UrlGeneratorContract {
 
 		$scheme = $this->getScheme($secure);
 
+		$extra = $this->formatParameters($extra);
+
 		$tail = implode('/', array_map(
 			'rawurlencode', (array) $extra)
 		);
@@ -231,7 +234,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	{
 		$route = $route ?: $this->routes->getByName($name);
 
-		$parameters = (array) $parameters;
+		$parameters = $this->formatParameters($parameters);
 
 		if ( ! is_null($route))
 		{
@@ -309,6 +312,38 @@ class UrlGenerator implements UrlGeneratorContract {
 			return isset($parameters[$m[1]]) ? array_pull($parameters, $m[1]) : $m[0];
 
 		}, $path);
+	}
+
+	/**
+	 * Format the array of URL parameters.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function formatParameters(array $parameters)
+	{
+		return $this->replaceRoutableParameters($parameters);
+	}
+
+	/**
+	 * Replace UrlRoutable parameters with their route parameter.
+	 *
+	 * @param  array  $parameters
+	 * @return array
+	 */
+	protected function replaceRoutableParameters($parameters = array())
+	{
+		$parameters = is_array($parameters) ? $parameters : array($parameters);
+
+		foreach ($parameters as $key => $parameter)
+		{
+			if ($parameter instanceof UrlRoutable)
+			{
+				$parameters[$key] = $parameter->getRouteKey();
+			}
+		}
+
+		return $parameters;
 	}
 
 	/**
