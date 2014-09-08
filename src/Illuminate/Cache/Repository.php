@@ -90,7 +90,10 @@ class Repository implements CacheContract, ArrayAccess {
 	{
 		$minutes = $this->getMinutes($minutes);
 
-		$this->store->put($key, $value, $minutes);
+		if ( ! is_null($minutes))
+		{
+			$this->store->put($key, $value, $minutes);
+		}
 	}
 
 	/**
@@ -259,13 +262,15 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Calculate the number of minutes with the given duration.
 	 *
 	 * @param  \DateTime|int  $duration
-	 * @return int
+	 * @return int|null
 	 */
 	protected function getMinutes($duration)
 	{
 		if ($duration instanceof DateTime)
 		{
-			return max(0, Carbon::instance($duration)->diffInMinutes());
+			$fromNow = Carbon::instance($duration)->diffInMinutes();
+
+			return $fromNow > 0 ? $fromNow : null;
 		}
 
 		return is_string($duration) ? (int) $duration : $duration;

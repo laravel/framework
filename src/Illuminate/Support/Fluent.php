@@ -22,7 +22,10 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function __construct($attributes = array())
 	{
-		$this->attributes = (array) $attributes;
+		foreach ($attributes as $key => $value)
+		{
+			$this->attributes[$key] = $value;
+		}
 	}
 
 	/**
