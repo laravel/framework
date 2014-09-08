@@ -57,7 +57,7 @@ class CacheManager extends Manager {
 	 */
 	protected function createNullDriver()
 	{
-		return $this->repository(new NullStore());
+		return $this->repository(new NullStore);
 	}
 
 	/**
