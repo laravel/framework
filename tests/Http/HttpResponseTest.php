@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Support\JsonableInterface;
+use Illuminate\Contracts\Support\Jsonable;
 
 class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
@@ -28,7 +28,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
 	public function testRenderablesAreRendered()
 	{
-		$mock = m::mock('Illuminate\Contracts\Support\RenderableInterface');
+		$mock = m::mock('Illuminate\Contracts\Support\Renderable');
 		$mock->shouldReceive('render')->once()->andReturn('foo');
 		$response = new Illuminate\Http\Response($mock);
 		$this->assertEquals('foo', $response->getContent());
@@ -141,7 +141,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 		$response->setSession($session = m::mock('Illuminate\Session\Store'));
 		$session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
 		$session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
-		$provider = m::mock('Illuminate\Contracts\Support\MessageProviderInterface');
+		$provider = m::mock('Illuminate\Contracts\Support\MessageProvider');
 		$provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
 		$response->withErrors($provider);
 	}
@@ -193,6 +193,6 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class JsonableStub implements JsonableInterface {
+class JsonableStub implements Jsonable {
 	public function toJson($options = 0) { return 'foo'; }
 }

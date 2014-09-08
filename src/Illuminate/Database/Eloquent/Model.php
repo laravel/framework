@@ -5,14 +5,14 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Contracts\Support\JsonableInterface;
-use Illuminate\Contracts\Support\ArrayableInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface, UrlRoutable, JsonSerializable {
+abstract class Model implements ArrayAccess, Arrayable, Jsonable, UrlRoutable, JsonSerializable {
 
 	/**
 	 * The connection name for the model.
@@ -2299,7 +2299,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
 			// collections to their proper array form and we'll set the values.
-			if ($value instanceof ArrayableInterface)
+			if ($value instanceof Arrayable)
 			{
 				$relation = $value->toArray();
 			}
@@ -2494,7 +2494,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$value = $this->mutateAttribute($key, $value);
 
-		return $value instanceof ArrayableInterface ? $value->toArray() : $value;
+		return $value instanceof Arrayable ? $value->toArray() : $value;
 	}
 
 	/**

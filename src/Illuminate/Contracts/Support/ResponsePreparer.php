@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Contracts\Support;
 
-interface ResponsePreparerInterface {
+interface ResponsePreparer {
 
 	/**
 	 * Prepare the given value as a Response object.

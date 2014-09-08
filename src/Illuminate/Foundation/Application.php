@@ -10,13 +10,13 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Contracts\Support\ResponsePreparer;
 use Illuminate\Exception\ExceptionServiceProvider;
 use Illuminate\Config\FileEnvironmentVariablesLoader;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
-use Illuminate\Contracts\Support\ResponsePreparerInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,7 +25,7 @@ use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 class Application extends Container implements HttpKernelInterface,
                                                TerminableInterface,
                                                ApplicationContract,
-                                               ResponsePreparerInterface {
+                                               ResponsePreparer {
 
 	/**
 	 * The Laravel framework version.

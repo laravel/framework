@@ -4,7 +4,7 @@ use Closure;
 use Exception;
 use ErrorException;
 use ReflectionFunction;
-use Illuminate\Contracts\Support\ResponsePreparerInterface;
+use Illuminate\Contracts\Support\ResponsePreparer;
 use Illuminate\Contracts\Exception\Handler as HandlerContract;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException as FatalError;
@@ -14,7 +14,7 @@ class Handler implements HandlerContract {
 	/**
 	 * The response preparer implementation.
 	 *
-	 * @var \Illuminate\Contracts\Support\ResponsePreparerInterface
+	 * @var \Illuminate\Contracts\Support\ResponsePreparer
 	 */
 	protected $responsePreparer;
 
@@ -56,13 +56,13 @@ class Handler implements HandlerContract {
 	/**
 	 * Create a new error handler instance.
 	 *
-	 * @param  \Illuminate\Contracts\Support\ResponsePreparerInterface  $responsePreparer
+	 * @param  \Illuminate\Contracts\Support\ResponsePreparer  $responsePreparer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
 	 * @param  bool  $debug
 	 * @return void
 	 */
-	public function __construct(ResponsePreparerInterface $responsePreparer,
+	public function __construct(ResponsePreparer $responsePreparer,
                                 ExceptionDisplayerInterface $plainDisplayer,
                                 ExceptionDisplayerInterface $debugDisplayer,
                                 $debug = true)
