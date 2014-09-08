@@ -550,6 +550,19 @@ class UrlGenerator implements UrlGeneratorContract {
 	}
 
 	/**
+	 * Set the route collection.
+	 *
+	 * @param  \Illuminate\Routing\RouteCollection  $routes
+	 * @return $this
+	 */
+	public function setRoutes(RouteCollection $routes)
+	{
+		$this->routes = $routes;
+
+		return $this;
+	}
+
+	/**
 	 * Set the root controller namespace.
 	 *
 	 * @param  string  $rootNamespace
