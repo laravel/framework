@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Contracts\Support;
 
-interface MessageProviderInterface {
+interface MessageProvider {
 
 	/**
 	 * Get the messages for the instance.

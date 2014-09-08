@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\MacroableTrait;
 use Illuminate\Http\Response as IlluminateResponse;
-use Illuminate\Contracts\Support\ArrayableInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -52,7 +52,7 @@ class Response {
 	 */
 	public static function json($data = array(), $status = 200, array $headers = array(), $options = 0)
 	{
-		if ($data instanceof ArrayableInterface)
+		if ($data instanceof Arrayable)
 		{
 			$data = $data->toArray();
 		}

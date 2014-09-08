@@ -3,11 +3,11 @@
 use Closure;
 use ArrayAccess;
 use Illuminate\Support\MessageBag;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineInterface;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\View\View as ViewContract;
-use Illuminate\Contracts\Support\RenderableInterface;
-use Illuminate\Contracts\Support\MessageProviderInterface;
-use Illuminate\Contracts\Support\ArrayableInterface as Arrayable;
 
 class View implements ArrayAccess, ViewContract {
 
@@ -146,7 +146,7 @@ class View implements ArrayAccess, ViewContract {
 
 		foreach ($data as $key => $value)
 		{
-			if ($value instanceof RenderableInterface)
+			if ($value instanceof Renderable)
 			{
 				$data[$key] = $value->render();
 			}
@@ -192,12 +192,12 @@ class View implements ArrayAccess, ViewContract {
 	/**
 	 * Add validation errors to the view.
 	 *
-	 * @param  \Illuminate\Contracts\Support\MessageProviderInterface|array  $provider
+	 * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
 	 * @return $this
 	 */
 	public function withErrors($provider)
 	{
-		if ($provider instanceof MessageProviderInterface)
+		if ($provider instanceof MessageProvider)
 		{
 			$this->with('errors', $provider->getMessageBag());
 		}

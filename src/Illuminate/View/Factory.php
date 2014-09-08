@@ -2,10 +2,10 @@
 
 use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\View\Factory as FactoryContract;
-use Illuminate\Contracts\Support\ArrayableInterface as Arrayable;
 
 class Factory implements FactoryContract {
 

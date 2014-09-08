@@ -6,10 +6,10 @@ use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\RotatingFileHandler;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
-use Illuminate\Contracts\Support\JsonableInterface;
-use Illuminate\Contracts\Support\ArrayableInterface;
 use Illuminate\Contracts\Logging\Log as LogContract;
 
 class Writer implements LogContract, PsrLoggerInterface {
@@ -278,11 +278,11 @@ class Writer implements LogContract, PsrLoggerInterface {
 		{
 			return var_export($message, true);
 		}
-		elseif ($message instanceof JsonableInterface)
+		elseif ($message instanceof Jsonable)
 		{
 			return $message->toJson();
 		}
-		elseif ($message instanceof ArrayableInterface)
+		elseif ($message instanceof Arrayable)
 		{
 			return var_export($message->toArray(), true);
 		}

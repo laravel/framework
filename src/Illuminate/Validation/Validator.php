@@ -7,11 +7,11 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Contracts\Support\MessageProviderInterface;
 
-class Validator implements MessageProviderInterface {
+class Validator implements MessageProvider {
 
 	/**
 	 * The Translator implementation.

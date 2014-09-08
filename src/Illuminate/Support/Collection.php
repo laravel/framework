@@ -7,10 +7,10 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Contracts\Support\JsonableInterface;
-use Illuminate\Contracts\Support\ArrayableInterface;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
-class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface, JsonSerializable {
+class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable {
 
 	/**
 	 * The items contained in the collection.
@@ -91,7 +91,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Diff the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function diff($items)
@@ -269,7 +269,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function intersect($items)
@@ -333,7 +333,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Merge the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function merge($items)
@@ -696,7 +696,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return array_map(function($value)
 		{
-			return $value instanceof ArrayableInterface ? $value->toArray() : $value;
+			return $value instanceof Arrayable ? $value->toArray() : $value;
 
 		}, $this->items);
 	}
@@ -816,9 +816,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Results array of items from Collection or ArrayableInterface.
+	 * Results array of items from Collection or Arrayable.
 	 *
-  	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\ArrayableInterface|array  $items
+  	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return array
 	 */
 	protected function getArrayableItems($items)
@@ -827,7 +827,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		{
 			$items = $items->all();
 		}
-		elseif ($items instanceof ArrayableInterface)
+		elseif ($items instanceof Arrayable)
 		{
 			$items = $items->toArray();
 		}

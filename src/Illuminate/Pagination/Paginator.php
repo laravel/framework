@@ -5,10 +5,10 @@ use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Support\JsonableInterface;
-use Illuminate\Contracts\Support\ArrayableInterface;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
-class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorAggregate, JsonableInterface {
+class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable {
 
 	/**
 	 * The pagination factory.
