@@ -1203,6 +1203,18 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
+	 * Flush the container of all bindings and resolved instances.
+	 *
+	 * @return void
+	 */
+	public function flush()
+	{
+		parent::flush();
+
+		$this->loadedProviders = [];
+	}
+
+	/**
 	 * Dynamically access application services.
 	 *
 	 * @param  string  $key
