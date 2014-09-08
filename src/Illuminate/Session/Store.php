@@ -144,7 +144,7 @@ class Store implements SessionInterface {
 	 */
 	public function setId($id)
 	{
-		if (!$this->isValidId($id))
+		if ( ! $this->isValidId($id))
 		{
 			$id = $this->generateSessionId();
 		}
