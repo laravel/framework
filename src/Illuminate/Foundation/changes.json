@@ -31,7 +31,8 @@
 		{"message": "Allow 'where' route constraints to be passed in array definition of Route.", "backport": null},
 		{"message": "Properly support Route 'where' constraints on a Route group.", "backport": null},
 		{"message": "When 'increment' or 'decrement' is called on a single Model instance, the local attribute value is updated as well.", "backport": null},
-		{"message": "Automatically retry queries on database connections that have 'gone away'.", "backport": null}
+		{"message": "Automatically retry queries on database connections that have 'gone away'.", "backport": null},
+		{"message": "Allow accessing of read / write database connections using ::read and ::write syntax.", "backport": null}
 	],
 	"4.1.*": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
