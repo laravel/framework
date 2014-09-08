@@ -17,6 +17,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 */
 	public function get($key)
 	{
+		//
 	}
 
 	/**
@@ -29,6 +30,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 */
 	public function put($key, $value, $minutes)
 	{
+		//
 	}
 
 	/**
@@ -40,6 +42,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
+		//
 	}
 
 	/**
@@ -51,6 +54,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
+		//
 	}
 
 	/**
@@ -62,6 +66,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forever($key, $value)
 	{
+		//
 	}
 
 	/**
@@ -72,6 +77,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forget($key)
 	{
+		//
 	}
 
 	/**
@@ -81,6 +87,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 */
 	public function flush()
 	{
+		//
 	}
 
 	/**
