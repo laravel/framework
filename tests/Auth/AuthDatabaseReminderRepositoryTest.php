@@ -22,7 +22,8 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 
 		$results = $repo->create($user);
 
-		$this->assertTrue(is_string($results) and strlen($results) > 1);
+		$this->assertInternalType('string', $results);
+		$this->assertGreaterThan(1, strlen($results));
 	}
 
 
