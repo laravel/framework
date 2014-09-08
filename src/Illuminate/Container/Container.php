@@ -873,6 +873,19 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
+	 * Flush the container of all bindings and resolved instances.
+	 *
+	 * @return void
+	 */
+	public function flush()
+	{
+		$this->aliases = [];
+		$this->resolved = [];
+		$this->bindings = [];
+		$this->instances = [];
+	}
+
+	/**
 	 * Determine if a given offset exists.
 	 *
 	 * @param  string  $key
