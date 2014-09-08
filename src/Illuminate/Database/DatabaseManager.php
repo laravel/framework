@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database;
 
-use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Str;
+use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseManager implements ConnectionResolverInterface {
 
@@ -54,27 +54,34 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function connection($name = null)
 	{
-		$name = $driver = $name ?: $this->getDefaultConnection();
-		$type = null;
-
-		if (Str::endsWith($name, ['::write', '::read']))
-		{
-			list($driver, $type) = explode('::', $name, 2);
-		}
+		list($name, $type) = $this->parseConnectionName($name);
 
 		// If we haven't created this connection, we'll create it based on the config
 		// provided in the application. Once we've created the connections we will
 		// set the "fetch mode" for PDO which determines the query return types.
 		if ( ! isset($this->connections[$name]))
 		{
-			$connection = $this->makeConnection($driver);
-
-			$connection = $this->prepareReadWriteMode($connection, $type);
+			$connection = $this->makeConnection($driver)
+                               ->setPdoForType($connection, $type);
 
 			$this->connections[$name] = $this->prepare($connection);
 		}
 
 		return $this->connections[$name];
+	}
+
+	/**
+	 * Parse the connection into an array of the name and read / write type.
+	 *
+	 * @param  string  $name
+	 * @return array
+	 */
+	protected function parseConnectionName($name)
+	{
+		$name = $name ?: $this->getDefaultConnection();
+
+		return Str::endsWith($name, ['::read', '::write'])
+                            ? explode('::', $name, 2) : [$name, null];
 	}
 
 	/**
@@ -221,7 +228,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 * @param  string  $type
 	 * @return \Illuminate\Database\Connection
 	 */
-	protected function prepareReadWriteMode($connection, $type = null)
+	protected function setPdoForType(Connection $connection, $type = null)
 	{
 		if ($type == 'read')
 		{
