@@ -89,7 +89,10 @@ class Repository implements ArrayAccess {
 	{
 		$minutes = $this->getMinutes($minutes);
 
-		$this->store->put($key, $value, $minutes);
+		if ( ! is_null($minutes))
+		{
+			$this->store->put($key, $value, $minutes);
+		}
 	}
 
 	/**
@@ -247,13 +250,20 @@ class Repository implements ArrayAccess {
 	 * Calculate the number of minutes with the given duration.
 	 *
 	 * @param  \DateTime|int  $duration
-	 * @return int
+	 * @return int|null
 	 */
 	protected function getMinutes($duration)
 	{
 		if ($duration instanceof DateTime)
 		{
-			return max(0, Carbon::instance($duration)->diffInMinutes());
+			$minutes_from_now = Carbon::instance($duration)->diffInMinutes();
+			
+			if ($minutes_from_now <= 0) 
+			{
+				return null;
+			}
+			
+			return $minutes_from_now;
 		}
 
 		return is_string($duration) ? (int) $duration : $duration;
