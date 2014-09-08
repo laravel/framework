@@ -389,7 +389,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $attributes
 	 * @return $this
 	 *
-	 * @throws MassAssignmentException
+	 * @throws \Illuminate\Database\Eloquent\MassAssignmentException
 	 */
 	public function fill(array $attributes)
 	{
@@ -665,7 +665,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $columns
 	 * @return \Illuminate\Support\Collection|static
 	 *
-	 * @throws ModelNotFoundException
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public static function findOrFail($id, $columns = array('*'))
 	{
