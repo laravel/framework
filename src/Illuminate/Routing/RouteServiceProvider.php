@@ -57,13 +57,13 @@ class RouteServiceProvider extends ServiceProvider {
 	{
 		$namespace = trim($this->app['config']['namespaces.controllers'], '\\');
 
-		if (!empty($namespace))
+		if (empty($namespace))
 		{
-			$this->app['router']->group(['namespace' => $namespace], $callback);
+			$callback($this->app['router']);
 		}
 		else
 		{
-			$callback($this->app['router']);
+			$this->app['router']->group(compact('namespace'), $callback);
 		}
 	}
 
