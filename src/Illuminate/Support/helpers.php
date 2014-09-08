@@ -368,6 +368,21 @@ if ( ! function_exists('base_path'))
 	}
 }
 
+if ( ! function_exists('bcrypt'))
+{
+	/**
+	 * Hash the given value.
+	 *
+	 * @param  string  $value
+	 * @param  array   $options
+	 * @return string
+	 */
+	function bcrypt($value, $options = array())
+	{
+		return app('hash')->make($value, $options);
+	}
+}
+
 if ( ! function_exists('camel_case'))
 {
 	/**
@@ -416,6 +431,21 @@ if ( ! function_exists('class_uses_recursive'))
 		}
 
 		return array_unique($results);
+	}
+}
+
+if ( ! function_exists('config'))
+{
+	/**
+	 * Get the specified configuration value.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	function config($key, $default = null)
+	{
+		return app('config')->get($key, $default);
 	}
 }
 
@@ -487,6 +517,21 @@ if ( ! function_exists('data_get'))
 	}
 }
 
+if ( ! function_exists('delete'))
+{
+	/**
+	 * Register a new DELETE route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function delete($uri, $action)
+	{
+		return app('router')->delete($uri, $action);
+	}
+}
+
 if ( ! function_exists('dd'))
 {
 	/**
@@ -530,6 +575,21 @@ if ( ! function_exists('ends_with'))
 	}
 }
 
+if ( ! function_exists('get'))
+{
+	/**
+	 * Register a new GET route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function get($uri, $action)
+	{
+		return app('router')->get($uri, $action);
+	}
+}
+
 if ( ! function_exists('head'))
 {
 	/**
@@ -541,6 +601,21 @@ if ( ! function_exists('head'))
 	function head($array)
 	{
 		return reset($array);
+	}
+}
+
+if ( ! function_exists('info'))
+{
+	/**
+	 * Write some information to the log.
+	 *
+	 * @param  string  $message
+	 * @param  array  $context
+	 * @return void
+	 */
+	function info($message, $context = array())
+	{
+		return app('log')->info($message, $context);
 	}
 }
 
@@ -654,6 +729,36 @@ if ( ! function_exists('object_get'))
 	}
 }
 
+if ( ! function_exists('post'))
+{
+	/**
+	 * Register a new POST route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function post($uri, $action)
+	{
+		return app('router')->post($uri, $action);
+	}
+}
+
+if ( ! function_exists('put'))
+{
+	/**
+	 * Register a new PUT route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function put($uri, $action)
+	{
+		return app('router')->put($uri, $action);
+	}
+}
+
 if ( ! function_exists('preg_replace_sub'))
 {
 	/**
@@ -685,6 +790,27 @@ if ( ! function_exists('public_path'))
 	function public_path($path = '')
 	{
 		return app()->make('path.public').($path ? '/'.$path : $path);
+	}
+}
+
+if ( ! function_exists('redirect'))
+{
+	/**
+	 * Get an instance of the redirector.
+	 *
+	 * @param  string|null  $to
+	 * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+	 */
+	function redirect($to = null)
+	{
+		if ( ! is_null($to))
+		{
+			return app('redirect')->to($to);
+		}
+		else
+		{
+			return app('redirect');
+		}
 	}
 }
 
@@ -1002,6 +1128,22 @@ if ( ! function_exists('value'))
 	function value($value)
 	{
 		return $value instanceof Closure ? $value() : $value;
+	}
+}
+
+if ( ! function_exists('view'))
+{
+	/**
+	 * Get the evaluated view contents for the given view.
+	 *
+	 * @param  string  $view
+	 * @param  array   $data
+	 * @param  array   $mergeData
+	 * @return \Illuminate\View\View
+	 */
+	function view($view, $data = array(), $mergeData = array())
+	{
+		return app('view')->make($view, $data, $mergeData);
 	}
 }
 

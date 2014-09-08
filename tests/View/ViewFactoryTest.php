@@ -376,7 +376,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		return new Factory(
 			m::mock('Illuminate\View\Engines\EngineResolver'),
 			m::mock('Illuminate\View\ViewFinderInterface'),
-			m::mock('Illuminate\Events\Dispatcher')
+			m::mock('Illuminate\Contracts\Events\Dispatcher')
 		);
 	}
 
@@ -386,7 +386,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		return array(
 			m::mock('Illuminate\View\Engines\EngineResolver'),
 			m::mock('Illuminate\View\ViewFinderInterface'),
-			m::mock('Illuminate\Events\Dispatcher')
+			m::mock('Illuminate\Contracts\Events\Dispatcher')
 		);
 	}
 

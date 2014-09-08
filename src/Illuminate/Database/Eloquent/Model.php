@@ -5,13 +5,13 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
+use Illuminate\Contracts\Support\ArrayableInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -181,7 +181,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected static $dispatcher;
 
@@ -1126,88 +1126,96 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Register a saving model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function saving($callback)
+	public static function saving($callback, $priority = 0)
 	{
-		static::registerModelEvent('saving', $callback);
+		static::registerModelEvent('saving', $callback, $priority);
 	}
 
 	/**
 	 * Register a saved model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function saved($callback)
+	public static function saved($callback, $priority = 0)
 	{
-		static::registerModelEvent('saved', $callback);
+		static::registerModelEvent('saved', $callback, $priority);
 	}
 
 	/**
 	 * Register an updating model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function updating($callback)
+	public static function updating($callback, $priority = 0)
 	{
-		static::registerModelEvent('updating', $callback);
+		static::registerModelEvent('updating', $callback, $priority);
 	}
 
 	/**
 	 * Register an updated model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function updated($callback)
+	public static function updated($callback, $priority = 0)
 	{
-		static::registerModelEvent('updated', $callback);
+		static::registerModelEvent('updated', $callback, $priority);
 	}
 
 	/**
 	 * Register a creating model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function creating($callback)
+	public static function creating($callback, $priority = 0)
 	{
-		static::registerModelEvent('creating', $callback);
+		static::registerModelEvent('creating', $callback, $priority);
 	}
 
 	/**
 	 * Register a created model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function created($callback)
+	public static function created($callback, $priority = 0)
 	{
-		static::registerModelEvent('created', $callback);
+		static::registerModelEvent('created', $callback, $priority);
 	}
 
 	/**
 	 * Register a deleting model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function deleting($callback)
+	public static function deleting($callback, $priority = 0)
 	{
-		static::registerModelEvent('deleting', $callback);
+		static::registerModelEvent('deleting', $callback, $priority);
 	}
 
 	/**
 	 * Register a deleted model event with the dispatcher.
 	 *
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function deleted($callback)
+	public static function deleted($callback, $priority = 0)
 	{
-		static::registerModelEvent('deleted', $callback);
+		static::registerModelEvent('deleted', $callback, $priority);
 	}
 
 	/**
@@ -1232,15 +1240,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $event
 	 * @param  \Closure|string  $callback
+	 * @param  int  $priority
 	 * @return void
 	 */
-	protected static function registerModelEvent($event, $callback)
+	protected static function registerModelEvent($event, $callback, $priority = 0)
 	{
 		if (isset(static::$dispatcher))
 		{
 			$name = get_called_class();
 
-			static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
+			static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback, $priority);
 		}
 	}
 
@@ -2867,7 +2876,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public static function getEventDispatcher()
 	{
@@ -2877,7 +2886,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
 	public static function setEventDispatcher(Dispatcher $dispatcher)

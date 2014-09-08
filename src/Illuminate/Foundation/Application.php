@@ -7,6 +7,7 @@ use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Exception\ExceptionServiceProvider;
@@ -15,19 +16,23 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
-use Illuminate\Support\Contracts\ResponsePreparerInterface;
+use Illuminate\Contracts\Support\ResponsePreparerInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
-class Application extends Container implements HttpKernelInterface, TerminableInterface, ResponsePreparerInterface {
+class Application extends Container implements HttpKernelInterface,
+                                               TerminableInterface,
+                                               ApplicationContract,
+                                               ResponsePreparerInterface {
 
 	/**
 	 * The Laravel framework version.
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.2.8';
+	const VERSION = '4.3-dev';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -330,7 +335,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		// If the application has already booted, we will call this boot method on
 		// the provider class so it has an opportunity to do its boot logic and
 		// will be ready for any usage by the developer's application logics.
-		if ($this->booted) $provider->boot();
+		if ($this->booted)
+		{
+			$this->bootProvider($provider);
+		}
 
 		return $provider;
 	}
@@ -437,7 +445,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			$this->booting(function() use ($instance)
 			{
-				$instance->boot();
+				$this->bootProvider($instance);
 			});
 		}
 	}
@@ -583,7 +591,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		if ($this->booted) return;
 
-		array_walk($this->serviceProviders, function($p) { $p->boot(); });
+		array_walk($this->serviceProviders, function($p) { $this->bootProvider($p); });
 
 		$this->bootApplication();
 	}
@@ -627,6 +635,20 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		$this->bootedCallbacks[] = $callback;
 
 		if ($this->isBooted()) $this->fireAppCallbacks(array($callback));
+	}
+
+	/**
+	 * Boot the given service provider.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider  $provider
+	 * @return void
+	 */
+	protected function bootProvider(ServiceProvider $provider)
+	{
+		if (method_exists($provider, 'boot'))
+		{
+			return $this->call([$provider, 'boot']);
+		}
 	}
 
 	/**
@@ -722,6 +744,46 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Determine if the application routes are cached.
+	 *
+	 * @return bool
+	 */
+	public function routesAreCached()
+	{
+		return $this['files']->exists($this->getRouteCachePath());
+	}
+
+	/**
+	 * Get the path to the routes cache file.
+	 *
+	 * @return string
+	 */
+	public function getRouteCachePath()
+	{
+		return $this['path.storage'].'/meta/routes.php';
+	}
+
+	/**
+	 * Determine if the application events are cached.
+	 *
+	 * @return bool
+	 */
+	public function eventsAreCached()
+	{
+ 		return $this['files']->exists($this->getEventCachePath());
+	}
+
+	/**
+	 * Get the path to the events cache file.
+	 *
+	 * @return string
+	 */
+	public function getEventCachePath()
+	{
+		return $this['path.storage'].'/meta/events.php';
+	}
+
+	/**
 	 * Handle the given request and get the response.
 	 *
 	 * Provides compatibility with BrowserKit functional testing.
@@ -761,13 +823,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function dispatch(Request $request)
 	{
-		if ($this->isDownForMaintenance())
-		{
-			$response = $this['events']->until('illuminate.app.down');
-
-			if ( ! is_null($response)) return $this->prepareResponse($response, $request);
-		}
-
 		if ($this->runningUnitTests() && ! $this['session']->isStarted())
 		{
 			$this['session']->start();
@@ -972,7 +1027,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function getConfigLoader()
 	{
-		return new FileLoader(new Filesystem, $this['path'].'/config');
+		return new FileLoader(new Filesystem, $this['path.config']);
 	}
 
 	/**
@@ -1101,43 +1156,49 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function registerCoreContainerAliases()
 	{
 		$aliases = array(
-			'app'            => 'Illuminate\Foundation\Application',
+			'app'            => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
 			'artisan'        => 'Illuminate\Console\Application',
 			'auth'           => 'Illuminate\Auth\AuthManager',
+			'auth.driver'    => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Authenticator'],
 			'auth.reminder.repository' => 'Illuminate\Auth\Reminders\ReminderRepositoryInterface',
 			'blade.compiler' => 'Illuminate\View\Compilers\BladeCompiler',
-			'cache'          => 'Illuminate\Cache\CacheManager',
-			'cache.store'    => 'Illuminate\Cache\Repository',
-			'config'         => 'Illuminate\Config\Repository',
-			'cookie'         => 'Illuminate\Cookie\CookieJar',
-			'encrypter'      => 'Illuminate\Encryption\Encrypter',
+			'cache'          => ['Illuminate\Cache\CacheManager', 'Illuminate\Contracts\Cache\Factory'],
+			'cache.store'    => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Cache'],
+			'config'         => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Config'],
+			'cookie'         => ['Illuminate\Cookie\CookieJar', 'Illuminate\Contracts\Cookie\Factory', 'Illuminate\Contracts\Cookie\QueueingFactory'],
+			'exception'      => 'Illuminate\Contracts\Exception\Handler',
+			'encrypter'      => ['Illuminate\Encryption\Encrypter', 'Illuminate\Contracts\Encryption\Encrypter'],
 			'db'             => 'Illuminate\Database\DatabaseManager',
-			'events'         => 'Illuminate\Events\Dispatcher',
+			'events'         => ['Illuminate\Events\Dispatcher', 'Illuminate\Contracts\Events\Dispatcher'],
 			'files'          => 'Illuminate\Filesystem\Filesystem',
-			'form'           => 'Illuminate\Html\FormBuilder',
-			'hash'           => 'Illuminate\Hashing\HasherInterface',
-			'html'           => 'Illuminate\Html\HtmlBuilder',
-			'translator'     => 'Illuminate\Translation\Translator',
-			'log'            => 'Illuminate\Log\Writer',
-			'mailer'         => 'Illuminate\Mail\Mailer',
+			'filesystem'     => 'Illuminate\Contracts\Filesystem\Factory',
+			'filesystem.disk' => 'Illuminate\Contracts\Filesystem\Filesystem',
+			'filesystem.cloud' => 'Illuminate\Contracts\Filesystem\Cloud',
+			'hash'           => 'Illuminate\Contracts\Hashing\Hasher',
+			'translator'     => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
+			'log'            => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
+			'mailer'         => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
 			'paginator'      => 'Illuminate\Pagination\Factory',
-			'auth.reminder'  => 'Illuminate\Auth\Reminders\PasswordBroker',
+			'auth.reminder'  => ['Illuminate\Auth\Reminders\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
 			'queue'          => 'Illuminate\Queue\QueueManager',
+			'queue.connection' => 'Illuminate\Contracts\Queue\Queue',
 			'redirect'       => 'Illuminate\Routing\Redirector',
-			'redis'          => 'Illuminate\Redis\Database',
+			'redis'          => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
 			'request'        => 'Illuminate\Http\Request',
 			'router'         => 'Illuminate\Routing\Router',
 			'session'        => 'Illuminate\Session\SessionManager',
-			'session.store'  => 'Illuminate\Session\Store',
-			'remote'         => 'Illuminate\Remote\RemoteManager',
-			'url'            => 'Illuminate\Routing\UrlGenerator',
+			'session.store'  => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
+			'url'            => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
 			'validator'      => 'Illuminate\Validation\Factory',
-			'view'           => 'Illuminate\View\Factory',
+			'view'           => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
 		);
 
-		foreach ($aliases as $key => $alias)
+		foreach ($aliases as $key => $aliases)
 		{
-			$this->alias($key, $alias);
+			foreach ((array) $aliases as $alias)
+			{
+				$this->alias($key, $alias);
+			}
 		}
 	}
 

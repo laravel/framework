@@ -35,7 +35,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerEngineResolver()
 	{
-		$this->app->bindShared('view.engine.resolver', function($app)
+		$this->app->bindShared('view.engine.resolver', function()
 		{
 			$resolver = new EngineResolver;
 

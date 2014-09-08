@@ -2,8 +2,9 @@
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
-class UrlGenerator {
+class UrlGenerator implements UrlGeneratorContract {
 
 	/**
 	 * The route collection.
@@ -32,6 +33,13 @@ class UrlGenerator {
 	 * @var string
 	 */
 	protected $forceSchema;
+
+	/**
+	 * The root namespace being applied to controller actions.
+	 *
+	 * @var string
+	 */
+	protected $rootNamespace;
 
 	/**
 	 * Characters that should not be URL encoded.
@@ -452,6 +460,15 @@ class UrlGenerator {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
+		if ($this->rootNamespace && ! (strpos($action, '\\') === 0))
+		{
+			$action = $this->rootNamespace.'\\'.$action;
+		}
+		else
+		{
+			$action = trim($action, '\\');
+		}
+
 		return $this->route($action, $parameters, $absolute, $this->routes->getByAction($action));
 	}
 
@@ -530,6 +547,19 @@ class UrlGenerator {
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;
+	}
+
+	/**
+	 * Set the root controller namespace.
+	 *
+	 * @param  string  $rootNamespace
+	 * @return $this
+	 */
+	public function setRootControllerNamespace($rootNamespace)
+	{
+		$this->rootNamespace = $rootNamespace;
+
+		return $this;
 	}
 
 }

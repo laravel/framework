@@ -17,7 +17,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('delete')->once();
 		$query->shouldReceive('insert')->once();
-		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
+		$user = m::mock('Illuminate\Contracts\Auth\Remindable');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
 
 		$results = $repo->create($user);
@@ -33,7 +33,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$query->shouldReceive('first')->andReturn(null);
-		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
+		$user = m::mock('Illuminate\Contracts\Auth\Remindable');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
 
 		$this->assertFalse($repo->exists($user, 'token'));
@@ -48,7 +48,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$date = date('Y-m-d H:i:s', time() - 300000);
 		$query->shouldReceive('first')->andReturn((object) array('created_at' => $date));
-		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
+		$user = m::mock('Illuminate\Contracts\Auth\Remindable');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
 
 		$this->assertFalse($repo->exists($user, 'token'));
@@ -63,7 +63,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$date = date('Y-m-d H:i:s', time() - 600);
 		$query->shouldReceive('first')->andReturn((object) array('created_at' => $date));
-		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
+		$user = m::mock('Illuminate\Contracts\Auth\Remindable');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
 
 		$this->assertTrue($repo->exists($user, 'token'));

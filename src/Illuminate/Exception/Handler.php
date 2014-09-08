@@ -1,18 +1,20 @@
 <?php namespace Illuminate\Exception;
 
 use Closure;
+use Exception;
 use ErrorException;
 use ReflectionFunction;
-use Illuminate\Support\Contracts\ResponsePreparerInterface;
+use Illuminate\Contracts\Support\ResponsePreparerInterface;
+use Illuminate\Contracts\Exception\Handler as HandlerContract;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException as FatalError;
 
-class Handler {
+class Handler implements HandlerContract {
 
 	/**
 	 * The response preparer implementation.
 	 *
-	 * @var \Illuminate\Support\Contracts\ResponsePreparerInterface
+	 * @var \Illuminate\Contracts\Support\ResponsePreparerInterface
 	 */
 	protected $responsePreparer;
 
@@ -54,7 +56,7 @@ class Handler {
 	/**
 	 * Create a new error handler instance.
 	 *
-	 * @param  \Illuminate\Support\Contracts\ResponsePreparerInterface  $responsePreparer
+	 * @param  \Illuminate\Contracts\Support\ResponsePreparerInterface  $responsePreparer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $plainDisplayer
 	 * @param  \Illuminate\Exception\ExceptionDisplayerInterface  $debugDisplayer
 	 * @param  bool  $debug
@@ -141,7 +143,7 @@ class Handler {
 	 * @param  \Exception  $exception
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function handleException($exception)
+	public function handleException(Exception $exception)
 	{
 		$response = $this->callCustomHandlers($exception);
 

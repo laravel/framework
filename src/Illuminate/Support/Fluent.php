@@ -2,8 +2,8 @@
 
 use ArrayAccess;
 use JsonSerializable;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
+use Illuminate\Contracts\Support\ArrayableInterface;
 
 class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, JsonSerializable {
 

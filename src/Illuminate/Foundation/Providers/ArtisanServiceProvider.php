@@ -2,9 +2,23 @@
 
 use Illuminate\Foundation\Artisan;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Console\TailCommand;
+use Illuminate\Foundation\Console\UpCommand;
+use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Foundation\Console\TinkerCommand;
+use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\ChangesCommand;
+use Illuminate\Foundation\Console\OptimizeCommand;
+use Illuminate\Foundation\Console\RouteListCommand;
+use Illuminate\Foundation\Console\EventCacheCommand;
+use Illuminate\Foundation\Console\RouteCacheCommand;
+use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
+use Illuminate\Foundation\Console\KeyGenerateCommand;
+use Illuminate\Foundation\Console\RequestMakeCommand;
+use Illuminate\Foundation\Console\ProviderMakeCommand;
+use Illuminate\Foundation\Console\ClearCompiledCommand;
 
 class ArtisanServiceProvider extends ServiceProvider {
 
@@ -16,33 +30,278 @@ class ArtisanServiceProvider extends ServiceProvider {
 	protected $defer = true;
 
 	/**
+	 * The commands to be registered.
+	 *
+	 * @var array
+	 */
+	protected $commands = [
+		'AppName',
+		'Changes',
+		'ClearCompiled',
+		'ConsoleMake',
+		'Down',
+		'Environment',
+		'EventCache',
+		'KeyGenerate',
+		'Optimize',
+		'ProviderMake',
+		'RequestMake',
+		'RouteCache',
+		'RouteClear',
+		'RouteList',
+		'Serve',
+		'Tinker',
+		'Up',
+	];
+
+	/**
 	 * Register the service provider.
 	 *
 	 * @return void
 	 */
 	public function register()
 	{
+		// This Artisan class is a lightweight wrapper for calling into the Artisan
+		// command line. If a call to this class is executed we will boot up the
+		// entire Artisan command line then pass the method into the main app.
 		$this->app->bindShared('artisan', function($app)
 		{
 			return new Artisan($app);
 		});
 
-		$this->app->bindShared('command.tail', function($app)
+		foreach ($this->commands as $command)
 		{
-			return new TailCommand;
-		});
+			$this->{"register{$command}Command"}();
+		}
 
-		$this->app->bindShared('command.changes', function($app)
+		$this->commands(
+			'command.changes', 'command.environment', 'command.event.cache',
+			'command.route.cache', 'command.route.clear', 'command.route.list',
+			'command.request.make', 'command.tinker', 'command.console.make',
+			'command.key.generate', 'command.down', 'command.up', 'command.clear-compiled',
+			'command.optimize', 'command.serve', 'command.app.name', 'command.provider.make'
+		);
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerAppNameCommand()
+	{
+		$this->app->bindShared('command.app.name', function($app)
+		{
+			return new AppNameCommand($app['composer'], $app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerChangesCommand()
+	{
+		$this->app->bindShared('command.changes', function()
 		{
 			return new ChangesCommand;
 		});
+	}
 
-		$this->app->bindShared('command.environment', function($app)
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerClearCompiledCommand()
+	{
+		$this->app->bindShared('command.clear-compiled', function()
+		{
+			return new ClearCompiledCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerConsoleMakeCommand()
+	{
+		$this->app->bindShared('command.console.make', function($app)
+		{
+			return new ConsoleMakeCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerDownCommand()
+	{
+		$this->app->bindShared('command.down', function()
+		{
+			return new DownCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerEnvironmentCommand()
+	{
+		$this->app->bindShared('command.environment', function()
 		{
 			return new EnvironmentCommand;
 		});
+	}
 
-		$this->commands('command.tail', 'command.changes', 'command.environment');
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerEventCacheCommand()
+	{
+		$this->app->bindShared('command.event.cache', function($app)
+		{
+			return new EventCacheCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerKeyGenerateCommand()
+	{
+		$this->app->bindShared('command.key.generate', function($app)
+		{
+			return new KeyGenerateCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerOptimizeCommand()
+	{
+		$this->app->bindShared('command.optimize', function($app)
+		{
+			return new OptimizeCommand($app['composer']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerProviderMakeCommand()
+	{
+		$this->app->bindShared('command.provider.make', function($app)
+		{
+			return new ProviderMakeCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerRequestMakeCommand()
+	{
+		$this->app->bindShared('command.request.make', function($app)
+		{
+			return new RequestMakeCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerRouteCacheCommand()
+	{
+		$this->app->bindShared('command.route.cache', function($app)
+		{
+			return new RouteCacheCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerRouteClearCommand()
+	{
+		$this->app->bindShared('command.route.clear', function($app)
+		{
+			return new RouteClearCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerRouteListCommand()
+	{
+		$this->app->bindShared('command.route.list', function($app)
+		{
+			return new RouteListCommand($app['router']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerServeCommand()
+	{
+		$this->app->bindShared('command.serve', function()
+		{
+			return new ServeCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerTinkerCommand()
+	{
+		$this->app->bindShared('command.tinker', function()
+		{
+			return new TinkerCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerUpCommand()
+	{
+		$this->app->bindShared('command.up', function()
+		{
+			return new UpCommand;
+		});
 	}
 
 	/**
@@ -52,7 +311,14 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('artisan', 'command.changes', 'command.environment');
+		return [
+			'artisan', 'command.changes', 'command.environment',
+			'command.event.cache', 'command.route.cache', 'command.route.clear',
+			'command.route.list', 'command.request.make', 'command.tinker',
+			'command.console.make', 'command.key.generate', 'command.down',
+			'command.up', 'command.clear-compiled', 'command.optimize',
+			'command.serve', 'command.app.name', 'command.provider.make',
+		];
 	}
 
 }
