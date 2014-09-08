@@ -9,7 +9,7 @@ interface MailQueue {
 	 * @param  array   $data
 	 * @param  \Closure|string  $callback
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function queue($view, array $data, $callback, $queue = null);
 
@@ -21,7 +21,7 @@ interface MailQueue {
 	 * @param  array  $data
 	 * @param  \Closure|string  $callback
 	 * @param  string  $queue
-	 * @return void
+	 * @return mixed
 	 */
 	public function later($delay, $view, array $data, $callback, $queue = null);
 
