@@ -63,7 +63,7 @@ class FormRequest extends Request {
 	public function validate(ValidationFactory $factory)
 	{
 		$instance = $factory->make(
-			$this->input(), $this->container->call([$this, 'rules'])
+			$this->input(), $this->container->call([$this, 'rules']), $this->container->call([$this, 'messages'])
 		);
 
 		if ($instance->fails())
