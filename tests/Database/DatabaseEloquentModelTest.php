@@ -32,10 +32,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	public function testDirtyAttributes()
 	{
-		$model = new EloquentModelStub(array('foo' => '1'));
+		$model = new EloquentModelStub(array('foo' => '1', 'bar' => 2, 'baz' => 3));
 		$model->syncOriginal();
 		$model->foo = 1;
+		$model->bar = 20;
+		$model->baz = 30;
+
+		$this->assertTrue($model->isDirty());
 		$this->assertFalse($model->isDirty('foo'));
+		$this->assertTrue($model->isDirty('bar'));
+		$this->assertTrue($model->isDirty('foo', 'bar'));
+		$this->assertTrue($model->isDirty(['foo', 'bar']));
 	}
 
 
