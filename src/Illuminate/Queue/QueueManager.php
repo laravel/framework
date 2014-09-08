@@ -197,7 +197,7 @@ class QueueManager {
 	}
 
 	/**
-	* Determine if the worker should run in maintenance mode.
+	* Determine if the application is in maintenance mode.
 	*
 	* @return bool
 	*/
