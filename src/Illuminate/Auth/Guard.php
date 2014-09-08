@@ -618,6 +618,7 @@ class Guard implements AuthenticatorContract {
 	 * Set the event dispatcher instance.
 	 *
 	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
 	{
