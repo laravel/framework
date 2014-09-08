@@ -831,7 +831,7 @@ class BelongsToMany extends Relation {
 
 		if (count($ids) > 0)
 		{
-			$query->whereIn($this->otherKey, $ids);
+			$query->whereIn($this->otherKey, (array) $ids);
 		}
 
 		if ($touch) $this->touchIfTouching();

@@ -197,6 +197,16 @@ class QueueManager {
 	}
 
 	/**
+	* Determine if the application is in maintenance mode.
+	*
+	* @return bool
+	*/
+	public function isDownForMaintenance()
+	{
+		return $this->app->isDownForMaintenance();
+	}
+
+	/**
 	 * Dynamically pass calls to the default connection.
 	 *
 	 * @param  string  $method
