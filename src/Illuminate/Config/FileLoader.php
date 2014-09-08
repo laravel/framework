@@ -159,7 +159,9 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path = $this->defaultPath.'/'.$file))
 		{
-			$items = array_replace_recursive($items, $this->getRequire($path));
+			$items = array_replace_recursive(
+				$items, $this->getRequire($path)
+			);
 		}
 
 		// Once we have merged the regular package configuration we need to look for
@@ -169,7 +171,9 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path))
 		{
-			$items = array_replace_recursive($items, $this->getRequire($path));
+			$items = array_replace_recursive(
+				$items, $this->getRequire($path)
+			);
 		}
 
 		return $items;
