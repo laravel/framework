@@ -125,7 +125,7 @@ class PublisherServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('view.publisher', function($app)
 		{
-			$viewPath = $app['path.views'];
+			$viewPath = $app['path'].'/resources/views';;
 
 			// Once we have created the view publisher, we will set the default packages
 			// path on this object so that it knows where to find all of the packages
