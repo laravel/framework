@@ -1700,6 +1700,8 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 		}
 
 		$this->routes = $routes;
+
+		$this->container->instance('routes', $this->routes);
 	}
 
 	/**
