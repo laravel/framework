@@ -540,7 +540,7 @@ class Connection implements ConnectionInterface {
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
-	 * @throws QueryException
+	 * @throws \Illuminate\Database\QueryException
 	 */
 	protected function run($query, $bindings, Closure $callback)
 	{
@@ -580,7 +580,7 @@ class Connection implements ConnectionInterface {
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
-	 * @throws QueryException
+	 * @throws \Illuminate\Database\QueryException
 	 */
 	protected function runQueryCallback($query, $bindings, Closure $callback)
 	{
@@ -613,8 +613,10 @@ class Connection implements ConnectionInterface {
 	 * @param  array     $bindings
 	 * @param  \Closure  $callback
 	 * @return mixed
+	 *
+	 * @throws \Illuminate\Database\QueryException
 	 */
-	protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, $callback)
+	protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
 	{
 		if ($this->causedByLostConnection($e))
 		{
@@ -651,6 +653,8 @@ class Connection implements ConnectionInterface {
 	 * Reconnect to the database.
 	 *
 	 * @return void
+	 *
+	 * @throws \LogicException
 	 */
 	public function reconnect()
 	{
