@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class {{class}} extends Controller {
 
