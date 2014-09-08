@@ -568,7 +568,9 @@ class Guard {
 	 */
 	protected function createRememberTokenIfDoesntExist(UserInterface $user)
 	{
-		if (is_null($user->getRememberToken()))
+		$rememberToken = $user->getRememberToken();
+
+		if (empty($rememberToken))
 		{
 			$this->refreshRememberToken($user);
 		}
