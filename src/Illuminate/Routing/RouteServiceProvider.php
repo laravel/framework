@@ -16,7 +16,10 @@ class RouteServiceProvider extends ServiceProvider {
 
 		if ($this->app->routesAreCached())
 		{
-			require $this->app->getRouteCachePath();
+			$this->app->booted(function()
+			{
+				require $this->app->getRouteCachePath();
+			});
 		}
 		else
 		{

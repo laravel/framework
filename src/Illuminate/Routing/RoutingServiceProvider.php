@@ -55,10 +55,22 @@ class RoutingServiceProvider extends ServiceProvider {
 			// and all the registered routes will be available to the generator.
 			$routes = $app['router']->getRoutes();
 
-			return new UrlGenerator($routes, $app->rebinding('request', function($app, $request)
+			$app->instance('routes', $routes);
+
+			$url = new UrlGenerator($routes, $app->rebinding('request', function($app, $request)
 			{
 				$app['url']->setRequest($request);
 			}));
+
+			// If the route collection is "rebound", for example, when the routes stay
+			// cached for the application, we will need to rebind the routes on the
+			// URL generator instance so it has the latest version of the routes.
+			$app->rebinding('routes', function($app, $routes)
+			{
+				$app['url']->setRoutes($routes);
+			});
+
+			return $url;
 		});
 	}
 
