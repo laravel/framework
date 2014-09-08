@@ -76,6 +76,7 @@ class Migrator {
 		$ran = $this->repository->getRan();
 
 		$migrations = array_diff($files, $ran);
+
 		$this->requireFiles($path, $migrations);
 
 		$this->runMigrationList($migrations, $pretend);
