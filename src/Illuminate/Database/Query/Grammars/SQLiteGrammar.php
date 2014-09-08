@@ -75,6 +75,16 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
+	 * Get the function for random ordering.
+	 *
+	 * @return string
+	 */
+	public function getRandomFunction()
+	{
+		return 'random()';
+	}
+
+	/**
 	 * Compile a "where day" clause.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query

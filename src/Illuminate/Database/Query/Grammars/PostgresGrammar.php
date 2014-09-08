@@ -173,4 +173,14 @@ class PostgresGrammar extends Grammar {
 		return array('truncate '.$this->wrapTable($query->from).' restart identity' => array());
 	}
 
+	/**
+	 * Get the function for random ordering.
+	 *
+	 * @return string
+	 */
+	public function getRandomFunction()
+	{
+		return 'random()';
+	}
+
 }
