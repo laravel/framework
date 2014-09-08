@@ -105,7 +105,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static
 	 *
-	 * @throws ModelNotFoundException
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
@@ -131,7 +131,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static
 	 *
-	 * @throws ModelNotFoundException
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function firstOrFail($columns = array('*'))
 	{
