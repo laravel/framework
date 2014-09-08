@@ -75,6 +75,11 @@ class PostgresConnector extends Connector implements ConnectorInterface {
 			$dsn .= ";port={$port}";
 		}
 
+		if (isset($config['sslmode']))
+		{
+			$dsn .= ";sslmode={$sslmode}";
+		}
+
 		return $dsn;
 	}
 

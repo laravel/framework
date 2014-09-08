@@ -64,6 +64,8 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		foreach ($this->items as $values)
 		{
+			if ($values instanceof Collection) $values = $values->all();
+
 			$results = array_merge($results, $values);
 		}
 
