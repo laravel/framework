@@ -196,7 +196,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$query = m::mock('stdClass');
 		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-		$query->shouldReceive('where')->once()->with('role_id', 1);
+		$query->shouldReceive('whereIn')->once()->with('role_id', [1]);
 		$query->shouldReceive('delete')->once()->andReturn(true);
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
 		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
