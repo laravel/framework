@@ -44,14 +44,14 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$oldId = $session->getId();
 		$session->getHandler()->shouldReceive('destroy')->never();
 		$this->assertTrue($session->migrate());
-		$this->assertFalse($oldId == $session->getId());
+		$this->assertNotEquals($oldId, $session->getId());
 
 
 		$session = $this->getSession();
 		$oldId = $session->getId();
 		$session->getHandler()->shouldReceive('destroy')->once()->with($oldId);
 		$this->assertTrue($session->migrate(true));
-		$this->assertFalse($oldId == $session->getId());
+		$this->assertNotEquals($oldId, $session->getId());
 	}
 
 
@@ -61,7 +61,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$oldId = $session->getId();
 		$session->getHandler()->shouldReceive('destroy')->never();
 		$this->assertTrue($session->regenerate());
-		$this->assertFalse($oldId == $session->getId());
+		$this->assertNotEquals($oldId, $session->getId());
 	}
 
 
@@ -85,11 +85,11 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session = $this->getSession();
 		$oldId = $session->getId();
 		$session->set('foo','bar');
-		$this->assertTrue(count($session->all()) > 0);
+		$this->assertGreaterThan(0, count($session->all()));
 		$session->getHandler()->shouldReceive('destroy')->never();
 		$this->assertTrue($session->invalidate());
-		$this->assertFalse($oldId == $session->getId());
-		$this->assertTrue(count($session->all()) == 0);
+		$this->assertNotEquals($oldId, $session->getId());
+		$this->assertCount(0, $session->all());
 	}
 
 
@@ -195,8 +195,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session->set('foo', 'bar');
 		$session->set('qu', 'ux');
 		$session->replace(array('foo' => 'baz'));
-		$this->assertTrue($session->get('foo') == 'baz');
-		$this->assertTrue($session->get('qu') == 'ux');
+		$this->assertEquals('baz', $session->get('foo'));
+		$this->assertEquals('ux', $session->get('qu'));
 	}
 
 
@@ -206,7 +206,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session->set('foo', 'bar');
 		$pulled = $session->remove('foo');
 		$this->assertFalse($session->has('foo'));
-		$this->assertTrue($pulled == 'bar');
+		$this->assertEquals('bar', $pulled);
 	}
 
 
@@ -260,7 +260,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	public function testToken()
 	{
 		$session = $this->getSession();
-		$this->assertTrue($session->token() == $session->getToken());
+		$this->assertEquals($session->token(), $session->getToken());
 	}
 
 
