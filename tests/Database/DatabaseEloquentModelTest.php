@@ -635,7 +635,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$relation = $model->hasOne('EloquentModelSaveStub', 'foo');
 		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
 		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 
@@ -662,7 +662,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$relation = $model->hasMany('EloquentModelSaveStub', 'foo');
 		$this->assertEquals('save_stub.foo', $relation->getForeignKey());
 		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 
@@ -684,7 +684,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$relation = $model->belongsToStub();
 		$this->assertEquals('belongs_to_stub_id', $relation->getForeignKey());
 		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
@@ -700,7 +700,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$relation = $model->morphToStub();
 		$this->assertEquals('morph_to_stub_id', $relation->getForeignKey());
 		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 
@@ -712,7 +712,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getForeignKey());
 		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getOtherKey());
 		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 		$this->assertEquals(__FUNCTION__, $relation->getRelationName());
 
 		$model = new EloquentModelStub;
@@ -721,7 +721,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('table.foreign', $relation->getForeignKey());
 		$this->assertEquals('table.other', $relation->getOtherKey());
 		$this->assertSame($model, $relation->getParent());
-		$this->assertTrue($relation->getQuery()->getModel() instanceof EloquentModelSaveStub);
+		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 	}
 
 
