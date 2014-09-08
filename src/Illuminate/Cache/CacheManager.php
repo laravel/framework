@@ -52,6 +52,16 @@ class CacheManager extends Manager implements FactoryContract {
 	}
 
 	/**
+	 * Create an instance of the Null cache driver.
+	 *
+	 * @return \Illuminate\Cache\NullStore
+	 */
+	protected function createNullDriver()
+	{
+		return $this->repository(new NullStore);
+	}
+
+	/**
 	 * Create an instance of the WinCache cache driver.
 	 *
 	 * @return \Illuminate\Cache\WinCacheStore
