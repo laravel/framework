@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database;
 
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Support\Str;
 
 class DatabaseManager implements ConnectionResolverInterface {
 
@@ -53,14 +54,22 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function connection($name = null)
 	{
-		$name = $name ?: $this->getDefaultConnection();
+		$name = $driver = $name ?: $this->getDefaultConnection();
+		$type = null;
+
+		if (Str::endsWith($name, ['::write', '::read']))
+		{
+			list($driver, $type) = explode('::', $name, 2);
+		}
 
 		// If we haven't created this connection, we'll create it based on the config
 		// provided in the application. Once we've created the connections we will
 		// set the "fetch mode" for PDO which determines the query return types.
 		if ( ! isset($this->connections[$name]))
 		{
-			$connection = $this->makeConnection($name);
+			$connection = $this->makeConnection($driver);
+
+			$connection = $this->prepareReadWriteMode($connection, $type);
 
 			$this->connections[$name] = $this->prepare($connection);
 		}
@@ -201,6 +210,27 @@ class DatabaseManager implements ConnectionResolverInterface {
 		{
 			$this->reconnect($connection->getName());
 		});
+
+		return $connection;
+	}
+
+	/**
+	 * Prepare the read write mode for database connection instance.
+	 *
+	 * @param  \Illuminate\Database\Connection  $connection
+	 * @param  string  $type
+	 * @return \Illuminate\Database\Connection
+	 */
+	protected function prepareReadWriteMode($connection, $type = null)
+	{
+		if ($type == 'read')
+		{
+			$connection->setPdo($connection->getReadPdo());
+		}
+		elseif ($type == 'write')
+		{
+			$connection->setReadPdo($connection->getPdo());
+		}
 
 		return $connection;
 	}
