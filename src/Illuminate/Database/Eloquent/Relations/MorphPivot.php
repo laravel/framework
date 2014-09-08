@@ -30,7 +30,7 @@ class MorphPivot extends Pivot {
 	 */
 	protected function setKeysForSaveQuery(Builder $query)
 	{
-		$query->where($this->morphType, $this->getAttribute($this->morphType));
+		$query->where($this->morphType, $this->morphClass);
 
 		return parent::setKeysForSaveQuery($query);
 	}
@@ -44,7 +44,7 @@ class MorphPivot extends Pivot {
 	{
 		$query = $this->getDeleteQuery();
 
-		$query->where($this->morphType, $this->getAttribute($this->morphType));
+		$query->where($this->morphType, $this->morphClass);
 
 		return $query->delete();
 	}
