@@ -2,9 +2,11 @@
 
 use Closure;
 use DateTime;
-use Carbon\Carbon;
+use Illuminate\Support\Traits\DurationTrait;
 
 class TaggedCache implements StoreInterface {
+
+	use DurationTrait;
 
 	/**
 	 * The cache store implementation.
@@ -221,24 +223,6 @@ class TaggedCache implements StoreInterface {
 	public function getPrefix()
 	{
 		return $this->store->getPrefix();
-	}
-
-	/**
-	 * Calculate the number of minutes with the given duration.
-	 *
-	 * @param  \DateTime|int  $duration
-	 * @return int|null
-	 */
-	protected function getMinutes($duration)
-	{
-		if ($duration instanceof DateTime)
-		{
-			$fromNow = Carbon::instance($duration)->diffInMinutes();
-
-			return $fromNow > 0 ? $fromNow : null;
-		}
-
-		return is_string($duration) ? (int) $duration : $duration;
 	}
 
 }

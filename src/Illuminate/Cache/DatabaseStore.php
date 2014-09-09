@@ -138,16 +138,6 @@ class DatabaseStore implements StoreInterface {
 	}
 
 	/**
-	 * Get the current system time.
-	 *
-	 * @return int
-	 */
-	protected function getTime()
-	{
-		return time();
-	}
-
-	/**
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
