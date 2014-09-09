@@ -162,8 +162,10 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testLogoutRemovesSessionTokenAndRememberMeCookie()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$sessionConfig = array('secure' => false, 'path' => '/', 'domain' => 'foo.com');
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName', 'getRecallerName'), array($provider, $session, $request));
 		$mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
+		$mock->setSessionConfig($sessionConfig);
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$user->shouldReceive('setRememberToken')->once();
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
@@ -171,7 +173,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$provider->shouldReceive('updateRememberToken')->once();
 
 		$cookie = m::mock('Symfony\Component\HttpFoundation\Cookie');
-		$cookies->shouldReceive('forget')->once()->with('bar')->andReturn($cookie);
+		$cookies->shouldReceive('make')->once()->with('bar', null, -2628000, '/', 'foo.com', false)->andReturn($cookie);
 		$cookies->shouldReceive('queue')->once()->with($cookie);
 		$mock->getSession()->shouldReceive('forget')->once()->with('foo');
 		$mock->setUser($user);
@@ -198,10 +200,12 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testLoginMethodQueuesCookieWhenRemembering()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$sessionConfig = array('secure' => false, 'path' => '/', 'domain' => 'foo.com');
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->setCookieJar($cookie);
+		$guard->setSessionConfig($sessionConfig);
 		$foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
-		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller')->andReturn($foreverCookie);
+		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller', '/', 'foo.com', false)->andReturn($foreverCookie);
 		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
 		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
 		$session->shouldReceive('migrate')->once();
@@ -217,8 +221,10 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	public function testLoginMethodCreatesRememberTokenIfOneDoesntExist()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$sessionConfig = array('secure' => false, 'path' => '/', 'domain' => 'foo.com');
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->setCookieJar($cookie);
+		$guard->setSessionConfig($sessionConfig);
 		$foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
 		$cookie->shouldReceive('forever')->once()->andReturn($foreverCookie);
 		$cookie->shouldReceive('queue')->once()->with($foreverCookie);
