@@ -1,15 +1,9 @@
 <?php namespace Illuminate\Validation;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
 class ValidationServiceProvider extends ServiceProvider {
-
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = true;
 
 	/**
 	 * Register the service provider.
@@ -18,8 +12,36 @@ class ValidationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->registerValiationResolverHook();
+
 		$this->registerPresenceVerifier();
 
+		$this->registerValidationFactory();
+	}
+
+	/**
+	 * Register the "ValidatesWhenResolved" container hook.
+	 *
+	 * @return void
+	 */
+	protected function registerValiationResolverHook()
+	{
+		$this->app->afterResolvingAny(function($resolved, $app)
+		{
+			if ($resolved instanceof ValidatesWhenResolved)
+			{
+				$resolved->setContainer($app)->validate();
+			}
+		});
+	}
+
+	/**
+	 * Register the validation factory.
+	 *
+	 * @return void
+	 */
+	protected function registerValidationFactory()
+	{
 		$this->app->bindShared('validator', function($app)
 		{
 			$validator = new Factory($app['translator'], $app);
@@ -47,16 +69,6 @@ class ValidationServiceProvider extends ServiceProvider {
 		{
 			return new DatabasePresenceVerifier($app['db']);
 		});
-	}
-
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array('validator', 'validation.presence');
 	}
 
 }

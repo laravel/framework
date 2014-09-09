@@ -60,6 +60,13 @@ class Container implements ArrayAccess, ContainerContract {
 	protected $globalResolvingCallbacks = array();
 
 	/**
+	 * All of the global after resolving callbacks.
+	 *
+	 * @var array
+	 */
+	protected $globalAfterResolvingCallbacks = array();
+
+	/**
 	 * Determine if a given string is resolvable.
 	 *
 	 * @param  string  $abstract
@@ -790,6 +797,17 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
+	 * Register a new after resolving callback for all types.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function afterResolvingAny(Closure $callback)
+	{
+		$this->globalAfterResolvingCallbacks[] = $callback;
+	}
+
+	/**
 	 * Fire all of the resolving callbacks.
 	 *
 	 * @param  string  $abstract
@@ -804,6 +822,8 @@ class Container implements ArrayAccess, ContainerContract {
 		}
 
 		$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
+
+		$this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
 	}
 
 	/**

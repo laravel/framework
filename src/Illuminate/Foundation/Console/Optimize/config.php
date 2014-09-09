@@ -42,6 +42,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Exception/ExceptionServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RoutingServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Events/EventServiceProvider.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Validation/ValidationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FoundationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/EventServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FormRequestServiceProvider.php',
