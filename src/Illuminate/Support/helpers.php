@@ -505,6 +505,22 @@ if ( ! function_exists('preg_replace_sub'))
 	}
 }
 
+
+if ( ! function_exists('slug'))
+{
+	/**
+	 * Generate a URL friendly "slug" from a given string.
+	 *
+	 * @param  string  $title
+	 * @param  string  $separator
+	 * @return string
+	 */
+	function slug($title, $separator = '-')
+	{
+		return Str::slug($title, $separator);
+	}
+}
+
 if ( ! function_exists('snake_case'))
 {
 	/**
