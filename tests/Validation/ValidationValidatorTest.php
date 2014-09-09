@@ -25,6 +25,34 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAfterCallbacksAreCalledWithValidatorInstance()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
+		$v->setContainer(new Illuminate\Container\Container);
+		$v->after(function($validator)
+		{
+			$_SERVER['__validator.after.test'] = spl_object_hash($validator);
+		});
+
+		$this->assertFalse($v->passes());
+		$this->assertEquals(spl_object_hash($v), $_SERVER['__validator.after.test']);
+
+		unset($_SERVER['__validator.after.test']);
+
+		/**
+		 * Class Based Callback
+		 */
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
+		$v->setContainer(new Illuminate\Container\Container);
+		$v->after('ValidatorTestAfterCallbackStub');
+
+		$this->assertFalse($v->passes());
+		$this->assertEquals(spl_object_hash($v), $_SERVER['__validator.after.test']);
+	}
+
+
 	public function testHasFailedValidationRules()
 	{
 		$trans = $this->getRealTranslator();
@@ -1287,4 +1315,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		return $trans;
 	}
 
+}
+
+
+class ValidatorTestAfterCallbackStub {
+	public function validate($validator) {
+		$_SERVER['__validator.after.test'] = spl_object_hash($validator);
+	}
 }
