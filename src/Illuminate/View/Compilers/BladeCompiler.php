@@ -694,6 +694,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Sets the raw tags used for the compiler.
+	 *
+	 * @param  string  $openTag
+	 * @param  string  $closeTag
+	 * @return void
+	 */
+	public function setRawTags($openTag, $closeTag)
+	{
+		$this->rawTags = array(preg_quote($openTag), preg_quote($closeTag));
+	}
+
+	/**
 	 * Sets the content tags used for the compiler.
 	 *
 	 * @param  string  $openTag
