@@ -29,7 +29,7 @@ class FormRequestServiceProvider extends ServiceProvider {
 			{
 				// If the resolved instance is an instance of the FormRequest object, we will go
 				// ahead and initialize the request as well as set a few dependencies on this
-				// request instance. We will then run the "validate" method on the request.
+				// request instance. The "ValidatesWhenResolved" hook will fire "validate".
 				if ($resolved instanceof FormRequest)
 				{
 					$this->initializeRequest($resolved, $app['request']);
