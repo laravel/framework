@@ -107,6 +107,22 @@ if ( ! function_exists('config'))
 	}
 }
 
+if ( ! function_exists('controller'))
+{
+	/**
+	 * Route a controller to a URI with wildcard routing.
+	 *
+	 * @param  string  $uri
+	 * @param  string  $controller
+	 * @param  array   $names
+	 * @return void
+	 */
+	function controller($uri, $controller, $names = array())
+	{
+		return app('router')->controller($uri, $controller, $names);
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
@@ -158,6 +174,21 @@ if ( ! function_exists('get'))
 	function get($uri, $action)
 	{
 		return app('router')->get($uri, $action);
+	}
+}
+
+if ( ! function_exists('group'))
+{
+	/**
+	 * Create a route group with shared attributes.
+	 *
+	 * @param  array     $attributes
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	function group(array $attributes, Closure $callback)
+	{
+		return app('router')->group($attributes, $callback);
 	}
 }
 
@@ -218,6 +249,22 @@ if ( ! function_exists('put'))
 	function put($uri, $action)
 	{
 		return app('router')->put($uri, $action);
+	}
+}
+
+if ( ! function_exists('resource'))
+{
+	/**
+	 * Route a resource to a controller.
+	 *
+	 * @param  string  $name
+	 * @param  string  $controller
+	 * @param  array   $options
+	 * @return void
+	 */
+	function resource($name, $controller, array $options = array())
+	{
+		return app('router')->resource($name, $controller, $options);
 	}
 }
 
