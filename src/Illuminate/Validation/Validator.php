@@ -63,6 +63,13 @@ class Validator implements MessageProvider {
 	protected $rules;
 
 	/**
+	 * All of the registered "after" callbacks.
+	 *
+	 * @var array
+	 */
+	protected $after = array();
+
+	/**
 	 * The array of custom error messages.
 	 *
 	 * @var array
@@ -189,6 +196,29 @@ class Validator implements MessageProvider {
 	}
 
 	/**
+	 * After an after validation callback.
+	 *
+	 * @param  callable|string  $callback
+	 * @return $this
+	 */
+	public function after($callback)
+	{
+		if (is_string($callback))
+		{
+			$this->after[] = function($validator) use ($callback)
+			{
+				return $this->container->call($callback, [$validator], 'validate');
+			};
+		}
+		else
+		{
+			$this->after[] = $callback;
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Add conditions to a given field based on a Closure.
 	 *
 	 * @param  string  $attribute
@@ -272,6 +302,14 @@ class Validator implements MessageProvider {
 			{
 				$this->validate($attribute, $rule);
 			}
+		}
+
+		// We'll spin through each rule, validating the attributes attached to that
+		// rule. Any error messages will be added to the containers with each of
+		// the other error messages, returning true if we don't have messages.
+		foreach ($this->after as $after)
+		{
+			call_user_func($after, $this);
 		}
 
 		return count($this->messages->all()) === 0;

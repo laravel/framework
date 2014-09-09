@@ -361,6 +361,28 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor', $result[1]);
 	}
 
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
+	{
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub');
+	}
+
+
+	public function testCallWithAtSignBasedClassReferences()
+	{
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub@work', ['foo', 'bar']);
+		$this->assertEquals(['foo', 'bar'], $result);
+
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
+		$this->assertEquals(['foo', 'bar'], $result);
+	}
+
 }
 
 class ContainerConcreteStub {}
@@ -416,4 +438,10 @@ class ContainerConstructorParameterLoggingStub {
 class ContainerLazyExtendStub {
 	public static $initialized = false;
 	public function init() { static::$initialized = true; }
+}
+
+class ContainerTestCallStub {
+	public function work() {
+		return func_get_args();
+	}
 }
