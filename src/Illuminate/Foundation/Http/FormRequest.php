@@ -62,9 +62,7 @@ class FormRequest extends Request {
 	 */
 	public function validate(ValidationFactory $factory)
 	{
-		$instance = $factory->make(
-			$this->input(), $this->container->call([$this, 'rules']), $this->container->call([$this, 'messages'])
-		);
+		$instance = $this->getValidatorInstance($factory);
 
 		if ($instance->fails())
 		{
@@ -78,6 +76,26 @@ class FormRequest extends Request {
 		}
 
 		$this->runFinalValidationChecks();
+	}
+
+	/**
+	 * Get the validator instance for the request.
+	 *
+	 * @param  \Illuminate\Validation\Factory  $factory
+	 * @return \Illuminate\Validation\Validator
+	 */
+	protected function getValidatorInstance(ValidationFactory $factory)
+	{
+		if (method_exists($this, 'validator'))
+		{
+			return $this->container->call([$this, 'validator'], compact('factory'));
+		}
+		else
+		{
+			return $factory->make(
+				$this->input(), $this->container->call([$this, 'rules']), $this->messages()
+			);
+		}
 	}
 
 	/**
@@ -224,7 +242,7 @@ class FormRequest extends Request {
 	{
 		return $this->input($key);
 	}
-	
+
 	/**
 	* Set custom messages for validator errors.
 	*

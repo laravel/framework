@@ -203,17 +203,10 @@ class Validator implements MessageProvider {
 	 */
 	public function after($callback)
 	{
-		if (is_string($callback))
+		$this->after[] = function() use ($callback)
 		{
-			$this->after[] = function($validator) use ($callback)
-			{
-				return $this->container->call($callback, [$validator], 'validate');
-			};
-		}
-		else
-		{
-			$this->after[] = $callback;
-		}
+			return $this->container->call($callback, [], 'validate');
+		};
 
 		return $this;
 	}
@@ -309,7 +302,7 @@ class Validator implements MessageProvider {
 		// the other error messages, returning true if we don't have messages.
 		foreach ($this->after as $after)
 		{
-			call_user_func($after, $this);
+			call_user_func($after);
 		}
 
 		return count($this->messages->all()) === 0;
