@@ -35,6 +35,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
+	protected $rawTags = array('{!!', '!!}');
+
+	/**
+	 * Array of opening and closing tags for escaped echos.
+	 *
+	 * @var array
+	 */
 	protected $contentTags = array('{{', '}}');
 
 	/**
@@ -190,6 +197,8 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
+		$value = $this->compileRawEchos($value);
+
 		$difference = strlen($this->contentTags[0]) - strlen($this->escapedTags[0]);
 
 		if ($difference > 0)
@@ -222,6 +231,26 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the "raw" echo statements.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	protected function compileRawEchos($value)
+	{
+		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->rawTags[0], $this->rawTags[1]);
+
+		$callback = function($matches)
+		{
+			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
+
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
+		};
+
+		return preg_replace_callback($pattern, $callback, $value);
+	}
+
+	/**
 	 * Compile the "regular" echo statements.
 	 *
 	 * @param  string  $value
@@ -235,7 +264,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		{
 			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo e('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);

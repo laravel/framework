@@ -7,10 +7,10 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
-class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface, JsonSerializable {
+class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable {
 
 	/**
 	 * The items contained in the collection.
@@ -22,12 +22,14 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Create a new collection.
 	 *
-	 * @param  array  $items
+	 * @param  mixed  $items
 	 * @return void
 	 */
-	public function __construct(array $items = array())
+	public function __construct($items = array())
 	{
-		$this->items = $items;
+		$items = is_null($items) ? [] : $this->getArrayableItems($items);
+
+		$this->items = (array) $items;
 	}
 
 	/**
@@ -36,13 +38,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  mixed  $items
 	 * @return static
 	 */
-	public static function make($items)
+	public static function make($items = null)
 	{
-		if (is_null($items)) return new static;
-
-		if ($items instanceof Collection) return $items;
-
-		return new static(is_array($items) ? $items : array($items));
+		return new static($items);
 	}
 
 	/**
@@ -93,7 +91,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Diff the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function diff($items)
@@ -271,7 +269,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function intersect($items)
@@ -335,7 +333,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Merge the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function merge($items)
@@ -427,7 +425,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Create a colleciton of all elements that do not pass a given truth test.
+	 * Create a collection of all elements that do not pass a given truth test.
 	 *
 	 * @param  \Closure|mixed  $callback
 	 * @return static
@@ -698,7 +696,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return array_map(function($value)
 		{
-			return $value instanceof ArrayableInterface ? $value->toArray() : $value;
+			return $value instanceof Arrayable ? $value->toArray() : $value;
 
 		}, $this->items);
 	}
@@ -818,9 +816,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Results array of items from Collection or ArrayableInterface.
+	 * Results array of items from Collection or Arrayable.
 	 *
-  	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+  	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return array
 	 */
 	protected function getArrayableItems($items)
@@ -829,7 +827,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		{
 			$items = $items->all();
 		}
-		elseif ($items instanceof ArrayableInterface)
+		elseif ($items instanceof Arrayable)
 		{
 			$items = $items->toArray();
 		}

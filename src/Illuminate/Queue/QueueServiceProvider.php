@@ -60,6 +60,11 @@ class QueueServiceProvider extends ServiceProvider {
 
 			return $manager;
 		});
+
+		$this->app->bindShared('queue.connection', function($app)
+		{
+			return $app['queue']->connection();
+		});
 	}
 
 	/**
@@ -131,7 +136,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function registerRestartCommand()
 	{
-		$this->app->bindShared('command.queue.restart', function($app)
+		$this->app->bindShared('command.queue.restart', function()
 		{
 			return new RestartCommand;
 		});
@@ -146,7 +151,7 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSubscriber()
 	{
-		$this->app->bindShared('command.queue.subscribe', function($app)
+		$this->app->bindShared('command.queue.subscribe', function()
 		{
 			return new SubscribeCommand;
 		});
@@ -298,7 +303,7 @@ class QueueServiceProvider extends ServiceProvider {
 		return array(
 			'queue', 'queue.worker', 'queue.listener', 'queue.failer',
 			'command.queue.work', 'command.queue.listen', 'command.queue.restart',
-			'command.queue.subscribe',
+			'command.queue.subscribe', 'queue.connection',
 		);
 	}
 

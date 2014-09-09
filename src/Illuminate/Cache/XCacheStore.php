@@ -89,11 +89,11 @@ class XCacheStore extends TaggableStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		xcache_unset($this->prefix.$key);
+		return xcache_unset($this->prefix.$key);
 	}
 
 	/**
