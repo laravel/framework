@@ -156,6 +156,11 @@ class Guard implements AuthenticatorContract {
 			$user = $this->getUserByRecaller($recaller);
 		}
 
+		if (is_null($user) && ! is_null($id))
+		{
+			$this->clearUserDataFromStorage();
+		}
+
 		return $this->user = $user;
 	}
 
