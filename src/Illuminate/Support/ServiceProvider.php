@@ -149,7 +149,7 @@ abstract class ServiceProvider {
 	 */
 	protected function getAppViewPath($package)
 	{
-		return $this->app['path']."/views/packages/{$package}";
+		return $this->app['path.base']."/resources/views/packages/{$package}";
 	}
 
 	/**
