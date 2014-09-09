@@ -326,17 +326,14 @@ class Request extends SymfonyRequest {
 	 */
 	public function hasFile($key)
 	{
-		if (is_array($file = $this->file($key))) 
-		{
-			foreach ($file as $f)
-			{
-				if ($f instanceof SplFileInfo && $f->getPath() != '') return true;
-			}
+		if ( ! is_array($files = $this->file($key))) $files = array($files);
 
-			return false;
+		foreach ($files as $file)
+		{
+			if ($file instanceof SplFileInfo && $file->getPath() != '') return true;
 		}
 
-		return $file instanceof SplFileInfo && $file->getPath() != '';
+		return false;
 	}
 
 	/**
