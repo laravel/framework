@@ -11,12 +11,4 @@ interface ValidatesWhenResolved {
 	 */
 	public function validate();
 
-	/**
-	 * Set the container implementation.
-	 *
-	 * @param  Container  $container
-	 * @return $this
-	 */
-	public function setContainer(Container $container);
-
 }

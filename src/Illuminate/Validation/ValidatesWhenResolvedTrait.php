@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Validation;
 
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\ValidationException;
 use Illuminate\Contracts\Validation\UnauthorizedException;
 
@@ -8,13 +7,6 @@ use Illuminate\Contracts\Validation\UnauthorizedException;
  * Provides default implementation of ValidatesWhenResolved contract.
  */
 trait ValidatesWhenResolvedTrait {
-
-	/**
-	 * The container instance.
-	 *
-	 * @var  Container  $container
-	 */
-	protected $container;
 
 	/**
 	 * Validate the class instance.
@@ -42,7 +34,7 @@ trait ValidatesWhenResolvedTrait {
 	 */
 	protected function getValidatorInstance()
 	{
-		return $this->container->call([$this, 'validator']);
+		return $this->validator();
 	}
 
 	/**
@@ -65,7 +57,7 @@ trait ValidatesWhenResolvedTrait {
 	{
 		if (method_exists($this, 'authorize'))
 		{
-			return $this->container->call([$this, 'authorize']);
+			return $this->authorize();
 		}
 
 		return true;
@@ -79,19 +71,6 @@ trait ValidatesWhenResolvedTrait {
 	protected function failedAuthorization()
 	{
 		throw new UnauthorizedException;
-	}
-
-	/**
-	 * Set the container implementation.
-	 *
-	 * @param  Container  $container
-	 * @return $this
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-
-		return $this;
 	}
 
 }
