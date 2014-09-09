@@ -16,6 +16,13 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	use ValidatesWhenResolvedTrait;
 
 	/**
+	 * The container instance.
+	 *
+	 * @var  Container  $container
+	 */
+	protected $container;
+
+	/**
 	 * The route instance the request is dispatched to.
 	 *
 	 * @var \Illuminate\Routing\Route
@@ -199,6 +206,19 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	public function setRedirector(Redirector $redirector)
 	{
 		$this->redirector = $redirector;
+
+		return $this;
+	}
+
+	/**
+	 * Set the container implementation.
+	 *
+	 * @param  Container  $container
+	 * @return $this
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
 
 		return $this;
 	}
