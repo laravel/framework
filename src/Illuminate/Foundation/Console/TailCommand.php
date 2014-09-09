@@ -119,11 +119,11 @@ class TailCommand extends Command {
 
 		if (is_null($connection))
 		{
-			return base_path().'/app/storage/logs/laravel.log';
+			return storage_path('/logs/laravel.log');
 		}
 		else
 		{
-			return $this->getRoot($connection).'/app/storage/logs/laravel.log';
+			return $this->getRoot($connection).str_replace(base_path(), '', storage_path()).'/logs/laravel.log';
 		}
 	}
 
