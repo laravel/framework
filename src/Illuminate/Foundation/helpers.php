@@ -244,6 +244,21 @@ if ( ! function_exists('link_to_action'))
 	}
 }
 
+if ( ! function_exists('patch'))
+{
+	/**
+	 * Register a new PATCH route with the router.
+	 *
+	 * @param  string  $uri
+	 * @param  \Closure|array|string  $action
+	 * @return \Illuminate\Routing\Route
+	 */
+	function patch($uri, $action)
+	{
+		return app('router')->patch($uri, $action);
+	}
+}
+
 if ( ! function_exists('post'))
 {
 	/**
@@ -271,21 +286,6 @@ if ( ! function_exists('put'))
 	function put($uri, $action)
 	{
 		return app('router')->put($uri, $action);
-	}
-}
-
-if ( ! function_exists('patch'))
-{
-	/**
-	 * Register a new PATCH route with the router.
-	 * 
-	 * @param  string  $uri
-	 * @param  \Closure|array|string  $action
-	 * @return \Illuminate\Routing\Route
-	 */
-	function patch($uri, $action)
-	{
-		return app('router')->patch($uri, $action);
 	}
 }
 
