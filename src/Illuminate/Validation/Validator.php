@@ -297,9 +297,9 @@ class Validator implements MessageProvider {
 			}
 		}
 
-		// We'll spin through each rule, validating the attributes attached to that
-		// rule. Any error messages will be added to the containers with each of
-		// the other error messages, returning true if we don't have messages.
+		// Here we will spin through all of the "after" hooks on this validator and
+		// fire them off. This gives the callbacks a chance to perform all kinds
+		// of other validation that needs to get wrapped up in this operation.
 		foreach ($this->after as $after)
 		{
 			call_user_func($after);
