@@ -36,8 +36,7 @@ class FormRequestServiceProvider extends ServiceProvider {
 
 					$resolved->setContainer($app)
                              ->setRoute($app['Illuminate\Routing\Route'])
-                             ->setRedirector($app['Illuminate\Routing\Redirector'])
-                             ->validate($app['Illuminate\Validation\Factory']);
+                             ->setRedirector($app['Illuminate\Routing\Redirector']);
 				}
 			});
 		});

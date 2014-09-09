@@ -8,16 +8,12 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
 use Illuminate\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
-use Illuminate\Validation\Factory as ValidationFactory;
+use Illuminate\Validation\ValidatesWhenResolvedTrait;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
-class FormRequest extends Request {
+class FormRequest extends Request implements ValidatesWhenResolved {
 
-	/**
-	 * The container instance.
-	 *
-	 * @var  \Illuminate\Container\Container  $container
-	 */
-	protected $container;
+	use ValidatesWhenResolvedTrait;
 
 	/**
 	 * The route instance the request is dispatched to.
@@ -55,37 +51,14 @@ class FormRequest extends Request {
 	protected $dontFlash = ['password', 'password_confirmation'];
 
 	/**
-	 * Validate the form request according to its rules.
-	 *
-	 * @param  \Illuminate\Validation\Factory  $factory
-	 * @return void
-	 */
-	public function validate(ValidationFactory $factory)
-	{
-		$instance = $this->getValidatorInstance($factory);
-
-		if ($instance->fails())
-		{
-			throw new HttpResponseException($this->response(
-				$this->formatErrors($instance)
-			));
-		}
-		elseif ($this->failsAuthorization())
-		{
-			throw new HttpResponseException($this->forbiddenResponse());
-		}
-
-		$this->runFinalValidationChecks();
-	}
-
-	/**
 	 * Get the validator instance for the request.
 	 *
-	 * @param  \Illuminate\Validation\Factory  $factory
 	 * @return \Illuminate\Validation\Validator
 	 */
-	protected function getValidatorInstance(ValidationFactory $factory)
+	protected function getValidatorInstance()
 	{
+		$factory = $this->container->make('Illuminate\Validation\Factory');
+
 		if (method_exists($this, 'validator'))
 		{
 			return $this->container->call([$this, 'validator'], compact('factory'));
@@ -99,31 +72,41 @@ class FormRequest extends Request {
 	}
 
 	/**
-	 * Deteremine if the request fails the authorization check.
+	 * Handle a failed validation attempt.
 	 *
-	 * @return bool
+	 * @param  \Illuminate\Validation\Validator  $validator
+	 * @return mixed
 	 */
-	protected function failsAuthorization()
+	protected function failedValidation(Validator $validator)
 	{
-		if (method_exists($this, 'authorize'))
-		{
-			return ! $this->container->call([$this, 'authorize']);
-		}
-
-		return true;
+		throw new HttpResponseException($this->response(
+			$this->formatErrors($validator)
+		));
 	}
 
 	/**
-	 * Post validation method. Run any final validation checks.
+	 * Deteremine if the request passes the authorization check.
 	 *
-	 * @return void
+	 * @return bool
 	 */
-	protected function runFinalValidationChecks()
+	protected function passesAuthorization()
 	{
-		if (method_exists($this, 'validated'))
+		if (method_exists($this, 'authorize'))
 		{
-			$this->container->call([$this, 'validated']);
+			return $this->container->call([$this, 'authorize']);
 		}
+
+		return false;
+	}
+
+	/**
+	 * Handle a failed authorization attempt.
+	 *
+	 * @return mixed
+	 */
+	protected function failedAuthorization()
+	{
+		throw new HttpResponseException($this->forbiddenResponse());
 	}
 
 	/**
@@ -192,19 +175,6 @@ class FormRequest extends Request {
 		{
 			return $url->previous();
 		}
-	}
-
-	/**
-	 * Set the container instance used to resolve dependencies.
-	 *
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return \Illuminate\Foundation\Http\FormRequest
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-
-		return $this;
 	}
 
 	/**
