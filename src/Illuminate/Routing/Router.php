@@ -300,7 +300,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 		// If a given controller method has been named, we will assign the name to the
 		// controller action array, which provides for a short-cut to method naming
 		// so you don't have to define an individual route for these controllers.
-		$action['as'] = array_pull($names, $method);
+		$action['as'] = array_get($names, $method);
 
 		$this->{$route['verb']}($route['uri'], $action);
 	}
