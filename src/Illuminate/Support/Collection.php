@@ -195,7 +195,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function get($key, $default = null)
 	{
-		if (array_key_exists($key, $this->items))
+		if ($this->offsetExists($key))
 		{
 			return $this->items[$key];
 		}
@@ -251,7 +251,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function has($key)
 	{
-		return array_key_exists($key, $this->items);
+		return $this->offsetExists($key);
 	}
 
 	/**
