@@ -106,5 +106,14 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 
 		$redis->flush();
 	}
+	
+	public function testTaggedCacheForever()
+	{
+		$data = ['foo' => 'bar'];
+		Cache::tags('tag')->flush();
+		Cache::tags('tag')->forever('data', $data);
+		$cachedData = Cache::tags('tag')->get('data');
+		$this->assertTrue($cachedData === ['foo' => 'bar']);
+	}
 
 }
