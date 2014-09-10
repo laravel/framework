@@ -317,10 +317,10 @@ class UrlGenerator implements UrlGeneratorContract {
 	/**
 	 * Format the array of URL parameters.
 	 *
-	 * @param  array  $parameters
+	 * @param  mixed|array  $parameters
 	 * @return array
 	 */
-	protected function formatParameters(array $parameters)
+	protected function formatParameters($parameters)
 	{
 		return $this->replaceRoutableParameters($parameters);
 	}
