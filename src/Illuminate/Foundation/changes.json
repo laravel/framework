@@ -10,7 +10,8 @@
 		{"message": "Flysystem integration now included with framework.", "backport": null},
 		{"message": "Passing an Eloquent model to a URL generator method will now automatically pull its ID.", "backport": null},
 		{"message": "Make both {{ }} and {{{ }}} escape values by default, new {!! !!} construct to echo raw data.", "backport": null},
-		{"message": "Add 'after' callback to Validator.", "backport": null}
+		{"message": "Add 'after' callback to Validator.", "backport": null},
+		{"message": "Returning 'false' from a database ::chunk operation will stop processing records.", "backport": null}
 	],
 	"4.2.*": [
 		{"message": "View and Pagination 'Environment' classes renamed to 'Factory'.", "backport": null},
