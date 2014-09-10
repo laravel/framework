@@ -1881,6 +1881,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, UrlRoutable, J
 	}
 
 	/**
+	 * Set the primary key for the model.
+	 *
+	 * @return void
+	 */
+	public function setKeyName($key)
+	{
+		$this->primaryKey = $key;
+	}
+
+	/**
 	 * Get the table qualified key name.
 	 *
 	 * @return string
