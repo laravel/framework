@@ -52,6 +52,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $escapedTags = array('{{{', '}}}');
 
 	/**
+	 * The "regular" / legacy echo string format.
+	 *
+	 * @var string
+	 */
+	protected $echoFormat = 'e(%s)';
+
+	/**
 	 * Array of footer lines to be added to template.
 	 *
 	 * @var array
@@ -264,7 +271,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		{
 			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo e('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
+			$wrapped = sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2]));
+
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$wrapped.'; ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -750,6 +759,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function getEscapedContentTags()
 	{
 		return $this->escapedTags;
+	}
+
+	/**
+	 * Set the echo format to be used by the compiler.
+	 *
+	 * @param  string  $format
+	 * @return void
+	 */
+	public function setEchoFormat($format)
+	{
+		$this->echoFormat = $format;
 	}
 
 }

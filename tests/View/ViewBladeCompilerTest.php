@@ -441,6 +441,19 @@ empty
 	}
 
 
+	public function testRawTagsCanBeSetToLegacyValues()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setEchoFormat('%s');
+
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
+			$name
+		}}'));
+	}
+
+
 	public function testExpressionsOnTheSameLine()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
