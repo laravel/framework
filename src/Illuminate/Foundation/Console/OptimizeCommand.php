@@ -105,9 +105,12 @@ class OptimizeCommand extends Command {
 
 		$core = require __DIR__.'/Optimize/config.php';
 
-		$files = array_merge($core, $this->laravel['config']['compile.files']);
+		$compiledFiles = $this->laravel['config']->get( 'compile.files', [] );
 
-		foreach ($this->laravel['config']['compile.providers'] as $provider)
+		$files = array_merge($core, $compiledFiles);
+
+		$providers = $this->laravel['config']->get( 'compile.providers', [] );
+		foreach ($providers as $provider)
 		{
 			$files = array_merge($files, forward_static_call([$provider, 'compiles']));
 		}
