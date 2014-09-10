@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -266,7 +267,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function getRelationCountQueryForSelfJoin(Builder $query, Builder $parent)
 	{
-		$query->select(new \Illuminate\Database\Query\Expression('count(*)'));
+		$query->select(new Expression('count(*)'));
 
 		$tablePrefix = $this->query->getQuery()->getConnection()->getTablePrefix();
 
@@ -274,7 +275,7 @@ class BelongsToMany extends Relation {
 
 		$key = $this->wrap($this->getQualifiedParentKeyName());
 
-		return $query->where($hash.'.'.$this->foreignKey, '=', new \Illuminate\Database\Query\Expression($key));
+		return $query->where($hash.'.'.$this->foreignKey, '=', new Expression($key));
 	}
 
 	/**
