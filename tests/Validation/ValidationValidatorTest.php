@@ -146,6 +146,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('Name is required!', $v->messages()->first('name'));
+		
+		//set customAttributes by setter
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.required' => ':attribute is required!'), 'en', 'messages');
+		$customAttributes = array('name' => 'Name');
+		$v = new Validator($trans, array('name' => ''), array('name' => 'Required'));
+		$v->addCustomAttributes($customAttributes);
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('Name is required!', $v->messages()->first('name'));
+
 
 		$trans = $this->getRealTranslator();
 		$trans->addResource('array', array('validation.required' => ':attribute is required!'), 'en', 'messages');
@@ -177,7 +188,38 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 		$v->messages()->setFormat(':message');
 		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
-
+		
+		// test addCustomValues
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.in' => ':attribute must be included in :values.'), 'en', 'messages');
+		$customValues = array(
+				 'type' => 
+					array(
+					 '5'   => 'Short',
+					 '300' => 'Long',
+					)
+				);
+		$v = new Validator($trans, array('type' => '4'), array('type' => 'in:5,300'));
+		$v->addCustomValues($customValues);
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
+		
+		// set custom values by setter
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.in' => ':attribute must be included in :values.'), 'en', 'messages');
+		$customValues = array(
+				 'type' => 
+					array(
+					 '5'   => 'Short',
+					 '300' => 'Long',
+					)
+				);
+		$v = new Validator($trans, array('type' => '4'), array('type' => 'in:5,300'));
+		$v->setValueNames($customValues);
+		$this->assertFalse($v->passes());
+		$v->messages()->setFormat(':message');
+		$this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
 	}
 
 

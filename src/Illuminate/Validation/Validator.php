@@ -2189,6 +2189,19 @@ class Validator implements MessageProvider {
 	}
 
 	/**
+	 * Set the custom values on the validator.
+	 *
+	 * @param  array  $values
+	 * @return $this
+	 */
+	public function setValueNames(array $values)
+	{
+		$this->customValues = $values;
+
+		return $this;
+	}
+
+	/**
 	 * Get the files under validation.
 	 *
 	 * @return array
@@ -2279,6 +2292,52 @@ class Validator implements MessageProvider {
 	public function setCustomMessages(array $messages)
 	{
 		$this->customMessages = array_merge($this->customMessages, $messages);
+	}
+
+	/**
+	 * Get the custom attributes used by the validator.
+	 *
+	 * @return array
+	 */
+	public function getCustomAttributes()
+	{
+		return $this->customAttributes;
+	}
+
+	/**
+	 * Add custom attributes to the validator.
+	 *
+	 * @param  array  $customAttributes
+	 * @return $this
+	 */
+	public function addCustomAttributes(array $customAttributes)
+	{
+		$this->customAttributes = array_merge($this->customAttributes, $customAttributes);
+
+		return $this;
+	}
+
+	/**
+	 * Get the custom values for the validator.
+	 *
+	 * @return array
+	 */
+	public function getCustomValues()
+	{
+		return $this->customValues;
+	}
+
+	/**
+	 * Add the custom values for the validator.
+	 *
+	 * @param  array  $customValues
+	 * @return $this
+	 */
+	public function addCustomValues(array $customValues)
+	{
+		$this->customValues = array_merge($this->customValues, $customValues);
+
+		return $this;
 	}
 
 	/**
