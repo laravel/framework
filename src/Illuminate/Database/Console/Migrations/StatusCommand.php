@@ -46,51 +46,36 @@ class StatusCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
-		$this->migrator->setConnection($this->input->getOption('database'));
-
-		$this->output->writeln(" Status   Migration Name ");
-		$this->output->writeln("--------------------------------------------");
-
-		$versions = $this->migrator->getRepository()->getRan();
-		$migrationFiles = $this->migrator->getMigrationFiles($this->getMigrationPath());
-
-		foreach ($migrationFiles as $migration)
+		if ( ! $this->migrator->repositoryExists())
 		{
-			if (in_array($migration, $versions))
-			{
-				$status = "   <info>up</info>  ";
-				unset($versions[array_search($migration, $versions)]);
-			}
-			else
-			{
-				$status = "  <error>down</error> ";
-			}
-
-			$this->output->writeln("{$status}   <comment>{$migration}</comment>");
+			return $this->error('No migrations found.');
 		}
 
-		foreach ($versions as $missing)
+		$ran = $this->migrator->getRepository()->getRan();
+
+		foreach ($this->getAllMigrationFiles() as $migration)
 		{
-			$this->output->writeln("   <error>up</error>     {$missing} <error>*** MISSING ***</error>");
+			$migrations[] = in_array($migration, $ran) ? ['<info>✔</info>', $migration] : ['<fg=red>✗</fg=red>', $migration];
+		}
+
+		if (count($migrations) > 0)
+		{
+			$this->table(['Ran?', 'Migration'], $migrations);
+		}
+		else
+		{
+			$this->error('No migrations found');
 		}
 	}
 
 	/**
-	 * Get the console command options.
+	 * Get all of the migration files.
 	 *
 	 * @return array
 	 */
-	protected function getOptions()
+	protected function getAllMigrationFiles()
 	{
-		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
-
-			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
-
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
-
-			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
-		);
+		return $this->migrator->getMigrationFiles($this->laravel['path.database'].'/migrations');
 	}
 
 }
