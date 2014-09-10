@@ -28,7 +28,7 @@ class SupportMacroTraitTest extends \PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testResgisterMacroAndCallWithoutStatic()
+	public function testRegisterMacroAndCallWithoutStatic()
 	{
 		$macroTrait = $this->macroTrait;
 		$macroTrait::macro(__CLASS__, function() { return 'Taylor'; });
