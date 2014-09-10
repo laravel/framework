@@ -19,8 +19,7 @@
         "illuminate/cache": "4.2.*",
         "illuminate/console": "4.2.*",
         "illuminate/filesystem": "4.2.*",
-        "illuminate/pagination": "4.2.*",
-        "illuminate/support": "4.2.*"
+        "illuminate/pagination": "4.2.*"
     },
     "autoload": {
         "psr-0": {
