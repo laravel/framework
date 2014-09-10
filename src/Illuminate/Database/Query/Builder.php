@@ -1504,12 +1504,14 @@ class Builder {
 			// On each chunk result set, we will pass them to the callback and then let the
 			// developer take care of everything within the callback, which allows us to
 			// keep the memory low for spinning through large result sets for working.
-			call_user_func($callback, $results);
+			$return = call_user_func($callback, $results);
 
 			$page++;
 
 			$results = $this->forPage($page, $count)->get();
 		}
+
+		return $return;
 	}
 
 	/**
