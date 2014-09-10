@@ -3,6 +3,7 @@
 use PDO;
 use Closure;
 use DateTime;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 
@@ -947,7 +948,7 @@ class Connection implements ConnectionInterface {
 	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
-	public function setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
+	public function setEventDispatcher(Dispatcher $events)
 	{
 		$this->events = $events;
 	}

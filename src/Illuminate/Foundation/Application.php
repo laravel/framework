@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation;
 
 use Closure;
+use Stack\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Config\FileLoader;
@@ -677,7 +678,7 @@ class Application extends Container implements HttpKernelInterface,
 	{
 		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
 
-		$client = (new \Stack\Builder)
+		$client = (new Builder)
                     ->push('Illuminate\Cookie\Guard', $this['encrypter'])
                     ->push('Illuminate\Cookie\Queue', $this['cookie'])
                     ->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
@@ -693,7 +694,7 @@ class Application extends Container implements HttpKernelInterface,
 	 * @param  \Stack\Builder
 	 * @return void
 	 */
-	protected function mergeCustomMiddlewares(\Stack\Builder $stack)
+	protected function mergeCustomMiddlewares(Builder $stack)
 	{
 		foreach ($this->middlewares as $middleware)
 		{
