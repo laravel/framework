@@ -667,7 +667,16 @@ class Grammar extends BaseGrammar {
 
 		$where = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-		return trim("delete from $table ".$where);
+		if (isset($query->joins))
+		{
+			$joins = ' '.$this->compileJoins($query, $query->joins);
+		}
+		else
+		{
+			$joins = '';
+		}
+
+		return trim("delete $table from {$table}{$joins} $where");
 	}
 
 	/**
