@@ -158,6 +158,26 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Returns the client IP address.
+	 *
+	 * @return string
+	 */
+	public function ip()
+	{
+		return $this->getClientIp();
+	}
+
+	/**
+	 * Returns the client IP addresses.
+	 *
+	 * @return array
+	 */
+	public function ips()
+	{
+		return $this->getClientIps();
+	}
+
+	/**
 	 * Determine if the request contains a given input item key.
 	 *
 	 * @param  string|array  $key
