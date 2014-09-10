@@ -53,6 +53,8 @@ class StatusCommand extends BaseCommand {
 
 		$ran = $this->migrator->getRepository()->getRan();
 
+		$migrations = [];
+
 		foreach ($this->getAllMigrationFiles() as $migration)
 		{
 			$migrations[] = in_array($migration, $ran) ? ['<info>✔</info>', $migration] : ['<fg=red>✗</fg=red>', $migration];
