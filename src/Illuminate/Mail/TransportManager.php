@@ -22,7 +22,9 @@ class TransportManager extends Manager {
 		// The Swift SMTP transport instance will allow us to use any SMTP backend
 		// for delivering mail such as Sendgrid, Amazon SES, or a custom server
 		// a developer has available. We will just pass this configured host.
-		$transport = SmtpTransport::newInstance($config['host'], $config['port']);
+		$transport = SmtpTransport::newInstance(
+			$config['host'], $config['port']
+		);
 
 		if (isset($config['encryption']))
 		{
