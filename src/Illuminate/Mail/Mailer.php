@@ -3,7 +3,6 @@
 use Closure;
 use Swift_Mailer;
 use Swift_Message;
-use Illuminate\Log\Writer;
 use Psr\Log\LoggerInterface;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\View\Factory;
