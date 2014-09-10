@@ -116,25 +116,57 @@ class DatabaseStore implements StoreInterface {
 	 * @param  mixed   $value
 	 * @return void
 	 *
-	 * @throws \LogicException
+	 * @throws LogicException If value to be incremented is not numeric
 	 */
 	public function increment($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		$prefixed = $this->prefix . $key;
+		
+		$this->connection->beginTransaction();
+
+		$cache = $this->table()->where('key', $prefixed)->lockForUpdate()->first();
+
+		if (is_array($cache)) $cache = (object) $cache;
+
+		if (time() >= $cache->expiration)
+		{
+			return $this->forget($key);
+		}
+
+		$existingValue = $this->encrypter->decrypt($cache->value);
+
+		if( ! is_numeric($existingValue))
+			throw new \LogicException('Increment and Decrement works only with numeric values.');
+
+		$newValue = $this->encrypter->encrypt($existingValue + $fraction);
+		$expiration = $cache->expiration + $this->time();
+
+		try 
+		{
+			$this->table()->where('key', $prefixed)
+				->update(array('value' => $newValue, 'expiration' => $expiration));
+		}
+		catch(\Exception $e) 
+		{
+			$this->connection->rollback();
+			throw $e;
+		}
+
+		$this->connection->commit();
 	}
 
 	/**
-	 * Increment the value of an item in the cache.
+	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
 	 *
-	 * @throws \LogicException
+	 * @throws LogicException If value to be decremented is not numeric
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Decrement operations not supported by this driver.");
+		$this->increment($key, $value * -1);
 	}
 
 	/**
