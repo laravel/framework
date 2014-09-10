@@ -1281,13 +1281,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$observables = is_array($observables) ? $observables : func_get_args();
 
-		foreach ($observables as $observable)
-		{	
-			if ( ! in_array($observable, $this->observables))
-			{
-				$this->observables[] = $observable;
-			}			
-		}
+		$this->observables = array_unique(array_merge($this->observables, $observables));
 	}
 
 	/**
@@ -1300,13 +1294,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$observables = is_array($observables) ? $observables : func_get_args();
 
-		foreach ($observables as $observable)
-		{
-			if (($index = array_search($observable, $this->observables)) !== false)
-			{
-				unset($this->observables[$index]);
-			}
-		}
+		$this->observables = array_diff($this->observables, $observables);
 	}
 
 	/**
