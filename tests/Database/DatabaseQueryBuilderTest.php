@@ -947,6 +947,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDeleteWithJoinMethod()
+	{
+		$builder = $this->getMySqlBuilder();
+		$builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `email` = ?', array('foo'))->andReturn(1);
+		$result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->delete();
+		$this->assertEquals(1, $result);
+
+		$builder = $this->getMySqlBuilder();
+		$builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `id` = ?', array(1))->andReturn(1);
+		$result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete(1);
+		$this->assertEquals(1, $result);
+	}
+
+
 	public function testTruncateMethod()
 	{
 		$builder = $this->getBuilder();
