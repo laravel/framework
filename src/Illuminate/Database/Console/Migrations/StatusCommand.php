@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Database\Migrations\Migrator;
-use Symfony\Component\Console\Input\InputOption;
 
 class StatusCommand extends BaseCommand {
 
