@@ -670,13 +670,10 @@ class Grammar extends BaseGrammar {
 		if (isset($query->joins))
 		{
 			$joins = ' '.$this->compileJoins($query, $query->joins);
-		}
-		else
-		{
-			$joins = '';
+			return trim("delete $table from {$table}{$joins} $where");
 		}
 
-		return trim("delete $table from {$table}{$joins} $where");
+		return trim("delete from $table $where");
 	}
 
 	/**
