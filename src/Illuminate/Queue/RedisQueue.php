@@ -165,8 +165,6 @@ class RedisQueue extends Queue implements QueueInterface {
 
 		if (count($jobs) > 0)
 		{
-			$this->removeExpiredJobs($from, $time);
-
 			call_user_func_array(array($this->redis, 'rpush'), array_merge(array($to), $jobs));
 		}
 	}
@@ -180,7 +178,14 @@ class RedisQueue extends Queue implements QueueInterface {
 	 */
 	protected function getExpiredJobs($queue, $time)
 	{
-		return $this->redis->zrangebyscore($queue, '-inf', $time);
+		$jobs = $this->redis->transaction()
+			->zrangebyscore($queue, '-inf', $time)
+			->zremrangebyscore($queue, '-inf', $time)
+			->execute();
+
+		// 0th index will contain the results from zrangebyscore
+		// 1st index will contain the results from zremrangebyscore
+		return $jobs[0];
 	}
 
 	/**
