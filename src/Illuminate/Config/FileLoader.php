@@ -159,7 +159,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path = $this->defaultPath.'/'.$file))
 		{
-			$items = array_replace_recursive(
+			$items = array_merge(
 				$items, $this->getRequire($path)
 			);
 		}
@@ -171,7 +171,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path))
 		{
-			$items = array_replace_recursive(
+			$items = array_merge(
 				$items, $this->getRequire($path)
 			);
 		}
