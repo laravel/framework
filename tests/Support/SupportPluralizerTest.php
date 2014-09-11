@@ -33,4 +33,12 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('CRITERION', str_singular('CRITERIA'));
 	}
 
+	public function testIfEndOfWord()
+	{
+		$this->assertEquals('VortexFields', str_plural('VortexField'));
+		$this->assertEquals('MatrixFields', str_plural('MatrixField'));
+		$this->assertEquals('IndexFields', str_plural('IndexField'));
+		$this->assertEquals('VertexFields', str_plural('VertexField'));
+	}
+
 }
