@@ -47,6 +47,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(isset($array['names']['developer']));
 		$this->assertFalse(isset($array['names']['otherDeveloper']));
 		$this->assertTrue(isset($array['names']['thirdDeveloper']));
+
+		$array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle'], 'otherNames' => ['developer' => 'Lucas', 'otherDeveloper' => 'Graham']];
+		array_forget($array, ['names.developer', 'otherNames.otherDeveloper']);
+		$expected = ['names' => ['otherDeveloper' => 'dayle'], 'otherNames' => ['developer' => 'Lucas']];
+		$this->assertEquals($expected, $array);
 	}
 
 
