@@ -9,9 +9,9 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/container": "4.3.*",
-        "illuminate/contracts": "4.3.*",
-        "illuminate/support": "4.3.*",
+        "illuminate/container": "5.0.*",
+        "illuminate/contracts": "5.0.*",
+        "illuminate/support": "5.0.*",
         "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~5.1"
     },
@@ -22,7 +22,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.3-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "suggest": {

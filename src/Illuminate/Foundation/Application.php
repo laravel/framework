@@ -33,7 +33,7 @@ class Application extends Container implements HttpKernelInterface,
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.3-dev';
+	const VERSION = '5.0-dev';
 
 	/**
 	 * Indicates if the application has "booted".
