@@ -314,17 +314,29 @@ class Validator implements MessageProviderInterface {
 			$this->addFailure($attribute, $rule, $parameters);
 		}
 	}
-	
+
 	/**
- 	 * Returns the data which have been successfully validated
+ 	 * Returns the data which was valid.
  	 *
 	 * @return array
 	 */
-	public function passed()
+	public function valid()
 	{
 		if ( ! $this->messages) $this->passes();
-		
+
  		return array_diff_key($this->data, $this->messages()->toArray());
+	}
+
+	/**
+ 	 * Returns the data which was invalid.
+ 	 *
+	 * @return array
+	 */
+	public function invalid()
+	{
+		if ( ! $this->messages) $this->passes();
+
+ 		return array_intersect_key($this->data, $this->messages()->toArray());
 	}
 
 	/**
