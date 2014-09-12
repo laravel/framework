@@ -1,10 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class RouteClearCommand extends Command {
 

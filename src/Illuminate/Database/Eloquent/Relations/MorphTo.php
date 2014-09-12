@@ -104,7 +104,7 @@ class MorphTo extends BelongsTo {
 	{
 		$this->parent->setAttribute($this->foreignKey, $model->getKey());
 
-		$this->parent->setAttribute($this->morphType, get_class($model));
+		$this->parent->setAttribute($this->morphType, $model->getMorphClass());
 
 		return $this->parent->setRelation($this->relation, $model);
 	}

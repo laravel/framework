@@ -3,8 +3,6 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class RouteCacheCommand extends Command {
 

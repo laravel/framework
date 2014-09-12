@@ -33,7 +33,7 @@ class Application extends Container implements HttpKernelInterface,
 	 *
 	 * @var string
 	 */
-	const VERSION = '4.3-dev';
+	const VERSION = '5.0-dev';
 
 	/**
 	 * Indicates if the application has "booted".
@@ -762,26 +762,6 @@ class Application extends Container implements HttpKernelInterface,
 	public function getRouteCachePath()
 	{
 		return $this['path.storage'].'/meta/routes.php';
-	}
-
-	/**
-	 * Determine if the application events are cached.
-	 *
-	 * @return bool
-	 */
-	public function eventsAreCached()
-	{
- 		return $this['files']->exists($this->getEventCachePath());
-	}
-
-	/**
-	 * Get the path to the events cache file.
-	 *
-	 * @return string
-	 */
-	public function getEventCachePath()
-	{
-		return $this['path.storage'].'/meta/events.php';
 	}
 
 	/**
