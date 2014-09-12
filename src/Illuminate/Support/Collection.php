@@ -450,24 +450,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function reject($callback)
 	{
-		$results = [];
-
-		foreach ($this->items as $key => $value)
+		if ($callback instanceof Closure)
 		{
-			if ($callback instanceof Closure)
+			return $this->filter(function($item) use ($callback)
 			{
-				if ( ! $callback($value))
-				{
-					$results[$key] = $value;
-				}
-			}
-			elseif ($callback != $value)
-			{
-				$results[$key] = $value;
-			}
+				return ! $callback($item);
+			});
 		}
 
-		return new static($results);
+		return $this->filter(function($item) use ($callback)
+		{
+			return $item != $callback;
+		});
 	}
 
 	/**
