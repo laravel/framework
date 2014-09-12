@@ -847,7 +847,8 @@ class Blueprint {
 	 */
 	public function addedColumns()
 	{
-		return array_filter($this->columns, function($column) {
+		return array_filter($this->columns, function($column)
+		{
 			return !$column->change;
 		});
 	}
@@ -859,7 +860,8 @@ class Blueprint {
 	 */
 	public function changedColumns()
 	{
-		return array_filter($this->columns, function($column) {
+		return array_filter($this->columns, function($column)
+		{
 			return !!$column->change;
 		});
 	}

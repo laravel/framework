@@ -1,12 +1,12 @@
 <?php namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Support\Fluent;
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Schema\TableDiff;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Types\Type;
+use Illuminate\Support\Fluent;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
+use Doctrine\DBAL\Schema\Comparator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Grammar as BaseGrammar;
@@ -112,14 +112,14 @@ abstract class Grammar extends BaseGrammar {
 	 * Compile the blueprint's column definitions.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint $blueprint
-	 * @param bool $change Filter added/changed columns
+	 * @param  bool $change
 	 * @return array
 	 */
 	protected function getColumns(Blueprint $blueprint, $change = false)
 	{
 		$columns = array();
 
-		foreach ( !$change ? $blueprint->addedColumns() : $blueprint->changedColumns() as $column)
+		foreach ($change ? $blueprint->changedColumns() : $blueprint->addedColumns() as $column)
 		{
 			// Each of the column types have their own compiler functions which are tasked
 			// with turning the column definition into its SQL format for this platform
@@ -272,9 +272,11 @@ abstract class Grammar extends BaseGrammar {
 	}
 
 	/**
-	 * @param Blueprint $blueprint
-	 * @param Fluent $command
-	 * @param Connection $connection
+	 * Compile a change column command into a series of SQL statements.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $command
+	 * @param  \Illuminate\Database\Connection $connection
 	 * @return array
 	 */
 	public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
@@ -283,7 +285,7 @@ abstract class Grammar extends BaseGrammar {
 
 		$tableDiff = $this->getChangedDiff($blueprint, $schema);
 
-		if($tableDiff !== false)
+		if ($tableDiff !== false)
 		{
 			return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
 		}
@@ -292,97 +294,93 @@ abstract class Grammar extends BaseGrammar {
 	}
 
 	/**
-	 * @param Blueprint $blueprint
-	 * @param SchemaManager $schema
-	 * @return bool|TableDiff
+	 * Get the Doctrine table difference for the given changes.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
+	 * @return \Doctrine\DBAL\Schema\TableDiff|bool
 	 */
 	protected function getChangedDiff(Blueprint $blueprint, SchemaManager $schema)
 	{
-		$tableName = $this->getTablePrefix().$blueprint->getTable();
+		$table = $schema->listTableDetails($this->getTablePrefix().$blueprint->getTable());
 
-		$table = $schema->listTableDetails($tableName);
-
-		$tableClone = $this->getChangedColumnsClone($blueprint, $table);
-
-		$comparator = new Comparator;
-
-		$tableDiff = $comparator->diffTable($table, $tableClone);
-
-		return $tableDiff;
+		return (new Comparator)->diffTable($table, $this->getChangedColumnsClone($blueprint, $table));
 	}
 
 	/**
 	 * Clone Doctrine table and update column definitions based on blueprint.
 	 *
-	 * @param Blueprint $blueprint
-	 * @param Table $table
-	 * @return Table
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Doctrine\DBAL\Schema\Table  $table
+	 * @return \Doctrine\DBAL\Schema\TableDiff
 	 */
 	protected function getChangedColumnsClone(Blueprint $blueprint, Table $table)
 	{
-		$tableClone = clone $table;
+		$table = clone $table;
 
-		foreach($blueprint->changedColumns() as $fluentColumn)
+		foreach($blueprint->changedColumns() as $fluent)
 		{
-			$tableClone = $tableClone->changeColumn($fluentColumn['name'], array('type' => Type::getType($fluentColumn['type'])));
+			$table = $table->changeColumn(
+				$fluent['name'], array('type' => Type::getType($fluent['type']))
+			);
 
-			$column = $tableClone->getColumn($fluentColumn['name']);
+			$column = $table->getColumn($fluent['name']);
 
-			//Skipable boolean attributes must be reset
-			$column->setNotnull(true);
-			$column->setUnsigned(false);
-
-			foreach ($fluentColumn->getAttributes() as $key => $value)
+			foreach ($fluent->getAttributes() as $key => $value)
 			{
+				$option = $this->mapFluenOptionToDoctrine($key);
 
-				$option = $this->getFluentAttributeDoctrineColumnOptionName($key);
-
-				//Behavior of notnull is opposite of nullable
-				if($option == 'notnull') $value = !$value;
-
-				if( ! is_null($option) )
+				if ( ! is_null($option))
 				{
-					$method = 'set'.ucfirst($option);
-
-					if (method_exists($column, $method))
+					if (method_exists($column, $method = 'set'.ucfirst($option)))
 					{
-						$column->{$method}($value);
+						$column->{$method}($this->mapFluentValueToDoctrine($option, $value));
 					}
 				}
 			}
 		}
 
-		return $tableClone;
+		return $table;
 	}
 
 	/**
-	 * Returns comparable doctrine option for fluent attribute name.
+	 * Get the matching Doctrine value for a given Fluent attribute.
 	 *
-	 * @param $attribute
+	 * @param  string  $option
+	 * @param  mixed  $value
+	 * @return mixed
+	 */
+	protected function mapFluentValueToDoctrine($option, $value)
+	{
+		return $option == 'notnull' ? ! $value : $value;
+	}
+
+	/**
+	 * Get the matching Doctrine option for a given Fluent attribute name.
+	 *
+	 * @param  string  $attribute
 	 * @return string
 	 */
-	protected function getFluentAttributeDoctrineColumnOptionName($attribute) {
-		$option = null;
+	protected function mapFluenOptionToDoctrine($attribute)
+	{
 		switch($attribute)
 		{
 			case 'type':
 			case 'name':
-				//No option for type and name
-				break;
+				return;
+
 			case 'nullable':
-				$option = 'notnull';
-				break;
+				return 'notnull';
+
 			case 'total':
-				$option = 'precision';
-				break;
+				return 'precision';
+
 			case 'places':
-				$option = 'scale';
-				break;
+				return 'scale';
+
 			default:
-				$option = $attribute;
-				break;
+				return $attribute;
 		}
-		return $option;
 	}
 
 }
