@@ -70,8 +70,7 @@
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~3.0",
         "mockery/mockery": "~0.9",
-        "phpunit/phpunit": "~4.0",
-        "doctrine/dbal": "~2.0"
+        "phpunit/phpunit": "~4.0"
     },
     "autoload": {
         "classmap": [
