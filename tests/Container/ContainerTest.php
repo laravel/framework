@@ -329,6 +329,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 
+    public function testSingletonInstanceWithMultipleSingletonCalls()
+    {
+        $container = new Container;
+        $container->singleton('StdClass');
+        $instance_1 = $container->make('StdClass');
+        $container->singleton('StdClass');
+        $instance_2 = $container->make('StdClass');
+        $this->assertSame($instance_1, $instance_2);
+    }
+
 }
 
 class ContainerConcreteStub {}

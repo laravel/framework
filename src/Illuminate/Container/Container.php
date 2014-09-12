@@ -191,7 +191,9 @@ class Container implements ArrayAccess {
 	 */
 	public function singleton($abstract, $concrete = null)
 	{
-		$this->bind($abstract, $concrete, true);
+        if (!$this->isShared($abstract)) {
+            $this->bind($abstract, $concrete, true);
+        }
 	}
 
 	/**
