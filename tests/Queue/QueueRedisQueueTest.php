@@ -86,8 +86,10 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime'), array($redis = m::mock('Illuminate\Redis\Database'), 'default'));
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-		$redis->shouldReceive('zrangebyscore')->once()->with('from', '-inf', 1)->andReturn(array('foo', 'bar'));
-		$redis->shouldReceive('zremrangebyscore')->once()->with('from', '-inf', 1);
+		$redis->shouldReceive('transaction')->once()->andReturn($redis);
+		$redis->shouldReceive('zrangebyscore')->once()->with('from', '-inf', 1)->andReturn($redis);
+		$redis->shouldReceive('zremrangebyscore')->once()->with('from', '-inf', 1)->andReturn($redis);
+		$redis->shouldReceive('execute')->once()->andReturn(array(array('foo', 'bar'), 1));
 		$redis->shouldReceive('rpush')->once()->with('to', 'foo', 'bar');
 
 		$queue->migrateExpiredJobs('from', 'to');
