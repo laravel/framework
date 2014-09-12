@@ -119,7 +119,7 @@ abstract class Grammar extends BaseGrammar {
 	{
 		$columns = array();
 
-		foreach ($change ? $blueprint->changedColumns() : $blueprint->addedColumns() as $column)
+		foreach ($change ? $blueprint->getChangedColumns() : $blueprint->getAddedColumns() as $column)
 		{
 			// Each of the column types have their own compiler functions which are tasked
 			// with turning the column definition into its SQL format for this platform
@@ -304,33 +304,30 @@ abstract class Grammar extends BaseGrammar {
 	{
 		$table = $schema->listTableDetails($this->getTablePrefix().$blueprint->getTable());
 
-		return (new Comparator)->diffTable($table, $this->getChangedColumnsClone($blueprint, $table));
+		return (new Comparator)->diffTable($table, $this->getTableWithColumnChanges($blueprint, $table));
 	}
 
 	/**
-	 * Clone Doctrine table and update column definitions based on blueprint.
+	 * Get a copy of the given Doctrine table after making the column changes.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Doctrine\DBAL\Schema\Table  $table
 	 * @return \Doctrine\DBAL\Schema\TableDiff
 	 */
-	protected function getChangedColumnsClone(Blueprint $blueprint, Table $table)
+	protected function getTableWithColumnChanges(Blueprint $blueprint, Table $table)
 	{
 		$table = clone $table;
 
-		foreach($blueprint->changedColumns() as $fluent)
+		foreach($blueprint->getChangedColumns() as $fluent)
 		{
-			$table = $table->changeColumn(
-				$fluent['name'], array('type' => Type::getType($fluent['type']))
-			);
+			$column = $this->getDoctrineColumnForChange($table, $fluent);
 
-			$column = $table->getColumn($fluent['name']);
-
+			// Here we will spin through each fluent column definition and map it to the proper
+			// Doctrine column definitions, which is necessasry because Laravel and Doctrine
+			// use some different terminology for various column attributes on the tables.
 			foreach ($fluent->getAttributes() as $key => $value)
 			{
-				$option = $this->mapFluenOptionToDoctrine($key);
-
-				if ( ! is_null($option))
+				if ( ! is_null($option = $this->mapFluentOptionToDoctrine($key)))
 				{
 					if (method_exists($column, $method = 'set'.ucfirst($option)))
 					{
@@ -344,15 +341,56 @@ abstract class Grammar extends BaseGrammar {
 	}
 
 	/**
-	 * Get the matching Doctrine value for a given Fluent attribute.
+	 * Get the Doctrine column instance for a column change.
 	 *
-	 * @param  string  $option
-	 * @param  mixed  $value
-	 * @return mixed
+	 * @param  \Doctrine\DBAL\Schema\Table  $table
+	 * @param  \Illuminate\Support\Fluent  $fluent
+	 * @return \Doctrine\DBAL\Schema\Column
 	 */
-	protected function mapFluentValueToDoctrine($option, $value)
+	protected function getDoctrineColumnForChange(Table $table, Fluent $fluent)
 	{
-		return $option == 'notnull' ? ! $value : $value;
+		return $table->changeColumn(
+			$fluent['name'], $this->getDoctrineColumnChangeOptions($fluent)
+		)->getColumn($fluent['name']);
+	}
+
+	/**
+	 * Get the Doctrine column change options.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $fluent
+	 * @return array
+	 */
+	protected function getDoctrineColumnChangeOptions(Fluent $fluent)
+	{
+		$options = ['type' => Type::getType($fluent['type'])];
+
+		if (in_array($fluent['type'], ['text', 'mediumText', 'longText']))
+		{
+			$options['length'] = $this->calculateDoctrineTextLength($fluent['type']);
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Calculate the proper column length to force the Doctrine text type.
+	 *
+	 * @param  string  $type
+	 * @return int
+	 */
+	protected function calculateDoctrineTextLength($type)
+	{
+		switch ($type)
+		{
+			case 'mediumText':
+				return 65535 + 1;
+
+			case 'longText':
+				return 16777215 + 1;
+
+			default:
+				return 255 + 1;
+		}
 	}
 
 	/**
@@ -361,7 +399,7 @@ abstract class Grammar extends BaseGrammar {
 	 * @param  string  $attribute
 	 * @return string
 	 */
-	protected function mapFluenOptionToDoctrine($attribute)
+	protected function mapFluentOptionToDoctrine($attribute)
 	{
 		switch($attribute)
 		{
@@ -381,6 +419,18 @@ abstract class Grammar extends BaseGrammar {
 			default:
 				return $attribute;
 		}
+	}
+
+	/**
+	 * Get the matching Doctrine value for a given Fluent attribute.
+	 *
+	 * @param  string  $option
+	 * @param  mixed  $value
+	 * @return mixed
+	 */
+	protected function mapFluentValueToDoctrine($option, $value)
+	{
+		return $option == 'notnull' ? ! $value : $value;
 	}
 
 }

@@ -103,14 +103,12 @@ class Blueprint {
 	 */
 	protected function addImpliedCommands()
 	{
-		//compileAdd command to add columns
-		if (count($this->addedColumns()) > 0 && ! $this->creating())
+		if (count($this->getAddedColumns()) > 0 && ! $this->creating())
 		{
 			array_unshift($this->commands, $this->createCommand('add'));
 		}
 
-		//compileChange command to modify columns
-		if (count($this->changedColumns()) > 0 && ! $this->creating())
+		if (count($this->getChangedColumns()) > 0 && ! $this->creating())
 		{
 			array_unshift($this->commands, $this->createCommand('change'));
 		}
@@ -845,7 +843,7 @@ class Blueprint {
 	 *
 	 * @return array
 	 */
-	public function addedColumns()
+	public function getAddedColumns()
 	{
 		return array_filter($this->columns, function($column)
 		{
@@ -858,7 +856,7 @@ class Blueprint {
 	 *
 	 * @return array
 	 */
-	public function changedColumns()
+	public function getChangedColumns()
 	{
 		return array_filter($this->columns, function($column)
 		{
