@@ -11,7 +11,7 @@ class Pluralizer {
 		'/(quiz)$/i' => "$1zes",
 		'/^(ox)$/i' => "$1en",
 		'/([m|l])ouse$/i' => "$1ice",
-		'/(matr|vert|ind)ix|ex$/i' => "$1ices",
+		'/(matr|vert|ind)ix$|ex$/i' => "$1ices",
 		'/(stoma|epo|monar|matriar|patriar|oligar|eunu)ch$/i' => "$1chs",
 		'/(x|ch|ss|sh)$/i' => "$1es",
 		'/([^aeiouy]|qu)y$/i' => "$1ies",
