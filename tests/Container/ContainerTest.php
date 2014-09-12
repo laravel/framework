@@ -336,7 +336,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
         $instance_1 = $container->make('StdClass');
         $container->singleton('StdClass');
         $instance_2 = $container->make('StdClass');
-        $this->assertTrue($instance_1 === $instance_2);
+        $this->assertSame($instance_1, $instance_2);
     }
 
 }
