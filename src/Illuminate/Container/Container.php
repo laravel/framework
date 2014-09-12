@@ -998,4 +998,27 @@ class Container implements ArrayAccess, ContainerContract {
 		unset($this->instances[$key]);
 	}
 
+	/**
+	 * Dynamically access container services.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		return $this[$key];
+	}
+
+	/**
+	 * Dynamically set container services.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function __set($key, $value)
+	{
+		$this[$key] = $value;
+	}
+
 }
