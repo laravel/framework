@@ -10,7 +10,6 @@ use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\ChangesCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
-use Illuminate\Foundation\Console\EventCacheCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
@@ -41,7 +40,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'ConsoleMake',
 		'Down',
 		'Environment',
-		'EventCache',
 		'KeyGenerate',
 		'Optimize',
 		'ProviderMake',
@@ -158,19 +156,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->bindShared('command.environment', function()
 		{
 			return new EnvironmentCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerEventCacheCommand()
-	{
-		$this->app->bindShared('command.event.cache', function($app)
-		{
-			return new EventCacheCommand($app['files']);
 		});
 	}
 

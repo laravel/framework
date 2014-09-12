@@ -765,26 +765,6 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * Determine if the application events are cached.
-	 *
-	 * @return bool
-	 */
-	public function eventsAreCached()
-	{
- 		return $this['files']->exists($this->getEventCachePath());
-	}
-
-	/**
-	 * Get the path to the events cache file.
-	 *
-	 * @return string
-	 */
-	public function getEventCachePath()
-	{
-		return $this['path.storage'].'/meta/events.php';
-	}
-
-	/**
 	 * Handle the given request and get the response.
 	 *
 	 * Provides compatibility with BrowserKit functional testing.
