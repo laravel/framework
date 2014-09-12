@@ -73,7 +73,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		}
 
 		$this->commands(
-			'command.changes', 'command.environment', 'command.event.cache',
+			'command.changes', 'command.environment',
 			'command.route.cache', 'command.route.clear', 'command.route.list',
 			'command.request.make', 'command.tinker', 'command.console.make',
 			'command.key.generate', 'command.down', 'command.up', 'command.clear-compiled',
@@ -298,7 +298,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	{
 		return [
 			'artisan', 'command.changes', 'command.environment',
-			'command.event.cache', 'command.route.cache', 'command.route.clear',
+			'command.route.cache', 'command.route.clear',
 			'command.route.list', 'command.request.make', 'command.tinker',
 			'command.console.make', 'command.key.generate', 'command.down',
 			'command.up', 'command.clear-compiled', 'command.optimize',
