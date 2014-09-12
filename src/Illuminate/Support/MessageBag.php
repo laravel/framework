@@ -37,6 +37,16 @@ class MessageBag implements Arrayable, Countable, Jsonable, MessageProvider, Jso
 	}
 
 	/**
+	 * Get the keys present in the message bag.
+	 *
+	 * @return array
+	 */
+	public function keys()
+	{
+		return array_keys($this->messages);
+	}
+
+	/**
 	 * Add a message to the bag.
 	 *
 	 * @param  string  $key
