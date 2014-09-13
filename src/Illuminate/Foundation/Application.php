@@ -1018,7 +1018,9 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function getEnvironmentVariablesLoader()
 	{
-		return new FileEnvironmentVariablesLoader(new Filesystem, $this['path.base']);
+		$env = $this->bound('path.env') ? $this['path.env'] : $this['path.base'];
+
+		return new FileEnvironmentVariablesLoader(new Filesystem, $env);
 	}
 
 	/**
