@@ -1,5 +1,5 @@
 filter:
-    excluded_paths: [tests/*]
+    excluded_paths: [tests/*, spec/*]
 
 checks:
     php:
