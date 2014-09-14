@@ -244,6 +244,8 @@ class Validator implements MessageProviderInterface {
 	 * @param  string  $attribute
 	 * @param  array   $ruleSet
 	 * @param  array   $messages
+	 * @return void
+	 *
 	 * @throws \InvalidArgumentException
 	 */
 	public function iterate($attribute, array $ruleSet = [], $messages = [])
@@ -267,7 +269,6 @@ class Validator implements MessageProviderInterface {
 			$this->addIteratedValidationRules($attribute.'.'.$i.'.', $ruleSet, $messages);
 		}
 	}
-
 
 	/**
 	 * Merge additional rules into a given attribute.
@@ -2556,7 +2557,6 @@ class Validator implements MessageProviderInterface {
 			throw new \InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
 		}
 	}
-
 
 	/**
 	 * Add rules for a particular index of an array.

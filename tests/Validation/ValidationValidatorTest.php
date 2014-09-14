@@ -1347,7 +1347,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 	}
 
-	
+
 	public function testIteratingValidatorCanFailWithNoNesting()
 	{
 		$input = $this->iteratingInput();
