@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Container\Container;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Controller {
@@ -20,18 +21,18 @@ abstract class Controller {
 	protected $afterFilters = array();
 
 	/**
+	 * The container instance.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
+
+	/**
 	 * The route filterer implementation.
 	 *
 	 * @var \Illuminate\Routing\RouteFiltererInterface
 	 */
 	protected static $filterer;
-
-	/**
-	 * The layout used by the controller.
-	 *
-	 * @var \Illuminate\View\View
-	 */
-	protected $layout;
 
 	/**
 	 * Register a "before" filter on the controller.
@@ -211,13 +212,6 @@ abstract class Controller {
 	}
 
 	/**
-	 * Create the layout used by the controller.
-	 *
-	 * @return void
-	 */
-	protected function setupLayout() {}
-
-	/**
 	 * Execute an action on the controller.
 	 *
 	 * @param  string  $method
@@ -226,19 +220,7 @@ abstract class Controller {
 	 */
 	public function callAction($method, $parameters)
 	{
-		$this->setupLayout();
-
-		$response = call_user_func_array(array($this, $method), $parameters);
-
-		// If no response is returned from the controller action and a layout is being
-		// used we will assume we want to just return the layout view as any nested
-		// views were probably bound on this view during this controller actions.
-		if (is_null($response) && ! is_null($this->layout))
-		{
-			$response = $this->layout;
-		}
-
-		return $response;
+		return call_user_func_array(array($this, $method), $parameters);
 	}
 
 	/**
@@ -252,6 +234,19 @@ abstract class Controller {
 	public function missingMethod($parameters = array())
 	{
 		throw new NotFoundHttpException("Controller method not found.");
+	}
+
+	/**
+	 * Set the container instance on the controller.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return $this
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+
+		return $this;
 	}
 
 	/**

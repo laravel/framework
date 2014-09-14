@@ -50,7 +50,7 @@ class RemindersTableCommand extends Command {
 
 		$this->files->put($fullPath, $this->getMigrationStub());
 
-		$this->info('Migration created successfully!');
+		$this->info('Migration created successfully.');
 
 		$this->call('dump-autoload');
 	}
@@ -64,7 +64,7 @@ class RemindersTableCommand extends Command {
 	{
 		$name = 'create_password_reminders_table';
 
-		$path = $this->laravel['path'].'/database/migrations';
+		$path = $this->laravel['path.database'].'/migrations';
 
 		return $this->laravel['migration.creator']->create($name, $path);
 	}

@@ -16,7 +16,7 @@ class ClearRemindersCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Flush expired reminders.';
+	protected $description = 'Flush expired password reminders';
 
 	/**
 	 * Execute the console command.

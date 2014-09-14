@@ -1,24 +1,26 @@
 <?php namespace Illuminate\Auth;
 
-use Illuminate\Cookie\CookieJar;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Auth\User as UserContract;
+use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
+use Illuminate\Contracts\Auth\Authenticator as AuthenticatorContract;
 
-class Guard {
+class Guard implements AuthenticatorContract {
 
 	/**
 	 * The currently authenticated user.
 	 *
-	 * @var \Illuminate\Auth\UserInterface
+	 * @var \Illuminate\Contracts\Auth\User
 	 */
 	protected $user;
 
 	/**
 	 * The user we last attempted to retrieve.
 	 *
-	 * @var \Illuminate\Auth\UserInterface
+	 * @var \Illuminate\Contracts\Auth\User
 	 */
 	protected $lastAttempted;
 
@@ -46,7 +48,7 @@ class Guard {
 	/**
 	 * The Illuminate cookie creator service.
 	 *
-	 * @var \Illuminate\Cookie\CookieJar
+	 * @var \Illuminate\Contracts\Cookie\QueueingFactory
 	 */
 	protected $cookie;
 
@@ -60,7 +62,7 @@ class Guard {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -118,7 +120,7 @@ class Guard {
 	/**
 	 * Get the currently authenticated user.
 	 *
-	 * @return \Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Contracts\Auth\User|null
 	 */
 	public function user()
 	{
@@ -141,7 +143,7 @@ class Guard {
 
 		if ( ! is_null($id))
 		{
-			$user = $this->provider->retrieveByID($id);
+			$user = $this->provider->retrieveById($id);
 		}
 
 		// If the user is null, but we decrypt a "recaller" cookie we can attempt to
@@ -406,11 +408,11 @@ class Guard {
 	/**
 	 * Log a user into the application.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Contracts\Auth\User  $user
 	 * @param  bool  $remember
 	 * @return void
 	 */
-	public function login(UserInterface $user, $remember = false)
+	public function login(UserContract $user, $remember = false)
 	{
 		$this->updateSession($user->getAuthIdentifier());
 
@@ -453,7 +455,7 @@ class Guard {
 	 *
 	 * @param  mixed  $id
 	 * @param  bool   $remember
-	 * @return \Illuminate\Auth\UserInterface
+	 * @return \Illuminate\Contracts\Auth\User
 	 */
 	public function loginUsingId($id, $remember = false)
 	{
@@ -474,16 +476,16 @@ class Guard {
 	{
 		$this->setUser($this->provider->retrieveById($id));
 
-		return $this->user instanceof UserInterface;
+		return $this->user instanceof UserContract;
 	}
 
 	/**
 	 * Queue the recaller cookie into the cookie jar.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Contracts\Auth\User  $user
 	 * @return void
 	 */
-	protected function queueRecallerCookie(UserInterface $user)
+	protected function queueRecallerCookie(UserContract $user)
 	{
 		$value = $user->getAuthIdentifier().'|'.$user->getRememberToken();
 
@@ -550,10 +552,10 @@ class Guard {
 	/**
 	 * Refresh the remember token for the user.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Contracts\Auth\User  $user
 	 * @return void
 	 */
-	protected function refreshRememberToken(UserInterface $user)
+	protected function refreshRememberToken(UserContract $user)
 	{
 		$user->setRememberToken($token = str_random(60));
 
@@ -563,10 +565,10 @@ class Guard {
 	/**
 	 * Create a new remember token for the user if one doesn't already exist.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Contracts\Auth\User  $user
 	 * @return void
 	 */
-	protected function createRememberTokenIfDoesntExist(UserInterface $user)
+	protected function createRememberTokenIfDoesntExist(UserContract $user)
 	{
 		$rememberToken = $user->getRememberToken();
 
@@ -579,7 +581,7 @@ class Guard {
 	/**
 	 * Get the cookie creator instance used by the guard.
 	 *
-	 * @return \Illuminate\Cookie\CookieJar
+	 * @return \Illuminate\Contracts\Cookie\QueueingFactory
 	 *
 	 * @throws \RuntimeException
 	 */
@@ -596,7 +598,7 @@ class Guard {
 	/**
 	 * Set the cookie creator instance used by the guard.
 	 *
-	 * @param  \Illuminate\Cookie\CookieJar  $cookie
+	 * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
 	 * @return void
 	 */
 	public function setCookieJar(CookieJar $cookie)
@@ -607,7 +609,7 @@ class Guard {
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public function getDispatcher()
 	{
@@ -617,7 +619,7 @@ class Guard {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
@@ -659,7 +661,7 @@ class Guard {
 	/**
 	 * Return the currently cached user of the application.
 	 *
-	 * @return \Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Contracts\Auth\User|null
 	 */
 	public function getUser()
 	{
@@ -669,10 +671,10 @@ class Guard {
 	/**
 	 * Set the current user of the application.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Contracts\Auth\User  $user
 	 * @return void
 	 */
-	public function setUser(UserInterface $user)
+	public function setUser(UserContract $user)
 	{
 		$this->user = $user;
 
@@ -705,7 +707,7 @@ class Guard {
 	/**
 	 * Get the last user we attempted to authenticate.
 	 *
-	 * @return \Illuminate\Auth\UserInterface
+	 * @return \Illuminate\Contracts\Auth\User
 	 */
 	public function getLastAttempted()
 	{
