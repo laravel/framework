@@ -25,6 +25,36 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAfterCallbacksAreCalledWithValidatorInstance()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
+		$v->setContainer(new Illuminate\Container\Container);
+		$v->after(function()
+		{
+			$_SERVER['__validator.after.test'] = true;
+		});
+
+		$this->assertFalse($v->passes());
+		$this->assertTrue($_SERVER['__validator.after.test']);
+
+		unset($_SERVER['__validator.after.test']);
+
+		/**
+		 * Class Based Callback
+		 */
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
+		$v->setContainer(new Illuminate\Container\Container);
+		$v->after('ValidatorTestAfterCallbackStub');
+
+		$this->assertFalse($v->passes());
+		$this->assertTrue($_SERVER['__validator.after.test']);
+
+		unset($_SERVER['__validator.after.test']);
+	}
+
+
 	public function testHasFailedValidationRules()
 	{
 		$trans = $this->getRealTranslator();
@@ -1261,6 +1291,96 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo!', $v->messages()->first('name'));
 	}
 
+	public function testIterableValidator()
+	{
+		// Test that it can pass with no nested arrays
+		$trans = $this->getRealTranslator();
+		$input = array(
+			'iterable' => array(
+				array(
+					'foo' => 'bar',
+					'baz' => 'buz'
+				),
+				array(
+					'foo' => 'ping',
+					'baz' => 'pong'
+				),
+			),
+			'foo' => 'bar'
+		);
+		$v = new Validator(
+			$trans,
+			$input,
+			array('iterable' => 'array', 'foo' => 'required')
+		);
+
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
+		$this->assertTrue($v->passes());
+
+		// Test that it can fail with no nested arrays
+		$trans = $this->getRealTranslator();
+		$v = new Validator(
+		  $trans,
+		  $input,
+		  array('iterable' => 'array', 'foo' => 'required')
+		);
+
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|integer'));
+		$this->assertTrue($v->fails());
+
+		// Test that it passes for nested repeating arrays
+		$trans = $this->getRealTranslator();
+		$input['foo'] = array(
+			array(
+				'bar' => array(
+					array('baz' => 'buz'),
+					array('baz' => 'foo'),
+				),
+			),
+		);
+		$v = new Validator(
+		  	$trans,
+		  	$input,
+		  	array('iterable' => 'array', 'foo' => 'array')
+		);
+
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
+		$v->iterate(
+		  	'foo',
+		  	array(
+			  	'bar' => array(
+					'required',
+					'array',
+					'iterate' => array(
+						'rules' => array(
+					  		'baz' => 'required|alpha'
+						)
+					)
+				)
+			)
+		);
+		$this->assertTrue($v->passes());
+
+		// Test it can fail for nested repeating arrays
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
+		$v->iterate(
+			'foo',
+			array(
+				'bar' => array(
+					'array',
+					'iterate' => array(
+						'rules' => array(
+							'baz' => 'required|integer'
+						)
+					)
+				)
+			)
+		);
+
+		$this->assertTrue($v->fails());
+
+    }
+
 
 	public function testClassBasedCustomValidators()
 	{
@@ -1346,4 +1466,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		return $trans;
 	}
 
+}
+
+
+class ValidatorTestAfterCallbackStub {
+	public function validate() {
+		$_SERVER['__validator.after.test'] = true;
+	}
 }

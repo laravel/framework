@@ -24,7 +24,7 @@ class Manager {
      */
     public function __construct(Container $container = null)
     {
-        $this->setupContainer($container);
+        $this->setupContainer($container ?: new Container);
 
         // Once we have the container setup, we will setup the default configuration
         // options in the container "config" bindings. This just makes this queue

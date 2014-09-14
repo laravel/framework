@@ -43,7 +43,7 @@ class BaseCommand extends Command {
 			return $this->laravel['path.base'].$path;
 		}
 
-		return $this->laravel['path'].'/database/migrations';
+		return $this->laravel['path.database'].'/migrations';
 	}
 
 }

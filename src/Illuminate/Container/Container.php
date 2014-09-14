@@ -3,9 +3,12 @@
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
+use ReflectionMethod;
+use ReflectionFunction;
 use ReflectionParameter;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
-class Container implements ArrayAccess {
+class Container implements ArrayAccess, ContainerContract {
 
 	/**
 	 * An array of the types that have been resolved.
@@ -55,6 +58,13 @@ class Container implements ArrayAccess {
 	 * @var array
 	 */
 	protected $globalResolvingCallbacks = array();
+
+	/**
+	 * All of the global after resolving callbacks.
+	 *
+	 * @var array
+	 */
+	protected $globalAfterResolvingCallbacks = array();
 
 	/**
 	 * Determine if a given string is resolvable.
@@ -402,6 +412,116 @@ class Container implements ArrayAccess {
 	}
 
 	/**
+	 * Wrap the given closure such that its dependencies will be injected when executed.
+	 *
+	 * @param  \Closure  $callback
+	 * @param  array  $parameters
+	 * @return \Closure
+	 */
+	public function wrap(Closure $callback, array $parameters = array())
+	{
+		return function() use ($callback, $parameters)
+		{
+			return $this->call($callback, $parameters);
+		};
+	}
+
+	/**
+	 * Call the given Closure and inject its dependencies.
+	 *
+	 * @param  callable  $callback
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function call($callback, array $parameters = array(), $defaultMethod = null)
+	{
+		if (is_string($callback))
+		{
+			return $this->callClass($callback, $parameters, $defaultMethod);
+		}
+
+		$dependencies = [];
+
+		foreach ($this->getCallReflector($callback)->getParameters() as $key => $parameter)
+		{
+			$dependencies[] = $this->getDependencyForCallParameter($parameter, $parameters);
+		}
+
+		return call_user_func_array($callback, $dependencies);
+	}
+
+	/**
+	 * Get the proper reflection instance for the given callback.
+	 *
+	 * @param  \Closure|array  $callback
+	 * @return \ReflectionFunctionAbstract
+	 */
+	protected function getCallReflector($callback)
+	{
+		if (is_array($callback))
+		{
+			return new ReflectionMethod($callback[0], $callback[1]);
+		}
+		else
+		{
+			return new ReflectionFunction($callback);
+		}
+	}
+
+	/**
+	 * Get the dependency for the given call parameter.
+	 *
+	 * @param  \ReflectionParameter  $parameter
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	protected function getDependencyForCallParameter(ReflectionParameter $parameter, array $parameters)
+	{
+		if (array_key_exists($parameter->name, $parameters))
+		{
+			return $parameters[$parameter->name];
+		}
+		elseif ($parameter->getClass())
+		{
+			return $this->make($parameter->getClass()->name);
+		}
+		elseif ($parameter->isDefaultValueAvailable())
+		{
+			return $parameter->getDefaultValue();
+		}
+	}
+
+	/**
+	 * Call a string reference to a class using Class@method syntax.
+	 *
+	 * @param  string  $target
+	 * @param  array  $parameters
+	 * @param  string|null  $defaultMethod
+	 * @return mixed
+	 */
+	protected function callClass($target, array $parameters = array(), $defaultMethod = null)
+	{
+		// If the listener has an @ sign, we will assume it is being used to delimit
+		// the class name from the handle method name. This allows for handlers
+		// to run multiple handler methods in a single class for convenience.
+		$segments = explode('@', $target);
+
+		$method = count($segments) == 2 ? $segments[1] : $defaultMethod;
+
+		if (is_null($method))
+		{
+			throw new \InvalidArgumentException("Method not provided.");
+		}
+
+		// We will make a callable of the listener instance and a method that should
+		// be called on that instance, then we will pass in the arguments that we
+		// received in this method into this listener class instance's methods.
+		$callable = array($this->make($segments[0]), $method);
+
+		return call_user_func_array($callable, $parameters);
+	}
+
+	/**
 	 * Resolve the given type from the container.
 	 *
 	 * @param  string  $abstract
@@ -677,6 +797,17 @@ class Container implements ArrayAccess {
 	}
 
 	/**
+	 * Register a new after resolving callback for all types.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function afterResolvingAny(Closure $callback)
+	{
+		$this->globalAfterResolvingCallbacks[] = $callback;
+	}
+
+	/**
 	 * Fire all of the resolving callbacks.
 	 *
 	 * @param  string  $abstract
@@ -691,6 +822,8 @@ class Container implements ArrayAccess {
 		}
 
 		$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
+
+		$this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
 	}
 
 	/**
@@ -703,7 +836,7 @@ class Container implements ArrayAccess {
 	{
 		foreach ($callbacks as $callback)
 		{
-			call_user_func($callback, $object, $this);
+			$callback($object, $this);
 		}
 	}
 
@@ -792,6 +925,19 @@ class Container implements ArrayAccess {
 	public function forgetInstances()
 	{
 		$this->instances = array();
+	}
+
+	/**
+	 * Flush the container of all bindings and resolved instances.
+	 *
+	 * @return void
+	 */
+	public function flush()
+	{
+		$this->aliases = [];
+		$this->resolved = [];
+		$this->bindings = [];
+		$this->instances = [];
 	}
 
 	/**

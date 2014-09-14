@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Pagination;
 
 use Illuminate\Http\Request;
-use Illuminate\View\Factory as ViewFactory;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class Factory {
@@ -16,7 +16,7 @@ class Factory {
 	/**
 	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Factory
+	 * @var \Illuminate\Contracts\View\Factory
 	 */
 	protected $view;
 
@@ -66,7 +66,7 @@ class Factory {
 	 * Create a new pagination factory.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Illuminate\View\Factory  $view
+	 * @param  \Illuminate\Contracts\View\Factory  $view
 	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
 	 * @return void
@@ -258,7 +258,7 @@ class Factory {
 	/**
 	 * Get the current view factory.
 	 *
-	 * @return \Illuminate\View\Factory
+	 * @return \Illuminate\Contracts\View\Factory
 	 */
 	public function getViewFactory()
 	{
@@ -268,7 +268,7 @@ class Factory {
 	/**
 	 * Set the current view factory.
 	 *
-	 * @param  \Illuminate\View\Factory  $view
+	 * @param  \Illuminate\Contracts\View\Factory  $view
 	 * @return void
 	 */
 	public function setViewFactory(ViewFactory $view)

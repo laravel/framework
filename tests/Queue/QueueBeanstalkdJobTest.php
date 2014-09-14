@@ -33,7 +33,7 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 	public function testReleaseProperlyReleasesJobOntoBeanstalkd()
 	{
 		$job = $this->getJob();
-		$job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), Pheanstalk_Pheanstalk::DEFAULT_PRIORITY, 0);
+		$job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 0);
 
 		$job->release();
 	}
@@ -52,8 +52,8 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 	{
 		return new Illuminate\Queue\Jobs\BeanstalkdJob(
 			m::mock('Illuminate\Container\Container'),
-			m::mock('Pheanstalk_Pheanstalk'),
-			m::mock('Pheanstalk_Job'),
+			m::mock('Pheanstalk\Pheanstalk'),
+			m::mock('Pheanstalk\Job'),
 			'default'
 		);
 	}

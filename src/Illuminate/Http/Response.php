@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Http;
 
 use ArrayObject;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\RenderableInterface;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Renderable;
 
 class Response extends \Symfony\Component\HttpFoundation\Response {
 
@@ -35,10 +35,10 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 			$content = $this->morphToJson($content);
 		}
 
-		// If this content implements the "RenderableInterface", then we will call the
+		// If this content implements the "Renderable" interface then we will call the
 		// render method on the object so we will avoid any "__toString" exceptions
 		// that might be thrown and have their errors obscured by PHP's handling.
-		elseif ($content instanceof RenderableInterface)
+		elseif ($content instanceof Renderable)
 		{
 			$content = $content->render();
 		}
@@ -54,7 +54,7 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 */
 	protected function morphToJson($content)
 	{
-		if ($content instanceof JsonableInterface) return $content->toJson();
+		if ($content instanceof Jsonable) return $content->toJson();
 
 		return json_encode($content);
 	}
@@ -67,7 +67,7 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 */
 	protected function shouldBeJson($content)
 	{
-		return $content instanceof JsonableInterface ||
+		return $content instanceof Jsonable ||
 			   $content instanceof ArrayObject ||
 			   is_array($content);
 	}

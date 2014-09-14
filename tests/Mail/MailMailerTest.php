@@ -75,7 +75,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 	{
 		list($view, $swift) = $this->getMocks();
 		$mailer = new Illuminate\Mail\Mailer($view, $swift);
-		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
 		$queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), null);
 
 		$mailer->queue('foo', array(1), 'callable');
@@ -86,7 +86,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 	{
 		list($view, $swift) = $this->getMocks();
 		$mailer = new Illuminate\Mail\Mailer($view, $swift);
-		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
 		$queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), 'queue');
 
 		$mailer->queueOn('queue', 'foo', array(1), 'callable');
@@ -97,7 +97,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 	{
 		list($view, $swift) = $this->getMocks();
 		$mailer = new Illuminate\Mail\Mailer($view, $swift);
-		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
 		$serialized = serialize(new Illuminate\Support\SerializableClosure($closure = function() {}));
 		$queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => $serialized), null);
 
@@ -109,7 +109,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 	{
 		list($view, $swift) = $this->getMocks();
 		$mailer = new Illuminate\Mail\Mailer($view, $swift);
-		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
 		$queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), null);
 
 		$mailer->later(10, 'foo', array(1), 'callable');
@@ -120,7 +120,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 	{
 		list($view, $swift) = $this->getMocks();
 		$mailer = new Illuminate\Mail\Mailer($view, $swift);
-		$mailer->setQueue($queue = m::mock('Illuminate\Queue\QueueManager'));
+		$mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
 		$queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => 'callable'), 'queue');
 
 		$mailer->laterOn('queue', 10, 'foo', array(1), 'callable');
@@ -141,7 +141,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 		$message->shouldReceive('getTo')->once()->andReturn(array('taylor@userscape.com' => 'Taylor'));
 		$message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
 		$mailer->getSwiftMailer()->shouldReceive('send')->never();
-		$logger = m::mock('Illuminate\Log\Writer');
+		$logger = m::mock('Psr\Log\LoggerInterface');
 		$logger->shouldReceive('info')->once()->with('Pretending to mail message to: taylor@userscape.com');
 		$mailer->setLogger($logger);
 		$mailer->pretend();
@@ -211,13 +211,13 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 
 	protected function getMailer()
 	{
-		return new Illuminate\Mail\Mailer(m::mock('Illuminate\View\Factory'), m::mock('Swift_Mailer'));
+		return new Illuminate\Mail\Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'));
 	}
 
 
 	protected function getMocks()
 	{
-		return array(m::mock('Illuminate\View\Factory'), m::mock('Swift_Mailer'));
+		return array(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'));
 	}
 
 }

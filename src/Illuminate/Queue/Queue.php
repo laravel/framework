@@ -3,8 +3,8 @@
 use Closure;
 use DateTime;
 use Illuminate\Container\Container;
-use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\SerializableClosure;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 abstract class Queue {
 
@@ -132,10 +132,10 @@ abstract class Queue {
 	/**
 	 * Set the encrypter instance.
 	 *
-	 * @param  \Illuminate\Encryption\Encrypter  $crypt
+	 * @param  \Illuminate\Contracts\Encryption\EncrypterContract  $crypt
 	 * @return void
 	 */
-	public function setEncrypter(Encrypter $crypt)
+	public function setEncrypter(EncrypterContract $crypt)
 	{
 		$this->crypt = $crypt;
 	}

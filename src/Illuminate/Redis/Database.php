@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Redis;
 
 use Predis\Client;
+use Illuminate\Contracts\Redis\Database as DatabaseContract;
 
-class Database {
+class Database implements DatabaseContract {
 
 	/**
 	 * The host address of the database.
