@@ -261,33 +261,33 @@ class Validator implements MessageProvider {
 		}
 	}
 
-    /**
-     * @param $attribute
-     * @param array $ruleSet
-     * @param array $messages
-     * @throws \InvalidArgumentException
-     */
-    public function iterate($attribute, array $ruleSet = [], $messages = [])
-    {
-        $payload = array_merge($this->data, $this->files);
-        $input = array_get($payload, $attribute);
+    	/**
+    	* @param $attribute
+     	* @param array $ruleSet
+     	* @param array $messages
+     	* @throws \InvalidArgumentException
+     	*/
+    	public function iterate($attribute, array $ruleSet = [], $messages = [])
+    	{
+        	$payload = array_merge($this->data, $this->files);
+        	$input = array_get($payload, $attribute);
 
-        if (!is_null($input) && !is_array($input))
-        {
-            throw new \InvalidArgumentException('Attribute for iterate() must be an array.');
-        }
+	        if (!is_null($input) && !is_array($input))
+    	    {
+        	    throw new \InvalidArgumentException('Attribute for iterate() must be an array.');
+        	}
 
-        if (!$entries = count($input))
-        {
-            //Whatever you're trying to iterate, the payload didn't have any
-            return;
-        }
+    	    if (!$entries = count($input))
+        	{
+            	//Whatever you're trying to iterate, the payload didn't have any
+            	return;
+        	}
 
-        for ($i = 0; $i < $entries; $i++)
-        {
-            $this->addIteratedValidationRules($attribute.'.'.$i.'.', $ruleSet, $messages);
-        }
-    }
+	        for ($i = 0; $i < $entries; $i++)
+    	    {
+        	    $this->addIteratedValidationRules($attribute.'.'.$i.'.', $ruleSet, $messages);
+        	}
+    	}
 
 
 	/**
