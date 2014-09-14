@@ -1332,23 +1332,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 	}
 
-	public function testIterableValidator()
+
+	public function testIteratingValidatorCanPasWithNoNesting()
 	{
-		// Test that it can pass with no nested arrays
+		$input = $this->iteratingInput();
 		$trans = $this->getRealTranslator();
-		$input = array(
-			'iterable' => array(
-				array(
-					'foo' => 'bar',
-					'baz' => 'buz'
-				),
-				array(
-					'foo' => 'ping',
-			  		'baz' => 'pong'
-				),
-		  	),
-			'foo' => 'bar'
-		);
 		$v = new Validator(
 			$trans,
 			$input,
@@ -1357,8 +1345,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
 		$this->assertTrue($v->passes());
+	}
 
-		// Test that it can fail with no nested arrays
+
+	public function testIteratingValidatorCanFailWithNoNesting()
+	{
+		$input = $this->iteratingInput();
 		$trans = $this->getRealTranslator();
 		$v = new Validator(
 			$trans,
@@ -1368,9 +1360,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|integer'));
 		$this->assertTrue($v->fails());
+	}
 
-		// Test that it passes for nested repeating arrays
+
+	public function testIteratingValidatorCanPassWithNesting()
+	{
 		$trans = $this->getRealTranslator();
+		$input = $this->iteratingInput();
 		$input['foo'] = array(
 			array(
 				'bar' => array(
@@ -1401,8 +1397,27 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 		$this->assertTrue($v->passes());
+	}
 
-		// Test it can fail for nested repeating arrays
+
+	public function testIteratingValidatorCanFailWithNesting()
+	{
+		$trans = $this->getRealTranslator();
+		$input = $this->iteratingInput();
+		$input['foo'] = array(
+			array(
+				'bar' => array(
+					array('baz' => 'buz'),
+					array('baz' => 'foo'),
+				),
+			),
+		);
+
+		$v = new Validator(
+			$trans,
+			$input,
+			array('iterable' => 'array', 'foo' => 'array')
+		);
 		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
 		$v->iterate(
 			'foo',
@@ -1419,10 +1434,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		);
 
 		$this->assertTrue($v->fails());
-
 	}
-
-
 
 
 	protected function getTranslator()
@@ -1436,6 +1448,27 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = new Symfony\Component\Translation\Translator('en', new Symfony\Component\Translation\MessageSelector);
 		$trans->addLoader('array', new Symfony\Component\Translation\Loader\ArrayLoader);
 		return $trans;
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function iteratingInput()
+	{
+		$input = array(
+		  'iterable' => array(
+			array(
+			  'foo' => 'bar',
+			  'baz' => 'buz'
+			),
+			array(
+			  'foo' => 'ping',
+			  'baz' => 'pong'
+			),
+		  ),
+		  'foo' => 'bar'
+		);
+		return $input;
 	}
 
 }

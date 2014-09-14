@@ -239,11 +239,13 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Add rules to be applied to a repeatable indexed array
+	 * Add rules to be applied to a repeatable indexed array.
 	 *
-	 * @param $attribute
-	 * @param array $ruleSet
-	 * @param array $messages
+	 * @param  string  $attribute
+	 * @param  array   $ruleSet
+	 * @param  array   $messages
+	 * @return void
+	 *
 	 * @throws \InvalidArgumentException
 	 */
 	public function iterate($attribute, array $ruleSet = [], $messages = [])
@@ -267,7 +269,6 @@ class Validator implements MessageProviderInterface {
 			$this->addIteratedValidationRules($attribute.'.'.$i.'.', $ruleSet, $messages);
 		}
 	}
-
 
 	/**
 	 * Merge additional rules into a given attribute.
@@ -2557,14 +2558,12 @@ class Validator implements MessageProviderInterface {
 		}
 	}
 
-
 	/**
-	 * Add rules for a particular index of an array
+	 * Add rules for a particular index of an array.
 	 *
-	 * @param string $attribute
-	 * @param array $ruleSet
-	 * @param array $messages
-	 *
+	 * @param  string  $attribute
+	 * @param  array   $ruleSet
+	 * @param  array   $messages
 	 * @return void
 	 */
 	protected function addIteratedValidationRules($attribute, $ruleSet = [], $messages = [])
@@ -2574,7 +2573,7 @@ class Validator implements MessageProviderInterface {
 			$rules = str_replace('required_with_parent', rtrim('required_with:'.$attribute, '.'), $rules);
 			$rules = is_string($rules) ? explode('|', $rules) : $rules;
 
-			//If it contains nested iterated items, recursively add validation rules for them too
+			//If it contains nested iterated items, recursively add validation rules for them too.
 			if(isset($rules['iterate']))
 			{
 				$this->iterateNestedRuleSet($attribute.$field, $rules);
@@ -2588,11 +2587,10 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Add custom messages to be applied at a particular index of a repeating input array
+	 * Add custom messages to be applied at a particular index of a repeating input array.
 	 *
-	 * @param $attribute
-	 * @param array $messages
-	 *
+	 * @param  string  $attribute
+	 * @param  array   $messages
 	 * @return void
 	 */
 	protected function addIteratedValidationMessages($attribute, $messages = [])
@@ -2607,14 +2605,12 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Apply the iterate() function to a set of rules and messages
-	 * Used for cleaner recursive calls to iterate(), when nested
-	 * repeatable fields are present
+	 * Apply the iterate() function to a set of rules and messages.
 	 *
 	 * @see addIteratedValidationRules()
-	 * @param $attribute
-	 * @param $rules
 	 *
+	 * @param  string  $attribute
+	 * @param  array   $rules
 	 * @return void
 	 */
 	protected function iterateNestedRuleSet($attribute, $rules)
