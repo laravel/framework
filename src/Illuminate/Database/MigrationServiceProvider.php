@@ -108,7 +108,7 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.migrate', function($app)
 		{
-			$packagePath = $app['path.base'].'/vendor';
+			$packagePath = $app['path.composer'].'/vendor';
 
 			return new MigrateCommand($app['migrator'], $packagePath);
 		});
@@ -190,7 +190,7 @@ class MigrationServiceProvider extends ServiceProvider {
 			// creation of the migrations, and may be extended by these developers.
 			$creator = $app['migration.creator'];
 
-			$packagePath = $app['path.base'].'/vendor';
+			$packagePath = $app['path.composer'].'/vendor';
 
 			return new MigrateMakeCommand($creator, $packagePath);
 		});

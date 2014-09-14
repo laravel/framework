@@ -43,7 +43,7 @@ class MigratePublishCommand extends Command {
 	 */
 	protected function getSourcePath()
 	{
-		$vendor = $this->laravel['path.base'].'/vendor';
+		$vendor = $this->laravel['path.composer'].'/vendor';
 
 		return $vendor.'/'.$this->argument('package').'/src/migrations';
 	}

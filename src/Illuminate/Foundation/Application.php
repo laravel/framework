@@ -193,6 +193,12 @@ class Application extends Container implements HttpKernelInterface,
 	{
 		$this->instance('path', realpath($paths['app']));
 
+		// Defaults path.composer to path.base
+		if (!isset($paths['composer']) && isset($paths['base']))
+		{
+			$paths['composer'] = $paths['base'];
+		}
+
 		// Here we will bind the install paths into the container as strings that can be
 		// accessed from any point in the system. Each path key is prefixed with path
 		// so that they have the consistent naming convention inside the container.

@@ -22,7 +22,7 @@ class ComposerServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('composer', function($app)
 		{
-			return new Composer($app['files'], $app['path.base']);
+			return new Composer($app['files'], $app['path.composer']);
 		});
 
 		$this->app->bindShared('command.dump-autoload', function($app)
