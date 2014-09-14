@@ -242,8 +242,8 @@ class Validator implements MessageProviderInterface {
 	 * Add rules to be applied to a repeatable indexed array.
 	 *
 	 * @param  string  $attribute
-	 * @param  array  $ruleSet
-	 * @param  array  $messages
+	 * @param  array   $ruleSet
+	 * @param  array   $messages
 	 * @throws \InvalidArgumentException
 	 */
 	public function iterate($attribute, array $ruleSet = [], $messages = [])
@@ -2562,8 +2562,8 @@ class Validator implements MessageProviderInterface {
 	 * Add rules for a particular index of an array.
 	 *
 	 * @param  string  $attribute
-	 * @param  array  $ruleSet
-	 * @param  array  $messages
+	 * @param  array   $ruleSet
+	 * @param  array   $messages
 	 * @return void
 	 */
 	protected function addIteratedValidationRules($attribute, $ruleSet = [], $messages = [])
@@ -2590,7 +2590,7 @@ class Validator implements MessageProviderInterface {
 	 * Add custom messages to be applied at a particular index of a repeating input array.
 	 *
 	 * @param  string  $attribute
-	 * @param  array  $messages
+	 * @param  array   $messages
 	 * @return void
 	 */
 	protected function addIteratedValidationMessages($attribute, $messages = [])
@@ -2609,7 +2609,7 @@ class Validator implements MessageProviderInterface {
 	 *
 	 * @see addIteratedValidationRules()
 	 * @param  string  $attribute
-	 * @param  array  $rules
+	 * @param  array   $rules
 	 * @return void
 	 */
 	protected function iterateNestedRuleSet($attribute, $rules)
