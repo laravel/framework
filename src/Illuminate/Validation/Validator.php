@@ -2605,9 +2605,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Apply the iterate() function to a set of rules and messages
-	 * Used for cleaner recursive calls to iterate(), when nested
-	 * repeatable fields are present.
+	 * Apply the iterate() function to a set of rules and messages.
 	 *
 	 * @see addIteratedValidationRules()
 	 * @param  string  $attribute
