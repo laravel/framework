@@ -289,65 +289,6 @@ class Validator implements MessageProvider {
         }
     }
 
-    /**
-     * @param string $attribute
-     * @param array $ruleSet
-     * @param array $messages
-     *
-     * @return void
-     */
-    protected function addIteratedValidationRules($attribute, $ruleSet = [], $messages = [])
-    {
-        foreach ($ruleSet as $field => $rules)
-        {
-            $rules = str_replace('required_with_parent', rtrim('required_with:'.$attribute, '.'), $rules);
-            $rules = is_string($rules) ? explode('|', $rules) : $rules;
-
-            //If it contains nested iterated items, recursively add validation rules for them too
-            if(isset($rules['iterate']))
-            {
-                $this->iterateNestedRuleSet($attribute.$field, $rules);
-                unset($rules['iterate']);
-            }
-
-            $this->mergeRules($attribute.$field, $rules);
-        }
-
-        $this->addIteratedValidationMessages($attribute, $messages);
-    }
-
-    /**
-     * Add any custom messages for this ruleSet to the validator
-     *
-     * @param $attribute
-     * @param array $messages
-     *
-     * @return void
-     */
-    protected function addIteratedValidationMessages($attribute, $messages = [])
-    {
-        foreach ($messages as $field => $message)
-        {
-            $field_name = $attribute.$field;
-            $messages[$field_name] = $message;
-        }
-
-        $this->setCustomMessages($messages);
-    }
-
-    /**
-     * @param $attribute
-     * @param $rules
-     *
-     * @return void
-     */
-    protected function iterateNestedRuleSet($attribute, $rules)
-    {
-        $nestedRuleSet = isset($rules['iterate']['rules']) ? $rules['iterate']['rules'] : [];
-        $nestedMessages = isset($rules['iterate']['messages']) ? $rules['iterate']['messages'] : [];
-
-        $this->iterate($attribute, $nestedRuleSet, $nestedMessages);
-    }
 
 	/**
 	 * Merge additional rules into a given attribute.
@@ -2644,6 +2585,67 @@ class Validator implements MessageProvider {
 			throw new \InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
 		}
 	}
+
+	/**
+	 * @param string $attribute
+	 * @param array $ruleSet
+	 * @param array $messages
+	 *
+	 * @return void
+	 */
+	protected function addIteratedValidationRules($attribute, $ruleSet = [], $messages = [])
+	{
+		foreach ($ruleSet as $field => $rules)
+		{
+			$rules = str_replace('required_with_parent', rtrim('required_with:'.$attribute, '.'), $rules);
+			$rules = is_string($rules) ? explode('|', $rules) : $rules;
+
+			//If it contains nested iterated items, recursively add validation rules for them too
+			if(isset($rules['iterate']))
+			{
+				$this->iterateNestedRuleSet($attribute.$field, $rules);
+				unset($rules['iterate']);
+			}
+
+			$this->mergeRules($attribute.$field, $rules);
+		}
+
+		$this->addIteratedValidationMessages($attribute, $messages);
+	}
+
+	/**
+	 * Add any custom messages for this ruleSet to the validator
+	 *
+	 * @param $attribute
+	 * @param array $messages
+	 *
+	 * @return void
+	 */
+	protected function addIteratedValidationMessages($attribute, $messages = [])
+	{
+		foreach ($messages as $field => $message)
+		{
+			$field_name = $attribute.$field;
+			$messages[$field_name] = $message;
+		}
+
+		$this->setCustomMessages($messages);
+	}
+
+	/**
+	 * @param $attribute
+	 * @param $rules
+	 *
+	 * @return void
+	 */
+	protected function iterateNestedRuleSet($attribute, $rules)
+	{
+		$nestedRuleSet = isset($rules['iterate']['rules']) ? $rules['iterate']['rules'] : [];
+		$nestedMessages = isset($rules['iterate']['messages']) ? $rules['iterate']['messages'] : [];
+
+		$this->iterate($attribute, $nestedRuleSet, $nestedMessages);
+	}
+
 
 	/**
 	 * Handle dynamic calls to class methods.
