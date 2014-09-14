@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LessManager">
+    <option name="deleteCssFiles" value="false" />
+    <option name="lessProfiles">
+      <map>
+        <entry key="laravel-backbone">
+          <value>
+            <LessProfile>
+              <option name="cssDirectories">
+                <list>
+                  <CssDirectory>
+                    <option name="path" value="$USER_HOME$/Sites/projects/laravel-backbone/laravel/public/css" />
+                  </CssDirectory>
+                </list>
+              </option>
+              <option name="lessDirPath" value="$USER_HOME$/Sites/projects/laravel-backbone/laravel/public/css" />
+              <option name="name" value="laravel-backbone" />
+            </LessProfile>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="deleteCssFiles" value="false" />
+  </component>
+  <component name="PhpUnit" load_method="CUSTOM_LOADER" custom_loader_path="$USER_HOME$/Sites/aaa-movers.local-copy/src/www/laravel-quote-engine/vendor/autoload.php" phpunit_phar_path="" />
+  <component name="ProjectRootManager" version="2" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="sslv3">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <configuration useDefault="false">$USER_HOME$/.subversion</configuration>
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="VagrantSettings">
+    <option name="instanceFolder" value="" />
+    <option name="provider" value="" />
+    <option name="vagrantExecutable" value="/usr/bin/vagrant" />
+  </component>
+</project>
+
