@@ -2608,7 +2608,7 @@ class Validator implements MessageProviderInterface {
 	 * Apply the iterate() function to a set of rules and messages.
 	 *
 	 * @see addIteratedValidationRules()
-	 * 
+	 *
 	 * @param  string  $attribute
 	 * @param  array   $rules
 	 * @return void
