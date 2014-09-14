@@ -1332,6 +1332,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 	}
 
+
 	public function testIterableValidator()
 	{
 		// Test that it can pass with no nested arrays
@@ -1419,10 +1420,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		);
 
 		$this->assertTrue($v->fails());
-
 	}
-
-
 
 
 	protected function getTranslator()
