@@ -169,7 +169,7 @@ class Route {
 	{
 		if ( ! isset($this->action['before'])) return array();
 
-		return $this->parseFilters($this->action['before']);
+		return $this->action['before'];
 	}
 
 	/**
@@ -181,20 +181,26 @@ class Route {
 	{
 		if ( ! isset($this->action['after'])) return array();
 
-		return $this->parseFilters($this->action['after']);
+		return $this->action['after'];
 	}
 
 	/**
-	 * Parse the given filter string.
+	 * Parse the given filter.
 	 *
-	 * @param  string  $filters
+	 * @param  array|string  $filters
 	 * @return array
 	 */
 	public static function parseFilters($filters)
 	{
-		return array_build(static::explodeFilters($filters), function($key, $value)
+		return array_build(static::explodeFilters($filters), function($filter, $parameters)
 		{
-			return Route::parseFilter($value);
+			if ( ! is_string($filter))
+			{
+				$filter = $parameters;
+				$parameters = null;
+			}
+			
+			return static::parseFilter($filter, $parameters);
 		});
 	}
 
@@ -206,8 +212,8 @@ class Route {
 	 */
 	protected static function explodeFilters($filters)
 	{
-		if (is_array($filters)) return static::explodeArrayFilters($filters);
-
+		if (is_array($filters)) return static::explodeFilterArray($filters);
+		
 		return array_map('trim', explode('|', $filters));
 	}
 
@@ -217,13 +223,18 @@ class Route {
 	 * @param  array  $filters
 	 * @return array
 	 */
-	protected static function explodeArrayFilters(array $filters)
+	protected static function explodeFilterArray(array $filters)
 	{
 		$results = array();
+			
+		foreach($filters as $filter => $value) {
+			if ( ! is_string($filter) && is_string($value))
+			{
+				$results = array_merge($results, static::explodeFilters($value));
+				continue;
+			}
 
-		foreach ($filters as $filter)
-		{
-			$results = array_merge($results, array_map('trim', explode('|', $filter)));
+			$results[$filter] = $value;
 		}
 
 		return $results;
@@ -232,27 +243,32 @@ class Route {
 	/**
 	 * Parse the given filter into name and parameters.
 	 *
-	 * @param  string  $filter
+	 * @param  string        $filter
+	 * @param  array|string  $parameters
 	 * @return array
 	 */
-	public static function parseFilter($filter)
-	{
-		if ( ! str_contains($filter, ':')) return array($filter, array());
-
-		return static::parseParameterFilter($filter);
+	public static function parseFilter($filter, $parameters = null)
+	{			
+		if (str_contains($filter, ':'))
+		{
+			list($filter, $parameters) = array_map('trim', explode(':', $filter, 2));
+		}
+		
+		return array($filter, static::parseFilterParameters($parameters));
 	}
 
 	/**
-	 * Parse a filter with parameters.
+	 * Parse the parameters of a filter.
 	 *
-	 * @param  string  $filter
+	 * @param  array|string|null  $parameters
 	 * @return array
 	 */
-	protected static function parseParameterFilter($filter)
+	protected static function parseFilterParameters($parameters)
 	{
-		list($name, $parameters) = explode(':', $filter, 2);
+		if (is_array($parameters)) return $parameters;
+		if (is_null($parameters)) return array();
 
-		return array($name, explode(',', $parameters));
+		return array_map('trim', explode(',', $parameters));
 	}
 
 	/**
@@ -486,11 +502,20 @@ class Route {
 		// If no "uses" property has been set, we will dig through the array to find a
 		// Closure instance within this list. We will set the first Closure we come
 		// across into the "uses" property that will get fired off by this route.
-		elseif ( ! isset($action['uses']))
+		if ( ! isset($action['uses']))
 		{
 			$action['uses'] = $this->findClosure($action);
 		}
 
+		if (isset($action['before']))
+		{
+			$action['before'] = $this->parseFilters($action['before']);
+		}
+		if (isset($action['after']))
+		{
+			$action['after'] = $this->parseFilters($action['after']);
+		}
+		
 		return $action;
 	}
 
@@ -529,7 +554,7 @@ class Route {
 	/**
 	 * Add before filters to the route.
 	 *
-	 * @param  string  $filters
+	 * @param  string|array  $filters
 	 * @return $this
 	 */
 	public function before($filters)
@@ -540,7 +565,7 @@ class Route {
 	/**
 	 * Add after filters to the route.
 	 *
-	 * @param  string  $filters
+	 * @param  string|array  $filters
 	 * @return $this
 	 */
 	public function after($filters)
@@ -551,20 +576,18 @@ class Route {
 	/**
 	 * Add the given filters to the route by type.
 	 *
-	 * @param  string  $type
-	 * @param  string  $filters
+	 * @param  string        $type
+	 * @param  string|array  $filters
 	 * @return $this
 	 */
 	protected function addFilters($type, $filters)
 	{
-		if (isset($this->action[$type]))
+		if ( ! isset($this->action[$type]))
 		{
-			$this->action[$type] .= '|'.$filters;
+			$this->action[$type] = array();
 		}
-		else
-		{
-			$this->action[$type] = $filters;
-		}
+		
+		$this->action[$type] = array_merge($this->action[$type], $this->parseFilters($filters));
 
 		return $this;
 	}
@@ -792,7 +815,7 @@ class Route {
 	 */
 	public function setAction(array $action)
 	{
-		$this->action = $action;
+		$this->action = $this->parseAction($action);
 
 		return $this;
 	}

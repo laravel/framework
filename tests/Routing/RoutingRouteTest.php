@@ -337,6 +337,80 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testActionParsedWhenSetDirectly()
+	{
+		$router = $this->getRouter();
+		$route = $router->get('foo/bar', function () { return 'hello'; });
+		$route->setAction(array(function () { return 'taylor'; }));
+		$this->assertEquals('taylor', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+	}
+
+
+	public function testFiltersCanBeSetDirectly()
+	{
+		unset($_SERVER['__filter.before']);
+		unset($_SERVER['__filter.after']);
+		$router = $this->getRouter();
+		$route = $router->get('foo/bar', function() { return 'hello'; });
+		
+		$router->filter('foo.before', function($route, $request, $valueA, $valueB) {
+			$_SERVER['__filter.before'] = true;
+			if ($valueA === 'foo' && $valueB === 'before') {
+				return 'foo before!';
+			}
+		});
+		$router->filter('foo.after', function($route, $request, $response, $valueA, $valueB) {
+			$_SERVER['__filter.after'] = true;
+			if ($valueA === 'foo' && $valueB === 'after') {
+				$response->setContent($response->getContent() . ' foo after!');
+			}
+		});
+
+		$action = $route->getAction();
+		$action['before'] = array('foo.before' => array('foo', 'before'));
+		$route->setAction($action);
+		$this->assertEquals('foo before!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertTrue($_SERVER['__filter.before']);
+
+		$action = $route->getAction();
+		unset($action['before']);
+		$action['after'] = array('foo.after' => array('foo', 'after'));
+		$route->setAction($action);
+		$this->assertEquals('hello foo after!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());		
+		$this->assertTrue($_SERVER['__filter.after']);
+	}
+
+
+	public function testActionIsParsedFromDifferentFormats()
+	{
+		$parsed = array('foo' => array(), 'bar' => array(), 'hello' => array('foo', 'bar'));
+		$router = $this->getRouter();
+		$route = $router->get('foo/bar', array('foo', function() { return 'bar'; }, 'before' => 'foo|bar|hello:foo,bar'));
+		$action = $route->getAction();
+		$this->assertEquals($parsed, $action['before']);
+		
+		$action['before'] = array('foo', 'bar', 'hello:foo,bar');
+		$route->setAction($action);
+		$action = $route->getAction();
+		$this->assertEquals($parsed, $action['before']);
+
+		$action['before'] = array('foo', 'bar', 'hello' => 'foo,bar');
+		$route->setAction($action);
+		$action = $route->getAction();
+		$this->assertEquals($parsed, $action['before']);
+
+		$action['before'] = array('foo', 'bar', 'hello' => array('foo', 'bar'));
+		$route->setAction($action);
+		$action = $route->getAction();
+		$this->assertEquals($parsed, $action['before']);
+
+		$action['before'] = array('foo' => array(), 'bar' => array(), 'hello' => array('foo', 'bar'));
+		$route->setAction($action);
+		$action = $route->getAction();
+		$this->assertEquals($parsed, $action['before']);
+	}
+
+
 	public function testPatternBasedFilters()
 	{
 		$router = $this->getRouter();
@@ -638,15 +712,28 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		/**
 		 * Merging Filters
 		 */
+		unset($_SERVER['__filter.before.foo']);
+		unset($_SERVER['__filter.before.bar']);
+		unset($_SERVER['__filter.before.baz']);
 		$router = $this->getRouter();
 		$router->group(array('before' => 'foo|bar'), function() use ($router)
 		{
 			$router->get('foo/bar', array('before' => 'baz', function() { return 'hello'; }));
 		});
-		$router->filter('foo', function() {});
-		$router->filter('bar', function() {});
-		$router->filter('baz', function() { return 'foo!'; });
+		$router->filter('foo', function() {
+			$_SERVER['__filter.before.foo'] = true;
+		});
+		$router->filter('bar', function() {
+			$_SERVER['__filter.before.bar'] = true;
+		});
+		$router->filter('baz', function() {
+			$_SERVER['__filter.before.baz'] = true;
+			return 'foo!';
+		});
 		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertTrue($_SERVER['__filter.before.foo']);
+		$this->assertTrue($_SERVER['__filter.before.bar']);
+		$this->assertTrue($_SERVER['__filter.before.baz']);
 
 		/**
 		 * getPrefix() method
