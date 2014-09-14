@@ -262,11 +262,13 @@ class Validator implements MessageProvider {
 	}
 
     	/**
-    	* @param $attribute
-     	* @param array $ruleSet
-     	* @param array $messages
-     	* @throws \InvalidArgumentException
-     	*/
+		 * Add rules to be applied to a repeatable indexed array
+		 *
+    	 * @param $attribute
+     	 * @param array $ruleSet
+     	 * @param array $messages
+     	 * @throws \InvalidArgumentException
+     	 */
     	public function iterate($attribute, array $ruleSet = [], $messages = [])
     	{
         	$payload = array_merge($this->data, $this->files);
@@ -2587,6 +2589,8 @@ class Validator implements MessageProvider {
 	}
 
 	/**
+	 * Add rules for a particular index of an array
+	 *
 	 * @param string $attribute
 	 * @param array $ruleSet
 	 * @param array $messages
@@ -2614,7 +2618,7 @@ class Validator implements MessageProvider {
 	}
 
 	/**
-	 * Add any custom messages for this ruleSet to the validator
+	 * Add custom messages to be applied at a particular index of a repeating input array
 	 *
 	 * @param $attribute
 	 * @param array $messages
@@ -2633,6 +2637,11 @@ class Validator implements MessageProvider {
 	}
 
 	/**
+	 * Apply the iterate() function to a set of rules and messages
+	 * Used for cleaner recursive calls to iterate(), when nested
+	 * repeatable fields are present
+	 *
+	 * @see addIteratedValidationRules()
 	 * @param $attribute
 	 * @param $rules
 	 *
