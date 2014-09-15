@@ -3,8 +3,9 @@
 use Closure;
 use Illuminate\Container\Container;
 use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Validation\Factory as FactoryContract;
 
-class Factory {
+class Factory implements FactoryContract {
 
 	/**
 	 * The Translator implementation.
