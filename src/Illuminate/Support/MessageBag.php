@@ -167,7 +167,7 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 		// We will simply spin through the given messages and transform each one
 		// replacing the :message place holder with the real message allowing
 		// the messages to be easily formatted to each developer's desires.
-		foreach ($messages as $key => &$message)
+		foreach ($messages as &$message)
 		{
 			$replace = array(':message', ':key');
 
