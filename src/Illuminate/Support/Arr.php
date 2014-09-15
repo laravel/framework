@@ -239,9 +239,7 @@ class Arr {
 
 		if (empty($array) || empty($keys)) return [];
 
-		$dotted = static::dot($array);
-
-		$dotted = array_intersect_key($dotted, array_flip($keys));
+		$dotted = array_intersect_key(static::dot($array), array_flip($keys));
 
 		$result = [];
 
