@@ -982,6 +982,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$file5->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
 		$v->setFiles(array('x' => $file5));
 		$this->assertTrue($v->passes());
+
+		$file6 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('guessExtension'), $uploadedFile);
+		$file6->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
+		$v->setFiles(array('x' => $file6));
+		$this->assertTrue($v->passes());
 	}
 
 
