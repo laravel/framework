@@ -729,7 +729,7 @@ class BelongsToMany extends Relation {
 	{
 		$records = array();
 
-		$timed = ($this->hasPivotColumn('created_at') || $this->hasPivotColumn('updated_at'));
+		$timed = ($this->hasPivotColumn($this->createdAt()) || $this->hasPivotColumn($this->updatedAt()));
 
 		// To create the attachment records, we will simply spin through the IDs given
 		// and create a new record to insert for each ID. Each ID may actually be a
@@ -818,12 +818,12 @@ class BelongsToMany extends Relation {
 	{
 		$fresh = $this->parent->freshTimestamp();
 
-		if ( ! $exists && $this->hasPivotColumn('created_at'))
+		if ( ! $exists && $this->hasPivotColumn($this->createdAt()))
 		{
 			$record[$this->createdAt()] = $fresh;
 		}
 
-		if ($this->hasPivotColumn('updated_at'))
+		if ($this->hasPivotColumn($this->updatedAt()))
 		{
 			$record[$this->updatedAt()] = $fresh;
 		}
