@@ -133,6 +133,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		), array_fetch($data, 'comments'));
 
 		$this->assertEquals(array(array('#foo', '#bar'), array('#baz')), array_fetch($data, 'comments.tags'));
+		$this->assertEquals([], array_fetch($data, 'foo'));
+		$this->assertEquals([], array_fetch($data, 'foo.bar'));
 	}
 
 
