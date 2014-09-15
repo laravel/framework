@@ -180,6 +180,38 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAttachInsertsPivotTableRecordWithACreatedAtTimestamp()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
+		$relation->withPivot('created_at');
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('insert')->once()->with(array(array('user_id' => 1, 'role_id' => 2, 'foo' => 'bar', 'created_at' => 'time')))->andReturn(true);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
+		$relation->expects($this->once())->method('touchIfTouching');
+
+		$relation->attach(2, array('foo' => 'bar'));
+	}
+
+
+	public function testAttachInsertsPivotTableRecordWithAnUpdatedAtTimestamp()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
+		$relation->withPivot('updated_at');
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('insert')->once()->with(array(array('user_id' => 1, 'role_id' => 2, 'foo' => 'bar', 'updated_at' => 'time')))->andReturn(true);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
+		$relation->expects($this->once())->method('touchIfTouching');
+
+		$relation->attach(2, array('foo' => 'bar'));
+	}
+
+
 	public function testDetachRemovesPivotTableRecord()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());

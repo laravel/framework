@@ -327,6 +327,17 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Determine whether the given column is defined as a pivot column.
+	 *
+	 * @param  string  $column
+	 * @return bool
+	 */
+	protected function hasPivotColumn($column)
+	{
+		return in_array($column, $this->pivotColumns);
+	}
+
+	/**
 	 * Set the join clause for the relation query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder|null
@@ -718,7 +729,7 @@ class BelongsToMany extends Relation {
 	{
 		$records = array();
 
-		$timed = in_array($this->createdAt(), $this->pivotColumns);
+		$timed = ($this->hasPivotColumn('created_at') || $this->hasPivotColumn('updated_at'));
 
 		// To create the attachment records, we will simply spin through the IDs given
 		// and create a new record to insert for each ID. Each ID may actually be a
@@ -807,9 +818,15 @@ class BelongsToMany extends Relation {
 	{
 		$fresh = $this->parent->freshTimestamp();
 
-		if ( ! $exists) $record[$this->createdAt()] = $fresh;
+		if ( ! $exists && $this->hasPivotColumn('created_at'))
+		{
+			$record[$this->createdAt()] = $fresh;
+		}
 
-		$record[$this->updatedAt()] = $fresh;
+		if ($this->hasPivotColumn('updated_at'))
+		{
+			$record[$this->updatedAt()] = $fresh;
+		}
 
 		return $record;
 	}
