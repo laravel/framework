@@ -235,7 +235,22 @@ class Arr {
 	 */
 	public static function only($array, $keys)
 	{
-		return array_intersect_key($array, array_flip((array) $keys));
+		$keys = array_filter(is_array($keys) ? $keys : (array) $keys);
+
+		if (empty($array) || empty($keys)) return [];
+
+		$dotted = static::dot($array);
+
+		$dotted = array_intersect_key($dotted, array_flip($keys));
+
+		$result = [];
+
+		foreach ($dotted as $key => $value)
+		{
+			static::set($result, $key, $value);
+		}
+
+		return $result;
 	}
 
 	/**
