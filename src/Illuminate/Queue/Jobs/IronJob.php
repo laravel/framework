@@ -15,7 +15,7 @@ class IronJob extends Job {
 	/**
 	 * The IronMQ message instance.
 	 *
-	 * @var array
+	 * @var object
 	 */
 	protected $job;
 
