@@ -44,6 +44,13 @@ class BelongsToMany extends Relation {
 	protected $pivotColumns = array();
 
 	/**
+	 * Any pivot table restrictions.
+	 *
+	 * @var array
+	 */
+	protected $pivotWheres = [];
+
+	/**
 	 * Create a new has many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -85,6 +92,8 @@ class BelongsToMany extends Relation {
 	 */
 	public function wherePivot($column, $operator = null, $value = null, $boolean = 'and')
 	{
+		$this->pivotWheres[] = func_get_args();
+
 		return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
 	}
 
@@ -888,6 +897,11 @@ class BelongsToMany extends Relation {
 	{
 		$query = $this->newPivotStatement();
 
+		foreach ($this->pivotWheres as $whereArgs)
+		{
+			call_user_func_array([$query, 'where'], $whereArgs);
+		}
+
 		return $query->where($this->foreignKey, $this->parent->getKey());
 	}
 
@@ -909,11 +923,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function newPivotStatementForId($id)
 	{
-		$pivot = $this->newPivotStatement();
-
-		$key = $this->parent->getKey();
-
-		return $pivot->where($this->foreignKey, $key)->where($this->otherKey, $id);
+		return $this->newPivotQuery()->where($this->otherKey, $id);
 	}
 
 	/**
