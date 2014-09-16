@@ -149,6 +149,16 @@ abstract class Job {
 	}
 
 	/**
+	 * Get the current system time.
+	 *
+	 * @return int
+	 */
+	protected function getTime()
+	{
+		return time();
+	}
+
+	/**
 	 * Get the name of the queued job class.
 	 *
 	 * @return string
