@@ -20,7 +20,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $pivot->getAttributes());
 		$this->assertEquals('connection', $pivot->getConnectionName());
 		$this->assertEquals('table', $pivot->getTable());
-		$this->assertTrue($pivot->exists);
+		$this->assertTrue($pivot->exists());
 	}
 
 
@@ -51,10 +51,10 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 		$parent->shouldReceive('getConnectionName')->andReturn('connection');
 		$parent->shouldReceive('getDates')->andReturn(array());
 		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
-		$this->assertTrue($pivot->timestamps);
+		$this->assertTrue($pivot->usesTimestamps());
 
 		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar'), 'table');
-		$this->assertFalse($pivot->timestamps);
+		$this->assertFalse($pivot->usesTimestamps());
 	}
 
 

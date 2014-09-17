@@ -160,7 +160,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		// make sure foo isn't synced so we can test that dirty attributes only are updated
 		$model->syncOriginal();
 		$model->name = 'taylor';
-		$model->exists = true;
+		$model->setExists(true);
 		$this->assertTrue($model->save());
 	}
 
@@ -180,7 +180,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->syncOriginal();
 		$model->created_at = 'foo';
 		$model->updated_at = 'bar';
-		$model->exists = true;
+		$model->setExists(true);
 		$this->assertTrue($model->save());
 	}
 
@@ -192,7 +192,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(false);
-		$model->exists = true;
+		$model->setExists(true);
 
 		$this->assertFalse($model->save());
 	}
@@ -206,7 +206,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
 		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
-		$model->exists = true;
+		$model->setExists(true);
 		$model->foo = 'bar';
 
 		$this->assertFalse($model->save());
@@ -216,7 +216,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testUpdateProcessWithoutTimestamps()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps', 'fireModelEvent'));
-		$model->timestamps = false;
+		$model->useTimestamps(false);
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$query->shouldReceive('where')->once()->with('id', '=', 1);
 		$query->shouldReceive('update')->once()->with(array('name' => 'taylor'));
@@ -227,7 +227,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->id = 1;
 		$model->syncOriginal();
 		$model->name = 'taylor';
-		$model->exists = true;
+		$model->setExists(true);
 		$this->assertTrue($model->save());
 	}
 
@@ -250,7 +250,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->syncOriginal();
 		$model->id = 2;
 		$model->foo = 'bar';
-		$model->exists = true;
+		$model->setExists(true);
 
 		$this->assertTrue($model->save());
 	}
@@ -350,10 +350,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
 
 		$model->name = 'taylor';
-		$model->exists = false;
+		$model->setExists(false);
 		$this->assertTrue($model->save());
 		$this->assertEquals(1, $model->id);
-		$this->assertTrue($model->exists);
+		$this->assertTrue($model->exists());
 
 		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -369,10 +369,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
 
 		$model->name = 'taylor';
-		$model->exists = false;
+		$model->setExists(false);
 		$this->assertTrue($model->save());
 		$this->assertNull($model->id);
-		$this->assertTrue($model->exists);
+		$this->assertTrue($model->exists());
 	}
 
 
@@ -386,7 +386,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
 
 		$this->assertFalse($model->save());
-		$this->assertFalse($model->exists);
+		$this->assertFalse($model->exists());
 	}
 
 
@@ -398,7 +398,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('delete')->once();
 		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 		$model->expects($this->once())->method('touchOwners');
-		$model->exists = true;
+		$model->setExists(true);
 		$model->id = 1;
 		$model->delete();
 	}
@@ -770,7 +770,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$class = new EloquentModelStub;
 		$class->id = 1;
-		$class->exists = true;
+		$class->setExists(true);
 		$class->first = 'taylor';
 		$class->last = 'otwell';
 		$class->created_at = $class->freshTimestamp();
@@ -780,7 +780,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$clone = $class->replicate();
 
 		$this->assertNull($clone->id);
-		$this->assertFalse($clone->exists);
+		$this->assertFalse($clone->exists());
 		$this->assertEquals('taylor', $clone->first);
 		$this->assertEquals('otwell', $clone->last);
 		$this->assertObjectNotHasAttribute('created_at', $clone);
@@ -903,7 +903,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
 	{
 		$model = m::mock('EloquentModelStub[newQuery]');
-		$model->exists = true;
+		$model->setExists(true);
 		$model->id = 1;
 		$model->syncOriginalAttribute('id');
 		$model->foo = 2;
