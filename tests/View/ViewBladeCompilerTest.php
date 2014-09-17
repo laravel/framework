@@ -470,6 +470,17 @@ empty
 	}
 
 
+	public function testRenderIdenticalDelimiters()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		//Demonstrate that it is working as expected
+		$this->assertEquals(['{{','}}'], $compiler->getContentTags());
+		$compiler->setContentTags('{{', '}}');
+		//uhoh, what happened?
+		$this->assertEquals(['{{','}}'], $compiler->getContentTags());
+	}
+
+
 	protected function getFiles()
 	{
 		return m::mock('Illuminate\Filesystem\Filesystem');
