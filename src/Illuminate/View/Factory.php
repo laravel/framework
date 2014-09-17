@@ -111,6 +111,18 @@ class Factory implements FactoryContract {
 	}
 
 	/**
+	 * Normalize a view name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return string
+	 */
+	protected function normalizeName($name)
+	{
+		return str_replace('/', '.', $name);
+	}
+
+	/**
 	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
@@ -121,6 +133,8 @@ class Factory implements FactoryContract {
 	public function make($view, $data = array(), $mergeData = array())
 	{
 		if (isset($this->aliases[$view])) $view = $this->aliases[$view];
+
+		$view = $this->normalizeName($view);
 
 		$path = $this->finder->find($view);
 
@@ -363,6 +377,8 @@ class Factory implements FactoryContract {
 	 */
 	protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
 	{
+		$view = $this->normalizeName($view);
+
 		if ($callback instanceof Closure)
 		{
 			$this->addEventListener($prefix.$view, $callback, $priority);
