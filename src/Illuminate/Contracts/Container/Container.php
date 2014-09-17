@@ -78,4 +78,13 @@ interface Container {
 	 */
 	public function resolved($abstract);
 
+	/**
+	 * Call the given Closure and inject its dependencies.
+	 *
+	 * @param  callable  $callback
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function call($callback, array $parameters = array(), $defaultMethod = null);
+
 }
