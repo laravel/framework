@@ -803,7 +803,8 @@ class Validator implements MessageProviderInterface {
 
 		$length = strlen((string) $value);
 
-		return $length >= $parameters[0] && $length <= $parameters[1];
+		return $this->validateNumeric($attribute, $value)
+		  && $length >= $parameters[0] && $length <= $parameters[1];
 	}
 
 	/**
