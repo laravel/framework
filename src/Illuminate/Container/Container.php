@@ -512,9 +512,9 @@ class Container implements ArrayAccess, ContainerContract, ContextAwareContainer
 	}
 
 	/**
-	 * Call the given Closure and inject its dependencies.
+	 * Call the given Closure / class@method and inject its dependencies.
 	 *
-	 * @param  callable  $callback
+	 * @param  callable|string  $callback
 	 * @param  array  $parameters
 	 * @return mixed
 	 */
