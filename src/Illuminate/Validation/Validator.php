@@ -347,6 +347,30 @@ class Validator implements ValidatorContract {
 	}
 
 	/**
+ 	 * Returns the data which was valid.
+ 	 *
+	 * @return array
+	 */
+	public function valid()
+	{
+		if ( ! $this->messages) $this->passes();
+
+ 		return array_diff_key($this->data, $this->messages()->toArray());
+	}
+
+	/**
+ 	 * Returns the data which was invalid.
+ 	 *
+	 * @return array
+	 */
+	public function invalid()
+	{
+		if ( ! $this->messages) $this->passes();
+
+ 		return array_intersect_key($this->data, $this->messages()->toArray());
+	}
+
+	/**
 	 * Get the value of a given attribute.
 	 *
 	 * @param  string  $attribute

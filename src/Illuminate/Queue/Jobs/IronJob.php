@@ -16,7 +16,7 @@ class IronJob extends Job implements JobContract {
 	/**
 	 * The IronMQ message instance.
 	 *
-	 * @var array
+	 * @var object
 	 */
 	protected $job;
 
