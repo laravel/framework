@@ -224,6 +224,15 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testComposersAreRegisteredWithSlashAndDot()
+	{
+		$factory = $this->getFactory();
+		$factory->getDispatcher()->shouldReceive('listen')->with('composing: foo.bar', m::any())->twice();
+		$factory->composer('foo.bar', '');
+		$factory->composer('foo/bar', '');
+	}
+
+
 	public function testRenderCountHandling()
 	{
 		$factory = $this->getFactory();
@@ -329,6 +338,17 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		$factory->flushSections();
 
 		$this->assertEquals(0, count($factory->getSections()));
+	}
+
+
+	public function testMakeWithSlashAndDot()
+	{
+		$factory = $this->getFactory();
+		$factory->getFinder()->shouldReceive('find')->twice()->with('foo.bar')->andReturn('path.php');
+		$factory->getEngineResolver()->shouldReceive('resolve')->twice()->with('php')->andReturn(m::mock('Illuminate\View\Engines\EngineInterface'));
+		$factory->getDispatcher()->shouldReceive('fire');
+		$factory->make('foo/bar');
+		$factory->make('foo.bar');
 	}
 
 
