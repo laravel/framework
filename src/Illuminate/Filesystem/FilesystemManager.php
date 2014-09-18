@@ -82,7 +82,7 @@ class FilesystemManager implements FactoryContract {
 	 */
 	public function createLocalDriver(array $config)
 	{
-		return $this->decorate(new Flysystem(new LocalAdapter($config['root'])));
+		return $this->adapt(new Flysystem(new LocalAdapter($config['root'])));
 	}
 
 	/**
@@ -97,7 +97,7 @@ class FilesystemManager implements FactoryContract {
 			'key' => $config['key'], 'secret' => $config['secret'],
 		]);
 
-		return $this->decorate(
+		return $this->adapt(
 			new Flysystem(new S3Adapter($client, $config['bucket']))
 		);
 	}
@@ -114,7 +114,7 @@ class FilesystemManager implements FactoryContract {
 			'username' => $config['username'], 'apiKey' => $config['key'],
 		]);
 
-		return $this->decorate(new Flysystem(
+		return $this->adapt(new Flysystem(
 			new RackspaceAdapter($this->getRackspaceContainer($client, $config))
 		));
 	}
@@ -134,14 +134,14 @@ class FilesystemManager implements FactoryContract {
 	}
 
 	/**
-	 * Decorate the filesystem implementation.
+	 * Adapt the filesystem implementation.
 	 *
 	 * @param  \League\Flysystem\FilesystemInterface  $filesystem
 	 * @return \Illuminate\Contracts\Filesystem\Filesystem
 	 */
-	protected function decorate(FilesystemInterface $filesystem)
+	protected function adapt(FilesystemInterface $filesystem)
 	{
-		return new FilesystemDecorator($filesystem);
+		return new FilesystemAdapter($filesystem);
 	}
 
 	/**
