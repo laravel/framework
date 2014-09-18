@@ -268,7 +268,7 @@ class Request extends SymfonyRequest {
 
 		foreach ($keys as $key)
 		{
-			array_set($results, $key, array_get($input, $key, null));
+			array_set($results, $key, array_get($input, $key));
 		}
 
 		return $results;
