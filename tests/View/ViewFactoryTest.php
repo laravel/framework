@@ -352,6 +352,17 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testNamespacedViewNamesAreNormalizedProperly()
+	{
+		$factory = $this->getFactory();
+		$factory->getFinder()->shouldReceive('find')->twice()->with('vendor/package::foo.bar')->andReturn('path.php');
+		$factory->getEngineResolver()->shouldReceive('resolve')->twice()->with('php')->andReturn(m::mock('Illuminate\View\Engines\EngineInterface'));
+		$factory->getDispatcher()->shouldReceive('fire');
+		$factory->make('vendor/package::foo/bar');
+		$factory->make('vendor/package::foo.bar');
+	}
+
+
 	public function testMakeWithAlias()
 	{
 		$factory = $this->getFactory();
