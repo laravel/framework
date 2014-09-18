@@ -7,7 +7,7 @@ use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 
-class FilesystemDecorator implements FilesystemContract, CloudFilesystemContract {
+class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 
 	/**
 	 * The Flysystem filesystem implementation.
@@ -17,7 +17,7 @@ class FilesystemDecorator implements FilesystemContract, CloudFilesystemContract
 	protected $driver;
 
 	/**
-	 * Create a new filesystem decorator instance.
+	 * Create a new filesystem adapter instance.
 	 *
 	 * @param  \League\Flysystem\FilesystemInterface  $driver
 	 * @return void
