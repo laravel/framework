@@ -13,13 +13,30 @@ interface Container {
 	public function bound($abstract);
 
 	/**
-	 * Alias a type to a shorter name.
+	 * Alias a type to a different name.
 	 *
 	 * @param  string  $abstract
 	 * @param  string  $alias
 	 * @return void
 	 */
 	public function alias($abstract, $alias);
+
+	/**
+	 * Assign a set of tags to a given binding.
+	 *
+	 * @param  string  $abstract
+	 * @param  array|dynamic  $tags
+	 * @return void
+	 */
+	public function tag($abstract, $tags);
+
+	/**
+	 * Resolve all of the bindings for a given tag.
+	 *
+	 * @param  array  $tag
+	 * @return array
+	 */
+	public function tagged($tag);
 
 	/**
 	 * Register a binding with the container.
@@ -77,5 +94,22 @@ interface Container {
 	 * @return bool
 	 */
 	public function resolved($abstract);
+
+	/**
+	 * Register a new resolving callback.
+	 *
+	 * @param  string    $abstract
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function resolving($abstract, Closure $callback);
+
+	/**
+	 * Register a new resolving callback for all types.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function resolvingAny(Closure $callback);
 
 }
