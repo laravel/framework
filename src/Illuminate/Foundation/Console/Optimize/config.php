@@ -4,6 +4,8 @@ $basePath = $app['path.base'];
 
 return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/Container.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/ContextAwareContainer.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/ContextualBindingBuilder.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/Renderable.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/ResponsePreparer.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Config/Repository.php',
