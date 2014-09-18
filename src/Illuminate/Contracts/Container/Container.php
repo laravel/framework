@@ -88,6 +88,15 @@ interface Container {
 	public function make($abstract, $parameters = array());
 
 	/**
+	 * Call the given Closure / class@method and inject its dependencies.
+	 *
+	 * @param  callable|string  $callback
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function call($callback, array $parameters = array(), $defaultMethod = null);
+
+	/**
 	 * Determine if the given abstract type has been resolved.
 	 *
 	 * @param  string $abstract
