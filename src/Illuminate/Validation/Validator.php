@@ -7,11 +7,11 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
-class Validator implements MessageProvider {
+class Validator implements ValidatorContract {
 
 	/**
 	 * The Translator implementation.
@@ -1163,7 +1163,7 @@ class Validator implements MessageProvider {
 	 */
 	protected function validateImage($attribute, $value)
 	{
-		return $this->validateMimes($attribute, $value, array('jpeg', 'png', 'gif', 'bmp'));
+		return $this->validateMimes($attribute, $value, array('jpeg', 'png', 'gif', 'bmp', 'svg'));
 	}
 
 	/**

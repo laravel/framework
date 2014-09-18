@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Contracts\Validation;
 
-use Illuminate\Contracts\Container\Container;
-
 interface ValidatesWhenResolved {
 
 	/**

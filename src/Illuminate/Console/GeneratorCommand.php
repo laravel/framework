@@ -20,6 +20,13 @@ abstract class GeneratorCommand extends Command {
 	protected $configKey = '';
 
 	/**
+	 * The type of class being generated.
+	 *
+	 * @var string
+	 */
+	protected $type;
+
+	/**
 	 * Create a new controller creator command instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files

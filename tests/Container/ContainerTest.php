@@ -383,6 +383,61 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(['foo', 'bar'], $result);
 	}
 
+
+	public function testContainerCanInjectDifferentImplementationsDependingOnContext()
+	{
+		$container = new Container;
+
+		$container->bind('IContainerContractStub', 'ContainerImplementationStub');
+
+		$container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStub');
+		$container->when('ContainerTestContextInjectTwo')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+		$one = $container->make('ContainerTestContextInjectOne');
+		$two = $container->make('ContainerTestContextInjectTwo');
+
+		$this->assertInstanceOf('ContainerImplementationStub', $one->impl);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
+
+		/**
+		 * Test With Closures
+		 */
+		$container = new Container;
+
+		$container->bind('IContainerContractStub', 'ContainerImplementationStub');
+
+		$container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStub');
+		$container->when('ContainerTestContextInjectTwo')->needs('IContainerContractStub')->give(function($container) {
+			return $container->make('ContainerImplementationStubTwo');
+		});
+
+		$one = $container->make('ContainerTestContextInjectOne');
+		$two = $container->make('ContainerTestContextInjectTwo');
+
+		$this->assertInstanceOf('ContainerImplementationStub', $one->impl);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
+	}
+
+
+	public function testContainerTags()
+	{
+		$container = new Container;
+		$container->tag('ContainerImplementationStub', 'foo', 'bar');
+		$container->tag('ContainerImplementationStubTwo', ['foo']);
+
+		$this->assertEquals(1, count($container->tagged('bar')));
+		$this->assertEquals(2, count($container->tagged('foo')));
+		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
+		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('bar')[0]);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
+
+		$container = new Container;
+		$container->tag(['ContainerImplementationStub', 'ContainerImplementationStubTwo'], ['foo']);
+		$this->assertEquals(2, count($container->tagged('foo')));
+		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
+	}
+
 }
 
 class ContainerConcreteStub {}
@@ -390,6 +445,7 @@ class ContainerConcreteStub {}
 interface IContainerContractStub {}
 
 class ContainerImplementationStub implements IContainerContractStub {}
+class ContainerImplementationStubTwo implements IContainerContractStub {}
 
 class ContainerDependentStub {
 	public $impl;
@@ -443,5 +499,21 @@ class ContainerLazyExtendStub {
 class ContainerTestCallStub {
 	public function work() {
 		return func_get_args();
+	}
+}
+
+class ContainerTestContextInjectOne {
+	public $impl;
+	public function __construct(IContainerContractStub $impl)
+	{
+		$this->impl = $impl;
+	}
+}
+
+class ContainerTestContextInjectTwo {
+	public $impl;
+	public function __construct(IContainerContractStub $impl)
+	{
+		$this->impl = $impl;
 	}
 }

@@ -13,7 +13,8 @@
 		{"message": "Add 'after' callback to Validator.", "backport": null},
 		{"message": "Returning 'false' from a database ::chunk operation will stop processing records.", "backport": null},
 		{"message": "The 'swift.transport' container binding is now an instance of 'Illuminate\\Mail\\TransportManager'.", "backport": null},
-		{"message": "Added support for container context aware bindings and container tags.", "backport": null}
+		{"message": "Added support for container context aware bindings and container tags.", "backport": null},
+		{"message": "SVG files are now considered valid by the 'image' validation rule.", "backport": null}
 	],
 	"4.2.*": [
 		{"message": "View and Pagination 'Environment' classes renamed to 'Factory'.", "backport": null},
