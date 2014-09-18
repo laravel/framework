@@ -11,7 +11,7 @@
         "php": ">=5.4.0",
         "illuminate/filesystem": "~5.0",
         "illuminate/support": "~5.0",
-        "symfony/finder": "~2.3"
+        "symfony/finder": "2.6.*"
     },
     "require-dev": {
         "illuminate/console": "~5.0"

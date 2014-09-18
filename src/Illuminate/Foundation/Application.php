@@ -1170,7 +1170,7 @@ class Application extends Container implements HttpKernelInterface,
 			'session'        => 'Illuminate\Session\SessionManager',
 			'session.store'  => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
 			'url'            => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
-			'validator'      => 'Illuminate\Validation\Factory',
+			'validator'      => ['Illuminate\Validation\Factory', 'Illuminate\Contracts\Validation\Factory'],
 			'view'           => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
 		);
 

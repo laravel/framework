@@ -19,7 +19,7 @@ class Inspiring {
 			'Simplicity is the ultimate sophistication. - Leonardo da Vinci',
 			'Simplicity is the essence of happiness. - Cedric Bledsoe',
 			'Smile, breathe, and go slowly. - Thich Nhat Hanh',
-			'Simplicity is an aquired taste. - Katharine Gerould',
+			'Simplicity is an acquired taste. - Katharine Gerould',
 
 		])->random();
 	}
