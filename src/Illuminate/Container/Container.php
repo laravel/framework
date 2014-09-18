@@ -516,6 +516,7 @@ class Container implements ArrayAccess, ContainerContract, ContextAwareContainer
 	 *
 	 * @param  callable|string  $callback
 	 * @param  array  $parameters
+	 * @param  string|null  $defaultMethod
 	 * @return mixed
 	 */
 	public function call($callback, array $parameters = array(), $defaultMethod = null)
