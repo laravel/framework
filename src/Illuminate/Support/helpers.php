@@ -244,6 +244,21 @@ if ( ! function_exists('array_get'))
 	}
 }
 
+if ( ! function_exists('array_has'))
+{
+	/**
+	 * Check if an item exists in an array using "dot" notation.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return bool
+	 */
+	function array_has($array, $key)
+	{
+		return Arr::has($array, $key);
+	}
+}
+
 if ( ! function_exists('array_only'))
 {
 	/**
