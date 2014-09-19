@@ -19,6 +19,15 @@ interface Factory {
 	 * @return \Illuminate\Contracts\View\View
 	 */
 	public function make($view, $data = array(), $mergeData = array());
+	
+	/**
+	 * Add a piece of shared data to the environment.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function share($key, $value = null)
 
 	/**
 	 * Register a view composer event.
