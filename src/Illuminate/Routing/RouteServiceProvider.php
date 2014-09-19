@@ -12,7 +12,7 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->before();
+		$this->app->call([$this, 'before']);
 
 		if ($this->app->routesAreCached())
 		{
@@ -23,7 +23,7 @@ class RouteServiceProvider extends ServiceProvider {
 		}
 		else
 		{
-			$this->map();
+			$this->app->call([$this, 'map']);
 		}
 	}
 
@@ -33,22 +33,6 @@ class RouteServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function register() {}
-
-	/**
-	 * Called before routes are registered.
-	 *
-	 * Register any model bindings or pattern based filters.
-	 *
-	 * @return void
-	 */
-	public function before() {}
-
-	/**
-	 * Define the routes for the application.
-	 *
-	 * @return void
-	 */
-	public function map() {}
 
 	/**
 	 * Register the given Closure with the "group" function namespace set.
