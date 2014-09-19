@@ -18,7 +18,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * The container instance.
 	 *
-	 * @var  Container  $container
+	 * @var  \Illuminate\Container\Container  $container
 	 */
 	protected $container;
 
@@ -131,8 +131,8 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		else
 		{
 			return $this->redirector->to($this->getRedirectUrl())
-                                            ->withInput($this->except($this->dontFlash))
-                                            ->withErrors($errors);
+				->withInput($this->except($this->dontFlash))
+				->withErrors($errors);
 		}
 	}
 
@@ -213,7 +213,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Set the container implementation.
 	 *
-	 * @param  Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return $this
 	 */
 	public function setContainer(Container $container)
