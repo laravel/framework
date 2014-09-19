@@ -51,9 +51,13 @@ class FormRequestServiceProvider extends ServiceProvider {
 	 */
 	protected function initializeRequest(FormRequest $form, Request $current)
 	{
+		$files = $current->files->all();
+
+		$files = is_array($files) ? array_filter($files) : $files;
+
 		$form->initialize(
 			$current->query->all(), $current->request->all(), $current->attributes->all(),
-			$current->cookies->all(), $current->files->all(), $current->server->all(), $current->getContent()
+			$current->cookies->all(), $files, $current->server->all(), $current->getContent()
 		);
 	}
 
