@@ -19,6 +19,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/Registrar.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/View/Factory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/MessageProvider.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/MessageBag.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/View/View.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Container/Container.php',
     $basePath.'/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/HttpKernelInterface.php',

@@ -5,8 +5,9 @@ use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 
-class MessageBag implements Arrayable, Countable, Jsonable, MessageProvider, JsonSerializable {
+class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, MessageBagContract, MessageProvider  {
 
 	/**
 	 * All of the registered messages.
