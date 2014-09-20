@@ -129,8 +129,8 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	public function __construct(Dispatcher $events, Container $container = null)
 	{
 		$this->events = $events;
-		$this->routes = new RouteCollection;
 		$this->container = $container ?: new Container;
+		$this->routes = $this->container->make('Illuminate\\Routing\\RouteCollection');
 
 		$this->bind('_missing', function($v) { return explode('/', $v); });
 	}
@@ -854,7 +854,8 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	 */
 	protected function newRoute($methods, $uri, $action)
 	{
-		return (new Route($methods, $uri, $action))->setContainer($this->container);
+		return $this->container->make('Illuminate\\Routing\\Route', [$methods, $uri, $action])
+			->setContainer($this->container);
 	}
 
 	/**
@@ -1497,7 +1498,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	{
 		if ( ! $response instanceof SymfonyResponse)
 		{
-			$response = new Response($response);
+			$response = $this->container->make('Illuminate\\Http\\Response', [$response]);
 		}
 
 		return $response->prepare($request);
@@ -1712,7 +1713,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	{
 		if (is_null($this->controllerDispatcher))
 		{
-			$this->controllerDispatcher = new ControllerDispatcher($this, $this->container);
+			$this->controllerDispatcher = $this->container->make('Illuminate\\Routing\\ControllerDispatcher', [$this, $this->container]);
 		}
 
 		return $this->controllerDispatcher;
