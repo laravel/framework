@@ -1152,10 +1152,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		{
 			return $callback.'@filter';
 		}
-		else
-		{
-			return $callback;
-		}
+
+		return $callback;
 	}
 
 	/**

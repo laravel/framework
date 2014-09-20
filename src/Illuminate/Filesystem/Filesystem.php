@@ -82,10 +82,8 @@ class Filesystem {
 		{
 			return $this->put($path, $data.$this->get($path));
 		}
-		else
-		{
-			return $this->put($path, $data);
-		}
+
+		return $this->put($path, $data);
 	}
 
 	/**
@@ -295,10 +293,8 @@ class Filesystem {
 		{
 			return @mkdir($path, $mode, $recursive);
 		}
-		else
-		{
-			return mkdir($path, $mode, $recursive);
-		}
+
+		return mkdir($path, $mode, $recursive);
 	}
 
 	/**

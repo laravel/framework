@@ -234,10 +234,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			return in_array($this['env'], func_get_args());
 		}
-		else
-		{
-			return $this['env'];
-		}
+
+		return $this['env'];
 	}
 
 	/**

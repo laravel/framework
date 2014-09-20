@@ -191,10 +191,8 @@ class UrlGenerator {
 		{
 			return $this->forceSchema ?: $this->request->getScheme().'://';
 		}
-		else
-		{
-			return $secure ? 'https://' : 'http://';
-		}
+
+		return $secure ? 'https://' : 'http://';
 	}
 
 	/**
@@ -402,10 +400,8 @@ class UrlGenerator {
 		{
 			return $domain;
 		}
-		else
-		{
-			return $domain .= ':'.$this->request->getPort();
-		}
+
+		return $domain.':'.$this->request->getPort();
 	}
 
 	/**
@@ -436,10 +432,8 @@ class UrlGenerator {
 		{
 			return $this->getScheme(true);
 		}
-		else
-		{
-			return $this->getScheme(null);
-		}
+
+		return $this->getScheme(null);
 	}
 
 	/**

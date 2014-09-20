@@ -766,10 +766,8 @@ class BelongsToMany extends Relation {
 		{
 			return array($key, array_merge($value, $attributes));
 		}
-		else
-		{
-			return array($value, $attributes);
-		}
+
+		return array($value, $attributes);
 	}
 
 	/**
