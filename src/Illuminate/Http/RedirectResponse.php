@@ -138,10 +138,8 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 		{
 			return $provider->getMessageBag();
 		}
-		else
-		{
-			return new MessageBag((array) $provider);
-		}
+
+		return new MessageBag((array) $provider);
 	}
 
 	/**

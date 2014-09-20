@@ -45,10 +45,8 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 		{
 			return array();
 		}
-		else
-		{
-			return array_dot($this->files->getRequire($path));
-		}
+
+		return array_dot($this->files->getRequire($path));
 	}
 
 	/**
@@ -63,10 +61,8 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 		{
 			return $this->path.'/.env.'.$environment.'.php';
 		}
-		else
-		{
-			return $this->path.'/.env.php';
-		}
+
+		return $this->path.'/.env.php';
 	}
 
 }

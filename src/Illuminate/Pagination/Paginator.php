@@ -321,10 +321,8 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		{
 			return $this->currentPage;
 		}
-		else
-		{
-			return min($this->currentPage, (int) ceil($total / $this->perPage));
-		}
+
+		return min($this->currentPage, (int) ceil($total / $this->perPage));
 	}
 
 	/**
