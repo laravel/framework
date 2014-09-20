@@ -194,7 +194,7 @@ class ControllerGenerator {
 	 */
 	protected function getMethods($options)
 	{
-		if (isset($options['only']) && count($options['only']) > 0)
+		if (isset($options['only']) && ! empty($options['only']))
 		{
 			return $options['only'];
 		}

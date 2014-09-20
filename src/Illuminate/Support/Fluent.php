@@ -140,7 +140,7 @@ class Fluent implements ArrayAccess, ArrayableInterface, JsonableInterface, Json
 	 */
 	public function __call($method, $parameters)
 	{
-		$this->attributes[$method] = count($parameters) > 0 ? $parameters[0] : true;
+		$this->attributes[$method] = ! empty($parameters) ? $parameters[0] : true;
 
 		return $this;
 	}

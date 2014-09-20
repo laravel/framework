@@ -94,7 +94,7 @@ class ProviderRepository {
 	 */
 	protected function registerLoadEvents(Application $app, $provider, array $events)
 	{
-		if (count($events) < 1) return;
+		if (empty($events)) return;
 
 		$app->make('events')->listen($events, function() use ($app, $provider)
 		{

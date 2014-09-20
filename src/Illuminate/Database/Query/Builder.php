@@ -601,7 +601,7 @@ class Builder {
 	 */
 	public function addNestedWhereQuery($query, $boolean = 'and')
 	{
-		if (count($query->wheres))
+		if ( ! empty($query->wheres))
 		{
 			$type = 'Nested';
 
@@ -1307,7 +1307,7 @@ class Builder {
 	{
 		$result = (array) $this->first(array($column));
 
-		return count($result) > 0 ? reset($result) : null;
+		return  ! empty($result) ? reset($result) : null;
 	}
 
 	/**
@@ -1320,7 +1320,7 @@ class Builder {
 	{
 		$results = $this->take(1)->get($columns);
 
-		return count($results) > 0 ? reset($results) : null;
+		return ! empty($results) > 0 ? reset($results) : null;
 	}
 
 	/**
@@ -1457,7 +1457,7 @@ class Builder {
 	{
 		$results = $this->forPage($page = 1, $count)->get();
 
-		while (count($results) > 0)
+		while ( ! empty($results))
 		{
 			// On each chunk result set, we will pass them to the callback and then let the
 			// developer take care of everything within the callback, which allows us to
@@ -1491,7 +1491,7 @@ class Builder {
 		// If a key was specified and we have results, we will go ahead and combine
 		// the values with the keys of all of the records so that the values can
 		// be accessed by the key of the rows instead of simply being numeric.
-		if ( ! is_null($key) && count($results) > 0)
+		if ( ! is_null($key) && ! empty($results))
 		{
 			$keys = $results->fetch($key)->all();
 

@@ -423,7 +423,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function fillableFromArray(array $attributes)
 	{
-		if (count($this->fillable) > 0 && ! static::$unguarded)
+		if ( ! empty($this->fillable) && ! static::$unguarded)
 		{
 			return array_intersect_key($attributes, array_flip($this->fillable));
 		}
@@ -1461,7 +1461,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$dirty = $this->getDirty();
 
-		if (count($dirty) > 0)
+		if ( ! empty($dirty))
 		{
 			// If the updating event returns false, we will cancel the update operation so
 			// developers can hook Validation systems into their models and cancel this
@@ -1484,7 +1484,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// models are updated, giving them a chance to do any special processing.
 			$dirty = $this->getDirty();
 
-			if (count($dirty) > 0)
+			if ( ! empty($dirty))
 			{
 				$this->setKeysForSaveQuery($query)->update($dirty);
 
@@ -2129,7 +2129,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function totallyGuarded()
 	{
-		return count($this->fillable) == 0 && $this->guarded == array('*');
+		return empty($this->fillable) && $this->guarded == array('*');
 	}
 
 	/**
@@ -2279,7 +2279,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getArrayableAppends()
 	{
-		if ( ! count($this->appends)) return [];
+		if (empty($this->appends)) return [];
 
 		return $this->getArrayableItems(
 			array_combine($this->appends, $this->appends)
@@ -2353,7 +2353,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function getArrayableItems(array $values)
 	{
-		if (count($this->visible) > 0)
+		if ( ! empty($this->visible))
 		{
 			return array_intersect_key($values, array_flip($this->visible));
 		}
@@ -2737,7 +2737,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$dirty = $this->getDirty();
 
-		if (is_null($attributes)) return count($dirty) > 0;
+		if (is_null($attributes)) return ! empty($dirty);
 
 		if ( ! is_array($attributes)) $attributes = func_get_args();
 

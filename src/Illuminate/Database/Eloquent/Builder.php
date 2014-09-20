@@ -153,7 +153,7 @@ class Builder {
 		// If we actually found models we will also eager load any relationships that
 		// have been specified as needing to be eager loaded, which will solve the
 		// n+1 query issue for the developers to avoid running a lot of queries.
-		if (count($models) > 0)
+		if ( ! empty($models))
 		{
 			$models = $this->eagerLoadRelations($models);
 		}
@@ -185,7 +185,7 @@ class Builder {
 	{
 		$results = $this->forPage($page = 1, $count)->get();
 
-		while (count($results) > 0)
+		while ( ! empty($results))
 		{
 			// On each chunk result set, we will pass them to the callback and then let the
 			// developer take care of everything within the callback, which allows us to
@@ -503,7 +503,7 @@ class Builder {
 		// If there are nested relationships set on the query, we will put those onto
 		// the query instances so that they can be handled after this relationship
 		// is loaded. In this way they will all trickle down as they are loaded.
-		if (count($nested) > 0)
+		if ( ! empty($nested))
 		{
 			$query->getQuery()->with($nested);
 		}

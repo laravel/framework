@@ -251,7 +251,7 @@ class HtmlBuilder {
 	{
 		$html = '';
 
-		if (count($list) == 0) return $html;
+		if (empty($list)) return $html;
 
 		// Essentially we will just spin through the list and build the list of the HTML
 		// elements from the array. We will also handled nested lists in case that is
@@ -326,7 +326,7 @@ class HtmlBuilder {
 			if ( ! is_null($element)) $html[] = $element;
 		}
 
-		return count($html) > 0 ? ' '.implode(' ', $html) : '';
+		return ! empty($html) ? ' '.implode(' ', $html) : '';
 	}
 
 	/**

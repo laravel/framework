@@ -32,7 +32,7 @@ class ListFailedCommand extends Command {
 			$rows[] = $this->parseFailedJob((array) $failed);
 		}
 
-		if (count($rows) == 0)
+		if (empty($rows))
 		{
 			return $this->info('No failed jobs!');
 		}

@@ -264,7 +264,7 @@ class Connection implements ConnectionInterface {
 	{
 		$records = $this->select($query, $bindings);
 
-		return count($records) > 0 ? reset($records) : null;
+		return ! empty($records) ? reset($records) : null;
 	}
 
 	/**

@@ -277,7 +277,7 @@ class UrlGenerator {
 	 */
 	protected function replaceRouteParameters($path, array &$parameters)
 	{
-		if (count($parameters))
+		if ( ! empty($parameters))
 		{
 			$path = preg_replace_sub(
 				'/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
@@ -314,7 +314,7 @@ class UrlGenerator {
 		// First we will get all of the string parameters that are remaining after we
 		// have replaced the route wildcards. We'll then build a query string from
 		// these string parameters then use it as a starting point for the rest.
-		if (count($parameters) == 0) return '';
+		if (empty($parameters)) return '';
 
 		$query = http_build_query(
 			$keyed = $this->getStringParameters($parameters)

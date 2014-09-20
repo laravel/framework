@@ -475,7 +475,7 @@ class Validator implements MessageProviderInterface {
 		{
 			return false;
 		}
-		elseif (is_array($value) && count($value) < 1)
+		elseif (is_array($value) && empty($value))
 		{
 			return false;
 		}

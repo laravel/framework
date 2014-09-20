@@ -147,7 +147,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		if (is_null($callback))
 		{
-			return count($this->items) > 0 ? reset($this->items) : null;
+			return ! empty($this->items) ? reset($this->items) : null;
 		}
 		else
 		{
@@ -324,7 +324,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	*/
 	public function last()
 	{
-		return count($this->items) > 0 ? end($this->items) : null;
+		return ! empty($this->items) ? end($this->items) : null;
 	}
 
 	/**
