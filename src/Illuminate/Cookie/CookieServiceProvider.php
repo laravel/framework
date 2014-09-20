@@ -18,4 +18,16 @@ class CookieServiceProvider extends ServiceProvider {
 			return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain']);
 		});
 	}
+
+	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		$this->app->middleware('Illuminate\Cookie\Guard', [$this->app['encrypter']]);
+		$this->app->middleware('Illuminate\Cookie\Queue', [$this->app['cookie']]);
+	}
+
 }

@@ -116,8 +116,6 @@ class Application extends Container implements HttpKernelInterface,
 		$this->registerBaseBindings($request ?: $this->createNewRequest());
 
 		$this->registerBaseServiceProviders();
-
-		$this->registerBaseMiddlewares();
 	}
 
 	/**
@@ -676,25 +674,19 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	protected function getStackedClient()
 	{
-		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
-
-		$client = (new Builder)
-                    ->push('Illuminate\Cookie\Guard', $this['encrypter'])
-                    ->push('Illuminate\Cookie\Queue', $this['cookie'])
-                    ->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
-
-		$this->mergeCustomMiddlewares($client);
+		$client = new Builder;
+		$this->mergeMiddlewares($client);
 
 		return $client->resolve($this);
 	}
 
 	/**
-	 * Merge the developer defined middlewares onto the stack.
+	 * Merge the middlewares onto the stack.
 	 *
 	 * @param  \Stack\Builder
 	 * @return void
 	 */
-	protected function mergeCustomMiddlewares(Builder $stack)
+	protected function mergeMiddlewares(Builder $stack)
 	{
 		foreach ($this->middlewares as $middleware)
 		{
@@ -704,16 +696,6 @@ class Application extends Container implements HttpKernelInterface,
 
 			call_user_func_array(array($stack, 'push'), $parameters);
 		}
-	}
-
-	/**
-	 * Register the default, but optional middlewares.
-	 *
-	 * @return void
-	 */
-	protected function registerBaseMiddlewares()
-	{
-		//
 	}
 
 	/**

@@ -17,6 +17,18 @@ class SessionServiceProvider extends ServiceProvider {
 
 		$this->registerSessionDriver();
 	}
+	
+	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		$sessionReject = $this->app->bound('session.reject') ? $this->app['session.reject'] : null;
+		
+		$this->app->middleware('Illuminate\Session\Middleware', [$this->app['session'], $sessionReject]);
+	}
 
 	/**
 	 * Setup the default session driver for the application.
