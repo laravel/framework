@@ -27,7 +27,7 @@ class FilesystemManager implements FactoryContract {
 	protected $disks = [];
 
 	/**
-	 * Create a new queue manager instance.
+	 * Create a new filesystem manager instance.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 * @return void
@@ -75,7 +75,7 @@ class FilesystemManager implements FactoryContract {
 	}
 
 	/**
-	 * Create an instance of the given driver.
+	 * Create an instance of the local driver.
 	 *
 	 * @param  array  $config
 	 * @return \Illuminate\Contracts\Filesystem\Filesystem
@@ -86,7 +86,7 @@ class FilesystemManager implements FactoryContract {
 	}
 
 	/**
-	 * Create an instance of the given driver.
+	 * Create an instance of the Amazon S3 driver.
 	 *
 	 * @param  array  $config
 	 * @return \Illuminate\Contracts\Filesystem\Cloud
@@ -103,7 +103,7 @@ class FilesystemManager implements FactoryContract {
 	}
 
 	/**
-	 * Create an instance of the given driver.
+	 * Create an instance of the Rackspace driver.
 	 *
 	 * @param  array  $config
 	 * @return \Illuminate\Contracts\Filesystem\Cloud
