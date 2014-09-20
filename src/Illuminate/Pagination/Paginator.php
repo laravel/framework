@@ -239,7 +239,9 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	{
 		if (is_null($fragment)) return $this->fragment;
 
-		$this->fragment = $fragment; return $this;
+		$this->fragment = $fragment;
+
+		return $this;
 	}
 
 	/**
