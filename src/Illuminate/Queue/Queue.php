@@ -4,6 +4,7 @@ use Closure;
 use DateTime;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
+use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 abstract class Queue {
@@ -57,8 +58,57 @@ abstract class Queue {
 		}
 		else
 		{
-			return json_encode(array('job' => $job, 'data' => $data));
+			return json_encode($this->createPlainPayload($job, $data));
 		}
+	}
+
+	/**
+	 * Create a typical, "plain" queue payload array.
+	 *
+	 * @param  string  $job
+	 * @param  mixed  $data
+	 * @return array
+	 */
+	protected function createPlainPayload($job, $data)
+	{
+		return ['job' => $job, 'data' => $this->prepareQueueableEntities($data)];
+	}
+
+	/**
+	 * Prepare any queueable entities for storage in the queue.
+	 *
+	 * @param  mixed  $data
+	 * @return mixed
+	 */
+	protected function prepareQueueableEntities($data)
+	{
+		if ($data instanceof QueueableEntity)
+		{
+			return $this->prepareQueueableEntity($data);
+		}
+
+		if (is_array($data))
+		{
+			array_walk($data, function(&$d) { $d = $this->prepareQueueableEntity($d); });
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Prepare a single queueable entity for storage on the queue.
+	 *
+	 * @param  mixed  $value
+	 * @return mixed
+	 */
+	protected function prepareQueueableEntity($value)
+	{
+		if ($value instanceof QueueableEntity)
+		{
+			return '::entity::|'.get_class($value).'|'.$value->getQueueableId();
+		}
+
+		return $value;
 	}
 
 	/**
@@ -72,7 +122,7 @@ abstract class Queue {
 	{
 		$closure = $this->crypt->encrypt(serialize(new SerializableClosure($job)));
 
-		return array('job' => 'IlluminateQueueClosure', 'data' => compact('closure'));
+		return ['job' => 'IlluminateQueueClosure', 'data' => compact('closure')];
 	}
 
 	/**

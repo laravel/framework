@@ -14,7 +14,7 @@ class SyncQueue extends Queue implements QueueContract {
 	 */
 	public function push($job, $data = '', $queue = null)
 	{
-		$this->resolveJob($job, json_encode($data))->fire();
+		$this->resolveJob($this->createPayload($job, $data, $queue))->fire();
 
 		return 0;
 	}
@@ -58,12 +58,12 @@ class SyncQueue extends Queue implements QueueContract {
 	 * Resolve a Sync job instance.
 	 *
 	 * @param  string  $job
-	 * @param  string  $data
+	 * @param  string  $payload
 	 * @return \Illuminate\Queue\Jobs\SyncJob
 	 */
-	protected function resolveJob($job, $data)
+	protected function resolveJob($payload)
 	{
-		return new Jobs\SyncJob($this->container, $job, $data);
+		return new Jobs\SyncJob($this->container, $payload);
 	}
 
 }
