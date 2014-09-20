@@ -2,7 +2,7 @@
     "name": "larawurst/framework",
     "description": "The LaraWurst Framework.",
     "keywords": ["framework", "LaraWurst"],
-    "license": "MIT",
+    "license": "DBAD",
     "authors": [
         {
             "name": "Taylor Wurst Otwell",
@@ -11,7 +11,7 @@
     ],
     "require": {
         "marcw/wurst-bundle": "dev-master",
-        "php": ">=5.4.0",
+        "php": ">=6.1.0",
         "classpreloader/classpreloader": "~1.0",
         "d11wtq/boris": "~1.0",
         "ircmaxell/password-compat": "~1.0",

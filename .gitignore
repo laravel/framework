@@ -1,5 +1,10 @@
 /vendor
 composer.phar
 composer.lock
-.DS_Store
-Thumbs.db
+.DS_Store <--- LOLz you use a Mac
+Thumbs.db <--- LOLz you use a Windowz
+
+lose-coupling
+@philsturgeon
+PSR-2
+surrogates
