@@ -1159,12 +1159,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateMimes($attribute, $value, $parameters)
 	{
-		if ( ! $value instanceof File)
-		{
-			return false;
-		}
-
-		if ($value instanceof UploadedFile && ! $value->isValid())
+		if ( ! $value instanceof File || ($value instanceof UploadedFile && ! $value->isValid()))
 		{
 			return false;
 		}
@@ -1172,12 +1167,7 @@ class Validator implements MessageProviderInterface {
 		// The Symfony File class should do a decent job of guessing the extension
 		// based on the true MIME type so we'll just loop through the array of
 		// extensions and compare it to the guessed extension of the files.
-		if ($value->getPath() != '')
-		{
-			return in_array($value->guessExtension(), $parameters);
-		}
-
-		return false;
+		return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
 	}
 
 	/**
