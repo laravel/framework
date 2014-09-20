@@ -157,14 +157,7 @@ class Route {
 	{
 		preg_match_all('/\{(\w+?)\?\}/', $this->uri, $matches);
 
-		$optional = array();
-
-		if (isset($matches[1]))
-		{
-			foreach ($matches[1] as $key) { $optional[$key] = null; }
-		}
-
-		return $optional;
+		return isset($matches[1]) ? array_fill_keys($matches[1], null) : [];
 	}
 
 	/**
