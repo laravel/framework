@@ -219,7 +219,7 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 		// If we have any extra query string key / value pairs that need to be added
 		// onto the URL, we will put them in query string form and then attach it
 		// to the URL. This allows for extra information like sortings storage.
-		if (count($this->query) > 0)
+		if ( ! empty($this->query))
 		{
 			$parameters = array_merge($this->query, $parameters);
 		}

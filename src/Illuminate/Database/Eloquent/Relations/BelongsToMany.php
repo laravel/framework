@@ -111,7 +111,7 @@ class BelongsToMany extends Relation {
 	{
 		$results = $this->take(1)->get($columns);
 
-		return count($results) > 0 ? $results->first() : null;
+		return ! empty($results) ? $results->first() : null;
 	}
 
 	/**
@@ -151,7 +151,7 @@ class BelongsToMany extends Relation {
 		// If we actually found models we will also eager load any relationships that
 		// have been specified as needing to be eager loaded. This will solve the
 		// n + 1 query problem for the developer and also increase performance.
-		if (count($models) > 0)
+		if ( ! empty($models))
 		{
 			$models = $this->query->eagerLoadRelations($models);
 		}
@@ -459,7 +459,7 @@ class BelongsToMany extends Relation {
 		// to the parent models. This will help us keep any caching synced up here.
 		$ids = $this->getRelatedIds();
 
-		if (count($ids) > 0)
+		if ( ! empty($ids))
 		{
 			$this->getRelated()->newQuery()->whereIn($key, $ids)->update($columns);
 		}
@@ -585,7 +585,7 @@ class BelongsToMany extends Relation {
 		// Next, we will take the differences of the currents and given IDs and detach
 		// all of the entities that exist in the "current" array but are not in the
 		// the array of the IDs given to the method which will complete the sync.
-		if ($detaching && count($detach) > 0)
+		if ($detaching && ! empty($detach))
 		{
 			$this->detach($detach);
 
@@ -599,7 +599,7 @@ class BelongsToMany extends Relation {
 			$changes, $this->attachNew($records, $current, false)
 		);
 
-		if (count($changes['attached']) || count($changes['updated']))
+		if ( ! empty($changes['attached']) || ! empty($changes['updated']))
 		{
 			$this->touchIfTouching();
 		}
@@ -657,7 +657,7 @@ class BelongsToMany extends Relation {
 			// Now we'll try to update an existing pivot record with the attributes that were
 			// given to the method. If the model is actually updated we will add it to the
 			// list of updated pivot records so we return them back out to the consumer.
-			elseif (count($attributes) > 0 &&
+			elseif ( ! empty($attributes) &&
 				$this->updateExistingPivot($id, $attributes, $touch))
 			{
 				$changes['updated'][] = (int) $id;
@@ -830,7 +830,7 @@ class BelongsToMany extends Relation {
 		// We'll return the numbers of affected rows when we do the deletes.
 		$ids = (array) $ids;
 
-		if (count($ids) > 0)
+		if ( ! empty($ids))
 		{
 			$query->whereIn($this->otherKey, (array) $ids);
 		}

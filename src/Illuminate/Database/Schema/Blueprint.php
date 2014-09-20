@@ -103,7 +103,7 @@ class Blueprint {
 	 */
 	protected function addImpliedCommands()
 	{
-		if (count($this->columns) > 0 && ! $this->creating())
+		if ( ! empty($this->columns) && ! $this->creating())
 		{
 			array_unshift($this->commands, $this->createCommand('add'));
 		}
