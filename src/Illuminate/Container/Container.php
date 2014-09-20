@@ -490,10 +490,8 @@ class Container implements ArrayAccess, ContainerContract, ContextAwareContainer
 		{
 			return $this->reboundCallbacks[$abstract];
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**
@@ -680,10 +678,8 @@ class Container implements ArrayAccess, ContainerContract, ContextAwareContainer
 
 			return $abstract;
 		}
-		else
-		{
-			return $this->bindings[$abstract]['concrete'];
-		}
+
+		return $this->bindings[$abstract]['concrete'];
 	}
 
 	/**

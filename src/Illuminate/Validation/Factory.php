@@ -147,10 +147,8 @@ class Factory implements FactoryContract {
 		{
 			return new Validator($this->translator, $data, $rules, $messages, $customAttributes);
 		}
-		else
-		{
-			return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
-		}
+
+		return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
 	}
 
 	/**

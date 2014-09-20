@@ -307,10 +307,8 @@ class PackageCreator {
 		{
 			return $this->files->get(__DIR__.'/stubs/plain.provider.stub');
 		}
-		else
-		{
-			return $this->files->get(__DIR__.'/stubs/provider.stub');
-		}
+
+		return $this->files->get(__DIR__.'/stubs/provider.stub');
 	}
 
 	/**

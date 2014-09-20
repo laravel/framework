@@ -56,10 +56,8 @@ abstract class Queue {
 		{
 			return json_encode($this->createClosurePayload($job, $data));
 		}
-		else
-		{
-			return json_encode($this->createPlainPayload($job, $data));
-		}
+
+		return json_encode($this->createPlainPayload($job, $data));
 	}
 
 	/**
@@ -152,10 +150,8 @@ abstract class Queue {
 		{
 			return max(0, $delay->getTimestamp() - $this->getTime());
 		}
-		else
-		{
-			return (int) $delay;
-		}
+
+		return (int) $delay;
 	}
 
 	/**

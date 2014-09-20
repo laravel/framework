@@ -96,7 +96,7 @@ class Builder {
 		$this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
 		return $this->get($columns);
-    }
+	}
 
 	/**
 	 * Find a model by its primary key or throw an exception.
@@ -242,10 +242,8 @@ class Builder {
 		{
 			return $this->groupedPaginate($paginator, $perPage, $columns);
 		}
-		else
-		{
-			return $this->ungroupedPaginate($paginator, $perPage, $columns);
-		}
+
+		return $this->ungroupedPaginate($paginator, $perPage, $columns);
 	}
 
 	/**
@@ -374,10 +372,8 @@ class Builder {
 		{
 			return call_user_func($this->onDelete, $this);
 		}
-		else
-		{
-			return $this->query->delete();
-		}
+
+		return $this->query->delete();
 	}
 
 	/**

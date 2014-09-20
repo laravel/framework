@@ -1650,10 +1650,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			return $this->original[$this->getKeyName()];
 		}
-		else
-		{
-			return $this->getAttribute($this->getKeyName());
-		}
+
+		return $this->getAttribute($this->getKeyName());
 	}
 
 	/**
