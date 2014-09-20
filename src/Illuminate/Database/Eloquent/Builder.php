@@ -96,7 +96,7 @@ class Builder {
 		$this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
 		return $this->get($columns);
-    }
+	}
 
 	/**
 	 * Find a model by its primary key or throw an exception.
