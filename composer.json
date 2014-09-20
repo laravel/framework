@@ -1,15 +1,16 @@
 {
-    "name": "laravel/framework",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "name": "larawurst/framework",
+    "description": "The LaraWurst Framework.",
+    "keywords": ["framework", "LaraWurst"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "name": "Taylor Wurst Otwell",
+            "email": "taylorotwell@wurstcon.com"
         }
     ],
     "require": {
+        "marcw/wurst-bundle": "dev-master",
         "php": ">=5.4.0",
         "classpreloader/classpreloader": "~1.0",
         "d11wtq/boris": "~1.0",
