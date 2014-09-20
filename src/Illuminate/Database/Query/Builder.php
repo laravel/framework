@@ -1427,10 +1427,8 @@ class Builder {
 		{
 			return $cache->rememberForever($key, $callback);
 		}
-		else
-		{
-			return $cache->remember($key, $minutes, $callback);
-		}
+
+		return $cache->remember($key, $minutes, $callback);
 	}
 
 	/**
@@ -1597,10 +1595,8 @@ class Builder {
 		{
 			return $this->groupedPaginate($paginator, $perPage, $columns);
 		}
-		else
-		{
-			return $this->ungroupedPaginate($paginator, $perPage, $columns);
-		}
+
+		return $this->ungroupedPaginate($paginator, $perPage, $columns);
 	}
 
 	/**

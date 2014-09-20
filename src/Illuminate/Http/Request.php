@@ -268,7 +268,7 @@ class Request extends SymfonyRequest {
 
 		foreach ($keys as $key)
 		{
-			array_set($results, $key, array_get($input, $key, null));
+			array_set($results, $key, array_get($input, $key));
 		}
 
 		return $results;
@@ -456,10 +456,8 @@ class Request extends SymfonyRequest {
 		{
 			return $this->$source->all();
 		}
-		else
-		{
-			return $this->$source->get($key, $default, true);
-		}
+
+		return $this->$source->get($key, $default, true);
 	}
 
 	/**

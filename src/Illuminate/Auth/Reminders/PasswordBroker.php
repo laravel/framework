@@ -197,10 +197,8 @@ class PasswordBroker implements PasswordBrokerContract {
 		{
 			return call_user_func($this->passwordValidator, $credentials) && $password === $confirm;
 		}
-		else
-		{
-			return $this->validatePasswordWithDefaults($credentials);
-		}
+
+		return $this->validatePasswordWithDefaults($credentials);
 	}
 
 	/**

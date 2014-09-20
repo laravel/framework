@@ -42,10 +42,8 @@ class ConnectionFactory {
 		{
 			return $this->createReadWriteConnection($config);
 		}
-		else
-		{
-			return $this->createSingleConnection($config);
-		}
+
+		return $this->createSingleConnection($config);
 	}
 
 	/**
@@ -126,10 +124,8 @@ class ConnectionFactory {
 		{
 			return $config[$type][array_rand($config[$type])];
 		}
-		else
-		{
-			return $config[$type];
-		}
+
+		return $config[$type];
 	}
 
 	/**

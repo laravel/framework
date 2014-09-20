@@ -1156,10 +1156,8 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 		{
 			return $callback.'@filter';
 		}
-		else
-		{
-			return $callback;
-		}
+
+		return $callback;
 	}
 
 	/**

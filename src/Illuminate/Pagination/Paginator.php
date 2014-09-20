@@ -239,7 +239,9 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	{
 		if (is_null($fragment)) return $this->fragment;
 
-		$this->fragment = $fragment; return $this;
+		$this->fragment = $fragment;
+
+		return $this;
 	}
 
 	/**
@@ -321,10 +323,8 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 		{
 			return $this->currentPage;
 		}
-		else
-		{
-			return min($this->currentPage, (int) ceil($total / $this->perPage));
-		}
+
+		return min($this->currentPage, (int) ceil($total / $this->perPage));
 	}
 
 	/**
