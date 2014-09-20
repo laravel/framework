@@ -93,7 +93,20 @@ abstract class Job {
 
 		$this->instance = $this->resolve($class);
 
-		$this->instance->{$method}($this, $payload['data']);
+		$this->instance->{$method}($this, $this->resolveQueueableEntities($payload['data']));
+	}
+
+	/**
+	 * Parse the job declaration into class and method.
+	 *
+	 * @param  string  $job
+	 * @return array
+	 */
+	protected function parseJob($job)
+	{
+		$segments = explode('@', $job);
+
+		return count($segments) > 1 ? $segments : array($segments[0], 'fire');
 	}
 
 	/**
@@ -108,16 +121,52 @@ abstract class Job {
 	}
 
 	/**
-	 * Parse the job declaration into class and method.
+	 * Resolve all of the queueable entities in the given payload.
 	 *
-	 * @param  string  $job
-	 * @return array
+	 * @param  mixed  $data
+	 * @return mixed
 	 */
-	protected function parseJob($job)
+	protected function resolveQueueableEntities($data)
 	{
-		$segments = explode('@', $job);
+		if (is_string($data))
+		{
+			return $this->resolveQueueableEntity($data);
+		}
 
-		return count($segments) > 1 ? $segments : array($segments[0], 'fire');
+		if (is_array($data))
+		{
+			array_walk($data, function(&$d) { $d = $this->resolveQueueableEntity($d); });
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Resolve a single queueable entity from the resolver.
+	 *
+	 * @param  mixed  $value
+	 * @return \Illuminate\Contracts\Queue\QueueableEntity
+	 */
+	protected function resolveQueueableEntity($value)
+	{
+		if (is_string($value) and starts_with($value, '::entity::'))
+		{
+			list($marker, $type, $id) = explode('|', $value, 3);
+
+			return $this->getEntityResolver()->resolve($type, $id);
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Get an entity resolver instance.
+	 *
+	 * @return \Illuminate\Contracts\Queue\EntityResolver
+	 */
+	protected function getEntityResolver()
+	{
+		return $this->container->make('Illuminate\Contracts\Queue\EntityResolver');
 	}
 
 	/**

@@ -35,6 +35,14 @@ interface Authenticator {
 	public function attempt(array $credentials = array(), $remember = false, $login = true);
 
 	/**
+	 * Validate a user's credentials.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	public function validate(array $credentials = array());
+
+	/**
 	 * Log a user into the application.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\User  $user

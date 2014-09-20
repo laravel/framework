@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, Arrayable, Jsonable, UrlRoutable, JsonSerializable {
+abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable {
 
 	/**
 	 * The connection name for the model.
@@ -1904,6 +1905,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, UrlRoutable, J
 	public function getKey()
 	{
 		return $this->getAttribute($this->getKeyName());
+	}
+
+	/**
+	 * Get the queueable identity for the entity.
+	 *
+	 * @var mixed
+	 */
+	public function getQueueableId()
+	{
+		return $this->getKey();
 	}
 
 	/**
