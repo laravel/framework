@@ -397,10 +397,8 @@ class Validator implements MessageProviderInterface {
 			return array_key_exists($attribute, array_dot($this->data))
                 || array_key_exists($attribute, $this->files);
 		}
-		else
-		{
-			return true;
-		}
+
+		return true;
 	}
 
 	/**
@@ -500,10 +498,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return $this->validateRequired($attribute, $value);
 		}
-		else
-		{
-			return true;
-		}
+
+		return true;
 	}
 
 	/**
@@ -897,10 +893,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return $value->getSize() / 1024;
 		}
-		else
-		{
-			return $this->getStringSize($value);
-		}
+
+		return $this->getStringSize($value);
 	}
 
 	/**
@@ -1011,10 +1005,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return $this->getExtraConditions(array_slice($parameters, 4));
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**
@@ -1060,10 +1052,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return $verifier->getMultiCount($table, $column, $value, $extra);
 		}
-		else
-		{
-			return $verifier->getCount($table, $column, $value, null, null, $extra);
-		}
+
+		return $verifier->getCount($table, $column, $value, null, null, $extra);
 	}
 
 	/**
@@ -1186,10 +1176,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return in_array($value->guessExtension(), $parameters);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -1299,10 +1287,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return strtotime($value) < strtotime($this->getValue($parameters[0]));
 		}
-		else
-		{
-			return strtotime($value) < $date;
-		}
+
+		return strtotime($value) < $date;
 	}
 
 	/**
@@ -1341,10 +1327,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return strtotime($value) > strtotime($this->getValue($parameters[0]));
 		}
-		else
-		{
-			return strtotime($value) > $date;
-		}
+
+		return strtotime($value) > $date;
 	}
 
 	/**
@@ -1639,10 +1623,7 @@ class Validator implements MessageProviderInterface {
 		// If no language line has been specified for the attribute all of the
 		// underscores are removed from the attribute name and that will be
 		// used as default versions of the attribute's displayable names.
-		else
-		{
-			return str_replace('_', ' ', snake_case($attribute));
-		}
+		return str_replace('_', ' ', snake_case($attribute));
 	}
 
 	/**
@@ -1665,10 +1646,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return $line;
 		}
-		else
-		{
-			return $value;
-		}
+
+		return $value;
 	}
 
 	/**
@@ -1921,10 +1900,8 @@ class Validator implements MessageProviderInterface {
 		{
 			return str_replace(':date', $this->getAttribute($parameters[0]), $message);
 		}
-		else
-		{
-			return str_replace(':date', $parameters[0], $message);
-		}
+
+		return str_replace(':date', $parameters[0], $message);
 	}
 
 	/**

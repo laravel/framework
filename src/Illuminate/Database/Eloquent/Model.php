@@ -1626,10 +1626,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			return $this->original[$this->getKeyName()];
 		}
-		else
-		{
-			return $this->getAttribute($this->getKeyName());
-		}
+
+		return $this->getAttribute($this->getKeyName());
 	}
 
 	/**

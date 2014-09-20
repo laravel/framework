@@ -149,10 +149,8 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		{
 			return count($this->items) > 0 ? reset($this->items) : null;
 		}
-		else
-		{
-			return array_first($this->items, $callback, $default);
-		}
+
+		return array_first($this->items, $callback, $default);
 	}
 
 	/**
@@ -235,10 +233,8 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		{
 			return $groupBy($value, $key);
 		}
-		else
-		{
-			return data_get($value, $groupBy);
-		}
+
+		return data_get($value, $groupBy);
 	}
 
 	/**

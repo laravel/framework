@@ -456,10 +456,8 @@ class Request extends SymfonyRequest {
 		{
 			return $this->$source->all();
 		}
-		else
-		{
-			return $this->$source->get($key, $default, true);
-		}
+
+		return $this->$source->get($key, $default, true);
 	}
 
 	/**

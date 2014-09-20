@@ -17,10 +17,8 @@ class EnvironmentDetector {
 		{
 			return $this->detectConsoleEnvironment($environments, $consoleArgs);
 		}
-		else
-		{
-			return $this->detectWebEnvironment($environments);
-		}
+
+		return $this->detectWebEnvironment($environments);
 	}
 
 	/**
@@ -69,10 +67,8 @@ class EnvironmentDetector {
 		{
 			return head(array_slice(explode('=', $value), 1));
 		}
-		else
-		{
-			return $this->detectWebEnvironment($environments);
-		}
+
+		return $this->detectWebEnvironment($environments);
 	}
 
 	/**
