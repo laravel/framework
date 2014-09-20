@@ -1168,7 +1168,7 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
-	 * Check that the given value is a valid file instnace.
+	 * Check that the given value is a valid file instance.
 	 *
 	 * @param  mixed  $value
 	 * @return bool
