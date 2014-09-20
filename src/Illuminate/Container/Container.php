@@ -395,10 +395,8 @@ class Container implements ArrayAccess {
 		{
 			return $this->reboundCallbacks[$abstract];
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**
@@ -469,10 +467,8 @@ class Container implements ArrayAccess {
 
 			return $abstract;
 		}
-		else
-		{
-			return $this->bindings[$abstract]['concrete'];
-		}
+
+		return $this->bindings[$abstract]['concrete'];
 	}
 
 	/**
