@@ -225,18 +225,13 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  string  $name
 	 * @param  mixed   $parameters
 	 * @param  bool  $absolute
-	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function route($name, $parameters = array(), $absolute = true, $route = null)
+	public function route($name, $parameters = array(), $absolute = true)
 	{
-		$route = $route ?: $this->routes->getByName($name);
-
-		$parameters = $this->formatParameters($parameters);
-
-		if ( ! is_null($route))
+		if ( ! is_null($route = $this->routes->getByName($name)))
 		{
 			return $this->toRoute($route, $parameters, $absolute);
 		}
@@ -256,6 +251,8 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	protected function toRoute($route, array $parameters, $absolute)
 	{
+		$parameters = $this->formatParameters($parameters);
+
 		$domain = $this->getRouteDomain($route, $parameters);
 
 		$uri = strtr(rawurlencode($this->trimUrl(
@@ -504,7 +501,7 @@ class UrlGenerator implements UrlGeneratorContract {
 			$action = trim($action, '\\');
 		}
 
-		return $this->route($action, $parameters, $absolute, $this->routes->getByAction($action));
+		return $this->toRoute($this->routes->getByAction($action), $parameters, $absolute);
 	}
 
 	/**

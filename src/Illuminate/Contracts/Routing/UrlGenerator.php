@@ -36,19 +36,18 @@ interface UrlGenerator {
 	 * @param  string  $name
 	 * @param  mixed   $parameters
 	 * @param  bool  $absolute
-	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function route($name, $parameters = array(), $absolute = true, $route = null);
+	public function route($name, $parameters = array(), $absolute = true);
 
 	/**
 	 * Get the URL to a controller action.
 	 *
 	 * @param  string  $action
-	 * @param  mixed   $parameters
-	 * @param  bool    $absolute
+	 * @param  mixed $parameters
+	 * @param  bool $absolute
 	 * @return string
 	 */
 	public function action($action, $parameters = array(), $absolute = true);
