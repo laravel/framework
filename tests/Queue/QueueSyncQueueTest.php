@@ -12,6 +12,8 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPushShouldFireJobInstantly()
 	{
+		unset($_SERVER['__sync.test']);
+
 		/**
 		 * Test Synced Closure
 		 */
