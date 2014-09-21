@@ -1689,7 +1689,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function replaceDigitsBetween($message, $attribute, $rule, $parameters)
 	{
-		return str_replace(array(':min', ':max'), $parameters, $message);
+		return $this->replaceBetween($message, $attribute, $rule, $parameters);
 	}
 
 	/**
