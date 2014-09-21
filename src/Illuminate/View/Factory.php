@@ -454,12 +454,10 @@ class Factory {
 		{
 			return explode('@', $class);
 		}
-		else
-		{
-			$method = str_contains($prefix, 'composing') ? 'compose' : 'create';
 
-			return array($class, $method);
-		}
+		$method = str_contains($prefix, 'composing') ? 'compose' : 'create';
+
+		return array($class, $method);
 	}
 
 	/**
