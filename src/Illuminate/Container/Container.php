@@ -618,10 +618,8 @@ class Container implements ArrayAccess {
 			{
 				return $parameter->getDefaultValue();
 			}
-			else
-			{
-				throw $e;
-			}
+
+			throw $e;
 		}
 	}
 
