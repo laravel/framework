@@ -13,6 +13,13 @@ interface Application extends Container {
 	public function environment();
 
 	/**
+	 * Determine if the application is currently down for maintenance.
+	 *
+	 * @return bool
+	 */
+	public function isDownForMaintenance();
+
+	/**
 	 * Register a service provider with the application.
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
