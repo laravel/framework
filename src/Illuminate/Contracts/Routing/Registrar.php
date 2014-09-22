@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Contracts\Routing;
 
+use Closure;
+
 interface Registrar {
 
 	/**
@@ -75,6 +77,15 @@ interface Registrar {
 	 * @return void
 	 */
 	public function resource($name, $controller, array $options = array());
+
+	/**
+	 * Create a route group with shared attributes.
+	 *
+	 * @param  array     $attributes
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function group(array $attributes, Closure $callback);
 
 	/**
 	 * Register a new "before" filter with the router.
