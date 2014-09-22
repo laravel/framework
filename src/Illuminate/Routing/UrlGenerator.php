@@ -231,6 +231,8 @@ class UrlGenerator implements UrlGeneratorContract {
 	{
 		if ( ! is_null($route = $this->routes->getByName($name)))
 		{
+			$parameters = (array) $parameters;
+			
 			return $this->toRoute($route, $parameters, $absolute);
 		}
 		else
