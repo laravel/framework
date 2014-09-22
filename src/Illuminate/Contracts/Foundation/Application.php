@@ -5,6 +5,14 @@ use Illuminate\Contracts\Container\Container;
 interface Application extends Container {
 
 	/**
+	 * Get or check the current application environment.
+	 *
+	 * @param  mixed
+	 * @return string
+	 */
+	public function environment();
+
+	/**
 	 * Register a service provider with the application.
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
