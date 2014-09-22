@@ -764,9 +764,7 @@ class Container implements ArrayAccess {
 	 */
 	protected function dropStaleInstances($abstract)
 	{
-		unset($this->instances[$abstract]);
-
-		unset($this->aliases[$abstract]);
+		unset($this->instances[$abstract], $this->aliases[$abstract]);
 	}
 
 	/**
@@ -843,9 +841,7 @@ class Container implements ArrayAccess {
 	 */
 	public function offsetUnset($key)
 	{
-		unset($this->bindings[$key]);
-
-		unset($this->instances[$key]);
+		unset($this->bindings[$key], $this->instances[$key]);
 	}
 
 	/**
