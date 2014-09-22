@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Contracts\Config;
 
-interface Config {
+interface Repository {
 
 	/**
 	 * Determine if the given configuration value exists.

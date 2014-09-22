@@ -5,7 +5,7 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use Illuminate\Support\Traits\MacroableTrait;
-use Illuminate\Contracts\Cache\Cache as CacheContract;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Repository implements CacheContract, ArrayAccess {
 

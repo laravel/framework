@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Cache\Cache as CacheContract;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker {
 
@@ -31,7 +31,7 @@ class Worker {
 	/**
 	 * The cache repository implementation.
 	 *
-	 * @var \Illuminate\Contracts\Cache\Cache
+	 * @var \Illuminate\Contracts\Cache\Repository
 	 */
 	protected $cache;
 
@@ -330,7 +330,7 @@ class Worker {
 	/**
 	 * Set the cache repository implementation.
 	 *
-	 * @param  \Illuminate\Contracts\Cache\Cache  $cache
+	 * @param  \Illuminate\Contracts\Cache\Repository  $cache
 	 * @return void
 	 */
 	public function setCache(CacheContract $cache)
