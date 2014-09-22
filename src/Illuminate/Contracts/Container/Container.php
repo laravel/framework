@@ -79,6 +79,14 @@ interface Container {
 	public function extend($abstract, Closure $closure);
 
 	/**
+	 * Define a contextual binding.
+	 *
+	 * @param  string  $concrete
+	 * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
+	 */
+	public function when($concrete);
+
+	/**
 	 * Resolve the given type from the container.
 	 *
 	 * @param  string  $abstract

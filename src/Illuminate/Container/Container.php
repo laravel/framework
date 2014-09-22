@@ -7,9 +7,8 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\Container as ContainerContract;
-use Illuminate\Contracts\Container\ContextAwareContainer as ContextAwareContainerContract;
 
-class Container implements ArrayAccess, ContainerContract, ContextAwareContainerContract {
+class Container implements ArrayAccess, ContainerContract {
 
 	/**
 	 * An array of the types that have been resolved.
