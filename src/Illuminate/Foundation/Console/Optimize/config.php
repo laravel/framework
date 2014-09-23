@@ -16,6 +16,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Cookie/QueueingFactory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Encryption/Encrypter.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/Registrar.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/ResponseFactory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/View/Factory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/MessageProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/MessageBag.php',
