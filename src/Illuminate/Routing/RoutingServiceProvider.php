@@ -16,6 +16,8 @@ class RoutingServiceProvider extends ServiceProvider {
 		$this->registerUrlGenerator();
 
 		$this->registerRedirector();
+
+		$this->registerResponseFactory();
 	}
 
 	/**
@@ -94,6 +96,19 @@ class RoutingServiceProvider extends ServiceProvider {
 			}
 
 			return $redirector;
+		});
+	}
+
+	/**
+	 * Register the response factory implementation.
+	 *
+	 * @return void
+	 */
+	protected function registerResponseFactory()
+	{
+		$this->app->bindShared('Illuminate\Contracts\Routing\ResponseFactory', function($app)
+		{
+			return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
 		});
 	}
 
