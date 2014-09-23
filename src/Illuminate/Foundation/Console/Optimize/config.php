@@ -156,4 +156,5 @@ return array_map('realpath', array(
     $basePath.'/vendor/symfony/security-core/Symfony/Component/Security/Core/Util/StringUtils.php',
     $basePath.'/vendor/symfony/security-core/Symfony/Component/Security/Core/Util/SecureRandomInterface.php',
     $basePath.'/vendor/symfony/security-core/Symfony/Component/Security/Core/Util/SecureRandom.php',
+    $basePath.'/vendor/nesbot/carbon/src/Carbon/Carbon.php',
 ));
