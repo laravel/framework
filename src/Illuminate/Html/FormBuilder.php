@@ -36,7 +36,7 @@ class FormBuilder {
 	 */
 	protected $session;
 
-	/**r
+	/**
 	 * The current model instance for the form.
 	 *
 	 * @var mixed
