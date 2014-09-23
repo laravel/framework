@@ -12,6 +12,8 @@ use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 
 class ResponseFactory implements FactoryContract {
 
+	use MacroableTrait;
+
 	/**
 	 * The view factory implementation.
 	 *
