@@ -106,6 +106,32 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testLower()
+	{
+		$this->assertEquals('adil ilhan', Str::lower('ADIL ILHAN'));
+		$this->assertEquals('adil ilhan', Str::lower('aDiL iLHaN'));
+	}
+
+
+	public function testUpper()
+	{
+		$this->assertEquals('ADIL ILHAN', Str::upper('adil ilhan'));
+		$this->assertEquals('ADIL ILHAN', Str::upper('aDiL iLHaN'));
+	}
+
+
+	public function testLimit()
+	{
+		$this->assertEquals('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
+	}
+
+
+	public function testLength()
+	{
+		$this->assertEquals(10, Str::length('adil ilhan'));
+	}
+
+
 	public function testQuickRandom()
 	{
 		$randomInteger = mt_rand(1, 100);
