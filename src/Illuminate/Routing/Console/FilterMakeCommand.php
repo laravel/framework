@@ -44,12 +44,42 @@ class FilterMakeCommand extends GeneratorCommand {
 	{
 		if ($this->option('global'))
 		{
-			return __DIR__.'/stubs/filter.global.stub';
+			return $this->getGlobalFilterStubPath();
 		}
 		else
 		{
-			return __DIR__.'/stubs/filter.stub';
+			return $this->getFilterStubPath();
 		}
+	}
+
+	/**
+	 * Get the global filter stub path.
+	 *
+	 * @return string
+	 */
+	protected function getGlobalFilterStubPath()
+	{
+		if ($this->option('after'))
+		{
+			return __DIR__.'/stubs/filter.global.after.stub';
+		}
+
+		return __DIR__.'/stubs/filter.global.stub';
+	}
+
+	/**
+	 * Get the filter stub path.
+	 *
+	 * @return string
+	 */
+	protected function getFilterStubPath()
+	{
+		if ($this->option('after'))
+		{
+			return __DIR__.'/stubs/filter.after.stub';
+		}
+
+		return __DIR__.'/stubs/filter.stub';
 	}
 
 	/**
@@ -60,6 +90,8 @@ class FilterMakeCommand extends GeneratorCommand {
 	protected function getOptions()
 	{
 		return [
+			['after', null, InputOption::VALUE_NONE, 'Indicates the filter will be run after routes are executed.'],
+
 			['global', null, InputOption::VALUE_NONE, 'Indicates the filter should be global.'],
 		];
 	}
