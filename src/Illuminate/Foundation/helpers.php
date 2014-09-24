@@ -1,5 +1,24 @@
 <?php
 
+if ( ! function_exists('abort'))
+{
+	/**
+	 * Throw an HttpException with the given data.
+	 *
+	 * @param  int     $code
+	 * @param  string  $message
+	 * @param  array   $headers
+	 * @return void
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	function abort($code, $message = '', array $headers = array())
+	{
+		return app()->abort($code, $message, $headers);
+	}
+}
+
 if ( ! function_exists('action'))
 {
 	/**
@@ -380,7 +399,7 @@ if ( ! function_exists('url'))
 	 */
 	function url($path = null, $parameters = array(), $secure = null)
 	{
-		return app('url')->to($path, $parameters, $secure);
+		return app('Illuminate\Contracts\Routing\UrlGenerator')->to($path, $parameters, $secure);
 	}
 }
 
@@ -396,6 +415,6 @@ if ( ! function_exists('view'))
 	 */
 	function view($view, $data = array(), $mergeData = array())
 	{
-		return app('view')->make($view, $data, $mergeData);
+		return app('Illuminate\Contracts\View\Factory')->make($view, $data, $mergeData);
 	}
 }
