@@ -663,6 +663,7 @@ class BelongsToMany extends Relation {
 				$changes['updated'][] = (int) $id;
 			}
 		}
+
 		return $changes;
 	}
 
