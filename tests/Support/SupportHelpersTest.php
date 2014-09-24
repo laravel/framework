@@ -93,6 +93,12 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('dayle', array_first($array, function($key, $value) { return $value == 'dayle'; }));
 	}
 
+	public function testArrayLast()
+	{
+		$array = array(100, 250, 290, 320, 500, 560, 670);
+		$this->assertEquals(670, array_last($array, function($key, $value) { return $value > 320; }));
+	}
+
 
 	public function testArrayFetch()
 	{
