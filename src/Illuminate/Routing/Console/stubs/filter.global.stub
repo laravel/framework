@@ -8,8 +8,8 @@ class {{class}} {
 	/**
 	 * Run the request filter.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @param  Request  $request
+	 * @param  Response|null  $response
 	 * @return mixed
 	 */
 	public function filter(Request $request, Response $response = null)

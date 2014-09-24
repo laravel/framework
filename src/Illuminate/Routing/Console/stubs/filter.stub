@@ -9,8 +9,9 @@ class {{class}} {
 	/**
 	 * Run the request filter.
 	 *
-	 * @param  \Illuminate\Routing\Route  $route
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  Route  $route
+	 * @param  Request  $request
+	 * @param  Response|null  $response
 	 * @return mixed
 	 */
 	public function filter(Route $route, Request $request, Response $response = null)
