@@ -332,7 +332,14 @@ if ( ! function_exists('response'))
 	 */
 	function response($content = '', $status = 200, array $headers = array())
 	{
-		return app('Illuminate\Contracts\Routing\ResponseFactory')->make($content, $status, $headers);
+		$factory = app('Illuminate\Contracts\Routing\ResponseFactory');
+
+		if (func_num_args() === 0)
+		{
+			return $factory;
+		}
+
+		return $factory->make($content, $status, $headers);
 	}
 }
 
