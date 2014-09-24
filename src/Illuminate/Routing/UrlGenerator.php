@@ -233,10 +233,8 @@ class UrlGenerator implements UrlGeneratorContract {
 		{
 			return $this->toRoute($route, $parameters, $absolute);
 		}
-		else
-		{
-			throw new InvalidArgumentException("Route [{$name}] not defined.");
-		}
+
+		throw new InvalidArgumentException("Route [{$name}] not defined.");
 	}
 
 	/**
