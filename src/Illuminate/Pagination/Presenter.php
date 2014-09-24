@@ -202,12 +202,10 @@ abstract class Presenter {
 		{
 			return $this->getDisabledTextWrapper($text);
 		}
-		else
-		{
-			$url = $this->paginator->getUrl($this->currentPage - 1);
 
-			return $this->getPageLinkWrapper($url, $text, 'prev');
-		}
+		$url = $this->paginator->getUrl($this->currentPage - 1);
+
+		return $this->getPageLinkWrapper($url, $text, 'prev');
 	}
 
 	/**
@@ -225,12 +223,10 @@ abstract class Presenter {
 		{
 			return $this->getDisabledTextWrapper($text);
 		}
-		else
-		{
-			$url = $this->paginator->getUrl($this->currentPage + 1);
 
-			return $this->getPageLinkWrapper($url, $text, 'next');
-		}
+		$url = $this->paginator->getUrl($this->currentPage + 1);
+
+		return $this->getPageLinkWrapper($url, $text, 'next');
 	}
 
 	/**
