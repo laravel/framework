@@ -904,10 +904,8 @@ class Builder {
 		{
 			return $this->callScope($scope, $parameters);
 		}
-		else
-		{
-			$result = call_user_func_array(array($this->query, $method), $parameters);
-		}
+
+		$result = call_user_func_array(array($this->query, $method), $parameters);
 
 		return in_array($method, $this->passthru) ? $result : $this;
 	}
