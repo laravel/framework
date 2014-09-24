@@ -126,6 +126,26 @@ if ( ! function_exists('config'))
 	}
 }
 
+if ( ! function_exists('cookie'))
+{
+	/**
+	 * Create a new cookie instance.
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  int     $minutes
+	 * @param  string  $path
+	 * @param  string  $domain
+	 * @param  bool    $secure
+	 * @param  bool    $httpOnly
+	 * @return \Symfony\Component\HttpFoundation\Cookie
+	 */
+	function cookie($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
+	{
+		return app('Illuminate\Contracts\Cookie\Factory')->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly);
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
