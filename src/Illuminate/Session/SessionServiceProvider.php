@@ -62,14 +62,4 @@ class SessionServiceProvider extends ServiceProvider {
 		});
 	}
 
-	/**
-	 * Get the session driver name.
-	 *
-	 * @return string
-	 */
-	protected function getDriver()
-	{
-		return $this->app['config']['session.driver'];
-	}
-
 }
