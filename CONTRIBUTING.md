@@ -1,3 +1,3 @@
-# Laravel Contribution Guide
+# LaraWurst Contribution Guide
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions). Please review the entire guide before sending a pull request.
+Thank you for considering contributing to the LaraWurst framework! The contribution guide can be found in the [LaraWurst documentation](http://laracon.com/). Please review the entire guide before sending a pull request.
