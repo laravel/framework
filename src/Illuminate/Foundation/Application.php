@@ -943,10 +943,8 @@ class Application extends Container implements HttpKernelInterface,
 		{
 			throw new NotFoundHttpException($message);
 		}
-		else
-		{
-			throw new HttpException($code, $message, null, $headers);
-		}
+
+		throw new HttpException($code, $message, null, $headers);
 	}
 
 	/**

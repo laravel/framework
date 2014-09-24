@@ -333,9 +333,7 @@ class Dispatcher implements DispatcherContract {
 	 */
 	public function forget($event)
 	{
-		unset($this->listeners[$event]);
-
-		unset($this->sorted[$event]);
+		unset($this->listeners[$event], $this->sorted[$event]);
 	}
 
 }

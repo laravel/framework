@@ -250,12 +250,10 @@ class BelongsToMany extends Relation {
 		{
 			return $this->getRelationCountQueryForSelfJoin($query, $parent);
 		}
-		else
-		{
-			$this->setJoin($query);
 
-			return parent::getRelationCountQuery($query, $parent);
-		}
+		$this->setJoin($query);
+
+		return parent::getRelationCountQuery($query, $parent);
 	}
 
 	/**
@@ -663,6 +661,7 @@ class BelongsToMany extends Relation {
 				$changes['updated'][] = (int) $id;
 			}
 		}
+
 		return $changes;
 	}
 
