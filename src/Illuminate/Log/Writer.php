@@ -269,7 +269,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	/**
 	 * Format the parameters for the logger.
 	 *
-	 * @param  mixed  $parameters
+	 * @param  mixed  $message
 	 * @return void
 	 */
 	protected function formatMessage($message)
