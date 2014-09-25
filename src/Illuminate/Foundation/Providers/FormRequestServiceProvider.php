@@ -59,6 +59,8 @@ class FormRequestServiceProvider extends ServiceProvider {
 			$current->query->all(), $current->request->all(), $current->attributes->all(),
 			$current->cookies->all(), $files, $current->server->all(), $current->getContent()
 		);
+
+		$form->setUserResolver($current->getUserResolver());
 	}
 
 }
