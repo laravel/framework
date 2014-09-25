@@ -464,8 +464,17 @@ if ( ! function_exists('view'))
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	function view($view, $data = array(), $mergeData = array())
+	function view($view = null, $data = array(), $mergeData = array())
 	{
-		return app('Illuminate\Contracts\View\Factory')->make($view, $data, $mergeData);
+		$factory = app('Illuminate\Contracts\View\Factory');
+
+		if (func_num_args() === 0)
+		{
+			return $factory;
+		}
+		else
+		{
+			return $factory->make($view, $data, $mergeData);
+		}
 	}
 }
