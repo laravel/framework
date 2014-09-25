@@ -233,12 +233,15 @@ class TaggedCache implements StoreInterface {
 	{
 		if ($duration instanceof DateTime)
 		{
-			$fromNow = Carbon::instance($duration)->diffInMinutes();
+			$duration = Carbon::instance($duration)->diffInMinutes();
 
-			return $fromNow > 0 ? $fromNow : null;
+		}
+		elseif (is_string($duration))
+		{
+			$duration = (int) $duration;
 		}
 
-		return is_string($duration) ? (int) $duration : $duration;
+		return $duration > 0 ? $duration : null;
 	}
 
 }
