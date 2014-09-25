@@ -37,6 +37,8 @@ class Expression {
 	 */
 	public function __toString()
 	{
+		if ($this->getValue() === false) return "0";
+		
 		return (string) $this->getValue();
 	}
 

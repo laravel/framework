@@ -129,7 +129,7 @@ abstract class Grammar {
 	 */
 	public function getValue($expression)
 	{
-		return $expression->getValue();
+		return (string) $expression;
 	}
 
 	/**
