@@ -279,7 +279,7 @@ class Builder {
 		// one condition, so we'll add the join and call a Closure with the query.
 		if ($one instanceof Closure)
 		{
-			$this->joins[] = new JoinClause($this, $type, $table);
+			$this->joins[] = new JoinClause($type, $table);
 
 			call_user_func($one, end($this->joins));
 		}
@@ -289,7 +289,7 @@ class Builder {
 		// this simple join clauses attached to it. There is not a join callback.
 		else
 		{
-			$join = new JoinClause($this, $type, $table);
+			$join = new JoinClause($type, $table);
 
 			$this->joins[] = $join->on(
 				$one, $operator, $two, 'and', $where

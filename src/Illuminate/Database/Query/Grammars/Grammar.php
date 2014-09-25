@@ -142,6 +142,11 @@ class Grammar extends BaseGrammar {
 				$clauses[] = $this->compileJoinConstraint($clause);
 			}
 
+			foreach ($join->bindings as $binding)
+			{
+				$query->addBinding($binding, 'join');
+			}
+
 			// Once we have constructed the clauses, we'll need to take the boolean connector
 			// off of the first clause as it obviously will not be required on that clause
 			// because it leads the rest of the clauses, thus not requiring any boolean.
