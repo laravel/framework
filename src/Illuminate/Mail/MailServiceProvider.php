@@ -244,7 +244,7 @@ class MailServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('swift.transport', function($app)
 		{
-			return new LogTransport($app['log']->getMonolog());
+			return new LogTransport($app->make('Psr\Log\LoggerInterface'));
 		});
 	}
 
