@@ -18,6 +18,8 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->registerUserResolver();
+
 		$this->app->bindShared('auth', function($app)
 		{
 			// Once the authentication service has actually been requested by the developer
@@ -35,13 +37,26 @@ class AuthServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register a resolver for the authenticated user.
+	 *
+	 * @return void
+	 */
+	protected function registerUserResolver()
+	{
+		$this->app->bind('Illuminate\Contracts\Auth\User', function($app)
+		{
+			return $app['auth']->user();
+		});
+	}
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
 	 */
 	public function provides()
 	{
-		return ['auth', 'auth.driver'];
+		return ['auth', 'auth.driver', 'Illuminate\Contracts\Auth\User'];
 	}
 
 }
