@@ -213,7 +213,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		foreach ($this->items as $key => $value)
 		{
-			$results[$this->getGroupbyKey($groupBy, $key, $value)][] = $value;
+			$groupbyKey = $this->getGroupbyKey($groupBy, $key, $value);
+			
+			if ( ! array_key_exists($groupbyKey, $results)) $results[$groupbyKey] = [];
+			
+			$results[$groupbyKey][] = $value;
 		}
 
 		return new static($results);
