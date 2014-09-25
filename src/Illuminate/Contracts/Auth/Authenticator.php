@@ -52,6 +52,15 @@ interface Authenticator {
 	public function login(User $user, $remember = false);
 
 	/**
+	 * Log the given user ID into the application.
+	 *
+	 * @param  mixed  $id
+	 * @param  bool   $remember
+	 * @return \Illuminate\Contracts\Auth\User
+	 */
+	public function loginUsingId($id, $remember = false);
+
+	/**
 	 * Determine if the user was authenticated via "remember me" cookie.
 	 *
 	 * @return bool
