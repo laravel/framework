@@ -52,6 +52,13 @@ interface Authenticator {
 	public function login(User $user, $remember = false);
 
 	/**
+	 * Determine if the user was authenticated via "remember me" cookie.
+	 *
+	 * @return bool
+	 */
+	public function viaRemember();
+
+	/**
 	 * Log the user out of the application.
 	 *
 	 * @return void
