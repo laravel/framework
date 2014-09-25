@@ -5,21 +5,26 @@ use Illuminate\Support\ServiceProvider;
 class AuthServiceProvider extends ServiceProvider {
 
 	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = true;
-
-	/**
 	 * Register the service provider.
 	 *
 	 * @return void
 	 */
 	public function register()
 	{
+		$this->registerAuthenticator();
+
 		$this->registerUserResolver();
 
+		$this->registerRequestRebindHandler();
+	}
+
+	/**
+	 * Register the authenticator services.
+	 *
+	 * @return void
+	 */
+	protected function registerAuthenticator()
+	{
 		$this->app->bindShared('auth', function($app)
 		{
 			// Once the authentication service has actually been requested by the developer
@@ -50,13 +55,19 @@ class AuthServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Get the services provided by the provider.
+	 * Register a resolver for the authenticated user.
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function provides()
+	protected function registerRequestRebindHandler()
 	{
-		return ['auth', 'auth.driver', 'Illuminate\Contracts\Auth\User'];
+		$this->app->rebinding('request', function($app, $request)
+		{
+			$request->setUserResolver(function() use ($app)
+			{
+				return $app['auth']->user();
+			});
+		});
 	}
 
 }

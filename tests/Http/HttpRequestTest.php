@@ -392,4 +392,12 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request->session();
 	}
 
+
+	public function testUserResolverMakesUserAvailableAsMagicProperty()
+	{
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
+		$request->setUserResolver(function() { return 'user'; });
+		$this->assertEquals('user', $request->user);
+	}
+
 }
