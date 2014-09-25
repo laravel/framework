@@ -734,6 +734,18 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Validate that an attribute is a string.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateString($attribute, $value)
+	{
+		return is_string($value);
+	}
+
+	/**
 	 * Validate that an attribute is an array.
 	 *
 	 * @param  string  $attribute
