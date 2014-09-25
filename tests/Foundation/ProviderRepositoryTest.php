@@ -91,7 +91,6 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	public function testLoadManifestReturnsParsedJSON()
 	{
 		$repo = new Illuminate\Foundation\ProviderRepository($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
-		$files->shouldReceive('exists')->once()->with(__DIR__.'/services.json')->andReturn(true);
 		$files->shouldReceive('get')->once()->with(__DIR__.'/services.json')->andReturn(json_encode($array = array('users' => array('dayle' => true))));
 		$array['when'] = array();
 

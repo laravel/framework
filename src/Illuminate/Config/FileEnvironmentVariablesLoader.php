@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Config;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FileNotFoundException;
 
 class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterface {
 
@@ -41,12 +42,14 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 	{
 		if ($environment == 'production') $environment = null;
 
-		if ( ! $this->files->exists($path = $this->getFile($environment)))
+		try
 		{
-			return array();
+			return array_dot($this->files->getRequire($this->getFile($environment)));
 		}
-
-		return array_dot($this->files->getRequire($path));
+		catch (FileNotFoundException $e)
+		{
+			return [];
+		}
 	}
 
 	/**

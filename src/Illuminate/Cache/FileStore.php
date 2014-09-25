@@ -50,22 +50,16 @@ class FileStore implements StoreInterface {
 	 */
 	protected function getPayload($key)
 	{
-		$path = $this->path($key);
-
 		// If the file doesn't exists, we obviously can't return the cache so we will
 		// just return null. Otherwise, we'll get the contents of the file and get
 		// the expiration UNIX timestamps from the start of the file's contents.
-		if ( ! $this->files->exists($path))
-		{
-			return array('data' => null, 'time' => null);
-		}
-
 		try
 		{
-			$expire = substr($contents = $this->files->get($path), 0, 10);
+			$expire = substr($contents = $this->files->get($this->path($key)), 0, 10);
 		}
 		catch (\Exception $e)
 		{
+			// Also occurs when a FileNotFoundException is thrown.
 			return array('data' => null, 'time' => null);
 		}
 
