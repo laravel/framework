@@ -591,14 +591,26 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Get the user resolver callback.
+	 *
+	 * @return \Closure
+	 */
+	public function getUserResolver()
+	{
+		return $this->userResolver ?: function() {};
+	}
+
+	/**
 	 * Set the user resolver callback.
 	 *
 	 * @param  \Closure  $callback
-	 * @return void
+	 * @return $this
 	 */
 	public function setUserResolver(Closure $callback)
 	{
 		$this->userResolver = $callback;
+
+		return $this;
 	}
 
 	/**
