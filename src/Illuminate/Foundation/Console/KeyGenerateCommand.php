@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
@@ -74,7 +73,7 @@ class KeyGenerateCommand extends Command {
 	 */
 	protected function getRandomKey()
 	{
-		return Str::random(32);
+		return str_random(32);
 	}
 
 }
