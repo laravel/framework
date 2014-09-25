@@ -108,15 +108,15 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 
 	public function testLower()
 	{
-		$this->assertEquals('adil ilhan', Str::lower('ADIL ILHAN'));
-		$this->assertEquals('adil ilhan', Str::lower('aDiL iLHaN'));
+		$this->assertEquals('foo bar baz', Str::lower('FOO BAR BAZ'));
+		$this->assertEquals('foo bar baz', Str::lower('fOo Bar bAz'));
 	}
 
 
 	public function testUpper()
 	{
-		$this->assertEquals('ADIL ILHAN', Str::upper('adil ilhan'));
-		$this->assertEquals('ADIL ILHAN', Str::upper('aDiL iLHaN'));
+		$this->assertEquals('FOO BAR BAZ', Str::upper('foo bar baz'));
+		$this->assertEquals('FOO BAR BAZ', Str::upper('foO bAr BaZ'));
 	}
 
 
@@ -128,7 +128,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 
 	public function testLength()
 	{
-		$this->assertEquals(10, Str::length('adil ilhan'));
+		$this->assertEquals(11, Str::length('foo bar baz'));
 	}
 
 
