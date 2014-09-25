@@ -28,7 +28,7 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	public function __construct(Repository $cache, $minutes)
 	{
 		$this->cache = $cache;
-		$this->minutes = $minutes;
+		$this->minutes = max(1, $minutes);
 	}
 
 	/**
