@@ -917,7 +917,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$mockPartnerModel->shouldReceive('touchOwners')->once();
 		$model->setRelation('partner', $mockPartnerModel);
 
-
 		$model->touchOwners();
 	}
 
@@ -932,9 +931,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->shouldReceive('partner')->once()->andReturn($relation);
 		$model->setTouchedRelations(['partner']);
 
-
 		$model->setRelation('partner', null);
-
 
 		$model->touchOwners();
 	}
