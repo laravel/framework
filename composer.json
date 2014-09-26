@@ -11,11 +11,11 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "classpreloader/classpreloader": "~1.0",
+        "classpreloader/classpreloader": "~1.0.2",
         "d11wtq/boris": "~1.0",
         "ircmaxell/password-compat": "~1.0",
         "filp/whoops": "1.1.*",
-        "jeremeamia/superclosure": "~1.0",
+        "jeremeamia/superclosure": "~1.0.1",
         "monolog/monolog": "~1.6",
         "nesbot/carbon": "~1.0",
         "patchwork/utf8": "1.1.*",
