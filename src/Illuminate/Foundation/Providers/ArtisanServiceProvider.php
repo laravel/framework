@@ -27,17 +27,17 @@ class ArtisanServiceProvider extends ServiceProvider {
 			return new Artisan($app);
 		});
 
-		$this->app->bindShared('command.tail', function($app)
+		$this->app->bindShared('command.tail', function()
 		{
 			return new TailCommand;
 		});
 
-		$this->app->bindShared('command.changes', function($app)
+		$this->app->bindShared('command.changes', function()
 		{
 			return new ChangesCommand;
 		});
 
-		$this->app->bindShared('command.environment', function($app)
+		$this->app->bindShared('command.environment', function()
 		{
 			return new EnvironmentCommand;
 		});
