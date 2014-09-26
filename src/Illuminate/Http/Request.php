@@ -5,9 +5,6 @@ use SplFileInfo;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-/**
- * @property \Illuminate\Contracts\Auth\User  $user
- */
 class Request extends SymfonyRequest {
 
 	/**
@@ -591,6 +588,16 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Get the user making the request.
+	 *
+	 * @return \Closure
+	 */
+	public function user()
+	{
+		return call_user_func($this->getUserResolver());
+	}
+
+	/**
 	 * Get the user resolver callback.
 	 *
 	 * @return \Closure
@@ -611,22 +618,6 @@ class Request extends SymfonyRequest {
 		$this->userResolver = $callback;
 
 		return $this;
-	}
-
-	/**
-	 * Dynamically handle retrieving Request properties.
-	 *
-	 * @param  string  $key
-	 * @return mixed
-	 */
-	public function __get($key)
-	{
-		if ($key == 'user')
-		{
-			return call_user_func($this->userResolver);
-		}
-
-		throw new \Exception("Property [{$key}] does not exist on the user.");
 	}
 
 }

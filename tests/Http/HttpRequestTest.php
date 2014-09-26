@@ -397,7 +397,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
 		$request->setUserResolver(function() { return 'user'; });
-		$this->assertEquals('user', $request->user);
+		$this->assertEquals('user', $request->user());
 	}
 
 }
