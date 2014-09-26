@@ -904,6 +904,23 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTimestampsAreNotUpdatedWithTimestampsFalseSaveOption()
+	{
+		$model = m::mock('EloquentModelStub[newQuery]');
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('name' => 'taylor'));
+		$model->shouldReceive('newQuery')->once()->andReturn($query);
+
+		$model->id = 1;
+		$model->syncOriginal();
+		$model->name = 'taylor';
+		$model->exists = true;
+		$this->assertTrue($model->save(['timestamps' => false]));
+		$this->assertEquals(null, $model->updated_at);
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
