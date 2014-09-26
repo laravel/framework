@@ -27,6 +27,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "some""table"', $builder->toSql());
 	}
 
+	public function testAliasWrappingAsWholeConstant()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('x.y as foo.bar')->from('baz');
+		$this->assertEquals('select "x"."y" as "foo.bar" from "baz"', $builder->toSql());
+	}
 
 	public function testAddingSelects()
 	{
