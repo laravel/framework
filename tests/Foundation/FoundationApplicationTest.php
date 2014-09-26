@@ -46,6 +46,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(0, count($app->getMiddlewares()));
 	}
 
+
 	public function testDeferredServicesMarkedAsBound()
 	{
 		$app = new Application;
