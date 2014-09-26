@@ -903,6 +903,42 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($model->isDirty());
 	}
 
+	public function testRelationshipTouchOwnersIsPropagated()
+	{
+		$relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsTo')->setMethods(array('touch'))->disableOriginalConstructor()->getMock();
+		$relation->expects($this->once())->method('touch');
+
+		$model = m::mock('EloquentModelStub[partner]');
+		$this->addMockConnection($model);
+		$model->shouldReceive('partner')->once()->andReturn($relation);
+		$model->setTouchedRelations(['partner']);
+
+		$mockPartnerModel = m::mock('EloquentModelStub[touchOwners]');
+		$mockPartnerModel->shouldReceive('touchOwners')->once();
+		$model->setRelation('partner', $mockPartnerModel);
+
+
+		$model->touchOwners();
+	}
+
+
+	public function testRelationshipTouchOwnersIsNotPropagatedIfNoRelationshipResult()
+	{
+		$relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsTo')->setMethods(array('touch'))->disableOriginalConstructor()->getMock();
+		$relation->expects($this->once())->method('touch');
+
+		$model = m::mock('EloquentModelStub[partner]');
+		$this->addMockConnection($model);
+		$model->shouldReceive('partner')->once()->andReturn($relation);
+		$model->setTouchedRelations(['partner']);
+
+
+		$model->setRelation('partner', null);
+
+
+		$model->touchOwners();
+	}
+
 
 	protected function addMockConnection($model)
 	{
