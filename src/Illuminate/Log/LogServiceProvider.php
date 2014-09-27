@@ -22,6 +22,11 @@ class LogServiceProvider extends ServiceProvider {
 		$this->app->instance(
 			'log', new Writer(new Logger($this->app['env']), $this->app['events'])
 		);
+
+		$this->app->bind('Psr\Log\LoggerInterface', function()
+		{
+			return $this->app['log']->getMonolog();
+		});
 	}
 
 	/**

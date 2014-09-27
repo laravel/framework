@@ -3103,9 +3103,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function __unset($key)
 	{
-		unset($this->attributes[$key]);
-
-		unset($this->relations[$key]);
+		unset($this->attributes[$key], $this->relations[$key]);
 	}
 
 	/**
