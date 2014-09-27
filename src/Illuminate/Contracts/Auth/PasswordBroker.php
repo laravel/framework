@@ -57,4 +57,12 @@ interface PasswordBroker {
 	 */
 	public function reset(array $credentials, Closure $callback);
 
+	/**
+	 * Set a custom password validator.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function validator(Closure $callback);
+
 }
