@@ -457,6 +457,19 @@ if ( ! function_exists('last'))
 	}
 }
 
+if ( ! function_exists('now'))
+{
+	/**
+	 * Returns current timestamp for use with Eloquent models
+	 *
+	 * @return string
+	 */
+	function now()
+	{
+		return date("Y-m-d H:i:s");;
+	}
+}
+
 if ( ! function_exists('object_get'))
 {
 	/**
