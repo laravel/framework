@@ -160,7 +160,7 @@ class ResponseFactory implements FactoryContract {
 	 */
 	public function redirectToAction($action, $parameters = array(), $status = 302, $headers = array())
 	{
-		return $this->redirector->action($route, $parameters, $status, $headers);
+		return $this->redirector->action($action, $parameters, $status, $headers);
 	}
 
 	/**
