@@ -48,7 +48,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$date = date('Y-m-d H:i:s', time() - 300000);
-		$query->shouldReceive('first')->andReturn((object) array('created_at' => $date));
+		$query->shouldReceive('first')->andReturn((object) ['created_at' => $date]);
 		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
 
@@ -63,7 +63,7 @@ class AuthDatabaseReminderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
 		$date = date('Y-m-d H:i:s', time() - 600);
-		$query->shouldReceive('first')->andReturn((object) array('created_at' => $date));
+		$query->shouldReceive('first')->andReturn((object) ['created_at' => $date]);
 		$user = m::mock('Illuminate\Auth\Reminders\RemindableInterface');
 		$user->shouldReceive('getReminderEmail')->andReturn('email');
 
