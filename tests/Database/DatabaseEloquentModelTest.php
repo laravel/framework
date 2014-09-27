@@ -918,6 +918,56 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($model->isDirty());
 	}
 
+	public function testRelationshipTouchOwnersIsPropagated()
+	{
+		$relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsTo')->setMethods(array('touch'))->disableOriginalConstructor()->getMock();
+		$relation->expects($this->once())->method('touch');
+
+		$model = m::mock('EloquentModelStub[partner]');
+		$this->addMockConnection($model);
+		$model->shouldReceive('partner')->once()->andReturn($relation);
+		$model->setTouchedRelations(['partner']);
+
+		$mockPartnerModel = m::mock('EloquentModelStub[touchOwners]');
+		$mockPartnerModel->shouldReceive('touchOwners')->once();
+		$model->setRelation('partner', $mockPartnerModel);
+
+		$model->touchOwners();
+	}
+
+
+	public function testRelationshipTouchOwnersIsNotPropagatedIfNoRelationshipResult()
+	{
+		$relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsTo')->setMethods(array('touch'))->disableOriginalConstructor()->getMock();
+		$relation->expects($this->once())->method('touch');
+
+		$model = m::mock('EloquentModelStub[partner]');
+		$this->addMockConnection($model);
+		$model->shouldReceive('partner')->once()->andReturn($relation);
+		$model->setTouchedRelations(['partner']);
+
+		$model->setRelation('partner', null);
+
+		$model->touchOwners();
+	}
+
+
+	public function testTimestampsAreNotUpdatedWithTimestampsFalseSaveOption()
+	{
+		$model = m::mock('EloquentModelStub[newQuery]');
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('name' => 'taylor'));
+		$model->shouldReceive('newQuery')->once()->andReturn($query);
+
+		$model->id = 1;
+		$model->syncOriginal();
+		$model->name = 'taylor';
+		$model->exists = true;
+		$this->assertTrue($model->save(['timestamps' => false]));
+		$this->assertEquals(null, $model->updated_at);
+	}
+
 
 	protected function addMockConnection($model)
 	{

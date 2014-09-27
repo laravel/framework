@@ -1444,7 +1444,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// clause to only update this model. Otherwise, we'll just insert them.
 		if ($this->exists)
 		{
-			$saved = $this->performUpdate($query);
+			$saved = $this->performUpdate($query, $options);
 		}
 
 		// If the model is brand new, we'll insert it into our database and set the
@@ -1452,7 +1452,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// which is typically an auto-increment value managed by the database.
 		else
 		{
-			$saved = $this->performInsert($query);
+			$saved = $this->performInsert($query, $options);
 		}
 
 		if ($saved) $this->finishSave($options);
@@ -1481,7 +1481,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @return bool|null
 	 */
-	protected function performUpdate(Builder $query)
+	protected function performUpdate(Builder $query, array $options)
 	{
 		$dirty = $this->getDirty();
 
@@ -1498,7 +1498,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			// First we need to create a fresh query instance and touch the creation and
 			// update timestamp on the model which are maintained by us for developer
 			// convenience. Then we will just continue saving the model instances.
-			if ($this->timestamps)
+			if ($this->timestamps && array_get($options, 'timestamps', true))
 			{
 				$this->updateTimestamps();
 			}
@@ -1525,14 +1525,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @return bool
 	 */
-	protected function performInsert(Builder $query)
+	protected function performInsert(Builder $query, array $options)
 	{
 		if ($this->fireModelEvent('creating') === false) return false;
 
 		// First we'll need to create a fresh query instance and touch the creation and
 		// update timestamps on this model, which are maintained by us for developer
 		// convenience. After, we will just continue saving these model instances.
-		if ($this->timestamps)
+		if ($this->timestamps && array_get($options, 'timestamps', true))
 		{
 			$this->updateTimestamps();
 		}
@@ -1590,7 +1590,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			$this->$relation()->touch();
 
-			$this->$relation->touchOwners();
+			if ( ! is_null($this->$relation))
+			{
+				$this->$relation->touchOwners();
+			}
 		}
 	}
 
