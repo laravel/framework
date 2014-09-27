@@ -13,11 +13,10 @@
     },
     "autoload": {
         "classmap": [
-            "src/migrations"
+            "resources/migrations"
         ],
-        "psr-0": {
+        "psr-4": {
             "{{vendor}}\\{{name}}\\": "src/"
         }
-    },
-    "minimum-stability": "stable"
+    }
 }

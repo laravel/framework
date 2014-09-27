@@ -45,7 +45,7 @@ class MigratePublishCommand extends Command {
 	{
 		$vendor = $this->laravel['path.base'].'/vendor';
 
-		return $vendor.'/'.$this->argument('package').'/src/migrations';
+		return $vendor.'/'.$this->argument('package').'/resources/migrations';
 	}
 
 	/**

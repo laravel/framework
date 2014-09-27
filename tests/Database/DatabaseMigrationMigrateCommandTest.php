@@ -46,7 +46,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
 		$command->setLaravel(new ApplicationDatabaseMigrationStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
-		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/bar/src/migrations', false);
+		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/bar/resources/migrations', false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 		$migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
@@ -59,7 +59,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
 		$command->setLaravel(new ApplicationDatabaseMigrationStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
-		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/foo/bar/src/migrations', false);
+		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/foo/bar/resources/migrations', false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
 		$migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 

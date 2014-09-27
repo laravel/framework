@@ -13,7 +13,7 @@ class ViewPublisher extends Publisher {
 	 */
 	protected function getSource($package, $packagePath)
 	{
-		$source = $packagePath."/{$package}/src/views";
+		$source = $packagePath."/{$package}/resources/views";
 
 		if ( ! $this->files->isDirectory($source))
 		{

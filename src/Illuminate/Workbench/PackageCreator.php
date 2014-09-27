@@ -188,7 +188,7 @@ class PackageCreator {
 	 */
 	public function writeSupportDirectories(Package $package, $directory)
 	{
-		foreach (array('config', 'controllers', 'lang', 'migrations', 'views') as $support)
+		foreach (array('config', 'lang', 'migrations', 'views') as $support)
 		{
 			$this->writeSupportDirectory($package, $support, $directory);
 		}
@@ -207,7 +207,7 @@ class PackageCreator {
 		// Once we create the source directory, we will write an empty file to the
 		// directory so that it will be kept in source control allowing the dev
 		// to go ahead and push these components to GitHub right on creation.
-		$path = $directory.'/src/'.$support;
+		$path = $directory.'/resources/'.$support;
 
 		$this->files->makeDirectory($path, 0777, true);
 
@@ -273,14 +273,9 @@ class PackageCreator {
 	 */
 	protected function writeProviderStub(Package $package, $directory, $stub)
 	{
-		$path = $this->createClassDirectory($package, $directory);
+		$this->files->makeDirectory($directory.'/src', 0777, true);
 
-		// The primary source directory where the package's classes will live may not
-		// exist yet, so we will need to create it before we write these providers
-		// out to that location. We'll go ahead and create now here before then.
-		$file = $path.'/'.$package->name.'ServiceProvider.php';
-
-		$this->files->put($file, $stub);
+		$this->files->put($directory.'/src/'.$package->name.'ServiceProvider.php', $stub);
 	}
 
 	/**
@@ -309,25 +304,6 @@ class PackageCreator {
 		}
 
 		return $this->files->get(__DIR__.'/stubs/provider.stub');
-	}
-
-	/**
-	 * Create the main source directory for the package.
-	 *
-	 * @param  \Illuminate\Workbench\Package  $package
-	 * @param  string  $directory
-	 * @return string
-	 */
-	protected function createClassDirectory(Package $package, $directory)
-	{
-		$path = $directory.'/src/'.$package->vendor.'/'.$package->name;
-
-		if ( ! $this->files->isDirectory($path))
-		{
-			$this->files->makeDirectory($path, 0777, true);
-		}
-
-		return $path;
 	}
 
 	/**
