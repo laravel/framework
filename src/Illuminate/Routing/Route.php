@@ -878,9 +878,7 @@ class Route {
 			throw new \LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
 		}
 
-		unset($this->container);
-
-		unset($this->compiled);
+		unset($this->container, $this->compiled);
 	}
 
 }
