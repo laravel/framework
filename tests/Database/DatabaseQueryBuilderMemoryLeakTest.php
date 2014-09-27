@@ -38,6 +38,8 @@ class DatabaseJoinMemoryLeakTest extends PHPUnit_Framework_TestCase {
 
         $last = null;
 
+	    gc_collect_cycles();
+
         while($i--)
         {
             $callback();
