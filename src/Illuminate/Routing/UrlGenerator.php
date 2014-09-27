@@ -599,4 +599,14 @@ class UrlGenerator implements UrlGeneratorContract {
 		return $this;
 	}
 
+	/**
+	 * Get the current controller namespace.
+	 *
+	 * @return string
+	 */
+	public function getRootControllerNamespace()
+	{
+		return $this->rootNamespace;
+	}
+
 }
