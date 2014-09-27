@@ -738,7 +738,7 @@ class Application extends Container implements HttpKernelInterface,
 	{
 		$this->middlewares = array_filter($this->middlewares, function($m) use ($class)
 		{
-			return get_class($m['class']) != $class;
+			return $m['class'] != $class;
 		});
 	}
 

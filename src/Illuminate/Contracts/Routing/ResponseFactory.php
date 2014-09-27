@@ -35,6 +35,18 @@ interface ResponseFactory {
 	public function json($data = array(), $status = 200, array $headers = array(), $options = 0);
 
 	/**
+	 * Return a new JSONP response from the application.
+	 *
+	 * @param  string  $callback
+	 * @param  string|array  $data
+	 * @param  int    $status
+	 * @param  array  $headers
+	 * @param  int    $options
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function jsonp($callback, $data = array(), $status = 200, array $headers = array(), $options = 0);
+
+	/**
 	 * Return a new streamed response from the application.
 	 *
 	 * @param  \Closure  $callback
