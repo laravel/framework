@@ -73,9 +73,9 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 	{
 		$app['view'] = $view = m::mock('\Illuminate\View\Factory');
 		$app['files'] = $files = m::mock('\Illuminate\Filesystem\Filesystem');
-		$app['path'] = __DIR__;
+		$app['path.base'] = __DIR__;
 
-		$viewAppPath = $app['path'].'/views/packages';
+		$viewAppPath = $app['path.base'].'/resources/views/packages';
 		$path = __DIR__.'/views';
 
 		$view->shouldReceive('addNamespace')->once()->with('foo', $viewAppPath.'/foo/bar')->andReturnNull()
