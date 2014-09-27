@@ -21,14 +21,14 @@ class JoinClause {
 	 *
 	 * @var array
 	 */
-	public $clauses = array();
+	public $clauses = [];
 
 	/**
 	* The "on" bindings for the join.
 	*
 	* @var array
 	*/
-	public $bindings = array();
+	public $bindings = [];
 
 	/**
 	 * Create a new join clause instance.

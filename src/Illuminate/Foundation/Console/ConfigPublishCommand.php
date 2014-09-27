@@ -94,9 +94,9 @@ class ConfigPublishCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('package', InputArgument::REQUIRED, 'The name of the package being published.'),
-		);
+		return [
+			['package', InputArgument::REQUIRED, 'The name of the package being published.'],
+		];
 	}
 
 	/**
@@ -106,11 +106,11 @@ class ConfigPublishCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the configuration files.', null),
+		return [
+			['path', null, InputOption::VALUE_OPTIONAL, 'The path to the configuration files.', null],
 
-			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when the file already exists.'),
-		);
+			['force', null, InputOption::VALUE_NONE, 'Force the operation to run when the file already exists.'],
+		];
 	}
 
 }

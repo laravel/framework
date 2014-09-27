@@ -289,9 +289,9 @@ class AppNameCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('name', InputArgument::REQUIRED, 'The desired namespace.'),
-		);
+		return [
+			['name', InputArgument::REQUIRED, 'The desired namespace.'],
+		];
 	}
 
 }

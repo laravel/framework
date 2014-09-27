@@ -2,7 +2,7 @@
 
 $basePath = $app['path.base'];
 
-return array_map('realpath', array(
+return array_map('realpath', [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/Container.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/ContextualBindingBuilder.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/Renderable.php',
@@ -158,4 +158,4 @@ return array_map('realpath', array(
     $basePath.'/vendor/symfony/security-core/Symfony/Component/Security/Core/Util/SecureRandomInterface.php',
     $basePath.'/vendor/symfony/security-core/Symfony/Component/Security/Core/Util/SecureRandom.php',
     $basePath.'/vendor/nesbot/carbon/src/Carbon/Carbon.php',
-));
+]);

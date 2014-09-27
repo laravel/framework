@@ -23,7 +23,7 @@ class FileLoader implements LoaderInterface {
 	 *
 	 * @var array
 	 */
-	protected $hints = array();
+	protected $hints = [];
 
 	/**
 	 * Create a new file loader instance.
@@ -73,7 +73,7 @@ class FileLoader implements LoaderInterface {
 			return $this->loadNamespaceOverrides($lines, $locale, $group, $namespace);
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -112,7 +112,7 @@ class FileLoader implements LoaderInterface {
 			return $this->files->getRequire($full);
 		}
 
-		return array();
+		return [];
 	}
 
 	/**

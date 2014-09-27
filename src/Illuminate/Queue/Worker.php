@@ -252,7 +252,7 @@ class Worker {
 		{
 			$data = json_decode($job->getRawBody(), true);
 
-			$this->events->fire('illuminate.queue.failed', array($connection, $job, $data));
+			$this->events->fire('illuminate.queue.failed', [$connection, $job, $data]);
 		}
 	}
 

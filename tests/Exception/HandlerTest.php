@@ -18,7 +18,7 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 	{
 		$error = null;
 		try {
-			$this->handler->handleError(E_USER_ERROR, 'message', '/path/to/file', 111, array());
+			$this->handler->handleError(E_USER_ERROR, 'message', '/path/to/file', 111, []);
 		} catch (ErrorException $error) {}
 
 		$this->assertInstanceOf('ErrorException', $error);

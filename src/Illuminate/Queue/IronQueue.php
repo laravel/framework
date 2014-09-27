@@ -74,7 +74,7 @@ class IronQueue extends Queue implements QueueContract {
 	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function pushRaw($payload, $queue = null, array $options = array())
+	public function pushRaw($payload, $queue = null, array $options = [])
 	{
 		if ($this->shouldEncrypt) $payload = $this->crypt->encrypt($payload);
 
@@ -91,7 +91,7 @@ class IronQueue extends Queue implements QueueContract {
 	 */
 	public function recreate($payload, $queue = null, $delay)
 	{
-		$options = array('delay' => $this->getSeconds($delay));
+		$options = ['delay' => $this->getSeconds($delay)];
 
 		return $this->pushRaw($payload, $queue, $options);
 	}
@@ -172,9 +172,9 @@ class IronQueue extends Queue implements QueueContract {
 
 		$body = $this->parseJobBody($r->getContent());
 
-		return (object) array(
+		return (object) [
 			'id' => $r->header('iron-message-id'), 'body' => $body, 'pushed' => true,
-		);
+		];
 	}
 
 	/**

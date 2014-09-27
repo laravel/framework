@@ -20,11 +20,11 @@ class BcryptHasher implements HasherContract {
 	 *
 	 * @throws \RuntimeException
 	 */
-	public function make($value, array $options = array())
+	public function make($value, array $options = [])
 	{
 		$cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
 
-		$hash = password_hash($value, PASSWORD_BCRYPT, array('cost' => $cost));
+		$hash = password_hash($value, PASSWORD_BCRYPT, ['cost' => $cost]);
 
 		if ($hash === false)
 		{
@@ -42,7 +42,7 @@ class BcryptHasher implements HasherContract {
 	 * @param  array   $options
 	 * @return bool
 	 */
-	public function check($value, $hashedValue, array $options = array())
+	public function check($value, $hashedValue, array $options = [])
 	{
 		return password_verify($value, $hashedValue);
 	}
@@ -54,11 +54,11 @@ class BcryptHasher implements HasherContract {
 	 * @param  array   $options
 	 * @return bool
 	 */
-	public function needsRehash($hashedValue, array $options = array())
+	public function needsRehash($hashedValue, array $options = [])
 	{
 		$cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
 
-		return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, array('cost' => $cost));
+		return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, ['cost' => $cost]);
 	}
 
 }

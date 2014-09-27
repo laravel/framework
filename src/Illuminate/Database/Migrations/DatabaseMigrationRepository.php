@@ -69,7 +69,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 */
 	public function log($file, $batch)
 	{
-		$record = array('migration' => $file, 'batch' => $batch);
+		$record = ['migration' => $file, 'batch' => $batch];
 
 		$this->table()->insert($record);
 	}

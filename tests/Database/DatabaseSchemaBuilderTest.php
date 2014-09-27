@@ -19,7 +19,7 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = new Builder($connection);
 		$grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
 		$connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-		$connection->shouldReceive('select')->once()->with('sql', array('prefix_table'))->andReturn(array('prefix_table'));
+		$connection->shouldReceive('select')->once()->with('sql', ['prefix_table'])->andReturn(['prefix_table']);
 
 		$this->assertTrue($builder->hasTable('table'));
 	}

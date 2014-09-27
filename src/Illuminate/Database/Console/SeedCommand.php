@@ -88,13 +88,13 @@ class SeedCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'),
+		return [
+			['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'],
 
-			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'),
+			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
 
-			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
-		);
+			['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+		];
 	}
 
 }

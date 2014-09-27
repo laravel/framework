@@ -20,7 +20,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app['translator'] = $trans = m::mock('StdClass');
 		$trans->shouldReceive('setLocale')->once()->with('foo');
 		$app['events'] = $events = m::mock('StdClass');
-		$events->shouldReceive('fire')->once()->with('locale.changed', array('foo'));
+		$events->shouldReceive('fire')->once()->with('locale.changed', ['foo']);
 
 		$app->setLocale('foo');
 	}
@@ -50,7 +50,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testDeferredServicesMarkedAsBound()
 	{
 		$app = new Application;
-		$app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderStub'));
+		$app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
 		$this->assertTrue($app->bound('foo'));
 		$this->assertEquals('foo', $app->make('foo'));
 	}
@@ -59,7 +59,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testDeferredServicesAreSharedProperly()
 	{
 		$app = new Application;
-		$app->setDeferredServices(array('foo' => 'ApplicationDeferredSharedServiceProviderStub'));
+		$app->setDeferredServices(['foo' => 'ApplicationDeferredSharedServiceProviderStub']);
 		$this->assertTrue($app->bound('foo'));
 		$one = $app->make('foo'); $two = $app->make('foo');
 		$this->assertInstanceOf('StdClass', $one);
@@ -71,7 +71,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testDeferredServicesCanBeExtended()
 	{
 		$app = new Application;
-		$app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderStub'));
+		$app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
 		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
 		$this->assertEquals('foobar', $app->make('foo'));
 	}
@@ -80,7 +80,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testDeferredServiceProviderIsRegisteredOnlyOnce()
 	{
 		$app = new Application;
-		$app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderCountStub'));
+		$app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderCountStub']);
 		$obj = $app->make('foo');
 		$this->assertInstanceOf('StdClass', $obj);
 		$this->assertSame($obj, $app->make('foo'));
@@ -92,7 +92,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	{
 		ApplicationDeferredServiceProviderStub::$initialized = false;
 		$app = new Application;
-		$app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderStub'));
+		$app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
 		$this->assertTrue($app->bound('foo'));
 		$this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
 		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
@@ -105,7 +105,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testDeferredServicesCanRegisterFactories()
 	{
 		$app = new Application;
-		$app->setDeferredServices(array('foo' => 'ApplicationFactoryProviderStub'));
+		$app->setDeferredServices(['foo' => 'ApplicationFactoryProviderStub']);
 		$this->assertTrue($app->bound('foo'));
 		$this->assertEquals(1, $app->make('foo'));
 		$this->assertEquals(2, $app->make('foo'));
@@ -116,10 +116,10 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	public function testSingleProviderCanProvideMultipleDeferredServices()
 	{
 		$app = new Application;
-		$app->setDeferredServices(array(
+		$app->setDeferredServices([
 			'foo' => 'ApplicationMultiProviderStub',
 			'bar' => 'ApplicationMultiProviderStub',
-		));
+		]);
 		$this->assertEquals('foo', $app->make('foo'));
 		$this->assertEquals('foobar', $app->make('bar'));
 	}

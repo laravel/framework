@@ -11,14 +11,14 @@ abstract class Controller {
 	 *
 	 * @var array
 	 */
-	protected $beforeFilters = array();
+	protected $beforeFilters = [];
 
 	/**
 	 * The "after" filters registered on the controller.
 	 *
 	 * @var array
 	 */
-	protected $afterFilters = array();
+	protected $afterFilters = [];
 
 	/**
 	 * The container instance.
@@ -41,7 +41,7 @@ abstract class Controller {
 	 * @param  array  $options
 	 * @return void
 	 */
-	public function beforeFilter($filter, array $options = array())
+	public function beforeFilter($filter, array $options = [])
 	{
 		$this->beforeFilters[] = $this->parseFilter($filter, $options);
 	}
@@ -53,7 +53,7 @@ abstract class Controller {
 	 * @param  array  $options
 	 * @return void
 	 */
-	public function afterFilter($filter, array $options = array())
+	public function afterFilter($filter, array $options = [])
 	{
 		$this->afterFilters[] = $this->parseFilter($filter, $options);
 	}
@@ -67,7 +67,7 @@ abstract class Controller {
 	 */
 	protected function parseFilter($filter, array $options)
 	{
-		$parameters = array();
+		$parameters = [];
 
 		$original = $filter;
 
@@ -108,7 +108,7 @@ abstract class Controller {
 	 */
 	protected function registerInstanceFilter($filter)
 	{
-		$this->getFilterer()->filter($filter, array($this, substr($filter, 1)));
+		$this->getFilterer()->filter($filter, [$this, substr($filter, 1)]);
 
 		return $filter;
 	}
@@ -220,7 +220,7 @@ abstract class Controller {
 	 */
 	public function callAction($method, $parameters)
 	{
-		return call_user_func_array(array($this, $method), $parameters);
+		return call_user_func_array([$this, $method], $parameters);
 	}
 
 	/**
@@ -231,7 +231,7 @@ abstract class Controller {
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
-	public function missingMethod($parameters = array())
+	public function missingMethod($parameters = [])
 	{
 		throw new NotFoundHttpException("Controller method not found.");
 	}

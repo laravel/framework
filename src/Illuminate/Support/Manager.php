@@ -16,14 +16,14 @@ abstract class Manager {
 	 *
 	 * @var array
 	 */
-	protected $customCreators = array();
+	protected $customCreators = [];
 
 	/**
 	 * The array of created "drivers".
 	 *
 	 * @var array
 	 */
-	protected $drivers = array();
+	protected $drivers = [];
 
 	/**
 	 * Create a new manager instance.
@@ -135,7 +135,7 @@ abstract class Manager {
 	 */
 	public function __call($method, $parameters)
 	{
-		return call_user_func_array(array($this->driver(), $method), $parameters);
+		return call_user_func_array([$this->driver(), $method], $parameters);
 	}
 
 }

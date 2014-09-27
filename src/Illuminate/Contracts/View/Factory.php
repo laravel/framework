@@ -18,7 +18,7 @@ interface Factory {
 	 * @param  array  $mergeData
 	 * @return \Illuminate\Contracts\View\View
 	 */
-	public function make($view, $data = array(), $mergeData = array());
+	public function make($view, $data = [], $mergeData = []);
 
 	/**
 	 * Add a piece of shared data to the environment.

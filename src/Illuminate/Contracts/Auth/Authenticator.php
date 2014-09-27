@@ -22,7 +22,7 @@ interface Authenticator {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function once(array $credentials = array());
+	public function once(array $credentials = []);
 
 	/**
 	 * Attempt to authenticate a user using the given credentials.
@@ -32,7 +32,7 @@ interface Authenticator {
 	 * @param  bool   $login
 	 * @return bool
 	 */
-	public function attempt(array $credentials = array(), $remember = false, $login = true);
+	public function attempt(array $credentials = [], $remember = false, $login = true);
 
 	/**
 	 * Validate a user's credentials.
@@ -40,7 +40,7 @@ interface Authenticator {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function validate(array $credentials = array());
+	public function validate(array $credentials = []);
 
 	/**
 	 * Log a user into the application.

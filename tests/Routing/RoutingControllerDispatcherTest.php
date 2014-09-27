@@ -26,7 +26,7 @@ class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('controller');
 		// Blank "users" Closure because we just need to stub something...
-		$route = new Route(array('GET'), 'controller', array('uses' => function() {}));
+		$route = new Route(['GET'], 'controller', ['uses' => function() {}]);
 		$route->bind($request);
 		$dispatcher = new ControllerDispatcher(m::mock('Illuminate\Routing\RouteFiltererInterface'), new Container);
 
@@ -41,7 +41,7 @@ class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('controller/foo');
 		// Blank "users" Closure because we just need to stub something...
-		$route = new Route(array('GET'), 'controller/{foo}', array('uses' => function() {}));
+		$route = new Route(['GET'], 'controller/{foo}', ['uses' => function() {}]);
 		$route->bind($request);
 		$dispatcher = new ControllerDispatcher(m::mock('Illuminate\Routing\RouteFiltererInterface'), new Container);
 
@@ -56,7 +56,7 @@ class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('controller/foo/bar');
 		// Blank "users" Closure because we just need to stub something...
-		$route = new Route(array('GET'), 'controller/{foo}/{bar}', array('uses' => function() {}));
+		$route = new Route(['GET'], 'controller/{foo}/{bar}', ['uses' => function() {}]);
 		$route->bind($request);
 		$dispatcher = new ControllerDispatcher(m::mock('Illuminate\Routing\RouteFiltererInterface'), new Container);
 
