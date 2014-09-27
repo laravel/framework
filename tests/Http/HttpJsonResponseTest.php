@@ -10,6 +10,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $data->foo);
 	}
 
+
 	public function testSetAndRetrieveOptions()
 	{
 		$response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);
