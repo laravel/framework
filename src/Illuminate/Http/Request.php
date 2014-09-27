@@ -601,7 +601,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Get the user making the request.
 	 *
-	 * @return \Closure
+	 * @return mixed
 	 */
 	public function user()
 	{
