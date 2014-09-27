@@ -9,11 +9,11 @@ class PostgresGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $operators = array(
+	protected $operators = [
 		'=', '<', '>', '<=', '>=', '<>', '!=',
 		'like', 'not like', 'between', 'ilike',
 		'&', '|', '#', '<<', '>>',
-	);
+	];
 
 	/**
 	 * Compile the lock into SQL.
@@ -60,7 +60,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function compileUpdateColumns($values)
 	{
-		$columns = array();
+		$columns = [];
 
 		// When gathering the columns for an update statement, we'll wrap each of the
 		// columns and convert it to a parameter value. Then we will concatenate a
@@ -83,7 +83,7 @@ class PostgresGrammar extends Grammar {
 	{
 		if ( ! isset($query->joins)) return '';
 
-		$froms = array();
+		$froms = [];
 
 		// When using Postgres, updates with joins list the joined tables in the from
 		// clause, which is different than other systems like MySQL. Here, we will
@@ -129,7 +129,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function compileUpdateJoinWheres(Builder $query)
 	{
-		$joinWheres = array();
+		$joinWheres = [];
 
 		// Here we will just loop through all of the join constraints and compile them
 		// all out then implode them. This should give us "where" like syntax after
@@ -168,7 +168,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	public function compileTruncate(Builder $query)
 	{
-		return array('truncate '.$this->wrapTable($query->from).' restart identity' => array());
+		return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
 	}
 
 }

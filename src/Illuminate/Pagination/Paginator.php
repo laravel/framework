@@ -78,7 +78,7 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 *
 	 * @var array
 	 */
-	protected $query = array();
+	protected $query = [];
 
 	/**
 	 * The fragment to be appended to all URLs.
@@ -212,9 +212,9 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 */
 	public function getUrl($page)
 	{
-		$parameters = array(
+		$parameters = [
 			$this->factory->getPageName() => $page,
-		);
+		];
 
 		// If we have any extra query string key / value pairs that need to be added
 		// onto the URL, we will put them in query string form and then attach it
@@ -511,11 +511,11 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 */
 	public function toArray()
 	{
-		return array(
+		return [
 			'total' => $this->total, 'per_page' => $this->perPage,
 			'current_page' => $this->currentPage, 'last_page' => $this->lastPage,
 			'from' => $this->from, 'to' => $this->to, 'data' => $this->getCollection()->toArray(),
-		);
+		];
 	}
 
 	/**
@@ -538,7 +538,7 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 */
 	public function __call($method, $arguments)
 	{
-		return call_user_func_array(array($this->getCollection(), $method), $arguments);
+		return call_user_func_array([$this->getCollection(), $method], $arguments);
 	}
 
 }

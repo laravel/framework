@@ -62,9 +62,9 @@ class RemindersControllerCommand extends GeneratorCommand {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('name', InputArgument::OPTIONAL, 'The name of the class', 'Auth\RemindersController'),
-		);
+		return [
+			['name', InputArgument::OPTIONAL, 'The name of the class', 'Auth\RemindersController'],
+		];
 	}
 
 }

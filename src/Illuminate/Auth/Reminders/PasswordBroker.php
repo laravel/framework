@@ -191,7 +191,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	 */
 	protected function validNewPasswords(array $credentials)
 	{
-		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
+		list($password, $confirm) = [$credentials['password'], $credentials['password_confirmation']];
 
 		if (isset($this->passwordValidator))
 		{
@@ -224,7 +224,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	 */
 	public function getUser(array $credentials)
 	{
-		$credentials = array_except($credentials, array('token'));
+		$credentials = array_except($credentials, ['token']);
 
 		$user = $this->users->retrieveByCredentials($credentials);
 

@@ -49,7 +49,7 @@ class SeedServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('seeder', 'command.seed');
+		return ['seeder', 'command.seed'];
 	}
 
 }

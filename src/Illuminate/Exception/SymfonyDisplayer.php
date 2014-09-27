@@ -43,11 +43,11 @@ class SymfonyDisplayer implements ExceptionDisplayerInterface {
 	{
 		if ($this->returnJson)
 		{
-			return new JsonResponse(array(
+			return new JsonResponse([
 				'error' => $exception->getMessage(),
 				'file' => $exception->getFile(),
 				'line' => $exception->getLine(),
-			), 500);
+			], 500);
 		}
 
 		return $this->symfony->createResponse($exception);

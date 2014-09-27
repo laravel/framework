@@ -6,9 +6,9 @@ class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoaderCanBeCreatedAndRegisteredOnce()
 	{
-		$loader = AliasLoader::getInstance(array('foo' => 'bar'));
+		$loader = AliasLoader::getInstance(['foo' => 'bar']);
 
-		$this->assertEquals(array('foo' => 'bar'), $loader->getAliases());
+		$this->assertEquals(['foo' => 'bar'], $loader->getAliases());
 		$this->assertFalse($loader->isRegistered());
 		$loader->register();
 		$loader->register();
@@ -18,7 +18,7 @@ class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetInstanceCreatesOneInstance()
 	{
-		$loader = AliasLoader::getInstance(array('foo' => 'bar'));
+		$loader = AliasLoader::getInstance(['foo' => 'bar']);
 		$this->assertEquals($loader, AliasLoader::getInstance());
 	}
 

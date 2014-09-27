@@ -93,7 +93,7 @@ abstract class Presenter {
 	 */
 	public function getPageRange($start, $end)
 	{
-		$pages = array();
+		$pages = [];
 
 		for ($page = $start; $page <= $end; $page++)
 		{

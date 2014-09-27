@@ -58,9 +58,9 @@ class ControllerMakeCommand extends GeneratorCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('plain', null, InputOption::VALUE_NONE, 'Generate an empty controller class.'),
-		);
+		return [
+			['plain', null, InputOption::VALUE_NONE, 'Generate an empty controller class.'],
+		];
 	}
 
 }

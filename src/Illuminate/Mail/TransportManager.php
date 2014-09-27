@@ -73,7 +73,7 @@ class TransportManager extends Manager {
 	 */
 	protected function createMailgunDriver()
 	{
-		$config = $this->app['config']->get('services.mailgun', array());
+		$config = $this->app['config']->get('services.mailgun', []);
 
 		return new MailgunTransport($config['secret'], $config['domain']);
 	}
@@ -85,7 +85,7 @@ class TransportManager extends Manager {
 	 */
 	protected function createMandrillDriver()
 	{
-		$config = $this->app['config']->get('services.mandrill', array());
+		$config = $this->app['config']->get('services.mandrill', []);
 
 		return new MandrillTransport($config['secret']);
 	}

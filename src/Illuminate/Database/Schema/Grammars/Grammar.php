@@ -63,7 +63,7 @@ abstract class Grammar extends BaseGrammar {
 	{
 		$newColumn = new Column($command->to, $column->getType(), $column->toArray());
 
-		$tableDiff->renamedColumns = array($command->from => $newColumn);
+		$tableDiff->renamedColumns = [$command->from => $newColumn];
 
 		return $tableDiff;
 	}
@@ -117,7 +117,7 @@ abstract class Grammar extends BaseGrammar {
 	 */
 	protected function getColumns(Blueprint $blueprint, $change = false)
 	{
-		$columns = array();
+		$columns = [];
 
 		foreach ($change ? $blueprint->getChangedColumns() : $blueprint->getAddedColumns() as $column)
 		{

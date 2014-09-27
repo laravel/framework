@@ -84,7 +84,7 @@ class ReminderServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('auth.reminder', 'auth.reminder.repository');
+		return ['auth.reminder', 'auth.reminder.repository'];
 	}
 
 }

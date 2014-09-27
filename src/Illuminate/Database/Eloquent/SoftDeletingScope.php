@@ -67,9 +67,9 @@ class SoftDeletingScope implements ScopeInterface {
 		{
 			$column = $builder->getModel()->getDeletedAtColumn();
 
-			return $builder->update(array(
+			return $builder->update([
 				$column => $builder->getModel()->freshTimestampString()
-			));
+			]);
 		});
 	}
 
@@ -99,7 +99,7 @@ class SoftDeletingScope implements ScopeInterface {
 		{
 			$builder->withTrashed();
 
-			return $builder->update(array($builder->getModel()->getDeletedAtColumn() => null));
+			return $builder->update([$builder->getModel()->getDeletedAtColumn() => null]);
 		});
 	}
 

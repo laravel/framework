@@ -235,7 +235,7 @@ class Guard implements AuthenticatorContract {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function once(array $credentials = array())
+	public function once(array $credentials = [])
 	{
 		if ($this->validate($credentials))
 		{
@@ -253,7 +253,7 @@ class Guard implements AuthenticatorContract {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function validate(array $credentials = array())
+	public function validate(array $credentials = [])
 	{
 		return $this->attempt($credentials, false, false);
 	}
@@ -319,7 +319,7 @@ class Guard implements AuthenticatorContract {
 	 */
 	protected function getBasicCredentials(Request $request, $field)
 	{
-		return array($field => $request->getUser(), 'password' => $request->getPassword());
+		return [$field => $request->getUser(), 'password' => $request->getPassword()];
 	}
 
 	/**
@@ -329,7 +329,7 @@ class Guard implements AuthenticatorContract {
 	 */
 	protected function getBasicResponse()
 	{
-		$headers = array('WWW-Authenticate' => 'Basic');
+		$headers = ['WWW-Authenticate' => 'Basic'];
 
 		return new Response('Invalid credentials.', 401, $headers);
 	}
@@ -342,7 +342,7 @@ class Guard implements AuthenticatorContract {
 	 * @param  bool   $login
 	 * @return bool
 	 */
-	public function attempt(array $credentials = array(), $remember = false, $login = true)
+	public function attempt(array $credentials = [], $remember = false, $login = true)
 	{
 		$this->fireAttemptEvent($credentials, $remember, $login);
 
@@ -385,7 +385,7 @@ class Guard implements AuthenticatorContract {
 	{
 		if ($this->events)
 		{
-			$payload = array($credentials, $remember, $login);
+			$payload = [$credentials, $remember, $login];
 
 			$this->events->fire('auth.attempt', $payload);
 		}
@@ -431,7 +431,7 @@ class Guard implements AuthenticatorContract {
 		// based on the login and logout events fired from the guard instances.
 		if (isset($this->events))
 		{
-			$this->events->fire('auth.login', array($user, $remember));
+			$this->events->fire('auth.login', [$user, $remember]);
 		}
 
 		$this->setUser($user);
@@ -524,7 +524,7 @@ class Guard implements AuthenticatorContract {
 
 		if (isset($this->events))
 		{
-			$this->events->fire('auth.logout', array($user));
+			$this->events->fire('auth.logout', [$user]);
 		}
 
 		// Once we have fired the logout event we will clear the users out of memory
