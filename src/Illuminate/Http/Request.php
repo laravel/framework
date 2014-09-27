@@ -350,10 +350,21 @@ class Request extends SymfonyRequest {
 
 		foreach ($files as $file)
 		{
-			if ($file instanceof SplFileInfo && $file->getPath() != '') return true;
+			if ($this->isValidFile($file)) return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check that the given file is a valid file instance.
+	 *
+	 * @param  mixed  $file
+	 * @return bool
+	 */
+	protected function isValidFile($file)
+	{
+		return $file instanceof SplFileInfo && $file->getPath() != '';
 	}
 
 	/**
