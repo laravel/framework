@@ -1184,7 +1184,7 @@ class Validator implements ValidatorContract {
 	 * Validate the MIME type of a file upload attribute is in a set of MIME types.
 	 *
 	 * @param  string  $attribute
-	 * @param  array   $value
+	 * @param  mixed  $value
 	 * @param  array   $parameters
 	 * @return bool
 	 */
