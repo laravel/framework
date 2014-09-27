@@ -65,4 +65,14 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 		return $this->setData($this->getData());
 	}
 
+	/**
+	 * Get the JSON encoding options.
+	 *
+	 * @return int
+	 */
+	public function getJsonOptions()
+	{
+		return $this->jsonOptions;
+	}
+
 }
