@@ -40,7 +40,7 @@ class SupportSerializableClosureTest extends PHPUnit_Framework_TestCase {
 			return $a + $b + $i;
 		});
 
-		$expectedVars = array('a' => 1, 'b' => 2);
+		$expectedVars = ['a' => 1, 'b' => 2];
 		$expectedCode = 'function ($i) use($a, $b) {'.PHP_EOL.
 '    return $a + $b + $i;'.PHP_EOL.
 '};';

@@ -24,14 +24,14 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 *
 	 * @var array
 	 */
-	protected $connections = array();
+	protected $connections = [];
 
 	/**
 	 * The custom connection resolvers.
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
 
 	/**
 	 * Create a new database manager instance.
@@ -318,7 +318,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	public function __call($method, $parameters)
 	{
-		return call_user_func_array(array($this->connection(), $method), $parameters);
+		return call_user_func_array([$this->connection(), $method], $parameters);
 	}
 
 }

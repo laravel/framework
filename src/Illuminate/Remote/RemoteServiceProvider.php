@@ -31,7 +31,7 @@ class RemoteServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('remote');
+		return ['remote'];
 	}
 
 }

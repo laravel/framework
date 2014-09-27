@@ -13,9 +13,9 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 	public function testFireProperlyCallsTheJobHandler()
 	{
 		$job = $this->getJob();
-		$job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(array('job' => 'foo', 'data' => array('data'))));
+		$job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
 		$job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
-		$handler->shouldReceive('fire')->once()->with($job, array('data'));
+		$handler->shouldReceive('fire')->once()->with($job, ['data']);
 
 		$job->fire();
 	}

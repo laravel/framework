@@ -97,7 +97,7 @@ class MigrateCommand extends BaseCommand {
 
 		if ( ! $this->migrator->repositoryExists())
 		{
-			$options = array('--database' => $this->input->getOption('database'));
+			$options = ['--database' => $this->input->getOption('database')];
 
 			$this->call('migrate:install', $options);
 		}
@@ -110,21 +110,21 @@ class MigrateCommand extends BaseCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
+		return [
+			['bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null],
 
-			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
-			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
+			['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
+			['path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null],
 
-			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
+			['package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null],
 
-			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
+			['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
-			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
-		);
+			['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
+		];
 	}
 
 }

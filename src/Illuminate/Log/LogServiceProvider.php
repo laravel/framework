@@ -49,7 +49,7 @@ class LogServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('log');
+		return ['log'];
 	}
 
 }

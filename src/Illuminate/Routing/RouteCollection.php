@@ -15,28 +15,28 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 *
 	 * @var array
 	 */
-	protected $routes = array();
+	protected $routes = [];
 
 	/**
 	 * An flattened array of all of the routes.
 	 *
 	 * @var array
 	 */
-	protected $allRoutes = array();
+	protected $allRoutes = [];
 
 	/**
 	 * A look-up table of routes by their names.
 	 *
 	 * @var array
 	 */
-	protected $nameList = array();
+	protected $nameList = [];
 
 	/**
 	 * A look-up table of routes by controller action.
 	 *
 	 * @var array
 	 */
-	protected $actionList = array();
+	protected $actionList = [];
 
 	/**
 	 * Add a Route instance to the collection.
@@ -156,12 +156,12 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function checkForAlternateVerbs($request)
 	{
-		$methods = array_diff(Router::$verbs, array($request->getMethod()));
+		$methods = array_diff(Router::$verbs, [$request->getMethod()]);
 
 		// Here we will spin through all verbs except for the current request verb and
 		// check to see if any routes respond to them. If they do, we will return a
 		// proper error response with the correct headers on the response string.
-		$others = array();
+		$others = [];
 
 		foreach ($methods as $method)
 		{
@@ -189,7 +189,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 		{
 			return (new Route('OPTIONS', $request->path(), function() use ($others)
 			{
-				return new Response('', 200, array('Allow' => implode(',', $others)));
+				return new Response('', 200, ['Allow' => implode(',', $others)]);
 
 			}))->bind($request);
 		}
@@ -236,7 +236,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	{
 		if (is_null($method)) return $this->getRoutes();
 
-		return array_get($this->routes, $method, array());
+		return array_get($this->routes, $method, []);
 	}
 
 	/**

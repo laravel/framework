@@ -40,7 +40,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @var array
 	 */
-	protected $tasks = array();
+	protected $tasks = [];
 
 	/**
 	 * The output implementation for the connection.

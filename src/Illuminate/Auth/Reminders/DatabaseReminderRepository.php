@@ -92,7 +92,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 */
 	protected function getPayload($email, $token)
 	{
-		return array('email' => $email, 'token' => $token, 'created_at' => new Carbon);
+		return ['email' => $email, 'token' => $token, 'created_at' => new Carbon];
 	}
 
 	/**

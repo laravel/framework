@@ -34,7 +34,7 @@ class KeyGeneratorServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.key.generate');
+		return ['command.key.generate'];
 	}
 
 }

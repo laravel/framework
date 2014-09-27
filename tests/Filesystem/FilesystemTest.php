@@ -81,7 +81,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		file_put_contents(__DIR__.'/foo/2.txt', '2');
 		mkdir(__DIR__.'/foo/bar');
 		$files = new Filesystem;
-		$this->assertEquals(array(__DIR__.'/foo/1.txt', __DIR__.'/foo/2.txt'), $files->files(__DIR__.'/foo'));
+		$this->assertEquals([__DIR__.'/foo/1.txt', __DIR__.'/foo/2.txt'], $files->files(__DIR__.'/foo'));
 		unset($files);
 		@unlink(__DIR__.'/foo/1.txt');
 		@unlink(__DIR__.'/foo/2.txt');

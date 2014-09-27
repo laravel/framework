@@ -43,7 +43,7 @@ class FileEnvironmentVariablesLoader implements EnvironmentVariablesLoaderInterf
 
 		if ( ! $this->files->exists($path = $this->getFile($environment)))
 		{
-			return array();
+			return [];
 		}
 
 		return array_dot($this->files->getRequire($path));

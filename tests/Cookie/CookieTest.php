@@ -77,12 +77,12 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 
 	public function getCreator()
 	{
-		return new CookieJar(Request::create('/foo', 'GET'), array(
+		return new CookieJar(Request::create('/foo', 'GET'), [
 			'path'     => '/path',
 			'domain'   => '/domain',
 			'secure'   => true,
 			'httpOnly' => false,
-		));
+		]);
 	}
 
 }

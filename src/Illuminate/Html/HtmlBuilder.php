@@ -55,7 +55,7 @@ class HtmlBuilder {
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function script($url, $attributes = array(), $secure = null)
+	public function script($url, $attributes = [], $secure = null)
 	{
 		$attributes['src'] = $this->url->asset($url, $secure);
 
@@ -70,9 +70,9 @@ class HtmlBuilder {
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function style($url, $attributes = array(), $secure = null)
+	public function style($url, $attributes = [], $secure = null)
 	{
-		$defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
+		$defaults = ['media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet'];
 
 		$attributes = $attributes + $defaults;
 
@@ -90,7 +90,7 @@ class HtmlBuilder {
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function image($url, $alt = null, $attributes = array(), $secure = null)
+	public function image($url, $alt = null, $attributes = [], $secure = null)
 	{
 		$attributes['alt'] = $alt;
 
@@ -106,9 +106,9 @@ class HtmlBuilder {
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function link($url, $title = null, $attributes = array(), $secure = null)
+	public function link($url, $title = null, $attributes = [], $secure = null)
 	{
-		$url = $this->url->to($url, array(), $secure);
+		$url = $this->url->to($url, [], $secure);
 
 		if (is_null($title) || $title === false) $title = $url;
 
@@ -123,7 +123,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function secureLink($url, $title = null, $attributes = array())
+	public function secureLink($url, $title = null, $attributes = [])
 	{
 		return $this->link($url, $title, $attributes, true);
 	}
@@ -137,7 +137,7 @@ class HtmlBuilder {
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function linkAsset($url, $title = null, $attributes = array(), $secure = null)
+	public function linkAsset($url, $title = null, $attributes = [], $secure = null)
 	{
 		$url = $this->url->asset($url, $secure);
 
@@ -152,7 +152,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function linkSecureAsset($url, $title = null, $attributes = array())
+	public function linkSecureAsset($url, $title = null, $attributes = [])
 	{
 		return $this->linkAsset($url, $title, $attributes, true);
 	}
@@ -166,7 +166,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function linkRoute($name, $title = null, $parameters = array(), $attributes = array())
+	public function linkRoute($name, $title = null, $parameters = [], $attributes = [])
 	{
 		return $this->link($this->url->route($name, $parameters), $title, $attributes);
 	}
@@ -180,7 +180,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function linkAction($action, $title = null, $parameters = array(), $attributes = array())
+	public function linkAction($action, $title = null, $parameters = [], $attributes = [])
 	{
 		return $this->link($this->url->action($action, $parameters), $title, $attributes);
 	}
@@ -193,7 +193,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function mailto($email, $title = null, $attributes = array())
+	public function mailto($email, $title = null, $attributes = [])
 	{
 		$email = $this->email($email);
 
@@ -222,7 +222,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function ol($list, $attributes = array())
+	public function ol($list, $attributes = [])
 	{
 		return $this->listing('ol', $list, $attributes);
 	}
@@ -234,7 +234,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function ul($list, $attributes = array())
+	public function ul($list, $attributes = [])
 	{
 		return $this->listing('ul', $list, $attributes);
 	}
@@ -247,7 +247,7 @@ class HtmlBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	protected function listing($type, $list, $attributes = array())
+	protected function listing($type, $list, $attributes = [])
 	{
 		$html = '';
 
@@ -310,7 +310,7 @@ class HtmlBuilder {
 	 */
 	public function attributes($attributes)
 	{
-		$html = array();
+		$html = [];
 
 		// For numeric keys we will assume that the key and the value are the same
 		// as this will convert HTML attributes such as "required" to a correct

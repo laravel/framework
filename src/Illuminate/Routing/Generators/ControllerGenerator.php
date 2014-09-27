@@ -16,7 +16,7 @@ class ControllerGenerator {
 	 *
 	 * @var array
 	 */
-	protected $defaults = array(
+	protected $defaults = [
 		'index',
 		'create',
 		'store',
@@ -24,7 +24,7 @@ class ControllerGenerator {
 		'edit',
 		'update',
 		'destroy'
-	);
+	];
 
 	/**
 	 * Create a new controller generator instance.
@@ -45,7 +45,7 @@ class ControllerGenerator {
 	 * @param  array   $options
 	 * @return void
 	 */
-	public function make($controller, $path, array $options = array())
+	public function make($controller, $path, array $options = [])
 	{
 		$stub = $this->addMethods($this->getController($controller), $options);
 
@@ -171,7 +171,7 @@ class ControllerGenerator {
 	 */
 	protected function getMethodStubs($options)
 	{
-		$stubs = array();
+		$stubs = [];
 
 		// Each stub is conveniently kept in its own file so we can just grab the ones
 		// we need from disk to build the controller file. Once we have them all in

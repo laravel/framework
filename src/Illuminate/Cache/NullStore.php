@@ -7,7 +7,7 @@ class NullStore extends TaggableStore implements StoreInterface {
 	 *
 	 * @var array
 	 */
-	protected $storage = array();
+	protected $storage = [];
 
 	/**
 	 * Retrieve an item from the cache by key.

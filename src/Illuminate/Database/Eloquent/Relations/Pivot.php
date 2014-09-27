@@ -31,7 +31,7 @@ class Pivot extends Model {
 	 *
 	 * @var array
 	 */
-	protected $guarded = array();
+	protected $guarded = [];
 
 	/**
 	 * Create a new pivot model instance.

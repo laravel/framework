@@ -60,7 +60,7 @@ class OptimizeServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('command.optimize', 'command.clear-compiled');
+		return ['command.optimize', 'command.clear-compiled'];
 	}
 
 }

@@ -31,7 +31,7 @@ class RedisServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('redis');
+		return ['redis'];
 	}
 
 }

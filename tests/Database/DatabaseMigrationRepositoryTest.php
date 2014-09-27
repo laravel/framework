@@ -26,9 +26,9 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
 	{
-		$repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', array('getLastBatchNumber'), array(
+		$repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations'
-		));
+		]);
 		$repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));
 		$query = m::mock('stdClass');
 		$connectionMock = m::mock('Illuminate\Database\Connection');
@@ -49,7 +49,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$connectionMock = m::mock('Illuminate\Database\Connection');
 		$repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
-		$query->shouldReceive('insert')->once()->with(array('migration' => 'bar', 'batch' => 1));
+		$query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1]);
 
 		$repo->log('bar', 1);
 	}
@@ -64,7 +64,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
 		$query->shouldReceive('where')->once()->with('migration', 'foo')->andReturn($query);
 		$query->shouldReceive('delete')->once();
-		$migration = (object) array('migration' => 'foo');
+		$migration = (object) ['migration' => 'foo'];
 
 		$repo->delete($migration);
 	}
@@ -72,9 +72,9 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetNextBatchNumberReturnsLastBatchNumberPlusOne()
 	{
-		$repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', array('getLastBatchNumber'), array(
+		$repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
 			m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations'
-		));
+		]);
 		$repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));
 
 		$this->assertEquals(2, $repo->getNextBatchNumber());
