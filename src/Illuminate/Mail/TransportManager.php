@@ -97,7 +97,7 @@ class TransportManager extends Manager {
 	 */
 	protected function createLogDriver()
 	{
-		return new LogTransport($this->app['log']->getMonolog());
+		return new LogTransport($app->make('Psr\Log\LoggerInterface'));
 	}
 
 	/**
