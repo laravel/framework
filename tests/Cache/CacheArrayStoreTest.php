@@ -57,4 +57,11 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($store->get('baz'));
 	}
 
+
+	public function testCacheKey()
+	{
+		$store = new ArrayStore;
+		$this->assertEquals('', $store->getPrefix());
+	}
+
 }
