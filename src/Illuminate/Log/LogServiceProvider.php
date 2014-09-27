@@ -25,6 +25,11 @@ class LogServiceProvider extends ServiceProvider {
 
 		$this->app->instance('log', $logger);
 
+		$this->app->bind('Psr\Log\LoggerInterface', function($app)
+		{
+			return $app['log']->getMonolog();
+		});
+
 		// If the setup Closure has been bound in the container, we will resolve it
 		// and pass in the logger instance. This allows this to defer all of the
 		// logger class setup until the last possible second, improving speed.
