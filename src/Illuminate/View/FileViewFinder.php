@@ -23,21 +23,21 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @var array
 	 */
-	protected $views = array();
+	protected $views = [];
 
 	/**
 	 * The namespace to file path hints.
 	 *
 	 * @var array
 	 */
-	protected $hints = array();
+	protected $hints = [];
 
 	/**
 	 * Register a view extension with the finder.
 	 *
 	 * @var array
 	 */
-	protected $extensions = array('blade.php', 'php');
+	protected $extensions = ['blade.php', 'php'];
 
 	/**
 	 * Hint path delimiter value.

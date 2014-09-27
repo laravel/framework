@@ -17,7 +17,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 *
 	 * @var array
 	 */
-	protected $items = array();
+	protected $items = [];
 
 	/**
 	 * Create a new collection.
@@ -25,7 +25,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  array  $items
 	 * @return void
 	 */
-	public function __construct(array $items = array())
+	public function __construct(array $items = [])
 	{
 		$this->items = $items;
 	}
@@ -42,7 +42,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		if ($items instanceof Collection) return $items;
 
-		return new static(is_array($items) ? $items : array($items));
+		return new static(is_array($items) ? $items : [$items]);
 	}
 
 	/**
@@ -62,7 +62,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function collapse()
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($this->items as $values)
 		{
@@ -209,7 +209,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function groupBy($groupBy)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($this->items as $key => $value)
 		{
@@ -561,7 +561,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
 	{
-		$results = array();
+		$results = [];
 
 		if (is_string($callback)) $callback =
                           $this->valueRetriever($callback);
@@ -610,7 +610,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  mixed  $replacement
 	 * @return static
 	 */
-	public function splice($offset, $length = 0, $replacement = array())
+	public function splice($offset, $length = 0, $replacement = [])
 	{
 		return new static(array_splice($this->items, $offset, $length, $replacement));
 	}

@@ -49,7 +49,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
 		$monolog->shouldReceive('addError')->once()->with('foo');
 
-		$events->listen('illuminate.log', function($level, $message, array $context = array())
+		$events->listen('illuminate.log', function($level, $message, array $context = [])
 		{
 			$_SERVER['__log.level']   = $level;
 			$_SERVER['__log.message'] = $message;
@@ -64,7 +64,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $_SERVER['__log.message']);
 		unset($_SERVER['__log.message']);
 		$this->assertTrue(isset($_SERVER['__log.context']));
-		$this->assertEquals(array(), $_SERVER['__log.context']);
+		$this->assertEquals([], $_SERVER['__log.context']);
 		unset($_SERVER['__log.context']);
 	}
 

@@ -20,7 +20,7 @@ class Response {
 	 * @param  array   $headers
 	 * @return \Illuminate\Http\Response
 	 */
-	public static function make($content = '', $status = 200, array $headers = array())
+	public static function make($content = '', $status = 200, array $headers = [])
 	{
 		return new IlluminateResponse($content, $status, $headers);
 	}
@@ -34,7 +34,7 @@ class Response {
 	 * @param  array   $headers
 	 * @return \Illuminate\Http\Response
 	 */
-	public static function view($view, $data = array(), $status = 200, array $headers = array())
+	public static function view($view, $data = [], $status = 200, array $headers = [])
 	{
 		$app = Facade::getFacadeApplication();
 
@@ -50,7 +50,7 @@ class Response {
 	 * @param  int    $options
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public static function json($data = array(), $status = 200, array $headers = array(), $options = 0)
+	public static function json($data = [], $status = 200, array $headers = [], $options = 0)
 	{
 		if ($data instanceof ArrayableInterface)
 		{
@@ -83,7 +83,7 @@ class Response {
 	 * @param  array    $headers
 	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
-	public static function stream($callback, $status = 200, array $headers = array())
+	public static function stream($callback, $status = 200, array $headers = [])
 	{
 		return new StreamedResponse($callback, $status, $headers);
 	}
@@ -97,7 +97,7 @@ class Response {
 	 * @param  null|string  $disposition
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
-	public static function download($file, $name = null, array $headers = array(), $disposition = 'attachment')
+	public static function download($file, $name = null, array $headers = [], $disposition = 'attachment')
 	{
 		$response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 

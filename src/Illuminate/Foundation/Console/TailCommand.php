@@ -143,9 +143,9 @@ class TailCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('connection', InputArgument::OPTIONAL, 'The remote connection name'),
-		);
+		return [
+			['connection', InputArgument::OPTIONAL, 'The remote connection name'],
+		];
 	}
 
 	/**
@@ -155,11 +155,11 @@ class TailCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The fully qualified path to the log file.'),
+		return [
+			['path', null, InputOption::VALUE_OPTIONAL, 'The fully qualified path to the log file.'],
 
-			array('lines', null, InputOption::VALUE_OPTIONAL, 'The number of lines to tail.', 20),
-		);
+			['lines', null, InputOption::VALUE_OPTIONAL, 'The number of lines to tail.', 20],
+		];
 	}
 
 }

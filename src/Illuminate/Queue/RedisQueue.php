@@ -62,7 +62,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function pushRaw($payload, $queue = null, array $options = array())
+	public function pushRaw($payload, $queue = null, array $options = [])
 	{
 		$this->redis->rpush($this->getQueue($queue), $payload);
 

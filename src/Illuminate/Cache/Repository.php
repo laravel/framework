@@ -278,7 +278,7 @@ class Repository implements ArrayAccess {
 			return $this->macroCall($method, $parameters);
 		}
 
-		return call_user_func_array(array($this->store, $method), $parameters);
+		return call_user_func_array([$this->store, $method], $parameters);
 	}
 
 }

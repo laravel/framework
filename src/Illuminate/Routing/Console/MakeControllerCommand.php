@@ -145,7 +145,7 @@ class MakeControllerCommand extends Command {
 	{
 		$option = $this->input->getOption($name);
 
-		return is_null($option) ? array() : explode(',', $option);
+		return is_null($option) ? [] : explode(',', $option);
 	}
 
 	/**
@@ -155,9 +155,9 @@ class MakeControllerCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('name', InputArgument::REQUIRED, 'The name of the controller class'),
-		);
+		return [
+			['name', InputArgument::REQUIRED, 'The name of the controller class'],
+		];
 	}
 
 	/**
@@ -167,15 +167,15 @@ class MakeControllerCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The workbench the controller belongs to'),
+		return [
+			['bench', null, InputOption::VALUE_OPTIONAL, 'The workbench the controller belongs to'],
 
-			array('only', null, InputOption::VALUE_OPTIONAL, 'The methods that should be included'),
+			['only', null, InputOption::VALUE_OPTIONAL, 'The methods that should be included'],
 
-			array('except', null, InputOption::VALUE_OPTIONAL, 'The methods that should be excluded'),
+			['except', null, InputOption::VALUE_OPTIONAL, 'The methods that should be excluded'],
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'Where to place the controller'),
-		);
+			['path', null, InputOption::VALUE_OPTIONAL, 'Where to place the controller'],
+		];
 	}
 
 }

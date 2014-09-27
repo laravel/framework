@@ -24,7 +24,7 @@ class Writer {
 	 *
 	 * @var array
 	 */
-	protected $levels = array(
+	protected $levels = [
 		'debug',
 		'info',
 		'notice',
@@ -33,7 +33,7 @@ class Writer {
 		'critical',
 		'alert',
 		'emergency',
-	);
+	];
 
 	/**
 	 * The event dispatcher instance.
@@ -73,7 +73,7 @@ class Writer {
 			$parameters[0] = json_encode($parameters[0]);
 		}
 
-		return call_user_func_array(array($this->monolog, $method), $parameters);
+		return call_user_func_array([$this->monolog, $method], $parameters);
 	}
 
 	/**
@@ -234,7 +234,7 @@ class Writer {
 	 * @param  array   $context
 	 * @return void
 	 */
-	protected function fireLogEvent($level, $message, array $context = array())
+	protected function fireLogEvent($level, $message, array $context = [])
 	{
 		// If the event dispatcher is set, we will pass along the parameters to the
 		// log listeners. These are useful for building profilers or other tools
@@ -255,7 +255,7 @@ class Writer {
 	{
 		$level = head(func_get_args());
 
-		return call_user_func_array(array($this, $level), array_slice(func_get_args(), 1));
+		return call_user_func_array([$this, $level], array_slice(func_get_args(), 1));
 	}
 
 	/**
@@ -273,7 +273,7 @@ class Writer {
 		{
 			$this->formatParameters($parameters);
 
-			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
+			call_user_func_array([$this, 'fireLogEvent'], array_merge([$method], $parameters));
 
 			$method = 'add'.ucfirst($method);
 

@@ -10,7 +10,7 @@ class MigrationPublisher {
 	 *
 	 * @var array
 	 */
-	protected $existing = array();
+	protected $existing = [];
 
 	/**
 	 * Create a new migration publisher instance.
@@ -34,7 +34,7 @@ class MigrationPublisher {
 	{
 		$add = 0;
 
-		$published = array();
+		$published = [];
 
 		foreach ($this->getFreshMigrations($source, $destination) as $file)
 		{
