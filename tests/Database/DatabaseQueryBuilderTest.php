@@ -465,6 +465,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select "email" as "foo_email" from "users" having "foo_email" > ?', $builder->toSql());
 	}
 
+
 	public function testRawHavings()
 	{
 		$builder = $this->getBuilder();
