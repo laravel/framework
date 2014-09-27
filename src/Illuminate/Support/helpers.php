@@ -776,6 +776,20 @@ if ( ! function_exists('storage_path'))
 	}
 }
 
+if ( ! function_exists('str_ascii'))
+{
+	/**
+	 * Transliterate a UTF-8 value to ASCII.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	function str_ascii($value)
+	{
+		return Str::ascii($value);
+	}
+}
+
 if ( ! function_exists('str_contains'))
 {
 	/**
