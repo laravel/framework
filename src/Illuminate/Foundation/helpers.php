@@ -472,9 +472,7 @@ if ( ! function_exists('view'))
 		{
 			return $factory;
 		}
-		else
-		{
-			return $factory->make($view, $data, $mergeData);
-		}
+
+		return $factory->make($view, $data, $mergeData);
 	}
 }
