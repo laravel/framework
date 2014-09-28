@@ -2,9 +2,9 @@
 
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
-use Illuminate\Foundation\AssetPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Foundation\Publishing\AssetPublisher;
 
 class AssetPublishCommand extends Command {
 
@@ -13,7 +13,7 @@ class AssetPublishCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'asset:publish';
+	protected $name = 'publish:assets';
 
 	/**
 	 * The console command description.
@@ -25,14 +25,14 @@ class AssetPublishCommand extends Command {
 	/**
 	 * The asset publisher instance.
 	 *
-	 * @var \Illuminate\Foundation\AssetPublisher
+	 * @var \Illuminate\Foundation\Publishing\AssetPublisher
 	 */
 	protected $assets;
 
 	/**
 	 * Create a new asset publish command instance.
 	 *
-	 * @param  \Illuminate\Foundation\AssetPublisher  $assets
+	 * @param  \Illuminate\Foundation\Publishing\AssetPublisher  $assets
 	 * @return void
 	 */
 	public function __construct(AssetPublisher $assets)

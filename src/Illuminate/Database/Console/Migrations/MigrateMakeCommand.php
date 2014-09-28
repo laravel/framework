@@ -11,7 +11,7 @@ class MigrateMakeCommand extends BaseCommand {
 	 *
 	 * @var string
 	 */
-	protected $name = 'migrate:make';
+	protected $name = 'make:migration';
 
 	/**
 	 * The console command description.

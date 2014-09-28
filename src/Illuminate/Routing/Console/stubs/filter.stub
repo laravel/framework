@@ -1,0 +1,20 @@
+<?php namespace {{namespace}};
+
+use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+
+class {{class}} {
+
+	/**
+	 * Run the request filter.
+	 *
+	 * @param  Route  $route
+	 * @param  Request  $request
+	 * @return mixed
+	 */
+	public function filter(Route $route, Request $request)
+	{
+		//
+	}
+
+}

@@ -1,12 +1,13 @@
 <?php namespace Illuminate\View;
 
 use Closure;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\View\Factory as FactoryContract;
 
-class Factory {
+class Factory implements FactoryContract {
 
 	/**
 	 * The engine implementation.
@@ -25,7 +26,7 @@ class Factory {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -97,7 +98,7 @@ class Factory {
 	 *
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
 	 * @param  \Illuminate\View\ViewFinderInterface  $finder
-	 * @param  \Illuminate\Events\Dispatcher  $events
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
@@ -107,6 +108,27 @@ class Factory {
 		$this->engines = $engines;
 
 		$this->share('__env', $this);
+	}
+
+	/**
+	 * Normalize a view name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return string
+	 */
+	protected function normalizeName($name)
+	{
+		$delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+
+		if (strpos($name, $delimiter) === false)
+		{
+			return str_replace('/', '.', $name);
+		}
+
+		list($namespace, $name) = explode($delimiter, $name);
+
+		return $namespace . $delimiter . str_replace('/', '.', $name);
 	}
 
 	/**
@@ -120,6 +142,8 @@ class Factory {
 	public function make($view, $data = array(), $mergeData = array())
 	{
 		if (isset($this->aliases[$view])) $view = $this->aliases[$view];
+
+		$view = $this->normalizeName($view);
 
 		$path = $this->finder->find($view);
 
@@ -362,6 +386,8 @@ class Factory {
 	 */
 	protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
 	{
+		$view = $this->normalizeName($view);
+
 		if ($callback instanceof Closure)
 		{
 			$this->addEventListener($prefix.$view, $callback, $priority);
@@ -758,7 +784,7 @@ class Factory {
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public function getDispatcher()
 	{
@@ -768,7 +794,7 @@ class Factory {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)

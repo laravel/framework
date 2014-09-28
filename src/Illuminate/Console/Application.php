@@ -60,13 +60,6 @@ class Application extends \Symfony\Component\Console\Application {
 	 */
 	public function boot()
 	{
-		$path = $this->laravel['path'].'/start/artisan.php';
-
-		if (file_exists($path))
-		{
-			require $path;
-		}
-
 		// If the event dispatcher is set on the application, we will fire an event
 		// with the Artisan instance to provide each listener the opportunity to
 		// register their commands on this application before it gets started.

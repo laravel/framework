@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Queue;
 
 use Closure;
+use Illuminate\Contracts\Queue\Factory as FactoryContract;
 
-class QueueManager {
+class QueueManager implements FactoryContract {
 
 	/**
 	 * The application instance.

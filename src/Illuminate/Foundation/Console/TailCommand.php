@@ -119,10 +119,27 @@ class TailCommand extends Command {
 
 		if (is_null($connection))
 		{
-			return storage_path('/logs/laravel.log');
+			return $this->getLocalPath();
+		}
+		else
+		{
+			return $this->getRoot($connection).'/app/storage/logs/laravel.log';
+		}
+	}
+
+	/**
+	 * Search locally for daily log files, otherwise return a global log file.
+	 *
+	 * @return string
+	 */
+	protected function getLocalPath()
+	{
+		if ($dailyLogs = $this->laravel['files']->glob(base_path().'/app/storage/logs/log-*.txt'))
+		{
+			return last($dailyLogs);
 		}
 
-		return $this->getRoot($connection).str_replace(base_path(), '', storage_path()).'/logs/laravel.log';
+		return base_path().'/app/storage/logs/laravel.log';
 	}
 
 	/**

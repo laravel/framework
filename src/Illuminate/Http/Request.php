@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Http;
 
+use Closure;
 use SplFileInfo;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -595,6 +596,39 @@ class Request extends SymfonyRequest {
 		}
 
 		return $this->getSession();
+	}
+
+	/**
+	 * Get the user making the request.
+	 *
+	 * @return mixed
+	 */
+	public function user()
+	{
+		return call_user_func($this->getUserResolver());
+	}
+
+	/**
+	 * Get the user resolver callback.
+	 *
+	 * @return \Closure
+	 */
+	public function getUserResolver()
+	{
+		return $this->userResolver ?: function() {};
+	}
+
+	/**
+	 * Set the user resolver callback.
+	 *
+	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function setUserResolver(Closure $callback)
+	{
+		$this->userResolver = $callback;
+
+		return $this;
 	}
 
 }
