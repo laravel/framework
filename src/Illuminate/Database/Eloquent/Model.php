@@ -2567,9 +2567,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the value is already a DateTime instance, we will just skip the rest of
 		// these checks since they will be a waste of time, and hinder performance
 		// when checking the field. We will just return the DateTime right away.
+		// However, we must ensure the incoming DateTime is in the same timezone
+		// as the application before it is later converted to a string (losing timezone
+		// information) or the represented time will be silently shifted.
 		if ($value instanceof DateTime)
 		{
-			//
+			$value = Carbon::instance($value)->setTimezone(date_default_timezone_get());
 		}
 
 		// If the value is totally numeric, we will assume it is a UNIX timestamp and

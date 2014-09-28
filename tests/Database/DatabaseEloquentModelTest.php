@@ -335,6 +335,37 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTimestampsCreatedFromObjectsHandleTimezone()
+	{
+		$model = new EloquentDateModelStub;
+		$inputDate = Carbon\Carbon::parse('2000-01-01 12:00:00 PST');
+		$model->created_at = $inputDate;
+		$outputDate = $model->created_at;
+		$this->assertSame('2000-01-01T12:00:00-08:00', $inputDate->toW3cString());
+		$this->assertSame('2000-01-01T20:00:00+00:00', $outputDate->toW3cString());
+		$this->assertInstanceOf('Carbon\Carbon', $outputDate);
+		$this->assertSame($inputDate->getTimestamp(), $outputDate->getTimestamp());
+	}
+
+
+	public function testTimestampsCreatedFromObjectsHandleTimezoneWithoutUTC()
+	{
+		$previousTimezone = date_default_timezone_get();
+		date_default_timezone_set('Europe/Berlin');
+
+		$model = new EloquentDateModelStub;
+		$inputDate = Carbon\Carbon::parse('2000-01-01 12:00:00 PST');
+		$model->created_at = $inputDate;
+		$outputDate = $model->created_at;
+		$this->assertSame('2000-01-01T12:00:00-08:00', $inputDate->toW3cString());
+		$this->assertSame('2000-01-01T21:00:00+01:00', $outputDate->toW3cString());
+		$this->assertInstanceOf('Carbon\Carbon', $outputDate);
+		$this->assertSame($inputDate->getTimestamp(), $outputDate->getTimestamp());
+
+		date_default_timezone_set($previousTimezone);
+	}
+
+
 	public function testInsertProcess()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
