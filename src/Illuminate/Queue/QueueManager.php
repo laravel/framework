@@ -78,7 +78,7 @@ class QueueManager implements FactoryContract {
 	 * Resolve a queue connection instance.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Queue\QueueInterface
+	 * @return \Illuminate\Contracts\Queue\Queue
 	 */
 	public function connection($name = null)
 	{
@@ -103,7 +103,7 @@ class QueueManager implements FactoryContract {
 	 * Resolve a queue connection.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Queue\QueueInterface
+	 * @return \Illuminate\Contracts\Queue\Queue
 	 */
 	protected function resolve($name)
 	{
