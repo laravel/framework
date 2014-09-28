@@ -8,14 +8,14 @@ class ValidationException extends RuntimeException {
 	/**
 	 * The message provider implementation.
 	 *
-	 * @var MessageProvider
+	 * @var \Illuminate\Contracts\Support\MessageProvider
 	 */
 	protected $provider;
 
 	/**
 	 * Create a new validation exception instance.
 	 *
-	 * @param  MessageProvider  $provider
+	 * @param  \Illuminate\Contracts\Support\MessageProvider  $provider
 	 * @return void
 	 */
 	public function __construct(MessageProvider $provider)
@@ -26,7 +26,7 @@ class ValidationException extends RuntimeException {
 	/**
 	 * Get the validation error message provider.
 	 *
-	 * @return MessagesProvider
+	 * @return \Illuminate\Contracts\Support\MessageProvider
 	 */
 	public function errors()
 	{
@@ -36,7 +36,7 @@ class ValidationException extends RuntimeException {
 	/**
 	 * Get the validation error message provider.
 	 *
-	 * @return MessagesProvider
+	 * @return \Illuminate\Contracts\Support\MessageProvider
 	 */
 	public function getMessageProvider()
 	{
