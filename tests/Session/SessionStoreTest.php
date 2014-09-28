@@ -294,7 +294,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		return array(
 			$this->getSessionName(),
 			m::mock('SessionHandlerInterface'),
-			$this->getSessionId()
+			$this->getSessionId(),
 		);
 	}
 

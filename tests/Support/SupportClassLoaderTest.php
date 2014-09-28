@@ -1,6 +1,5 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Support\ClassLoader;
 
 class SupportClassLoaderTest extends PHPUnit_Framework_TestCase {

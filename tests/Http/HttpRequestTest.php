@@ -58,7 +58,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 			array('', 1, 'default'),
 			array('foo/bar//baz', '1', 'foo'),
 			array('foo/bar//baz', '2', 'bar'),
-			array('foo/bar//baz', '3', 'baz')
+			array('foo/bar//baz', '3', 'baz'),
 		);
 	}
 
@@ -81,7 +81,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 			array('', array()),
 			array('foo/bar', array('foo', 'bar')),
 			array('foo/bar//baz', array('foo', 'bar', 'baz')),
-			array('foo/0/bar', array('foo', '0', 'bar'))
+			array('foo/0/bar', array('foo', '0', 'bar')),
 		);
 	}
 
