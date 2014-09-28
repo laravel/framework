@@ -675,6 +675,19 @@ class Route {
 	}
 
 	/**
+	 * Add a name to the route.
+	 *
+	 * @param  string  $name
+	 * @return $this
+	 */
+	public function name($name)
+	{
+		$this->action['as'] = $name;
+
+		return $this;
+	}
+
+	/**
 	 * Add a prefix to the route URI.
 	 *
 	 * @param  string  $prefix
