@@ -1,23 +1,27 @@
 <?php namespace Illuminate\Filesystem;
 
-use Aws\S3\S3Client;
-use OpenCloud\Rackspace;
 use Illuminate\Support\Manager;
-use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
-use League\Flysystem\Adapter\AwsS3 as S3Adapter;
-use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\Adapter\Rackspace as RackspaceAdapter;
+use League\Flysystem\AdapterInterface as Adapter;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
+use Illuminate\Filesystem\Adapters\ConnectionFactory as Factory;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
 class FilesystemManager implements FactoryContract {
 
 	/**
 	 * The application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $app;
+
+	/**
+	 * The factory instance.
+	 *
+	 * @var \Illuminate\Filesystem\Adapters\ConnectionFactory
+	 */
+	protected $factory;
 
 	/**
 	 * The array of resolved filesystem drivers.
@@ -29,12 +33,14 @@ class FilesystemManager implements FactoryContract {
 	/**
 	 * Create a new filesystem manager instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
+	 * @param  \Illuminate\Filesystem\Adapters\ConnectionFactory  $factory
 	 * @return void
 	 */
-	public function __construct($app)
+	public function __construct(ApplicationContract $app, Factory $factory)
 	{
 		$this->app = $app;
+		$this->factory = $factory;
 	}
 
 	/**
@@ -71,77 +77,18 @@ class FilesystemManager implements FactoryContract {
 	{
 		$config = $this->getConfig($name);
 
-		return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
-	}
-
-	/**
-	 * Create an instance of the local driver.
-	 *
-	 * @param  array  $config
-	 * @return \Illuminate\Contracts\Filesystem\Filesystem
-	 */
-	public function createLocalDriver(array $config)
-	{
-		return $this->adapt(new Flysystem(new LocalAdapter($config['root'])));
-	}
-
-	/**
-	 * Create an instance of the Amazon S3 driver.
-	 *
-	 * @param  array  $config
-	 * @return \Illuminate\Contracts\Filesystem\Cloud
-	 */
-	public function createS3Driver(array $config)
-	{
-		$client = S3Client::factory([
-			'key' => $config['key'], 'secret' => $config['secret'],
-		]);
-
-		return $this->adapt(
-			new Flysystem(new S3Adapter($client, $config['bucket']))
-		);
-	}
-
-	/**
-	 * Create an instance of the Rackspace driver.
-	 *
-	 * @param  array  $config
-	 * @return \Illuminate\Contracts\Filesystem\Cloud
-	 */
-	public function createRackspaceDriver(array $config)
-	{
-		$client = new Rackspace($config['endpoint'], [
-			'username' => $config['username'], 'apiKey' => $config['key'],
-		]);
-
-		return $this->adapt(new Flysystem(
-			new RackspaceAdapter($this->getRackspaceContainer($client, $config))
-		));
-	}
-
-	/**
-	 * Get the Rackspace Cloud Files container.
-	 *
-	 * @param  Rackspace  $client
-	 * @param  array  $config
-	 * @return \OpenCloud\ObjectStore\Resource\Container
-	 */
-	protected function getRackspaceContainer(Rackspace $client, array $config)
-	{
-		$store = $client->objectStoreService('cloudFiles', $config['region']);
-
-		return $store->getContainer($config['container']);
+		return $this->adapt($this->factory->make($config));
 	}
 
 	/**
 	 * Adapt the filesystem implementation.
 	 *
-	 * @param  \League\Flysystem\FilesystemInterface  $filesystem
+	 * @param  \League\Flysystem\AdapterInterface  $adapter
 	 * @return \Illuminate\Contracts\Filesystem\Filesystem
 	 */
-	protected function adapt(FilesystemInterface $filesystem)
+	protected function adapt(Adapter $adapter)
 	{
-		return new FilesystemAdapter($filesystem);
+		return new FilesystemAdapter(new Flysystem($adapter));
 	}
 
 	/**

@@ -282,7 +282,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 			return $value['path'];
 		});
 
-        return $contents->values()->all();
+		return $contents->values()->all();
 	}
 
 	/**
