@@ -178,7 +178,7 @@ abstract class Queue {
 	/**
 	 * Set the encrypter instance.
 	 *
-	 * @param  \Illuminate\Contracts\Encryption\EncrypterContract  $crypt
+	 * @param  \Illuminate\Contracts\Encryption\Encrypter  $crypt
 	 * @return void
 	 */
 	public function setEncrypter(EncrypterContract $crypt)
