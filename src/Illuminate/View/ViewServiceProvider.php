@@ -166,7 +166,7 @@ class ViewServiceProvider extends ServiceProvider {
 	/**
 	 * Determine if the application session has errors.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return bool
 	 */
 	public function sessionHasErrors($app)

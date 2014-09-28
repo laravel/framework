@@ -18,14 +18,14 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * The Laravel application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $laravel;
 
 	/**
 	 * Create and boot a new Console application.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return \Illuminate\Console\Application
 	 */
 	public static function start($app)
@@ -36,7 +36,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Create a new Console application.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return \Illuminate\Console\Application
 	 */
 	public static function make($app)
@@ -210,7 +210,7 @@ class Application extends \Symfony\Component\Console\Application {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $laravel
+	 * @param  \Illuminate\Contracts\Foundation\Application  $laravel
 	 * @return $this
 	 */
 	public function setLaravel($laravel)

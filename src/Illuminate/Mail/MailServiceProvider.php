@@ -57,7 +57,7 @@ class MailServiceProvider extends ServiceProvider {
 	 * Set a few dependencies on the mailer instance.
 	 *
 	 * @param  \Illuminate\Mail\Mailer  $mailer
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return void
 	 */
 	protected function setMailerDependencies($mailer, $app)

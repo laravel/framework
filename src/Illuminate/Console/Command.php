@@ -14,7 +14,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * The Laravel application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $laravel;
 
@@ -363,7 +363,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Get the Laravel application instance.
 	 *
-	 * @return \Illuminate\Foundation\Application
+	 * @return \Illuminate\Contracts\Foundation\Application
 	 */
 	public function getLaravel()
 	{
@@ -373,7 +373,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $laravel
+	 * @param  \Illuminate\Contracts\Foundation\Application  $laravel
 	 * @return void
 	 */
 	public function setLaravel($laravel)

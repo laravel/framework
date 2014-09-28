@@ -41,7 +41,7 @@ class ProviderRepository {
 	/**
 	 * Register the application service providers.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @param  array  $providers
 	 * @return void
 	 */
@@ -87,7 +87,7 @@ class ProviderRepository {
 	/**
 	 * Register the load events for the given provider.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @param  string  $provider
 	 * @param  array  $events
 	 * @return void
@@ -105,7 +105,7 @@ class ProviderRepository {
 	/**
 	 * Compile the application manifest file.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @param  array  $providers
 	 * @return array
 	 */
@@ -148,7 +148,7 @@ class ProviderRepository {
 	/**
 	 * Create a new provider instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @param  string  $provider
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
