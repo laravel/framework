@@ -148,7 +148,7 @@ class Manager {
 	/**
 	 * Get the queue manager instance.
 	 *
-	 * @return \Illuminate\Queue\Manager
+	 * @return \Illuminate\Queue\QueueManager
 	 */
 	public function getQueueManager()
 	{
