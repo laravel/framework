@@ -910,7 +910,7 @@ if ( ! function_exists('str_except'))
 	 *
 	 * @param  string  $value
 	 * @param  array   $except
-	 * @param  boolean $trim
+	 * @param  bool    $trim
 	 * @return string
 	 */
 	function str_except($value, $except, $trim = false)

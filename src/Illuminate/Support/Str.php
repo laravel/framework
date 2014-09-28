@@ -325,7 +325,7 @@ class Str {
 	 *
 	 * @param  string  $value
 	 * @param  array   $except
-	 * @param  boolean $trim
+	 * @param  bool    $trim
 	 * @return string
 	 */
 	public static function except($value, $except, $trim = false)
