@@ -332,7 +332,7 @@ class Str {
 	{
 		$except = implode('|', $except);
 		$value = preg_replace('#' . $except . '#', '', $value);
-		return ( $trim === false ) ? $value : trim($value);
+		return ($trim === false) ? $value : trim($value);
 	}
 
 }
