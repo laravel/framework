@@ -145,7 +145,7 @@ class Route {
 	 * Dispatch the request to the route to a controller class.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Routing\ControllerDispatacher  $controllerDispatcher
+	 * @param  \Illuminate\Routing\ControllerDispatcher  $controllerDispatcher
 	 * @return mixed
 	 */
 	protected function dispatchToController(Request $request, ControllerDispatcher $controllerDispatcher)
