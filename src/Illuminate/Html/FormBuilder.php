@@ -387,7 +387,7 @@ class FormBuilder {
 
 		return array_merge($options, array('cols' => $segments[0], 'rows' => $segments[1]));
 	}
-	
+
 	/**
 	 * Create a number input field.
 	 *
