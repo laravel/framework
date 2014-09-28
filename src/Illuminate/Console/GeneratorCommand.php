@@ -5,19 +5,14 @@ use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command {
 
+	use AppNamespaceDetectorTrait;
+
 	/**
 	 * The filesystem instance.
 	 *
 	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
-
-	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = '';
 
 	/**
 	 * The type of class being generated.
@@ -73,9 +68,9 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function getPath($name)
 	{
-		$name = str_replace('\\', '/', $name);
+		$name = str_replace($this->getAppNamespace(), '', $name);
 
-		return $this->laravel['path.'.$this->configKey].'/'.$name.'.php';
+		return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
 	}
 
 	/**
@@ -115,44 +110,19 @@ abstract class GeneratorCommand extends Command {
 	protected function replaceNamespace(&$stub, $name)
 	{
 		$stub = str_replace(
-			'{{namespace}}', $this->getNamespaceWithSuffix($this->configKey, $name), $stub
+			'{{namespace}}', $this->getNamespace($name), $stub
 		);
 
 		return $this;
 	}
 
 	/**
-	 * Get the fully qualified class name.
+	 * Get the full namespace name for a given class.
 	 *
 	 * @param  string  $name
 	 * @return string
 	 */
-	protected function getFullClassName($name)
-	{
-		return trim($this->laravel['config']['namespaces.'.$this->configKey], '\\').'\\'.$name;
-	}
-
-	/**
-	 * Get the full namespace name by type and suffix.
-	 *
-	 * @param  string  $type
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function getNamespaceWithSuffix($type, $name)
-	{
-		$suffix = $this->getNamespaceSuffix($name);
-
-		return trim($this->laravel['config']['namespaces.'.$type].$suffix, '\\');
-	}
-
-	/**
-	 * Get the namespace suffix to be added to the root namespace.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function getNamespaceSuffix($name)
+	protected function getNamespace($name)
 	{
 		return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
 	}
@@ -166,9 +136,9 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function replaceClass($stub, $name)
 	{
-		$name = str_replace($this->getNamespaceSuffix($name).'\\', '', $name);
+		$class = str_replace($this->getNamespace($name).'\\', '', $name);
 
-		return str_replace('{{class}}', $name, $stub);
+		return str_replace('{{class}}', $class, $stub);
 	}
 
 	/**

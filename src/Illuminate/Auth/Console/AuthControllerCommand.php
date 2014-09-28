@@ -27,13 +27,6 @@ class AuthControllerCommand extends GeneratorCommand {
 	protected $type = 'Controller';
 
 	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = 'controllers';
-
-	/**
 	 * Execute the console command.
 	 *
 	 * @return void
@@ -57,7 +50,7 @@ class AuthControllerCommand extends GeneratorCommand {
 		$stub = parent::replaceClass($stub, $name);
 
 		return str_replace(
-			'{{request.namespace}}', $this->laravel['config']['namespaces.requests'], $stub
+			'{{request.namespace}}', $this->getAppNamespace().'Http\Requests\\', $stub
 		);
 	}
 
@@ -78,8 +71,10 @@ class AuthControllerCommand extends GeneratorCommand {
 	 */
 	protected function getArguments()
 	{
+		$default = $this->getAppNamespace().'Http\Controllers\Auth\AuthController';
+
 		return array(
-			array('name', InputArgument::OPTIONAL, 'The name of the class', 'Auth\AuthController'),
+			array('name', InputArgument::OPTIONAL, 'The name of the class', $default),
 		);
 	}
 

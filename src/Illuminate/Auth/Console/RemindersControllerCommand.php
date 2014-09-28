@@ -27,13 +27,6 @@ class RemindersControllerCommand extends GeneratorCommand {
 	protected $type = 'Controller';
 
 	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = 'controllers';
-
-	/**
 	 * Execute the console command.
 	 *
 	 * @return void
@@ -62,8 +55,10 @@ class RemindersControllerCommand extends GeneratorCommand {
 	 */
 	protected function getArguments()
 	{
+		$default = $this->getAppNamespace().'Http\Controllers\Auth\RemindersController';
+
 		return array(
-			array('name', InputArgument::OPTIONAL, 'The name of the class', 'Auth\RemindersController'),
+			array('name', InputArgument::OPTIONAL, 'The name of the class', $default),
 		);
 	}
 

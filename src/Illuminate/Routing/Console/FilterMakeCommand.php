@@ -29,13 +29,6 @@ class FilterMakeCommand extends GeneratorCommand {
 	protected $type = 'Filter';
 
 	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = 'filters';
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
+use Illuminate\Console\AppNamespaceDetectorTrait;
 use Illuminate\Foundation\Console\ChangesCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
@@ -20,6 +21,8 @@ use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 
 class ArtisanServiceProvider extends ServiceProvider {
+
+	use AppNamespaceDetectorTrait;
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -84,7 +87,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('command.app.name', function($app)
 		{
-			return new AppNameCommand($app['composer'], $app['files']);
+			return new AppNameCommand($app['composer'], $app['files'], $this->getAppNamespace());
 		});
 	}
 
