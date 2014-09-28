@@ -73,9 +73,19 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		else
 		{
 			return $factory->make(
-				$this->all(), $this->container->call([$this, 'rules']), $this->messages()
+				$this->formatInput(), $this->container->call([$this, 'rules']), $this->messages()
 			);
 		}
+	}
+
+	/**
+	 * Get the input that should be fed to the validator.
+	 *
+	 * @return array
+	 */
+	protected function formatInput()
+	{
+		return $this->all();
 	}
 
 	/**
