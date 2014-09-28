@@ -65,6 +65,13 @@ class Guard {
 	protected $events;
 
 	/**
+	 * Indicates if the session is secure.
+	 *
+	 * @var bool
+	 */
+	protected $sessionSecure;
+
+	/**
 	 * Indicates if the logout method has been called.
 	 *
 	 * @var bool
@@ -88,11 +95,13 @@ class Guard {
 	 */
 	public function __construct(UserProviderInterface $provider,
 								SessionStore $session,
-								Request $request = null)
+								Request $request = null,
+								$sessionSecure = false)
 	{
 		$this->session = $session;
 		$this->request = $request;
 		$this->provider = $provider;
+		$this->sessionSecure = $sessionSecure;
 	}
 
 	/**
@@ -498,7 +507,7 @@ class Guard {
 	 */
 	protected function createRecaller($value)
 	{
-		return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+		return $this->getCookieJar()->forever($this->getRecallerName(), $value, null, null, $this->sessionSecure);
 	}
 
 	/**

@@ -36,7 +36,7 @@ class AuthManager extends Manager {
 
 		if ($custom instanceof Guard) return $custom;
 
-		return new Guard($custom, $this->app['session.store']);
+		return new Guard($custom, $this->app['session.store'], null, $this->app['config']['session.secure']);
 	}
 
 	/**
@@ -48,7 +48,7 @@ class AuthManager extends Manager {
 	{
 		$provider = $this->createDatabaseProvider();
 
-		return new Guard($provider, $this->app['session.store']);
+		return new Guard($provider, $this->app['session.store'], null, $this->app['config']['session.secure']);
 	}
 
 	/**
@@ -77,7 +77,7 @@ class AuthManager extends Manager {
 	{
 		$provider = $this->createEloquentProvider();
 
-		return new Guard($provider, $this->app['session.store']);
+		return new Guard($provider, $this->app['session.store'], null, $this->app['config']['session.secure']);
 	}
 
 	/**
