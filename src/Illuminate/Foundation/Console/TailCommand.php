@@ -121,10 +121,8 @@ class TailCommand extends Command {
 		{
 			return $this->getLocalPath();
 		}
-		else
-		{
-			return $this->getRoot($connection).'/app/storage/logs/laravel.log';
-		}
+
+		return $this->getRoot($connection).'/app/storage/logs/laravel.log';
 	}
 
 	/**
