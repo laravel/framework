@@ -7,7 +7,7 @@ class Artisan {
 	/**
 	 * The application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $app;
 
@@ -21,7 +21,7 @@ class Artisan {
 	/**
 	 * Create a new Artisan command runner instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct(Application $app)
