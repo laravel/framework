@@ -7,7 +7,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	public function testGetRetrievesFiles()
 	{
 		file_put_contents(__DIR__.'/file.txt', 'Hello World');
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$this->assertEquals('Hello World', $files->get(__DIR__.'/file.txt'));
 		@unlink(__DIR__.'/file.txt');
 	}
@@ -15,7 +15,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 
 	public function testPutStoresFiles()
 	{
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$files->put(__DIR__.'/file.txt', 'Hello World');
 		$this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
 		@unlink(__DIR__.'/file.txt');
@@ -25,7 +25,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	public function testDeleteRemovesFiles()
 	{
 		file_put_contents(__DIR__.'/file.txt', 'Hello World');
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$files->delete(__DIR__.'/file.txt');
 		$this->assertFalse(file_exists(__DIR__.'/file.txt'));
 		@unlink(__DIR__.'/file.txt');
@@ -34,7 +34,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 
 	public function testPrependExistingFiles()
 	{
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$files->put(__DIR__.'/file.txt', 'World');
 		$files->prepend(__DIR__.'/file.txt', 'Hello ');
 		$this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
@@ -44,7 +44,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 
 	public function testPrependNewFiles()
 	{
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$files->prepend(__DIR__.'/file.txt', 'Hello World');
 		$this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
 		@unlink(__DIR__.'/file.txt');
@@ -55,7 +55,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		mkdir(__DIR__.'/foo');
 		file_put_contents(__DIR__.'/foo/file.txt', 'Hello World');
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$files->deleteDirectory(__DIR__.'/foo');
 		$this->assertFalse(is_dir(__DIR__.'/foo'));
 		$this->assertFalse(file_exists(__DIR__.'/foo/file.txt'));
@@ -66,7 +66,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		mkdir(__DIR__.'/foo');
 		file_put_contents(__DIR__.'/foo/file.txt', 'Hello World');
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$files->cleanDirectory(__DIR__.'/foo');
 		$this->assertTrue(is_dir(__DIR__.'/foo'));
 		$this->assertFalse(file_exists(__DIR__.'/foo/file.txt'));
@@ -80,8 +80,8 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		file_put_contents(__DIR__.'/foo/1.txt', '1');
 		file_put_contents(__DIR__.'/foo/2.txt', '2');
 		mkdir(__DIR__.'/foo/bar');
-		$files = new Filesystem;
-		$this->assertEquals(array(__DIR__.'/foo/1.txt', __DIR__.'/foo/2.txt'), $files->files(__DIR__.'/foo'));
+		$files = new Filesystem();
+		$this->assertEquals([__DIR__.'/foo/1.txt', __DIR__.'/foo/2.txt'], $files->files(__DIR__.'/foo'));
 		unset($files);
 		@unlink(__DIR__.'/foo/1.txt');
 		@unlink(__DIR__.'/foo/2.txt');
@@ -92,7 +92,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 
 	public function testCopyDirectoryReturnsFalseIfSourceIsntDirectory()
 	{
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$this->assertFalse($files->copyDirectory(__DIR__.'/foo/bar/baz/breeze/boom', __DIR__));
 	}
 
@@ -105,7 +105,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		mkdir(__DIR__.'/tmp/nested', 0777, true);
 		file_put_contents(__DIR__.'/tmp/nested/baz.txt', '');
 
-		$files = new Filesystem;
+		$files = new Filesystem();
 		$files->copyDirectory(__DIR__.'/tmp', __DIR__.'/tmp2');
 		$this->assertTrue(is_dir(__DIR__.'/tmp2'));
 		$this->assertTrue(file_exists(__DIR__.'/tmp2/foo.txt'));

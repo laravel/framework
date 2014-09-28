@@ -12,7 +12,11 @@
         "illuminate/contracts": "5.0.*",
         "illuminate/support": "5.0.*",
         "symfony/finder": "2.6.*",
-        "league/flysystem": "~0.5"
+        "league/flysystem": "~0.5.6"
+    },
+    "require-dev": {
+        "aws/aws-sdk-php": "~2.6",
+        "rackspace/php-opencloud": "~1.8"
     },
     "autoload": {
         "psr-4": {
