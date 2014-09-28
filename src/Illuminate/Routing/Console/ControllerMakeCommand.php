@@ -28,13 +28,6 @@ class ControllerMakeCommand extends GeneratorCommand {
 	protected $type = 'Controller';
 
 	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = 'controllers';
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string

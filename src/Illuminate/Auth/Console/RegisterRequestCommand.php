@@ -26,13 +26,6 @@ class RegisterRequestCommand extends GeneratorCommand {
 	protected $type = 'Request';
 
 	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = 'requests';
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string
@@ -49,7 +42,7 @@ class RegisterRequestCommand extends GeneratorCommand {
 	 */
 	protected function getNameInput()
 	{
-		return 'Auth\RegisterRequest';
+		return $this->getAppNamespace().'Http\Requests\Auth\RegisterRequest';
 	}
 
 	/**

@@ -37,13 +37,12 @@ class RouteServiceProvider extends ServiceProvider {
 	/**
 	 * Register the given Closure with the "group" function namespace set.
 	 *
+	 * @param  string  $namespace
 	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	protected function namespaced(Closure $callback)
+	protected function namespaced($namespace, Closure $callback)
 	{
-		$namespace = trim($this->app['config']['namespaces.controllers'], '\\');
-
 		if (empty($namespace))
 		{
 			$callback($this->app['router']);

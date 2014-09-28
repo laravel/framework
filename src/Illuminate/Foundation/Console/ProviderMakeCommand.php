@@ -28,13 +28,6 @@ class ProviderMakeCommand extends GeneratorCommand {
 	protected $type = 'Provider';
 
 	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = 'providers';
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string

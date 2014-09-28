@@ -29,13 +29,6 @@ class ConsoleMakeCommand extends GeneratorCommand {
 	protected $type = 'Console command';
 
 	/**
-	 * Set the configuration key for the namespace.
-	 *
-	 * @var string
-	 */
-	protected $configKey = 'console';
-
-	/**
 	 * Replace the class name for the given stub.
 	 *
 	 * @param  string  $stub

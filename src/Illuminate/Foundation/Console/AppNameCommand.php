@@ -37,17 +37,27 @@ class AppNameCommand extends Command {
 	protected $files;
 
 	/**
+	 * Current root application namespace.
+	 *
+	 * @var string
+	 */
+	protected $currentRoot;
+
+	/**
 	 * Create a new key generator command.
 	 *
+	 * @param  \Illuminate\Foundation\Composer  $composer
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  string  $currentRoot
 	 * @return void
 	 */
-	public function __construct(Composer $composer, Filesystem $files)
+	public function __construct(Composer $composer, Filesystem $files, $currentRoot)
 	{
 		parent::__construct();
 
 		$this->files = $files;
 		$this->composer = $composer;
+		$this->currentRoot = trim($currentRoot, '\\');
 	}
 
 	/**
@@ -96,11 +106,11 @@ class AppNameCommand extends Command {
 	protected function replaceNamespace($path)
 	{
 		$this->replaceIn(
-			$path, 'namespace '.$this->root().';', 'namespace '.$this->argument('name').';'
+			$path, 'namespace '.$this->currentRoot.';', 'namespace '.$this->argument('name').';'
 		);
 
 		$this->replaceIn(
-			$path, 'namespace '.$this->root().'\\', 'namespace '.$this->argument('name').'\\'
+			$path, 'namespace '.$this->currentRoot.'\\', 'namespace '.$this->argument('name').'\\'
 		);
 	}
 
@@ -114,6 +124,8 @@ class AppNameCommand extends Command {
 		$this->setReferencedFilterNamespaces();
 
 		$this->setReferencedConsoleNamespaces();
+
+		$this->setReferencedRouteNamespaces();
 	}
 
 	/**
@@ -125,7 +137,7 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/FilterServiceProvider.php',
-			$this->root().'\\Http\\Filters', $this->argument('name').'\\Http\\Filters'
+			$this->currentRoot.'\\Http\\Filters', $this->argument('name').'\\Http\\Filters'
 		);
 	}
 
@@ -138,7 +150,20 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/ArtisanServiceProvider.php',
-			$this->root().'\\Console', $this->argument('name').'\\Console'
+			$this->currentRoot.'\\Console', $this->argument('name').'\\Console'
+		);
+	}
+
+	/**
+	 * Set the namespace on the referenced commands in the Routes service provider.
+	 *
+	 * @return void
+	 */
+	protected function setReferencedRouteNamespaces()
+	{
+		$this->replaceIn(
+			$this->laravel['path'].'/Providers/RouteServiceProvider.php',
+			$this->currentRoot.'\\Http', $this->argument('name').'\\Http'
 		);
 	}
 
@@ -150,7 +175,7 @@ class AppNameCommand extends Command {
 	protected function setComposerNamespace()
 	{
 		$this->replaceIn(
-			$this->getComposerPath(), $this->root().'\\\\', $this->argument('name').'\\\\'
+			$this->getComposerPath(), $this->currentRoot.'\\\\', $this->argument('name').'\\\\'
 		);
 	}
 
@@ -164,8 +189,6 @@ class AppNameCommand extends Command {
 		$this->setAppConfigNamespaces();
 
 		$this->setAuthConfigNamespace();
-
-		$this->setNamespaceConfigNamespace();
 	}
 
 	/**
@@ -176,11 +199,11 @@ class AppNameCommand extends Command {
 	protected function setAppConfigNamespaces()
 	{
 		$this->replaceIn(
-			$this->getConfigPath('app'), $this->root().'\\Providers', $this->argument('name').'\\Providers'
+			$this->getConfigPath('app'), $this->currentRoot.'\\Providers', $this->argument('name').'\\Providers'
 		);
 
 		$this->replaceIn(
-			$this->getConfigPath('app'), $this->root().'\\Http\\Controllers\\', $this->argument('name').'\\Http\\Controllers\\'
+			$this->getConfigPath('app'), $this->currentRoot.'\\Http\\Controllers\\', $this->argument('name').'\\Http\\Controllers\\'
 		);
 	}
 
@@ -192,19 +215,7 @@ class AppNameCommand extends Command {
 	protected function setAuthConfigNamespace()
 	{
 		$this->replaceIn(
-			$this->getAuthConfigPath(), $this->root().'\\User', $this->argument('name').'\\User'
-		);
-	}
-
-	/**
-	 * Set the namespace configuration file namespaces.
-	 *
-	 * @return void
-	 */
-	protected function setNamespaceConfigNamespace()
-	{
-		$this->replaceIn(
-			$this->getNamespaceConfigPath(), $this->root().'\\', $this->argument('name').'\\'
+			$this->getAuthConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
 		);
 	}
 
@@ -219,16 +230,6 @@ class AppNameCommand extends Command {
 	protected function replaceIn($path, $search, $replace)
 	{
 		$this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
-	}
-
-	/**
-	 * Get the root namespace for the application.
-	 *
-	 * @return string
-	 */
-	protected function root()
-	{
-		return trim($this->laravel['config']['namespaces.root'], '\\');
 	}
 
 	/**
@@ -270,16 +271,6 @@ class AppNameCommand extends Command {
 	protected function getAuthConfigPath()
 	{
 		return $this->getConfigPath('auth');
-	}
-
-	/**
-	 * Get the path to the namespace configuration file.
-	 *
-	 * @return string
-	 */
-	protected function getNamespaceConfigPath()
-	{
-		return $this->getConfigPath('namespaces');
 	}
 
 	/**
