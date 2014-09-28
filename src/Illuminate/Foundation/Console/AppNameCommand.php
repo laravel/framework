@@ -112,6 +112,10 @@ class AppNameCommand extends Command {
 		$this->replaceIn(
 			$path, 'namespace '.$this->currentRoot.'\\', 'namespace '.$this->argument('name').'\\'
 		);
+
+		$this->replaceIn(
+			$path, $this->currentRoot.'\\', $this->argument('name').'\\'
+		);
 	}
 
 	/**
