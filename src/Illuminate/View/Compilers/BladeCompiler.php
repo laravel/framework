@@ -601,7 +601,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the push statements into valid PHP.
 	 *
-	 * @param $expression
+	 * @param  string  $expression
 	 * @return string
 	 */
 	protected function compilePush($expression)
@@ -612,7 +612,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the endpush statements into valid PHP.
 	 *
-	 * @param $expression
+	 * @param  string  $expression
 	 * @return string
 	 */
 	protected function compileEndpush($expression)
