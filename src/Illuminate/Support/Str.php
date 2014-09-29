@@ -329,9 +329,9 @@ class Str {
 	 * @return string
 	 */
 	public static function except($value, $except, $trim = false)
-	{		
+	{
 		$value = str_replace($except, '', $value);
-                
+
 		return ($trim === false) ? $value : trim($value);
 	}
 
