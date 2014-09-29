@@ -109,7 +109,7 @@ class GenericUser implements UserInterface {
 	 * Dynamically unset a value on the user.
 	 *
 	 * @param  string  $key
-	 * @return bool
+	 * @return void
 	 */
 	public function __unset($key)
 	{
