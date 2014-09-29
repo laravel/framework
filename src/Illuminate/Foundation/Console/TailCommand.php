@@ -122,7 +122,7 @@ class TailCommand extends Command {
 			return $this->getLocalPath();
 		}
 
-		return $this->getRoot($connection).'/app/storage/logs/laravel.log';
+		return $this->getRoot($connection).str_replace(base_path(), '', storage_path()).'/logs/laravel.log';
 	}
 
 	/**
@@ -132,12 +132,12 @@ class TailCommand extends Command {
 	 */
 	protected function getLocalPath()
 	{
-		if ($dailyLogs = $this->laravel['files']->glob(base_path().'/app/storage/logs/log-*.txt'))
+		if ($dailyLogs = $this->laravel['files']->glob(storage_path('logs/log-*.txt')))
 		{
 			return last($dailyLogs);
 		}
 
-		return base_path().'/app/storage/logs/laravel.log';
+		return storage_path('logs/laravel.log');
 	}
 
 	/**
