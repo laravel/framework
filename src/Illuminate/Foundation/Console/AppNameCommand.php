@@ -73,6 +73,8 @@ class AppNameCommand extends Command {
 
 		$this->setComposerNamespace();
 
+		$this->setPhpSpecNamespace();
+
 		$this->info('Application namespace set!');
 
 		$this->composer->dumpAutoloads();
@@ -224,6 +226,21 @@ class AppNameCommand extends Command {
 	}
 
 	/**
+	 * Set the PHPSpec configuration namespace.
+	 *
+	 * @return void
+	 */
+	protected function setPhpSpecNamespace()
+	{
+		$path = $this->getPhpSpecConfigPath();
+
+		// Only replace the namespace if the user hasn't removed the phpspec.yml file.
+		if ($this->files->has($path)) {
+			$this->replaceIn($path, $this->currentRoot, $this->argument('name'));
+		}
+	}
+
+	/**
 	 * Replace the given string in the given file.
 	 *
 	 * @param  string  $path
@@ -275,6 +292,16 @@ class AppNameCommand extends Command {
 	protected function getAuthConfigPath()
 	{
 		return $this->getConfigPath('auth');
+	}
+
+	/**
+	 * Get the path to the PHPSpec configuration file.
+	 *
+	 * @return string
+	 */
+	protected function getPhpSpecConfigPath()
+	{
+		return $this->laravel['path.base'].'/phpspec.yml';
 	}
 
 	/**
