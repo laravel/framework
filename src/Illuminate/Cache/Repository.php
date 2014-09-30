@@ -70,13 +70,13 @@ class Repository implements ArrayAccess {
 
 		if (is_null($value))
 		{
-			$this->events->fire('cache.missed', ['key' => $key]);
+			$this->events->fire('cache.missed', [$key]);
 
 			$value = value($default);
 		}
 		else
 		{
-			$this->events->fire('cache.hit', ['key' => $key, 'value' => $value]);
+			$this->events->fire('cache.hit', [$key, $value]);
 		}
 
 		return $value;
@@ -114,7 +114,7 @@ class Repository implements ArrayAccess {
 		{
 			$this->store->put($key, $value, $minutes);
 
-			$this->events->fire('cache.write', ['key' => $key, 'value' => $value, 'duration' => $minutes]);
+			$this->events->fire('cache.write', [$key, $value, $minutes]);
 		}
 	}
 
@@ -147,7 +147,7 @@ class Repository implements ArrayAccess {
 	{
 		$this->store->forever($key, $value);
 
-		$this->events->fire('cache.write', ['key' => $key, 'value' => $value, 'duration' => 0]);
+		$this->events->fire('cache.write', [$key, $value, 0]);
 	}
 
 	/**
@@ -160,7 +160,7 @@ class Repository implements ArrayAccess {
 	{
 		$this->store->forget($key);
 
-		$this->events->fire('cache.delete', ['key' => $key]);
+		$this->events->fire('cache.delete', [$key]);
 	}
 
 	/**
