@@ -111,7 +111,7 @@ class GenericUser implements UserContract {
 	 * Dynamically unset a value on the user.
 	 *
 	 * @param  string  $key
-	 * @return bool
+	 * @return void
 	 */
 	public function __unset($key)
 	{

@@ -1,15 +1,10 @@
 <?php
 
 use Mockery as m;
-
 use Aws\Sqs\SqsClient;
-use Aws\Common\Credentials\Credentials;
-use Aws\Common\Credentials\CredentialsInterface;
-use Aws\Common\Signature\SignatureInterface;
-use Aws\Common\Signature\SignatureV4;
-
 use Guzzle\Common\Collection;
-use Guzzle\Service\Resource\Model;
+use Aws\Common\Signature\SignatureV4;
+use Aws\Common\Credentials\Credentials;
 
 class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
@@ -51,6 +46,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+
 	public function tearDown()
 	{
 		m::close();
@@ -75,6 +71,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$job->getSqs()->expects($this->once())->method('deleteMessage')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle));
 		$job->delete();
 	}
+
 
 	protected function getJob()
 	{
