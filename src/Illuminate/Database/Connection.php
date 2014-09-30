@@ -98,7 +98,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @var bool
 	 */
-	protected $loggingQueries = true;
+	protected $loggingQueries = false;
 
 	/**
 	 * Indicates if the connection is in a "dry run".
@@ -156,6 +156,12 @@ class Connection implements ConnectionInterface {
 		$this->useDefaultQueryGrammar();
 
 		$this->useDefaultPostProcessor();
+
+		// Enable query log explicitly. Disabled query log makes sense for
+		// lon-playing background CLI scripts of for production environment.
+		if ($this->getConfig('log')) {
+			$this->enableQueryLog();
+		}
 	}
 
 	/**
