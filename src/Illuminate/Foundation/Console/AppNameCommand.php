@@ -4,9 +4,12 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Console\AppNamespaceDetectorTrait;
 use Symfony\Component\Console\Input\InputArgument;
 
 class AppNameCommand extends Command {
+
+	use AppNamespaceDetectorTrait;
 
 	/**
 	 * The console command name.
@@ -48,16 +51,14 @@ class AppNameCommand extends Command {
 	 *
 	 * @param  \Illuminate\Foundation\Composer  $composer
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string  $currentRoot
 	 * @return void
 	 */
-	public function __construct(Composer $composer, Filesystem $files, $currentRoot)
+	public function __construct(Composer $composer, Filesystem $files)
 	{
 		parent::__construct();
 
 		$this->files = $files;
 		$this->composer = $composer;
-		$this->currentRoot = trim($currentRoot, '\\');
 	}
 
 	/**
@@ -67,6 +68,8 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
+		$this->currentRoot = trim($this->getAppNamespace(), '\\');
+
 		$this->setAppDirectoryNamespace();
 
 		$this->setConfigNamespaces();
