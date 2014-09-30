@@ -87,7 +87,6 @@ class AppNameCommand extends Command {
 	{
 		$files = Finder::create()
                             ->in($this->laravel['path'])
-                            ->exclude($this->laravel['path'].'/Http/Views')
                             ->name('*.php');
 
 		foreach ($files as $file)
