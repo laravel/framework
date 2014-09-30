@@ -523,14 +523,25 @@ class Container implements ArrayAccess, ContainerContract {
 			return $this->callClass($callback, $parameters, $defaultMethod);
 		}
 
-		$dependencies = [];
+		$dependencies = $this->getMethodDependencies($callback,$parameters);
 
+		return call_user_func_array($callback, $dependencies);
+	}
+
+	/**
+	 * Get all dependencies for a given method
+	 * @param \Closure|array  $callback
+	 * @param array  $parameters
+	 * @return array
+	 */
+	protected function getMethodDependencies($callback,$parameters = array()) {
+		$dependencies = [];
 		foreach ($this->getCallReflector($callback)->getParameters() as $key => $parameter)
 		{
 			$dependencies[] = $this->getDependencyForCallParameter($parameter, $parameters);
 		}
 
-		return call_user_func_array($callback, $dependencies);
+		return array_merge($dependencies,$parameters);
 	}
 
 	/**
@@ -601,7 +612,9 @@ class Container implements ArrayAccess, ContainerContract {
 		// received in this method into this listener class instance's methods.
 		$callable = array($this->make($segments[0]), $method);
 
-		return call_user_func_array($callable, $parameters);
+		$dependencies = $this->getMethodDependencies($callable,$parameters);
+
+		return call_user_func_array($callable, $dependencies);
 	}
 
 	/**
