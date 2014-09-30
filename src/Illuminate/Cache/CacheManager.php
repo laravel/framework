@@ -154,6 +154,8 @@ class CacheManager extends Manager {
 	 */
 	protected function repository(StoreInterface $store)
 	{
+		$events = $this->app['events'];
+
 		return new Repository($store);
 	}
 

@@ -4,6 +4,7 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Traits\MacroableTrait;
 
 class Repository implements ArrayAccess {
@@ -20,6 +21,13 @@ class Repository implements ArrayAccess {
 	protected $store;
 
 	/**
+	 * The cache store implementation.
+	 *
+	 * @var \Illuminate\Events\Dispatcher
+	 */
+	protected $events;
+
+	/**
 	 * The default number of minutes to store items.
 	 *
 	 * @var int
@@ -30,10 +38,12 @@ class Repository implements ArrayAccess {
 	 * Create a new cache repository instance.
 	 *
 	 * @param  \Illuminate\Cache\StoreInterface  $store
+	 * @param  \Illuminate\Events\Dispatcher  $events
 	 */
-	public function __construct(StoreInterface $store)
+	public function __construct(StoreInterface $store, Dispatcher $events)
 	{
 		$this->store = $store;
+		$this->events = $events;
 	}
 
 	/**
@@ -58,7 +68,18 @@ class Repository implements ArrayAccess {
 	{
 		$value = $this->store->get($key);
 
-		return ! is_null($value) ? $value : value($default);
+		if (is_null($value))
+		{
+			$this->events->fire('cache.missed', ['key' => $key]);
+
+			$value = value($default);
+		}
+		else
+		{
+			$this->events->fire('cache.hit', ['key' => $key, 'value' => $value]);
+		}
+
+		return $value;
 	}
 
 	/**
@@ -92,6 +113,8 @@ class Repository implements ArrayAccess {
 		if ( ! is_null($minutes))
 		{
 			$this->store->put($key, $value, $minutes);
+
+			$this->events->fire('cache.write', ['key' => $key, 'value' => $value, 'duration' => $minutes]);
 		}
 	}
 
@@ -111,6 +134,33 @@ class Repository implements ArrayAccess {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Store an item in the cache indefinitely.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function forever($key, $value)
+	{
+		$this->store->forever($key, $value);
+
+		$this->events->fire('cache.write', ['key' => $key, 'value' => $value, 'duration' => 0]);
+	}
+
+	/**
+	 * Remove an item from the cache.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function forget($key)
+	{
+		$this->store->forget($key);
+
+		$this->events->fire('cache.delete', ['key' => $key]);
 	}
 
 	/**
