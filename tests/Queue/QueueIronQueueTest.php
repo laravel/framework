@@ -41,7 +41,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$closure = new Illuminate\Support\SerializableClosure($innerClosure = function() use ($name) { return $name; });
 		$crypt->shouldReceive('encrypt')->once()->with(serialize($closure))->andReturn('serial_closure');
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array(
-			'job' => 'IlluminateQueueClosure', 'data' => array('closure' => 'serial_closure'), 'attempts' => 1, 'queue' => 'default'
+			'job' => 'IlluminateQueueClosure', 'data' => array('closure' => 'serial_closure'), 'attempts' => 1, 'queue' => 'default',
 		)))->andReturn('encrypted');
 		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array())->andReturn((object) array('id' => 1));
 		$queue->push($innerClosure);

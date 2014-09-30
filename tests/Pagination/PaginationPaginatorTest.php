@@ -196,7 +196,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 		$p->appends(array(
 			'sort' => 'desc',
-			'page' => '2'
+			'page' => '2',
 		));
 		$this->assertEquals('http://foo.com?sort=desc&page=1', $p->getUrl(1));
 	}

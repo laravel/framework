@@ -77,7 +77,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	 * Delete all existing reset tokens from the database.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\Remindable  $user
-	 * @return string
+	 * @return int
 	 */
 	protected function deleteExisting(Remindable $user)
 	{

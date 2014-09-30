@@ -17,7 +17,7 @@ class IronConnector implements ConnectorInterface {
 	/**
 	 * The current request instance.
 	 *
-	 * @var \Illuminate\Http\Request;
+	 * @var \Illuminate\Http\Request
 	 */
 	protected $request;
 

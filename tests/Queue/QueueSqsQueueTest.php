@@ -90,4 +90,5 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
 		$id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
 		$this->assertEquals($this->mockedMessageId, $id);
 	}
+
 }
