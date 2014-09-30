@@ -380,13 +380,13 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 		$container = new Container;
 		$result = $container->call('ContainerTestCallStub@inject');
-		$this->assertInstanceOf('ContainerConcreteStub',$result[0]);
-		$this->assertEquals('taylor',$result[1]);
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
 
 		$container = new Container;
-		$result = $container->call('ContainerTestCallStub@inject',['default'=>'foo']);
-		$this->assertInstanceOf('ContainerConcreteStub',$result[0]);
-		$this->assertEquals('foo',$result[1]);
+		$result = $container->call('ContainerTestCallStub@inject', ['default' => 'foo']);
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('foo', $result[1]);
 
 		$container = new Container;
 		$result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
@@ -510,7 +510,9 @@ class ContainerTestCallStub {
 	public function work() {
 		return func_get_args();
 	}
-	public function inject(ContainerConcreteStub $stub,$default = 'taylor') {
+
+	public function inject(ContainerConcreteStub $stub, $default = 'taylor')
+	{
 		return func_get_args();
 	}
 }
