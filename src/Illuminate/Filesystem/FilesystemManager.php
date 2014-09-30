@@ -95,6 +95,7 @@ class FilesystemManager implements FactoryContract {
 	{
 		$client = S3Client::factory([
 			'key' => $config['key'], 'secret' => $config['secret'],
+				'base_url' => $config['base_url'],
 		]);
 
 		return $this->adapt(
