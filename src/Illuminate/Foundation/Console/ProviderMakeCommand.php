@@ -37,4 +37,15 @@ class ProviderMakeCommand extends GeneratorCommand {
 		return __DIR__.'/stubs/provider.stub';
 	}
 
+	/**
+	 * Get the default namespace for the class.
+	 *
+	 * @param  string  $rootNamespace
+	 * @return string
+	 */
+	protected function getDefaultNamespace($rootNamespace)
+	{
+		return $rootNamespace.'\Providers';
+	}
+
 }
