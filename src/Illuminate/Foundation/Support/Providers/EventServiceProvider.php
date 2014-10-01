@@ -1,9 +1,9 @@
-<?php namespace Illuminate\Events;
+<?php namespace Illuminate\Foundation\Support\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
-class ListenerServiceProvider extends ServiceProvider {
+class EventServiceProvider extends ServiceProvider {
 
 	/**
 	 * Register the application's event listeners.
