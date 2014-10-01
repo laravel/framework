@@ -392,5 +392,6 @@ class HtmlBuilder {
 		$parsed_url = 'https://twitter.com/share?url=' . $url . '&amp;text=' . $text; 
 
 		return '<a href="' . $parsed_url . '" ' . $this->attributes($attributes) . '>' . $this->entities($title) . '</a>';
+	}
 
 }
