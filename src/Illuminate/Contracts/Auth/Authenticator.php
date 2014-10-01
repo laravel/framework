@@ -35,6 +35,22 @@ interface Authenticator {
 	public function attempt(array $credentials = array(), $remember = false, $login = true);
 
 	/**
+	 * Attempt to authenticate using HTTP Basic Auth.
+	 *
+	 * @param  string  $field
+	 * @return \Symfony\Component\HttpFoundation\Response|null
+	 */
+	public function basic($field = 'email');
+
+	/**
+	 * Perform a stateless HTTP Basic login attempt.
+	 *
+	 * @param  string  $field
+	 * @return \Symfony\Component\HttpFoundation\Response|null
+	 */
+	public function onceBasic($field = 'email');
+
+	/**
 	 * Validate a user's credentials.
 	 *
 	 * @param  array  $credentials

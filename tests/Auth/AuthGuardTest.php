@@ -18,8 +18,9 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$guard->shouldReceive('check')->once()->andReturn(false);
 		$guard->shouldReceive('attempt')->once()->with(array('email' => 'foo@bar.com', 'password' => 'secret'))->andReturn(true);
 		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+		$guard->setRequest($request);
 
-		$guard->basic('email', $request);
+		$guard->basic('email');
 	}
 
 
@@ -30,6 +31,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$guard->shouldReceive('check')->once()->andReturn(true);
 		$guard->shouldReceive('attempt')->never();
 		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+		$guard->setRequest($request);
 
 		$guard->basic('email', $request);
 	}
@@ -42,6 +44,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 		$guard->shouldReceive('check')->once()->andReturn(false);
 		$guard->shouldReceive('attempt')->once()->with(array('email' => 'foo@bar.com', 'password' => 'secret'))->andReturn(false);
 		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array(), array(), array('PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret'));
+		$guard->setRequest($request);
 		$response = $guard->basic('email', $request);
 
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
