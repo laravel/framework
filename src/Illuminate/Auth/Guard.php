@@ -262,19 +262,16 @@ class Guard implements AuthenticatorContract {
 	 * Attempt to authenticate using HTTP Basic Auth.
 	 *
 	 * @param  string  $field
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Symfony\Component\HttpFoundation\Response|null
 	 */
-	public function basic($field = 'email', Request $request = null)
+	public function basic($field = 'email')
 	{
 		if ($this->check()) return;
-
-		$request = $request ?: $this->getRequest();
 
 		// If a username is set on the HTTP basic request, we will return out without
 		// interrupting the request lifecycle. Otherwise, we'll need to generate a
 		// request indicating that the given credentials were invalid for login.
-		if ($this->attemptBasic($request, $field)) return;
+		if ($this->attemptBasic($this->getRequest(), $field)) return;
 
 		return $this->getBasicResponse();
 	}
@@ -283,14 +280,11 @@ class Guard implements AuthenticatorContract {
 	 * Perform a stateless HTTP Basic login attempt.
 	 *
 	 * @param  string  $field
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Symfony\Component\HttpFoundation\Response|null
 	 */
-	public function onceBasic($field = 'email', Request $request = null)
+	public function onceBasic($field = 'email')
 	{
-		$request = $request ?: $this->getRequest();
-
-		if ( ! $this->once($this->getBasicCredentials($request, $field)))
+		if ( ! $this->once($this->getBasicCredentials($this->getRequest(), $field)))
 		{
 			return $this->getBasicResponse();
 		}
