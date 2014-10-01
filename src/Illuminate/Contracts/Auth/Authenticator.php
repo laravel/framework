@@ -10,6 +10,13 @@ interface Authenticator {
 	public function check();
 
 	/**
+	 * Determine if the current user is a guest.
+	 *
+	 * @return bool
+	 */
+	public function guest();
+
+	/**
 	 * Get the currently authenticated user.
 	 *
 	 * @return \Illuminate\Contracts\Auth\User|null
