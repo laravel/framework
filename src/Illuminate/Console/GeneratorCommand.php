@@ -48,7 +48,9 @@ abstract class GeneratorCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ($this->files->exists($path = $this->getPath($name = $this->getNameInput())))
+		$name = $this->parseName($this->getNameInput());
+
+		if ($this->files->exists($path = $this->getPath($name)))
 		{
 			return $this->error($this->type.' already exists!');
 		}
@@ -71,6 +73,37 @@ abstract class GeneratorCommand extends Command {
 		$name = str_replace($this->getAppNamespace(), '', $name);
 
 		return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+	}
+
+	/**
+	 * Parse the name and format according to the root namespace.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function parseName($name)
+	{
+		$rootNamespace = $this->getAppNamespace();
+
+		if (starts_with($name, $rootNamespace))
+		{
+			return $name;
+		}
+		else
+		{
+			return $this->parseName($this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name);
+		}
+	}
+
+	/**
+	 * Get the default namespace for the class.
+	 *
+	 * @param  string  $rootNamespace
+	 * @return string
+	 */
+	protected function getDefaultNamespace($rootNamespace)
+	{
+		return $rootNamespace;
 	}
 
 	/**

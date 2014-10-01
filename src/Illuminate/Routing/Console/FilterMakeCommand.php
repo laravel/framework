@@ -76,6 +76,17 @@ class FilterMakeCommand extends GeneratorCommand {
 	}
 
 	/**
+	 * Get the default namespace for the class.
+	 *
+	 * @param  string  $rootNamespace
+	 * @return string
+	 */
+	protected function getDefaultNamespace($rootNamespace)
+	{
+		return $rootNamespace.'\Http\Filters';
+	}
+
+	/**
 	 * Get the console command options.
 	 *
 	 * @return array
