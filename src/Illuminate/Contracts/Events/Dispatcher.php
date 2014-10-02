@@ -54,4 +54,11 @@ interface Dispatcher {
 	 */
 	public function forget($event);
 
+	/**
+	 * Forget all of the queued listeners.
+	 *
+	 * @return void
+	 */
+	public function forgetQueued();
+
 }
