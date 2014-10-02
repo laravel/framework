@@ -328,7 +328,7 @@ class Str {
 	 * @param  bool    $trim
 	 * @return string
 	 */
-	public static function except($value, $except, $trim = false)
+	public static function except($value, $except, $trim = true)
 	{
 		$value = str_replace($except, '', $value);
 
