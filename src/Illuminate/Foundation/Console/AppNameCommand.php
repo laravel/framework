@@ -68,7 +68,7 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->currentRoot = trim($this->getAppNamespace(), '\\');
+		$this->currentRoot = str_replace('\\\\', '\\', trim($this->getAppNamespace(), '\\'));
 
 		$this->setAppDirectoryNamespace();
 
@@ -89,8 +89,8 @@ class AppNameCommand extends Command {
 	protected function setAppDirectoryNamespace()
 	{
 		$files = Finder::create()
-                            ->in($this->laravel['path'])
-                            ->name('*.php');
+		               ->in($this->laravel['path'])
+		               ->name('*.php');
 
 		foreach ($files as $file)
 		{
@@ -108,15 +108,15 @@ class AppNameCommand extends Command {
 	protected function replaceNamespace($path)
 	{
 		$this->replaceIn(
-			$path, 'namespace '.$this->currentRoot.';', 'namespace '.$this->argument('name').';'
+			$path, 'namespace '.$this->currentRoot.';', 'namespace '.$this->getDesiredNamespace().';'
 		);
 
 		$this->replaceIn(
-			$path, 'namespace '.$this->currentRoot.'\\', 'namespace '.$this->argument('name').'\\'
+			$path, 'namespace '.$this->currentRoot.'\\', 'namespace '.$this->getDesiredNamespace().'\\'
 		);
 
 		$this->replaceIn(
-			$path, $this->currentRoot.'\\', $this->argument('name').'\\'
+			$path, $this->currentRoot.'\\', $this->getDesiredNamespace().'\\'
 		);
 	}
 
@@ -143,7 +143,7 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/FilterServiceProvider.php',
-			$this->currentRoot.'\\Http\\Filters', $this->argument('name').'\\Http\\Filters'
+			$this->currentRoot.'\\Http\\Filters', $this->getDesiredNamespace().'\\Http\\Filters'
 		);
 	}
 
@@ -156,7 +156,7 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/ArtisanServiceProvider.php',
-			$this->currentRoot.'\\Console', $this->argument('name').'\\Console'
+			$this->currentRoot.'\\Console', $this->getDesiredNamespace().'\\Console'
 		);
 	}
 
@@ -169,7 +169,7 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/RouteServiceProvider.php',
-			$this->currentRoot.'\\Http', $this->argument('name').'\\Http'
+			$this->currentRoot.'\\Http', $this->getDesiredNamespace().'\\Http'
 		);
 	}
 
@@ -181,7 +181,9 @@ class AppNameCommand extends Command {
 	protected function setComposerNamespace()
 	{
 		$this->replaceIn(
-			$this->getComposerPath(), $this->currentRoot.'\\\\', $this->argument('name').'\\\\'
+			$this->getComposerPath(),
+			str_replace('\\', '\\\\', $this->currentRoot).'\\\\',
+			str_replace('\\', '\\\\', $this->getDesiredNamespace()).'\\\\'
 		);
 	}
 
@@ -205,11 +207,11 @@ class AppNameCommand extends Command {
 	protected function setAppConfigNamespaces()
 	{
 		$this->replaceIn(
-			$this->getConfigPath('app'), $this->currentRoot.'\\Providers', $this->argument('name').'\\Providers'
+			$this->getConfigPath('app'), $this->currentRoot.'\\Providers', $this->getDesiredNamespace().'\\Providers'
 		);
 
 		$this->replaceIn(
-			$this->getConfigPath('app'), $this->currentRoot.'\\Http\\Controllers\\', $this->argument('name').'\\Http\\Controllers\\'
+			$this->getConfigPath('app'), $this->currentRoot.'\\Http\\Controllers\\', $this->getDesiredNamespace().'\\Http\\Controllers\\'
 		);
 	}
 
@@ -221,7 +223,7 @@ class AppNameCommand extends Command {
 	protected function setAuthConfigNamespace()
 	{
 		$this->replaceIn(
-			$this->getAuthConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+			$this->getAuthConfigPath(), $this->currentRoot.'\\User', $this->getDesiredNamespace().'\\User'
 		);
 	}
 
@@ -277,6 +279,16 @@ class AppNameCommand extends Command {
 	protected function getAuthConfigPath()
 	{
 		return $this->getConfigPath('auth');
+	}
+
+	/**
+	 * Get the desired namespace
+	 *
+	 * @return string
+	 */
+	protected function getDesiredNamespace()
+	{
+		return str_replace('\\\\', '\\', $this->argument('name'));
 	}
 
 	/**
