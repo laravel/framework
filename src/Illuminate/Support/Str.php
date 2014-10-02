@@ -324,7 +324,7 @@ class Str {
 	 * Get all of the given string except for a specified string of items.
 	 *
 	 * @param  string  $value
-	 * @param  array   $except
+	 * @param  string|array  $except
 	 * @param  bool    $trim
 	 * @return string
 	 */
