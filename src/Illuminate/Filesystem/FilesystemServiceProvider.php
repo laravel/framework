@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Filesystem;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Filesystem\Adapters\ConnectionFactory as Factory;
 
 class FilesystemServiceProvider extends ServiceProvider {
 
@@ -33,6 +34,8 @@ class FilesystemServiceProvider extends ServiceProvider {
 	 */
 	protected function registerFlysystem()
 	{
+		$this->registerFactory();
+
 		$this->registerManager();
 
 		$this->app->bindShared('filesystem.disk', function()
@@ -47,6 +50,19 @@ class FilesystemServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	 * Register the filesystem factory.
+	 *
+	 * @return void
+	 */
+	protected function registerFactory()
+	{
+		$this->app->bindShared('filesystem.factory', function()
+		{
+			return new Factory();
+		});
+	}
+
+	/**
 	 * Register the filesystem manager.
 	 *
 	 * @return void
@@ -55,7 +71,7 @@ class FilesystemServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('filesystem', function()
 		{
-			return new FilesystemManager($this->app);
+			return new FilesystemManager($this->app, $app['filesystem.factory']);
 		});
 	}
 
