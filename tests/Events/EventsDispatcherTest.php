@@ -57,6 +57,22 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testQueuedEventsCanBeForgotten()
+	{
+		$_SERVER['__event.test'] = 'unset';
+		$d = new Dispatcher;
+		$d->queue('update', array('name' => 'taylor'));
+		$d->listen('update', function($name)
+		{
+			$_SERVER['__event.test'] = $name;
+		});
+
+		$d->forgetQueued();
+		$d->flush('update');
+		$this->assertEquals('unset', $_SERVER['__event.test']);
+	}
+
+
 	public function testWildcardListeners()
 	{
 		unset($_SERVER['__event.test']);
