@@ -598,11 +598,11 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	protected function callClass($target, array $parameters = array(), $defaultMethod = null)
 	{
+		$segments = explode('@', $target);
+
 		// If the listener has an @ sign, we will assume it is being used to delimit
 		// the class name from the handle method name. This allows for handlers
 		// to run multiple handler methods in a single class for convenience.
-		$segments = explode('@', $target);
-
 		$method = count($segments) == 2 ? $segments[1] : $defaultMethod;
 
 		if (is_null($method))
@@ -610,14 +610,7 @@ class Container implements ArrayAccess, ContainerContract {
 			throw new \InvalidArgumentException("Method not provided.");
 		}
 
-		// We will make a callable of the listener instance and a method that should
-		// be called on that instance, then we will pass in the arguments that we
-		// received in this method into this listener class instance's methods.
-		$callable = array($this->make($segments[0]), $method);
-
-		$dependencies = $this->getMethodDependencies($callable, $parameters);
-
-		return call_user_func_array($callable, $dependencies);
+		return $this->call([$this->make($segments[0]), $method], $parameters);
 	}
 
 	/**
