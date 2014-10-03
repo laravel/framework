@@ -40,14 +40,16 @@ class ReminderServiceProvider extends ServiceProvider {
 
 			$users = $app['auth']->driver()->getProvider();
 
-			$view = $app['config']['auth.reminder.email'];
+			$view = $app['config']['auth.reminder.email.html'];
+
+			$plain = $app['config']['auth.reminder.email.plain'];
 
 			// The password broker uses the reminder repository to validate tokens and send
 			// reminder e-mails, as well as validating that password reset process as an
 			// aggregate service of sorts providing a convenient interface for resets.
 			return new PasswordBroker(
 
-				$reminders, $users, $app['mailer'], $view
+				$reminders, $users, $app['mailer'], array($view, $plain)
 
 			);
 		});
