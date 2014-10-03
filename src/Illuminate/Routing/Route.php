@@ -169,7 +169,21 @@ class Route {
 	{
 		if ( ! isset($this->action['before'])) return array();
 
-		return $this->parseFilters($this->action['before']);
+		$filters = $this->parseFilters($this->action['before']);
+
+		return array_diff_key($filters, $this->notBeforeFilters());
+	}
+
+	/**
+	 * Get the "not before" filters for the route.
+	 *
+	 * @return array
+	 */
+	public function notBeforeFilters()
+	{
+		if ( ! isset($this->action['notBefore'])) return array();
+
+		return $this->parseFilters($this->action['notBefore']);
 	}
 
 	/**
@@ -181,7 +195,21 @@ class Route {
 	{
 		if ( ! isset($this->action['after'])) return array();
 
-		return $this->parseFilters($this->action['after']);
+		$filters = $this->parseFilters($this->action['after']);
+
+		return array_diff_key($filters, $this->notAfterFilters());
+	}
+
+	/**
+	 * Get the "not after" filters for the route.
+	 *
+	 * @return array
+	 */
+	public function notAfterFilters()
+	{
+		if ( ! isset($this->action['notAfter'])) return array();
+
+		return $this->parseFilters($this->action['notAfter']);
 	}
 
 	/**
@@ -192,10 +220,34 @@ class Route {
 	 */
 	public static function parseFilters($filters)
 	{
-		return array_build(static::explodeFilters($filters), function($key, $value)
+		$filters = array_build(static::explodeFilters($filters), function($key, $value)
 		{
 			return Route::parseFilter($value);
 		});
+
+		return static::skipFilters($filters);
+	}
+
+	/**
+	 * Skip filters.
+	 *
+	 * @param  string  $filters
+	 * @return array
+	 */
+	protected static function skipFilters($filters)
+	{
+		$skipped = [];
+
+		foreach ($filters as $name => $filter)
+		{
+			if (starts_with($name, '-'))
+			{
+				$skipped[ltrim($name, '-')] = $name;
+				$skipped[$name] = $name;
+			}
+		}
+
+		return array_diff_key($filters, $skipped);
 	}
 
 	/**

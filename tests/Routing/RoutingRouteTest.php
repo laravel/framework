@@ -313,6 +313,53 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBeforeFiltersCanBeSkipped()
+	{
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => 'foo|-foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => '-foo|foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => '-foo|foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$router->filter('-foo', function() { return '-foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => '-FoO | FOO ', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => '|bar|foo|-bar', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		// using notBefore
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => 'foo', 'notBefore' => 'foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => '-FoO ', 'notBefore' => ' FOO ', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('before' => 'bar|foo', 'not'=>'bar', function() { return 'hello'; }));
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+	}
+
+
 	public function testGlobalAfterFilters()
 	{
 		unset($_SERVER['__filter.after']);
@@ -334,6 +381,53 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 		$this->assertTrue($_SERVER['__filter.after']);
+	}
+
+
+	public function testAfterFiltersCanBeSkipped()
+	{
+		$_SERVER['__filter.after'] = false;
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('after' => 'foo|-foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { $_SERVER['__filter.after'] = true; return 'foo!'; });
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertFalse($_SERVER['__filter.after']);
+
+		$_SERVER['__filter.after'] = false;
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('after' => '-foo|foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { $_SERVER['__filter.after'] = true; return 'foo!'; });
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertFalse($_SERVER['__filter.after']);
+
+		$_SERVER['__filter.after'] = null;
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('after' => '-bar|foo|bar', function() { return 'hello'; }));
+		$router->filter('foo', function() { $_SERVER['__filter.after'] = 'foo'; return 'foo!'; });
+		$router->filter('bar', function() { $_SERVER['__filter.after'] = 'bar'; return 'foo!'; });
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertSame('foo', $_SERVER['__filter.after']);
+
+		// using notAfter
+		$_SERVER['__filter.after'] = false;
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('after' => 'foo', 'notAfter' => 'foo', function() { return 'hello'; }));
+		$router->filter('foo', function() { $_SERVER['__filter.after'] = true; return 'foo!'; });
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertFalse($_SERVER['__filter.after']);
+
+		$_SERVER['__filter.after'] = null;
+		$router = $this->getRouter();
+		$router->get('foo/bar', array('after' => 'foo|bar', 'notAfter' => 'bar', function() { return 'hello'; }));
+		$router->filter('foo', function() { $_SERVER['__filter.after'] = 'foo'; return 'foo!'; });
+		$router->filter('bar', function() { $_SERVER['__filter.after'] = 'bar'; return 'foo!'; });
+
+		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertSame('foo', $_SERVER['__filter.after']);
 	}
 
 
