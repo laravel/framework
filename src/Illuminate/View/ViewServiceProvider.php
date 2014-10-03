@@ -77,7 +77,7 @@ class ViewServiceProvider extends ServiceProvider {
 		// instance to pass into the engine so it can compile the views properly.
 		$app->bindShared('blade.compiler', function($app)
 		{
-			$cache = $app['path.storage'].'/views';
+			$cache = $app['config']['view.compiled'];
 
 			return new BladeCompiler($app['files'], $cache);
 		});
