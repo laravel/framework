@@ -69,7 +69,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 
 		foreach (array_keys($this->commands) as $command)
 		{
-			call_user_func_array([$this, "register{$command}Command"], []);
+			$method = "register{$command}Command";
+
+			call_user_func_array([$this, $method], []);
 		}
 
 		$this->commands(array_values($this->commands));
