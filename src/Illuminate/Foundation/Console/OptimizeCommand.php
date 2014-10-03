@@ -85,7 +85,7 @@ class OptimizeCommand extends Command {
 	{
 		$this->registerClassPreloaderCommand();
 
-		$outputPath = $this->laravel['path.storage'].'/meta/compiled.php';
+		$outputPath = $this->laravel['path.storage'].'/framework/compiled.php';
 
 		$this->callSilent('compile', array(
 			'--config' => implode(',', $this->getClassFiles()),

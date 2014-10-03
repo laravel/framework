@@ -759,7 +759,7 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function getRouteCachePath()
 	{
-		return $this['path.storage'].'/meta/routes.php';
+		return $this['path.storage'].'/framework/routes.php';
 	}
 
 	/**
