@@ -55,7 +55,7 @@ class RemindersControllerCommand extends GeneratorCommand {
 	 */
 	protected function getArguments()
 	{
-		$default = $this->getAppNamespace().'Http\Controllers\Auth\RemindersController';
+		$default = 'Auth\RemindersController';
 
 		return array(
 			array('name', InputArgument::OPTIONAL, 'The name of the class', $default),

@@ -71,7 +71,7 @@ class AuthControllerCommand extends GeneratorCommand {
 	 */
 	protected function getArguments()
 	{
-		$default = $this->getAppNamespace().'Http\Controllers\Auth\AuthController';
+		$default = 'Auth\AuthController';
 
 		return array(
 			array('name', InputArgument::OPTIONAL, 'The name of the class', $default),
