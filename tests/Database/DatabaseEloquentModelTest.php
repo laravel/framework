@@ -30,6 +30,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDynamicMutation()
+	{
+		$model = new EloquentModelBootingTestStub;
+		$model->addMutator('foo', function($value) { return 'bar'; });
+
+		$this->assertEquals('bar', $model->foo);
+
+		$model->removeMutator('foo');
+		$this->assertNull($model->foo);
+	}
+
+
 	public function testDirtyAttributes()
 	{
 		$model = new EloquentModelStub(array('foo' => '1', 'bar' => 2, 'baz' => 3));
