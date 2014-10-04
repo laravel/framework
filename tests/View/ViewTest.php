@@ -6,7 +6,7 @@ use Illuminate\Support\Contracts\ArrayableInterface;
 
 class ViewTest extends PHPUnit_Framework_TestCase {
 
-	public function __construct()
+	public function tearDown()
 	{
 		m::close();
 	}
@@ -58,7 +58,6 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		));
 
 		$view->shouldReceive('render')->with(m::type('Closure'))->once()->andReturn($sections = array('foo' => 'bar'));
-		$view->getFactory()->shouldReceive('getSections')->once()->andReturn($sections);
 
 		$this->assertEquals($sections, $view->renderSections());
 	}
@@ -67,12 +66,12 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	public function testSectionsAreNotFlushedWhenNotDoneRendering()
 	{
 		$view = $this->getView();
-		$view->getFactory()->shouldReceive('incrementRender')->once();
-		$view->getFactory()->shouldReceive('callComposer')->once()->with($view);
-		$view->getFactory()->shouldReceive('getShared')->once()->andReturn(array('shared' => 'foo'));
-		$view->getEngine()->shouldReceive('get')->once()->with('path', array('foo' => 'bar', 'shared' => 'foo'))->andReturn('contents');
-		$view->getFactory()->shouldReceive('decrementRender')->once();
-		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
+		$view->getFactory()->shouldReceive('incrementRender')->twice();
+		$view->getFactory()->shouldReceive('callComposer')->twice()->with($view);
+		$view->getFactory()->shouldReceive('getShared')->twice()->andReturn(array('shared' => 'foo'));
+		$view->getEngine()->shouldReceive('get')->twice()->with('path', array('foo' => 'bar', 'shared' => 'foo'))->andReturn('contents');
+		$view->getFactory()->shouldReceive('decrementRender')->twice();
+		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->twice();
 
 		$this->assertEquals('contents', $view->render());
 		$this->assertEquals('contents', (string) $view);
@@ -166,7 +165,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 		$view->renderable = m::mock('Illuminate\Support\Contracts\RenderableInterface');
 		$view->renderable->shouldReceive('render')->once()->andReturn('text');
-		$view->render();
+		$this->assertEquals('contents', $view->render());
 	}
 
 
