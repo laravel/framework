@@ -16,7 +16,8 @@
         "illuminate/support": "5.0.*",
         "symfony/http-foundation": "2.6.*",
         "symfony/http-kernel": "2.6.*",
-        "symfony/routing": "2.6.*"
+        "symfony/routing": "2.6.*",
+        "doctrine/annotations": "~1.0"
     },
     "require-dev": {
         "illuminate/console": "5.0.*",
