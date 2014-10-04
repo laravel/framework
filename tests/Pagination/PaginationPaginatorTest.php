@@ -42,7 +42,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, $p->getLastPage());
 		$this->assertEquals(1, $p->getCurrentPage());
-		$this->assertEquals(3, count($p->getItems()));
+		$this->assertCount(3, $p->getItems());
 	}
 
 
@@ -155,7 +155,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
 
-		$this->assertEquals(3, count($p));
+		$this->assertCount(3, $p);
 	}
 
 

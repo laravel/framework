@@ -7,7 +7,7 @@ class RoutingControllerInspectorTest extends PHPUnit_Framework_TestCase {
 		$inspector = new Illuminate\Routing\ControllerInspector;
 		$data = $inspector->getRoutable('RoutingControllerInspectorStub', 'prefix');
 
-		$this->assertEquals(4, count($data));
+		$this->assertCount(4, $data);
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix', 'uri' => 'prefix'), $data['getIndex'][1]);
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix/index', 'uri' => 'prefix/index/{one?}/{two?}/{three?}/{four?}/{five?}'), $data['getIndex'][0]);
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix/foo-bar', 'uri' => 'prefix/foo-bar/{one?}/{two?}/{three?}/{four?}/{five?}'), $data['getFooBar'][0]);
@@ -21,7 +21,7 @@ class RoutingControllerInspectorTest extends PHPUnit_Framework_TestCase {
 		$inspector = new Illuminate\Routing\ControllerInspector;
 		$data = $inspector->getRoutable('\\RoutingControllerInspectorStub', 'prefix');
 
-		$this->assertEquals(4, count($data));
+		$this->assertCount(4, $data);
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix', 'uri' => 'prefix'), $data['getIndex'][1]);
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix/index', 'uri' => 'prefix/index/{one?}/{two?}/{three?}/{four?}/{five?}'), $data['getIndex'][0]);
 		$this->assertEquals(array('verb' => 'get', 'plain' => 'prefix/foo-bar', 'uri' => 'prefix/foo-bar/{one?}/{two?}/{three?}/{four?}/{five?}'), $data['getFooBar'][0]);
