@@ -25,7 +25,7 @@ class ConfigRepositoryTest extends PHPUnit_Framework_TestCase {
 		$config->getLoader()->shouldReceive('load')->once()->with('production', 'app', null)->andReturn($options);
 
 		$this->assertTrue($config->has('app.bing'));
-		$this->assertEquals(true,$config->get('app.bing'));
+		$this->assertTrue($config->get('app.bing'));
 	}
 
 
