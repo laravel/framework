@@ -57,6 +57,15 @@ class SqlServerGrammar extends Grammar {
 			$select .= 'top '.$query->limit.' ';
 		}
 
+    // include the binding logic from the parent method
+    $bindings = array_flatten(array_fetch($columns, 'bindings'));
+
+    if ($bindings) {
+      $query->addBinding($bindings);
+    }
+
+    $columns = array_flatten(array_fetch($columns, 'columns'));
+
 		return $select.$this->columnize($columns);
 	}
 

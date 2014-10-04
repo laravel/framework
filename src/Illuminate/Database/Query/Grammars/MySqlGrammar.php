@@ -51,7 +51,9 @@ class MySqlGrammar extends Grammar {
 	{
 		$joiner = $union['all'] ? ' union all ' : ' union ';
 
-		return $joiner.'('.$union['query']->toSql().')';
+    $select = $this->compileSelect($union['query']);
+
+		return "$joiner($select)";
 	}
 
 	/**

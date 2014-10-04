@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Grammar as BaseGrammar;
+use Illuminate\Database\Query\Expression;
 
 class Grammar extends BaseGrammar {
 
@@ -33,8 +34,9 @@ class Grammar extends BaseGrammar {
 	 */
 	public function compileSelect(Builder $query)
 	{
-		if (is_null($query->columns)) $query->columns = array('*');
-
+		if (is_null($query->columns)) $query->setSelect(array('*'));
+    // reset the bindings each time we compile.
+    $query->setBindings([]);
 		return trim($this->concatenate($this->compileComponents($query)));
 	}
 
@@ -102,6 +104,14 @@ class Grammar extends BaseGrammar {
 
 		$select = $query->distinct ? 'select distinct ' : 'select ';
 
+    $bindings = array_flatten(array_fetch($columns, 'bindings'));
+
+    if ($bindings) {
+      $query->addBinding($bindings);
+    }
+
+    $columns = array_flatten(array_fetch($columns, 'columns'));
+
 		return $select.$this->columnize($columns);
 	}
 
@@ -144,7 +154,7 @@ class Grammar extends BaseGrammar {
 
 			foreach ($join->bindings as $binding)
 			{
-				$query->addBinding($binding, 'join');
+				$query->addBinding($binding);
 			}
 
 			// Once we have constructed the clauses, we'll need to take the boolean connector
@@ -226,7 +236,10 @@ class Grammar extends BaseGrammar {
 	{
 		$nested = $where['query'];
 
-		return '('.substr($this->compileWheres($nested), 6).')';
+    $wheres = substr($this->compileWheres($nested), 6);
+    $query->addBinding($nested->getBindings());
+
+		return "($wheres)";
 	}
 
 	/**
@@ -240,6 +253,8 @@ class Grammar extends BaseGrammar {
 	{
 		$select = $this->compileSelect($where['query']);
 
+    $query->addBinding($where['query']->getBindings());
+
 		return $this->wrap($where['column']).' '.$where['operator']." ($select)";
 	}
 
@@ -252,7 +267,13 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereBasic(Builder $query, $where)
 	{
-		$value = $this->parameter($where['value']);
+    $value = $where['value'];
+    if ( ! $value instanceof Expression)
+    {
+      $query->addBinding($value);
+    }
+
+		$value = $this->parameter($value);
 
 		return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
 	}
@@ -268,6 +289,8 @@ class Grammar extends BaseGrammar {
 	{
 		$between = $where['not'] ? 'not between' : 'between';
 
+    $query->addBinding($where['values']);
+
 		return $this->wrap($where['column']).' '.$between.' ? and ?';
 	}
 
@@ -280,7 +303,11 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereExists(Builder $query, $where)
 	{
-		return 'exists ('.$this->compileSelect($where['query']).')';
+    $select = $this->compileSelect($where['query']);
+
+    $query->addBinding($where['query']->getBindings());
+
+		return "exists ($select)";
 	}
 
 	/**
@@ -292,7 +319,11 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereNotExists(Builder $query, $where)
 	{
-		return 'not exists ('.$this->compileSelect($where['query']).')';
+    $select = $this->compileSelect($where['query']);
+
+    $query->addBinding($where['query']->getBindings());
+
+		return "not exists ($select)";
 	}
 
 	/**
@@ -305,6 +336,8 @@ class Grammar extends BaseGrammar {
 	protected function whereIn(Builder $query, $where)
 	{
 		$values = $this->parameterize($where['values']);
+
+    $query->addBinding($where['values']);
 
 		return $this->wrap($where['column']).' in ('.$values.')';
 	}
@@ -320,6 +353,8 @@ class Grammar extends BaseGrammar {
 	{
 		$values = $this->parameterize($where['values']);
 
+    $query->addBinding($where['values']);
+
 		return $this->wrap($where['column']).' not in ('.$values.')';
 	}
 
@@ -334,6 +369,8 @@ class Grammar extends BaseGrammar {
 	{
 		$select = $this->compileSelect($where['query']);
 
+    $query->addBinding($where['query']->getBindings());
+
 		return $this->wrap($where['column']).' in ('.$select.')';
 	}
 
@@ -347,6 +384,8 @@ class Grammar extends BaseGrammar {
 	protected function whereNotInSub(Builder $query, $where)
 	{
 		$select = $this->compileSelect($where['query']);
+
+    $query->addBinding($where['query']->getBindings());
 
 		return $this->wrap($where['column']).' not in ('.$select.')';
 	}
@@ -423,6 +462,8 @@ class Grammar extends BaseGrammar {
 	{
 		$value = $this->parameter($where['value']);
 
+    $query->addBinding($where['value']);
+
 		return $type.'('.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
 	}
 
@@ -435,6 +476,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereRaw(Builder $query, $where)
 	{
+    $query->addBinding($where['bindings']);
 		return $where['sql'];
 	}
 
@@ -459,7 +501,14 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileHavings(Builder $query, $havings)
 	{
-		$sql = implode(' ', array_map(array($this, 'compileHaving'), $havings));
+    $sql = [];
+
+    foreach ($havings as $having)
+    {
+      $sql[] = $this->compileHaving($query, $having);
+    }
+
+		$sql = implode(' ', $sql);
 
 		return 'having '.preg_replace('/and /', '', $sql, 1);
 	}
@@ -470,17 +519,18 @@ class Grammar extends BaseGrammar {
 	 * @param  array   $having
 	 * @return string
 	 */
-	protected function compileHaving(array $having)
+	protected function compileHaving(Builder $query, array $having)
 	{
 		// If the having clause is "raw", we can just return the clause straight away
 		// without doing any more processing on it. Otherwise, we will compile the
 		// clause into SQL based on the components that make it up from builder.
 		if ($having['type'] === 'raw')
 		{
+      $query->addBinding($having['bindings']);
 			return $having['boolean'].' '.$having['sql'];
 		}
 
-		return $this->compileBasicHaving($having);
+		return $this->compileBasicHaving($query, $having);
 	}
 
 	/**
@@ -489,9 +539,11 @@ class Grammar extends BaseGrammar {
 	 * @param  array   $having
 	 * @return string
 	 */
-	protected function compileBasicHaving($having)
+	protected function compileBasicHaving(Builder $query, $having)
 	{
 		$column = $this->wrap($having['column']);
+
+    $query->addBinding($having['value']);
 
 		$parameter = $this->parameter($having['value']);
 
@@ -507,9 +559,12 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileOrders(Builder $query, $orders)
 	{
-		return 'order by '.implode(', ', array_map(function($order)
+		return 'order by '.implode(', ', array_map(function($order) use($query)
 		{
-			if (isset($order['sql'])) return $order['sql'];
+			if (isset($order['sql'])) {
+        $query->addBinding($order['bindings']);
+        return $order['sql'];
+      }
 
 			return $this->wrap($order['column']).' '.$order['direction'];
 		}
@@ -553,6 +608,7 @@ class Grammar extends BaseGrammar {
 		foreach ($query->unions as $union)
 		{
 			$sql .= $this->compileUnion($union);
+      $query->addBinding($union['query']->getBindings());
 		}
 
 		return ltrim($sql);
@@ -568,7 +624,9 @@ class Grammar extends BaseGrammar {
 	{
 		$joiner = $union['all'] ? ' union all ' : ' union ';
 
-		return $joiner.$union['query']->toSql();
+    $select = $this->compileSelect($union['query']);
+
+    return $joiner.$select;
 	}
 
 	/**

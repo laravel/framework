@@ -120,6 +120,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function dateBasedWhere($type, Builder $query, $where)
 	{
+    $query->addBinding($where['value']);
 		$value = str_pad($where['value'], 2, '0', STR_PAD_LEFT);
 
 		$value = $this->parameter($value);
