@@ -199,7 +199,7 @@ class Builder {
 	 */
 	public function select($columns = array('*'))
 	{
-    $columns = is_array($columns) ? $columns : func_get_args();
+		$columns = is_array($columns) ? $columns : func_get_args();
 		$this->setSelect($columns);
 
 		return $this;
@@ -239,9 +239,9 @@ class Builder {
 		{
 			$sql = $query->toSql();
 
-      $bindings = $query->getBindings();
+			$bindings = $query->getBindings();
 
-      $query = $sql;
+			$query = $sql;
 		}
 		elseif (is_string($query))
 		{
@@ -270,20 +270,20 @@ class Builder {
 		return $this;
 	}
 
-  /**
-   * Add a new select column to the query.
-   *
-   * @param  mixed  $column
-   * @return $this
-   */
-  public function setSelect($column, $bindings = [])
-  {
-    $this->columns = [];
+	/**
+	 * Add a new select column to the query.
+	 *
+	 * @param  mixed  $column
+	 * @return $this
+	 */
+	public function setSelect($column, $bindings = [])
+	{
+		$this->columns = [];
 
-    $this->addSelect($column, $bindings);
+		$this->addSelect($column, $bindings);
 
-    return $this;
-  }
+		return $this;
+	}
 
 	/**
 	 * Force the query to only return distinct results.
@@ -1883,7 +1883,7 @@ class Builder {
 	public function update(array $values)
 	{
 		$sql = $this->grammar->compileUpdate($this, $values);
-    $bindings = array_values(array_merge($values, $this->getBindings()));
+		$bindings = array_values(array_merge($values, $this->getBindings()));
 
 		return $this->connection->update($sql, $this->cleanBindings($bindings));
 	}
@@ -2009,13 +2009,13 @@ class Builder {
 		return $this->bindings;
 	}
 
-  /**
-   * Set the bindings on the query builder.
-   *
-   * @param  array $bindings
-   * @return $this
-   *
-   */
+	/**
+	 * Set the bindings on the query builder.
+	 *
+	 * @param  array $bindings
+	 * @return $this
+	 *
+	 */
 	public function setBindings(array $bindings)
 	{
 		$this->bindings = $bindings;
@@ -2023,13 +2023,13 @@ class Builder {
 		return $this;
 	}
 
-  /**
-   * Add a binding to the query.
-   *
-   * @param  mixed $value
-   * @return $this
-   *
-   */
+	/**
+	 * Add a binding to the query.
+	 *
+	 * @param  mixed $value
+	 * @return $this
+	 *
+	 */
 	public function addBinding($value)
 	{
 		if (is_array($value))
