@@ -51,7 +51,7 @@ class MySqlGrammar extends Grammar {
 	{
 		$joiner = $union['all'] ? ' union all ' : ' union ';
 
-    $select = $this->compileSelect($union['query']);
+		$select = $this->compileSelect($union['query']);
 
 		return "$joiner($select)";
 	}

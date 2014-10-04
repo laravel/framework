@@ -770,8 +770,8 @@ class Builder {
 
 			if ( ! isset($results[$last = implode('.', $progress)]))
 			{
- 				$results[$last] = function() {};
- 			}
+				$results[$last] = function() {};
+			}
 		}
 
 		return $results;
