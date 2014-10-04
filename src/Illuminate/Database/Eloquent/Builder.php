@@ -48,8 +48,8 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'toSql', 'lists', 'insert', 'insertGetId', 'pluck', 'count',
-		'min', 'max', 'avg', 'sum', 'exists', 'getBindings',
+		'compile', 'lists', 'insert', 'insertGetId', 'pluck', 'count',
+		'min', 'max', 'avg', 'sum', 'exists',
 	);
 
 	/**
@@ -599,7 +599,9 @@ class Builder {
 	{
 		$relation = $this->getHasRelationQuery($relation);
 
-		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
+		// get the new query without scopes. This should be the foreign key where plus any wheres on the Relation definition.
+		// addHasWhere will add wheres that are the result of scopes on the related model.
+		$query = $relation->getRelationCountQuery($relation->getRelated()->newQueryWithoutScopes(), $this);
 
 		if ($callback) call_user_func($callback, $query);
 
@@ -666,7 +668,9 @@ class Builder {
 			$count = new Expression($count);
 		}
 
-		return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
+		$compiled = $hasQuery->compile();
+
+		return $this->query->whereRaw($compiled->sql, $compiled->bindings, $operator, $count, $boolean);
 	}
 
 	/**
@@ -680,14 +684,10 @@ class Builder {
 	{
 		// Here we have the "has" query and the original relation. We need to copy over any
 		// where clauses the developer may have put in the relationship function over to
-		// the has query, and then copy the bindings from the "has" query to the main.
+		// the has query.
 		$relationQuery = $relation->getBaseQuery();
 
-		$hasQuery->mergeWheres(
-			$relationQuery->wheres, $relationQuery->getBindings()
-		);
-
-		$this->query->mergeBindings($hasQuery->getQuery());
+		$hasQuery->mergeWheres($relationQuery->wheres);
 	}
 
 	/**
@@ -774,8 +774,8 @@ class Builder {
 
 			if ( ! isset($results[$last = implode('.', $progress)]))
 			{
- 				$results[$last] = function() {};
- 			}
+				$results[$last] = function() {};
+			}
 		}
 
 		return $results;

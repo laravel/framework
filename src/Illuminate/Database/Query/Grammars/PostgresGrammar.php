@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\CompiledQuery;
 
 class PostgresGrammar extends Grammar {
 
@@ -20,13 +21,13 @@ class PostgresGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  bool|string  $value
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileLock(Builder $query, $value)
 	{
-		if (is_string($value)) return $value;
+		if (is_string($value)) return CompiledQuery($value);
 
-		return $value ? 'for update' : 'for share';
+		return new CompiledQuery($value ? 'for update' : 'for share');
 	}
 
 	/**
@@ -34,7 +35,7 @@ class PostgresGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $values
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	public function compileUpdate(Builder $query, $values)
 	{
@@ -45,11 +46,13 @@ class PostgresGrammar extends Grammar {
 		// the values in the list of bindings so we can make the sets statements.
 		$columns = $this->compileUpdateColumns($values);
 
+		$update = new CompiledQuery("update {$table} set {$columns}");
+
 		$from = $this->compileUpdateFrom($query);
 
 		$where = $this->compileUpdateWheres($query);
 
-		return trim("update {$table} set {$columns}{$from} $where");
+		return $update->concatenate($from)->concatenate($where);
 	}
 
 	/**
@@ -77,11 +80,11 @@ class PostgresGrammar extends Grammar {
 	 * Compile the "from" clause for an update with a join.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileUpdateFrom(Builder $query)
 	{
-		if ( ! isset($query->joins)) return '';
+		if ( ! isset($query->joins)) return;
 
 		$froms = array();
 
@@ -93,14 +96,14 @@ class PostgresGrammar extends Grammar {
 			$froms[] = $this->wrapTable($join->table);
 		}
 
-		if (count($froms) > 0) return ' from '.implode(', ', $froms);
+		return (count($froms) > 0) ? new CompiledQuery('from '.implode(', ', $froms)) : null ;
 	}
 
 	/**
 	 * Compile the additional where clauses for updates with joins.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileUpdateWheres(Builder $query)
 	{
@@ -113,23 +116,25 @@ class PostgresGrammar extends Grammar {
 		// strip the leading boolean we will do so when using as the only where.
 		$joinWhere = $this->compileUpdateJoinWheres($query);
 
-		if (trim($baseWhere) == '')
+		if ($baseWhere->sql == '')
 		{
-			return 'where '.$this->removeLeadingBoolean($joinWhere);
+			$joinWhere->sql = 'where '.$this->removeLeadingBoolean($joinWhere);
+
+			return $joinWhere;
 		}
 
-		return $baseWhere.' '.$joinWhere;
+		return $baseWhere->concatenate($joinWhere);
 	}
 
 	/**
 	 * Compile the "join" clauses for an update.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileUpdateJoinWheres(Builder $query)
 	{
-		$joinWheres = array();
+		$joinWheres = new CompiledQuery();
 
 		// Here we will just loop through all of the join constraints and compile them
 		// all out then implode them. This should give us "where" like syntax after
@@ -138,11 +143,11 @@ class PostgresGrammar extends Grammar {
 		{
 			foreach ($join->clauses as $clause)
 			{
-				$joinWheres[] = $this->compileJoinConstraint($clause);
+				$joinWheres->concatenate($this->compileJoinConstraint($clause));
 			}
 		}
 
-		return implode(' ', $joinWheres);
+		return $joinWheres;
 	}
 
 	/**
@@ -151,13 +156,16 @@ class PostgresGrammar extends Grammar {
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array   $values
 	 * @param  string  $sequence
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	public function compileInsertGetId(Builder $query, $values, $sequence)
 	{
 		if (is_null($sequence)) $sequence = 'id';
 
-		return $this->compileInsert($query, $values).' returning '.$this->wrap($sequence);
+		$insert = $this->compileInsert($query, $values);
+		$insert->sql .= ' returning '.$this->wrap($sequence);
+
+		return $insert;
 	}
 
 	/**

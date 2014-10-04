@@ -459,11 +459,14 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testRealNestedWhereWithScopes()
 	{
+		$expectedSql = 'select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)';
+		$expectedBindings = ['bar', 9000];
+
 		$model = new EloquentBuilderTestNestedStub;
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->where('foo', '=', 'bar')->where(function($query) { $query->where('baz', '>', 9000); });
-		$this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
-		$this->assertEquals(array('bar', 9000), $query->getBindings());
+
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -496,8 +499,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->has('subs');
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 	public function testRealHasWithOperatorAndCount()
@@ -509,8 +511,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->has('subs', '=', 4);
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 	public function testRealOrHas()
@@ -522,8 +523,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->where('foo', 'bar')->orHas('subs');
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -536,8 +536,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->whereHas('subs', function($subs) { $subs->where('foo', '=', 'bar');});
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -550,8 +549,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->where('foo', '=', 'bar')->orWhereHas('subs', function($subs) { $subs->where('fizz', '=', 'buzz');});
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -564,8 +562,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->has('subs');
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -578,8 +575,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->has('subs', '=', 4);
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -592,8 +588,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->where('foo', 'bar')->orHas('subs');
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -606,8 +601,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->whereHas('subs', function($subs) { $subs->where('foo', '=', 'bar');});
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -620,8 +614,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->mockConnectionForModel($model, 'SQLite');
 		$query = $model->newQuery()->where('foo', '=', 'bar')->orWhereHas('subs', function($subs) { $subs->where('fizz', '=', 'buzz');});
 
-		$this->assertEquals($expectedSql, $query->toSql());
-		$this->assertEquals($expectedBindings, $query->getBindings());
+		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
 
@@ -659,6 +652,12 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$query = m::mock('Illuminate\Database\Query\Builder');
 		$query->shouldReceive('from')->with('foo_table');
 		return $query;
+	}
+
+	protected function assertBuilderCompile($buidler, $expectedSql, $expectedBindings = []) {
+		$compiled = $buidler->compile();
+		$this->assertEquals($expectedSql, $compiled->sql);
+		$this->assertEquals($expectedBindings, $compiled->bindings);
 	}
 
 }

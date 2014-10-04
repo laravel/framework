@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\CompiledQuery;
 
 class MySqlGrammar extends Grammar {
 
@@ -31,27 +32,32 @@ class MySqlGrammar extends Grammar {
 	 */
 	public function compileSelect(Builder $query)
 	{
-		$sql = parent::compileSelect($query);
+		$select = parent::compileSelect($query);
 
 		if ($query->unions)
 		{
-			$sql = '('.$sql.') '.$this->compileUnions($query);
+			$select->sql = '('.$select->sql.')';
+			$select->concatenate($this->compileUnions($query, $query->unions));
 		}
 
-		return $sql;
+		return $select;
 	}
 
 	/**
 	 * Compile a single union statement.
 	 *
 	 * @param  array  $union
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileUnion(array $union)
 	{
-		$joiner = $union['all'] ? ' union all ' : ' union ';
+		$joiner = $union['all'] ? 'union all ' : 'union ';
 
-		return $joiner.'('.$union['query']->toSql().')';
+		$select = $this->compileSelect($union['query']);
+
+		$select->sql = "$joiner({$select->sql})";
+
+		return $select;
 	}
 
 	/**
@@ -59,13 +65,13 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  bool|string  $value
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileLock(Builder $query, $value)
 	{
-		if (is_string($value)) return $value;
+		if (is_string($value)) return CompiledQuery($value);
 
-		return $value ? 'for update' : 'lock in share mode';
+		return new CompiledQuery($value ? 'for update' : 'lock in share mode');
 	}
 
 	/**
@@ -73,45 +79,49 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $values
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	public function compileUpdate(Builder $query, $values)
 	{
-		$sql = parent::compileUpdate($query, $values);
+		$update = parent::compileUpdate($query, $values);
 
 		if (isset($query->orders))
 		{
-			$sql .= ' '.$this->compileOrders($query, $query->orders);
+			$update->concatenate($this->compileOrders($query, $query->orders));
 		}
 
 		if (isset($query->limit))
 		{
-			$sql .= ' '.$this->compileLimit($query, $query->limit);
+			$update->concatenate($this->compileLimit($query, $query->limit));
 		}
 
-		return rtrim($sql);
+		return $update;
 	}
 
 	/**
 	 * Compile a delete statement into SQL.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	public function compileDelete(Builder $query)
 	{
 		$table = $this->wrapTable($query->from);
 
-		$where = is_array($query->wheres) ? $this->compileWheres($query) : '';
+		$where = is_array($query->wheres) ? $this->compileWheres($query) : null;
 
 		if (isset($query->joins))
 		{
-			$joins = ' '.$this->compileJoins($query, $query->joins);
+			$joins = $this->compileJoins($query, $query->joins);
 
-			return trim("delete $table from {$table}{$joins} $where");
+			$compiled = new CompiledQuery("delete $table from {$table}");
+
+			return $compiled->concatenate($joins)->concatenate($where);
 		}
 
-		return trim("delete from $table $where");
+		$compiled = new CompiledQuery("delete from $table");
+
+		return $compiled->concatenate($where);
 	}
 
 	/**
