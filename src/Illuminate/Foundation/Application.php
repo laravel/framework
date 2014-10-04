@@ -749,7 +749,7 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function routesAreCached()
 	{
-		return $this['files']->exists($this->getRouteCachePath());
+		return $this['files']->exists($this->getCachedRoutesPath());
 	}
 
 	/**
@@ -757,9 +757,29 @@ class Application extends Container implements HttpKernelInterface,
 	 *
 	 * @return string
 	 */
-	public function getRouteCachePath()
+	public function getCachedRoutesPath()
 	{
 		return $this['path.storage'].'/framework/routes.php';
+	}
+
+	/**
+	 * Determine if the application routes have been scanned.
+	 *
+	 * @return bool
+	 */
+	public function routesAreScanned()
+	{
+		return $this['files']->exists($this->getScannedRoutesPath());
+	}
+
+	/**
+	 * Get the path to the scanned routes file.
+	 *
+	 * @return string
+	 */
+	public function getScannedRoutesPath()
+	{
+		return $this['path.storage'].'/framework/routes.scanned.php';
 	}
 
 	/**

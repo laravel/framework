@@ -10,6 +10,7 @@ use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\ChangesCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
+use Illuminate\Foundation\Console\RouteScanCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
@@ -47,6 +48,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'RouteCache' => 'command.route.cache',
 		'RouteClear' => 'command.route.clear',
 		'RouteList' => 'command.route.list',
+		'RouteScan' => 'command.route.scan',
 		'Serve' => 'command.serve',
 		'Tinker' => 'command.tinker',
 		'Up' => 'command.up',
@@ -243,6 +245,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->bindShared('command.route.list', function($app)
 		{
 			return new RouteListCommand($app['router']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerRouteScanCommand()
+	{
+		$this->app->bindShared('command.route.scan', function()
+		{
+			return new RouteScanCommand;
 		});
 	}
 

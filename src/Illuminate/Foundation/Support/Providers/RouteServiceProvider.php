@@ -15,16 +15,50 @@ class RouteServiceProvider extends ServiceProvider {
 		$this->app->call([$this, 'before']);
 
 		if ($this->app->routesAreCached())
+			return $this->loadCachedRoutes();
+
+		$this->loadRoutes();
+	}
+
+	/**
+	 * Load the cached routes for the application.
+	 *
+	 * @return void
+	 */
+	protected function loadCachedRoutes()
+	{
+		$this->app->booted(function()
 		{
-			$this->app->booted(function()
-			{
-				require $this->app->getRouteCachePath();
-			});
-		}
-		else
+			require $this->app->getCachedRoutesPath();
+		});
+	}
+
+	/**
+	 * Load the application routes.
+	 *
+	 * @return void
+	 */
+	protected function loadRoutes()
+	{
+		if ($this->app->routesAreScanned())
+			$this->loadScannedRoutes();
+
+		$this->app->call([$this, 'map']);
+	}
+
+	/**
+	 * Load the scanned application routes.
+	 *
+	 * @return void
+	 */
+	protected function loadScannedRoutes()
+	{
+		$this->app->booted(function()
 		{
-			$this->app->call([$this, 'map']);
-		}
+			$router = app('Illuminate\Contracts\Routing\Registrar');
+
+			require $this->app->getScannedRoutesPath();
+		});
 	}
 
 	/**
