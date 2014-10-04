@@ -7,7 +7,7 @@ class MethodEndpoint implements EndpointInterface {
 	 *
 	 * @var string
 	 */
-	protected $template = '$router->%s(\'%s\', [\'uses\' => \'%s\', \'domain\' => %s, \'as\' => %s, \'before\' => %s, \'after\' => %s, \'where\' => %s);';
+	protected $template = '$router->%s(\'%s\', [\'uses\' => \'%s\', \'domain\' => %s, \'as\' => %s, \'before\' => %s, \'after\' => %s, \'where\' => %s]);';
 
 	/**
 	 * The ReflectionClass instance for the controller class.
