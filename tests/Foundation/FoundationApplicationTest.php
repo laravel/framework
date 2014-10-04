@@ -42,7 +42,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app = new ApplicationGetMiddlewaresStub;
 		$app->middleware('Illuminate\Http\FrameGuard');
 		$app->forgetMiddleware('Illuminate\Http\FrameGuard');
-		$this->assertEquals(0, count($app->getMiddlewares()));
+		$this->assertCount(0, $app->getMiddlewares());
 	}
 
 
