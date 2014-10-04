@@ -2012,7 +2012,7 @@ class Builder {
 	/**
 	 * Set the bindings on the query builder.
 	 *
-	 * @param  array $bindings
+	 * @param  array  $bindings
 	 * @return $this
 	 *
 	 */
@@ -2026,7 +2026,7 @@ class Builder {
 	/**
 	 * Add a binding to the query.
 	 *
-	 * @param  mixed $value
+	 * @param  mixed  $value
 	 * @return $this
 	 *
 	 */

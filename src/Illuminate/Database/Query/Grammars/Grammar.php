@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Grammar as BaseGrammar;
+
 
 class Grammar extends BaseGrammar {
 
