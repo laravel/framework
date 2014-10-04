@@ -10,7 +10,7 @@ class RoutingAnnotationScannerTest extends PHPUnit_Framework_TestCase {
 		$scanner = Scanner::create(__DIR__.'/fixtures/annotations', 'App\Http\Controllers');
 		$definition = $scanner->getRouteDefinitions();
 
-		$this->assertEquals(file_get_contents(__DIR__.'/results/annotation-basic.php'), $definition);
+		$this->assertEquals(trim(file_get_contents(__DIR__.'/results/annotation-basic.php')), $definition);
 	}
 
 }

@@ -5,7 +5,7 @@ $router->put('more/{id}', ['uses' => 'App\Http\Controllers\BasicController@doMor
   0 => 'log',
 ), 'where' => array (
   'id' => 'regex',
-));
+)]);
 $router->group(['before' => array (
   0 => 'auth',
   1 => 'inline',
