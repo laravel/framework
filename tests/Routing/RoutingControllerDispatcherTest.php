@@ -18,6 +18,8 @@ class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function tearDown()
 	{
 		unset($_SERVER['ControllerDispatcherTestControllerStub']);
+		$this->addToAssertionCount(m::getContainer()->mockery_getExpectationCount());
+
 		m::close();
 	}
 
