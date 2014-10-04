@@ -335,13 +335,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
 		$this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertEquals([1, 2], $builder->getBindings());
 
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->union($this->getMySqlBuilder()->select('*')->from('users')->where('id', '=', 2));
 		$this->assertEquals('(select * from `users` where `id` = ?) union (select * from `users` where `id` = ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertEquals([1, 2], $builder->getBindings());
 	}
 
 
@@ -351,8 +351,57 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
 		$this->assertEquals('select * from "users" where "id" = ? union all select * from "users" where "id" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertEquals([1, 2], $builder->getBindings());
+
+    $builder = $this->getMySqlBuilder();
+    $builder->select('*')->from('users')->where('id', '=', 1);
+    $builder->unionAll($this->getMySqlBuilder()->select('*')->from('users')->where('id', '=', 2));
+    $this->assertEquals('(select * from `users` where `id` = ?) union all (select * from `users` where `id` = ?)', $builder->toSql());
+    $this->assertEquals([1, 2], $builder->getBindings());
 	}
+
+
+  public function testUnionsWithJoins()
+  {
+    $expectedSql = 'select * from "users" inner join "photos" on "users"."id" = ? where "id" = ? union select * from "users" inner join "photos" on "users"."id" = ? where "id" = ?';
+    $expectedBindings = ['foo', 1, 'bar', 2];
+
+    $first = $this->getBuilder();
+    $first->select('*')->from('users')->join('photos', function($join) {$join->where('users.id', '=', 'foo');})->where('id', '=', 1);
+    $second = $this->getBuilder()->select('*')->from('users')->join('photos', function($join) {$join->where('users.id', '=', 'bar');})->where('id', '=', 2);
+    $first->union($second);
+    $this->assertEquals($expectedSql, $first->toSql());
+    $this->assertEquals($expectedBindings, $first->getBindings());
+  }
+
+
+  public function testUnionsWithOrder()
+  {
+    $expectedSql = 'select * from "users" where "id" = ? order by "email" asc, "age" ? desc union select * from "users" where "id" = ? order by "email" asc, "age" ? desc';
+    $expectedBindings = [1, 'foo', 2, 'bar'];
+
+    $first = $this->getBuilder();
+    $first->select('*')->from('users')->where('id', '=', 1)->orderBy('email')->orderByRaw('"age" ? desc', array('foo'));
+    $second = $this->getBuilder()->select('*')->from('users')->where('id', '=', 2)->orderBy('email')->orderByRaw('"age" ? desc', array('bar'));
+    $first->union($second);
+
+    $this->assertEquals($expectedSql, $first->toSql());
+    $this->assertEquals($expectedBindings, $first->getBindings());
+  }
+
+  public function testUnionsWithHavings()
+  {
+    $expectedSql = 'select * from "users" where "id" = ? group by "email" having "email" = ? union select * from "users" where "id" = ? group by "email" having "email" = ?';
+    $expectedBindings = [1, 'me@email.com', 2, 'you@email.com'];
+
+    $first = $this->getBuilder();
+    $first->select('*')->from('users')->where('id', '=', 1)->groupBy('email')->having('email', '=', 'me@email.com');
+    $second = $this->getBuilder()->select('*')->from('users')->where('id', '=', 2)->groupBy('email')->having('email', '=', 'you@email.com');
+    $first->union($second);
+
+    $this->assertEquals($expectedSql, $first->toSql());
+    $this->assertEquals($expectedBindings, $first->getBindings());
+  }
 
 
 	public function testMultipleUnions()
@@ -395,6 +444,46 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
 		$this->assertEquals(array(25), $builder->getBindings());
 	}
+
+
+  public function testSubSelectWhereInsWithHavings()
+  {
+    $builder = $this->getBuilder();
+    $builder->select('*')->from('users')->groupBy('email')->having('email', '!=', 'me@email.com')->whereIn('id', function($q)
+    {
+      $q->select('id')->from('users')->where('age', '>', 25)->take(3);
+    });
+    $this->assertEquals('select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3) group by "email" having "email" != ?', $builder->toSql());
+    $this->assertEquals([ 25, 'me@email.com'], $builder->getBindings());
+
+    $builder = $this->getBuilder();
+    $builder->select('*')->from('users')->groupBy('email')->having('email', '!=', 'me@email.com')->whereNotIn('id', function($q)
+    {
+      $q->select('id')->from('users')->where('age', '>', 25)->take(3);
+    });
+    $this->assertEquals('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3) group by "email" having "email" != ?', $builder->toSql());
+    $this->assertEquals([ 25, 'me@email.com'], $builder->getBindings());
+  }
+
+
+  public function testSubSelectWhereInsWithJoins()
+  {
+    $builder = $this->getBuilder();
+    $builder->select('*')->from('users')->joinWhere('photos', 'users.id', '=', 'foo')->whereIn('id', function($q)
+    {
+      $q->select('id')->from('users')->joinWhere('photos', 'users.id', '!=', 'bar')->where('age', '>', 25)->take(3);
+    });
+    $this->assertEquals('select * from "users" inner join "photos" on "users"."id" = ? where "id" in (select "id" from "users" inner join "photos" on "users"."id" != ? where "age" > ? limit 3)', $builder->toSql());
+    $this->assertEquals(['foo', 'bar', 25], $builder->getBindings());
+
+    $builder = $this->getBuilder();
+    $builder->select('*')->from('users')->joinWhere('photos', 'users.id', '=', 'foo')->whereNotIn('id', function($q)
+    {
+      $q->select('id')->from('users')->joinWhere('photos', 'users.id', '!=', 'bar')->where('age', '>', 25)->take(3);
+    });
+    $this->assertEquals('select * from "users" inner join "photos" on "users"."id" = ? where "id" not in (select "id" from "users" inner join "photos" on "users"."id" != ? where "age" > ? limit 3)', $builder->toSql());
+    $this->assertEquals(['foo', 'bar', 25], $builder->getBindings());
+  }
 
 
 	public function testBasicWhereNulls()
@@ -455,14 +544,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->having('email', '>', 1);
 		$this->assertEquals('select * from "users" having "email" > ?', $builder->toSql());
+    $this->assertEquals([1], $builder->getBindings());
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy('email')->having('email', '>', 1);
 		$this->assertEquals('select * from "users" group by "email" having "email" > ?', $builder->toSql());
+    $this->assertEquals([1], $builder->getBindings());
 
 		$builder = $this->getBuilder();
 		$builder->select('email as foo_email')->from('users')->having('foo_email', '>', 1);
 		$this->assertEquals('select "email" as "foo_email" from "users" having "foo_email" > ?', $builder->toSql());
+    $this->assertEquals([1], $builder->getBindings());
 	}
 
 
@@ -472,9 +564,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('users')->havingRaw('user_foo < user_bar');
 		$this->assertEquals('select * from "users" having user_foo < user_bar', $builder->toSql());
 
+    $builder = $this->getBuilder();
+    $builder->select('*')->from('users')->havingRaw('user_foo < ?', [1]);
+    $this->assertEquals('select * from "users" having user_foo < ?', $builder->toSql());
+    $this->assertEquals([1], $builder->getBindings());
+
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->having('baz', '=', 1)->orHavingRaw('user_foo < user_bar');
 		$this->assertEquals('select * from "users" having "baz" = ? or user_foo < user_bar', $builder->toSql());
+    $this->assertEquals([1], $builder->getBindings());
 	}
 
 
@@ -1032,9 +1130,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->wheres = array('foo');
-		$builder->mergeWheres(array('wheres'), array(12 => 'foo', 13 => 'bar'));
+		$builder->mergeWheres(array('wheres'));
 		$this->assertEquals(array('foo', 'wheres'), $builder->wheres);
-		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
 	}
 
 
@@ -1178,57 +1275,80 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testAddBindingWithArrayMergesBindingsInCorrectOrder()
-	{
-		$builder = $this->getBuilder();
-		$builder->addBinding(array('bar', 'baz'), 'having');
-		$builder->addBinding(array('foo'), 'where');
-		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
-	}
-
-
-	public function testMergeBuilders()
-	{
-		$builder = $this->getBuilder();
-		$builder->addBinding(array('foo', 'bar'));
-		$otherBuilder = $this->getBuilder();
-		$otherBuilder->addBinding(array('baz'));
-		$builder->mergeBindings($otherBuilder);
-		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
-	}
-
-
-	public function testMergeBuildersBindingOrder()
-	{
-		$builder = $this->getBuilder();
-		$builder->addBinding('foo', 'where');
-		$builder->addBinding('baz', 'having');
-		$otherBuilder = $this->getBuilder();
-		$otherBuilder->addBinding('bar', 'where');
-		$builder->mergeBindings($otherBuilder);
-		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
-	}
-
-
 	public function testSubSelect()
 	{
 		$expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
 		$expectedBindings = ['subval', 'val'];
 
-		$builder = $this->getPostgresBuilder();
+		$builder = $this->getBuilder();
 		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
 		$builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval'); }, 'sub');
 		$this->assertEquals($expectedSql, $builder->toSql());
 		$this->assertEquals($expectedBindings, $builder->getBindings());
 
-		$builder = $this->getPostgresBuilder();
+		$builder = $this->getBuilder();
 		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
-		$subBuilder = $this->getPostgresBuilder();
+		$subBuilder = $this->getBuilder();
 		$subBuilder->from('two')->select('baz')->where('subkey', '=', 'subval');
 		$builder->selectSub($subBuilder, 'sub');
 		$this->assertEquals($expectedSql, $builder->toSql());
 		$this->assertEquals($expectedBindings, $builder->getBindings());
 	}
+
+
+  public function testSubSelectWithOrder()
+  {
+    $expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ? order by "age" ? desc) as "sub" from "one" where "key" = ? order by "age" ? desc';
+    $expectedBindings = ['subval', 'buzz', 'val', 'fuzz'];
+
+    $builder = $this->getBuilder();
+    $builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val')->orderByRaw('"age" ? desc', array('fuzz'));
+    $builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval')->orderByRaw('"age" ? desc', array('buzz')); }, 'sub');
+    $this->assertEquals($expectedSql, $builder->toSql());
+    $this->assertEquals($expectedBindings, $builder->getBindings());
+  }
+
+
+  public function testSubSelectWithHavings()
+  {
+    $expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ? having "age" > ?) as "sub" from "one" where "key" = ? having "email" != ?';
+    $expectedBindings = ['subval', 25, 'val', 'me@email.com'];
+
+    $builder = $this->getBuilder();
+    $builder->from('one')->select(['foo', 'bar']);
+    $builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval')->having('age', '>', 25); }, 'sub');
+    $builder->where('key', '=', 'val')->having('email', '!=', 'me@email.com');
+    $this->assertEquals($expectedSql, $builder->toSql());
+    $this->assertEquals($expectedBindings, $builder->getBindings());
+  }
+
+
+  public function testSubSelectWithJoins()
+  {
+    $expectedSql = 'select "foo", "bar", (select "baz" from "two" inner join "photos" on "users"."id" != ? where "subkey" = ?) as "sub" from "one" inner join "photos" on "users"."id" = ? where "key" = ?';
+    $expectedBindings = ['bar', 'subval', 'foo', 'val'];
+
+    $builder = $this->getBuilder();
+    $builder->from('one')->select(['foo', 'bar']);
+    $builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval')->joinWhere('photos', 'users.id', '!=', 'bar'); }, 'sub');
+    $builder->where('key', '=', 'val')->joinWhere('photos', 'users.id', '=', 'foo');
+    $this->assertEquals($expectedSql, $builder->toSql());
+    $this->assertEquals($expectedBindings, $builder->getBindings());
+  }
+
+
+  public function testSubSelectWithRawSelect()
+  {
+    $expectedSql = 'select (select ? from "two" where "subkey" = ?) as "sub", "foo", "bar", ? from "one" where "key" = ?';
+    $expectedBindings = ['baz', 'subval', 'buzz', 'val'];
+
+    $builder = $this->getBuilder();
+    $builder->from('one');
+    $builder->selectSub(function($query) { $query->from('two')->selectRaw('?', ['baz'])->where('subkey', '=', 'subval'); }, 'sub');
+    $builder->addSelect(['foo', 'bar'])->selectRaw('?', ['buzz'])->where('key', '=', 'val');
+    $this->assertEquals($expectedSql, $builder->toSql());
+    $this->assertEquals($expectedBindings, $builder->getBindings());
+  }
 
 
 	protected function getBuilder()

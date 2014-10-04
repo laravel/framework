@@ -487,6 +487,144 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRealHas()
+	{
+		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "status" = ?) >= 1';
+		$expectedBindings = ['active'];
+
+		$model = new EloquentBuilderTestHasStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->has('subs');
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+	public function testRealHasWithOperatorAndCount()
+	{
+		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "status" = ?) = 4';
+		$expectedBindings = ['active'];
+
+		$model = new EloquentBuilderTestHasStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->has('subs', '=', 4);
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+	public function testRealOrHas()
+	{
+		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "status" = ?) >= 1';
+		$expectedBindings = ['bar', 'active'];
+
+		$model = new EloquentBuilderTestHasStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->where('foo', 'bar')->orHas('subs');
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
+	public function testRealWhereHas()
+	{
+		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "foo" = ? and "status" = ?) >= 1';
+		$expectedBindings = ['bar', 'active'];
+
+		$model = new EloquentBuilderTestHasStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->whereHas('subs', function($subs) { $subs->where('foo', '=', 'bar');});
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
+	public function testRealOrWhereHas()
+	{
+		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "fizz" = ? and "status" = ?) >= 1';
+		$expectedBindings = ['bar', 'buzz', 'active'];
+
+		$model = new EloquentBuilderTestHasStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->where('foo', '=', 'bar')->orWhereHas('subs', function($subs) { $subs->where('fizz', '=', 'buzz');});
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
+	public function testRealHasWithScopes()
+	{
+		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "subTable"."deleted_at" is null and "status" = ?) >= 1';
+		$expectedBindings = ['active'];
+
+		$model = new EloquentBuilderTestHasScopeStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->has('subs');
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
+	public function testRealHasWithScopesOperatorAndCount()
+	{
+		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "subTable"."deleted_at" is null and "status" = ?) = 4';
+		$expectedBindings = ['active'];
+
+		$model = new EloquentBuilderTestHasScopeStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->has('subs', '=', 4);
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
+	public function testRealOrHasWithScopes()
+	{
+		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "subTable"."deleted_at" is null and "status" = ?) >= 1';
+		$expectedBindings = ['bar', 'active'];
+
+		$model = new EloquentBuilderTestHasScopeStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->where('foo', 'bar')->orHas('subs');
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
+	public function testRealWhereHasWithScopes()
+	{
+		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "foo" = ? and "subTable"."deleted_at" is null and "status" = ?) >= 1';
+		$expectedBindings = ['bar', 'active'];
+
+		$model = new EloquentBuilderTestHasScopeStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->whereHas('subs', function($subs) { $subs->where('foo', '=', 'bar');});
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
+	public function testRealOrWhereHasWithScopes()
+	{
+		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "fizz" = ? and "subTable"."deleted_at" is null and "status" = ?) >= 1';
+		$expectedBindings = ['bar', 'buzz', 'active'];
+
+		$model = new EloquentBuilderTestHasScopeStub;
+		$this->mockConnectionForModel($model, 'SQLite');
+		$query = $model->newQuery()->where('foo', '=', 'bar')->orWhereHas('subs', function($subs) { $subs->where('fizz', '=', 'buzz');});
+
+		$this->assertEquals($expectedSql, $query->toSql());
+		$this->assertEquals($expectedBindings, $query->getBindings());
+	}
+
+
 	protected function mockConnectionForModel($model, $database)
 	{
 		$grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -542,6 +680,30 @@ class EloquentBuilderTestWithTrashedStub extends Illuminate\Database\Eloquent\Mo
 
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'table';
+	use Illuminate\Database\Eloquent\SoftDeletingTrait;
+}
+
+
+class EloquentBuilderTestHasStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'table';
+	public function subs() {
+		return $this->hasMany('EloquentBuilderTestHasRelationStub', 'table_id')->where('status', '=', 'active');
+	}
+}
+
+class EloquentBuilderTestHasRelationStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'subTable';
+}
+
+class EloquentBuilderTestHasScopeStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'table';
+	public function subs() {
+		return $this->hasMany('EloquentBuilderTestHasRelationScopeStub', 'table_id')->where('status', '=', 'active');
+	}
+}
+
+class EloquentBuilderTestHasRelationScopeStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'subTable';
 	use Illuminate\Database\Eloquent\SoftDeletingTrait;
 }
 
