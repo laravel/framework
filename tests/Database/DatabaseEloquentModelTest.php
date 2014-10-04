@@ -950,7 +950,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->name = 'taylor';
 		$model->exists = true;
 		$this->assertTrue($model->save(['timestamps' => false]));
-		$this->assertEquals(null, $model->updated_at);
+		$this->assertNull($model->updated_at);
 	}
 
 
