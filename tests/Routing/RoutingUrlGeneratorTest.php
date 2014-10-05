@@ -25,7 +25,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		);
 
 		$this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar'));
-		
+
 		/**
 		 * Test asset URL generation...
 		 */
