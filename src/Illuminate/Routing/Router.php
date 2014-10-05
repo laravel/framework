@@ -378,9 +378,9 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 		// If the route is routing to a controller we will parse the route action into
 		// an acceptable array format before registering it and creating this route
 		// instance itself. We need to build the Closure that will call this out.
-		if ($this->routingToController($action))
+		if ($this->actionReferencesController($action))
 		{
-			$action = $this->getControllerAction($action);
+			$action = $this->convertToControllerAction($action);
 		}
 
 		$route = $this->newRoute(
@@ -390,9 +390,9 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
 		// the merge we will be ready to return the route back out to the caller.
-		if ( ! empty($this->groupStack))
+		if ($this->hasGroupStack())
 		{
-			$this->mergeController($route);
+			$this->mergeGroupAttributesIntoRoute($route);
 		}
 
 		$this->addWhereClausesToRoute($route);
@@ -445,7 +445,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return void
 	 */
-	protected function mergeController($route)
+	protected function mergeGroupAttributesIntoRoute($route)
 	{
 		$action = $this->mergeWithLastGroup($route->getAction());
 
@@ -458,7 +458,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	 * @param  array  $action
 	 * @return bool
 	 */
-	protected function routingToController($action)
+	protected function actionReferencesController($action)
 	{
 		if ($action instanceof Closure) return false;
 
@@ -471,7 +471,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	 * @param  array|string  $action
 	 * @return array
 	 */
-	protected function getControllerAction($action)
+	protected function convertToControllerAction($action)
 	{
 		if (is_string($action)) $action = array('uses' => $action);
 
