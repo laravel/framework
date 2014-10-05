@@ -666,7 +666,7 @@ class Builder {
 			$count = new Expression($count);
 		}
 
-		return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
+		return $this->where(new Expression('('.$hasQuery->toSql()->sql.')'), $operator, $count, $boolean);
 	}
 
 	/**
@@ -680,14 +680,10 @@ class Builder {
 	{
 		// Here we have the "has" query and the original relation. We need to copy over any
 		// where clauses the developer may have put in the relationship function over to
-		// the has query, and then copy the bindings from the "has" query to the main.
+		// the has query.
 		$relationQuery = $relation->getBaseQuery();
 
-		$hasQuery->mergeWheres(
-			$relationQuery->wheres, $relationQuery->getBindings()
-		);
-
-		$this->query->mergeBindings($hasQuery->getQuery());
+		$hasQuery->mergeWheres($relationQuery->wheres);
 	}
 
 	/**
@@ -774,8 +770,8 @@ class Builder {
 
 			if ( ! isset($results[$last = implode('.', $progress)]))
 			{
- 				$results[$last] = function() {};
- 			}
+				$results[$last] = function() {};
+			}
 		}
 
 		return $results;

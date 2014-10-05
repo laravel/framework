@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\CompiledQuery;
 
 class SqlServerGrammar extends Grammar {
 
@@ -19,7 +20,7 @@ class SqlServerGrammar extends Grammar {
 	 * Compile a select query into SQL.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	public function compileSelect(Builder $query)
 	{
@@ -41,7 +42,7 @@ class SqlServerGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $columns
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileColumns(Builder $query, $columns)
 	{
@@ -57,7 +58,12 @@ class SqlServerGrammar extends Grammar {
 			$select .= 'top '.$query->limit.' ';
 		}
 
-		return $select.$this->columnize($columns);
+		// include the binding logic from the parent method
+		$bindings = array_flatten(array_fetch($columns, 'bindings'));
+
+		$columns = array_flatten(array_fetch($columns, 'columns'));
+
+		return new CompiledQuery($select.$this->columnize($columns), $bindings);
 	}
 
 	/**
@@ -65,17 +71,19 @@ class SqlServerGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  string  $table
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileFrom(Builder $query, $table)
 	{
 		$from = parent::compileFrom($query, $table);
 
-		if (is_string($query->lock)) return $from.' '.$query->lock;
+		if (is_string($query->lock)) return $from->concatenate(new CompiledQuery($query->lock));
 
 		if ( ! is_null($query->lock))
 		{
-			return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
+			$from->sql .= ' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
+
+			return $from;
 		}
 
 		return $from;
@@ -95,7 +103,7 @@ class SqlServerGrammar extends Grammar {
 		// does not complain about the queries for not having an "order by" clause.
 		if ( ! isset($components['orders']))
 		{
-			$components['orders'] = 'order by (select 0)';
+			$components['orders'] = new CompiledQuery('order by (select 0)');
 		}
 
 		// We need to add the row number to the query so we can compare it to the offset
@@ -103,7 +111,7 @@ class SqlServerGrammar extends Grammar {
 		// the "select" that will give back the row numbers on each of the records.
 		$orderings = $components['orders'];
 
-		$components['columns'] .= $this->compileOver($orderings);
+		$components['columns']->sql .= $this->compileOver($orderings->sql);
 
 		unset($components['orders']);
 
@@ -112,12 +120,12 @@ class SqlServerGrammar extends Grammar {
 		// set we will just handle the offset only since that is all that matters.
 		$constraint = $this->compileRowConstraint($query);
 
-		$sql = $this->concatenate($components);
+		$compiled = $this->concatenate($components);
 
 		// We are now ready to build the final SQL query so we'll create a common table
 		// expression from the query and get the records with row numbers within our
 		// given limit and offset value that we just put on as a query constraint.
-		return $this->compileTableExpression($sql, $constraint);
+		return $this->compileTableExpression($compiled, $constraint);
 	}
 
 	/**
@@ -156,11 +164,13 @@ class SqlServerGrammar extends Grammar {
 	 *
 	 * @param  string  $sql
 	 * @param  string  $constraint
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
-	protected function compileTableExpression($sql, $constraint)
+	protected function compileTableExpression(CompiledQuery $compiled, $constraint)
 	{
-		return "select * from ({$sql}) as temp_table where row_num {$constraint}";
+		$compiled->sql = "select * from ({$compiled->sql}) as temp_table where row_num {$constraint}";
+
+		return $compiled;
 	}
 
 	/**
@@ -168,11 +178,11 @@ class SqlServerGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  int  $limit
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileLimit(Builder $query, $limit)
 	{
-		return '';
+		return new CompiledQuery;
 	}
 
 	/**
@@ -180,11 +190,11 @@ class SqlServerGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  int  $offset
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function compileOffset(Builder $query, $offset)
 	{
-		return '';
+		return new CompiledQuery;
 	}
 
 	/**

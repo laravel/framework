@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\CompiledQuery;
 
 class SQLiteGrammar extends Grammar {
 
@@ -20,7 +21,7 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $values
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	public function compileInsert(Builder $query, array $values)
 	{
@@ -56,7 +57,7 @@ class SQLiteGrammar extends Grammar {
 
 		$columns = array_fill(0, count($values), implode(', ', $columns));
 
-		return "insert into $table ($names) select ".implode(' union select ', $columns);
+		return new CompiledQuery("insert into $table ($names) select ".implode(' union select ', $columns));
 	}
 
 	/**
@@ -79,7 +80,7 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function whereDay(Builder $query, $where)
 	{
@@ -91,7 +92,7 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function whereMonth(Builder $query, $where)
 	{
@@ -103,7 +104,7 @@ class SQLiteGrammar extends Grammar {
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function whereYear(Builder $query, $where)
 	{
@@ -116,7 +117,7 @@ class SQLiteGrammar extends Grammar {
 	 * @param  string  $type
 	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @param  array  $where
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	protected function dateBasedWhere($type, Builder $query, $where)
 	{
@@ -124,7 +125,9 @@ class SQLiteGrammar extends Grammar {
 
 		$value = $this->parameter($value);
 
-		return 'strftime(\''.$type.'\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+		$sql = 'strftime(\''.$type.'\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+
+		return new CompiledQuery($sql, $where['value']);
 	}
 
 }
