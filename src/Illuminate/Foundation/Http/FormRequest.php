@@ -23,6 +23,13 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected $container;
 
 	/**
+	 * The redirector instance.
+	 *
+	 * @var Redirector
+	 */
+	protected $redirector;
+
+	/**
 	 * The route instance the request is dispatched to.
 	 *
 	 * @var \Illuminate\Routing\Route
@@ -102,7 +109,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	}
 
 	/**
-	 * Deteremine if the request passes the authorization check.
+	 * Determine if the request passes the authorization check.
 	 *
 	 * @return bool
 	 */
