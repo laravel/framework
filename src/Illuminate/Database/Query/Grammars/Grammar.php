@@ -38,6 +38,7 @@ class Grammar extends BaseGrammar {
 		if (is_null($query->columns)) $query->setSelect(array('*'));
 		// reset the bindings each time we compile.
 		$query->setBindings([]);
+
 		return trim($this->concatenate($this->compileComponents($query)));
 	}
 
@@ -107,9 +108,7 @@ class Grammar extends BaseGrammar {
 
 		$bindings = array_flatten(array_fetch($columns, 'bindings'));
 
-		if ($bindings) {
-			$query->addBinding($bindings);
-		}
+		if ($bindings) $query->addBinding($bindings);
 
 		$columns = array_flatten(array_fetch($columns, 'columns'));
 
@@ -269,10 +268,7 @@ class Grammar extends BaseGrammar {
 	protected function whereBasic(Builder $query, $where)
 	{
 		$value = $where['value'];
-		if ( ! $value instanceof Expression)
-		{
-			$query->addBinding($value);
-		}
+		if ( ! $value instanceof Expression) $query->addBinding($value);
 
 		$value = $this->parameter($value);
 
@@ -478,6 +474,7 @@ class Grammar extends BaseGrammar {
 	protected function whereRaw(Builder $query, $where)
 	{
 		$query->addBinding($where['bindings']);
+
 		return $where['sql'];
 	}
 
@@ -564,6 +561,7 @@ class Grammar extends BaseGrammar {
 		{
 			if (isset($order['sql'])) {
 				$query->addBinding($order['bindings']);
+
 				return $order['sql'];
 			}
 
