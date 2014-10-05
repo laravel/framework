@@ -39,6 +39,13 @@ class Container implements ArrayAccess, ContainerContract {
 	protected $aliases = array();
 
 	/**
+	 * The extension closures for services.
+	 *
+	 * @var array
+	 */
+	protected $extenders = [];
+
+	/**
 	 * All of the registered tags.
 	 *
 	 * @var array
@@ -295,11 +302,6 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	public function extend($abstract, Closure $closure)
 	{
-		if ( ! isset($this->bindings[$abstract]))
-		{
-			throw new \InvalidArgumentException("Type {$abstract} is not bound.");
-		}
-
 		if (isset($this->instances[$abstract]))
 		{
 			$this->instances[$abstract] = $closure($this->instances[$abstract], $this);
@@ -308,30 +310,8 @@ class Container implements ArrayAccess, ContainerContract {
 		}
 		else
 		{
-			$extender = $this->getExtender($abstract, $closure);
-
-			$this->bind($abstract, $extender, $this->isShared($abstract));
+			$this->extenders[$abstract][] = $closure;
 		}
-	}
-
-	/**
-	 * Get an extender Closure for resolving a type.
-	 *
-	 * @param  string    $abstract
-	 * @param  \Closure  $closure
-	 * @return \Closure
-	 */
-	protected function getExtender($abstract, Closure $closure)
-	{
-		// To "extend" a binding, we will grab the old "resolver" Closure and pass it
-		// into a new one. The old resolver will be called first and the result is
-		// handed off to the "new" resolver, along with this container instance.
-		$resolver = $this->bindings[$abstract]['concrete'];
-
-		return function($container) use ($resolver, $closure)
-		{
-			return $closure($resolver($container), $container);
-		};
 	}
 
 	/**
@@ -649,6 +629,14 @@ class Container implements ArrayAccess, ContainerContract {
 			$object = $this->make($concrete, $parameters);
 		}
 
+		// If we defined any extenders for this type, these will now be
+		// applied. This allows for extension of services with other
+		// drivers, changing config or wrapping with decorators.
+		foreach ($this->getExtenders($abstract) as $extender)
+		{
+			$object = $extender($object, $this);
+		}
+
 		// If the requested type is registered as a singleton we'll want to cache off
 		// the instances in "memory" so we can return it later without creating an
 		// entirely new instance of an object on each subsequent request for it.
@@ -716,6 +704,22 @@ class Container implements ArrayAccess, ContainerContract {
 	protected function missingLeadingSlash($abstract)
 	{
 		return is_string($abstract) && strpos($abstract, '\\') !== 0;
+	}
+
+	/**
+	 * Get the extender callbacks for a given type.
+	 *
+	 * @param  string  $abstract
+	 * @return array
+	 */
+	protected function getExtenders($abstract)
+	{
+		if (isset($this->extenders[$abstract]))
+		{
+			return $this->extenders[$abstract];
+		}
+
+		return [];
 	}
 
 	/**
