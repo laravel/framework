@@ -844,19 +844,6 @@ class Route {
 	}
 
 	/**
-	 * Set the container instance used by the route.
-	 *
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return \Illuminate\Routing\Route
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-
-		return $this;
-	}
-
-	/**
 	 * Get the compiled version of the route.
 	 *
 	 * @return \Symfony\Component\Routing\CompiledRoute
@@ -864,6 +851,19 @@ class Route {
 	public function getCompiled()
 	{
 		return $this->compiled;
+	}
+
+	/**
+	 * Set the container instance on the route.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return $this
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+
+		return $this;
 	}
 
 	/**
