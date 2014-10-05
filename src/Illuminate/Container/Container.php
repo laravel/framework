@@ -541,7 +541,7 @@ class Container implements ArrayAccess, ContainerContract {
 
 		foreach ($this->getCallReflector($callback)->getParameters() as $key => $parameter)
 		{
-			$dependencies[] = $this->getDependencyForCallParameter($parameter, $parameters);
+			$this->addDependencyForCallParameter($parameter, $parameters, $dependencies);
 		}
 
 		return array_merge($dependencies, $parameters);
@@ -570,21 +570,22 @@ class Container implements ArrayAccess, ContainerContract {
 	 *
 	 * @param  \ReflectionParameter  $parameter
 	 * @param  array  $parameters
+	 * @param  array  $dependencies
 	 * @return mixed
 	 */
-	protected function getDependencyForCallParameter(ReflectionParameter $parameter, array $parameters)
+	protected function addDependencyForCallParameter(ReflectionParameter $parameter, array $parameters, &$dependencies)
 	{
 		if (array_key_exists($parameter->name, $parameters))
 		{
-			return $parameters[$parameter->name];
+			$dependencies[] = $parameters[$parameter->name];
 		}
 		elseif ($parameter->getClass())
 		{
-			return $this->make($parameter->getClass()->name);
+			$dependencies[] = $this->make($parameter->getClass()->name);
 		}
 		elseif ($parameter->isDefaultValueAvailable())
 		{
-			return $parameter->getDefaultValue();
+			$dependencies[] = $parameter->getDefaultValue();
 		}
 	}
 

@@ -31,7 +31,9 @@ trait RouteDependencyResolverTrait {
 	{
 		if ( ! method_exists($instance, $method)) return $parameters;
 
-		return $this->resolveMethodDependencies($parameters, new ReflectionMethod($instance, $method));
+		return $this->resolveMethodDependencies(
+			$parameters, new ReflectionMethod($instance, $method)
+		);
 	}
 
 	/**
@@ -52,7 +54,9 @@ trait RouteDependencyResolverTrait {
 
 			if ($class && ! $this->alreadyInParameters($class->name, $parameters))
 			{
-				array_splice($parameters, $key, 0, [$this->container->make($class->name)]);
+				array_splice(
+					$parameters, $key, 0, [$this->container->make($class->name)]
+				);
 			}
 		}
 
