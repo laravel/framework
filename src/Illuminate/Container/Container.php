@@ -573,11 +573,13 @@ class Container implements ArrayAccess, ContainerContract {
 	 * @param  array  $dependencies
 	 * @return mixed
 	 */
-	protected function addDependencyForCallParameter(ReflectionParameter $parameter, array $parameters, &$dependencies)
+	protected function addDependencyForCallParameter(ReflectionParameter $parameter, array &$parameters, &$dependencies)
 	{
 		if (array_key_exists($parameter->name, $parameters))
 		{
 			$dependencies[] = $parameters[$parameter->name];
+
+			unset($parameters[$parameter->name]);
 		}
 		elseif ($parameter->getClass())
 		{
