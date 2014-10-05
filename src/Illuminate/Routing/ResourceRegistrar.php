@@ -194,7 +194,7 @@ class ResourceRegistrar {
 		// the resource action. Otherwise we'll just use an empty string for here.
 		$prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-		if (empty($this->router->getGroupStack()))
+		if ( ! $this->router->hasGroupStack())
 		{
 			return $prefix.$resource.'.'.$method;
 		}

@@ -1032,6 +1032,16 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	}
 
 	/**
+	 * Determine if the router currently has a group stack.
+	 *
+	 * @return bool
+	 */
+	public function hasGroupStack()
+	{
+		return ! empty($this->groupStack);
+	}
+
+	/**
 	 * Get the current group stack for the router.
 	 *
 	 * @return array
