@@ -214,6 +214,19 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExtendCanBeCalledBeforeBind()
+	{
+		$container = new Container;
+		$container->extend('foo', function($old, $container)
+		{
+			return $old.'bar';
+		});
+		$container['foo'] = 'foo';
+
+		$this->assertEquals('foobar', $container->make('foo'));
+	}
+
+
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
