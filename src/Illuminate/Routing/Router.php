@@ -57,13 +57,6 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	protected $controllerDispatcher;
 
 	/**
-	 * The controller inspector instance.
-	 *
-	 * @var \Illuminate\Routing\ControllerInspector
-	 */
-	protected $inspector;
-
-	/**
 	 * Indicates if the router is running filters.
 	 *
 	 * @var bool
@@ -1272,16 +1265,6 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	public function setControllerDispatcher(ControllerDispatcher $dispatcher)
 	{
 		$this->controllerDispatcher = $dispatcher;
-	}
-
-	/**
-	 * Get a controller inspector instance.
-	 *
-	 * @return \Illuminate\Routing\ControllerInspector
-	 */
-	public function getInspector()
-	{
-		return $this->inspector ?: $this->inspector = new ControllerInspector;
 	}
 
 	/**
