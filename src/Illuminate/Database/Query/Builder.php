@@ -30,13 +30,6 @@ class Builder {
 	protected $processor;
 
 	/**
-	 * The current query value bindings.
-	 *
-	 * @var array
-	 */
-	protected $bindings = [];
-
-	/**
 	 * An aggregate function and column to be run.
 	 *
 	 * @var array
@@ -237,11 +230,11 @@ class Builder {
 
 		if ($query instanceof Builder)
 		{
-			$sql = $query->toSql();
+			$compiled = $query->toSql();
 
-			$bindings = $query->getBindings();
+			$bindings = $compiled->bindings;
 
-			$query = $sql;
+			$query = $compiled->sql;
 		}
 		elseif (is_string($query))
 		{
@@ -1247,7 +1240,7 @@ class Builder {
 	/**
 	 * Get the SQL representation of the query.
 	 *
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
 	public function toSql()
 	{
@@ -1376,7 +1369,9 @@ class Builder {
 	 */
 	protected function runSelect()
 	{
-		return $this->connection->select($this->toSql(), $this->getBindings());
+		$compiled = $this->toSql();
+
+		return $this->connection->select($compiled->sql, $compiled->bindings);
 	}
 
 	/**
@@ -1449,8 +1444,9 @@ class Builder {
 	public function generateCacheKey()
 	{
 		$name = $this->connection->getName();
+		$compiled = $this->toSql();
 
-		return md5($name.$this->toSql().serialize($this->getBindings()));
+		return md5($name.$compiled->sql.serialize($compiled->bindings));
 	}
 
 	/**
@@ -1848,14 +1844,14 @@ class Builder {
 			}
 		}
 
-		$sql = $this->grammar->compileInsert($this, $values);
+		$insert = $this->grammar->compileInsert($this, $values);
 
 		// Once we have compiled the insert statement's SQL we can execute it on the
 		// connection and return a result as a boolean success indicator as that
 		// is the same type of result returned by the raw connection instance.
 		$bindings = $this->cleanBindings($bindings);
 
-		return $this->connection->insert($sql, $bindings);
+		return $this->connection->insert($insert->sql, $bindings);
 	}
 
 	/**
@@ -1867,11 +1863,11 @@ class Builder {
 	 */
 	public function insertGetId(array $values, $sequence = null)
 	{
-		$sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
+		$insert = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
 		$values = $this->cleanBindings($values);
 
-		return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
+		return $this->processor->processInsertGetId($this, $insert->sql, $values, $sequence);
 	}
 
 	/**
@@ -1882,10 +1878,10 @@ class Builder {
 	 */
 	public function update(array $values)
 	{
-		$sql = $this->grammar->compileUpdate($this, $values);
-		$bindings = array_values(array_merge($values, $this->getBindings()));
+		$update = $this->grammar->compileUpdate($this, $values);
+		$bindings = array_values(array_merge($values, $update->bindings));
 
-		return $this->connection->update($sql, $this->cleanBindings($bindings));
+		return $this->connection->update($update->sql, $this->cleanBindings($bindings));
 	}
 
 	/**
@@ -1935,9 +1931,9 @@ class Builder {
 		// from their database without manually specifying the where clauses.
 		if ( ! is_null($id)) $this->where('id', '=', $id);
 
-		$sql = $this->grammar->compileDelete($this);
+		$delete = $this->grammar->compileDelete($this);
 
-		return $this->connection->delete($sql, $this->getBindings());
+		return $this->connection->delete($delete->sql, $delete->bindings);
 	}
 
 	/**
@@ -1997,51 +1993,6 @@ class Builder {
 	public function raw($value)
 	{
 		return $this->connection->raw($value);
-	}
-
-	/**
-	 * Get the current query value bindings in a flattened array.
-	 *
-	 * @return array
-	 */
-	public function getBindings()
-	{
-		return $this->bindings;
-	}
-
-	/**
-	 * Set the bindings on the query builder.
-	 *
-	 * @param  array  $bindings
-	 * @return $this
-	 *
-	 */
-	public function setBindings(array $bindings)
-	{
-		$this->bindings = $bindings;
-
-		return $this;
-	}
-
-	/**
-	 * Add a binding to the query.
-	 *
-	 * @param  mixed  $value
-	 * @return $this
-	 *
-	 */
-	public function addBinding($value)
-	{
-		if (is_array($value))
-		{
-			$this->bindings = array_values(array_merge($this->bindings, $value));
-		}
-		else
-		{
-			$this->bindings[] = $value;
-		}
-
-		return $this;
 	}
 
 	/**

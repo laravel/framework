@@ -666,7 +666,7 @@ class Builder {
 			$count = new Expression($count);
 		}
 
-		return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
+		return $this->where(new Expression('('.$hasQuery->toSql()->sql.')'), $operator, $count, $boolean);
 	}
 
 	/**
