@@ -1,7 +1,5 @@
 <?php namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller;
-
 /**
  * @Resource("foobar/photos", only={"index", "update"}, names={"index": "index.name"})
  * @Controller(domain="{id}.account.com")
@@ -9,7 +7,7 @@ use Illuminate\Routing\Controller;
  * @Before("csrf", on={"post", "put", "delete"})
  * @Where({"id": "regex"})
  */
-class BasicController extends Controller {
+class BasicController {
 
 	/**
 	 * @Before("inline")

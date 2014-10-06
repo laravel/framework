@@ -81,7 +81,6 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Session/SessionServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RouteDependencyResolverTrait.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RouteFiltererInterface.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Router.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Route.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RouteCollection.php',
