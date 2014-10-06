@@ -14,12 +14,12 @@ class Builder {
 	/**
 	 * Push a new middleware onto the stack.
 	 *
-	 * @param  string  $middleware
+	 * @param  array|string  $middleware
 	 * @return $this
 	 */
 	public function middleware($middleware)
 	{
-		$this->middlewares[] = $middleware;
+		$this->middlewares = array_merge($this->middlewares, (array) $middleware);
 
 		return $this;
 	}
