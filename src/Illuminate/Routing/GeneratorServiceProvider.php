@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Routing\Console\FilterMakeCommand;
+use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 
 class GeneratorServiceProvider extends ServiceProvider {
@@ -22,9 +22,9 @@ class GeneratorServiceProvider extends ServiceProvider {
 	{
 		$this->registerControllerGenerator();
 
-		$this->registerFilterGenerator();
+		$this->registerMiddlewareGenerator();
 
-		$this->commands('command.controller.make', 'command.filter.make');
+		$this->commands('command.controller.make', 'command.middleware.make');
 	}
 
 	/**
@@ -41,15 +41,15 @@ class GeneratorServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Register the filter generator command.
+	 * Register the middleware generator command.
 	 *
 	 * @return void
 	 */
-	protected function registerFilterGenerator()
+	protected function registerMiddlewareGenerator()
 	{
-		$this->app->bindShared('command.filter.make', function($app)
+		$this->app->bindShared('command.middleware.make', function($app)
 		{
-			return new FilterMakeCommand($app['files']);
+			return new MiddlewareMakeCommand($app['files']);
 		});
 	}
 
@@ -61,7 +61,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return array(
-			'command.controller.make', 'command.filter.make',
+			'command.controller.make', 'command.middleware.make',
 		);
 	}
 
