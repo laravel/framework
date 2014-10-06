@@ -8,9 +8,11 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
+use Illuminate\Routing\Controller as BaseController;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Routing\RouteDependencyResolverTrait;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Route {
 
@@ -115,25 +117,21 @@ class Route {
 	 * Run the route action and return the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Routing\ControllerDispatcher  $controllerDispatcher
 	 * @return mixed
 	 */
-	public function run(Request $request, ControllerDispatcher $controllerDispatcher = null)
+	public function run(Request $request)
 	{
-		$parameters = array_filter($this->parameters(), function($p) { return isset($p); });
+		$this->container = $this->container ?: new Container;
 
 		try
 		{
+			if ($this->customDispatcherIsBound())
+				return $this->runWithCustomDispatcher($request);
+
 			if (is_string($this->action['uses']))
-			{
-				return $this->dispatchToController($request, $controllerDispatcher);
-			}
+				return $this->runController($request);
 
-			$parameters = $this->resolveMethodDependencies(
-				$parameters, new ReflectionFunction($this->action['uses'])
-			);
-
-			return call_user_func_array($this->action['uses'], $parameters);
+			return $this->runCallable($request);
 		}
 		catch (HttpResponseException $e)
 		{
@@ -142,17 +140,63 @@ class Route {
 	}
 
 	/**
-	 * Dispatch the request to the route to a controller class.
+	 * Run the route action and return the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Routing\ControllerDispatcher  $controllerDispatcher
 	 * @return mixed
 	 */
-	protected function dispatchToController(Request $request, ControllerDispatcher $controllerDispatcher)
+	protected function runCallable(Request $request)
 	{
-		list($class, $method) = explode('@', $this->action['controller']);
+		$parameters = $this->resolveMethodDependencies(
+			$this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+		);
 
-		return $controllerDispatcher->dispatch($this, $request, $class, $method);
+		return call_user_func_array($this->action['uses'], $parameters);
+	}
+
+	/**
+	 * Run the route action and return the response.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return mixed
+	 */
+	protected function runController(Request $request)
+	{
+		list($class, $method) = explode('@', $this->action['uses']);
+
+		$parameters = $this->resolveClassMethodDependencies(
+			$this->parametersWithoutNulls(), $class, $method
+		);
+
+		if ( ! method_exists($instance = $this->container->make($class), $method))
+			throw new NotFoundHttpException;
+
+		return call_user_func_array([$instance, $method], $parameters);
+	}
+
+	/**
+	 * Determine if a custom route dispatcher is bound in the container.
+	 *
+	 * @return bool
+	 */
+	protected function customDispatcherIsBound()
+	{
+		return $this->container->bound('illuminate.route.dispatcher');
+	}
+
+	/**
+	 * Send the request and route to a custom dispatcher for handling.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return mixed
+	 */
+	protected function runWithCustomDispatcher(Request $request)
+	{
+		list($class, $method) = explode('@', $this->action['uses']);
+
+		$dispatcher = $this->container->make('illuminate.route.dispatcher');
+
+		return $dispatcher->dispatch($this, $request, $class, $method);
 	}
 
 	/**

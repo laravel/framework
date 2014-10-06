@@ -12,7 +12,7 @@ use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInterface {
+class Router implements HttpKernelInterface, RegistrarContract {
 
 	/**
 	 * The event dispatcher instance.
@@ -48,13 +48,6 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 	 * @var \Illuminate\Http\Request
 	 */
 	protected $currentRequest;
-
-	/**
-	 * The controller dispatcher instance.
-	 *
-	 * @var \Illuminate\Routing\ControllerDispatcher
-	 */
-	protected $controllerDispatcher;
 
 	/**
 	 * Indicates if the router is running filters.
@@ -553,9 +546,7 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 
 		if (is_null($response))
 		{
-			$response = $route->run(
-				$request, $this->getControllerDispatcher()
-			);
+			$response = $route->run($request);
 		}
 
 		$response = $this->prepareResponse($request, $response);
@@ -1249,32 +1240,6 @@ class Router implements HttpKernelInterface, RegistrarContract, RouteFiltererInt
 		$this->routes = $routes;
 
 		$this->container->instance('routes', $this->routes);
-	}
-
-	/**
-	 * Get the controller dispatcher instance.
-	 *
-	 * @return \Illuminate\Routing\ControllerDispatcher
-	 */
-	public function getControllerDispatcher()
-	{
-		if (is_null($this->controllerDispatcher))
-		{
-			$this->controllerDispatcher = new ControllerDispatcher($this, $this->container);
-		}
-
-		return $this->controllerDispatcher;
-	}
-
-	/**
-	 * Set the controller dispatcher instance.
-	 *
-	 * @param  \Illuminate\Routing\ControllerDispatcher  $dispatcher
-	 * @return void
-	 */
-	public function setControllerDispatcher(ControllerDispatcher $dispatcher)
-	{
-		$this->controllerDispatcher = $dispatcher;
 	}
 
 	/**
