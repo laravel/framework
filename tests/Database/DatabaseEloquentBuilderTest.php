@@ -490,7 +490,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealHas()
+	public function testHas()
 	{
 		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "status" = ?) >= 1';
 		$expectedBindings = ['active'];
@@ -502,7 +502,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
-	public function testRealHasWithOperatorAndCount()
+	public function testHasWithOperatorAndCount()
 	{
 		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "status" = ?) = 4';
 		$expectedBindings = ['active'];
@@ -514,7 +514,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertBuilderCompile($query, $expectedSql, $expectedBindings);
 	}
 
-	public function testRealOrHas()
+	public function testOrHas()
 	{
 		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "status" = ?) >= 1';
 		$expectedBindings = ['bar', 'active'];
@@ -527,7 +527,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealWhereHas()
+	public function testWhereHas()
 	{
 		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "foo" = ? and "status" = ?) >= 1';
 		$expectedBindings = ['bar', 'active'];
@@ -540,7 +540,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealOrWhereHas()
+	public function testOrWhereHas()
 	{
 		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "fizz" = ? and "status" = ?) >= 1';
 		$expectedBindings = ['bar', 'buzz', 'active'];
@@ -553,7 +553,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealHasWithScopes()
+	public function testHasWithScopes()
 	{
 		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "subTable"."deleted_at" is null and "status" = ?) >= 1';
 		$expectedBindings = ['active'];
@@ -566,7 +566,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealHasWithScopesOperatorAndCount()
+	public function testHasWithScopesOperatorAndCount()
 	{
 		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "subTable"."deleted_at" is null and "status" = ?) = 4';
 		$expectedBindings = ['active'];
@@ -579,7 +579,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealOrHasWithScopes()
+	public function testOrHasWithScopes()
 	{
 		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "subTable"."deleted_at" is null and "status" = ?) >= 1';
 		$expectedBindings = ['bar', 'active'];
@@ -592,7 +592,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealWhereHasWithScopes()
+	public function testWhereHasWithScopes()
 	{
 		$expectedSql = 'select * from "table" where (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "foo" = ? and "subTable"."deleted_at" is null and "status" = ?) >= 1';
 		$expectedBindings = ['bar', 'active'];
@@ -605,7 +605,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testRealOrWhereHasWithScopes()
+	public function testOrWhereHasWithScopes()
 	{
 		$expectedSql = 'select * from "table" where "foo" = ? or (select count(*) from "subTable" where "subTable"."table_id" = "table"."id" and "fizz" = ? and "subTable"."deleted_at" is null and "status" = ?) >= 1';
 		$expectedBindings = ['bar', 'buzz', 'active'];
