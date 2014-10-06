@@ -13,12 +13,7 @@ class AppServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$router = $this->app['router'];
-
-		foreach ($this->middleware as $key => $class)
-		{
-			$router->middleware($key, $class);
-		}
+		$this->registerMiddlewareShortcuts();
 
 		if (method_exists($this, 'stack'))
 		{
@@ -27,6 +22,21 @@ class AppServiceProvider extends ServiceProvider {
 		else
 		{
 			$this->buildStack();
+		}
+	}
+
+	/**
+	 * Register the middleware short-cuts for routing.
+	 *
+	 * @return void
+	 */
+	protected function registerMiddlewareShortcuts()
+	{
+		$router = $this->app['router'];
+
+		foreach ($this->middleware as $key => $class)
+		{
+			$router->middleware($key, $class);
 		}
 	}
 
