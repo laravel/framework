@@ -13,7 +13,7 @@ abstract class Route extends Annotation {
 	{
 		$endpoint->addPath(new Path(
 			strtolower(class_basename(get_class($this))), $this->domain, $this->value,
-			$this->as, (array) $this->before, (array) $this->after, (array) $this->where
+			$this->as, (array) $this->middleware, (array) $this->where
 		));
 	}
 

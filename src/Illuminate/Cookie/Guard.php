@@ -1,20 +1,14 @@
 <?php namespace Illuminate\Cookie;
 
+use Closure;
 use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class Guard implements HttpKernelInterface {
-
-	/**
-	 * The wrapped kernel implementation.
-	 *
-	 * @var \Symfony\Component\HttpKernel\HttpKernelInterface
-	 */
-	protected $app;
+class Guard implements Middleware {
 
 	/**
 	 * The encrypter instance.
@@ -26,29 +20,24 @@ class Guard implements HttpKernelInterface {
 	/**
 	 * Create a new CookieGuard instance.
 	 *
-	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface  $app
 	 * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
 	 * @return void
 	 */
-	public function __construct(HttpKernelInterface $app, EncrypterContract $encrypter)
+	public function __construct(EncrypterContract $encrypter)
 	{
-		$this->app = $app;
 		$this->encrypter = $encrypter;
 	}
 
 	/**
-	 * Handle the given request and get the response.
-	 *
-	 * @implements HttpKernelInterface::handle
+	 * Handle an incoming request.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  int   $type
-	 * @param  bool  $catch
+	 * @param  \Closure  $next
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+	public function handle($request, Closure $next)
 	{
-		return $this->encrypt($this->app->handle($this->decrypt($request), $type, $catch));
+		return $this->encrypt($next($this->decrypt($request)));
 	}
 
 	/**
@@ -61,12 +50,9 @@ class Guard implements HttpKernelInterface {
 	{
 		foreach ($request->cookies as $key => $c)
 		{
-			try
-			{
+			try {
 				$request->cookies->set($key, $this->decryptCookie($c));
-			}
-			catch (DecryptException $e)
-			{
+			} catch (DecryptException $e) {
 				$request->cookies->set($key, null);
 			}
 		}
@@ -98,9 +84,7 @@ class Guard implements HttpKernelInterface {
 		$decrypted = array();
 
 		foreach ($cookie as $key => $value)
-		{
 			$decrypted[$key] = $this->encrypter->decrypt($value);
-		}
 
 		return $decrypted;
 	}
@@ -113,11 +97,11 @@ class Guard implements HttpKernelInterface {
 	 */
 	protected function encrypt(Response $response)
 	{
-		foreach ($response->headers->getCookies() as $key => $c)
+		foreach ($response->headers->getCookies() as $key => $cookie)
 		{
-			$encrypted = $this->encrypter->encrypt($c->getValue());
-
-			$response->headers->setCookie($this->duplicate($c, $encrypted));
+			$response->headers->setCookie($this->duplicate(
+				$cookie, $this->encrypter->encrypt($cookie->getValue())
+			));
 		}
 
 		return $response;

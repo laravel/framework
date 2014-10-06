@@ -7,7 +7,7 @@ class MethodEndpoint implements EndpointInterface {
 	 *
 	 * @var string
 	 */
-	protected $template = '$router->%s(\'%s\', [\'uses\' => \'%s\', \'domain\' => %s, \'as\' => %s, \'before\' => %s, \'after\' => %s, \'where\' => %s]);';
+	protected $template = '$router->%s(\'%s\', [\'uses\' => \'%s\', \'domain\' => %s, \'as\' => %s, \'middleware\' => %s, \'where\' => %s]);';
 
 	/**
 	 * The ReflectionClass instance for the controller class.
@@ -38,18 +38,18 @@ class MethodEndpoint implements EndpointInterface {
 	public $uses;
 
 	/**
-	 * The before filters defined on endpoints without paths.
+	 * All of the class level "inherited" middleware defined for the pathless endpoint.
 	 *
 	 * @var array
 	 */
-	public $pathlessBefore = [];
+	public $classMiddleware = [];
 
 	/**
-	 * The after filters defined on endpoints without paths.
+	 * All of the middleware defined for the pathless endpoint.
 	 *
 	 * @var array
 	 */
-	public $pathlessAfter = [];
+	public $middleware = [];
 
 	/**
 	 * Create a new route definition instance.
@@ -60,9 +60,7 @@ class MethodEndpoint implements EndpointInterface {
 	public function __construct(array $attributes = array())
 	{
 		foreach ($attributes as $key => $value)
-		{
 			$this->{$key} = $value;
-		}
 	}
 
 	/**
@@ -78,12 +76,22 @@ class MethodEndpoint implements EndpointInterface {
 		{
 			$routes[] = sprintf(
 				$this->template, $path->verb, $path->path, $this->uses, var_export($path->domain, true),
-				var_export($path->as, true), var_export($path->before, true),
-				var_export($path->after, true), var_export($path->where, true)
+				var_export($path->as, true), var_export($this->getMiddleware($path), true), var_export($path->where, true)
 			);
 		}
 
 		return implode(PHP_EOL, $routes);
+	}
+
+	/**
+	 * Get the middleware for the path.
+	 *
+	 * @param  AbstractPath  $path
+	 * @return array
+	 */
+	protected function getMiddleware(AbstractPath $path)
+	{
+		return array_merge($this->classMiddleware, $path->middleware, $this->middleware);
 	}
 
 	/**

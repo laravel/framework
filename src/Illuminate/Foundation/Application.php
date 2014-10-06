@@ -71,13 +71,6 @@ class Application extends Container implements HttpKernelInterface,
 	protected $shutdownCallbacks = array();
 
 	/**
-	 * All of the developer defined middlewares.
-	 *
-	 * @var array
-	 */
-	protected $middlewares = array();
-
-	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
@@ -99,6 +92,13 @@ class Application extends Container implements HttpKernelInterface,
 	protected $deferredServices = array();
 
 	/**
+	 * The stack callback for the application.
+	 *
+	 * @var \Closure
+	 */
+	protected $stack;
+
+	/**
 	 * The request class used by the application.
 	 *
 	 * @var string
@@ -116,8 +116,6 @@ class Application extends Container implements HttpKernelInterface,
 		$this->registerBaseBindings($request ?: $this->createNewRequest());
 
 		$this->registerBaseServiceProviders();
-
-		$this->registerBaseMiddlewares();
 	}
 
 	/**
@@ -629,98 +627,6 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * Run the application and send the response.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return void
-	 */
-	public function run(SymfonyRequest $request = null)
-	{
-		$request = $request ?: $this['request'];
-
-		$response = with($stack = $this->getStackedClient())->handle($request);
-
-		$response->send();
-
-		$stack->terminate($request, $response);
-	}
-
-	/**
-	 * Get the stacked HTTP kernel for the application.
-	 *
-	 * @return  \Symfony\Component\HttpKernel\HttpKernelInterface
-	 */
-	protected function getStackedClient()
-	{
-		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
-
-		$client = (new Builder)
-                    ->push('Illuminate\Cookie\Guard', $this['encrypter'])
-                    ->push('Illuminate\Cookie\Queue', $this['cookie'])
-                    ->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
-
-		$this->mergeCustomMiddlewares($client);
-
-		return $client->resolve($this);
-	}
-
-	/**
-	 * Merge the developer defined middlewares onto the stack.
-	 *
-	 * @param  \Stack\Builder
-	 * @return void
-	 */
-	protected function mergeCustomMiddlewares(Builder $stack)
-	{
-		foreach ($this->middlewares as $middleware)
-		{
-			list($class, $parameters) = array_values($middleware);
-
-			array_unshift($parameters, $class);
-
-			call_user_func_array(array($stack, 'push'), $parameters);
-		}
-	}
-
-	/**
-	 * Register the default, but optional middlewares.
-	 *
-	 * @return void
-	 */
-	protected function registerBaseMiddlewares()
-	{
-		//
-	}
-
-	/**
-	 * Add a HttpKernel middleware onto the stack.
-	 *
-	 * @param  string  $class
-	 * @param  array  $parameters
-	 * @return $this
-	 */
-	public function middleware($class, array $parameters = array())
-	{
-		$this->middlewares[] = compact('class', 'parameters');
-
-		return $this;
-	}
-
-	/**
-	 * Remove a custom middleware from the application.
-	 *
-	 * @param  string  $class
-	 * @return void
-	 */
-	public function forgetMiddleware($class)
-	{
-		$this->middlewares = array_filter($this->middlewares, function($m) use ($class)
-		{
-			return $m['class'] != $class;
-		});
-	}
-
-	/**
 	 * Determine if the application routes are cached.
 	 *
 	 * @return bool
@@ -758,6 +664,38 @@ class Application extends Container implements HttpKernelInterface,
 	public function getScannedRoutesPath()
 	{
 		return $this['path.storage'].'/framework/routes.scanned.php';
+	}
+
+	/**
+	 * Register the application stack.
+	 *
+	 * @param  \Closure  $stack
+	 * @return $this
+	 */
+	public function stack(Closure $stack)
+	{
+		$this->stack = $stack;
+
+		return $this;
+	}
+
+	/**
+	 * Run the application and send the response.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
+	public function run(SymfonyRequest $request = null)
+	{
+		$this->boot();
+
+		$request = $request ?: $this['request'];
+
+		$response = with($stack = $this->call($this->stack))->setContainer($this)->run($request);
+
+		$response->send();
+
+		$stack->terminate($request, $response);
 	}
 
 	/**

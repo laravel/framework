@@ -1,15 +1,14 @@
-$router->put('more/{id}', ['uses' => 'App\Http\Controllers\BasicController@doMore', 'domain' => '{id}.account.com', 'as' => NULL, 'before' => array (
-  0 => 'csrf',
-  1 => 'auth',
-), 'after' => array (
-  0 => 'log',
+$router->put('more/{id}', ['uses' => 'App\Http\Controllers\BasicController@doMore', 'domain' => '{id}.account.com', 'as' => NULL, 'middleware' => array (
+  0 => 'FooMiddleware',
+  1 => 'BarMiddleware',
+  2 => 'QuxMiddleware',
 ), 'where' => array (
   'id' => 'regex',
 )]);
-$router->group(['before' => array (
-  0 => 'auth',
-  1 => 'inline',
-), 'after' => array (
+$router->group(['middleware' => array (
+  0 => 'FooMiddleware',
+  1 => 'BarMiddleware',
+  2 => 'BazMiddleware',
 ), 'prefix' => NULL, 'domain' => '{id}.account.com', 'where' => array (
   'id' => 'regex',
 )], function($router) { $router->resource('foobar/photos', 'App\\Http\\Controllers\\BasicController', ['only' => array (
@@ -17,11 +16,9 @@ $router->group(['before' => array (
 ), 'names' => array (
   'index' => 'index.name',
 )]); });
-$router->group(['before' => array (
-  0 => 'csrf',
-  1 => 'auth',
-  2 => 'inline',
-), 'after' => array (
+$router->group(['middleware' => array (
+  0 => 'FooMiddleware',
+  1 => 'BarMiddleware',
 ), 'prefix' => NULL, 'domain' => '{id}.account.com', 'where' => array (
   'id' => 'regex',
 )], function($router) { $router->resource('foobar/photos', 'App\\Http\\Controllers\\BasicController', ['only' => array (

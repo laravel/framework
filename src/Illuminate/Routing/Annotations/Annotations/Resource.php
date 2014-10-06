@@ -26,52 +26,39 @@ class Resource extends Annotation {
 		$endpoints->push(new ResourceEndpoint([
 			'reflection' => $class, 'name' => $this->value, 'names' => (array) $this->names,
 			'only' => (array) $this->only, 'except' => (array) $this->except,
-			'before' => $this->getBeforeFilters($endpoints), 'after' => $this->getAfterFilters($endpoints),
+			'middleware' => $this->getMiddleware($endpoints),
 		]));
 	}
 
 	/**
-	 * Get all of the pathless before filters.
+	 * Get all of the middleware defined on the resource method endpoints.
 	 *
 	 * @param  EndpointCollection  $endpoints
 	 * @return array
 	 */
-	protected function getBeforeFilters(EndpointCollection $endpoints)
+	protected function getMiddleware(EndpointCollection $endpoints)
 	{
-		return $this->getFilters($endpoints, 'pathlessBefore');
+		return $this->extractFromEndpoints($endpoints, 'middleware');
 	}
 
 	/**
-	 * Get all of the pathless after filters.
-	 *
-	 * @param  EndpointCollection  $endpoints
-	 * @return array
-	 */
-	protected function getAfterFilters(EndpointCollection $endpoints)
-	{
-		return $this->getFilters($endpoints, 'pathlessAfter');
-	}
-
-	/**
-	 * Get all of the pathless filters for the given key.
+	 * Extract method items from endpoints for the given key.
 	 *
 	 * @param  EndpointCollection  $endpoints
 	 * @param  string  $key
 	 * @return array
 	 */
-	protected function getFilters(EndpointCollection $endpoints, $key)
+	protected function extractFromEndpoints(EndpointCollection $endpoints, $key)
 	{
-		$filters = [
+		$items = [
 			'index' => [], 'create' => [], 'store' => [], 'show' => [],
 			'edit' => [], 'update' => [], 'destroy' => []
 		];
 
-		foreach ($this->getPathlessFilterEndpoints($endpoints, $key) as $endpoint)
-		{
-			$filters[$endpoint->method] = array_merge($filters[$endpoint->method], $endpoint->{$key});
-		}
+		foreach ($this->getEndpointsWithResourceMethods($endpoints, $key) as $endpoint)
+			$items[$endpoint->method] = array_merge($items[$endpoint->method], $endpoint->{$key});
 
-		return $filters;
+		return $items;
 	}
 
 	/**
@@ -81,13 +68,12 @@ class Resource extends Annotation {
 	 * @param  string  $key
 	 * @return array
 	 */
-	protected function getPathlessFilterEndpoints(EndpointCollection $endpoints, $key)
+	protected function getEndpointsWithResourceMethods(EndpointCollection $endpoints)
 	{
-		return Collection::make($endpoints)->filter(function($endpoint) use ($key)
+		return Collection::make($endpoints)->filter(function($endpoint)
 		{
 			return ($endpoint instanceof MethodEndpoint &&
-	                in_array($endpoint->method, $this->methods) &&
-	                count($endpoint->{$key}) > 0);
+	                in_array($endpoint->method, $this->methods));
 
 		})->all();
 	}

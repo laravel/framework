@@ -7,7 +7,7 @@ class ResourceEndpoint implements EndpointInterface {
 	 *
 	 * @var string
 	 */
-	protected $template = '$router->group([\'before\' => %s, \'after\' => %s, \'prefix\' => %s, \'domain\' => %s, \'where\' => %s], function($router) { $router->resource(%s, %s, [\'only\' => %s, \'names\' => %s]); });';
+	protected $template = '$router->group([\'middleware\' => %s, \'prefix\' => %s, \'domain\' => %s, \'where\' => %s], function($router) { $router->resource(%s, %s, [\'only\' => %s, \'names\' => %s]); });';
 
 	/**
 	 * All of the resource controller methods.
@@ -61,18 +61,20 @@ class ResourceEndpoint implements EndpointInterface {
 	public $except = [];
 
 	/**
-	 * The before filters that were assigned at the route level.
+	 * The class level "inherited" middleware that apply to the resource.
 	 *
 	 * @var array
 	 */
-	public $before = [];
+	public $classMiddleware = [];
 
 	/**
-	 * The after filters that were assigned at the route level.
+	 * The middleware that was applied at the method level.
+	 *
+	 * This array is keyed by resource method name (index, create, etc).
 	 *
 	 * @var array
 	 */
-	public $after = [];
+	public $middleware = [];
 
 	/**
 	 * Create a new route definition instance.
@@ -134,11 +136,11 @@ class ResourceEndpoint implements EndpointInterface {
 		foreach ($this->paths as $path)
 		{
 			$routes[] = sprintf(
-				$this->template, var_export($this->getBeforeFilters($path), true),
-				var_export($this->getAfterFilters($path), true), var_export($path->path, true),
-				var_export($path->domain, true), var_export($path->where, true),
-				var_export($this->name, true), var_export($this->reflection->name, true),
-				var_export([$path->method], true), var_export($this->getNames($path), true)
+				$this->template, var_export($this->getMiddleware($path), true),
+				var_export($path->path, true), var_export($path->domain, true),
+				var_export($path->where, true), var_export($this->name, true),
+				var_export($this->reflection->name, true), var_export([$path->method], true),
+				var_export($this->getNames($path), true)
 			);
 		}
 
@@ -146,29 +148,16 @@ class ResourceEndpoint implements EndpointInterface {
 	}
 
 	/**
-	 * Get all of the before filters for the given path.
+	 * Get all of the middleware for the given path.
 	 *
-	 * This will also merge in any of the filters applied at the route level.
-	 *
-	 * @param  ResourcePath  $path
-	 * @return array
-	 */
-	protected function getBeforeFilters(ResourcePath $path)
-	{
-		return array_merge($path->before, array_get($this->before, $path->method, []));
-	}
-
-	/**
-	 * Get all of the after filters for the given path.
-	 *
-	 * This will also merge in any of the filters applied at the route level.
+	 * This will also merge in any of the middleware applied at the route level.
 	 *
 	 * @param  ResourcePath  $path
 	 * @return array
 	 */
-	protected function getAfterFilters(ResourcePath $path)
+	protected function getMiddleware(ResourcePath $path)
 	{
-		return array_merge($path->after, array_get($this->after, $path->method, []));
+		return array_merge($this->classMiddleware, array_get($this->middleware, $path->method, []));
 	}
 
 	/**
