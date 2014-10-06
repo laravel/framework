@@ -29,7 +29,7 @@ class RoutingServiceProvider extends ServiceProvider {
 	{
 		$this->app['router'] = $this->app->share(function($app)
 		{
-			return Router($app['events'], $app);
+			return new Router($app['events'], $app);
 		});
 	}
 
