@@ -353,6 +353,20 @@ class Handler implements HandlerContract {
 	}
 
 	/**
+	 * Register an error handler for fatal errors.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function fatal(Closure $callback)
+	{
+		$this->error(function(FatalError $e) use ($callback)
+		{
+			return call_user_func($callback, $e);
+		});
+	}
+
+	/**
 	 * Prepare the given response.
 	 *
 	 * @param  mixed  $response
