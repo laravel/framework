@@ -507,28 +507,6 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * Register a "before" application filter.
-	 *
-	 * @param  \Closure|string  $callback
-	 * @return void
-	 */
-	public function before($callback)
-	{
-		return $this['router']->before($callback);
-	}
-
-	/**
-	 * Register an "after" application filter.
-	 *
-	 * @param  \Closure|string  $callback
-	 * @return void
-	 */
-	public function after($callback)
-	{
-		return $this['router']->after($callback);
-	}
-
-	/**
 	 * Register a "finish" application filter.
 	 *
 	 * @param  \Closure|string  $callback
@@ -976,42 +954,6 @@ class Application extends Container implements HttpKernelInterface,
 	public function missing(Closure $callback)
 	{
 		$this->error(function(NotFoundHttpException $e) use ($callback)
-		{
-			return call_user_func($callback, $e);
-		});
-	}
-
-	/**
-	 * Register an application error handler.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function error(Closure $callback)
-	{
-		$this['exception']->error($callback);
-	}
-
-	/**
-	 * Register an error handler at the bottom of the stack.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function pushError(Closure $callback)
-	{
-		$this['exception']->pushError($callback);
-	}
-
-	/**
-	 * Register an error handler for fatal errors.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function fatal(Closure $callback)
-	{
-		$this->error(function(FatalErrorException $e) use ($callback)
 		{
 			return call_user_func($callback, $e);
 		});
