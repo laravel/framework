@@ -11,6 +11,7 @@ use Illuminate\Foundation\Console\ChangesCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RouteScanCommand;
+use Illuminate\Foundation\Console\EventScanCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
@@ -41,6 +42,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'ConsoleMake' => 'command.console.make',
 		'Down' => 'command.down',
 		'Environment' => 'command.environment',
+		'EventScan' => 'command.event.scan',
 		'KeyGenerate' => 'command.key.generate',
 		'Optimize' => 'command.optimize',
 		'ProviderMake' => 'command.provider.make',
@@ -154,6 +156,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->bindShared('command.environment', function()
 		{
 			return new EnvironmentCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerEventScanCommand()
+	{
+		$this->app->bindShared('command.event.scan', function()
+		{
+			return new EventScanCommand;
 		});
 	}
 
