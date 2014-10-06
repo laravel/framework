@@ -40,8 +40,7 @@ class AppServiceProvider extends ServiceProvider {
 		$this->app->stack(function(Stack $stack, Router $router)
 		{
 			return $stack
-				->middleware($this->stack)
-				->then(function($request) use ($router)
+				->middleware($this->stack)->then(function($request) use ($router)
 				{
 					return $router->dispatch($request);
 				});
