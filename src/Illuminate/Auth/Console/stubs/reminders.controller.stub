@@ -1,11 +1,10 @@
 <?php namespace {{namespace}};
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class {{class}} extends Controller {
+class {{class}} {
 
 	/**
 	 * The password reminder implementation.
@@ -24,8 +23,8 @@ class {{class}} extends Controller {
 	{
 		$this->passwords = $passwords;
 
-		$this->beforeFilter('guest');
-		$this->beforeFilter('csrf', ['on' => ['post']]);
+		//$this->beforeFilter('guest');
+		//$this->beforeFilter('csrf', ['on' => ['post']]);
 	}
 
 	/**

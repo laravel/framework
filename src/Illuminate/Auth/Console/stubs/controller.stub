@@ -1,12 +1,11 @@
 <?php namespace {{namespace}};
 
-use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Auth\Authenticator;
 
 use {{request.namespace}}Auth\LoginRequest;
 use {{request.namespace}}Auth\RegisterRequest;
 
-class AuthController extends Controller {
+class AuthController {
 
 	/**
 	 * The authenticator implementation.
@@ -25,8 +24,8 @@ class AuthController extends Controller {
 	{
 		$this->auth = $auth;
 
-		$this->beforeFilter('csrf', ['on' => ['post']]);
-		$this->beforeFilter('guest', ['except' => ['getLogout']]);
+		//$this->beforeFilter('csrf', ['on' => ['post']]);
+		//$this->beforeFilter('guest', ['except' => ['getLogout']]);
 	}
 
 	/**
