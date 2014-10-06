@@ -3,6 +3,7 @@
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Routing\RoutableInterface;
@@ -50,11 +51,11 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	protected $currentRequest;
 
 	/**
-	 * Indicates if the router is running filters.
+	 * All of the short-hand keys for middlewares.
 	 *
-	 * @var bool
+	 * @var array
 	 */
-	protected $filtering = true;
+	protected $middleware = [];
 
 	/**
 	 * The registered pattern based filters.
@@ -501,9 +502,10 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 * Dispatch the request to the application.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
+	 * @param  bool  $runMiddleware
 	 * @return \Illuminate\Http\Response
 	 */
-	public function dispatch(Request $request)
+	public function dispatch(Request $request, $runMiddleware = true)
 	{
 		$this->currentRequest = $request;
 
@@ -514,7 +516,9 @@ class Router implements HttpKernelInterface, RegistrarContract {
 
 		if (is_null($response))
 		{
-			$response = $this->dispatchToRoute($request);
+			$response = $this->dispatchToRoute(
+				$request, $runMiddleware
+			);
 		}
 
 		$response = $this->prepareResponse($request, $response);
@@ -528,12 +532,24 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	}
 
 	/**
+	 * Dispatch the request to the application. Do not run any middleware.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function dispatchWithoutMiddleware(Request $request)
+	{
+		return $this->dispatch($request, false);
+	}
+
+	/**
 	 * Dispatch the request to a route and return the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
+	 * @param  bool  $runMiddleware
 	 * @return mixed
 	 */
-	public function dispatchToRoute(Request $request)
+	public function dispatchToRoute(Request $request, $runMiddleware = true)
 	{
 		$route = $this->findRoute($request);
 
@@ -546,7 +562,9 @@ class Router implements HttpKernelInterface, RegistrarContract {
 
 		if (is_null($response))
 		{
-			$response = $route->run($request);
+			$response = $this->runRouteWithinStack(
+				$route, $request, $runMiddleware
+			);
 		}
 
 		$response = $this->prepareResponse($request, $response);
@@ -557,6 +575,38 @@ class Router implements HttpKernelInterface, RegistrarContract {
 		$this->callRouteAfter($route, $request, $response);
 
 		return $response;
+	}
+
+	/**
+	 * Run the given route within a Stack "onion" instance.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  bool  $runMiddleware
+	 * @return mixed
+	 */
+	protected function runRouteWithinStack(Route $route, Request $request, $runMiddleware)
+	{
+		return (new Stack\Stack(function($request) use ($route)
+		{
+			return $route->run($request);
+
+		}, $runMiddleware ? $this->gatherRouteMiddlewares($route) : []))->run($request);
+	}
+
+	/**
+	 * Gather the middleware for the given route.
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return array
+	 */
+	protected function gatherRouteMiddlewares(Route $route)
+	{
+		return Collection::make($route->middleware())->map(function($m)
+		{
+			return array_get($this->middleware, $m, $m);
+
+		})->all();
 	}
 
 	/**
@@ -649,6 +699,20 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	protected function addGlobalFilter($filter, $callback)
 	{
 		$this->events->listen('router.'.$filter, $this->parseFilter($callback));
+	}
+
+	/**
+	 * Register a short-hand name for a middleware.
+	 *
+	 * @param  string  $name
+	 * @param  string  $class
+	 * @return $this
+	 */
+	public function middleware($name, $class)
+	{
+		$this->middlewares[$name] = $class;
+
+		return $this;
 	}
 
 	/**
@@ -821,8 +885,6 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 */
 	protected function callFilter($filter, $request, $response = null)
 	{
-		if ( ! $this->filtering) return null;
-
 		return $this->events->until('router.'.$filter, array($request, $response));
 	}
 
@@ -984,8 +1046,6 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 */
 	public function callRouteFilter($filter, $parameters, $route, $request, $response = null)
 	{
-		if ( ! $this->filtering) return null;
-
 		$data = array_merge(array($route, $request, $response), $parameters);
 
 		return $this->events->until('router.filter: '.$filter, $this->cleanFilterParameters($data));
@@ -1040,41 +1100,6 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	public function getGroupStack()
 	{
 		return $this->groupStack;
-	}
-
-	/**
-	 * Run a callback with filters disable on the router.
-	 *
-	 * @param  callable  $callback
-	 * @return void
-	 */
-	public function withoutFilters(callable $callback)
-	{
-		$this->disableFilters();
-
-		call_user_func($callback);
-
-		$this->enableFilters();
-	}
-
-	/**
-	 * Enable route filtering on the router.
-	 *
-	 * @return void
-	 */
-	public function enableFilters()
-	{
-		$this->filtering = true;
-	}
-
-	/**
-	 * Disable route filtering on the router.
-	 *
-	 * @return void
-	 */
-	public function disableFilters()
-	{
-		$this->filtering = false;
 	}
 
 	/**

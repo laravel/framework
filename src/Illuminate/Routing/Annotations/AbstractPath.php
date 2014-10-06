@@ -24,18 +24,11 @@ abstract class AbstractPath {
 	public $path;
 
 	/**
-	 * The path's before filters.
+	 * The path's middleware.
 	 *
 	 * @var array
 	 */
-	public $before = [];
-
-	/**
-	 * The path's after filters.
-	 *
-	 * @var array
-	 */
-	public $after = [];
+	public $middleware = [];
 
 	/**
 	 * The path's "where" clauses.

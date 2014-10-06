@@ -251,6 +251,16 @@ class Route {
 	}
 
 	/**
+	 * Get the middlewares attached to the route.
+	 *
+	 * @return array
+	 */
+	public function middleware()
+	{
+		return (array) array_get($this->action, 'middleware', []);
+	}
+
+	/**
 	 * Get the "before" filters for the route.
 	 *
 	 * @return array
