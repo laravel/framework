@@ -188,72 +188,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testDispatchingOfControllers()
-	{
-		$router = $this->getRouter();
-		$router->get('foo', 'RouteTestControllerDispatchStub@foo');
-		$this->assertEquals('bar', $router->dispatch(Request::create('foo', 'GET'))->getContent());
-
-		$router = $this->getRouter();
-		$router->filter('foo', function()
-		{
-			return 'filter';
-		});
-		$router->get('bar', 'RouteTestControllerDispatchStub@bar');
-		$this->assertEquals('filter', $router->dispatch(Request::create('bar', 'GET'))->getContent());
-
-		$router = $this->getRouter();
-		$router->get('baz', 'RouteTestControllerDispatchStub@baz');
-		$this->assertEquals('filtered', $router->dispatch(Request::create('baz', 'GET'))->getContent());
-
-
-		unset($_SERVER['__test.after.filter']);
-		$router = $this->getRouter();
-		$router->filter('qux', function()
-		{
-			$_SERVER['__test.after.filter'] = true;
-		});
-		$router->get('qux', 'RouteTestControllerDispatchStub@qux');
-		$this->assertEquals('qux', $router->dispatch(Request::create('qux', 'GET'))->getContent());
-		$this->assertTrue($_SERVER['__test.after.filter']);
-
-		/**
-		 * Test filter removal.
-		 */
-		$router = $this->getRouter();
-		$router->filter('removeBefore', function() {
-			$_SERVER['__test.before.removeBeforeFilter'] = true;
-		});
-		$router->get('beforeRoute', 'RouteTestControllerRemoveFilterStub@beforeRoute');
-		$this->assertEquals('beforeRoute', $router->dispatch(Request::create('beforeRoute', 'GET'))->getContent());
-		$this->assertTrue(!isset($_SERVER['__test.after.removeBeforeFilter']) || is_null(isset($_SERVER['__test.after.removeBeforeFilter'])));
-
-		$router = $this->getRouter();
-		$router->filter('removeAfter', function() {
-			$_SERVER['__test.after.removeAfterFilter'] = true;
-		});
-		$router->get('afterRoute', 'RouteTestControllerRemoveFilterStub@afterRoute');
-		$this->assertEquals('afterRoute', $router->dispatch(Request::create('afterRoute', 'GET'))->getContent());
-		$this->assertTrue(!isset($_SERVER['__test.after.removeAfterFilter']) || is_null(isset($_SERVER['__test.after.removeAfterFilter'])));
-
-		/**
-		 * Test filters disabled...
-		 */
-		$router = $this->getRouter();
-		$router->filter('foo', function()
-		{
-			return 'filter';
-		});
-		$router->disableFilters();
-		$router->get('bar', 'RouteTestControllerDispatchStub@bar');
-		$this->assertEquals('baz', $router->dispatch(Request::create('bar', 'GET'))->getContent());
-
-		$this->assertTrue($router->currentRouteUses('RouteTestControllerDispatchStub@bar'));
-		$this->assertTrue($router->uses('RouteTestControllerDispatchStub@bar'));
-		$this->assertFalse($router->uses('RouteTestControllerDispatchStub@baz'));
-	}
-
-
 	public function testBasicBeforeFilters()
 	{
 		$router = $this->getRouter();
@@ -852,66 +786,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 }
 
-
-class RouteTestControllerDispatchStub extends Illuminate\Routing\Controller {
-	public function __construct()
-	{
-		$this->beforeFilter('foo', array('only' => 'bar'));
-		$this->beforeFilter('@filter', array('only' => 'baz'));
-		$this->afterFilter('qux', array('only' => 'qux'));
-	}
-	public function foo()
-	{
-		return 'bar';
-	}
-	public function bar()
-	{
-		return 'baz';
-	}
-	public function filter()
-	{
-		return 'filtered';
-	}
-	public function baz()
-	{
-		return 'baz';
-	}
-	public function qux()
-	{
-		return 'qux';
-	}
-}
-
-class RouteTestControllerRemoveFilterStub extends \Illuminate\Routing\Controller {
-	public function __construct()
-	{
-		$this->beforeFilter('removeBefore', array('only' => 'beforeRoute'));
-		$this->beforeFilter('@inlineBeforeFilter', array('only' => 'beforeRoute'));
-		$this->afterFilter('removeAfter', array('only' => 'afterRoute'));
-		$this->afterFilter('@inlineAfterFilter', array('only' => 'afterRoute'));
-
-		$this->forgetBeforeFilter('removeBefore');
-		$this->forgetBeforeFilter('@inlineBeforeFilter');
-		$this->forgetAfterFilter('removeAfter');
-		$this->forgetAfterFilter('@inlineAfterFilter');
-	}
-	public function beforeRoute()
-	{
-		return __FUNCTION__;
-	}
-	public function afterRoute()
-	{
-		return __FUNCTION__;
-	}
-	public function inlineBeforeFilter()
-	{
-		return __FUNCTION__;
-	}
-	public function inlineAfterFilter()
-	{
-		return __FUNCTION__;
-	}
-}
 
 class RouteBindingStub {
 	public function bind($value, $route) { return strtoupper($value); }
