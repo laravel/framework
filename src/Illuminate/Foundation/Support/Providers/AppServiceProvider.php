@@ -15,14 +15,7 @@ class AppServiceProvider extends ServiceProvider {
 	{
 		$this->registerMiddlewareShortcuts();
 
-		if (method_exists($this, 'stack'))
-		{
-			$this->app->call([$this, 'stack']);
-		}
-		else
-		{
-			$this->buildStack();
-		}
+		return $this->app->call([$this, 'stack']);
 	}
 
 	/**
@@ -38,23 +31,6 @@ class AppServiceProvider extends ServiceProvider {
 		{
 			$router->middleware($key, $class);
 		}
-	}
-
-	/**
-	 * Build the application stack based on the provider properties.
-	 *
-	 * @return void
-	 */
-	public function buildStack()
-	{
-		$this->app->stack(function(Stack $stack, Router $router)
-		{
-			return $stack
-				->middleware($this->stack)->then(function($request) use ($router)
-				{
-					return $router->dispatch($request);
-				});
-			});
 	}
 
 	/**
