@@ -591,7 +591,7 @@ class Router implements HttpKernelInterface, RegistrarContract {
 		{
 			return $route->run($request);
 
-		}, $runMiddleware ? $this->gatherRouteMiddlewares($route) : []))->run($request);
+		}, $runMiddleware ? $this->gatherRouteMiddlewares($route) : []))->setContainer($this->container)->run($request);
 	}
 
 	/**
