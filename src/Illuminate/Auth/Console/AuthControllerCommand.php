@@ -35,7 +35,7 @@ class AuthControllerCommand extends GeneratorCommand {
 	{
 		parent::fire();
 
-		$this->comment('Route: $router->controller(\'auth\', \''.$this->argument('name')."');");
+		//$this->comment('Route: $router->controller(\'auth\', \''.$this->argument('name')."');");
 	}
 
 	/**
