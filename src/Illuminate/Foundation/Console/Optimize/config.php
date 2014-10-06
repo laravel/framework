@@ -56,7 +56,6 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FoundationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/EventServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FormRequestServiceProvider.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/FilterServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RouteServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/AuthServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php',
