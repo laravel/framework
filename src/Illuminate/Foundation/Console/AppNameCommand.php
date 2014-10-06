@@ -127,7 +127,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function setServiceProviderNamespaceReferences()
 	{
-		$this->setReferencedFilterNamespaces();
+		$this->setReferencedMiddlewareNamespaces();
 
 		$this->setReferencedConsoleNamespaces();
 
@@ -135,15 +135,15 @@ class AppNameCommand extends Command {
 	}
 
 	/**
-	 * Set the namespace on the referenced filters in the filter service provider.
+	 * Set the namespace on the referenced middleware.
 	 *
 	 * @return void
 	 */
-	protected function setReferencedFilterNamespaces()
+	protected function setReferencedMiddlewareNamespaces()
 	{
 		$this->replaceIn(
-			$this->laravel['path'].'/Providers/FilterServiceProvider.php',
-			$this->currentRoot.'\\Http\\Filters', $this->argument('name').'\\Http\\Filters'
+			$this->laravel['path'].'/Providers/AppServiceProvider.php',
+			$this->currentRoot.'\\Http\\Middleware', $this->argument('name').'\\Http\\Middleware'
 		);
 	}
 
