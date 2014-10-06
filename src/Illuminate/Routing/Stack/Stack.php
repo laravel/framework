@@ -65,15 +65,17 @@ class Stack {
 		$request);
 	}
 
+	/**
+	 * Set the container instance on the Stack.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return $this
+	 */
 	public function setContainer(Container $container)
 	{
 		$this->container = $container;
-		return $this;
-	}
 
-	public function terminate($request, $response)
-	{
-		//
+		return $this;
 	}
 
 }
