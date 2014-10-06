@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Cookie;
+<?php namespace Illuminate\Cookie\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Routing\Middleware;
