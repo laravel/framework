@@ -710,7 +710,7 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 */
 	public function middleware($name, $class)
 	{
-		$this->middlewares[$name] = $class;
+		$this->middleware[$name] = $class;
 
 		return $this;
 	}
