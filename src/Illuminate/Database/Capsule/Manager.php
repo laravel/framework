@@ -2,7 +2,6 @@
 
 use PDO;
 use Illuminate\Support\Fluent;
-use Illuminate\Cache\CacheManager;
 use Illuminate\Container\Container;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -187,30 +186,6 @@ class Manager {
 	public function setEventDispatcher(Dispatcher $dispatcher)
 	{
 		$this->container->instance('events', $dispatcher);
-	}
-
-	/**
-	 * Get the current cache manager instance.
-	 *
-	 * @return \Illuminate\Cache\CacheManager
-	 */
-	public function getCacheManager()
-	{
-		if ($this->container->bound('cache'))
-		{
-			return $this->container['cache'];
-		}
-	}
-
-	/**
-	 * Set the cache manager to be used by connections.
-	 *
-	 * @param  \Illuminate\Cache\CacheManager  $cache
-	 * @return void
-	 */
-	public function setCacheManager(CacheManager $cache)
-	{
-		$this->container->instance('cache', $cache);
 	}
 
 	/**

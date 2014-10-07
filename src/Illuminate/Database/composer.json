@@ -18,8 +18,6 @@
     "require-dev": {
         "illuminate/console": "5.0.*",
         "illuminate/filesystem": "5.0.*",
-        "illuminate/pagination": "5.0.*",
-        "illuminate/support": "5.0.*"
     },
     "autoload": {
         "psr-4": {
