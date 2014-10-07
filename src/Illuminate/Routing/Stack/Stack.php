@@ -50,19 +50,43 @@ class Stack {
 	{
 		$this->container = $this->container ?: new Container;
 
-		return call_user_func(array_reduce(array_reverse($this->middlewares),
-		function($stack, $middleware)
+		$firstSlice = $this->getInitialSlice($request);
+
+		$middlewares = array_reverse($this->middlewares);
+
+		return call_user_func(
+			array_reduce($middlewares, $this->getSlice(), $firstSlice), $request
+		);
+	}
+
+	/**
+	 * Get a Closure that represents a slice of the application onion.
+	 *
+	 * @return \Closure
+	 */
+	protected function getSlice()
+	{
+		return function($stack, $middleware)
 		{
 			return function($request) use ($stack, $middleware)
 			{
 				return $this->container->make($middleware)->handle($request, $stack);
 			};
-		},
-		function() use ($request)
+		};
+	}
+
+	/**
+	 * Get the initial slice to begin the stack call.
+	 *
+	 * @param  \Illuminate\Http\Request
+	 * @return \Closure
+	 */
+	protected function getInitialSlice($request)
+	{
+		return function() use ($request)
 		{
 			return call_user_func($this->app, $request);
-		}),
-		$request);
+		};
 	}
 
 	/**
