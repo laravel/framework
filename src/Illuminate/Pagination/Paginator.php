@@ -3,162 +3,106 @@
 use Countable;
 use ArrayAccess;
 use ArrayIterator;
+use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
+use Illuminate\Contracts\Pagination\Presenter as PresenterContract;
 
-class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable {
-
-	/**
-	 * The pagination factory.
-	 *
-	 * @var \Illuminate\Pagination\Factory
-	 */
-	protected $factory;
+class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, PaginatorContract {
 
 	/**
-	 * The items being paginated.
+	 * All of the items being paginated.
 	 *
-	 * @var array
+	 * @var \Illuminate\Support\Collection
 	 */
 	protected $items;
 
 	/**
-	 * The total number of items.
+	 * The total number of items before slicing.
 	 *
 	 * @var int
 	 */
 	protected $total;
 
 	/**
-	 * Indicates if a pagination doing "quick" pagination has more items.
-	 *
-	 * @var bool
-	 */
-	protected $hasMore;
-
-	/**
-	 * The amount of items to show per page.
+	 * The number of items to be shown per page.
 	 *
 	 * @var int
 	 */
 	protected $perPage;
 
 	/**
-	 * Get the current page for the request.
+	 * The current page being "viewed".
 	 *
 	 * @var int
 	 */
 	protected $currentPage;
 
 	/**
-	 * Get the last available page number.
+	 * The last available page.
 	 *
-	 * @return int
+	 * @var int
 	 */
 	protected $lastPage;
 
 	/**
-	 * The number of the first item in this range.
-	 *
-	 * @var int
-	 */
-	protected $from;
-
-	/**
-	 * The number of the last item in this range.
-	 *
-	 * @var int
-	 */
-	protected $to;
-
-	/**
-	 * All of the additional query string values.
-	 *
-	 * @var array
-	 */
-	protected $query = array();
-
-	/**
-	 * The fragment to be appended to all URLs.
+	 * The base path to assign to all URLs.
 	 *
 	 * @var string
 	 */
-	protected $fragment;
+	protected $path = '/';
 
 	/**
-	 * Create a new Paginator instance.
+	 * The query parameters to add to all URLs.
 	 *
-	 * @param  \Illuminate\Pagination\Factory  $factory
-	 * @param  array     $items
-	 * @param  int       $total
-	 * @param  int|null  $perPage
+	 * @var array
+	 */
+	protected $query = [];
+
+	/**
+	 * The URL fragment to add to all URLs.
+	 *
+	 * @var string
+	 */
+	protected $fragment = null;
+
+	/**
+	 * The query string variable used to store the page.
+	 *
+	 * @var string
+	 */
+	protected $pageName = 'page';
+
+	/**
+	 * Create a new paginator instance.
+	 *
+	 * @param  mixed  $items
+	 * @param  int  $total
+	 * @param  int  $perPage
+	 * @param  array  $options (path, query, fragment, pageName)
 	 * @return void
 	 */
-	public function __construct(Factory $factory, array $items, $total, $perPage = null)
+	public function __construct($items, $total, $currentPage, $perPage, array $options = array())
 	{
-		$this->factory = $factory;
-
-		if (is_null($perPage))
+		foreach ($options as $key => $value)
 		{
-			$this->perPage = (int) $total;
-			$this->hasMore = count($items) > $this->perPage;
-			$this->items = array_slice($items, 0, $this->perPage);
+			$this->{$key} = $value;
 		}
-		else
+
+		$this->total = $total;
+		$this->perPage = $perPage;
+		$this->lastPage = (int) ceil($this->total / $this->perPage);
+		$this->currentPage = $this->setCurrentPage($currentPage, $this->lastPage);
+		$this->path = $this->path != '/' ? rtrim($this->path, '/').'/' : $this->path;
+		$this->items = $items instanceof Collection ? $items : Collection::make($items);
+
+		if (count($this->items) > $this->perPage)
 		{
-			$this->items = $items;
-			$this->total = (int) $total;
-			$this->perPage = (int) $perPage;
+			$this->items = $this->items->paginate($this->currentPage, $this->perPage);
 		}
-	}
-
-	/**
-	 * Setup the pagination context (current and last page).
-	 *
-	 * @return $this
-	 */
-	public function setupPaginationContext()
-	{
-		$this->calculateCurrentAndLastPages();
-
-		$this->calculateItemRanges();
-
-		return $this;
-	}
-
-	/**
-	 * Calculate the current and last pages for this instance.
-	 *
-	 * @return void
-	 */
-	protected function calculateCurrentAndLastPages()
-	{
-		if ($this->isQuickPaginating())
-		{
-			$this->currentPage = $this->factory->getCurrentPage();
-
-			$this->lastPage = $this->hasMore ? $this->currentPage + 1 : $this->currentPage;
-		}
-		else
-		{
-			$this->lastPage = (int) ceil($this->total / $this->perPage);
-
-			$this->currentPage = $this->calculateCurrentPage($this->lastPage);
-		}
-	}
-
-	/**
-	 * Calculate the first and last item number for this instance.
-	 *
-	 * @return void
-	 */
-	protected function calculateItemRanges()
-	{
-		$this->from = $this->total ? ($this->currentPage - 1) * $this->perPage + 1 : 0;
-
-		$this->to = min($this->total, $this->currentPage * $this->perPage);
 	}
 
 	/**
@@ -167,19 +111,17 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 * @param  int  $lastPage
 	 * @return int
 	 */
-	protected function calculateCurrentPage($lastPage)
+	protected function setCurrentPage($currentPage, $lastPage)
 	{
-		$page = $this->factory->getCurrentPage();
-
 		// The page number will get validated and adjusted if it either less than one
 		// or greater than the last page available based on the count of the given
 		// items array. If it's greater than the last, we'll give back the last.
-		if (is_numeric($page) && $page > $lastPage)
+		if (is_numeric($currentPage) && $currentPage > $lastPage)
 		{
 			return $lastPage > 0 ? $lastPage : 1;
 		}
 
-		return $this->isValidPageNumber($page) ? (int) $page : 1;
+		return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
 	}
 
 	/**
@@ -194,14 +136,35 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	}
 
 	/**
-	 * Get the pagination links view.
+	 * Get the URLs to the items being paginated.
 	 *
-	 * @param  string  $view
-	 * @return \Illuminate\View\View
+	 * @return array
 	 */
-	public function links($view = null)
+	public function urls()
 	{
-		return $this->factory->getPaginationView($this, $view);
+		$urls = [];
+
+		for ($page = 1; $page <= $this->lastPage; $page++)
+			$urls[] = $this->url($page);
+
+		return $urls;
+	}
+
+	/**
+	 * Create a range of pagination URLs.
+	 *
+	 * @param  int  $start
+	 * @param  int  $end
+	 * @return string
+	 */
+	public function getUrlRange($start, $end)
+	{
+		$urls = [];
+
+		for ($page = $start; $page <= $end; $page++)
+			$urls[$page] = $this->url($page);
+
+		return $urls;
 	}
 
 	/**
@@ -210,38 +173,23 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 * @param  int  $page
 	 * @return string
 	 */
-	public function getUrl($page)
+	public function url($page)
 	{
-		$parameters = array(
-			$this->factory->getPageName() => $page,
-		);
+		if ($page > $this->lastPage || $page <= 0) return;
 
 		// If we have any extra query string key / value pairs that need to be added
 		// onto the URL, we will put them in query string form and then attach it
 		// to the URL. This allows for extra information like sortings storage.
+		$parameters = [$this->pageName => $page];
+
 		if (count($this->query) > 0)
 		{
 			$parameters = array_merge($this->query, $parameters);
 		}
 
-		$fragment = $this->buildFragment();
-
-		return $this->factory->getCurrentUrl().'?'.http_build_query($parameters, null, '&').$fragment;
-	}
-
-	/**
-	 * Get / set the URL fragment to be appended to URLs.
-	 *
-	 * @param  string|null  $fragment
-	 * @return $this|string
-	 */
-	public function fragment($fragment = null)
-	{
-		if (is_null($fragment)) return $this->fragment;
-
-		$this->fragment = $fragment;
-
-		return $this;
+		return $this->path.'?'
+		                .http_build_query($parameters, null, '&')
+		                .$this->buildFragment();
 	}
 
 	/**
@@ -255,178 +203,86 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	}
 
 	/**
-	 * Add a query string value to the paginator.
-	 *
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @return $this
-	 */
-	public function appends($key, $value = null)
-	{
-		if (is_array($key)) return $this->appendArray($key);
-
-		return $this->addQuery($key, $value);
-	}
-
-	/**
-	 * Add an array of query string values.
-	 *
-	 * @param  array  $keys
-	 * @return $this
-	 */
-	protected function appendArray(array $keys)
-	{
-		foreach ($keys as $key => $value)
-		{
-			$this->addQuery($key, $value);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Add a query string value to the paginator.
-	 *
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @return $this
-	 */
-	public function addQuery($key, $value)
-	{
-		if ($key !== $this->factory->getPageName())
-		{
-			$this->query[$key] = $value;
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Determine if the paginator is doing "quick" pagination.
-	 *
-	 * @return bool
-	 */
-	public function isQuickPaginating()
-	{
-		return is_null($this->total);
-	}
-
-	/**
-	 * Get the current page for the request.
-	 *
-	 * @param  int|null  $total
-	 * @return int
-	 */
-	public function getCurrentPage($total = null)
-	{
-		if (is_null($total))
-		{
-			return $this->currentPage;
-		}
-
-		return min($this->currentPage, (int) ceil($total / $this->perPage));
-	}
-
-	/**
-	 * Get the last page that should be available.
+	 * Get the total number of items being paginated.
 	 *
 	 * @return int
 	 */
-	public function getLastPage()
-	{
-		return $this->lastPage;
-	}
-
-	/**
-	 * Get the number of the first item on the paginator.
-	 *
-	 * @return int
-	 */
-	public function getFrom()
-	{
-		return $this->from;
-	}
-
-	/**
-	 * Get the number of the last item on the paginator.
-	 *
-	 * @return int
-	 */
-	public function getTo()
-	{
-		return $this->to;
-	}
-
-	/**
-	 * Get the number of items to be displayed per page.
-	 *
-	 * @return int
-	 */
-	public function getPerPage()
-	{
-		return $this->perPage;
-	}
-
-	/**
-	 * Get a collection instance containing the items.
-	 *
-	 * @return \Illuminate\Support\Collection
-	 */
-	public function getCollection()
-	{
-		return new Collection($this->items);
-	}
-
-	/**
-	 * Get the items being paginated.
-	 *
-	 * @return array
-	 */
-	public function getItems()
-	{
-		return $this->items;
-	}
-
-	/**
-	 * Set the items being paginated.
-	 *
-	 * @param  mixed  $items
-	 * @return void
-	 */
-	public function setItems($items)
-	{
-		$this->items = $items;
-	}
-
-	/**
-	 * Get the total number of items in the collection.
-	 *
-	 * @return int
-	 */
-	public function getTotal()
+	public function totalItems()
 	{
 		return $this->total;
 	}
 
 	/**
-	* Set the base URL in use by the paginator.
-	*
-	* @param  string  $baseUrl
-	* @return void
-	*/
-	public function setBaseUrl($baseUrl)
+	 * Get the slice of items being paginated.
+	 *
+	 * @return array
+	 */
+	public function items()
 	{
-		$this->factory->setBaseUrl($baseUrl);
+		return $this->items->all();
 	}
 
 	/**
-	 * Get the pagination factory.
+	 * Get the number of the first item in the slice.
 	 *
-	 * @return \Illuminate\Pagination\Factory
+	 * @return int
 	 */
-	public function getFactory()
+	public function firstItem()
 	{
-		return $this->factory;
+		return ($this->currentPage - 1) * $this->perPage + 1;
+	}
+
+	/**
+	 * Get the number of the last item in the slice.
+	 *
+	 * @return int
+	 */
+	public function lastItem()
+	{
+		return min($this->total, $this->firstItem() + $perPage - 1);
+	}
+
+	/**
+	 * Get the number of items shown per page.
+	 *
+	 * @return int
+	 */
+	public function perPage()
+	{
+		return $this->perPage;
+	}
+
+	/**
+	 * Get the current page.
+	 *
+	 * @return int
+	 */
+	public function currentPage()
+	{
+		return $this->currentPage;
+	}
+
+	/**
+	 * Get the last page.
+	 *
+	 * @return int
+	 */
+	public function lastPage()
+	{
+		return $this->lastPage;
+	}
+
+	/**
+	 * Render the paginator using the given presenter.
+	 *
+	 * @param  \Illuminate\Contracts\Pagination\Presenter  $presenter
+	 * @return string
+	 */
+	public function render(PresenterContract $presenter = null)
+	{
+		$presenter = $presenter ?: new BootstrapThreePresenter($this);
+
+		return $presenter->render();
 	}
 
 	/**
@@ -436,17 +292,7 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 */
 	public function getIterator()
 	{
-		return new ArrayIterator($this->items);
-	}
-
-	/**
-	 * Determine if the list of items is empty or not.
-	 *
-	 * @return bool
-	 */
-	public function isEmpty()
-	{
-		return empty($this->items);
+		return new ArrayIterator($this->items->all());
 	}
 
 	/**
@@ -467,7 +313,7 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 */
 	public function offsetExists($key)
 	{
-		return array_key_exists($key, $this->items);
+		return array_key_exists($key, $this->items->all());
 	}
 
 	/**
@@ -513,8 +359,8 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	{
 		return array(
 			'total' => $this->total, 'per_page' => $this->perPage,
-			'current_page' => $this->currentPage, 'last_page' => $this->lastPage,
-			'from' => $this->from, 'to' => $this->to, 'data' => $this->getCollection()->toArray(),
+			'current_page' => $this->currentPage(), 'last_page' => $this->lastPage(),
+			'from' => $this->firstItem(), 'to' => $this->lastItem(), 'data' => $this->items->toArray(),
 		);
 	}
 
@@ -527,18 +373,6 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
-	}
-
-	/**
-	 * Call a method on the underlying Collection
-	 *
-	 * @param  string  $method
-	 * @param  array   $arguments
-	 * @return mixed
-	 */
-	public function __call($method, $arguments)
-	{
-		return call_user_func_array(array($this->getCollection(), $method), $arguments);
 	}
 
 }
