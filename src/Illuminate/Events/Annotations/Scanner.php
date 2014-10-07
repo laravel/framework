@@ -68,12 +68,25 @@ class Scanner {
 			{
 				foreach ($reader->getMethodAnnotations($method) as $annotation)
 				{
-					$output .= sprintf('$events->listen(%s, \''.$class->name.'@'.$method->name.'\');', var_export($annotation->events, true)).PHP_EOL;
+					$output .= $this->buildListener($class->name, $method->name, $annotation->events);
 				}
 			}
 		}
 
 		return trim($output);
+	}
+
+	/**
+	 * Build the event listener for the class and method.
+	 *
+	 * @param  string  $class
+	 * @param  string  $method
+	 * @param  array  $events
+	 * @return string
+	 */
+	protected function buildListener($class, $method, $events)
+	{
+		return sprintf('$events->listen(%s, \''.$class.'@'.$method.'\');', var_export($events, true)).PHP_EOL;
 	}
 
 	/**
