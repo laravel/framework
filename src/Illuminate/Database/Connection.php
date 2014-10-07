@@ -59,20 +59,6 @@ class Connection implements ConnectionInterface {
 	protected $events;
 
 	/**
-	 * The paginator environment instance.
-	 *
-	 * @var \Illuminate\Pagination\Paginator
-	 */
-	protected $paginator;
-
-	/**
-	 * The cache manager instance.
-	 *
-	 * @var \Illuminate\Cache\CacheManager
-	 */
-	protected $cache;
-
-	/**
 	 * The default fetch mode of the connection.
 	 *
 	 * @var int
@@ -975,58 +961,6 @@ class Connection implements ConnectionInterface {
 	public function setEventDispatcher(Dispatcher $events)
 	{
 		$this->events = $events;
-	}
-
-	/**
-	 * Get the paginator environment instance.
-	 *
-	 * @return \Illuminate\Pagination\Factory
-	 */
-	public function getPaginator()
-	{
-		if ($this->paginator instanceof Closure)
-		{
-			$this->paginator = call_user_func($this->paginator);
-		}
-
-		return $this->paginator;
-	}
-
-	/**
-	 * Set the pagination environment instance.
-	 *
-	 * @param  \Illuminate\Pagination\Factory|\Closure  $paginator
-	 * @return void
-	 */
-	public function setPaginator($paginator)
-	{
-		$this->paginator = $paginator;
-	}
-
-	/**
-	 * Get the cache manager instance.
-	 *
-	 * @return \Illuminate\Cache\CacheManager
-	 */
-	public function getCacheManager()
-	{
-		if ($this->cache instanceof Closure)
-		{
-			$this->cache = call_user_func($this->cache);
-		}
-
-		return $this->cache;
-	}
-
-	/**
-	 * Set the cache manager instance on the connection.
-	 *
-	 * @param  \Illuminate\Cache\CacheManager|\Closure  $cache
-	 * @return void
-	 */
-	public function setCacheManager($cache)
-	{
-		$this->cache = $cache;
 	}
 
 	/**

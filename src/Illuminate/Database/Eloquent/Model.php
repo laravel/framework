@@ -48,13 +48,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $primaryKey = 'id';
 
 	/**
-	 * The number of models to return for pagination.
-	 *
-	 * @var int
-	 */
-	protected $perPage = 15;
-
-	/**
 	 * Indicates if the IDs are auto-incrementing.
 	 *
 	 * @var bool
@@ -2015,27 +2008,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function getMorphClass()
 	{
 		return $this->morphClass ?: get_class($this);
-	}
-
-	/**
-	 * Get the number of models to return per page.
-	 *
-	 * @return int
-	 */
-	public function getPerPage()
-	{
-		return $this->perPage;
-	}
-
-	/**
-	 * Set the number of models to return per page.
-	 *
-	 * @param  int   $perPage
-	 * @return void
-	 */
-	public function setPerPage($perPage)
-	{
-		$this->perPage = $perPage;
 	}
 
 	/**
