@@ -714,8 +714,6 @@ class Application extends Container implements HttpKernelInterface,
 		$response = with($stack = $this->call($this->stack))->setContainer($this)->run($request);
 
 		$response->send();
-
-		$stack->terminate($request, $response);
 	}
 
 	/**
@@ -901,20 +899,6 @@ class Application extends Container implements HttpKernelInterface,
 		}
 
 		throw new HttpException($code, $message, null, $headers);
-	}
-
-	/**
-	 * Register a 404 error handler.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function missing(Closure $callback)
-	{
-		$this->error(function(NotFoundHttpException $e) use ($callback)
-		{
-			return call_user_func($callback, $e);
-		});
 	}
 
 	/**

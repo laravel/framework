@@ -6,6 +6,7 @@ use ErrorException;
 use ReflectionFunction;
 use Illuminate\Contracts\Support\ResponsePreparer;
 use Illuminate\Contracts\Exception\Handler as HandlerContract;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException as FatalError;
 
@@ -350,6 +351,20 @@ class Handler implements HandlerContract {
 	public function pushError(Closure $callback)
 	{
 		$this->handlers[] = $callback;
+	}
+
+	/**
+	 * Register a 404 error handler.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function missing(Closure $callback)
+	{
+		$this->error(function(NotFoundHttpException $e) use ($callback)
+		{
+			return call_user_func($callback, $e);
+		});
 	}
 
 	/**
