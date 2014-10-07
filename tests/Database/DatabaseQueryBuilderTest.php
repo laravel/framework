@@ -16,7 +16,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users');
-		$this->assertEquals('select * from "users"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users"');
 	}
 
 
@@ -24,21 +24,21 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('some"table');
-		$this->assertEquals('select * from "some""table"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "some""table"');
 	}
 
 	public function testAliasWrappingAsWholeConstant()
 	{
 		$builder = $this->getBuilder();
 		$builder->select('x.y as foo.bar')->from('baz');
-		$this->assertEquals('select "x"."y" as "foo.bar" from "baz"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select "x"."y" as "foo.bar" from "baz"');
 	}
 
 	public function testAddingSelects()
 	{
 		$builder = $this->getBuilder();
 		$builder->select('foo')->addSelect('bar')->addSelect(array('baz', 'boom'))->from('users');
-		$this->assertEquals('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select "foo", "bar", "baz", "boom" from "users"');
 	}
 
 
@@ -47,7 +47,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->getGrammar()->setTablePrefix('prefix_');
 		$builder->select('*')->from('users');
-		$this->assertEquals('select * from "prefix_users"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "prefix_users"');
 	}
 
 
@@ -55,7 +55,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->distinct()->select('foo', 'bar')->from('users');
-		$this->assertEquals('select distinct "foo", "bar" from "users"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select distinct "foo", "bar" from "users"');
 	}
 
 
@@ -123,7 +123,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('foo as bar')->from('users');
-		$this->assertEquals('select "foo" as "bar" from "users"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select "foo" as "bar" from "users"');
 	}
 
 
@@ -131,7 +131,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('public.users');
-		$this->assertEquals('select * from "public"."users"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "public"."users"');
 	}
 
 
@@ -139,8 +139,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1);
-		$this->assertEquals('select * from "users" where "id" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ?', [1]);
 	}
 
 
@@ -148,7 +147,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->From('some`table');
-		$this->assertEquals('select * from `some``table`', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from `some``table`');
 	}
 
 
@@ -156,8 +155,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('users')->whereDay('created_at', '=', 1);
-		$this->assertEquals('select * from `users` where day(`created_at`) = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from `users` where day(`created_at`) = ?', [1]);
 	}
 
 
@@ -165,8 +163,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
-		$this->assertEquals('select * from `users` where month(`created_at`) = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 5), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from `users` where month(`created_at`) = ?', [5]);
 	}
 
 
@@ -174,8 +171,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
-		$this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 2014), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from `users` where year(`created_at`) = ?', [2014]);
 	}
 
 
@@ -183,8 +179,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('users')->whereDay('created_at', '=', 1);
-		$this->assertEquals('select * from "users" where day("created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where day("created_at") = ?', [1]);
 	}
 
 
@@ -192,8 +187,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
-		$this->assertEquals('select * from "users" where month("created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 5), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where month("created_at") = ?', [5]);
 	}
 
 
@@ -201,8 +195,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
-		$this->assertEquals('select * from "users" where year("created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 2014), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where year("created_at") = ?', [2014]);
 	}
 
 
@@ -210,8 +203,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSQLiteBuilder();
 		$builder->select('*')->from('users')->whereDay('created_at', '=', 1);
-		$this->assertEquals('select * from "users" where strftime(\'%d\', "created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where strftime(\'%d\', "created_at") = ?', [1]);
 	}
 
 
@@ -219,8 +211,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSQLiteBuilder();
 		$builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
-		$this->assertEquals('select * from "users" where strftime(\'%m\', "created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 5), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where strftime(\'%m\', "created_at") = ?', [5]);
 	}
 
 
@@ -228,8 +219,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSQLiteBuilder();
 		$builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
-		$this->assertEquals('select * from "users" where strftime(\'%Y\', "created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 2014), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where strftime(\'%Y\', "created_at") = ?', [2014]);
 	}
 
 
@@ -237,8 +227,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('users')->whereDay('created_at', '=', 1);
-		$this->assertEquals('select * from "users" where day("created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where day("created_at") = ?', [1]);
 	}
 
 
@@ -246,8 +235,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
-		$this->assertEquals('select * from "users" where month("created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 5), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where month("created_at") = ?', [5]);
 	}
 
 
@@ -255,8 +243,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
-		$this->assertEquals('select * from "users" where year("created_at") = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 2014), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where year("created_at") = ?', [2014]);
 	}
 
 
@@ -264,13 +251,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereBetween('id', array(1, 2));
-		$this->assertEquals('select * from "users" where "id" between ? and ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" between ? and ?', [1, 2]);
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNotBetween('id', array(1, 2));
-		$this->assertEquals('select * from "users" where "id" not between ? and ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" not between ? and ?', [1, 2]);
 	}
 
 
@@ -278,8 +263,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhere('email', '=', 'foo');
-		$this->assertEquals('select * from "users" where "id" = ? or "email" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? or "email" = ?', [1, 'foo']);
 	}
 
 
@@ -287,8 +271,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereRaw('id = ? or email = ?', array(1, 'foo'));
-		$this->assertEquals('select * from "users" where id = ? or email = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where id = ? or email = ?', [1, 'foo']);
 	}
 
 
@@ -296,8 +279,31 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereRaw('email = ?', array('foo'));
-		$this->assertEquals('select * from "users" where "id" = ? or email = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? or email = ?', [1, 'foo']);
+	}
+
+
+	public function testRawWheresWithOperator()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->whereRaw('select count(*) from "photos" where "photo"."user_id" = "user"."id" and "type" = ?', array('profile'), '<', 1);
+		$this->assertBuilderCompile($builder, 'select * from "users" where (select count(*) from "photos" where "photo"."user_id" = "user"."id" and "type" = ?) < ?', ['profile', 1]);
+	}
+
+
+	public function testRawWheresWithOperatorAndValueExpression()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->whereRaw('select count(*) from "photos" where "photo"."user_id" = "user"."id" and "type" = ?', array('profile'), '<', new Raw('1'));
+		$this->assertBuilderCompile($builder, 'select * from "users" where (select count(*) from "photos" where "photo"."user_id" = "user"."id" and "type" = ?) < 1', ['profile']);
+	}
+
+
+	public function testRawOrWheresWithOperator()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->where('id', '=', 10)->orWhereRaw('select count(*) from "photos" where "photo"."user_id" = "user"."id" and "type" = ?', array('profile'), '<', 1);
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? or (select count(*) from "photos" where "photo"."user_id" = "user"."id" and "type" = ?) < ?', [10, 'profile', 1]);
 	}
 
 
@@ -305,13 +311,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereIn('id', array(1, 2, 3));
-		$this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" in (?, ?, ?)', [1, 2, 3]);
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereIn('id', array(1, 2, 3));
-		$this->assertEquals('select * from "users" where "id" = ? or "id" in (?, ?, ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 1, 2 => 2, 3 => 3), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? or "id" in (?, ?, ?)', [1, 1, 2, 3]);
 	}
 
 
@@ -319,13 +323,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNotIn('id', array(1, 2, 3));
-		$this->assertEquals('select * from "users" where "id" not in (?, ?, ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" not in (?, ?, ?)', [1, 2, 3]);
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotIn('id', array(1, 2, 3));
-		$this->assertEquals('select * from "users" where "id" = ? or "id" not in (?, ?, ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 1, 2 => 2, 3 => 3), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? or "id" not in (?, ?, ?)', [1, 1, 2, 3]);
 	}
 
 
@@ -334,14 +336,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
-		$this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? union select * from "users" where "id" = ?', [1, 2]);
 
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->union($this->getMySqlBuilder()->select('*')->from('users')->where('id', '=', 2));
-		$this->assertEquals('(select * from `users` where `id` = ?) union (select * from `users` where `id` = ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertBuilderCompile($builder, '(select * from `users` where `id` = ?) union (select * from `users` where `id` = ?)', [1, 2]);
 	}
 
 
@@ -350,8 +350,52 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
-		$this->assertEquals('select * from "users" where "id" = ? union all select * from "users" where "id" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? union all select * from "users" where "id" = ?', [1, 2]);
+
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('users')->where('id', '=', 1);
+		$builder->unionAll($this->getMySqlBuilder()->select('*')->from('users')->where('id', '=', 2));
+		$this->assertBuilderCompile($builder, '(select * from `users` where `id` = ?) union all (select * from `users` where `id` = ?)', [1, 2]);
+	}
+
+
+	public function testUnionsWithJoins()
+	{
+		$expectedSql = 'select * from "users" inner join "photos" on "users"."id" = ? where "id" = ? union select * from "users" inner join "photos" on "users"."id" = ? where "id" = ?';
+		$expectedBindings = ['foo', 1, 'bar', 2];
+
+		$first = $this->getBuilder();
+		$first->select('*')->from('users')->join('photos', function($join) {$join->where('users.id', '=', 'foo');})->where('id', '=', 1);
+		$second = $this->getBuilder()->select('*')->from('users')->join('photos', function($join) {$join->where('users.id', '=', 'bar');})->where('id', '=', 2);
+		$first->union($second);
+		$this->assertBuilderCompile($first, $expectedSql, $expectedBindings);
+	}
+
+
+	public function testUnionsWithOrder()
+	{
+		$expectedSql = 'select * from "users" where "id" = ? order by "email" asc, "age" ? desc union select * from "users" where "id" = ? order by "email" asc, "age" ? desc';
+		$expectedBindings = [1, 'foo', 2, 'bar'];
+
+		$first = $this->getBuilder();
+		$first->select('*')->from('users')->where('id', '=', 1)->orderBy('email')->orderByRaw('"age" ? desc', array('foo'));
+		$second = $this->getBuilder()->select('*')->from('users')->where('id', '=', 2)->orderBy('email')->orderByRaw('"age" ? desc', array('bar'));
+		$first->union($second);
+
+		$this->assertBuilderCompile($first, $expectedSql, $expectedBindings);
+	}
+
+	public function testUnionsWithHavings()
+	{
+		$expectedSql = 'select * from "users" where "id" = ? group by "email" having "email" = ? union select * from "users" where "id" = ? group by "email" having "email" = ?';
+		$expectedBindings = [1, 'me@email.com', 2, 'you@email.com'];
+
+		$first = $this->getBuilder();
+		$first->select('*')->from('users')->where('id', '=', 1)->groupBy('email')->having('email', '=', 'me@email.com');
+		$second = $this->getBuilder()->select('*')->from('users')->where('id', '=', 2)->groupBy('email')->having('email', '=', 'you@email.com');
+		$first->union($second);
+
+		$this->assertBuilderCompile($first, $expectedSql, $expectedBindings);
 	}
 
 
@@ -361,8 +405,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
 		$builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 3));
-		$this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ? union select * from "users" where "id" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? union select * from "users" where "id" = ? union select * from "users" where "id" = ?', [1, 2, 3]);
 	}
 
 
@@ -372,8 +415,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->select('*')->from('users')->where('id', '=', 1);
 		$builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
 		$builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 3));
-		$this->assertEquals('select * from "users" where "id" = ? union all select * from "users" where "id" = ? union all select * from "users" where "id" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? union all select * from "users" where "id" = ? union all select * from "users" where "id" = ?', [1, 2, 3]);
 	}
 
 
@@ -384,16 +426,50 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		{
 			$q->select('id')->from('users')->where('age', '>', 25)->take(3);
 		});
-		$this->assertEquals('select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
-		$this->assertEquals(array(25), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3)', [25]);
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNotIn('id', function($q)
 		{
 			$q->select('id')->from('users')->where('age', '>', 25)->take(3);
 		});
-		$this->assertEquals('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
-		$this->assertEquals(array(25), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', [25]);
+	}
+
+
+	public function testSubSelectWhereInsWithHavings()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->groupBy('email')->having('email', '!=', 'me@email.com')->whereIn('id', function($q)
+		{
+			$q->select('id')->from('users')->where('age', '>', 25)->take(3);
+		});
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3) group by "email" having "email" != ?', [ 25, 'me@email.com']);
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->groupBy('email')->having('email', '!=', 'me@email.com')->whereNotIn('id', function($q)
+		{
+			$q->select('id')->from('users')->where('age', '>', 25)->take(3);
+		});
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3) group by "email" having "email" != ?', [ 25, 'me@email.com']);
+	}
+
+
+	public function testSubSelectWhereInsWithJoins()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->joinWhere('photos', 'users.id', '=', 'foo')->whereIn('id', function($q)
+		{
+			$q->select('id')->from('users')->joinWhere('photos', 'users.id', '!=', 'bar')->where('age', '>', 25)->take(3);
+		});
+		$this->assertBuilderCompile($builder, 'select * from "users" inner join "photos" on "users"."id" = ? where "id" in (select "id" from "users" inner join "photos" on "users"."id" != ? where "age" > ? limit 3)', ['foo', 'bar', 25]);
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->joinWhere('photos', 'users.id', '=', 'foo')->whereNotIn('id', function($q)
+		{
+			$q->select('id')->from('users')->joinWhere('photos', 'users.id', '!=', 'bar')->where('age', '>', 25)->take(3);
+		});
+		$this->assertBuilderCompile($builder, 'select * from "users" inner join "photos" on "users"."id" = ? where "id" not in (select "id" from "users" inner join "photos" on "users"."id" != ? where "age" > ? limit 3)', ['foo', 'bar', 25]);
 	}
 
 
@@ -401,13 +477,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNull('id');
-		$this->assertEquals('select * from "users" where "id" is null', $builder->toSql());
-		$this->assertEquals(array(), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" is null');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereNull('id');
-		$this->assertEquals('select * from "users" where "id" = ? or "id" is null', $builder->toSql());
-		$this->assertEquals(array(0 => 1), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? or "id" is null', [1]);
 	}
 
 
@@ -415,13 +489,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNotNull('id');
-		$this->assertEquals('select * from "users" where "id" is not null', $builder->toSql());
-		$this->assertEquals(array(), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" is not null');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '>', 1)->orWhereNotNull('id');
-		$this->assertEquals('select * from "users" where "id" > ? or "id" is not null', $builder->toSql());
-		$this->assertEquals(array(0 => 1), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" > ? or "id" is not null', [1]);
 	}
 
 
@@ -429,11 +501,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy('id', 'email');
-		$this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" group by "id", "email"');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy(['id', 'email']);
-		$this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" group by "id", "email"');
 	}
 
 
@@ -441,12 +513,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->orderBy('email')->orderBy('age', 'desc');
-		$this->assertEquals('select * from "users" order by "email" asc, "age" desc', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" order by "email" asc, "age" desc');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', array('foo'));
-		$this->assertEquals('select * from "users" order by "email" asc, "age" ? desc', $builder->toSql());
-		$this->assertEquals(array('foo'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" order by "email" asc, "age" ? desc', ['foo']);
 	}
 
 
@@ -454,15 +525,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->having('email', '>', 1);
-		$this->assertEquals('select * from "users" having "email" > ?', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" having "email" > ?', [1]);
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy('email')->having('email', '>', 1);
-		$this->assertEquals('select * from "users" group by "email" having "email" > ?', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" group by "email" having "email" > ?', [1]);
 
 		$builder = $this->getBuilder();
 		$builder->select('email as foo_email')->from('users')->having('foo_email', '>', 1);
-		$this->assertEquals('select "email" as "foo_email" from "users" having "foo_email" > ?', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select "email" as "foo_email" from "users" having "foo_email" > ?', [1]);
 	}
 
 
@@ -470,11 +541,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->havingRaw('user_foo < user_bar');
-		$this->assertEquals('select * from "users" having user_foo < user_bar', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" having user_foo < user_bar');
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->havingRaw('user_foo < ?', [1]);
+		$this->assertBuilderCompile($builder, 'select * from "users" having user_foo < ?', [1]);
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->having('baz', '=', 1)->orHavingRaw('user_foo < user_bar');
-		$this->assertEquals('select * from "users" having "baz" = ? or user_foo < user_bar', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" having "baz" = ? or user_foo < user_bar', [1]);
 	}
 
 
@@ -482,23 +557,23 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->offset(5)->limit(10);
-		$this->assertEquals('select * from "users" limit 10 offset 5', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" limit 10 offset 5');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->skip(5)->take(10);
-		$this->assertEquals('select * from "users" limit 10 offset 5', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" limit 10 offset 5');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->skip(-5)->take(10);
-		$this->assertEquals('select * from "users" limit 10 offset 0', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" limit 10 offset 0');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->forPage(2, 15);
-		$this->assertEquals('select * from "users" limit 15 offset 15', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" limit 15 offset 15');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->forPage(-2, 15);
-		$this->assertEquals('select * from "users" limit 15 offset 0', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" limit 15 offset 0');
 	}
 
 
@@ -506,8 +581,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', 1)->orWhere('name', 'foo');
-		$this->assertEquals('select * from "users" where "id" = ? or "name" = ?', $builder->toSql());
-		$this->assertEquals(array(0 => 1, 1 => 'foo'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "id" = ? or "name" = ?', [1, 'foo']);
 	}
 
 
@@ -518,8 +592,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		{
 			$q->where('name', '=', 'bar')->where('age', '=', 25);
 		});
-		$this->assertEquals('select * from "users" where "email" = ? or ("name" = ? and "age" = ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 'foo', 1 => 'bar', 2 => 25), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "email" = ? or ("name" = ? and "age" = ?)', ['foo', 'bar', 25]);
 	}
 
 
@@ -531,8 +604,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 			$q->select(new Raw('max(id)'))->from('users')->where('email', '=', 'bar');
 		});
 
-		$this->assertEquals('select * from "users" where "email" = ? or "id" = (select max(id) from "users" where "email" = ?)', $builder->toSql());
-		$this->assertEquals(array(0 => 'foo', 1 => 'bar'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "email" = ? or "id" = (select max(id) from "users" where "email" = ?)', ['foo', 'bar']);
 	}
 
 
@@ -543,28 +615,28 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		{
 			$q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
 		});
-		$this->assertEquals('select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('orders')->whereNotExists(function($q)
 		{
 			$q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
 		});
-		$this->assertEquals('select * from "orders" where not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "orders" where not exists (select * from "products" where "products"."id" = "orders"."id")');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('orders')->where('id', '=', 1)->orWhereExists(function($q)
 		{
 			$q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
 		});
-		$this->assertEquals('select * from "orders" where "id" = ? or exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "orders" where "id" = ? or exists (select * from "products" where "products"."id" = "orders"."id")', [1]);
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('orders')->where('id', '=', 1)->orWhereNotExists(function($q)
 		{
 			$q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
 		});
-		$this->assertEquals('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', [1]);
 	}
 
 
@@ -572,12 +644,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->leftJoin('photos', 'users.id', '=', 'photos.id');
-		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id"');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->leftJoinWhere('photos', 'users.id', '=', 'bar')->joinWhere('photos', 'users.id', '=', 'foo');
-		$this->assertEquals('select * from "users" left join "photos" on "users"."id" = ? inner join "photos" on "users"."id" = ?', $builder->toSql());
-		$this->assertEquals(array('bar', 'foo'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" left join "photos" on "users"."id" = ? inner join "photos" on "users"."id" = ?', ['bar', 'foo']);
 	}
 
 
@@ -588,15 +659,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		{
 			$j->on('users.id', '=', 'contacts.id')->orOn('users.name', '=', 'contacts.name');
 		});
-		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "users"."name" = "contacts"."name"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "users"."name" = "contacts"."name"');
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->join('contacts', function($j)
 		{
 			$j->where('users.id', '=', 'foo')->orWhere('users.name', '=', 'bar');
 		});
-		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
-		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', ['foo', 'bar']);
 	}
 
 	public function testJoinWhereNull()
@@ -606,14 +676,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		{
 			$j->on('users.id', '=', 'contacts.id')->whereNull('contacts.deleted_at');
 		});
-		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is null', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is null');
 	}
 
 	public function testRawExpressionsInSelect()
 	{
 		$builder = $this->getBuilder();
 		$builder->select(new Raw('substr(foo, 6)'))->from('users');
-		$this->assertEquals('select substr(foo, 6) from "users"', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select substr(foo, 6) from "users"');
 	}
 
 
@@ -996,7 +1066,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('users');
-		$this->assertEquals('select * from `users`', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from `users`');
 	}
 
 
@@ -1004,7 +1074,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSQLiteBuilder();
 		$builder->select('*')->from('users')->orderBy('email', 'desc');
-		$this->assertEquals('select * from "users" order by "email" desc', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" order by "email" desc');
 	}
 
 
@@ -1012,19 +1082,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->take(10);
-		$this->assertEquals('select top 10 * from [users]', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select top 10 * from [users]');
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->skip(10);
-		$this->assertEquals('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num >= 11', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num >= 11');
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->skip(10)->take(10);
-		$this->assertEquals('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20');
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('users')->skip(10)->take(10)->orderBy('email', 'desc');
-		$this->assertEquals('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20');
 	}
 
 
@@ -1032,9 +1102,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->wheres = array('foo');
-		$builder->mergeWheres(array('wheres'), array(12 => 'foo', 13 => 'bar'));
+		$builder->mergeWheres(array('wheres'));
 		$this->assertEquals(array('foo', 'wheres'), $builder->wheres);
-		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
 	}
 
 
@@ -1042,7 +1111,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('foo', null);
-		$this->assertEquals('select * from "users" where "foo" is null', $builder->toSql());
+		$this->assertBuilderCompile($builder, 'select * from "users" where "foo" is null');
 	}
 
 
@@ -1113,13 +1182,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
-		$this->assertEquals('select * from `foo` where `bar` = ? for update', $builder->toSql());
-		$this->assertEquals(array('baz'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from `foo` where `bar` = ? for update', ['baz']);
 
 		$builder = $this->getMySqlBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
-		$this->assertEquals('select * from `foo` where `bar` = ? lock in share mode', $builder->toSql());
-		$this->assertEquals(array('baz'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from `foo` where `bar` = ? lock in share mode', ['baz']);
 	}
 
 
@@ -1127,13 +1194,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
-		$this->assertEquals('select * from "foo" where "bar" = ? for update', $builder->toSql());
-		$this->assertEquals(array('baz'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "foo" where "bar" = ? for update', ['baz']);
 
 		$builder = $this->getPostgresBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
-		$this->assertEquals('select * from "foo" where "bar" = ? for share', $builder->toSql());
-		$this->assertEquals(array('baz'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from "foo" where "bar" = ? for share', ['baz']);
 	}
 
 
@@ -1141,13 +1206,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
-		$this->assertEquals('select * from [foo] with(rowlock,updlock,holdlock) where [bar] = ?', $builder->toSql());
-		$this->assertEquals(array('baz'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from [foo] with(rowlock,updlock,holdlock) where [bar] = ?', ['baz']);
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
-		$this->assertEquals('select * from [foo] with(rowlock,holdlock) where [bar] = ?', $builder->toSql());
-		$this->assertEquals(array('baz'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, 'select * from [foo] with(rowlock,holdlock) where [bar] = ?', ['baz']);
 	}
 
 
@@ -1158,55 +1221,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->join('othertable', function($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', array('bar'));
-		$this->assertEquals($expectedSql, $builder->toSql());
-		$this->assertEquals($expectedBindings, $builder->getBindings());
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
 
 		// order of statements reversed
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', array('bar'))->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', function($join) { $join->where('bar', '=', 'foo'); });
-		$this->assertEquals($expectedSql, $builder->toSql());
-		$this->assertEquals($expectedBindings, $builder->getBindings());
-	}
-
-
-	public function testAddBindingWithArrayMergesBindings()
-	{
-		$builder = $this->getBuilder();
-		$builder->addBinding(array('foo', 'bar'));
-		$builder->addBinding(array('baz'));
-		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
-	}
-
-
-	public function testAddBindingWithArrayMergesBindingsInCorrectOrder()
-	{
-		$builder = $this->getBuilder();
-		$builder->addBinding(array('bar', 'baz'), 'having');
-		$builder->addBinding(array('foo'), 'where');
-		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
-	}
-
-
-	public function testMergeBuilders()
-	{
-		$builder = $this->getBuilder();
-		$builder->addBinding(array('foo', 'bar'));
-		$otherBuilder = $this->getBuilder();
-		$otherBuilder->addBinding(array('baz'));
-		$builder->mergeBindings($otherBuilder);
-		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
-	}
-
-
-	public function testMergeBuildersBindingOrder()
-	{
-		$builder = $this->getBuilder();
-		$builder->addBinding('foo', 'where');
-		$builder->addBinding('baz', 'having');
-		$otherBuilder = $this->getBuilder();
-		$otherBuilder->addBinding('bar', 'where');
-		$builder->mergeBindings($otherBuilder);
-		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
 	}
 
 
@@ -1215,19 +1235,68 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
 		$expectedBindings = ['subval', 'val'];
 
-		$builder = $this->getPostgresBuilder();
+		$builder = $this->getBuilder();
 		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
 		$builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval'); }, 'sub');
-		$this->assertEquals($expectedSql, $builder->toSql());
-		$this->assertEquals($expectedBindings, $builder->getBindings());
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
 
-		$builder = $this->getPostgresBuilder();
+		$builder = $this->getBuilder();
 		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
-		$subBuilder = $this->getPostgresBuilder();
+		$subBuilder = $this->getBuilder();
 		$subBuilder->from('two')->select('baz')->where('subkey', '=', 'subval');
 		$builder->selectSub($subBuilder, 'sub');
-		$this->assertEquals($expectedSql, $builder->toSql());
-		$this->assertEquals($expectedBindings, $builder->getBindings());
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
+	}
+
+
+	public function testSubSelectWithOrder()
+	{
+		$expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ? order by "age" ? desc) as "sub" from "one" where "key" = ? order by "age" ? desc';
+		$expectedBindings = ['subval', 'buzz', 'val', 'fuzz'];
+
+		$builder = $this->getBuilder();
+		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val')->orderByRaw('"age" ? desc', array('fuzz'));
+		$builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval')->orderByRaw('"age" ? desc', array('buzz')); }, 'sub');
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
+	}
+
+
+	public function testSubSelectWithHavings()
+	{
+		$expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ? having "age" > ?) as "sub" from "one" where "key" = ? having "email" != ?';
+		$expectedBindings = ['subval', 25, 'val', 'me@email.com'];
+
+		$builder = $this->getBuilder();
+		$builder->from('one')->select(['foo', 'bar']);
+		$builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval')->having('age', '>', 25); }, 'sub');
+		$builder->where('key', '=', 'val')->having('email', '!=', 'me@email.com');
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
+	}
+
+
+	public function testSubSelectWithJoins()
+	{
+		$expectedSql = 'select "foo", "bar", (select "baz" from "two" inner join "photos" on "users"."id" != ? where "subkey" = ?) as "sub" from "one" inner join "photos" on "users"."id" = ? where "key" = ?';
+		$expectedBindings = ['bar', 'subval', 'foo', 'val'];
+
+		$builder = $this->getBuilder();
+		$builder->from('one')->select(['foo', 'bar']);
+		$builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval')->joinWhere('photos', 'users.id', '!=', 'bar'); }, 'sub');
+		$builder->where('key', '=', 'val')->joinWhere('photos', 'users.id', '=', 'foo');
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
+	}
+
+
+	public function testSubSelectWithRawSelect()
+	{
+		$expectedSql = 'select (select ? from "two" where "subkey" = ?) as "sub", "foo", "bar", ? from "one" where "key" = ?';
+		$expectedBindings = ['baz', 'subval', 'buzz', 'val'];
+
+		$builder = $this->getBuilder();
+		$builder->from('one');
+		$builder->selectSub(function($query) { $query->from('two')->selectRaw('?', ['baz'])->where('subkey', '=', 'subval'); }, 'sub');
+		$builder->addSelect(['foo', 'bar'])->selectRaw('?', ['buzz'])->where('key', '=', 'val');
+		$this->assertBuilderCompile($builder, $expectedSql, $expectedBindings);
 	}
 
 
@@ -1268,6 +1337,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$grammar = new Illuminate\Database\Query\Grammars\SqlServerGrammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+	}
+
+	protected function assertBuilderCompile($buidler, $expectedSql, $expectedBindings = []) {
+		$compiled = $buidler->compile();
+		$this->assertEquals($expectedSql, $compiled->sql);
+		$this->assertEquals($expectedBindings, $compiled->bindings);
 	}
 
 }

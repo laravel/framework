@@ -30,19 +30,6 @@ class Builder {
 	protected $processor;
 
 	/**
-	 * The current query value bindings.
-	 *
-	 * @var array
-	 */
-	protected $bindings = array(
-		'select' => [],
-		'join'   => [],
-		'where'  => [],
-		'having' => [],
-		'order'  => [],
-	);
-
-	/**
 	 * An aggregate function and column to be run.
 	 *
 	 * @var array
@@ -205,7 +192,8 @@ class Builder {
 	 */
 	public function select($columns = array('*'))
 	{
-		$this->columns = is_array($columns) ? $columns : func_get_args();
+		$columns = is_array($columns) ? $columns : func_get_args();
+		$this->setSelect($columns);
 
 		return $this;
 	}
@@ -219,12 +207,7 @@ class Builder {
 	 */
 	public function selectRaw($expression, array $bindings = array())
 	{
-		$this->addSelect(new Expression($expression));
-
-		if ($bindings)
-		{
-			$this->addBinding($bindings, 'select');
-		}
+		$this->addSelect(new Expression($expression), $bindings);
 
 		return $this;
 	}
@@ -247,9 +230,11 @@ class Builder {
 
 		if ($query instanceof Builder)
 		{
-			$bindings = $query->getBindings();
+			$compiled = $query->compile();
 
-			$query = $query->toSql();
+			$bindings = $compiled->bindings;
+
+			$query = $compiled->sql;
 		}
 		elseif (is_string($query))
 		{
@@ -269,11 +254,26 @@ class Builder {
 	 * @param  mixed  $column
 	 * @return $this
 	 */
-	public function addSelect($column)
+	public function addSelect($column, $bindings = [])
 	{
-		$column = is_array($column) ? $column : func_get_args();
+		$columns = is_array($column) ? $column : [$column];
 
-		$this->columns = array_merge((array) $this->columns, $column);
+		$this->columns[] = compact('columns', 'bindings');
+
+		return $this;
+	}
+
+	/**
+	 * Add a new select column to the query.
+	 *
+	 * @param  mixed  $column
+	 * @return $this
+	 */
+	public function setSelect($column, $bindings = [])
+	{
+		$this->columns = [];
+
+		$this->addSelect($column, $bindings);
 
 		return $this;
 	}
@@ -490,11 +490,6 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-		if ( ! $value instanceof Expression)
-		{
-			$this->addBinding($value, 'where');
-		}
-
 		return $this;
 	}
 
@@ -533,13 +528,11 @@ class Builder {
 	 * @param  string  $boolean
 	 * @return $this
 	 */
-	public function whereRaw($sql, array $bindings = array(), $boolean = 'and')
+	public function whereRaw($sql, array $bindings = array(), $operator = null, $value = null, $boolean = 'and')
 	{
 		$type = 'raw';
 
-		$this->wheres[] = compact('type', 'sql', 'boolean');
-
-		$this->addBinding($bindings, 'where');
+		$this->wheres[] = compact('type', 'sql', 'boolean', 'bindings', 'operator', 'value');
 
 		return $this;
 	}
@@ -551,9 +544,9 @@ class Builder {
 	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orWhereRaw($sql, array $bindings = array())
+	public function orWhereRaw($sql, array $bindings = array(), $operator = null, $value = null)
 	{
-		return $this->whereRaw($sql, $bindings, 'or');
+		return $this->whereRaw($sql, $bindings, $operator, $value, 'or');
 	}
 
 	/**
@@ -569,9 +562,7 @@ class Builder {
 	{
 		$type = 'between';
 
-		$this->wheres[] = compact('column', 'type', 'boolean', 'not');
-
-		$this->addBinding($values, 'where');
+		$this->wheres[] = compact('column', 'type', 'boolean', 'not', 'values');
 
 		return $this;
 	}
@@ -648,8 +639,6 @@ class Builder {
 			$type = 'Nested';
 
 			$this->wheres[] = compact('type', 'query', 'boolean');
-
-			$this->mergeBindings($query);
 		}
 
 		return $this;
@@ -677,8 +666,6 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'column', 'operator', 'query', 'boolean');
 
-		$this->mergeBindings($query);
-
 		return $this;
 	}
 
@@ -702,8 +689,6 @@ class Builder {
 		call_user_func($callback, $query);
 
 		$this->wheres[] = compact('type', 'operator', 'query', 'boolean');
-
-		$this->mergeBindings($query);
 
 		return $this;
 	}
@@ -766,8 +751,6 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
-		$this->addBinding($values, 'where');
-
 		return $this;
 	}
 
@@ -827,8 +810,6 @@ class Builder {
 		call_user_func($callback, $query = $this->newQuery());
 
 		$this->wheres[] = compact('type', 'column', 'query', 'boolean');
-
-		$this->mergeBindings($query);
 
 		return $this;
 	}
@@ -940,8 +921,6 @@ class Builder {
 	{
 		$this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
 
-		$this->addBinding($value, 'where');
-
 		return $this;
 	}
 
@@ -1038,8 +1017,6 @@ class Builder {
 
 		$this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-		$this->addBinding($value, 'having');
-
 		return $this;
 	}
 
@@ -1068,9 +1045,7 @@ class Builder {
 	{
 		$type = 'raw';
 
-		$this->havings[] = compact('type', 'sql', 'boolean');
-
-		$this->addBinding($bindings, 'having');
+		$this->havings[] = compact('type', 'sql', 'boolean', 'bindings');
 
 		return $this;
 	}
@@ -1136,9 +1111,7 @@ class Builder {
 	{
 		$type = 'raw';
 
-		$this->orders[] = compact('type', 'sql');
-
-		$this->addBinding($bindings, 'order');
+		$this->orders[] = compact('type', 'sql', 'bindings');
 
 		return $this;
 	}
@@ -1218,8 +1191,6 @@ class Builder {
 		}
 
 		$this->unions[] = compact('query', 'all');
-
-		return $this->mergeBindings($query);
 	}
 
 	/**
@@ -1269,9 +1240,9 @@ class Builder {
 	/**
 	 * Get the SQL representation of the query.
 	 *
-	 * @return string
+	 * @return \Illuminate\Database\Query\CompiledQuery
 	 */
-	public function toSql()
+	public function compile()
 	{
 		return $this->grammar->compileSelect($this);
 	}
@@ -1386,7 +1357,7 @@ class Builder {
 	 */
 	public function getFresh($columns = array('*'))
 	{
-		if (is_null($this->columns)) $this->columns = $columns;
+		if (is_null($this->columns)) $this->setSelect($columns);
 
 		return $this->processor->processSelect($this, $this->runSelect());
 	}
@@ -1398,7 +1369,9 @@ class Builder {
 	 */
 	protected function runSelect()
 	{
-		return $this->connection->select($this->toSql(), $this->getBindings());
+		$compiled = $this->compile();
+
+		return $this->connection->select($compiled->sql, $compiled->bindings);
 	}
 
 	/**
@@ -1409,7 +1382,7 @@ class Builder {
 	 */
 	public function getCached($columns = array('*'))
 	{
-		if (is_null($this->columns)) $this->columns = $columns;
+		if (is_null($this->columns)) $this->setSelect($columns);
 
 		// If the query is requested to be cached, we will cache it using a unique key
 		// for this database connection and query statement, including the bindings
@@ -1471,8 +1444,9 @@ class Builder {
 	public function generateCacheKey()
 	{
 		$name = $this->connection->getName();
+		$compiled = $this->compile();
 
-		return md5($name.$this->toSql().serialize($this->getBindings()));
+		return md5($name.$compiled->sql.serialize($compiled->bindings));
 	}
 
 	/**
@@ -1870,14 +1844,14 @@ class Builder {
 			}
 		}
 
-		$sql = $this->grammar->compileInsert($this, $values);
+		$insert = $this->grammar->compileInsert($this, $values);
 
 		// Once we have compiled the insert statement's SQL we can execute it on the
 		// connection and return a result as a boolean success indicator as that
 		// is the same type of result returned by the raw connection instance.
 		$bindings = $this->cleanBindings($bindings);
 
-		return $this->connection->insert($sql, $bindings);
+		return $this->connection->insert($insert->sql, $bindings);
 	}
 
 	/**
@@ -1889,11 +1863,11 @@ class Builder {
 	 */
 	public function insertGetId(array $values, $sequence = null)
 	{
-		$sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
+		$insert = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
 		$values = $this->cleanBindings($values);
 
-		return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
+		return $this->processor->processInsertGetId($this, $insert->sql, $values, $sequence);
 	}
 
 	/**
@@ -1904,11 +1878,10 @@ class Builder {
 	 */
 	public function update(array $values)
 	{
-		$bindings = array_values(array_merge($values, $this->getBindings()));
+		$update = $this->grammar->compileUpdate($this, $values);
+		$bindings = array_values(array_merge($values, $update->bindings));
 
-		$sql = $this->grammar->compileUpdate($this, $values);
-
-		return $this->connection->update($sql, $this->cleanBindings($bindings));
+		return $this->connection->update($update->sql, $this->cleanBindings($bindings));
 	}
 
 	/**
@@ -1958,9 +1931,9 @@ class Builder {
 		// from their database without manually specifying the where clauses.
 		if ( ! is_null($id)) $this->where('id', '=', $id);
 
-		$sql = $this->grammar->compileDelete($this);
+		$delete = $this->grammar->compileDelete($this);
 
-		return $this->connection->delete($sql, $this->getBindings());
+		return $this->connection->delete($delete->sql, $delete->bindings);
 	}
 
 	/**
@@ -1987,17 +1960,14 @@ class Builder {
 	}
 
 	/**
-	 * Merge an array of where clauses and bindings.
+	 * Merge an array of where clauses.
 	 *
 	 * @param  array  $wheres
-	 * @param  array  $bindings
 	 * @return void
 	 */
-	public function mergeWheres($wheres, $bindings)
+	public function mergeWheres($wheres)
 	{
 		$this->wheres = array_merge((array) $this->wheres, (array) $wheres);
-
-		$this->bindings['where'] = array_values(array_merge($this->bindings['where'], (array) $bindings));
 	}
 
 	/**
@@ -2023,88 +1993,6 @@ class Builder {
 	public function raw($value)
 	{
 		return $this->connection->raw($value);
-	}
-
-	/**
-	 * Get the current query value bindings in a flattened array.
-	 *
-	 * @return array
-	 */
-	public function getBindings()
-	{
-		return array_flatten($this->bindings);
-	}
-
-	/**
-	 * Get the raw array of bindings.
-	 *
-	 * @return array
-	 */
-	public function getRawBindings()
-	{
-		return $this->bindings;
-	}
-
-	/**
-	 * Set the bindings on the query builder.
-	 *
-	 * @param  array   $bindings
-	 * @param  string  $type
-	 * @return $this
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function setBindings(array $bindings, $type = 'where')
-	{
-		if ( ! array_key_exists($type, $this->bindings))
-		{
-			throw new \InvalidArgumentException("Invalid binding type: {$type}.");
-		}
-
-		$this->bindings[$type] = $bindings;
-
-		return $this;
-	}
-
-	/**
-	 * Add a binding to the query.
-	 *
-	 * @param  mixed   $value
-	 * @param  string  $type
-	 * @return $this
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function addBinding($value, $type = 'where')
-	{
-		if ( ! array_key_exists($type, $this->bindings))
-		{
-			throw new \InvalidArgumentException("Invalid binding type: {$type}.");
-		}
-
-		if (is_array($value))
-		{
-			$this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
-		}
-		else
-		{
-			$this->bindings[$type][] = $value;
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Merge an array of bindings into our bindings.
-	 *
-	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return $this
-	 */
-	public function mergeBindings(Builder $query)
-	{
-		$this->bindings = array_merge_recursive($this->bindings, $query->bindings);
-
-		return $this;
 	}
 
 	/**
