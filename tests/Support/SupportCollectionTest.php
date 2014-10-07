@@ -557,6 +557,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('name', 'framework'), $c->keys());
 	}
 
+
+	public function testPaginate()
+	{
+		$c = new Collection(['one', 'two', 'three', 'four']);
+		$this->assertEquals(['one', 'two'], $c->paginate(1, 2)->all());
+		$this->assertEquals(['three', 'four'], $c->paginate(2, 2)->all());
+		$this->assertEquals([], $c->paginate(3, 2)->all());
+	}
+
 }
 
 class TestAccessorEloquentTestStub
