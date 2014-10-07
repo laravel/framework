@@ -667,6 +667,26 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
+	 * Determine if the application events have been scanned.
+	 *
+	 * @return bool
+	 */
+	public function eventsAreScanned()
+	{
+		return $this['files']->exists($this->getScannedEventsPath());
+	}
+
+	/**
+	 * Get the path to the scanned events file.
+	 *
+	 * @return string
+	 */
+	public function getScannedEventsPath()
+	{
+		return $this['path.storage'].'/framework/events.scanned.php';
+	}
+
+	/**
 	 * Register the application stack.
 	 *
 	 * @param  \Closure  $stack

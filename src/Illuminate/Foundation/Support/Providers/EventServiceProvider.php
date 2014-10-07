@@ -13,9 +13,9 @@ class EventServiceProvider extends ServiceProvider {
 	 */
 	public function boot(DispatcherContract $events)
 	{
-		if (file_exists($scanned = $this->app['path.storage'].'/framework/events.scanned.php'))
+		if ($this->app->eventsAreScanned())
 		{
-			require $scanned;
+			require $this->app->getScannedEventsPath();
 		}
 
 		foreach ($this->listen as $event => $listeners)
