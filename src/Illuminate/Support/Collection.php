@@ -356,6 +356,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * "Paginate" the collection by slicing it into a smaller collection.
+	 *
+	 * @param  int  $page
+	 * @param  int  $perPage
+	 * @return static
+	 */
+	public function paginate($page, $perPage)
+	{
+		return new static(array_slice($this->items, ($page - 1) * $perPage, $perPage));
+	}
+
+	/**
 	 * Get and remove the last item from the collection.
 	 *
 	 * @return mixed|null
