@@ -162,7 +162,7 @@ trait ApplicationTrait {
 	 */
 	public function be(UserInterface $user, $driver = null)
 	{
-		$this->app['auth']->driver($driver)->setUser($user);
+		$this->app['auth']->driver($driver)->loginUsingId($user->id);
 	}
 
 	/**
