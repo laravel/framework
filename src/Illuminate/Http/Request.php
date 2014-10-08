@@ -625,7 +625,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Get the route handling the request.
 	 *
-	 * @return Illuminate\Routing\Route|null
+	 * @return \Illuminate\Routing\Route|null
 	 */
 	public function route()
 	{
