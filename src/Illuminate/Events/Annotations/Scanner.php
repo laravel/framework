@@ -36,7 +36,9 @@ class Scanner {
 		$this->rootNamespace = rtrim($rootNamespace, '\\').'\\';
 
 		foreach (Finder::create()->files()->in(__DIR__.'/Annotations') as $file)
+		{
 			AnnotationRegistry::registerFile($file->getRealPath());
+		}
 	}
 
 	/**
