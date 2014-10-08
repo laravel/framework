@@ -42,7 +42,7 @@ class RouteListCommand extends Command {
 	 * @var array
 	 */
 	protected $headers = array(
-		'Domain', 'URI', 'Name', 'Action', 'Before Filters', 'After Filters'
+		'Domain', 'URI', 'Name', 'Action', 'Middleware'
 	);
 
 	/**
@@ -107,8 +107,7 @@ class RouteListCommand extends Command {
 			'uri'    => $uri,
 			'name'   => $route->getName(),
 			'action' => $route->getActionName(),
-			'before' => $this->getBeforeFilters($route),
-			'after'  => $this->getAfterFilters($route)
+			'middleware' => $this->getMiddleware($route)
 		));
 	}
 
@@ -129,13 +128,13 @@ class RouteListCommand extends Command {
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
-	protected function getBeforeFilters($route)
+	protected function getMiddleware($route)
 	{
-		$before = array_keys($route->beforeFilters());
+		$middleware = array_values($route->middleware());
 
-		$before = array_unique(array_merge($before, $this->getPatternFilters($route)));
+		$middleware = array_unique(array_merge($middleware, $this->getPatternFilters($route)));
 
-		return implode(', ', $before);
+		return implode(', ', $middleware);
 	}
 
 	/**
@@ -171,17 +170,6 @@ class RouteListCommand extends Command {
 	protected function getMethodPatterns($uri, $method)
 	{
 		return $this->router->findPatternFilters(Request::create($uri, $method));
-	}
-
-	/**
-	 * Get after filters
-	 *
-	 * @param  \Illuminate\Routing\Route  $route
-	 * @return string
-	 */
-	protected function getAfterFilters($route)
-	{
-		return implode(', ', array_keys($route->afterFilters()));
 	}
 
 	/**
