@@ -60,10 +60,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
 	 */
 	protected function setCurrentPage($currentPage, $lastPage)
 	{
-		if (is_null($currentPage) && isset(static::$currentPageResolver))
-		{
-			$currentPage = static::resolveCurrentPage();
-		}
+		$currentPage = $currentPage ?: static::resolveCurrentPage();
 
 		// The page number will get validated and adjusted if it either less than one
 		// or greater than the last page available based on the count of the given
