@@ -80,11 +80,15 @@ class FileLoader implements LoaderInterface {
 		// Finally we're ready to check for the environment specific configuration
 		// file which will be merged on top of the main arrays so that they get
 		// precedence over them if we are currently in an environments setup.
-		$file = "{$path}/{$environment}/{$group}.php";
+		$file = "{$path}/{$environment}/{$group}";
 
-		if ($this->files->exists($file))
+		if ($this->files->exists("{$file}.local.php"))
 		{
-			$items = $this->mergeEnvironment($items, $file);
+			$items = $this->mergeEnvironment($items, "{$file}.local.php");
+		}
+		else if ($this->files->exists("{$file}.php"))
+		{
+			$items = $this->mergeEnvironment($items, "{$file}.php");
 		}
 
 		return $items;
