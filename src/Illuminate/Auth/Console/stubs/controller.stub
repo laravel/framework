@@ -31,6 +31,7 @@ class AuthController {
 	/**
 	 * Show the application registration form.
 	 *
+	 * @Get("auth/register")
 	 * @return Response
 	 */
 	public function getRegister()
@@ -41,6 +42,7 @@ class AuthController {
 	/**
 	 * Handle a registration request for the application.
 	 *
+	 * @Post("auth/register")
 	 * @param  RegisterRequest  $request
 	 * @return Response
 	 */
@@ -56,6 +58,7 @@ class AuthController {
 	/**
 	 * Show the application login form.
 	 *
+	 * @Get("auth/login")
 	 * @return Response
 	 */
 	public function getLogin()
@@ -66,6 +69,7 @@ class AuthController {
 	/**
 	 * Handle a login request to the application.
 	 *
+	 * @Post("auth/login")
 	 * @param  LoginRequest  $request
 	 * @return Response
 	 */
@@ -84,6 +88,7 @@ class AuthController {
 	/**
 	 * Log the user out of the application.
 	 *
+	 * @Get("auth/logout")
 	 * @return Response
 	 */
 	public function getLogout()
