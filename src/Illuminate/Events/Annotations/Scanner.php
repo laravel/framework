@@ -2,7 +2,6 @@
 
 use SplFileInfo;
 use ReflectionClass;
-use ReflectionMethod;
 use Symfony\Component\Finder\Finder;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
