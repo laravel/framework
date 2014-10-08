@@ -1313,7 +1313,7 @@ class Builder {
 	 */
 	public function paginate($perPage = 15, $columns = ['*'])
 	{
-		$page = $page ?: Paginator::resolveCurrentPage();
+		$page = Paginator::resolveCurrentPage();
 
 		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 

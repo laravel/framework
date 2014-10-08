@@ -13,13 +13,13 @@ trait BootstrapThreeNextPreviousButtonRendererTrait {
 		// If the current page is less than or equal to one, it means we can't go any
 		// further back in the pages, so we will render a disabled previous button
 		// when that is the case. Otherwise, we will give it an active "status".
-		if ($this->currentPage() <= 1)
+		if ($this->paginator->currentPage() <= 1)
 		{
 			return $this->getDisabledTextWrapper($text);
 		}
 
 		$url = $this->paginator->url(
-			$this->currentPage() - 1
+			$this->paginator->currentPage() - 1
 		);
 
 		return $this->getPageLinkWrapper($url, $text, 'prev');
@@ -41,7 +41,7 @@ trait BootstrapThreeNextPreviousButtonRendererTrait {
 			return $this->getDisabledTextWrapper($text);
 		}
 
-		$url = $this->paginator->url($this->currentPage() + 1);
+		$url = $this->paginator->url($this->paginator->currentPage() + 1);
 
 		return $this->getPageLinkWrapper($url, $text, 'next');
 	}
