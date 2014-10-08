@@ -561,7 +561,7 @@ class Router implements HttpKernelInterface, RegistrarContract {
 			return $route;
 		});
 
-		$this->events->fire('router.matched', array($route, $request));
+		$this->events->fire('router.matched', [$route, $request]);
 
 		// Once we have successfully matched the incoming request to a given route we
 		// can call the before filters on that route. This works similar to global
