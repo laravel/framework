@@ -71,7 +71,7 @@ interface Paginator {
 	 *
 	 * @return bool
 	 */
-	public function hasMore();
+	public function hasMorePages();
 
 	/**
 	 * Render the paginator using a given Presenter.

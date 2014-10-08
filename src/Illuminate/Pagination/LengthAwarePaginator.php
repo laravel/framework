@@ -90,7 +90,7 @@ class LengthAwarePaginator implements Arrayable, ArrayAccess, Countable, Iterato
 	 *
 	 * @return bool
 	 */
-	public function hasMore()
+	public function hasMorePages()
 	{
 		return $this->currentPage() < $this->lastPage();
 	}
@@ -136,7 +136,7 @@ class LengthAwarePaginator implements Arrayable, ArrayAccess, Countable, Iterato
 	public function toArray()
 	{
 		return array(
-			'total' => $this->total, 'per_page' => $this->perPage,
+			'total' => $this->total(), 'per_page' => $this->perPage(),
 			'current_page' => $this->currentPage(), 'last_page' => $this->lastPage(),
 			'next_page_url' => $this->nextPageUrl(), 'prev_page_url' => $this->previousPageUrl(),
 			'from' => $this->firstItem(), 'to' => $this->lastItem(), 'data' => $this->items->toArray(),

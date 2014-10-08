@@ -26,7 +26,7 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 * Create a new paginator instance.
 	 *
 	 * @param  mixed  $items
-	 * @param  int  $total
+	 * @param  int  $currentPage
 	 * @param  int  $perPage
 	 * @param  array  $options (path, query, fragment, pageName)
 	 * @return void
@@ -44,7 +44,18 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 		$this->currentPage = $this->setCurrentPage($currentPage);
 		$this->path = $this->path != '/' ? rtrim($this->path, '/').'/' : $this->path;
 
+		$this->checkForMorePages();
+	}
+
+	/**
+	 * Check for more pages. The last item will be sliced off.
+	 *
+	 * @return void
+	 */
+	protected function checkForMorePages()
+	{
 		$this->hasMore = count($this->items) > ($this->perPage);
+
 		$this->items = $this->items->slice(0, $this->perPage);
 	}
 
@@ -77,7 +88,7 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 *
 	 * @return bool
 	 */
-	public function hasMore()
+	public function hasMorePages()
 	{
 		return $this->hasMore;
 	}
@@ -102,11 +113,9 @@ class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate,
 	 */
 	public function toArray()
 	{
-		$nextPage = $this->hasMore() ? $this->url($this->currenetPage() + 1) : null;
-
 		return array(
-			'per_page' => $this->perPage, 'current_page' => $this->currentPage(),
-			'prev_page_url' => $this->previousPageUrl(), 'next_page_url' => $this->nextPageUrl(),
+			'per_page' => $this->perPage(), 'current_page' => $this->currentPage(),
+			'next_page_url' => $this->nextPageUrl(), 'prev_page_url' => $this->previousPageUrl(),
 			'from' => $this->firstItem(), 'to' => $this->lastItem(), 'data' => $this->items->toArray(),
 		);
 	}

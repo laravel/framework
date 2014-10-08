@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -1301,6 +1302,24 @@ class Builder {
 		if (is_null($this->columns)) $this->columns = $columns;
 
 		return $this->processor->processSelect($this, $this->runSelect());
+	}
+
+	/**
+	 * Paginate the given query into a simple paginator.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\Paginator
+	 */
+	public function paginate($perPage = 15, $columns = ['*'])
+	{
+		$page = $page ?: Paginator::resolveCurrentPage();
+
+		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
+
+		return new Paginator($this->get($columns), $page, $perPage, [
+			'path' => Paginator::resolveCurrentPath()
+		]);
 	}
 
 	/**

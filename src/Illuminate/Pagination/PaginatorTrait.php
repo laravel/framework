@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Pagination;
 
+use Closure;
+
 trait PaginatorTrait {
 
 	/**
@@ -50,6 +52,20 @@ trait PaginatorTrait {
 	 * @var string
 	 */
 	protected $pageName = 'page';
+
+	/**
+	 * The current page resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected static $currentPathResolver;
+
+	/**
+	 * The current page resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected static $currentPageResolver;
 
 	/**
 	 * Determine if the given value is a valid page number.
@@ -184,7 +200,61 @@ trait PaginatorTrait {
 	 */
 	public function hasPages()
 	{
-		return ! ($this->currentPage() == 1 && ! $this->hasMore());
+		return ! ($this->currentPage() == 1 && ! $this->hasMorePages());
+	}
+
+	/**
+	 * Resolve the current request path or return the default value.
+	 *
+	 * @param  string  $default
+	 * @return string
+	 */
+	public static function resolveCurrentPath($default = '/')
+	{
+		if (isset(static::$currentPathResolver))
+		{
+			return call_user_func(static::$currentPathResolver);
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Set the current request path resolver callback.
+	 *
+	 * @param  \Closure  $resolver
+	 * @return void
+	 */
+	public static function currentPathResolver(Closure $resolver)
+	{
+		static::$currentPathResolver = $resolver;
+	}
+
+	/**
+	 * Resolve the current page or return the default value.
+	 *
+	 * @param  int  $default
+	 * @return int
+	 */
+	public static function resolveCurrentPage($default = 1)
+	{
+		if (isset(static::$currentPageResolver))
+		{
+			return call_user_func(static::$currentPageResolver);
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Set the current page resolver callback.
+	 *
+	 * @param  \Closure  $resolver
+	 * @return void
+	 */
+	public static function currentPageResolver(Closure $resolver)
+	{
+		static::$currentPageResolver = $resolver;
 	}
 
 	/**

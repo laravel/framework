@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -223,6 +224,26 @@ class Builder {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Paginate the given query into a simple paginator.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\Paginator
+	 */
+	public function paginate($perPage = null, $columns = ['*'])
+	{
+		$perPage = $perPage ?: $this->model->getPerPage();
+
+		$page = $page ?: Paginator::resolveCurrentPage();
+
+		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
+
+		return new Paginator($this->get($columns)->all(), $page, $perPage, [
+			'path' => Paginator::resolveCurrentPath()
+		]);
 	}
 
 	/**
