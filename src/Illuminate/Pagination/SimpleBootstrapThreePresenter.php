@@ -22,12 +22,14 @@ class SimpleBootstrapThreePresenter extends BootstrapThreePresenter {
 	 */
 	public function render()
 	{
-		if ($this->paginator->hasPages())
+		if ($this->paginator->hasPages() && count($this->paginator->items()) > 0)
 		{
 			return sprintf(
 				'<ul class="pager">%s %s</ul>', $this->getPreviousButton(), $this->getNextButton()
 			);
 		}
+
+		return '';
 	}
 
 }
