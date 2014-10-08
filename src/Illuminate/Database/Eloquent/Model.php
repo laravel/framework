@@ -2068,6 +2068,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$this->hidden = $hidden;
 	}
+	
+	/**
+	 * Add hidden attributes for the model.
+	 *
+	 * @param  array|string|null  $attributes
+	 * @return void
+	 */
+	public function addHidden($attributes = null)
+	{
+		if ( ! is_array($attributes)) $attributes = func_get_args();
+		
+		$this->hidden = array_merge($this->hidden, $attributes);
+	}
 
 	/**
 	 * Set the visible attributes for the model.
@@ -2078,6 +2091,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function setVisible(array $visible)
 	{
 		$this->visible = $visible;
+	}
+	
+	/**
+	 * Add visible attributes for the model.
+	 *
+	 * @param  array|string|null  $attributes
+	 * @return void
+	 */
+	public function addVisible($attributes = null)
+	{
+		if ( ! is_array($attributes)) $attributes = func_get_args();
+		
+		$this->visible = array_merge($this->visible, $attributes);
 	}
 
 	/**
