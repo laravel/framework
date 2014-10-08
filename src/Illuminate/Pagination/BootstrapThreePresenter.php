@@ -47,6 +47,8 @@ class BootstrapThreePresenter implements Renderable {
 				$this->getLinks(), $this->getNextButton()
 			);
 		}
+
+		return '';
 	}
 
 	/**
