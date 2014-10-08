@@ -241,7 +241,7 @@ class Builder {
 
 		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
-		return new Paginator($this->get($columns)->all(), $page, $perPage, [
+		return new Paginator($this->get($columns)->all(), $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath()
 		]);
 	}

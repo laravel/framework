@@ -24,12 +24,12 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	 * Create a new paginator instance.
 	 *
 	 * @param  mixed  $items
-	 * @param  int  $currentPage
 	 * @param  int  $perPage
+	 * @param  int|null  $currentPage
 	 * @param  array  $options (path, query, fragment, pageName)
 	 * @return void
 	 */
-	public function __construct($items, $currentPage, $perPage, array $options = array())
+	public function __construct($items, $perPage, $currentPage = null, array $options = array())
 	{
 		foreach ($options as $key => $value)
 		{
@@ -46,6 +46,19 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	}
 
 	/**
+	 * Get the current page for the request.
+	 *
+	 * @param  int  $lastPage
+	 * @return int
+	 */
+	protected function setCurrentPage($currentPage)
+	{
+		$currentPage = $currentPage ?: static::resolveCurrentPage();
+
+		return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
+	}
+
+	/**
 	 * Check for more pages. The last item will be sliced off.
 	 *
 	 * @return void
@@ -55,17 +68,6 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 		$this->hasMore = count($this->items) > ($this->perPage);
 
 		$this->items = $this->items->slice(0, $this->perPage);
-	}
-
-	/**
-	 * Get the current page for the request.
-	 *
-	 * @param  int  $lastPage
-	 * @return int
-	 */
-	protected function setCurrentPage($currentPage)
-	{
-		return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
 	}
 
 	/**
