@@ -123,6 +123,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foobar', $app->make('bar'));
 	}
 
+
 	public function testHandleRespectsCatchArgument()
 	{
 		$this->setExpectedException('Exception');
