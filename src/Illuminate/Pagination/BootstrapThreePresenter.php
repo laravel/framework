@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Pagination;
 
-use Illuminate\Contracts\Pagination\Presenter as PresenterContract;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
+use Illuminate\Contracts\Pagination\Presenter as PresenterContract;
 
 class BootstrapThreePresenter implements PresenterContract {
 
