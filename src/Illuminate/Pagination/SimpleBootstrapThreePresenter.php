@@ -16,13 +16,23 @@ class SimpleBootstrapThreePresenter extends BootstrapThreePresenter {
 	}
 
 	/**
+	 * Determine if the underlying paginator being presented has pages to show.
+	 *
+	 * @return bool
+	 */
+	public function hasPages()
+	{
+		return $this->paginator->hasPages() && count($this->paginator->items()) > 0;
+	}
+
+	/**
 	 * Convert the URL window into Bootstrap HTML.
 	 *
 	 * @return string
 	 */
 	public function render()
 	{
-		if ($this->paginator->hasPages() && count($this->paginator->items()) > 0)
+		if ($this->hasPages())
 		{
 			return sprintf(
 				'<ul class="pager">%s %s</ul>', $this->getPreviousButton(), $this->getNextButton()
