@@ -22,6 +22,20 @@ class Request extends SymfonyRequest {
 	protected $sessionStore;
 
 	/**
+	 * The user resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $userResolver;
+
+	/**
+	 * The route resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $routeResolver;
+
+	/**
 	 * Return the Request instance.
 	 *
 	 * @return $this
@@ -609,6 +623,16 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Get the route handling the request.
+	 *
+	 * @return Illuminate\Routing\Route|null
+	 */
+	public function route()
+	{
+		return call_user_func($this->getRouteResolver());
+	}
+
+	/**
 	 * Get the user resolver callback.
 	 *
 	 * @return \Closure
@@ -627,6 +651,29 @@ class Request extends SymfonyRequest {
 	public function setUserResolver(Closure $callback)
 	{
 		$this->userResolver = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Get the route resolver callback.
+	 *
+	 * @return \Closure
+	 */
+	public function getRouteResolver()
+	{
+		return $this->routeResolver ?: function() {};
+	}
+
+	/**
+	 * Set the route resolver callback.
+	 *
+	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function setRouteResolver(Closure $callback)
+	{
+		$this->routeResolver = $callback;
 
 		return $this;
 	}
