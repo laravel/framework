@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Pagination\UrlWindow;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator as Paginator;
 use Illuminate\Pagination\BootstrapThreePresenter as BootstrapPresenter;
 
@@ -8,29 +9,29 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPaginatorCanGiveMeRelevantPageInformation()
 	{
-		$p = new Paginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+		$p = new LengthAwarePaginator($array = ['item3', 'item4'], 4, 2, 2);
 
 		$this->assertEquals(2, $p->lastPage());
 		$this->assertEquals(2, $p->currentPage());
+		$this->assertTrue($p->hasPages());
+		$this->assertFalse($p->hasMore());
 		$this->assertEquals(['item3', 'item4'], $p->items());
 	}
 
 
 	public function testPaginatorCanGenerateUrls()
 	{
-		$p = new Paginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com', 'pageName' => 'foo']);
+		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com', 'pageName' => 'foo']);
 
-		$this->assertEquals(['http://website.com/?foo=1', 'http://website.com/?foo=2'], $p->urls());
 		$this->assertEquals('http://website.com/?foo=2', $p->url($p->currentPage()));
 		$this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 1));
-		$this->assertNull($p->url($p->currentPage() + 1));
-		$this->assertNull($p->url($p->currentPage() - 2));
+		$this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 2));
 	}
 
 
 	public function testPresenterCanDetermineIfThereAreAnyPagesToShow()
 	{
-		$p = new Paginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
 		$window = new UrlWindow($p);
 		$this->assertTrue($window->hasPages());
 	}
@@ -38,7 +39,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testPresenterCanGetAUrlRangeForASmallNumberOfUrls()
 	{
-		$p = new Paginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
 		$window = new UrlWindow($p);
 		$this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => null], $window->get());
 	}
@@ -49,7 +50,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new Paginator($array, count($array), 7, 1);
+		$p = new LengthAwarePaginator($array, count($array), 7, 1);
 		$window = new UrlWindow($p);
 		$slider = [];
 		for ($i = 4; $i <= 10; $i++)
@@ -60,7 +61,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		/**
 		 * Test Being Near The End Of The List
 		 */
-		$p = new Paginator($array, count($array), 8, 1);
+		$p = new LengthAwarePaginator($array, count($array), 8, 1);
 		$window = new UrlWindow($p);
 		$last = [];
 		for ($i = 5; $i <= 13; $i++)
@@ -76,7 +77,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new Paginator($array, count($array), 7, 1);
+		$p = new LengthAwarePaginator($array, count($array), 7, 1);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/slider.html')), $presenter->render());
@@ -89,7 +90,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new Paginator($array, count($array), 2, 1);
+		$p = new LengthAwarePaginator($array, count($array), 2, 1);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/beginning.html')), $presenter->render());
@@ -101,7 +102,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new Paginator($array, count($array), 12, 1);
+		$p = new LengthAwarePaginator($array, count($array), 12, 1);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/ending.html')), $presenter->render());
@@ -113,7 +114,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new Paginator($array, count($array), 13, 1);
+		$p = new LengthAwarePaginator($array, count($array), 13, 1);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/last_page.html')), $presenter->render());
@@ -125,10 +126,21 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new Paginator($array, count($array), 1, 1);
+		$p = new LengthAwarePaginator($array, count($array), 1, 1);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/first_page.html')), $presenter->render());
+	}
+
+
+	public function testSimplePaginatorReturnsRelevantContextInformation()
+	{
+		$p = new Paginator($array = ['item3', 'item4', 'item5'], 2, 2);
+
+		$this->assertEquals(2, $p->currentPage());
+		$this->assertTrue($p->hasPages());
+		$this->assertTrue($p->hasMore());
+		$this->assertEquals(['item3', 'item4'], $p->items());
 	}
 
 }

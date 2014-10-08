@@ -5,7 +5,7 @@ use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 
 class BootstrapThreePresenter implements Renderable {
 
-	use UrlWindowPresenterTrait;
+	use BootstrapThreeNextPreviousButtonRendererTrait, UrlWindowPresenterTrait;
 
 	/**
 	 * The paginator implementation.
@@ -40,7 +40,7 @@ class BootstrapThreePresenter implements Renderable {
 	 */
 	public function render()
 	{
-		if ($this->lastPage() > 1)
+		if ($this->paginator->hasPages())
 		{
 			return sprintf(
 				'<ul class="pagination">%s %s %s</ul>', $this->getPreviousButton(),
