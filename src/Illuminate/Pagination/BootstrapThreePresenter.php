@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Pagination;
 
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Pagination\Presenter as PresenterContract;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 
-class BootstrapThreePresenter implements Renderable {
+class BootstrapThreePresenter implements PresenterContract {
 
 	use BootstrapThreeNextPreviousButtonRendererTrait, UrlWindowPresenterTrait;
 
@@ -34,13 +34,23 @@ class BootstrapThreePresenter implements Renderable {
 	}
 
 	/**
+	 * Determine if the underlying paginator being presented has pages to show.
+	 *
+	 * @return bool
+	 */
+	public function hasPages()
+	{
+		return $this->paginator->hasPages();
+	}
+
+	/**
 	 * Convert the URL window into Bootstrap HTML.
 	 *
 	 * @return string
 	 */
 	public function render()
 	{
-		if ($this->paginator->hasPages())
+		if ($this->hasPages())
 		{
 			return sprintf(
 				'<ul class="pagination">%s %s %s</ul>', $this->getPreviousButton(),
