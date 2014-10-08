@@ -1,15 +1,8 @@
 <?php namespace Illuminate\Pagination;
 
-class SimpleBootstrapThreePresenter {
+use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 
-	use BootstrapThreeNextPreviousButtonRendererTrait;
-
-	/**
-	 * The paginator implementation.
-	 *
-	 * @var \Illuminate\Contracts\Pagination\Paginator
-	 */
-	protected $paginator;
+class SimpleBootstrapThreePresenter extends BootstrapThreePresenter {
 
 	/**
 	 * Create a simple Bootstrap 3 presenter.
@@ -32,7 +25,7 @@ class SimpleBootstrapThreePresenter {
 		if ($this->paginator->hasPages())
 		{
 			return sprintf(
-				'<ul class="pager">%s %s</ul>', $this->getPrevious(), $this->getNext()
+				'<ul class="pager">%s %s</ul>', $this->getPreviousButton(), $this->getNextButton()
 			);
 		}
 	}

@@ -11,12 +11,12 @@ class PaginationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		Paginator::setCurrentPathResolver(function()
+		Paginator::currentPathResolver(function()
 		{
 			return $this->app['request']->url();
 		});
 
-		Paginator::setCurrentPageResolver(function()
+		Paginator::currentPageResolver(function()
 		{
 			return $this->app['request']->input('page');
 		});
