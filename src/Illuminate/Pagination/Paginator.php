@@ -11,9 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Pagination\Presenter;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 
-class Paginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, PaginatorContract {
-
-	use PaginatorTrait;
+class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, PaginatorContract {
 
 	/**
 	 * Determine if there are more items in the data source.

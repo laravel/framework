@@ -7,7 +7,7 @@ use ArrayIterator;
 use JsonSerializable;
 use IteratorAggregate;
 
-trait PaginatorTrait {
+abstract class AbstractPaginator {
 
 	/**
 	 * All of the items being paginated.
@@ -136,6 +136,68 @@ trait PaginatorTrait {
 		{
 			return $this->url($this->currentPage() - 1);
 		}
+	}
+
+	/**
+	 * Get / set the URL fragment to be appended to URLs.
+	 *
+	 * @param  string|null  $fragment
+	 * @return $this|string
+	 */
+	public function fragment($fragment = null)
+	{
+		if (is_null($fragment)) return $this->fragment;
+
+		$this->fragment = $fragment;
+
+		return $this;
+	}
+
+	/**
+	 * Add a set of query string values to the paginator.
+	 *
+	 * @param  array|string  $key
+	 * @param  string  $value
+	 * @return $this
+	 */
+	public function appends($key, $value = null)
+	{
+		if (is_array($key)) return $this->appendArray($key);
+
+		return $this->addQuery($key, $value);
+	}
+
+	/**
+	 * Add an array of query string values.
+	 *
+	 * @param  array  $keys
+	 * @return $this
+	 */
+	protected function appendArray(array $keys)
+	{
+		foreach ($keys as $key => $value)
+		{
+			$this->addQuery($key, $value);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add a query string value to the paginator.
+	 *
+	 * @param  string  $key
+	 * @param  string  $value
+	 * @return $this
+	 */
+	public function addQuery($key, $value)
+	{
+		if ($key !== $this->pageName)
+		{
+			$this->query[$key] = $value;
+		}
+
+		return $this;
 	}
 
 	/**
@@ -325,6 +387,16 @@ trait PaginatorTrait {
 	public function offsetUnset($key)
 	{
 		unset($this->items[$key]);
+	}
+
+	/**
+	 * Render the contents of the paginator when casting to string.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->render();
 	}
 
 }

@@ -235,9 +235,9 @@ class Builder {
 	 */
 	public function paginate($perPage = null, $columns = ['*'])
 	{
-		$perPage = $perPage ?: $this->model->getPerPage();
+		$page = Paginator::resolveCurrentPage();
 
-		$page = $page ?: Paginator::resolveCurrentPage();
+		$perPage = $perPage ?: $this->model->getPerPage();
 
 		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 

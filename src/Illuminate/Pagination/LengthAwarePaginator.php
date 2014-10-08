@@ -11,9 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Pagination\Presenter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
-class LengthAwarePaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, LengthAwarePaginatorContract {
-
-	use PaginatorTrait;
+class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, LengthAwarePaginatorContract {
 
 	/**
 	 * The total number of items before slicing.
@@ -38,7 +36,7 @@ class LengthAwarePaginator implements Arrayable, ArrayAccess, Countable, Iterato
 	 * @param  array  $options (path, query, fragment, pageName)
 	 * @return void
 	 */
-	public function __construct($items, $total, $currentPage, $perPage, array $options = array())
+	public function __construct($items, $total, $perPage, $currentPage = null, array $options = array())
 	{
 		foreach ($options as $key => $value)
 		{
@@ -61,6 +59,11 @@ class LengthAwarePaginator implements Arrayable, ArrayAccess, Countable, Iterato
 	 */
 	protected function setCurrentPage($currentPage, $lastPage)
 	{
+		if (is_null($currentPage) && isset(static::$currentPageResolver))
+		{
+			$currentPage = static::resolveCurrentPage();
+		}
+
 		// The page number will get validated and adjusted if it either less than one
 		// or greater than the last page available based on the count of the given
 		// items array. If it's greater than the last, we'll give back the last.
