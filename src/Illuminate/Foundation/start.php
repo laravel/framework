@@ -45,7 +45,6 @@ if ( ! extension_loaded('mcrypt'))
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
-use Illuminate\Config\EnvironmentVariables;
 use Illuminate\Config\Repository as Config;
 
 /*
@@ -104,20 +103,6 @@ Facade::setFacadeApplication($app);
 */
 
 $app->registerCoreContainerAliases();
-
-/*
-|--------------------------------------------------------------------------
-| Register The Environment Variables
-|--------------------------------------------------------------------------
-|
-| Here we will register all of the $_ENV and $_SERVER variables into the
-| process so that they're globally available configuration options so
-| sensitive configuration information can be swept out of the code.
-|
-*/
-
-with($envVariables = new EnvironmentVariables(
-	$app->getEnvironmentVariablesLoader()))->load($env);
 
 /*
 |--------------------------------------------------------------------------
