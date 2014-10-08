@@ -25,12 +25,13 @@ class BootstrapThreePresenter implements PresenterContract {
 	 * Create a new Bootstrap presenter instance.
 	 *
 	 * @param  \Illuminate\Contracts\Pagination\Paginator  $paginator
+	 * @param  \Illuminate\Pagination\UrlWindow|null  $window
 	 * @return void
 	 */
-	public function __construct(PaginatorContract $paginator)
+	public function __construct(PaginatorContract $paginator, UrlWindow $window = null)
 	{
 		$this->paginator = $paginator;
-		$this->window = UrlWindow::make($paginator);
+		$this->window = is_null($window) ? UrlWindow::make($paginator) : $window->get();
 	}
 
 	/**
