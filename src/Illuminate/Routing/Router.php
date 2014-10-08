@@ -551,7 +551,15 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 */
 	public function dispatchToRoute(Request $request, $runMiddleware = true)
 	{
+		// First we will find a route that matches this request. We will also set the
+		// route resolver on the request so middlewares assigned to the route will
+		// receive access to this route instance for checking of the parameters.
 		$route = $this->findRoute($request);
+
+		$request->setRouteResolver(function() use ($route)
+		{
+			return $route;
+		});
 
 		$this->events->fire('router.matched', array($route, $request));
 

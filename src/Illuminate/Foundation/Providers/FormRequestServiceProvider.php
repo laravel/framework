@@ -61,6 +61,8 @@ class FormRequestServiceProvider extends ServiceProvider {
 		);
 
 		$form->setUserResolver($current->getUserResolver());
+
+		$form->setRouteResolver($current->getRouteResolver());
 	}
 
 }
