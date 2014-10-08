@@ -362,7 +362,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  int  $perPage
 	 * @return static
 	 */
-	public function paginate($page, $perPage)
+	public function forPage($page, $perPage)
 	{
 		return new static(array_slice($this->items, ($page - 1) * $perPage, $perPage));
 	}
