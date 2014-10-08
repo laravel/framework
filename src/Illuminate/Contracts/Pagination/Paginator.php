@@ -10,6 +10,23 @@ interface Paginator {
 	public function url($page);
 
 	/**
+	 * Add a set of query string values to the paginator.
+	 *
+	 * @param  array|string  $key
+	 * @param  string  $value
+	 * @return $this
+	 */
+	public function appends($key, $value = null);
+
+	/**
+	 * Get / set the URL fragment to be appended to URLs.
+	 *
+	 * @param  string|null  $fragment
+	 * @return $this|string
+	 */
+	public function fragment($fragment = null);
+
+	/**
 	 * The the URL for the next page, or null.
 	 *
 	 * @return string|null
