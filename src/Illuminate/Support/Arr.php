@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Support;
 
 use Closure;
-use ArrayAccess;
 use Illuminate\Support\Traits\MacroableTrait;
 
 class Arr {
