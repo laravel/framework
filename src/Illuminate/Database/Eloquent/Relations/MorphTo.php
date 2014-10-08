@@ -135,14 +135,28 @@ class MorphTo extends BelongsTo {
 	 */
 	protected function matchToMorphParents($type, Collection $results)
 	{
+		
+		$resultsMap = array();
 		foreach ($results as $result)
 		{
 			if (isset($this->dictionary[$type][$result->getKey()]))
 			{
 				foreach ($this->dictionary[$type][$result->getKey()] as $model)
 				{
-					$model->setRelation($this->relation, $result);
+					$resultsMap[$model->{$this->foreignKey}]['model'] = $model;
+					if (!array_key_exists('results', $resultsMap[$model->{$this->foreignKey}])) {
+						$resultsMap[$model->{$this->foreignKey}]['results'] = array();
+					}
+					array_push($resultsMap[$model->{$this->foreignKey}]['results'], $result);
 				}
+			}
+		}
+		foreach ($resultsMap as $map)
+		{
+			if (sizeof($map['results']) === 1) {
+				$map['model']->setRelation($this->relation, $map['results'][0]);
+			} else {
+				$map['model']->setRelation($this->relation, new Collection($map['results']));
 			}
 		}
 	}
