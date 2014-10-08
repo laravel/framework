@@ -50,7 +50,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new LengthAwarePaginator($array, count($array), 7, 1);
+		$p = new LengthAwarePaginator($array, count($array), 1, 7);
 		$window = new UrlWindow($p);
 		$slider = [];
 		for ($i = 4; $i <= 10; $i++)
@@ -61,7 +61,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		/**
 		 * Test Being Near The End Of The List
 		 */
-		$p = new LengthAwarePaginator($array, count($array), 8, 1);
+		$p = new LengthAwarePaginator($array, count($array), 1, 8);
 		$window = new UrlWindow($p);
 		$last = [];
 		for ($i = 5; $i <= 13; $i++)
@@ -102,7 +102,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new LengthAwarePaginator($array, count($array), 12, 1);
+		$p = new LengthAwarePaginator($array, count($array), 1, 12);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/ending.html')), $presenter->render());
@@ -114,7 +114,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new LengthAwarePaginator($array, count($array), 13, 1);
+		$p = new LengthAwarePaginator($array, count($array), 1, 13);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/last_page.html')), $presenter->render());
