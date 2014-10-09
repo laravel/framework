@@ -233,6 +233,8 @@ class Worker {
 
 			$job->delete();
 
+			$job->failed();
+
 			$this->raiseFailedJobEvent($connection, $job);
 		}
 
