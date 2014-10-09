@@ -948,6 +948,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('x' => 'http://google.com'), array('x' => 'active_url'));
 		$this->assertTrue($v->passes());
+		
+		$v = new Validator($trans, array('x' => 'http://www.google.com'), array('x' => 'active_url'));
+		$this->assertTrue($v->passes());		
 	}
 
 
