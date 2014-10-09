@@ -8,7 +8,8 @@ $router->put('more/{id}', ['uses' => 'App\Http\Controllers\BasicController@doMor
 $router->group(['middleware' => array (
   0 => 'FooMiddleware',
   1 => 'BarMiddleware',
-  2 => 'BazMiddleware',
+  2 => 'BoomMiddleware',
+  3 => 'BazMiddleware',
 ), 'prefix' => NULL, 'domain' => '{id}.account.com', 'where' => array (
   'id' => 'regex',
 )], function($router) { $router->resource('foobar/photos', 'App\\Http\\Controllers\\BasicController', ['only' => array (
