@@ -160,6 +160,25 @@ abstract class Job {
 	}
 
 	/**
+	 * Call the failed method on the job instance.
+	 *
+	 * @return void
+	 */
+	public function failed()
+	{
+		$payload = json_decode($this->getRawBody(), true);
+
+		list($class, $method) = $this->parseJob($payload['job']);
+
+		$this->instance = $this->resolve($class);
+
+		if (method_exists($this->instance, 'failed'))
+		{
+			$this->instance->failed($this->resolveQueueableEntities($payload['data']));
+		}
+	}
+
+	/**
 	 * Get an entity resolver instance.
 	 *
 	 * @return \Illuminate\Contracts\Queue\EntityResolver
