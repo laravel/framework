@@ -2,8 +2,9 @@
 
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
+use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 
-class QueueManager implements FactoryContract {
+class QueueManager implements FactoryContract, MonitorContract {
 
 	/**
 	 * The application instance.
