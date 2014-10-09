@@ -1,11 +1,10 @@
 <?php namespace {{namespace}};
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class {{class}} extends Controller {
+class {{class}} {
 
 	/**
 	 * The password reminder implementation.
@@ -24,13 +23,14 @@ class {{class}} extends Controller {
 	{
 		$this->passwords = $passwords;
 
-		$this->beforeFilter('guest');
-		$this->beforeFilter('csrf', ['on' => ['post']]);
+		//$this->beforeFilter('guest');
+		//$this->beforeFilter('csrf', ['on' => ['post']]);
 	}
 
 	/**
 	 * Display the password reminder view.
 	 *
+	 * @Get("password/remind")
 	 * @return Response
 	 */
 	public function getRemind()
@@ -41,6 +41,7 @@ class {{class}} extends Controller {
 	/**
 	 * Handle a POST request to remind a user of their password.
 	 *
+	 * @Post("password/remind")
 	 * @param  Request  $request
 	 * @return Response
 	 */
@@ -59,6 +60,7 @@ class {{class}} extends Controller {
 	/**
 	 * Display the password reset view for the given token.
 	 *
+	 * @Get("password/reset")
 	 * @param  string  $token
 	 * @return Response
 	 */
@@ -75,6 +77,7 @@ class {{class}} extends Controller {
 	/**
 	 * Handle a POST request to reset a user's password.
 	 *
+	 * @Post("password/reset")
 	 * @param  Request  $request
 	 * @return Response
 	 */

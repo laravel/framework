@@ -1,12 +1,11 @@
 <?php namespace {{namespace}};
 
-use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Auth\Authenticator;
 
 use {{request.namespace}}Auth\LoginRequest;
 use {{request.namespace}}Auth\RegisterRequest;
 
-class AuthController extends Controller {
+class AuthController {
 
 	/**
 	 * The authenticator implementation.
@@ -25,13 +24,14 @@ class AuthController extends Controller {
 	{
 		$this->auth = $auth;
 
-		$this->beforeFilter('csrf', ['on' => ['post']]);
-		$this->beforeFilter('guest', ['except' => ['getLogout']]);
+		//$this->beforeFilter('csrf', ['on' => ['post']]);
+		//$this->beforeFilter('guest', ['except' => ['getLogout']]);
 	}
 
 	/**
 	 * Show the application registration form.
 	 *
+	 * @Get("auth/register")
 	 * @return Response
 	 */
 	public function getRegister()
@@ -42,6 +42,7 @@ class AuthController extends Controller {
 	/**
 	 * Handle a registration request for the application.
 	 *
+	 * @Post("auth/register")
 	 * @param  RegisterRequest  $request
 	 * @return Response
 	 */
@@ -57,6 +58,7 @@ class AuthController extends Controller {
 	/**
 	 * Show the application login form.
 	 *
+	 * @Get("auth/login")
 	 * @return Response
 	 */
 	public function getLogin()
@@ -67,6 +69,7 @@ class AuthController extends Controller {
 	/**
 	 * Handle a login request to the application.
 	 *
+	 * @Post("auth/login")
 	 * @param  LoginRequest  $request
 	 * @return Response
 	 */
@@ -85,6 +88,7 @@ class AuthController extends Controller {
 	/**
 	 * Log the user out of the application.
 	 *
+	 * @Get("auth/logout")
 	 * @return Response
 	 */
 	public function getLogout()

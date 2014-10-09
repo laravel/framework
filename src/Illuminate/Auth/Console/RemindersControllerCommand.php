@@ -34,8 +34,6 @@ class RemindersControllerCommand extends GeneratorCommand {
 	public function fire()
 	{
 		parent::fire();
-
-		$this->comment('Route: $router->controller(\'password\', \''.$this->argument('name')."');");
 	}
 
 	/**
@@ -55,7 +53,7 @@ class RemindersControllerCommand extends GeneratorCommand {
 	 */
 	protected function getArguments()
 	{
-		$default = $this->getAppNamespace().'Http\Controllers\Auth\RemindersController';
+		$default = 'Auth\RemindersController';
 
 		return array(
 			array('name', InputArgument::OPTIONAL, 'The name of the class', $default),
