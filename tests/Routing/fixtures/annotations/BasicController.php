@@ -5,6 +5,7 @@
  * @Controller(domain="{id}.account.com")
  * @Middleware("FooMiddleware")
  * @Middleware("BarMiddleware")
+ * @Middleware("BoomMiddleware", only={"index"})
  * @Where({"id": "regex"})
  */
 class BasicController {
