@@ -378,12 +378,12 @@ if ( ! function_exists('data_get'))
 			}
 			elseif (is_object($target))
 			{
-				if ( ! isset($target->{$segment}))
-				{
-					return value($default);
-				}
-
-				$target = $target->{$segment};
+			    if ( ! isset($target->{$segment}) && !method_exists($target, "__get"))
+			    {
+			        return value($default);
+			    }
+			
+			    $target = $target->{$segment};
 			}
 			else
 			{
