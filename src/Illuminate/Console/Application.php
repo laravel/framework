@@ -1,12 +1,14 @@
 <?php namespace Illuminate\Console;
 
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Illuminate\Contracts\Console\Application as ApplicationContract;
 
-class Application extends \Symfony\Component\Console\Application {
+class Application extends SymfonyApplication implements ApplicationContract {
 
 	/**
 	 * The exception handler instance.
@@ -76,22 +78,28 @@ class Application extends \Symfony\Component\Console\Application {
 	 * Run an Artisan console command by name.
 	 *
 	 * @param  string  $command
-	 * @param  array   $parameters
-	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-	 * @return void
+	 * @param  array  $parameters
+	 * @return int
 	 */
-	public function call($command, array $parameters = array(), OutputInterface $output = null)
+	public function call($command, array $parameters = array())
 	{
 		$parameters['command'] = $command;
 
-		// Unless an output interface implementation was specifically passed to us we
-		// will use the "NullOutput" implementation by default to keep any writing
-		// suppressed so it doesn't leak out to the browser or any other source.
-		$output = $output ?: new NullOutput;
+		$this->lastOutput = new BufferedOutput;
 
 		$input = new ArrayInput($parameters);
 
-		return $this->find($command)->run($input, $output);
+		return $this->find($command)->run($input, $this->lastOutput);
+	}
+
+	/**
+	 * Get the output for the last run command.
+	 *
+	 * @return string
+	 */
+	public function output()
+	{
+		return $this->lastOutput ? $this->lastOutput->fetch() : '';
 	}
 
 	/**
