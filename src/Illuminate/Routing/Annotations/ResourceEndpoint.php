@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Routing\Annotations;
 
+use Illuminate\Support\Collection;
+
 class ResourceEndpoint implements EndpointInterface {
 
 	/**
@@ -157,7 +159,48 @@ class ResourceEndpoint implements EndpointInterface {
 	 */
 	protected function getMiddleware(ResourcePath $path)
 	{
-		return array_merge($this->classMiddleware, array_get($this->middleware, $path->method, []));
+		$classMiddleware = $this->getClassMiddlewareForPath($path)->all();
+
+		return array_merge($classMiddleware, array_get($this->middleware, $path->method, []));
+	}
+
+	/**
+	 * Get the class middleware for the given path.
+	 *
+	 * @param  ResourcePath  $path
+	 * @return array
+	 */
+	protected function getClassMiddlewareForPath(ResourcePath $path)
+	{
+		return Collection::make($this->classMiddleware)->filter(function($m) use ($path)
+		{
+			return $this->middlewareAppliesToMethod($path->method, $m);
+		})
+		->map(function($m)
+		{
+			return $m['name'];
+		});
+	}
+
+	/**
+	 * Determine if the middleware applies to a given method.
+	 *
+	 * @param  string  $method
+	 * @param  array  $middleware
+	 * @return bool
+	 */
+	protected function middlewareAppliesToMethod($method, array $middleware)
+	{
+		if ( ! empty($middleware['only']) && ! in_array($method, $middleware['only']))
+		{
+			return false;
+		}
+		elseif ( ! empty($middleware['except']) && in_array($method, $middleware['except']))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
