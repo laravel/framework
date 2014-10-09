@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Routing\Annotations;
 
+use Illuminate\Support\Collection;
+
 class MethodEndpoint implements EndpointInterface {
 
 	/**
@@ -91,7 +93,48 @@ class MethodEndpoint implements EndpointInterface {
 	 */
 	protected function getMiddleware(AbstractPath $path)
 	{
-		return array_merge($this->classMiddleware, $path->middleware, $this->middleware);
+		$classMiddleware = $this->getClassMiddlewareForPath($path)->all();
+
+		return array_merge($classMiddleware, $path->middleware, $this->middleware);
+	}
+
+	/**
+	 * Get the class middleware for the given path.
+	 *
+	 * @param  AbstractPath  $path
+	 * @return array
+	 */
+	protected function getClassMiddlewareForPath(AbstractPath $path)
+	{
+		return Collection::make($this->classMiddleware)->filter(function($m)
+		{
+			return $this->middlewareAppliesToMethod($this->method, $m);
+		})
+		->map(function($m)
+		{
+			return $m['name'];
+		});
+	}
+
+	/**
+	 * Determine if the middleware applies to a given method.
+	 *
+	 * @param  string  $method
+	 * @param  array  $middleware
+	 * @return bool
+	 */
+	protected function middlewareAppliesToMethod($method, array $middleware)
+	{
+		if ( ! empty($middleware['only']) && ! in_array($method, $middleware['only']))
+		{
+			return false;
+		}
+		elseif ( ! empty($middleware['except']) && in_array($method, $middleware['except']))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
