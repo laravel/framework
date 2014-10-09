@@ -1,41 +1,20 @@
-<?php namespace Illuminate\Http;
+<?php namespace Illuminate\Http\Middleware;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Closure;
+use Illuminate\Contracts\Routing\Middleware;
 
-class FrameGuard implements HttpKernelInterface {
-
-	/**
-	 * The wrapped kernel implementation.
-	 *
-	 * @var \Symfony\Component\HttpKernel\HttpKernelInterface
-	 */
-	protected $app;
-
-	/**
-	 * Create a new FrameGuard instance.
-	 *
-	 * @param  \Symfony\Component\HttpKernel\HttpKernelInterface  $app
-	 * @return void
-	 */
-	public function __construct(HttpKernelInterface $app)
-	{
-		$this->app = $app;
-	}
+class FrameGuard implements Middleware {
 
 	/**
 	 * Handle the given request and get the response.
 	 *
-	 * @implements HttpKernelInterface::handle
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  int   $type
-	 * @param  bool  $catch
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Closure  $next
+	 * @return \Illuminate\Http\Response
 	 */
-	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+	public function handle($request, Closure $next)
 	{
-		$response = $this->app->handle($request, $type, $catch);
+		$response = $next($request);
 
 		$response->headers->set('X-Frame-Options', 'SAMEORIGIN', false);
 
