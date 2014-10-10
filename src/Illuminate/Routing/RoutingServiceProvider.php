@@ -42,15 +42,17 @@ class RoutingServiceProvider extends ServiceProvider {
 	{
 		$this->app['url'] = $this->app->share(function($app)
 		{
+			$routes = $app['router']->getRoutes();
+
 			// The URL generator needs the route collection that exists on the router.
 			// Keep in mind this is an object, so we're passing by references here
 			// and all the registered routes will be available to the generator.
-			$routes = $app['router']->getRoutes();
-
 			$app->instance('routes', $routes);
 
 			$url = new UrlGenerator(
-				$routes, $app->rebinding('request', $this->requestRebinder())
+				$routes, $app->rebinding(
+					'request', $this->requestRebinder()
+				)
 			);
 
 			// If the route collection is "rebound", for example, when the routes stay
