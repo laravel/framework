@@ -521,11 +521,11 @@ class Router implements HttpKernelInterface, RegistrarContract {
 			);
 		}
 
-		$response = $this->prepareResponse($request, $response);
-
 		// Once this route has run and the response has been prepared, we will run the
 		// after filter to do any last work on the response or for this application
 		// before we will return the response back to the consuming code for use.
+		$response = $this->prepareResponse($request, $response);
+
 		$this->callFilter('after', $request, $response);
 
 		return $response;
@@ -595,11 +595,13 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 */
 	protected function runRouteWithinStack(Route $route, Request $request, $runMiddleware)
 	{
-		return (new Stack\Stack(function($request) use ($route)
-		{
-			return $route->run($request);
+		$middleware = $runMiddleware ? $this->gatherRouteMiddlewares($route) : [];
 
-		}, $runMiddleware ? $this->gatherRouteMiddlewares($route) : []))->setContainer($this->container)->run($request);
+		return (new Stack\Stack(function($request) use ($route, $runMiddleware)
+		{
+			return $route->run($request, $runMiddleware);
+
+		}, $middleware))->setContainer($this->container)->run($request);
 	}
 
 	/**
