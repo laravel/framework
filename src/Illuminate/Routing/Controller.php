@@ -28,13 +28,6 @@ abstract class Controller {
 	protected $afterFilters = array();
 
 	/**
-	 * The container instance.
-	 *
-	 * @var \Illuminate\Container\Container
-	 */
-	protected $container;
-
-	/**
 	 * The router instance.
 	 *
 	 * @var \Illuminate\Routing\Router
