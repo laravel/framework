@@ -13,6 +13,8 @@ class ControllerServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('illuminate.route.dispatcher', function($app)
 		{
+			Controller::setRouter($app['router']);
+
 			return new ControllerDispatcher($app['router'], $app);
 		});
 	}
