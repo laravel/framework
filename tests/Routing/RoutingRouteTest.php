@@ -763,6 +763,31 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testControllerRouting()
+	{
+		unset($_SERVER['route.test.controller.before.filter'], $_SERVER['route.test.controller.after.filter'], $_SERVER['route.test.controller.middleware']);
+		$router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
+		$router->filter('route.test.controller.before.filter', function()
+		{
+			$_SERVER['route.test.controller.before.filter'] = true;
+		});
+		$router->filter('route.test.controller.after.filter', function()
+		{
+			$_SERVER['route.test.controller.after.filter'] = true;
+		});
+		$container->singleton('illuminate.route.dispatcher', function($container) use ($router)
+		{
+			return new Illuminate\Routing\ControllerDispatcher($router, $container);
+		});
+		$router->get('foo/bar', 'RouteTestControllerStub@index');
+
+		$this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+		$this->assertTrue($_SERVER['route.test.controller.before.filter']);
+		$this->assertTrue($_SERVER['route.test.controller.after.filter']);
+		$this->assertTrue($_SERVER['route.test.controller.middleware']);
+	}
+
+
 	protected function getRouter()
 	{
 		return new Router(new Illuminate\Events\Dispatcher);
@@ -770,6 +795,26 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 }
 
+class RouteTestControllerStub extends Illuminate\Routing\Controller {
+	public function __construct()
+	{
+		$this->middleware('RouteTestControllerMiddleware');
+		$this->beforeFilter('route.test.controller.before.filter');
+		$this->afterFilter('route.test.controller.after.filter');
+	}
+	public function index()
+	{
+		return 'Hello World';
+	}
+}
+
+class RouteTestControllerMiddleware {
+	public function handle($request, $next)
+	{
+		$_SERVER['route.test.controller.middleware'] = true;
+		return $next($request);
+	}
+}
 
 class RouteBindingStub {
 	public function bind($value, $route) { return strtoupper($value); }
