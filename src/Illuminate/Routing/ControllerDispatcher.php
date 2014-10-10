@@ -100,6 +100,9 @@ class ControllerDispatcher {
 	{
 		$middleware = $runMiddleware ? $instance->getMiddleware() : [];
 
+		// Here we will make a stack onion instance to execute this request in, which gives
+		// us the ability to define middlewares on controllers. We will return the given
+		// response back out so that "after" filters can be run after the middlewares.
 		return (new Stack(function($request) use ($instance, $route, $method)
 		{
 			return $this->call($instance, $route, $method);
@@ -180,7 +183,9 @@ class ControllerDispatcher {
 	 */
 	protected function getAssignableAfter($filter)
 	{
-		return $filter['original'] instanceof Closure ? $filter['filter'] : $filter['original'];
+		if ($filter['original'] instanceof Closure) return $filter['filter'];
+
+		return $filter['original'];
 	}
 
 	/**
@@ -266,9 +271,9 @@ class ControllerDispatcher {
 	 */
 	protected function callFilter($filter, $route, $request)
 	{
-		extract($filter);
-
-		return $this->router->callRouteFilter($filter, $parameters, $route, $request);
+		return $this->router->callRouteFilter(
+			$filter['filter'], $filter['parameters'], $route, $request
+		);
 	}
 
 }
