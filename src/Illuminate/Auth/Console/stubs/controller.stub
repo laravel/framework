@@ -49,7 +49,7 @@ class AuthController {
 	 * @param  RegisterRequest  $request
 	 * @return Response
 	 */
-	public function handleRegistration(RegisterRequest $request)
+	public function register(RegisterRequest $request)
 	{
 		// Registration form is valid, create user...
 
@@ -78,7 +78,7 @@ class AuthController {
 	 * @param  LoginRequest  $request
 	 * @return Response
 	 */
-	public function handleLogin(LoginRequest $request)
+	public function login(LoginRequest $request)
 	{
 		if ($this->auth->attempt($request->only('email', 'password')))
 		{

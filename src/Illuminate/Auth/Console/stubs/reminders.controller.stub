@@ -1,11 +1,14 @@
 <?php namespace {{namespace}};
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class {{class}} extends Controller {
+/**
+ * @Middleware("csrf")
+ * @Middleware("guest")
+ */
+class {{class}} {
 
 	/**
 	 * The password reminder implementation.
@@ -23,17 +26,16 @@ class {{class}} extends Controller {
 	public function __construct(PasswordBroker $passwords)
 	{
 		$this->passwords = $passwords;
-
-		$this->beforeFilter('guest');
-		$this->beforeFilter('csrf', ['on' => ['post']]);
 	}
 
 	/**
 	 * Display the password reminder view.
 	 *
+	 * @Get("password/remind")
+	 *
 	 * @return Response
 	 */
-	public function getRemind()
+	public function showReminderForm()
 	{
 		return view('password.remind');
 	}
@@ -41,10 +43,12 @@ class {{class}} extends Controller {
 	/**
 	 * Handle a POST request to remind a user of their password.
 	 *
+	 * @Post("password/remind")
+	 *
 	 * @param  Request  $request
 	 * @return Response
 	 */
-	public function postRemind(Request $request)
+	public function sendPasswordResetEmail(Request $request)
 	{
 		switch ($response = $this->passwords->remind($request->only('email')))
 		{
@@ -59,10 +63,12 @@ class {{class}} extends Controller {
 	/**
 	 * Display the password reset view for the given token.
 	 *
+	 * @Get("password/reset")
+	 *
 	 * @param  string  $token
 	 * @return Response
 	 */
-	public function getReset($token = null)
+	public function showPasswordResetForm($token = null)
 	{
 		if (is_null($token))
 		{
@@ -75,10 +81,12 @@ class {{class}} extends Controller {
 	/**
 	 * Handle a POST request to reset a user's password.
 	 *
+	 * @Post("password/reset")
+	 *
 	 * @param  Request  $request
 	 * @return Response
 	 */
-	public function postReset(Request $request)
+	public function resetPassword(Request $request)
 	{
 		$credentials = $request->only(
 			'email', 'password', 'password_confirmation', 'token'
