@@ -5,6 +5,7 @@ use ReflectionMethod;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Routing\Stack\Stack;
+use Illuminate\Support\Collection;
 use Illuminate\Routing\RouteDependencyResolverTrait;
 
 class ControllerDispatcher {
@@ -98,7 +99,7 @@ class ControllerDispatcher {
 	 */
 	protected function callWithinStack($instance, $route, $request, $method, $runMiddleware)
 	{
-		$middleware = $runMiddleware ? $instance->getMiddleware() : [];
+		$middleware = $runMiddleware ? $this->getMiddleware($instance) : [];
 
 		// Here we will make a stack onion instance to execute this request in, which gives
 		// us the ability to define middlewares on controllers. We will return the given
@@ -108,6 +109,23 @@ class ControllerDispatcher {
 			return $this->call($instance, $route, $method);
 
 		}, $middleware))->setContainer($this->container)->run($request);
+	}
+
+	/**
+	 * Get the middleware for the controller instance.
+	 *
+	 * @param  \Illuminate\Routing\Controller  $instance
+	 * @return array
+	 */
+	protected function getMiddleware($instance)
+	{
+		$middleware = $this->router->getMiddleware();
+
+		return Collection::make($instance->getMiddleware())->map(function($m) use ($middleware)
+		{
+			return array_get($middleware, $m, $m);
+
+		})->all();
 	}
 
 	/**

@@ -712,6 +712,16 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	}
 
 	/**
+	 * Get all of the defined middleware short-hand names.
+	 *
+	 * @return array
+	 */
+	public function getMiddleware()
+	{
+		return $this->middleware;
+	}
+
+	/**
 	 * Register a short-hand name for a middleware.
 	 *
 	 * @param  string  $name
