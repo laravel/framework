@@ -254,19 +254,6 @@ abstract class Controller {
 	}
 
 	/**
-	 * Set the container instance on the controller.
-	 *
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return $this
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-
-		return $this;
-	}
-
-	/**
 	 * Handle calls to missing methods on the controller.
 	 *
 	 * @param  string  $method
