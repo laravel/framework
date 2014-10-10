@@ -84,7 +84,7 @@ class ControllerDispatcher {
 	{
 		Controller::setRouter($this->router);
 
-		return $this->container->make($controller)->setContainer($this->container);
+		return $this->container->make($controller);
 	}
 
 	/**
