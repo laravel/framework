@@ -215,7 +215,7 @@ if ( ! function_exists('info'))
 	 * Write some information to the log.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	function info($message, $context = array())
@@ -304,14 +304,16 @@ if ( ! function_exists('redirect'))
 	 * Get an instance of the redirector.
 	 *
 	 * @param  string|null  $to
-	 * @param  int  $status
+	 * @param  int     $status
+	 * @param  array   $headers
+	 * @param  bool    $secure
 	 * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
 	 */
-	function redirect($to = null, $status = 302)
+	function redirect($to = null, $status = 302, $headers = array(), $secure = null)
 	{
 		if ( ! is_null($to))
 		{
-			return app('redirect')->to($to, $status);
+			return app('redirect')->to($to, $status, $headers, $secure);
 		}
 		else
 		{
@@ -350,8 +352,8 @@ if ( ! function_exists('route'))
 	 *
 	 * @param  string  $name
 	 * @param  array   $parameters
-	 * @param  bool  $absolute
-	 * @param  \Illuminate\Routing\Route $route
+	 * @param  bool    $absolute
+	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
 	function route($name, $parameters = array(), $absolute = true, $route = null)
@@ -394,8 +396,8 @@ if ( ! function_exists('storage_path'))
 	/**
 	 * Get the path to the storage folder.
 	 *
-	 * @param   string  $path
-	 * @return  string
+	 * @param  string  $path
+	 * @return string
 	 */
 	function storage_path($path = '')
 	{
