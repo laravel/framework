@@ -184,7 +184,7 @@ class ControllerDispatcher {
 		foreach ($instance->getAfterFilters() as $filter)
 		{
 			// If the filter applies, we will add it to the route, since it has already been
-			// registered on the router by the controller, and will just let the normal
+			// registered with the router by the controller, and will just let the normal
 			// router take care of calling these filters so we do not duplicate logics.
 			if ($this->filterApplies($filter, $request, $method))
 			{
