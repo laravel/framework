@@ -142,8 +142,8 @@ class AppNameCommand extends Command {
 	protected function setReferencedFilterNamespaces()
 	{
 		$this->replaceIn(
-			$this->laravel['path'].'/Providers/FilterServiceProvider.php',
-			$this->currentRoot.'\\Http\\Filters', $this->getDesiredNamespace().'\\Http\\Filters'
+			$this->laravel['path'].'/Providers/AppServiceProvider.php',
+			$this->currentRoot.'\\Http\\Middleware', $this->getDesiredNamespace().'\\Http\\Middleware'
 		);
 	}
 
