@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Support;
 
+use Illuminate\Contracts\Support\ServiceProvider as ServiceProviderContract;
 use ReflectionClass;
 
-abstract class ServiceProvider {
+abstract class ServiceProvider implements ServiceProviderContract {
 
 	/**
 	 * The application instance.

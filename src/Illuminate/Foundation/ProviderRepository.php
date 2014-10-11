@@ -150,7 +150,7 @@ class ProviderRepository {
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 * @param  string  $provider
-	 * @return \Illuminate\Support\ServiceProvider
+	 * @return \Illuminate\Contracts\Support\ServiceProvider
 	 */
 	public function createProvider(Application $app, $provider)
 	{

@@ -8,9 +8,9 @@ use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Contracts\Support\ServiceProvider;
 use Illuminate\Contracts\Support\ResponsePreparer;
 use Illuminate\Exception\ExceptionServiceProvider;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -286,9 +286,9 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Force register a service provider with the application.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
+	 * @param  \Illuminate\Contracts\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
-	 * @return \Illuminate\Support\ServiceProvider
+	 * @return \Illuminate\Contracts\Support\ServiceProvider
 	 */
 	public function forceRegister($provider, $options = array())
 	{
@@ -298,10 +298,10 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Register a service provider with the application.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
+	 * @param  \Illuminate\Contracts\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
 	 * @param  bool   $force
-	 * @return \Illuminate\Support\ServiceProvider
+	 * @return \Illuminate\Contracts\Support\ServiceProvider
 	 */
 	public function register($provider, $options = array(), $force = false)
 	{
@@ -316,7 +316,7 @@ class Application extends Container implements HttpKernelInterface,
 			$provider = $this->resolveProviderClass($provider);
 		}
 
-		$provider->register();
+		$this->call([$provider, 'register']);
 
 		// Once we have registered the service we will iterate through the options
 		// and set each of them on the application so they will be available on
@@ -342,8 +342,8 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Get the registered service provider instance if it exists.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
-	 * @return \Illuminate\Support\ServiceProvider|null
+	 * @param  \Illuminate\Contracts\Support\ServiceProvider|string  $provider
+	 * @return \Illuminate\Contracts\Support\ServiceProvider|null
 	 */
 	public function getRegistered($provider)
 	{
@@ -362,7 +362,7 @@ class Application extends Container implements HttpKernelInterface,
 	 * Resolve a service provider instance from the class name.
 	 *
 	 * @param  string  $provider
-	 * @return \Illuminate\Support\ServiceProvider
+	 * @return \Illuminate\Contracts\Support\ServiceProvider
 	 */
 	public function resolveProviderClass($provider)
 	{
@@ -372,7 +372,7 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Mark the given provider as registered.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider
+	 * @param  \Illuminate\Contracts\Support\ServiceProvider
 	 * @return void
 	 */
 	protected function markAsRegistered($provider)
@@ -614,7 +614,7 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Boot the given service provider.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider  $provider
+	 * @param  \Illuminate\Contracts\Support\ServiceProvider  $provider
 	 * @return void
 	 */
 	protected function bootProvider(ServiceProvider $provider)

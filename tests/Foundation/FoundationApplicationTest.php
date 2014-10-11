@@ -30,10 +30,17 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
 		$class = get_class($provider);
 		$provider->shouldReceive('register')->once();
+
+		$contractProvider = m::mock('Illuminate\Contracts\Support\ServiceProvider');
+		$contractClass = get_class($contractProvider);
+		$contractProvider->shouldReceive('register')->once();
+
 		$app = new Application;
 		$app->register($provider);
+		$app->register($contractProvider);
 
 		$this->assertTrue(in_array($class, $app->getLoadedProviders()));
+		$this->assertTrue(in_array($contractClass, $app->getLoadedProviders()));
 	}
 
 
