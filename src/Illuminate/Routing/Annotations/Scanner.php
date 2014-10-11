@@ -165,7 +165,7 @@ class Scanner {
 	public function getClassName(SplFileInfo $file)
 	{
 		return $this->rootNamespace.str_replace(
-			'.php', '', str_replace('/', '\\', $this->getFilePathWithoutScanPath($file))
+			'.php', '', str_replace(DIRECTORY_SEPARATOR, '\\', $this->getFilePathWithoutScanPath($file))
 		);
 	}
 
