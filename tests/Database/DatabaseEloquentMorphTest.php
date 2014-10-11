@@ -8,6 +8,8 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
+		$this->addToAssertionCount(m::getContainer()->mockery_getExpectationCount());
+
 		m::close();
 	}
 
