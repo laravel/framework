@@ -47,7 +47,7 @@ abstract class AbstractPaginator {
 	/**
 	 * The URL fragment to add to all URLs.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $fragment = null;
 
@@ -157,7 +157,7 @@ abstract class AbstractPaginator {
 	 * Add a set of query string values to the paginator.
 	 *
 	 * @param  array|string  $key
-	 * @param  string  $value
+	 * @param  string|null  $value
 	 * @return $this
 	 */
 	public function appends($key, $value = null)
