@@ -1,6 +1,6 @@
 <?php
 
-$basePath = $app['path.base'];
+$basePath = $app['path.composer'];
 
 return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/Container.php',

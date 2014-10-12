@@ -101,7 +101,7 @@ class AssetPublishCommand extends Command {
 	 */
 	protected function findAllAssetPackages()
 	{
-		$vendor = $this->laravel['path.base'].'/vendor';
+		$vendor = $this->laravel['path.composer'].'/vendor';
 
 		$packages = array();
 
