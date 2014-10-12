@@ -32,7 +32,6 @@ interface Paginator {
 	 *
 	 * @return string|null
 	 */
-
 	public function nextPageUrl();
 
 	/**
