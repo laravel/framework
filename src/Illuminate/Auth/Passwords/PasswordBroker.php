@@ -82,7 +82,7 @@ class PasswordBroker implements PasswordBrokerContract {
 			return PasswordBrokerContract::INVALID_USER;
 		}
 
-		// Once we have the reminder token, we are ready to send a message out to the
+		// Once we have the reset token, we are ready to send the message out to this
 		// user with a link to reset their password. We will then redirect back to
 		// the current URI having nothing set in the session to indicate errors.
 		$token = $this->tokens->create($user);
@@ -191,11 +191,15 @@ class PasswordBroker implements PasswordBrokerContract {
 	 */
 	protected function validNewPasswords(array $credentials)
 	{
-		list($password, $confirm) = array($credentials['password'], $credentials['password_confirmation']);
+		list($password, $confirm) = [
+			$credentials['password'], $credentials['password_confirmation']
+		];
 
 		if (isset($this->passwordValidator))
 		{
-			return call_user_func($this->passwordValidator, $credentials) && $password === $confirm;
+			return call_user_func(
+				$this->passwordValidator, $credentials) && $password === $confirm
+			;
 		}
 
 		return $this->validatePasswordWithDefaults($credentials);
@@ -209,7 +213,9 @@ class PasswordBroker implements PasswordBrokerContract {
 	 */
 	protected function validatePasswordWithDefaults(array $credentials)
 	{
-		list($password, $confirm) = [$credentials['password'], $credentials['password_confirmation']];
+		list($password, $confirm) = [
+			$credentials['password'], $credentials['password_confirmation']
+		];
 
 		return $password === $confirm && mb_strlen($password) >= 6;
 	}
