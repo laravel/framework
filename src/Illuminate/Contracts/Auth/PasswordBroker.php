@@ -9,14 +9,14 @@ interface PasswordBroker {
 	 *
 	 * @var int
 	 */
-	const REMINDER_SENT = 'reminders.sent';
+	const RESET_LINK_SENT = 'reset.sent';
 
 	/**
 	 * Constant representing a successfully reset password.
 	 *
 	 * @var int
 	 */
-	const PASSWORD_RESET = 'reminders.reset';
+	const PASSWORD_RESET = 'reset.done';
 
 	/**
 	 * Constant representing the user not found response.
@@ -40,13 +40,13 @@ interface PasswordBroker {
 	const INVALID_TOKEN = 'reminders.token';
 
 	/**
-	 * Send a password reminder to a user.
+	 * Send a password reset link to a user.
 	 *
 	 * @param  array     $credentials
 	 * @param  \Closure  $callback
 	 * @return string
 	 */
-	public function remind(array $credentials, Closure $callback = null);
+	public function sendResetLink(array $credentials, Closure $callback = null);
 
 	/**
 	 * Reset the password for the given token.

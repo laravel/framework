@@ -1,19 +1,19 @@
-<?php namespace Illuminate\Auth\Reminders;
+<?php namespace Illuminate\Auth\Passwords;
 
 use Closure;
-use Illuminate\Contracts\Auth\Remindable;
 use Illuminate\Auth\UserProviderInterface;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 
 class PasswordBroker implements PasswordBrokerContract {
 
 	/**
-	 * The password reminder repository.
+	 * The password token repository.
 	 *
-	 * @var \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
+	 * @var \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
 	 */
-	protected $reminders;
+	protected $tokens;
 
 	/**
 	 * The user provider implementation.
@@ -30,11 +30,11 @@ class PasswordBroker implements PasswordBrokerContract {
 	protected $mailer;
 
 	/**
-	 * The view of the password reminder e-mail.
+	 * The view of the password reset link e-mail.
 	 *
 	 * @var string
 	 */
-	protected $reminderView;
+	protected $emailView;
 
 	/**
 	 * The custom password validator callback.
@@ -46,31 +46,31 @@ class PasswordBroker implements PasswordBrokerContract {
 	/**
 	 * Create a new password broker instance.
 	 *
-	 * @param  \Illuminate\Auth\Reminders\ReminderRepositoryInterface  $reminders
+	 * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
 	 * @param  \Illuminate\Auth\UserProviderInterface  $users
 	 * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-	 * @param  string  $reminderView
+	 * @param  string  $emailView
 	 * @return void
 	 */
-	public function __construct(ReminderRepositoryInterface $reminders,
+	public function __construct(TokenRepositoryInterface $tokens,
                                 UserProviderInterface $users,
                                 MailerContract $mailer,
-                                $reminderView)
+                                $emailView)
 	{
 		$this->users = $users;
 		$this->mailer = $mailer;
-		$this->reminders = $reminders;
-		$this->reminderView = $reminderView;
+		$this->tokens = $tokens;
+		$this->emailView = $emailView;
 	}
 
 	/**
-	 * Send a password reminder to a user.
+	 * Send a password reset link to a user.
 	 *
 	 * @param  array     $credentials
 	 * @param  \Closure  $callback
 	 * @return string
 	 */
-	public function remind(array $credentials, Closure $callback = null)
+	public function sendResetLink(array $credentials, Closure $callback = null)
 	{
 		// First we will check to see if we found a user at the given credentials and
 		// if we did not we will redirect back to this current URI with a piece of
@@ -85,31 +85,31 @@ class PasswordBroker implements PasswordBrokerContract {
 		// Once we have the reminder token, we are ready to send a message out to the
 		// user with a link to reset their password. We will then redirect back to
 		// the current URI having nothing set in the session to indicate errors.
-		$token = $this->reminders->create($user);
+		$token = $this->tokens->create($user);
 
-		$this->sendReminder($user, $token, $callback);
+		$this->emailResetLink($user, $token, $callback);
 
-		return PasswordBrokerContract::REMINDER_SENT;
+		return PasswordBrokerContract::RESET_LINK_SENT;
 	}
 
 	/**
-	 * Send the password reminder e-mail.
+	 * Send the password reset link via e-mail.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\Remindable  $user
+	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
 	 * @param  string    $token
 	 * @param  \Closure  $callback
 	 * @return int
 	 */
-	public function sendReminder(Remindable $user, $token, Closure $callback = null)
+	public function emailResetLink(CanResetPassword $user, $token, Closure $callback = null)
 	{
 		// We will use the reminder view that was given to the broker to display the
 		// password reminder e-mail. We'll pass a "token" variable into the views
 		// so that it may be displayed for an user to click for password reset.
-		$view = $this->reminderView;
+		$view = $this->emailView;
 
 		return $this->mailer->send($view, compact('token', 'user'), function($m) use ($user, $token, $callback)
 		{
-			$m->to($user->getReminderEmail());
+			$m->to($user->getEmailForPasswordReset());
 
 			if ( ! is_null($callback)) call_user_func($callback, $m, $user, $token);
 		});
@@ -129,7 +129,7 @@ class PasswordBroker implements PasswordBrokerContract {
 		// the user is properly redirected having an error message on the post.
 		$user = $this->validateReset($credentials);
 
-		if ( ! $user instanceof Remindable)
+		if ( ! $user instanceof CanResetPassword)
 		{
 			return $user;
 		}
@@ -141,7 +141,7 @@ class PasswordBroker implements PasswordBrokerContract {
 		// to the destination given by the developers from the callback return.
 		call_user_func($callback, $user, $pass);
 
-		$this->reminders->delete($credentials['token']);
+		$this->tokens->delete($credentials['token']);
 
 		return PasswordBrokerContract::PASSWORD_RESET;
 	}
@@ -150,7 +150,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * Validate a password reset for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Contracts\Auth\Remindable
+	 * @return \Illuminate\Contracts\Auth\CanResetPassword
 	 */
 	protected function validateReset(array $credentials)
 	{
@@ -164,7 +164,7 @@ class PasswordBroker implements PasswordBrokerContract {
 			return PasswordBrokerContract::INVALID_PASSWORD;
 		}
 
-		if ( ! $this->reminders->exists($user, $credentials['token']))
+		if ( ! $this->tokens->exists($user, $credentials['token']))
 		{
 			return PasswordBrokerContract::INVALID_TOKEN;
 		}
@@ -218,7 +218,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * Get the user for the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Contracts\Auth\Remindable
+	 * @return \Illuminate\Contracts\Auth\CanResetPassword
 	 *
 	 * @throws \UnexpectedValueException
 	 */
@@ -228,22 +228,22 @@ class PasswordBroker implements PasswordBrokerContract {
 
 		$user = $this->users->retrieveByCredentials($credentials);
 
-		if ($user && ! $user instanceof Remindable)
+		if ($user && ! $user instanceof CanResetPassword)
 		{
-			throw new \UnexpectedValueException("User must implement Remindable interface.");
+			throw new \UnexpectedValueException("User must implement CanResetPassword interface.");
 		}
 
 		return $user;
 	}
 
 	/**
-	 * Get the password reminder repository implementation.
+	 * Get the password reset token repository implementation.
 	 *
-	 * @return \Illuminate\Auth\Reminders\ReminderRepositoryInterface
+	 * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
 	 */
 	protected function getRepository()
 	{
-		return $this->reminders;
+		return $this->tokens;
 	}
 
 }
