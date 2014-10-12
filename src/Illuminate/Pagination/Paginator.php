@@ -72,7 +72,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	/**
 	 * Get the URL for the next page.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function nextPageUrl()
 	{
@@ -80,6 +80,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 		{
 			return $this->url($this->currentPage() + 1);
 		}
+		
+		return null;
 	}
 
 	/**
@@ -119,7 +121,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 			'prev_page_url' => $this->previousPageUrl(),
 			'from'          => $this->firstItem(),
 			'to'            => $this->lastItem(),
-			'data'          => $this->items->toArray(),
+			'data'          => $this->items->toArray()
 		];
 	}
 
