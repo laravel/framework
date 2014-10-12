@@ -130,7 +130,7 @@ abstract class AbstractPaginator {
 	/**
 	 * Get the URL for the previous page.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function previousPageUrl()
 	{
@@ -138,6 +138,8 @@ abstract class AbstractPaginator {
 		{
 			return $this->url($this->currentPage() - 1);
 		}
+		
+		return null;
 	}
 
 	/**
