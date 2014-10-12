@@ -5,6 +5,7 @@ interface Paginator {
 	/**
 	 * Get the URL for a given page.
 	 *
+	 * @param  int  $page
 	 * @return string
 	 */
 	public function url($page);
@@ -93,7 +94,7 @@ interface Paginator {
 	/**
 	 * Render the paginator using a given Presenter.
 	 *
-	 * @param  Presenter  $presenter
+	 * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
 	 * @return string
 	 */
 	public function render(Presenter $presenter = null);
