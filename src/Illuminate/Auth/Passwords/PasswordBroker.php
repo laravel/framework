@@ -159,7 +159,7 @@ class PasswordBroker implements PasswordBrokerContract {
 			return PasswordBrokerContract::INVALID_USER;
 		}
 
-		if ( ! $this->validNewPasswords($credentials))
+		if ( ! $this->validateNewPassword($credentials))
 		{
 			return PasswordBrokerContract::INVALID_PASSWORD;
 		}
@@ -189,7 +189,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	protected function validNewPasswords(array $credentials)
+	protected function validateNewPassword(array $credentials)
 	{
 		list($password, $confirm) = [
 			$credentials['password'], $credentials['password_confirmation']
