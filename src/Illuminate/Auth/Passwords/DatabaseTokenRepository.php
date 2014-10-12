@@ -1,10 +1,10 @@
-<?php namespace Illuminate\Auth\Reminders;
+<?php namespace Illuminate\Auth\Passwords;
 
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
-use Illuminate\Contracts\Auth\Remindable;
+use Illuminate\Contracts\Auth\CanResetPassword;
 
-class DatabaseReminderRepository implements ReminderRepositoryInterface {
+class DatabaseTokenRepository implements TokenRepositoryInterface {
 
 	/**
 	 * The database connection instance.
@@ -14,7 +14,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	protected $connection;
 
 	/**
-	 * The reminder database table.
+	 * The token database table.
 	 *
 	 * @var string
 	 */
@@ -28,14 +28,14 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	protected $hashKey;
 
 	/**
-	 * The number of seconds a reminder should last.
+	 * The number of seconds a token should last.
 	 *
 	 * @var int
 	 */
 	protected $expires;
 
 	/**
-	 * Create a new reminder repository instance.
+	 * Create a new token repository instance.
 	 *
 	 * @param  \Illuminate\Database\Connection  $connection
 	 * @param  string  $table
@@ -52,14 +52,14 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	}
 
 	/**
-	 * Create a new reminder record and token.
+	 * Create a new token record.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\Remindable  $user
+	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
 	 * @return string
 	 */
-	public function create(Remindable $user)
+	public function create(CanResetPassword $user)
 	{
-		$email = $user->getReminderEmail();
+		$email = $user->getEmailForPasswordReset();
 
 		$this->deleteExisting($user);
 
@@ -76,12 +76,12 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Delete all existing reset tokens from the database.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\Remindable  $user
+	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
 	 * @return int
 	 */
-	protected function deleteExisting(Remindable $user)
+	protected function deleteExisting(CanResetPassword $user)
 	{
-		return $this->getTable()->where('email', $user->getReminderEmail())->delete();
+		return $this->getTable()->where('email', $user->getEmailForPasswordReset())->delete();
 	}
 
 	/**
@@ -97,30 +97,30 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	}
 
 	/**
-	 * Determine if a reminder record exists and is valid.
+	 * Determine if a token record exists and is valid.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\Remindable  $user
+	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
 	 * @param  string  $token
 	 * @return bool
 	 */
-	public function exists(Remindable $user, $token)
+	public function exists(CanResetPassword $user, $token)
 	{
-		$email = $user->getReminderEmail();
+		$email = $user->getEmailForPasswordReset();
 
-		$reminder = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
+		$token = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
-		return $reminder && ! $this->reminderExpired($reminder);
+		return $token && ! $this->tokenExpired($token);
 	}
 
 	/**
-	 * Determine if the reminder has expired.
+	 * Determine if the token has expired.
 	 *
-	 * @param  array  $reminder
+	 * @param  array  $token
 	 * @return bool
 	 */
-	protected function reminderExpired($reminder)
+	protected function tokenExpired($token)
 	{
-		$createdPlusHour = strtotime($reminder['created_at']) + $this->expires;
+		$createdPlusHour = strtotime($token['created_at']) + $this->expires;
 
 		return $createdPlusHour < $this->getCurrentTime();
 	}
@@ -136,7 +136,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	}
 
 	/**
-	 * Delete a reminder record by token.
+	 * Delete a token record by token.
 	 *
 	 * @param  string  $token
 	 * @return void
@@ -147,7 +147,7 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	}
 
 	/**
-	 * Delete expired reminders.
+	 * Delete expired tokens.
 	 *
 	 * @return void
 	 */
@@ -161,12 +161,12 @@ class DatabaseReminderRepository implements ReminderRepositoryInterface {
 	/**
 	 * Create a new token for the user.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\Remindable  $user
+	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
 	 * @return string
 	 */
-	public function createNewToken(Remindable $user)
+	public function createNewToken(CanResetPassword $user)
 	{
-		$email = $user->getReminderEmail();
+		$email = $user->getEmailForPasswordReset();
 
 		$value = str_shuffle(sha1($email.spl_object_hash($this).microtime(true)));
 

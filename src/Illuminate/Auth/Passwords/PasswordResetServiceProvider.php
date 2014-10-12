@@ -1,9 +1,9 @@
-<?php namespace Illuminate\Auth\Reminders;
+<?php namespace Illuminate\Auth\Passwords;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Auth\Reminders\DatabaseReminderRepository as DbRepository;
+use Illuminate\Auth\Passwords\DatabaseTokenRepository as DbRepository;
 
-class ReminderServiceProvider extends ServiceProvider {
+class PasswordResetServiceProvider extends ServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -21,7 +21,7 @@ class ReminderServiceProvider extends ServiceProvider {
 	{
 		$this->registerPasswordBroker();
 
-		$this->registerReminderRepository();
+		$this->registerTokenRepository();
 	}
 
 	/**
@@ -31,47 +31,45 @@ class ReminderServiceProvider extends ServiceProvider {
 	 */
 	protected function registerPasswordBroker()
 	{
-		$this->app->bindShared('auth.reminder', function($app)
+		$this->app->bindShared('auth.password', function($app)
 		{
-			// The reminder repository is responsible for storing the user e-mail addresses
+			// The password token repository is responsible for storing the email addresses
 			// and password reset tokens. It will be used to verify the tokens are valid
 			// for the given e-mail addresses. We will resolve an implementation here.
-			$reminders = $app['auth.reminder.repository'];
+			$tokens = $app['auth.password.tokens'];
 
 			$users = $app['auth']->driver()->getProvider();
 
-			$view = $app['config']['auth.reminder.email'];
+			$view = $app['config']['auth.password.email'];
 
-			// The password broker uses the reminder repository to validate tokens and send
-			// reminder e-mails, as well as validating that password reset process as an
+			// The password broker uses a token repository to validate tokens and send user
+			// password e-mails, as well as validating that password reset process as an
 			// aggregate service of sorts providing a convenient interface for resets.
 			return new PasswordBroker(
-
-				$reminders, $users, $app['mailer'], $view
-
+				$tokens, $users, $app['mailer'], $view
 			);
 		});
 	}
 
 	/**
-	 * Register the reminder repository implementation.
+	 * Register the token repository implementation.
 	 *
 	 * @return void
 	 */
-	protected function registerReminderRepository()
+	protected function registerTokenRepository()
 	{
-		$this->app->bindShared('auth.reminder.repository', function($app)
+		$this->app->bindShared('auth.password.tokens', function($app)
 		{
 			$connection = $app['db']->connection();
 
-			// The database reminder repository is an implementation of the reminder repo
+			// The database token repository is an implementation of the token repository
 			// interface, and is responsible for the actual storing of auth tokens and
 			// their e-mail addresses. We will inject this table and hash key to it.
-			$table = $app['config']['auth.reminder.table'];
+			$table = $app['config']['auth.password.table'];
 
 			$key = $app['config']['app.key'];
 
-			$expire = $app['config']->get('auth.reminder.expire', 60);
+			$expire = $app['config']->get('auth.password.expire', 60);
 
 			return new DbRepository($connection, $table, $key, $expire);
 		});
@@ -84,7 +82,7 @@ class ReminderServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('auth.reminder', 'auth.reminder.repository');
+		return array('auth.password', 'auth.password.tokens');
 	}
 
 }
