@@ -23,6 +23,7 @@
         "nesbot/carbon": "~1.0",
         "patchwork/utf8": "~1.1",
         "predis/predis": "~1.0",
+        "sebastian/environment": "~1.0",
         "swiftmailer/swiftmailer": "~5.1",
         "symfony/console": "2.6.*",
         "symfony/debug": "2.6.*",

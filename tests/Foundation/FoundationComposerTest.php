@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use SebastianBergmann\Environment\Runtime;
 
 class FoundationComposerTest extends PHPUnit_Framework_TestCase {
 
@@ -12,11 +13,11 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase {
 
 	public function testDumpAutoloadRunsTheCorrectCommand()
 	{
-		$composer = $this->getMock('Illuminate\Foundation\Composer', array('getProcess'), array($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__));
+		$composer = $this->getMock('Illuminate\Foundation\Composer', array('getProcess'), array($files = m::mock('Illuminate\Filesystem\Filesystem'), $runtime = new Runtime, __DIR__));
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(true);
 		$process = m::mock('stdClass');
 		$composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
-		$process->shouldReceive('setCommandLine')->once()->with('"'.PHP_BINARY.'" composer.phar dump-autoload');
+		$process->shouldReceive('setCommandLine')->once()->with($runtime->getBinary().' composer.phar dump-autoload');
 		$process->shouldReceive('run')->once();
 
 		$composer->dumpAutoloads();
@@ -25,7 +26,8 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase {
 
 	public function testDumpAutoloadRunsTheCorrectCommandWhenComposerIsntPresent()
 	{
-		$composer = $this->getMock('Illuminate\Foundation\Composer', array('getProcess'), array($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__));
+		$composer = $this->getMock('Illuminate\Foundation\Composer', array('getProcess'), array($files = m::mock('Illuminate\Filesystem\Filesystem'), new Runtime, __DIR__));
+
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(false);
 		$process = m::mock('stdClass');
 		$composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));

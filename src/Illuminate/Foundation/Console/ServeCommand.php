@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use SebastianBergmann\Environment\Runtime;
 use Symfony\Component\Console\Input\InputOption;
 
 class ServeCommand extends Command {
@@ -20,13 +21,33 @@ class ServeCommand extends Command {
 	protected $description = "Serve the application on the PHP development server";
 
 	/**
+	 * The runtime instance.
+	 *
+	 * @var \SebastianBergmann\Environment\Runtime
+	 */
+	protected $runtime;
+
+	/**
+	 * Create a new serve command instance.
+	 *
+	 * @param  \SebastianBergmann\Environment\Runtime  $runtime
+	 * @return void
+	 */
+	public function __construct(Runtime $runtime)
+	{
+		parent::__construct();
+
+		$this->runtime = $runtime;
+	}
+
+	/**
 	 * Execute the console command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		$this->checkPhpVersion();
+		$this->checkIsSupported();
 
 		chdir($this->laravel['path.base']);
 
@@ -38,21 +59,21 @@ class ServeCommand extends Command {
 
 		$this->info("Laravel development server started on http://{$host}:{$port}");
 
-		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} -t \"{$public}\" server.php");
+		passthru($this->runtime->getBinary()." -S {$host}:{$port} -t \"{$public}\" server.php");
 	}
 
 	/**
-	 * Check the current PHP version is >= 5.4.
+	 * Check if the built in web server is supported.
 	 *
 	 * @return void
 	 *
 	 * @throws \Exception
 	 */
-	protected function checkPhpVersion()
+	protected function checkIsSupported()
 	{
-		if (version_compare(PHP_VERSION, '5.4.0', '<'))
+		if ($this->runtime->isHHVM())
 		{
-			throw new \Exception('This PHP binary is not version 5.4 or greater.');
+			throw new \Exception('The built in web server is not supported on HHVM.');
 		}
 	}
 

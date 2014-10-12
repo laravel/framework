@@ -2,6 +2,7 @@
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use SebastianBergmann\Environment\Runtime;
 
 class Composer {
 
@@ -11,6 +12,13 @@ class Composer {
 	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
+
+	/**
+	 * The runtime instance.
+	 *
+	 * @var \SebastianBergmann\Environment\Runtime
+	 */
+	protected $runtime;
 
 	/**
 	 * The working path to regenerate from.
@@ -23,12 +31,14 @@ class Composer {
 	 * Create a new Composer manager instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \SebastianBergmann\Environment\Runtime  $runtime
 	 * @param  string  $workingPath
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $workingPath = null)
+	public function __construct(Filesystem $files, Runtime $runtime, $workingPath = null)
 	{
 		$this->files = $files;
+		$this->runtime = $runtime;
 		$this->workingPath = $workingPath;
 	}
 
@@ -66,7 +76,7 @@ class Composer {
 	{
 		if ($this->files->exists($this->workingPath.'/composer.phar'))
 		{
-			return '"'.PHP_BINARY.'" composer.phar';
+			return $this->runtime->getBinary().' composer.phar';
 		}
 
 		return 'composer';

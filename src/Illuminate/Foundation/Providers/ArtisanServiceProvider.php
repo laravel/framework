@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use SebastianBergmann\Environment\Runtime;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\ServeCommand;
@@ -276,7 +277,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.serve', function()
 		{
-			return new ServeCommand;
+			return new ServeCommand(new Runtime);
 		});
 	}
 
