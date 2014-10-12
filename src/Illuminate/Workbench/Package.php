@@ -44,24 +44,32 @@ class Package {
 	 */
 	public $email;
 
-	/**
-	 * Create a new package instance.
-	 *
-	 * @param  string  $vendor
-	 * @param  string  $name
-	 * @param  string  $author
-	 * @param  string  $email
-	 * @return void
-	 */
-	public function __construct($vendor, $name, $author, $email)
-	{
-		$this->name = $name;
-		$this->email = $email;
-		$this->vendor = $vendor;
-		$this->author = $author;
-		$this->lowerName = snake_case($name, '-');
-		$this->lowerVendor = snake_case($vendor, '-');
-	}
+    /**
+     * The stability choice.
+     *
+     * @var string
+     */
+    public $stability;
+
+    /**
+     * Create a new package instance.
+     *
+     * @param  string $vendor
+     * @param  string $name
+     * @param  string $author
+     * @param  string $email
+     * @param  string $stability
+     */
+    public function __construct($vendor, $name, $author, $email, $stability = 'stable')
+    {
+        $this->name = $name;
+        $this->email = $email;
+        $this->vendor = $vendor;
+        $this->author = $author;
+        $this->stability = $stability;
+        $this->lowerName = snake_case($name, '-');
+        $this->lowerVendor = snake_case($vendor, '-');
+    }
 
 	/**
 	 * Get the full package name.
