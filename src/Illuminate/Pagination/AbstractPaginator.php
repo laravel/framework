@@ -95,7 +95,9 @@ abstract class AbstractPaginator {
 		$urls = [];
 
 		for ($page = $start; $page <= $end; $page++)
+		{
 			$urls[$page] = $this->url($page);
+		}
 
 		return $urls;
 	}
@@ -108,7 +110,7 @@ abstract class AbstractPaginator {
 	 */
 	public function url($page)
 	{
-		if ($page <= 0) $page = 1;;
+		if ($page <= 0) $page = 1;
 
 		// If we have any extra query string key / value pairs that need to be added
 		// onto the URL, we will put them in query string form and then attach it
@@ -142,7 +144,7 @@ abstract class AbstractPaginator {
 	 * Get / set the URL fragment to be appended to URLs.
 	 *
 	 * @param  string|null  $fragment
-	 * @return $this|string
+	 * @return $this|string|null
 	 */
 	public function fragment($fragment = null)
 	{
