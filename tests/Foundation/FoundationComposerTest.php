@@ -27,7 +27,6 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase {
 	public function testDumpAutoloadRunsTheCorrectCommandWhenComposerIsntPresent()
 	{
 		$composer = $this->getMock('Illuminate\Foundation\Composer', array('getProcess'), array($files = m::mock('Illuminate\Filesystem\Filesystem'), new Runtime, __DIR__));
-
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(false);
 		$process = m::mock('stdClass');
 		$composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
