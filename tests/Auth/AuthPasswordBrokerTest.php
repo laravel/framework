@@ -128,9 +128,9 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
 	{
 		$creds = array('token' => 'token');
-		$broker = $this->getMock('Illuminate\Auth\Passwords\PasswordBroker', array('validNewPasswords'), array_values($mocks = $this->getMocks()));
+		$broker = $this->getMock('Illuminate\Auth\Passwords\PasswordBroker', array('validateNewPassword'), array_values($mocks = $this->getMocks()));
 		$mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array_except($creds, array('token')))->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
-		$broker->expects($this->once())->method('validNewPasswords')->will($this->returnValue(true));
+		$broker->expects($this->once())->method('validateNewPassword')->will($this->returnValue(true));
 		$mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
 		$this->assertEquals(PasswordBroker::INVALID_TOKEN, $broker->reset($creds, function() {}));
