@@ -5,7 +5,6 @@ interface Presenter {
 	/**
 	 * Render the given paginator.
 	 *
-	 * @param  \Illuminate\Contracts\Pagination\Paginator  $paginator
 	 * @return string
 	 */
 	public function render();
