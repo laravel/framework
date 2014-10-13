@@ -5,10 +5,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Auth\User as UserContract;
+use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
-use Illuminate\Contracts\Auth\Authenticator as AuthenticatorContract;
 
-class Guard implements AuthenticatorContract {
+class Guard implements GuardContract {
 
 	/**
 	 * The currently authenticated user.
