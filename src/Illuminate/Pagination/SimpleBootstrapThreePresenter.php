@@ -35,7 +35,9 @@ class SimpleBootstrapThreePresenter extends BootstrapThreePresenter {
 		if ($this->hasPages())
 		{
 			return sprintf(
-				'<ul class="pager">%s %s</ul>', $this->getPreviousButton(), $this->getNextButton()
+				'<ul class="pager">%s %s</ul>',
+				$this->getPreviousButton(),
+				$this->getNextButton()
 			);
 		}
 
