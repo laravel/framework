@@ -14,7 +14,7 @@ interface Paginator {
 	 * Add a set of query string values to the paginator.
 	 *
 	 * @param  array|string  $key
-	 * @param  string  $value
+	 * @param  string|null  $value
 	 * @return $this
 	 */
 	public function appends($key, $value = null);
