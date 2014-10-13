@@ -143,7 +143,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	{
 		if ($this->ajax())
 		{
-			return new JsonResponse($errors, 422);
+			return new JsonResponse($errors, 400);
 		}
 		else
 		{
