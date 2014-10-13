@@ -358,6 +358,17 @@ class Route {
 	}
 
 	/**
+	 * Determine a given parameter exists from the route
+	 *
+	 * @param  string $name
+	 * @return bool
+	 */
+	public function hasParameter($name)
+	{
+		return array_key_exists($name, $this->parameters());
+	}
+
+	/**
 	 * Get a given parameter from the route.
 	 *
 	 * @param  string  $name
