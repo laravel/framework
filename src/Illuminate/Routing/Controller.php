@@ -1,10 +1,11 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\StackableController;
+use Illuminate\Contracts\Routing\FilterableController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-abstract class Controller {
+abstract class Controller implements FilterableController, StackableController {
 
 	/**
 	 * The middleware registered on the controller.

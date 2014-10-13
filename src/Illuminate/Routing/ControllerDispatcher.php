@@ -7,6 +7,8 @@ use Illuminate\Container\Container;
 use Illuminate\Routing\Stack\Stack;
 use Illuminate\Support\Collection;
 use Illuminate\Routing\RouteDependencyResolverTrait;
+use Illuminate\Contracts\Routing\StackableController;
+use Illuminate\Contracts\Routing\FilterableController;
 
 class ControllerDispatcher {
 
@@ -52,14 +54,19 @@ class ControllerDispatcher {
 	 */
 	public function dispatch(Route $route, Request $request, $controller, $method, $runMiddleware = true)
 	{
+		$response = null;
+
 		// First we will make an instance of this controller via the IoC container instance
 		// so that we can call the methods on it. We will also apply any "after" filters
 		// to the route so that they will be run by the routers after this processing.
 		$instance = $this->makeController($controller);
 
-		$this->assignAfter($instance, $route, $request, $method);
+		if ($instance instanceof FilterableController)
+		{
+			$this->assignAfter($instance, $route, $request, $method);
 
-		$response = $this->before($instance, $route, $request, $method);
+			$response = $this->before($instance, $route, $request, $method);
+		}
 
 		// If no before filters returned a response we'll call the method on the controller
 		// to get the response to be returned to the router. We will then return it back
@@ -119,6 +126,8 @@ class ControllerDispatcher {
 	 */
 	protected function getMiddleware($instance)
 	{
+		if ( ! $instance instanceof StackableController) return [];
+
 		$middleware = $this->router->getMiddleware();
 
 		return Collection::make($instance->getMiddleware())->map(function($m) use ($middleware)
