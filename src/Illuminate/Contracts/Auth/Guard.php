@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Contracts\Auth;
 
-interface Authenticator {
+interface Guard {
 
 	/**
 	 * Determine if the current user is authenticated.
