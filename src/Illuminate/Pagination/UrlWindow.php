@@ -7,14 +7,14 @@ class UrlWindow {
 	/**
 	 * The paginator implementation.
 	 *
-	 * @var \Illuminate\Contracts\Pagination\PaginatorContract
+	 * @var \Illuminate\Contracts\Pagination\Paginator
 	 */
 	protected $paginator;
 
 	/**
 	 * Create a new URL window instance.
 	 *
-	 * @param  \Illuminate\Contracts\Pagination\PaginatorContract  $paginator
+	 * @param  \Illuminate\Contracts\Pagination\Paginator  $paginator
 	 * @return void
 	 */
 	public function __construct(PaginatorContract $paginator)
@@ -25,7 +25,7 @@ class UrlWindow {
 	/**
 	 * Create a new URL window instance.
 	 *
-	 * @param  \Illuminate\Contracts\Pagination\PaginatorContract  $paginator
+	 * @param  \Illuminate\Contracts\Pagination\Paginator  $paginator
 	 * @param  int  $onEachSide
 	 * @return array
 	 */
