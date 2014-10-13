@@ -5,6 +5,7 @@ interface Paginator {
 	/**
 	 * Get the URL for a given page.
 	 *
+	 * @param  int  $page
 	 * @return string
 	 */
 	public function url($page);
@@ -13,7 +14,7 @@ interface Paginator {
 	 * Add a set of query string values to the paginator.
 	 *
 	 * @param  array|string  $key
-	 * @param  string  $value
+	 * @param  string|null  $value
 	 * @return $this
 	 */
 	public function appends($key, $value = null);
@@ -31,7 +32,6 @@ interface Paginator {
 	 *
 	 * @return string|null
 	 */
-
 	public function nextPageUrl();
 
 	/**
@@ -93,7 +93,7 @@ interface Paginator {
 	/**
 	 * Render the paginator using a given Presenter.
 	 *
-	 * @param  Presenter  $presenter
+	 * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
 	 * @return string
 	 */
 	public function render(Presenter $presenter = null);

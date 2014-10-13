@@ -54,8 +54,10 @@ class BootstrapThreePresenter implements PresenterContract {
 		if ($this->hasPages())
 		{
 			return sprintf(
-				'<ul class="pagination">%s %s %s</ul>', $this->getPreviousButton(),
-				$this->getLinks(), $this->getNextButton()
+				'<ul class="pagination">%s %s %s</ul>',
+				$this->getPreviousButton(),
+				$this->getLinks(),
+				$this->getNextButton()
 			);
 		}
 
@@ -67,7 +69,7 @@ class BootstrapThreePresenter implements PresenterContract {
 	 *
 	 * @param  string  $url
 	 * @param  int  $page
-	 * @param  string  $rel
+	 * @param  string|null  $rel
 	 * @return string
 	 */
 	protected function getAvailablePageWrapper($url, $page, $rel = null)

@@ -29,18 +29,17 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	 * @param  array  $options (path, query, fragment, pageName)
 	 * @return void
 	 */
-	public function __construct($items, $perPage, $currentPage = null, array $options = array())
+	public function __construct($items, $perPage, $currentPage = null, array $options = [])
 	{
 		foreach ($options as $key => $value)
 		{
 			$this->{$key} = $value;
 		}
 
-		$this->items = $items instanceof Collection ? $items : Collection::make($items);
-
 		$this->perPage = $perPage;
 		$this->currentPage = $this->setCurrentPage($currentPage);
 		$this->path = $this->path != '/' ? rtrim($this->path, '/').'/' : $this->path;
+		$this->items = $items instanceof Collection ? $items : Collection::make($items);
 
 		$this->checkForMorePages();
 	}
@@ -73,7 +72,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	/**
 	 * Get the URL for the next page.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function nextPageUrl()
 	{
@@ -96,7 +95,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	/**
 	 * Render the paginator using the given presenter.
 	 *
-	 * @param  \Illuminate\Contracts\Pagination\Presenter  $presenter
+	 * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
 	 * @return string
 	 */
 	public function render(Presenter $presenter = null)
@@ -113,11 +112,15 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	 */
 	public function toArray()
 	{
-		return array(
-			'per_page' => $this->perPage(), 'current_page' => $this->currentPage(),
-			'next_page_url' => $this->nextPageUrl(), 'prev_page_url' => $this->previousPageUrl(),
-			'from' => $this->firstItem(), 'to' => $this->lastItem(), 'data' => $this->items->toArray(),
-		);
+		return [
+			'per_page'      => $this->perPage(),
+			'current_page'  => $this->currentPage(),
+			'next_page_url' => $this->nextPageUrl(),
+			'prev_page_url' => $this->previousPageUrl(),
+			'from'          => $this->firstItem(),
+			'to'            => $this->lastItem(),
+			'data'          => $this->items->toArray()
+		];
 	}
 
 	/**
