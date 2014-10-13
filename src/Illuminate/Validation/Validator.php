@@ -415,7 +415,8 @@ class Validator implements MessageProviderInterface {
 
 	/**
 	 * Determine if it's a necessary presence validation.
-	 * It's unneccesary if any validation for the attribute has already failed
+	 *
+	 * It's unneccesary if any validation for the attribute has already failed.
 	 *
 	 * @param  string  $rule
 	 * @param  string  $attribute
@@ -431,6 +432,7 @@ class Validator implements MessageProviderInterface {
 			// in the database to avoid exceptions
 			return ! $this->messages->has($attribute);
 		}
+
 		return true;
 	}
 
