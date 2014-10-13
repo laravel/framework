@@ -80,8 +80,6 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 		{
 			return $this->url($this->currentPage() + 1);
 		}
-		
-		return null;
 	}
 
 	/**
