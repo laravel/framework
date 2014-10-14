@@ -126,13 +126,13 @@ class Route {
 
 		try
 		{
+			if ( ! is_string($this->action['uses']))
+				return $this->runCallable($request);
+
 			if ($this->customDispatcherIsBound())
 				return $this->runWithCustomDispatcher($request, $runMiddleware);
 
-			if (is_string($this->action['uses']))
-				return $this->runController($request);
-
-			return $this->runCallable($request);
+			return $this->runController($request);
 		}
 		catch (HttpResponseException $e)
 		{
