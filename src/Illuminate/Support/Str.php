@@ -191,7 +191,9 @@ class Str {
 			throw new \RuntimeException('OpenSSL extension is required.');
 		}
 
-		if ($bytes = openssl_random_pseudo_bytes($length * 2) === false)
+		$bytes = openssl_random_pseudo_bytes($length * 2);
+
+		if ($bytes === false)
 		{
 			throw new \RuntimeException('Unable to generate random string.');
 		}
