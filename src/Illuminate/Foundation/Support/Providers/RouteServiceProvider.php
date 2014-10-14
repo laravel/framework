@@ -40,7 +40,6 @@ class RouteServiceProvider extends ServiceProvider {
 		{
 			$this->loadRoutes();
 		}
-
 	}
 
 	/**
