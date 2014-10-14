@@ -36,13 +36,11 @@ class RouteServiceProvider extends ServiceProvider {
 		{
 			return $this->loadCachedRoutes();
 		}
-
-		if ($this->app->environment('local') && $this->scanWhenLocal)
+		else
 		{
-			$this->scanRoutes();
+			$this->loadRoutes();
 		}
 
-		$this->loadRoutes();
 	}
 
 	/**
@@ -65,6 +63,11 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	protected function loadRoutes()
 	{
+		if ($this->app->environment('local') && $this->scanWhenLocal)
+		{
+			$this->scanRoutes();
+		}
+
 		if ($this->app->routesAreScanned())
 		{
 			$this->loadScannedRoutes();
@@ -80,7 +83,9 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	protected function scanRoutes()
 	{
-		$scanner = new Scanner(app_path().'/'.$this->scanPath, $this->getAppNamespace());
+		$scanner = new Scanner(
+			app_path().'/'.$this->scanPath, $this->getAppNamespace().'Http\Controllers'
+		);
 
 		file_put_contents($this->app->getScannedRoutesPath(), '<?php '.$scanner->getRouteDefinitions());
 	}
