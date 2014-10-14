@@ -40,11 +40,9 @@ abstract class Controller {
 	 * @param  dynamic  $middleware
 	 * @return void
 	 */
-	public function middleware($middleware)
+	public function middleware($middleware, array $options = array())
 	{
-		if ( ! is_array($middleware)) $middleware = func_get_args();
-
-		$this->middleware = array_merge($this->middleware, $middleware);
+		$this->middleware[$middleware] = $options;
 	}
 
 	/**
