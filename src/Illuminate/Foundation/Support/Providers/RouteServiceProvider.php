@@ -34,7 +34,7 @@ class RouteServiceProvider extends ServiceProvider {
 
 		if ($this->app->routesAreCached())
 		{
-			return $this->loadCachedRoutes();
+			$this->loadCachedRoutes();
 		}
 		else
 		{
