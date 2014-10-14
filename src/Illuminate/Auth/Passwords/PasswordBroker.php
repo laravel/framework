@@ -110,6 +110,8 @@ class PasswordBroker implements PasswordBrokerContract {
 		return $this->mailer->send($view, compact('token', 'user'), function($m) use ($user, $token, $callback)
 		{
 			$m->to($user->getEmailForPasswordReset());
+			
+			$m->subject('Password Reset');
 
 			if ( ! is_null($callback)) call_user_func($callback, $m, $user, $token);
 		});
