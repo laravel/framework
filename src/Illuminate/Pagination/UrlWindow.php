@@ -1,21 +1,23 @@
 <?php namespace Illuminate\Pagination;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as PaginatorContract;
+
 class UrlWindow {
 
 	/**
 	 * The paginator implementation.
 	 *
-	 * @var \Illuminate\Pagination\LengthAwarePaginator
+	 * @var \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
 	protected $paginator;
 
 	/**
 	 * Create a new URL window instance.
 	 *
-	 * @param  \Illuminate\Pagination\LengthAwarePaginator  $paginator
+	 * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
 	 * @return void
 	 */
-	public function __construct(LengthAwarePaginator $paginator)
+	public function __construct(PaginatorContract $paginator)
 	{
 		$this->paginator = $paginator;
 	}
@@ -23,11 +25,11 @@ class UrlWindow {
 	/**
 	 * Create a new URL window instance.
 	 *
-	 * @param  \Illuminate\Pagination\LengthAwarePaginator  $paginator
+	 * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
 	 * @param  int  $onEachSide
 	 * @return array
 	 */
-	public static function make(LengthAwarePaginator $paginator, $onEachSide = 3)
+	public static function make(PaginatorContract $paginator, $onEachSide = 3)
 	{
 		return (new static($paginator))->get($onEachSide);
 	}
