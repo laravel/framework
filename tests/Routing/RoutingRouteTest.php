@@ -765,7 +765,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 	public function testControllerRouting()
 	{
-		unset($_SERVER['route.test.controller.before.filter'], $_SERVER['route.test.controller.after.filter'], $_SERVER['route.test.controller.middleware']);
+		unset(
+			$_SERVER['route.test.controller.before.filter'], $_SERVER['route.test.controller.after.filter'],
+			$_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware']
+		);
 		$router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
 		$router->filter('route.test.controller.before.filter', function()
 		{
@@ -785,6 +788,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($_SERVER['route.test.controller.before.filter']);
 		$this->assertTrue($_SERVER['route.test.controller.after.filter']);
 		$this->assertTrue($_SERVER['route.test.controller.middleware']);
+		$this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
 	}
 
 
@@ -799,6 +803,7 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller {
 	public function __construct()
 	{
 		$this->middleware('RouteTestControllerMiddleware');
+		$this->middleware('RouteTestControllerExceptMiddleware', ['except' => 'index']);
 		$this->beforeFilter('route.test.controller.before.filter');
 		$this->afterFilter('route.test.controller.after.filter');
 	}
@@ -815,6 +820,16 @@ class RouteTestControllerMiddleware {
 		return $next($request);
 	}
 }
+
+
+class RouteTestControllerExceptMiddleware {
+	public function handle($request, $next)
+	{
+		$_SERVER['route.test.controller.except.middleware'] = true;
+		return $next($request);
+	}
+}
+
 
 class RouteBindingStub {
 	public function bind($value, $route) { return strtoupper($value); }

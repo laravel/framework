@@ -99,7 +99,7 @@ class ControllerDispatcher {
 	 */
 	protected function callWithinStack($instance, $route, $request, $method, $runMiddleware)
 	{
-		$middleware = $runMiddleware ? $this->getMiddleware($instance) : [];
+		$middleware = $runMiddleware ? $this->getMiddleware($instance, $method) : [];
 
 		// Here we will make a stack onion instance to execute this request in, which gives
 		// us the ability to define middlewares on controllers. We will return the given
@@ -115,17 +115,37 @@ class ControllerDispatcher {
 	 * Get the middleware for the controller instance.
 	 *
 	 * @param  \Illuminate\Routing\Controller  $instance
+	 * @param  string  $method
 	 * @return array
 	 */
-	protected function getMiddleware($instance)
+	protected function getMiddleware($instance, $method)
 	{
 		$middleware = $this->router->getMiddleware();
 
-		return Collection::make($instance->getMiddleware())->map(function($m) use ($middleware)
-		{
-			return array_get($middleware, $m, $m);
+		$results = [];
 
-		})->all();
+		foreach ($instance->getMiddleware() as $name => $options)
+		{
+			if ( ! $this->methodExcludedByOptions($method, $options))
+			{
+				$results[] = array_get($middleware, $name, $name);
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Determine if the given options exclude a particular method.
+	 *
+	 * @param  string  $method
+	 * @param  array  $options
+	 * @return bool
+	 */
+	public function methodExcludedByOptions($method, array $options)
+	{
+		return (( ! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+			( ! empty($options['except']) && in_array($method, (array) $options['except'])));
 	}
 
 	/**
@@ -216,7 +236,7 @@ class ControllerDispatcher {
 	 */
 	protected function filterApplies($filter, $request, $method)
 	{
-		foreach (array('Only', 'Except', 'On') as $type)
+		foreach (array('Method', 'On') as $type)
 		{
 			if ($this->{"filterFails{$type}"}($filter, $request, $method))
 			{
@@ -228,33 +248,16 @@ class ControllerDispatcher {
 	}
 
 	/**
-	 * Determine if the filter fails the "only" constraint.
+	 * Determine if the filter fails the method constraints.
 	 *
 	 * @param  array  $filter
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $method
 	 * @return bool
 	 */
-	protected function filterFailsOnly($filter, $request, $method)
+	protected function filterFailsMethod($filter, $request, $method)
 	{
-		if ( ! isset($filter['options']['only'])) return false;
-
-		return ! in_array($method, (array) $filter['options']['only']);
-	}
-
-	/**
-	 * Determine if the filter fails the "except" constraint.
-	 *
-	 * @param  array  $filter
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  string  $method
-	 * @return bool
-	 */
-	protected function filterFailsExcept($filter, $request, $method)
-	{
-		if ( ! isset($filter['options']['except'])) return false;
-
-		return in_array($method, (array) $filter['options']['except']);
+		return $this->methodExcludedByOptions($method, $filter['options']);
 	}
 
 	/**
