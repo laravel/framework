@@ -11,6 +11,8 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "ext-openssl": "*",
+        "ext-mcrypt": "*",
         "classpreloader/classpreloader": "~1.0.2",
         "d11wtq/boris": "~1.0",
         "doctrine/annotations": "~1.0",
