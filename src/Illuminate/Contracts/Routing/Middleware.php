@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Contracts\Routing;
 
 use Closure;
+use Illuminate\Http\Request;
 
 interface Middleware {
 
@@ -11,6 +12,6 @@ interface Middleware {
 	 * @param  \Closure  $next
 	 * @return mixed
 	 */
-	public function handle($request, Closure $next);
+	public function handle(Request $request, Closure $next);
 
 }
