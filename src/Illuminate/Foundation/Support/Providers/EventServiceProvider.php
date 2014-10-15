@@ -2,12 +2,9 @@
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\Annotations\Scanner;
-use Illuminate\Console\AppNamespaceDetectorTrait;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class EventServiceProvider extends ServiceProvider {
-
-	use AppNamespaceDetectorTrait;
 
 	/**
 	 * Determines if we will auto-scan in the local environment.
@@ -62,7 +59,9 @@ class EventServiceProvider extends ServiceProvider {
 	 */
 	protected function scanEvents()
 	{
-		$scanner = new Scanner(app_path(), $this->getAppNamespace());
+		if (empty($this->scan)) return;
+
+		$scanner = new Scanner($this->scan);
 
 		file_put_contents(
 			$this->app->getScannedEventsPath(), '<?php '.$scanner->getEventDefinitions()

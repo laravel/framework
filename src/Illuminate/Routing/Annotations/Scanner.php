@@ -16,23 +16,14 @@ class Scanner {
 	protected $scan;
 
 	/**
-	 * The root namespace of the controllers.
-	 *
-	 * @var string
-	 */
-	protected $rootNamespace;
-
-	/**
 	 * Create a new scanner instance.
 	 *
 	 * @param  string  $scan
-	 * @param  string  $rootNamespace
 	 * @return void
 	 */
-	public function __construct($scan, $rootNamespace)
+	public function __construct(array $scan)
 	{
 		$this->scan = $scan;
-		$this->rootNamespace = rtrim($rootNamespace, '\\').'\\';
 
 		foreach (Finder::create()->files()->in(__DIR__.'/Annotations') as $file)
 			AnnotationRegistry::registerFile($file->getRealPath());
@@ -41,13 +32,12 @@ class Scanner {
 	/**
 	 * Create a new scanner instance.
 	 *
-	 * @param  string  $scan
-	 * @param  string  $rootNamespace
+	 * @param  array  $scan
 	 * @return static
 	 */
-	public static function create($scan, $rootNamespace)
+	public static function create(array $scan)
 	{
-		return new static($scan, $rootNamespace);
+		return new static($scan);
 	}
 
 	/**
@@ -75,7 +65,7 @@ class Scanner {
 	{
 		$endpoints = new EndpointCollection;
 
-		foreach ($this->getClassesInScanPath() as $class)
+		foreach ($this->getClassesToScan() as $class)
 		{
 			$endpoints = $endpoints->merge($this->getEndpointsInClass(
 				$class, new AnnotationSet($class, $reader)
@@ -126,58 +116,24 @@ class Scanner {
 	}
 
 	/**
-	 * Get all of the ReflectionClass instances in the scan path.
+	 * Get all of the ReflectionClass instances in the scan array.
 	 *
 	 * @return array
 	 */
-	protected function getClassesInScanPath()
+	protected function getClassesToScan()
 	{
 		$classes = [];
 
-		foreach ($this->getFilesInScanPath() as $file)
+		foreach ($this->scan as $scan)
 		{
 			try {
-				$classes[] = new ReflectionClass($this->getClassName($file));
+				$classes[] = new ReflectionClass($scan);
 			} catch (\Exception $e) {
 				//
 			}
 		}
 
 		return $classes;
-	}
-
-	/**
-	 * Get the files in the scan path.
-	 *
-	 * @return Finder
-	 */
-	protected function getFilesInScanPath()
-	{
-		return Finder::create()->files()->in($this->scan)->notName('routes.php');
-	}
-
-	/**
-	 * Get the class name from the given file.
-	 *
-	 * @param  \SplFileInfo  $file
-	 * @return string
-	 */
-	public function getClassName(SplFileInfo $file)
-	{
-		return $this->rootNamespace.str_replace(
-			'.php', '', str_replace(DIRECTORY_SEPARATOR, '\\', $this->getFilePathWithoutScanPath($file))
-		);
-	}
-
-	/**
-	 * Get the file path with the scan path removed.
-	 *
-	 * @param  \SplFileInfo  $file
-	 * @return string
-	 */
-	protected function getFilePathWithoutScanPath(SplFileInfo $file)
-	{
-		return trim(str_replace($this->scan, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 	}
 
 	/**

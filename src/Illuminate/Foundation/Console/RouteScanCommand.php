@@ -43,7 +43,7 @@ class RouteScanCommand extends Command {
 	protected function getRouteDefinitions()
 	{
 		return '<?php '.PHP_EOL.PHP_EOL.Scanner::create(
-			$this->laravel['path'].DIRECTORY_SEPARATOR.$this->option('path'), $this->option('namespace')
+			$this->laravel['router']->getControllersToScan()
 		)->getRouteDefinitions().PHP_EOL;
 	}
 

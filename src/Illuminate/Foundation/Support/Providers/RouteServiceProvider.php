@@ -3,18 +3,8 @@
 use Closure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Annotations\Scanner;
-use Illuminate\Console\AppNamespaceDetectorTrait;
 
 class RouteServiceProvider extends ServiceProvider {
-
-	use AppNamespaceDetectorTrait;
-
-	/**
-	 * The path (relative to app directory) to scan for routes.
-	 *
-	 * @var string
-	 */
-	protected $scanPath = 'Http/Controllers';
 
 	/**
 	 * Determines if we will auto-scan in the local environment.
@@ -30,6 +20,8 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
+		$this->setRoutingMetaInformation();
+
 		$this->app->call([$this, 'before']);
 
 		if ($this->app->routesAreCached())
@@ -40,6 +32,18 @@ class RouteServiceProvider extends ServiceProvider {
 		{
 			$this->loadRoutes();
 		}
+	}
+
+	/**
+	 * Set some meta information regarding routing.
+	 *
+	 * @return void
+	 */
+	protected function setRoutingMetaInformation()
+	{
+		$this->app['url']->setRootControllerNamespace($this->rootUrlNamespace);
+
+		$this->app['router']->setControllersToScan($this->scan ?: []);
 	}
 
 	/**
@@ -82,9 +86,9 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	protected function scanRoutes()
 	{
-		$scanner = new Scanner(
-			app_path().'/'.$this->scanPath, $this->getAppNamespace().'Http\Controllers'
-		);
+		if (empty($this->scan)) return;
+
+		$scanner = new Scanner($this->scan);
 
 		file_put_contents($this->app->getScannedRoutesPath(), '<?php '.$scanner->getRouteDefinitions());
 	}
