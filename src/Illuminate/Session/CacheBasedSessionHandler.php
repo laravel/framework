@@ -2,7 +2,7 @@
 
 use Illuminate\Cache\Repository;
 
-class CacheBasedSessionHandler implements \SessionHandlerInterface {
+class CacheBasedSessionHandler extends ExpirationAwareSessionHandler {
 
 	/**
 	 * The cache repository instance.
@@ -12,23 +12,14 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	protected $cache;
 
 	/**
-	 * The number of minutes to store the data in the cache.
-	 *
-	 * @var int
-	 */
-	protected $minutes;
-
-	/**
 	 * Create a new cache driven handler instance.
 	 *
 	 * @param  \Illuminate\Cache\Repository  $cache
-	 * @param  int  $minutes
 	 * @return void
 	 */
-	public function __construct(Repository $cache, $minutes)
+	public function __construct(Repository $cache)
 	{
 		$this->cache = $cache;
-		$this->minutes = $minutes;
 	}
 
 	/**
@@ -60,7 +51,7 @@ class CacheBasedSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function write($sessionId, $data)
 	{
-		return $this->cache->put($sessionId, $data, $this->minutes);
+		return $this->cache->put($sessionId, $data, $this->lifetime);
 	}
 
 	/**
