@@ -25,7 +25,7 @@ class ClearRemindersCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->laravel['auth.reminder.repository']->deleteExpired();
+		$this->laravel['auth.password.tokens']->deleteExpired();
 
 		$this->info('Expired reminders cleared!');
 	}
