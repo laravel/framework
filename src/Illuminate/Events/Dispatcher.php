@@ -41,6 +41,13 @@ class Dispatcher implements DispatcherContract {
 	protected $firing = array();
 
 	/**
+	 * The classes that should be scanned.
+	 *
+	 * @var array
+	 */
+	protected $classesToScan = array();
+
+	/**
 	 * Create a new event dispatcher instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
@@ -347,6 +354,27 @@ class Dispatcher implements DispatcherContract {
 		{
 			if (ends_with($key, '_queue')) $this->forget($key);
 		}
+	}
+
+	/**
+	 * Get the classes to scan.
+	 *
+	 * @return array
+	 */
+	public function getClassesToScan()
+	{
+		return $this->classesToScan;
+	}
+
+	/**
+	 * Set the classes that should be scanned.
+	 *
+	 * @param  array  $classes
+	 * @return void
+	 */
+	public function setClassesToScan(array $classes)
+	{
+		$this->classesToScan = $classes;
 	}
 
 }

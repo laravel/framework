@@ -21,6 +21,8 @@ class EventServiceProvider extends ServiceProvider {
 	 */
 	public function boot(DispatcherContract $events)
 	{
+		$this->app['events']->setClassesToScan($this->scan ?: []);
+
 		if ($this->app->environment('local') && $this->scanWhenLocal)
 		{
 			$this->scanEvents();
