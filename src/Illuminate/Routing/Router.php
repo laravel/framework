@@ -93,6 +93,13 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	protected $groupStack = array();
 
 	/**
+	 * The controllers that should be scanned.
+	 *
+	 * @var array
+	 */
+	protected $controllersToScan = array();
+
+	/**
 	 * All of the verbs supported by the router.
 	 *
 	 * @var array
@@ -1290,6 +1297,27 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	public function getPatterns()
 	{
 		return $this->patterns;
+	}
+
+	/**
+	 * Get the controllers to scan.
+	 *
+	 * @return array
+	 */
+	public function getControllersToScan()
+	{
+		return $this->controllersToScan;
+	}
+
+	/**
+	 * Set the controllers that should be scanned.
+	 *
+	 * @param  array  $controllers
+	 * @return void
+	 */
+	public function setControllersToScan(array $controllers)
+	{
+		$this->controllersToScan = $controllers;
 	}
 
 	/**
