@@ -706,6 +706,8 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function run(SymfonyRequest $request = null)
 	{
+		$request = $request ?: $this['request'];
+
 		with($response = $this->handleRequest($request))->send();
 
 		$this->terminate($request, $response);
