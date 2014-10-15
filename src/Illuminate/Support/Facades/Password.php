@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
 /**
- * @see \Illuminate\Auth\Reminders\PasswordBroker
+ * @see \Illuminate\Auth\Passwords\PasswordBroker
  */
 class Password extends Facade {
 
@@ -45,6 +45,6 @@ class Password extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'auth.reminder'; }
+	protected static function getFacadeAccessor() { return 'auth.password'; }
 
 }
