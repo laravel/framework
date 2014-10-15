@@ -42,9 +42,9 @@ class EventScanCommand extends Command {
 	 */
 	protected function getEventDefinitions()
 	{
-		return '<?php '.PHP_EOL.PHP_EOL.Scanner::create(
+		return '<?php '.PHP_EOL.PHP_EOL.Scanner::create([
 			rtrim($this->laravel['path'].'/'.$this->option('path'), '/'), $this->getAppNamespace()
-		)->getEventDefinitions().PHP_EOL;
+		])->getEventDefinitions().PHP_EOL;
 	}
 
 	/**
