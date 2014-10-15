@@ -60,7 +60,7 @@ class Scanner {
 		$output = '';
 
 		foreach ($this->getEndpointsInClasses($this->getReader()) as $endpoint)
-			$output .= $endpoint->toRouteDefinition().PHP_EOL;
+			$output .= $endpoint->toRouteDefinition().PHP_EOL.PHP_EOL;
 
 		return trim($output);
 	}

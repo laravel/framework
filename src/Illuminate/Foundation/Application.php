@@ -702,17 +702,13 @@ class Application extends Container implements HttpKernelInterface,
 	 * Run the application and send the response.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return void
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function run(SymfonyRequest $request = null)
 	{
-		$this->boot();
+		with($response = $this->handleRequest($request))->send();
 
-		$request = $request ?: $this['request'];
-
-		$response = with($stack = $this->call($this->stack))->setContainer($this)->run($request);
-
-		$response->send();
+		$this->terminate($request, $response);
 	}
 
 	/**
@@ -733,11 +729,7 @@ class Application extends Container implements HttpKernelInterface,
 	{
 		try
 		{
-			$this->refreshRequest($request = Request::createFromBase($request));
-
-			$this->boot();
-
-			return $this->dispatch($request);
+			return $this->handleRequest($request);
 		}
 		catch (\Exception $e)
 		{
@@ -750,17 +742,18 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Handle the given request and get the response.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function dispatch(Request $request)
+	protected function handleRequest(SymfonyRequest $request = null)
 	{
-		if ($this->runningUnitTests() && ! $this['session']->isStarted())
-		{
-			$this['session']->start();
-		}
+		$request = $request ?: $this['request'];
 
-		return $this['router']->dispatch($this->prepareRequest($request));
+		$this->refreshRequest($request = Request::createFromBase($request));
+
+		$this->boot();
+
+		return with($stack = $this->call($this->stack))->setContainer($this)->run($request);
 	}
 
 	/**
@@ -817,22 +810,6 @@ class Application extends Container implements HttpKernelInterface,
 		{
 			call_user_func($callback, $this);
 		}
-	}
-
-	/**
-	 * Prepare the request by injecting any services.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Request
-	 */
-	public function prepareRequest(Request $request)
-	{
-		if ( ! is_null($this['config']['session.driver']) && ! $request->hasSession())
-		{
-			$request->setSession($this['session']->driver());
-		}
-
-		return $request;
 	}
 
 	/**

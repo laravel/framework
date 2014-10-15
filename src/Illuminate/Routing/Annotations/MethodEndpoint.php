@@ -5,13 +5,6 @@ use Illuminate\Support\Collection;
 class MethodEndpoint implements EndpointInterface {
 
 	/**
-	 * The route defintion template.
-	 *
-	 * @var string
-	 */
-	protected $template = '$router->%s(\'%s\', [\'uses\' => \'%s\', \'domain\' => %s, \'as\' => %s, \'middleware\' => %s, \'where\' => %s]);';
-
-	/**
 	 * The ReflectionClass instance for the controller class.
 	 *
 	 * @var \ReflectionClass
@@ -77,12 +70,12 @@ class MethodEndpoint implements EndpointInterface {
 		foreach ($this->paths as $path)
 		{
 			$routes[] = sprintf(
-				$this->template, $path->verb, $path->path, $this->uses, var_export($path->domain, true),
-				var_export($path->as, true), var_export($this->getMiddleware($path), true), var_export($path->where, true)
+				$this->getTemplate(), $path->verb, $path->path, $this->uses, var_export($path->as, true),
+				$this->getMiddleware($path), $this->implodeArray($path->where), var_export($path->domain, true)
 			);
 		}
 
-		return implode(PHP_EOL, $routes);
+		return implode(PHP_EOL.PHP_EOL, $routes);
 	}
 
 	/**
@@ -95,7 +88,9 @@ class MethodEndpoint implements EndpointInterface {
 	{
 		$classMiddleware = $this->getClassMiddlewareForPath($path)->all();
 
-		return array_merge($classMiddleware, $path->middleware, $this->middleware);
+		return $this->implodeArray(
+			array_merge($classMiddleware, $path->middleware, $this->middleware)
+		);
 	}
 
 	/**
@@ -177,6 +172,47 @@ class MethodEndpoint implements EndpointInterface {
 	public function getPaths()
 	{
 		return $this->paths;
+	}
+
+	/**
+	 * Implode the given list into a comma separated string.
+	 *
+	 * @param  array  $list
+	 * @return string
+	 */
+	protected function implodeArray(array $array)
+	{
+		$results = [];
+
+		foreach ($array as $key => $value)
+		{
+			if (is_string($key))
+			{
+				$results[] = "'".$key."' => '".$value."'";
+			}
+			else
+			{
+				$results[] = "'".$value."'";
+			}
+		}
+
+		return count($results) > 0 ? implode(', ', $results) : '';
+	}
+
+	/**
+	 * Get the template for the endpoint.
+	 *
+	 * @return string
+	 */
+	protected function getTemplate()
+	{
+		return '$router->%s(\'%s\', [
+	\'uses\' => \'%s\',
+	\'as\' => %s,
+	\'middleware\' => [%s],
+	\'where\' => [%s],
+	\'domain\' => %s,
+]);';
 	}
 
 }

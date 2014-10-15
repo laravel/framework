@@ -502,10 +502,9 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 * Dispatch the request to the application.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  bool  $runMiddleware
 	 * @return \Illuminate\Http\Response
 	 */
-	public function dispatch(Request $request, $runMiddleware = true)
+	public function dispatch(Request $request)
 	{
 		$this->currentRequest = $request;
 
@@ -516,9 +515,7 @@ class Router implements HttpKernelInterface, RegistrarContract {
 
 		if (is_null($response))
 		{
-			$response = $this->dispatchToRoute(
-				$request, $runMiddleware
-			);
+			$response = $this->dispatchToRoute($request);
 		}
 
 		// Once this route has run and the response has been prepared, we will run the
@@ -546,10 +543,9 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 * Dispatch the request to a route and return the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  bool  $runMiddleware
 	 * @return mixed
 	 */
-	public function dispatchToRoute(Request $request, $runMiddleware = true)
+	public function dispatchToRoute(Request $request)
 	{
 		// First we will find a route that matches this request. We will also set the
 		// route resolver on the request so middlewares assigned to the route will
@@ -571,7 +567,7 @@ class Router implements HttpKernelInterface, RegistrarContract {
 		if (is_null($response))
 		{
 			$response = $this->runRouteWithinStack(
-				$route, $request, $runMiddleware
+				$route, $request
 			);
 		}
 
@@ -590,16 +586,15 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  bool  $runMiddleware
 	 * @return mixed
 	 */
-	protected function runRouteWithinStack(Route $route, Request $request, $runMiddleware)
+	protected function runRouteWithinStack(Route $route, Request $request)
 	{
-		$middleware = $runMiddleware ? $this->gatherRouteMiddlewares($route) : [];
+		$middleware = $this->gatherRouteMiddlewares($route);
 
-		return (new Stack\Stack(function($request) use ($route, $runMiddleware)
+		return (new Stack\Stack(function($request) use ($route)
 		{
-			return $route->run($request, $runMiddleware);
+			return $route->run($request);
 
 		}, $middleware))->setContainer($this->container)->run($request);
 	}

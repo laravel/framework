@@ -5,13 +5,6 @@ use Illuminate\Support\Collection;
 class ResourceEndpoint implements EndpointInterface {
 
 	/**
-	 * The route defintion template.
-	 *
-	 * @var string
-	 */
-	protected $template = '$router->group([\'middleware\' => %s, \'prefix\' => %s, \'domain\' => %s, \'where\' => %s], function($router) { $router->resource(%s, %s, [\'only\' => %s, \'names\' => %s]); });';
-
-	/**
 	 * All of the resource controller methods.
 	 *
 	 * @var array
@@ -138,15 +131,16 @@ class ResourceEndpoint implements EndpointInterface {
 		foreach ($this->paths as $path)
 		{
 			$routes[] = sprintf(
-				$this->template, var_export($this->getMiddleware($path), true),
-				var_export($path->path, true), var_export($path->domain, true),
-				var_export($path->where, true), var_export($this->name, true),
-				var_export($this->reflection->name, true), var_export([$path->method], true),
-				var_export($this->getNames($path), true)
+				$this->getTemplate(), 'Resource: '.$this->name.'@'.$path->method,
+				$this->implodeArray($this->getMiddleware($path)),
+				var_export($path->path, true), $this->implodeArray($path->where),
+				var_export($path->domain, true), var_export($this->name, true),
+				var_export($this->reflection->name, true), $this->implodeArray([$path->method]),
+				$this->implodeArray($this->getNames($path))
 			);
 		}
 
-		return implode(PHP_EOL, $routes);
+		return implode(PHP_EOL.PHP_EOL, $routes);
 	}
 
 	/**
@@ -254,6 +248,45 @@ class ResourceEndpoint implements EndpointInterface {
 	public function getPaths()
 	{
 		return $this->paths;
+	}
+
+	/**
+	 * Implode the given list into a comma separated string.
+	 *
+	 * @param  array  $list
+	 * @return string
+	 */
+	protected function implodeArray(array $array)
+	{
+		$results = [];
+
+		foreach ($array as $key => $value)
+		{
+			if (is_string($key))
+			{
+				$results[] = "'".$key."' => '".$value."'";
+			}
+			else
+			{
+				$results[] = "'".$value."'";
+			}
+		}
+
+		return count($results) > 0 ? implode(', ', $results) : '';
+	}
+
+	/**
+	 * Get the template for the endpoint.
+	 *
+	 * @return string
+	 */
+	protected function getTemplate()
+	{
+		return '// %s
+$router->group([\'middleware\' => [%s], \'prefix\' => %s, \'where\' => [%s], \'domain\' => %s], function() use ($router)
+{
+	$router->resource(%s, %s, [\'only\' => [%s], \'names\' => [%s]]);
+});';
 	}
 
 }
