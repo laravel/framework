@@ -44,6 +44,13 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	protected $current;
 
 	/**
+	 * Indicates if the router is running filters.
+	 *
+	 * @var bool
+	 */
+	protected $filtering = true;
+
+	/**
 	 * The request currently being dispatched.
 	 *
 	 * @var \Illuminate\Http\Request
@@ -907,6 +914,8 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 */
 	protected function callFilter($filter, $request, $response = null)
 	{
+		if ( ! $this->filtering) return null;
+
 		return $this->events->until('router.'.$filter, array($request, $response));
 	}
 
@@ -1068,9 +1077,31 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	 */
 	public function callRouteFilter($filter, $parameters, $route, $request, $response = null)
 	{
+		if ( ! $this->filtering) return null;
+
 		$data = array_merge(array($route, $request, $response), $parameters);
 
 		return $this->events->until('router.filter: '.$filter, $this->cleanFilterParameters($data));
+	}
+
+	/**
+	 * Enable route filtering on the router.
+	 *
+	 * @return void
+	 */
+	public function enableFilters()
+	{
+		$this->filtering = true;
+	}
+
+	/**
+	 * Disable route filtering on the router.
+	 *
+	 * @return void
+	 */
+	public function disableFilters()
+	{
+		$this->filtering = false;
 	}
 
 	/**
