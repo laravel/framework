@@ -26,7 +26,9 @@ class Scanner {
 		$this->scan = $scan;
 
 		foreach (Finder::create()->files()->in(__DIR__.'/Annotations') as $file)
+		{
 			AnnotationRegistry::registerFile($file->getRealPath());
+		}
 	}
 
 	/**
