@@ -454,6 +454,17 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a json type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeJson(Fluent $column)
+	{
+		return 'text';
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
