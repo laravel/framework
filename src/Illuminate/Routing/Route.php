@@ -117,10 +117,9 @@ class Route {
 	 * Run the route action and return the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  bool  $runMiddleware
 	 * @return mixed
 	 */
-	public function run(Request $request, $runMiddleware = true)
+	public function run(Request $request)
 	{
 		$this->container = $this->container ?: new Container;
 
@@ -130,7 +129,7 @@ class Route {
 				return $this->runCallable($request);
 
 			if ($this->customDispatcherIsBound())
-				return $this->runWithCustomDispatcher($request, $runMiddleware);
+				return $this->runWithCustomDispatcher($request);
 
 			return $this->runController($request);
 		}
@@ -189,16 +188,15 @@ class Route {
 	 * Send the request and route to a custom dispatcher for handling.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  bool  $runMiddleware
 	 * @return mixed
 	 */
-	protected function runWithCustomDispatcher(Request $request, $runMiddleware)
+	protected function runWithCustomDispatcher(Request $request)
 	{
 		list($class, $method) = explode('@', $this->action['uses']);
 
 		$dispatcher = $this->container->make('illuminate.route.dispatcher');
 
-		return $dispatcher->dispatch($this, $request, $class, $method, $runMiddleware);
+		return $dispatcher->dispatch($this, $request, $class, $method);
 	}
 
 	/**

@@ -1,28 +1,19 @@
-$router->put('more/{id}', ['uses' => 'App\Http\Controllers\BasicController@doMore', 'domain' => '{id}.account.com', 'as' => NULL, 'middleware' => array (
-  0 => 'FooMiddleware',
-  1 => 'BarMiddleware',
-  2 => 'QuxMiddleware',
-), 'where' => array (
-  'id' => 'regex',
-)]);
-$router->group(['middleware' => array (
-  0 => 'FooMiddleware',
-  1 => 'BarMiddleware',
-  2 => 'BoomMiddleware',
-  3 => 'BazMiddleware',
-), 'prefix' => NULL, 'domain' => '{id}.account.com', 'where' => array (
-  'id' => 'regex',
-)], function($router) { $router->resource('foobar/photos', 'App\\Http\\Controllers\\BasicController', ['only' => array (
-  0 => 'index',
-), 'names' => array (
-  'index' => 'index.name',
-)]); });
-$router->group(['middleware' => array (
-  0 => 'FooMiddleware',
-  1 => 'BarMiddleware',
-), 'prefix' => NULL, 'domain' => '{id}.account.com', 'where' => array (
-  'id' => 'regex',
-)], function($router) { $router->resource('foobar/photos', 'App\\Http\\Controllers\\BasicController', ['only' => array (
-  0 => 'update',
-), 'names' => array (
-)]); });
+$router->put('more/{id}', [
+	'uses' => 'App\Http\Controllers\BasicController@doMore',
+	'as' => NULL,
+	'middleware' => ['FooMiddleware', 'BarMiddleware', 'QuxMiddleware'],
+	'where' => ['id' => 'regex'],
+	'domain' => '{id}.account.com',
+]);
+
+// Resource: foobar/photos@index
+$router->group(['middleware' => ['FooMiddleware', 'BarMiddleware', 'BoomMiddleware', 'BazMiddleware'], 'prefix' => NULL, 'where' => ['id' => 'regex'], 'domain' => '{id}.account.com'], function() use ($router)
+{
+	$router->resource('foobar/photos', 'App\\Http\\Controllers\\BasicController', ['only' => ['index'], 'names' => ['index' => 'index.name']]);
+});
+
+// Resource: foobar/photos@update
+$router->group(['middleware' => ['FooMiddleware', 'BarMiddleware'], 'prefix' => NULL, 'where' => ['id' => 'regex'], 'domain' => '{id}.account.com'], function() use ($router)
+{
+	$router->resource('foobar/photos', 'App\\Http\\Controllers\\BasicController', ['only' => ['update'], 'names' => []]);
+});

@@ -47,10 +47,9 @@ class ControllerDispatcher {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $controller
 	 * @param  string  $method
-	 * @param  bool  $runMiddleware
 	 * @return mixed
 	 */
-	public function dispatch(Route $route, Request $request, $controller, $method, $runMiddleware = true)
+	public function dispatch(Route $route, Request $request, $controller, $method)
 	{
 		// First we will make an instance of this controller via the IoC container instance
 		// so that we can call the methods on it. We will also apply any "after" filters
@@ -67,7 +66,7 @@ class ControllerDispatcher {
 		if (is_null($response))
 		{
 			$response = $this->callWithinStack(
-				$instance, $route, $request, $method, $runMiddleware
+				$instance, $route, $request, $method
 			);
 		}
 
@@ -94,12 +93,11 @@ class ControllerDispatcher {
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $method
-	 * @param  bool  $runMiddleware
 	 * @return mixed
 	 */
-	protected function callWithinStack($instance, $route, $request, $method, $runMiddleware)
+	protected function callWithinStack($instance, $route, $request, $method)
 	{
-		$middleware = $runMiddleware ? $this->getMiddleware($instance, $method) : [];
+		$middleware = $this->getMiddleware($instance, $method);
 
 		// Here we will make a stack onion instance to execute this request in, which gives
 		// us the ability to define middlewares on controllers. We will return the given
