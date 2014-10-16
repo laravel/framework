@@ -2574,6 +2574,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function fromDateTime($value)
 	{
+		$format = $this->getDateFormat();
 		return (new Carbon($value))->format($format);
 	}
 
