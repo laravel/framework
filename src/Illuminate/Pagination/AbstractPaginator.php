@@ -337,6 +337,16 @@ abstract class AbstractPaginator {
 	}
 
 	/**
+	 * Determine if the list of items is empty or not.
+	 *
+	 * @return bool
+	 */
+	public function isEmpty()
+	{
+		return empty($this->items);
+	}
+
+	/**
 	 * Get the number of items for the current page.
 	 *
 	 * @return int
