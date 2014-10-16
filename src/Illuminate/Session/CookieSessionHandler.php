@@ -3,7 +3,7 @@
 use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 
-class CookieSessionHandler implements \SessionHandlerInterface {
+class CookieSessionHandler extends ExpirationAwareSessionHandler {
 
 	/**
 	 * The cookie jar instance.
@@ -29,7 +29,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	public function __construct(CookieJar $cookie, $minutes)
 	{
 		$this->cookie = $cookie;
-		$this->minutes = $minutes;
+		$this->lifetime = $minutes;
 	}
 
 	/**
@@ -61,7 +61,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function write($sessionId, $data)
 	{
-		$this->cookie->queue($sessionId, $data, $this->minutes);
+		$this->cookie->queue($sessionId, $data, $this->lifetime);
 	}
 
 	/**
