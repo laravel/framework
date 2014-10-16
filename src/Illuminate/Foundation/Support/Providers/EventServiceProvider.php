@@ -33,7 +33,7 @@ class EventServiceProvider extends ServiceProvider {
 			$this->scanEvents();
 		}
 
-		if ($this->app->eventsAreScanned())
+		if ( ! empty($this->scan) && $this->app->eventsAreScanned())
 		{
 			$this->loadScannedEvents();
 		}
