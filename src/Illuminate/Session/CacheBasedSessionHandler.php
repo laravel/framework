@@ -15,11 +15,13 @@ class CacheBasedSessionHandler extends ExpirationAwareSessionHandler {
 	 * Create a new cache driven handler instance.
 	 *
 	 * @param  \Illuminate\Cache\Repository  $cache
+	 * @param  int  $minutes
 	 * @return void
 	 */
-	public function __construct(Repository $cache)
+	public function __construct(Repository $cache, $minutes)
 	{
 		$this->cache = $cache;
+		$this->lifetime = $minutes;
 	}
 
 	/**

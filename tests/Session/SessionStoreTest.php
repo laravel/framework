@@ -249,7 +249,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($session->handlerNeedsRequest());
 		$session->getHandler()->shouldReceive('setRequest')->never();
 
-		$handler = m::mock(new \Illuminate\Session\CookieSessionHandler(new \Illuminate\Cookie\CookieJar()));
+		$handler = m::mock(new \Illuminate\Session\CookieSessionHandler(new \Illuminate\Cookie\CookieJar(), 60));
 		$handler->setLifetime(60);
 		$session = new \Illuminate\Session\Store('test', $handler);
 

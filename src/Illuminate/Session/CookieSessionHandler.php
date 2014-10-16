@@ -23,11 +23,13 @@ class CookieSessionHandler extends ExpirationAwareSessionHandler {
 	 * Create a new cookie driven handler instance.
 	 *
 	 * @param  \Illuminate\Cookie\CookieJar  $cookie
+	 * @param  int  $minutes
 	 * @return void
 	 */
-	public function __construct(CookieJar $cookie)
+	public function __construct(CookieJar $cookie, $minutes)
 	{
 		$this->cookie = $cookie;
+		$this->lifetime = $minutes;
 	}
 
 	/**

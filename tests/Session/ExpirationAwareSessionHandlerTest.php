@@ -9,24 +9,14 @@ class ExpirationAwareSessionHandlerTest extends PHPUnit_Framework_TestCase {
         m::close();
     }
 
-    public function testNoDefaultLifetime()
-    {
-        $handler = m::mock(
-            new \Illuminate\Session\CookieSessionHandler(
-                new \Illuminate\Cookie\CookieJar()
-            )
-        );
-
-        $this->assertEquals(0, $handler->getLifetime());
-    }
-
     public function testLifetimeAccessorMutator()
     {
-        $handler = m::mock(
-            new \Illuminate\Session\CookieSessionHandler(
-                new \Illuminate\Cookie\CookieJar()
-            )
+        $handler = new \Illuminate\Session\CookieSessionHandler(
+            new \Illuminate\Cookie\CookieJar(),
+            50
         );
+
+        $this->assertEquals(50, $handler->getLifetime());
 
         $handler->setLifetime(100);
         $this->assertEquals(100, $handler->getLifetime());

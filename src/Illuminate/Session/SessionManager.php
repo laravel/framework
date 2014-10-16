@@ -33,7 +33,9 @@ class SessionManager extends Manager {
 	 */
 	protected function createCookieDriver()
 	{
-		return $this->buildSession(new CookieSessionHandler($this->app['cookie']));
+		$minutes = $this->app['config']['session.lifetime'];
+
+		return $this->buildSession(new CookieSessionHandler($this->app['cookie'], $minutes));
 	}
 
 	/**
@@ -147,7 +149,9 @@ class SessionManager extends Manager {
 	 */
 	protected function createCacheHandler($driver)
 	{
-		return new CacheBasedSessionHandler($this->app['cache']->driver($driver));
+		$minutes = $this->app['config']['session.lifetime'];
+
+		return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
 	}
 
 	/**
