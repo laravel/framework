@@ -7,6 +7,20 @@ use Illuminate\Routing\Annotations\Scanner;
 class RouteServiceProvider extends ServiceProvider {
 
 	/**
+	 * The root namespace to assume when generating URLs to actions.
+	 *
+	 * @var string
+	 */
+	protected $rootUrlNamespace = null;
+
+	/**
+	 * The controllers to scan for route annotations.
+	 *
+	 * @var array
+	 */
+	protected $scan = [];
+
+	/**
 	 * Determines if we will auto-scan in the local environment.
 	 *
 	 * @var bool
@@ -20,7 +34,7 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->setRoutingMetaInformation();
+		$this->app['url']->setRootControllerNamespace($this->rootUrlNamespace);
 
 		$this->app->call([$this, 'before']);
 
@@ -32,18 +46,6 @@ class RouteServiceProvider extends ServiceProvider {
 		{
 			$this->loadRoutes();
 		}
-	}
-
-	/**
-	 * Set some meta information regarding routing.
-	 *
-	 * @return void
-	 */
-	protected function setRoutingMetaInformation()
-	{
-		$this->app['url']->setRootControllerNamespace($this->rootUrlNamespace);
-
-		$this->app['router']->setControllersToScan($this->scan ?: []);
 	}
 
 	/**
@@ -116,22 +118,13 @@ class RouteServiceProvider extends ServiceProvider {
 	public function register() {}
 
 	/**
-	 * Register the given Closure with the "group" function namespace set.
+	 * Get the classes to be scanned by the provider.
 	 *
-	 * @param  string  $namespace
-	 * @param  \Closure  $callback
-	 * @return void
+	 * @return array
 	 */
-	protected function namespaced($namespace, Closure $callback)
+	public function scans()
 	{
-		if (empty($namespace))
-		{
-			$callback($this->app['router']);
-		}
-		else
-		{
-			$this->app['router']->group(compact('namespace'), $callback);
-		}
+		return $this->scan;
 	}
 
 	/**

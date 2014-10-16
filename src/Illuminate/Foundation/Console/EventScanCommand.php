@@ -42,8 +42,10 @@ class EventScanCommand extends Command {
 	 */
 	protected function getEventDefinitions()
 	{
+		$provider = 'Illuminate\Foundation\Support\Providers\EventServiceProvider';
+
 		return '<?php '.PHP_EOL.PHP_EOL.Scanner::create(
-			rtrim($this->laravel['path'].'/'.$this->option('path'), '/'), $this->getAppNamespace()
+			$this->laravel->getRegistered($provider)->scans()
 		)->getEventDefinitions().PHP_EOL;
 	}
 

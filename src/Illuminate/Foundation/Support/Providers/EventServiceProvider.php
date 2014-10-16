@@ -7,6 +7,13 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 class EventServiceProvider extends ServiceProvider {
 
 	/**
+	 * The classes to scan for event annotations.
+	 *
+	 * @var array
+	 */
+	protected $scan = [];
+
+	/**
 	 * Determines if we will auto-scan in the local environment.
 	 *
 	 * @var bool
@@ -74,6 +81,16 @@ class EventServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		//
+	}
+
+	/**
+	 * Get the classes to be scanned by the provider.
+	 *
+	 * @return array
+	 */
+	public function scans()
+	{
+		return $this->scan;
 	}
 
 }

@@ -349,13 +349,10 @@ class Application extends Container implements HttpKernelInterface,
 	{
 		$name = is_string($provider) ? $provider : get_class($provider);
 
-		if (array_key_exists($name, $this->loadedProviders))
+		return array_first($this->serviceProviders, function($key, $value) use ($name)
 		{
-			return array_first($this->serviceProviders, function($key, $value) use ($name)
-			{
-				return get_class($value) == $name;
-			});
-		}
+			return $value instanceof $name;
+		});
 	}
 
 	/**
