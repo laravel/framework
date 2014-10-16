@@ -1,6 +1,8 @@
 <?php namespace {{namespace}};
 
-class {{class}} {
+use Illuminate\Routing\Controller;
+
+class {{class}} extends Controller {
 
 	//
 
