@@ -633,7 +633,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Support\Collection|static
+	 * @return \Illuminate\Support\Collection|static|null
 	 */
 	public static function find($id, $columns = array('*'))
 	{
