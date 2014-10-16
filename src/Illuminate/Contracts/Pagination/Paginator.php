@@ -91,6 +91,13 @@ interface Paginator {
 	public function hasMorePages();
 
 	/**
+	 * Determine if the list of items is empty or not.
+	 *
+	 * @return bool
+	 */
+	public function isEmpty();
+
+	/**
 	 * Render the paginator using a given Presenter.
 	 *
 	 * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
