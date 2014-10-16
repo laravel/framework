@@ -26,13 +26,26 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 
 	public function testUpdateMethodUpdatesModelsWithTimestamps()
 	{
-		$relation = $this->getRelation();
-		$relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
-		$relation->getRelated()->shouldReceive('freshTimestamp')->once()->andReturn(100);
-		$relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		$relation->getQuery()->shouldReceive('update')->once()->with(array('foo' => 'bar', 'updated_at' => 100))->andReturn('results');
+		$query_builder = m::mock('Illuminate\Database\Query\Builder');
+		$query_builder->shouldReceive('update')->andReturn(array('foo' => 'bar', 'updated_at' => 100));
+		$query_builder->shouldReceive('from')->once();
+		$query_builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
 
-		$this->assertEquals('results', $relation->update(array('foo' => 'bar')));
+		$related = m::mock('Illuminate\Database\Eloquent\Model');
+		$related->shouldReceive('getTable')->once();
+		$related->shouldReceive('usesTimestamps')->once()->andReturn(true);
+		$related->shouldReceive('freshTimestampString')->once()->andReturn("100");
+		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+
+		$builder = new \Illuminate\Database\Eloquent\Builder($query_builder);
+		$builder->setModel($related);
+
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+
+		$relation = new HasMany($builder, $parent, 'table.foreign_key', 'id');
+
+		$this->assertEquals(array('foo' => 'bar', 'updated_at' => "100"), $relation->update(array('foo' => 'bar')));
 	}
 
 
@@ -96,6 +109,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
+
 		$parent = m::mock('Illuminate\Database\Eloquent\Model');
 		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
