@@ -73,7 +73,7 @@ class RouteServiceProvider extends ServiceProvider {
 			$this->scanRoutes();
 		}
 
-		if ($this->app->routesAreScanned())
+		if ( ! empty($this->scan) && $this->app->routesAreScanned())
 		{
 			$this->loadScannedRoutes();
 		}
