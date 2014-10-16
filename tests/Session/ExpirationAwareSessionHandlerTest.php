@@ -24,4 +24,5 @@ class ExpirationAwareSessionHandlerTest extends PHPUnit_Framework_TestCase {
 		$handler->setLifetime(200);
 		$this->assertEquals(200, $handler->getLifetime());
 	}
+
 }

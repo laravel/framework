@@ -12,7 +12,7 @@ interface ExpirationAwareInterface {
 	/**
 	 * Set the expiration time of session data in minutes
 	 *
-	 * @param  int   $lifetime
+	 * @param  int  $lifetime
 	 * @return int
 	 */
 	public function setLifetime($lifetime);
@@ -23,4 +23,5 @@ interface ExpirationAwareInterface {
 	 * @return bool
 	 */
 	public function garbageCollect();
+
 }

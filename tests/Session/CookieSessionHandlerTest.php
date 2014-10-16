@@ -18,4 +18,5 @@ class CookieSessionHandlerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(120, $handler->getLifetime());
 	}
+
 }

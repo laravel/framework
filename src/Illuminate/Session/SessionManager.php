@@ -162,7 +162,8 @@ class SessionManager extends Manager {
 	 */
 	protected function buildSession($handler)
 	{
-		if ($handler instanceof ExpirationAwareInterface) {
+		if ($handler instanceof ExpirationAwareInterface)
+		{
 			$handler->setLifetime($this->app['config']['session.lifetime']);
 		}
 

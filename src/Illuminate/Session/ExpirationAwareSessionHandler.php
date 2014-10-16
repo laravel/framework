@@ -14,21 +14,25 @@ abstract class ExpirationAwareSessionHandler implements SessionHandlerInterface,
 	/**
 	 * {@inheritDoc}
 	 */
-	public function setLifetime($lifetime) {
+	public function setLifetime($lifetime)
+	{
 		$this->lifetime = $lifetime;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getLifetime() {
+	public function getLifetime()
+	{
 		return $this->lifetime;
 	}
 
 	/**
 	 * Runs the garbage collection (gc) method using $lifetime
 	 */
-	public function garbageCollect() {
+	public function garbageCollect()
+	{
 		return $this->gc($this->lifetime * 60);
 	}
+
 }
