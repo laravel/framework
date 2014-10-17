@@ -99,4 +99,28 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 		$queue->migrateExpiredJobs('from', 'to');
 	}
 
+
+	public function testNotExpireJobsWhenExpireNull()
+	{
+		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'migrateAllExpiredJobs'), array($redis = m::mock('Illuminate\Redis\Database'), 'default', null, null));
+		$queue->setContainer(m::mock('Illuminate\Container\Container'));
+		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
+		$redis->shouldReceive('lpop')->once()->with('queues:default')->andReturn('foo');
+		$redis->shouldReceive('zadd')->once()->with('queues:default:reserved', 1, 'foo');
+
+		$result = $queue->pop();
+	}
+
+
+	public function testExpireJobsWhenExpireSet()
+	{
+		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'migrateAllExpiredJobs'), array($redis = m::mock('Illuminate\Redis\Database'), 'default', null, 30));
+		$queue->setContainer(m::mock('Illuminate\Container\Container'));
+		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
+		$redis->shouldReceive('lpop')->once()->with('queues:default')->andReturn('foo');
+		$redis->shouldReceive('zadd')->once()->with('queues:default:reserved', 31, 'foo');
+
+		$result = $queue->pop();
+	}
+
 }

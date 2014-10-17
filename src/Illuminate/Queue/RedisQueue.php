@@ -27,6 +27,13 @@ class RedisQueue extends Queue implements QueueInterface {
 	protected $default;
 
 	/**
+	 * The expiration time of a job.
+	 *
+	 * @var int|null
+	 */
+	protected $expire;
+
+	/**
 	 * Create a new Redis queue instance.
 	 *
 	 * @param  \Illuminate\Redis\Database  $redis
@@ -34,11 +41,12 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * @param  string  $connection
 	 * @return void
 	 */
-	public function __construct(Database $redis, $default = 'default', $connection = null)
+	public function __construct(Database $redis, $default = 'default', $connection = null, $expire = 60)
 	{
 		$this->redis = $redis;
 		$this->default = $default;
 		$this->connection = $connection;
+		$this->expire = $expire;
 	}
 
 	/**
@@ -115,13 +123,20 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$original = $queue ?: $this->default;
 
-		$this->migrateAllExpiredJobs($queue = $this->getQueue($queue));
+		$queue = $this->getQueue($queue);
+
+		$expire = $this->expire;
+
+		if (!is_null($expire))
+		{
+			$this->migrateAllExpiredJobs($queue);
+		}
 
 		$job = $this->redis->lpop($queue);
 
 		if ( ! is_null($job))
 		{
-			$this->redis->zadd($queue.':reserved', $this->getTime() + 60, $job);
+			$this->redis->zadd($queue.':reserved', $this->getTime() + $expire, $job);
 
 			return new RedisJob($this->container, $this, $job, $original);
 		}
