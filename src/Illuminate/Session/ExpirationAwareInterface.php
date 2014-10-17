@@ -3,14 +3,14 @@
 interface ExpirationAwareInterface {
 
 	/**
-	 * Get the expiration time of session data in minutes
+	 * Get the expiration time of session data in minutes.
 	 *
 	 * @return int
 	 */
 	public function getLifetime();
 
 	/**
-	 * Set the expiration time of session data in minutes
+	 * Set the expiration time of session data in minutes.
 	 *
 	 * @param  int  $lifetime
 	 * @return int
@@ -18,7 +18,7 @@ interface ExpirationAwareInterface {
 	public function setLifetime($lifetime);
 
 	/**
-	 * Runs the garbage collector using the minutes set in the lifetime
+	 * Runs the garbage collector using the minutes set in the lifetime.
 	 *
 	 * @return bool
 	 */

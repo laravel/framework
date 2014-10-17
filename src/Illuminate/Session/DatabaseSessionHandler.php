@@ -66,10 +66,7 @@ class DatabaseSessionHandler extends ExpirationAwareSessionHandler implements Ex
 		$session = $this->getQuery()->find($sessionId);
 
 		// If the session is null, no data
-		if (is_null($session))
-		{
-			return;
-		}
+		if (is_null($session)) return;
 
 		// Delete the session if it's still in the database but it has expired
 		if ($session->last_activity <= time() - ($this->lifetime * 60))
