@@ -24,6 +24,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @var array
 	 */
 	protected $compilers = array(
+		'EscapeBlock',
 		'Extensions',
 		'Statements',
 		'Comments',
@@ -710,5 +711,35 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		return $this->escapedTags;
 	}
+	
+	
+	/**
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public $escapeBlockContainer = array();
+	
+	
+	
+	/**
+	 * 
+	 * 
+	 * 
+	 */	
+
+	    public function compileEscapeBlock($value){
+	        $callback = function($match)
+	        {
+	            $count = count($this->escapeBlockContainer);
+	            $this->escapeBlockContainer['[['.$count.']]'] = $match[1];
+	            return '[['.$count.']]';
+	        };
+	
+	        return preg_replace_callback('#\@escape(.+?)\@endEscape#s', $callback, $value);
+	    }
+	
+	
 
 }
