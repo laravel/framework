@@ -279,17 +279,13 @@ class Str {
 	 *
 	 * @param  string  $value
 	 * @param  string  $delimiter
-	 * @param  bool    $each
 	 * @return string
 	 */
-	public static function snake($value, $delimiter = '_', $each = true)
+	public static function snake($value, $delimiter = '_')
 	{
 		if (ctype_lower($value)) return $value;
 
-		$replace = $each ? '$1'.$delimiter : '$1'.$delimiter.'$2';
-		$pattern = $each ? '/(.)(?=[A-Z])/' : '/(.)([A-Z]+)/';
-
-		return strtolower(preg_replace($pattern, $replace, $value));
+		return strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
 	}
 
 	/**
