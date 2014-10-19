@@ -281,7 +281,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 *
 	 * @return string
 	 */
-	public function getDefaultDriver()
+	public function getDefaultDatabaseDriver()
 	{
 		return array_get($this->getConfig(), 'driver');
 	}
