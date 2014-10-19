@@ -36,7 +36,7 @@ class ViewErrorBag implements Countable {
 	/**
 	 * Get all the bags.
 	 * 
-	 * @return $this->bags
+	 * @return array
 	 */
 	public function getBags()
 	{
