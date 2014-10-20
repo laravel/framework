@@ -29,6 +29,7 @@ class Kernel implements KernelContract {
 	protected $bootstrappers = [
 		'Illuminate\Foundation\Bootstrap\LoadEnvironment',
 		'Illuminate\Foundation\Bootstrap\LoadConfiguration',
+		'Illuminate\Foundation\Bootstrap\RegisterFacades',
 		'Illuminate\Foundation\Bootstrap\RegisterProviders',
 		'Illuminate\Foundation\Bootstrap\BootProviders',
 	];
