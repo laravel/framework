@@ -5,7 +5,7 @@ use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
-class Queue implements Middleware {
+class AddQueuedCookiesToRequest implements Middleware {
 
 	/**
 	 * The cookie jar instance.

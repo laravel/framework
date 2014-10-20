@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class Guard implements Middleware {
+class EncryptCookies implements Middleware {
 
 	/**
 	 * The encrypter instance.
