@@ -5,7 +5,7 @@ use Illuminate\Support\ViewErrorBag;
 use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 
-class ErrorBinder implements Middleware {
+class ShareErrorsFromSession implements Middleware {
 
 	/**
 	 * The view factory implementation.

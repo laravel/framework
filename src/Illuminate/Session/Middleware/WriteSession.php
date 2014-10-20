@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
 
-class Writer implements MiddlewareContract {
+class WriteSession implements MiddlewareContract {
 
 	use MiddlewareTrait;
 

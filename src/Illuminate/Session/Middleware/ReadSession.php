@@ -5,7 +5,7 @@ use Illuminate\Session\SessionManager;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
 
-class Reader implements MiddlewareContract {
+class ReadSession implements MiddlewareContract {
 
 	use MiddlewareTrait;
 
