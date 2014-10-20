@@ -36,6 +36,18 @@ class Request extends SymfonyRequest {
 	protected $routeResolver;
 
 	/**
+	 * Create a new Illuminate HTTP request from server variables.
+	 *
+	 * @return static
+	 */
+	public static function capture()
+	{
+		static::enableHttpMethodParameterOverride();
+
+		return static::createFromBase(SymfonyRequest::createFromGlobals());
+	}
+
+	/**
 	 * Return the Request instance.
 	 *
 	 * @return $this

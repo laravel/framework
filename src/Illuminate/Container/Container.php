@@ -11,6 +11,13 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 class Container implements ArrayAccess, ContainerContract {
 
 	/**
+	 * The current globally available container (if any).
+	 *
+	 * @var static
+	 */
+	protected static $instance;
+
+	/**
 	 * An array of the types that have been resolved.
 	 *
 	 * @var array
@@ -1050,6 +1057,27 @@ class Container implements ArrayAccess, ContainerContract {
 		$this->resolved = [];
 		$this->bindings = [];
 		$this->instances = [];
+	}
+
+	/**
+	 * Set the globally available instance of the container.
+	 *
+	 * @return static
+	 */
+	public static function getInstance()
+	{
+		return static::$instance;
+	}
+
+	/**
+	 * Set the shared instance of the container.
+	 *
+	 * @param  static  $container
+	 * @return void
+	 */
+	public static function setInstance(Container $container)
+	{
+		static::$instance = $container;
 	}
 
 	/**

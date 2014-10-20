@@ -5,6 +5,13 @@ use Illuminate\Contracts\Container\Container;
 interface Application extends Container {
 
 	/**
+	 * Get the version number of the application.
+	 *
+	 * @return string
+	 */
+	public function version();
+
+	/**
 	 * Get or check the current application environment.
 	 *
 	 * @param  mixed
@@ -18,6 +25,13 @@ interface Application extends Container {
 	 * @return bool
 	 */
 	public function isDownForMaintenance();
+
+	/**
+	 * Register all of the configured providers.
+	 *
+	 * @return void
+	 */
+	public function registerConfiguredProviders();
 
 	/**
 	 * Register a service provider with the application.
