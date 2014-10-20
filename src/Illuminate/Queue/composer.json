@@ -24,7 +24,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Illuminate\\Queuing\\": ""
+            "Illuminate\\Queue\\": ""
         },
         "classmap": [
             "IlluminateQueueClosure.php"
