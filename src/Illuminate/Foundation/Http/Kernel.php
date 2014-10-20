@@ -33,7 +33,13 @@ class Kernel implements KernelContract {
 	 *
 	 * @return void
 	 */
-	protected $bootstrappers = [];
+	protected $bootstrappers = [
+		'Illuminate\Foundation\Bootstrap\LoadEnvironment',
+		'Illuminate\Foundation\Bootstrap\HandleExceptions',
+		'Illuminate\Foundation\Bootstrap\LoadConfiguration',
+		'Illuminate\Foundation\Bootstrap\RegisterProviders',
+		'Illuminate\Foundation\Bootstrap\BootProviders',
+	];
 
 	/**
 	 * The application's middleware stack.
