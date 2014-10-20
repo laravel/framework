@@ -36,7 +36,7 @@ class LogServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return ['log'];
+		return ['log', 'Psr\Log\LoggerInterface'];
 	}
 
 }
