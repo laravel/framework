@@ -46,7 +46,7 @@ class Kernel implements KernelContract {
 	 *
 	 * @var array
 	 */
-	protected $stack = [];
+	protected $middleware = [];
 
 	/**
 	 * Create a new HTTP kernel instance.
@@ -74,7 +74,7 @@ class Kernel implements KernelContract {
 
 		return (new Stack($this->app))
 		            ->send($request)
-		            ->through($this->stack)
+		            ->through($this->middleware)
 		            ->then($this->dispatchToRouter());
 	}
 
