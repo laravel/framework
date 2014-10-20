@@ -18,7 +18,7 @@ class HandleExceptions {
 
 		ErrorHandler::register();
 
-		ExceptionHandler::register(strtolower(getenv('APP_DEBUG')) === 'yes');
+		ExceptionHandler::register($app['config']['app.debug']);
 
 		if ( ! $app->environment('testing'))
 		{
