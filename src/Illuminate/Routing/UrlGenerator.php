@@ -241,11 +241,11 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * Get the URL for a given route instance.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
-	 * @param  array  $parameters
-	 * @param  bool  $absolute
+	 * @param  mixed  $parameters
+	 * @param  bool   $absolute
 	 * @return string
 	 */
-	protected function toRoute($route, array $parameters, $absolute)
+	protected function toRoute($route, $parameters, $absolute)
 	{
 		$parameters = $this->formatParameters($parameters);
 

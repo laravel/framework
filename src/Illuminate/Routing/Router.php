@@ -528,17 +528,6 @@ class Router implements RegistrarContract {
 	}
 
 	/**
-	 * Dispatch the request to the application. Do not run any middleware.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
-	 */
-	public function dispatchWithoutMiddleware(Request $request)
-	{
-		return $this->dispatch($request, false);
-	}
-
-	/**
 	 * Dispatch the request to a route and return the response.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
