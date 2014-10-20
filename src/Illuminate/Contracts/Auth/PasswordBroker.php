@@ -9,14 +9,14 @@ interface PasswordBroker {
 	 *
 	 * @var int
 	 */
-	const RESET_LINK_SENT = 'reset.sent';
+	const RESET_LINK_SENT = 'reminders.sent';
 
 	/**
 	 * Constant representing a successfully reset password.
 	 *
 	 * @var int
 	 */
-	const PASSWORD_RESET = 'reset.done';
+	const PASSWORD_RESET = 'reminders.reset';
 
 	/**
 	 * Constant representing the user not found response.
