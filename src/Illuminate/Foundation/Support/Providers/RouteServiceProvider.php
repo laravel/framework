@@ -27,12 +27,7 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$router = $this->app['router'];
-
-		foreach ($this->middleware as $key => $value)
-		{
-			$router->middleware($key, $value);
-		}
+		$this->addMiddleware();
 
 		$this->app->call([$this, 'before']);
 
@@ -43,6 +38,21 @@ class RouteServiceProvider extends ServiceProvider {
 		else
 		{
 			$this->loadRoutes();
+		}
+	}
+
+	/**
+	 * Add the short-hand middleware names to the router.
+	 *
+	 * @return void
+	 */
+	protected function addMiddleware()
+	{
+		$router = $this->app['router'];
+
+		foreach ($this->middleware as $key => $value)
+		{
+			$router->middleware($key, $value);
 		}
 	}
 
