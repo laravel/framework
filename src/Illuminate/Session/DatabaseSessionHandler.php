@@ -86,6 +86,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAware
 				'id' => $sessionId, 'payload' => base64_encode($data), 'last_activity' => time(),
 			]);
 		}
+		
+		$this->exists = true;
 	}
 
 	/**
