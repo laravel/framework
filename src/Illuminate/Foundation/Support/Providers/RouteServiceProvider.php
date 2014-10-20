@@ -7,13 +7,6 @@ use Illuminate\Routing\Annotations\Scanner;
 class RouteServiceProvider extends ServiceProvider {
 
 	/**
-	 * The root namespace to assume when generating URLs to actions.
-	 *
-	 * @var string
-	 */
-	protected $rootUrlNamespace = null;
-
-	/**
 	 * The controllers to scan for route annotations.
 	 *
 	 * @var array
@@ -34,7 +27,12 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->app['url']->setRootControllerNamespace($this->rootUrlNamespace);
+		$router = $this->app['router'];
+
+		foreach ($this->middleware as $key => $value)
+		{
+			$router->middleware($key, $value);
+		}
 
 		$this->app->call([$this, 'before']);
 

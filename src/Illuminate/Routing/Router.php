@@ -7,13 +7,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Routing\RoutableInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Router implements HttpKernelInterface, RegistrarContract {
+class Router implements RegistrarContract {
 
 	/**
 	 * The event dispatcher instance.
@@ -592,11 +591,13 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	{
 		$middleware = $this->gatherRouteMiddlewares($route);
 
-		return (new Stack\Stack(function($request) use ($route)
-		{
-			return $route->run($request);
-
-		}, $middleware))->setContainer($this->container)->run($request);
+		return (new Stack($this->container))
+		                ->send($request)
+		                ->through($middleware)
+		                ->then(function($request) use ($route)
+						{
+							return $route->run($request);
+						});
 	}
 
 	/**
@@ -1290,19 +1291,6 @@ class Router implements HttpKernelInterface, RegistrarContract {
 	public function getPatterns()
 	{
 		return $this->patterns;
-	}
-
-	/**
-	 * Get the response for a given request.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  int   $type
-	 * @param  bool  $catch
-	 * @return \Illuminate\Http\Response
-	 */
-	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
-	{
-		return $this->dispatch(Request::createFromBase($request));
 	}
 
 }

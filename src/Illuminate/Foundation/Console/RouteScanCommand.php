@@ -45,7 +45,7 @@ class RouteScanCommand extends Command {
 		$provider = 'Illuminate\Foundation\Support\Providers\RouteServiceProvider';
 
 		return '<?php '.PHP_EOL.PHP_EOL.Scanner::create(
-			$this->laravel->getRegistered($provider)->scans()
+			$this->laravel->getProvider($provider)->scans()
 		)->getRouteDefinitions().PHP_EOL;
 	}
 

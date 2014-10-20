@@ -37,7 +37,7 @@ if ( ! function_exists('action'))
 if ( ! function_exists('app'))
 {
 	/**
-	 * Get the root Facade application instance.
+	 * Get the available container instance.
 	 *
 	 * @param  string  $make
 	 * @return mixed
@@ -49,7 +49,7 @@ if ( ! function_exists('app'))
 			return app()->make($make);
 		}
 
-		return Illuminate\Support\Facades\Facade::getFacadeApplication();
+		return Illuminate\Container\Container::getInstance();
 	}
 }
 
@@ -490,17 +490,17 @@ if ( ! function_exists('elixir'))
 	function elixir($file)
 	{
 		static $manifest = null;
-	
+
 		if (is_null($manifest))
 		{
 		    $manifest = json_decode(file_get_contents(public_path().'/build/rev-manifest.json'), true);
 		}
-	
+
 		if (isset($manifest[$file]))
 		{
 		    return '/build/'.$manifest[$file];
 		}
-		
+
 		throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
 	}
 

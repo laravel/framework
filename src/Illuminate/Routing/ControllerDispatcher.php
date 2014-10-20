@@ -4,7 +4,6 @@ use Closure;
 use ReflectionMethod;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
-use Illuminate\Routing\Stack\Stack;
 use Illuminate\Support\Collection;
 use Illuminate\Routing\RouteDependencyResolverTrait;
 
@@ -102,11 +101,13 @@ class ControllerDispatcher {
 		// Here we will make a stack onion instance to execute this request in, which gives
 		// us the ability to define middlewares on controllers. We will return the given
 		// response back out so that "after" filters can be run after the middlewares.
-		return (new Stack(function($request) use ($instance, $route, $method)
-		{
-			return $this->call($instance, $route, $method);
-
-		}, $middleware))->setContainer($this->container)->run($request);
+		return (new Stack($this->container))
+	                ->send($request)
+	                ->through($middleware)
+	                ->then(function($request) use ($instance, $route, $method)
+					{
+						return $this->call($instance, $route, $method);
+					});
 	}
 
 	/**
