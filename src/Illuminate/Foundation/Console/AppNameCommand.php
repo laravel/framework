@@ -89,8 +89,8 @@ class AppNameCommand extends Command {
 	protected function setAppDirectoryNamespace()
 	{
 		$files = Finder::create()
-                            ->in($this->laravel['path'])
-                            ->name('*.php');
+			->in($this->laravel['path'])
+			->name('*.php');
 
 		foreach ($files as $file)
 		{
@@ -127,7 +127,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function setServiceProviderNamespaceReferences()
 	{
-		$this->setReferencedMiddlewareNamespaces();
+		$this->setReferencedAppKernelNamespaces();
 
 		$this->setReferencedConsoleNamespaces();
 
@@ -135,15 +135,15 @@ class AppNameCommand extends Command {
 	}
 
 	/**
-	 * Set the namespace on the referenced middleware.
+	 * Set the namespace on the referenced commands in the bootstrap app file.
 	 *
 	 * @return void
 	 */
-	protected function setReferencedMiddlewareNamespaces()
+	protected function setReferencedAppKernelNamespaces()
 	{
 		$this->replaceIn(
-			$this->laravel['path'].'/Providers/AppServiceProvider.php',
-			$this->currentRoot.'\\Http\\Middleware', $this->argument('name').'\\Http\\Middleware'
+			$this->getBootstrapAppPath(),
+			$this->currentRoot.'\\Console\\Kernel', $this->argument('name').'\\Console\\Kernel'
 		);
 	}
 
@@ -256,6 +256,16 @@ class AppNameCommand extends Command {
 	protected function getComposerPath()
 	{
 		return $this->laravel['path.base'].'/composer.json';
+	}
+
+	/**
+	 * Get the path to the app.php file.
+	 *
+	 * @return string
+	 */
+	protected function getBootstrapAppPath()
+	{
+		return $this->laravel['path.base'].'/bootstrap/app.php';
 	}
 
 	/**
