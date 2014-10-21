@@ -35,6 +35,13 @@ class Kernel implements KernelContract {
 	];
 
 	/**
+	 * The Artisan commands provided by your application.
+	 *
+	 * @var array
+	 */
+	protected $commands = [];
+
+	/**
 	 * Create a new console kernel instance.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -58,7 +65,9 @@ class Kernel implements KernelContract {
 	{
 		$this->app->bootstrapWith($this->bootstrappers);
 
-		return (new Artisan($this->app, $this->events))->run($input, $output);
+		return (new Artisan($this->app, $this->events))
+		                        ->resolveCommands($this->commands)
+		                        ->run($input, $output);
 	}
 
 }

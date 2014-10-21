@@ -112,7 +112,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
 	 * Resolve an array of commands through the application.
 	 *
 	 * @param  array|mixed  $commands
-	 * @return void
+	 * @return $this
 	 */
 	public function resolveCommands($commands)
 	{
@@ -122,6 +122,8 @@ class Application extends SymfonyApplication implements ApplicationContract {
 		{
 			$this->resolve($command);
 		}
+
+		return $this;
 	}
 
 	/**
