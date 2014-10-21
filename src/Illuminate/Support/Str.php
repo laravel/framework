@@ -119,7 +119,7 @@ class Str {
 	 */
 	public static function limit($value, $limit = 100, $end = '...')
 	{
-		if (self::length($value) <= $limit) return $value;
+		if (static::length($value) <= $limit) return $value;
 
 		return rtrim(mb_substr($value, 0, $limit, 'UTF-8')).$end;
 	}
