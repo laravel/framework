@@ -143,6 +143,11 @@ class AppNameCommand extends Command {
 			$this->getBootstrapAppPath(),
 			$this->currentRoot.'\\Console\\Kernel', $this->argument('name').'\\Console\\Kernel'
 		);
+		
+		$this->replaceIn(
+			$this->getBootstrapAppPath(),
+			$this->currentRoot.'\\Http\\Kernel', $this->argument('name').'\\Http\\Kernel'
+		);
 	}
 
 	/**
