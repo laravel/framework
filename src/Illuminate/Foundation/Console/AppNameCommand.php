@@ -89,8 +89,8 @@ class AppNameCommand extends Command {
 	protected function setAppDirectoryNamespace()
 	{
 		$files = Finder::create()
-                            ->in($this->laravel['path'])
-                            ->name('*.php');
+			->in($this->laravel['path'])
+			->name('*.php');
 
 		foreach ($files as $file)
 		{
@@ -127,36 +127,21 @@ class AppNameCommand extends Command {
 	 */
 	protected function setServiceProviderNamespaceReferences()
 	{
-		$this->setReferencedMiddlewareNamespaces();
-
-		$this->setReferencedConsoleNamespaces();
+		$this->setReferencedAppKernelNamespaces();
 
 		$this->setReferencedRouteNamespaces();
 	}
 
 	/**
-	 * Set the namespace on the referenced middleware.
+	 * Set the namespace on the referenced commands in the bootstrap app file.
 	 *
 	 * @return void
 	 */
-	protected function setReferencedMiddlewareNamespaces()
+	protected function setReferencedAppKernelNamespaces()
 	{
 		$this->replaceIn(
-			$this->laravel['path'].'/Providers/AppServiceProvider.php',
-			$this->currentRoot.'\\Http\\Middleware', $this->argument('name').'\\Http\\Middleware'
-		);
-	}
-
-	/**
-	 * Set the namespace on the referenced commands in the Artisan service provider.
-	 *
-	 * @return void
-	 */
-	protected function setReferencedConsoleNamespaces()
-	{
-		$this->replaceIn(
-			$this->laravel['path'].'/Providers/ArtisanServiceProvider.php',
-			$this->currentRoot.'\\Console', $this->argument('name').'\\Console'
+			$this->getBootstrapAppPath(),
+			$this->currentRoot.'\\Console\\Kernel', $this->argument('name').'\\Console\\Kernel'
 		);
 	}
 
@@ -256,6 +241,16 @@ class AppNameCommand extends Command {
 	protected function getComposerPath()
 	{
 		return $this->laravel['path.base'].'/composer.json';
+	}
+
+	/**
+	 * Get the path to the app.php file.
+	 *
+	 * @return string
+	 */
+	protected function getBootstrapAppPath()
+	{
+		return $this->laravel['path.base'].'/bootstrap/app.php';
 	}
 
 	/**
