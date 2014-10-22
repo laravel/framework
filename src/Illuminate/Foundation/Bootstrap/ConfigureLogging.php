@@ -14,9 +14,7 @@ class ConfigureLogging {
 	 */
 	public function bootstrap(Application $app)
 	{
-		$app->instance('log', new Writer(new Monolog(
-			$app->environment()), $app['Illuminate\Contracts\Events\Dispatcher']
-		));
+		$app->instance('log', new Writer(new Monolog($app->environment()), $app['events']));
 
 		$app->bind('Psr\Log\LoggerInterface', function()
 		{
