@@ -61,7 +61,7 @@ class SQLiteGrammar extends Grammar {
 
 		$sql .= (string) $this->addPrimaryKeys($blueprint);
 
-		return $sql .= ')';
+		return $sql . ')';
 	}
 
 	/**
