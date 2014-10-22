@@ -14,8 +14,13 @@ class ConfigureLogging {
 	 */
 	public function bootstrap(Application $app)
 	{
-		$app->instance('log', new Writer(new Monolog($app->environment()), $app['events']));
+		$app->instance('log', new Writer(
+			new Monolog($app->environment()), $app['events'])
+		);
 
+		// Next we will bind the a Closure to resolve the PSR logger implementation
+		// as this will grant us the ability to be interoperable with many other
+		// libraries which are able to utilize the PSR standardized interface.
 		$app->bind('Psr\Log\LoggerInterface', function()
 		{
 			return $app['log']->getMonolog();
