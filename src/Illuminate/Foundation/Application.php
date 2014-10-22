@@ -1,16 +1,14 @@
 <?php namespace Illuminate\Foundation;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Routing\RoutingServiceProvider;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Request;
+use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class Application extends Container implements ApplicationContract {
 
