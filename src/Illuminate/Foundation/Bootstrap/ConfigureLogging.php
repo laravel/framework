@@ -1,9 +1,10 @@
 <?php namespace Illuminate\Foundation\Bootstrap;
 
-use Dotenv;
+use Illuminate\Log\Writer;
+use Monolog\Logger as Monolog;
 use Illuminate\Contracts\Foundation\Application;
 
-class LoadEnvironment {
+class ConfigureLogging {
 
 	/**
 	 * Bootstrap the given application.
@@ -13,14 +14,13 @@ class LoadEnvironment {
 	 */
 	public function bootstrap(Application $app)
 	{
-		if (file_exists($app['path.base'].'/.env'))
-		{
-			Dotenv::load($app['path.base']);
-		}
+		$app->instance('log', new Writer(new Monolog(
+			$app->environment()), $app['Illuminate\Contracts\Events\Dispatcher']
+		));
 
-		$app->detectEnvironment(function()
+		$app->bind('Psr\Log\LoggerInterface', function()
 		{
-			return getenv('APP_ENV') ?: 'production';
+			return $app['log']->getMonolog();
 		});
 	}
 
