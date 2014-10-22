@@ -1,11 +1,7 @@
 <?php namespace Illuminate\Pagination;
 
-use Closure;
-use Countable;
-use ArrayAccess;
 use ArrayIterator;
-use JsonSerializable;
-use IteratorAggregate;
+use Closure;
 
 abstract class AbstractPaginator {
 
