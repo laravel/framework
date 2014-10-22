@@ -61,7 +61,7 @@ class Kernel implements KernelContract {
 
 		$this->app->loadDeferredProviders();
 
-		return (new Artisan($this->app, $this->events))->run($input, $output);
+		return $this->app->make('artisan')->run($input, $output);
 	}
 
 	/**

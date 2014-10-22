@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Foundation\Artisan;
+use Illuminate\Console\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
@@ -68,7 +68,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		// entire Artisan command line then pass the method into the main app.
 		$this->app->bindShared('artisan', function($app)
 		{
-			return new Artisan($app);
+			return new Application($app, $app['events']);
 		});
 
 		foreach (array_keys($this->commands) as $command)
