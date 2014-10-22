@@ -67,6 +67,14 @@ class ProviderRepository {
 			$manifest['eager'] = $manifest['providers'];
 		}
 
+		// Next, we will register events to load the providers for each of the events
+		// that it has requested. This allows the service provider to defer itself
+		// while still getting automatically loaded when a certain event occurs.
+		foreach ($manifest['when'] as $provider => $events)
+		{
+			$this->registerLoadEvents($provider, $events);
+		}
+
 		// We will go ahead and register all of the eagerly loaded providers with the
 		// application so their services can be registered with the application as
 		// a provided service. Then we will set the deferred service list on it.
@@ -76,6 +84,25 @@ class ProviderRepository {
 		}
 
 		$this->app->setDeferredServices($manifest['deferred']);
+	}
+
+	/**
+	 * Register the load events for the given provider.
+	 *
+	 * @param  string  $provider
+	 * @param  array  $events
+	 * @return void
+	 */
+	protected function registerLoadEvents($provider, array $events)
+	{
+		if (count($events) < 1) return;
+
+		$app = $this->app;
+
+		$app->make('events')->listen($events, function() use ($app, $provider)
+		{
+			$app->register($provider);
+		});
 	}
 
 	/**
@@ -104,6 +131,8 @@ class ProviderRepository {
 				{
 					$manifest['deferred'][$service] = $provider;
 				}
+
+				$manifest['when'][$provider] = $instance->when();
 			}
 
 			// If the service providers are not deferred, we will simply add it to an
@@ -153,7 +182,9 @@ class ProviderRepository {
 		// deferred loading or should be eagerly loaded on each request to us.
 		if ($this->files->exists($this->manifestPath))
 		{
-			return json_decode($this->files->get($this->manifestPath), true);
+			$manifest = json_decode($this->files->get($this->manifestPath), true);
+
+			return array_merge(['when' => []], $manifest);
 		}
 	}
 
