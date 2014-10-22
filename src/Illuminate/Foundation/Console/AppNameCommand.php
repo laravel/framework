@@ -89,8 +89,8 @@ class AppNameCommand extends Command {
 	protected function setAppDirectoryNamespace()
 	{
 		$files = Finder::create()
-			->in($this->laravel['path'])
-			->name('*.php');
+			    ->in($this->laravel['path'])
+			    ->name('*.php');
 
 		foreach ($files as $file)
 		{
