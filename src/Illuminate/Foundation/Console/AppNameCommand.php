@@ -70,6 +70,8 @@ class AppNameCommand extends Command {
 	{
 		$this->currentRoot = trim($this->getAppNamespace(), '\\');
 
+		$this->setBootstrapNamespaces();
+
 		$this->setAppDirectoryNamespace();
 
 		$this->setConfigNamespaces();
@@ -89,15 +91,13 @@ class AppNameCommand extends Command {
 	protected function setAppDirectoryNamespace()
 	{
 		$files = Finder::create()
-                            ->in($this->laravel['path'])
-                            ->name('*.php');
+			->in($this->laravel['path'])
+			->name('*.php');
 
 		foreach ($files as $file)
 		{
 			$this->replaceNamespace($file->getRealPath());
 		}
-
-		$this->setServiceProviderNamespaceReferences();
 	}
 
 	/**
@@ -121,55 +121,18 @@ class AppNameCommand extends Command {
 	}
 
 	/**
-	 * Set the referenced namespaces in various service providers.
+	 * Set the bootstrap namespaces.
 	 *
 	 * @return void
 	 */
-	protected function setServiceProviderNamespaceReferences()
-	{
-		$this->setReferencedMiddlewareNamespaces();
-
-		$this->setReferencedConsoleNamespaces();
-
-		$this->setReferencedRouteNamespaces();
-	}
-
-	/**
-	 * Set the namespace on the referenced middleware.
-	 *
-	 * @return void
-	 */
-	protected function setReferencedMiddlewareNamespaces()
+	protected function setBootstrapNamespaces()
 	{
 		$this->replaceIn(
-			$this->laravel['path'].'/Providers/AppServiceProvider.php',
-			$this->currentRoot.'\\Http\\Middleware', $this->argument('name').'\\Http\\Middleware'
+			$this->getBootstrapPath(), $this->currentRoot.'\\Http', $this->argument('name').'\\Http'
 		);
-	}
 
-	/**
-	 * Set the namespace on the referenced commands in the Artisan service provider.
-	 *
-	 * @return void
-	 */
-	protected function setReferencedConsoleNamespaces()
-	{
 		$this->replaceIn(
-			$this->laravel['path'].'/Providers/ArtisanServiceProvider.php',
-			$this->currentRoot.'\\Console', $this->argument('name').'\\Console'
-		);
-	}
-
-	/**
-	 * Set the namespace on the referenced commands in the Routes service provider.
-	 *
-	 * @return void
-	 */
-	protected function setReferencedRouteNamespaces()
-	{
-		$this->replaceIn(
-			$this->laravel['path'].'/Providers/RouteServiceProvider.php',
-			$this->currentRoot.'\\Http', $this->argument('name').'\\Http'
+			$this->getBootstrapPath(), $this->currentRoot.'\\Console', $this->argument('name').'\\Console'
 		);
 	}
 
@@ -246,6 +209,16 @@ class AppNameCommand extends Command {
 	protected function getUserClassPath()
 	{
 		return $this->laravel['path'].'/Core/User.php';
+	}
+
+	/**
+	 * Get the path to the bootstrap/app.php file.
+	 *
+	 * @return string
+	 */
+	protected function getBootstrapPath()
+	{
+		return $this->laravel['path.base'].'/bootstrap/app.php';
 	}
 
 	/**
