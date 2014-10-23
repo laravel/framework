@@ -4,6 +4,7 @@ git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Cache:git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Config:git@github.com:illuminate/config.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Console:git@github.com:illuminate/console.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Container:git@github.com:illuminate/container.git
+git subsplit publish --heads="master" --no-tags src/Illuminate/Contracts:git@github.com:illuminate/contracts.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Cookie:git@github.com:illuminate/cookie.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Database:git@github.com:illuminate/database.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Encryption:git@github.com:illuminate/encryption.git

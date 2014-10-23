@@ -18,7 +18,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 				'queue.default' => 'sync',
 				'queue.connections.sync' => array('driver' => 'sync'),
 			),
-			'encrypter' => $encrypter = m::mock('Illuminate\Encryption\Encrypter'),
+			'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
 		);
 
 		$manager = new QueueManager($app);
@@ -40,7 +40,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase {
 				'queue.default' => 'sync',
 				'queue.connections.foo' => array('driver' => 'bar'),
 			),
-			'encrypter' => $encrypter = m::mock('Illuminate\Encryption\Encrypter'),
+			'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
 		);
 
 		$manager = new QueueManager($app);

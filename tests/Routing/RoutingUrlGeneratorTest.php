@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Contracts\Routing\UrlRoutable;
 
 class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
@@ -94,7 +95,45 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor')));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('taylor', 'otwell', 'wall', 'woz')));
 		$this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', array('baz' => 'åαф')));
+	}
 
+
+	public function testControllerRoutesWithADefaultNamespace()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$url->setRootControllerNamespace('namespace');
+
+		/**
+		 * Controller Route Route
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('controller' => 'namespace\foo@bar'));
+		$routes->add($route);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'something/else', array('controller' => 'something\foo@bar'));
+		$routes->add($route);
+
+		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
+		$this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
+	}
+
+	public function testRoutableInterfaceRouting()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/{bar}', array('as' => 'routable'));
+		$routes->add($route);
+
+		$model = new RoutableInterfaceStub;
+		$model->key = 'routable';
+
+		$this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
 	}
 
 
@@ -235,4 +274,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
 	}
 
+}
+
+class RoutableInterfaceStub implements UrlRoutable {
+	public $key;
+	public function getRouteKey() { return $this->{$this->getRouteKeyName()}; }
+	public function getRouteKeyName() { return 'key'; }
 }

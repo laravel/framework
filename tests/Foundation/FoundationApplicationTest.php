@@ -37,15 +37,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testForgetMiddleware()
-	{
-		$app = new ApplicationGetMiddlewaresStub;
-		$app->middleware('Illuminate\Http\FrameGuard');
-		$app->forgetMiddleware('Illuminate\Http\FrameGuard');
-		$this->assertEquals(0, count($app->getMiddlewares()));
-	}
-
-
 	public function testDeferredServicesMarkedAsBound()
 	{
 		$app = new Application;

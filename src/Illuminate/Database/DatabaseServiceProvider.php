@@ -25,6 +25,8 @@ class DatabaseServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->registerQueueableEntityResolver();
+
 		// The connection factory is used to create the actual connection instances on
 		// the database. We will inject the factory into the manager so that it may
 		// make the connections while they are actually needed and not of before.
@@ -39,6 +41,19 @@ class DatabaseServiceProvider extends ServiceProvider {
 		$this->app->bindShared('db', function($app)
 		{
 			return new DatabaseManager($app, $app['db.factory']);
+		});
+	}
+
+	/**
+	 * Register the queueable entity resolver implementation.
+	 *
+	 * @return void
+	 */
+	protected function registerQueueableEntityResolver()
+	{
+		$this->app->bindShared('Illuminate\Contracts\Queue\EntityResolver', function()
+		{
+			return new Eloquent\QueueEntityResolver;
 		});
 	}
 
