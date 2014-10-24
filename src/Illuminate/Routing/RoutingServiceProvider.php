@@ -49,11 +49,7 @@ class RoutingServiceProvider extends ServiceProvider {
 			// and all the registered routes will be available to the generator.
 			$app->instance('routes', $routes);
 
-			$url = new UrlGenerator(
-				$routes, $app->rebinding(
-					'request', $this->requestRebinder()
-				)
-			);
+			$url = new UrlGenerator($routes, $this->getRequestInstance());
 
 			// If the route collection is "rebound", for example, when the routes stay
 			// cached for the application, we will need to rebind the routes on the
@@ -65,6 +61,25 @@ class RoutingServiceProvider extends ServiceProvider {
 
 			return $url;
 		});
+	}
+
+	/**
+	 * Resolve/rebind or create a Request object.
+	 *
+	 * @return \Illuminate\Http\Request
+	 */
+	public function getRequestInstance()
+	{
+		$request = $this->app->rebinding('request', $this->requestRebinder());
+
+		if (is_null($request))
+		{
+			$request = \Illuminate\Http\Request::capture();
+
+			$this->app->instance('request', $request);
+		}
+
+		return $request;
 	}
 
 	/**
