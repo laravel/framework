@@ -22,21 +22,13 @@ class Kernel implements KernelContract {
 	protected $router;
 
 	/**
-	 * Indicates if the bootstrap process has run.
-	 *
-	 * @var bool
-	 */
-	protected $bootstrapped = false;
-
-	/**
 	 * The bootstrap classes for the application.
 	 *
 	 * @return void
 	 */
 	protected $bootstrappers = [
-		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
+		'Illuminate\Foundation\Bootstrap\LoadEnvironment',
 		'Illuminate\Foundation\Bootstrap\LoadConfiguration',
-		'Illuminate\Foundation\Bootstrap\ConfigureLogging',
 		'Illuminate\Foundation\Bootstrap\HandleExceptions',
 		'Illuminate\Foundation\Bootstrap\RegisterFacades',
 		'Illuminate\Foundation\Bootstrap\RegisterProviders',
@@ -87,12 +79,10 @@ class Kernel implements KernelContract {
 	 */
 	public function bootstrap()
 	{
-		if ( ! $this->bootstrapped)
+		if ( ! $this->app->hasBeenBootstrapped())
 		{
 			$this->app->bootstrapWith($this->bootstrappers);
 		}
-
-		$this->bootstrapped = true;
 	}
 
 	/**

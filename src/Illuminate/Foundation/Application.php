@@ -29,6 +29,13 @@ class Application extends Container implements ApplicationContract {
 	protected $basePath;
 
 	/**
+	 * Indicates if the application has been bootstrapped before.
+	 *
+	 * @var bool
+	 */
+	protected $hasBeenBootstrapped = false;
+
+	/**
 	 * Indicates if the application has "booted".
 	 *
 	 * @var bool
@@ -135,6 +142,18 @@ class Application extends Container implements ApplicationContract {
 		{
 			$this->make($bootstrapper)->bootstrap($this);
 		}
+
+		$this->hasBeenBootstrapped = true;
+	}
+
+	/**
+	 * Determine if the application has been bootstrapped before.
+	 *
+	 * @return bool
+	 */
+	public function hasBeenBootstrapped()
+	{
+		return $this->hasBeenBootstrapped;
 	}
 
 	/**

@@ -27,20 +27,12 @@ class Kernel implements KernelContract {
 	 * @return void
 	 */
 	protected $bootstrappers = [
-		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
+		'Illuminate\Foundation\Bootstrap\LoadEnvironment',
 		'Illuminate\Foundation\Bootstrap\LoadConfiguration',
-		'Illuminate\Foundation\Bootstrap\ConfigureLogging',
 		'Illuminate\Foundation\Bootstrap\RegisterFacades',
 		'Illuminate\Foundation\Bootstrap\RegisterProviders',
 		'Illuminate\Foundation\Bootstrap\BootProviders',
 	];
-
-	/**
-	 * The Artisan commands provided by your application.
-	 *
-	 * @var array
-	 */
-	protected $commands = [];
 
 	/**
 	 * Create a new console kernel instance.
@@ -64,11 +56,22 @@ class Kernel implements KernelContract {
 	 */
 	public function handle($input, $output = null)
 	{
-		$this->app->bootstrapWith($this->bootstrappers);
+		$this->bootstrap();
 
-		return (new Artisan($this->app, $this->events))
-		                        ->resolveCommands($this->commands)
-		                        ->run($input, $output);
+		return (new Artisan($this->app, $this->events))->run($input, $output);
+	}
+
+	/**
+	 * Bootstrap the application for HTTP requests.
+	 *
+	 * @return void
+	 */
+	public function bootstrap()
+	{
+		if ( ! $this->app->hasBeenBootstrapped())
+		{
+			$this->app->bootstrapWith($this->bootstrappers);
+		}
 	}
 
 }
