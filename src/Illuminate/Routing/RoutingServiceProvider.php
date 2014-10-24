@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Routing;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 
 class RoutingServiceProvider extends ServiceProvider {
@@ -72,9 +73,9 @@ class RoutingServiceProvider extends ServiceProvider {
 	{
 		$request = $this->app->rebinding('request', $this->requestRebinder());
 
-		if (is_null($request))
+		if ($request === null)
 		{
-			$request = \Illuminate\Http\Request::capture();
+			$request = Request::capture();
 
 			$this->app->instance('request', $request);
 		}
