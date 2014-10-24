@@ -127,37 +127,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function setServiceProviderNamespaceReferences()
 	{
-		$this->setReferencedMiddlewareNamespaces();
-
-		$this->setReferencedConsoleNamespaces();
-
 		$this->setReferencedRouteNamespaces();
-	}
-
-	/**
-	 * Set the namespace on the referenced middleware.
-	 *
-	 * @return void
-	 */
-	protected function setReferencedMiddlewareNamespaces()
-	{
-		$this->replaceIn(
-			$this->laravel['path'].'/Providers/AppServiceProvider.php',
-			$this->currentRoot.'\\Http\\Middleware', $this->argument('name').'\\Http\\Middleware'
-		);
-	}
-
-	/**
-	 * Set the namespace on the referenced commands in the Artisan service provider.
-	 *
-	 * @return void
-	 */
-	protected function setReferencedConsoleNamespaces()
-	{
-		$this->replaceIn(
-			$this->laravel['path'].'/Providers/ArtisanServiceProvider.php',
-			$this->currentRoot.'\\Console', $this->argument('name').'\\Console'
-		);
 	}
 
 	/**
