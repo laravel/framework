@@ -171,9 +171,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path))
 		{
-			$items = array_merge(
-				$items, $this->getRequire($path)
-			);
+			$items = $this->mergeEnvironment($items, $path);
 		}
 
 		return $items;
