@@ -3,8 +3,9 @@
 use Illuminate\Log\Writer;
 use Monolog\Logger as Monolog;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrapper as BootstrapperContract;
 
-class ConfigureLogging {
+class ConfigureLogging implements BootstrapperContract {
 
 	/**
 	 * Bootstrap the given application.

@@ -24,7 +24,7 @@ class Kernel implements KernelContract {
 	/**
 	 * The bootstrap classes for the application.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	protected $bootstrappers = [
 		'Illuminate\Foundation\Bootstrap\DetectEnvironment',

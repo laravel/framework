@@ -3,8 +3,9 @@
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrapper as BootstrapperContract;
 
-class HandleExceptions {
+class HandleExceptions implements BootstrapperContract {
 
 	/**
 	 * Bootstrap the given application.
