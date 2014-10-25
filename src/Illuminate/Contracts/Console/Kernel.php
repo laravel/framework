@@ -11,4 +11,13 @@ interface Kernel {
 	 */
 	public function handle($input, $output = null);
 
+	/**
+	 * Run an Artisan console command by name.
+	 *
+	 * @param  string  $command
+	 * @param  array  $parameters
+	 * @return int
+	 */
+	public function call($command, array $parameters = array());
+
 }

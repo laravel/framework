@@ -22,6 +22,13 @@ class Kernel implements KernelContract {
 	protected $events;
 
 	/**
+	 * The Artisan application instance.
+	 *
+	 * @var \Illuminate\Console\Application
+	 */
+	protected $artisan;
+
+	/**
 	 * The bootstrap classes for the application.
 	 *
 	 * @return void
@@ -59,9 +66,21 @@ class Kernel implements KernelContract {
 	{
 		$this->bootstrap();
 
-		$this->app->loadDeferredProviders();
+		return $this->getArtisan()->run($input, $output);
+	}
 
-		return (new Artisan($this->app, $this->events))->run($input, $output);
+	/**
+	 * Run an Artisan console command by name.
+	 *
+	 * @param  string  $command
+	 * @param  array  $parameters
+	 * @return int
+	 */
+	public function call($command, array $parameters = array())
+	{
+		$this->bootstrap();
+
+		return $this->getArtisan()->call($command, $parameters);
 	}
 
 	/**
@@ -75,6 +94,20 @@ class Kernel implements KernelContract {
 		{
 			$this->app->bootstrapWith($this->bootstrappers);
 		}
+
+		$this->app->loadDeferredProviders();
+	}
+
+	/**
+	 * Get the Artisan application instance.
+	 *
+	 * @return \Illuminate\Console\Application
+	 */
+	protected function getArtisan()
+	{
+		if ($this->artisan) return $this->artisan;
+
+		return $this->artisan = new Artisan($this->app, $this->events);
 	}
 
 }
