@@ -20,4 +20,11 @@ interface Kernel {
 	 */
 	public function call($command, array $parameters = array());
 
+	/**
+	 * Get the output for the last run command.
+	 *
+	 * @return string
+	 */
+	public function output();
+
 }

@@ -84,6 +84,18 @@ class Kernel implements KernelContract {
 	}
 
 	/**
+	 * Get the output for the last run command.
+	 *
+	 * @return string
+	 */
+	public function output()
+	{
+		$this->bootstrap();
+
+		return $this->getArtisan()->output();
+	}
+
+	/**
 	 * Bootstrap the application for HTTP requests.
 	 *
 	 * @return void
