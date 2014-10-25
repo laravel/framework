@@ -159,7 +159,17 @@ abstract class ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return [];
+	}
+
+	/**
+	 * Get the events that trigger this service provider to register.
+	 *
+	 * @return array
+	 */
+	public function when()
+	{
+		return [];
 	}
 
 	/**
