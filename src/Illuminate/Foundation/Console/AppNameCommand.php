@@ -143,7 +143,8 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/AppServiceProvider.php',
-			$this->currentRoot.'\\Http\\Middleware', $this->argument('name').'\\Http\\Middleware'
+			$this->currentRoot.'\\Http\\Middleware',
+			$this->argument('name').'\\Http\\Middleware'
 		);
 	}
 
@@ -156,7 +157,8 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/ArtisanServiceProvider.php',
-			$this->currentRoot.'\\Console', $this->argument('name').'\\Console'
+			$this->currentRoot.'\\Console',
+			$this->argument('name').'\\Console'
 		);
 	}
 
@@ -169,7 +171,8 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->laravel['path'].'/Providers/RouteServiceProvider.php',
-			$this->currentRoot.'\\Http', $this->argument('name').'\\Http'
+			$this->currentRoot.'\\Http',
+			$this->argument('name').'\\Http'
 		);
 	}
 
@@ -181,7 +184,9 @@ class AppNameCommand extends Command {
 	protected function setComposerNamespace()
 	{
 		$this->replaceIn(
-			$this->getComposerPath(), $this->currentRoot.'\\\\', $this->argument('name').'\\\\'
+			$this->getComposerPath(),
+			$this->currentRoot.'\\\\',
+			$this->argument('name').'\\\\'
 		);
 	}
 
@@ -205,11 +210,15 @@ class AppNameCommand extends Command {
 	protected function setAppConfigNamespaces()
 	{
 		$this->replaceIn(
-			$this->getConfigPath('app'), $this->currentRoot.'\\Providers', $this->argument('name').'\\Providers'
+			$this->getConfigPath('app'),
+			$this->currentRoot.'\\Providers',
+			$this->argument('name').'\\Providers'
 		);
 
 		$this->replaceIn(
-			$this->getConfigPath('app'), $this->currentRoot.'\\Http\\Controllers\\', $this->argument('name').'\\Http\\Controllers\\'
+			$this->getConfigPath('app'),
+			$this->currentRoot.'\\Http\\Controllers\\',
+			$this->argument('name').'\\Http\\Controllers\\'
 		);
 	}
 
@@ -221,7 +230,9 @@ class AppNameCommand extends Command {
 	protected function setAuthConfigNamespace()
 	{
 		$this->replaceIn(
-			$this->getAuthConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+			$this->getAuthConfigPath(),
+			$this->currentRoot.'\\User',
+			$this->argument('name').'\\User'
 		);
 	}
 
@@ -235,7 +246,10 @@ class AppNameCommand extends Command {
 	 */
 	protected function replaceIn($path, $search, $replace)
 	{
-		$this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
+		if ($this->files->exists($path))
+		{
+			$this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
+		}
 	}
 
 	/**
