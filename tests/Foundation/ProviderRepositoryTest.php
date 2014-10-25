@@ -15,7 +15,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array($app, m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__.'/services.json')));
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers'), 'when' => array()));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
 		$repo->shouldReceive('createProvider')->once()->with('foo')->andReturn($provider);
@@ -33,7 +33,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
 
 		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array($app, m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__.'/services.json')));
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers')));
+		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers'), 'when' => array()));
 		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
 		$provider = m::mock('Illuminate\Support\ServiceProvider');
 		$repo->shouldReceive('createProvider')->once()->with('providers')->andReturn($provider);
@@ -59,6 +59,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 		$repo->shouldReceive('createProvider')->once()->with('foo')->andReturn($fooMock = m::mock('StdClass'));
 		$fooMock->shouldReceive('isDeferred')->once()->andReturn(true);
 		$fooMock->shouldReceive('provides')->once()->andReturn(array('foo.provides1', 'foo.provides2'));
+		$fooMock->shouldReceive('when')->once()->andReturn(array());
 
 		// bar mock is added to eagers since it's not reserved
 		$repo->shouldReceive('createProvider')->once()->with('bar')->andReturn($barMock = m::mock('Illuminate\Support\ServiceProvider'));
@@ -89,7 +90,7 @@ class ProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	{
 		$repo = new Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.json');
 		$files->shouldReceive('exists')->once()->with(__DIR__.'/services.json')->andReturn(true);
-		$files->shouldReceive('get')->once()->with(__DIR__.'/services.json')->andReturn(json_encode($array = array('users' => array('dayle' => true))));
+		$files->shouldReceive('get')->once()->with(__DIR__.'/services.json')->andReturn(json_encode($array = array('users' => array('dayle' => true), 'when' => array())));
 
 		$this->assertEquals($array, $repo->loadManifest());
 	}
