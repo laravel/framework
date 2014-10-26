@@ -117,9 +117,12 @@ class Kernel implements KernelContract {
 	 */
 	protected function getArtisan()
 	{
-		if ($this->artisan) return $this->artisan;
+		if (is_null($this->artisan))
+		{
+			return $this->artisan = new Artisan($this->app, $this->events);
+		}
 
-		return $this->artisan = new Artisan($this->app, $this->events);
+		return $this->artisan;
 	}
 
 }
