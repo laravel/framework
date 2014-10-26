@@ -4,6 +4,8 @@ use Illuminate\Support\Collection;
 
 class MethodEndpoint implements EndpointInterface {
 
+	use EndpointTrait;
+
 	/**
 	 * The ReflectionClass instance for the controller class.
 	 *
@@ -112,27 +114,6 @@ class MethodEndpoint implements EndpointInterface {
 	}
 
 	/**
-	 * Determine if the middleware applies to a given method.
-	 *
-	 * @param  string  $method
-	 * @param  array  $middleware
-	 * @return bool
-	 */
-	protected function middlewareAppliesToMethod($method, array $middleware)
-	{
-		if ( ! empty($middleware['only']) && ! in_array($method, $middleware['only']))
-		{
-			return false;
-		}
-		elseif ( ! empty($middleware['except']) && in_array($method, $middleware['except']))
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Determine if the endpoint has any paths.
 	 *
 	 * @var bool
@@ -143,28 +124,6 @@ class MethodEndpoint implements EndpointInterface {
 	}
 
 	/**
-	 * Get the controller method for the given endpoint path.
-	 *
-	 * @param  AbstractPath  $path
-	 * @return string
-	 */
-	public function getMethodForPath(AbstractPath $path)
-	{
-		return $this->method;
-	}
-
-	/**
-	 * Add the given path definition to the endpoint.
-	 *
-	 * @param  AbstractPath  $path
-	 * @return void
-	 */
-	public function addPath(AbstractPath $path)
-	{
-		$this->paths[] = $path;
-	}
-
-	/**
 	 * Get all of the path definitions for an endpoint.
 	 *
 	 * @return array
@@ -172,31 +131,6 @@ class MethodEndpoint implements EndpointInterface {
 	public function getPaths()
 	{
 		return $this->paths;
-	}
-
-	/**
-	 * Implode the given list into a comma separated string.
-	 *
-	 * @param  array  $list
-	 * @return string
-	 */
-	protected function implodeArray(array $array)
-	{
-		$results = [];
-
-		foreach ($array as $key => $value)
-		{
-			if (is_string($key))
-			{
-				$results[] = "'".$key."' => '".$value."'";
-			}
-			else
-			{
-				$results[] = "'".$value."'";
-			}
-		}
-
-		return count($results) > 0 ? implode(', ', $results) : '';
 	}
 
 	/**
