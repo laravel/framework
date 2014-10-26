@@ -65,6 +65,12 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$routes->add($route);
 
 		/**
+		 * Single Parameter...
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz}', array('as' => 'foobar'));
+		$routes->add($route);
+
+		/**
 		 * HTTPS...
 		 */
 		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'baz', 'https'));
@@ -89,6 +95,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/bar?foo=bar', $url->route('foo', array('foo' => 'bar'), false));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall')));
 		$this->assertEquals('http://www.foo.com/foo/bar/otwell/breeze/taylor?fly=wall', $url->route('bar', array('boom' => 'taylor', 'baz' => 'otwell', 'fly' => 'wall')));
+		$this->assertEquals('http://www.foo.com/foo/bar/2', $url->route('foobar', 2));
+		$this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor'));
 		$this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall'), false));
 		$this->assertEquals('https://www.foo.com/foo/bar', $url->route('baz'));
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
@@ -120,6 +128,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
 	}
 
+
 	public function testRoutableInterfaceRouting()
 	{
 		$url = new UrlGenerator(
@@ -134,6 +143,23 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$model->key = 'routable';
 
 		$this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
+	}
+
+
+	public function testRoutableInterfaceRoutingWithSingleParameter()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/{bar}', array('as' => 'routable'));
+		$routes->add($route);
+
+		$model = new RoutableInterfaceStub;
+		$model->key = 'routable';
+
+		$this->assertEquals('/foo/routable', $url->route('routable', $model, false));
 	}
 
 
