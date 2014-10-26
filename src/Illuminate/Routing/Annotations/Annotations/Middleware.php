@@ -3,7 +3,6 @@
 use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Routing\Annotations\MethodEndpoint;
-use Illuminate\Routing\Annotations\EndpointInterface;
 use Illuminate\Routing\Annotations\EndpointCollection;
 
 /**

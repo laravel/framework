@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Foundation\Support\Providers;
 
-use Closure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Annotations\Scanner;
 
