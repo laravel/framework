@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Foundation\Artisan;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
@@ -63,14 +62,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		// This Artisan class is a lightweight wrapper for calling into the Artisan
-		// command line. If a call to this class is executed we will boot up the
-		// entire Artisan command line then pass the method into the main app.
-		$this->app->bindShared('artisan', function($app)
-		{
-			return new Artisan($app);
-		});
-
 		foreach (array_keys($this->commands) as $command)
 		{
 			$method = "register{$command}Command";
@@ -322,7 +313,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array_merge(['artisan'], array_values($this->commands));
+		return array_values($this->commands);
 	}
 
 }
