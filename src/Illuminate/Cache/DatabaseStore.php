@@ -73,7 +73,7 @@ class DatabaseStore implements StoreInterface {
 			{
 				$this->forget($key);
 
-				return null;
+				return;
 			}
 
 			return $this->encrypter->decrypt($cache->value);

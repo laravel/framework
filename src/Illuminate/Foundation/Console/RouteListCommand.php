@@ -183,7 +183,7 @@ class RouteListCommand extends Command {
 		if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
 			 $this->option('path') && ! str_contains($route['uri'], $this->option('path')))
 		{
-			return null;
+			return;
 		}
 
 		return $route;
