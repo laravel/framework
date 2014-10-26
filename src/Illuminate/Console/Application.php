@@ -27,6 +27,13 @@ class Application extends SymfonyApplication implements ApplicationContract {
 	protected $events;
 
 	/**
+	 * The output from the previous command.
+	 *
+	 * @var \Symfony\Component\Console\Output\OutputInterface
+	 */
+	protected $lastOutput;
+
+	/**
 	 * Create a new Artisan console application.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $laravel
