@@ -57,6 +57,13 @@ class Application extends Container implements ApplicationContract {
 	protected $bootedCallbacks = array();
 
 	/**
+	 * The array of shutdown callbacks.
+	 *
+	 * @var array
+	 */
+	protected $shutdownCallbacks = array();
+
+	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
@@ -665,14 +672,36 @@ class Application extends Container implements ApplicationContract {
 	}
 
 	/**
-	 * Handle the given request and get the response.
+	 * Register a "shutdown" callback.
+	 *
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function shutdown(callable $callback = null)
+	{
+		if (is_null($callback))
+		{
+			$this->fireAppCallbacks($this->shutdownCallbacks);
+		}
+		else
+		{
+			$this->shutdownCallbacks[] = $callback;
+		}
+	}
+
+	/**
+	 * Handle the given request and send the response.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return void
 	 */
 	protected function run(SymfonyRequest $request)
 	{
-		return $this->make('Illuminate\Contracts\Http\Kernel')->run(Request::createFromBase($request));
+		$response = $this->make('Illuminate\Contracts\Http\Kernel')->run(Request::createFromBase($request));
+
+		$response->send();
+
+		$this->shutdown();
 	}
 
 	/**
