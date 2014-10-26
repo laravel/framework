@@ -2,13 +2,14 @@
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Dispatcher implements DispatcherContract {
 
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
@@ -43,10 +44,10 @@ class Dispatcher implements DispatcherContract {
 	/**
 	 * Create a new event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
-	public function __construct(Container $container = null)
+	public function __construct(ContainerContract $container = null)
 	{
 		$this->container = $container ?: new Container;
 	}
