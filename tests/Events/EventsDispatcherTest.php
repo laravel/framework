@@ -109,4 +109,20 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $_SERVER['__event.test']);
 	}
 
+	public function testAsyncFiringQueueTheEvent()
+	{
+		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
+		$d->setQueueConnection($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
+
+		$queue->shouldReceive('push')->with(m::type('callable'))->once()->andReturn(true);
+		$this->assertTrue($d->fireAsync('async.event', ['data']));
+	}
+
+	public function testAsyncFiringRequiresObjectOfQueueContract()
+	{
+		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
+
+		$this->setExpectedException('RuntimeException');
+		$d->fireAsync('async.event', ['data']);
+	}
 }
