@@ -126,7 +126,7 @@ abstract class Controller {
 	 * Determine if a filter is a local method on the controller.
 	 *
 	 * @param  mixed  $filter
-	 * @return boolean
+	 * @return bool
 	 *
 	 * @throws \InvalidArgumentException
 	 */
@@ -168,7 +168,7 @@ abstract class Controller {
 	 * Remove the given controller filter from the provided filter array.
 	 *
 	 * @param  string  $removing
-	 * @param  array  $current
+	 * @param  array   $current
 	 * @return array
 	 */
 	protected function removeFilter($removing, $current)
