@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Events\Annotations;
 
-use SplFileInfo;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Doctrine\Common\Annotations\AnnotationRegistry;

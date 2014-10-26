@@ -1,11 +1,8 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
-use ReflectionMethod;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
-use Illuminate\Support\Collection;
-use Illuminate\Routing\RouteDependencyResolverTrait;
 
 class ControllerDispatcher {
 
