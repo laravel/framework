@@ -388,7 +388,7 @@ class Container implements ArrayAccess, ContainerContract {
 
 		foreach ($tags as $tag)
 		{
-			array_add($this->tags, $tag, []);
+			if ( ! isset($this->tags[$tag])) $this->tags[$tag] = [];
 
 			foreach ((array) $abstracts as $abstract)
 			{
