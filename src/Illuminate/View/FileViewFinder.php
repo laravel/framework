@@ -223,7 +223,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 * Returns whether or not the view specify a hint information.
 	 *
 	 * @param  string  $name
-	 * @return boolean
+	 * @return bool
 	 */
 	public function hasHintInformation($name)
 	{
