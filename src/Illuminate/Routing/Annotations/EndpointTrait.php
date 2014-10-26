@@ -26,7 +26,7 @@ trait EndpointTrait {
 	/**
 	 * Get the controller method for the given endpoint path.
 	 *
-	 * @param  AbstractPath  $path
+	 * @param  \Illuminate\Routing\Annotations\AbstractPath  $path
 	 * @return string
 	 */
 	public function getMethodForPath(AbstractPath $path)
@@ -37,7 +37,7 @@ trait EndpointTrait {
 	/**
 	 * Add the given path definition to the endpoint.
 	 *
-	 * @param  AbstractPath  $path
+	 * @param  \Illuminate\Routing\Annotations\AbstractPath  $path
 	 * @return void
 	 */
 	public function addPath(AbstractPath $path)
