@@ -792,7 +792,7 @@ class Router implements RegistrarContract {
 	{
 		$this->bind($key, function($value) use ($class, $callback)
 		{
-			if (is_null($value)) return null;
+			if (is_null($value)) return;
 
 			// For model binders, we will attempt to retrieve the models using the first
 			// method on the model instance. If we cannot retrieve the models we'll
