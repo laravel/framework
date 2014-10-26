@@ -665,17 +665,6 @@ class Application extends Container implements ApplicationContract {
 	}
 
 	/**
-	 * Handle the given request and get the response.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	protected function run(SymfonyRequest $request)
-	{
-		return $this->make('Illuminate\Contracts\Http\Kernel')->run(Request::createFromBase($request));
-	}
-
-	/**
 	 * Call the booting callbacks for the application.
 	 *
 	 * @param  array  $callbacks
