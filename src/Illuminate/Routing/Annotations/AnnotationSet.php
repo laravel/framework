@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Routing\Annotations;
 
 use ReflectionClass;
-use Illuminate\Support\Collection;
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
 
 class AnnotationSet {

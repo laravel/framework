@@ -8,10 +8,8 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
-use Illuminate\Routing\Controller as BaseController;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
-use Illuminate\Routing\RouteDependencyResolverTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Route {
