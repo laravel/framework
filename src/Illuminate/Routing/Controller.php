@@ -1,8 +1,6 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Container\Container;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Controller {
 

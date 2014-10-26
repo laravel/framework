@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Routing\Annotations\Annotations;
 
 use ReflectionClass;
-use ReflectionMethod;
 use Illuminate\Routing\Annotations\EndpointCollection;
 
 /**

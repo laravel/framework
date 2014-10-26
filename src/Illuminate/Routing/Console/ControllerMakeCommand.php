@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Routing\Console;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
