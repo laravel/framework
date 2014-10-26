@@ -1413,7 +1413,7 @@ class Validator implements ValidatorContract {
 		}
 		catch (\Exception $e)
 		{
-			return null;
+			return;
 		}
 	}
 

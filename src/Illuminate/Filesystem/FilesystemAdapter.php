@@ -294,7 +294,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	protected function parseVisibility($visibility)
 	{
-		if (is_null($visibility)) return null;
+		if (is_null($visibility)) return;
 
 		switch ($visibility)
 		{
