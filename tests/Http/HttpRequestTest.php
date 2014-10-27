@@ -348,6 +348,23 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(1 => 'A', 2 => 'B', 3 => 'C'), $request2->all());
 	}
 
+    public function testInputWithEmptyFilename()
+    {
+        $invalidFiles = [
+            'file' => [
+                'name' => null,
+                'type' => null,
+                'tmp_name' => null,
+                'error' => 4,
+                'size' => 0
+            ]
+        ];
+
+        $baseRequest = \Symfony\Component\HttpFoundation\Request::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), $invalidFiles);
+
+        $request = Request::createFromBase($baseRequest);
+    }
+
 
 	public function testOldMethodCallsSession()
 	{
