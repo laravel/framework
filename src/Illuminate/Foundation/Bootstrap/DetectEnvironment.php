@@ -2,8 +2,9 @@
 
 use Dotenv;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrapper as BootstrapperContract;
 
-class DetectEnvironment {
+class DetectEnvironment implements BootstrapperContract {
 
 	/**
 	 * Bootstrap the given application.

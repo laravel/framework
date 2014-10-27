@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrapper as BootstrapperContract;
 
-class RegisterProviders {
+class RegisterProviders implements BootstrapperContract {
 
 	/**
 	 * Bootstrap the given application.

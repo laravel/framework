@@ -4,8 +4,9 @@ use Illuminate\Config\FileLoader;
 use Illuminate\Config\Repository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrapper as BootstrapperContract;
 
-class LoadConfiguration {
+class LoadConfiguration implements BootstrapperContract {
 
 	/**
 	 * Bootstrap the given application.

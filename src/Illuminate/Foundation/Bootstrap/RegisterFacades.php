@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrapper as BootstrapperContract;
 
-class RegisterFacades {
+class RegisterFacades implements BootstrapperContract {
 
 	/**
 	 * Bootstrap the given application.

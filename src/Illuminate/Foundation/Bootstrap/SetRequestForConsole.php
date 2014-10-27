@@ -2,8 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrapper as BootstrapperContract;
 
-class SetRequestForConsole {
+class SetRequestForConsole implements BootstrapperContract {
 
 	/**
 	 * Bootstrap the given application.
