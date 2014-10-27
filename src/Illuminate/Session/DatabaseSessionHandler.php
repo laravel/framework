@@ -4,6 +4,7 @@ use SessionHandlerInterface;
 use Illuminate\Database\ConnectionInterface;
 
 class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface, ExpirationAwareInterface {
+
 	use ExpirationAwareTrait;
 
 	/**
