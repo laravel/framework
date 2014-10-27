@@ -80,6 +80,6 @@ interface Application extends Container {
 	 *
 	 * @return bool
 	 */
-	public function hasBeenBootstrapped()
+	public function hasBeenBootstrapped();
 
 }
