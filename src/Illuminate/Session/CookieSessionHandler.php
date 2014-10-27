@@ -4,7 +4,8 @@ use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
-class CookieSessionHandler implements SessionHandlerInterface {
+class CookieSessionHandler implements SessionHandlerInterface, ExpirationAwareInterface {
+	use ExpirationAwareTrait;
 
 	/**
 	 * The cookie jar instance.
@@ -23,14 +24,13 @@ class CookieSessionHandler implements SessionHandlerInterface {
 	/**
 	 * Create a new cookie driven handler instance.
 	 *
-	 * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
+	 * @param  \Illuminate\Contracts\Cookie\Factory  $cookie
 	 * @param  int  $minutes
 	 * @return void
 	 */
-	public function __construct(CookieJar $cookie, $minutes)
+	public function __construct(CookieJar $cookie)
 	{
 		$this->cookie = $cookie;
-		$this->minutes = $minutes;
 	}
 
 	/**
@@ -62,7 +62,7 @@ class CookieSessionHandler implements SessionHandlerInterface {
 	 */
 	public function write($sessionId, $data)
 	{
-		$this->cookie->queue($sessionId, $data, $this->minutes);
+		$this->cookie->queue($sessionId, $data, $this->lifetime);
 	}
 
 	/**
