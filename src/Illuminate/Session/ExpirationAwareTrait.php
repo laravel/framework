@@ -5,12 +5,14 @@ trait ExpirationAwareTrait {
 	/**
 	 * The total number of minutes that a session is valid for.
 	 *
-	 * @var int
+	 * @var int|null
 	 */
 	protected $lifetime = null;
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the number of minutes that a session is valid for.
+	 *
+	 * @param $lifetime  int
 	 */
 	public function setLifetime($lifetime)
 	{
@@ -28,7 +30,9 @@ trait ExpirationAwareTrait {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Gets the number of minutes that a session is valid for.
+	 *
+	 * @return int|null
 	 */
 	public function getLifetime()
 	{
@@ -36,7 +40,9 @@ trait ExpirationAwareTrait {
 	}
 
 	/**
-	 * Runs the garbage collection (gc) method using $lifetime.
+	 * Runs the garbage collection (gc) method using $this->lifetime.
+	 *
+	 * @return bool
 	 */
 	public function garbageCollect()
 	{
