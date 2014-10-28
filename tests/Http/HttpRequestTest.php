@@ -365,7 +365,6 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::createFromBase($baseRequest);
 	}
 
-
 	public function testOldMethodCallsSession()
 	{
 		$request = Request::create('/', 'GET');
