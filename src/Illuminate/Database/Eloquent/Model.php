@@ -1991,6 +1991,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Set whether the model uses timestamps.
+	 *
+	 * @param  bool  $value
+	 * @return void
+	 */
+	public function setTimestamps($value)
+	{
+		$this->timestamps = $value;
+	}
+
+	/**
 	 * Get the polymorphic relationship columns.
 	 *
 	 * @param  string  $name
