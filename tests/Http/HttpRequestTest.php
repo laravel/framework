@@ -348,6 +348,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(1 => 'A', 2 => 'B', 3 => 'C'), $request2->all());
 	}
 
+
 	public function testInputWithEmptyFilename()
 	{
 		$invalidFiles = [
@@ -364,6 +365,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 		$request = Request::createFromBase($baseRequest);
 	}
+
 
 	public function testOldMethodCallsSession()
 	{
