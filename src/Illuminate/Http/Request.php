@@ -599,7 +599,7 @@ class Request extends SymfonyRequest {
 	{
 		if ($request instanceof static) return $request;
 
-        return (new static)->duplicate(
+		return (new static)->duplicate(
 
 			$request->query->all(), $request->request->all(), $request->attributes->all(),
 
@@ -607,30 +607,30 @@ class Request extends SymfonyRequest {
 		);
 	}
 
-    /**
-     * Clones a request and overrides some of its parameters.
-     *
-     * @param array $query
-     * @param array $request
-     * @param array $attributes
-     * @param array $cookies
-     * @param array $files
-     * @param array $server
-     * @return Request
-     */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
-    {
-        if ($files != null) {
-            $files = array_filter($files, function ($file) {
-                return ($file != null);
-            });
-        }
+	/**
+	 * Clones a request and overrides some of its parameters.
+	 *
+	 * @param array $query
+	 * @param array $request
+	 * @param array $attributes
+	 * @param array $cookies
+	 * @param array $files
+	 * @param array $server
+	 * @return Request
+	 */
+	public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
+	{
+		if ($files != null) {
+			$files = array_filter($files, function ($file) {
+				return ($file != null);
+			});
+		}
 
-        return parent::duplicate($query, $request, $attributes, $cookies, $files, $server);
-    }
+		return parent::duplicate($query, $request, $attributes, $cookies, $files, $server);
+	}
 
-    /**
-     * Get the session associated with the request.
+	/**
+	 * Get the session associated with the request.
 	 *
 	 * @return \Illuminate\Session\Store
 	 *
