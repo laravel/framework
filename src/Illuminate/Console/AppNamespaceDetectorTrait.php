@@ -5,8 +5,9 @@ trait AppNamespaceDetectorTrait {
 	/**
 	 * Get the application namespace from the Composer file.
 	 *
-	 * @param  string  $namespacePath
 	 * @return string
+	 *
+	 * @throws \RuntimeException
 	 */
 	protected function getAppNamespace()
 	{
