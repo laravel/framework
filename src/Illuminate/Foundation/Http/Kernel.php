@@ -94,6 +94,8 @@ class Kernel implements KernelContract {
 	{
 		return function($request)
 		{
+			$this->app->instance('request', $request);
+
 			return $this->router->dispatch($request);
 		};
 	}
