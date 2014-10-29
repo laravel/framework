@@ -608,23 +608,11 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
-	 * Clone a request and overrides some of its parameters.
-	 *
-	 * @param  array  $query
-	 * @param  array  $request
-	 * @param  array  $attributes
-	 * @param  array  $cookies
-	 * @param  array  $files
-	 * @param  array  $server
-	 * @return \Illuminate\Http\Request
+	 * {@inheritdoc}
 	 */
 	public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
 	{
-		if ($files != null) {
-			$files = array_filter($files, function ($file) {
-				return ($file != null);
-			});
-		}
+		$files = array_filter((array) $files);
 
 		return parent::duplicate($query, $request, $attributes, $cookies, $files, $server);
 	}
