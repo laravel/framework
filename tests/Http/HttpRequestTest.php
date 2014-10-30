@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Illuminate\Http\Request;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase {
@@ -361,7 +362,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 			]
 		];
 
-		$baseRequest = \Symfony\Component\HttpFoundation\Request::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), $invalidFiles);
+		$baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), $invalidFiles);
 
 		$request = Request::createFromBase($baseRequest);
 	}
