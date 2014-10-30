@@ -50,9 +50,12 @@ class EncryptCookies implements Middleware {
 	{
 		foreach ($request->cookies as $key => $c)
 		{
-			try {
+			try
+			{
 				$request->cookies->set($key, $this->decryptCookie($c));
-			} catch (DecryptException $e) {
+			}
+			catch (DecryptException $e)
+			{
 				$request->cookies->set($key, null);
 			}
 		}

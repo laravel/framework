@@ -129,9 +129,12 @@ class Scanner {
 
 		foreach ($this->scan as $scan)
 		{
-			try {
+			try
+			{
 				$classes[] = new ReflectionClass($scan);
-			} catch (\Exception $e) {
+			}
+			catch (\Exception $e)
+			{
 				//
 			}
 		}
