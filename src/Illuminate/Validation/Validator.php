@@ -861,7 +861,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'max');
 
-		if ($value instanceof UploadedFile && ! $value->isValid()) return false;
+		if ($this->isAValidUploadedFileInstance($value) && ! $value->isValid()) return false;
 
 		return $this->getSize($attribute, $value) <= $parameters[0];
 	}
@@ -1167,18 +1167,29 @@ class Validator implements MessageProviderInterface {
 		return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
 	}
 
-	/**
-	 * Check that the given value is a valid file instance.
-	 *
-	 * @param  mixed  $value
-	 * @return bool
-	 */
-	protected function isAValidFileInstance($value)
-	{
-		if ($value instanceof UploadedFile && ! $value->isValid()) return false;
+    /**
+     * Check that the given value is a valid file instance.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isAValidFileInstance($value)
+    {
+        if ($this->isAValidUploadedFileInstance($value) && ! $value->isValid()) return false;
 
-		return $value instanceof File;
-	}
+        return $value instanceof File;
+    }
+
+    /**
+     * Check whether the given value is a valid UploadedFile instance.
+     *
+     * @param $value
+     * @return bool
+     */
+    protected function isAValidUploadedFileInstance($value)
+    {
+        return $value instanceof UploadedFile || $value instanceof Symfony\Component\HttpFoundation\File\UploadedFile;
+    }
 
 	/**
 	 * Validate that an attribute contains only alphabetic characters.
