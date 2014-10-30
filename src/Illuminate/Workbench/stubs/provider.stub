@@ -38,7 +38,7 @@ class {{name}}ServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return [];
 	}
 
 }
