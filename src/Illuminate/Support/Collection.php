@@ -445,5 +445,10 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return $this->toJson();
 	}
+	
+	public function getDot($key, $default = null)
+	{
+		return \Illuminate\Support\Arr::get($this->items, $key, $default);
+	}
 
 }
