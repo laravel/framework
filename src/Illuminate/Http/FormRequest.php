@@ -1,9 +1,6 @@
-<?php namespace Illuminate\Foundation\Http;
+<?php namespace Illuminate\Http;
 
-use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
 use Illuminate\Validation\Validator;
@@ -205,7 +202,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	 * Set the route handling the request.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
-	 * @return \Illuminate\Foundation\Http\FormRequest
+	 * @return \Illuminate\Http\FormRequest
 	 */
 	public function setRoute(Route $route)
 	{
@@ -218,7 +215,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	 * Set the Redirector instance.
 	 *
 	 * @param  \Illuminate\Routing\Redirector  $redirector
-	 * @return \Illuminate\Foundation\Http\FormRequest
+	 * @return \Illuminate\Http\FormRequest
 	 */
 	public function setRedirector(Redirector $redirector)
 	{
