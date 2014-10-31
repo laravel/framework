@@ -98,7 +98,7 @@ trait ApplicationTrait {
 	{
 		$uri = $this->app['url']->route($name, $routeParameters);
 
-		return $this->call($method, $uri, $parameters, $cookies, $files, $server, $content, $changeHistory);
+		return $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
 	}
 
 	/**
