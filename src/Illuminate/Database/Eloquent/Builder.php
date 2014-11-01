@@ -470,6 +470,25 @@ class Builder {
 
 		$models = $relation->initRelation($models, $name);
 
+		// Check for foreign key with a null value for belongsTo relations to avoid the creation of
+		// unnecessary query that obviously returns an empty result
+		if(is_a($relation, 'Illuminate\Database\Eloquent\Relations\BelongsTo'))
+		{
+			$keys = array();
+			foreach ($models as $model)
+			{
+				if ( ! is_null($value = $model->{$relation->getForeignKey()}))
+				{
+					$keys[] = $value;
+				}
+			}
+
+			if (count($keys) == 0)
+			{
+				return $relation->match($models, new Collection, $name);
+			}
+		}
+
 		// Once we have the results, we just match those back up to their parent models
 		// using the relationship instance. Then we just return the finished arrays
 		// of models which have been eagerly hydrated and are readied for return.
