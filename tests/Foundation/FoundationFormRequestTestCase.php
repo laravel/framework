@@ -86,7 +86,7 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 
 }
 
-class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest {
+class FoundationTestFormRequestStub extends Illuminate\Http\FormRequest {
 	public function rules(StdClass $dep) {
 		return ['name' => 'required'];
 	}
@@ -98,7 +98,7 @@ class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormReque
 	}
 }
 
-class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\FormRequest {
+class FoundationTestFormRequestForbiddenStub extends Illuminate\Http\FormRequest {
 	public function rules() {
 		return ['name' => 'required'];
 	}

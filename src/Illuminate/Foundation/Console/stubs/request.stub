@@ -1,6 +1,6 @@
 <?php namespace {{namespace}};
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\FormRequest;
 
 class {{class}} extends FormRequest {
 
