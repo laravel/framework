@@ -376,6 +376,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 1, 1 => 2, 2 => 3), $builder->getBindings());
 	}
 
+
 	public function testUnionOrderBys()
 	{
 		$builder = $this->getBuilder();
@@ -386,6 +387,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
 	}
 
+
 	public function testUnionLimitsAndOffsets()
 	{
 		$builder = $this->getBuilder();
@@ -394,6 +396,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->skip(5)->take(10);
 		$this->assertEquals('select * from "users" union select * from "dogs" limit 10 offset 5', $builder->toSql());
 	}
+
 
 	public function testMySqlUnionOrderBys()
 	{
@@ -405,6 +408,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
 	}
 
+
 	public function testMySqlUnionLimitsAndOffsets()
 	{
 		$builder = $this->getMySqlBuilder();
@@ -413,6 +417,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->skip(5)->take(10);
 		$this->assertEquals('(select * from `users`) union (select * from `dogs`) limit 10 offset 5', $builder->toSql());
 	}
+
 
 	public function testSubSelectWhereIns()
 	{
