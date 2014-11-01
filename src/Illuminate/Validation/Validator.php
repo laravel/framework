@@ -395,6 +395,7 @@ class Validator implements MessageProviderInterface {
 		if ($this->hasRule($attribute, array('Sometimes')))
 		{
 			return array_key_exists($attribute, array_dot($this->data))
+				|| in_array($attribute, array_keys($this->data))
                 || array_key_exists($attribute, $this->files);
 		}
 
