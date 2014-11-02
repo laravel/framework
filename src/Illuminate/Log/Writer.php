@@ -316,10 +316,12 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	protected function parseLevel($level)
 	{
-		return array_get($this->levels, $level, function ()
+		if (isset($this->levels[$level]))
 		{
-			throw new \InvalidArgumentException("Invalid log level.");
-		});
+			return $this->levels[$level];
+		}
+
+		throw new \InvalidArgumentException("Invalid log level.");
 	}
 
 	/**
