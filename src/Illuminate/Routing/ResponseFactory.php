@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Routing;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Support\Arrayable;
@@ -130,7 +129,7 @@ class ResponseFactory implements FactoryContract {
 
 		if ( ! is_null($name))
 		{
-			return $response->setContentDisposition($disposition, $name, Str::ascii($name));
+			return $response->setContentDisposition($disposition, $name, str_ascii($name));
 		}
 
 		return $response;
