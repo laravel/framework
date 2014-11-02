@@ -1,5 +1,6 @@
 {
     "name": "illuminate/console",
+    "description": "The Illuminate Console package.",
     "license": "MIT",
     "authors": [
         {

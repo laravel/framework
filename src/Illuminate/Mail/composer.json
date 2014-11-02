@@ -1,5 +1,6 @@
 {
     "name": "illuminate/mail",
+    "description": "The Illuminate Mail package.",
     "license": "MIT",
     "authors": [
         {
