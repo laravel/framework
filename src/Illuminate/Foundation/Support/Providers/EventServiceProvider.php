@@ -18,7 +18,7 @@ class EventServiceProvider extends ServiceProvider {
 	 *
 	 * @var bool
 	 */
-	protected $scanWhenLocal = true;
+	protected $scanWhenLocal = false;
 
 	/**
 	 * Register the application's event listeners.

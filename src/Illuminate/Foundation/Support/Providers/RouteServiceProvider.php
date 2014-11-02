@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider {
 	 *
 	 * @var bool
 	 */
-	protected $scanWhenLocal = true;
+	protected $scanWhenLocal = false;
 
 	/**
 	 * Register the service provider.
