@@ -27,6 +27,8 @@ class ControllerInspector {
 
 		$reflection = new ReflectionClass($controller);
 
+		if ($reflection->name == 'Illuminate\Routing\Controller') return $routable;
+
 		$methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
 
 		// To get the routable methods, we will simply spin through all methods on the
@@ -61,8 +63,6 @@ class ControllerInspector {
 	 */
 	public function isRoutable(ReflectionMethod $method)
 	{
-		if ($method->class == 'Illuminate\Routing\Controller') return false;
-
 		return starts_with($method->name, $this->verbs);
 	}
 
