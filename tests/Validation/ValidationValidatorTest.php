@@ -30,23 +30,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
 		$v->setContainer(new Illuminate\Container\Container);
-		$v->after(function()
+		$v->after(function($validator)
 		{
 			$_SERVER['__validator.after.test'] = true;
 		});
-
-		$this->assertFalse($v->passes());
-		$this->assertTrue($_SERVER['__validator.after.test']);
-
-		unset($_SERVER['__validator.after.test']);
-
-		/**
-		 * Class Based Callback
-		 */
-		$trans = $this->getRealTranslator();
-		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
-		$v->setContainer(new Illuminate\Container\Container);
-		$v->after('ValidatorTestAfterCallbackStub');
 
 		$this->assertFalse($v->passes());
 		$this->assertTrue($_SERVER['__validator.after.test']);
@@ -948,9 +935,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('x' => 'http://google.com'), array('x' => 'active_url'));
 		$this->assertTrue($v->passes());
-		
+
 		$v = new Validator($trans, array('x' => 'http://www.google.com'), array('x' => 'active_url'));
-		$this->assertTrue($v->passes());		
+		$this->assertTrue($v->passes());
 	}
 
 
