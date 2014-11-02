@@ -235,4 +235,19 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
 	}
 
+
+	public function testPrevious()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$url->getRequest()->headers->set('referer', 'http://www.bar.com/');
+		$this->assertEquals('http://www.bar.com/', $url->previous());
+
+		$url->getRequest()->headers->remove('referer');
+		$this->assertEquals($url->to('/'), $url->previous());
+	}
+
 }
