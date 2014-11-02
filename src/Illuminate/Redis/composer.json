@@ -1,5 +1,6 @@
 {
     "name": "illuminate/redis",
+    "description": "The Illuminate Redis package.",
     "license": "MIT",
     "authors": [
         {

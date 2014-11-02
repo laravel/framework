@@ -1,5 +1,6 @@
 {
     "name": "illuminate/log",
+    "description": "The Illuminate Log package.",
     "license": "MIT",
     "authors": [
         {

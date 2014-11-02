@@ -1,5 +1,6 @@
 {
     "name": "illuminate/support",
+    "description": "The Illuminate Support package.",
     "license": "MIT",
     "authors": [
         {

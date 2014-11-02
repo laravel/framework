@@ -1,5 +1,6 @@
 {
     "name": "illuminate/auth",
+    "description": "The Illuminate Auth package.",
     "license": "MIT",
     "authors": [
         {
