@@ -107,17 +107,19 @@ class AppNameCommand extends Command {
 	 */
 	protected function replaceNamespace($path)
 	{
-		$this->replaceIn(
-			$path, 'namespace '.$this->currentRoot.';', 'namespace '.$this->argument('name').';'
-		);
+		$search = [
+			'namespace '.$this->currentRoot.';',
+			'namespace '.$this->currentRoot.'\\',
+			$this->currentRoot.'\\',
+		];
 
-		$this->replaceIn(
-			$path, 'namespace '.$this->currentRoot.'\\', 'namespace '.$this->argument('name').'\\'
-		);
+		$replace = [
+			'namespace '.$this->argument('name').';',
+			'namespace '.$this->argument('name').'\\',
+			$this->argument('name').'\\',
+		];
 
-		$this->replaceIn(
-			$path, $this->currentRoot.'\\', $this->argument('name').'\\'
-		);
+		$this->replaceIn($path, $search, $replace);
 	}
 
 	/**
@@ -127,13 +129,17 @@ class AppNameCommand extends Command {
 	 */
 	protected function setBootstrapNamespaces()
 	{
-		$this->replaceIn(
-			$this->getBootstrapPath(), $this->currentRoot.'\\Http', $this->argument('name').'\\Http'
-		);
+		$search = [
+			$this->currentRoot.'\\Http',
+			$this->currentRoot.'\\Console',
+		];
 
-		$this->replaceIn(
-			$this->getBootstrapPath(), $this->currentRoot.'\\Console', $this->argument('name').'\\Console'
-		);
+		$replace = [
+			$this->argument('name').'\\Http',
+			$this->argument('name').'\\Console',
+		];
+
+		$this->replaceIn($this->getBootstrapPath(), $search, $replace);
 	}
 
 	/**
@@ -167,13 +173,17 @@ class AppNameCommand extends Command {
 	 */
 	protected function setAppConfigNamespaces()
 	{
-		$this->replaceIn(
-			$this->getConfigPath('app'), $this->currentRoot.'\\Providers', $this->argument('name').'\\Providers'
-		);
+		$search = [
+			$this->currentRoot.'\\Providers',
+			$this->currentRoot.'\\Http\\Controllers\\',
+		];
 
-		$this->replaceIn(
-			$this->getConfigPath('app'), $this->currentRoot.'\\Http\\Controllers\\', $this->argument('name').'\\Http\\Controllers\\'
-		);
+		$replace = [
+			$this->argument('name').'\\Providers',
+			$this->argument('name').'\\Http\\Controllers\\',
+		];
+
+		$this->replaceIn($this->getConfigPath('app'), $search, $replace);
 	}
 
 	/**
