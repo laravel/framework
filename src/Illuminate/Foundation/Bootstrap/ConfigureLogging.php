@@ -14,9 +14,11 @@ class ConfigureLogging {
 	 */
 	public function bootstrap(Application $app)
 	{
-		$app->instance('log', new Writer(
+		$app->instance('log', $log = new Writer(
 			new Monolog($app->environment()), $app['events'])
 		);
+
+		$log->useDailyFiles($app->storagePath().'/logs/laravel.log', 5);
 
 		// Next, we will bind a Closure that resolves the PSR logger implementation
 		// as this will grant us the ability to be interoperable with many other
