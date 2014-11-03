@@ -224,6 +224,21 @@ if ( ! function_exists('info'))
 	}
 }
 
+if ( ! function_exists('log'))
+{
+	/**
+	 * Log a debug message to the logs.
+	 *
+	 * @param  string  $message
+	 * @param  array  $context
+	 * @return void
+	 */
+	function log($message, array $context = array())
+	{
+		return app('log')->debug($message, $context);
+	}
+}
+
 if ( ! function_exists('old'))
 {
 	/**
