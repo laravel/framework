@@ -45,7 +45,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 */
 	protected function registerClearRemindersCommand()
 	{
-		$this->app->bindShared('command.auth.reminders.clear', function()
+		$this->app->singleton('command.auth.reminders.clear', function()
 		{
 			return new ClearRemindersCommand;
 		});
