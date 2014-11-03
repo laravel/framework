@@ -147,7 +147,7 @@ class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\Se
 	protected $defer = true;
 	public function register()
 	{
-		$this->app->bindShared('foo', function() {
+		$this->app->singleton('foo', function() {
 			return new StdClass;
 		});
 	}
@@ -188,7 +188,7 @@ class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
 	protected $defer = true;
 	public function register()
 	{
-		$this->app->bindShared('foo', function() { return 'foo'; });
-		$this->app->bindShared('bar', function($app) { return $app['foo'].'bar'; });
+		$this->app->singleton('foo', function() { return 'foo'; });
+		$this->app->singleton('bar', function($app) { return $app['foo'].'bar'; });
 	}
 }

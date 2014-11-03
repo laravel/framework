@@ -21,7 +21,7 @@ class SeedServiceProvider extends ServiceProvider {
 	{
 		$this->registerSeedCommand();
 
-		$this->app->bindShared('seeder', function()
+		$this->app->singleton('seeder', function()
 		{
 			return new Seeder;
 		});
@@ -36,7 +36,7 @@ class SeedServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSeedCommand()
 	{
-		$this->app->bindShared('command.seed', function($app)
+		$this->app->singleton('command.seed', function($app)
 		{
 			return new SeedCommand($app['db']);
 		});
