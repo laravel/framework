@@ -224,7 +224,7 @@ if ( ! function_exists('info'))
 	}
 }
 
-if ( ! function_exists('log'))
+if ( ! function_exists('logger'))
 {
 	/**
 	 * Log a debug message to the logs.
@@ -233,7 +233,7 @@ if ( ! function_exists('log'))
 	 * @param  array  $context
 	 * @return void
 	 */
-	function log($message, array $context = array())
+	function logger($message, array $context = array())
 	{
 		return app('log')->debug($message, $context);
 	}
