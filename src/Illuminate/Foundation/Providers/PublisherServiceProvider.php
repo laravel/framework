@@ -49,7 +49,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerAssetPublishCommand();
 
-		$this->app->bindShared('asset.publisher', function($app)
+		$this->app->singleton('asset.publisher', function($app)
 		{
 			$publicPath = $app['path.public'];
 
@@ -71,7 +71,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerAssetPublishCommand()
 	{
-		$this->app->bindShared('command.asset.publish', function($app)
+		$this->app->singleton('command.asset.publish', function($app)
 		{
 			return new AssetPublishCommand($app['asset.publisher']);
 		});
@@ -86,7 +86,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerConfigPublishCommand();
 
-		$this->app->bindShared('config.publisher', function($app)
+		$this->app->singleton('config.publisher', function($app)
 		{
 			$path = $app['path.config'];
 
@@ -108,7 +108,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerConfigPublishCommand()
 	{
-		$this->app->bindShared('command.config.publish', function($app)
+		$this->app->singleton('command.config.publish', function($app)
 		{
 			return new ConfigPublishCommand($app['config.publisher']);
 		});
@@ -123,7 +123,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerViewPublishCommand();
 
-		$this->app->bindShared('view.publisher', function($app)
+		$this->app->singleton('view.publisher', function($app)
 		{
 			$viewPath = $app['path.base'].'/resources/views';
 
@@ -145,7 +145,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerViewPublishCommand()
 	{
-		$this->app->bindShared('command.view.publish', function($app)
+		$this->app->singleton('command.view.publish', function($app)
 		{
 			return new ViewPublishCommand($app['view.publisher']);
 		});
@@ -160,7 +160,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerMigratePublishCommand();
 
-		$this->app->bindShared('migration.publisher', function($app)
+		$this->app->singleton('migration.publisher', function($app)
 		{
 			return new MigrationPublisher($app['files']);
 		});
@@ -173,7 +173,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMigratePublishCommand()
 	{
-		$this->app->bindShared('command.migrate.publish', function()
+		$this->app->singleton('command.migrate.publish', function()
 		{
 			return new MigratePublishCommand;
 		});

@@ -31,7 +31,7 @@ class PasswordResetServiceProvider extends ServiceProvider {
 	 */
 	protected function registerPasswordBroker()
 	{
-		$this->app->bindShared('auth.password', function($app)
+		$this->app->singleton('auth.password', function($app)
 		{
 			// The password token repository is responsible for storing the email addresses
 			// and password reset tokens. It will be used to verify the tokens are valid
@@ -58,7 +58,7 @@ class PasswordResetServiceProvider extends ServiceProvider {
 	 */
 	protected function registerTokenRepository()
 	{
-		$this->app->bindShared('auth.password.tokens', function($app)
+		$this->app->singleton('auth.password.tokens', function($app)
 		{
 			$connection = $app['db']->connection();
 
