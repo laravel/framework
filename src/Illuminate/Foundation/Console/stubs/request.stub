@@ -1,8 +1,8 @@
 <?php namespace {{namespace}};
 
-use Illuminate\Foundation\Http\FormRequest;
+use {{rootNamespace}}Http\Requests\Request;
 
-class {{class}} extends FormRequest {
+class {{class}} extends Request {
 
 	/**
 	 * Get the validation rules that apply to the request.

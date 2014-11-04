@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Http;
 
+use Exception;
 use Illuminate\Routing\Stack;
 use Illuminate\Routing\Router;
 use Illuminate\Contracts\Foundation\Application;
@@ -29,6 +30,7 @@ class Kernel implements KernelContract {
 	protected $bootstrappers = [
 		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
 		'Illuminate\Foundation\Bootstrap\LoadConfiguration',
+		'Illuminate\Foundation\Bootstrap\ConfigureLogging',
 		'Illuminate\Foundation\Bootstrap\HandleExceptions',
 		'Illuminate\Foundation\Bootstrap\RegisterFacades',
 		'Illuminate\Foundation\Bootstrap\RegisterProviders',
@@ -94,8 +96,33 @@ class Kernel implements KernelContract {
 	{
 		return function($request)
 		{
+			$this->app->instance('request', $request);
+
 			return $this->router->dispatch($request);
 		};
+	}
+
+	/**
+	 * Report the exception to the exception handler.
+	 *
+	 * @param  \Exception  $e
+	 * @return void
+	 */
+	protected function reportException(Exception $e)
+	{
+		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+	}
+
+	/**
+	 * Render the exception to a response.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Exception  $e
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	protected function renderException($request, Exception $e)
+	{
+		return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
 	}
 
 	/**

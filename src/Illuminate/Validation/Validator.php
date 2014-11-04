@@ -205,7 +205,7 @@ class Validator implements ValidatorContract {
 	{
 		$this->after[] = function() use ($callback)
 		{
-			return $this->container->call($callback, [], 'validate');
+			return call_user_func_array($callback, [$this]);
 		};
 
 		return $this;

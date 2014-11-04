@@ -1,6 +1,6 @@
 <?php namespace {{namespace}};
 
-use Illuminate\Routing\Controller;
+use {{rootNamespace}}Http\Controllers\Controller;
 
 class {{class}} extends Controller {
 
