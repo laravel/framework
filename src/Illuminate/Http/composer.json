@@ -1,5 +1,6 @@
 {
     "name": "illuminate/http",
+    "description": "The Illuminate Http package.",
     "license": "MIT",
     "authors": [
         {

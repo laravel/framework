@@ -1,5 +1,6 @@
 {
     "name": "illuminate/filesystem",
+    "description": "The Illuminate Filesystem package.",
     "license": "MIT",
     "authors": [
         {
