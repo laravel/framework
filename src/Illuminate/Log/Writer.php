@@ -30,6 +30,22 @@ class Writer implements LogContract, PsrLoggerInterface {
 	protected $dispatcher;
 
 	/**
+	 * The Log levels.
+	 *
+	 * @var array
+	 */
+	protected $levels = [
+		'debug'     => MonologLogger::DEBUG,
+		'info'      => MonologLogger::INFO,
+		'notice'    => MonologLogger::NOTICE,
+		'warning'   => MonologLogger::WARNING,
+		'error'     => MonologLogger::ERROR,
+		'critical'  => MonologLogger::CRITICAL,
+		'alert'     => MonologLogger::ALERT,
+		'emergency' => MonologLogger::EMERGENCY,
+	];
+
+	/**
 	 * Create a new log writer instance.
 	 *
 	 * @param  \Monolog\Logger  $monolog
@@ -313,35 +329,12 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	protected function parseLevel($level)
 	{
-		switch ($level)
+		if (isset($this->levels[$level]))
 		{
-			case 'debug':
-				return MonologLogger::DEBUG;
-
-			case 'info':
-				return MonologLogger::INFO;
-
-			case 'notice':
-				return MonologLogger::NOTICE;
-
-			case 'warning':
-				return MonologLogger::WARNING;
-
-			case 'error':
-				return MonologLogger::ERROR;
-
-			case 'critical':
-				return MonologLogger::CRITICAL;
-
-			case 'alert':
-				return MonologLogger::ALERT;
-
-			case 'emergency':
-				return MonologLogger::EMERGENCY;
-
-			default:
-				throw new \InvalidArgumentException("Invalid log level.");
+			return $this->levels[$level];
 		}
+
+		throw new \InvalidArgumentException("Invalid log level.");
 	}
 
 	/**
