@@ -2,11 +2,11 @@
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpFoundation\Request;
-use Illuminate\Session\Store as SessionStore;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Auth\User as UserContract;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class Guard implements GuardContract {
 
@@ -39,9 +39,9 @@ class Guard implements GuardContract {
 	protected $provider;
 
 	/**
-	 * The session store used by the guard.
+	 * The session used by the guard.
 	 *
-	 * @var \Illuminate\Session\Store
+	 * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
 	 */
 	protected $session;
 
@@ -84,12 +84,12 @@ class Guard implements GuardContract {
 	 * Create a new authentication guard.
 	 *
 	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
-	 * @param  \Illuminate\Session\Store  $session
+	 * @param  \Symfony\Component\HttpFoundation\Session\SessionInterface  $session
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
-								SessionStore $session,
+								SessionInterface $session,
 								Request $request = null)
 	{
 		$this->session = $session;
@@ -439,7 +439,7 @@ class Guard implements GuardContract {
 	 */
 	protected function updateSession($id)
 	{
-		$this->session->put($this->getName(), $id);
+		$this->session->set($this->getName(), $id);
 
 		$this->session->migrate(true);
 	}
@@ -453,7 +453,7 @@ class Guard implements GuardContract {
 	 */
 	public function loginUsingId($id, $remember = false)
 	{
-		$this->session->put($this->getName(), $id);
+		$this->session->set($this->getName(), $id);
 
 		$this->login($user = $this->provider->retrieveById($id), $remember);
 
@@ -536,7 +536,7 @@ class Guard implements GuardContract {
 	 */
 	protected function clearUserDataFromStorage()
 	{
-		$this->session->forget($this->getName());
+		$this->session->remove($this->getName());
 
 		$recaller = $this->getRecallerName();
 
