@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Log;
 
 use Closure;
+use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
@@ -210,6 +211,18 @@ class Writer implements LogContract, PsrLoggerInterface {
 		);
 
 		$handler->setFormatter($this->getDefaultFormatter());
+	}
+
+	/**
+	 * Register a Syslog handler.
+	 *
+	 * @param  string  $name
+	 * @param  string  $level
+	 * @return void
+	 */
+	public function useSyslog($name = 'laravel', $level = 'debug')
+	{
+		return $this->monolog->pushHandler(new SyslogHandler('laravel', LOG_USER, $level));
 	}
 
 	/**

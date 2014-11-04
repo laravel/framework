@@ -794,6 +794,14 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testControllerInspection()
+	{
+		$router = $this->getRouter();
+		$router->controller('home', 'RouteTestInspectedControllerStub');
+		$this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
+	}
+
+
 	protected function getRouter()
 	{
 		return new Router(new Illuminate\Events\Dispatcher);
@@ -823,6 +831,12 @@ class RouteTestControllerMiddleware {
 	}
 }
 
+class RouteTestInspectedControllerStub extends Illuminate\Routing\Controller {
+	public function getFoo()
+	{
+		return 'hello';
+	}
+}
 
 class RouteTestControllerExceptMiddleware {
 	public function handle($request, $next)

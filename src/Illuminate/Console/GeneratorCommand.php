@@ -146,6 +146,10 @@ abstract class GeneratorCommand extends Command {
 			'{{namespace}}', $this->getNamespace($name), $stub
 		);
 
+		$stub = str_replace(
+			'{{rootNamespace}}', $this->getAppNamespace(), $stub
+		);
+
 		return $this;
 	}
 
