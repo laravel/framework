@@ -1,5 +1,6 @@
 {
     "name": "illuminate/events",
+    "description": "The Illuminate Events package.",
     "license": "MIT",
     "authors": [
         {

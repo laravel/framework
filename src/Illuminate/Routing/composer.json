@@ -1,5 +1,6 @@
 {
     "name": "illuminate/routing",
+    "description": "The Illuminate Routing package.",
     "license": "MIT",
     "authors": [
         {

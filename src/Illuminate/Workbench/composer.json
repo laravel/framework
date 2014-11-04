@@ -1,5 +1,6 @@
 {
     "name": "illuminate/workbench",
+    "description": "The Illuminate Workbench package.",
     "license": "MIT",
     "authors": [
         {

@@ -1,5 +1,6 @@
 {
     "name": "illuminate/database",
+    "description": "The Illuminate Database package.",
     "license": "MIT",
     "keywords": ["laravel", "database", "sql", "orm"],
     "authors": [
