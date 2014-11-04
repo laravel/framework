@@ -1,14 +1,14 @@
 <?php namespace Illuminate\Session;
 
 use Symfony\Component\Finder\Finder;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 class FileSessionHandler implements \SessionHandlerInterface {
 
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Filesystem\Filesystem
+	 * @var \Illuminate\Contracts\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -22,7 +22,7 @@ class FileSessionHandler implements \SessionHandlerInterface {
 	/**
 	 * Create a new file driven handler instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Contracts\Filesystem\Filesystem  $files
 	 * @param  string  $path
 	 * @return void
 	 */
