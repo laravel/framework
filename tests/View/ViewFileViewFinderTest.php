@@ -152,7 +152,7 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getFinder()
 	{
-		return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__));
+		return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Contracts\Filesystem\Filesystem'), array(__DIR__));
 	}
 
 }
