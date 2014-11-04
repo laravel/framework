@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Auth;
 
-use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
@@ -9,7 +9,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * The active database connection.
 	 *
-	 * @var \Illuminate\Database\Connection
+	 * @var \Illuminate\Database\ConnectionInterface
 	 */
 	protected $conn;
 
@@ -30,12 +30,12 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * Create a new database user provider.
 	 *
-	 * @param  \Illuminate\Database\Connection  $conn
+	 * @param  \Illuminate\Database\ConnectionInterface  $conn
 	 * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
 	 * @param  string  $table
 	 * @return void
 	 */
-	public function __construct(Connection $conn, HasherContract $hasher, $table)
+	public function __construct(ConnectionInterface $conn, HasherContract $hasher, $table)
 	{
 		$this->conn = $conn;
 		$this->table = $table;
