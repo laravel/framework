@@ -176,6 +176,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 			'baz@baz' => array('qux', 'foo'),
 		));
 
+		$this->assertCount(3, $composers);
 		$reflections = array(
 			new ReflectionFunction($composers[0]),
 			new ReflectionFunction($composers[1]),
