@@ -325,7 +325,7 @@ class Factory {
 
 		foreach ($composers as $callback => $views)
 		{
-			$registered += $this->composer($views, $callback);
+			$registered = array_merge($registered, $this->composer($views, $callback));
 		}
 
 		return $registered;
