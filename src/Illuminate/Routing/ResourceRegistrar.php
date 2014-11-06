@@ -30,7 +30,6 @@ class ResourceRegistrar {
 	/**
 	 * Route a resource to a controller.
 	 *
-	 * @param  Router  $router
 	 * @param  string  $name
 	 * @param  string  $controller
 	 * @param  array   $options
