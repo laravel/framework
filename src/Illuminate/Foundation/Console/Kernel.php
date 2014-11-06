@@ -32,7 +32,7 @@ class Kernel implements KernelContract {
 	/**
 	 * The bootstrap classes for the application.
 	 *
-	 * @return void
+	 * @var array
 	 */
 	protected $bootstrappers = [
 		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
@@ -76,7 +76,7 @@ class Kernel implements KernelContract {
 	 * Run an Artisan console command by name.
 	 *
 	 * @param  string  $command
-	 * @param  array  $parameters
+	 * @param  array   $parameters
 	 * @return int
 	 */
 	public function call($command, array $parameters = array())
