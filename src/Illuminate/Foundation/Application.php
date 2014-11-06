@@ -35,6 +35,13 @@ class Application extends Container implements ApplicationContract {
 	protected $hasBeenBootstrapped = false;
 
 	/**
+	 * Indicates if the application has been terminated before.
+	 *
+	 * @var bool
+	 */
+	protected $hasBeenTerminated = false;
+
+	/**
 	 * Indicates if the application has "booted".
 	 *
 	 * @var bool
@@ -153,6 +160,32 @@ class Application extends Container implements ApplicationContract {
 	public function hasBeenBootstrapped()
 	{
 		return $this->hasBeenBootstrapped;
+	}
+
+	/**
+	 * Run the given array of terminator classes.
+	 *
+	 * @param  array  $terminators
+	 * @return void
+	 */
+	public function terminateWith(array $terminators)
+	{
+		foreach ($terminators as $terminator)
+		{
+			$this->make($terminator)->terminate($this);
+		}
+
+		$this->hasBeenTerminated = true;
+	}
+
+	/**
+	 * Determine if the application has been terminated before.
+	 *
+	 * @return bool
+	 */
+	public function hasBeenTerminated()
+	{
+		return $this->hasBeenTerminated;
 	}
 
 	/**

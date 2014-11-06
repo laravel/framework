@@ -46,6 +46,13 @@ class Kernel implements KernelContract {
 	];
 
 	/**
+	 * The terminator classes for the application.
+	 *
+	 * @var array
+	 */
+	protected $terminators = [];
+
+	/**
 	 * Create a new console kernel instance.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -111,6 +118,19 @@ class Kernel implements KernelContract {
 		}
 
 		$this->app->loadDeferredProviders();
+	}
+
+	/**
+	 * Terminate the application.
+	 *
+	 * @return void
+	 */
+	public function terminate()
+	{
+		if ( ! $this->app->hasBeenTerminated())
+		{
+			$this->app->terminateWith($this->terminators);
+		}
 	}
 
 	/**

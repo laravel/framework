@@ -82,4 +82,11 @@ interface Application extends Container {
 	 */
 	public function hasBeenBootstrapped();
 
+	/**
+	 * Determine if the application has been terminated before.
+	 *
+	 * @return bool
+	 */
+	public function hasBeenTerminated();
+
 }

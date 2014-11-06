@@ -10,6 +10,13 @@ interface Kernel {
 	public function bootstrap();
 
 	/**
+	 * Terminate the application.
+	 *
+	 * @return void
+	 */
+	public function terminate();
+
+	/**
 	 * Handle an incoming HTTP request.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request

@@ -10,6 +10,13 @@ interface Kernel {
 	public function bootstrap();
 
 	/**
+	 * Terminate the application.
+	 *
+	 * @return void
+	 */
+	public function terminate();
+
+	/**
 	 * Handle an incoming console command.
 	 *
 	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
