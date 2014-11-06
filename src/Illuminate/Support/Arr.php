@@ -357,29 +357,34 @@ class Arr {
 	}
 
 	/**
-	 * Converts a one-dimensional array with keys that are written in dot notation
-	 * into a multidimensional associative array
+	 * Expand a flattened array with dots keys to a multi-dimensional
+	 * associative array.
 	 *
-	 * @param array $array
+	 * @param  array  $array
 	 * @return array
 	 */
 	public static function associativeFromDotKeys(array $array)
 	{
 		$results = array();
+
 		while (list($keys, $value) = each($array))
 		{
 			self::assignArrayByPath($results, $keys, $value);
 		}
+
 		return $results;
 	}
 
 	/**
-	 * In a couple of [key => value] assigned value to the key in the form of multi-dimensional array
-	 * formed from a string key with dot notation
+	 * Assigns value to the transformed from string with dots key
 	 *
-	 * @param array $array
-	 * @param string $path
-	 * @param mixed  $value
+	 * In a couple of [key => value] assigned value to the key in the form of
+	 * multi-dimensional array formed from a string key with dot notation
+	 *
+	 * @param  array   $array
+	 * @param  string  $path
+	 * @param  mixed   $value
+	 * @return void
 	 */
 	protected static function assignArrayByPath(array &$array, $path, $value)
 	{
