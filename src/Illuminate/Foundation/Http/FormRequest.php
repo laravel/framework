@@ -192,7 +192,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 			return $url->action($this->redirectAction);
 		}
 
-		return $url->previous();}
+		return $url->previous();
 	}
 
 	/**
