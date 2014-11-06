@@ -376,10 +376,10 @@ class Arr {
 	}
 
 	/**
-	 * Assigns value to the transformed from string with dots key
+	 * Assigns value to the transformed from string with dots key.
 	 *
 	 * In a couple of [key => value] assigned value to the key in the form of
-	 * multi-dimensional array formed from a string key with dot notation
+	 * multi-dimensional array formed from a string key with dot notation.
 	 *
 	 * @param  array   $array
 	 * @param  string  $path
