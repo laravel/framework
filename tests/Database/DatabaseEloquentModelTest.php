@@ -75,7 +75,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$collection = EloquentModelStub::hydrate($data);
 
 		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
-		$this->assertEquals(2, count($collection));
+		$this->assertCount(2, $collection);
 		$this->assertInstanceOf('EloquentModelStub', $collection[0]);
 		$this->assertInstanceOf('EloquentModelStub', $collection[1]);
 		$this->assertEquals('Taylor', $collection[0]->name);

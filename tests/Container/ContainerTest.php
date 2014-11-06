@@ -435,8 +435,8 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->tag('ContainerImplementationStub', 'foo', 'bar');
 		$container->tag('ContainerImplementationStubTwo', ['foo']);
 
-		$this->assertEquals(1, count($container->tagged('bar')));
-		$this->assertEquals(2, count($container->tagged('foo')));
+		$this->assertCount(1, $container->tagged('bar'));
+		$this->assertCount(2, $container->tagged('foo'));
 		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
 		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('bar')[0]);
 		$this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
