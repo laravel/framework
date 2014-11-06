@@ -60,6 +60,8 @@ class FormRequestServiceProvider extends ServiceProvider {
 			$current->cookies->all(), $files, $current->server->all(), $current->getContent()
 		);
 
+		$form->setSession($current->getSession());
+
 		$form->setUserResolver($current->getUserResolver());
 
 		$form->setRouteResolver($current->getRouteResolver());
