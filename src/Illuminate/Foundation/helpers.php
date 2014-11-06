@@ -496,7 +496,7 @@ if ( ! function_exists('view'))
 
 if ( ! function_exists('elixir'))
 {
-       /**
+	/**
 	* Get the path to a versioned Elixir file.
 	*
 	* @param  string  $file

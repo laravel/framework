@@ -34,7 +34,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 */
 	protected function registerControllerGenerator()
 	{
-		$this->app->bindShared('command.controller.make', function($app)
+		$this->app->singleton('command.controller.make', function($app)
 		{
 			return new ControllerMakeCommand($app['files']);
 		});
@@ -47,7 +47,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMiddlewareGenerator()
 	{
-		$this->app->bindShared('command.middleware.make', function($app)
+		$this->app->singleton('command.middleware.make', function($app)
 		{
 			return new MiddlewareMakeCommand($app['files']);
 		});

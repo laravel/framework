@@ -1,5 +1,6 @@
 {
     "name": "illuminate/contracts",
+    "description": "The Illuminate Contracts package.",
     "license": "MIT",
     "authors": [
         {

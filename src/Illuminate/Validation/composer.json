@@ -1,5 +1,6 @@
 {
     "name": "illuminate/validation",
+    "description": "The Illuminate Validation package.",
     "license": "MIT",
     "authors": [
         {

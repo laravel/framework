@@ -23,7 +23,7 @@ class FilesystemServiceProvider extends ServiceProvider {
 	 */
 	protected function registerNativeFilesystem()
 	{
-		$this->app->bindShared('files', function() { return new Filesystem; });
+		$this->app->singleton('files', function() { return new Filesystem; });
 	}
 
 	/**
@@ -35,12 +35,12 @@ class FilesystemServiceProvider extends ServiceProvider {
 	{
 		$this->registerManager();
 
-		$this->app->bindShared('filesystem.disk', function()
+		$this->app->singleton('filesystem.disk', function()
 		{
 			return $this->app['filesystem']->disk($this->getDefaultDriver());
 		});
 
-		$this->app->bindShared('filesystem.cloud', function()
+		$this->app->singleton('filesystem.cloud', function()
 		{
 			return $this->app['filesystem']->disk($this->getCloudDriver());
 		});
@@ -53,7 +53,7 @@ class FilesystemServiceProvider extends ServiceProvider {
 	 */
 	protected function registerManager()
 	{
-		$this->app->bindShared('filesystem', function()
+		$this->app->singleton('filesystem', function()
 		{
 			return new FilesystemManager($this->app);
 		});

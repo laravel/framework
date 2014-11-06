@@ -1,5 +1,6 @@
 {
     "name": "illuminate/session",
+    "description": "The Illuminate Session package.",
     "license": "MIT",
     "authors": [
         {
