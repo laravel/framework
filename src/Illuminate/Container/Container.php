@@ -566,10 +566,8 @@ class Container implements ArrayAccess, ContainerContract {
 		{
 			return new ReflectionMethod($callback[0], $callback[1]);
 		}
-		else
-		{
-			return new ReflectionFunction($callback);
-		}
+
+		return new ReflectionFunction($callback);
 	}
 
 	/**

@@ -102,10 +102,7 @@ class UrlWindow {
 		// If we have enough room on both sides of the current page to build a slider we
 		// will surround it with both the beginning and ending caps, with this window
 		// of pages in the middle providing a Google style sliding paginator setup.
-		else
-		{
-			return $this->getFullSlider($onEachSide);
-		}
+		return $this->getFullSlider($onEachSide);
 	}
 
 	/**

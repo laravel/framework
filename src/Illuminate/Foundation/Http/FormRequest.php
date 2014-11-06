@@ -77,12 +77,10 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		{
 			return $this->container->call([$this, 'validator'], compact('factory'));
 		}
-		else
-		{
-			return $factory->make(
-				$this->formatInput(), $this->container->call([$this, 'rules']), $this->messages()
-			);
-		}
+
+		return $factory->make(
+			$this->formatInput(), $this->container->call([$this, 'rules']), $this->messages()
+		);
 	}
 
 	/**
@@ -145,12 +143,10 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		{
 			return new JsonResponse($errors, 422);
 		}
-		else
-		{
-			return $this->redirector->to($this->getRedirectUrl())
-                                            ->withInput($this->except($this->dontFlash))
-                                            ->withErrors($errors);
-		}
+
+		return $this->redirector->to($this->getRedirectUrl())
+                                        ->withInput($this->except($this->dontFlash))
+                                        ->withErrors($errors);
 	}
 
 	/**
@@ -195,10 +191,8 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		{
 			return $url->action($this->redirectAction);
 		}
-		else
-		{
-			return $url->previous();
-		}
+
+		return $url->previous();
 	}
 
 	/**
