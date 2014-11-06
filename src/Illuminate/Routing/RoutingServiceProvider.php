@@ -110,7 +110,7 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function registerResponseFactory()
 	{
-		$this->app->bindShared('Illuminate\Contracts\Routing\ResponseFactory', function($app)
+		$this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function($app)
 		{
 			return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
 		});

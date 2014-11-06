@@ -15,6 +15,7 @@ class Hears {
 	/**
 	 * Create a new annotation instance.
 	 *
+	 * @param array  $values
 	 * @return void
 	 */
 	public function __construct(array $values = array())

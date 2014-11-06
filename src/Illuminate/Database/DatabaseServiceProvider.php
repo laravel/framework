@@ -30,7 +30,7 @@ class DatabaseServiceProvider extends ServiceProvider {
 		// The connection factory is used to create the actual connection instances on
 		// the database. We will inject the factory into the manager so that it may
 		// make the connections while they are actually needed and not of before.
-		$this->app->bindShared('db.factory', function($app)
+		$this->app->singleton('db.factory', function($app)
 		{
 			return new ConnectionFactory($app);
 		});
@@ -38,7 +38,7 @@ class DatabaseServiceProvider extends ServiceProvider {
 		// The database manager is used to resolve various connections, since multiple
 		// connections might be managed. It also implements the connection resolver
 		// interface which may be used by other components requiring connections.
-		$this->app->bindShared('db', function($app)
+		$this->app->singleton('db', function($app)
 		{
 			return new DatabaseManager($app, $app['db.factory']);
 		});
@@ -51,7 +51,7 @@ class DatabaseServiceProvider extends ServiceProvider {
 	 */
 	protected function registerQueueableEntityResolver()
 	{
-		$this->app->bindShared('Illuminate\Contracts\Queue\EntityResolver', function()
+		$this->app->singleton('Illuminate\Contracts\Queue\EntityResolver', function()
 		{
 			return new Eloquent\QueueEntityResolver;
 		});

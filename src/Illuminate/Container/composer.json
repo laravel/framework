@@ -1,5 +1,6 @@
 {
     "name": "illuminate/container",
+    "description": "The Illuminate Container package.",
     "license": "MIT",
     "authors": [
         {

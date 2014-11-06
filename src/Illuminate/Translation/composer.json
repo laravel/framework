@@ -1,5 +1,6 @@
 {
     "name": "illuminate/translation",
+    "description": "The Illuminate Translation package.",
     "license": "MIT",
     "authors": [
         {
