@@ -148,10 +148,8 @@ if ( ! function_exists('cookie'))
 		{
 			return $cookie;
 		}
-		else
-		{
-			return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly);
-		}
+
+		return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly);
 	}
 }
 
