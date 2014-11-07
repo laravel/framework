@@ -2,9 +2,9 @@
 
 use Closure;
 use Illuminate\Auth\UserProviderInterface;
-use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 class PasswordBroker implements PasswordBrokerContract {
 
@@ -100,7 +100,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * @param  \Closure  $callback
 	 * @return int
 	 */
-	public function emailResetLink(CanResetPassword $user, $token, Closure $callback = null)
+	public function emailResetLink(CanResetPasswordContract $user, $token, Closure $callback = null)
 	{
 		// We will use the reminder view that was given to the broker to display the
 		// password reminder e-mail. We'll pass a "token" variable into the views
@@ -129,7 +129,7 @@ class PasswordBroker implements PasswordBrokerContract {
 		// the user is properly redirected having an error message on the post.
 		$user = $this->validateReset($credentials);
 
-		if ( ! $user instanceof CanResetPassword)
+		if ( ! $user instanceof CanResetPasswordContract)
 		{
 			return $user;
 		}
@@ -234,7 +234,7 @@ class PasswordBroker implements PasswordBrokerContract {
 
 		$user = $this->users->retrieveByCredentials($credentials);
 
-		if ($user && ! $user instanceof CanResetPassword)
+		if ($user && ! $user instanceof CanResetPasswordContract)
 		{
 			throw new \UnexpectedValueException("User must implement CanResetPassword interface.");
 		}
