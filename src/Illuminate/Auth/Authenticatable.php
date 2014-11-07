@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Auth;
 
-trait Authenticates {
+trait Authenticatable {
 
 	/**
 	 * Get the unique identifier for the user.
