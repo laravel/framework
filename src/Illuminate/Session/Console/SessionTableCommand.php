@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Session\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class SessionTableCommand extends Command {
 
@@ -22,14 +22,14 @@ class SessionTableCommand extends Command {
 	/**
 	 * The filesystem instance.
 	 *
-	 * @var \Illuminate\Contracts\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
 	/**
 	 * Create a new session table command instance.
 	 *
-	 * @param  \Illuminate\Contracts\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(Filesystem $files)
