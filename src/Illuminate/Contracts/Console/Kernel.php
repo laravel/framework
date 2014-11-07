@@ -3,6 +3,20 @@
 interface Kernel {
 
 	/**
+	 * Bootstrap the application for HTTP requests.
+	 *
+	 * @return void
+	 */
+	public function bootstrap();
+
+	/**
+	 * Terminate the application.
+	 *
+	 * @return void
+	 */
+	public function terminate();
+
+	/**
 	 * Handle an incoming console command.
 	 *
 	 * @param  \Symfony\Component\Console\Input\InputInterface  $input

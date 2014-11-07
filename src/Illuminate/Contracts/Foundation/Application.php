@@ -75,4 +75,18 @@ interface Application extends Container {
 	 */
 	public function booted($callback);
 
+	/**
+	 * Determine if the application has been bootstrapped before.
+	 *
+	 * @return bool
+	 */
+	public function hasBeenBootstrapped();
+
+	/**
+	 * Determine if the application has been terminated before.
+	 *
+	 * @return bool
+	 */
+	public function hasBeenTerminated();
+
 }

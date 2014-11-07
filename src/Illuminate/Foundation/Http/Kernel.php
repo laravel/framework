@@ -19,14 +19,14 @@ class Kernel implements KernelContract {
 	/**
 	 * The router instance.
 	 *
-	 * @param \Illuminate\Routing\Router
+	 * @var \Illuminate\Routing\Router
 	 */
 	protected $router;
 
 	/**
 	 * The bootstrap classes for the application.
 	 *
-	 * @return void
+	 * @var array
 	 */
 	protected $bootstrappers = [
 		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
@@ -44,6 +44,13 @@ class Kernel implements KernelContract {
 	 * @var array
 	 */
 	protected $middleware = [];
+
+	/**
+	 * The terminator classes for the application.
+	 *
+	 * @var array
+	 */
+	protected $terminators = [];
 
 	/**
 	 * Create a new HTTP kernel instance.
@@ -144,6 +151,19 @@ class Kernel implements KernelContract {
 	protected function renderException($request, Exception $e)
 	{
 		return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
+	}
+
+	/**
+	 * Terminate the application.
+	 *
+	 * @return void
+	 */
+	public function terminate()
+	{
+		if ( ! $this->app->hasBeenTerminated())
+		{
+			$this->app->terminateWith($this->terminators);
+		}
 	}
 
 	/**

@@ -32,7 +32,7 @@ class Kernel implements KernelContract {
 	/**
 	 * The bootstrap classes for the application.
 	 *
-	 * @return void
+	 * @var array
 	 */
 	protected $bootstrappers = [
 		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
@@ -44,6 +44,13 @@ class Kernel implements KernelContract {
 		'Illuminate\Foundation\Bootstrap\RegisterProviders',
 		'Illuminate\Foundation\Bootstrap\BootProviders',
 	];
+
+	/**
+	 * The terminator classes for the application.
+	 *
+	 * @var array
+	 */
+	protected $terminators = [];
 
 	/**
 	 * Create a new console kernel instance.
@@ -76,7 +83,7 @@ class Kernel implements KernelContract {
 	 * Run an Artisan console command by name.
 	 *
 	 * @param  string  $command
-	 * @param  array  $parameters
+	 * @param  array   $parameters
 	 * @return int
 	 */
 	public function call($command, array $parameters = array())
@@ -111,6 +118,19 @@ class Kernel implements KernelContract {
 		}
 
 		$this->app->loadDeferredProviders();
+	}
+
+	/**
+	 * Terminate the application.
+	 *
+	 * @return void
+	 */
+	public function terminate()
+	{
+		if ( ! $this->app->hasBeenTerminated())
+		{
+			$this->app->terminateWith($this->terminators);
+		}
 	}
 
 	/**
