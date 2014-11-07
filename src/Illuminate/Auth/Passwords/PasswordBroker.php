@@ -230,7 +230,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	 */
 	public function getUser(array $credentials)
 	{
-		$credentials = array_except($credentials, array('token'));
+		$credentials = array_except($credentials, ['token']);
 
 		$user = $this->users->retrieveByCredentials($credentials);
 

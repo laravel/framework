@@ -89,7 +89,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	{
 		$this->conn->table($this->table)
                             ->where('id', $user->getAuthIdentifier())
-                            ->update(array('remember_token' => $token));
+                            ->update(['remember_token' => $token]);
 	}
 
 	/**
