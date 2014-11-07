@@ -706,9 +706,9 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	protected function getContextualConcrete($abstract)
 	{
-		if (isset($this->contextual[last($this->buildStack)][$abstract]))
+		if (isset($this->contextual[end($this->buildStack)][$abstract]))
 		{
-			return $this->contextual[last($this->buildStack)][$abstract];
+			return $this->contextual[end($this->buildStack)][$abstract];
 		}
 	}
 
