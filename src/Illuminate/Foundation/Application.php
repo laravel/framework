@@ -265,7 +265,14 @@ class Application extends Container implements ApplicationContract {
 	{
 		if (func_num_args() > 0)
 		{
-			return in_array($this['env'], func_get_args());
+			if (is_array(func_get_arg(0)))
+			{
+				return in_array($this['env'], func_get_arg(0));
+			}
+			else
+			{
+				return in_array($this['env'], func_get_args());
+			}
 		}
 
 		return $this['env'];
