@@ -104,7 +104,7 @@ class Kernel implements KernelContract {
 	{
 		if ( ! $this->app->hasBeenBootstrapped())
 		{
-			$this->app->bootstrapWith($this->getBootstrappers());
+			$this->app->bootstrapWith($this->bootstrappers());
 		}
 	}
 
@@ -128,7 +128,7 @@ class Kernel implements KernelContract {
 	 *
 	 * @return array
 	 */
-	protected function getBootstrappers()
+	protected function bootstrappers()
 	{
 		return $this->bootstrappers;
 	}
