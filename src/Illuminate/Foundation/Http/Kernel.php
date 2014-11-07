@@ -4,6 +4,7 @@ use Exception;
 use Illuminate\Routing\Stack;
 use Illuminate\Routing\Router;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 
 class Kernel implements KernelContract {
@@ -72,6 +73,26 @@ class Kernel implements KernelContract {
 		            ->send($request)
 		            ->through($this->middleware)
 		            ->then($this->dispatchToRouter());
+	}
+
+	/**
+	 * Call the terminate method on any terminable middleware.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Http\Response  $response
+	 * @return void
+	 */
+	public function terminate($request, $response)
+	{
+		foreach ($this->middleware as $middleware)
+		{
+			$instance = $this->app->make($middleware);
+
+			if ($instance instanceof TerminableMiddleware)
+			{
+				$instance->terminate($request, $response);
+			}
+		}
 	}
 
 	/**
