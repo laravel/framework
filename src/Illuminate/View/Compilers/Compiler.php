@@ -1,13 +1,13 @@
 <?php namespace Illuminate\View\Compilers;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 abstract class Compiler {
 
 	/**
 	 * The Filesystem instance.
 	 *
-	 * @var \Illuminate\Contracts\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -21,7 +21,7 @@ abstract class Compiler {
 	/**
 	 * Create a new compiler instance.
 	 *
-	 * @param  \Illuminate\Contracts\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $cachePath
 	 * @return void
 	 */

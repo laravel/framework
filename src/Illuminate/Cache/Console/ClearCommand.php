@@ -2,7 +2,7 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class ClearCommand extends Command {
 
@@ -30,7 +30,7 @@ class ClearCommand extends Command {
 	/**
 	 * The file system instance.
 	 *
-	 * @var \Illuminate\Contracts\Filesystem\Filesystem
+	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $files;
 
@@ -38,7 +38,7 @@ class ClearCommand extends Command {
 	 * Create a new cache clear command instance.
 	 *
 	 * @param  \Illuminate\Cache\CacheManager  $cache
-	 * @param  \Illuminate\Contracts\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
 	public function __construct(CacheManager $cache, Filesystem $files)

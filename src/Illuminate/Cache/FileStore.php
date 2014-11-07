@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 
 class FileStore implements StoreInterface {
 
@@ -21,7 +21,7 @@ class FileStore implements StoreInterface {
 	/**
 	 * Create a new file cache store instance.
 	 *
-	 * @param  \Illuminate\Contracts\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $directory
 	 * @return void
 	 */
@@ -226,7 +226,7 @@ class FileStore implements StoreInterface {
 	/**
 	 * Get the Filesystem instance.
 	 *
-	 * @return \Illuminate\Contracts\Filesystem\Filesystem
+	 * @return \Illuminate\Filesystem\Filesystem
 	 */
 	public function getFilesystem()
 	{
