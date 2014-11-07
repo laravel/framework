@@ -104,7 +104,7 @@ class Kernel implements KernelContract {
 	{
 		if ( ! $this->app->hasBeenBootstrapped())
 		{
-			$this->app->bootstrapWith($this->bootstrappers);
+			$this->app->bootstrapWith($this->getBootstrappers());
 		}
 	}
 
@@ -121,6 +121,16 @@ class Kernel implements KernelContract {
 
 			return $this->router->dispatch($request);
 		};
+	}
+
+	/**
+	 * Get the bootstrap classes for the application.
+	 *
+	 * @return array
+	 */
+	protected function getBootstrappers()
+	{
+		return $this->bootstrappers;
 	}
 
 	/**
