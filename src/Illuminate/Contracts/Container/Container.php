@@ -79,6 +79,15 @@ interface Container {
 	public function extend($abstract, Closure $closure);
 
 	/**
+	 * Register an existing instance as shared in the container.
+	 *
+	 * @param  string  $abstract
+	 * @param  mixed   $instance
+	 * @return void
+	 */
+	public function instance($abstract, $instance);
+
+	/**
 	 * Define a contextual binding.
 	 *
 	 * @param  string  $concrete
