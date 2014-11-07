@@ -51,6 +51,10 @@ class MailServiceProvider extends ServiceProvider {
 
 			return $mailer;
 		});
+
+		$this->app->alias('mailer', 'Illuminate\Mail\Mailer');
+		$this->app->alias('mailer', 'Illuminate\Contracts\Mail\Mailer');
+		$this->app->alias('mailer', 'Illuminate\Contracts\Mail\MailQueue');
 	}
 
 	/**

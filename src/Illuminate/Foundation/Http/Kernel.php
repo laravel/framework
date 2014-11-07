@@ -66,6 +66,9 @@ class Kernel implements KernelContract {
 	{
 		$this->app->instance('request', $request);
 
+		$this->app->alias('request', 'Illuminate\Http\Request');
+		$this->app->alias('request', 'Symfony\Component\HttpFoundation\Request');
+
 		$this->bootstrap();
 
 		return (new Stack($this->app))

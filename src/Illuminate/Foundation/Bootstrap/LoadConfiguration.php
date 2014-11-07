@@ -19,6 +19,9 @@ class LoadConfiguration {
 			new FileLoader(new Filesystem, $app['path.config']), $app->environment()
 		));
 
+		$app->alias('config', 'Illuminate\Config\Repository');
+		$app->alias('config', 'Illuminate\Contracts\Config\Repository');
+
 		date_default_timezone_set($config['app.timezone']);
 	}
 

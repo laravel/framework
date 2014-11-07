@@ -38,6 +38,10 @@ class ConfigureLogging {
 			new Monolog($app->environment()), $app['events'])
 		);
 
+		$app->alias('log', 'Illuminate\Log\Writer');
+		$app->alias('log', 'Illuminate\Contracts\Logging\Log');
+		$app->alias('log', 'Psr\Log\LoggerInterface');
+
 		return $log;
 	}
 

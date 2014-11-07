@@ -22,6 +22,9 @@ class RedisServiceProvider extends ServiceProvider {
 		{
 			return new Database($app['config']['database.redis']);
 		});
+
+		$this->app->alias('redis', 'Illuminate\Redis\Database');
+		$this->app->alias('redis', 'Illuminate\Contracts\Redis\Database');
 	}
 
 	/**

@@ -19,6 +19,8 @@ class HashServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		$this->app->singleton('hash', function() { return new BcryptHasher; });
+
+		$this->app->alias('hash', 'Illuminate\Contracts\Hashing\Hasher');
 	}
 
 	/**

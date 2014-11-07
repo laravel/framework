@@ -35,10 +35,15 @@ class AuthServiceProvider extends ServiceProvider {
 			return new AuthManager($app);
 		});
 
+		$this->app->alias('auth', 'Illuminate\Auth\AuthManager');
+
 		$this->app->singleton('auth.driver', function($app)
 		{
 			return $app['auth']->driver();
 		});
+
+		$this->app->alias('auth.driver', 'Illuminate\Auth\Guard');
+		$this->app->alias('auth.driver', 'Illuminate\Contracts\Auth\Guard');
 	}
 
 	/**

@@ -35,6 +35,9 @@ class TranslationServiceProvider extends ServiceProvider {
 
 			return $trans;
 		});
+
+		$this->app->alias('translator', 'Illuminate\Translation\Translator');
+		$this->app->alias('translator', 'Symfony\Component\Translation\TranslatorInterface');
 	}
 
 	/**

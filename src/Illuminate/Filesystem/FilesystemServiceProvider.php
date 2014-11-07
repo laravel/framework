@@ -24,6 +24,8 @@ class FilesystemServiceProvider extends ServiceProvider {
 	protected function registerNativeFilesystem()
 	{
 		$this->app->singleton('files', function() { return new Filesystem; });
+
+		$this->app->alias('files', 'Illuminate\Filesystem\Filesystem');
 	}
 
 	/**
@@ -40,10 +42,14 @@ class FilesystemServiceProvider extends ServiceProvider {
 			return $this->app['filesystem']->disk($this->getDefaultDriver());
 		});
 
+		$this->app->alias('filesystem.disk', 'Illuminate\Contracts\Filesystem\Filesystem');
+
 		$this->app->singleton('filesystem.cloud', function()
 		{
 			return $this->app['filesystem']->disk($this->getCloudDriver());
 		});
+
+		$this->app->alias('filesystem.cloud', 'Illuminate\Contracts\Filesystem\Cloud');
 	}
 
 	/**
@@ -57,6 +63,8 @@ class FilesystemServiceProvider extends ServiceProvider {
 		{
 			return new FilesystemManager($this->app);
 		});
+
+		$this->app->alias('filesystem', 'Illuminate\Contracts\Filesystem\Factory');
 	}
 
 	/**

@@ -56,6 +56,9 @@ class ValidationServiceProvider extends ServiceProvider {
 
 			return $validator;
 		});
+
+		$this->app->alias('validator', 'Illuminate\Validation\Factory');
+		$this->app->alias('validator', 'Illuminate\Contracts\Validation\Factory');
 	}
 
 	/**
