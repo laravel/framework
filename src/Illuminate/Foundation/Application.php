@@ -263,7 +263,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function environment()
 	{
-		if (count(func_get_args()) > 0)
+		if (func_num_args() > 0)
 		{
 			return in_array($this['env'], func_get_args());
 		}
