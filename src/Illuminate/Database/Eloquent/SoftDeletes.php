@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent;
 
-trait SoftDeletingTrait {
+trait SoftDeletes {
 
 	/**
 	 * Indicates if the model is currently force deleting.
@@ -14,7 +14,7 @@ trait SoftDeletingTrait {
 	 *
 	 * @return void
 	 */
-	public static function bootSoftDeletingTrait()
+	public static function bootSoftDeletes()
 	{
 		static::addGlobalScope(new SoftDeletingScope);
 	}

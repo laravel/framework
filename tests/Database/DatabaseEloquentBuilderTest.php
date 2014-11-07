@@ -468,14 +468,14 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentBuilderTestWithTrashedStub extends Illuminate\Database\Eloquent\Model {
-	use Illuminate\Database\Eloquent\SoftDeletingTrait;
+	use Illuminate\Database\Eloquent\SoftDeletes;
 	protected $table = 'table';
 	public function getKeyName() { return 'foo'; }
 }
 
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'table';
-	use Illuminate\Database\Eloquent\SoftDeletingTrait;
+	use Illuminate\Database\Eloquent\SoftDeletes;
 }
 
 class EloquentBuilderTestListsStub {

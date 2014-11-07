@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Auth\Passwords;
 
-trait CanResetPasswordTrait {
+trait ResetsPassword {
 
 	/**
 	 * Get the e-mail address where password reset links are sent.
