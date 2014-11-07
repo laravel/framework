@@ -111,4 +111,5 @@ class ApplicationDatabaseMigrationStub implements ArrayAccess {
 	public function offsetSet($offset, $value) { $this->content[$offset] = $value; }
 	public function offsetUnset($offset) { unset($this->content[$offset]); }
 	public function environment() { return $this->env; }
+	public function call($method) { return call_user_func($method); }
 }
