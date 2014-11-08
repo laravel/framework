@@ -448,12 +448,15 @@ class Connection implements ConnectionInterface {
 	 */
 	public function beginTransaction()
 	{
-		++$this->transactions;
-
-		if ($this->transactions == 1)
+		// only begin a new transaction
+		// when there are no other
+		// transactions occuring
+		if ($this->transactions == 0)
 		{
 			$this->pdo->beginTransaction();
 		}
+
+		++$this->transactions;
 
 		$this->fireConnectionEvent('beganTransaction');
 	}
@@ -465,9 +468,11 @@ class Connection implements ConnectionInterface {
 	 */
 	public function commit()
 	{
-		if ($this->transactions == 1) $this->pdo->commit();
+		if ($this->transactions > 0) --$this->transactions;
 
-		--$this->transactions;
+		// do not attempt to commit when
+		// there are nested transactions
+		if ($this->transactions == 0) $this->pdo->commit();
 
 		$this->fireConnectionEvent('committed');
 	}
@@ -479,16 +484,14 @@ class Connection implements ConnectionInterface {
 	 */
 	public function rollBack()
 	{
-		if ($this->transactions == 1)
+		// if we have not called beginTransaction
+		// then there is no need to rollback
+		if ($this->transactions > 0)
 		{
-			$this->transactions = 0;
-
 			$this->pdo->rollBack();
 		}
-		else
-		{
-			--$this->transactions;
-		}
+
+		$this->transactions = 0;
 
 		$this->fireConnectionEvent('rollingBack');
 	}
@@ -1014,5 +1017,4 @@ class Connection implements ConnectionInterface {
 
 		return $grammar;
 	}
-
 }
