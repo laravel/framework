@@ -7,7 +7,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 
-class Kernel implements KernelContract {
+abstract class Kernel implements KernelContract {
 
 	/**
 	 * The application implementation.
