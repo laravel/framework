@@ -267,7 +267,15 @@ class Application extends Container implements ApplicationContract {
 		{
 			$patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
 
-			return in_array($this['env'], $patterns);
+			foreach ($patterns as $pattern)
+			{
+				if (str_is($pattern, $this['env']))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		return $this['env'];
