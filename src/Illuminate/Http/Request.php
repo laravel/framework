@@ -703,7 +703,7 @@ class Request extends SymfonyRequest {
 		{
 			return $this->input($key);
 		}
-		else
+		elseif ( ! is_null($this->route()))
 		{
 			return $this->route()->parameter($key);
 		}
