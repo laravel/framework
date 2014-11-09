@@ -30,13 +30,6 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected $redirector;
 
 	/**
-	 * The route instance the request is dispatched to.
-	 *
-	 * @var \Illuminate\Routing\Route
-	 */
-	public $route;
-
-	/**
 	 * The URI to redirect to if validation fails.
 	 *
 	 * @var string
@@ -196,19 +189,6 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	}
 
 	/**
-	 * Set the route handling the request.
-	 *
-	 * @param  \Illuminate\Routing\Route  $route
-	 * @return \Illuminate\Foundation\Http\FormRequest
-	 */
-	public function setRoute(Route $route)
-	{
-		$this->route = $route;
-
-		return $this;
-	}
-
-	/**
 	 * Set the Redirector instance.
 	 *
 	 * @param  \Illuminate\Routing\Redirector  $redirector
@@ -232,16 +212,6 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		$this->container = $container;
 
 		return $this;
-	}
-
-	/**
-	 * Get an input element from the request.
-	 *
-	 * @return mixed
-	 */
-	public function __get($key)
-	{
-		return $this->input($key);
 	}
 
 	/**
