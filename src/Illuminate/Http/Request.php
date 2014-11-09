@@ -690,4 +690,23 @@ class Request extends SymfonyRequest {
 		return $this;
 	}
 
+	/**
+	 * Get an input element from the request.
+	 *
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		$input = $this->input();
+
+		if (array_key_exists($key, $input))
+		{
+			return $this->input($key);
+		}
+		else
+		{
+			return $this->route()->parameter($key);
+		}
+	}
+
 }
