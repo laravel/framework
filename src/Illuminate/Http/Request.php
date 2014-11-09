@@ -641,7 +641,14 @@ class Request extends SymfonyRequest {
 	 */
 	public function route()
 	{
-		return call_user_func($this->getRouteResolver());
+		if (func_num_args() == 1)
+		{
+			return $this->route()->parameter(func_get_arg(0));
+		}
+		else
+		{
+			return call_user_func($this->getRouteResolver());
+		}
 	}
 
 	/**
