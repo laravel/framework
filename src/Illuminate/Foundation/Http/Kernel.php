@@ -30,6 +30,7 @@ class Kernel implements KernelContract {
 		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
 		'Illuminate\Foundation\Bootstrap\LoadConfiguration',
 		'Illuminate\Foundation\Bootstrap\HandleExceptions',
+		'Illuminate\Foundation\Bootstrap\WorkbenchStarter',
 		'Illuminate\Foundation\Bootstrap\RegisterFacades',
 		'Illuminate\Foundation\Bootstrap\RegisterProviders',
 		'Illuminate\Foundation\Bootstrap\BootProviders',
