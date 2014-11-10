@@ -3,9 +3,9 @@
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Auth\User as UserContract;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class Guard implements GuardContract {
@@ -13,14 +13,14 @@ class Guard implements GuardContract {
 	/**
 	 * The currently authenticated user.
 	 *
-	 * @var \Illuminate\Contracts\Auth\User
+	 * @var \Illuminate\Contracts\Auth\Authenticatable
 	 */
 	protected $user;
 
 	/**
 	 * The user we last attempted to retrieve.
 	 *
-	 * @var \Illuminate\Contracts\Auth\User
+	 * @var \Illuminate\Contracts\Auth\Authenticatable
 	 */
 	protected $lastAttempted;
 
@@ -120,7 +120,7 @@ class Guard implements GuardContract {
 	/**
 	 * Get the currently authenticated user.
 	 *
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function user()
 	{
@@ -402,7 +402,7 @@ class Guard implements GuardContract {
 	/**
 	 * Log a user into the application.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  bool  $remember
 	 * @return void
 	 */
@@ -449,7 +449,7 @@ class Guard implements GuardContract {
 	 *
 	 * @param  mixed  $id
 	 * @param  bool   $remember
-	 * @return \Illuminate\Contracts\Auth\User
+	 * @return \Illuminate\Contracts\Auth\Authenticatable
 	 */
 	public function loginUsingId($id, $remember = false)
 	{
@@ -546,7 +546,7 @@ class Guard implements GuardContract {
 	/**
 	 * Refresh the remember token for the user.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
 	protected function refreshRememberToken(UserContract $user)
@@ -559,7 +559,7 @@ class Guard implements GuardContract {
 	/**
 	 * Create a new remember token for the user if one doesn't already exist.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
 	protected function createRememberTokenIfDoesntExist(UserContract $user)
@@ -665,7 +665,7 @@ class Guard implements GuardContract {
 	/**
 	 * Set the current user of the application.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
 	public function setUser(UserContract $user)
@@ -701,7 +701,7 @@ class Guard implements GuardContract {
 	/**
 	 * Get the last user we attempted to authenticate.
 	 *
-	 * @return \Illuminate\Contracts\Auth\User
+	 * @return \Illuminate\Contracts\Auth\Authenticatable
 	 */
 	public function getLastAttempted()
 	{

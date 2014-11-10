@@ -19,7 +19,7 @@ interface Guard {
 	/**
 	 * Get the currently authenticated user.
 	 *
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function user();
 
@@ -68,18 +68,18 @@ interface Guard {
 	/**
 	 * Log a user into the application.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  bool  $remember
 	 * @return void
 	 */
-	public function login(User $user, $remember = false);
+	public function login(Authenticatable $user, $remember = false);
 
 	/**
 	 * Log the given user ID into the application.
 	 *
 	 * @param  mixed  $id
 	 * @param  bool   $remember
-	 * @return \Illuminate\Contracts\Auth\User
+	 * @return \Illuminate\Contracts\Auth\Authenticatable
 	 */
 	public function loginUsingId($id, $remember = false);
 
