@@ -82,7 +82,7 @@ class PasswordResetServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('auth.password', 'auth.password.tokens');
+		return ['auth.password', 'auth.password.tokens'];
 	}
 
 }
