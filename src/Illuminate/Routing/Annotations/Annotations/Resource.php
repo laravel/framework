@@ -78,5 +78,4 @@ class Resource extends Annotation {
 		})->all();
 	}
 
-
 }
