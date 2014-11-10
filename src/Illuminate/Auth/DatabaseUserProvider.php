@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Auth;
 
 use Illuminate\Database\Connection;
-use Illuminate\Contracts\Auth\User as UserContract;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 class DatabaseUserProvider implements UserProviderInterface {
 
@@ -46,7 +46,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	 * Retrieve a user by their unique identifier.
 	 *
 	 * @param  mixed  $identifier
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveById($identifier)
 	{
@@ -63,7 +63,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	 *
 	 * @param  mixed   $identifier
 	 * @param  string  $token
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveByToken($identifier, $token)
 	{
@@ -81,7 +81,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * Update the "remember me" token for the given user in storage.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  string  $token
 	 * @return void
 	 */
@@ -127,7 +127,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	/**
 	 * Validate a user against the given credentials.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  array  $credentials
 	 * @return bool
 	 */

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\User as UserContract;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 trait ApplicationTrait {
 
@@ -145,7 +145,7 @@ trait ApplicationTrait {
 	/**
 	 * Set the currently logged in user for the application.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  string  $driver
 	 * @return void
 	 */
