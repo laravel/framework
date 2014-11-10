@@ -5,12 +5,11 @@ use Carbon\Carbon;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
 
-class WriteSession implements MiddlewareContract {
-
-	use MiddlewareTrait;
+class StartSession implements MiddlewareContract {
 
 	/**
 	 * The session manager.
@@ -39,6 +38,16 @@ class WriteSession implements MiddlewareContract {
 	 */
 	public function handle($request, Closure $next)
 	{
+		// If a session driver has been configured, we will need to start the session here
+		// so that the data is ready for an application. Note that the Laravel sessions
+		// do not make use of PHP "native" sessions in any way since they are crappy.
+		if ($this->sessionConfigured())
+		{
+			$session = $this->startSession($request);
+
+			$request->setSession($session);
+		}
+
 		$response = $next($request);
 
 		// Again, if the session has been configured we will need to close out the session
@@ -46,7 +55,7 @@ class WriteSession implements MiddlewareContract {
 		// add the session identifier cookie to the application response headers now.
 		if ($this->sessionConfigured())
 		{
-			with($session = $this->getSession())->save();
+			with($session = $this->manager->driver())->save();
 
 			$this->collectGarbage($session);
 
@@ -54,6 +63,36 @@ class WriteSession implements MiddlewareContract {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Start the session for the given request.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Illuminate\Session\SessionInterface
+	 */
+	protected function startSession(Request $request)
+	{
+		with($session = $this->getSession($request))->setRequestOnHandler($request);
+
+		$session->start();
+
+		return $session;
+	}
+
+	/**
+	 * Get the session implementation from the manager.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Illuminate\Session\SessionInterface
+	 */
+	public function getSession(Request $request)
+	{
+		$session = $this->manager->driver();
+
+		$session->setId($request->cookies->get($session->getName()));
+
+		return $session;
 	}
 
 	/**
@@ -127,13 +166,26 @@ class WriteSession implements MiddlewareContract {
 	}
 
 	/**
-	 * Get the session implementation from the manager.
+	 * Determine if a session driver has been configured.
 	 *
-	 * @return \Illuminate\Session\SessionInterface
+	 * @return bool
 	 */
-	public function getSession()
+	protected function sessionConfigured()
 	{
-		return $this->manager->driver();
+		return ! is_null(array_get($this->manager->getSessionConfig(), 'driver'));
+	}
+
+	/**
+	 * Determine if the configured session driver is persistent.
+	 *
+	 * @param  array|null  $config
+	 * @return bool
+	 */
+	protected function sessionIsPersistent(array $config = null)
+	{
+		$config = $config ?: $this->manager->getSessionConfig();
+
+		return ! in_array($config['driver'], array(null, 'array'));
 	}
 
 }
