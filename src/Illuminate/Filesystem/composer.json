@@ -13,7 +13,7 @@
         "illuminate/contracts": "5.0.*",
         "illuminate/support": "5.0.*",
         "symfony/finder": "2.6.*",
-        "league/flysystem": "~0.6"
+        "league/flysystem": "0.6.*"
     },
     "autoload": {
         "psr-4": {
