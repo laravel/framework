@@ -18,7 +18,7 @@
         "doctrine/annotations": "~1.0",
         "ircmaxell/password-compat": "~1.0",
         "jeremeamia/superclosure": "~1.0.1",
-        "league/flysystem": "0.5.*",
+        "league/flysystem": "~0.6",
         "monolog/monolog": "~1.6",
         "nesbot/carbon": "~1.0",
         "patchwork/utf8": "~1.1",
