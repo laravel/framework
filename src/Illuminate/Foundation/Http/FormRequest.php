@@ -72,7 +72,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		}
 
 		return $factory->make(
-			$this->formatInput(), $this->container->call([$this, 'rules']), $this->messages()
+			$this->formatInput(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
 		);
 	}
 
@@ -220,6 +220,16 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	* @return array
 	*/
 	public function messages()
+	{
+		return [];
+	}
+
+	/**
+	* Set custom attributes for validator errors.
+	*
+	* @return array
+	*/
+	public function attributes()
 	{
 		return [];
 	}
