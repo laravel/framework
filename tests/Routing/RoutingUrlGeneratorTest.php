@@ -244,7 +244,6 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals('http://bar.com', $url->previous());
 
-
         $url = new UrlGenerator(
             $routes = new Illuminate\Routing\RouteCollection,
             $request = Illuminate\Http\Request::create('http://www.foo.com/') 
