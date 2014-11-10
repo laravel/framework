@@ -154,6 +154,20 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRollbackDoesNotAcquireNegativeTransactions()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+		$connection = $this->getMockConnection(array('getName'), $pdo);
+		$connection->expects($this->any())->method('getName')->will($this->returnValue('name'));
+		$connection->rollBack();
+		$connection->rollBack();
+		$connection->rollBack();
+
+		// regression bug fix, calling multiple times caused negative level
+		$this->assertEquals(0, $connection->transactionLevel());
+	}
+
+
 	public function testTransactionMethodRunsSuccessfully()
 	{
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO', array('beginTransaction', 'commit'));
