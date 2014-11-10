@@ -4,7 +4,7 @@ use Closure;
 use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
-class AddQueuedCookiesToRequest implements Middleware {
+class AddQueuedCookiesToResponse implements Middleware {
 
 	/**
 	 * The cookie jar instance.
