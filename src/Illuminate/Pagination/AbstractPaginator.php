@@ -52,7 +52,7 @@ abstract class AbstractPaginator {
 	 *
 	 * @var string
 	 */
-	protected $pageName = 'page';
+	public static $pageName = 'page';
 
 	/**
 	 * The current page resolver callback.
@@ -111,7 +111,7 @@ abstract class AbstractPaginator {
 		// If we have any extra query string key / value pairs that need to be added
 		// onto the URL, we will put them in query string form and then attach it
 		// to the URL. This allows for extra information like sortings storage.
-		$parameters = [$this->pageName => $page];
+		$parameters = [static::$pageName => $page];
 
 		if (count($this->query) > 0)
 		{
@@ -190,7 +190,7 @@ abstract class AbstractPaginator {
 	 */
 	public function addQuery($key, $value)
 	{
-		if ($key !== $this->pageName)
+		if ($key !== static::$pageName)
 		{
 			$this->query[$key] = $value;
 		}
