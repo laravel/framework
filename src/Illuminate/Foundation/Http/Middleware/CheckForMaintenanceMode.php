@@ -5,7 +5,7 @@ use Illuminate\Http\Response;
 use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\Foundation\Application;
 
-class UnderMaintenance implements Middleware {
+class CheckForMaintenanceMode implements Middleware {
 
 	/**
 	 * The application implementation.
