@@ -98,7 +98,7 @@ class Store implements SessionInterface {
 	 */
 	protected function loadSession()
 	{
-		$this->attributes = $this->readFromHandler();
+		$this->attributes = $this->attributes + $this->readFromHandler();
 
 		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
 		{
