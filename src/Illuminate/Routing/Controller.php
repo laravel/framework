@@ -35,7 +35,8 @@ abstract class Controller {
 	/**
 	 * Register middleware on the controller.
 	 *
-	 * @param  dynamic  $middleware
+	 * @param  string  $middleware
+	 * @param  array   $options
 	 * @return void
 	 */
 	public function middleware($middleware, array $options = array())

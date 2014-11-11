@@ -347,7 +347,7 @@ if ( ! function_exists('config_merge'))
 	/**
 	 * Sensibly merge configuration arrays.
 	 *
-	 * @param  dynamic array
+	 * @param  array  ...$args
 	 * @return array
 	 */
 	function config_merge()

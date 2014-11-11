@@ -378,8 +378,8 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Assign a set of tags to a given binding.
 	 *
-	 * @param  array|string  $abstract
-	 * @param  array|dynamic  $tags
+	 * @param  array|string  $abstracts
+	 * @param  array|mixed   ...$tags
 	 * @return void
 	 */
 	public function tag($abstracts, $tags)
