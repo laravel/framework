@@ -5,6 +5,7 @@ use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
+use Symfony\Component\Security\Core\Util\StringUtils;
 
 class VerifyCsrfToken implements Middleware {
 
@@ -57,8 +58,8 @@ class VerifyCsrfToken implements Middleware {
 
 		$header = $request->header('X-XSRF-TOKEN');
 
-		return $token === $request->input('_token') ||
-		       ($header && $token === $this->encrypter->decrypt($header));
+		return StringUtils::equals($token, $request->input('_token')) ||
+		       ($header && StringUtils::equals($token, $this->encrypter->decrypt($header)));
 	}
 
 	/**
