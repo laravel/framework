@@ -4,7 +4,7 @@ use Closure;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Routing\Middleware;
 
-class AuthenticatedWithBasicAuth implements Middleware {
+class AuthenticateWithBasicAuth implements Middleware {
 
 	/**
 	 * The Guard implementation.
