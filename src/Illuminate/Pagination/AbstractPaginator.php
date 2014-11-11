@@ -271,7 +271,7 @@ abstract class AbstractPaginator {
 	/**
 	 * Set the query string variable used to store the page.
 	 *
-	 * @param string $name
+	 * @param  string  $name
 	 * @return $this
 	 */
 	public function setPageName($name)
