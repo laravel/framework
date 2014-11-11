@@ -1,5 +1,6 @@
 {
     "name": "illuminate/auth",
+    "description": "The Illuminate Auth package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,26 +10,24 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/cookie": "4.2.*",
-        "illuminate/encryption": "4.2.*",
-        "illuminate/events": "4.2.*",
-        "illuminate/hashing": "4.2.*",
-        "illuminate/http": "4.2.*",
-        "illuminate/session": "4.2.*",
-        "illuminate/support": "4.2.*",
+        "illuminate/contracts": "5.0.*",
+        "illuminate/http": "5.0.*",
+        "illuminate/session": "5.0.*",
+        "illuminate/support": "5.0.*",
         "nesbot/carbon": "~1.0"
     },
     "require-dev": {
-        "illuminate/console": "4.2.*",
-        "illuminate/routing": "4.2.*"
+        "illuminate/console": "5.0.*",
+        "illuminate/routing": "5.0.*"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Auth": ""}
+        "psr-4": {
+            "Illuminate\\Auth\\": ""
+        }
     },
-    "target-dir": "Illuminate/Auth",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

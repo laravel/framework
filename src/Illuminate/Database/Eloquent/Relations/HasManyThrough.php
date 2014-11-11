@@ -234,22 +234,6 @@ class HasManyThrough extends Relation {
 	}
 
 	/**
-	 * Get a paginator for the "select" statement.
-	 *
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	public function paginate($perPage = null, $columns = array('*'))
-	{
-		$this->query->addSelect($this->getSelectColumns($columns));
-
-		$pager = $this->query->paginate($perPage, $columns);
-
-		return $pager;
-	}
-
-	/**
 	 * Get the key name of the parent model.
 	 *
 	 * @return string

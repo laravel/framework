@@ -1,12 +1,14 @@
 <?php namespace Illuminate\Auth;
 
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+
 interface UserProviderInterface {
 
 	/**
 	 * Retrieve a user by their unique identifier.
 	 *
 	 * @param  mixed  $identifier
-	 * @return \Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveById($identifier);
 
@@ -15,34 +17,34 @@ interface UserProviderInterface {
 	 *
 	 * @param  mixed   $identifier
 	 * @param  string  $token
-	 * @return \Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveByToken($identifier, $token);
 
 	/**
 	 * Update the "remember me" token for the given user in storage.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  string  $token
 	 * @return void
 	 */
-	public function updateRememberToken(UserInterface $user, $token);
+	public function updateRememberToken(UserContract $user, $token);
 
 	/**
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Auth\UserInterface|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveByCredentials(array $credentials);
 
 	/**
 	 * Validate a user against the given credentials.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function validateCredentials(UserInterface $user, array $credentials);
+	public function validateCredentials(UserContract $user, array $credentials);
 
 }

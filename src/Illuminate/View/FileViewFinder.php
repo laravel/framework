@@ -40,13 +40,6 @@ class FileViewFinder implements ViewFinderInterface {
 	protected $extensions = array('blade.php', 'php');
 
 	/**
-	 * Hint path delimiter value.
-	 *
-	 * @var string
-	 */
-	const HINT_PATH_DELIMITER = '::';
-
-	/**
 	 * Create a new file view loader instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -230,7 +223,7 @@ class FileViewFinder implements ViewFinderInterface {
 	 * Returns whether or not the view specify a hint information.
 	 *
 	 * @param  string  $name
-	 * @return boolean
+	 * @return bool
 	 */
 	public function hasHintInformation($name)
 	{

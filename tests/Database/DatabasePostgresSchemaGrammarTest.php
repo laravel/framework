@@ -312,7 +312,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" real not null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" double precision not null', $statements[0]);
 	}
 
 
@@ -378,7 +378,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" timestamp not null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
 	}
 
 
@@ -389,7 +389,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" time not null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" time(0) without time zone not null', $statements[0]);
 	}
 
 
@@ -400,7 +400,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "foo" timestamp not null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
 	}
 
 
@@ -411,7 +411,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table "users" add column "created_at" timestamp not null, add column "updated_at" timestamp not null', $statements[0]);
+		$this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone not null, add column "updated_at" timestamp(0) without time zone not null', $statements[0]);
 	}
 
 

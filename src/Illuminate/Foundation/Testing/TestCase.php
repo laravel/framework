@@ -5,6 +5,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	use ApplicationTrait, AssertionsTrait;
 
 	/**
+	 * Creates the application.
+	 *
+	 * Needs to be implemented by subclasses.
+	 *
+	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+	 */
+	abstract public function createApplication();
+
+	/**
 	 * Setup the test environment.
 	 *
 	 * @return void
@@ -18,12 +27,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Creates the application.
+	 * Clean up the testing environment before the next test.
 	 *
-	 * Needs to be implemented by subclasses.
-	 *
-	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+	 * @return void
 	 */
-	abstract public function createApplication();
+	public function tearDown()
+	{
+		if ($this->app)
+		{
+			$this->app->flush();
+		}
+	}
 
 }

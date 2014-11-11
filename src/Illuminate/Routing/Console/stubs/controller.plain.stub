@@ -1,0 +1,9 @@
+<?php namespace {{namespace}};
+
+use {{rootNamespace}}Http\Controllers\Controller;
+
+class {{class}} extends Controller {
+
+	//
+
+}

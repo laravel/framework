@@ -225,6 +225,15 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testComposersAreRegisteredWithSlashAndDot()
+	{
+		$factory = $this->getFactory();
+		$factory->getDispatcher()->shouldReceive('listen')->with('composing: foo.bar', m::any())->twice();
+		$factory->composer('foo.bar', '');
+		$factory->composer('foo/bar', '');
+	}
+
+
 	public function testRenderCountHandling()
 	{
 		$factory = $this->getFactory();
@@ -333,6 +342,28 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMakeWithSlashAndDot()
+	{
+		$factory = $this->getFactory();
+		$factory->getFinder()->shouldReceive('find')->twice()->with('foo.bar')->andReturn('path.php');
+		$factory->getEngineResolver()->shouldReceive('resolve')->twice()->with('php')->andReturn(m::mock('Illuminate\View\Engines\EngineInterface'));
+		$factory->getDispatcher()->shouldReceive('fire');
+		$factory->make('foo/bar');
+		$factory->make('foo.bar');
+	}
+
+
+	public function testNamespacedViewNamesAreNormalizedProperly()
+	{
+		$factory = $this->getFactory();
+		$factory->getFinder()->shouldReceive('find')->twice()->with('vendor/package::foo.bar')->andReturn('path.php');
+		$factory->getEngineResolver()->shouldReceive('resolve')->twice()->with('php')->andReturn(m::mock('Illuminate\View\Engines\EngineInterface'));
+		$factory->getDispatcher()->shouldReceive('fire');
+		$factory->make('vendor/package::foo/bar');
+		$factory->make('vendor/package::foo.bar');
+	}
+
+
 	public function testMakeWithAlias()
 	{
 		$factory = $this->getFactory();
@@ -377,7 +408,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		return new Factory(
 			m::mock('Illuminate\View\Engines\EngineResolver'),
 			m::mock('Illuminate\View\ViewFinderInterface'),
-			m::mock('Illuminate\Events\Dispatcher')
+			m::mock('Illuminate\Contracts\Events\Dispatcher')
 		);
 	}
 
@@ -387,7 +418,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		return array(
 			m::mock('Illuminate\View\Engines\EngineResolver'),
 			m::mock('Illuminate\View\ViewFinderInterface'),
-			m::mock('Illuminate\Events\Dispatcher'),
+			m::mock('Illuminate\Contracts\Events\Dispatcher')
 		);
 	}
 

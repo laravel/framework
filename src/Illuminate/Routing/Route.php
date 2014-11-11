@@ -1,13 +1,20 @@
 <?php namespace Illuminate\Routing;
 
+use Closure;
+use ReflectionFunction;
 use Illuminate\Http\Request;
+use Illuminate\Container\Container;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
+use Illuminate\Http\Exception\HttpResponseException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Route {
+
+	use RouteDependencyResolverTrait;
 
 	/**
 	 * The URI pattern the route responds to.
@@ -66,6 +73,13 @@ class Route {
 	protected $compiled;
 
 	/**
+	 * The container instance used by the route.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $container;
+
+	/**
 	 * The validators used by the routes.
 	 *
 	 * @var array
@@ -100,13 +114,87 @@ class Route {
 	/**
 	 * Run the route action and return the response.
 	 *
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return mixed
 	 */
-	public function run()
+	public function run(Request $request)
 	{
-		$parameters = array_filter($this->parameters(), function($p) { return isset($p); });
+		$this->container = $this->container ?: new Container;
+
+		try
+		{
+			if ( ! is_string($this->action['uses']))
+				return $this->runCallable($request);
+
+			if ($this->customDispatcherIsBound())
+				return $this->runWithCustomDispatcher($request);
+
+			return $this->runController($request);
+		}
+		catch (HttpResponseException $e)
+		{
+			return $e->getResponse();
+		}
+	}
+
+	/**
+	 * Run the route action and return the response.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return mixed
+	 */
+	protected function runCallable(Request $request)
+	{
+		$parameters = $this->resolveMethodDependencies(
+			$this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+		);
 
 		return call_user_func_array($this->action['uses'], $parameters);
+	}
+
+	/**
+	 * Run the route action and return the response.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return mixed
+	 */
+	protected function runController(Request $request)
+	{
+		list($class, $method) = explode('@', $this->action['uses']);
+
+		$parameters = $this->resolveClassMethodDependencies(
+			$this->parametersWithoutNulls(), $class, $method
+		);
+
+		if ( ! method_exists($instance = $this->container->make($class), $method))
+			throw new NotFoundHttpException;
+
+		return call_user_func_array([$instance, $method], $parameters);
+	}
+
+	/**
+	 * Determine if a custom route dispatcher is bound in the container.
+	 *
+	 * @return bool
+	 */
+	protected function customDispatcherIsBound()
+	{
+		return $this->container->bound('illuminate.route.dispatcher');
+	}
+
+	/**
+	 * Send the request and route to a custom dispatcher for handling.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return mixed
+	 */
+	protected function runWithCustomDispatcher(Request $request)
+	{
+		list($class, $method) = explode('@', $this->action['uses']);
+
+		$dispatcher = $this->container->make('illuminate.route.dispatcher');
+
+		return $dispatcher->dispatch($this, $request, $class, $method);
 	}
 
 	/**
@@ -158,6 +246,16 @@ class Route {
 		preg_match_all('/\{(\w+?)\?\}/', $this->uri, $matches);
 
 		return isset($matches[1]) ? array_fill_keys($matches[1], null) : [];
+	}
+
+	/**
+	 * Get the middlewares attached to the route.
+	 *
+	 * @return array
+	 */
+	public function middleware()
+	{
+		return (array) array_get($this->action, 'middleware', []);
 	}
 
 	/**
@@ -253,6 +351,17 @@ class Route {
 		list($name, $parameters) = explode(':', $filter, 2);
 
 		return array($name, explode(',', $parameters));
+	}
+
+	/**
+	 * Determine a given parameter exists from the route
+	 *
+	 * @param  string $name
+	 * @return bool
+	 */
+	public function hasParameter($name)
+	{
+		return array_key_exists($name, $this->parameters());
 	}
 
 	/**
@@ -805,6 +914,47 @@ class Route {
 	public function getCompiled()
 	{
 		return $this->compiled;
+	}
+
+	/**
+	 * Set the container instance on the route.
+	 *
+	 * @param  \Illuminate\Container\Container  $container
+	 * @return $this
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+
+		return $this;
+	}
+
+	/**
+	 * Prepare the route instance for serialization.
+	 *
+	 * @return void
+	 */
+	public function prepareForSerialization()
+	{
+		if ($this->action['uses'] instanceof Closure)
+		{
+			throw new \LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
+		}
+
+		unset($this->container);
+
+		unset($this->compiled);
+	}
+
+	/**
+	 * Dynamically access route parameters.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		return $this->parameter($key);
 	}
 
 }

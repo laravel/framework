@@ -7,7 +7,7 @@ abstract class ServiceProvider {
 	/**
 	 * The application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $app;
 
@@ -21,20 +21,13 @@ abstract class ServiceProvider {
 	/**
 	 * Create a new service provider instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct($app)
 	{
 		$this->app = $app;
 	}
-
-	/**
-	 * Bootstrap the application events.
-	 *
-	 * @return void
-	 */
-	public function boot() {}
 
 	/**
 	 * Register the service provider.
@@ -156,7 +149,7 @@ abstract class ServiceProvider {
 	 */
 	protected function getAppViewPath($package)
 	{
-		return $this->app['path']."/views/packages/{$package}";
+		return $this->app['path.base']."/resources/views/packages/{$package}";
 	}
 
 	/**
@@ -166,7 +159,7 @@ abstract class ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -176,7 +169,7 @@ abstract class ServiceProvider {
 	 */
 	public function when()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -187,6 +180,30 @@ abstract class ServiceProvider {
 	public function isDeferred()
 	{
 		return $this->defer;
+	}
+
+	/**
+	 * Get a list of files that should be compiled for the package.
+	 *
+	 * @return array
+	 */
+	public static function compiles()
+	{
+		return [];
+	}
+
+	/**
+	 * Dynamically handle missing method calls.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		if ($method == 'boot') return;
+
+		throw new \BadMethodCallException("Call to undefined method [{$method}]");
 	}
 
 }

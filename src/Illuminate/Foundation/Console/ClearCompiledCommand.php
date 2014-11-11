@@ -25,7 +25,7 @@ class ClearCompiledCommand extends Command {
 	 */
 	public function fire()
 	{
-		if (file_exists($path = $this->laravel['path.base'].'/bootstrap/compiled.php'))
+		if (file_exists($path = $this->laravel['path.storage'].'/framework/compiled.php'))
 		{
 			@unlink($path);
 		}
