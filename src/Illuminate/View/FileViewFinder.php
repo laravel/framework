@@ -108,7 +108,7 @@ class FileViewFinder implements ViewFinderInterface {
 	{
 		$segments = explode(static::HINT_PATH_DELIMITER, $name);
 
-		if (count($segments) != 2)
+		if (count($segments) !== 2)
 		{
 			throw new \InvalidArgumentException("View [$name] has an invalid name.");
 		}

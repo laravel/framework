@@ -224,7 +224,7 @@ class Guard {
 
 		$segments = explode('|', $recaller);
 
-		return count($segments) == 2 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
+		return count($segments) === 2 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
 	}
 
 	/**

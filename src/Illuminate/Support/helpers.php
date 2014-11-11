@@ -636,7 +636,7 @@ if ( ! function_exists('object_get'))
 	 */
 	function object_get($object, $key, $default = null)
 	{
-		if (is_null($key) || trim($key) == '') return $object;
+		if (is_null($key) || trim($key) === '') return $object;
 
 		foreach (explode('.', $key) as $segment)
 		{

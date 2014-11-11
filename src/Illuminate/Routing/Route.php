@@ -441,7 +441,7 @@ class Route {
 	 */
 	protected function matchToKeys(array $matches)
 	{
-		if (count($this->parameterNames()) == 0) return array();
+		if (count($this->parameterNames()) === 0) return array();
 
 		$parameters = array_intersect_key($matches, array_flip($this->parameterNames()));
 

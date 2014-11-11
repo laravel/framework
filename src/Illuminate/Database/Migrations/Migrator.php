@@ -94,7 +94,7 @@ class Migrator {
 		// First we will just make sure that there are any migrations to run. If there
 		// aren't, we will just make a note of it to the developer so they're aware
 		// that all of the migrations have been run against this database system.
-		if (count($migrations) == 0)
+		if (count($migrations) === 0)
 		{
 			$this->note('<info>Nothing to migrate.</info>');
 
@@ -157,7 +157,7 @@ class Migrator {
 		// of them "down" to reverse the last migration "operation" which ran.
 		$migrations = $this->repository->getLast();
 
-		if (count($migrations) == 0)
+		if (count($migrations) === 0)
 		{
 			$this->note('<info>Nothing to rollback.</info>');
 

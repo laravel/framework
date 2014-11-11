@@ -165,7 +165,7 @@ abstract class Controller {
 	{
 		return array_filter($current, function($filter) use ($removing)
 		{
-			return $filter['original'] != $removing;
+			return $filter['original'] !== $removing;
 		});
 	}
 

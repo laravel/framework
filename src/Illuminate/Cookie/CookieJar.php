@@ -41,7 +41,7 @@ class CookieJar {
 	{
 		list($path, $domain) = $this->getPathAndDomain($path, $domain);
 
-		$time = ($minutes == 0) ? 0 : time() + ($minutes * 60);
+		$time = ($minutes === 0) ? 0 : time() + ($minutes * 60);
 
 		return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
 	}

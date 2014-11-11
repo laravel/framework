@@ -251,7 +251,7 @@ class HtmlBuilder {
 	{
 		$html = '';
 
-		if (count($list) == 0) return $html;
+		if (count($list) === 0) return $html;
 
 		// Essentially we will just spin through the list and build the list of the HTML
 		// elements from the array. We will also handled nested lists in case that is

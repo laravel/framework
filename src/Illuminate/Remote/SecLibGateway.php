@@ -202,9 +202,9 @@ class SecLibGateway implements GatewayInterface {
 	 */
 	protected function hasRsaKey()
 	{
-		$hasKey = (isset($this->auth['key']) && trim($this->auth['key']) != '');
+		$hasKey = (isset($this->auth['key']) && trim($this->auth['key']) !== '');
 
-		return $hasKey || (isset($this->auth['keytext']) && trim($this->auth['keytext']) != '');
+		return $hasKey || (isset($this->auth['keytext']) && trim($this->auth['keytext']) !== '');
 	}
 
 	/**

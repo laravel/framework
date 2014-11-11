@@ -73,7 +73,7 @@ class TinkerCommand extends Command {
 	{
 		$input = $this->prompt();
 
-		while ($input != 'quit')
+		while ($input !== 'quit')
 		{
 			// We will wrap the execution of the command in a try / catch block so we
 			// can easily display the errors in a convenient way instead of having

@@ -146,7 +146,7 @@ class SoftDeletingScope implements ScopeInterface {
 	 */
 	protected function isSoftDeleteConstraint(array $where, $column)
 	{
-		return $where['type'] == 'Null' && $where['column'] == $column;
+		return $where['type'] === 'Null' && $where['column'] === $column;
 	}
 
 }

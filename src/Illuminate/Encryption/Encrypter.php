@@ -218,7 +218,7 @@ class Encrypter {
 	{
 		$beforePad = strlen($value) - $pad;
 
-		return substr($value, $beforePad) == str_repeat(substr($value, -1), $pad);
+		return substr($value, $beforePad) === str_repeat(substr($value, -1), $pad);
 	}
 
 	/**

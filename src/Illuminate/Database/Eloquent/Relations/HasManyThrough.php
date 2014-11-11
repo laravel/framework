@@ -225,7 +225,7 @@ class HasManyThrough extends Relation {
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
 	{
-		if ($columns == array('*'))
+		if ($columns === array('*'))
 		{
 			$columns = array($this->related->getTable().'.*');
 		}

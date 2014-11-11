@@ -245,7 +245,7 @@ class Filesystem {
 		// directories in our list, but only true files within the directory.
 		return array_filter($glob, function($file)
 		{
-			return filetype($file) == 'file';
+			return filetype($file) === 'file';
 		});
 	}
 

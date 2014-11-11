@@ -400,7 +400,7 @@ class Builder {
 		// Here we will make some assumptions about the operator. If only 2 values are
 		// passed to the method, we will assume that the operator is an equals sign
 		// and keep going. Otherwise, we'll require the operator to be passed in.
-		if (func_num_args() == 2)
+		if (func_num_args() === 2)
 		{
 			list($value, $operator) = array($operator, '=');
 		}
@@ -438,7 +438,7 @@ class Builder {
 		// that method for convenience so the developer doesn't have to check.
 		if (is_null($value))
 		{
-			return $this->whereNull($column, $boolean, $operator != '=');
+			return $this->whereNull($column, $boolean, $operator !== '=');
 		}
 
 		// Now that we are working with just a simple query we can put the elements
@@ -480,7 +480,7 @@ class Builder {
 	{
 		$isOperator = in_array($operator, $this->operators);
 
-		return ($isOperator && $operator != '=' && is_null($value));
+		return ($isOperator && $operator !== '=' && is_null($value));
 	}
 
 	/**
@@ -928,7 +928,7 @@ class Builder {
 			// If the segment is not a boolean connector, we can assume it is a column's name
 			// and we will add it to the query as a new constraint as a where clause, then
 			// we can keep iterating through the dynamic method string's segments again.
-			if ($segment != 'And' && $segment != 'Or')
+			if ($segment !== 'And' && $segment !== 'Or')
 			{
 				$this->addDynamic($segment, $connector, $parameters, $index);
 
@@ -1054,7 +1054,7 @@ class Builder {
 	 */
 	public function orderBy($column, $direction = 'asc')
 	{
-		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
+		$direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
 
 		$this->orders[] = compact('column', 'direction');
 

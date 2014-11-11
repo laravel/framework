@@ -100,7 +100,7 @@ abstract class Presenter {
 			// If the current page is equal to the page we're iterating on, we will create a
 			// disabled link for that page. Otherwise, we can create a typical active one
 			// for the link. We will use this implementing class's methods to get HTML.
-			if ($this->currentPage == $page)
+			if ($this->currentPage === $page)
 			{
 				$pages[] = $this->getActivePageWrapper($page);
 			}
