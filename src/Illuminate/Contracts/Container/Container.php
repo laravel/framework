@@ -24,11 +24,11 @@ interface Container {
 	/**
 	 * Assign a set of tags to a given binding.
 	 *
-	 * @param  string  $abstract
-	 * @param  array|dynamic  $tags
+	 * @param  array|string  $abstracts
+	 * @param  array|mixed   ...$tags
 	 * @return void
 	 */
-	public function tag($abstract, $tags);
+	public function tag($abstracts, $tags);
 
 	/**
 	 * Resolve all of the bindings for a given tag.
