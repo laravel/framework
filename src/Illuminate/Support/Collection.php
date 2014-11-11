@@ -458,7 +458,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		return $this->filter(function($item) use ($callback)
 		{
-			return $item != $callback;
+			return $item !== $callback;
 		});
 	}
 

@@ -1016,7 +1016,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$caller = $trace['function'];
 
-			return ( ! in_array($caller, Model::$manyMethods) && $caller != $self);
+			return ( ! in_array($caller, Model::$manyMethods) && $caller !== $self);
 		});
 
 		return ! is_null($caller) ? $caller['function'] : null;
@@ -1365,7 +1365,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function incrementOrDecrementAttributeValue($column, $amount, $method)
 	{
-		$this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
+		$this->{$column} = $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
 		$this->syncOriginalAttribute($column);
 	}
@@ -2132,7 +2132,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function isGuarded($key)
 	{
-		return in_array($key, $this->guarded) || $this->guarded == array('*');
+		return in_array($key, $this->guarded) || $this->guarded === array('*');
 	}
 
 	/**
@@ -2142,7 +2142,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function totallyGuarded()
 	{
-		return count($this->fillable) == 0 && $this->guarded == array('*');
+		return count($this->fillable) === 0 && $this->guarded === array('*');
 	}
 
 	/**

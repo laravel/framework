@@ -245,7 +245,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function isLocal()
 	{
-		return $this['env'] == 'local';
+		return $this['env'] === 'local';
 	}
 
 	/**
@@ -268,7 +268,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function runningInConsole()
 	{
-		return php_sapi_name() == 'cli';
+		return php_sapi_name() === 'cli';
 	}
 
 	/**
@@ -278,7 +278,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function runningUnitTests()
 	{
-		return $this['env'] == 'testing';
+		return $this['env'] === 'testing';
 	}
 
 	/**
@@ -348,7 +348,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 		{
 			return array_first($this->serviceProviders, function($key, $value) use ($name)
 			{
-				return get_class($value) == $name;
+				return get_class($value) === $name;
 			});
 		}
 	}
@@ -716,7 +716,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$this->middlewares = array_filter($this->middlewares, function($m) use ($class)
 		{
-			return $m['class'] != $class;
+			return $m['class'] !== $class;
 		});
 	}
 
@@ -904,7 +904,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{
-		if ($code == 404)
+		if ($code === 404)
 		{
 			throw new NotFoundHttpException($message);
 		}

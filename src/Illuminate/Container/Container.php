@@ -160,7 +160,7 @@ class Container implements ArrayAccess {
 	{
 		return function($c, $parameters = array()) use ($abstract, $concrete)
 		{
-			$method = ($abstract == $concrete) ? 'build' : 'make';
+			$method = ($abstract === $concrete) ? 'build' : 'make';
 
 			return $c->$method($concrete, $parameters);
 		};

@@ -177,7 +177,7 @@ abstract class Grammar extends BaseGrammar {
 	{
 		return array_filter($blueprint->getCommands(), function($value) use ($name)
 		{
-			return $value->name == $name;
+			return $value->name === $name;
 		});
 	}
 

@@ -39,7 +39,7 @@ class MemcachedStore extends TaggableStore implements StoreInterface {
 	{
 		$value = $this->memcached->get($this->prefix.$key);
 
-		if ($this->memcached->getResultCode() == 0)
+		if ($this->memcached->getResultCode() === 0)
 		{
 			return $value;
 		}

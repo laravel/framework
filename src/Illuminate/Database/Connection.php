@@ -482,7 +482,7 @@ class Connection implements ConnectionInterface {
 	{
 		++$this->transactions;
 
-		if ($this->transactions == 1)
+		if ($this->transactions === 1)
 		{
 			$this->pdo->beginTransaction();
 		}
@@ -497,7 +497,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function commit()
 	{
-		if ($this->transactions == 1) $this->pdo->commit();
+		if ($this->transactions === 1) $this->pdo->commit();
 
 		--$this->transactions;
 
@@ -511,7 +511,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function rollBack()
 	{
-		if ($this->transactions == 1)
+		if ($this->transactions === 1)
 		{
 			$this->transactions = 0;
 

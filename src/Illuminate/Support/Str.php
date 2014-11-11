@@ -40,7 +40,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle != '' && strpos($haystack, $needle) !== false) return true;
+			if ($needle !== '' && strpos($haystack, $needle) !== false) return true;
 		}
 
 		return false;
@@ -86,7 +86,7 @@ class Str {
 	 */
 	public static function is($pattern, $value)
 	{
-		if ($pattern == $value) return true;
+		if ($pattern === $value) return true;
 
 		$pattern = preg_quote($pattern, '#');
 
@@ -261,7 +261,7 @@ class Str {
 		$title = static::ascii($title);
 
 		// Convert all dashes/underscores into separator
-		$flip = $separator == '-' ? '_' : '-';
+		$flip = $separator === '-' ? '_' : '-';
 
 		$title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 
@@ -301,7 +301,7 @@ class Str {
 	{
 		foreach ((array) $needles as $needle)
 		{
-			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
+			if ($needle !== '' && strpos($haystack, $needle) === 0) return true;
 		}
 
 		return false;

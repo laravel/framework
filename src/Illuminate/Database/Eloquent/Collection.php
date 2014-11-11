@@ -20,7 +20,7 @@ class Collection extends BaseCollection {
 
 		return array_first($this->items, function($itemKey, $model) use ($key)
 		{
-			return $model->getKey() == $key;
+			return $model->getKey() === $key;
 
 		}, $default);
 	}

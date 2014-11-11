@@ -49,7 +49,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 			return "dblib:host={$host}{$port};dbname={$database}";
 		}
 
-		$dbName = $database != '' ? ";Database={$database}" : '';
+		$dbName = $database !== '' ? ";Database={$database}" : '';
 
 		return "sqlsrv:Server={$host}{$port}{$dbName}";
 	}

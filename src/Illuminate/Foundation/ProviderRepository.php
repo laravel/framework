@@ -166,7 +166,7 @@ class ProviderRepository {
 	 */
 	public function shouldRecompile($manifest, $providers)
 	{
-		return is_null($manifest) || $manifest['providers'] != $providers;
+		return is_null($manifest) || $manifest['providers'] !== $providers;
 	}
 
 	/**

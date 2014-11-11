@@ -562,7 +562,7 @@ class FormBuilder {
 			return in_array($value, $selected) ? 'selected' : null;
 		}
 
-		return ((string) $value == (string) $selected) ? 'selected' : null;
+		return ((string) $value === (string) $selected) ? 'selected' : null;
 	}
 
 	/**
@@ -634,7 +634,7 @@ class FormBuilder {
 				return $this->getRadioCheckedState($name, $value, $checked);
 
 			default:
-				return $this->getValueAttribute($name) == $value;
+				return $this->getValueAttribute($name) === $value;
 		}
 	}
 
@@ -669,7 +669,7 @@ class FormBuilder {
 	{
 		if ($this->missingOldAndModel($name)) return $checked;
 
-		return $this->getValueAttribute($name) == $value;
+		return $this->getValueAttribute($name) === $value;
 	}
 
 	/**
@@ -749,7 +749,7 @@ class FormBuilder {
 	{
 		$method = strtoupper($method);
 
-		return $method != 'GET' ? 'POST' : $method;
+		return $method !== 'GET' ? 'POST' : $method;
 	}
 
 	/**
@@ -853,7 +853,7 @@ class FormBuilder {
 		// If the method is something other than GET we will go ahead and attach the
 		// CSRF token to the form, as this can't hurt and is convenient to simply
 		// always have available on every form the developers creates for them.
-		if ($method != 'GET')
+		if ($method !== 'GET')
 		{
 			$appendage .= $this->token();
 		}
@@ -944,7 +944,7 @@ class FormBuilder {
 	 */
 	public function oldInputIsEmpty()
 	{
-		return (isset($this->session) && count($this->session->getOldInput()) == 0);
+		return (isset($this->session) && count($this->session->getOldInput()) === 0);
 	}
 
 	/**

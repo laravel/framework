@@ -246,7 +246,7 @@ class BelongsToMany extends Relation {
 	 */
 	public function getRelationCountQuery(Builder $query, Builder $parent)
 	{
-		if ($parent->getQuery()->from == $query->getQuery()->from)
+		if ($parent->getQuery()->from === $query->getQuery()->from)
 		{
 			return $this->getRelationCountQueryForSelfJoin($query, $parent);
 		}
@@ -294,7 +294,7 @@ class BelongsToMany extends Relation {
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
 	{
-		if ($columns == array('*'))
+		if ($columns === array('*'))
 		{
 			$columns = array($this->related->getTable().'.*');
 		}

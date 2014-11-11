@@ -311,7 +311,7 @@ class Dispatcher {
 			// to run multiple handler methods in a single class for convenience.
 			$segments = explode('@', $listener);
 
-			$method = count($segments) == 2 ? $segments[1] : 'handle';
+			$method = count($segments) === 2 ? $segments[1] : 'handle';
 
 			$callable = array($container->make($segments[0]), $method);
 

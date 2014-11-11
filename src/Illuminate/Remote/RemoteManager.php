@@ -111,7 +111,7 @@ class RemoteManager {
 	 */
 	protected function setOutput(Connection $connection)
 	{
-		$output = php_sapi_name() == 'cli' ? new ConsoleOutput : new NullOutput;
+		$output = php_sapi_name() === 'cli' ? new ConsoleOutput : new NullOutput;
 
 		$connection->setOutput($output);
 	}
@@ -130,11 +130,11 @@ class RemoteManager {
 		{
 			return array('agent' => true);
 		}
-		elseif (isset($config['key']) && trim($config['key']) != '')
+		elseif (isset($config['key']) && trim($config['key']) !== '')
 		{
 			return array('key' => $config['key'], 'keyphrase' => $config['keyphrase']);
 		}
-		elseif (isset($config['keytext']) && trim($config['keytext']) != '')
+		elseif (isset($config['keytext']) && trim($config['keytext']) !== '')
 		{
 			return array('keytext' => $config['keytext']);
 		}

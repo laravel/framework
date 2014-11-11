@@ -185,7 +185,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 */
 	protected function getOtherMethodsRoute($request, array $others)
 	{
-		if ($request->method() == 'OPTIONS')
+		if ($request->method() === 'OPTIONS')
 		{
 			return (new Route('OPTIONS', $request->path(), function() use ($others)
 			{

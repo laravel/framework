@@ -18,7 +18,7 @@ class SqlServerConnection extends Connection {
 	 */
 	public function transaction(Closure $callback)
 	{
-		if ($this->getDriverName() == 'sqlsrv')
+		if ($this->getDriverName() === 'sqlsrv')
 		{
 			return parent::transaction($callback);
 		}

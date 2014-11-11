@@ -81,7 +81,7 @@ class Request extends SymfonyRequest {
 	{
 		$pattern = trim($this->getPathInfo(), '/');
 
-		return $pattern == '' ? '/' : $pattern;
+		return $pattern === '' ? '/' : $pattern;
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Request extends SymfonyRequest {
 	{
 		$segments = explode('/', $this->path());
 
-		return array_values(array_filter($segments, function($v) { return $v != ''; }));
+		return array_values(array_filter($segments, function($v) { return $v !== ''; }));
 	}
 
 	/**
@@ -364,7 +364,7 @@ class Request extends SymfonyRequest {
 	 */
 	protected function isValidFile($file)
 	{
-		return $file instanceof SplFileInfo && $file->getPath() != '';
+		return $file instanceof SplFileInfo && $file->getPath() !== '';
 	}
 
 	/**
@@ -521,7 +521,7 @@ class Request extends SymfonyRequest {
 	{
 		if ($this->isJson()) return $this->json();
 
-		return $this->getMethod() == 'GET' ? $this->query : $this->request;
+		return $this->getMethod() === 'GET' ? $this->query : $this->request;
 	}
 
 	/**
@@ -543,7 +543,7 @@ class Request extends SymfonyRequest {
 	{
 		$acceptable = $this->getAcceptableContentTypes();
 
-		return isset($acceptable[0]) && $acceptable[0] == 'application/json';
+		return isset($acceptable[0]) && $acceptable[0] === 'application/json';
 	}
 
 	/**

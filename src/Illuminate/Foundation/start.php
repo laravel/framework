@@ -149,7 +149,7 @@ $app->instance('config', $config = new Config(
 
 $app->startExceptionHandling();
 
-if ($env != 'testing') ini_set('display_errors', 'Off');
+if ($env !== 'testing') ini_set('display_errors', 'Off');
 
 /*
 |--------------------------------------------------------------------------

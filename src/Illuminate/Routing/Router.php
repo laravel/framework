@@ -1254,7 +1254,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 			// to run multiple bind methods in a single class for convenience.
 			$segments = explode('@', $binding);
 
-			$method = count($segments) == 2 ? $segments[1] : 'bind';
+			$method = count($segments) === 2 ? $segments[1] : 'bind';
 
 			$callable = [$this->container->make($segments[0]), $method];
 
@@ -1614,7 +1614,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteNamed($name)
 	{
-		return ($this->current()) ? $this->current()->getName() == $name : false;
+		return ($this->current()) ? $this->current()->getName() === $name : false;
 	}
 
 	/**
@@ -1658,7 +1658,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function currentRouteUses($action)
 	{
-		return $this->currentRouteAction() == $action;
+		return $this->currentRouteAction() === $action;
 	}
 
 	/**

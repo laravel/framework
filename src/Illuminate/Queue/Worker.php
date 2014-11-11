@@ -313,7 +313,7 @@ class Worker {
 	 */
 	protected function queueShouldRestart($lastRestart)
 	{
-		return $this->getTimestampOfLastQueueRestart() != $lastRestart;
+		return $this->getTimestampOfLastQueueRestart() !== $lastRestart;
 	}
 
 	/**

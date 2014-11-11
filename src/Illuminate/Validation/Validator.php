@@ -298,7 +298,7 @@ class Validator implements MessageProviderInterface {
 	{
 		list($rule, $parameters) = $this->parseRule($rule);
 
-		if ($rule == '') return;
+		if ($rule === '') return;
 
 		// We will get the value for the given attribute from the array of data and then
 		// verify that the attribute is indeed validatable. Unless the rule implies
@@ -479,7 +479,7 @@ class Validator implements MessageProviderInterface {
 		}
 		elseif ($value instanceof File)
 		{
-			return (string) $value->getPath() != '';
+			return (string) $value->getPath() !== '';
 		}
 
 		return true;
@@ -683,7 +683,7 @@ class Validator implements MessageProviderInterface {
 
 		$other = array_get($this->data, $parameters[0]);
 
-		return (isset($other) && $value == $other);
+		return (isset($other) && $value === $other);
 	}
 
 	/**
@@ -700,7 +700,7 @@ class Validator implements MessageProviderInterface {
 
 		$other = $parameters[0];
 
-		return isset($this->data[$other]) && $value != $this->data[$other];
+		return isset($this->data[$other]) && $value !== $this->data[$other];
 	}
 
 	/**
@@ -782,7 +782,7 @@ class Validator implements MessageProviderInterface {
 		$this->requireParameterCount(1, $parameters, 'digits');
 
 		return $this->validateNumeric($attribute, $value)
-			&& strlen((string) $value) == $parameters[0];
+			&& strlen((string) $value) === (int) $parameters[0];
 	}
 
 	/**
@@ -814,7 +814,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'size');
 
-		return $this->getSize($attribute, $value) == $parameters[0];
+		return (float) $this->getSize($attribute, $value) === (float) $parameters[0];
 	}
 
 	/**
@@ -963,7 +963,7 @@ class Validator implements MessageProviderInterface {
 		{
 			list($idColumn, $id) = $this->getUniqueIds($parameters);
 
-			if (strtolower($id) == 'null') $id = null;
+			if (strtolower($id) === 'null') $id = null;
 		}
 
 		// The presence verifier is responsible for counting rows within this store
@@ -977,7 +977,7 @@ class Validator implements MessageProviderInterface {
 
 			$table, $column, $value, $id, $idColumn, $extra
 
-		) == 0;
+		) === 0;
 	}
 
 	/**
@@ -1164,7 +1164,7 @@ class Validator implements MessageProviderInterface {
 			return false;
 		}
 
-		return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
+		return $value->getPath() !== '' && in_array($value->guessExtension(), $parameters);
 	}
 
 	/**
@@ -1467,7 +1467,7 @@ class Validator implements MessageProviderInterface {
 		// messages out of the translator service for this validation rule.
 		$key = "validation.{$lowerRule}";
 
-		if ($key != ($value = $this->translator->trans($key)))
+		if ($key !== ($value = $this->translator->trans($key)))
 		{
 			return $value;
 		}
@@ -2013,7 +2013,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function parseParameters($rule, $parameter)
 	{
-		if (strtolower($rule) == 'regex') return array($parameter);
+		if (strtolower($rule) === 'regex') return array($parameter);
 
 		return str_getcsv($parameter);
 	}

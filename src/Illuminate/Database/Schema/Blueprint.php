@@ -154,7 +154,7 @@ class Blueprint {
 	{
 		foreach ($this->commands as $command)
 		{
-			if ($command->name == 'create') return true;
+			if ($command->name === 'create') return true;
 		}
 
 		return false;
@@ -771,7 +771,7 @@ class Blueprint {
 	{
 		$this->columns = array_values(array_filter($this->columns, function($c) use ($name)
 		{
-			return $c['attributes']['name'] != $name;
+			return $c['attributes']['name'] !== $name;
 		}));
 
 		return $this;
