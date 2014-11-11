@@ -68,7 +68,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	public function put($path, $contents, $visibility = null)
 	{
-		return $this->driver->put($path, $contents, $this->parseVisibility($visibility));
+		return $this->driver->put($path, $contents, ['visibility' => $this->parseVisibility($visibility)]);
 	}
 
 	/**
