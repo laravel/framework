@@ -52,18 +52,41 @@ class MandrillTransport implements Swift_Transport {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
-	{
-		$client = $this->getHttpClient();
+    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    {
+        $client = $this->getHttpClient();
 
-		$client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
-			'body' => [
-				'key' => $this->key,
-				'raw_message' => (string) $message,
-				'async' => false,
-			],
-		]);
-	}
+        $client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
+            'body' => [
+                'key' => $this->key,
+                'raw_message' => (string) $message,
+                'async' => false,
+                'to' => $this->getToAddresses($message)
+            ],
+        ]);
+    }
+
+    /**
+     * Get all the addresses this email should be sent to,
+     * including "to", "cc" and "bcc" addresses
+     *
+     * @param Swift_Mime_Message $message
+     * @return array
+     */
+    protected function getToAddresses(Swift_Mime_Message $message)
+    {
+        $to = [];
+        if ($message->getTo()) {
+            $to = array_merge($to, array_keys($message->getTo()));
+        }
+        if ($message->getCc()) {
+            $to = array_merge($to, array_keys($message->getCc()));
+        }
+        if ($message->getBcc()) {
+            $to = array_merge($to, array_keys($message->getBcc()));
+        }
+        return $to;
+    }
 
 	/**
 	 * {@inheritdoc}
