@@ -114,6 +114,16 @@ class Kernel implements KernelContract {
 	}
 
 	/**
+	 * Get all defined artisan commands
+	 *
+	 * @return array
+	 */
+	public function all()
+	{
+		return $this->commands;
+	}
+
+	/**
 	 * Get the Artisan application instance.
 	 *
 	 * @return \Illuminate\Console\Application
