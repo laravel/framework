@@ -2081,6 +2081,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		
 		$this->hidden = array_merge($this->hidden, $attributes);
 	}
+	
+	/**
+	 * Get the visible attributes for the model.
+	 *
+	 * @return array
+	 */
+	public function getVisible()
+	{
+		return $this->visible;
+	}
 
 	/**
 	 * Set the visible attributes for the model.
