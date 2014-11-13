@@ -66,13 +66,13 @@ class MandrillTransport implements Swift_Transport {
 		]);
 	}
 
-    /**
-     * Get all the addresses this email should be sent to,
-     * including "to", "cc" and "bcc" addresses
-     *
-     * @param Swift_Mime_Message $message
-     * @return array
-     */
+	/**
+	 * Get all the addresses this email should be sent to,
+	 * including "to", "cc" and "bcc" addresses
+	 *
+	 * @param Swift_Mime_Message $message
+	 * @return array
+	 */
 	protected function getToAddresses(Swift_Mime_Message $message)
 	{
 		$to = [];
