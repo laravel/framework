@@ -2077,7 +2077,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function addHidden($attributes = null)
 	{
-		if ( ! is_array($attributes)) $attributes = func_get_args();
+		$attributes = is_array($attributes) ? $attributes : func_get_args();
 		
 		$this->hidden = array_merge($this->hidden, $attributes);
 	}
@@ -2111,7 +2111,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function addVisible($attributes = null)
 	{
-		if ( ! is_array($attributes)) $attributes = func_get_args();
+		$attributes = is_array($attributes) ? $attributes : func_get_args();
 		
 		$this->visible = array_merge($this->visible, $attributes);
 	}
