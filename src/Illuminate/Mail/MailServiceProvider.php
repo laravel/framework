@@ -1,9 +1,11 @@
 <?php namespace Illuminate\Mail;
 
 use Swift_Mailer;
+use Aws\Ses\SesClient;
 use Illuminate\Support\ServiceProvider;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
@@ -130,6 +132,9 @@ class MailServiceProvider extends ServiceProvider {
 			case 'mandrill':
 				return $this->registerMandrillTransport($config);
 
+			case 'ses':
+				return $this->registerSesTransport($config);
+
 			case 'log':
 				return $this->registerLogTransport($config);
 
@@ -185,6 +190,24 @@ class MailServiceProvider extends ServiceProvider {
 		$this->app['swift.transport'] = $this->app->share(function($app) use ($config)
 		{
 			return SendmailTransport::newInstance($config['sendmail']);
+		});
+	}
+
+	/**
+	 * Register the SES Swift Transport instance.
+	 *
+	 * @param  array  $config
+	 * @return void
+	 */
+	protected function registerSesTransport($config)
+	{
+		$ses = $this->app['config']->get('services.ses', array());
+
+		$this->app->bindShared('swift.transport', function() use ($ses)
+		{
+			$sesClient = SesClient::factory($ses);
+
+			return new SesTransport($sesClient);
 		});
 	}
 
