@@ -34,4 +34,11 @@ interface Kernel {
 	 */
 	public function output();
 
+	/**
+	 * Get all defined artisan commands
+	 *
+	 * @return array
+	 */
+	public function all();
+
 }
