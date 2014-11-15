@@ -11,6 +11,7 @@ use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Routing\Matching\CallableWheresValidator;
 
 class Route {
 
@@ -50,6 +51,13 @@ class Route {
 	 * @var array
 	 */
 	protected $wheres = array();
+
+	/**
+	 * The callable conditions requirements.
+	 *
+	 * @var array
+	 */
+	protected $callableWheres = [];
 
 	/**
 	 * The array of matched parameters.
@@ -632,6 +640,7 @@ class Route {
 		return static::$validators = array(
 			new MethodValidator, new SchemeValidator,
 			new HostValidator, new UriValidator,
+			new CallableWheresValidator()
 		);
 	}
 
@@ -696,17 +705,62 @@ class Route {
 	 * Set a regular expression requirement on the route.
 	 *
 	 * @param  array|string  $name
-	 * @param  string  $expression
+	 * @param  string        $expression
 	 * @return $this
 	 */
 	public function where($name, $expression = null)
 	{
+		if ($this->isCallableWhere($name))
+		{
+			$this->addCallableWhere($name);
+
+			return $this;
+		}
+
 		foreach ($this->parseWhere($name, $expression) as $name => $expression)
 		{
 			$this->wheres[$name] = $expression;
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Symfony wheres says we must have a string expression
+	 * so we can't have a clousure, therefore we check
+	 * if this condition wants to be called.
+	 *
+	 * @param  string|Closure $condition
+	 * @return bool
+	 */
+	protected function isCallableWhere($condition)
+	{
+		if (is_string($condition))
+		{
+			return strpos($condition, 'callable:') === 0;
+		}
+
+		return $condition instanceof Closure;
+	}
+
+	/**
+	 * We adding condition to a callable collection
+	 * for calling later as a route validator.
+	 *
+	 * @param  string|Closure $condition
+	 * @return null
+	 */
+	protected function addCallableWhere($condition = null){
+		$this->callableWheres[] = $condition;
+	}
+
+	/**
+	 * Getter for protected callable_wheres.
+	 *
+	 * @return array
+	 */
+	public function getCallableWheres(){
+		return $this->callableWheres;
 	}
 
 	/**
