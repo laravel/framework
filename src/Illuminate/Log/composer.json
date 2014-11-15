@@ -1,5 +1,6 @@
 {
     "name": "illuminate/log",
+    "description": "The Illuminate Log package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,21 +10,18 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
+        "illuminate/contracts": "5.0.*",
+        "illuminate/support": "5.0.*",
         "monolog/monolog": "~1.6"
     },
-    "require-dev": {
-        "illuminate/events": "4.2.*"
-    },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Log": ""
+        "psr-4": {
+            "Illuminate\\Log\\": ""
         }
     },
-    "target-dir": "Illuminate/Log",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

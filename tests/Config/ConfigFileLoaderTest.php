@@ -34,11 +34,11 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 		$loader = $this->getLoader();
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/app.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/local/app.php')->andReturn(true);
-		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/app.php')->andReturn(array('foo' => 'bar'));
-		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/app.php')->andReturn(array('foo' => 'blah', 'baz' => 'boom'));
+		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/app.php')->andReturn(array('foo' => 'bar', 'providers' => ['AppProvider']));
+		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/app.php')->andReturn(array('foo' => 'blah', 'baz' => 'boom', 'providers' => ['SomeProvider']));
 		$array = $loader->load('local', 'app', null);
 
-		$this->assertEquals(array('foo' => 'blah', 'baz' => 'boom'), $array);
+		$this->assertEquals(array('foo' => 'blah', 'baz' => 'boom', 'providers' => ['AppProvider', 'SomeProvider']), $array);
 	}
 
 

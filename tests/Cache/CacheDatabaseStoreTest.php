@@ -113,13 +113,13 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	protected function getStore()
 	{
-		return new DatabaseStore(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Encryption\Encrypter'), 'table', 'prefix');
+		return new DatabaseStore(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), 'table', 'prefix');
 	}
 
 
 	protected function getMocks()
 	{
-		return array(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Encryption\Encrypter'), 'table', 'prefix');
+		return array(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), 'table', 'prefix');
 	}
 
 }

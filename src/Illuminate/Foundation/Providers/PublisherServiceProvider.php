@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\ViewPublisher;
-use Illuminate\Foundation\AssetPublisher;
-use Illuminate\Foundation\ConfigPublisher;
-use Illuminate\Foundation\MigrationPublisher;
+use Illuminate\Foundation\Publishing\ViewPublisher;
+use Illuminate\Foundation\Publishing\AssetPublisher;
+use Illuminate\Foundation\Publishing\ConfigPublisher;
 use Illuminate\Foundation\Console\ViewPublishCommand;
 use Illuminate\Foundation\Console\AssetPublishCommand;
 use Illuminate\Foundation\Console\ConfigPublishCommand;
+use Illuminate\Foundation\Publishing\MigrationPublisher;
 use Illuminate\Foundation\Console\MigratePublishCommand;
 
 class PublisherServiceProvider extends ServiceProvider {
@@ -49,7 +49,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerAssetPublishCommand();
 
-		$this->app->bindShared('asset.publisher', function($app)
+		$this->app->singleton('asset.publisher', function($app)
 		{
 			$publicPath = $app['path.public'];
 
@@ -71,7 +71,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerAssetPublishCommand()
 	{
-		$this->app->bindShared('command.asset.publish', function($app)
+		$this->app->singleton('command.asset.publish', function($app)
 		{
 			return new AssetPublishCommand($app['asset.publisher']);
 		});
@@ -86,9 +86,9 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerConfigPublishCommand();
 
-		$this->app->bindShared('config.publisher', function($app)
+		$this->app->singleton('config.publisher', function($app)
 		{
-			$path = $app['path'].'/config';
+			$path = $app['path.config'];
 
 			// Once we have created the configuration publisher, we will set the default
 			// package path on the object so that it knows where to find the packages
@@ -108,7 +108,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerConfigPublishCommand()
 	{
-		$this->app->bindShared('command.config.publish', function($app)
+		$this->app->singleton('command.config.publish', function($app)
 		{
 			return new ConfigPublishCommand($app['config.publisher']);
 		});
@@ -123,9 +123,9 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerViewPublishCommand();
 
-		$this->app->bindShared('view.publisher', function($app)
+		$this->app->singleton('view.publisher', function($app)
 		{
-			$viewPath = $app['path'].'/views';
+			$viewPath = $app['path.base'].'/resources/views';
 
 			// Once we have created the view publisher, we will set the default packages
 			// path on this object so that it knows where to find all of the packages
@@ -145,7 +145,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerViewPublishCommand()
 	{
-		$this->app->bindShared('command.view.publish', function($app)
+		$this->app->singleton('command.view.publish', function($app)
 		{
 			return new ViewPublishCommand($app['view.publisher']);
 		});
@@ -160,7 +160,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	{
 		$this->registerMigratePublishCommand();
 
-		$this->app->bindShared('migration.publisher', function($app)
+		$this->app->singleton('migration.publisher', function($app)
 		{
 			return new MigrationPublisher($app['files']);
 		});
@@ -173,7 +173,7 @@ class PublisherServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMigratePublishCommand()
 	{
-		$this->app->bindShared('command.migrate.publish', function()
+		$this->app->singleton('command.migrate.publish', function()
 		{
 			return new MigratePublishCommand;
 		});

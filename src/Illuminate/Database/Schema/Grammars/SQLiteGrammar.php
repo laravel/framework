@@ -428,7 +428,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function typeDecimal(Fluent $column)
 	{
-		return 'float';
+		return 'numeric';
 	}
 
 	/**
