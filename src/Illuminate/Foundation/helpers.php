@@ -493,23 +493,43 @@ if ( ! function_exists('view'))
 if ( ! function_exists('elixir'))
 {
 	/**
-	* Get the path to a versioned Elixir file.
-	*
-	* @param  string  $file
-	* @return string
-	*/
+	 * Get the path to a versioned Elixir file.
+	 *
+	 * @param  string  $file
+	 * @return string
+	 */
 	function elixir($file)
 	{
-		static $manifest = null;
+		static $manifest   = null;
+		static $build_path = null;
+
+		if (is_null($build_path))
+		{
+			if (file_exists(base_path().DIRECTORY_SEPARATOR.'elixir.json'))
+			{
+				$elixir_config = json_decode(file_get_contents(base_path().DIRECTORY_SEPARATOR.'elixir.json'), true);
+				$build_path_setting = array_get($elixir_config, 'buildDir');
+
+				if ( ! empty($build_path_setting))
+				{
+					$build_path = DIRECTORY_SEPARATOR.trim($build_path_setting, DIRECTORY_SEPARATOR);
+				}
+			}
+
+			if (empty($build_path))
+			{
+				$build_path = '';
+			}
+		}
 
 		if (is_null($manifest))
 		{
-			$manifest = json_decode(file_get_contents(public_path().'/build/rev-manifest.json'), true);
+			$manifest = json_decode(file_get_contents(public_path().$build_path.DIRECTORY_SEPARATOR.'build'.DIRECTORY_SEPARATOR.'rev-manifest.json'), true);
 		}
 
 		if (isset($manifest[$file]))
 		{
-			return '/build/'.$manifest[$file];
+			return $build_path.'/build/'.$manifest[$file];
 		}
 
 		throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
