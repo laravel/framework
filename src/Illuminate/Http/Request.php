@@ -601,14 +601,17 @@ class Request extends SymfonyRequest {
 
 		$files = [];
 		foreach ($request->files->all() as $index => $file) {
-			if (null !== $file) $files[$index] = $file;
+			if (null !== $file)
+			{
+				$files[$index] = $file;
+			}
 		}
 
 		return (new static)->duplicate(
 
-    			$request->query->all(), $request->request->all(), $request->attributes->all(),
+			$request->query->all(), $request->request->all(), $request->attributes->all(),
 
-    			$request->cookies->all(), $files, $request->server->all()
+			$request->cookies->all(), $files, $request->server->all()
 		);
 	}
 
