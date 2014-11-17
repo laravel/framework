@@ -790,7 +790,7 @@ class Builder {
 		// To create the exists sub-select, we will actually create a query and call the
 		// provided callback with the query so the developer may set any of the query
 		// conditions they want for the in clause, then we'll put it in this array.
-		call_user_func($callback, $query = $this->newQuery());
+		$query = call_user_func($callback);
 
 		$this->wheres[] = compact('type', 'column', 'query', 'boolean');
 
