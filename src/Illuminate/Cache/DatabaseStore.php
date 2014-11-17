@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Cache;
 
 use Illuminate\Database\Connection;
-use Illuminate\Encryption\Encrypter;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class DatabaseStore implements StoreInterface {
 
@@ -15,7 +15,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * The encrypter instance.
 	 *
-	 * @var \Illuminate\Encryption\Encrypter
+	 * @var \Illuminate\Contracts\Encryption\Encrypter
 	 */
 	protected $encrypter;
 
@@ -37,12 +37,12 @@ class DatabaseStore implements StoreInterface {
 	 * Create a new database store.
 	 *
 	 * @param  \Illuminate\Database\Connection  $connection
-	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
+	 * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
 	 * @param  string  $table
 	 * @param  string  $prefix
 	 * @return void
 	 */
-	public function __construct(Connection $connection, Encrypter $encrypter, $table, $prefix = '')
+	public function __construct(Connection $connection, EncrypterContract $encrypter, $table, $prefix = '')
 	{
 		$this->table = $table;
 		$this->prefix = $prefix;
@@ -73,7 +73,7 @@ class DatabaseStore implements StoreInterface {
 			{
 				$this->forget($key);
 
-				return null;
+				return;
 			}
 
 			return $this->encrypter->decrypt($cache->value);
@@ -163,11 +163,13 @@ class DatabaseStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
 		$this->table()->where('key', '=', $this->prefix.$key)->delete();
+
+		return true;
 	}
 
 	/**
@@ -203,7 +205,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return \Illuminate\Encryption\Encrypter
+	 * @return \Illuminate\Contracts\Encryption\Encrypter
 	 */
 	public function getEncrypter()
 	{

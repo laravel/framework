@@ -1,5 +1,6 @@
 {
     "name": "illuminate/redis",
+    "description": "The Illuminate Redis package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,18 +10,18 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
-        "predis/predis": "0.8.*"
+        "illuminate/contracts": "5.0.*",
+        "illuminate/support": "5.0.*",
+        "predis/predis": "~1.0"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Redis": ""
+        "psr-4": {
+            "Illuminate\\Redis\\": ""
         }
     },
-    "target-dir": "Illuminate/Redis",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

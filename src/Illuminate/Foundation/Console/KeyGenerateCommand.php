@@ -21,6 +21,13 @@ class KeyGenerateCommand extends Command {
 	protected $description = "Set the application key";
 
 	/**
+	 * The filesystem instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
 	 * Create a new key generator command.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -62,7 +69,7 @@ class KeyGenerateCommand extends Command {
 	{
 		$env = $this->option('env') ? $this->option('env').'/' : '';
 
-		$contents = $this->files->get($path = $this->laravel['path']."/config/{$env}app.php");
+		$contents = $this->files->get($path = $this->laravel['path.config']."/{$env}app.php");
 
 		return array($path, $contents);
 	}

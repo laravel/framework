@@ -5,13 +5,13 @@ use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Support\Contracts\MessageProviderInterface;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
-class Validator implements MessageProviderInterface {
+class Validator implements ValidatorContract {
 
 	/**
 	 * The Translator implementation.
@@ -26,6 +26,13 @@ class Validator implements MessageProviderInterface {
 	 * @var \Illuminate\Validation\PresenceVerifierInterface
 	 */
 	protected $presenceVerifier;
+
+	/**
+	 * The container instance.
+	 *
+	 * @var \Illuminate\Contracts\Container\Container
+	 */
+	protected $container;
 
 	/**
 	 * The failed validation rules.
@@ -61,6 +68,13 @@ class Validator implements MessageProviderInterface {
 	 * @var array
 	 */
 	protected $rules;
+
+	/**
+	 * All of the registered "after" callbacks.
+	 *
+	 * @var array
+	 */
+	protected $after = array();
 
 	/**
 	 * The array of custom error messages.
@@ -189,6 +203,22 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * After an after validation callback.
+	 *
+	 * @param  callable|string  $callback
+	 * @return $this
+	 */
+	public function after($callback)
+	{
+		$this->after[] = function() use ($callback)
+		{
+			return call_user_func_array($callback, [$this]);
+		};
+
+		return $this;
+	}
+
+	/**
 	 * Add conditions to a given field based on a Closure.
 	 *
 	 * @param  string  $attribute
@@ -272,6 +302,14 @@ class Validator implements MessageProviderInterface {
 			{
 				$this->validate($attribute, $rule);
 			}
+		}
+
+		// Here we will spin through all of the "after" hooks on this validator and
+		// fire them off. This gives the callbacks a chance to perform all kinds
+		// of other validation that needs to get wrapped up in this operation.
+		foreach ($this->after as $after)
+		{
+			call_user_func($after);
 		}
 
 		return count($this->messages->all()) === 0;
@@ -1134,7 +1172,7 @@ class Validator implements MessageProviderInterface {
 	{
 		$url = str_replace(array('http://', 'https://', 'ftp://'), '', strtolower($value));
 
-		return checkdnsrr($url);
+		return checkdnsrr($url, 'A');
 	}
 
 	/**
@@ -1146,7 +1184,7 @@ class Validator implements MessageProviderInterface {
 	 */
 	protected function validateImage($attribute, $value)
 	{
-		return $this->validateMimes($attribute, $value, array('jpeg', 'png', 'gif', 'bmp'));
+		return $this->validateMimes($attribute, $value, array('jpeg', 'png', 'gif', 'bmp', 'svg'));
 	}
 
 	/**
@@ -1382,7 +1420,7 @@ class Validator implements MessageProviderInterface {
 		}
 		catch (\Exception $e)
 		{
-			return null;
+			return;
 		}
 	}
 
@@ -2403,7 +2441,7 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

@@ -1,5 +1,6 @@
 {
     "name": "illuminate/support",
+    "description": "The Illuminate Support package.",
     "license": "MIT",
     "authors": [
         {
@@ -8,24 +9,24 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "illuminate/contracts": "5.0.*"
     },
     "require-dev": {
         "jeremeamia/superclosure": "~1.0.1",
-        "patchwork/utf8": "1.1.*"
+        "patchwork/utf8": "~1.1"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Support": ""
+        "psr-4": {
+            "Illuminate\\Support\\": ""
         },
         "files": [
-            "Illuminate/Support/helpers.php"
+            "helpers.php"
         ]
     },
-    "target-dir": "Illuminate/Support",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

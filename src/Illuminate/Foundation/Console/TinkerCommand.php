@@ -28,88 +28,14 @@ class TinkerCommand extends Command {
 	{
 		if ($this->supportsBoris())
 		{
-			$this->runBorisShell();
+			$this->getApplication()->setCatchExceptions(false);
+
+			(new Boris('> '))->start();
 		}
 		else
 		{
-			$this->comment('Full REPL not supported. Falling back to simple shell.');
-
-			$this->runPlainShell();
+			$this->comment('Boris REPL not supported. Needs readline, posix, and pcntl extensions.');
 		}
-	}
-
-	/**
-	 * Run the Boris REPL with the current context.
-	 *
-	 * @return void
-	 */
-	protected function runBorisShell()
-	{
-		$this->setupBorisErrorHandling();
-
-		(new Boris('> '))->start();
-	}
-
-	/**
-	 * Setup the Boris exception handling.
-	 *
-	 * @return void
-	 */
-	protected function setupBorisErrorHandling()
-	{
-		restore_error_handler(); restore_exception_handler();
-
-		$this->laravel->make('artisan')->setCatchExceptions(false);
-
-		$this->laravel->error(function() { return ''; });
-	}
-
-	/**
-	 * Run the plain Artisan tinker shell.
-	 *
-	 * @return void
-	 */
-	protected function runPlainShell()
-	{
-		$input = $this->prompt();
-
-		while ($input != 'quit')
-		{
-			// We will wrap the execution of the command in a try / catch block so we
-			// can easily display the errors in a convenient way instead of having
-			// them bubble back out to the CLI and stop the entire command loop.
-			try
-			{
-				if (starts_with($input, 'dump '))
-				{
-					$input = 'var_dump('.substr($input, 5).');';
-				}
-
-				eval($input);
-			}
-
-			// If an exception occurs, we will just display the message and keep this
-			// loop going so we can keep executing commands. However, when a fatal
-			// error occurs, we have no choice but to bail out of this routines.
-			catch (\Exception $e)
-			{
-				$this->error($e->getMessage());
-			}
-
-			$input = $this->prompt();
-		}
-	}
-
-	/**
-	 * Prompt the developer for a command.
-	 *
-	 * @return string
-	 */
-	protected function prompt()
-	{
-		$dialog = $this->getHelperSet()->get('dialog');
-
-		return $dialog->ask($this->output, "<info>></info>", null);
 	}
 
 	/**

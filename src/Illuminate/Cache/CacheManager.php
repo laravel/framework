@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Cache;
 
 use Illuminate\Support\Manager;
+use Illuminate\Contracts\Cache\Factory as FactoryContract;
 
-class CacheManager extends Manager {
+class CacheManager extends Manager implements FactoryContract {
 
 	/**
 	 * Create an instance of the APC cache driver.

@@ -24,8 +24,8 @@ trait MacroableTrait {
 	/**
 	 * Checks if macro is registered
 	 *
-	 * @param  string    $name
-	 * @return boolean
+	 * @param  string  $name
+	 * @return bool
 	 */
 	public static function hasMacro($name)
 	{

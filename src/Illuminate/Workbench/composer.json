@@ -1,5 +1,6 @@
 {
     "name": "illuminate/workbench",
+    "description": "The Illuminate Workbench package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,22 +10,21 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/filesystem": "4.2.*",
-        "illuminate/support": "4.2.*",
-        "symfony/finder": "2.5.*"
+        "illuminate/filesystem": "~5.0",
+        "illuminate/support": "~5.0",
+        "symfony/finder": "2.6.*"
     },
     "require-dev": {
-        "illuminate/console": "4.2.*"
+        "illuminate/console": "~5.0"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Workbench": ""
+        "psr-4": {
+            "Illuminate\\Workbench\\": ""
         }
     },
-    "target-dir": "Illuminate/Workbench",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

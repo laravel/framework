@@ -1,5 +1,6 @@
 {
     "name": "illuminate/queue",
+    "description": "The Illuminate Queue package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,32 +10,30 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/console": "4.2.*",
-        "illuminate/container": "4.2.*",
-        "illuminate/http": "4.2.*",
-        "illuminate/support": "4.2.*",
-        "symfony/process": "2.5.*",
+        "illuminate/console": "5.0.*",
+        "illuminate/contracts": "5.0.*",
+        "illuminate/container": "5.0.*",
+        "illuminate/http": "5.0.*",
+        "illuminate/support": "5.0.*",
+        "symfony/process": "2.6.*",
         "nesbot/carbon": "~1.0"
     },
     "require-dev": {
-        "illuminate/cache": "4.2.*",
-        "illuminate/events": "4.2.*",
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~2.1"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Queue": ""
+        "psr-4": {
+            "Illuminate\\Queue\\": ""
         },
         "classmap": [
             "IlluminateQueueClosure.php"
         ]
     },
-    "target-dir": "Illuminate/Queue",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "suggest": {

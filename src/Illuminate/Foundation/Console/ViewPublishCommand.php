@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\ViewPublisher;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Foundation\Publishing\ViewPublisher;
 
 class ViewPublishCommand extends Command {
 
@@ -12,7 +12,7 @@ class ViewPublishCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'view:publish';
+	protected $name = 'publish:views';
 
 	/**
 	 * The console command description.
@@ -24,14 +24,14 @@ class ViewPublishCommand extends Command {
 	/**
 	 * The view publisher instance.
 	 *
-	 * @var \Illuminate\Foundation\ViewPublisher
+	 * @var \Illuminate\Foundation\Publishing\ViewPublisher
 	 */
 	protected $view;
 
 	/**
 	 * Create a new view publish command instance.
 	 *
-	 * @param  \Illuminate\Foundation\ViewPublisher  $view
+	 * @param  \Illuminate\Foundation\Publishing\ViewPublisher  $view
 	 * @return void
 	 */
 	public function __construct(ViewPublisher $view)

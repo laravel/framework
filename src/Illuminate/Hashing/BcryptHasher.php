@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Hashing;
 
-class BcryptHasher implements HasherInterface {
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+
+class BcryptHasher implements HasherContract {
 
 	/**
 	 * Default crypt cost factor.
