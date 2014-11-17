@@ -599,13 +599,10 @@ class Request extends SymfonyRequest {
 	{
 		if ($request instanceof static) return $request;
 
-		$files = [];
-		foreach ($request->files->all() as $index => $file) {
-			if ($file !== null)
-			{
-				$files[$index] = $file;
-			}
-		}
+		$files = array_filter($request->files->all(), function($file)
+		{
+			return $file !== null;
+		});
 
 		return (new static)->duplicate(
 
