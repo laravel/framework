@@ -601,7 +601,7 @@ class Request extends SymfonyRequest {
 
 		$files = [];
 		foreach ($request->files->all() as $index => $file) {
-			if (null !== $file)
+			if ($file !== null)
 			{
 				$files[$index] = $file;
 			}
