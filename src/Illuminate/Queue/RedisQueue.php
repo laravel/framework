@@ -124,10 +124,7 @@ class RedisQueue extends Queue implements QueueInterface {
 
 		$queue = $this->getQueue($queue);
 
-		if ( ! is_null($this->expire))
-		{
-			$this->migrateAllExpiredJobs($queue);
-		}
+		$this->migrateAllExpiredJobs($queue);
 
 		$job = $this->redis->lpop($queue);
 
@@ -161,7 +158,10 @@ class RedisQueue extends Queue implements QueueInterface {
 	{
 		$this->migrateExpiredJobs($queue.':delayed', $queue);
 
-		$this->migrateExpiredJobs($queue.':reserved', $queue);
+		if ( ! is_null($this->expire))
+		{
+			$this->migrateExpiredJobs($queue.':reserved', $queue);
+		}
 	}
 
 	/**
