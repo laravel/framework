@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Config;
 
+use Closure;
 use Illuminate\Filesystem\Filesystem;
 
 class FileLoader implements LoaderInterface {
@@ -99,7 +100,13 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function mergeEnvironment(array $items, $file)
 	{
-		return config_merge($items, $this->files->getRequire($file));
+		$fileItems = $this->files->getRequire($file);
+		if ($fileItems instanceof Closure)
+		{
+			return call_user_func($fileItems, $items);
+		}
+
+		return array_replace_recursive($items, $fileItems);
 	}
 
 	/**
@@ -159,7 +166,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path = $this->defaultPath.'/'.$file))
 		{
-			$items = config_merge(
+			$items = array_merge(
 				$items, $this->getRequire($path)
 			);
 		}
@@ -171,7 +178,7 @@ class FileLoader implements LoaderInterface {
 
 		if ($this->files->exists($path))
 		{
-			$items = config_merge(
+			$items = array_merge(
 				$items, $this->getRequire($path)
 			);
 		}
