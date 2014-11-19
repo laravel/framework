@@ -112,7 +112,7 @@ class Worker {
 		}
 		catch (\Exception $e)
 		{
-			if ($this->exceptions) $this->exceptions->handleException($e);
+			if ($this->exceptions) $this->exceptions->report($e);
 		}
 	}
 
@@ -319,10 +319,10 @@ class Worker {
 	/**
 	 * Set the exception handler to use in Daemon mode.
 	 *
-	 * @param  \Illuminate\Exception\Handler  $handler
+	 * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
 	 * @return void
 	 */
-	public function setDaemonExceptionHandler($handler)
+	public function setDaemonExceptionHandler(ExceptionHandler $handler)
 	{
 		$this->exceptions = $handler;
 	}
