@@ -669,4 +669,14 @@ class Event {
 		return $this->buildCommand();
 	}
 
+	/**
+	 * Get the Cron expression for the event.
+	 *
+	 * @return string
+	 */
+	public function getExpression()
+	{
+		return $this->expression;
+	}
+
 }
