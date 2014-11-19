@@ -10,7 +10,12 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "illuminate/contracts": "5.0.*",
         "symfony/console": "2.6.*"
+    },
+    "require-dev": {
+        "mtdowling/cron-expression": "~1.0",
+        "symfony/process": "2.6.*"
     },
     "autoload": {
         "psr-4": {

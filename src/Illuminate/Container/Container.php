@@ -124,7 +124,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	public function bound($abstract)
 	{
-		return isset($this->bindings[$abstract]) || isset($this->instances[$abstract]);
+		return isset($this->bindings[$abstract]) || isset($this->instances[$abstract]) || $this->isAlias($abstract);
 	}
 
 	/**

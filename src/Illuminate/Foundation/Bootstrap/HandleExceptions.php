@@ -115,10 +115,21 @@ class HandleExceptions {
 		{
 			if ( ! $this->isFatal($error['type'])) return;
 
-			$this->handleException(new FatalErrorException(
-				$error['message'], $error['type'], 0, $error['file'], $error['line']
-			));
+			$this->handleException($this->fatalExceptionFromError($error));
 		}
+	}
+
+	/**
+	 * Create a new fatal exception instance from an error array.
+	 *
+	 * @param  array  $error
+	 * @return \Symfony\Component\Debug\Exception\FatalErrorException
+	 */
+	protected function fatalExceptionFromError(array $error)
+	{
+		return new FatalErrorException(
+			$error['message'], $error['type'], 0, $error['file'], $error['line']
+		);
 	}
 
 	/**

@@ -1,19 +1,11 @@
-<?php namespace Illuminate\Foundation\Debug;
+<?php namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
 use Psr\Log\LoggerInterface;
-use Illuminate\Contracts\Config\Repository as Configuration;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 
-class ExceptionHandler implements ExceptionHandlerContract {
-
-	/**
-	 * The configuration repository implementation.
-	 *
-	 * @var \Illuminate\Contracts\Config\Repository
-	 */
-	protected $config;
+class Handler implements ExceptionHandlerContract {
 
 	/**
 	 * The log implementation.
@@ -25,14 +17,12 @@ class ExceptionHandler implements ExceptionHandlerContract {
 	/**
 	 * Create a new exception handler instance.
 	 *
-	 * @param  \Illuminate\Contracts\Config\Repository  $config
 	 * @param  \Psr\Log\LoggerInterface  $log
 	 * @return void
 	 */
-	public function __construct(Configuration $config, LoggerInterface $log)
+	public function __construct(LoggerInterface $log)
 	{
 		$this->log = $log;
-		$this->config = $config;
 	}
 
 	/**
@@ -51,11 +41,11 @@ class ExceptionHandler implements ExceptionHandlerContract {
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Exception  $e
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function render($request, Exception $e)
 	{
-		return (new SymfonyDisplayer($this->config->get('app.debug')))->createResponse($e);
+		return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
 	}
 
 	/**

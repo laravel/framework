@@ -2,6 +2,7 @@
 
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
@@ -56,6 +57,21 @@ class Kernel implements KernelContract {
 	{
 		$this->app = $app;
 		$this->events = $events;
+		$this->defineConsoleSchedule();
+	}
+
+	/**
+	 * Define the application's command schedule.
+	 *
+	 * @return void
+	 */
+	protected function defineConsoleSchedule()
+	{
+		$this->app->instance(
+			'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule
+		);
+
+		$this->schedule($schedule);
 	}
 
 	/**
@@ -67,9 +83,31 @@ class Kernel implements KernelContract {
 	 */
 	public function handle($input, $output = null)
 	{
-		$this->bootstrap();
+		try
+		{
+			$this->bootstrap();
 
-		return $this->getArtisan()->run($input, $output);
+			return $this->getArtisan()->run($input, $output);
+		}
+		catch (Exception $e)
+		{
+			$this->reportException($e);
+
+			$this->renderException($output, $e);
+
+			return 1;
+		}
+	}
+
+	/**
+	 * Define the application's command schedule.
+	 *
+	 * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+	 * @return void
+	 */
+	protected function schedule(Schedule $schedule)
+	{
+		//
 	}
 
 	/**
@@ -84,6 +122,18 @@ class Kernel implements KernelContract {
 		$this->bootstrap();
 
 		return $this->getArtisan()->call($command, $parameters);
+	}
+
+	/**
+	 * Get all of the commands registered with the console.
+	 *
+	 * @return array
+	 */
+	public function all()
+	{
+		$this->bootstrap();
+
+		return $this->getArtisan()->all();
 	}
 
 	/**
