@@ -2,15 +2,35 @@
 
 use Illuminate\Log\Writer;
 use Monolog\Logger as Monolog;
-use Monolog\Handler\SyslogHandler;
 use Illuminate\Contracts\Foundation\Application;
 
 class ConfigureLogging {
 
 	/**
+	 * Log file name
+	 *
+	 * @var string
+	 */
+	protected $logfile;
+
+	/**
+	 * Application
+	 *
+	 * @var Application
+	 */
+	protected $app;
+
+	/**
+	 * Log Writer
+	 *
+	 * @var Writer
+	 */
+	protected $log;
+
+	/**
 	 * Bootstrap the given application.
 	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application $app
 	 * @return void
 	 */
 	public function bootstrap(Application $app)
@@ -20,8 +40,7 @@ class ConfigureLogging {
 		// Next, we will bind a Closure that resolves the PSR logger implementation
 		// as this will grant us the ability to be interoperable with many other
 		// libraries which are able to utilize the PSR standardized interface.
-		$app->bind('Psr\Log\LoggerInterface', function($app)
-		{
+		$app->bind('Psr\Log\LoggerInterface', function ($app) {
 			return $app['log']->getMonolog();
 		});
 	}
@@ -29,13 +48,13 @@ class ConfigureLogging {
 	/**
 	 * Register the logger instance in the container.
 	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application $app
 	 * @return \Illuminate\Log\Writer
 	 */
 	protected function registerLogger(Application $app)
 	{
 		$app->instance('log', $log = new Writer(
-			new Monolog($app->environment()), $app['events'])
+				new Monolog($app->environment()), $app['events'])
 		);
 
 		return $log;
@@ -44,51 +63,53 @@ class ConfigureLogging {
 	/**
 	 * Configure the Monolog handlers for the application.
 	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
-	 * @param  \Illuminate\Log\Writer  $log
+	 * @param  \Illuminate\Contracts\Foundation\Application $app
+	 * @param  \Illuminate\Log\Writer $log
 	 * @return void
 	 */
 	protected function configureHandlers(Application $app, Writer $log)
 	{
-		$method = "configure".ucfirst($app['config']['app.log'])."Handler";
+		$this->app = $app;
+		$this->log = $log;
+		$this->logfile = $app->storagePath() . '/logs/laravel.log';
 
-		$this->{$method}($app, $log);
+		if (!empty($app['config']['app.logfile'])) {
+			$this->logfile = $app['config']['app.logfile'];
+		}
+
+		$method = "configure" . ucfirst($app['config']['app.log']) . "Handler";
+
+		$this->{$method}();
 	}
 
 	/**
 	 * Configure the Monolog handlers for the application.
 	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
-	 * @param  \Illuminate\Log\Writer  $log
 	 * @return void
 	 */
-	protected function configureSingleHandler(Application $app, Writer $log)
+	protected function configureSingleHandler()
 	{
-		$log->useFiles($app->storagePath().'/logs/laravel.log');
+		$this->log->useFiles($this->logfile);
 	}
 
 	/**
 	 * Configure the Monolog handlers for the application.
 	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
-	 * @param  \Illuminate\Log\Writer  $log
 	 * @return void
 	 */
-	protected function configureDailyHandler(Application $app, Writer $log)
+	protected function configureDailyHandler()
 	{
-		$log->useDailyFiles($app->storagePath().'/logs/laravel.log', 5);
+		$this->log->useDailyFiles($this->logfile, 5);
 	}
 
 	/**
 	 * Configure the Monolog handlers for the application.
 	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
-	 * @param  \Illuminate\Log\Writer  $log
 	 * @return void
 	 */
-	protected function configureSyslogHandler(Application $app, Writer $log)
+	protected function configureSyslogHandler()
 	{
-		$log->useSyslog('laravel');
+		$this->log->useSyslog('laravel');
 	}
 
 }
