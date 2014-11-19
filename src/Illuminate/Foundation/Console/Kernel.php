@@ -137,18 +137,6 @@ class Kernel implements KernelContract {
 	}
 
 	/**
-	 * Get all of the commands registered with the console.
-	 *
-	 * @return array
-	 */
-	public function all()
-	{
-		$this->bootstrap();
-
-		return $this->getArtisan()->all();
-	}
-
-	/**
 	 * Get the output for the last run command.
 	 *
 	 * @return string
