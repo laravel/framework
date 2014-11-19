@@ -112,6 +112,18 @@ class Mailer implements MailerContract, MailQueueContract {
 	}
 
 	/**
+	 * Send a new message when only a raw text part.
+	 *
+	 * @param  string  $text
+	 * @param  mixed   $callback
+	 * @return int
+	 */
+	public function raw($text, $callback)
+	{
+		return $this->send(array('raw' => $text), [], $callback);
+	}
+
+	/**
 	 * Send a new message when only a plain part.
 	 *
 	 * @param  string  $view
@@ -137,7 +149,7 @@ class Mailer implements MailerContract, MailQueueContract {
 		// First we need to parse the view, which could either be a string or an array
 		// containing both an HTML and plain text versions of the view which should
 		// be used when sending an e-mail. We will extract both of them out here.
-		list($view, $plain) = $this->parseView($view);
+		list($view, $plain, $raw) = $this->parseView($view);
 
 		$data['message'] = $message = $this->createMessage();
 
@@ -146,7 +158,7 @@ class Mailer implements MailerContract, MailQueueContract {
 		// Once we have retrieved the view content for the e-mail we will set the body
 		// of this message using the HTML type, which will provide a simple wrapper
 		// to creating view based emails that are able to receive arrays of data.
-		$this->addContent($message, $view, $plain, $data);
+		$this->addContent($message, $view, $plain, $raw, $data);
 
 		$message = $message->getSwiftMessage();
 
@@ -264,10 +276,11 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * @param  \Illuminate\Mail\Message  $message
 	 * @param  string  $view
 	 * @param  string  $plain
+	 * @param  string  $raw
 	 * @param  array   $data
 	 * @return void
 	 */
-	protected function addContent($message, $view, $plain, $data)
+	protected function addContent($message, $view, $plain, $raw, $data)
 	{
 		if (isset($view))
 		{
@@ -277,6 +290,11 @@ class Mailer implements MailerContract, MailQueueContract {
 		if (isset($plain))
 		{
 			$message->addPart($this->getView($plain, $data), 'text/plain');
+		}
+
+		if (isset($raw))
+		{
+			$message->addPart($raw, 'text/plain');
 		}
 	}
 
@@ -290,14 +308,14 @@ class Mailer implements MailerContract, MailQueueContract {
 	 */
 	protected function parseView($view)
 	{
-		if (is_string($view)) return array($view, null);
+		if (is_string($view)) return [$view, null, null];
 
 		// If the given view is an array with numeric keys, we will just assume that
 		// both a "pretty" and "plain" view were provided, so we will return this
 		// array as is, since must should contain both views with numeric keys.
 		if (is_array($view) && isset($view[0]))
 		{
-			return $view;
+			return [$view[0], $view[1], null];
 		}
 
 		// If the view is an array, but doesn't contain numeric keys, we will assume
@@ -305,9 +323,11 @@ class Mailer implements MailerContract, MailQueueContract {
 		// named keys instead, allowing the developers to use one or the other.
 		elseif (is_array($view))
 		{
-			return array(
-				array_get($view, 'html'), array_get($view, 'text')
-			);
+			return [
+				array_get($view, 'html'),
+				array_get($view, 'text'),
+				array_get($view, 'raw'),
+			];
 		}
 
 		throw new \InvalidArgumentException("Invalid view.");

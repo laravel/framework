@@ -65,6 +65,26 @@ class Kernel implements KernelContract {
 	 */
 	public function handle($request)
 	{
+		try
+		{
+			return $this->sendRequestThroughRouter($request);
+		}
+		catch (Exception $e)
+		{
+			$this->reportException($e);
+
+			return $this->renderException($request, $e);
+		}
+	}
+
+	/**
+	 * Send the given request through the middleware / router.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	protected function sendRequestThroughRouter($request)
+	{
 		$this->app->instance('request', $request);
 
 		$this->bootstrap();

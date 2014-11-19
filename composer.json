@@ -20,6 +20,7 @@
         "jeremeamia/superclosure": "~1.0.1",
         "league/flysystem": "0.6.*",
         "monolog/monolog": "~1.6",
+        "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.0",
         "patchwork/utf8": "~1.1",
         "predis/predis": "~1.0",
