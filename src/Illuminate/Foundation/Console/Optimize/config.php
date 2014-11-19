@@ -43,6 +43,8 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Http/Request.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Http/Middleware/FrameGuard.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/CheckForMaintenanceMode.php',
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Request.php',
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/ParameterBag.php',
     $basePath.'/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/FileBag.php',
