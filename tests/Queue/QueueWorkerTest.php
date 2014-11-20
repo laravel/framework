@@ -58,7 +58,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('getQueue')->once()->andReturn('queue');
 		$job->shouldReceive('getRawBody')->once()->andReturn('body');
 		$job->shouldReceive('delete')->once();
-		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body', '/^exception \'[a-zA-Z]+Exception\'/');
+		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body', 'RuntimeException');
 
 		$worker->process('connection', $job, 3, 0);
 	}
@@ -72,7 +72,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('getQueue')->once()->andReturn('queue');
 		$job->shouldReceive('getRawBody')->once()->andReturn('body');
 		$job->shouldReceive('delete')->once();
-		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body', '/^exception \'RuntimeException\' with message \'Oops\'/');
+		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body', 'RuntimeException');
 
 		$worker->process('connection', $job, 1, 0);
 	}

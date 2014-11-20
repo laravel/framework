@@ -242,7 +242,7 @@ class Worker {
 	{
 		if ($this->failer)
 		{
-			$this->failer->log($connection, $job->getQueue(), $job->getRawBody(), (string) $exception);
+			$this->failer->log($connection, $job->getQueue(), $job->getRawBody(), $exception);
 
 			$job->delete();
 

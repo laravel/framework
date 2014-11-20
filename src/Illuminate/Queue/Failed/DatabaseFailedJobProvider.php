@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\ConnectionResolverInterface;
+use Exception;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 
@@ -47,14 +48,15 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	 * @param  string  $connection
 	 * @param  string  $queue
 	 * @param  string  $payload
-	 * @param  string  $error
+	 * @param  \Exception  $error
 	 * @return void
 	 */
-	public function log($connection, $queue, $payload, $error)
+	public function log($connection, $queue, $payload, Exception $exception = null)
 	{
 		$failed_at = Carbon::now();
+		$message = $exception ? $exception->getMessage() : '';
 
-		$this->getTable()->insert(compact('connection', 'queue', 'payload', 'error', 'failed_at'));
+		$this->getTable()->insert(compact('connection', 'queue', 'payload', 'exception', 'message', 'failed_at'));
 	}
 
 	/**

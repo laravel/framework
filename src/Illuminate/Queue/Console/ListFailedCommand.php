@@ -52,20 +52,13 @@ class ListFailedCommand extends Command {
 	 */
 	protected function parseFailedJob(array $failed)
 	{
-		$error = $failed['error'];
-
-		// Attempt to extract the message portion
-		if ($error && preg_match('/^exception \'[a-zA-Z]+Exception\' with message \'([^\']+)\'/', $error, $matches)) {
-			$error = $matches[1];
-		}
-
 		return array(
 			'id' => $failed['id'],
 			'connection' => $failed['connection'],
 			'queue' => $failed['queue'],
 			'class' => array_get(json_decode($failed['payload'], true), 'job'),
 			'payload' => $failed['payload'],
-			'error' => $error,
+			'message' => $failed['message'],
 			'failed_at' => $failed['failed_at']
 		);
 	}
