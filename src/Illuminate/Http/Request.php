@@ -608,6 +608,16 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
+	{
+		$files = array_filter((array) $files);
+
+		return parent::duplicate($query, $request, $attributes, $cookies, $files, $server);
+	}
+
+	/**
 	 * Get the session associated with the request.
 	 *
 	 * @return \Illuminate\Session\Store
