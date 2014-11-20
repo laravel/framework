@@ -542,7 +542,7 @@ if ( ! function_exists('format_filesize'))
 		// If you send 0 to the formula below, it will throw a division by zero error.
 		if ($size === 0)
 		{
-			return '0 B';
+			return '0 '.$sizes[0];
 		}
 
 		return (round($size / pow(1024, ($index = floor(log($size, 1024)))), 2).' '.$sizes[$index]);
