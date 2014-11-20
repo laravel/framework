@@ -58,15 +58,13 @@ class TransportManager extends Manager {
 	}
 
 	/**
-	 * Create an instance of the SES Swift Transport drive.
+	 * Create an instance of the Amazon SES Swift Transport driver.
 	 *
 	 * @return \Swift_SendmailTransport
 	 */
 	protected function createSesDriver()
 	{
-		$ses = $this->app['config']->get('services.ses', array());
-
-		$sesClient = SesClient::factory($ses);
+		$sesClient = SesClient::factory($this->app['config']->get('services.ses', []));
 
 		return new SesTransport($sesClient);
 	}
