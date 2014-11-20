@@ -4,6 +4,7 @@ use Illuminate\Queue\Jobs\Job;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
+use Exception;
 
 class Worker {
 
@@ -110,7 +111,7 @@ class Worker {
 		{
 			$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			if ($this->exceptions) $this->exceptions->handleException($e);
 		}
@@ -192,11 +193,6 @@ class Worker {
 	 */
 	public function process($connection, Job $job, $maxTries = 0, $delay = 0)
 	{
-		if ($maxTries > 0 && $job->attempts() > $maxTries)
-		{
-			return $this->logFailedJob($connection, $job);
-		}
-
 		try
 		{
 			// First we will fire off the job. Once it is done we will see if it will
@@ -209,8 +205,15 @@ class Worker {
 			return ['job' => $job, 'failed' => false];
 		}
 
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
+			// If the job failed, let's log it and exit the process early.
+			if ($maxTries > 0 && ($job->attempts() + 1) >= $maxTries)
+			{
+				$this->logFailedJob($connection, $job, $e);
+				return;
+			}
+
 			// If we catch an exception, we will attempt to release the job back onto
 			// the queue so it is not lost. This will let is be retried at a later
 			// time by another listener (or the same one). We will do that here.
@@ -225,13 +228,14 @@ class Worker {
 	 *
 	 * @param  string  $connection
 	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  \Exception  $exception
 	 * @return array
 	 */
-	protected function logFailedJob($connection, Job $job)
+	protected function logFailedJob($connection, Job $job, Exception $exception)
 	{
 		if ($this->failer)
 		{
-			$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
+			$this->failer->log($connection, $job->getQueue(), $job->getRawBody(), (string) $exception);
 
 			$job->delete();
 

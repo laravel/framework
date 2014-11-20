@@ -8,9 +8,10 @@ interface FailedJobProviderInterface {
 	 * @param  string  $connection
 	 * @param  string  $queue
 	 * @param  string  $payload
+	 * @param  string  $error
 	 * @return void
 	 */
-	public function log($connection, $queue, $payload);
+	public function log($connection, $queue, $payload, $error);
 
 	/**
 	 * Get a list of all of the failed jobs.
