@@ -213,7 +213,7 @@ class ResourceRegistrar {
 	{
 		$group = str_replace('/', '.', $this->router->getLastGroupPrefix());
 
-		return trim("{$prefix}{$group}.{$resource}.{$method}", '.');
+		return trim("{$prefix}{$group}{$resource}.{$method}", '.');
 	}
 
 	/**
