@@ -59,7 +59,7 @@ class ConsoleMakeCommand extends GeneratorCommand {
 	 */
 	protected function getDefaultNamespace($rootNamespace)
 	{
-		return $rootNamespace.'\Console';
+		return $rootNamespace.'\Console\Commands';
 	}
 
 	/**

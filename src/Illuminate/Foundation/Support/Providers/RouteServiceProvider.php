@@ -1,9 +1,17 @@
 <?php namespace Illuminate\Foundation\Support\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Annotations\Scanner;
 
 class RouteServiceProvider extends ServiceProvider {
+
+	/**
+	 * The controller namespace for the application.
+	 *
+	 * @var string
+	 */
+	protected $namespace = '';
 
 	/**
 	 * The controllers to scan for route annotations.
@@ -20,15 +28,14 @@ class RouteServiceProvider extends ServiceProvider {
 	protected $scanWhenLocal = false;
 
 	/**
-	 * Register the service provider.
+	 * Bootstrap any application services.
 	 *
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @return void
 	 */
-	public function boot()
+	public function boot(Router $router)
 	{
-		$this->addMiddleware();
-
-		$this->app->call([$this, 'before']);
+		$this->setRootControllerNamespace();
 
 		if ($this->app->routesAreCached())
 		{
@@ -41,18 +48,16 @@ class RouteServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Add the short-hand middleware names to the router.
+	 * Set the root controller namespace for the application.
 	 *
 	 * @return void
 	 */
-	protected function addMiddleware()
+	protected function setRootControllerNamespace()
 	{
-		$router = $this->app['router'];
+		if (is_null($this->namespace)) return;
 
-		foreach ($this->middleware as $key => $value)
-		{
-			$router->middleware($key, $value);
-		}
+		$this->app['Illuminate\Contracts\Routing\UrlGenerator']
+						->setRootControllerNamespace($this->namespace);
 	}
 
 	/**
@@ -86,6 +91,22 @@ class RouteServiceProvider extends ServiceProvider {
 		}
 
 		$this->app->call([$this, 'map']);
+	}
+
+	/**
+	 * Load the standard routes file for the application.
+	 *
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function loadRoutesFrom($path)
+	{
+		$router = $this->app['Illuminate\Routing\Router'];
+
+		$router->group(['namespace' => $this->namespace], function($router) use ($path)
+		{
+			require $path;
+		});
 	}
 
 	/**

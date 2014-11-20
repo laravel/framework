@@ -46,6 +46,13 @@ class Kernel implements KernelContract {
 	protected $middleware = [];
 
 	/**
+	 * The application's route middleware.
+	 *
+	 * @var array
+	 */
+	protected $routeMiddleware = [];
+
+	/**
 	 * Create a new HTTP kernel instance.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -55,6 +62,11 @@ class Kernel implements KernelContract {
 	{
 		$this->app = $app;
 		$this->router = $router;
+
+		foreach ($this->routeMiddleware as $key => $middleware)
+		{
+			$router->middleware($key, $middleware);
+		}
 	}
 
 	/**
