@@ -134,6 +134,10 @@ class AppNameCommand extends Command {
 		$this->replaceIn(
 			$this->getBootstrapPath(), $this->currentRoot.'\\Console', $this->argument('name').'\\Console'
 		);
+		
+		$this->replaceIn(
+			$this->getBootstrapPath(), $this->currentRoot.'\\Exceptions', $this->argument('name').'\\Exceptions'
+		);
 	}
 
 	/**
