@@ -10,7 +10,7 @@ class MySqlProcessor extends Processor {
 	 */
 	public function processColumnListing($results)
 	{
-		return array_map(function($r) { return $r->column_name; }, $results);
+		return array_map(function($r) { $r = (object) $r; return $r->column_name; }, $results);
 	}
 
 }
