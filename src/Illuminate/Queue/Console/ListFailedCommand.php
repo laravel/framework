@@ -39,7 +39,7 @@ class ListFailedCommand extends Command {
 
 		$table = $this->getHelperSet()->get('table');
 
-		$table->setHeaders(array('ID', 'Connection', 'Queue', 'Class', 'Failed At'))
+		$table->setHeaders(array('ID', 'Connection', 'Queue', 'Class', 'Payload', 'Error Message', 'Failed At'))
               ->setRows($rows)
               ->render($this->output);
 	}
@@ -52,11 +52,22 @@ class ListFailedCommand extends Command {
 	 */
 	protected function parseFailedJob(array $failed)
 	{
-		$row = array_values(array_except($failed, array('payload')));
+		$error = $failed['error'];
 
-		array_splice($row, 3, 0, array_get(json_decode($failed['payload'], true), 'job'));
+		// Attempt to extract the message portion
+		if ($error && preg_match('/^exception \'[a-zA-Z]+Exception\' with message \'([^\']+)\'/', $error, $matches)) {
+			$error = $matches[1];
+		}
 
-		return $row;
+		return array(
+			'id' => $failed['id'],
+			'connection' => $failed['connection'],
+			'queue' => $failed['queue'],
+			'class' => array_get(json_decode($failed['payload'], true), 'job'),
+			'payload' => $failed['payload'],
+			'error' => $error,
+			'failed_at' => $failed['failed_at']
+		);
 	}
 
 }
