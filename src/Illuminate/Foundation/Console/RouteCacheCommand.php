@@ -77,7 +77,7 @@ class RouteCacheCommand extends Command {
 	{
 		$app = require $this->laravel['path.base'].'/bootstrap/app.php';
 
-		$app->make('Illuminate\Contracts\Http\Kernel')->bootstrap();
+		$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
 		return $app['router']->getRoutes();
 	}
