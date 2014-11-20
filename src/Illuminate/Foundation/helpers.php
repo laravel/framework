@@ -341,7 +341,7 @@ if ( ! function_exists('response'))
 	 * @param  string  $content
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Routing\ResponseFactory
 	 */
 	function response($content = '', $status = 200, array $headers = array())
 	{
