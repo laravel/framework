@@ -5,6 +5,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Exception;
+use RuntimeException;
 
 class Worker {
 
@@ -193,6 +194,12 @@ class Worker {
 	 */
 	public function process($connection, Job $job, $maxTries = 0, $delay = 0)
 	{
+		if ($maxTries > 0 && $job->attempts() > $maxTries)
+		{
+			$this->logFailedJob($connection, $job, new RuntimeException(sprintf('Max tries of %d attempted.', $maxTries)));
+			return;
+		}
+
 		try
 		{
 			// First we will fire off the job. Once it is done we will see if it will
@@ -207,7 +214,7 @@ class Worker {
 
 		catch (Exception $e)
 		{
-			// If the job failed, let's log it and exit the process early.
+			// If the job failed and hit the max, let's log it and exit the process early.
 			if ($maxTries > 0 && ($job->attempts() + 1) >= $maxTries)
 			{
 				$this->logFailedJob($connection, $job, $e);
