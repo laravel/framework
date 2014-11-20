@@ -2397,6 +2397,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			{
 				$attributes[$key] = $relation;
 			}
+
+			unset($relation);
 		}
 
 		return $attributes;

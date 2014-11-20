@@ -11,6 +11,15 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSetRelationFail()
+	{
+		$parent = new EloquentRelationResetModelStub;
+		$relation =new EloquentRelationResetModelStub;
+		$parent->setRelation('test',$relation);
+		$parent->setRelation('foo','bar');
+		$this->assertTrue(!array_key_exists('foo', $parent->toArray()));
+	}
+
 	public function testTouchMethodUpdatesRelatedTimestamps()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
