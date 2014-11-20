@@ -597,6 +597,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		});
 		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
 		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
+
+		// Run the assertions again
+		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
+		$this->assertEquals(array('foo', 'bar'), $builder->getBindings());
 	}
 
 	public function testJoinWhereNull()
