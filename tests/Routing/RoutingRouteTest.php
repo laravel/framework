@@ -802,12 +802,110 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWhereClousureIsTouched(){
+		$router = $this->getRouter();
+
+		$touched = false;
+		$router->get('/foo/bar', function(){
+			return 'foo';
+		})->where(function($route, $request) use (&$touched)
+		{
+			$touched = true;
+			return true;
+		});
+
+		$router->dispatch(Request::create('/foo/bar', 'GET'))->getContent();
+
+		$this->assertTrue($touched);
+	}
+
+	public function testWhereClousure()
+	{
+		$router = $this->getRouter();
+
+		$router->get('/{foo}', function(){
+					return 'foo';
+		})->where(function($route, $request){
+			return false;
+		});
+
+		$router->get('/{bar}', function(){
+			return 'bar';
+		});
+
+		$this->assertEquals('bar', $router->dispatch(Request::create('/some-page', 'GET'))->getContent());
+	}
+
+	public function testWhereClassname()
+	{
+		$router = $this->getRouter();
+
+		$router->get('/{page}', function(){
+					return 'foo';
+		})->where('callable:RouteTestWhereClassnameStub');
+
+		$router->get('/{post}', function(){
+			return 'bar';
+		});
+
+		$this->assertEquals('bar', $router->dispatch(Request::create('/some-page', 'GET'))->getContent());
+	}
+
+	public function testWithoutCallableWhere()
+	{
+		$router = $this->getRouter();
+
+		$router->get('/{page}', function(){
+			return 'foo';
+		});
+
+		$router->get('/{post}', function(){
+			return 'bar';
+		});
+
+		$this->assertEquals('foo', $router->dispatch(Request::create('/some-page', 'GET'))->getContent());
+	}
+
+	public function testParametersWorksInCallableWhere(){
+		$router = $this->getRouter();
+
+		$router->get('/{category}/{post}', function(){
+			return 'foo';
+		})->where(function($route, $request){
+			$this->assertEquals($route->category, 'foo');
+			$this->assertEquals($route->post, 'bar');
+			return true;
+		});
+
+		$router->dispatch(Request::create('/foo/bar', 'GET'))->getContent();
+	}
+
 	protected function getRouter()
 	{
 		return new Router(new Illuminate\Events\Dispatcher);
 	}
 
 }
+
+class RouteTestWhereClassnameStub implements Illuminate\Contracts\Routing\CallableWhere {
+
+	/**
+	 * Validate a given rule against a route and request.
+	 *
+	 * @param  \Illuminate\Routing\Route $route
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return bool
+	 */
+	public function check($route, $request)
+	{
+		// hehe, we dont have any pages
+		// here you can do some, checks, ex:
+		// return Page::whereSlug($route->parameter('slug'))->count();
+		return false;
+	}
+
+}
+
 
 class RouteTestControllerStub extends Illuminate\Routing\Controller {
 	public function __construct()
