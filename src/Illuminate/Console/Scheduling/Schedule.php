@@ -30,9 +30,9 @@ class Schedule {
 	 * @param  string  $command
 	 * @return \Illuminate\Console\Scheduling\Event
 	 */
-	public function artisan($command)
+	public function command($command)
 	{
-		return $this->command(PHP_BINARY.' artisan '.$command);
+		return $this->exec(PHP_BINARY.' artisan '.$command);
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Schedule {
 	 * @param  string  $command
 	 * @return \Illuminate\Console\Scheduling\Event
 	 */
-	public function command($command)
+	public function exec($command)
 	{
 		$this->events[] = $event = new Event($command);
 
