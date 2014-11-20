@@ -6,7 +6,7 @@ interface Log {
 	 * Log an alert message to the logs.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function alert($message, array $context = array());
@@ -15,7 +15,7 @@ interface Log {
 	 * Log a critical message to the logs.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function critical($message, array $context = array());
@@ -24,7 +24,7 @@ interface Log {
 	 * Log an error message to the logs.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function error($message, array $context = array());
@@ -33,7 +33,7 @@ interface Log {
 	 * Log a warning message to the logs.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function warning($message, array $context = array());
@@ -42,7 +42,7 @@ interface Log {
 	 * Log a notice to the logs.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function notice($message, array $context = array());
@@ -51,7 +51,7 @@ interface Log {
 	 * Log an informational message to the logs.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function info($message, array $context = array());
@@ -60,16 +60,17 @@ interface Log {
 	 * Log a debug message to the logs.
 	 *
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function debug($message, array $context = array());
 
 	/**
-	 * Log a message to the logs.
+	 * Log a message of the according level to the logs.
 	 *
+	 * @param  string  $level
 	 * @param  string  $message
-	 * @param  array  $context
+	 * @param  array   $context
 	 * @return void
 	 */
 	public function log($level, $message, array $context = array());
