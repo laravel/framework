@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Illuminate\Http\Request;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase {
@@ -346,6 +347,24 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request2 = Request::create('/', 'POST', array(1 => 'A', 2 => 'B', 3 => 'C'));
 		$request2->replace(array(1 => 'A', 2 => 'B', 3 => 'C'));
 		$this->assertEquals(array(1 => 'A', 2 => 'B', 3 => 'C'), $request2->all());
+	}
+
+
+	public function testInputWithEmptyFilename()
+	{
+		$invalidFiles = [
+			'file' => [
+				'name' => null,
+				'type' => null,
+				'tmp_name' => null,
+				'error' => 4,
+				'size' => 0
+			]
+		];
+
+		$baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), $invalidFiles);
+
+		$request = Request::createFromBase($baseRequest);
 	}
 
 
