@@ -170,9 +170,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerFreshCommand()
 	{
-		$this->app->singleton('command.fresh', function()
+		$this->app->singleton('command.fresh', function($app)
 		{
-			return new FreshCommand;
+			return new FreshCommand($app['files']);
 		});
 	}
 
