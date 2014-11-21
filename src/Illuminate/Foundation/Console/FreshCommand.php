@@ -73,7 +73,7 @@ class FreshCommand extends Command {
 		return [
 			base_path('.bowerrc'),
 			base_path('bower.json'),
-			base_path('gulpfile.json'),
+			base_path('gulpfile.js'),
 			base_path('package.json'),
 		];
 	}
