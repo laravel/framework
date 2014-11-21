@@ -50,14 +50,14 @@ class FreshCommand extends Command {
 		{
 			$this->files->delete($file);
 
-			$this->info('<info>Removed File:</info> '.$file);
+			$this->line('<info>Removed File:</info> '.$file);
 		}
 
 		foreach ($this->getDirectories() as $directory)
 		{
 			$this->files->deleteDirectory($directory);
 
-			$this->info('<comment>Removed Directory:</comment> '.$directory);
+			$this->line('<comment>Removed Directory:</comment> '.$directory);
 		}
 
 		$this->info('Scaffolding Removed!');
