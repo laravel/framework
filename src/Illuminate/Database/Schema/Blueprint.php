@@ -103,9 +103,14 @@ class Blueprint {
 	 */
 	protected function addImpliedCommands()
 	{
-		if (count($this->columns) > 0 && ! $this->creating())
+		if (count($this->getAddedColumns()) > 0 && ! $this->creating())
 		{
 			array_unshift($this->commands, $this->createCommand('add'));
+		}
+
+		if (count($this->getChangedColumns()) > 0 && ! $this->creating())
+		{
+			array_unshift($this->commands, $this->createCommand('change'));
 		}
 
 		$this->addFluentIndexes();
@@ -814,7 +819,7 @@ class Blueprint {
 	}
 
 	/**
-	 * Get the columns that should be added.
+	 * Get the columns on the blueprint.
 	 *
 	 * @return array
 	 */
@@ -831,6 +836,32 @@ class Blueprint {
 	public function getCommands()
 	{
 		return $this->commands;
+	}
+
+	/**
+	 * Get the columns on the blueprint that should be added.
+	 *
+	 * @return array
+	 */
+	public function getAddedColumns()
+	{
+		return array_filter($this->columns, function($column)
+		{
+			return !$column->change;
+		});
+	}
+
+	/**
+	 * Get the columns on the blueprint that should be changed.
+	 *
+	 * @return array
+	 */
+	public function getChangedColumns()
+	{
+		return array_filter($this->columns, function($column)
+		{
+			return !!$column->change;
+		});
 	}
 
 }

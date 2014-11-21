@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Http;
 
+use Closure;
 use SplFileInfo;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -19,6 +20,32 @@ class Request extends SymfonyRequest {
 	 * @var \Illuminate\Session\Store
 	 */
 	protected $sessionStore;
+
+	/**
+	 * The user resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $userResolver;
+
+	/**
+	 * The route resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $routeResolver;
+
+	/**
+	 * Create a new Illuminate HTTP request from server variables.
+	 *
+	 * @return static
+	 */
+	public static function capture()
+	{
+		static::enableHttpMethodParameterOverride();
+
+		return static::createFromBase(SymfonyRequest::createFromGlobals());
+	}
 
 	/**
 	 * Return the Request instance.
@@ -581,6 +608,14 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
+	{
+		return parent::duplicate($query, $request, $attributes, $cookies, array_filter((array) $files), $server);
+	}
+
+	/**
 	 * Get the session associated with the request.
 	 *
 	 * @return \Illuminate\Session\Store
@@ -595,6 +630,98 @@ class Request extends SymfonyRequest {
 		}
 
 		return $this->getSession();
+	}
+
+	/**
+	 * Get the user making the request.
+	 *
+	 * @return mixed
+	 */
+	public function user()
+	{
+		return call_user_func($this->getUserResolver());
+	}
+
+	/**
+	 * Get the route handling the request.
+	 *
+	 * @return \Illuminate\Routing\Route|null
+	 */
+	public function route()
+	{
+		if (func_num_args() == 1)
+		{
+			return $this->route()->parameter(func_get_arg(0));
+		}
+		else
+		{
+			return call_user_func($this->getRouteResolver());
+		}
+	}
+
+	/**
+	 * Get the user resolver callback.
+	 *
+	 * @return \Closure
+	 */
+	public function getUserResolver()
+	{
+		return $this->userResolver ?: function() {};
+	}
+
+	/**
+	 * Set the user resolver callback.
+	 *
+	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function setUserResolver(Closure $callback)
+	{
+		$this->userResolver = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Get the route resolver callback.
+	 *
+	 * @return \Closure
+	 */
+	public function getRouteResolver()
+	{
+		return $this->routeResolver ?: function() {};
+	}
+
+	/**
+	 * Set the route resolver callback.
+	 *
+	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function setRouteResolver(Closure $callback)
+	{
+		$this->routeResolver = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Get an input element from the request.
+	 *
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		$input = $this->input();
+
+		if (array_key_exists($key, $input))
+		{
+			return $this->input($key);
+		}
+		elseif ( ! is_null($this->route()))
+		{
+			return $this->route()->parameter($key);
+		}
 	}
 
 }

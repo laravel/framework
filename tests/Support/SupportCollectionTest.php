@@ -48,9 +48,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
-		$item1 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item1 = m::mock('Illuminate\Contracts\Support\Arrayable');
 		$item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-		$item2 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
 		$item2->shouldReceive('toArray')->once()->andReturn('bar.array');
 		$c = new Collection(array($item1, $item2));
 		$results = $c->toArray();
@@ -324,6 +324,80 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMakeMethodFromNull()
+	{
+		$collection = Collection::make(null);
+		$this->assertEquals([], $collection->all());
+
+		$collection = Collection::make();
+		$this->assertEquals([], $collection->all());
+	}
+
+
+	public function testMakeMethodFromCollection()
+	{
+		$firstCollection = Collection::make(['foo' => 'bar']);
+		$secondCollection = Collection::make($firstCollection);
+		$this->assertEquals(['foo' => 'bar'], $secondCollection->all());
+	}
+
+
+	public function testMakeMethodFromArray()
+	{
+		$collection = Collection::make(['foo' => 'bar']);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+	public function testConstructMakeFromObject()
+	{
+		$object = new stdClass();
+		$object->foo = 'bar';
+		$collection = Collection::make($object);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
+	public function testConstructMethod()
+	{
+		$collection = new Collection('foo');
+		$this->assertEquals(array('foo'), $collection->all());
+	}
+
+
+	public function testConstructMethodFromNull()
+	{
+		$collection = new Collection(null);
+		$this->assertEquals([], $collection->all());
+
+		$collection = new Collection();
+		$this->assertEquals([], $collection->all());
+	}
+
+
+	public function testConstructMethodFromCollection()
+	{
+		$firstCollection = new Collection(['foo' => 'bar']);
+		$secondCollection = new Collection($firstCollection);
+		$this->assertEquals(['foo' => 'bar'], $secondCollection->all());
+	}
+
+
+	public function testConstructMethodFromArray()
+	{
+		$collection = new Collection(['foo' => 'bar']);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
+	public function testConstructMethodFromObject()
+	{
+		$object = new stdClass();
+		$object->foo = 'bar';
+		$collection = new Collection($object);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
 	public function testSplice()
 	{
 		$data = new Collection(array('foo', 'baz'));
@@ -481,6 +555,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$c = new Collection(array('name' => 'taylor', 'framework' => 'laravel'));
 		$this->assertEquals(array('name', 'framework'), $c->keys());
+	}
+
+
+	public function testPaginate()
+	{
+		$c = new Collection(['one', 'two', 'three', 'four']);
+		$this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
+		$this->assertEquals(['three', 'four'], $c->forPage(2, 2)->all());
+		$this->assertEquals([], $c->forPage(3, 2)->all());
 	}
 
 }

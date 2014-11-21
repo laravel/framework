@@ -3,8 +3,9 @@
 use Closure;
 use ArrayAccess;
 use Illuminate\Support\NamespacedItemResolver;
+use Illuminate\Contracts\Config\Repository as ConfigContract;
 
-class Repository extends NamespacedItemResolver implements ArrayAccess {
+class Repository extends NamespacedItemResolver implements ArrayAccess, ConfigContract {
 
 	/**
 	 * The loader implementation.

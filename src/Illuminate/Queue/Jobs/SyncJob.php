@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Job as JobContract;
 
-class SyncJob extends Job {
+class SyncJob extends Job implements JobContract {
 
 	/**
 	 * The class name of the job.
@@ -17,20 +17,18 @@ class SyncJob extends Job {
 	 *
 	 * @var string
 	 */
-	protected $data;
+	protected $payload;
 
 	/**
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @param  string  $job
-	 * @param  string  $data
+	 * @param  string  $payload
 	 * @return void
 	 */
-	public function __construct(Container $container, $job, $data = '')
+	public function __construct(Container $container, $payload)
 	{
-		$this->job = $job;
-		$this->data = $data;
+		$this->payload = $payload;
 		$this->container = $container;
 	}
 
@@ -41,16 +39,7 @@ class SyncJob extends Job {
 	 */
 	public function fire()
 	{
-		$data = json_decode($this->data, true);
-
-		if ($this->job instanceof Closure)
-		{
-			call_user_func($this->job, $this, $data);
-		}
-		else
-		{
-			$this->resolveAndFire(array('job' => $this->job, 'data' => $data));
-		}
+		$this->resolveAndFire(json_decode($this->payload, true));
 	}
 
 	/**

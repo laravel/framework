@@ -1,5 +1,6 @@
 {
     "name": "illuminate/cookie",
+    "description": "The Illuminate Cookie package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,20 +10,19 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/encryption": "4.2.*",
-        "illuminate/support": "4.2.*",
-        "symfony/http-kernel": "2.5.*",
-        "symfony/http-foundation": "2.5.*"
+        "illuminate/contracts": "5.0.*",
+        "illuminate/support": "5.0.*",
+        "symfony/http-kernel": "2.6.*",
+        "symfony/http-foundation": "2.6.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Cookie": ""
+        "psr-4": {
+            "Illuminate\\Cookie\\": ""
         }
     },
-    "target-dir": "Illuminate/Cookie",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

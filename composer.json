@@ -11,30 +11,30 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "ext-openssl": "*",
+        "ext-mcrypt": "*",
         "classpreloader/classpreloader": "~1.0.2",
         "d11wtq/boris": "~1.0",
+        "doctrine/annotations": "~1.0",
         "ircmaxell/password-compat": "~1.0",
-        "filp/whoops": "1.1.*",
         "jeremeamia/superclosure": "~1.0.1",
+        "league/flysystem": "0.6.*",
         "monolog/monolog": "~1.6",
+        "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.0",
-        "patchwork/utf8": "1.1.*",
-        "phpseclib/phpseclib": "0.3.*",
-        "predis/predis": "0.8.*",
-        "stack/builder": "~1.0",
+        "patchwork/utf8": "~1.1",
+        "predis/predis": "~1.0",
         "swiftmailer/swiftmailer": "~5.1",
-        "symfony/browser-kit": "2.5.*",
-        "symfony/console": "2.5.*",
-        "symfony/css-selector": "2.5.*",
-        "symfony/debug": "2.5.*",
-        "symfony/dom-crawler": "2.5.*",
-        "symfony/finder": "2.5.*",
-        "symfony/http-foundation": "2.5.*",
-        "symfony/http-kernel": "2.5.*",
-        "symfony/process": "2.5.*",
-        "symfony/routing": "2.5.*",
-        "symfony/security-core": "2.5.*",
-        "symfony/translation": "2.5.*"
+        "symfony/console": "2.6.*",
+        "symfony/debug": "2.6.*",
+        "symfony/finder": "2.6.*",
+        "symfony/http-foundation": "2.6.*",
+        "symfony/http-kernel": "2.6.*",
+        "symfony/process": "2.6.*",
+        "symfony/routing": "2.6.*",
+        "symfony/security-core": "2.6.*",
+        "symfony/translation": "2.6.*",
+        "vlucas/phpdotenv": "~1.0"
     },
     "replace": {
         "illuminate/auth": "self.version",
@@ -42,6 +42,7 @@
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
         "illuminate/container": "self.version",
+        "illuminate/contracts": "self.version",
         "illuminate/cookie": "self.version",
         "illuminate/database": "self.version",
         "illuminate/encryption": "self.version",
@@ -51,13 +52,11 @@
         "illuminate/foundation": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
-        "illuminate/html": "self.version",
         "illuminate/log": "self.version",
         "illuminate/mail": "self.version",
         "illuminate/pagination": "self.version",
         "illuminate/queue": "self.version",
         "illuminate/redis": "self.version",
-        "illuminate/remote": "self.version",
         "illuminate/routing": "self.version",
         "illuminate/session": "self.version",
         "illuminate/support": "self.version",
@@ -69,7 +68,7 @@
     "require-dev": {
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",
-        "pda/pheanstalk": "~2.1",
+        "pda/pheanstalk": "~3.0",
         "mockery/mockery": "~0.9",
         "phpunit/phpunit": "~4.0"
     },
@@ -78,6 +77,7 @@
             "src/Illuminate/Queue/IlluminateQueueClosure.php"
         ],
         "files": [
+            "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],
         "psr-0": {
@@ -86,11 +86,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "suggest": {
-        "doctrine/dbal": "Allow renaming columns and dropping SQLite columns."
+        "doctrine/dbal": "Allow renaming columns and dropping SQLite columns.",
+        "guzzlehttp/guzzle": "Required for Mailgun and Mandrill mail drivers."
     },
     "minimum-stability": "dev"
 }

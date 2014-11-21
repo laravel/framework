@@ -4,6 +4,7 @@ git subsplit publish src/Illuminate/Cache:git@github.com:illuminate/cache.git
 git subsplit publish src/Illuminate/Config:git@github.com:illuminate/config.git
 git subsplit publish src/Illuminate/Console:git@github.com:illuminate/console.git
 git subsplit publish src/Illuminate/Container:git@github.com:illuminate/container.git
+git subsplit publish --heads="master" src/Illuminate/Contracts:git@github.com:illuminate/contracts.git
 git subsplit publish src/Illuminate/Cookie:git@github.com:illuminate/cookie.git
 git subsplit publish src/Illuminate/Database:git@github.com:illuminate/database.git
 git subsplit publish src/Illuminate/Encryption:git@github.com:illuminate/encryption.git

@@ -2,7 +2,7 @@
 
 use Mockery as m;
 use Illuminate\View\View;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\Arrayable;
 
 class ViewTest extends PHPUnit_Framework_TestCase {
 
@@ -90,7 +90,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testViewAcceptsArrayableImplementations()
 	{
-		$arrayable = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$arrayable = m::mock('Illuminate\Contracts\Support\Arrayable');
 		$arrayable->shouldReceive('toArray')->once()->andReturn(array('foo' => 'bar', 'baz' => array('qux', 'corge')));
 
 		$view = new View(
@@ -163,7 +163,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
 		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-		$view->renderable = m::mock('Illuminate\Support\Contracts\RenderableInterface');
+		$view->renderable = m::mock('Illuminate\Contracts\Support\Renderable');
 		$view->renderable->shouldReceive('render')->once()->andReturn('text');
 		$this->assertEquals('contents', $view->render());
 	}

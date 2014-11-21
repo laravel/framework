@@ -20,7 +20,7 @@ class TranslationServiceProvider extends ServiceProvider {
 	{
 		$this->registerLoader();
 
-		$this->app->bindShared('translator', function($app)
+		$this->app->singleton('translator', function($app)
 		{
 			$loader = $app['translation.loader'];
 
@@ -44,9 +44,9 @@ class TranslationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerLoader()
 	{
-		$this->app->bindShared('translation.loader', function($app)
+		$this->app->singleton('translation.loader', function($app)
 		{
-			return new FileLoader($app['files'], $app['path'].'/lang');
+			return new FileLoader($app['files'], $app['path.lang']);
 		});
 	}
 

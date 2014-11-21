@@ -1,4 +1,22 @@
 {
+	"5.0.*": [
+		{"message": "Allow passing a priority to Eloquent event listeners.", "backport": null},
+		{"message": "Tweak 'compile' configuration file for 'files' and 'providers' support.", "backport": null},
+		{"message": "Allow method injection via IoC to any controller or route method.", "backport": null},
+		{"message": "Added the 'call' method to the Container to execute a callback with its dependencies.", "backport": null},
+		{"message": "Added 'route:cache' Artisan command for ultra fast route definition.", "backport": null},
+		{"message": "Added new FormRequest class for simpler validation and authorization.", "backport": null},
+		{"message": "Contracts for most major components of the framework.", "backport": null},
+		{"message": "Flysystem integration now included with framework.", "backport": null},
+		{"message": "Passing an Eloquent model to a URL generator method will now automatically pull its ID.", "backport": null},
+		{"message": "Make both {{ }} and {{{ }}} escape values by default, new {!! !!} construct to echo raw data.", "backport": null},
+		{"message": "Add 'after' callback to Validator.", "backport": null},
+		{"message": "Returning 'false' from a database ::chunk operation will stop processing records.", "backport": null},
+		{"message": "The 'swift.transport' container binding is now an instance of 'Illuminate\\Mail\\TransportManager'.", "backport": null},
+		{"message": "Added support for container context aware bindings and container tags.", "backport": null},
+		{"message": "SVG files are now considered valid by the 'image' validation rule.", "backport": null},
+		{"message": "Eloquent models are now gracefully retrieved when needed by queue jobs.", "backport": null}
+	],
 	"4.2.*": [
 		{"message": "View and Pagination 'Environment' classes renamed to 'Factory'.", "backport": null},
 		{"message": "Configurable encryption for Iron.io queue messages.", "backport": null},

@@ -1,5 +1,6 @@
 {
     "name": "illuminate/console",
+    "description": "The Illuminate Console package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,17 +10,21 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "symfony/console": "2.5.*"
+        "illuminate/contracts": "5.0.*",
+        "symfony/console": "2.6.*"
+    },
+    "require-dev": {
+        "mtdowling/cron-expression": "~1.0",
+        "symfony/process": "2.6.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Console": ""
+        "psr-4": {
+            "Illuminate\\Console\\": ""
         }
     },
-    "target-dir": "Illuminate/Console",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

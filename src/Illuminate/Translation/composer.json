@@ -1,5 +1,6 @@
 {
     "name": "illuminate/translation",
+    "description": "The Illuminate Translation package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,19 +10,18 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/filesystem": "4.2.*",
-        "illuminate/support": "4.2.*",
-        "symfony/translation": "2.5.*"
+        "illuminate/filesystem": "5.0.*",
+        "illuminate/support": "5.0.*",
+        "symfony/translation": "2.6.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Translation": ""
+        "psr-4": {
+            "Illuminate\\Translation\\": ""
         }
     },
-    "target-dir": "Illuminate/Translation",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

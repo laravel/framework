@@ -59,65 +59,6 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testSelectWithCaching()
-	{
-		$cache = m::mock('stdClass');
-		$driver = m::mock('stdClass');
-		$query = $this->setupCacheTestQuery($cache, $driver);
-
-		$query = $query->remember(5);
-
-		$driver->shouldReceive('remember')
-						 ->once()
-						 ->with($query->getCacheKey(), 5, m::type('Closure'))
-						 ->andReturnUsing(function($key, $minutes, $callback) { return $callback(); });
-
-
-		$this->assertEquals($query->get(), array('results'));
-	}
-
-
-	public function testSelectWithCachingForever()
-	{
-		$cache = m::mock('stdClass');
-		$driver = m::mock('stdClass');
-		$query = $this->setupCacheTestQuery($cache, $driver);
-
-		$query = $query->rememberForever();
-
-		$driver->shouldReceive('rememberForever')
-												->once()
-												->with($query->getCacheKey(), m::type('Closure'))
-												->andReturnUsing(function($key, $callback) { return $callback(); });
-
-
-
-		$this->assertEquals($query->get(), array('results'));
-	}
-
-
-	public function testSelectWithCachingAndTags()
-	{
-		$taggedCache = m::mock('StdClass');
-		$cache = m::mock('stdClass');
-		$driver = m::mock('stdClass');
-
-		$driver->shouldReceive('tags')
-				->once()
-				->with(array('foo','bar'))
-				->andReturn($taggedCache);
-
-		$query = $this->setupCacheTestQuery($cache, $driver);
-		$query = $query->cacheTags(array('foo', 'bar'))->remember(5);
-
-		$taggedCache->shouldReceive('remember')
-						->once()
-						->with($query->getCacheKey(), 5, m::type('Closure'))
-						->andReturnUsing(function($key, $minutes, $callback) { return $callback(); });
-
-		$this->assertEquals($query->get(), array('results'));
-	}
-
 
 	public function testBasicAlias()
 	{
@@ -687,78 +628,6 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPaginateCorrectlyCreatesPaginatorInstance()
-	{
-		$connection = m::mock('Illuminate\Database\ConnectionInterface');
-		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getPaginationCount', 'forPage', 'get'), array($connection, $grammar, $processor));
-		$paginator = m::mock('Illuminate\Pagination\Factory');
-		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
-		$builder->expects($this->once())->method('forPage')->with($this->equalTo(1), $this->equalTo(15))->will($this->returnValue($builder));
-		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo')));
-		$builder->expects($this->once())->method('getPaginationCount')->will($this->returnValue(10));
-		$paginator->shouldReceive('make')->once()->with(array('foo'), 10, 15)->andReturn(array('results'));
-
-		$this->assertEquals(array('results'), $builder->paginate(15, array('*')));
-	}
-
-
-	public function testPaginateCorrectlyCreatesPaginatorInstanceForGroupedQuery()
-	{
-		$connection = m::mock('Illuminate\Database\ConnectionInterface');
-		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('get'), array($connection, $grammar, $processor));
-		$paginator = m::mock('Illuminate\Pagination\Factory');
-		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(2);
-		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
-		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo', 'bar', 'baz')));
-		$paginator->shouldReceive('make')->once()->with(array('baz'), 3, 2)->andReturn(array('results'));
-
-		$this->assertEquals(array('results'), $builder->groupBy('foo')->paginate(2, array('*')));
-	}
-
-
-	public function testGetPaginationCountGetsResultCount()
-	{
-		unset($_SERVER['orders']);
-		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
-		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($query, $results)
-		{
-			$_SERVER['orders'] = $query->orders;
-			return $results;
-		});
-		$results = $builder->from('users')->orderBy('foo', 'desc')->getPaginationCount();
-
-		$this->assertNull($_SERVER['orders']);
-		unset($_SERVER['orders']);
-
-		$this->assertEquals(array(0 => array('column' => 'foo', 'direction' => 'desc')), $builder->orders);
-		$this->assertEquals(1, $results);
-	}
-
-
-	public function testQuickPaginateCorrectlyCreatesPaginatorInstance()
-	{
-		$connection = m::mock('Illuminate\Database\ConnectionInterface');
-		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('skip', 'take', 'get'), array($connection, $grammar, $processor));
-		$paginator = m::mock('Illuminate\Pagination\Factory');
-		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
-		$builder->expects($this->once())->method('skip')->with($this->equalTo(0))->will($this->returnValue($builder));
-		$builder->expects($this->once())->method('take')->with($this->equalTo(16))->will($this->returnValue($builder));
-		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(array('foo')));
-		$paginator->shouldReceive('make')->once()->with(array('foo'), 15)->andReturn(array('results'));
-
-		$this->assertEquals(array('results'), $builder->simplePaginate(15, array('*')));
-	}
-
-
 	public function testPluckMethodReturnsSingleColumn()
 	{
 		$builder = $this->getBuilder();
@@ -1211,6 +1080,27 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$otherBuilder->addBinding('bar', 'where');
 		$builder->mergeBindings($otherBuilder);
 		$this->assertEquals(array('foo', 'bar', 'baz'), $builder->getBindings());
+	}
+
+
+	public function testSubSelect()
+	{
+		$expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
+		$expectedBindings = ['subval', 'val'];
+
+		$builder = $this->getPostgresBuilder();
+		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
+		$builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval'); }, 'sub');
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
+
+		$builder = $this->getPostgresBuilder();
+		$builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
+		$subBuilder = $this->getPostgresBuilder();
+		$subBuilder->from('two')->select('baz')->where('subkey', '=', 'subval');
+		$builder->selectSub($subBuilder, 'sub');
+		$this->assertEquals($expectedSql, $builder->toSql());
+		$this->assertEquals($expectedBindings, $builder->getBindings());
 	}
 
 

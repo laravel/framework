@@ -61,7 +61,7 @@ class SQLiteGrammar extends Grammar {
 
 		$sql .= (string) $this->addPrimaryKeys($blueprint);
 
-		return $sql .= ')';
+		return $sql.')';
 	}
 
 	/**
@@ -428,7 +428,7 @@ class SQLiteGrammar extends Grammar {
 	 */
 	protected function typeDecimal(Fluent $column)
 	{
-		return 'float';
+		return 'numeric';
 	}
 
 	/**
