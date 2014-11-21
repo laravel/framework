@@ -20,6 +20,13 @@ class FreshCommand extends Command {
 	protected $description = "Remove some of Laravel's opionated scaffolding";
 
 	/**
+	 * The filesystem instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
 	 * Create a new command instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
