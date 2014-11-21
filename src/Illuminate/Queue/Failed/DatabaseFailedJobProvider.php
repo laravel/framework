@@ -1,8 +1,8 @@
 <?php namespace Illuminate\Queue\Failed;
 
+use Exception;
 use Carbon\Carbon;
 use Illuminate\Database\ConnectionResolverInterface;
-use Exception;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 
@@ -48,7 +48,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	 * @param  string  $connection
 	 * @param  string  $queue
 	 * @param  string  $payload
-	 * @param  \Exception  $error
+	 * @param  \Exception|null  $exception
 	 * @return void
 	 */
 	public function log($connection, $queue, $payload, Exception $exception = null)

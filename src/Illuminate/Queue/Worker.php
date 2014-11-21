@@ -1,11 +1,11 @@
 <?php namespace Illuminate\Queue;
 
+use Exception;
+use RuntimeException;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
-use Exception;
-use RuntimeException;
 
 class Worker {
 
