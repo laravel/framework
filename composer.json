@@ -66,7 +66,7 @@
         "illuminate/workbench": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": ">=2.7.5",
+        "aws/aws-sdk-php": "~2.7",
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~3.0",
         "mockery/mockery": "~0.9",
