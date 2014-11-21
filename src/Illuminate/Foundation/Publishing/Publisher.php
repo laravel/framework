@@ -12,6 +12,13 @@ abstract class Publisher {
 	protected $files;
 
 	/**
+	 * The package registrar instance.
+	 *
+	 * @var \Illuminate\Foundation\Publishing\PackageRegistrar
+	 */
+	protected $registrar;
+
+	/**
 	 * The destination of the config files.
 	 *
 	 * @var string
@@ -32,9 +39,10 @@ abstract class Publisher {
 	 * @param  string  $publishPath
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $publishPath)
+	public function __construct(Filesystem $files, PackageRegistrar $registrar, $publishPath)
 	{
 		$this->files = $files;
+		$this->registrar = $registrar;
 		$this->publishPath = $publishPath;
 	}
 
