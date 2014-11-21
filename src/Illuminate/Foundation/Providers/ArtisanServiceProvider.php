@@ -3,6 +3,7 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\FreshCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\ChangesCommand;
@@ -41,6 +42,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'Down' => 'command.down',
 		'Environment' => 'command.environment',
 		'EventScan' => 'command.event.scan',
+		'Fresh' => 'command.fresh',
 		'KeyGenerate' => 'command.key.generate',
 		'Optimize' => 'command.optimize',
 		'ProviderMake' => 'command.provider.make',
@@ -158,6 +160,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.event.scan', function()
 		{
 			return new EventScanCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerFreshCommand()
+	{
+		$this->app->singleton('command.fresh', function()
+		{
+			return new FreshCommand;
 		});
 	}
 
