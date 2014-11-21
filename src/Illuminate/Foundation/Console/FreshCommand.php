@@ -17,7 +17,7 @@ class FreshCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = "Remove some of Laravel's opionated scaffolding";
+	protected $description = "Remove some of Laravel's scaffolding";
 
 	/**
 	 * The filesystem instance.
@@ -70,7 +70,12 @@ class FreshCommand extends Command {
 	 */
 	protected function getFiles()
 	{
-		return [];
+		return [
+			base_path('.bowerrc'),
+			base_path('bower.json'),
+			base_path('gulpfile.json'),
+			base_path('package.json'),
+		];
 	}
 
 	/**
