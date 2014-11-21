@@ -41,51 +41,83 @@ abstract class ServiceProvider {
 	 *
 	 * @param  string  $package
 	 * @param  string  $namespace
-	 * @param  string  $path
+	 * @param  string  $packagePath
+	 * @param  array  $relativePaths
 	 * @return void
 	 */
-	public function package($package, $namespace = null, $path = null)
+	public function package($package, $namespace = null, $path = null, array $relativePaths = null)
 	{
 		$namespace = $this->getPackageNamespace($package, $namespace);
+
+		$path = $path ?: $this->guessPackagePath();
+
+		// Register the package in the registrar
+		$this->app['package.registrar']->registerPackage($package, $namespace, $path, $relativePaths);
 
 		// In this method we will register the configuration package for the package
 		// so that the configuration options cleanly cascade into the application
 		// folder to make the developers lives much easier in maintaining them.
-		$path = $path ?: $this->guessPackagePath();
+		$this->registerPackageConfig($package, $namespace);
 
-		$config = $path.'/config';
+        // Next we will check for any "language" components. If language files exist
+        // we will register them with this given package's namespace so that they
+        // may be accessed using the translation facilities of the application.
+		$this->registerPackageLanguage($package, $namespace);
 
-		if ($this->app['files']->isDirectory($config))
+        // Finally we will register the view namespace so that we can access each of
+        // the views available in this package. We use a standard convention when
+        // registering the paths to every package's views and other components.
+		$this->registerPackageViews($package, $namespace);
+	}
+
+	/**
+	 * Register the package's config files
+	 *
+	 * @param  string  $package
+	 * @param  string  $namespace
+	 * @return void
+	 */
+	public function registerPackageConfig($package, $namespace)
+	{
+		if ($this->app['files']->isDirectory($config = $this->app['package.registrar']->getConfigPath($package)))
 		{
 			$this->app['config']->package($package, $config, $namespace);
 		}
+	}
 
-		// Next we will check for any "language" components. If language files exist
-		// we will register them with this given package's namespace so that they
-		// may be accessed using the translation facilities of the application.
-		$lang = $path.'/resources/lang';
-
-		if ($this->app['files']->isDirectory($lang))
+	/**
+	 * Register the package's language files
+	 *
+	 * @param  string  $package
+	 * @param  string  $namespace
+	 * @return void
+	 */
+	public function registerPackageLanguage($package, $namespace, $packagePath)
+	{
+		if ($this->app['files']->isDirectory($lang = $this->app['package.registrar']->getLanguagePath($package)))
 		{
 			$this->app['translator']->addNamespace($namespace, $lang);
 		}
+	}
 
-		// Next, we will see if the application view folder contains a folder for the
+	/**
+	 * Register the package's view files
+	 *
+	 * @param  string  $package
+	 * @param  string  $namespace
+	 * @return void
+	 */
+	public function registerPackageViews($package, $namespace)
+	{
+		// We will see if the application view folder contains a folder for the
 		// package and namespace. If it does, we'll give that folder precedence on
 		// the loader list for the views so the package views can be overridden.
-		$appView = $this->getAppViewPath($package);
-
-		if ($this->app['files']->isDirectory($appView))
+		if ($this->app['files']->isDirectory($appView = $this->getAppViewPath($package)))
 		{
 			$this->app['view']->addNamespace($namespace, $appView);
 		}
 
-		// Finally we will register the view namespace so that we can access each of
-		// the views available in this package. We use a standard convention when
-		// registering the paths to every package's views and other components.
-		$view = $path.'/resources/views';
-
-		if ($this->app['files']->isDirectory($view))
+		if ($this->app['files']->isDirectory($view = $this->app['package.registrar']->getViewsPath($package)))
 		{
 			$this->app['view']->addNamespace($namespace, $view);
 		}

@@ -13,7 +13,7 @@ class AssetPublisher extends Publisher {
 	 */
 	protected function getSource($package, $packagePath)
 	{
-		$source = $packagePath."/{$package}/public";
+		$source = $packagePath."/{$package}/".$this->registrar->getAssetsPath($package);
 
 		if ( ! $this->files->isDirectory($source))
 		{
