@@ -61,8 +61,31 @@ class MandrillTransport implements Swift_Transport {
 				'key' => $this->key,
 				'raw_message' => (string) $message,
 				'async' => false,
+				'to' => $this->getToAddresses($message)
 			],
 		]);
+	}
+
+	/**
+	 * Get all the addresses this email should be sent to,
+	 * including "to", "cc" and "bcc" addresses
+	 *
+	 * @param Swift_Mime_Message $message
+	 * @return array
+	 */
+	protected function getToAddresses(Swift_Mime_Message $message)
+	{
+		$to = [];
+		if ($message->getTo()) {
+			$to = array_merge($to, array_keys($message->getTo()));
+		}
+		if ($message->getCc()) {
+			$to = array_merge($to, array_keys($message->getCc()));
+		}
+		if ($message->getBcc()) {
+			$to = array_merge($to, array_keys($message->getBcc()));
+		}
+		return $to;
 	}
 
 	/**
