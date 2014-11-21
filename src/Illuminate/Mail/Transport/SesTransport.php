@@ -15,7 +15,7 @@ class SesTransport implements Swift_Transport {
 	protected $ses;
 
 	/**
-	 * Create a new Mailgun transport instance.
+	 * Create a new SES transport instance.
 	 *
 	 * @param  \Aws\Ses\SesClient  $ses
 	 * @return void
