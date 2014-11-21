@@ -145,6 +145,7 @@ class Grammar extends BaseGrammar {
 			foreach ($join->bindings as $index => $binding)
 			{
 				unset($join->bindings[$index]);
+
 				$query->addBinding($binding, 'join');
 			}
 
