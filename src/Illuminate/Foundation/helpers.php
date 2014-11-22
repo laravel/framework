@@ -500,36 +500,36 @@ if ( ! function_exists('elixir'))
 	 */
 	function elixir($file)
 	{
-		static $manifest   = null;
-		static $build_path = null;
+		static $manifest  = null;
+		static $buildPath = null;
 
-		if (is_null($build_path))
+		if (is_null($buildPath))
 		{
 			if (file_exists(base_path().DIRECTORY_SEPARATOR.'elixir.json'))
 			{
-				$elixir_config = json_decode(file_get_contents(base_path().DIRECTORY_SEPARATOR.'elixir.json'), true);
-				$build_path_setting = array_get($elixir_config, 'buildDir');
+				$elixirConfig     = json_decode(file_get_contents(base_path().DIRECTORY_SEPARATOR.'elixir.json'), true);
+				$buildPathSetting = array_get($elixirConfig, 'buildDir');
 
-				if ( ! empty($build_path_setting))
+				if ( ! empty($buildPathSetting))
 				{
-					$build_path = DIRECTORY_SEPARATOR.trim($build_path_setting, DIRECTORY_SEPARATOR);
+					$buildPath = DIRECTORY_SEPARATOR.trim($buildPathSetting, DIRECTORY_SEPARATOR);
 				}
 			}
 
-			if (empty($build_path))
+			if (empty($buildPath))
 			{
-				$build_path = '';
+				$buildPath = '';
 			}
 		}
 
 		if (is_null($manifest))
 		{
-			$manifest = json_decode(file_get_contents(public_path().$build_path.DIRECTORY_SEPARATOR.'build'.DIRECTORY_SEPARATOR.'rev-manifest.json'), true);
+			$manifest = json_decode(file_get_contents(public_path().$buildPath.DIRECTORY_SEPARATOR.'build'.DIRECTORY_SEPARATOR.'rev-manifest.json'), true);
 		}
 
 		if (isset($manifest[$file]))
 		{
-			return $build_path.'/build/'.$manifest[$file];
+			return $buildPath.'/build/'.$manifest[$file];
 		}
 
 		throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
