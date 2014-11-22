@@ -11,8 +11,8 @@ class FoundationHelpersTest extends PHPUnit_Framework_TestCase {
 		app()->instance('path.base', __DIR__);
 
 		// regular usage without considering elixir config
-		$asset_path = elixir('test.css');
-		$this->assertEquals('/build/test-123.css', $asset_path);
+		$assetPath = elixir('test.css');
+		$this->assertEquals('/build/test-123.css', $assetPath);
 	}
 
 	public function testElixirWithBuildPath()
@@ -24,18 +24,18 @@ class FoundationHelpersTest extends PHPUnit_Framework_TestCase {
 		app()->instance('path.base', __DIR__.DIRECTORY_SEPARATOR.'fixtures');
 
 		// grab elixir config
-		$elixir_filename = base_path().DIRECTORY_SEPARATOR.'elixir.json';
-		$elixir_config   = file_exists($elixir_filename) ? json_decode(file_get_contents($elixir_filename), true) : [];
+		$elixirFilename = base_path().DIRECTORY_SEPARATOR.'elixir.json';
+		$elixirConfig   = file_exists($elixirFilename) ? json_decode(file_get_contents($elixirFilename), true) : [];
 
 		// get the elixir buildDir setting
-		$build_dir = trim(array_get($elixir_config, 'buildDir'), DIRECTORY_SEPARATOR);
-		$build_dir = empty($build_dir) ? '' : DIRECTORY_SEPARATOR.$build_dir;
+		$buildDir = trim(array_get($elixirConfig, 'buildDir'), DIRECTORY_SEPARATOR);
+		$buildDir = empty($buildDir) ? '' : DIRECTORY_SEPARATOR.$buildDir;
 
 		// run the file through the elixir helper
-		$asset_path = elixir('test.css');
+		$assetPath = elixir('test.css');
 
 		// compare the results
-		$this->assertEquals("{$build_dir}/build/test-123.css", $asset_path);
+		$this->assertEquals("{$buildDir}/build/test-123.css", $assetPath);
 	}
 
 }
