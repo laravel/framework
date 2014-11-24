@@ -45,4 +45,5 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 class AppDatabaseMigrationRollbackStub {
 	public $env = 'development';
 	public function environment() { return $this->env; }
+	public function call($callback, array $parameters = array(), $defaultMethod = null) { return call_user_func_array($callback, []); }
 }

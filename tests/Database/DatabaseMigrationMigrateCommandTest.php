@@ -14,7 +14,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testBasicMigrationsCallMigratorWithProperArguments()
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app = new DatabaseMigrationMigrateCommandTestApplicationStub(array('path.database' => __DIR__));
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false);
@@ -29,7 +29,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	{
 		$params = array($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
 		$command = $this->getMock('Illuminate\Database\Console\Migrations\MigrateCommand', array('call'), $params);
-		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app = new DatabaseMigrationMigrateCommandTestApplicationStub(array('path.database' => __DIR__));
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false);
@@ -44,7 +44,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testPackageIsRespectedWhenMigrating()
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-		$command->setLaravel(new ApplicationDatabaseMigrationStub());
+		$command->setLaravel(new DatabaseMigrationMigrateCommandTestApplicationStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/bar/src/migrations', false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
@@ -57,7 +57,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testVendorPackageIsRespectedWhenMigrating()
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-		$command->setLaravel(new ApplicationDatabaseMigrationStub());
+		$command->setLaravel(new DatabaseMigrationMigrateCommandTestApplicationStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/vendor/foo/bar/src/migrations', false);
 		$migrator->shouldReceive('getNotes')->andReturn(array());
@@ -70,7 +70,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testTheCommandMayBePretended()
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app = new DatabaseMigrationMigrateCommandTestApplicationStub(array('path.database' => __DIR__));
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', true);
@@ -84,7 +84,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	public function testTheDatabaseMayBeSet()
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app = new DatabaseMigrationMigrateCommandTestApplicationStub(array('path.database' => __DIR__));
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with('foo');
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false);
@@ -102,7 +102,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class ApplicationDatabaseMigrationStub implements ArrayAccess {
+class DatabaseMigrationMigrateCommandTestApplicationStub implements ArrayAccess {
 	public $content = array();
 	public $env = 'development';
 	public function __construct(array $data = array()) { $this->content = $data; }
@@ -111,4 +111,5 @@ class ApplicationDatabaseMigrationStub implements ArrayAccess {
 	public function offsetSet($offset, $value) { $this->content[$offset] = $value; }
 	public function offsetUnset($offset) { unset($this->content[$offset]); }
 	public function environment() { return $this->env; }
+	public function call($callback, array $parameters = array(), $defaultMethod = null) { return call_user_func_array($callback, []); }
 }
