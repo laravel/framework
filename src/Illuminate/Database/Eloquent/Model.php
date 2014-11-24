@@ -418,6 +418,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Fill the model with an array of attributes. Force mass assignment.
+	 *
+	 * @param  array  $attributes
+	 * @return $this
+	 */
+	public function forceFill(array $attributes)
+	{
+		static::unguard();
+
+		$this->fill($attributes);
+
+		static::reguard();
+
+		return $this;
+	}
+
+	/**
 	 * Get the fillable attributes of a given array.
 	 *
 	 * @param  array  $attributes
@@ -526,6 +543,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		$model = new static($attributes);
 
 		$model->save();
+
+		return $model;
+	}
+
+	/**
+	 * Save a new model and return the instance. Allow mass-assignment.
+	 *
+	 * @param  array  $attributes
+	 * @return static
+	 */
+	public static function forceCreate(array $attributes)
+	{
+		static::unguard();
+
+		$model = static::create($attributes);
+
+		static::reguard();
 
 		return $model;
 	}
