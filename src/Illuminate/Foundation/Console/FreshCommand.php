@@ -60,6 +60,11 @@ class FreshCommand extends Command {
 			$this->line('<comment>Removed Directory:</comment> '.$directory);
 		}
 
+		foreach ($this->getStubs() as $stub => $path)
+		{
+			$this->files->put($path, $this->files->get(__DIR__.'/stubs/fresh/'.$stub));
+		}
+
 		$this->info('Scaffolding Removed!');
 	}
 
@@ -75,6 +80,12 @@ class FreshCommand extends Command {
 			base_path('bower.json'),
 			base_path('gulpfile.js'),
 			base_path('package.json'),
+			app_path('Http/Requests/LoginRequest.php'),
+			app_path('Http/Requests/RegisterRequest.php'),
+			app_path('Http/Controllers/AuthController.php'),
+			base_path('resources/views/dashboard.blade.php'),
+			app_path('Http/Controllers/PasswordController.php'),
+			app_path('Http/Controllers/DashboardController.php'),
 		];
 	}
 
@@ -85,7 +96,29 @@ class FreshCommand extends Command {
 	 */
 	protected function getDirectories()
 	{
-		return [];
+		return [
+			public_path('js'),
+			public_path('css'),
+			base_path('resources/assets'),
+			base_path('resources/views/auth'),
+			base_path('resources/views/emails'),
+			base_path('resources/views/layouts'),
+			base_path('resources/views/partials'),
+		];
+	}
+
+	/**
+	 * Get the stubs to copy.
+	 *
+	 * @return array
+	 */
+	protected function getStubs()
+	{
+		return [
+			'routes.stub' => app_path('Http/routes.php'),
+			'view.stub' => base_path('resources/views/welcome.blade.php'),
+			'welcome.stub' => app_path('Http/Controllers/WelcomeController.php'),
+		];
 	}
 
 }
