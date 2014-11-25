@@ -25,6 +25,13 @@ class Event {
 	protected $expression = '* * * * * *';
 
 	/**
+	 * The timezone the date should be evaluated on.
+	 *
+	 * @var string
+	 */
+	protected $timezone;
+
+	/**
 	 * The user the command should run as.
 	 *
 	 * @var string
@@ -224,7 +231,14 @@ class Event {
 	 */
 	protected function expressionPasses()
 	{
-		return CronExpression::factory($this->expression)->isDue();
+		$date = Carbon::now();
+
+		if ($this->timezone)
+		{
+			$date->setTimezone($this->timezone);
+		}
+
+		return CronExpression::factory($this->expression)->isDue($date);
 	}
 
 	/**
@@ -514,6 +528,19 @@ class Event {
 	public function days($days)
 	{
 		$this->spliceIntoPosition(5, implode(',', is_array($days) ? $days : func_get_args()));
+
+		return $this;
+	}
+
+	/**
+	 * Set the timezone the date should be evaluated on.
+	 *
+	 * @param  string  $timezone
+	 * @return $this
+	 */
+	public function timezone($timezone)
+	{
+		$this->timezone = $timezone;
 
 		return $this;
 	}
