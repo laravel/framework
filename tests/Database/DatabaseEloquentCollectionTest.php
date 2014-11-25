@@ -247,6 +247,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testMagicRelationshipListsAttributesMethod()
 	{
 		$mockItem = m::mock('EloquentModelCollectionMagicLoadStub');
+		$mockItem->relations = ['workerType'=>'results'];
 		$mockItem->shouldReceive('getAttribute')->with('workerType')->once()->andReturn('results');
 		$mockItem->shouldReceive('newQuery')->never()->andReturn($mockItem);
 		$mockItem->shouldReceive('with')->never()->andReturn($mockItem);
@@ -264,6 +265,8 @@ class EloquentModelCollectionMagicLoadStub extends Illuminate\Database\Eloquent\
 	protected $table = 'stub';
 
 	protected $guarded = array();
+
+	public $relations = array();
 
 	public function workerType()
 	{

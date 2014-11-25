@@ -269,7 +269,7 @@ class Collection extends BaseCollection {
 		// If it is not the case, we'll load the relationship.
 		if(method_exists($first, $key))
 		{
-			if (!isset($first[snake_case($key)]))
+			if(!array_key_exists($key, $first->relations))
 			{
 				$this->load($key);
 			}
