@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Application extends Container implements ApplicationContract {
 
@@ -700,6 +701,24 @@ class Application extends Container implements ApplicationContract {
 	public function down(Closure $callback)
 	{
 		$this['events']->listen('illuminate.app.down', $callback);
+	}
+
+	/**
+	 * Throw an HttpException with the given data.
+	 *
+	 * @param  int $code
+	 * @param  string $message
+	 * @param  array $headers
+	 * @throws HttpException
+	 */
+	public function abort($code, $message = '', array $headers = array())
+	{
+		if ($code == 404)
+		{
+			throw new NotFoundHttpException($message);
+		}
+
+		throw new HttpException($code, $message, null, $headers);
 	}
 
 	/**
