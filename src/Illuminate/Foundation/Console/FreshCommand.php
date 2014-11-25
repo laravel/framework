@@ -80,10 +80,14 @@ class FreshCommand extends Command {
 			base_path('bower.json'),
 			base_path('gulpfile.js'),
 			base_path('package.json'),
-			app_path('Http/Controllers/AuthController.php'),
+			app_path('Http/Controllers/Auth/AuthController.php'),
 			base_path('resources/views/dashboard.blade.php'),
-			app_path('Http/Controllers/PasswordController.php'),
+			app_path('Http/Controllers/Auth/PasswordController.php'),
 			app_path('Http/Controllers/DashboardController.php'),
+			app_path('Http/Requests/Auth/LoginRequest.php'),
+			app_path('Http/Requests/Auth/RegisterRequest.php'),
+			app_path('Http/Requests/Auth/EmailPasswordLinkRequest.php'),
+			app_path('Http/Requests/Auth/ResetPasswordRequest.php'),
 		];
 	}
 
