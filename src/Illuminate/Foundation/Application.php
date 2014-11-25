@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
@@ -706,10 +707,12 @@ class Application extends Container implements ApplicationContract {
 	/**
 	 * Throw an HttpException with the given data.
 	 *
-	 * @param  int $code
-	 * @param  string $message
-	 * @param  array $headers
-	 * @throws HttpException
+	 * @param  int     $code
+	 * @param  string  $message
+	 * @param  array   $headers
+	 * @return void
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{
