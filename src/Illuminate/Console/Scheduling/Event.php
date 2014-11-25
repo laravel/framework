@@ -27,7 +27,7 @@ class Event {
 	/**
 	 * The timezone the date should be evaluated on.
 	 *
-	 * @var string
+	 * @var \DateTimeZone|string
 	 */
 	protected $timezone;
 
@@ -535,7 +535,7 @@ class Event {
 	/**
 	 * Set the timezone the date should be evaluated on.
 	 *
-	 * @param  string  $timezone
+	 * @param  \DateTimeZone|string  $timezone
 	 * @return $this
 	 */
 	public function timezone($timezone)
