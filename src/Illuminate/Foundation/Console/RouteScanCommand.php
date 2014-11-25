@@ -34,7 +34,8 @@ class RouteScanCommand extends Command {
 
 		$this->info('Routes scanned!');
 		
-		if ($this->option('list')) {
+		if ($this->option('list')) 
+		{
 			$this->call('route:list');
 		}
 	}
