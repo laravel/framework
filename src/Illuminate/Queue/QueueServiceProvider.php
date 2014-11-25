@@ -7,6 +7,7 @@ use Illuminate\Queue\Console\ListenCommand;
 use Illuminate\Queue\Console\RestartCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Console\SubscribeCommand;
+use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
@@ -167,10 +168,24 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	public function registerConnectors($manager)
 	{
-		foreach (array('Sync', 'Beanstalkd', 'Redis', 'Sqs', 'Iron') as $connector)
+		foreach (array('Null', 'Sync', 'Beanstalkd', 'Redis', 'Sqs', 'Iron') as $connector)
 		{
 			$this->{"register{$connector}Connector"}($manager);
 		}
+	}
+
+	/**
+	 * Register the Null queue connector.
+	 *
+	 * @param  \Illuminate\Queue\QueueManager  $manager
+	 * @return void
+	 */
+	protected function registerNullConnector($manager)
+	{
+		$manager->addConnector('null', function()
+		{
+			return new NullConnector;
+		});
 	}
 
 	/**
