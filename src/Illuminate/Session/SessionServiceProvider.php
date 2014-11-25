@@ -42,6 +42,8 @@ class SessionServiceProvider extends ServiceProvider {
 		{
 			return new SessionManager($app);
 		});
+
+		$this->app->alias('session', 'Illuminate\Session\SessionManager');
 	}
 
 	/**
@@ -60,6 +62,9 @@ class SessionServiceProvider extends ServiceProvider {
 
 			return $manager->driver();
 		});
+
+		$this->app->alias('session.store', 'Illuminate\Session\Store');
+		$this->app->alias('session.store', 'Symfony\Component\HttpFoundation\Session\SessionInterface');
 	}
 
 }

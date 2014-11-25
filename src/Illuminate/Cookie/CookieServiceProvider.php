@@ -17,6 +17,10 @@ class CookieServiceProvider extends ServiceProvider {
 
 			return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain']);
 		});
+
+		$this->app->alias('cookie', 'Illuminate\Cookie\CookieJar');
+		$this->app->alias('cookie', 'Illuminate\Contracts\Cookie\Factory');
+		$this->app->alias('cookie', 'Illuminate\Contracts\Cookie\QueueingFactory');
 	}
 
 }

@@ -31,6 +31,9 @@ class RoutingServiceProvider extends ServiceProvider {
 		{
 			return new Router($app['events'], $app);
 		});
+
+		$this->app->alias('router', 'Illuminate\Routing\Router');
+		$this->app->alias('router', 'Illuminate\Contracts\Routing\Registrar');
 	}
 
 	/**
@@ -65,6 +68,9 @@ class RoutingServiceProvider extends ServiceProvider {
 
 			return $url;
 		});
+
+		$this->app->alias('url', 'Illuminate\Routing\UrlGenerator');
+		$this->app->alias('url', 'Illuminate\Contracts\Routing\UrlGenerator');
 	}
 
 	/**
@@ -101,6 +107,8 @@ class RoutingServiceProvider extends ServiceProvider {
 
 			return $redirector;
 		});
+
+		$this->app->alias('redirect', 'Illuminate\Routing\Redirector');
 	}
 
 	/**

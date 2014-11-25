@@ -49,6 +49,9 @@ class PasswordResetServiceProvider extends ServiceProvider {
 				$tokens, $users, $app['mailer'], $view
 			);
 		});
+
+		$this->app->alias('auth.password', 'Illuminate\Auth\Passwords\PasswordBroker');
+		$this->app->alias('auth.password', 'Illuminate\Contracts\Auth\PasswordBroker');
 	}
 
 	/**
@@ -73,6 +76,8 @@ class PasswordResetServiceProvider extends ServiceProvider {
 
 			return new DbRepository($connection, $table, $key, $expire);
 		});
+
+		$this->app->alias('auth.password.tokens', 'Illuminate\Auth\Passwords\TokenRepositoryInterface');
 	}
 
 	/**

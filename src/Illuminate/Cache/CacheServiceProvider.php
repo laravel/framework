@@ -23,10 +23,16 @@ class CacheServiceProvider extends ServiceProvider {
 			return new CacheManager($app);
 		});
 
+		$this->app->alias('cache', 'Illuminate\Cache\CacheManager');
+		$this->app->alias('cache', 'Illuminate\Contracts\Cache\Factory');
+
 		$this->app->singleton('cache.store', function($app)
 		{
 			return $app['cache']->driver();
 		});
+
+		$this->app->alias('cache.store', 'Illuminate\Cache\Repository');
+		$this->app->alias('cache.store', 'Illuminate\Contracts\Cache\Repository');
 
 		$this->app->singleton('memcached.connector', function()
 		{

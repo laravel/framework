@@ -42,6 +42,8 @@ class DatabaseServiceProvider extends ServiceProvider {
 		{
 			return new DatabaseManager($app, $app['db.factory']);
 		});
+
+		$this->app->alias('db', 'Illuminate\Database\DatabaseManager');
 	}
 
 	/**

@@ -22,6 +22,9 @@ class EncryptionServiceProvider extends ServiceProvider {
 
 			return $encrypter;
 		});
+
+		$this->app->alias('encrypter', 'Illuminate\Encryption\Encrypter');
+		$this->app->alias('encrypter', 'Illuminate\Contracts\Encryption\Encrypter');
 	}
 
 }

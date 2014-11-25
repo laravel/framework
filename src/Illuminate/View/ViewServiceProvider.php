@@ -77,6 +77,8 @@ class ViewServiceProvider extends ServiceProvider {
 			return new BladeCompiler($app['files'], $cache);
 		});
 
+		$app->alias('blade.compiler', 'Illuminate\View\Compilers\BladeCompiler');
+
 		$resolver->register('blade', function() use ($app)
 		{
 			return new CompilerEngine($app['blade.compiler'], $app['files']);
@@ -125,6 +127,9 @@ class ViewServiceProvider extends ServiceProvider {
 
 			return $env;
 		});
+
+		$this->app->alias('view', 'Illuminate\View\Factory');
+		$this->app->alias('view', 'Illuminate\Contracts\View\Factory');
 	}
 
 }

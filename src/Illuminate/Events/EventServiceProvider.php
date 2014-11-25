@@ -15,6 +15,9 @@ class EventServiceProvider extends ServiceProvider {
 		{
 			return new Dispatcher($app);
 		});
+
+		$this->app->alias('events', 'Illuminate\Events\Dispatcher');
+		$this->app->alias('events', 'Illuminate\Contracts\Events\Dispatcher');
 	}
 
 }

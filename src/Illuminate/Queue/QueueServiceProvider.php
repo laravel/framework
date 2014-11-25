@@ -61,10 +61,16 @@ class QueueServiceProvider extends ServiceProvider {
 			return $manager;
 		});
 
+		$this->app->alias('queue', 'Illuminate\Queue\QueueManager');
+		$this->app->alias('queue', 'Illuminate\Contracts\Queue\Factory');
+		$this->app->alias('queue', 'Illuminate\Contracts\Queue\Monitor');
+
 		$this->app->singleton('queue.connection', function($app)
 		{
 			return $app['queue']->connection();
 		});
+
+		$this->app->alias('queue.connection', 'Illuminate\Contracts\Queue\Queue');
 	}
 
 	/**
