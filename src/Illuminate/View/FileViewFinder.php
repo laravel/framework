@@ -166,6 +166,16 @@ class FileViewFinder implements ViewFinderInterface {
 	}
 
 	/**
+	 * Initialize locations list to empty.
+	 *
+	 * @return void
+	 */
+	public function resetLocations()
+	{
+		$this->paths = [];
+	}
+
+	/**
 	* Empty locations list.
 	*
 	* @return void

@@ -26,6 +26,13 @@ interface ViewFinderInterface {
 	public function addLocation($location);
 
 	/**
+	 * Initialize locations list to empty.
+	 *
+	 * @return void
+	 */
+	public function resetLocations();
+
+	/**
 	 * Add a namespace hint to the finder.
 	 *
 	 * @param  string  $namespace
