@@ -20,13 +20,6 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	protected $manager;
 
 	/**
-	 * Indicates if the session has been saved before.
-	 *
-	 * @var bool
-	 */
-	protected $sessionHasBeenSaved = false;
-
-	/**
 	 * Create a new session middleware.
 	 *
 	 * @param  \Illuminate\Session\SessionManager  $manager
@@ -58,7 +51,14 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 
 		$response = $next($request);
 
-		$this->saveSession($response);
+		// If the session has been configured we will add the session
+		// identifier cookie to the application response headers now.
+		if ($this->sessionConfigured())
+		{
+			$this->collectGarbage($session);
+
+			$this->addCookieToResponse($response, $session);
+		}
 
 		return $response;
 	}
@@ -195,24 +195,11 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 */
 	public function terminate($request, $response)
 	{
-		$this->saveSession($response);
-	}
-
-	private function saveSession($response)
-	{
-		// Again, if the session has been configured and has not been already saved,
-		// we will need to close out the session so that the attributes may be persisted
-		// to some storage medium. We will also add the session identifier cookie to the
-		// application response headers now.
-		if ($this->sessionConfigured() && ! $this->sessionHasBeenSaved)
+		// If the session has been configured will need to close out the session
+		// so that the attributes may be persisted to some storage medium.
+		if ($this->sessionConfigured())
 		{
 			with($session = $this->manager->driver())->save();
-
-			$this->collectGarbage($session);
-
-			$this->addCookieToResponse($response, $session);
-
-			$this->sessionHasBeenSaved = true;
 		}
 	}
 
