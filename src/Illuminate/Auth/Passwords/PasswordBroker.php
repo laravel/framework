@@ -35,6 +35,13 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * @var string
 	 */
 	protected $emailView;
+	
+	/**
+	 * The subject of the password reset e-mail.
+	 * 
+	 * @var string
+	 */
+	protected $subject;
 
 	/**
 	 * The custom password validator callback.
