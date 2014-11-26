@@ -225,9 +225,9 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$two = m::mock('Illuminate\Database\Eloquent\Model');
 		$two->shouldReceive('getAttribute')->with('name')->once()->andReturn('dayle');
 
-		$data = new Collection(array($one, $two));
+		$c = new Collection(array($one, $two));
 
-		$this->assertEquals(array('taylor', 'dayle'), $data->name->all());
+		$this->assertEquals(array('taylor', 'dayle'), $c->name->all());
 	}
 
 	public function testMagicEagerLoadsRelationshipListsAttributesMethod()

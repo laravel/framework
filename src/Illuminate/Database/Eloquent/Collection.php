@@ -162,7 +162,7 @@ class Collection extends BaseCollection {
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \ArrayAccess|array  $items
+	 * @param  \ArrayAccess|array  $items
 	 * @return static
 	 */
 	public function intersect($items)
@@ -249,11 +249,10 @@ class Collection extends BaseCollection {
 	{
 		return new BaseCollection($this->items);
 	}
-
 	/**
 	 * Get an array with the attribute values of given key.
 	 *
-	 * @param  string  $key
+	 * @param  string $key
 	 * @return array
 	 */
 	public function listsAttributeArray($key)
@@ -267,11 +266,14 @@ class Collection extends BaseCollection {
 		// Therefore we check if we're trying to list
 		// a relationship and if it's already loaded.
 		// If it is not the case, we'll load the relationship.
-		if(method_exists($first, $key))
+		if ($first instanceof Model)
 		{
-			if(!array_key_exists($key, $first->relations))
+			if (method_exists($first, $key))
 			{
-				$this->load($key);
+				if ( ! array_key_exists($key, $first->relations))
+				{
+					$this->load($key);
+				}
 			}
 		}
 
@@ -287,7 +289,7 @@ class Collection extends BaseCollection {
 	/**
 	 * Get a collection with the values of a given key.
 	 *
-	 * @param  string  $key
+	 * @param  string $key
 	 * @return mixed
 	 */
 	public function listsAttribute($key)
@@ -311,7 +313,10 @@ class Collection extends BaseCollection {
 
 		foreach ($this->items as $values)
 		{
-			if ($values instanceof Collection) $values = $values->all();
+			if ($values instanceof Collection)
+			{
+				$values = $values->all();
+			}
 
 			$results = array_merge($results, $values);
 		}
@@ -330,9 +335,12 @@ class Collection extends BaseCollection {
 	 */
 	public function newCollection(array $items = null)
 	{
-		if(is_null($items)) $items = $this->items;
+		if (is_null($items))
+		{
+			$items = $this->items;
+		}
 
-		if(($first = reset($items)) instanceof Model)
+		if (($first = reset($items)) instanceof Model)
 		{
 			$result = $first->newCollection($items);
 		}
@@ -347,7 +355,7 @@ class Collection extends BaseCollection {
 	/**
 	 * Dynamically retrieve attributes on the models.
 	 *
-	 * @param  string  $key
+	 * @param  string $key
 	 * @return mixed
 	 */
 	public function __get($key)
