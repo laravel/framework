@@ -51,8 +51,9 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 
 		$response = $next($request);
 
-		// If the session has been configured we will add the session
-		// identifier cookie to the application response headers now.
+		// Again, if the session has been configured we will need to close out the session
+		// so that the attributes may be persisted to some storage medium. We will also
+		// add the session identifier cookie to the application response headers now.
 		if ($this->sessionConfigured())
 		{
 			$this->collectGarbage($session);
@@ -61,6 +62,21 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Perform any final actions for the request lifecycle.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request $request
+	 * @param  \Symfony\Component\HttpFoundation\Response $response
+	 * @return void
+	 */
+	public function terminate($request, $response)
+	{
+		if ($this->sessionConfigured())
+		{
+			$this->manager->driver()->save();
+		}
 	}
 
 	/**
@@ -184,23 +200,6 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 		$config = $config ?: $this->manager->getSessionConfig();
 
 		return ! in_array($config['driver'], array(null, 'array'));
-	}
-
-	/**
-	 * Perform any final actions for the request lifecycle.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request $request
-	 * @param  \Symfony\Component\HttpFoundation\Response $response
-	 * @return void
-	 */
-	public function terminate($request, $response)
-	{
-		// If the session has been configured will need to close out the session
-		// so that the attributes may be persisted to some storage medium.
-		if ($this->sessionConfigured())
-		{
-			with($session = $this->manager->driver())->save();
-		}
 	}
 
 }
