@@ -40,13 +40,6 @@ interface ViewFinderInterface {
 	 * @return void
 	 */	
 	public function addNamespace($namespace, $hints);
-	
-    /**
-     * Add a valid view extension to the finder.
-     *
-     * @return void
-     */
-    public function resetLocations();
 
 	/**
 	 * Prepend a namespace hint to the finder.

@@ -176,15 +176,6 @@ class FileViewFinder implements ViewFinderInterface {
 	}
 
 	/**
-	* Empty locations list.
-	*
-	* @return void
-	*/
-	public function resetLocations(){
-		$this->paths = [];
-	}
-	
-	/**
 	 * Add a namespace hint to the finder.
 	 *
 	 * @param  string  $namespace
