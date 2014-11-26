@@ -5,6 +5,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
 
 class Builder {
@@ -133,6 +134,13 @@ class Builder {
 	 * @var string|bool
 	 */
 	public $lock;
+
+	/**
+	 * The field backups currently in use.
+	 *
+	 * @var array
+	 */
+	protected $backups = [];
 
 	/**
 	 * All of the available clause operators.
@@ -1310,9 +1318,31 @@ class Builder {
 	 *
 	 * @param  int  $perPage
 	 * @param  array  $columns
-	 * @return \Illuminate\Contracts\Pagination\Paginator
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
 	public function paginate($perPage = 15, $columns = ['*'])
+	{
+		$page = Paginator::resolveCurrentPage();
+
+		$total = $this->getCountForPagination();
+
+		$results = $this->forPage($page, $perPage)->get($columns);
+
+		return new LengthAwarePaginator($results, $total, $perPage, $page, [
+			'path' => Paginator::resolveCurrentPath()
+		]);
+	}
+
+	/**
+	 * Get a paginator only supporting simple next and previous links.
+	 *
+	 * This is more efficient on larger data-sets, etc.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\Paginator
+	 */
+	public function simplePaginate($perPage = 15, $columns = ['*'])
 	{
 		$page = Paginator::resolveCurrentPage();
 
@@ -1321,6 +1351,52 @@ class Builder {
 		return new Paginator($this->get($columns), $page, $perPage, [
 			'path' => Paginator::resolveCurrentPath()
 		]);
+	}
+
+	/**
+	 * Get the count of the total records for the paginator.
+	 *
+	 * @return in
+	 */
+	public function getCountForPagination()
+	{
+		$this->backupFieldsForCount();
+
+		$total = $this->count();
+
+		$this->restoreFieldsForCount();
+
+		return $total;
+	}
+
+	/**
+	 * Backup some fields for the pagination count.
+	 *
+	 * @return void
+	 */
+	protected function backupFieldsForCount()
+	{
+		foreach (['orders', 'limit', 'offset'] as $field)
+		{
+			$this->backups[$field] = $this->{$field};
+
+			$this->{$field} = null;
+		}
+	}
+
+	/**
+	 * Restore some fields after the pagination count.
+	 *
+	 * @return void
+	 */
+	protected function restoreFieldsForCount()
+	{
+		foreach (['orders', 'limit', 'offset'] as $field)
+		{
+			$this->{$field} = $this->backups[$field];
+		}
+
+		$this->backups = [];
 	}
 
 	/**
