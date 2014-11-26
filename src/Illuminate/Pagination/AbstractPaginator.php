@@ -267,20 +267,7 @@ abstract class AbstractPaginator {
 	{
 		return ! ($this->currentPage() == 1 && ! $this->hasMorePages());
 	}
-	
-	/**
-	 * Set the query string variable used to store the page.
-	 *
-	 * @param  string  $name
-	 * @return $this
-	 */
-	public function setPageName($name)
-	{
-		$this->pageName = $name;
 
-		return $this;
-	}
-	
 	/**
 	 * Resolve the current request path or return the default value.
 	 *
@@ -333,6 +320,19 @@ abstract class AbstractPaginator {
 	public static function currentPageResolver(Closure $resolver)
 	{
 		static::$currentPageResolver = $resolver;
+	}
+
+	/**
+	 * Set the query string variable used to store the page.
+	 *
+	 * @param  string  $name
+	 * @return $this
+	 */
+	public function setPageName($name)
+	{
+		$this->pageName = $name;
+
+		return $this;
 	}
 
 	/**
