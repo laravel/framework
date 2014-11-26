@@ -35,6 +35,13 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * @var string
 	 */
 	protected $emailView;
+	
+	/**
+	 * The subject of the password reset e-mail.
+	 * 
+	 * @var string
+	 */
+	protected $subject;
 
 	/**
 	 * The custom password validator callback.
@@ -50,17 +57,20 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * @param  \Illuminate\Auth\UserProviderInterface  $users
 	 * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
 	 * @param  string  $emailView
+	 * @param  string  $subject
 	 * @return void
 	 */
 	public function __construct(TokenRepositoryInterface $tokens,
                                 UserProviderInterface $users,
                                 MailerContract $mailer,
-                                $emailView)
+                                $emailView
+                                $subject)
 	{
 		$this->users = $users;
 		$this->mailer = $mailer;
 		$this->tokens = $tokens;
 		$this->emailView = $emailView;
+		$this->subject = $subject;
 	}
 
 	/**
@@ -106,10 +116,11 @@ class PasswordBroker implements PasswordBrokerContract {
 		// password reminder e-mail. We'll pass a "token" variable into the views
 		// so that it may be displayed for an user to click for password reset.
 		$view = $this->emailView;
+		$subject = $this->subject;
 
-		return $this->mailer->send($view, compact('token', 'user'), function($m) use ($user, $token, $callback)
+		return $this->mailer->send($view, compact('token', 'user'), function($m) use ($user, $token, $callback, $subject)
 		{
-			$m->to($user->getEmailForPasswordReset());
+			$m->to($user->getEmailForPasswordReset())->subject($subject);
 
 			if ( ! is_null($callback)) call_user_func($callback, $m, $user, $token);
 		});
