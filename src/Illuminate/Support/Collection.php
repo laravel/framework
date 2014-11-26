@@ -135,6 +135,26 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Filter items by the given operator.
+	 *
+	 * @param  string  $key
+	 * @param  string  $operator
+	 * @param  mixed  $value
+	 * @return static
+	 */
+	public function where($key, $operator, $value = null)
+	{
+		if (func_num_args() == 2)
+		{
+			$value = $operator;
+
+			$operator = null;
+		}
+
+		return $this->filter($this->operatorChecker($key, $operator, $value));
+	}
+
+	/**
 	 * Get the first item from the collection.
 	 *
 	 * @param  \Closure   $callback
@@ -704,6 +724,44 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 		return function($item) use ($value)
 		{
 			return data_get($item, $value);
+		};
+	}
+
+	/**
+	 * Get an operator checker callback.
+	 *
+	 * @param  string  $key
+	 * @param  string  $operator
+	 * @param  mixed  $value
+	 * @return \Closure
+	 */
+	protected function operatorChecker($key, $operator, $value)
+	{
+		return function($item) use ($key, $operator, $value)
+		{
+			$retrieved = data_get($item, $key);
+
+			switch ($operator)
+			{
+				default:
+				case '=':
+				case '==':  return $retrieved == $value;
+
+				case '===': return $retrieved === $value;
+
+				case '<=':  return $retrieved <= $value;
+
+				case '>=':  return $retrieved >= $value;
+
+				case '<':   return $retrieved < $value;
+
+				case '>':   return $retrieved > $value;
+
+				case '<>':
+				case '!=':  return $retrieved != $value;
+
+				case '!==': return $retrieved !== $value;
+			}
 		};
 	}
 
