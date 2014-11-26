@@ -4,7 +4,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Annotations\Scanner;
 
-class RouteServiceProvider extends ServiceProvider {
+abstract class RouteServiceProvider extends ServiceProvider {
 
 	/**
 	 * The controller namespace for the application.
@@ -166,5 +166,12 @@ class RouteServiceProvider extends ServiceProvider {
 	{
 		return call_user_func_array([$this->app['router'], $method], $parameters);
 	}
+
+	/**
+	 * Define the routes for the application.
+	 *
+	 * @return void
+	 */
+	abstract public function map();
 
 }
