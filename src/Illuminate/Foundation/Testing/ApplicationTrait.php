@@ -59,7 +59,7 @@ trait ApplicationTrait {
 	{
 		$uri = 'https://localhost/'.ltrim($uri, '/');
 
-		return $this->call($method, $uri, $parameters, $files, $server, $content);
+		return $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
 	}
 
 	/**
@@ -69,6 +69,7 @@ trait ApplicationTrait {
 	 * @param  string  $action
 	 * @param  array   $wildcards
 	 * @param  array   $parameters
+	 * @param  array   $cookies
 	 * @param  array   $files
 	 * @param  array   $server
 	 * @param  string  $content
