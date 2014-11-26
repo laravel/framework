@@ -123,10 +123,12 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $app->environment());
 
 		$this->assertTrue($app->environment('foo'));
+		$this->assertTrue($app->environment('f*'));
 		$this->assertTrue($app->environment('foo', 'bar'));
 		$this->assertTrue($app->environment(['foo', 'bar']));
 
 		$this->assertFalse($app->environment('qux'));
+		$this->assertFalse($app->environment('q*'));
 		$this->assertFalse($app->environment('qux', 'bar'));
 		$this->assertFalse($app->environment(['qux', 'bar']));
 	}
