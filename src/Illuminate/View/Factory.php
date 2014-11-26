@@ -228,9 +228,10 @@ class Factory implements FactoryContract {
 	 * @param  array   $data
 	 * @param  string  $iterator
 	 * @param  string  $empty
+	 * @param  array   $extraData
 	 * @return string
 	 */
-	public function renderEach($view, $data, $iterator, $empty = 'raw|')
+	public function renderEach($view, $data, $iterator, $empty = 'raw|', $extraData = [])
 	{
 		$result = '';
 
@@ -243,7 +244,7 @@ class Factory implements FactoryContract {
 			{
 				$data = array('key' => $key, $iterator => $value);
 
-				$result .= $this->make($view, $data)->render();
+				$result .= $this->make($view, $data)->with($extraData)->render();
 			}
 		}
 
