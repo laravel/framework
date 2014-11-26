@@ -3,6 +3,7 @@
 use Closure;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -227,13 +228,34 @@ class Builder {
 	}
 
 	/**
+	 * Paginate the given query.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+	 */
+	public function paginate($perPage = 15, $columns = ['*'])
+	{
+		$total = $this->query->getCountForPagination();
+
+		$this->query->forPage(
+			$page = Paginator::resolveCurrentPage(),
+			$perPage = $perPage ?: $this->model->getPerPage()
+		);
+
+		return new LengthAwarePaginator($this->get($columns)->all(), $total, $perPage, $page, [
+			'path' => Paginator::resolveCurrentPath()
+		]);
+	}
+
+	/**
 	 * Paginate the given query into a simple paginator.
 	 *
 	 * @param  int  $perPage
 	 * @param  array  $columns
 	 * @return \Illuminate\Contracts\Pagination\Paginator
 	 */
-	public function paginate($perPage = null, $columns = ['*'])
+	public function simplePaginate($perPage = null, $columns = ['*'])
 	{
 		$page = Paginator::resolveCurrentPage();
 
