@@ -8,8 +8,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
+use Illuminate\Contracts\Routing\TerminableMiddleware;
 
-class StartSession implements MiddlewareContract {
+class StartSession implements MiddlewareContract, TerminableMiddleware {
 
 	/**
 	 * The session manager.
@@ -17,6 +18,13 @@ class StartSession implements MiddlewareContract {
 	 * @var \Illuminate\Session\SessionManager
 	 */
 	protected $manager;
+
+	/**
+	 * Indicates if the session has been saved before.
+	 *
+	 * @var bool
+	 */
+	protected $sessionHasBeenSaved = false;
 
 	/**
 	 * Create a new session middleware.
@@ -50,17 +58,7 @@ class StartSession implements MiddlewareContract {
 
 		$response = $next($request);
 
-		// Again, if the session has been configured we will need to close out the session
-		// so that the attributes may be persisted to some storage medium. We will also
-		// add the session identifier cookie to the application response headers now.
-		if ($this->sessionConfigured())
-		{
-			with($session = $this->manager->driver())->save();
-
-			$this->collectGarbage($session);
-
-			$this->addCookieToResponse($response, $session);
-		}
+		$this->saveSession($response);
 
 		return $response;
 	}
@@ -186,6 +184,36 @@ class StartSession implements MiddlewareContract {
 		$config = $config ?: $this->manager->getSessionConfig();
 
 		return ! in_array($config['driver'], array(null, 'array'));
+	}
+
+	/**
+	 * Perform any final actions for the request lifecycle.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request $request
+	 * @param  \Symfony\Component\HttpFoundation\Response $response
+	 * @return void
+	 */
+	public function terminate($request, $response)
+	{
+		$this->saveSession($response);
+	}
+
+	private function saveSession($response)
+	{
+		// Again, if the session has been configured and has not been already saved,
+		// we will need to close out the session so that the attributes may be persisted
+		// to some storage medium. We will also add the session identifier cookie to the
+		// application response headers now.
+		if ($this->sessionConfigured() && ! $this->sessionHasBeenSaved)
+		{
+			with($session = $this->manager->driver())->save();
+
+			$this->collectGarbage($session);
+
+			$this->addCookieToResponse($response, $session);
+
+			$this->sessionHasBeenSaved = true;
+		}
 	}
 
 }
