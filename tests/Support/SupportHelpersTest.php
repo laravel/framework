@@ -142,6 +142,22 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFormatFilesize()
+	{
+		$this->assertEquals('0 B', format_filesize(0));
+		$this->assertEquals('1023 B', format_filesize(1023));
+		$this->assertEquals('1 KB', format_filesize(1024));
+		$this->assertEquals('1.21 KB', format_filesize(1234));
+		$this->assertEquals('1 MB', format_filesize(1048576));
+		$this->assertEquals('1 GB', format_filesize(1073741824));
+		$this->assertEquals('1 TB', format_filesize(1099511627776));
+		$this->assertEquals('1 PB', format_filesize(1125899906842624));
+		$this->assertEquals('1 EB', format_filesize(1152921504606846976));
+		$this->assertEquals('1 ZB', format_filesize(1.1805916207175e21));
+		$this->assertEquals('1 YB', format_filesize(1.2089258196147e24));
+	}
+
+
 	public function testStrIs()
 	{
 		$this->assertTrue(str_is('*.dev', 'localhost.dev'));

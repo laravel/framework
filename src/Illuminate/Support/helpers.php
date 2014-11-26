@@ -464,6 +464,27 @@ if ( ! function_exists('ends_with'))
 	}
 }
 
+if ( ! function_exists('format_filesize'))
+{
+	/**
+	 * Formats a filesize in a human readable way.
+	 *
+	 * @param int   $size
+	 * @param array $sizes
+	 * @return string
+	 */
+	function format_filesize($size, $sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'])
+	{
+		// If you send 0 to the formula below, it will throw a division by zero error.
+		if ($size === 0)
+		{
+			return '0 '.$sizes[0];
+		}
+
+		return (round($size / pow(1024, ($index = floor(log($size, 1024)))), 2).' '.$sizes[$index]);
+	}
+}
+
 if ( ! function_exists('head'))
 {
 	/**
