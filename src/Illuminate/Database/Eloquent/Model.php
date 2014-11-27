@@ -338,7 +338,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Get a global scope registered with the modal.
+	 * Get a global scope registered with the model.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
 	 * @return \Illuminate\Database\Eloquent\ScopeInterface|null
