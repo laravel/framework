@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Events;
 
+use RuntimeException;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
@@ -12,6 +14,13 @@ class Dispatcher implements DispatcherContract {
 	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
+
+	/**
+	 * The Queue instance.
+	 *
+	 * @var \Illuminate\Contracts\Queue\Queue
+	 */
+	protected $queueManager;
 
 	/**
 	 * The registered event listeners.
@@ -224,6 +233,31 @@ class Dispatcher implements DispatcherContract {
 	}
 
 	/**
+	 * Fire an event asynchronously.
+	 *
+	 * @param  string $event
+	 * @param  array  $payload
+	 * @param  bool   $halt
+	 * @return mixed
+	 */
+	public function fireAsync($event, $payload = array(), $halt = false)
+	{
+		if( ! $this->queueManager instanceof Queue)
+		{
+			throw new RuntimeException(
+				'Asynchronous events require an instance of Illuminate\Contracts\Queue\Queue'
+			);
+		}
+
+		$listener = function() use ($event, $payload, $halt)
+		{
+			return $this->fire($event, $payload, $halt);
+		};
+
+		return $this->queueManager->push($listener);
+	}
+
+	/**
 	 * Get all of the listeners for a given event name.
 	 *
 	 * @param  string  $eventName
@@ -348,6 +382,17 @@ class Dispatcher implements DispatcherContract {
 		{
 			if (ends_with($key, '_queue')) $this->forget($key);
 		}
+	}
+
+	/**
+	 * Set Queue connection instance.
+	 *
+	 * @param  Queue $connection
+	 * @return void
+	 */
+	public function setQueueConnection(Queue $connection)
+	{
+		$this->queueManager = $connection;
 	}
 
 }

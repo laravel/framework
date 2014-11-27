@@ -40,6 +40,16 @@ interface Dispatcher {
 	public function fire($event, $payload = array(), $halt = false);
 
 	/**
+	 * Fire an event asynchronously.
+	 *
+	 * @param  string $event
+	 * @param  array  $payload
+	 * @param  bool   $halt
+	 * @return mixed
+	 */
+	public function fireAsync($event, $payload = array(), $halt = false);
+
+	/**
 	 * Get the event that is currently firing.
 	 *
 	 * @return string
