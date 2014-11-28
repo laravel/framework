@@ -13,7 +13,10 @@ class EventServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('events', function($app)
 		{
-			return new Dispatcher($app);
+			return (new Dispatcher($app))->setQueueResolver(function() use ($app)
+			{
+				return $app->make('Illuminate\Contracts\Queue\Queue');
+			});
 		});
 	}
 
