@@ -1690,7 +1690,7 @@ class Builder {
 	 */
 	public function exists()
 	{
-		return $this->count() > 0;
+		return $this->limit(1)->count() > 0;
 	}
 
 	/**
