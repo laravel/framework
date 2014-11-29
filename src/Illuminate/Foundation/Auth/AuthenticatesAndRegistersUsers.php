@@ -63,7 +63,7 @@ trait AuthenticatesAndRegistersUsers {
 
 		$this->auth->login($this->createUser($request->all()));
 
-		return redirect('/home');
+		return redirect($this->redirectTo);
 	}
 
 	/**
@@ -92,7 +92,7 @@ trait AuthenticatesAndRegistersUsers {
 
 		if ($this->auth->attempt($credentials, $request->has('remember')))
 		{
-			return redirect('/home');
+			return redirect($this->redirectTo);
 		}
 
 		return redirect('/auth/login')
