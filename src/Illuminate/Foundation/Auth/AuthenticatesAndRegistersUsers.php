@@ -61,7 +61,7 @@ trait AuthenticatesAndRegistersUsers {
 			);
 		}
 
-		$this->auth->login($this->createUser($request->all()));
+		$this->auth->login($this->registrar->create($request->all()));
 
 		return redirect($this->redirectTo);
 	}
