@@ -11,7 +11,7 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 	 *
 	 * @var int
 	 */
-	protected $jsonOptions;
+	protected $jsonOptions = JSON_UNESCAPED_UNICODE;
 
 	/**
 	 * Constructor.
@@ -23,7 +23,7 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 	*/
 	public function __construct($data = null, $status = 200, $headers = array(), $options = 0)
 	{
-		$this->jsonOptions = $options;
+		$this->jsonOptions |= $options;
 
 		parent::__construct($data, $status, $headers);
 	}
