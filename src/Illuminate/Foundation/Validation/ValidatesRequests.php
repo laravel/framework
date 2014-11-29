@@ -20,10 +20,22 @@ trait ValidatesRequests {
 
 		if ($validator->fails())
 		{
-			throw new HttpResponseException($this->buildFailedValidationResponse(
-				$request, $this->formatValidationErrors($validator)
-			));
+			$this->throwValidationException($request, $validator);
 		}
+	}
+
+	/**
+	 * Throw the failed validation exception.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Contracts\Validation\Validator  $validator
+	 * @return void
+	 */
+	protected function throwValidationException(Request $request, $validator)
+	{
+		throw new HttpResponseException($this->buildFailedValidationResponse(
+			$request, $this->formatValidationErrors($validator)
+		));
 	}
 
 	/**
