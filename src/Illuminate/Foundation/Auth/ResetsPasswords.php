@@ -111,7 +111,7 @@ trait ResetsPasswords {
 		switch ($response)
 		{
 			case PasswordBroker::PASSWORD_RESET:
-				return redirect('/home');
+				return redirect($this->redirectTo);
 
 			default:
 				return redirect()->back()
