@@ -18,4 +18,10 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(JSON_PRETTY_PRINT, $response->getJsonOptions());
 	}
 
+    public function testDefaultUnescapedUnicode()
+    {
+        $response = new Illuminate\Http\JsonResponse(['china' => '中国']);
+        $this->assertEquals('{"china":"中国"}', $response->getContent());
+    }
+
 }
