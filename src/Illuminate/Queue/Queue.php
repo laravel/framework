@@ -27,7 +27,7 @@ abstract class Queue {
 	}
 
 	/**
-	 * Push a new an array of jobs onto the queue.
+	 * Push an array of jobs onto the queue.
 	 *
 	 * @param  array   $jobs
 	 * @param  mixed   $data

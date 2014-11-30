@@ -328,6 +328,19 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGroupFiltersAndRouteFilters()
+	{
+		$router = $this->getRouter();
+		$router->group(['before' => ['foo']], function() use ($router)
+		{
+			$router->get('foo/bar', function() { return 'hello'; })->before('bar');
+		});
+		$router->filter('foo', function($route, $request) { return 'foo'; });
+		$router->filter('bar', function($route, $request) { return 'bar'; });
+		$this->assertEquals('foo', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+	}
+
+
 	public function testRegexBasedFiltersWithVariables()
 	{
 		$router = $this->getRouter();
