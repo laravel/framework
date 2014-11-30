@@ -776,7 +776,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Terminate the request and send the response to the browser.
+	 * Call the "finish" and "shutdown" callbacks assigned to the application.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  \Symfony\Component\HttpFoundation\Response  $response
