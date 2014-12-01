@@ -63,7 +63,7 @@ trait AuthenticatesAndRegistersUsers {
 
 		$this->auth->login($this->registrar->create($request->all()));
 
-		return redirect($this->redirectTo);
+		return redirect($this->redirectPath());
 	}
 
 	/**
@@ -92,7 +92,7 @@ trait AuthenticatesAndRegistersUsers {
 
 		if ($this->auth->attempt($credentials, $request->has('remember')))
 		{
-			return redirect($this->redirectTo);
+			return redirect($this->redirectPath());
 		}
 
 		return redirect('/auth/login')
@@ -112,6 +112,16 @@ trait AuthenticatesAndRegistersUsers {
 		$this->auth->logout();
 
 		return redirect('/');
+	}
+
+	/**
+	 * Get the post register / login redirect path.
+	 *
+	 * @return string
+	 */
+	public function redirectPath()
+	{
+		return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
 	}
 
 }

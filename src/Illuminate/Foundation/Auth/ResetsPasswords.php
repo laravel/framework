@@ -111,13 +111,23 @@ trait ResetsPasswords {
 		switch ($response)
 		{
 			case PasswordBroker::PASSWORD_RESET:
-				return redirect($this->redirectTo);
+				return redirect($this->redirectPath());
 
 			default:
 				return redirect()->back()
 							->withInput($request->only('email'))
 							->withErrors(['email' => trans($response)]);
 		}
+	}
+
+	/**
+	 * Get the post register / login redirect path.
+	 *
+	 * @return string
+	 */
+	public function redirectPath()
+	{
+		return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
 	}
 
 }
