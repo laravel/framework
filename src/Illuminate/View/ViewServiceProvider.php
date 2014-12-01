@@ -90,7 +90,7 @@ class ViewServiceProvider extends ServiceProvider {
 	 */
 	public function registerViewFinder()
 	{
-		$this->app->singleton('view.finder', function($app)
+		$this->app->bind('view.finder', function($app)
 		{
 			$paths = $app['config']['view.paths'];
 
