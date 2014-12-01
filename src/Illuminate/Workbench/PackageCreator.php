@@ -320,7 +320,7 @@ class PackageCreator {
 	 */
 	protected function createClassDirectory(Package $package, $directory)
 	{
-		$path = $directory.'/src/'.$package->vendor.'/'.$package->name;
+		$path = $directory.'/src/';
 
 		if ( ! $this->files->isDirectory($path))
 		{
