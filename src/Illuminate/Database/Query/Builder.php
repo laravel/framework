@@ -1356,7 +1356,7 @@ class Builder {
 	/**
 	 * Get the count of the total records for the paginator.
 	 *
-	 * @return in
+	 * @return int
 	 */
 	public function getCountForPagination()
 	{
@@ -1414,11 +1414,12 @@ class Builder {
 	 *
 	 * @param  int  $count
 	 * @param  callable  $callback
+	 * @param  array  $columns
 	 * @return void
 	 */
-	public function chunk($count, callable $callback)
+	public function chunk($count, callable $callback, $columns = array('*'))
 	{
-		$results = $this->forPage($page = 1, $count)->get();
+		$results = $this->forPage($page = 1, $count)->get($columns);
 
 		while (count($results) > 0)
 		{
@@ -1432,7 +1433,7 @@ class Builder {
 
 			$page++;
 
-			$results = $this->forPage($page, $count)->get();
+			$results = $this->forPage($page, $count)->get($columns);
 		}
 	}
 
