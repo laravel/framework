@@ -15,7 +15,7 @@
         "classmap": [
             "src/migrations"
         ],
-        "psr-0": {
+        "psr-4": {
             "{{vendor}}\\{{name}}\\": "src/"
         }
     },
