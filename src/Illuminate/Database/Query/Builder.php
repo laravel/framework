@@ -1449,7 +1449,7 @@ class Builder {
 	 *
 	 * @param  int  $count
 	 * @param  callable  $callback
-	 * @param  array @columns
+	 * @param  array  $columns
 	 * @return void
 	 */
 	public function chunk($count, callable $callback, $columns = array('*'))
