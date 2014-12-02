@@ -88,6 +88,12 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/åαф/{baz}', array('as' => 'foobarbaz'));
 		$routes->add($route);
 
+		/**
+		 * Fragments
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar#derp', array('as' => 'fragment'));
+		$routes->add($route);
+
 		$this->assertEquals('/', $url->route('plain', array(), false));
 		$this->assertEquals('/?foo=bar', $url->route('plain', array('foo' => 'bar'), false));
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
@@ -103,6 +109,9 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor')));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('taylor', 'otwell', 'wall', 'woz')));
 		$this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', array('baz' => 'åαф')));
+		$this->assertEquals('/foo/bar#derp', $url->route('fragment', array(), false));
+		$this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', array('foo' => 'bar'), false));
+		$this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', array('baz' => 'åαф'), false));
 	}
 
 
