@@ -1414,12 +1414,11 @@ class Builder {
 	 *
 	 * @param  int  $count
 	 * @param  callable  $callback
-	 * @param  array  $columns
 	 * @return void
 	 */
-	public function chunk($count, callable $callback, $columns = array('*'))
+	public function chunk($count, callable $callback)
 	{
-		$results = $this->forPage($page = 1, $count)->get($columns);
+		$results = $this->forPage($page = 1, $count)->get();
 
 		while (count($results) > 0)
 		{
@@ -1433,7 +1432,7 @@ class Builder {
 
 			$page++;
 
-			$results = $this->forPage($page, $count)->get($columns);
+			$results = $this->forPage($page, $count)->get();
 		}
 	}
 
