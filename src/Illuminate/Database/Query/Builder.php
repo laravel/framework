@@ -1356,7 +1356,7 @@ class Builder {
 	/**
 	 * Get the count of the total records for the paginator.
 	 *
-	 * @return in
+	 * @return int
 	 */
 	public function getCountForPagination()
 	{
