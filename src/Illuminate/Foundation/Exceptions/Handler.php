@@ -2,6 +2,7 @@
 
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 
@@ -13,6 +14,13 @@ class Handler implements ExceptionHandlerContract {
 	 * @var \Psr\Log\LoggerInterface
 	 */
 	protected $log;
+
+	/**
+	 * A list of the exception types that should not be reported.
+	 *
+	 * @var array
+	 */
+	protected $dontReport = [];
 
 	/**
 	 * Create a new exception handler instance.
@@ -33,6 +41,12 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	public function report(Exception $e)
 	{
+		foreach ($this->dontReport as $type)
+		{
+			if ($e instanceof $type)
+					return;
+		}
+
 		$this->log->error((string) $e);
 	}
 
@@ -58,6 +72,35 @@ class Handler implements ExceptionHandlerContract {
 	public function renderForConsole($output, Exception $e)
 	{
 		$output->writeln((string) $e);
+	}
+
+	/**
+	 * Render the given HttpException.
+	 *
+	 * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	protected function renderHttpException(HttpException $e)
+	{
+		if (view()->exists('errors.'.$e->getStatusCode()))
+		{
+			return response()->view('errors.'.$e->getStatusCode(), [], $e->getStatusCode());
+		}
+		else
+		{
+			return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
+		}
+	}
+
+	/**
+	 * Determine if the given exception is an HTTP exception.
+	 *
+	 * @param  \Exception  $e
+	 * @return bool
+	 */
+	protected function isHttpException(Exception $e)
+	{
+		return $e instanceof HttpException;
 	}
 
 }
