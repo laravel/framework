@@ -298,6 +298,25 @@ class Filesystem {
 	}
 
 	/**
+	 * Create a directory if it does not exist.
+	 *
+	 * @param  string  $path
+	 * @param  int     $mode
+	 * @param  bool    $recursive
+	 * @param  bool    $force
+	 * @return bool
+	 */
+	public function makeDirectoryIfNotExists($path, $mode = 0755, $recursive = false, $force = false)
+	{
+		if ( ! $this->isDirectory($path))
+		{
+			return $this->makeDirectory($path, 0777, true);
+		}
+		else
+			return false;
+	}
+
+	/**
 	 * Copy a directory from one location to another.
 	 *
 	 * @param  string  $directory
