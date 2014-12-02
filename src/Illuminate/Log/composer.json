@@ -12,7 +12,7 @@
         "php": ">=5.4.0",
         "illuminate/contracts": "5.0.*",
         "illuminate/support": "5.0.*",
-        "monolog/monolog": "~1.6"
+        "monolog/monolog": "~1.11"
     },
     "autoload": {
         "psr-4": {
