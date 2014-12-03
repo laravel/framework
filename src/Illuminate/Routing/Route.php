@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Routing;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
@@ -504,7 +505,7 @@ class Route {
 	{
 		return array_first($action, function($key, $value)
 		{
-			return is_callable($value);
+			return $value instanceOf Closure;
 		});
 	}
 
