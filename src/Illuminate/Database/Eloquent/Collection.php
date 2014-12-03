@@ -62,11 +62,17 @@ class Collection extends BaseCollection {
 	 * Determine if a key exists in the collection.
 	 *
 	 * @param  mixed  $key
+	 * @param  mixed  $value
 	 * @return bool
 	 */
-	public function contains($key)
+	public function contains($key, $value = null)
 	{
-		return ! is_null($this->find($key));
+		if (func_num_args() == 1)
+		{
+			return ! is_null($this->find($key));
+		}
+
+		return parent::contains($key, $value);
 	}
 
 	/**

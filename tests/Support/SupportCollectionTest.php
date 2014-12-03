@@ -124,6 +124,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWhere()
+	{
+		$c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+
+		$this->assertEquals([['v' => 3], ['v' => '3']], $c->where('v', 3)->values()->all());
+	}
+
+
 	public function testValues()
 	{
 		$c = new Collection(array(array('id' => 1, 'name' => 'Hello'), array('id' => 2, 'name' => 'World')));
@@ -477,6 +485,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($c->contains(2));
 		$this->assertTrue($c->contains(function($value) { return $value < 5; }));
 		$this->assertFalse($c->contains(function($value) { return $value > 5; }));
+
+		$c = new Collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+		$this->assertTrue($c->contains('v', 1));
+		$this->assertFalse($c->contains('v', 2));
 	}
 
 
