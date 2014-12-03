@@ -13,6 +13,47 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException Illuminate\Filesystem\FileNotFoundException
+	 */
+	public function testGetThrowsExceptionNonexisitingFile()
+	{
+		$files = new Filesystem;
+		$files->get(__DIR__.'/unknown-file.txt');
+	}
+
+
+	public function testGetRequireReturnsProperly()
+	{
+		file_put_contents(__DIR__.'/file.php', '<?php return "Howdy?"; ?>');
+		$files = new Filesystem;
+		$this->assertEquals('Howdy?',$files->getRequire(__DIR__.'/file.php'));
+		@unlink(__DIR__.'/file.php');
+	}
+
+
+	/**
+	 * @expectedException Illuminate\Filesystem\FileNotFoundException
+	 */
+	public function testGetRequireThrowsExceptionNonexisitingFile()
+	{
+		$files = new Filesystem;
+		$files->getRequire(__DIR__.'/file.php');
+	}
+
+
+	public function testAppendAddsDataToFile()
+	{
+		file_put_contents(__DIR__.'/file.txt', 'foo');
+		$files = new Filesystem;
+		$bytesWritten = $files->append(__DIR__.'/file.txt','bar');
+		$this->assertEquals(mb_strlen('bar','8bit'),$bytesWritten);
+		$this->assertFileExists(__DIR__.'/file.txt');
+		$this->assertStringEqualsFile(__DIR__.'/file.txt','foobar');
+		@unlink(__DIR__.'/file.txt');
+	}
+
+
 	public function testPutStoresFiles()
 	{
 		$files = new Filesystem;
