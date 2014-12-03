@@ -491,8 +491,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('0000-00-00 00:00:00', $array['created_at']);
 		$this->assertEquals('0000-00-00 00:00:00', $array['updated_at']);
 	}
-	
-	
+
+
 	public function testToArrayIncludesDefaultFormattedTimestamps()
 	{
 		$model = new EloquentDateModelStub;
