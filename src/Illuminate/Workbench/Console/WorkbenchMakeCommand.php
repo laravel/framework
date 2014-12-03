@@ -102,7 +102,7 @@ class WorkbenchMakeCommand extends Command {
 			throw new \UnexpectedValueException("Please set the author's email in the workbench configuration file.");
 		}
 
-		return new Package($vendor, $name, $config['name'], $config['email']);
+		return new Package($vendor, $name, $config['name'], $config['email'], $config['stability']);
 	}
 
 	/**
