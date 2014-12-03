@@ -230,12 +230,19 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$object = (object) array('users' => array('name' => array('Taylor', 'Otwell')));
 		$array = array((object) array('users' => array((object) array('name' => 'Taylor'))));
+		$arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John'])]);
 
 		$this->assertEquals('Taylor', data_get($object, 'users.name.0'));
 		$this->assertEquals('Taylor', data_get($array, '0.users.0.name'));
 		$this->assertNull(data_get($array, '0.users.3'));
 		$this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
 		$this->assertEquals('Not found', data_get($array, '0.users.3', function (){ return 'Not found'; }));
+		$this->assertEquals(56, data_get($arrayAccess, 'price'));
+		$this->assertEquals('John', data_get($arrayAccess, 'user.name'));
+		$this->assertEquals('void', data_get($arrayAccess, 'foo', 'void'));
+		$this->assertEquals('void', data_get($arrayAccess, 'user.foo', 'void'));
+		$this->assertNull(data_get($arrayAccess, 'foo'));
+		$this->assertNull(data_get($arrayAccess, 'user.foo'));
 	}
 
 
@@ -292,3 +299,19 @@ class SupportTestClassOne {
 }
 
 class SupportTestClassTwo extends SupportTestClassOne {}
+
+class SupportTestArrayAccess implements ArrayAccess {
+
+	protected $attributes = [];
+
+	public function __construct ($attributes = []){ $this->attributes = $attributes; }
+
+	public function offsetExists ($offset){ return isset($this->attributes[$offset]); }
+
+	public function offsetGet ($offset){ return $this->attributes[$offset]; }
+
+	public function offsetSet ($offset, $value){ $this->attributes[$offset] = $value; }
+
+	public function offsetUnset ($offset){ unset($this->attributes[$offset]); }
+
+}
