@@ -310,7 +310,7 @@ class Filesystem {
 	{
 		if ( ! $this->isDirectory($path))
 		{
-			return $this->makeDirectory($path, 0777, true);
+			return $this->makeDirectory($path, $mode, $recursive, $force);
 		}
 		else
 			return false;
