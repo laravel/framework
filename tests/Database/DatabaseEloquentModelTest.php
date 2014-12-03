@@ -482,8 +482,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentDateModelStub;
 		$model->setRawAttributes(array(
-			'created_at'	=> '0000-00-00',
-			'updated_at'	=> '0000-00-00',
+			'created_at'	=> '0000-00-00 00:00:00',
+			'updated_at'	=> '0000-00-00 00:00:00',
 		));
 
 		$array = $model->toArray();
