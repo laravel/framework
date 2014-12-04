@@ -478,7 +478,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testToArrayIncludesNulledMysqlTimestamps()
+	public function testToArrayIncludesUnsetMysqlTimestamps()
 	{
 		$model = new EloquentDateModelStub;
 		$model->setRawAttributes(array(
