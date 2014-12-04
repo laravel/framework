@@ -22,7 +22,6 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider {
 		'Illuminate\Database\MigrationServiceProvider',
 		'Illuminate\Database\SeedServiceProvider',
 		'Illuminate\Foundation\Providers\ComposerServiceProvider',
-		'Illuminate\Foundation\Providers\PublisherServiceProvider',
 		'Illuminate\Queue\FailConsoleServiceProvider',
 		'Illuminate\Routing\GeneratorServiceProvider',
 		'Illuminate\Session\CommandsServiceProvider',
