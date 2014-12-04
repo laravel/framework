@@ -54,6 +54,44 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMoveMovesFiles()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		$files = new Filesystem;
+		$files->move(__DIR__.'/foo.txt',__DIR__.'/bar.txt');
+		$this->assertFileExists(__DIR__.'/bar.txt');
+		$this->assertFileNotExists(__DIR__.'/foo.txt');
+		@unlink(__DIR__.'/bar.txt');
+	}
+
+
+	public function testExtensionReturnsExtension()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		$files = new Filesystem;
+		$this->assertEquals('txt',$files->extension(__DIR__.'/foo.txt'));
+		@unlink(__DIR__.'/foo.txt');
+	}
+
+
+	public function testTypeIndentifiesFile()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		$files = new Filesystem;
+		$this->assertEquals('file',$files->type(__DIR__.'/foo.txt'));
+		@unlink(__DIR__.'/foo.txt');
+	}
+
+
+	public function testTypeIndentifiesDirectory()
+	{
+		mkdir(__DIR__.'/foo');
+		$files = new Filesystem;
+		$this->assertEquals('dir',$files->type(__DIR__.'/foo'));
+		@rmdir(__DIR__.'/foo');
+	}
+
+
 	public function testPutStoresFiles()
 	{
 		$files = new Filesystem;
