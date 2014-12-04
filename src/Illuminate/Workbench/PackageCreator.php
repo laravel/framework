@@ -322,11 +322,8 @@ class PackageCreator {
 	{
 		$path = $directory.'/src/'.$package->vendor.'/'.$package->name;
 
-		if ( ! $this->files->isDirectory($path))
-		{
-			$this->files->makeDirectory($path, 0777, true);
-		}
-
+		$this->files->makeDirectoryIfNotExists($path, 0777, true);
+		
 		return $path;
 	}
 
@@ -363,14 +360,12 @@ class PackageCreator {
 		// If the directory doesn't exist, we will go ahead and create the package
 		// directory in the workbench location. We will use this entire package
 		// name when creating the directory to avoid any potential conflicts.
-		if ( ! $this->files->isDirectory($fullPath))
+		if ($this->files->makeDirectoryIfNotExists($fullPath, 0777, true))
 		{
-			$this->files->makeDirectory($fullPath, 0777, true);
-
 			return $fullPath;
 		}
-
-		throw new \InvalidArgumentException("Package exists.");
+		else
+			throw new \InvalidArgumentException("Package exists.");
 	}
 
 }

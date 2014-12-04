@@ -61,6 +61,24 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		$this->assertFileNotExists(__DIR__.'/foo/file.txt');
 	}
 
+	public function testMakeDirectory()
+	{
+		$files = new Filesystem;
+		$this->assertTrue($files->makeDirectory(__DIR__.'/foo'));
+		$this->assertFileExists(__DIR__.'/foo');
+		@rmdir(__DIR__.'/foo');
+	}
+
+	public function testMakeDirectoryIfNotExists()
+	{
+		$files = new Filesystem;
+		$this->assertTrue($files->makeDirectoryIfNotExists(__DIR__.'/foo'));
+		$this->assertFileExists(__DIR__.'/foo');
+
+		// Since foo is now already there, trying to make it by makeDirectoryIfNotExists will return false
+		$this->assertFalse($files->makeDirectoryIfNotExists(__DIR__.'/foo'));
+		@rmdir(__DIR__.'/foo');
+	}
 
 	public function testCleanDirectory()
 	{
