@@ -13,7 +13,7 @@ class ConfigPublisher extends Publisher {
 	 */
 	protected function getSource($package, $packagePath)
 	{
-		$source = $packagePath."/{$package}/src/config";
+		$source = $packagePath."/{$package}/resources/config";
 
 		if ( ! $this->files->isDirectory($source))
 		{

@@ -28,7 +28,7 @@ class BaseCommand extends Command {
 		// is in the package directories and will place them in that location.
 		if ( ! is_null($package))
 		{
-			return $this->packagePath.'/'.$package.'/src/migrations';
+			return $this->packagePath.'/'.$package.'/resources/migrations';
 		}
 
 		$bench = $this->input->getOption('bench');
@@ -38,7 +38,7 @@ class BaseCommand extends Command {
 		// developers to develop packages along side a "standard" app install.
 		if ( ! is_null($bench))
 		{
-			$path = "/workbench/{$bench}/src/migrations";
+			$path = "/workbench/{$bench}/resources/migrations";
 
 			return $this->laravel['path.base'].$path;
 		}

@@ -12,10 +12,10 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 	public function testPackageNameCanBeGuessed()
 	{
 		$superProvider = new SuperProvider(null);
-		$this->assertEquals(realpath(__DIR__.'/'), $superProvider->guessPackagePath());
+		$this->assertEquals(realpath(__DIR__.'/stubs/providers/'), $superProvider->guessPackagePath());
 
 		$superSuperProvider = new SuperSuperProvider(null);
-		$this->assertEquals(realpath(__DIR__.'/'), $superSuperProvider->guessPackagePath());
+		$this->assertEquals(realpath(__DIR__.'/stubs/providers/'), $superSuperProvider->guessPackagePath());
 	}
 
 }
