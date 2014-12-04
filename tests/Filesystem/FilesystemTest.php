@@ -92,6 +92,86 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSizeOutputsSize()
+	{
+		$size = file_put_contents(__DIR__.'/foo.txt', 'foo');
+		$files = new Filesystem;
+		$this->assertEquals($size,$files->size(__DIR__.'/foo.txt'));
+		@unlink(__DIR__.'/foo.txt');
+	}
+
+
+	public function testLastModified()
+	{
+		$time = time();
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		$files = new Filesystem;
+		$this->assertEquals($time,$files->lastModified(__DIR__.'/foo.txt'));
+		@unlink(__DIR__.'/foo.txt');
+	}
+
+
+	public function testIsWritable()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		$files = new Filesystem;
+		@chmod(__DIR__.'/foo.txt', 0444);
+		$this->assertFalse($files->isWritable(__DIR__.'/foo.txt'));
+		@chmod(__DIR__.'/foo.txt', 0777);
+		$this->assertTrue($files->isWritable(__DIR__.'/foo.txt'));
+		@unlink(__DIR__.'/foo.txt');
+	}
+
+
+	public function testGlobFindsFiles()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		file_put_contents(__DIR__.'/bar.txt', 'bar');
+		$files = new Filesystem;
+		$glob = $files->glob(__DIR__.'/*.txt');
+		$this->assertContains(__DIR__.'/foo.txt',$glob);
+		$this->assertContains(__DIR__.'/bar.txt',$glob);
+		@unlink(__DIR__.'/foo.txt');
+		@unlink(__DIR__.'/bar.txt');
+	}
+
+
+	public function testAllFilesFindsFiles()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		file_put_contents(__DIR__.'/bar.txt', 'bar');
+		$files = new Filesystem;
+		$allFiles = [];
+		foreach($files->allFiles(__DIR__) as $file)
+			$allFiles[] = $file->getFilename();
+		$this->assertContains('foo.txt',$allFiles);
+		$this->assertContains('bar.txt',$allFiles);
+		@unlink(__DIR__.'/foo.txt');
+		@unlink(__DIR__.'/bar.txt');
+	}
+
+
+	public function testDirectoriesFindsDirectories()
+	{
+		mkdir(__DIR__.'/foo');
+		mkdir(__DIR__.'/bar');
+		$files = new Filesystem;
+		$directories = $files->directories(__DIR__);
+		$this->assertContains(__DIR__.'/foo',$directories);
+		$this->assertContains(__DIR__.'/bar',$directories);
+		@rmdir(__DIR__.'/foo');
+		@rmdir(__DIR__.'/bar');
+	}
+
+	public function testMakeDirectory()
+	{
+		$files = new Filesystem;
+		$this->assertTrue($files->makeDirectory(__DIR__.'/foo'));
+		$this->assertFileExists(__DIR__.'/foo');
+		@rmdir(__DIR__.'/foo');
+	}
+
+
 	public function testPutStoresFiles()
 	{
 		$files = new Filesystem;
@@ -138,6 +218,17 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		$files->deleteDirectory(__DIR__.'/foo');
 		$this->assertFalse(is_dir(__DIR__.'/foo'));
 		$this->assertFileNotExists(__DIR__.'/foo/file.txt');
+	}
+
+
+	public function testDeleteDirectoryWorksRecursively()
+	{
+		mkdir(__DIR__.'/foo');
+		mkdir(__DIR__.'/foo/bar');
+		$files = new Filesystem;
+		$files->deleteDirectory(__DIR__.'/foo');
+		$this->assertFalse(is_dir(__DIR__.'/foo/bar'));
+		$this->assertFalse(is_dir(__DIR__.'/foo'));
 	}
 
 
