@@ -2931,7 +2931,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the connection associated with the model.
 	 *
 	 * @param  string  $name
-	 * @param  string  $override
+	 * @param  bool    $override
 	 * @return $this
 	 */
 	public function setConnection($name, $override = false)
