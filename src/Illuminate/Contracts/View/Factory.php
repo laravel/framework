@@ -11,6 +11,16 @@ interface Factory {
 	public function exists($view);
 
 	/**
+	 * Get the evaluated view contents for the given path.
+	 *
+	 * @param  string  $path
+	 * @param  array  $data
+	 * @param  array  $mergeData
+	 * @return \Illuminate\Contracts\View\View
+	 */
+	public function file($path, $data = array(), $mergeData = array());
+
+	/**
 	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param  string  $view

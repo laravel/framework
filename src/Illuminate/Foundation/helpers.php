@@ -114,15 +114,24 @@ if ( ! function_exists('bcrypt'))
 if ( ! function_exists('config'))
 {
 	/**
-	 * Get the specified configuration value.
+	 * Get / set the specified configuration value.
 	 *
-	 * @param  string  $key
+	 * If an array as passed as the key, we will assume you want to set an array of values.
+	 *
+	 * @param  array|string  $key
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
 	function config($key, $default = null)
 	{
-		return app('config')->get($key, $default);
+		if (is_array($key))
+		{
+			return app('config')->set($key);
+		}
+		else
+		{
+			return app('config')->get($key, $default);
+		}
 	}
 }
 

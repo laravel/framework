@@ -6,7 +6,12 @@ use Illuminate\Contracts\Config\Repository as ConfigContract;
 
 class Repository implements ArrayAccess, ConfigContract {
 
-	protected $items;
+	/**
+	 * All of the configuration items.
+	 *
+	 * @var array
+	 */
+	protected $items = [];
 
 	/**
 	 * Create a new configuration repository.
@@ -47,13 +52,23 @@ class Repository implements ArrayAccess, ConfigContract {
 	/**
 	 * Set a given configuration value.
 	 *
-	 * @param  string  $key
+	 * @param  array|string  $key
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function set($key, $value)
+	public function set($key, $value = null)
 	{
-		array_set($this->items, $key, $value);
+		if (is_array($key))
+		{
+			foreach ($key as $innerKey => $innerValue)
+			{
+				array_set($this->items, $innerKey, $innerValue);
+			}
+		}
+		else
+		{
+			array_set($this->items, $key, $value);
+		}
 	}
 
 	/**

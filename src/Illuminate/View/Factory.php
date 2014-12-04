@@ -111,24 +111,20 @@ class Factory implements FactoryContract {
 	}
 
 	/**
-	 * Normalize a view name.
+	 * Get the evaluated view contents for the given view.
 	 *
-	 * @param  string $name
-	 *
-	 * @return string
+	 * @param  string  $path
+	 * @param  array   $data
+	 * @param  array   $mergeData
+	 * @return \Illuminate\View\View
 	 */
-	protected function normalizeName($name)
+	public function file($path, $data = array(), $mergeData = array())
 	{
-		$delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+		$data = array_merge($mergeData, $this->parseData($data));
 
-		if (strpos($name, $delimiter) === false)
-		{
-			return str_replace('/', '.', $name);
-		}
+		$this->callCreator($view = new View($this, $this->getEngineFromPath($path), $path, $path, $data));
 
-		list($namespace, $name) = explode($delimiter, $name);
-
-		return $namespace . $delimiter . str_replace('/', '.', $name);
+		return $view;
 	}
 
 	/**
@@ -152,6 +148,27 @@ class Factory implements FactoryContract {
 		$this->callCreator($view = new View($this, $this->getEngineFromPath($path), $view, $path, $data));
 
 		return $view;
+	}
+
+	/**
+	 * Normalize a view name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return string
+	 */
+	protected function normalizeName($name)
+	{
+		$delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+
+		if (strpos($name, $delimiter) === false)
+		{
+			return str_replace('/', '.', $name);
+		}
+
+		list($namespace, $name) = explode($delimiter, $name);
+
+		return $namespace . $delimiter . str_replace('/', '.', $name);
 	}
 
 	/**
