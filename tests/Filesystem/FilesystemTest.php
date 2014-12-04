@@ -27,7 +27,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		file_put_contents(__DIR__.'/file.txt', 'Hello World');
 		$files = new Filesystem;
 		$files->delete(__DIR__.'/file.txt');
-		$this->assertFalse(file_exists(__DIR__.'/file.txt'));
+		$this->assertFileNotExists(__DIR__.'/file.txt');
 		@unlink(__DIR__.'/file.txt');
 	}
 
@@ -58,7 +58,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		$files = new Filesystem;
 		$files->deleteDirectory(__DIR__.'/foo');
 		$this->assertFalse(is_dir(__DIR__.'/foo'));
-		$this->assertFalse(file_exists(__DIR__.'/foo/file.txt'));
+		$this->assertFileNotExists(__DIR__.'/foo/file.txt');
 	}
 
 
@@ -69,7 +69,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		$files = new Filesystem;
 		$files->cleanDirectory(__DIR__.'/foo');
 		$this->assertTrue(is_dir(__DIR__.'/foo'));
-		$this->assertFalse(file_exists(__DIR__.'/foo/file.txt'));
+		$this->assertFileNotExists(__DIR__.'/foo/file.txt');
 		@rmdir(__DIR__.'/foo');
 	}
 
@@ -108,10 +108,10 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		$files = new Filesystem;
 		$files->copyDirectory(__DIR__.'/tmp', __DIR__.'/tmp2');
 		$this->assertTrue(is_dir(__DIR__.'/tmp2'));
-		$this->assertTrue(file_exists(__DIR__.'/tmp2/foo.txt'));
-		$this->assertTrue(file_exists(__DIR__.'/tmp2/bar.txt'));
+		$this->assertFileExists(__DIR__.'/tmp2/foo.txt');
+		$this->assertFileExists(__DIR__.'/tmp2/bar.txt');
 		$this->assertTrue(is_dir(__DIR__.'/tmp2/nested'));
-		$this->assertTrue(file_exists(__DIR__.'/tmp2/nested/baz.txt'));
+		$this->assertFileExists(__DIR__.'/tmp2/nested/baz.txt');
 
 		unlink(__DIR__.'/tmp/nested/baz.txt');
 		rmdir(__DIR__.'/tmp/nested');
