@@ -369,6 +369,16 @@ class Repository extends NamespacedItemResolver implements ArrayAccess, ConfigCo
 	}
 
 	/**
+	 * Get all the registered packages.
+	 * 
+	 * @return array
+	 */
+	public function getPackages()
+	{
+		return $this->packages;
+	}
+
+	/**
 	 * Determine if the given configuration option exists.
 	 *
 	 * @param  string  $key
