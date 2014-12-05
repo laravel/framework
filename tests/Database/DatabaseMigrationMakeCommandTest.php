@@ -35,28 +35,6 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPackagePathsMayBeUsed()
-	{
-		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
-		$app = new Illuminate\Container\Container;
-		$app['path.database'] = __DIR__;
-		$command->setLaravel($app);
-		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/vendor/bar/src/migrations', null, false);
-
-		$this->runCommand($command, array('name' => 'create_foo', '--package' => 'bar'));
-	}
-
-
-	public function testPackageFallsBackToVendorDirWhenNotExplicit()
-	{
-		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
-		$command->setLaravel(new Illuminate\Container\Container);
-		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/vendor/foo/bar/src/migrations', null, false);
-
-		$this->runCommand($command, array('name' => 'create_foo', '--package' => 'foo/bar'));
-	}
-
-
 	protected function runCommand($command, $input = array())
 	{
 		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
