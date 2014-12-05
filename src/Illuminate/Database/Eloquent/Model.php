@@ -30,6 +30,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var string
 	 */
 	protected $connection;
+	
+	/**
+	 * Override connection of all relations
+	 * 
+	 * @var bool
+	 */
+	protected $overrideConnection = false;
 
 	/**
 	 * The table associated with the model.
@@ -601,16 +608,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Begin querying the model on a given connection.
 	 *
 	 * @param  string  $connection
+	 * @param  bool    $override
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public static function on($connection = null)
+	public static function on($connection = null, $override = false)
 	{
 		// First we will just create a fresh instance of this model, and then we can
 		// set the connection on the model so that it is be used for the queries
 		// we execute, as well as being set on each relationship we retrieve.
 		$instance = new static;
 
-		$instance->setConnection($connection);
+		$instance->setConnection($connection, $override);
 
 		return $instance->newQuery();
 	}
@@ -719,6 +727,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$instance->setConnection($this->getConnectionName());
+		}
 
 		$localKey = $localKey ?: $this->getKeyName();
 
@@ -738,6 +751,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
 	{
 		$instance = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$instance->setConnection($this->getConnectionName());
+		}
 
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
@@ -778,6 +796,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		$instance = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$instance->setConnection($this->getConnectionName());
+		}
 
 		// Once we have the foreign key names, we'll just create a new Eloquent query
 		// for the related models and returns the relationship instance which will
@@ -827,6 +850,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		else
 		{
 			$instance = new $class;
+			
+			if ($this->overrideConnection) 
+			{
+				$instance->setConnection($this->getConnectionName());
+			}
 
 			return new MorphTo(
 				$instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
@@ -847,6 +875,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$instance->setConnection($this->getConnectionName());
+		}
 
 		$localKey = $localKey ?: $this->getKeyName();
 
@@ -865,12 +898,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
 	{
 		$through = new $through;
+		$related = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$through->setConnection($this->getConnectionName());
+			$related->setConnection($this->getConnectionName());
+		}
 
 		$firstKey = $firstKey ?: $this->getForeignKey();
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		return new HasManyThrough($related->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
@@ -886,6 +926,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
 	{
 		$instance = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$instance->setConnection($this->getConnectionName());
+		}
 
 		// Here we will gather up the morph type and ID for the relationship so that we
 		// can properly query the intermediate table of a relation. Finally, we will
@@ -925,6 +970,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$instance->setConnection($this->getConnectionName());
+		}
 
 		$otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -965,6 +1015,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$foreignKey = $foreignKey ?: $name.'_id';
 
 		$instance = new $related;
+		
+		if ($this->overrideConnection) 
+		{
+			$instance->setConnection($this->getConnectionName());
+		}
 
 		$otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -2876,10 +2931,12 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Set the connection associated with the model.
 	 *
 	 * @param  string  $name
+	 * @param  bool    $override
 	 * @return $this
 	 */
-	public function setConnection($name)
+	public function setConnection($name, $override = false)
 	{
+		$this->overrideConnection = $override;
 		$this->connection = $name;
 
 		return $this;
