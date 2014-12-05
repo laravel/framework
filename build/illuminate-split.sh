@@ -26,5 +26,4 @@ git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Support:g
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Translation:git@github.com:illuminate/translation.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Validation:git@github.com:illuminate/validation.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/View:git@github.com:illuminate/view.git
-git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Workbench:git@github.com:illuminate/workbench.git
 rm -rf .subsplit/
