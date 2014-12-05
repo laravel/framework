@@ -26,5 +26,4 @@ git subsplit publish src/Illuminate/Support:git@github.com:illuminate/support.gi
 git subsplit publish src/Illuminate/Translation:git@github.com:illuminate/translation.git
 git subsplit publish src/Illuminate/Validation:git@github.com:illuminate/validation.git
 git subsplit publish src/Illuminate/View:git@github.com:illuminate/view.git
-git subsplit publish src/Illuminate/Workbench:git@github.com:illuminate/workbench.git
 rm -rf .subsplit/
