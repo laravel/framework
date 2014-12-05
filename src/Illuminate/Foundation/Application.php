@@ -231,7 +231,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function langPath()
 	{
-		return $this->basePath.'/resources/lang';
+		return $this->basePath.'/lang';
 	}
 
 	/**
