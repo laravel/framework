@@ -24,6 +24,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 	}
 
+
 	public function testSometimesWorksOnArrays()
 	{
 		$trans = $this->getRealTranslator();
@@ -35,6 +36,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array('foo' => array('bar', 'baz', 'moo', 'pew', 'boom')), array('foo' => 'sometimes|required|between:5,10'));
 		$this->assertTrue($v->passes());
 	}
+
 
 	public function testHasFailedValidationRules()
 	{
