@@ -25,7 +25,6 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider {
 		'Illuminate\Queue\FailConsoleServiceProvider',
 		'Illuminate\Routing\GeneratorServiceProvider',
 		'Illuminate\Session\CommandsServiceProvider',
-		'Illuminate\Workbench\WorkbenchServiceProvider',
 	];
 
 }
