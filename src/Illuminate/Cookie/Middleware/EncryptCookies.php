@@ -113,7 +113,7 @@ class EncryptCookies implements Middleware {
 	/**
 	 * Duplicate a cookie with a new value.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
+	 * @param  \Symfony\Component\HttpFoundation\Cookie  $c
 	 * @param  mixed  $value
 	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
