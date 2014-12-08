@@ -181,6 +181,13 @@ class Builder {
 	);
 
 	/**
+	 * Whether use write pdo for select.
+	 *
+	 * @var bool
+	 */
+	protected $useWritePdo = false;
+
+	/**
 	 * Create a new query builder instance.
 	 *
 	 * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -1356,6 +1363,10 @@ class Builder {
 	 */
 	protected function runSelect()
 	{
+		if ($this->useWritePdo) {
+			return $this->connection->select($this->toSql(), $this->getBindings(), false);
+		}
+
 		return $this->connection->select($this->toSql(), $this->getBindings());
 	}
 
@@ -2090,6 +2101,13 @@ class Builder {
 	public function getGrammar()
 	{
 		return $this->grammar;
+	}
+
+	public function useWritePdo()
+	{
+		$this->useWritePdo = true;
+
+		return $this;
 	}
 
 	/**
