@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Foundation\Composer;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\Migrations\MigrationCreator;
@@ -35,17 +36,24 @@ class MigrateMakeCommand extends BaseCommand {
 	protected $packagePath;
 
 	/**
+	 * @var \Illuminate\Foundation\Composer
+	 */
+	protected $composer;
+
+	/**
 	 * Create a new migration install command instance.
 	 *
 	 * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
+	 * @param  \Illuminate\Foundation\Composer  $composer
 	 * @param  string  $packagePath
 	 * @return void
 	 */
-	public function __construct(MigrationCreator $creator, $packagePath)
+	public function __construct(MigrationCreator $creator, Composer $composer, $packagePath)
 	{
 		parent::__construct();
 
 		$this->creator = $creator;
+		$this->composer = $composer;
 		$this->packagePath = $packagePath;
 	}
 
@@ -72,7 +80,7 @@ class MigrateMakeCommand extends BaseCommand {
 		// make sure that the migrations are registered by the class loaders.
 		$this->writeMigration($name, $table, $create);
 
-		$this->call('dump-autoload');
+		$this->composer->dumpAutoloads();
 	}
 
 	/**
