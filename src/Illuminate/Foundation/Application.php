@@ -211,7 +211,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function configPath()
 	{
-		return $this->basePath.'/config';
+		return $this->basePath.'/resources/config';
 	}
 
 	/**
@@ -221,7 +221,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function databasePath()
 	{
-		return $this->basePath.'/database';
+		return $this->basePath.'/resources/database';
 	}
 
 	/**
@@ -231,7 +231,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function langPath()
 	{
-		return $this->basePath.'/lang';
+		return $this->basePath.'/resources/lang';
 	}
 
 	/**
