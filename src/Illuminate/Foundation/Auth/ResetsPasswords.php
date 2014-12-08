@@ -24,6 +24,7 @@ trait ResetsPasswords {
 	/**
 	 * Create a new password controller instance.
 	 *
+	 * @param  Guard  $auth
 	 * @param  PasswordBroker  $passwords
 	 * @return void
 	 */
