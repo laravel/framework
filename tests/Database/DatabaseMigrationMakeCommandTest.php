@@ -10,10 +10,29 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 		m::close();
 	}
 
+	public function testBasicCreateDumpsAutoload()
+	{
+		$command = new DatabaseMigrationMakeCommandTestStub(
+			$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
+			$composer = m::mock('Illuminate\Foundation\Composer'),
+			__DIR__.'/vendor'
+		);
+		$app = new Illuminate\Container\Container;
+		$app['path.database'] = __DIR__;
+		$command->setLaravel($app);
+		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
+		$composer->shouldReceive('dumpAutoloads')->once();
+
+		$this->runCommand($command, array('name' => 'create_foo'));
+	}
 
 	public function testBasicCreateGivesCreatorProperArguments()
 	{
-		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
+		$command = new DatabaseMigrationMakeCommandTestStub(
+			$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
+			m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
+			__DIR__.'/vendor'
+		);
 		$app = new Illuminate\Container\Container;
 		$app['path.database'] = __DIR__;
 		$command->setLaravel($app);
@@ -25,7 +44,11 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
 	{
-		$command = new DatabaseMigrationMakeCommandTestStub($creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'), __DIR__.'/vendor');
+		$command = new DatabaseMigrationMakeCommandTestStub(
+			$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
+			m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
+			__DIR__.'/vendor'
+		);
 		$app = new Illuminate\Container\Container;
 		$app['path.database'] = __DIR__;
 		$command->setLaravel($app);

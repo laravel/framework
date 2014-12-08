@@ -192,7 +192,9 @@ class MigrationServiceProvider extends ServiceProvider {
 
 			$packagePath = $app['path.base'].'/vendor';
 
-			return new MigrateMakeCommand($creator, $packagePath);
+			$composer = $app['composer'];
+
+			return new MigrateMakeCommand($creator, $composer, $packagePath);
 		});
 	}
 
