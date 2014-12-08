@@ -35,7 +35,7 @@ class LoadConfiguration {
 		// options available to the developer for use in various parts of this app.
 		if ( ! isset($loadedFromCache))
 		{
-			$this->loadConfigurationFiles($config);
+			$this->loadConfigurationFiles($app, $config);
 		}
 
 		date_default_timezone_set($config['app.timezone']);
@@ -44,12 +44,13 @@ class LoadConfiguration {
 	/**
 	 * Load the configuration items from all of the files.
 	 *
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @param  \Illuminate\Contracts\Config\Repository  $config
 	 * @return void
 	 */
-	protected function loadConfigurationFiles(Repository $config)
+	protected function loadConfigurationFiles(Application $app, Repository $config)
 	{
-		foreach ($this->getConfigurationFiles() as $key => $path)
+		foreach ($this->getConfigurationFiles($app) as $key => $path)
 		{
 			$config->set($key, require $path);
 		}
@@ -58,13 +59,14 @@ class LoadConfiguration {
 	/**
 	 * Get all of the configuration files for the application.
 	 *
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return array
 	 */
-	protected function getConfigurationFiles()
+	protected function getConfigurationFiles(Application $app)
 	{
 		$files = [];
 
-		foreach (Finder::create()->files()->in(base_path('config')) as $file)
+		foreach (Finder::create()->files()->in($app->configPath()) as $file)
 		{
 			$files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
 		}
