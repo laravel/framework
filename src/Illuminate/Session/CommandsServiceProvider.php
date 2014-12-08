@@ -20,7 +20,7 @@ class CommandsServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.session.database', function($app)
 		{
-			return new Console\SessionTableCommand($app['files']);
+			return new Console\SessionTableCommand($app['files'], $app['composer']);
 		});
 
 		$this->commands('command.session.database');
