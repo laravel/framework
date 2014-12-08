@@ -41,7 +41,7 @@ class CallbackEvent extends Event {
 	/**
 	 * Run the given event.
 	 *
-	 * @param  \Illuminate\Contracts\Container\Container $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function run(Container $container)
