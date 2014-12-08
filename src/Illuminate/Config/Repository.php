@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Config;
 
-use Closure;
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
