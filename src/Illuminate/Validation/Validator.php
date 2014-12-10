@@ -889,7 +889,7 @@ class Validator implements MessageProviderInterface {
 		{
 			return count($value);
 		}
-		elseif ($value instanceof File)
+		elseif ($value instanceof UploadedFile)
 		{
 			return ($value->isValid()) ? $value->getSize() / 1024 : false;
 		}
