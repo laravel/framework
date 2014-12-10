@@ -891,7 +891,7 @@ class Validator implements MessageProviderInterface {
 		}
 		elseif ($value instanceof UploadedFile)
 		{
-			return ($value->isValid()) ? $value->getSize() / 1024 : (int)false;
+			return ($value->isValid()) ? $value->getSize() / 1024 : 0;
 		}
 
 		return $this->getStringSize($value);
