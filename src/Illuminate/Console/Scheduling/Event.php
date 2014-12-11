@@ -188,10 +188,8 @@ class Event {
 		{
 			return 'Scheduled Job Output ('.$this->description.')';
 		}
-		else
-		{
-			return 'Scheduled Job Output';
-		}
+
+		return 'Scheduled Job Output';
 	}
 
 	/**
@@ -627,6 +625,8 @@ class Event {
 	 *
 	 * @param  array|dynamic  $addresses
 	 * @return $this
+	 * 
+	 * @throws \LogicException
 	 */
 	public function emailOutputTo($addresses)
 	{

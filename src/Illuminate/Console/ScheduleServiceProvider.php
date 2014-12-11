@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Console;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Console\Scheduling\ScheduleRunCommand;
 
 class ScheduleServiceProvider extends ServiceProvider {
 
