@@ -122,11 +122,13 @@ class ResponseFactory implements FactoryContract {
 	 * @param  string  $name
 	 * @param  array   $headers
 	 * @param  null|string  $disposition
+	 * @param  boolean $autoEtag
+	 * @param  boolean $autoLastModified
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
-	public function download($file, $name = null, array $headers = array(), $disposition = 'attachment')
+	public function download($file, $name = null, array $headers = array(), $disposition = 'attachment', $autoEtag = false, $autoLastModified = true)
 	{
-		$response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
+		$response = new BinaryFileResponse($file, 200, $headers, true, $disposition, $autoEtag, $autoLastModified);
 
 		if ( ! is_null($name))
 		{
