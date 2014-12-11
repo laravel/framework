@@ -538,8 +538,8 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Get all dependencies for a given method.
 	 *
-	 * @param \Closure|array  $callback
-	 * @param array  $parameters
+	 * @param  \Closure|array  $callback
+	 * @param  array  $parameters
 	 * @return array
 	 */
 	protected function getMethodDependencies($callback, $parameters = [])
