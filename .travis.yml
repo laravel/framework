@@ -6,8 +6,10 @@ php:
   - 5.6
   - hhvm
 
-before_script:
+before_install:
   - travis_retry composer self-update
+  
+install:
   - travis_retry composer install --prefer-source --no-interaction --dev
 
 script: vendor/bin/phpunit --verbose
