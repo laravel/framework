@@ -10,7 +10,7 @@ class Scanner {
 	/**
 	 * The classes to scan for annotations.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $scan;
 
