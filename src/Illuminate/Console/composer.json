@@ -15,7 +15,8 @@
     },
     "require-dev": {
         "mtdowling/cron-expression": "~1.0",
-        "symfony/process": "2.6.*"
+        "symfony/process": "2.6.*",
+        "nesbot/carbon": "~1.0"
     },
     "autoload": {
         "psr-4": {
