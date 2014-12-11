@@ -198,7 +198,7 @@ class Redirector {
 	/**
 	 * Get the URL generator instance.
 	 *
-	 * @return  \Illuminate\Routing\UrlGenerator
+	 * @return \Illuminate\Routing\UrlGenerator
 	 */
 	public function getUrlGenerator()
 	{

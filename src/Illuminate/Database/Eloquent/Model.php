@@ -1055,7 +1055,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get the relationship name of the belongs to many.
 	 *
-	 * @return  string
+	 * @return string
 	 */
 	protected function getBelongsToManyCaller()
 	{
