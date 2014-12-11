@@ -94,7 +94,6 @@ class RouteListCommand extends Command {
 	/**
 	 * Get the route information for a given route.
 	 *
-	 * @param  string  $name
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return array
 	 */
