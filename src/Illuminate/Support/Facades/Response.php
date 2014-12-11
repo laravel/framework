@@ -95,6 +95,8 @@ class Response {
 	 * @param  string  $name
 	 * @param  array   $headers
 	 * @param  null|string  $disposition
+	 * @param  boolean $autoEtag
+	 * @param  boolean $autoLastModified
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
 	 */
 	public static function download($file, $name = null, array $headers = array(), $disposition = 'attachment', $autoEtag = false, $autoLastModified = true)
