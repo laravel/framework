@@ -111,10 +111,8 @@ class HandleExceptions {
 	 */
 	public function handleShutdown()
 	{
-		if ( ! is_null($error = error_get_last()))
+		if ( ! is_null($error = error_get_last()) && $this->isFatal($error['type']))
 		{
-			if ( ! $this->isFatal($error['type'])) return;
-
 			$this->handleException($this->fatalExceptionFromError($error));
 		}
 	}
