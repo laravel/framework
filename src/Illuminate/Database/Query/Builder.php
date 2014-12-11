@@ -38,10 +38,10 @@ class Builder {
 	 */
 	protected $bindings = array(
 		'select' => [],
-		'join'   => [],
-		'where'  => [],
+		'join' => [],
+		'where' => [],
 		'having' => [],
-		'order'  => [],
+		'order' => [],
 	);
 
 	/**
