@@ -644,6 +644,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		return $instance->newQuery()->find($id, $columns);
 	}
 
+	public static function onWrite()
+	{
+		$instance = new static;
+
+		return $instance->newQuery()->useWritePdo();
+	}
+
 	/**
 	 * Find a model by its primary key or return new static.
 	 *
