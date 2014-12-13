@@ -1070,10 +1070,10 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Set the shared instance of the container.
 	 *
-	 * @param  static  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
-	public static function setInstance(Container $container)
+	public static function setInstance(ContainerContract $container)
 	{
 		static::$instance = $container;
 	}
