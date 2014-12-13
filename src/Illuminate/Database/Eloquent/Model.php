@@ -2397,19 +2397,19 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the key already exists in the relationships array, it just means the
 		// relationship has already been loaded, so we'll just return it out of
 		// here because there is no need to query within the relations twice.
-		if (array_key_exists($key, $this->relations))
+		$camelKey = camel_case($key);
+
+		if (array_key_exists($camelKey, $this->relations))
 		{
-			return $this->relations[$key];
+			return $this->relations[$camelKey];
 		}
 
 		// If the "attribute" exists as a method on the model, we will just assume
 		// it is a relationship and will load and return results from the query
 		// and hydrate the relationship's value on the "relationships" array.
-		$camelKey = camel_case($key);
-
 		if (method_exists($this, $camelKey))
 		{
-			return $this->getRelationshipFromMethod($key, $camelKey);
+			return $this->getRelationshipFromMethod($camelKey);
 		}
 	}
 
@@ -2460,14 +2460,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Get a relationship value from a method.
 	 *
 	 * @param  string  $key
-	 * @param  string  $camelKey
 	 * @return mixed
 	 *
 	 * @throws \LogicException
 	 */
-	protected function getRelationshipFromMethod($key, $camelKey)
+	protected function getRelationshipFromMethod($key)
 	{
-		$relations = $this->$camelKey();
+		$relations = $this->$key();
 
 		if ( ! $relations instanceof Relation)
 		{

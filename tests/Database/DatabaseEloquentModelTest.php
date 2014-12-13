@@ -842,6 +842,30 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetRelationAttributeReturnsSameCollectionEachTime()
+	{
+		$model = new EloquentModelWithHasManyRelation;
+
+		$data = array(array('name' => 'Taylor'), array('name' => 'Otwell'));
+		$collection = EloquentModelStub::hydrate($data);
+
+		$model->setRelation('testRelation', $collection);
+		$this->assertSame($collection, $model->testRelation);
+	}
+
+
+	public function testGetRelationAttributeReturnsSameCollectionEachTimeWithCamelCase()
+	{
+		$model = new EloquentModelWithHasManyRelation;
+
+		$data = array(array('name' => 'Taylor'), array('name' => 'Otwell'));
+		$collection = EloquentModelStub::hydrate($data);
+
+		$model->setRelation('testRelation', $collection);
+		$this->assertSame($collection, $model->test_relation);
+	}
+
+
 	public function testModelIsBootedOnUnserialize()
 	{
 		$model = new EloquentModelBootingTestStub;
@@ -1115,5 +1139,12 @@ class EloquentModelAppendsStub extends Illuminate\Database\Eloquent\Model {
 	public function getIsAdminAttribute()
 	{
 		return 'admin';
+	}
+}
+
+class EloquentModelWithHasManyRelation extends Illuminate\Database\Eloquent\Model {
+	public function testRelation()
+	{
+		return $this->hasMany('EloquentModelStub');
 	}
 }
