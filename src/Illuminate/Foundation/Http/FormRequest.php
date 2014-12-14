@@ -58,6 +58,13 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected $dontFlash = ['password', 'password_confirmation'];
 
 	/**
+	 * The name for the MessageBag of errors.
+	 *
+	 * @var string
+	 */
+	protected $messageBagName = 'default';
+
+	/**
 	 * Get the validator instance for the request.
 	 *
 	 * @return \Illuminate\Validation\Validator
@@ -139,7 +146,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 
 		return $this->redirector->to($this->getRedirectUrl())
                                         ->withInput($this->except($this->dontFlash))
-                                        ->withErrors($errors);
+                                        ->withErrors($errors, $this->messageBagName);
 	}
 
 	/**
