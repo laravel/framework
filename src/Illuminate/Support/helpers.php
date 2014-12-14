@@ -697,6 +697,21 @@ if ( ! function_exists('str_singular'))
 	}
 }
 
+if ( ! function_exists('str_slug'))
+{
+	/**
+	 * Generate a URL friendly "slug" from a given string.
+	 *
+	 * @param  string  $title
+	 * @param  string  $separator
+	 * @return string
+	 */
+	function str_slug($title, $separator = '-')
+	{
+		return Str::slug($title, $separator);
+	}
+}
+
 if ( ! function_exists('studly_case'))
 {
 	/**
