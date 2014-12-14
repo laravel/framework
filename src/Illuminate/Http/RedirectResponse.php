@@ -145,7 +145,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Get the request instance.
 	 *
-	 * @return  \Illuminate\Http\Request
+	 * @return \Illuminate\Http\Request
 	 */
 	public function getRequest()
 	{

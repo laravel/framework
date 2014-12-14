@@ -625,7 +625,7 @@ class Event {
 	 *
 	 * @param  array|dynamic  $addresses
 	 * @return $this
-	 * 
+	 *
 	 * @throws \LogicException
 	 */
 	public function emailOutputTo($addresses)

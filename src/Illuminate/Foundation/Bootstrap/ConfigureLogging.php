@@ -2,7 +2,6 @@
 
 use Illuminate\Log\Writer;
 use Monolog\Logger as Monolog;
-use Monolog\Handler\SyslogHandler;
 use Illuminate\Contracts\Foundation\Application;
 
 class ConfigureLogging {

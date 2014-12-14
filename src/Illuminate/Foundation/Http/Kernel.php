@@ -19,7 +19,7 @@ class Kernel implements KernelContract {
 	/**
 	 * The router instance.
 	 *
-	 * @param \Illuminate\Routing\Router
+	 * @param  \Illuminate\Routing\Router
 	 */
 	protected $router;
 

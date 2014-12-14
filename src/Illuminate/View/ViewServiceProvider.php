@@ -1,6 +1,5 @@
 <?php namespace Illuminate\View;
 
-use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\CompilerEngine;
