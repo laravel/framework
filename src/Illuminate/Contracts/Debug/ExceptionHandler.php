@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Contracts\Debug;
 
 use Exception;
-use Illuminate\Contracts\Console\Application as ConsoleApplication;
 
 interface ExceptionHandler {
 

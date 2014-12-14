@@ -1,9 +1,7 @@
 <?php namespace Illuminate\Foundation\Bootstrap;
 
-use Illuminate\Config\FileLoader;
 use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Foundation\Application;
 
 class LoadConfiguration {

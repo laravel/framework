@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Support;
 
-use ReflectionClass;
-
 abstract class ServiceProvider {
 
 	/**
