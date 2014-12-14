@@ -126,9 +126,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testWhere()
 	{
-		$c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+		$d = [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]];
+
+		$c = new Collection($d);
 
 		$this->assertEquals([['v' => 3], ['v' => '3']], $c->where('v', 3)->values()->all());
+
+		$d = array_map(function ($i) { return new Collection($i); }, $d);
+
+		$c = new Collection($d);
+
+		$this->assertEquals(
+			[
+				new Collection(['v' => 3]),
+				new Collection(['v' => '3'])
+			],
+			$c->where('v', 3)->values()->all()
+		);
 	}
 
 
