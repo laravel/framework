@@ -1267,6 +1267,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
 	}
 
+
 	protected function getMySqlBuilderWithProcessor()
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
