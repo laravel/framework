@@ -649,7 +649,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @return \Illuminate\Database\Query\Builder
 	 */
-	public static function onWrite()
+	public static function onWriteConnection()
 	{
 		$instance = new static;
 
