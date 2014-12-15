@@ -240,9 +240,11 @@ class Repository implements CacheContract, ArrayAccess {
 	 */
 	public function forget($key)
 	{
-		return $this->store->forget($key);
+		$success = $this->store->forget($key);
 
 		$this->fireCacheEvent('delete', [$key]);
+
+		return $success;
 	}
 
 	/**
