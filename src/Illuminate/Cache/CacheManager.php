@@ -155,7 +155,14 @@ class CacheManager extends Manager implements FactoryContract {
 	 */
 	protected function repository(StoreInterface $store)
 	{
-		return new Repository($store);
+		$repository = new Repository($store);
+
+		if ($this->app->bound('events'))
+		{
+			$repository->setEventDispatcher($this->app['events']);
+		}
+
+		return $repository;
 	}
 
 	/**
