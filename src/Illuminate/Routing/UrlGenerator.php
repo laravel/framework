@@ -320,19 +320,17 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	protected function addQueryString($uri, array $parameters)
 	{
-		$fragment = parse_url($uri, PHP_URL_FRAGMENT);
-		if (!is_null($fragment))
+		// If the URI has a fragmnet, we will move it to the end of the URI since it will
+		// need to come after any query string that may be added to the URL else it is
+		// not going to be available. We will remove it then append it back on here.
+		if ( ! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT)))
 		{
 			$uri = preg_replace('/#.*/', '', $uri);
 		}
 
 		$uri .= $this->getRouteQueryString($parameters);
-		if (!is_null($fragment))
-		{
-			$uri .= "#$fragment";
-		}
 
-		return $uri;
+		return is_null($fragment) ? $uri : $uri."#{$fragment}";
 	}
 
 	/**
