@@ -479,18 +479,14 @@ if ( ! function_exists('env'))
 		switch (strtolower($value)) {
 			case 'true':
 			case '(true)':
-				$value = true;
-				break;
+				return true;
 			case 'false':
 			case '(false)':
-				$value = false;
-				break;
+				return false;
 			case '(null)':
-				$value = null;
-				break;
+				return null;
 			case '(empty)':
-				$value = '';
-				break;
+				return '';
 		}
 		return $value;
 	}
