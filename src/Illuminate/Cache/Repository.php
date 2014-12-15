@@ -4,7 +4,7 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Traits\MacroableTrait;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -22,9 +22,9 @@ class Repository implements CacheContract, ArrayAccess {
 	protected $store;
 
 	/**
-	 * The cache store implementation.
+	 * The event dispatcher implementation.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
