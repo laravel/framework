@@ -102,9 +102,9 @@ class RouteListCommand extends Command {
 		$uri = implode('|', $route->methods()).' '.$route->uri();
 
 		return $this->filterRoute(array(
-			'host'   => $route->domain(),
-			'uri'    => $uri,
-			'name'   => $route->getName(),
+			'host' => $route->domain(),
+			'uri' => $uri,
+			'name' => $route->getName(),
 			'action' => $route->getActionName(),
 			'middleware' => $this->getMiddleware($route)
 		));
