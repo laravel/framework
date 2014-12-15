@@ -354,7 +354,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	protected function getDefaultFormatter()
 	{
-		return new LineFormatter(null, null, true);
+		return new LineFormatter(null, null, true, true);
 	}
 
 	/**
