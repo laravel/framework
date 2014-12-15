@@ -850,6 +850,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Dynamically access the collection attributes.
+	 *
+	 * @param  mixed  $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		return $this->items[$key];
+	}
+
+	/**
+	 * Dynamically check if an attribute is set.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function __isset($key)
+	{
+		return isset($this->items[$key]);
+	}
+
+	/**
 	 * Convert the collection to its string representation.
 	 *
 	 * @return string
