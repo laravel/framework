@@ -105,6 +105,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $result);
 	}
 
+	public function testFindMethodUseWritePdo()
+	{
+		$result =  EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
+	}
+
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
@@ -1060,6 +1065,17 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
+		return $mock;
+	}
+}
+
+class EloquentModelFindWithWritePdoStub extends Illuminate\Database\Eloquent\Model {
+	public function newQuery()
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('useWritePdo')->once()->andReturnSelf();
+		$mock->shouldReceive('find')->once()->with(1)->andReturn('foo');
+
 		return $mock;
 	}
 }

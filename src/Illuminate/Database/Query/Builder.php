@@ -156,6 +156,13 @@ class Builder {
 	);
 
 	/**
+	 * Whether use write pdo for select.
+	 *
+	 * @var bool
+	 */
+	protected $useWritePdo = false;
+
+	/**
 	 * Create a new query builder instance.
 	 *
 	 * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -1314,6 +1321,21 @@ class Builder {
 	}
 
 	/**
+	 * Run the query as a "select" statement against the connection.
+	 *
+	 * @return array
+	 */
+	protected function runSelect()
+	{
+		if ($this->useWritePdo)
+		{
+			return $this->connection->select($this->toSql(), $this->getBindings(), false);
+		}
+
+		return $this->connection->select($this->toSql(), $this->getBindings());
+	}
+
+	/**
 	 * Paginate the given query into a simple paginator.
 	 *
 	 * @param  int  $perPage
@@ -1397,16 +1419,6 @@ class Builder {
 		}
 
 		$this->backups = [];
-	}
-
-	/**
-	 * Run the query as a "select" statement against the connection.
-	 *
-	 * @return array
-	 */
-	protected function runSelect()
-	{
-		return $this->connection->select($this->toSql(), $this->getBindings());
 	}
 
 	/**
@@ -1910,6 +1922,18 @@ class Builder {
 	public function getGrammar()
 	{
 		return $this->grammar;
+	}
+
+	/**
+	 * Use the write pdo for query.
+	 *
+	 * @return $this
+	 */
+	public function useWritePdo()
+	{
+		$this->useWritePdo = true;
+
+		return $this;
 	}
 
 	/**
