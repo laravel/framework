@@ -157,9 +157,11 @@ class CacheManager extends Manager implements FactoryContract {
 	{
 		$repository = new Repository($store);
 
-		if ($this->app->bound('events'))
+		if ($this->app->bound('Illuminate\Contracts\Events\Dispatcher'))
 		{
-			$repository->setEventDispatcher($this->app['events']);
+			$repository->setEventDispatcher(
+				$this->app['Illuminate\Contracts\Events\Dispatcher']
+			);
 		}
 
 		return $repository;
