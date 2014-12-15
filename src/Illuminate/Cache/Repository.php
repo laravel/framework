@@ -4,6 +4,7 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Traits\MacroableTrait;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -21,6 +22,13 @@ class Repository implements CacheContract, ArrayAccess {
 	protected $store;
 
 	/**
+	 * The cache store implementation.
+	 *
+	 * @var \Illuminate\Events\Dispatcher
+	 */
+	protected $events;
+
+	/**
 	 * The default number of minutes to store items.
 	 *
 	 * @var int
@@ -35,6 +43,32 @@ class Repository implements CacheContract, ArrayAccess {
 	public function __construct(StoreInterface $store)
 	{
 		$this->store = $store;
+	}
+
+	/**
+	 * Set the event dispatcher instance.
+	 *
+	 * @param  \Illuminate\Events\Dispatcher
+	 * @return void
+	 */
+	public function setEventDispatcher(Dispatcher $events)
+	{
+		$this->events = $events;
+	}
+
+	/**
+	 * Fire an event for this cache instance.
+	 *
+	 * @param  string  $event
+	 * @param  array  $payload
+	 * @return void
+	 */
+	protected function fireCacheEvent($event, $payload)
+	{
+		if (isset($this->events))
+		{
+			$this->events->fire('cache.'.$event, $payload);
+		}
 	}
 
 	/**
@@ -59,7 +93,18 @@ class Repository implements CacheContract, ArrayAccess {
 	{
 		$value = $this->store->get($key);
 
-		return ! is_null($value) ? $value : value($default);
+		if (is_null($value))
+		{
+			$this->fireCacheEvent('missed', [$key]);
+
+			$value = value($default);
+		}
+		else
+		{
+			$this->fireCacheEvent('hit', [$key, $value]);
+		}
+
+		return $value;
 	}
 
 	/**
@@ -93,6 +138,8 @@ class Repository implements CacheContract, ArrayAccess {
 		if ( ! is_null($minutes))
 		{
 			$this->store->put($key, $value, $minutes);
+
+			$this->fireCacheEvent('write', [$key, $value, $minutes]);
 		}
 	}
 
@@ -112,6 +159,20 @@ class Repository implements CacheContract, ArrayAccess {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Store an item in the cache indefinitely.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function forever($key, $value)
+	{
+		$this->store->forever($key, $value);
+
+		$this->fireCacheEvent('write', [$key, $value, 0]);
 	}
 
 	/**
@@ -180,6 +241,8 @@ class Repository implements CacheContract, ArrayAccess {
 	public function forget($key)
 	{
 		return $this->store->forget($key);
+
+		$this->fireCacheEvent('delete', [$key]);
 	}
 
 	/**
