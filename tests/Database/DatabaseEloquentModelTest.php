@@ -107,7 +107,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 	public function testFindMethodUseWritePdo()
 	{
-		$result =  EloquentModelFindWithWritePdoStub::onWrite()->find(1);
+		$result =  EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
 	}
 
 	/**
