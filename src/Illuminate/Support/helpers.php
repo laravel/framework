@@ -474,26 +474,28 @@ if ( ! function_exists('env'))
 	 */
 	function env($key)
 	{
-		$value = getenv($key);
+		$value = $originalValue = getenv($key);
+
+		$value = trim(strtolower($value));
 
 		if ($value === 'true' || $value === '(true)')
 		{
-			$value = true;
+			return true;
 		}
 		elseif ($value === 'false' || $value === '(false)')
 		{
-			$value = false;
+			return false;
 		}
 		elseif ($value === '(null)')
 		{
-			$value = null;
+			return null;
 		}
 		elseif ($value === '(empty)')
 		{
-			$value = '';
+			return '';
 		}
 
-		return $value;
+		return $originalValue;
 	}
 }
 
