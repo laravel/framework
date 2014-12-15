@@ -18,6 +18,11 @@ class CacheServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->app->bindShared('memcached.connector', function()
+		{
+			return new MemcachedConnector;
+		});
+		
 		$this->app->bindShared('cache', function($app)
 		{
 			return new CacheManager($app);
@@ -26,11 +31,6 @@ class CacheServiceProvider extends ServiceProvider {
 		$this->app->bindShared('cache.store', function($app)
 		{
 			return $app['cache']->driver();
-		});
-
-		$this->app->bindShared('memcached.connector', function()
-		{
-			return new MemcachedConnector;
 		});
 
 		$this->registerCommands();
