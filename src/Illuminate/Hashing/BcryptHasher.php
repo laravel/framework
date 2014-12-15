@@ -62,14 +62,16 @@ class BcryptHasher implements HasherContract {
 	}
 
 	/**
-	 * Set the default crypt cost factor.
+	 * Set the default passwork work factor.
 	 *
 	 * @param  int  $rounds
-	 * @return void
+	 * @return $this
 	 */
 	public function setRounds($rounds)
 	{
 		$this->rounds = (int) $rounds;
+
+		return $this;
 	}
 
 }
