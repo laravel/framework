@@ -644,6 +644,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		return $instance->newQuery()->find($id, $columns);
 	}
 
+	/**
+	 * Begin querying the model on the write connection.
+	 *
+	 * @return \Illuminate\Database\Query\Builder
+	 */
 	public static function onWrite()
 	{
 		$instance = new static;

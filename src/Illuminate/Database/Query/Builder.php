@@ -2104,6 +2104,11 @@ class Builder {
 		return $this->grammar;
 	}
 
+	/**
+	 * Use the write pdo for query.
+	 *
+	 * @return $this
+	 */
 	public function useWritePdo()
 	{
 		$this->useWritePdo = true;
