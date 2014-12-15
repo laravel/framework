@@ -35,14 +35,14 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 * @var array
 	 */
 	protected $levels = [
-		'debug'     => MonologLogger::DEBUG,
-		'info'      => MonologLogger::INFO,
-		'notice'    => MonologLogger::NOTICE,
-		'warning'   => MonologLogger::WARNING,
-		'error'     => MonologLogger::ERROR,
-		'critical'  => MonologLogger::CRITICAL,
-		'alert'     => MonologLogger::ALERT,
-		'emergency' => MonologLogger::EMERGENCY,
+		'debug',
+		'info',
+		'notice',
+		'warning',
+		'error',
+		'critical',
+		'alert',
+		'emergency'
 	];
 
 	/**
@@ -329,9 +329,9 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	protected function parseLevel($level)
 	{
-		if (isset($this->levels[$level]))
+		if (in_array($level, $this->levels))
 		{
-			return $this->levels[$level];
+			return constant('MonologLogger::' . strtoupper($level));
 		}
 
 		throw new \InvalidArgumentException("Invalid log level.");
