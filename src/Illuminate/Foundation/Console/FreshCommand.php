@@ -76,11 +76,8 @@ class FreshCommand extends Command {
 	protected function getFiles()
 	{
 		return [
-			base_path('.bowerrc'),
-			base_path('bower.json'),
 			base_path('gulpfile.js'),
 			base_path('package.json'),
-			base_path('views/dashboard.blade.php'),
 			app_path('Http/Controllers/HomeController.php'),
 		];
 	}
@@ -93,14 +90,7 @@ class FreshCommand extends Command {
 	protected function getDirectories()
 	{
 		return [
-			public_path('js'),
-			public_path('css'),
-			base_path('assets'),
-			base_path('views/auth'),
-			base_path('views/emails'),
-			base_path('views/layouts'),
-			base_path('views/partials'),
-			app_path('Http/Requests/Auth'),
+			base_path('resources/assets'),
 			app_path('Http/Controllers/Auth'),
 		];
 	}
@@ -114,7 +104,7 @@ class FreshCommand extends Command {
 	{
 		return [
 			'routes.stub' => app_path('Http/routes.php'),
-			'view.stub' => base_path('views/welcome.blade.php'),
+			'view.stub' => base_path('resources/templates/welcome.blade.php'),
 			'welcome.stub' => app_path('Http/Controllers/WelcomeController.php'),
 		];
 	}
