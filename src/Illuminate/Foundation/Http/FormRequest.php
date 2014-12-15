@@ -51,18 +51,18 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected $redirectAction;
 
 	/**
+	 * The key to be used for the view error bag.
+	 *
+	 * @var string
+	 */
+	protected $errorBag = 'default';
+
+	/**
 	 * The input keys that should not be flashed on redirect.
 	 *
 	 * @var array
 	 */
 	protected $dontFlash = ['password', 'password_confirmation'];
-	
-	/**
-	 * The key to be used on the withErrors method.
-	 *
-	 * @var string
-	 */
-	protected $errorsKey = 'default';
 
 	/**
 	 * Get the validator instance for the request.
@@ -146,7 +146,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 
 		return $this->redirector->to($this->getRedirectUrl())
                                         ->withInput($this->except($this->dontFlash))
-                                        ->withErrors($errors, $this->errorsKey);
+                                        ->withErrors($errors, $this->errorBag);
 	}
 
 	/**
