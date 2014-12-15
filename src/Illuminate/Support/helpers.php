@@ -464,6 +464,39 @@ if ( ! function_exists('ends_with'))
 	}
 }
 
+if ( ! function_exists('env'))
+{
+	/**
+	 * Gets the value of an environment variable. Supports boolean, empty and null.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	function env($key)
+	{
+		$value = getenv($key);
+
+		if ($value === 'true' || $value === '(true)')
+		{
+			$value = true;
+		}
+		elseif ($value === 'false' || $value === '(false)')
+		{
+			$value = false;
+		}
+		elseif ($value === '(null)')
+		{
+			$value = null;
+		}
+		elseif ($value === '(empty)')
+		{
+			$value = '';
+		}
+
+		return $value;
+	}
+}
+
 if ( ! function_exists('head'))
 {
 	/**
@@ -757,38 +790,5 @@ if ( ! function_exists('with'))
 	function with($object)
 	{
 		return $object;
-	}
-}
-
-if ( ! function_exists('env'))
-{
-	/**
-	 * Gets the value of an environment variable. Supports boolean, empty and null.
-	 *
-	 * @param  string  $key
-	 * @return mixed
-	 */
-	function env($key)
-	{
-		$value = getenv($key);
-
-		if ($value === 'true' || $value === '(true)')
-		{
-			$value = true;
-		}
-		elseif ($value === 'false' || $value === '(false)')
-		{
-			$value = false;
-		}
-		elseif ($value === '(null)')
-		{
-			$value = null;
-		}
-		elseif ($value === '(empty)')
-		{
-			$value = '';
-		}
-
-		return $value;
 	}
 }
