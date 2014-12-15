@@ -59,4 +59,15 @@ class BcryptHasher implements HasherInterface {
 		return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, array('cost' => $cost));
 	}
 
+	/**
+	 * Set the default crypt cost factor.
+	 *
+	 * @param  int  $rounds
+	 * @return void
+	 */
+	public function setRounds($rounds)
+	{
+		$this->rounds = (int) $rounds;
+	}
+
 }
