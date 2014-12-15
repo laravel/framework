@@ -124,14 +124,14 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 	{
 		extract($config);
 
-		$port = isset($config['port']) ? ','.$port : '';
-
 		if (in_array('dblib', PDO::getAvailableDrivers()))
 		{
+			$port = isset($config['port']) ? ':'.$port : '';
 			return "dblib:host={$host}{$port};dbname={$database}";
 		}
 		else
 		{
+			$port = isset($config['port']) ? ','.$port : '';
 			return "sqlsrv:Server={$host}{$port};Database={$database}";
 		}
 	}
