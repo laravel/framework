@@ -20,6 +20,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBasicSelectUseWritePdo()
+	{
+		$builder = $this->getMySqlBuilderWithProcessor();
+		$builder->getConnection()->shouldReceive('select')->once()
+			->with('select * from `users`', array(), false);
+		$builder->useWritePdo()->select('*')->from('users')->get();
+
+		$builder = $this->getMySqlBuilderWithProcessor();
+		$builder->getConnection()->shouldReceive('select')->once()
+			->with('select * from `users`', array());
+		$builder->select('*')->from('users')->get();
+	}
+
+
 	public function testBasicTableWrappingProtectsQuotationMarks()
 	{
 		$builder = $this->getBuilder();
@@ -1140,6 +1154,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\SqlServerGrammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+	}
+
+
+	protected function getMySqlBuilderWithProcessor()
+	{
+		$grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
+		$processor = new Illuminate\Database\Query\Processors\MySqlProcessor;
 		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
 	}
 
