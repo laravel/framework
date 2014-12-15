@@ -1484,6 +1484,14 @@ class Builder {
 		// otherwise we can just give these values back without a specific key.
 		$results = new Collection($this->get($columns));
 
+		// If the selected column contains a "dot", we will remove it so that the list
+		// operation can run normally. Specifying the table is not needed, since we
+		// really want the names of the columns as it is in this resulting array.
+		if (($dot = strpos($columns[0], '.')) !== false)
+		{
+			$columns[0] = substr($columns[0], $dot + 1);
+		}
+
 		$values = $results->fetch($columns[0])->all();
 
 		// If a key was specified and we have results, we will go ahead and combine
@@ -1509,14 +1517,6 @@ class Builder {
 	protected function getListSelect($column, $key)
 	{
 		$select = is_null($key) ? array($column) : array($column, $key);
-
-		// If the selected column contains a "dot", we will remove it so that the list
-		// operation can run normally. Specifying the table is not needed, since we
-		// really want the names of the columns as it is in this resulting array.
-		if (($dot = strpos($select[0], '.')) !== false)
-		{
-			$select[0] = substr($select[0], $dot + 1);
-		}
 
 		return $select;
 	}

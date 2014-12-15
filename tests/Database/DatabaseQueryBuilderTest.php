@@ -653,6 +653,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('bar', 'baz'), $results);
 
 		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select "users"."foo" from "users" where "id" = ?', array(1))->andReturn(array(array('foo' => 'bar'), array('foo' => 'baz')));
+		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function($query, $results)
+		{
+			return $results;
+		});
+		$results = $builder->from('users')->where('id', '=', 1)->lists('users.foo');
+		$this->assertEquals(array('bar', 'baz'), $results);
+
+		$builder = $this->getBuilder();
 		$builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('id' => 1, 'foo' => 'bar'), array('id' => 10, 'foo' => 'baz')));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('id' => 1, 'foo' => 'bar'), array('id' => 10, 'foo' => 'baz')))->andReturnUsing(function($query, $results)
 		{
