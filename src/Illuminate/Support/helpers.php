@@ -476,23 +476,18 @@ if ( ! function_exists('env'))
 	{
 		$value = getenv($key);
 
-		if ($value === 'true' || $value === '(true)')
-		{
-			$value = true;
+		switch (strtolower($value)) {
+			case 'true':
+			case '(true)':
+				return true;
+			case 'false':
+			case '(false)':
+				return false;
+			case '(null)':
+				return null;
+			case '(empty)':
+				return '';
 		}
-		elseif ($value === 'false' || $value === '(false)')
-		{
-			$value = false;
-		}
-		elseif ($value === '(null)')
-		{
-			$value = null;
-		}
-		elseif ($value === '(empty)')
-		{
-			$value = '';
-		}
-
 		return $value;
 	}
 }
