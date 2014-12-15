@@ -2,6 +2,7 @@
 
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FileNotFoundException;
 
 class FileSessionHandler implements \SessionHandlerInterface {
 
@@ -53,12 +54,14 @@ class FileSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function read($sessionId)
 	{
-		if ($this->files->exists($path = $this->path.'/'.$sessionId))
+		try
 		{
-			return $this->files->get($path);
+			return $this->files->get($this->path.'/'.$sessionId);
 		}
-
-		return '';
+		catch (FileNotFoundException $e)
+		{
+			return '';
+		}
 	}
 
 	/**
