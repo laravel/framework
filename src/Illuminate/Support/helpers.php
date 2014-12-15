@@ -402,6 +402,15 @@ if ( ! function_exists('data_get'))
 
 				$target = $target[$segment];
 			}
+			elseif ($target instanceof ArrayAccess)
+			{
+				if ( ! isset($target[$segment]))
+				{
+					return value($default);
+				}
+
+				$target = $target[$segment];
+			}
 			elseif (is_object($target))
 			{
 				if ( ! isset($target->{$segment}))
