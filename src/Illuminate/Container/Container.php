@@ -525,7 +525,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	public function call($callback, array $parameters = array(), $defaultMethod = null)
 	{
-		if (is_string($callback))
+		if ($this->isCallableWithAtSign($callback, $defaultMethod))
 		{
 			return $this->callClass($callback, $parameters, $defaultMethod);
 		}
@@ -538,7 +538,7 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Get all dependencies for a given method.
 	 *
-	 * @param  \Closure|array  $callback
+	 * @param  callable|string  $callback
 	 * @param  array  $parameters
 	 * @return array
 	 */
@@ -557,11 +557,16 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Get the proper reflection instance for the given callback.
 	 *
-	 * @param  \Closure|array  $callback
+	 * @param  callable|string  $callback
 	 * @return \ReflectionFunctionAbstract
 	 */
 	protected function getCallReflector($callback)
 	{
+		if (is_string($callback) && strpos($callback, '::') !== false)
+		{
+			$callback = explode('::', $callback);
+		}
+
 		if (is_array($callback))
 		{
 			return new ReflectionMethod($callback[0], $callback[1]);
@@ -1155,6 +1160,23 @@ class Container implements ArrayAccess, ContainerContract {
 	public function __set($key, $value)
 	{
 		$this[$key] = $value;
+	}
+
+	/**
+	 * Is the given string of the Class@method syntax or is defaultMethod filled.
+	 *
+	 * @param  mixed   $callback
+	 * @param  string  $defaultMethod
+	 * @return bool
+	 */
+	protected function isCallableWithAtSign($callback, $defaultMethod = null)
+	{
+		if ( ! is_string($callback))
+		{
+			return false;
+		}
+
+		return strpos($callback, '@') !== false || $defaultMethod;
 	}
 
 }
