@@ -525,7 +525,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	public function call($callback, array $parameters = array(), $defaultMethod = null)
 	{
-		if ($this->isCallableWithAtSign($callback, $defaultMethod))
+		if ($this->isCallableWithAtSign($callback) || $defaultMethod)
 		{
 			return $this->callClass($callback, $parameters, $defaultMethod);
 		}
@@ -533,6 +533,19 @@ class Container implements ArrayAccess, ContainerContract {
 		$dependencies = $this->getMethodDependencies($callback, $parameters);
 
 		return call_user_func_array($callback, $dependencies);
+	}
+
+	/**
+	 * Determine if the given string is in Class@method syntax.
+	 *
+	 * @param  mixed  $callback
+	 * @return bool
+	 */
+	protected function isCallableWithAtSign($callback)
+	{
+		if ( ! is_string($callback)) return false;
+
+		return strpos($callback, '@') !== false;
 	}
 
 	/**
@@ -1160,23 +1173,6 @@ class Container implements ArrayAccess, ContainerContract {
 	public function __set($key, $value)
 	{
 		$this[$key] = $value;
-	}
-
-	/**
-	 * Is the given string of the Class@method syntax or is defaultMethod filled.
-	 *
-	 * @param  mixed   $callback
-	 * @param  string  $defaultMethod
-	 * @return bool
-	 */
-	protected function isCallableWithAtSign($callback, $defaultMethod = null)
-	{
-		if ( ! is_string($callback))
-		{
-			return false;
-		}
-
-		return strpos($callback, '@') !== false || $defaultMethod;
 	}
 
 }
