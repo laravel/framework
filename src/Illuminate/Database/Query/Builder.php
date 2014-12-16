@@ -1702,7 +1702,13 @@ class Builder {
 	 */
 	public function exists()
 	{
-		return $this->limit(1)->count() > 0;
+		$limit = $this->limit;
+
+		$result = $this->limit(1)->count() > 0;
+
+		$this->limit($limit);
+
+		return $result;
 	}
 
 	/**
