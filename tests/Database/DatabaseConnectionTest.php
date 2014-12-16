@@ -182,6 +182,27 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	/**
+	 * @expectedException RuntimeException
+	 * @expectedExceptionMessage Attempt to change PDO inside running transaction
+	 */
+	public function testTransactionMethodDisallowPDOChanging()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO', array('beginTransaction', 'commit', 'rollBack'));
+		$pdo->expects($this->once())->method('beginTransaction');
+		$pdo->expects($this->once())->method('rollBack');
+		$pdo->expects($this->never())->method('commit');
+
+		$mock = $this->getMockConnection(array(), $pdo);
+
+		$mock->setReconnector(function ($connection)
+		{
+			$connection->setPDO(null);
+		});
+
+		$mock->transaction(function ($connection) { $connection->reconnect(); });
+	}
+
 
 	public function testFromCreatesNewQueryBuilder()
 	{
