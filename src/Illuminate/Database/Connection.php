@@ -831,7 +831,8 @@ class Connection implements ConnectionInterface {
 	 */
 	public function setPdo($pdo)
 	{
-		if ($this->transactions >= 1) throw new \RuntimeException("Attempt to change PDO inside running transaction");
+		if ($this->transactions >= 1)
+			throw new \RuntimeException("Can't swap PDO instance while within transaction.");
 
 		$this->pdo = $pdo;
 
