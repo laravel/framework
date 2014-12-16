@@ -1106,6 +1106,17 @@ class Builder {
 	{
 		return $this->orderBy($column, 'asc');
 	}
+	
+	/**
+	 * Add an "where active" clause to the query.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function active($column = 'active', $value = '1')
+	{
+		return $this->where($column, $value);
+	}
 
 	/**
 	 * Add a raw "order by" clause to the query.
