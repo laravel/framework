@@ -982,6 +982,53 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
 	}
 
+
+	public function testWithoutProtectionOption()
+	{
+		$model = new EloquentModelStub;
+		$model->fillable(array('name'));
+		$model->fill(array('name' => 'foo', 'age' => 'bar'), array('without_protection' => true));
+		$this->assertEquals('foo', $model->name);
+		$this->assertEquals('bar', $model->age);
+	}
+
+
+	public function testScopedFillable()
+	{
+		$model = new EloquentModelStub;
+		$model->fillable(array('default' => array('name'), 'admin' => array('name', 'age')));
+
+		$model->fill(array('name' => 'foo', 'age' => 'bar'), array('as' => 'default'));
+		$this->assertFalse(isset($model->age));
+		$this->assertEquals('foo', $model->name);
+
+		$model->fill(array('name' => 'bar', 'age' => 'baz'), array('as' => 'admin'));
+		$this->assertEquals('bar', $model->name);
+		$this->assertEquals('baz', $model->age);
+	}
+
+
+	public function testScopedFillableUsesDefault()
+	{
+		$model = new EloquentModelStub;
+		$model->fillable(array('default' => array('name'), 'admin' => array('name', 'age')));
+
+		$model->fill(array('name' => 'foo', 'age' => 'bar'));
+		$this->assertFalse(isset($model->age));
+		$this->assertEquals('foo', $model->name);
+	}
+
+
+	public function testPassingInvalidFillableAs()
+	{
+		$model = new EloquentModelStub;
+		$model->fillable(array('default' => array('name'), 'admin' => array('name', 'age')));
+
+		$model->fill(array('age' => 'bar', 'name' => 'foo'), array('as' => 'tester'));
+		$this->assertFalse(isset($model->age));
+		$this->assertFalse(isset($model->name));
+	}
+
 }
 
 class EloquentTestObserverStub {

@@ -242,13 +242,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  array  $attributes
 	 * @return void
 	 */
-	public function __construct(array $attributes = array())
+	public function __construct(array $attributes = array(), array $options = array())
 	{
 		$this->bootIfNotBooted();
 
 		$this->syncOriginal();
 
-		$this->fill($attributes);
+		$this->fill($attributes, $options);
 	}
 
 	/**
@@ -393,18 +393,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 *
 	 * @throws \Illuminate\Database\Eloquent\MassAssignmentException
 	 */
-	public function fill(array $attributes)
+	public function fill(array $attributes, array $options = array())
 	{
 		$totallyGuarded = $this->totallyGuarded();
 
-		foreach ($this->fillableFromArray($attributes) as $key => $value)
+		foreach ($this->fillableFromArray($attributes, $options) as $key => $value)
 		{
 			$key = $this->removeTableFromKey($key);
 
 			// The developers may choose to place some attributes in the "fillable"
 			// array, which means only those attributes may be set through mass
 			// assignment to the model, and all others will just be ignored.
-			if ($this->isFillable($key))
+			if ($this->isFillable($key, $options))
 			{
 				$this->setAttribute($key, $value);
 			}
@@ -440,14 +440,71 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  array  $attributes
 	 * @return array
 	 */
-	protected function fillableFromArray(array $attributes)
+	protected function fillableFromArray(array $attributes, array $options = array())
 	{
-		if (count($this->fillable) > 0 && ! static::$unguarded)
+		if (!$this->fillWithoutProtection($options) && count($this->fillable) > 0 && ! static::$unguarded)
 		{
-			return array_intersect_key($attributes, array_flip($this->fillable));
+			return array_intersect_key($attributes, array_flip($this->getFillableForRole($options)));
 		}
 
 		return $attributes;
+	}
+
+	/**
+	 * Determine if the with_protection argument has been used.
+	 *
+	 * @param  array  $options
+	 * @return bool
+	 */
+	protected function fillWithoutProtection(array $options = array())
+	{
+		return isset($options['without_protection']) && $options['without_protection'];
+	}
+
+	/**
+	 * Group $fillable rules by role.
+	 *
+	 * @return array
+	 */
+	public function groupedFillableAttributes()
+	{
+		$groupedFillableAttributes = array();
+
+		foreach ($this->fillable as $role => $fillable)
+		{
+			if (is_array($fillable))
+			{
+				if ($role)
+				{
+					$groupedFillableAttributes[$role] = $fillable;
+				}
+				else
+				{
+					$groupedFillableAttributes['default'] = $fillable;
+				}
+			}
+			else
+			{
+				$groupedFillableAttributes['default'] = $this->fillable;
+				break;
+			}
+		}
+
+		return $groupedFillableAttributes;
+	}
+
+	/**
+	 * Get the fillable attributes for a given role.
+	 * @param  array  $options
+	 * @return array
+	 */
+	protected function getFillableForRole(array $options = array())
+	{
+		$groupedFillableAttributes = $this->groupedFillableAttributes();
+
+		$role = isset($options['as']) ? $options['as'] : 'default';
+
+		return isset($groupedFillableAttributes[$role]) ? $groupedFillableAttributes[$role] : array();
 	}
 
 	/**
@@ -457,12 +514,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  bool   $exists
 	 * @return static
 	 */
-	public function newInstance($attributes = array(), $exists = false)
+	public function newInstance($attributes = array(), $exists = false, $options = array())
 	{
 		// This method just provides a convenient way for us to generate fresh model
 		// instances of this current model. It is particularly useful during the
 		// hydration of new objects via the Eloquent query builder instances.
-		$model = new static((array) $attributes);
+		$model = new static((array) $attributes, $options);
 
 		$model->exists = $exists;
 
@@ -538,9 +595,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  array  $attributes
 	 * @return static
 	 */
-	public static function create(array $attributes)
+	public static function create(array $attributes, array $options = array())
 	{
-		$model = new static($attributes);
+		$model = new static($attributes, $options);
 
 		$model->save();
 
@@ -586,14 +643,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  array  $attributes
 	 * @return static
 	 */
-	public static function firstOrNew(array $attributes)
+	public static function firstOrNew(array $attributes, array $options = array())
 	{
 		if ( ! is_null($instance = static::where($attributes)->first()))
 		{
 			return $instance;
 		}
 
-		return new static($attributes);
+		return new static($attributes, $options);
 	}
 
 	/**
@@ -603,11 +660,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  array  $values
 	 * @return static
 	 */
-	public static function updateOrCreate(array $attributes, array $values = array())
+	public static function updateOrCreate(array $attributes, array $values = array(), array $options = array())
 	{
-		$instance = static::firstOrNew($attributes);
+		$instance = static::firstOrNew($attributes, $options);
 
-		$instance->fill($values)->save();
+		$instance->fill($values, $options)->save();
 
 		return $instance;
 	}
@@ -1446,14 +1503,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  array  $attributes
 	 * @return bool|int
 	 */
-	public function update(array $attributes = array())
+	public function update(array $attributes = array(), array $options = array())
 	{
 		if ( ! $this->exists)
 		{
 			return $this->newQuery()->update($attributes);
 		}
 
-		return $this->fill($attributes)->save();
+		return $this->fill($attributes, $options)->save();
 	}
 
 	/**
@@ -2210,14 +2267,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  string  $key
 	 * @return bool
 	 */
-	public function isFillable($key)
+	public function isFillable($key, array $options = array())
 	{
-		if (static::$unguarded) return true;
+		if (static::$unguarded || $this->fillWithoutProtection($options)) return true;
 
 		// If the key is in the "fillable" array, we can of course assume that it's
 		// a fillable attribute. Otherwise, we will check the guarded array when
 		// we need to determine if the attribute is black-listed on the model.
-		if (in_array($key, $this->fillable)) return true;
+
+		if (in_array($key, $this->getFillableForRole($options))) return true;
 
 		if ($this->isGuarded($key)) return false;
 
