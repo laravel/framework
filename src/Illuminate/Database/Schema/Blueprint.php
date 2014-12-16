@@ -390,6 +390,21 @@ class Blueprint {
 	}
 
 	/**
+	 * Create new column of custom type on the table
+	 *
+	 * @param string $name
+	 * @param string $type
+	 *
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function custom($name, $type)
+	{
+		$params = func_get_args();
+		$params = array_splice($params, 2);
+		$this->addColumn('custom', $name, ['type_name' => $type, 'params' => $params]);
+	}
+
+	/**
 	 * Create a new text column on the table.
 	 *
 	 * @param  string  $column
