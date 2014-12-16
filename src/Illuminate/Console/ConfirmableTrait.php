@@ -24,7 +24,7 @@ trait ConfirmableTrait {
 			$this->comment(str_repeat('*', strlen($warning) + 12));
 			$this->output->writeln('');
 
-			$confirmed = $this->confirm('Do you really wish to run this command?');
+			$confirmed = $this->confirm('Do you really wish to run this command? [Y/n]');
 
 			if ( ! $confirmed)
 			{
