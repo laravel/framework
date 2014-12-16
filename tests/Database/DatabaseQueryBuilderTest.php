@@ -412,6 +412,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('select * from "users" having "email" > ?', $builder->toSql());
 
 		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')
+			->orHaving('email', '=', 'test@example.com')
+			->orHaving('email', '=', 'test2@example.com');
+		$this->assertEquals('select * from "users" having "email" = ? or "email" = ?', $builder->toSql());
+
+		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->groupBy('email')->having('email', '>', 1);
 		$this->assertEquals('select * from "users" group by "email" having "email" > ?', $builder->toSql());
 
