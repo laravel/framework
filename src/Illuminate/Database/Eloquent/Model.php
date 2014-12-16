@@ -59,14 +59,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 *
 	 * @var bool
 	 */
-	public $incrementing = true;
+	protected $incrementing = true;
 
 	/**
 	 * Indicates if the model should be timestamped.
 	 *
 	 * @var bool
 	 */
-	public $timestamps = true;
+	protected $timestamps = true;
 
 	/**
 	 * The model's attributes.
@@ -164,14 +164,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 *
 	 * @var bool
 	 */
-	public $exists = false;
+	protected $exists = false;
 
 	/**
 	 * Indicates whether attributes are snake cased on arrays.
 	 *
 	 * @var bool
 	 */
-	public static $snakeAttributes = true;
+	protected static $snakeAttributes = true;
 
 	/**
 	 * The connection resolver instance.
@@ -220,7 +220,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 *
 	 * @var array
 	 */
-	public static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
+	protected static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
 
 	/**
 	 * The name of the "created at" column.
@@ -464,7 +464,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// hydration of new objects via the Eloquent query builder instances.
 		$model = new static((array) $attributes);
 
-		$model->exists = $exists;
+		$model->setExists($exists);
 
 		return $model;
 	}
@@ -2037,6 +2037,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Change whether the model should use timestamps.
+	 *
+	 * @param  bool $useTimestamps
+	 * @return void
+	 */
+	public function useTimestamps($useTimestamps)
+	{
+		$this->timestamps = (bool) $useTimestamps;
+	}
+
+	/**
 	 * Get the polymorphic relationship columns.
 	 *
 	 * @param  string  $name
@@ -3070,6 +3081,27 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		}
 
 		return array();
+	}
+
+	/**
+	 * Determine if the model exists.
+	 *
+	 * @return bool
+	 */
+	public function exists()
+	{
+		return $this->exists;
+	}
+
+	/**
+	 * Set whether the model exists or not.
+	 *
+	 * @param  bool $exists
+	 * @return void
+	 */
+	public function setExists($exists)
+	{
+		$this->exists = (bool) $exists;
 	}
 
 	/**

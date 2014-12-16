@@ -46,7 +46,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(4, $results[1]->pivot->role_id);
 		$this->assertEquals('foo.connection', $results[1]->pivot->getConnectionName());
 		$this->assertEquals('user_role', $results[0]->pivot->getTable());
-		$this->assertTrue($results[0]->pivot->exists);
+		$this->assertTrue($results[0]->pivot->exists());
 	}
 
 
