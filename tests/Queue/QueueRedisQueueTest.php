@@ -109,11 +109,11 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testNotExpireJobsWhenExpireNull()
 	{
-		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'migrateAllExpiredJobs'), array($redis = m::mock('Illuminate\Redis\Database'), 'default', null));
+		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'migrateExpiredJobs'), array($redis = m::mock('Illuminate\Redis\Database'), 'default', null));
 		$queue->setContainer(m::mock('Illuminate\Container\Container'));
 		$queue->setExpire(null);
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-		$queue->expects($this->never())->method('migrateAllExpiredJobs');
+		$queue->expects($this->once())->method('migrateExpiredJobs')->with($this->equalTo('queues:default:delayed'), $this->equalTo('queues:default'));
 		$redis->shouldReceive('lpop')->once()->with('queues:default')->andReturn('foo');
 		$redis->shouldReceive('zadd')->once()->with('queues:default:reserved', 1, 'foo');
 
@@ -123,11 +123,11 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testExpireJobsWhenExpireSet()
 	{
-		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'migrateAllExpiredJobs'), array($redis = m::mock('Illuminate\Redis\Database'), 'default', null));
+		$queue = $this->getMock('Illuminate\Queue\RedisQueue', array('getTime', 'migrateExpiredJobs'), array($redis = m::mock('Illuminate\Redis\Database'), 'default', null));
 		$queue->setContainer(m::mock('Illuminate\Container\Container'));
 		$queue->setExpire(30);
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-		$queue->expects($this->once())->method('migrateAllExpiredJobs')->with($this->equalTo('queues:default'));
+		$queue->expects($this->exactly(2))->method('migrateExpiredJobs');
 		$redis->shouldReceive('lpop')->once()->with('queues:default')->andReturn('foo');
 		$redis->shouldReceive('zadd')->once()->with('queues:default:reserved', 31, 'foo');
 
