@@ -672,8 +672,8 @@ class Builder {
 	/**
 	 * Merge the "wheres" from a relation query to a has query.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
-	 * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+	 * @param  \Illuminate\Database\Eloquent\Builder $hasQuery
+	 * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
 	 * @return void
 	 */
 	protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
@@ -682,6 +682,11 @@ class Builder {
 		// where clauses the developer may have put in the relationship function over to
 		// the has query, and then copy the bindings from the "has" query to the main.
 		$relationQuery = $relation->getBaseQuery();
+
+		// The relation query is going to have all the necessary global scope definitions
+		// If the global scopes aren't removed here then they will be duplicated in the final
+		// Query.  This is noticeable when a global scope includes where clauses.
+		$hasQuery = $hasQuery->getModel()->removeGlobalScopes($hasQuery);
 
 		$hasQuery->mergeWheres(
 			$relationQuery->wheres, $relationQuery->getBindings()
