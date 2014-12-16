@@ -683,9 +683,6 @@ class Builder {
 		// the has query, and then copy the bindings from the "has" query to the main.
 		$relationQuery = $relation->getBaseQuery();
 
-		// The relation query is going to have all the necessary global scope definitions
-		// If the global scopes aren't removed here then they will be duplicated in the final
-		// Query.  This is noticeable when a global scope includes where clauses.
 		$hasQuery = $hasQuery->getModel()->removeGlobalScopes($hasQuery);
 
 		$hasQuery->mergeWheres(
