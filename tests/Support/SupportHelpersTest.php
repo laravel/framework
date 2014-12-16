@@ -27,6 +27,16 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayHas()
+	{
+		$array = array('names' => array('developer' => 'taylor'));
+		$this->assertTrue(array_has($array, 'names'));
+		$this->assertTrue(array_has($array, 'names.developer'));
+		$this->assertFalse(array_has($array, 'foo'));
+		$this->assertFalse(array_has($array, 'foo.bar'));
+	}
+
+
 	public function testArraySet()
 	{
 		$array = array();
