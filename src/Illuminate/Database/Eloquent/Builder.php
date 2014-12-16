@@ -560,6 +560,9 @@ class Builder {
 	 */
 	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
 	{
+		if (strpos($relation, '.') !== false)
+			return $this->hasNested($relation, $operator, $count, $boolean, $callback);
+
 		$relation = $this->getHasRelationQuery($relation);
 
 		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
@@ -567,6 +570,35 @@ class Builder {
 		if ($callback) call_user_func($callback, $query);
 
 		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
+	}
+
+	/**
+	 * Add nested relationship count conditions to the query.
+	 * 
+	 * @param  string  $relations
+	 * @param  string  $operator
+	 * @param  integer $count
+	 * @param  string  $boolean
+	 * @param  \Closure  $callback
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
+	{
+		$relations = explode('.', $relations);
+
+		$closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback)
+		{
+			if (count($relations) > 1)
+			{
+				$q->whereHas(array_shift($relations), $closure);
+			}
+			else
+			{
+				$q->has(array_shift($relations), $operator, $count, $boolean, $callback);
+			}
+		};
+
+		return $this->whereHas(array_shift($relations), $closure);
 	}
 
 	/**
