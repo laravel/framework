@@ -136,8 +136,8 @@ class ProviderRepository {
 			}
 
 			// If the service providers are not deferred, we will simply add it to an
-			// of eagerly loaded providers that will be registered with the app on
-			// each request to the applications instead of being lazy loaded in.
+			// array of eagerly loaded providers that will get registered on every
+			// request to this application instead of "lazy" loading every time.
 			else
 			{
 				$manifest['eager'][] = $provider;
