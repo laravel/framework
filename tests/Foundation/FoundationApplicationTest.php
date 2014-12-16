@@ -123,6 +123,21 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foobar', $app->make('bar'));
 	}
 
+
+	public function testHandleRespectsCatchArgument()
+	{
+		$this->setExpectedException('Exception');
+		$app = new Application;
+		$app['router'] = $router = m::mock('StdClass');
+		$router->shouldReceive('dispatch')->andThrow('Exception');
+		$app['env'] = 'temporarilynottesting';
+		$app->handle(
+			new Symfony\Component\HttpFoundation\Request(),
+			Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST,
+			false
+		);
+	}
+
 }
 
 class ApplicationCustomExceptionHandlerStub extends Illuminate\Foundation\Application {
