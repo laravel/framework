@@ -95,7 +95,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testCountable()
 	{
 		$c = new Collection(array('foo', 'bar'));
-		$this->assertEquals(2, count($c));
+		$this->assertCount(2, $c);
 	}
 
 
@@ -253,7 +253,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testChunk ()
+	public function testChunk()
 	{
 		$data = new Collection(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		$data = $data->chunk(3);

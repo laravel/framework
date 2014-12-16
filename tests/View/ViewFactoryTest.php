@@ -334,11 +334,11 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		echo 'hi';
 		$factory->stopSection();
 
-		$this->assertEquals(1, count($factory->getSections()));
+		$this->assertCount(1, $factory->getSections());
 
 		$factory->flushSections();
 
-		$this->assertEquals(0, count($factory->getSections()));
+		$this->assertCount(0, $factory->getSections());
 	}
 
 
