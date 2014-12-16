@@ -70,6 +70,8 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$result2->foreign_key = 2;
 		$result3 = new EloquentHasManyModelStub;
 		$result3->foreign_key = 2;
+		$result4 = new EloquentHasManyModelStub;
+		$result4->foreign_key = null;
 
 		$model1 = new EloquentHasManyModelStub;
 		$model1->id = 1;
@@ -77,9 +79,10 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$model2->id = 2;
 		$model3 = new EloquentHasManyModelStub;
 		$model3->id = 3;
+		$model4 = new EloquentHasManyModelStub;
 
 		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array) { return new Collection($array); });
-		$models = $relation->match(array($model1, $model2, $model3), new Collection(array($result1, $result2, $result3)), 'foo');
+		$models = $relation->match(array($model1, $model2, $model3, $model4), new Collection(array($result1, $result2, $result3, $result4)), 'foo');
 
 		$this->assertEquals(1, $models[0]->foo[0]->foreign_key);
 		$this->assertEquals(1, count($models[0]->foo));
@@ -87,6 +90,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(2, $models[1]->foo[1]->foreign_key);
 		$this->assertEquals(2, count($models[1]->foo));
 		$this->assertEquals(0, count($models[2]->foo));
+		$this->assertEquals(0, count($models[3]->foo));
 	}
 
 
