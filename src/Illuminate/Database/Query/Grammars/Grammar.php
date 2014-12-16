@@ -463,7 +463,7 @@ class Grammar extends BaseGrammar {
 	{
 		$sql = implode(' ', array_map(array($this, 'compileHaving'), $havings));
 
-		return 'having '.preg_replace('/and /', '', $sql, 1);
+		return 'having '.preg_replace('/and |or /', '', $sql, 1);
 	}
 
 	/**
