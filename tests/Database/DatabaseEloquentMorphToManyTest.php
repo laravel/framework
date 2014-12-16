@@ -86,6 +86,7 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 		$parent->shouldReceive('getKey')->andReturn(1);
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+		$parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
 
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
@@ -93,6 +94,7 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 
 		$related->shouldReceive('getTable')->andReturn('tags');
 		$related->shouldReceive('getKeyName')->andReturn('id');
+		$related->shouldReceive('getMorphClass')->andReturn(get_class($related));
 
 		$builder->shouldReceive('join')->once()->with('taggables', 'tags.id', '=', 'taggables.tag_id');
 		$builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
