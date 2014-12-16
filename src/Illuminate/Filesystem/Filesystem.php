@@ -138,6 +138,17 @@ class Filesystem {
 	{
 		return copy($path, $target);
 	}
+	
+	/**
+	 * Extract the file name from a file path.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	public function name($path)
+	{
+		return pathinfo($path, PATHINFO_FILENAME);
+	}
 
 	/**
 	 * Extract the file extension from a file path.
