@@ -1328,11 +1328,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$data = ['foo' => [5, 10, 15]];
 
 		$v = new Validator($trans, $data, ['foo' => 'Array']);
-		$v->each('foo', ['field' => 'numeric|min:6|max:14']);
+		$v->each('foo', ['numeric|min:6|max:14']);
 		$this->assertFalse($v->passes());
 
 		$v = new Validator($trans, $data, ['foo' => 'Array']);
-		$v->each('foo', ['field' => 'numeric|min:4|max:16']);
+		$v->each('foo', ['numeric|min:4|max:16']);
 		$this->assertTrue($v->passes());
 	}
 
@@ -1355,6 +1355,21 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, ['foo' => 'string'], ['foo' => 'numeric']);
 		$v->each('foo', ['min:7|max:13']);
 		$this->assertFalse($v->passes());
+	}
+
+
+	public function testValidateEachWithKeyedNestedData()
+	{
+		$trans = $this->getRealTranslator();
+		$data = ['foo' => [['field' => 5], ['field' => 10], ['field' => 15]]];
+
+		$v = new Validator($trans, $data, ['foo' => 'Array']);
+		$v->each('foo', ['field' => 'numeric|min:6|max:14']);
+		$this->assertFalse($v->passes());
+
+		$v = new Validator($trans, $data, ['foo' => 'Array']);
+		$v->each('foo', ['field' => 'numeric|min:4|max:16']);
+		$this->assertTrue($v->passes());
 	}
 
 

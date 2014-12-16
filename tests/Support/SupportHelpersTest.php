@@ -286,6 +286,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('firstname' => 'Ferid'), $developer);
 	}
 
+
+	public function testIsAssoc()
+	{
+		$this->assertTrue(is_assoc(array('foo' => 'bar')));
+		$this->assertFalse(is_assoc(array('0' => 'bar')));
+		$this->assertFalse(is_assoc(array('bar')));
+	}
+
 }
 
 trait SupportTestTraitOne {}

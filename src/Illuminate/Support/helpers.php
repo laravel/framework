@@ -291,6 +291,20 @@ if ( ! function_exists('array_where'))
 	}
 }
 
+if ( ! function_exists('is_assoc'))
+{
+	/**
+	 * Determine if the given array is associative.
+	 *
+	 * @param  array  $array
+	 * @return bool
+	 */
+	function is_assoc($array)
+	{
+		return (bool) count(array_filter(array_keys($array), 'is_string'));
+	}
+}
+
 if ( ! function_exists('camel_case'))
 {
 	/**

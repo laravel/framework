@@ -259,11 +259,15 @@ class Validator implements ValidatorContract {
 			throw new \InvalidArgumentException('Attribute for each() must be an array.');
 		}
 
+		$keyed = is_assoc($rules);
+
 		foreach ($data as $dataKey => $dataValue)
 		{
-			foreach ($rules as $ruleValue)
+			foreach ($rules as $ruleKey => $ruleValue)
 			{
-				$this->mergeRules("$attribute.$dataKey", $ruleValue);
+				$nestedAttribute = ($keyed) ? "$attribute.$dataKey.$ruleKey" : "$attribute.$dataKey";
+
+				$this->mergeRules($nestedAttribute, $ruleValue);
 			}
 		}
 	}
