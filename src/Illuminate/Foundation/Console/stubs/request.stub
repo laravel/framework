@@ -17,6 +17,16 @@ class {{class}} extends Request {
 	}
 
 	/**
+	 * Get the sanitized input for the request.
+	 *
+	 * @return array
+	 */
+	public function sanitize()
+	{
+		return $this->all();
+	}
+
+	/**
 	 * Determine if the user is authorized to make this request.
 	 *
 	 * @return bool
