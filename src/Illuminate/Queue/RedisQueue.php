@@ -28,6 +28,13 @@ class RedisQueue extends Queue implements QueueContract {
 	protected $default;
 
 	/**
+	 * The expiration time of a job.
+	 *
+	 * @var int|null
+	 */
+	protected $expire = 60;
+
+	/**
 	 * Create a new Redis queue instance.
 	 *
 	 * @param  \Illuminate\Redis\Database  $redis
@@ -116,13 +123,18 @@ class RedisQueue extends Queue implements QueueContract {
 	{
 		$original = $queue ?: $this->default;
 
-		$this->migrateAllExpiredJobs($queue = $this->getQueue($queue));
+		$queue = $this->getQueue($queue);
+
+		if ( ! is_null($this->expire))
+		{
+			$this->migrateAllExpiredJobs($queue);
+		}
 
 		$job = $this->getConnection()->lpop($queue);
 
 		if ( ! is_null($job))
 		{
-			$this->getConnection()->zadd($queue.':reserved', $this->getTime() + 60, $job);
+			$this->getConnection()->zadd($queue.':reserved', $this->getTime() + $this->expire, $job);
 
 			return new RedisJob($this->container, $this, $job, $original);
 		}
@@ -282,6 +294,26 @@ class RedisQueue extends Queue implements QueueContract {
 	public function getRedis()
 	{
 		return $this->redis;
+	}
+
+	/**
+	 * Get the expiration time in seconds.
+	 *
+	 * @return int|null
+	 */
+	public function getExpire()
+	{
+		return $this->expire;
+	}
+
+	/**
+	 * Set the expiration time in seconds.
+	 *
+	 * @param int|null $seconds
+	 */
+	public function setExpire($seconds)
+	{
+		$this->expire = $seconds;
 	}
 
 }
