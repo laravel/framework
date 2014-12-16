@@ -166,7 +166,14 @@ class Guard {
 	{
 		if ($this->loggedOut) return;
 
-		return $this->session->get($this->getName(), $this->getRecallerId());
+		$id = $this->session->get($this->getName(), $this->getRecallerId());
+
+		if (is_null($id) && $this->user())
+		{
+			$id = $this->user()->getAuthIdentifier();
+		}
+
+		return $id;
 	}
 
 	/**
