@@ -154,6 +154,8 @@ class Guard implements GuardContract {
 		if (is_null($user) && ! is_null($recaller))
 		{
 			$user = $this->getUserByRecaller($recaller);
+
+			if ($user) $this->fireLoginEvent($user, true);
 		}
 
 		return $this->user = $user;
@@ -423,12 +425,24 @@ class Guard implements GuardContract {
 		// If we have an event dispatcher instance set we will fire an event so that
 		// any listeners will hook into the authentication events and run actions
 		// based on the login and logout events fired from the guard instances.
+		$this->fireLoginEvent($user, $remember);
+
+		$this->setUser($user);
+	}
+
+	/**
+	 * Fire the login event if the dispatcher is set.
+	 *
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+	 * @param  bool  $remember
+	 * @return void
+	 */
+	protected function fireLoginEvent($user, $remember = false)
+	{
 		if (isset($this->events))
 		{
 			$this->events->fire('auth.login', [$user, $remember]);
 		}
-
-		$this->setUser($user);
 	}
 
 	/**
