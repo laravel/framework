@@ -408,9 +408,18 @@ if ( ! function_exists('data_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
-			if (is_array($target))
+			if (is_array($target) || $target instanceof ArrayAccess)
 			{
-				if ( ! array_key_exists($segment, $target))
+				if ($target instanceof ArrayAccess)
+				{
+					$key_exists = $target->offsetExists($segment);
+				}
+				else
+				{
+					$key_exists = array_key_exists($segment, $target);
+				}
+
+				if ( ! $key_exists)
 				{
 					return value($default);
 				}
@@ -428,12 +437,12 @@ if ( ! function_exists('data_get'))
 			}
 			elseif (is_object($target))
 			{
-				if ( ! isset($target->{$segment}))
-				{
-					return value($default);
-				}
-
-				$target = $target->{$segment};
+			    if ( ! isset($target->{$segment}) && !method_exists($target, "__get"))
+			    {
+			        return value($default);
+			    }
+			
+			    $target = $target->{$segment};
 			}
 			else
 			{
