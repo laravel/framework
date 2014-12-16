@@ -177,7 +177,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  bool    $default
 	 * @return bool
 	 */
-	public function confirm($question, $default = true)
+	public function confirm($question, $default = false)
 	{
 		$helper = $this->getHelperSet()->get('question');
 
