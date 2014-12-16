@@ -213,7 +213,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 
 		foreach ($this->items as $key => $value)
 		{
-			$results[$this->getGroupbyKey($groupBy, $key, $value)][] = $value;
+			$results[$this->getGroupByKey($groupBy, $key, $value)][] = $value;
 		}
 
 		return new static($results);
@@ -227,7 +227,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  mixed  $value
 	 * @return string
 	 */
-	protected function getGroupbyKey($groupBy, $key, $value)
+	protected function getGroupByKey($groupBy, $key, $value)
 	{
 		if ( ! is_string($groupBy) && is_callable($groupBy))
 		{
