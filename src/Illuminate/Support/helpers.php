@@ -404,7 +404,7 @@ if ( ! function_exists('data_get'))
 			}
 			elseif ($target instanceof ArrayAccess)
 			{
-				if ( ! isset($target[$segment]))
+				if ( ! $target->offsetExists($segment))
 				{
 					return value($default);
 				}

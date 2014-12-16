@@ -306,7 +306,7 @@ class SupportTestArrayAccess implements ArrayAccess {
 
 	public function __construct ($attributes = []){ $this->attributes = $attributes; }
 
-	public function offsetExists ($offset){ return isset($this->attributes[$offset]); }
+	public function offsetExists ($offset){ return array_key_exists($offset, $this->attributes); }
 
 	public function offsetGet ($offset){ return $this->attributes[$offset]; }
 
