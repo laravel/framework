@@ -707,7 +707,8 @@ class BelongsToMany extends Relation {
 	{
 		$records = array();
 
-		$timed = ($this->hasPivotColumn($this->createdAt()) || $this->hasPivotColumn($this->updatedAt()));
+		$timed = ($this->hasPivotColumn($this->createdAt()) ||
+			      $this->hasPivotColumn($this->updatedAt()));
 
 		// To create the attachment records, we will simply spin through the IDs given
 		// and create a new record to insert for each ID. Each ID may actually be a
