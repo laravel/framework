@@ -201,10 +201,8 @@ class AppNameCommand extends Command {
 	 */
 	protected function setPhpSpecNamespace()
 	{
-		$path = $this->getPhpSpecConfigPath();
-
-		// Only replace the namespace if the user hasn't removed the phpspec.yml file.
-		if ($this->files->has($path)) {
+		if ($this->files->has($path = $this->getPhpSpecConfigPath()))
+		{
 			$this->replaceIn($path, $this->currentRoot, $this->argument('name'));
 		}
 	}
