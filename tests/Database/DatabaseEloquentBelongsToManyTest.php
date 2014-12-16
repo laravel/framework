@@ -383,6 +383,38 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWherePivotParamsUsedForNewQueries()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', ['attach', 'detach', 'touchIfTouching', 'formatSyncList'], $this->getRelationArguments());
+
+		// we expect to call $relation->wherePivot()
+		$relation->getQuery()->shouldReceive('where')->once()->andReturn($relation);
+
+		// Our sync() call will produce a new query
+		$mockQueryBuilder = m::mock('stdClass');
+		$query            = m::mock('stdClass');
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder);
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+
+		// BelongsToMany::newPivotStatement() sets this
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+
+		// BelongsToMany::newPivotQuery() sets this
+		$query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+
+		// This is our test! The wherePivot() params also need to be called
+		$query->shouldReceive('where')->once()->with('foo', '=', 'bar')->andReturn($query);
+
+		// This is so $relation->sync() works
+		$query->shouldReceive('lists')->once()->with('role_id')->andReturn([1, 2, 3]);
+		$relation->expects($this->once())->method('formatSyncList')->with([1, 2, 3])->will($this->returnValue([1 => [],2 => [],3 => []]));
+
+
+		$relation = $relation->wherePivot('foo', '=', 'bar'); // these params are to be stored
+		$relation->sync([1,2,3]); // triggers the whole process above
+	}
+
+
 	public function getRelation()
 	{
 		list($builder, $parent) = $this->getRelationArguments();
