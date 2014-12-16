@@ -184,7 +184,6 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @expectedException RuntimeException
-	 * @expectedExceptionMessage Attempt to change PDO inside running transaction
 	 */
 	public function testTransactionMethodDisallowPDOChanging()
 	{
