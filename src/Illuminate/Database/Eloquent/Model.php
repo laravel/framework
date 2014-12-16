@@ -2505,11 +2505,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If the "attribute" exists as a method on the model, we will just assume
 		// it is a relationship and will load and return results from the query
 		// and hydrate the relationship's value on the "relationships" array.
-		$camelKey = camel_case($key);
-
-		if (method_exists($this, $camelKey))
+		if (method_exists($this, $key))
 		{
-			return $this->getRelationshipFromMethod($key, $camelKey);
+			return $this->getRelationshipFromMethod($key);
 		}
 	}
 
@@ -2559,15 +2557,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get a relationship value from a method.
 	 *
-	 * @param  string  $key
-	 * @param  string  $camelKey
+	 * @param  string  $method
 	 * @return mixed
 	 *
 	 * @throws \LogicException
 	 */
-	protected function getRelationshipFromMethod($key, $camelKey)
+	protected function getRelationshipFromMethod($method)
 	{
-		$relations = $this->$camelKey();
+		$relations = $this->$method();
 
 		if ( ! $relations instanceof Relation)
 		{
@@ -2575,7 +2572,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 				. 'Illuminate\Database\Eloquent\Relations\Relation');
 		}
 
-		return $this->relations[$key] = $relations->getResults();
+		return $this->relations[$method] = $relations->getResults();
 	}
 
 	/**
