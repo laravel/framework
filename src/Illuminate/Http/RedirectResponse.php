@@ -46,13 +46,11 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 */
 	public function with($key, $value = null)
 	{
-		if (is_array($key))
+		$key = is_array($key) ? $key : [$key => $value];
+
+		foreach ($key as $k => $v)
 		{
-			foreach ($key as $k => $v) $this->with($k, $v);
-		}
-		else
-		{
-			$this->session->flash($key, $value);
+			$this->session->flash($k, $v);
 		}
 
 		return $this;
