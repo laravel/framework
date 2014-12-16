@@ -511,7 +511,7 @@ class Validator implements ValidatorContract {
 		{
 			return false;
 		}
-		elseif (is_array($value) && count($value) < 1)
+		elseif ((is_array($value) || $value instanceof \Countable) && count($value) < 1)
 		{
 			return false;
 		}
