@@ -752,7 +752,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$class = new EloquentModelStub;
 
-		$this->assertEquals(array('list_items', 'password', 'appendable'), $class->getMutatedAttributes());
+		$expectedAttributes = [
+			'list_items' => 'getListItemsAttribute',
+			'password'   => 'getPasswordAttribute',
+			'appendable' => 'getAppendableAttribute'
+		];
+
+		$this->assertEquals($expectedAttributes, $class->getMutatedAttributes());
 	}
 
 
