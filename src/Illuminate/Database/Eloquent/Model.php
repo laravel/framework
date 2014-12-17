@@ -2527,14 +2527,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function hasGetMutator($key)
 	{
-		return $this->getMutatorMethod($key);
+		return $this->getMutatorMethod($key) !== null;
 	}
 
 	/**
 	 * Get the method name if a get mutator exists for an attribute.
 	 *
 	 * @param  string  $key
-	 * @return bool
+	 * @return string|null
 	 */
 	public function getMutatorMethod($key)
 	{
