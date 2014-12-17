@@ -614,7 +614,7 @@ class Builder {
 	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public function hasNot($relation, $boolean = 'and', Closure $callback = null)
+	public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
 	{
 		return $this->has($relation, '<', 1, $boolean, $callback);
 	}
@@ -640,7 +640,7 @@ class Builder {
 	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public function whereHasNot($relation, Closure $callback)
+	public function whereDoesntHave($relation, Closure $callback)
 	{
 		return $this->hasNot($relation, 'and', $callback);
 	}
