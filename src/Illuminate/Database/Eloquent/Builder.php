@@ -558,7 +558,7 @@ class Builder {
 	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
+	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
 	{
 		$relation = $this->getHasRelationQuery($relation);
 
@@ -567,6 +567,19 @@ class Builder {
 		if ($callback) call_user_func($callback, $query);
 
 		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
+	}
+
+	/**
+	 * Add a relationship count condition to the query.
+	 *
+	 * @param  string  $relation
+	 * @param  string  $boolean
+	 * @param  \Closure  $callback
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
+	{
+		return $this->has($relation, '<', 1, $boolean, $callback);
 	}
 
 	/**
@@ -581,6 +594,18 @@ class Builder {
 	public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
 	{
 		return $this->has($relation, $operator, $count, 'and', $callback);
+	}
+
+	/**
+	 * Add a relationship count condition to the query with where clauses.
+	 *
+	 * @param  string  $relation
+	 * @param  \Closure  $callback
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function whereDoesntHave($relation, Closure $callback)
+	{
+		return $this->hasNot($relation, 'and', $callback);
 	}
 
 	/**
@@ -739,8 +764,8 @@ class Builder {
 
 			if ( ! isset($results[$last = implode('.', $progress)]))
 			{
- 				$results[$last] = function() {};
- 			}
+				$results[$last] = function() {};
+			}
 		}
 
 		return $results;
