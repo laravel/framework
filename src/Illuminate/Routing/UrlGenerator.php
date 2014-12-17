@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
@@ -560,7 +561,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	public function isValidUrl($path)
 	{
-		if (starts_with($path, array('#', '//', 'mailto:', 'tel:'))) return true;
+		if (starts_with($path, ['#', '//', 'mailto:', 'tel:', 'http://', 'https://'])) return true;
 
 		return filter_var($path, FILTER_VALIDATE_URL) !== false;
 	}

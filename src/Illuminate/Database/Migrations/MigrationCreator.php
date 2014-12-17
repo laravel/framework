@@ -106,7 +106,7 @@ class MigrationCreator {
 	/**
 	 * Get the class name of a migration name.
 	 *
-	 * @param  string $name
+	 * @param  string  $name
 	 * @return string
 	 */
 	protected function getClassName($name)
