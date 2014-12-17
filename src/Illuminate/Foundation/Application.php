@@ -296,7 +296,7 @@ class Application extends Container implements ApplicationContract {
 	 * @param  \Closure  $callback
 	 * @return string
 	 */
-	public function detectEnvironment(Closure $callback)
+	public function detectEnvironment(\Closure $callback)
 	{
 		$args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
 
