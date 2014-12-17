@@ -693,10 +693,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 
 	/**
-	 * Gets the content tags used for the compiler.
+	 * Gets the tags used for the compiler.
 	 *
 	 * @param  bool  $escaped
-	 * @return string
+	 * @return array
 	 */
 	protected function getTags($escaped = false)
 	{
