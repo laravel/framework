@@ -354,27 +354,27 @@ class Validator implements ValidatorContract {
 	}
 
 	/**
- 	 * Returns the data which was valid.
- 	 *
+	 * Returns the data which was valid.
+	 *
 	 * @return array
 	 */
 	public function valid()
 	{
 		if ( ! $this->messages) $this->passes();
 
- 		return array_diff_key($this->data, $this->messages()->toArray());
+		return array_diff_key($this->data, $this->messages()->toArray());
 	}
 
 	/**
- 	 * Returns the data which was invalid.
- 	 *
+	 * Returns the data which was invalid.
+	 *
 	 * @return array
 	 */
 	public function invalid()
 	{
 		if ( ! $this->messages) $this->passes();
 
- 		return array_intersect_key($this->data, $this->messages()->toArray());
+		return array_intersect_key($this->data, $this->messages()->toArray());
 	}
 
 	/**
@@ -406,7 +406,7 @@ class Validator implements ValidatorContract {
 	protected function isValidatable($rule, $attribute, $value)
 	{
 		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
-               $this->passesOptionalCheck($attribute);
+			   $this->passesOptionalCheck($attribute);
 	}
 
 	/**
@@ -433,7 +433,8 @@ class Validator implements ValidatorContract {
 		if ($this->hasRule($attribute, array('Sometimes')))
 		{
 			return array_key_exists($attribute, array_dot($this->data))
-                || array_key_exists($attribute, $this->files);
+				|| in_array($attribute, array_keys($this->data))
+				|| array_key_exists($attribute, $this->files);
 		}
 
 		return true;

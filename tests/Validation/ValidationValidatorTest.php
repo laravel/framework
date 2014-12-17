@@ -42,6 +42,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSometimesWorksOnArrays()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => array('bar', 'baz', 'moo')), array('foo' => 'sometimes|required|between:5,10'));
+		$this->assertFalse($v->passes());
+		$this->assertNotEmpty($v->failed());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => array('bar', 'baz', 'moo', 'pew', 'boom')), array('foo' => 'sometimes|required|between:5,10'));
+		$this->assertTrue($v->passes());
+	}
+
+
 	public function testHasFailedValidationRules()
 	{
 		$trans = $this->getRealTranslator();
