@@ -607,11 +607,11 @@ class Builder {
 	}
 
 	/**
-	 * Add a relationship count condition to the query
+	 * Add a relationship count condition to the query.
 	 *
-	 * @param  string  $relation
-	 * @param  string  $boolean
-	 * @param  null    $callback
+	 * @param  string    $relation
+	 * @param  string    $boolean
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function hasNot($relation, $boolean = 'and', $callback = null)
