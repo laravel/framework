@@ -391,6 +391,48 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUnionOrderBys()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->where('id', '=', 1);
+		$builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
+		$builder->orderBy('id', 'desc');
+		$this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ? order by "id" desc', $builder->toSql());
+		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+	}
+
+
+	public function testUnionLimitsAndOffsets()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users');
+		$builder->union($this->getBuilder()->select('*')->from('dogs'));
+		$builder->skip(5)->take(10);
+		$this->assertEquals('select * from "users" union select * from "dogs" limit 10 offset 5', $builder->toSql());
+	}
+
+
+	public function testMySqlUnionOrderBys()
+	{
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('users')->where('id', '=', 1);
+		$builder->union($this->getMySqlBuilder()->select('*')->from('users')->where('id', '=', 2));
+		$builder->orderBy('id', 'desc');
+		$this->assertEquals('(select * from `users` where `id` = ?) union (select * from `users` where `id` = ?) order by `id` desc', $builder->toSql());
+		$this->assertEquals(array(0 => 1, 1 => 2), $builder->getBindings());
+	}
+
+
+	public function testMySqlUnionLimitsAndOffsets()
+	{
+		$builder = $this->getMySqlBuilder();
+		$builder->select('*')->from('users');
+		$builder->union($this->getMySqlBuilder()->select('*')->from('dogs'));
+		$builder->skip(5)->take(10);
+		$this->assertEquals('(select * from `users`) union (select * from `dogs`) limit 10 offset 5', $builder->toSql());
+	}
+
+
 	public function testSubSelectWhereIns()
 	{
 		$builder = $this->getBuilder();
