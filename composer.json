@@ -14,7 +14,7 @@
         "ext-openssl": "*",
         "ext-mcrypt": "*",
         "classpreloader/classpreloader": "~1.0.2",
-        "d11wtq/boris": "~1.0",
+        "psy/psysh": "0.3.*",
         "doctrine/annotations": "~1.0",
         "ircmaxell/password-compat": "~1.0",
         "jeremeamia/superclosure": "~1.0.1",
