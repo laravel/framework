@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Boris\Boris;
+use Psy\Shell;
 use Illuminate\Console\Command;
 
 class TinkerCommand extends Command {
@@ -26,26 +26,11 @@ class TinkerCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ($this->supportsBoris())
-		{
-			$this->getApplication()->setCatchExceptions(false);
+		$this->getApplication()->setCatchExceptions(false);
 
-			(new Boris('> '))->start();
-		}
-		else
-		{
-			$this->comment('Boris REPL not supported. Needs readline, posix, and pcntl extensions.');
-		}
-	}
+		$shell = new Shell();
 
-	/**
-	 * Determine if the current environment supports Boris.
-	 *
-	 * @return bool
-	 */
-	protected function supportsBoris()
-	{
-		return extension_loaded('readline') && extension_loaded('posix') && extension_loaded('pcntl');
+		$shell->run();
 	}
 
 }
