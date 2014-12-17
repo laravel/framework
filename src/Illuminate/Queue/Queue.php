@@ -3,7 +3,7 @@
 use Closure;
 use DateTime;
 use Illuminate\Container\Container;
-use Illuminate\Support\SerializableClosure;
+use SuperClosure\SerializableClosure;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
