@@ -65,7 +65,7 @@ class SoftDeletingScope implements ScopeInterface {
 
 		$builder->onDelete(function(Builder $builder)
 		{
-			$column = $builder->getModel()->getDeletedAtColumn();
+			$column = $builder->getModel()->getQualifiedDeletedAtColumn();
 
 			return $builder->update(array(
 				$column => $builder->getModel()->freshTimestampString()
