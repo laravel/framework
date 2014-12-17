@@ -892,6 +892,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 	}
 
+	public function testValidationExistsIsNotCalledUnnecessarily()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('id' => 'foo'), array('id' => 'Integer|Exists:users,id'));
+		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock2->shouldReceive('getCount')->never();
+		$v->setPresenceVerifier($mock2);
+		$this->assertFalse($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('id' => '1'), array('id' => 'Integer|Exists:users,id'));
+		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock2->shouldReceive('getCount')->once()->with('users', 'id', '1', null, null, array())->andReturn(true);
+		$v->setPresenceVerifier($mock2);
+		$this->assertTrue($v->passes());
+	}
+
 
 	public function testValidateIp()
 	{

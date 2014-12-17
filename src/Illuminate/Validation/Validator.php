@@ -368,7 +368,8 @@ class Validator implements MessageProviderInterface {
 	protected function isValidatable($rule, $attribute, $value)
 	{
 		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
-			   $this->passesOptionalCheck($attribute);
+               $this->passesOptionalCheck($attribute) &&
+               $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
 	}
 
 	/**
@@ -411,6 +412,21 @@ class Validator implements MessageProviderInterface {
 	protected function isImplicit($rule)
 	{
 		return in_array($rule, $this->implicitRules);
+	}
+
+	/**
+	 * Determine if it's a necessary presence validation.
+	 *
+	 * This is to avoid possible database type comparison errors.
+	 *
+	 * @param  string  $rule
+	 * @param  string  $attribute
+	 * @return bool
+	 */
+	protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
+	{
+		return in_array($rule, ['Unique', 'Exists'])
+						? ! $this->messages->has($attribute): true;
 	}
 
 	/**
