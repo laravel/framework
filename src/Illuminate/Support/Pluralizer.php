@@ -172,6 +172,8 @@ class Pluralizer {
 	{
 		if ($count == 1) return $value;
 
+		if (in_array($value, static::$irregular)) return $value;
+
 		// First we'll check the cache of inflected values. We cache each word that
 		// is inflected so we don't have to spin through the regular expressions
 		// on each subsequent method calls for this word by the app developer.
