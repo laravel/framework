@@ -4,10 +4,10 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Psr\Log\LoggerInterface;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\SerializableClosure;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
@@ -52,11 +52,11 @@ class Mailer implements MailerContract, MailQueueContract {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
-	/*
+	/**
 	 * The queue implementation.
 	 *
 	 * @var \Illuminate\Contracts\Queue\Queue
@@ -386,7 +386,7 @@ class Mailer implements MailerContract, MailQueueContract {
 		}
 		elseif (is_string($callback))
 		{
-			return $this->container[$callback]->mail($message);
+			return $this->container->make($callback)->mail($message);
 		}
 
 		throw new \InvalidArgumentException("Callback is not valid.");
@@ -515,7 +515,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

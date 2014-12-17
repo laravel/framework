@@ -181,8 +181,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 			new ReflectionFunction($composers[0]),
 			new ReflectionFunction($composers[1]),
 		);
-		$this->assertEquals(array('class' => 'foo', 'method' => 'compose', 'container' => null), $reflections[0]->getStaticVariables());
-		$this->assertEquals(array('class' => 'baz', 'method' => 'baz', 'container' => null), $reflections[1]->getStaticVariables());
+		$this->assertEquals(array('class' => 'foo', 'method' => 'compose'), $reflections[0]->getStaticVariables());
+		$this->assertEquals(array('class' => 'baz', 'method' => 'baz'), $reflections[1]->getStaticVariables());
 	}
 
 
