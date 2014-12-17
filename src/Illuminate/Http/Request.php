@@ -433,8 +433,8 @@ class Request extends SymfonyRequest {
 	/**
 	 * Flash the input for the current request to the session.
 	 *
-	 * @param  string $filter
-	 * @param  array  $keys
+	 * @param  string  $filter
+	 * @param  array   $keys
 	 * @return void
 	 */
 	public function flash($filter = null, $keys = array())

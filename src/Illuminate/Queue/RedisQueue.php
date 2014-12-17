@@ -309,7 +309,8 @@ class RedisQueue extends Queue implements QueueContract {
 	/**
 	 * Set the expiration time in seconds.
 	 *
-	 * @param int|null $seconds
+	 * @param  int|null  $seconds
+	 * @return void
 	 */
 	public function setExpire($seconds)
 	{
