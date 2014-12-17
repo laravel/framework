@@ -162,7 +162,7 @@ class Mailer implements MailerContract, MailQueueContract {
 
 		$message = $message->getSwiftMessage();
 
-		$this->sendSwiftMessage($message);
+		return $this->sendSwiftMessage($message);
 	}
 
 	/**
@@ -348,7 +348,7 @@ class Mailer implements MailerContract, MailQueueContract {
 
 		if ( ! $this->pretending)
 		{
-			$this->swift->send($message, $this->failedRecipients);
+			return $this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
 		{
