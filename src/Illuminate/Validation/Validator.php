@@ -1367,9 +1367,9 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Given two date/time strings, check that one is after the other.
 	 *
-	 * @param  string $format
-	 * @param  string $before
-	 * @param  string $after
+	 * @param  string  $format
+	 * @param  string  $before
+	 * @param  string  $after
 	 * @return bool
 	 */
 	protected function checkDateTimeOrder($format, $before, $after)
@@ -1384,8 +1384,8 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Get a DateTime instance from a string.
 	 *
-	 * @param  string $format
-	 * @param  string $value
+	 * @param  string  $format
+	 * @param  string  $value
 	 * @return \DateTime|null
 	 */
 	protected function getDateTimeWithOptionalFormat($format, $value)

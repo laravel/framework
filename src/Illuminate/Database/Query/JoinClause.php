@@ -106,7 +106,7 @@ class JoinClause {
 	 * Add an "on where is null" clause to the join
 	 *
 	 * @param  $column
-	 * @param  string $boolean
+	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Query\JoinClause
 	 */
 	public function whereNull($column, $boolean = 'and')
