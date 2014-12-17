@@ -456,24 +456,6 @@ empty
 	}
 
 
-	public function testSetAndRetriveContentTags()
-	{
-		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals(['{{', '}}'], $compiler->getContentTags());
-		$compiler->setContentTags('{{', '}}');
-		$this->assertEquals(['{{', '}}'], $compiler->getContentTags());
-	}
-
-
-	public function testSetAndRetriveEscapedTags()
-	{
-		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals(['{{{', '}}}'], $compiler->getEscapedContentTags());
-		$compiler->setContentTags('{{{', '}}}');
-		$this->assertEquals(['{{{', '}}}'], $compiler->getEscapedContentTags());
-	}
-
-
 	protected function getFiles()
 	{
 		return m::mock('Illuminate\Filesystem\Filesystem');

@@ -177,9 +177,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileComments($value)
 	{
-		$contentTags = $this->quoteTags($this->contentTags);
-
-		$pattern = sprintf('/%s--((.|\s)*?)--%s/', $contentTags[0], $contentTags[1]);
+		$pattern = sprintf('/%s--((.|\s)*?)--%s/', $this->contentTags[0], $this->contentTags[1]);
 
 		return preg_replace($pattern, '<?php /*$1*/ ?>', $value);
 	}
@@ -192,11 +190,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		$contentTags = $this->quoteTags($this->contentTags);
-
-		$escapedTags = $this->quoteTags($this->escapedTags);
-
-		$difference = strlen($contentTags[0]) - strlen($escapedTags[0]);
+		$difference = strlen($this->contentTags[0]) - strlen($this->escapedTags[0]);
 
 		if ($difference > 0)
 		{
@@ -235,9 +229,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$contentTags = $this->quoteTags($this->contentTags);
-
-		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $contentTags[0], $contentTags[1]);
+		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
 
 		$callback = function($matches)
 		{
@@ -257,9 +249,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$escapedTags = $this->quoteTags($this->escapedTags);
-
-		$pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $escapedTags[0], $escapedTags[1]);
+		$pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
 
 		$callback = function($matches)
 		{
@@ -686,7 +676,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$property = ($escaped === true) ? 'escapedTags' : 'contentTags';
 
-		$this->{$property} = array($openTag, $closeTag);
+		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
 	}
 
 	/**
@@ -719,20 +709,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function getEscapedContentTags()
 	{
 		return $this->escapedTags;
-	}
-
-	/**
-	 * Quote tags.
-	 *
-	 * @param array  $tags
-	 * @return array
-	 */
-	protected function quoteTags($tags)
-	{
-		return [
-			preg_quote($tags[0]),
-			preg_quote($tags[1]),
-		];
 	}
 
 }
