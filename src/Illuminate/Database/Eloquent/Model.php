@@ -236,11 +236,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 
 	/**
-	 * The name of this class. Cached to avoid calls to the more expensive get_class.
+	 * The name of this class. Cached to avoid calls to get_class + studly_case.
 	 *
 	 * @var string
 	 */
-	protected $clazz;
+	protected $klass;
 
 	/**
 	 * Create a new Eloquent model instance.
@@ -250,7 +250,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __construct(array $attributes = array())
 	{
-		$this->clazz = get_class($this);
+		$this->klass = get_class($this);
 
 		$this->bootIfNotBooted();
 
@@ -266,9 +266,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function bootIfNotBooted()
 	{
-		if ( ! isset(static::$booted[$this->clazz]))
+		if ( ! isset(static::$booted[$this->klass]))
 		{
-			static::$booted[$this->clazz] = true;
+			static::$booted[$this->klass] = true;
 
 			$this->fireModelEvent('booting', false);
 
@@ -2293,7 +2293,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// when we need to array or JSON the model for convenience to the coder.
 		foreach ($this->getArrayableAppends() as $key)
 		{
-			$attributes[$key] = $this->mutateAttributeForArray($this->getMutatorMethod($key), null);
+			$attributes[$key] = $this->mutateAttributeForArray(
+				$this->getMutatorMethod($key), null
+			);
 		}
 
 		return $attributes;
@@ -2523,7 +2525,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getMutatorMethod($key)
 	{
-		$mutators = static::$mutatorCache[$this->clazz];
+		$mutators = static::$mutatorCache[$this->klass];
 
 		return isset($mutators[$key]) ? $mutators[$key] : null;
 	}
