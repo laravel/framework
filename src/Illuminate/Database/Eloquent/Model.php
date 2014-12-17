@@ -1470,7 +1470,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// us to recurs into all of these nested relations for this model instance.
 		foreach ($this->relations as $models)
 		{
-			foreach (Collection::make($models) as $model)
+			foreach (Collection::make(array($models)) as $model)
 			{
 				if ( ! $model->push()) return false;
 			}
