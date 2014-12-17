@@ -226,7 +226,7 @@ class CacheManager implements FactoryContract {
 	 * @param  \Illuminate\Cache\StoreInterface  $store
 	 * @return \Illuminate\Cache\Repository
 	 */
-	protected function repository(StoreInterface $store)
+	public function repository(StoreInterface $store)
 	{
 		$repository = new Repository($store);
 
