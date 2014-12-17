@@ -129,7 +129,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo myfunc(\'foo or bar\'); ?>', $compiler->compileString('{{ myfunc(\'foo or bar\') }}'));
 		$this->assertEquals('<?php echo myfunc("foo or bar"); ?>', $compiler->compileString('{{ myfunc("foo or bar") }}'));
 		$this->assertEquals('<?php echo myfunc("$name or \'foo\'"); ?>', $compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
-	
+
 		$this->assertEquals('<?php echo $errors->has(\'email\') ? \'error or failure\' : \'\'; ?>', $compiler->compileString('{{ $errors->has(\'email\') ? \'error or failure\' : \'\' }}'));
 		$this->assertEquals('<?php echo $errors->has("email") ? "error or failure" : ""; ?>', $compiler->compileString('{{ $errors->has("email") ? "error or failure" : "" }}'));
 		$this->assertEquals('<?php echo $errors->has("email") ? "error \'or\' failure" : ""; ?>', $compiler->compileString('{{ $errors->has("email") ? "error \'or\' failure" : "" }}'));
@@ -476,19 +476,6 @@ empty
 	}
 
 
-	public function testGetTagsProvider()
-	{
-		return [
-			['{{', '}}'],
-			['{{{', '}}}'],
-			['[[', ']]'],
-			['[[[', ']]]'],
-			['((', '))'],
-			['(((', ')))'],
-		];
-	}
-
-
 	/**
 	 * @dataProvider testGetTagsProvider()
 	 */
@@ -508,6 +495,19 @@ empty
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$compiler->setEscapedContentTags($openingTag, $closingTag);
 		$this->assertSame([$openingTag, $closingTag], $compiler->getEscapedContentTags());
+	}
+
+
+	public function testGetTagsProvider()
+	{
+		return [
+			['{{', '}}'],
+			['{{{', '}}}'],
+			['[[', ']]'],
+			['[[[', ']]]'],
+			['((', '))'],
+			['(((', ')))'],
+		];
 	}
 
 }
