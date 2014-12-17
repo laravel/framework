@@ -574,6 +574,18 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new json column on the table.
+	 *
+	 * @param  string  $column
+	 * @param  array   $allowed
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function json($column, array $allowed)
+	{
+		return $this->addColumn('json', $column);
+	}
+
+	/**
 	 * Create a new date column on the table.
 	 *
 	 * @param  string  $column
