@@ -633,7 +633,6 @@ class Builder {
 		return $this->has($relation, $operator, $count, 'and', $callback);
 	}
 
-
 	/**
 	 * Add a relationship count condition to the query with where clauses.
 	 *
