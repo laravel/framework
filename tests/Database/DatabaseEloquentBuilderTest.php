@@ -175,7 +175,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
 		$builder->setModel($this->getMockModel());
-		$builder->getModel()->shouldReceive('getMutatorMethod')->with('name')->andReturn(true);
+		$builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
 		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'bar'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'bar')));
 		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'baz'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'baz')));
 
@@ -188,7 +188,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
 		$builder->setModel($this->getMockModel());
-		$builder->getModel()->shouldReceive('getMutatorMethod')->with('name')->andReturn(false);
+		$builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
 
 		$this->assertEquals(array('bar', 'baz'), $builder->lists('name'));
 	}

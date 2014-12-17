@@ -212,7 +212,7 @@ class Builder {
 		// If the model has a mutator for the requested column, we will spin through
 		// the results and mutate the values so that the mutated version of these
 		// columns are returned as you would expect from these Eloquent models.
-		if ($this->model->getMutatorMethod($column))
+		if ($this->model->hasGetMutator($column))
 		{
 			foreach ($results as $key => &$value)
 			{
