@@ -461,4 +461,53 @@ empty
 		return m::mock('Illuminate\Filesystem\Filesystem');
 	}
 
+
+	public function testRetrieveDefaultContentTags()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals(['{{', '}}'], $compiler->getContentTags());
+	}
+
+
+	public function testRetrieveDefaultEscapedContentTags()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals(['{{{', '}}}'], $compiler->getEscapedContentTags());
+	}
+
+
+	public function testGetTagsProvider()
+	{
+		return [
+			['{{', '}}'],
+			['{{{', '}}}'],
+			['[[', ']]'],
+			['[[[', ']]]'],
+			['((', '))'],
+			['(((', ')))'],
+		];
+	}
+
+
+	/**
+	 * @dataProvider testGetTagsProvider()
+	 */
+	public function testSetAndRetrieveContentTags($openingTag, $closingTag)
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setContentTags($openingTag, $closingTag);
+		$this->assertSame([$openingTag, $closingTag], $compiler->getContentTags());
+	}
+
+
+	/**
+	 * @dataProvider testGetTagsProvider()
+	 */
+	public function testSetAndRetrieveEscapedContentTags($openingTag, $closingTag)
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setEscapedContentTags($openingTag, $closingTag);
+		$this->assertSame([$openingTag, $closingTag], $compiler->getEscapedContentTags());
+	}
+
 }

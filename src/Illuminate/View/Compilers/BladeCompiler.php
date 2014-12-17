@@ -691,6 +691,21 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$this->setContentTags($openTag, $closeTag, true);
 	}
 
+
+	/**
+	 * Gets the content tags used for the compiler.
+	 *
+	 * @param  bool  $escaped
+	 * @return string
+	 */
+	protected function getTags($escaped = false)
+	{
+		$tags = $escaped ? $this->escapedTags : $this->contentTags;
+
+		return array_map('stripcslashes', $tags);
+	}
+
+
 	/**
 	* Gets the content tags used for the compiler.
 	*
@@ -698,7 +713,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	*/
 	public function getContentTags()
 	{
-		return $this->contentTags;
+		return $this->getTags();
 	}
 
 	/**
@@ -708,7 +723,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	*/
 	public function getEscapedContentTags()
 	{
-		return $this->escapedTags;
+		return $this->getTags(true);
 	}
 
 }
