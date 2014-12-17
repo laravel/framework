@@ -42,4 +42,11 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('VertexFields', str_plural('VertexField'));
 	}
 
+	public function testAlreadyPluralizedIrregularWords()
+	{
+		$this->assertEquals('children', str_plural('children'));
+		$this->assertEquals('radii', str_plural('radii'));
+		$this->assertEquals('teeth', str_plural('teeth'));
+	}
+
 }

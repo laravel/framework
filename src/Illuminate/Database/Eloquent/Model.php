@@ -236,6 +236,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	const UPDATED_AT = 'updated_at';
 
+
+	/**
+	 * The name of this class. Cached to avoid calls to get_class + studly_case.
+	 *
+	 * @var string
+	 */
+	protected $klass;
+
 	/**
 	 * Create a new Eloquent model instance.
 	 *
@@ -244,6 +252,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function __construct(array $attributes = array())
 	{
+		$this->klass = get_class($this);
+
 		$this->bootIfNotBooted();
 
 		$this->syncOriginal();
@@ -258,11 +268,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function bootIfNotBooted()
 	{
-		$class = get_class($this);
-
-		if ( ! isset(static::$booted[$class]))
+		if ( ! isset(static::$booted[$this->klass]))
 		{
-			static::$booted[$class] = true;
+			static::$booted[$this->klass] = true;
 
 			$this->fireModelEvent('booting', false);
 
@@ -292,7 +300,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			{
 				if (static::$snakeAttributes) $matches[1] = snake_case($matches[1]);
 
-				static::$mutatorCache[$class][] = lcfirst($matches[1]);
+				static::$mutatorCache[$class][lcfirst($matches[1])] = $matches[0];
 			}
 		}
 
@@ -395,6 +403,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function fill(array $attributes)
 	{
+		if (empty($attributes)) return $this;
+
 		$totallyGuarded = $this->totallyGuarded();
 
 		foreach ($this->fillableFromArray($attributes) as $key => $value)
@@ -2393,12 +2403,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// We want to spin through all the mutated attributes for this model and call
 		// the mutator for the attribute. We cache off every mutated attributes so
 		// we don't have to constantly check on attributes that actually change.
-		foreach ($this->getMutatedAttributes() as $key)
+		foreach ($this->getMutatedAttributes() as $key => $method)
 		{
 			if ( ! array_key_exists($key, $attributes)) continue;
 
 			$attributes[$key] = $this->mutateAttributeForArray(
-				$key, $attributes[$key]
+				$method, $attributes[$key]
 			);
 		}
 
@@ -2407,7 +2417,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// when we need to array or JSON the model for convenience to the coder.
 		foreach ($this->getArrayableAppends() as $key)
 		{
-			$attributes[$key] = $this->mutateAttributeForArray($key, null);
+			$attributes[$key] = $this->mutateAttributeForArray(
+				$this->getMutatorMethod($key), null
+			);
 		}
 
 		return $attributes;
@@ -2527,7 +2539,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If the key references an attribute, we can just go ahead and return the
 		// plain attribute value from the model. This allows every attribute to
 		// be dynamically accessed through the _get method without accessors.
-		if ($inAttributes || $this->hasGetMutator($key))
+		if ($inAttributes || $this->getMutatorMethod($key))
 		{
 			return $this->getAttributeValue($key);
 		}
@@ -2562,11 +2574,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If the attribute has a get mutator, we will call that then return what
 		// it returns as the value, which is useful for transforming values on
 		// retrieval from the model to a form that is more useful for usage.
-		if ($this->hasGetMutator($key))
-		{
-			return $this->mutateAttribute($key, $value);
+		$getMutator = $this->getMutatorMethod($key);
+		if ($getMutator) {
+			return $this->getMutatedAttributeValue($key, $getMutator);
 		}
-
 		// If the attribute is listed as a date, we will convert it to a DateTime
 		// instance on retrieval, which makes it quite convenient to work with
 		// date fields without having to create a mutator for each property.
@@ -2576,6 +2587,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Get the mutated value of an attribute.
+	 *
+	 * @param  string  $key
+	 * @param  string  $mutatorMethod
+	 * @return mixed
+	 */
+	protected function getMutatedAttributeValue($key, $mutatorMethod)
+	{
+		$value = $this->getAttributeFromArray($key);
+
+		return $this->mutateAttribute($mutatorMethod, $value);
 	}
 
 	/**
@@ -2616,36 +2641,51 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Determine if a get mutator exists for an attribute.
 	 *
+	 * @deprecated Deprecated since version 4.2.13, to be removed in 5.0.0.
+	 *
 	 * @param  string  $key
 	 * @return bool
 	 */
 	public function hasGetMutator($key)
 	{
-		return method_exists($this, 'get'.studly_case($key).'Attribute');
+		return $this->getMutatorMethod($key) !== null;
+	}
+
+	/**
+	 * Get the method name if a get mutator exists for an attribute.
+	 *
+	 * @param  string  $key
+	 * @return string|null
+	 */
+	public function getMutatorMethod($key)
+	{
+		$mutators = static::$mutatorCache[$this->klass];
+
+		return isset($mutators[$key]) ? $mutators[$key] : null;
 	}
 
 	/**
 	 * Get the value of an attribute using its mutator.
 	 *
-	 * @param  string  $key
+	 * @param  string  $mutatorMethod
 	 * @param  mixed   $value
 	 * @return mixed
 	 */
-	protected function mutateAttribute($key, $value)
+	protected function mutateAttribute($mutatorMethod, $value)
 	{
-		return $this->{'get'.studly_case($key).'Attribute'}($value);
+		return $this->{$mutatorMethod}($value);
 	}
 
 	/**
 	 * Get the value of an attribute using its mutator for array conversion.
 	 *
-	 * @param  string  $key
+	 * @param  string  $mutatorMethod
 	 * @param  mixed   $value
 	 * @return mixed
 	 */
-	protected function mutateAttributeForArray($key, $value)
+	protected function mutateAttributeForArray($mutatorMethod, $value)
 	{
-		$value = $this->mutateAttribute($key, $value);
+		$value = $this->mutateAttribute($mutatorMethod, $value);
 
 		return $value instanceof Arrayable ? $value->toArray() : $value;
 	}
@@ -3187,7 +3227,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function __isset($key)
 	{
 		return ((isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-				($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
+				($method = $this->getMutatorMethod($key) && ! is_null($this->getMutatedAttributeValue($key, $method))));
 	}
 
 	/**
