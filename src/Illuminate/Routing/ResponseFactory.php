@@ -130,7 +130,7 @@ class ResponseFactory implements FactoryContract {
 
 		if ( ! is_null($name))
 		{
-			return $response->setContentDisposition($disposition, $name, Str::ascii($name));
+			return $response->setContentDisposition($disposition, $name, str_replace('%', '', Str::ascii($name)));
 		}
 
 		return $response;
