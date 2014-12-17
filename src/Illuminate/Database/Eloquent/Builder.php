@@ -26,14 +26,14 @@ class Builder {
 	 *
 	 * @var array
 	 */
-	protected $eagerLoad = [];
+	protected $eagerLoad = array();
 
 	/**
 	 * All of the registered builder macros.
 	 *
 	 * @var array
 	 */
-	protected $macros = [];
+	protected $macros = array();
 
 	/**
 	 * A replacement for the typical delete function.
@@ -47,10 +47,10 @@ class Builder {
 	 *
 	 * @var array
 	 */
-	protected $passthru = [
+	protected $passthru = array(
 		'toSql', 'lists', 'insert', 'insertGetId', 'pluck', 'count',
 		'min', 'max', 'avg', 'sum', 'exists', 'getBindings',
-	];
+	);
 
 	/**
 	 * Create a new Eloquent query builder instance.
@@ -70,7 +70,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static|null
 	 */
-	public function find($id, $columns = ['*'])
+	public function find($id, $columns = array('*'))
 	{
 		if (is_array($id))
 		{
@@ -89,7 +89,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
 	 */
-	public function findMany($id, $columns = ['*'])
+	public function findMany($id, $columns = array('*'))
 	{
 		if (empty($id)) return $this->model->newCollection();
 
@@ -107,7 +107,7 @@ class Builder {
 	 *
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	public function findOrFail($id, $columns = ['*'])
+	public function findOrFail($id, $columns = array('*'))
 	{
 		if ( ! is_null($model = $this->find($id, $columns))) return $model;
 
@@ -120,7 +120,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|static|null
 	 */
-	public function first($columns = ['*'])
+	public function first($columns = array('*'))
 	{
 		return $this->take(1)->get($columns)->first();
 	}
@@ -133,7 +133,7 @@ class Builder {
 	 *
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	public function firstOrFail($columns = ['*'])
+	public function firstOrFail($columns = array('*'))
 	{
 		if ( ! is_null($model = $this->first($columns))) return $model;
 
@@ -146,7 +146,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */
-	public function get($columns = ['*'])
+	public function get($columns = array('*'))
 	{
 		$models = $this->getModels($columns);
 
@@ -169,7 +169,7 @@ class Builder {
 	 */
 	public function pluck($column)
 	{
-		$result = $this->first([$column]);
+		$result = $this->first(array($column));
 
 		if ($result) return $result->{$column};
 	}
@@ -216,7 +216,7 @@ class Builder {
 		{
 			foreach ($results as $key => &$value)
 			{
-				$fill = [$column => $value];
+				$fill = array($column => $value);
 
 				$value = $this->model->newFromBuilder($fill)->$column;
 			}
@@ -232,7 +232,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = null, $columns = ['*'])
+	public function paginate($perPage = null, $columns = array('*'))
 	{
 		$perPage = $perPage ?: $this->model->getPerPage();
 
@@ -292,7 +292,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function simplePaginate($perPage = null, $columns = ['*'])
+	public function simplePaginate($perPage = null, $columns = array('*'))
 	{
 		$paginator = $this->query->getConnection()->getPaginator();
 
@@ -324,7 +324,7 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function increment($column, $amount = 1, array $extra = [])
+	public function increment($column, $amount = 1, array $extra = array())
 	{
 		$extra = $this->addUpdatedAtColumn($extra);
 
@@ -339,7 +339,7 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function decrement($column, $amount = 1, array $extra = [])
+	public function decrement($column, $amount = 1, array $extra = array())
 	{
 		$extra = $this->addUpdatedAtColumn($extra);
 
@@ -403,7 +403,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model[]
 	 */
-	public function getModels($columns = ['*'])
+	public function getModels($columns = array('*'))
 	{
 		// First, we will simply get the raw results from the query builders which we
 		// can use to populate an array with Eloquent models. We will pass columns
@@ -412,7 +412,7 @@ class Builder {
 
 		$connection = $this->model->getConnectionName();
 
-		$models = [];
+		$models = array();
 
 		// Once we have the results, we can spin through them and instantiate a fresh
 		// model instance for each records we retrieved from the database. We will
@@ -515,7 +515,7 @@ class Builder {
 	 */
 	protected function nestedRelations($relation)
 	{
-		$nested = [];
+		$nested = array();
 
 		// We are basically looking for any relationships that are nested deeper than
 		// the given top-level relationship. We will just check for any relations
@@ -566,7 +566,7 @@ class Builder {
 		}
 		else
 		{
-			call_user_func_array([$this->query, 'where'], func_get_args());
+			call_user_func_array(array($this->query, 'where'), func_get_args());
 		}
 
 		return $this;
@@ -588,11 +588,11 @@ class Builder {
 	/**
 	 * Add a relationship count condition to the query.
 	 *
-	 * @param  string    $relation
-	 * @param  string    $operator
-	 * @param  int       $count
-	 * @param  string    $boolean
-	 * @param  \Closure	 $callback
+	 * @param  string  $relation
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @param  string  $boolean
+	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
@@ -605,7 +605,6 @@ class Builder {
 
 		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
 	}
-
 
 	/**
 	 * Add a relationship count condition to the query
@@ -623,10 +622,10 @@ class Builder {
 	/**
 	 * Add a relationship count condition to the query with where clauses.
 	 *
-	 * @param  string  $relation
+	 * @param  string    $relation
 	 * @param  \Closure  $callback
-	 * @param  string  $operator
-	 * @param  int     $count
+	 * @param  string    $operator
+	 * @param  int       $count
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -641,7 +640,7 @@ class Builder {
 	 * @param  string    $relation
 	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
-     */
+	 */
 	public function whereHasNot($relation, Closure $callback)
 	{
 		return $this->hasNot($relation, 'and', $callback);
@@ -758,7 +757,7 @@ class Builder {
 	 */
 	protected function parseRelations(array $relations)
 	{
-		$results = [];
+		$results = array();
 
 		foreach ($relations as $name => $constraints)
 		{
@@ -769,7 +768,7 @@ class Builder {
 			{
 				$f = function() {};
 
-				list($name, $constraints) = [$constraints, $f];
+				list($name, $constraints) = array($constraints, $f);
 			}
 
 			// We need to separate out any nested includes. Which allows the developers
@@ -792,7 +791,7 @@ class Builder {
 	 */
 	protected function parseNested($name, $results)
 	{
-		$progress = [];
+		$progress = array();
 
 		// If the relation has already been set on the result array, we will not set it
 		// again, since that would override any constraints that were already placed
@@ -803,8 +802,8 @@ class Builder {
 
 			if ( ! isset($results[$last = implode('.', $progress)]))
 			{
- 				$results[$last] = function() {};
- 			}
+				$results[$last] = function() {};
+			}
 		}
 
 		return $results;
@@ -821,7 +820,7 @@ class Builder {
 	{
 		array_unshift($parameters, $this);
 
-		return call_user_func_array([$this->model, $scope], $parameters) ?: $this;
+		return call_user_func_array(array($this->model, $scope), $parameters) ?: $this;
 	}
 
 	/**
@@ -934,7 +933,7 @@ class Builder {
 			return $this->callScope($scope, $parameters);
 		}
 
-		$result = call_user_func_array([$this->query, $method], $parameters);
+		$result = call_user_func_array(array($this->query, $method), $parameters);
 
 		return in_array($method, $this->passthru) ? $result : $this;
 	}
