@@ -285,9 +285,7 @@ class Str {
 	{
 		if (ctype_lower($value)) return $value;
 
-		$replace = '$1'.$delimiter.'$2';
-
-		return strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
+		return strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
 	}
 
 	/**

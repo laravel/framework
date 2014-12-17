@@ -1480,7 +1480,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// us to recurs into all of these nested relations for this model instance.
 		foreach ($this->relations as $models)
 		{
-			foreach (Collection::make($models) as $model)
+			$models = is_array($models) ? $models : array($models);
+
+			foreach ($models as $model)
 			{
 				if ( ! $model->push()) return false;
 			}
@@ -2126,7 +2128,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$this->hidden = $hidden;
 	}
-	
+
 	/**
 	 * Add hidden attributes for the model.
 	 *
@@ -2136,10 +2138,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function addHidden($attributes = null)
 	{
 		$attributes = is_array($attributes) ? $attributes : func_get_args();
-		
+
 		$this->hidden = array_merge($this->hidden, $attributes);
 	}
-	
+
 	/**
 	 * Get the visible attributes for the model.
 	 *
@@ -2160,7 +2162,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$this->visible = $visible;
 	}
-	
+
 	/**
 	 * Add visible attributes for the model.
 	 *
@@ -2170,7 +2172,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function addVisible($attributes = null)
 	{
 		$attributes = is_array($attributes) ? $attributes : func_get_args();
-		
+
 		$this->visible = array_merge($this->visible, $attributes);
 	}
 
