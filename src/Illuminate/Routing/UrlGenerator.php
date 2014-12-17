@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
