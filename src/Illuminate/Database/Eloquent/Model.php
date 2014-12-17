@@ -2643,8 +2643,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Determine if a get mutator exists for an attribute.
 	 *
-	 * @deprecated Deprecated since version 4.2.13, to be removed in 5.0.0.
-	 *
 	 * @param  string  $key
 	 * @return bool
 	 */
