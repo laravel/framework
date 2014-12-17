@@ -92,7 +92,9 @@ class UrlGenerator {
 	 */
 	public function previous()
 	{
-		return $this->to($this->request->headers->get('referer'));
+		$referer = $this->request->headers->get('referer');
+
+		return is_null($referer) ? null : $this->to($referer);
 	}
 
 	/**
