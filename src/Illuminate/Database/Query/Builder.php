@@ -1198,7 +1198,7 @@ class Builder {
 	 * Add a union statement to the query.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder|\Closure  $query
-	 * @param  bool $all
+	 * @param  bool  $all
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
 	public function union($query, $all = false)

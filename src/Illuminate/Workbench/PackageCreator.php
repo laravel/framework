@@ -84,7 +84,7 @@ class PackageCreator {
 	/**
 	 * Get the blocks for a given package.
 	 *
-	 * @param  bool $plain
+	 * @param  bool  $plain
 	 * @return array
 	 */
 	protected function getBlocks($plain)
