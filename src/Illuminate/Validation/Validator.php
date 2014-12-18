@@ -345,7 +345,16 @@ class Validator implements ValidatorContract {
 
 		$validatable = $this->isValidatable($rule, $attribute, $value);
 
-		$method = "validate{$rule}";
+		$realAttribute = last(explode('.', $attribute));
+		
+		if (method_exists($this, "validate{$realAttribute}{$rule}"))
+		{
+			$method = "validate{$realAttribute}{$rule}";
+		}
+		else
+		{
+			$method = "validate{$rule}";
+		}
 
 		if ($validatable && ! $this->$method($attribute, $value, $parameters, $this))
 		{
