@@ -313,7 +313,7 @@ class Builder {
 	 */
 	public function update(array $values)
 	{
-		return $this->query->update($this->addUpdatedAtColumn($values));
+		return $this->query->update($values);
 	}
 
 	/**
