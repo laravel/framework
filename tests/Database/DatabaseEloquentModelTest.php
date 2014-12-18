@@ -105,10 +105,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $result);
 	}
 
+
 	public function testFindMethodUseWritePdo()
 	{
 		$result =  EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
 	}
+
 
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
