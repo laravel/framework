@@ -12,11 +12,9 @@ matrix:
       env: dependencies=lowest  
 
 sudo: false
-
-before_script:
-  - travis retry composer self-update
   
 install:
+  - travis retry composer self-update
   - travis_retry composer install --no-interaction --prefer-source
   - if [ "$dependencies" = "lowest" ]; then composer update --prefer-lowest --prefer-stable -n; fi;
 
