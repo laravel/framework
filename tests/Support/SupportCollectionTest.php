@@ -274,6 +274,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testListsWithArrayAccessValues()
+	{
+		$data = new Collection(array(
+			new TestArrayAccessImplementation(array('name' => 'taylor', 'email' => 'foo')),
+			new TestArrayAccessImplementation(array('name' => 'dayle', 'email' => 'bar'))
+		));
+
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name'));
+		$this->assertEquals(array('foo', 'bar'), $data->lists('email'));
+	}
+
+
 	public function testImplode()
 	{
 		$data = new Collection(array(array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
@@ -605,5 +617,35 @@ class TestAccessorEloquentTestStub
 	public function getSomeAttribute()
 	{
 		return $this->attributes['some'];
+	}
+}
+
+class TestArrayAccessImplementation implements ArrayAccess
+{
+	private $arr;
+
+	public function __construct($arr)
+	{
+		$this->arr = $arr;
+	}
+
+	public function offsetExists($offset)
+	{
+		return isset($this->arr[$offset]);
+	}
+
+	public function offsetGet($offset)
+	{
+		return $this->arr[$offset];
+	}
+
+	public function offsetSet($offset, $value)
+	{
+		$this->arr[$offset] = $value;
+	}
+
+	public function offsetUnset($offset)
+	{
+		unset($this->arr[$offset]);
 	}
 }
