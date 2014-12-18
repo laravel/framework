@@ -2537,6 +2537,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function getMutatorMethod($key)
 	{
 		$mutators = static::$mutatorCache[$this->klass];
+
 		$key = snake_case($key);
 
 		return isset($mutators[$key]) ? $mutators[$key] : null;
