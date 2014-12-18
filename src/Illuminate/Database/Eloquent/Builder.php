@@ -605,7 +605,7 @@ class Builder {
 	 */
 	public function whereDoesntHave($relation, Closure $callback)
 	{
-		return $this->hasNot($relation, 'and', $callback);
+		return $this->doesntHave($relation, 'and', $callback);
 	}
 
 	/**
