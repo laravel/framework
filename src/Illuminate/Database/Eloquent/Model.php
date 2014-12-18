@@ -2083,6 +2083,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		return $this;
 	}
+	
+	/**
+	 * Get the guarded attributes for the model.
+	 *
+	 * @return array
+	 */
+	public function getGuarded()
+	{
+		return $this->guarded;
+	}
 
 	/**
 	 * Set the guarded attributes for the model.
