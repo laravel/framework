@@ -5,15 +5,16 @@ php:
   - 5.5
   - 5.6
   - hhvm
-  
+
 matrix:
   include:
     - php: 5.4
-      env: dependencies=lowest  
+      env: dependencies=lowest
 
 sudo: false
-  
-install:
+
+before_script:
+	- composer self-update
   - travis_retry composer install --no-interaction --prefer-source
   - if [ "$dependencies" = "lowest" ]; then composer update --prefer-lowest --prefer-stable -n; fi;
 
