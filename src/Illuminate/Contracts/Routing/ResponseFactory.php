@@ -68,6 +68,15 @@ interface ResponseFactory {
 	public function download($file, $name = null, array $headers = array(), $disposition = 'attachment');
 
 	/**
+	 * Create a new redirect response to the previous location.
+	 *
+	 * @param  int    $status
+	 * @param  array  $headers
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function redirectBack($status = 302, $headers = array());
+
+	/**
 	 * Create a new redirect response to the given path.
 	 *
 	 * @param  string  $path
