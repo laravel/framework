@@ -8,6 +8,27 @@ class Str {
 	use MacroableTrait;
 
 	/**
+	 * The cache of snake-cased words.
+	 *
+	 * @var array
+	 */
+	protected static $snakeCache = [];
+
+	/**
+	 * The cache of camel-cased words.
+	 *
+	 * @var array
+	 */
+	protected static $camelCache = [];
+
+	/**
+	 * The cache of studly-cased words.
+	 *
+	 * @var array
+	 */
+	protected static $studlyCache = [];
+
+	/**
 	 * Transliterate a UTF-8 value to ASCII.
 	 *
 	 * @param  string  $value
@@ -26,7 +47,12 @@ class Str {
 	 */
 	public static function camel($value)
 	{
-		return lcfirst(static::studly($value));
+		if (isset(static::$camelCache[$value]))
+		{
+			return static::$camelCache[$value];
+		}
+
+		return static::$camelCache[$value] = lcfirst(static::studly($value));
 	}
 
 	/**
@@ -283,11 +309,19 @@ class Str {
 	 */
 	public static function snake($value, $delimiter = '_')
 	{
-		if (ctype_lower($value)) return $value;
+		if (isset(static::$snakeCache[$value.$delimiter]))
+		{
+			return static::$snakeCache[$value.$delimiter];
+		}
 
-		$replace = '$1'.$delimiter.'$2';
+		if ( ! ctype_lower($value))
+		{
+			$replace = '$1'.$delimiter.'$2';
 
-		return strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
+			$value = strtolower(preg_replace('/(.)([A-Z])/', $replace, $value));
+		}
+
+		return static::$snakeCache[$value.$delimiter] = $value;
 	}
 
 	/**
@@ -315,9 +349,14 @@ class Str {
 	 */
 	public static function studly($value)
 	{
+		if (isset(static::$studlyCache[$value]))
+		{
+			return static::$studlyCache[$value];
+		}
+
 		$value = ucwords(str_replace(array('-', '_'), ' ', $value));
 
-		return str_replace(' ', '', $value);
+		return static::$studlyCache[$value] = str_replace(' ', '', $value);
 	}
 
 }
