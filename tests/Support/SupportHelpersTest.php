@@ -207,6 +207,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testSnakeCase()
 	{
 		$this->assertEquals('foo_bar', snake_case('fooBar'));
+		$this->assertEquals('foo_bar', snake_case('fooBar')); // test cache
 	}
 
 
@@ -214,6 +215,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals('fooBar', camel_case('FooBar'));
 		$this->assertEquals('fooBar', camel_case('foo_bar'));
+		$this->assertEquals('fooBar', camel_case('foo_bar')); // test cache
 		$this->assertEquals('fooBarBaz', camel_case('Foo-barBaz'));
 		$this->assertEquals('fooBarBaz', camel_case('foo-bar_baz'));
 	}
@@ -223,6 +225,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals('FooBar', studly_case('fooBar'));
 		$this->assertEquals('FooBar', studly_case('foo_bar'));
+		$this->assertEquals('FooBar', studly_case('foo_bar')); // test cache
 		$this->assertEquals('FooBarBaz', studly_case('foo-barBaz'));
 		$this->assertEquals('FooBarBaz', studly_case('foo-bar_baz'));
 	}
