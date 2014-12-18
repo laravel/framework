@@ -126,7 +126,7 @@ class Writer {
 	}
 
 	/**
-	 * Get a defaut Monolog formatter instance.
+	 * Get a default Monolog formatter instance.
 	 *
 	 * @return \Monolog\Formatter\LineFormatter
 	 */
