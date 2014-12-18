@@ -43,6 +43,13 @@ class UrlGenerator implements UrlGeneratorContract {
 	protected $rootNamespace;
 
 	/**
+	 * The session resolver callable.
+	 *
+	 * @var callable
+	 */
+	protected $sessionResolver;
+
+	/**
 	 * Characters that should not be URL encoded.
 	 *
 	 * @var array
@@ -105,7 +112,9 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	public function previous()
 	{
-		return $this->to($this->request->headers->get('referer'));
+		$referrer = $this->request->headers->get('referer');
+
+		return $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 	}
 
 	/**
@@ -608,6 +617,41 @@ class UrlGenerator implements UrlGeneratorContract {
 	public function setRoutes(RouteCollection $routes)
 	{
 		$this->routes = $routes;
+
+		return $this;
+	}
+
+	/**
+	 * Get the previous URL from the session if possible.
+	 *
+	 * @return string|null
+	 */
+	protected function getPreviousUrlFromSession()
+	{
+		$session = $this->getSession();
+
+		return $session ? $session->previousUrl() : null;
+	}
+
+	/**
+	 * Get the session implementation from the resolver.
+	 *
+	 * @return \Illuminate\Session\Store
+	 */
+	protected function getSession()
+	{
+		return call_user_func($this->sessionResolver ?: function() {});
+	}
+
+	/**
+	 * Set the session resolver for the generator.
+	 *
+	 * @param  callable  $sessionResolver
+	 * @return $this
+	 */
+	public function setSessionResolver(callable $sessionResolver)
+	{
+		$this->sessionResolver = $sessionResolver;
 
 		return $this;
 	}
