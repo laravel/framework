@@ -82,16 +82,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 
 	public function testArrayOnly()
 	{
-		$array = array('name' => 'taylor', 'age' => 26, 'skills' => array('php' => 'Laravel'));
+		$array = array('name' => 'taylor', 'age' => 26);
 		$this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
 		$this->assertSame(array(), array_only($array, array('nonExistingKey')));
-		$this->assertSame(['skills' => ['php' => 'Laravel']], array_only($array, ['skills.php']));
-		$this->assertSame(['name'   => 'taylor', 'skills' => ['php' => 'Laravel']], array_only($array, ['skills.php', 'name']));
-		$this->assertSame([], array_only([], ['name']));
-		$this->assertSame([], array_only($array, []));
-		$this->assertSame([], array_only($array, ''));
-		$this->assertSame([], array_only($array, null));
-		$this->assertSame([], array_only($array, [null, '']));
 	}
 
 
