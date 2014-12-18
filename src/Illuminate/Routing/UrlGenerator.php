@@ -114,7 +114,9 @@ class UrlGenerator implements UrlGeneratorContract {
 	{
 		$referrer = $this->request->headers->get('referer');
 
-		return $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
+		$url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
+
+		return $url ?: $this->to('/');
 	}
 
 	/**
