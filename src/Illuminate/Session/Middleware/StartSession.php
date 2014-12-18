@@ -56,6 +56,8 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 		// add the session identifier cookie to the application response headers now.
 		if ($this->sessionConfigured())
 		{
+			$this->storeCurrentUrl($request, $session);
+
 			$this->collectGarbage($session);
 
 			$this->addCookieToResponse($response, $session);
@@ -107,6 +109,21 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 		$session->setId($request->cookies->get($session->getName()));
 
 		return $session;
+	}
+
+	/**
+	 * Store the current URL for the request if necessary.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Illuminate\Session\SessionInterface  $session
+	 * @return void
+	 */
+	protected function storeCurrentUrl(Request $request, $session)
+	{
+		if ($request->method() === 'GET' && $request->route() && ! $request->ajax())
+		{
+			$session->setPreviousUrl($request->fullUrl());
+		}
 	}
 
 	/**

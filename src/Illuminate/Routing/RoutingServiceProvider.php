@@ -55,6 +55,11 @@ class RoutingServiceProvider extends ServiceProvider {
 				)
 			);
 
+			$url->setSessionResolver(function()
+			{
+				return $this->app['session'];
+			});
+
 			// If the route collection is "rebound", for example, when the routes stay
 			// cached for the application, we will need to rebind the routes on the
 			// URL generator instance so it has the latest version of the routes.
