@@ -592,7 +592,7 @@ class Builder {
 	 * @param  string  $operator
 	 * @param  int     $count
 	 * @param  string  $boolean
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
@@ -611,7 +611,7 @@ class Builder {
 	 *
 	 * @param  string  $relation
 	 * @param  string  $boolean
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
@@ -622,10 +622,10 @@ class Builder {
 	/**
 	 * Add a relationship count condition to the query with where clauses.
 	 *
-	 * @param  string  $relation
+	 * @param  string    $relation
 	 * @param  \Closure  $callback
-	 * @param  string  $operator
-	 * @param  int     $count
+	 * @param  string    $operator
+	 * @param  int       $count
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -637,10 +637,10 @@ class Builder {
 	 * Add a relationship count condition to the query with where clauses.
 	 *
 	 * @param  string  $relation
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
-	public function whereDoesntHave($relation, Closure $callback)
+	public function whereDoesntHave($relation, Closure $callback = null)
 	{
 		return $this->doesntHave($relation, 'and', $callback);
 	}
@@ -661,10 +661,10 @@ class Builder {
 	/**
 	 * Add a relationship count condition to the query with where clauses and an "or".
 	 *
-	 * @param  string  $relation
+	 * @param  string    $relation
 	 * @param  \Closure  $callback
-	 * @param  string  $operator
-	 * @param  int     $count
+	 * @param  string    $operator
+	 * @param  int       $count
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -697,8 +697,8 @@ class Builder {
 	/**
 	 * Merge the "wheres" from a relation query to a has query.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder $hasQuery
-	 * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
+	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
+	 * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
 	 * @return void
 	 */
 	protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
@@ -812,7 +812,7 @@ class Builder {
 	 * Call the given model scope on the underlying model.
 	 *
 	 * @param  string  $scope
-	 * @param  array  $parameters
+	 * @param  array   $parameters
 	 * @return \Illuminate\Database\Query\Builder
 	 */
 	protected function callScope($scope, $parameters)
@@ -892,7 +892,7 @@ class Builder {
 	/**
 	 * Extend the builder with a given callback.
 	 *
-	 * @param  string  $name
+	 * @param  string    $name
 	 * @param  \Closure  $callback
 	 * @return void
 	 */
