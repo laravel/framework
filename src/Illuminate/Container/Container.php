@@ -102,6 +102,20 @@ class Container implements ArrayAccess, ContainerContract {
 	protected $globalAfterResolvingCallbacks = array();
 
 	/**
+	 * All of the after resolving callbacks by class type.
+	 *
+	 * @var array
+	 */
+	protected $resolvingCallbacksByType = array();
+
+	/**
+	 * All of the after resolving callbacks by class type.
+	 *
+	 * @var array
+	 */
+	protected $afterResolvingCallbacksByType = array();
+
+	/**
 	 * Define a contextual binding.
 	 *
 	 * @param  string  $concrete
@@ -950,6 +964,24 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
+	 * @param  $type
+	 * @param  callable  $callback
+	 */
+	public function resolvingType($type, Closure $callback)
+	{
+		$this->resolvingCallbacksByType[$type][] = $callback;
+	}
+
+	/**
+	 * @param  $type
+	 * @param  callable  $callback
+	 */
+	public function afterResolvingType($type, Closure $callback)
+	{
+		$this->afterResolvingCallbacksByType[$type][] = $callback;
+	}
+
+	/**
 	 * Fire all of the resolving callbacks.
 	 *
 	 * @param  string  $abstract
@@ -964,8 +996,10 @@ class Container implements ArrayAccess, ContainerContract {
 		}
 
 		$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
+		$this->fireCallbackArray($object, $this->getCallbacksForType($object, $this->resolvingCallbacksByType));
 
 		$this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
+		$this->fireCallbackArray($object, $this->getCallbacksForType($object, $this->afterResolvingCallbacksByType));
 	}
 
 	/**
@@ -1178,6 +1212,38 @@ class Container implements ArrayAccess, ContainerContract {
 	public function __set($key, $value)
 	{
 		$this[$key] = $value;
+	}
+
+	/**
+	 * Get all callbacks for all subtypes and interfaces for specific $abstract type.
+	 *
+	 * @param  object  $object
+	 * @param  array  $callbacksPerType
+	 *
+	 * @return array
+	 */
+	protected function getCallbacksForType($object, array $callbacksPerType)
+	{
+		$callbacks = $this->getItemsForType($object, $callbacksPerType);
+
+		return $callbacks ? call_user_func_array('array_merge', $callbacks) : [];
+	}
+
+	/**
+	 * Return all array items which are defined by a key which is a subtype of $abstract
+	 *
+	 * @param  object  $object
+	 * @param  array  $array
+	 *
+	 * @return array
+	 */
+	protected function getItemsForType($object, array $array)
+	{
+		$types = array_filter(array_keys($array), function ($type) use ($object) {
+			return is_a($object, $type);
+		});
+
+		return array_intersect_key($array, array_flip($types));
 	}
 
 }
