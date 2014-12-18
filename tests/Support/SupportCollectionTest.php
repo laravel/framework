@@ -613,6 +613,17 @@ class TestAccessorEloquentTestStub
 		return $this->$attribute;
 	}
 
+	public function __isset($attribute)
+	{
+		$accessor = 'get' .lcfirst($attribute). 'Attribute';
+
+		if (method_exists($this, $accessor)) {
+			return !is_null($this->$accessor());
+		}
+
+		return isset($this->$attribute);
+	}
+
 
 	public function getSomeAttribute()
 	{
