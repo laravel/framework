@@ -2661,6 +2661,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$mutators = static::$mutatorCache[$this->klass];
 
+		$key = snake_case($key);
+
 		return isset($mutators[$key]) ? $mutators[$key] : null;
 	}
 

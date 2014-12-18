@@ -886,8 +886,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new EloquentModelAppendsStub;
 		$this->assertEquals('admin', $model->is_admin);
+		$this->assertEquals('camelCased', $model->camelCased);
+		$this->assertEquals('StudlyCased', $model->StudlyCased);
 
-		$model->setHidden(['is_admin']);
+		$model->setHidden(['is_admin', 'camelCased', 'StudlyCased']);
 		$this->assertEquals([], $model->toArray());
 
 		$model->setVisible([]);
@@ -1148,9 +1150,17 @@ class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelAppendsStub extends Illuminate\Database\Eloquent\Model {
-	protected $appends = array('is_admin');
+	protected $appends = array('is_admin', 'camelCased', 'StudlyCased');
 	public function getIsAdminAttribute()
 	{
 		return 'admin';
+	}
+	public function getCamelCasedAttribute()
+	{
+		return 'camelCased';
+	}
+	public function getStudlyCasedAttribute()
+	{
+		return 'StudlyCased';
 	}
 }
