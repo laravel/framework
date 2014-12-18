@@ -70,6 +70,41 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRelateMethodOnMorphOneDefinesRelationship()
+	{
+		$relationship = 'foo';
+		$child = new EloquentMorphResetModelStub;
+
+		$relation = $this->getOneRelation();
+		$relation->relate($relationship);
+
+		$builder = $relation->getQuery();
+		$builder->shouldReceive('first')->andReturn($child);
+
+		$relation->getParent()->shouldReceive('getAttribute')->with('bip')->andReturn('bap');
+		$this->assertEquals('bap', $relation->getResults()->$relationship->bip);
+	}
+
+
+	public function testRelateMethodOnMorphManyDefinesRelationship()
+	{
+		$relationship = 'foo';
+		$child = new EloquentMorphResetModelStub;
+
+		$relation = $this->getManyRelation();
+		$relation->relate($relationship);
+
+		$builder = $relation->getQuery();
+		$builder->shouldReceive('get')->andReturn(new Illuminate\Database\Eloquent\Collection([$child]));
+
+		$children = $relation->getResults();
+		$this->assertCount(1, $children);
+
+		$relation->getParent()->shouldReceive('getAttribute')->with('bip')->andReturn('bap');
+		$this->assertEquals('bap', $children->first()->$relationship->bip);
+	}
+
+
 	protected function getOneRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
