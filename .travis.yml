@@ -5,9 +5,19 @@ php:
   - 5.5
   - 5.6
   - hhvm
+  
+matrix:
+  include:
+    - php: 5.4
+      env: dependencies=lowest  
 
 sudo: false
 
-install: travis_retry composer install --no-interaction --prefer-source
+before_script:
+  - travis retry composer self-update
+  
+install:
+  - travis_retry composer install --no-interaction --prefer-source
+  - if [ "$dependencies" = "lowest" ]; then composer update --prefer-lowest --prefer-stable -n; fi;
 
 script: vendor/bin/phpunit
