@@ -997,9 +997,10 @@ class Builder {
 	/**
 	 * Add a "group by" clause to the query.
 	 *
+	 * @param  array|string  $column,...
 	 * @return $this
 	 */
-	public function groupBy()
+	public function groupBy($column)
 	{
 		foreach (func_get_args() as $arg)
 		{
