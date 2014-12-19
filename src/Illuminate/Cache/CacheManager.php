@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Cache;
 
+use Closure;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 
 class CacheManager implements FactoryContract {
