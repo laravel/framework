@@ -20,6 +20,7 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(!array_key_exists('foo', $parent->toArray()));
 	}
 
+
 	public function testTouchMethodUpdatesRelatedTimestamps()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
