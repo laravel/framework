@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Encryption;
 
+use LengthException;
 use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Core\Util\SecureRandom;
 
@@ -11,6 +12,13 @@ class Encrypter {
 	 * @var string
 	 */
 	protected $key;
+
+	/**
+	 * The key length.
+	 *
+	 * @var int
+	 */
+	protected $keyLen = 32;
 
 	/**
 	 * The algorithm used for encryption.
@@ -41,7 +49,7 @@ class Encrypter {
 	 */
 	public function __construct($key)
 	{
-		$this->key = $key;
+		$this->setKey($key);
 	}
 
 	/**
@@ -263,9 +271,15 @@ class Encrypter {
 	 *
 	 * @param  string  $key
 	 * @return void
+	 *
+	 * @throws \LengthException
 	 */
 	public function setKey($key)
 	{
+		if (version_compare(PHP_VERSION, '5.6') === 1 && strlen($key) !== $this->keyLen) {
+			throw new LengthException("Key must be {$this->keyLen} bytes in length.");
+		}
+
 		$this->key = $key;
 	}
 
