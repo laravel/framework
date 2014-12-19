@@ -487,6 +487,38 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasNestedWithConstraints()
+	{
+		$model = new EloquentBuilderTestModelParentStub;
+
+		$builder = $model->whereHas('foo', function ($q) {
+			$q->whereHas('bar', function ($q) {
+				$q->where('baz', 'bam');
+			});
+		})->toSql();
+
+		$result = $model->whereHas('foo.bar', function ($q) {
+			$q->where('baz', 'bam');
+		})->toSql();
+
+		$this->assertEquals($builder, $result);
+	}
+
+	
+	public function testHasNested()
+	{
+		$model = new EloquentBuilderTestModelParentStub;
+
+		$builder = $model->whereHas('foo', function ($q) {
+			$q->has('bar');
+		});
+
+		$result = $model->has('foo.bar')->toSql();
+
+		$this->assertEquals($builder->toSql(), $result);
+	}
+
+
 	protected function mockConnectionForModel($model, $database)
 	{
 		$grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -556,3 +588,19 @@ class EloquentBuilderTestListsStub {
 		return 'foo_' . $this->attributes[$key];
 	}
 }
+
+class EloquentBuilderTestModelParentStub extends Illuminate\Database\Eloquent\Model {
+	public function foo()
+	{
+		return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub');
+	}
+}
+
+class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloquent\Model {
+	public function bar()
+	{
+		return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
+	}
+}
+
+class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model {}
