@@ -1014,6 +1014,7 @@ class Builder {
 	/**
 	 * Add a "group by" clause to the query.
 	 *
+	 * @param  array|string  $column,...
 	 * @return $this
 	 */
 	public function groupBy()
