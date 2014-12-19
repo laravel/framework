@@ -209,7 +209,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function setPhpSpecNamespace()
 	{
-		if ($this->files->has($path = $this->getPhpSpecConfigPath()))
+		if ($this->files->exists($path = $this->getPhpSpecConfigPath()))
 		{
 			$this->replaceIn($path, $this->currentRoot, $this->argument('name'));
 		}
