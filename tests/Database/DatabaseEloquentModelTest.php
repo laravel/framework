@@ -872,6 +872,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testAppendingOfAttributes()
 	{
 		$model = new EloquentModelAppendsStub;
+
+		$this->assertTrue(isset($model->is_admin));
+		$this->assertTrue(isset($model->camelCased));
+		$this->assertTrue(isset($model->StudlyCased));
+
 		$this->assertEquals('admin', $model->is_admin);
 		$this->assertEquals('camelCased', $model->camelCased);
 		$this->assertEquals('StudlyCased', $model->StudlyCased);
