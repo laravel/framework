@@ -47,6 +47,21 @@ class Arr {
 	}
 
 	/**
+	 * Check if the value is in the blacklist.
+	 *
+	 * If so return default, otherwise return value.
+	 *
+	 * @param  string  $value
+	 * @param  array   $blacklist
+	 * @param  mixed   $default
+	 * @return string
+	 */
+	public static function blacklist($value, $blacklist, $default = null)
+	{
+		return in_array($value, $blacklist) ? $default : $value;
+	}
+
+	/**
 	 * Divide an array into two arrays. One with keys and the other with values.
 	 *
 	 * @param  array  $array
@@ -381,6 +396,21 @@ class Arr {
 		}
 
 		return $filtered;
+	}
+
+	/**
+	 * Check if the value is in the whitelist.
+	 *
+	 * If so return value, otherwise return default.
+	 *
+	 * @param  string  $value
+	 * @param  array   $whitelist
+	 * @param  mixed   $default
+	 * @return string
+	 */
+	public static function whitelist($value, $whitelist, $default = null)
+	{
+		return in_array($value, $whitelist) ? $value : $default;
 	}
 
 }
