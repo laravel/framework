@@ -3116,7 +3116,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function __isset($key)
 	{
 		return ((isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-				($method = $this->getMutatorMethod($key) && ! is_null($this->getMutatedAttributeValue($key, $method))));
+				(($method = $this->getMutatorMethod($key)) && ! is_null($this->getMutatedAttributeValue($key, $method))));
 	}
 
 	/**
