@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Cache;
 
+
+use Closure;
 use Illuminate\Support\Manager;
 
 class CacheManager extends Manager {
