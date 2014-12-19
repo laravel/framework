@@ -60,6 +60,24 @@ if ( ! function_exists('array_build'))
 	}
 }
 
+if ( ! function_exists('array_blacklist'))
+{
+	/**
+	 * Check if the value is in the blacklist.
+	 *
+	 * If so return default, otherwise return value.
+	 *
+	 * @param  string 	$value
+	 * @param  array  	$blacklist
+	 * @param  mixed    $default
+	 * @return string
+	 */
+	function array_blacklist($value, $blacklist, $default = null)
+	{
+		return Arr::blacklist($value, $blacklist, $default);
+	}
+}
+
 if ( ! function_exists('array_divide'))
 {
 	/**
@@ -303,6 +321,24 @@ if ( ! function_exists('array_where'))
 	function array_where($array, Closure $callback)
 	{
 		return Arr::where($array, $callback);
+	}
+}
+
+if ( ! function_exists('array_whitelist'))
+{
+	/**
+	 * Check if the value is in the whitelist.
+	 *
+	 * If so return value, otherwise return default.
+	 *
+	 * @param  string 	$value
+	 * @param  array  	$whitelist
+	 * @param  mixed    $default
+	 * @return string
+	 */
+	function array_whitelist($value, $whitelist, $default = null)
+	{
+		return Arr::whitelist($value, $whitelist, $default);
 	}
 }
 

@@ -11,6 +11,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayBlacklist()
+	{
+		$this->assertNull(array_blacklist('foo', ['foo', 'bar', 'baz']));
+		$this->assertEquals('default', array_blacklist('foo', ['foo', 'bar', 'baz'], 'default'));
+		$this->assertEquals('foo', array_blacklist('foo', ['bar', 'baz']));
+	}
+
+
 	public function testArrayDot()
 	{
 		$array = array_dot(array('name' => 'taylor', 'languages' => array('php' => true)));
@@ -42,6 +50,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$array = array();
 		array_set($array, 'names.developer', 'taylor');
 		$this->assertEquals('taylor', $array['names']['developer']);
+	}
+
+
+	public function testArrayWhitelist()
+	{
+		$this->assertEquals('foo', array_whitelist('foo', ['foo', 'bar', 'baz']));
+		$this->assertEquals('default', array_whitelist('foo', ['bar', 'baz'], 'default'));
+		$this->assertNull(array_whitelist('foo', ['bar', 'baz']));
 	}
 
 
