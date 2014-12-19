@@ -277,8 +277,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function implode($value, $glue = null)
 	{
-		if (is_null($glue)) return implode($this->lists($value));
-
 		return implode($glue, $this->lists($value));
 	}
 

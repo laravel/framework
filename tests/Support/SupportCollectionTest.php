@@ -270,6 +270,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$data = new Collection(array(array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
 		$this->assertEquals('foobar', $data->implode('email'));
+		$this->assertEquals('foobar', $data->implode('email', ''));
+		$this->assertEquals('foobar', $data->implode('email', null));
 		$this->assertEquals('foo,bar', $data->implode('email', ','));
 	}
 
