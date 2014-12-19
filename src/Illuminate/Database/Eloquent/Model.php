@@ -2671,7 +2671,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// can return back the finally formatted DateTime instances to the devs.
 		else
 		{
-			$value = Carbon::createFromFormat($format, $value);
+			$parsed = date_parse_from_format($format, $value);
+			$errors = ( $parsed['error_count'] === 0 || $parsed['warning_count'] === 0);
+
+			if (!$errors)
+				throw new \Exception("Format of date could not be detected: ". $value);
+			else
+				$value = Carbon::createFromFormat($format, $value);
 		}
 
 		return $value->format($format);
