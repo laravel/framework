@@ -30,7 +30,7 @@ interface Filesystem {
 	 * @param  string  $path
 	 * @return string
 	 *
-	 * @throws FileNotFoundException
+	 * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
 	 */
 	public function get($path);
 
