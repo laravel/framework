@@ -134,7 +134,7 @@ class AppNameCommand extends Command {
 		$search = [
 			$this->currentRoot.'\\Http',
 			$this->currentRoot.'\\Console',
-			$this->currentRoot.'\\Exception',
+			$this->currentRoot.'\\Exceptions',
 		];
 
 		$replace = [
