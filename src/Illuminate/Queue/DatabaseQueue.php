@@ -126,7 +126,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 			'reserved' => 0,
 			'reserved_at' => null,
 			'available_at' => $availableAt->getTimestamp(),
-			'created_at' => time(),
+			'created_at' => $this->getTime(),
 		]);
 	}
 
@@ -190,7 +190,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 					->lockForUpdate()
 					->where('queue', $this->getQueue($queue))
 					->where('reserved', 0)
-					->where('available_at', '<=', time())
+					->where('available_at', '<=', $this->getTime())
 					->orderBy('id', 'asc')
 					->first();
 	}
@@ -204,7 +204,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 	protected function markJobAsReserved($id)
 	{
 		$this->database->table($this->table)->where('id', $id)->update([
-			'reserved' => 1, 'reserved_at' => time(),
+			'reserved' => 1, 'reserved_at' => $this->getTime(),
 		]);
 
 		$this->database->commit();
