@@ -270,11 +270,13 @@ class Encrypter {
 	 *
 	 * @param  string  $key
 	 * @return void
+	 *
+	 * @throws \LengthException
 	 */
 	public function setKey($key)
 	{
 		if (strlen($key) !== $this->keyLen) {
-			throw new DecryptException('Key must be 32 bytes in length. Use php artisan key:generate');
+			throw new \LengthException('Key must be 32 bytes in length. Use php artisan key:generate');
 		}
 
 		$this->key = $key;
