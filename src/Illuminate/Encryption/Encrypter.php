@@ -277,7 +277,7 @@ class Encrypter {
             throw new DecryptException('Key must be 32 bytes in length. Use php artisan key:generate');
         }
 
-		$this->key = $key;
+        $this->key = $key;
 	}
 
 	/**
