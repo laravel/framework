@@ -12,12 +12,12 @@ class Encrypter {
 	 */
 	protected $key;
 
-    /**
-     * The key length.
-     *
-     * @var int
-     */
-    protected $keyLen = 32;
+	/**
+	 * The key length.
+	 *
+	 * @var int
+	 */
+	protected $keyLen = 32;
 
 	/**
 	 * The algorithm used for encryption.
@@ -273,11 +273,11 @@ class Encrypter {
 	 */
 	public function setKey($key)
 	{
-        if ($this->keyLen !== strlen($key)) {
-            throw new DecryptException('Key must be 32 bytes in length. Use php artisan key:generate');
-        }
+		if (strlen($key) !== $this->keyLen) {
+			throw new DecryptException('Key must be 32 bytes in length. Use php artisan key:generate');
+		}
 
-        $this->key = $key;
+		$this->key = $key;
 	}
 
 	/**
