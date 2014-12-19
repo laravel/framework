@@ -50,7 +50,7 @@ class Builder {
 
 		$table = $this->connection->getTablePrefix().$table;
 		
-		$database	= $this->connection->getDatabaseName();
+		$database = $this->connection->getDatabaseName();
 
 		return count($this->connection->select($sql, array($database, $table))) > 0;
 	}
@@ -79,9 +79,9 @@ class Builder {
 	{
 		$table = $this->connection->getTablePrefix().$table;
 		
-		$database	= $this->connection->getDatabaseName();
+		$database = $this->connection->getDatabaseName();
 
-		$results = $this->connection->select($this->grammar->compileColumnExists(),Array($database, $table));
+		$results = $this->connection->select($this->grammar->compileColumnExists(), array($database, $table));
 
 		return $this->connection->getPostProcessor()->processColumnListing($results);
 	}
