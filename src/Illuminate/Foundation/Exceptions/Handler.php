@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
+use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
@@ -57,7 +58,7 @@ class Handler implements ExceptionHandlerContract {
 	 * @param  \Exception  $e
 	 * @return \Illuminate\Http\Response
 	 */
-	public function render($request, Exception $e)
+	public function render(Request $request, Exception $e)
 	{
 		return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
 	}

@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Contracts\Debug;
 
 use Exception;
+use Illuminate\Http\Request;
 
 interface ExceptionHandler {
 
@@ -19,7 +20,7 @@ interface ExceptionHandler {
 	 * @param  \Exception  $e
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function render($request, Exception $e);
+	public function render(Request $request, Exception $e);
 
 	/**
 	 * Render an exception to the console.
