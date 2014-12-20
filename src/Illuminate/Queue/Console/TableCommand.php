@@ -3,21 +3,21 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class FailedTableCommand extends Command {
+class TableCommand extends Command {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'queue:failed-table';
+	protected $name = 'queue:table';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a migration for the failed queue jobs database table';
+	protected $description = 'Create a migration for the queue jobs database table';
 
 	/**
 	 * The filesystem instance.
@@ -27,7 +27,7 @@ class FailedTableCommand extends Command {
 	protected $files;
 
 	/**
-	 * Create a new failed queue jobs table command instance.
+	 * Create a new queue job table command instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
@@ -48,7 +48,7 @@ class FailedTableCommand extends Command {
 	{
 		$fullPath = $this->createBaseMigration();
 
-		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/failed_jobs.stub'));
+		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/jobs.stub'));
 
 		$this->info('Migration created successfully!');
 	}
@@ -60,7 +60,7 @@ class FailedTableCommand extends Command {
 	 */
 	protected function createBaseMigration()
 	{
-		$name = 'create_failed_jobs_table';
+		$name = 'create_jobs_table';
 
 		$path = $this->laravel['path.database'].'/migrations';
 
