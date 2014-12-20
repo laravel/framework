@@ -196,9 +196,7 @@ class Store implements SessionInterface {
 	{
 		$this->attributes = array();
 
-		$this->migrate();
-
-		return true;
+		return $this->migrate();
 	}
 
 	/**
@@ -210,7 +208,9 @@ class Store implements SessionInterface {
 
 		$this->setExists(false);
 
-		$this->id = $this->generateSessionId(); return true;
+		$this->id = $this->generateSessionId();
+
+		return true;
 	}
 
 	/**
