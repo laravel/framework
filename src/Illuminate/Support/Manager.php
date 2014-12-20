@@ -76,7 +76,7 @@ abstract class Manager {
 	{
 		$methods = [
 			'create'.ucfirst($driver).'Driver',
-			'create'.snake_case($driver).'Driver'
+			'create'.studly_case($driver).'Driver'
 		];
 
 		// We'll check to see if a creator method exists for the given driver. If not we
