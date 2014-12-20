@@ -83,7 +83,7 @@ class MethodEndpoint implements EndpointInterface {
 	/**
 	 * Get the middleware for the path.
 	 *
-	 * @param  AbstractPath  $path
+	 * @param  \Illuminate\Routing\Annotations\AbstractPath  $path
 	 * @return array
 	 */
 	protected function getMiddleware(AbstractPath $path)
@@ -98,7 +98,7 @@ class MethodEndpoint implements EndpointInterface {
 	/**
 	 * Get the class middleware for the given path.
 	 *
-	 * @param  AbstractPath  $path
+	 * @param  \Illuminate\Routing\Annotations\AbstractPath  $path
 	 * @return array
 	 */
 	protected function getClassMiddlewareForPath(AbstractPath $path)

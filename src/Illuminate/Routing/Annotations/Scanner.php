@@ -10,14 +10,14 @@ class Scanner {
 	/**
 	 * The path to scan for annotations.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $scan;
 
 	/**
 	 * Create a new scanner instance.
 	 *
-	 * @param  string  $scan
+	 * @param  array  $scan
 	 * @return void
 	 */
 	public function __construct(array $scan)
@@ -61,8 +61,8 @@ class Scanner {
 	/**
 	 * Scan the directory and generate the route manifest.
 	 *
-	 * @param  SimpleAnnotationReader  $reader
-	 * @return EndpointCollection
+	 * @param  \Doctrine\Common\Annotations\SimpleAnnotationReader  $reader
+	 * @return \Illuminate\Routing\Annotations\EndpointCollection
 	 */
 	protected function getEndpointsInClasses(SimpleAnnotationReader $reader)
 	{
@@ -81,9 +81,9 @@ class Scanner {
 	/**
 	 * Build the Endpoints for the given class.
 	 *
-	 * @param  string  $class
-	 * @param  AnnotationSet  $annotations
-	 * @return EndpointCollection
+	 * @param  \ReflectionClass  $class
+	 * @param  \Illuminate\Routing\Annotations\AnnotationSet  $annotations
+	 * @return \Illuminate\Routing\Annotations\EndpointCollection
 	 */
 	protected function getEndpointsInClass(ReflectionClass $class, AnnotationSet $annotations)
 	{
@@ -101,8 +101,8 @@ class Scanner {
 	/**
 	 * Create a new endpoint in the collection.
 	 *
-	 * @param  EndpointCollection  $endpoints
-	 * @param  ReflectionClass  $class
+	 * @param  \Illuminate\Routing\Annotations\EndpointCollection  $endpoints
+	 * @param  \ReflectionClass  $class
 	 * @param  string  $method
 	 * @param  array  $annotations
 	 * @return void
