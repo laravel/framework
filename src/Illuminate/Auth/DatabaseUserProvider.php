@@ -52,10 +52,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	{
 		$user = $this->conn->table($this->table)->find($identifier);
 
-		if ( ! is_null($user))
-		{
-			return new GenericUser((array) $user);
-		}
+		return $this->getGenericUser($user);
 	}
 
 	/**
@@ -72,10 +69,7 @@ class DatabaseUserProvider implements UserProviderInterface {
                                 ->where('remember_token', $token)
                                 ->first();
 
-		if ( ! is_null($user))
-		{
-			return new GenericUser((array) $user);
-		}
+		return $this->getGenericUser($user);
 	}
 
 	/**
@@ -118,7 +112,18 @@ class DatabaseUserProvider implements UserProviderInterface {
 		// that there are no matching users for these given credential arrays.
 		$user = $query->first();
 
-		if ( ! is_null($user))
+		return $this->getGenericUser($user);
+	}
+
+	/**
+	 * Get the generic user.
+	 *
+	 * @param  mixed  $user
+	 * @return \Illuminate\Auth\GenericUser|null
+	 */
+	protected function getGenericUser($user)
+	{
+		if ($user !== null)
 		{
 			return new GenericUser((array) $user);
 		}
