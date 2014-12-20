@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Support\SerializableClosure as S;
+use SuperClosure\SerializableClosure;
 
 class SupportSerializableClosureTest extends PHPUnit_Framework_TestCase {
 
 	public function testClosureCanBeSerializedAndRebuilt()
 	{
-		$f = new S(function() { return 'hello'; });
+		$f = new SerializableClosure(function() { return 'hello'; });
 		$serialized = serialize($f);
 		$unserialized = unserialize($serialized);
 
@@ -19,7 +19,7 @@ class SupportSerializableClosureTest extends PHPUnit_Framework_TestCase {
 	{
 		$a = 1;
 		$b = 1;
-		$f = new S(function($i) use ($a, $b)
+		$f = new SerializableClosure(function($i) use ($a, $b)
 		{
 			return $a + $b + $i;
 		});
@@ -35,7 +35,7 @@ class SupportSerializableClosureTest extends PHPUnit_Framework_TestCase {
 	{
 		$a = 1;
 		$b = 2;
-		$f = new S(function($i) use ($a, $b)
+		$f = new SerializableClosure(function($i) use ($a, $b)
 		{
 			return $a + $b + $i;
 		});
