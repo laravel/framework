@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Console;
 
+use RuntimeException;
+
 trait AppNamespaceDetectorTrait {
 
 	/**
@@ -21,7 +23,7 @@ trait AppNamespaceDetectorTrait {
 			}
 		}
 
-		throw new \RuntimeException("Unable to detect application namespace.");
+		throw new RuntimeException("Unable to detect application namespace.");
 	}
 
 }

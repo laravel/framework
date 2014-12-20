@@ -6,6 +6,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
+use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container implements ArrayAccess, ContainerContract {
@@ -613,7 +614,7 @@ class Container implements ArrayAccess, ContainerContract {
 
 		if (is_null($method))
 		{
-			throw new \InvalidArgumentException("Method not provided.");
+			throw new InvalidArgumentException("Method not provided.");
 		}
 
 		return $this->call([$this->make($segments[0]), $method], $parameters);

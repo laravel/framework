@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Cache;
 
 use Memcached;
+use RuntimeException;
 
 class MemcachedConnector {
 
@@ -28,7 +29,7 @@ class MemcachedConnector {
 
 		if ($memcached->getVersion() === false)
 		{
-			throw new \RuntimeException("Could not establish Memcached connection.");
+			throw new RuntimeException("Could not establish Memcached connection.");
 		}
 
 		return $memcached;

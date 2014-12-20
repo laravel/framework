@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Session;
 
 use SessionHandlerInterface;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
@@ -526,7 +527,7 @@ class Store implements SessionInterface {
 	{
 		return array_get($this->bags, $name, function()
 		{
-			throw new \InvalidArgumentException("Bag not registered.");
+			throw new InvalidArgumentException("Bag not registered.");
 		});
 	}
 
