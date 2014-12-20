@@ -19,7 +19,7 @@ interface EndpointInterface {
 	/**
 	 * Get all of the path definitions for an endpoint.
 	 *
-	 * @return array[\Illuminate\Routing\Annotations\AbstractPath]
+	 * @return array
 	 */
 	public function getPaths();
 
