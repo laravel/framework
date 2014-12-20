@@ -455,10 +455,7 @@ class Store implements SessionInterface {
 	 */
 	public function replace(array $attributes)
 	{
-		foreach ($attributes as $key => $value)
-		{
-			$this->put($key, $value);
-		}
+		$this->put($attributes);
 	}
 
 	/**
