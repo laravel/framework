@@ -158,7 +158,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 	/**
 	 * Release the jobs that have been reserved for too long.
 	 *
-	 * @param  string  $quuee
+	 * @param  string  $queue
 	 * @return void
 	 */
 	protected function releaseJobsThatHaveBeenReservedTooLong($queue)
