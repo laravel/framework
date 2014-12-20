@@ -1,13 +1,14 @@
 <?php namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\RetryCommand;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Console\FlushFailedCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand;
 
-class FailConsoleServiceProvider extends ServiceProvider {
+class ConsoleServiceProvider extends ServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -23,6 +24,11 @@ class FailConsoleServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->app->singleton('command.queue.table', function($app)
+		{
+			return new TableCommand($app['files']);
+		});
+
 		$this->app->singleton('command.queue.failed', function()
 		{
 			return new ListFailedCommand;
@@ -49,8 +55,8 @@ class FailConsoleServiceProvider extends ServiceProvider {
 		});
 
 		$this->commands(
-			'command.queue.failed', 'command.queue.retry', 'command.queue.forget',
-			'command.queue.flush', 'command.queue.failed-table'
+			'command.queue.table', 'command.queue.failed', 'command.queue.retry',
+			'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table'
 		);
 	}
 
@@ -62,7 +68,8 @@ class FailConsoleServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return array(
-			'command.queue.failed', 'command.queue.retry', 'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
+			'command.queue.table', 'command.queue.failed', 'command.queue.retry',
+			'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
 		);
 	}
 
