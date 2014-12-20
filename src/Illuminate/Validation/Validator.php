@@ -2,7 +2,11 @@
 
 use Closure;
 use DateTime;
+use Countable;
 use DateTimeZone;
+use RuntimeException;
+use BadMethodCallException;
+use InvalidArgumentException;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
@@ -256,7 +260,7 @@ class Validator implements ValidatorContract {
 		{
 			if ($this->hasRule($attribute, 'Array')) return;
 
-			throw new \InvalidArgumentException('Attribute for each() must be an array.');
+			throw new InvalidArgumentException('Attribute for each() must be an array.');
 		}
 
 		foreach ($data as $dataKey => $dataValue)
@@ -528,7 +532,7 @@ class Validator implements ValidatorContract {
 		{
 			return false;
 		}
-		elseif ((is_array($value) || $value instanceof \Countable) && count($value) < 1)
+		elseif ((is_array($value) || $value instanceof Countable) && count($value) < 1)
 		{
 			return false;
 		}
@@ -2288,7 +2292,7 @@ class Validator implements ValidatorContract {
 	{
 		if ( ! isset($this->presenceVerifier))
 		{
-			throw new \RuntimeException("Presence verifier has not been set.");
+			throw new RuntimeException("Presence verifier has not been set.");
 		}
 
 		return $this->presenceVerifier;
@@ -2555,7 +2559,7 @@ class Validator implements ValidatorContract {
 	{
 		if (count($parameters) < $count)
 		{
-			throw new \InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
+			throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
 		}
 	}
 
@@ -2577,7 +2581,7 @@ class Validator implements ValidatorContract {
 			return $this->callExtension($rule, $parameters);
 		}
 
-		throw new \BadMethodCallException("Method [$method] does not exist.");
+		throw new BadMethodCallException("Method [$method] does not exist.");
 	}
 
 }

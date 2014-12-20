@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Database\Query;
 
 use Closure;
+use BadMethodCallException;
+use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\ConnectionInterface;
@@ -260,7 +262,7 @@ class Builder {
 		}
 		else
 		{
-			throw new \InvalidArgumentException;
+			throw new InvalidArgumentException;
 		}
 
 		return $this->selectRaw('('.$query.') as '.$this->grammar->wrap($as), $bindings);
@@ -451,7 +453,7 @@ class Builder {
 		}
 		elseif ($this->invalidOperatorAndValue($operator, $value))
 		{
-			throw new \InvalidArgumentException("Value must be provided.");
+			throw new InvalidArgumentException("Value must be provided.");
 		}
 
 		// If the columns is actually a Closure instance, we will assume the developer
@@ -1878,7 +1880,7 @@ class Builder {
 	{
 		if ( ! array_key_exists($type, $this->bindings))
 		{
-			throw new \InvalidArgumentException("Invalid binding type: {$type}.");
+			throw new InvalidArgumentException("Invalid binding type: {$type}.");
 		}
 
 		$this->bindings[$type] = $bindings;
@@ -1899,7 +1901,7 @@ class Builder {
 	{
 		if ( ! array_key_exists($type, $this->bindings))
 		{
-			throw new \InvalidArgumentException("Invalid binding type: {$type}.");
+			throw new InvalidArgumentException("Invalid binding type: {$type}.");
 		}
 
 		if (is_array($value))
@@ -1987,7 +1989,7 @@ class Builder {
 
 		$className = get_class($this);
 
-		throw new \BadMethodCallException("Call to undefined method {$className}::{$method}()");
+		throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
 	}
 
 }

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Http;
 
+use BadMethodCallException;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -198,7 +199,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
 		}
 
-		throw new \BadMethodCallException("Method [$method] does not exist on Redirect.");
+		throw new BadMethodCallException("Method [$method] does not exist on Redirect.");
 	}
 
 }

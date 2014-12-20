@@ -1,5 +1,6 @@
 <?php namespace Illuminate\View;
 
+use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
 
 class FileViewFinder implements ViewFinderInterface {
@@ -103,12 +104,12 @@ class FileViewFinder implements ViewFinderInterface {
 
 		if (count($segments) != 2)
 		{
-			throw new \InvalidArgumentException("View [$name] has an invalid name.");
+			throw new InvalidArgumentException("View [$name] has an invalid name.");
 		}
 
 		if ( ! isset($this->hints[$segments[0]]))
 		{
-			throw new \InvalidArgumentException("No hint path defined for [{$segments[0]}].");
+			throw new InvalidArgumentException("No hint path defined for [{$segments[0]}].");
 		}
 
 		return $segments;
@@ -136,7 +137,7 @@ class FileViewFinder implements ViewFinderInterface {
 			}
 		}
 
-		throw new \InvalidArgumentException("View [$name] not found.");
+		throw new InvalidArgumentException("View [$name] not found.");
 	}
 
 	/**

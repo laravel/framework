@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Log;
 
 use Closure;
+use RuntimeException;
+use InvalidArgumentException;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
@@ -270,7 +272,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	{
 		if ( ! isset($this->dispatcher))
 		{
-			throw new \RuntimeException("Events dispatcher has not been set.");
+			throw new RuntimeException("Events dispatcher has not been set.");
 		}
 
 		$this->dispatcher->listen('illuminate.log', $callback);
@@ -334,7 +336,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 			return $this->levels[$level];
 		}
 
-		throw new \InvalidArgumentException("Invalid log level.");
+		throw new InvalidArgumentException("Invalid log level.");
 	}
 
 	/**
