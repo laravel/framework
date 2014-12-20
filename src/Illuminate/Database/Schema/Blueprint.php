@@ -272,11 +272,12 @@ class Blueprint {
 	/**
 	* Indicate that the soft delete column should be dropped.
 	*
+	* @param  string  $column
 	* @return void
 	*/
-	public function dropSoftDeletes()
+	public function dropSoftDeletes($column = 'deleted_at')
 	{
-		$this->dropColumn('deleted_at');
+		$this->dropColumn($column);
 	}
 
 	/**
@@ -639,11 +640,12 @@ class Blueprint {
 	/**
 	 * Add a "deleted at" timestamp for the table.
 	 *
+	 * @param  string  $column
 	 * @return \Illuminate\Support\Fluent
 	 */
-	public function softDeletes()
+	public function softDeletes($column = 'deleted_at')
 	{
-		return $this->timestamp('deleted_at')->nullable();
+		return $this->timestamp($column)->nullable();
 	}
 
 	/**
