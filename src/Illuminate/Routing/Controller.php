@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
+use BadMethodCallException;
+use InvalidArgumentException;
 
 abstract class Controller {
 
@@ -137,7 +139,7 @@ abstract class Controller {
 		{
 			if (method_exists($this, substr($filter, 1))) return true;
 
-			throw new \InvalidArgumentException("Filter method [$filter] does not exist.");
+			throw new InvalidArgumentException("Filter method [$filter] does not exist.");
 		}
 
 		return false;
@@ -254,7 +256,7 @@ abstract class Controller {
 	 */
 	public function __call($method, $parameters)
 	{
-		throw new \BadMethodCallException("Method [$method] does not exist.");
+		throw new BadMethodCallException("Method [$method] does not exist.");
 	}
 
 }

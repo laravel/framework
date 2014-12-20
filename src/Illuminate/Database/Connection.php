@@ -3,6 +3,8 @@
 use PDO;
 use Closure;
 use DateTime;
+use LogicException;
+use RuntimeException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
@@ -674,7 +676,7 @@ class Connection implements ConnectionInterface {
 			return call_user_func($this->reconnector, $this);
 		}
 
-		throw new \LogicException("Lost connection and no reconnector available.");
+		throw new LogicException("Lost connection and no reconnector available.");
 	}
 
 	/**
@@ -818,7 +820,7 @@ class Connection implements ConnectionInterface {
 	public function setPdo($pdo)
 	{
 		if ($this->transactions >= 1)
-			throw new \RuntimeException("Can't swap PDO instance while within transaction.");
+			throw new RuntimeException("Can't swap PDO instance while within transaction.");
 
 		$this->pdo = $pdo;
 

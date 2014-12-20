@@ -1,6 +1,7 @@
 <?php namespace Illuminate\View;
 
 use Closure;
+use InvalidArgumentException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -294,7 +295,7 @@ class Factory implements FactoryContract {
 	{
 		if ( ! $extension = $this->getExtension($path))
 		{
-			throw new \InvalidArgumentException("Unrecognized extension in file: $path");
+			throw new InvalidArgumentException("Unrecognized extension in file: $path");
 		}
 
 		$engine = $this->extensions[$extension];

@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Queue;
 
 use Closure;
+use InvalidArgumentException;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 
@@ -128,7 +129,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 			return call_user_func($this->connectors[$driver]);
 		}
 
-		throw new \InvalidArgumentException("No connector for [$driver]");
+		throw new InvalidArgumentException("No connector for [$driver]");
 	}
 
 	/**

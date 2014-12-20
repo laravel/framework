@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseManager implements ConnectionResolverInterface {
@@ -242,7 +243,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 
 		if (is_null($config = array_get($connections, $name)))
 		{
-			throw new \InvalidArgumentException("Database [$name] not configured.");
+			throw new InvalidArgumentException("Database [$name] not configured.");
 		}
 
 		return $config;

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Filesystem;
 
+use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
@@ -306,7 +307,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 				return AdapterInterface::VISIBILITY_PRIVATE;
 		}
 
-		throw new \InvalidArgumentException('Unknown visibility: '.$visibility);
+		throw new InvalidArgumentException('Unknown visibility: '.$visibility);
 	}
 
 }

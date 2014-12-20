@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Cache;
 
 use Closure;
+use InvalidArgumentException;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 
 class CacheManager implements FactoryContract {
@@ -84,7 +85,7 @@ class CacheManager implements FactoryContract {
 
 		if (is_null($config))
 		{
-			throw new \InvalidArgumentException("Cache store [{$name}] is not defined.");
+			throw new InvalidArgumentException("Cache store [{$name}] is not defined.");
 		}
 
 		if (isset($this->customCreators[$config['driver']]))
