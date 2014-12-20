@@ -157,8 +157,8 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		mkdir(__DIR__.'/bar');
 		$files = new Filesystem;
 		$directories = $files->directories(__DIR__);
-		$this->assertContains(__DIR__.'/foo',$directories);
-		$this->assertContains(__DIR__.'/bar',$directories);
+		$this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'foo',$directories);
+		$this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'bar',$directories);
 		@rmdir(__DIR__.'/foo');
 		@rmdir(__DIR__.'/bar');
 	}
