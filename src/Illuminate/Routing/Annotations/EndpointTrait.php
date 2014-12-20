@@ -48,7 +48,7 @@ trait EndpointTrait {
 	/**
 	 * Implode the given list into a comma separated string.
 	 *
-	 * @param  array  $list
+	 * @param  array  $array
 	 * @return string
 	 */
 	protected function implodeArray(array $array)
