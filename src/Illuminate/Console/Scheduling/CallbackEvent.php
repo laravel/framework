@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Console\Scheduling;
 
+use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
 
 class CallbackEvent extends Event {
@@ -32,7 +33,7 @@ class CallbackEvent extends Event {
 
 		if ( ! is_string($this->callback) && ! is_callable($this->callback))
 		{
-			throw new \InvalidArgumentException(
+			throw new InvalidArgumentException(
 				"Invalid scheduled callback event. Must be string or callable."
 			);
 		}

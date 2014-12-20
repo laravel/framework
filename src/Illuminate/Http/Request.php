@@ -2,6 +2,7 @@
 
 use Closure;
 use SplFileInfo;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -626,7 +627,7 @@ class Request extends SymfonyRequest {
 	{
 		if ( ! $this->hasSession())
 		{
-			throw new \RuntimeException("Session store not set on request.");
+			throw new RuntimeException("Session store not set on request.");
 		}
 
 		return $this->getSession();

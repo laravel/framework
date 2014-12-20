@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use UnexpectedValueException;
 use Illuminate\Auth\UserProviderInterface;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
@@ -236,7 +237,7 @@ class PasswordBroker implements PasswordBrokerContract {
 
 		if ($user && ! $user instanceof CanResetPasswordContract)
 		{
-			throw new \UnexpectedValueException("User must implement CanResetPassword interface.");
+			throw new UnexpectedValueException("User must implement CanResetPassword interface.");
 		}
 
 		return $user;

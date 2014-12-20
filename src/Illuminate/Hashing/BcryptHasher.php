@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Hashing;
 
+use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
 class BcryptHasher implements HasherContract {
@@ -28,7 +29,7 @@ class BcryptHasher implements HasherContract {
 
 		if ($hash === false)
 		{
-			throw new \RuntimeException("Bcrypt hashing not supported.");
+			throw new RuntimeException("Bcrypt hashing not supported.");
 		}
 
 		return $hash;

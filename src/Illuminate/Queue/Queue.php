@@ -2,6 +2,7 @@
 
 use Closure;
 use DateTime;
+use RuntimeException;
 use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -23,7 +24,7 @@ abstract class Queue {
 	 */
 	public function marshal()
 	{
-		throw new \RuntimeException("Push queues only supported by Iron.");
+		throw new RuntimeException("Push queues only supported by Iron.");
 	}
 
 	/**

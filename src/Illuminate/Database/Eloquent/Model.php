@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use DateTime;
+use Exception;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
@@ -1158,7 +1159,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		if (is_null($this->primaryKey))
 		{
-			throw new \Exception("No primary key defined on model.");
+			throw new Exception("No primary key defined on model.");
 		}
 
 		if ($this->exists)

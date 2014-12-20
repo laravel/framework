@@ -2,6 +2,7 @@
 
 use Closure;
 use Carbon\Carbon;
+use LogicException;
 use Cron\CronExpression;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
@@ -632,7 +633,7 @@ class Event {
 	{
 		if (is_null($this->output))
 		{
-			throw new \LogicException("Must direct output to a file in order to e-mail results.");
+			throw new LogicException("Must direct output to a file in order to e-mail results.");
 		}
 
 		$this->emailAddresses = is_array($addresses) ? $addresses : func_get_args();

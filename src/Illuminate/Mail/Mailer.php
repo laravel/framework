@@ -4,6 +4,7 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Psr\Log\LoggerInterface;
+use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\SerializableClosure;
@@ -330,7 +331,7 @@ class Mailer implements MailerContract, MailQueueContract {
 			];
 		}
 
-		throw new \InvalidArgumentException("Invalid view.");
+		throw new InvalidArgumentException("Invalid view.");
 	}
 
 	/**
@@ -389,7 +390,7 @@ class Mailer implements MailerContract, MailQueueContract {
 			return $this->container->make($callback)->mail($message);
 		}
 
-		throw new \InvalidArgumentException("Callback is not valid.");
+		throw new InvalidArgumentException("Callback is not valid.");
 	}
 
 	/**

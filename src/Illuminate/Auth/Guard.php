@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Auth;
 
+use RuntimeException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -604,7 +605,7 @@ class Guard implements GuardContract {
 	{
 		if ( ! isset($this->cookie))
 		{
-			throw new \RuntimeException("Cookie jar has not been set.");
+			throw new RuntimeException("Cookie jar has not been set.");
 		}
 
 		return $this->cookie;
