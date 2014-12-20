@@ -13,7 +13,7 @@ trait AppNamespaceDetectorTrait {
 	 */
 	protected function getAppNamespace()
 	{
-		$composer = (array) json_decode(file_get_contents(base_path().'/composer.json', true));
+		$composer = json_decode(file_get_contents(base_path().'/composer.json', true), true);
 
 		foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path)
 		{
