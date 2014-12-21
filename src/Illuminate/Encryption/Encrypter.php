@@ -41,7 +41,7 @@ class Encrypter {
 	 */
 	public function __construct($key)
 	{
-		$this->key = $key;
+		$this->setKey($key);
 	}
 
 	/**
@@ -136,12 +136,12 @@ class Encrypter {
 		// to decrypt the given value. We'll also check the MAC for this encryption.
 		if ( ! $payload || $this->invalidPayload($payload))
 		{
-			throw new DecryptException("Invalid data.");
+			throw new DecryptException('Invalid data.');
 		}
 
 		if ( ! $this->validMac($payload))
 		{
-			throw new DecryptException("MAC is invalid.");
+			throw new DecryptException('MAC is invalid.');
 		}
 
 		return $payload;
@@ -263,9 +263,26 @@ class Encrypter {
 	 *
 	 * @param  string  $key
 	 * @return void
+	 *
+	 * @throws \Illuminate\Encryption\InvalidKeyException
 	 */
 	public function setKey($key)
 	{
+		if ( ! is_string($key))
+		{
+			throw new InvalidKeyException('The encryption key must be a string.');
+		}
+
+		if ($key === '')
+		{
+			throw new InvalidKeyException('The encryption key must be not be empty.');
+		}
+
+		if ($key === 'YourSecretKey!!!')
+		{
+			throw new InvalidKeyException('The encryption key must be a random string.');
+		}
+
 		$this->key = $key;
 	}
 
