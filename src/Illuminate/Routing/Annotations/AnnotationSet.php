@@ -22,8 +22,8 @@ class AnnotationSet {
 	/**
 	 * Create a new annotation set instance.
 	 *
-	 * @param  array  $class
-	 * @param  array  $method
+	 * @param  \ReflectionClass  $class
+	 * @param  \Doctrine\Common\Annotations\SimpleAnnotationReader  $reader
 	 * @return void
 	 */
 	public function __construct(ReflectionClass $class, SimpleAnnotationReader $reader)
