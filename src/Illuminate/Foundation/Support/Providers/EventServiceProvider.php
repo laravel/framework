@@ -70,7 +70,7 @@ class EventServiceProvider extends ServiceProvider {
 
 		$scanner = new Scanner($this->scan);
 
-		file_put_contents(
+		$this->app['files']->put(
 			$this->app->getScannedEventsPath(), '<?php '.$scanner->getEventDefinitions()
 		);
 	}
