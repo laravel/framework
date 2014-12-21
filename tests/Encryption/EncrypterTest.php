@@ -24,6 +24,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @expectedException Illuminate\Encryption\DecryptException
+	 * @expectedExceptionMessage Invalid data.
 	 */
 	public function testExceptionThrownWhenPayloadIsInvalid()
 	{
@@ -31,6 +32,36 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 		$payload = $e->encrypt('foo');
 		$payload = str_shuffle($payload);
 		$e->decrypt($payload);
+	}
+
+
+	/**
+	 * @expectedException Illuminate\Encryption\InvalidKeyException
+	 * @expectedExceptionMessage The encryption key must be a string.
+	 */
+	public function testConstuctWithNonString()
+	{
+		return new Encrypter(123);
+	}
+
+
+	/**
+	 * @expectedException Illuminate\Encryption\InvalidKeyException
+	 * @expectedExceptionMessage The encryption key must be not be empty.
+	 */
+	public function testConstuctWithEmptyString()
+	{
+		return new Encrypter('');
+	}
+
+
+	/**
+	 * @expectedException Illuminate\Encryption\InvalidKeyException
+	 * @expectedExceptionMessage The encryption key must be a random string.
+	 */
+	public function testConstuctWithDefaultString()
+	{
+		return new Encrypter('YourSecretKey!!!');
 	}
 
 
