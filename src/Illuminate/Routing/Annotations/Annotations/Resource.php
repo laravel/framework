@@ -33,7 +33,7 @@ class Resource extends Annotation {
 	/**
 	 * Get all of the middleware defined on the resource method endpoints.
 	 *
-	 * @param  EndpointCollection  $endpoints
+	 * @param  \Illuminate\Routing\Annotations\EndpointCollection  $endpoints
 	 * @return array
 	 */
 	protected function getMiddleware(EndpointCollection $endpoints)
@@ -44,7 +44,7 @@ class Resource extends Annotation {
 	/**
 	 * Extract method items from endpoints for the given key.
 	 *
-	 * @param  EndpointCollection  $endpoints
+	 * @param  \Illuminate\Routing\Annotations\EndpointCollection  $endpoints
 	 * @param  string  $key
 	 * @return array
 	 */
@@ -64,7 +64,7 @@ class Resource extends Annotation {
 	/**
 	 * Get all of the resource method endpoints with pathless filters.
 	 *
-	 * @param  EndpointCollection  $endpoints
+	 * @param  \Illuminate\Routing\Annotations\EndpointCollection  $endpoints
 	 * @param  string  $key
 	 * @return array
 	 */

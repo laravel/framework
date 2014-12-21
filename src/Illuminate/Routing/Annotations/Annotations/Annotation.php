@@ -29,8 +29,8 @@ abstract class Annotation implements ArrayAccess {
 	/**
 	 * Apply the annotation's settings to the given endpoint.
 	 *
-	 * @param  MethodEndpoint  $endpoint
-	 * @param  ReflectionMethod  $method
+	 * @param  \Illuminate\Routing\Annotations\MethodEndpoint  $endpoint
+	 * @param  \ReflectionMethod  $method
 	 * @return void
 	 */
 	public function modify(MethodEndpoint $endpoint, ReflectionMethod $method)
@@ -41,8 +41,8 @@ abstract class Annotation implements ArrayAccess {
 	/**
 	 * Apply the annotation's settings to the given endpoint collection.
 	 *
-	 * @param  EndpointCollection  $endpoints
-	 * @param  ReflectionClass  $class
+	 * @param  \Illuminate\Routing\Annotations\EndpointCollection  $endpoints
+	 * @param  \ReflectionClass  $class
 	 * @return void
 	 */
 	public function modifyCollection(EndpointCollection $endpoints, ReflectionClass $class)
