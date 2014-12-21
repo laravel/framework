@@ -120,7 +120,9 @@ class RouteServiceProvider extends ServiceProvider {
 
 		$scanner = new Scanner($this->scan);
 
-		file_put_contents($this->app->getScannedRoutesPath(), '<?php '.$scanner->getRouteDefinitions());
+		$this->app['files']->put(
+			$this->app->getScannedRoutesPath(), '<?php '.$scanner->getRouteDefinitions()
+		);
 	}
 
 	/**

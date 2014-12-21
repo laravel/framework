@@ -30,7 +30,7 @@ class RouteScanCommand extends Command {
 	 */
 	public function fire()
 	{
-		file_put_contents($this->getOutputPath(), $this->getRouteDefinitions());
+		$this->laravel['files']->put($this->getOutputPath(), $this->getRouteDefinitions());
 
 		$this->info('Routes scanned!');
 	}

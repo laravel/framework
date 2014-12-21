@@ -30,7 +30,7 @@ class EventScanCommand extends Command {
 	 */
 	public function fire()
 	{
-		file_put_contents($this->getOutputPath(), $this->getEventDefinitions());
+		$this->laravel['files']->put($this->getOutputPath(), $this->getEventDefinitions());
 
 		$this->info('Events scanned!');
 	}
