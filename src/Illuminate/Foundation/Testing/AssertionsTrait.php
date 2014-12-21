@@ -6,28 +6,26 @@ use PHPUnit_Framework_Assert as PHPUnit;
 trait AssertionsTrait {
 
 	/**
-	 * Assert that the client response has an OK status code.
+	 * Assert the response has an OK status code.
 	 *
 	 * @return void
 	 */
-	public function assertResponseOk()
+	public function assertResponseOk($response)
 	{
-		$response = $this->client->getResponse();
-
 		$actual = $response->getStatusCode();
 
 		return PHPUnit::assertTrue($response->isOk(), 'Expected status code 200, got ' .$actual);
 	}
 
 	/**
-	 * Assert that the client response has a given code.
+	 * Assert the response has a given code.
 	 *
 	 * @param  int  $code
 	 * @return void
 	 */
-	public function assertResponseStatus($code)
+	public function assertResponseStatus($response, $code)
 	{
-		return PHPUnit::assertEquals($code, $this->client->getResponse()->getStatusCode());
+		return PHPUnit::assertEquals($code, $response->getStatusCode());
 	}
 
 	/**
@@ -37,11 +35,9 @@ trait AssertionsTrait {
 	 * @param  mixed  $value
 	 * @return void
 	 */
-	public function assertViewHas($key, $value = null)
+	public function assertViewHas($response, $key, $value = null)
 	{
 		if (is_array($key)) return $this->assertViewHasAll($key);
-
-		$response = $this->client->getResponse();
 
 		if ( ! isset($response->original) || ! $response->original instanceof View)
 		{
@@ -85,9 +81,8 @@ trait AssertionsTrait {
 	 * @param  string  $key
 	 * @return void
 	 */
-	public function assertViewMissing($key)
+	public function assertViewMissing($response, $key)
 	{
-		$response = $this->client->getResponse();
 
 		if ( ! isset($response->original) || ! $response->original instanceof View)
 		{
@@ -104,9 +99,8 @@ trait AssertionsTrait {
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedTo($uri, $with = array())
+	public function assertRedirectedTo($response, $uri, $with = array())
 	{
-		$response = $this->client->getResponse();
 
 		PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
 
