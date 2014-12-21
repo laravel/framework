@@ -83,7 +83,6 @@ trait AssertionsTrait {
 	 */
 	public function assertViewMissing($response, $key)
 	{
-
 		if ( ! isset($response->original) || ! $response->original instanceof View)
 		{
 			return PHPUnit::assertTrue(false, 'The response was not a view.');
@@ -101,7 +100,6 @@ trait AssertionsTrait {
 	 */
 	public function assertRedirectedTo($response, $uri, $with = array())
 	{
-
 		PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
 
 		PHPUnit::assertEquals($this->app['url']->to($uri), $response->headers->get('Location'));
