@@ -2303,9 +2303,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// when we need to array or JSON the model for convenience to the coder.
 		foreach ($this->getArrayableAppends() as $key)
 		{
-			$attributes[$key] = $this->mutateAttributeForArray(
-				$this->getMutatorMethod($key), null
-			);
+			$getMutator = $this->getMutatorMethod($key) ?: $key;
+
+			$attributes[$key] = $this->mutateAttributeForArray($getMutator, null);
 		}
 
 		return $attributes;
@@ -2463,7 +2463,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// it returns as the value, which is useful for transforming values on
 		// retrieval from the model to a form that is more useful for usage.
 		$getMutator = $this->getMutatorMethod($key);
-		if ($getMutator) {
+
+		if ($getMutator)
+		{
 			return $this->getMutatedAttributeValue($key, $getMutator);
 		}
 		// If the attribute is listed as a date, we will convert it to a DateTime
