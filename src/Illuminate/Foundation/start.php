@@ -179,7 +179,7 @@ date_default_timezone_set($config['timezone']);
 
 if ($app['config']['app.key'] === 'YourSecretKey!!!')
 {
-	die('Please set the application key to a 32 character random string.');
+	//die('Please set the application key to a 32 character random string.');
 }
 
 /*
