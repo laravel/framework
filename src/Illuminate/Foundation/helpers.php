@@ -96,6 +96,21 @@ if ( ! function_exists('base_path'))
 	}
 }
 
+if ( ! function_exists('back'))
+{
+	/**
+	 * Create a new redirect response to the previous location.
+	 *
+	 * @param  int    $status
+	 * @param  array  $headers
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	function back($status = 302, $headers = array())
+	{
+		return app('redirect')->back($status, $headers);
+	}
+}
+
 if ( ! function_exists('bcrypt'))
 {
 	/**
