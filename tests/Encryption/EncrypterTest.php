@@ -46,7 +46,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be not be empty.
+	 * @expectedExceptionMessage The encryption key must not be empty.
 	 */
 	public function testConstuctWithEmptyString()
 	{
