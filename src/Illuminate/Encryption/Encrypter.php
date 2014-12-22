@@ -52,8 +52,6 @@ class Encrypter {
 	 */
 	public function encrypt($value)
 	{
-		$this->checkKey();
-
 		$iv = mcrypt_create_iv($this->getIvSize(), $this->getRandomizer());
 
 		$value = base64_encode($this->padAndMcrypt($value, $iv));
@@ -88,8 +86,6 @@ class Encrypter {
 	 */
 	public function decrypt($payload)
 	{
-		$this->checkKey();
-
 		$payload = $this->getJsonPayload($payload);
 
 		// We'll go ahead and remove the PKCS7 padding from the encrypted value before
@@ -307,26 +303,6 @@ class Encrypter {
 	protected function updateBlockSize()
 	{
 		$this->block = mcrypt_get_iv_size($this->cipher, $this->mode);
-	}
-
-	/**
-	 * Check the current key is usable to perform cryptographic operations.
-	 *
-	 * @return void
-	 *
-	 * @throws \Illuminate\Encryption\InvalidKeyException
-	 */
-	protected function checkKey()
-	{
-		if ($this->key === '')
-		{
-			throw new InvalidKeyException('The encryption key must not be empty.');
-		}
-
-		if ($this->key === 'YourSecretKey!!!')
-		{
-			throw new InvalidKeyException('The encryption key must be a random string.');
-		}
 	}
 
 }

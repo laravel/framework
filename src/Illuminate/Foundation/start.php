@@ -168,6 +168,22 @@ date_default_timezone_set($config['timezone']);
 
 /*
 |--------------------------------------------------------------------------
+| Check The Encryption Key
+|--------------------------------------------------------------------------
+|
+| We will make sure the encryption key has been set a 32 character random
+| string so we will safely and securely encrypt strings. This prevents
+| the developer from forgetting to set the key in the configuration.
+|
+*/
+
+if ($app['config']['app.key'] === 'YourSecretKey!!!')
+{
+	die('Please set the application key to a 32 character random string.');
+}
+
+/*
+|--------------------------------------------------------------------------
 | Register The Alias Loader
 |--------------------------------------------------------------------------
 |
