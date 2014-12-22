@@ -411,6 +411,21 @@ if ( ! function_exists('secure_url'))
 	}
 }
 
+if ( ! function_exists('session'))
+{
+	/**
+	 * Get a value from the session.
+	 *
+	 * @param  string  $name
+	 * @param  mixed|null  $default
+	 * @return mixed
+	 */
+	function session($name, $default = null)
+	{
+		return app('session')->get($name, $default);
+	}
+}
+
 if ( ! function_exists('storage_path'))
 {
 	/**
