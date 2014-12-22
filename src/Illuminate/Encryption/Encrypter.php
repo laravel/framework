@@ -272,7 +272,7 @@ class Encrypter implements EncrypterContract {
 
 		if ($key === '')
 		{
-			throw new InvalidKeyException('The encryption key must be not be empty.');
+			throw new InvalidKeyException('The encryption key must not be empty.');
 		}
 
 		if ($key === 'YourSecretKey!!!')
