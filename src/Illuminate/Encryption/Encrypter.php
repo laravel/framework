@@ -43,7 +43,7 @@ class Encrypter implements EncrypterContract {
 	 */
 	public function __construct($key)
 	{
-		$this->setKey($key);
+		$this->key = (string) $key;
 	}
 
 	/**
@@ -260,27 +260,10 @@ class Encrypter implements EncrypterContract {
 	 *
 	 * @param  string  $key
 	 * @return void
-	 *
-	 * @throws \Illuminate\Encryption\InvalidKeyException
 	 */
 	public function setKey($key)
 	{
-		if ( ! is_string($key))
-		{
-			throw new InvalidKeyException('The encryption key must be a string.');
-		}
-
-		if ($key === '')
-		{
-			throw new InvalidKeyException('The encryption key must be not be empty.');
-		}
-
-		if ($key === 'YourSecretKey!!!')
-		{
-			throw new InvalidKeyException('The encryption key must be a random string.');
-		}
-
-		$this->key = $key;
+		$this->key = (string) $key;
 	}
 
 	/**
