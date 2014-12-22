@@ -2083,7 +2083,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		return $this;
 	}
-	
+
 	/**
 	 * Get the guarded attributes for the model.
 	 *
@@ -2550,7 +2550,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$key = snake_case($key);
 
-		return isset($mutators[$key]) ? $mutators[$key] : null;
+		return array_get(static::$mutatorCache, "{$this->klass}.{$key}");
 	}
 
 	/**
