@@ -2202,7 +2202,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * get the guarded attributes for the model.
+	 * Get the guarded attributes for the model.
 	 *
 	 * @return array
 	 */
