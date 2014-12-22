@@ -8,6 +8,7 @@ trait AssertionsTrait {
 	/**
 	 * Assert the response has an OK status code.
 	 *
+	 * @param  Illuminate\Http\Response $response
 	 * @return void
 	 */
 	public function assertResponseOk($response)
@@ -20,6 +21,7 @@ trait AssertionsTrait {
 	/**
 	 * Assert the response has a given code.
 	 *
+	 * @param  Illuminate\Http\Response $response
 	 * @param  int  $code
 	 * @return void
 	 */
@@ -31,6 +33,7 @@ trait AssertionsTrait {
 	/**
 	 * Assert that the response view has a given piece of bound data.
 	 *
+	 * @param  Illuminate\Http\Response $response
 	 * @param  string|array  $key
 	 * @param  mixed  $value
 	 * @return void
@@ -78,6 +81,7 @@ trait AssertionsTrait {
 	/**
 	 * Assert that the response view is missing a piece of bound data.
 	 *
+	 * @param  Illuminate\Http\Response $response
 	 * @param  string  $key
 	 * @return void
 	 */
@@ -94,6 +98,7 @@ trait AssertionsTrait {
 	/**
 	 * Assert whether the client was redirected to a given URI.
 	 *
+	 * @param  Illuminate\Http\Response $response
 	 * @param  string  $uri
 	 * @param  array   $with
 	 * @return void
