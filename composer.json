@@ -34,6 +34,7 @@
         "symfony/routing": "2.6.*",
         "symfony/security-core": "2.6.*",
         "symfony/translation": "2.6.*",
+        "symfony/var-dumper": "2.6.*",
         "vlucas/phpdotenv": "~1.0"
     },
     "replace": {
