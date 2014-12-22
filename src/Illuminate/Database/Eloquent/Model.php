@@ -2551,7 +2551,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$key = snake_case($key);
 
-		return array_get(static::$mutatorCache, "{$this->klass}.{$key}");
+		if (isset(static::$mutatorCache[$this->klass][$key]))
+		{
+			return static::$mutatorCache[$this->klass][$key];
+		}
 	}
 
 	/**
