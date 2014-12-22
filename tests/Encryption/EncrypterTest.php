@@ -35,62 +35,6 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCanStillBeConstructedWithInvalidKeys()
-	{
-		$e = new Encrypter(''); // should not throw an exception
-
-		$e = new Encrypter('YourSecretKey!!!'); // should not throw an exception
-	}
-
-
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must not be empty.
-	 */
-	public function testEncryptWithEmptyStringAsKey()
-	{
-		$e = new Encrypter('');
-
-		$e->encrypt('bar'); // throw the exception now that we tried to use the encrypter
-	}
-
-
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must not be empty.
-	 */
-	public function testDecryptWithEmptyStringAsKey()
-	{
-		$e = new Encrypter('');
-
-		$e->decrypt('bar'); // throw the exception now that we tried to use the encrypter
-	}
-
-
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be a random string.
-	 */
-	public function testEncryptWithDefaultStringAsKey()
-	{
-		$e = new Encrypter('YourSecretKey!!!');
-
-		$e->encrypt('bar'); // throw the exception now that we tried to use the encrypter
-	}
-
-
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be a random string.
-	 */
-	public function testDecryptWithDefaultStringAsKey()
-	{
-		$e = new Encrypter('YourSecretKey!!!');
-
-		$e->decrypt('bar'); // throw the exception now that we tried to use the encrypter
-	}
-
-
 	protected function getEncrypter()
 	{
 		return new Encrypter(str_repeat('a', 32));
