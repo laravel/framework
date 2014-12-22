@@ -34,36 +34,6 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be a string.
-	 */
-	public function testConstuctWithNonString()
-	{
-		return new Encrypter(123);
-	}
-
-
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be not be empty.
-	 */
-	public function testConstuctWithEmptyString()
-	{
-		return new Encrypter('');
-	}
-
-
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be a random string.
-	 */
-	public function testConstuctWithDefaultString()
-	{
-		return new Encrypter('YourSecretKey!!!');
-	}
-
-
 	protected function getEncrypter()
 	{
 		return new Encrypter(str_repeat('a', 32));

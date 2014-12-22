@@ -2210,7 +2210,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		return $this;
 	}
-	
+
 	/**
 	 * Get the guarded attributes for the model.
 	 *
@@ -2430,9 +2430,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// when we need to array or JSON the model for convenience to the coder.
 		foreach ($this->getArrayableAppends() as $key)
 		{
-			$attributes[$key] = $this->mutateAttributeForArray(
-				$this->getMutatorMethod($key), null
-			);
+			$getMutator = $this->getMutatorMethod($key) ?: $key;
+
+			$attributes[$key] = $this->mutateAttributeForArray($getMutator, null);
 		}
 
 		return $attributes;
@@ -2588,9 +2588,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// it returns as the value, which is useful for transforming values on
 		// retrieval from the model to a form that is more useful for usage.
 		$getMutator = $this->getMutatorMethod($key);
-		if ($getMutator) {
+
+		if ($getMutator)
+		{
 			return $this->getMutatedAttributeValue($key, $getMutator);
 		}
+
 		// If the attribute is listed as a date, we will convert it to a DateTime
 		// instance on retrieval, which makes it quite convenient to work with
 		// date fields without having to create a mutator for each property.
@@ -2670,11 +2673,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getMutatorMethod($key)
 	{
-		$mutators = static::$mutatorCache[$this->klass];
-
 		$key = snake_case($key);
 
-		return isset($mutators[$key]) ? $mutators[$key] : null;
+		if (isset(static::$mutatorCache[$this->klass][$key]))
+		{
+			return static::$mutatorCache[$this->klass][$key];
+		}
 	}
 
 	/**
