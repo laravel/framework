@@ -35,23 +35,35 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be a string.
-	 */
-	public function testConstuctWithNonString()
+	public function testCanStillBeConstructedWithInvalidKeys()
 	{
-		return new Encrypter(123);
+		$e = new Encrypter(''); // should not throw an exception
+
+		$e = new Encrypter('YourSecretKey!!!'); // should not throw an exception
 	}
 
 
 	/**
 	 * @expectedException Illuminate\Encryption\InvalidKeyException
-	 * @expectedExceptionMessage The encryption key must be not be empty.
+	 * @expectedExceptionMessage The encryption key must not be empty.
 	 */
-	public function testConstuctWithEmptyString()
+	public function testEncryptWithEmptyStringAsKey()
 	{
-		return new Encrypter('');
+		$e = new Encrypter('');
+
+		$e->encrypt('bar'); // throw the exception now that we tried to use the encrypter
+	}
+
+
+	/**
+	 * @expectedException Illuminate\Encryption\InvalidKeyException
+	 * @expectedExceptionMessage The encryption key must not be empty.
+	 */
+	public function testDecryptWithEmptyStringAsKey()
+	{
+		$e = new Encrypter('');
+
+		$e->decrypt('bar'); // throw the exception now that we tried to use the encrypter
 	}
 
 
@@ -59,9 +71,23 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
 	 * @expectedException Illuminate\Encryption\InvalidKeyException
 	 * @expectedExceptionMessage The encryption key must be a random string.
 	 */
-	public function testConstuctWithDefaultString()
+	public function testEncryptWithDefaultStringAsKey()
 	{
-		return new Encrypter('YourSecretKey!!!');
+		$e = new Encrypter('YourSecretKey!!!');
+
+		$e->encrypt('bar'); // throw the exception now that we tried to use the encrypter
+	}
+
+
+	/**
+	 * @expectedException Illuminate\Encryption\InvalidKeyException
+	 * @expectedExceptionMessage The encryption key must be a random string.
+	 */
+	public function testDecryptWithDefaultStringAsKey()
+	{
+		$e = new Encrypter('YourSecretKey!!!');
+
+		$e->decrypt('bar'); // throw the exception now that we tried to use the encrypter
 	}
 
 
