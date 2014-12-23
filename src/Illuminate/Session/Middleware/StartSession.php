@@ -5,10 +5,11 @@ use Carbon\Carbon;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
+use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
 
 class StartSession implements MiddlewareContract, TerminableMiddleware {
 
@@ -75,7 +76,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 */
 	public function terminate($request, $response)
 	{
-		if ($this->sessionConfigured())
+		if ($this->sessionConfigured() && ! $this->usingCookieSessions())
 		{
 			$this->manager->driver()->save();
 		}
@@ -165,6 +166,11 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 */
 	protected function addCookieToResponse(Response $response, SessionInterface $session)
 	{
+		if ($this->usingCookieSessions())
+		{
+			$this->manager->driver()->save();
+		}
+
 		if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig()))
 		{
 			$response->headers->setCookie(new Cookie(
@@ -217,6 +223,18 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 		$config = $config ?: $this->manager->getSessionConfig();
 
 		return ! in_array($config['driver'], array(null, 'array'));
+	}
+
+	/**
+	 * Determine if the session is using cookie sessions.
+	 *
+	 * @return bool
+	 */
+	protected function usingCookieSessions()
+	{
+		if ( ! $this->sessionConfigured()) return false;
+
+		return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
 	}
 
 }
