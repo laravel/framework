@@ -989,6 +989,52 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelAttributesAreCastedWhenPresentInCastsArray()
+	{
+		$model = new EloquentModelCastingStub;
+		$model->first = '3';
+		$model->second = '4.0';
+		$model->third = 2.5;
+		$model->fourth = 1;
+		$model->fifth = 0;
+		$model->sixth = array('foo' => 'bar');
+		$obj = new StdClass;
+		$obj->foo = 'bar';
+		$model->seventh = $obj;
+		$model->eighth = array('foo' => 'bar');
+
+		$this->assertInternalType('int', $model->first);
+		$this->assertInternalType('float', $model->second);
+		$this->assertInternalType('string', $model->third);
+		$this->assertInternalType('boolean', $model->fourth);
+		$this->assertInternalType('boolean', $model->fifth);
+		$this->assertInternalType('object', $model->sixth);
+		$this->assertInternalType('array', $model->seventh);
+		$this->assertInternalType('array', $model->eighth);
+		$this->assertTrue($model->fourth);
+		$this->assertFalse($model->fifth);
+		$this->assertEquals($obj, $model->sixth);
+		$this->assertEquals(array('foo' => 'bar'), $model->seventh);
+		$this->assertEquals(array('foo' => 'bar'), $model->eighth);
+		$this->assertEquals('{"foo":"bar"}', $model->eighthAttributeValue());
+
+		$arr = $model->toArray();
+		$this->assertInternalType('int', $arr['first']);
+		$this->assertInternalType('float', $arr['second']);
+		$this->assertInternalType('string', $arr['third']);
+		$this->assertInternalType('boolean', $arr['fourth']);
+		$this->assertInternalType('boolean', $arr['fifth']);
+		$this->assertInternalType('object', $arr['sixth']);
+		$this->assertInternalType('array', $arr['seventh']);
+		$this->assertInternalType('array', $arr['eighth']);
+		$this->assertTrue($arr['fourth']);
+		$this->assertFalse($arr['fifth']);
+		$this->assertEquals($obj, $arr['sixth']);
+		$this->assertEquals(array('foo' => 'bar'), $arr['seventh']);
+		$this->assertEquals(array('foo' => 'bar'), $arr['eighth']);
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1169,5 +1215,22 @@ class EloquentModelAppendsStub extends Illuminate\Database\Eloquent\Model {
 	public function getStudlyCasedAttribute()
 	{
 		return 'StudlyCased';
+	}
+}
+
+class EloquentModelCastingStub extends Illuminate\Database\Eloquent\Model {
+	protected $casts = array(
+		'first' => 'int',
+		'second' => 'float',
+		'third' => 'string',
+		'fourth' => 'bool',
+		'fifth' => 'boolean',
+		'sixth' => 'object',
+		'seventh' => 'array',
+		'eighth' => 'json'
+	);
+	public function eighthAttributeValue()
+	{
+		return $this->attributes['eighth'];
 	}
 }
