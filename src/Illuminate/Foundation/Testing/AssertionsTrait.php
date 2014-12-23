@@ -12,11 +12,9 @@ trait AssertionsTrait {
 	 */
 	public function assertResponseOk()
 	{
-		$response = $this->client->getResponse();
+		$actual = $this->response->getStatusCode();
 
-		$actual = $response->getStatusCode();
-
-		return PHPUnit::assertTrue($response->isOk(), 'Expected status code 200, got ' .$actual);
+		return PHPUnit::assertTrue($this->response->isOk(), 'Expected status code 200, got ' .$actual);
 	}
 
 	/**
@@ -27,7 +25,7 @@ trait AssertionsTrait {
 	 */
 	public function assertResponseStatus($code)
 	{
-		return PHPUnit::assertEquals($code, $this->client->getResponse()->getStatusCode());
+		return PHPUnit::assertEquals($code, $this->response->getStatusCode());
 	}
 
 	/**
@@ -41,20 +39,18 @@ trait AssertionsTrait {
 	{
 		if (is_array($key)) return $this->assertViewHasAll($key);
 
-		$response = $this->client->getResponse();
-
-		if ( ! isset($response->original) || ! $response->original instanceof View)
+		if ( ! isset($this->response->original) || ! $this->response->original instanceof View)
 		{
 			return PHPUnit::assertTrue(false, 'The response was not a view.');
 		}
 
 		if (is_null($value))
 		{
-			PHPUnit::assertArrayHasKey($key, $response->original->getData());
+			PHPUnit::assertArrayHasKey($key, $this->response->original->getData());
 		}
 		else
 		{
-			PHPUnit::assertEquals($value, $response->original->$key);
+			PHPUnit::assertEquals($value, $this->response->original->$key);
 		}
 	}
 
@@ -87,14 +83,12 @@ trait AssertionsTrait {
 	 */
 	public function assertViewMissing($key)
 	{
-		$response = $this->client->getResponse();
-
-		if ( ! isset($response->original) || ! $response->original instanceof View)
+		if ( ! isset($this->response->original) || ! $this->response->original instanceof View)
 		{
 			return PHPUnit::assertTrue(false, 'The response was not a view.');
 		}
 
-		PHPUnit::assertArrayNotHasKey($key, $response->original->getData());
+		PHPUnit::assertArrayNotHasKey($key, $this->response->original->getData());
 	}
 
 	/**
@@ -106,11 +100,9 @@ trait AssertionsTrait {
 	 */
 	public function assertRedirectedTo($uri, $with = array())
 	{
-		$response = $this->client->getResponse();
+		PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $this->response);
 
-		PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
-
-		PHPUnit::assertEquals($this->app['url']->to($uri), $response->headers->get('Location'));
+		PHPUnit::assertEquals($this->app['url']->to($uri), $this->response->headers->get('Location'));
 
 		$this->assertSessionHasAll($with);
 	}
