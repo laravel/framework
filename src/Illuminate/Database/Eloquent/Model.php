@@ -2593,7 +2593,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get the type of cast for a model attribute.
 	 *
-	 * @param  string $key
+	 * @param  string  $key
 	 * @return string
 	 */
 	protected function getCastType($key)
