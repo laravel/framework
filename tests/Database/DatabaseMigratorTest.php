@@ -14,6 +14,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
 			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			m::mock('Illuminate\Container\Container'),
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
@@ -48,6 +49,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
 			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			m::mock('Illuminate\Container\Container'),
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
@@ -96,6 +98,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
 			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			m::mock('Illuminate\Container\Container'),
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
@@ -115,6 +118,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
 			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			m::mock('Illuminate\Container\Container'),
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
@@ -143,6 +147,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
 			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			m::mock('Illuminate\Container\Container'),
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
@@ -183,6 +188,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 	{
 		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
 			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			m::mock('Illuminate\Container\Container'),
 			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
 			m::mock('Illuminate\Filesystem\Filesystem'),
 		));
