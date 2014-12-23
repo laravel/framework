@@ -997,10 +997,43 @@ class Container implements ArrayAccess, ContainerContract {
 		}
 
 		$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
-		$this->fireCallbackArray($object, $this->getCallbacksForType($object, $this->resolvingCallbacksByType));
+
+		$this->fireCallbackArray(
+			$object, $this->getCallbacksForType(
+				$object, $this->resolvingCallbacksByType
+			)
+		);
 
 		$this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
-		$this->fireCallbackArray($object, $this->getCallbacksForType($object, $this->afterResolvingCallbacksByType));
+
+		$this->fireCallbackArray(
+			$object, $this->getCallbacksForType(
+				$object, $this->afterResolvingCallbacksByType
+			)
+		);
+	}
+
+	/**
+	 * Get all callbacks for a givne type.
+	 *
+	 * @param  object  $object
+	 * @param  array  $callbacksPerType
+	 *
+	 * @return array
+	 */
+	protected function getCallbacksForType($object, array $callbacksPerType)
+	{
+		$results = [];
+
+		foreach ($callbacksPerType as $type => $callbacks)
+		{
+			if ($object instanceof $type)
+			{
+				$results = array_merge($results, $callbacks);
+			}
+		}
+
+		return $results;
 	}
 
 	/**
@@ -1213,38 +1246,6 @@ class Container implements ArrayAccess, ContainerContract {
 	public function __set($key, $value)
 	{
 		$this[$key] = $value;
-	}
-
-	/**
-	 * Get all callbacks for all subtypes and interfaces for specific $abstract type.
-	 *
-	 * @param  object  $object
-	 * @param  array  $callbacksPerType
-	 *
-	 * @return array
-	 */
-	protected function getCallbacksForType($object, array $callbacksPerType)
-	{
-		$callbacks = $this->getItemsForType($object, $callbacksPerType);
-
-		return $callbacks ? call_user_func_array('array_merge', $callbacks) : [];
-	}
-
-	/**
-	 * Return all array items which are defined by a key which is a subtype of $abstract
-	 *
-	 * @param  object  $object
-	 * @param  array  $array
-	 *
-	 * @return array
-	 */
-	protected function getItemsForType($object, array $array)
-	{
-		$types = array_filter(array_keys($array), function ($type) use ($object) {
-			return is_a($object, $type);
-		});
-
-		return array_intersect_key($array, array_flip($types));
 	}
 
 }

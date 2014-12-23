@@ -270,6 +270,17 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResolvingCallbacksAreCalledForType()
+	{
+		$container = new Container;
+		$container->resolvingType('StdClass', function($object) { return $object->name = 'taylor'; });
+		$container->bind('foo', function() { return new StdClass; });
+		$instance = $container->make('foo');
+
+		$this->assertEquals('taylor', $instance->name);
+	}
+
+
 	public function testUnsetRemoveBoundInstances()
 	{
 		$container = new Container;
