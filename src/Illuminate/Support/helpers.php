@@ -455,7 +455,10 @@ if ( ! function_exists('dd'))
 	 */
 	function dd()
 	{
-		array_map(function($x) { dump($x); }, func_get_args()); die;
+		array_map(function($x) {
+			$dumper = new \Illuminate\Support\Debug\Dumper;
+			$dumper->dump($x);
+		}, func_get_args()); die;
 	}
 }
 
