@@ -2424,12 +2424,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			);
 		}
 
+		// Next we will handle any casts that have been setup for this model and cast
+		// the values to their appropriate type. If the attribute has a mutator we
+		// will not perform the cast on those attributes to avoid any confusion.
 		foreach ($this->casts as $key => $value)
 		{
-			if ( ! array_key_exists($key, $attributes)) continue;
-			if (in_array($key, $mutatedAttributes)) continue;
+			if ( ! array_key_exists($key, $attributes) ||
+				in_array($key, $mutatedAttributes)) continue;
 
-			$attributes[$key] = $this->castAttribute($key, $attributes[$key]);
+			$attributes[$key] = $this->castAttribute(
+				$key, $attributes[$key]
+			);
 		}
 
 		// Here we will grab all of the appended, calculated attributes to this model
@@ -2692,7 +2697,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Determine whether an attribute should be casted to a native type.
 	 *
 	 * @param  string  $key
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function hasCast($key)
 	{
@@ -2703,14 +2708,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Determine whether a value is JSON castable for inbound manipulation.
 	 *
 	 * @param  string  $key
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function isJsonCastable($key)
 	{
 		if ($this->hasCast($key))
 		{
-			return $this->getCastType($key) === 'json';
+			$type = $this->getCastType($key);
+
+			return $type === 'json' || $type === 'object';
 		}
+
 		return false;
 	}
 
@@ -2734,8 +2742,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function castAttribute($key, $value)
 	{
-		$type = $this->getCastType($key);
-		switch ($type)
+		switch ($this->getCastType($key))
 		{
 			case 'int':
 			case 'integer':
@@ -2752,23 +2759,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			case 'array':
 				return (array) $value;
 			case 'object':
-				return (object) $value;
+				return json_decode($value);
 			case 'json':
 				return json_decode($value, true);
+			default:
+				return $value;
 		}
-		return $value;
-	}
-
-	/**
-	 * Get the value of an attribute using its casting for array conversion.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return mixed
-	 */
-	protected function castAttributeForArray($key, $value)
-	{
-		return $value;
 	}
 
 	/**
@@ -2800,7 +2796,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		if ($this->isJsonCastable($key))
 		{
-			$value = json_encode($value, true);
+			$value = json_encode($value);
 		}
 
 		$this->attributes[$key] = $value;
