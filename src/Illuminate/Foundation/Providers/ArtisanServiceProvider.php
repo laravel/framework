@@ -11,6 +11,8 @@ use Illuminate\Foundation\Console\RouteScanCommand;
 use Illuminate\Foundation\Console\EventScanCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\ConfigCacheCommand;
+use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
@@ -35,6 +37,8 @@ class ArtisanServiceProvider extends ServiceProvider {
 	protected $commands = [
 		'AppName' => 'command.app.name',
 		'ClearCompiled' => 'command.clear-compiled',
+		'ConfigCache' => 'command.config.cache',
+		'ConfigClear' => 'command.config.clear',
 		'ConsoleMake' => 'command.console.make',
 		'Down' => 'command.down',
 		'Environment' => 'command.environment',
@@ -91,6 +95,32 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.clear-compiled', function()
 		{
 			return new ClearCompiledCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerConfigCacheCommand()
+	{
+		$this->app->singleton('command.config.cache', function()
+		{
+			return new ConfigCacheCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerConfigClearCommand()
+	{
+		$this->app->singleton('command.config.clear', function()
+		{
+			return new ConfigClearCommand;
 		});
 	}
 
