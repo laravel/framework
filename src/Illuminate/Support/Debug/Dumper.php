@@ -1,20 +1,21 @@
 <?php namespace Illuminate\Support\Debug;
 
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class Dumper {
 
 	/**
-	 * Var dump a value elegantly.
+	 * Dump a value with elegance.
 	 *
 	 * @param  mixed  $value
-	 * @return string
+	 * @return void
 	 */
 	public function dump($value)
 	{
-		$cloner = new VarCloner();
-		$dumper = 'cli' === PHP_SAPI ? new CliDumper() : new HtmlDumper();
-		$dumper->dump($cloner->cloneVar($value));
+		$dumper = 'cli' === PHP_SAPI ? new CliDumper : new HtmlDumper;
+
+		$dumper->dump((new VarCloner)->cloneVar($value));
 	}
+
 }
