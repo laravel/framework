@@ -590,6 +590,26 @@ class Application extends Container implements ApplicationContract {
 	}
 
 	/**
+	 * Determine if the application configuration is cached.
+	 *
+	 * @return bool
+	 */
+	public function configurationIsCached()
+	{
+		return $this['files']->exists($this->getCachedConfigPath());
+	}
+
+	/**
+	 * Get the path to the configuration cache file.
+	 *
+	 * @return string
+	 */
+	public function getCachedConfigPath()
+	{
+		return $this['path.storage'].'/framework/config.php';
+	}
+
+	/**
 	 * Determine if the application routes are cached.
 	 *
 	 * @return bool
