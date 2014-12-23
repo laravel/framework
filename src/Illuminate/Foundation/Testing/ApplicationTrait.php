@@ -13,6 +13,13 @@ trait ApplicationTrait {
 	protected $app;
 
 	/**
+	 * The last response returned by the application.
+	 *
+	 * @var \Illuminate\Http\Response
+	 */
+	protected $response;
+
+	/**
 	 * Refresh the application instance.
 	 *
 	 * @return void
@@ -40,7 +47,7 @@ trait ApplicationTrait {
 	{
 		$request = Request::create($uri, $method, $parameters, $cookies, $files, $server, $content);
 
-		return $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);
+		return $this->response = $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);
 	}
 
 	/**
@@ -59,7 +66,7 @@ trait ApplicationTrait {
 	{
 		$uri = 'https://localhost/'.ltrim($uri, '/');
 
-		return $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
+		return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
 	}
 
 	/**
@@ -79,7 +86,7 @@ trait ApplicationTrait {
 	{
 		$uri = $this->app['url']->action($action, $wildcards, true);
 
-		return $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
+		return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
 	}
 
 	/**
@@ -99,7 +106,7 @@ trait ApplicationTrait {
 	{
 		$uri = $this->app['url']->route($name, $routeParameters);
 
-		return $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
+		return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
 	}
 
 	/**
