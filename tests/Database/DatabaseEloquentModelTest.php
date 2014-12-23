@@ -973,6 +973,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($model->updated_at);
 	}
 
+
 	public function testModelAttributesAreCastedWhenPresentInCastsArray()
 	{
 		$model = new EloquentModelCastingStub;
