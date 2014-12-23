@@ -589,6 +589,16 @@ class Request extends SymfonyRequest {
 
 		return $default;
 	}
+	
+	/**
+	 * Determine if the request is the result of an PJAX call.
+	 *
+	 * @return bool
+	 */
+	public function isPjax()
+	{
+		return (true == $this->headers->get('X-PJAX'));
+	}
 
 	/**
 	 * Create an Illuminate request from a Symfony instance.
