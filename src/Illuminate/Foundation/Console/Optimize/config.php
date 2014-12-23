@@ -81,6 +81,8 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RouteServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/AuthServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pagination/PaginationServiceProvider.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Support/Providers/RouteServiceProvider.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Support/Providers/EventServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Hashing/HashServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Hashing/BcryptHasher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Pagination/Paginator.php',
