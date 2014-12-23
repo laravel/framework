@@ -176,6 +176,16 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Determine if the request is the result of an PJAX call.
+	 *
+	 * @return bool
+	 */
+	public function pjax()
+	{
+		return $this->headers->get('X-PJAX') == true;
+	}
+
+	/**
 	 * Determine if the request is over HTTPS.
 	 *
 	 * @return bool
