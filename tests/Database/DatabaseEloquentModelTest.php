@@ -411,6 +411,127 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPushNoRelations()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor'), 'id')->andReturn(1);
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->name = 'taylor';
+		$model->exists = false;
+
+		$this->assertTrue($model->push());
+		$this->assertEquals(1, $model->id);
+		$this->assertTrue($model->exists);
+	}
+
+
+	public function testPushEmptyOneRelation()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor'), 'id')->andReturn(1);
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->name = 'taylor';
+		$model->exists = false;
+		$model->setRelation('relationOne', null);
+
+		$this->assertTrue($model->push());
+		$this->assertEquals(1, $model->id);
+		$this->assertTrue($model->exists);
+		$this->assertNull($model->relationOne);
+	}
+
+
+	public function testPushOneRelation()
+	{
+		$related1 = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'related1'), 'id')->andReturn(2);
+		$related1->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$related1->expects($this->once())->method('updateTimestamps');
+		$related1->name = 'related1';
+		$related1->exists = false;
+
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor'), 'id')->andReturn(1);
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->name = 'taylor';
+		$model->exists = false;
+		$model->setRelation('relationOne', $related1);
+
+		$this->assertTrue($model->push());
+		$this->assertEquals(1, $model->id);
+		$this->assertTrue($model->exists);
+		$this->assertEquals(2, $model->relationOne->id);
+		$this->assertTrue($model->relationOne->exists);
+		$this->assertEquals(2, $related1->id);
+		$this->assertTrue($related1->exists);
+	}
+
+
+	public function testPushEmptyManyRelation()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor'), 'id')->andReturn(1);
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->name = 'taylor';
+		$model->exists = false;
+		$model->setRelation('relationMany', new Illuminate\Database\Eloquent\Collection(array()));
+
+		$this->assertTrue($model->push());
+		$this->assertEquals(1, $model->id);
+		$this->assertTrue($model->exists);
+		$this->assertEquals(0, count($model->relationMany));
+	}
+
+
+	public function testPushManyRelation()
+	{
+		$related1 = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'related1'), 'id')->andReturn(2);
+		$related1->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$related1->expects($this->once())->method('updateTimestamps');
+		$related1->name = 'related1';
+		$related1->exists = false;
+
+		$related2 = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'related2'), 'id')->andReturn(3);
+		$related2->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$related2->expects($this->once())->method('updateTimestamps');
+		$related2->name = 'related2';
+		$related2->exists = false;
+
+		$model = $this->getMock('EloquentModelStub', array('newQuery', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor'), 'id')->andReturn(1);
+		$model->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->name = 'taylor';
+		$model->exists = false;
+		$model->setRelation('relationMany', new Illuminate\Database\Eloquent\Collection(array($related1, $related2)));
+
+		$this->assertTrue($model->push());
+		$this->assertEquals(1, $model->id);
+		$this->assertTrue($model->exists);
+		$this->assertEquals(2, count($model->relationMany));
+		$this->assertEquals([2, 3], $model->relationMany->lists('id'));
+	}
+
+
 	public function testNewQueryReturnsEloquentQueryBuilder()
 	{
 		$conn = m::mock('Illuminate\Database\Connection');
