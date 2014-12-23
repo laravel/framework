@@ -3,8 +3,10 @@
 use SessionHandlerInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class Store implements SessionInterface {
 
@@ -44,6 +46,20 @@ class Store implements SessionInterface {
 	protected $metaBag;
 
 	/**
+	 * Should the session store the payload as encrypted or non-encrypted data
+	 *
+	 * @var bool
+	 */
+	protected $encrypted = false;
+
+	/**
+	 * The encrypter instance.
+	 *
+	 * @var \Illuminate\Contracts\Encryption\Encrypter
+	 */
+	protected $encrypter;
+
+	/**
 	 * Local copies of the session bag data.
 	 *
 	 * @var array
@@ -67,17 +83,20 @@ class Store implements SessionInterface {
 	/**
 	 * Create a new session instance.
 	 *
-	 * @param  string  $name
-	 * @param  \SessionHandlerInterface  $handler
-	 * @param  string|null  $id
+	 * @param  string $name
+	 * @param  \SessionHandlerInterface $handler
+	 * @param  string|null $id
+	 * @param  \Illuminate\Contracts\Encryption\Encrypter $encrypter
 	 * @return void
 	 */
-	public function __construct($name, SessionHandlerInterface $handler, $id = null)
+	public function __construct($name, SessionHandlerInterface $handler, $id = null, EncrypterContract $encrypter = null)
 	{
 		$this->setId($id);
 		$this->name = $name;
 		$this->handler = $handler;
 		$this->metaBag = new MetadataBag;
+		$this->encrypter = $encrypter;
+		$this->encrypted = !is_null($encrypter) ?: false;
 	}
 
 	/**
@@ -118,7 +137,47 @@ class Store implements SessionInterface {
 	{
 		$data = $this->handler->read($this->getId());
 
-		return $data ? unserialize($data) : array();
+		return $data ? unserialize($this->decryptData($data)) : array();
+	}
+
+	/**
+	 * Encrypts the data if $this->encrypted is true, otherwise returns the raw data.
+	 *
+	 * @param  mixed $data
+	 * @return string
+	 */
+	protected function encryptData($data)
+	{
+		if(!$this->encrypted)
+		{
+			return $data;
+		}
+
+		return $this->encrypter->encrypt($data);
+	}
+
+
+	/**
+	 * Safely decrypts the data and gracefully fails if the data it's trying to decrypt is not encrypted.
+	 *
+	 * @param  mixed $data
+	 * @return string
+	 */
+	protected function decryptData($data)
+	{
+		if( ! $this->encrypted)
+		{
+			return $data;
+		}
+
+		try
+		{
+			return $this->encrypter->decrypt($data);
+		}
+		catch(DecryptException $e)
+		{
+			return $data;
+		}
 	}
 
 	/**
@@ -234,7 +293,7 @@ class Store implements SessionInterface {
 
 		$this->ageFlashData();
 
-		$this->handler->write($this->getId(), serialize($this->attributes));
+		$this->handler->write($this->getId(), $this->encryptData(serialize($this->attributes)));
 
 		$this->started = false;
 	}
