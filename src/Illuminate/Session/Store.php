@@ -119,7 +119,14 @@ class Store implements SessionInterface {
 	{
 		$data = $this->handler->read($this->getId());
 
-		return $data ? unserialize($this->prepareForUnserialize($data)) : array();
+		if ($data)
+		{
+			$data = @unserialize($this->prepareForUnserialize($data));
+
+			if ($data !== false) return $data;
+		}
+
+		return [];
 	}
 
 	/**
