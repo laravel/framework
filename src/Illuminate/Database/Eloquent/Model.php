@@ -133,6 +133,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $dates = array();
 
 	/**
+	 * The attributes that should be casted to native types.
+	 *
+	 * @var array
+	 */
+	protected $casts = array();
+
+	/**
 	 * The relationships that should be touched on save.
 	 *
 	 * @var array
@@ -2403,16 +2410,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			$attributes[$key] = (string) $this->asDateTime($attributes[$key]);
 		}
 
+		$mutatedAttributes = $this->getMutatedAttributes();
+
 		// We want to spin through all the mutated attributes for this model and call
 		// the mutator for the attribute. We cache off every mutated attributes so
 		// we don't have to constantly check on attributes that actually change.
-		foreach ($this->getMutatedAttributes() as $key)
+		foreach ($mutatedAttributes as $key)
 		{
 			if ( ! array_key_exists($key, $attributes)) continue;
 
 			$attributes[$key] = $this->mutateAttributeForArray(
 				$key, $attributes[$key]
 			);
+		}
+
+		foreach ($this->casts as $key => $value)
+		{
+			if ( ! array_key_exists($key, $attributes)) continue;
+			if (in_array($key, $mutatedAttributes)) continue;
+
+			$attributes[$key] = $this->castAttribute($key, $attributes[$key]);
 		}
 
 		// Here we will grab all of the appended, calculated attributes to this model
@@ -2580,6 +2597,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			return $this->mutateAttribute($key, $value);
 		}
 
+		// If the attribute exists within the cast array, we will convert it to
+		// an appropriate native PHP type dependant upon the associated value
+		// given with the key in the pair. Dayle made this comment line up.
+		if ($this->hasCast($key))
+		{
+			$value = $this->castAttribute($key, $value);
+		}
+
 		// If the attribute is listed as a date, we will convert it to a DateTime
 		// instance on retrieval, which makes it quite convenient to work with
 		// date fields without having to create a mutator for each property.
@@ -2664,6 +2689,89 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Determine whether an attribute should be casted to a native type.
+	 *
+	 * @param  string  $key
+	 * @return boolean
+	 */
+	protected function hasCast($key)
+	{
+		return array_key_exists($key, $this->casts);
+	}
+
+	/**
+	 * Determine whether a value is JSON castable for inbound manipulation.
+	 *
+	 * @param  string  $key
+	 * @return boolean
+	 */
+	protected function isJsonCastable($key)
+	{
+		if ($this->hasCast($key))
+		{
+			return $this->getCastType($key) === 'json';
+		}
+		return false;
+	}
+
+	/**
+	 * Get the type of cast for a model attribute.
+	 *
+	 * @param  string  $key
+	 * @return string
+	 */
+	protected function getCastType($key)
+	{
+		return trim(strtolower($this->casts[$key]));
+	}
+
+	/**
+	 * Cast an attribute to a native PHP type.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return mixed
+	 */
+	protected function castAttribute($key, $value)
+	{
+		$type = $this->getCastType($key);
+		switch ($type)
+		{
+			case 'int':
+			case 'integer':
+				return (int) $value;
+			case 'real':
+			case 'float':
+			case 'double':
+				return (float) $value;
+			case 'string':
+				return (string) $value;
+			case 'bool':
+			case 'boolean':
+				return (bool) $value;
+			case 'array':
+				return (array) $value;
+			case 'object':
+				return (object) $value;
+			case 'json':
+				return json_decode($value, true);
+		}
+		return $value;
+	}
+
+	/**
+	 * Get the value of an attribute using its casting for array conversion.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return mixed
+	 */
+	protected function castAttributeForArray($key, $value)
+	{
+		return $value;
+	}
+
+	/**
 	 * Set a given attribute on the model.
 	 *
 	 * @param  string  $key
@@ -2688,6 +2796,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		elseif (in_array($key, $this->getDates()) && $value)
 		{
 			$value = $this->fromDateTime($value);
+		}
+
+		if ($this->isJsonCastable($key))
+		{
+			$value = json_encode($value, true);
 		}
 
 		$this->attributes[$key] = $value;
