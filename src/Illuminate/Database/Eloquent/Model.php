@@ -1478,14 +1478,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// us to recurs into all of these nested relations for this model instance.
 		foreach ($this->relations as $models)
 		{
-			// Models can be a collection of models (hasMany), an individual model (hasOne),
-			// or null (non-existing hasOne). Convert to an array.
-			$models = $models instanceof Collection ? $models->all() : array($models);
+			$models = $models instanceof Collection
+						? $models->all() : array($models);
 
-			// Filter out any null entries from non-existing relationships.
-			$models = array_filter($models);
-
-			foreach ($models as $model)
+			foreach (array_filter($models) as $model)
 			{
 				if ( ! $model->push()) return false;
 			}
