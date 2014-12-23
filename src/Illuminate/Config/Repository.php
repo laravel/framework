@@ -103,6 +103,16 @@ class Repository implements ArrayAccess, ConfigContract {
 	}
 
 	/**
+	 * Get all of the configuration items for the application.
+	 *
+	 * @var array
+	 */
+	public function all()
+	{
+		return $this->items;
+	}
+
+	/**
 	 * Determine if the given configuration option exists.
 	 *
 	 * @param  string  $key
