@@ -117,7 +117,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 		$queue->shouldReceive('push')->once()->with('Illuminate\Events\FireQueuedHandler', [
 			'class' => 'TestDispatcherQueuedHandler',
 			'method' => 'someMethod',
-			'data' => ['foo', 'bar'],
+			'data' => serialize(['foo', 'bar']),
 		]);
 		$d->setQueueResolver(function() use ($queue) { return $queue; });
 
