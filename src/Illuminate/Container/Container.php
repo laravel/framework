@@ -965,6 +965,8 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
+	 * Register a new resolving callback for a given type or one of its subtypes.
+	 *
 	 * @param  $type
 	 * @param  callable  $callback
 	 */
@@ -974,6 +976,8 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
+	 * Register a new after resolving callback for a given type or one of its subtypes.
+	 *
 	 * @param  $type
 	 * @param  callable  $callback
 	 */
@@ -1014,7 +1018,7 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
-	 * Get all callbacks for a givne type.
+	 * Get all callbacks for a given type.
 	 *
 	 * @param  object  $object
 	 * @param  array  $callbacksPerType

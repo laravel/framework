@@ -25,18 +25,14 @@ class FormRequestServiceProvider extends ServiceProvider {
 	{
 		$this->app['events']->listen('router.matched', function()
 		{
-			$this->app->resolvingAny(function($resolved, $app)
+			$this->app->resolvingType('Illuminate\Foundation\Http\FormRequest', function(FormRequest $resolved, $app)
 			{
-				// If the resolved instance is an instance of the FormRequest object, we will go
-				// ahead and initialize the request as well as set a few dependencies on this
+				// Initialize the request as well as set a few dependencies on this
 				// request instance. The "ValidatesWhenResolved" hook will fire "validate".
-				if ($resolved instanceof FormRequest)
-				{
-					$this->initializeRequest($resolved, $app['request']);
+				$this->initializeRequest($resolved, $app['request']);
 
-					$resolved->setContainer($app)
-                             ->setRedirector($app['Illuminate\Routing\Redirector']);
-				}
+				$resolved->setContainer($app)
+                         ->setRedirector($app['Illuminate\Routing\Redirector']);
 			});
 		});
 	}
