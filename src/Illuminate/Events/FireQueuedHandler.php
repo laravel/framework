@@ -33,7 +33,7 @@ class FireQueuedHandler {
 	public function fire(Job $job, array $data)
 	{
 		call_user_func_array(
-			[$this->container->make($data['class']), $data['method']], $data['data']
+			[$this->container->make($data['class']), $data['method']], unserialize($data['data'])
 		);
 
 		$job->delete();

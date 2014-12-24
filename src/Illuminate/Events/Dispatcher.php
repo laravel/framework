@@ -195,6 +195,11 @@ class Dispatcher implements DispatcherContract {
 	 */
 	public function fire($event, $payload = array(), $halt = false)
 	{
+		if (is_object($event))
+		{
+			list($payload, $event) = [[$event], get_class($event)];
+		}
+
 		$responses = array();
 
 		// If an array is not given to us as the payload, we will turn it into one so
@@ -385,7 +390,7 @@ class Dispatcher implements DispatcherContract {
 		return function() use ($class, $method)
 		{
 			$this->resolveQueue()->push('Illuminate\Events\FireQueuedHandler', [
-				'class' => $class, 'method' => $method, 'data' => func_get_args(),
+				'class' => $class, 'method' => $method, 'data' => serialize(func_get_args()),
 			]);
 		};
 	}
