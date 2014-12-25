@@ -8,34 +8,19 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 
 	static public function setUpBeforeClass()
 	{
-		mkdir(sys_get_temp_dir().'/laravel-test-dir/');
+		mkdir(__DIR__.'/laravel-test-dir/');
 	}
 
 	static public function tearDownAfterClass()
 	{
-		$testDir = sys_get_temp_dir().'/laravel-test-dir/';
-		$items = new RecursiveIteratorIterator(
-    					new RecursiveDirectoryIterator(
-    							$testDir, 
-    							RecursiveDirectoryIterator::SKIP_DOTS
-    						),
-    					RecursiveIteratorIterator::CHILD_FIRST
-					);
-		foreach ($items as $item) 
-		{
-			$path = $item->getRealPath();
-		    if($item->isDir())
-		    	rmdir($path);
-		    else
-		    	unlink($path);
-		}
-		rmdir($testDir);
+		$fs = new Filesystem();
+		$fs->deleteDirectory(__DIR__.'/laravel-test-dir/');
 	}
 
 	public function setUp()
 	{
-		//Using mt_rand provides us with a new directory for each test case
-		$this->testDirectory = sys_get_temp_dir().'/laravel-test-dir/'.mt_rand();
+		// Using mt_rand provides us with a new directory for each test case
+		$this->testDirectory = __DIR__.'/laravel-test-dir/'.mt_rand();
 		mkdir($this->testDirectory);
 	}
 
