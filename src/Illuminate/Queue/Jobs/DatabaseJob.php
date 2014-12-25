@@ -68,6 +68,8 @@ class DatabaseJob extends Job implements JobContract {
 	 */
 	public function release($delay = 0)
 	{
+		parent::release($delay);
+
 		$this->delete();
 
 		$this->database->release($this->queue, $this->job, $delay);
