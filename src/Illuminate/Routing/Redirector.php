@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Session\Store as SessionStore;
+use Illuminate\Session\StoreInterface;
 
 class Redirector {
 
@@ -208,10 +208,10 @@ class Redirector {
 	/**
 	 * Set the active session store.
 	 *
-	 * @param  \Illuminate\Session\Store  $session
+	 * @param  \Illuminate\Session\StoreInterface  $session
 	 * @return void
 	 */
-	public function setSession(SessionStore $session)
+	public function setSession(StoreInterface $session)
 	{
 		$this->session = $session;
 	}

@@ -4,8 +4,9 @@ use IronMQ;
 use Illuminate\Http\Request;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Queue\Connector as ConnectorContract;
 
-class IronConnector implements ConnectorInterface {
+class IronConnector implements ConnectorContract {
 
 	/**
 	 * The encrypter instance.

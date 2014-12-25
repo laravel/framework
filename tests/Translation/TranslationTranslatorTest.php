@@ -62,7 +62,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
 	protected function getLoader()
 	{
-		return m::mock('Illuminate\Translation\LoaderInterface');
+		return m::mock('Illuminate\Contracts\Translation\Loader');
 	}
 
 }

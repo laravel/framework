@@ -5,17 +5,17 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 
 class Builder {
 
 	/**
 	 * The database connection instance.
 	 *
-	 * @var \Illuminate\Database\Connection
+	 * @var \Illuminate\Contracts\Database\Connection
 	 */
 	protected $connection;
 
@@ -188,14 +188,12 @@ class Builder {
 	/**
 	 * Create a new query builder instance.
 	 *
-	 * @param  \Illuminate\Database\ConnectionInterface  $connection
+	 * @param  \Illuminate\Contracts\Database\Connection  $connection
 	 * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
 	 * @param  \Illuminate\Database\Query\Processors\Processor  $processor
 	 * @return void
 	 */
-	public function __construct(ConnectionInterface $connection,
-                                Grammar $grammar,
-                                Processor $processor)
+	public function __construct(ConnectionContract $connection, Grammar $grammar, Processor $processor)
 	{
 		$this->grammar = $grammar;
 		$this->processor = $processor;
@@ -1946,7 +1944,7 @@ class Builder {
 	/**
 	 * Get the database connection instance.
 	 *
-	 * @return \Illuminate\Database\ConnectionInterface
+	 * @return \Illuminate\Contracts\Database\Connection
 	 */
 	public function getConnection()
 	{

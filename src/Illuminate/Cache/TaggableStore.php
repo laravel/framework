@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
-abstract class TaggableStore {
+use Illuminate\Contracts\Cache\Store as StoreContract;
+
+abstract class TaggableStore implements StoreContract {
 
 	/**
 	 * Begin executing a new tags operation.

@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Queue\Connectors;
+<?php namespace Illuminate\Contracts\Queue;
 
-interface ConnectorInterface {
+interface Connector {
 
 	/**
 	 * Establish a queue connection.

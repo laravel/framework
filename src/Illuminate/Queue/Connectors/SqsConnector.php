@@ -2,8 +2,9 @@
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
+use Illuminate\Contracts\Queue\Connector as ConnectorContract;
 
-class SqsConnector implements ConnectorInterface {
+class SqsConnector implements ConnectorContract {
 
 	/**
 	 * Establish a queue connection.

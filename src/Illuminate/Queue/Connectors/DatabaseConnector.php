@@ -1,9 +1,10 @@
 <?php namespace Illuminate\Queue\Connectors;
 
 use Illuminate\Queue\DatabaseQueue;
-use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Contracts\Queue\Connector as ConnectorContract;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
 
-class DatabaseConnector implements ConnectorInterface {
+class DatabaseConnector implements ConnectorContract {
 
 	/**
 	 * Database connections.
@@ -15,10 +16,10 @@ class DatabaseConnector implements ConnectorInterface {
 	/**
 	 * Create a new connector instance.
 	 *
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $connections
+	 * @param  \Illuminate\Contracts\Database\ConnectionResolver  $connections
 	 * @return void
 	 */
-	public function __construct(ConnectionResolverInterface $connections)
+	public function __construct(ConnectionResolverContract $connections)
 	{
 		$this->connections = $connections;
 	}

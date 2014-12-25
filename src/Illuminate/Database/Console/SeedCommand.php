@@ -3,7 +3,7 @@
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
 
 class SeedCommand extends Command {
 
@@ -26,17 +26,17 @@ class SeedCommand extends Command {
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	protected $resolver;
 
 	/**
 	 * Create a new database seed command instance.
 	 *
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Contracts\Database\ConnectionResolver  $resolver
 	 * @return void
 	 */
-	public function __construct(Resolver $resolver)
+	public function __construct(ConnectionResolverContract $resolver)
 	{
 		parent::__construct();
 

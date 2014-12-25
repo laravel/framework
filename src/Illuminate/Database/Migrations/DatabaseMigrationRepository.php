@@ -1,13 +1,14 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
+use Illuminate\Contracts\Database\Migrations\MigrationRepository as MigrationRepositoryContract;
 
-class DatabaseMigrationRepository implements MigrationRepositoryInterface {
+class DatabaseMigrationRepository implements MigrationRepositoryContract {
 
 	/**
 	 * The database connection resolver instance.
 	 *
-	 * @var \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	protected $resolver;
 
@@ -28,11 +29,11 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Create a new database migration repository instance.
 	 *
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Contracts\Database\ConnectionResolver  $resolver
 	 * @param  string  $table
 	 * @return void
 	 */
-	public function __construct(Resolver $resolver, $table)
+	public function __construct(ConnectionResolverContract $resolver, $table)
 	{
 		$this->table = $table;
 		$this->resolver = $resolver;
@@ -150,7 +151,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	/**
 	 * Get the connection resolver instance.
 	 *
-	 * @return \Illuminate\Database\ConnectionResolverInterface
+	 * @return \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	public function getConnectionResolver()
 	{

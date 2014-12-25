@@ -9,8 +9,9 @@ use RuntimeException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 
-class Connection implements ConnectionInterface {
+class Connection implements ConnectionContract {
 
 	/**
 	 * The active PDO connection.

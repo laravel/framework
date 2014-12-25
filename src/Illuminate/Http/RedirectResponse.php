@@ -3,8 +3,8 @@
 use BadMethodCallException;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Session\StoreInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
@@ -21,7 +21,7 @@ class RedirectResponse extends BaseRedirectResponse {
 	/**
 	 * The session store implementation.
 	 *
-	 * @var \Illuminate\Session\Store
+	 * @var \Illuminate\Session\StoreInterface
 	 */
 	protected $session;
 
@@ -186,7 +186,7 @@ class RedirectResponse extends BaseRedirectResponse {
 	/**
 	 * Get the session store implementation.
 	 *
-	 * @return \Illuminate\Session\Store
+	 * @return \Illuminate\Session\StoreInterface
 	 */
 	public function getSession()
 	{
@@ -196,10 +196,10 @@ class RedirectResponse extends BaseRedirectResponse {
 	/**
 	 * Set the session store implementation.
 	 *
-	 * @param  \Illuminate\Session\Store  $session
+	 * @param  \Illuminate\Session\StoreInterface  $session
 	 * @return void
 	 */
-	public function setSession(SessionStore $session)
+	public function setSession(StoreInterface $session)
 	{
 		$this->session = $session;
 	}
@@ -209,7 +209,7 @@ class RedirectResponse extends BaseRedirectResponse {
 	 *
 	 * @param  string  $method
 	 * @param  array  $parameters
-	 * @return void
+	 * @return \Illuminate\Http\RedirectResponse
 	 *
 	 * @throws \BadMethodCallException
 	 */

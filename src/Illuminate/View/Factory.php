@@ -7,6 +7,7 @@ use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\Factory as FactoryContract;
+use Illuminate\Contracts\View\ViewFinder as ViewFinderContract;
 
 class Factory implements FactoryContract {
 
@@ -20,7 +21,7 @@ class Factory implements FactoryContract {
 	/**
 	 * The view finder implementation.
 	 *
-	 * @var \Illuminate\View\ViewFinderInterface
+	 * @var \Illuminate\Contracts\View\ViewFinder
 	 */
 	protected $finder;
 
@@ -98,11 +99,11 @@ class Factory implements FactoryContract {
 	 * Create a new view factory instance.
 	 *
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
-	 * @param  \Illuminate\View\ViewFinderInterface  $finder
+	 * @param  \Illuminate\Contracts\View\ViewFinder  $finder
 	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
-	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
+	public function __construct(EngineResolver $engines, ViewFinderContract $finder, Dispatcher $events)
 	{
 		$this->finder = $finder;
 		$this->events = $events;
@@ -160,7 +161,7 @@ class Factory implements FactoryContract {
 	 */
 	protected function normalizeName($name)
 	{
-		$delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+		$delimiter = ViewFinderContract::HINT_PATH_DELIMITER;
 
 		if (strpos($name, $delimiter) === false)
 		{
@@ -287,7 +288,7 @@ class Factory implements FactoryContract {
 	 * Get the appropriate view engine for the given path.
 	 *
 	 * @param  string  $path
-	 * @return \Illuminate\View\Engines\EngineInterface
+	 * @return \Illuminate\Contracts\View\Engine
 	 *
 	 * @throws \InvalidArgumentException
 	 */
@@ -555,7 +556,7 @@ class Factory implements FactoryContract {
 	 */
 	public function inject($section, $content)
 	{
-		return $this->startSection($section, $content);
+		$this->startSection($section, $content);
 	}
 
 	/**
@@ -779,7 +780,7 @@ class Factory implements FactoryContract {
 	/**
 	 * Get the view finder instance.
 	 *
-	 * @return \Illuminate\View\ViewFinderInterface
+	 * @return \Illuminate\Contracts\View\ViewFinder
 	 */
 	public function getFinder()
 	{
@@ -789,10 +790,10 @@ class Factory implements FactoryContract {
 	/**
 	 * Set the view finder instance.
 	 *
-	 * @param  \Illuminate\View\ViewFinderInterface  $finder
+	 * @param  \Illuminate\Contracts\View\ViewFinder  $finder
 	 * @return void
 	 */
-	public function setFinder(ViewFinderInterface $finder)
+	public function setFinder(ViewFinderContract $finder)
 	{
 		$this->finder = $finder;
 	}

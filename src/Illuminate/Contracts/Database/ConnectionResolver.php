@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php namespace Illuminate\Contracts\Database;
 
-interface ConnectionResolverInterface {
+interface ConnectionResolver {
 
 	/**
 	 * Get a database connection instance.

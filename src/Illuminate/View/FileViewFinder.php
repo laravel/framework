@@ -2,8 +2,9 @@
 
 use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\View\ViewFinder as ViewFinderContract;
 
-class FileViewFinder implements ViewFinderInterface {
+class FileViewFinder implements ViewFinderContract {
 
 	/**
 	 * The filesystem instance.

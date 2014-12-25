@@ -5,10 +5,10 @@ use ArrayAccess;
 use BadMethodCallException;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\View\Engines\EngineInterface;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Contracts\View\Engine as ViewEngine;
 
 class View implements ArrayAccess, ViewContract {
 
@@ -22,7 +22,7 @@ class View implements ArrayAccess, ViewContract {
 	/**
 	 * The engine implementation.
 	 *
-	 * @var \Illuminate\View\Engines\EngineInterface
+	 * @var \Illuminate\Contracts\View\Engine
 	 */
 	protected $engine;
 
@@ -51,13 +51,13 @@ class View implements ArrayAccess, ViewContract {
 	 * Create a new view instance.
 	 *
 	 * @param  \Illuminate\View\Factory  $factory
-	 * @param  \Illuminate\View\Engines\EngineInterface  $engine
+	 * @param  \Illuminate\Contracts\View\Engine  $engine
 	 * @param  string  $view
 	 * @param  string  $path
 	 * @param  array   $data
 	 * @return void
 	 */
-	public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = array())
+	public function __construct(Factory $factory, ViewEngine $engine, $view, $path, $data = array())
 	{
 		$this->view = $view;
 		$this->path = $path;
@@ -223,7 +223,7 @@ class View implements ArrayAccess, ViewContract {
 	/**
 	 * Get the view's rendering engine.
 	 *
-	 * @return \Illuminate\View\Engines\EngineInterface
+	 * @return \Illuminate\Contracts\View\Engine
 	 */
 	public function getEngine()
 	{

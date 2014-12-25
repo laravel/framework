@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Queue\Connectors;
 
+use Illuminate\Contracts\Queue\Connector as ConnectorContract;
 use Illuminate\Queue\SyncQueue;
 
-class SyncConnector implements ConnectorInterface {
+class SyncConnector implements ConnectorContract {
 
 	/**
 	 * Establish a queue connection.

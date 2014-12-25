@@ -37,7 +37,7 @@ class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
 
 	protected function getEngine()
 	{
-		return new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
+		return new CompilerEngine(m::mock('Illuminate\Contracts\View\Compiler'));
 	}
 
 }

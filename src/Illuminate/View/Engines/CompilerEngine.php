@@ -1,14 +1,14 @@
 <?php namespace Illuminate\View\Engines;
 
 use ErrorException;
-use Illuminate\View\Compilers\CompilerInterface;
+use Illuminate\Contracts\View\Compiler as CompilerContract;
 
 class CompilerEngine extends PhpEngine {
 
 	/**
 	 * The Blade compiler instance.
 	 *
-	 * @var \Illuminate\View\Compilers\CompilerInterface
+	 * @var \Illuminate\Contracts\View\Compiler
 	 */
 	protected $compiler;
 
@@ -22,10 +22,10 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * Create a new Blade view engine instance.
 	 *
-	 * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
+	 * @param  \Illuminate\Contracts\View\Compiler  $compiler
 	 * @return void
 	 */
-	public function __construct(CompilerInterface $compiler)
+	public function __construct(CompilerContract $compiler)
 	{
 		$this->compiler = $compiler;
 	}
@@ -91,7 +91,7 @@ class CompilerEngine extends PhpEngine {
 	/**
 	 * Get the compiler implementation.
 	 *
-	 * @return \Illuminate\View\Compilers\CompilerInterface
+	 * @return \Illuminate\Contracts\View\Compiler
 	 */
 	public function getCompiler()
 	{

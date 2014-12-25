@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
-class WinCacheStore extends TaggableStore implements StoreInterface {
+use Illuminate\Contracts\Cache\Store as StoreContract;
+
+class WinCacheStore extends TaggableStore implements StoreContract {
 
 	/**
 	 * A string that should be prepended to keys.

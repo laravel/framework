@@ -157,7 +157,7 @@ class ConnectionFactory {
 	 * Create a connector instance based on the configuration.
 	 *
 	 * @param  array  $config
-	 * @return \Illuminate\Database\Connectors\ConnectorInterface
+	 * @return \Illuminate\Contracts\Database\Connector
 	 *
 	 * @throws \InvalidArgumentException
 	 */

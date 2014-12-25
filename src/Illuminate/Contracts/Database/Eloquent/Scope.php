@@ -1,6 +1,9 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php namespace Illuminate\Contracts\Database\Eloquent;
 
-interface ScopeInterface {
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+interface Scope {
 
 	/**
 	 * Apply the scope to a given Eloquent query builder.

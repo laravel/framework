@@ -1,8 +1,9 @@
 <?php namespace Illuminate\View\Engines;
 
 use Exception;
+use Illuminate\Contracts\View\Engine as EngineContract;
 
-class PhpEngine implements EngineInterface {
+class PhpEngine implements EngineContract {
 
 	/**
 	 * Get the evaluated contents of the view.

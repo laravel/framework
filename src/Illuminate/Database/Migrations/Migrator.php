@@ -1,14 +1,15 @@
 <?php namespace Illuminate\Database\Migrations;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
+use Illuminate\Contracts\Database\Migrations\MigrationRepository as MigrationRepositoryContract;
 
 class Migrator {
 
 	/**
 	 * The migration repository implementation.
 	 *
-	 * @var \Illuminate\Database\Migrations\MigrationRepositoryInterface
+	 * @var \Illuminate\Contracts\Database\Migrations\MigrationRepository
 	 */
 	protected $repository;
 
@@ -22,7 +23,7 @@ class Migrator {
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	protected $resolver;
 
@@ -43,13 +44,13 @@ class Migrator {
 	/**
 	 * Create a new migrator instance.
 	 *
-	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Contracts\Database\Migrations\MigrationRepository  $repository
+	 * @param  \Illuminate\Contracts\Database\ConnectionResolver  $resolver
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(MigrationRepositoryInterface $repository,
-								Resolver $resolver,
+	public function __construct(MigrationRepositoryContract $repository,
+                                ConnectionResolverContract $resolver,
                                 Filesystem $files)
 	{
 		$this->files = $files;
@@ -354,7 +355,7 @@ class Migrator {
 	/**
 	 * Get the migration repository instance.
 	 *
-	 * @return \Illuminate\Database\Migrations\MigrationRepositoryInterface
+	 * @return \Illuminate\Contracts\Database\Migrations\MigrationRepository
 	 */
 	public function getRepository()
 	{

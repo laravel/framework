@@ -52,7 +52,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 
 	public function testWorkerLogsJobToFailedQueueIfMaxTriesHasBeenExceeded()
 	{
-		$worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'), $failer = m::mock('Illuminate\Queue\Failed\FailedJobProviderInterface'));
+		$worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'), $failer = m::mock('Illuminate\Contracts\Queue\Failed\FailedJobProvider'));
 		$job = m::mock('Illuminate\Contracts\Queue\Job');
 		$job->shouldReceive('attempts')->once()->andReturn(10);
 		$job->shouldReceive('getQueue')->once()->andReturn('queue');

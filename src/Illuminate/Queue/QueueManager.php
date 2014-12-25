@@ -15,11 +15,18 @@ class QueueManager implements FactoryContract, MonitorContract {
 	protected $app;
 
 	/**
+	 * The array of queue connectors resolvers.
+	 *
+	 * @var array
+	 */
+	protected $connectors = [];
+
+	/**
 	 * The array of resolved queue connections.
 	 *
 	 * @var array
 	 */
-	protected $connections = array();
+	protected $connections = [];
 
 	/**
 	 * Create a new queue manager instance.
@@ -118,7 +125,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	 * Get the connector for a given driver.
 	 *
 	 * @param  string  $driver
-	 * @return \Illuminate\Queue\Connectors\ConnectorInterface
+	 * @return \Illuminate\Contracts\Queue\Connector
 	 *
 	 * @throws \InvalidArgumentException
 	 */
@@ -141,7 +148,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	 */
 	public function extend($driver, Closure $resolver)
 	{
-		return $this->addConnector($driver, $resolver);
+		$this->addConnector($driver, $resolver);
 	}
 
 	/**

@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Translation;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Translation\Loader as LoaderContract;
 
-class FileLoader implements LoaderInterface {
+class FileLoader implements LoaderContract {
 
 	/**
 	 * The filesystem instance.

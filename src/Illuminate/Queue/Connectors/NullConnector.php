@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Queue\Connectors;
 
 use Illuminate\Queue\NullQueue;
+use Illuminate\Contracts\Queue\Connector as ConnectorContract;
 
-class NullConnector implements ConnectorInterface {
+class NullConnector implements ConnectorContract {
 
 	/**
 	 * Establish a queue connection.

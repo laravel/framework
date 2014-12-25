@@ -163,8 +163,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 	protected function getMocks()
 	{
 		$mocks = array(
-			'tokens' => m::mock('Illuminate\Auth\Passwords\TokenRepositoryInterface'),
-			'users'     => m::mock('Illuminate\Auth\UserProviderInterface'),
+			'tokens' => m::mock('Illuminate\Contracts\Auth\TokenRepository'),
+			'users'     => m::mock('Illuminate\Contracts\Auth\UserProvider'),
 			'mailer'    => m::mock('Illuminate\Contracts\Mail\Mailer'),
 			'view'      => 'resetLinkView',
 		);

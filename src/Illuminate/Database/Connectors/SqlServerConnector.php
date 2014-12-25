@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Database\Connectors;
 
 use PDO;
+use Illuminate\Contracts\Database\Connector as ConnectorContract;
 
-class SqlServerConnector extends Connector implements ConnectorInterface {
+class SqlServerConnector extends BaseConnector implements ConnectorContract {
 
 	/**
 	 * The PDO connection options.

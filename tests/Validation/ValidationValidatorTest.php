@@ -855,25 +855,25 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Unique:users'));
-		$mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array())->andReturn(0);
 		$v->setPresenceVerifier($mock);
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Unique:users,email_addr,1'));
-		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock2 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id', array())->andReturn(1);
 		$v->setPresenceVerifier($mock2);
 		$this->assertFalse($v->passes());
 
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Unique:users,email_addr,1,id_col'));
-		$mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock3 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock3->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id_col', array())->andReturn(2);
 		$v->setPresenceVerifier($mock3);
 		$this->assertFalse($v->passes());
 
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Unique:users,email_addr,NULL,id_col,foo,bar'));
-		$mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock3 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock3->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, 'id_col', array('foo' => 'bar'))->andReturn(2);
 		$v->setPresenceVerifier($mock3);
 		$this->assertFalse($v->passes());
@@ -884,26 +884,26 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users'));
-		$mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array())->andReturn(true);
 		$v->setPresenceVerifier($mock);
 		$this->assertTrue($v->passes());
 
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users,email,account_id,1,name,taylor'));
-		$mock4 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock4 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock4->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array('account_id' => 1, 'name' => 'taylor'))->andReturn(true);
 		$v->setPresenceVerifier($mock4);
 		$this->assertTrue($v->passes());
 
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Exists:users,email_addr'));
-		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock2 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, null, array())->andReturn(false);
 		$v->setPresenceVerifier($mock2);
 		$this->assertFalse($v->passes());
 
 		$v = new Validator($trans, array('email' => array('foo')), array('email' => 'Exists:users,email_addr'));
-		$mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock3 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', array('foo'), array())->andReturn(false);
 		$v->setPresenceVerifier($mock3);
 		$this->assertFalse($v->passes());
@@ -913,14 +913,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('id' => 'foo'), array('id' => 'Integer|Exists:users,id'));
-		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock2 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock2->shouldReceive('getCount')->never();
 		$v->setPresenceVerifier($mock2);
 		$this->assertFalse($v->passes());
 
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, array('id' => '1'), array('id' => 'Integer|Exists:users,id'));
-		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock2 = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$mock2->shouldReceive('getCount')->once()->with('users', 'id', '1', null, null, array())->andReturn(true);
 		$v->setPresenceVerifier($mock2);
 		$this->assertTrue($v->passes());

@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Database\Migrations;
+<?php namespace Illuminate\Contracts\Database\Migrations;
 
-interface MigrationRepositoryInterface {
+interface MigrationRepository {
 
 	/**
 	 * Get the ran migrations for a given package.

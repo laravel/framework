@@ -23,7 +23,8 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Contracts\Database\Eloquent\Scope as ScopeContract;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable {
 
@@ -184,7 +185,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	protected static $resolver;
 
@@ -326,10 +327,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Register a new global scope on the model.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
+	 * @param  \Illuminate\Contracts\Database\Eloquent\Scope  $scope
 	 * @return void
 	 */
-	public static function addGlobalScope(ScopeInterface $scope)
+	public static function addGlobalScope(ScopeContract $scope)
 	{
 		static::$globalScopes[get_called_class()][get_class($scope)] = $scope;
 	}
@@ -337,7 +338,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Determine if a model has a global scope.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
+	 * @param  \Illuminate\Contracts\Database\Eloquent\Scope  $scope
 	 * @return bool
 	 */
 	public static function hasGlobalScope($scope)
@@ -348,8 +349,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get a global scope registered with the model.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
-	 * @return \Illuminate\Database\Eloquent\ScopeInterface|null
+	 * @param  \Illuminate\Contracts\Database\Eloquent\Scope  $scope
+	 * @return \Illuminate\Contracts\Database\Eloquent\Scope|null
 	 */
 	public static function getGlobalScope($scope)
 	{
@@ -362,7 +363,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get the global scopes for this class instance.
 	 *
-	 * @return \Illuminate\Database\Eloquent\ScopeInterface[]
+	 * @return array
 	 */
 	public function getGlobalScopes()
 	{
@@ -1836,7 +1837,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get a new query instance without a given scope.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
+	 * @param  \Illuminate\Contracts\Database\Eloquent\Scope  $scope
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function newQueryWithoutScope($scope)
@@ -3112,7 +3113,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get the database connection for the model.
 	 *
-	 * @return \Illuminate\Database\Connection
+	 * @return \Illuminate\Contracts\Database\Connection
 	 */
 	public function getConnection()
 	{
@@ -3146,7 +3147,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Resolve a connection instance.
 	 *
 	 * @param  string  $connection
-	 * @return \Illuminate\Database\Connection
+	 * @return \Illuminate\Contracts\Database\Connection
 	 */
 	public static function resolveConnection($connection = null)
 	{
@@ -3156,7 +3157,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get the connection resolver instance.
 	 *
-	 * @return \Illuminate\Database\ConnectionResolverInterface
+	 * @return \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	public static function getConnectionResolver()
 	{
@@ -3166,10 +3167,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Set the connection resolver instance.
 	 *
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Contracts\Database\ConnectionResolver  $resolver
 	 * @return void
 	 */
-	public static function setConnectionResolver(Resolver $resolver)
+	public static function setConnectionResolver(ConnectionResolverContract $resolver)
 	{
 		static::$resolver = $resolver;
 	}

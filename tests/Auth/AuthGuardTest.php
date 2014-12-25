@@ -273,7 +273,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
 	{
 		return array(
 			m::mock('Symfony\Component\HttpFoundation\Session\SessionInterface'),
-			m::mock('Illuminate\Auth\UserProviderInterface'),
+			m::mock('Illuminate\Contracts\Auth\UserProvider'),
 			Symfony\Component\HttpFoundation\Request::create('/', 'GET'),
 			m::mock('Illuminate\Cookie\CookieJar'),
 		);

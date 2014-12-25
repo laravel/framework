@@ -12,7 +12,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testOptionResolution()
 	{
-		$connector = new Illuminate\Database\Connectors\Connector;
+		$connector = new Illuminate\Database\Connectors\BaseConnector;
 		$connector->setDefaultOptions(array(0 => 'foo', 1 => 'bar'));
 		$this->assertEquals(array(0 => 'baz', 1 => 'bar', 2 => 'boom'), $connector->getOptions(array('options' => array(0 => 'baz', 2 => 'boom'))));
 	}

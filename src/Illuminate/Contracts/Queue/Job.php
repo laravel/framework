@@ -32,6 +32,20 @@ interface Job {
 	public function attempts();
 
 	/**
+	 * Call the failed method on the job instance.
+	 *
+	 * @return void
+	 */
+	public function failed();
+
+	/**
+	 * Determine if the job has been deleted.
+	 *
+	 * @return bool
+	 */
+	public function isDeleted();
+
+	/**
 	 * Get the name of the queued job class.
 	 *
 	 * @return string
@@ -44,5 +58,13 @@ interface Job {
 	 * @return string
 	 */
 	public function getQueue();
+
+
+	/**
+	 * Get the raw body string for the job.
+	 *
+	 * @return string
+	 */
+	public function getRawBody();
 
 }

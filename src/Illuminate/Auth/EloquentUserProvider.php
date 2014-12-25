@@ -2,8 +2,9 @@
 
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Auth\UserProvider as UserProviderContract;
 
-class EloquentUserProvider implements UserProviderInterface {
+class EloquentUserProvider implements UserProviderContract {
 
 	/**
 	 * The hasher implementation.

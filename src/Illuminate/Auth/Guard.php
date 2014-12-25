@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Illuminate\Contracts\Auth\UserProvider as UserProviderContract;
 
 class Guard implements GuardContract {
 
@@ -35,7 +36,7 @@ class Guard implements GuardContract {
 	/**
 	 * The user provider implementation.
 	 *
-	 * @var \Illuminate\Auth\UserProviderInterface
+	 * @var \Illuminate\Contracts\Auth\UserProvider
 	 */
 	protected $provider;
 
@@ -84,14 +85,12 @@ class Guard implements GuardContract {
 	/**
 	 * Create a new authentication guard.
 	 *
-	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
+	 * @param  \Illuminate\Contracts\Auth\UserProvider $provider
 	 * @param  \Symfony\Component\HttpFoundation\Session\SessionInterface  $session
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request|null  $request
 	 * @return void
 	 */
-	public function __construct(UserProviderInterface $provider,
-								SessionInterface $session,
-								Request $request = null)
+	public function __construct(UserProviderContract $provider, SessionInterface $session, Request $request = null)
 	{
 		$this->session = $session;
 		$this->request = $request;
@@ -656,7 +655,7 @@ class Guard implements GuardContract {
 	/**
 	 * Get the user provider used by the guard.
 	 *
-	 * @return \Illuminate\Auth\UserProviderInterface
+	 * @return \Illuminate\Contracts\Auth\UserProvider
 	 */
 	public function getProvider()
 	{
@@ -666,10 +665,10 @@ class Guard implements GuardContract {
 	/**
 	 * Set the user provider used by the guard.
 	 *
-	 * @param  \Illuminate\Auth\UserProviderInterface  $provider
+	 * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
 	 * @return void
 	 */
-	public function setProvider(UserProviderInterface $provider)
+	public function setProvider(UserProviderContract $provider)
 	{
 		$this->provider = $provider;
 	}

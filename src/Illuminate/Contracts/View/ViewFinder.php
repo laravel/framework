@@ -1,6 +1,6 @@
-<?php namespace Illuminate\View;
+<?php namespace Illuminate\Contracts\View;
 
-interface ViewFinderInterface {
+interface ViewFinder {
 
 	/**
 	 * Hint path delimiter value.

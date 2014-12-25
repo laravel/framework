@@ -1,6 +1,9 @@
 <?php namespace Illuminate\Database;
 
-class ConnectionResolver implements ConnectionResolverInterface {
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
+
+class ConnectionResolver implements ConnectionResolverContract {
 
 	/**
 	 * All of the registered connections.
@@ -34,7 +37,7 @@ class ConnectionResolver implements ConnectionResolverInterface {
 	 * Get a database connection instance.
 	 *
 	 * @param  string  $name
-	 * @return \Illuminate\Database\ConnectionInterface
+	 * @return \Illuminate\Contracts\Database\Connection
 	 */
 	public function connection($name = null)
 	{
@@ -47,10 +50,10 @@ class ConnectionResolver implements ConnectionResolverInterface {
 	 * Add a connection to the resolver.
 	 *
 	 * @param  string  $name
-	 * @param  \Illuminate\Database\ConnectionInterface  $connection
+	 * @param  \Illuminate\Contracts\Database\Connection  $connection
 	 * @return void
 	 */
-	public function addConnection($name, ConnectionInterface $connection)
+	public function addConnection($name, ConnectionContract $connection)
 	{
 		$this->connections[$name] = $connection;
 	}

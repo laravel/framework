@@ -3,8 +3,9 @@
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
 use Illuminate\Queue\BeanstalkdQueue;
+use Illuminate\Contracts\Queue\Connector as ConnectorContract;
 
-class BeanstalkdConnector implements ConnectorInterface {
+class BeanstalkdConnector implements ConnectorContract {
 
 	/**
 	 * Establish a queue connection.
