@@ -330,7 +330,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function registerConfiguredProviders()
 	{
-		$manifestPath = $this['path.storage'].'/framework/services.json';
+		$manifestPath = $this->storagePath().'/framework/services.json';
 
 		(new ProviderRepository($this, new Filesystem, $manifestPath))
 		            ->load($this->config['app.providers']);
@@ -690,7 +690,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function isDownForMaintenance()
 	{
-		return file_exists($this['config']['app.manifest'].'/down');
+		return file_exists($this->storagePath().'/framework/down');
 	}
 
 	/**
