@@ -25,7 +25,7 @@ class DownCommand extends Command {
 	 */
 	public function fire()
 	{
-		touch($this->laravel['config']['app.manifest'].'/down');
+		touch($this->laravel->storagePath().'/framework/down');
 
 		$this->comment('Application is now in maintenance mode.');
 	}
