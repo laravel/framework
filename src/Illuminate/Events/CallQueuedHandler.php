@@ -3,7 +3,7 @@
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Container\Container;
 
-class FireQueuedHandler {
+class CallQueuedHandler {
 
 	/**
 	 * The container instance.
@@ -30,13 +30,35 @@ class FireQueuedHandler {
 	 * @param  array  $data
 	 * @return void
 	 */
-	public function fire(Job $job, array $data)
+	public function call(Job $job, array $data)
 	{
 		call_user_func_array(
-			[$this->container->make($data['class']), $data['method']], unserialize($data['data'])
+			[$this->createHandler($job, $data), $data['method']], unserialize($data['data'])
 		);
 
-		$job->delete();
+		if ( ! $job->isDeletedOrReleased())
+		{
+			$job->delete();
+		}
+	}
+
+	/**
+	 * Create the handler instance for the given event.
+	 *
+	 * @param  \Illuminate\Contracts\Queue\Job  $job
+	 * @param  array  $data
+	 * @return mixed
+	 */
+	protected function createHandler(Job $job, array $data)
+	{
+		$handler = $this->container->make($data['class']);
+
+		if (method_exists($handler, 'setJob'))
+		{
+			$handler->setJob($job);
+		}
+
+		return $handler;
 	}
 
 }

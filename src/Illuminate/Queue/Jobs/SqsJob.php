@@ -84,6 +84,8 @@ class SqsJob extends Job implements JobContract {
 	 */
 	public function release($delay = 0)
 	{
+		parent::release($delay);
+
 		// SQS job releases are handled by the server configuration...
 	}
 

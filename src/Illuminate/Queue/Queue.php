@@ -57,6 +57,13 @@ abstract class Queue {
 		{
 			return json_encode($this->createClosurePayload($job, $data));
 		}
+		elseif (is_object($job))
+		{
+			return json_encode([
+				'job' => 'Illuminate\Queue\CallQueuedHandler@call',
+				'data' => ['command' => serialize($job)]
+			]);
+		}
 
 		return json_encode($this->createPlainPayload($job, $data));
 	}

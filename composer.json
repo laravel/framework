@@ -39,6 +39,7 @@
     },
     "replace": {
         "illuminate/auth": "self.version",
+        "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
@@ -56,6 +57,7 @@
         "illuminate/log": "self.version",
         "illuminate/mail": "self.version",
         "illuminate/pagination": "self.version",
+        "illuminate/pipeline": "self.version",
         "illuminate/queue": "self.version",
         "illuminate/redis": "self.version",
         "illuminate/routing": "self.version",

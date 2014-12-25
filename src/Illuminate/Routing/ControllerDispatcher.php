@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
 
 class ControllerDispatcher {
@@ -98,7 +99,7 @@ class ControllerDispatcher {
 		// Here we will make a stack onion instance to execute this request in, which gives
 		// us the ability to define middlewares on controllers. We will return the given
 		// response back out so that "after" filters can be run after the middlewares.
-		return (new Stack($this->container))
+		return (new Pipeline($this->container))
 	                ->send($request)
 	                ->through($middleware)
 	                ->then(function($request) use ($instance, $route, $method)

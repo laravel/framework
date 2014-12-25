@@ -3,6 +3,7 @@
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -663,7 +664,7 @@ class Router implements RegistrarContract {
 	{
 		$middleware = $this->gatherRouteMiddlewares($route);
 
-		return (new Stack($this->container))
+		return (new Pipeline($this->container))
 		                ->send($request)
 		                ->through($middleware)
 		                ->then(function($request) use ($route)
