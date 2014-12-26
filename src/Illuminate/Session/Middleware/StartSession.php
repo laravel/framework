@@ -76,7 +76,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 */
 	public function terminate($request, $response)
 	{
-		if ($this->sessionConfigured() && ! $this->usingCookieSessions())
+		if ( ! $this->usingCookieSessions())
 		{
 			$this->manager->driver()->save();
 		}
