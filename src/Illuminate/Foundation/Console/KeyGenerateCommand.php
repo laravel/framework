@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
 
 class KeyGenerateCommand extends Command {
 
@@ -40,7 +41,14 @@ class KeyGenerateCommand extends Command {
 
 		$this->laravel['config']['app.key'] = $key;
 
-		$this->info("Application key [$key] set successfully.");
+		if ( ! $this->input->getOption('pretend'))
+		{
+			$this->info("Application key [$key] set successfully.");
+		}
+		else
+		{
+			$this->comment($key);
+		}
 	}
 
 	/**
@@ -51,6 +59,18 @@ class KeyGenerateCommand extends Command {
 	protected function getRandomKey()
 	{
 		return Str::random(32);
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('pretend', null, InputOption::VALUE_NONE, 'Generate key without updating the config file.'),
+		);
 	}
 
 }
