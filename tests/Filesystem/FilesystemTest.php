@@ -4,25 +4,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class FilesystemTest extends PHPUnit_Framework_TestCase {
 
-	protected $testDirectory;
-
-	static public function setUpBeforeClass()
-	{
-		mkdir(__DIR__.'/laravel-test-dir/');
-	}
-
-	static public function tearDownAfterClass()
-	{
-		$fs = new Filesystem();
-		$fs->deleteDirectory(__DIR__.'/laravel-test-dir/');
-	}
-
-	public function setUp()
-	{
-		// Using mt_rand provides us with a new directory for each test case
-		$this->testDirectory = __DIR__.'/laravel-test-dir/'.mt_rand();
-		mkdir($this->testDirectory);
-	}
+	protected $testDirectory = __DIR__;
 
 	public function testGetRetrievesFiles()
 	{
