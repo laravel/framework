@@ -1247,20 +1247,12 @@ class Router implements RegistrarContract {
 	/**
 	 * Alias for the "currentRouteNamed" method.
 	 *
-	 * @param  mixed  string
+	 * @param  array|string  $pattern
 	 * @return bool
 	 */
-	public function is()
+	public function is($pattern)
 	{
-		foreach (func_get_args() as $pattern)
-		{
-			if (str_is($pattern, $this->currentRouteName()))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return $this->matchPattern($this->currentRouteName(), $pattern);
 	}
 
 	/**
@@ -1291,14 +1283,28 @@ class Router implements RegistrarContract {
 	/**
 	 * Alias for the "currentRouteUses" method.
 	 *
-	 * @param  mixed  string
+	 * @param  array|string  $pattern
 	 * @return bool
 	 */
-	public function uses()
+	public function uses($pattern)
 	{
-		foreach (func_get_args() as $pattern)
+		return $this->matchPattern($this->currentRouteAction(), $pattern);
+	}
+
+	/**
+	 * Checks if one or many patterns match.
+	 *
+	 * @param  string  $value
+	 * @param  array|string  $pattern
+	 * @return bool
+	 */
+	protected function matchPattern($value, $pattern)
+	{
+		$patterns = is_array($pattern) ? $pattern : (array) $pattern;
+
+		foreach ($patterns as $pattern)
 		{
-			if (str_is($pattern, $this->currentRouteAction()))
+			if (str_is($pattern, $value))
 			{
 				return true;
 			}
