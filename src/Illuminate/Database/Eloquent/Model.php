@@ -1982,7 +1982,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Get the queueable identity for the entity.
 	 *
-	 * @var mixed
+	 * @return mixed
 	 */
 	public function getQueueableId()
 	{
