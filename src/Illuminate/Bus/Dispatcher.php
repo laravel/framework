@@ -20,12 +20,12 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	/**
 	 * The queue resolver callback.
 	 *
-	 * @var \Closure
+	 * @var \Closure|null
 	 */
 	protected $queueResolver;
 
 	/**
-	 * All of the commnad to handler mappings.
+	 * All of the command to handler mappings.
 	 *
 	 * @var array
 	 */
@@ -48,7 +48,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	public function __construct(Container $container, Closure $queueResolver = null)
 	{
 		$this->container = $container;
-		$this->queueResolver = $queueResolver ?: function() {};
+		$this->queueResolver = $queueResolver;
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	public function dispatch($command)
 	{
-		if ($command instanceof ShouldBeQueued && $this->queue)
+		if ($this->queueResolver && $command instanceof ShouldBeQueued)
 		{
 			return $this->dispatchToQueue($command);
 		}
@@ -87,19 +87,19 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 *
 	 * @param  mixed  $command
 	 * @return mixed
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function dispatchToQueue($command)
 	{
 		$queue = call_user_func($this->queueResolver);
 
-		if ($queue)
-		{
-			$queue->push($command);
-		}
-		else
+		if ( ! $queue instanceof Queue)
 		{
 			throw new \RuntimeException("Queue resolver did not return a Queue implementation.");
 		}
+
+		$queue->push($command);
 	}
 
 	/**
