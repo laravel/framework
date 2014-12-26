@@ -37,7 +37,7 @@ class Pipeline implements PipelineContract {
 	/**
 	 * Create a new class instance.
 	 *
-	 * @param  \Closure  $app
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function __construct(Container $container)
