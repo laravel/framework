@@ -449,16 +449,9 @@ class Factory implements FactoryContract {
 	 * @param  integer  $priority
 	 * @return void
 	 */
-	protected function addEventListener($name, $callback, $priority = null)
+	protected function addEventListener($name, $callback, $priority = 0)
 	{
-		if (is_null($priority))
-		{
-			$this->events->listen($name, $callback);
-		}
-		else
-		{
-			$this->events->listen($name, $callback, $priority);
-		}
+		$this->events->listen($name, $callback, $priority);
 	}
 
 	/**

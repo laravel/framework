@@ -146,7 +146,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	public function testComposersAreProperlyRegistered()
 	{
 		$factory = $this->getFactory();
-		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 0);
 		$callback = $factory->composer('foo', function() { return 'bar'; });
 		$callback = $callback[0];
 
@@ -168,9 +168,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	public function testComposersCanBeMassRegistered()
 	{
 		$factory = $this->getFactory();
-		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: bar', m::type('Closure'));
-		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: qux', m::type('Closure'));
-		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: bar', m::type('Closure'), 0);
+		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: qux', m::type('Closure'), 0);
+		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 0);
 		$composers = $factory->composers(array(
 			'foo' => 'bar',
 			'baz@baz' => array('qux', 'foo'),
@@ -189,7 +189,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	public function testClassCallbacks()
 	{
 		$factory = $this->getFactory();
-		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 0);
 		$factory->setContainer($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
 		$composer->shouldReceive('compose')->once()->with('view')->andReturn('composed');
@@ -203,7 +203,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	public function testClassCallbacksWithMethods()
 	{
 		$factory = $this->getFactory();
-		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
+		$factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 0);
 		$factory->setContainer($container = m::mock('Illuminate\Container\Container'));
 		$container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer = m::mock('StdClass'));
 		$composer->shouldReceive('doComposer')->once()->with('view')->andReturn('composed');
@@ -228,7 +228,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	public function testComposersAreRegisteredWithSlashAndDot()
 	{
 		$factory = $this->getFactory();
-		$factory->getDispatcher()->shouldReceive('listen')->with('composing: foo.bar', m::any())->twice();
+		$factory->getDispatcher()->shouldReceive('listen')->with('composing: foo.bar', m::any(), 0)->twice();
 		$factory->composer('foo.bar', '');
 		$factory->composer('foo/bar', '');
 	}
