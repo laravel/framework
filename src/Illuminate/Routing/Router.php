@@ -1295,12 +1295,13 @@ class Router implements RegistrarContract {
 	 * Checks if one or many patterns match.
 	 *
 	 * @param  string  $value
-	 * @param  array|string  $pattern
+	 * @param  array|mixed  $patterns
 	 * @return bool
 	 */
-	protected function matchPattern($value, $pattern)
+	protected function matchPattern($value, $patterns)
 	{
-		$patterns = is_array($pattern) ? $pattern : (array) $pattern;
+		$value = func_get_arg(0);
+		$patterns = array_slice(func_get_args(), 1);
 
 		foreach ($patterns as $pattern)
 		{
