@@ -135,7 +135,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	protected function resolvable($abstract)
 	{
-		return $this->bound($abstract) || $this->isAlias($abstract);
+		return $this->bound($abstract);
 	}
 
 	/**
