@@ -497,11 +497,14 @@ if ( ! function_exists('env'))
 	 * Gets the value of an environment variable. Supports boolean, empty and null.
 	 *
 	 * @param  string  $key
+	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	function env($key)
+	function env($key, $default = null)
 	{
 		$value = getenv($key);
+
+		if ( ! $value) return value($default);
 
 		switch (strtolower($value))
 		{
