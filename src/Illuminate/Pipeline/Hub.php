@@ -61,12 +61,12 @@ class Hub implements HubContract {
 	 * @param  string|null  $pipeline
 	 * @return mixed
 	 */
-	public function pipe($object, $pipieline = null)
+	public function pipe($object, $pipeline = null)
 	{
-		$pipieline = $pipieline ?: 'default';
+		$pipeline = $pipeline ?: 'default';
 
 		return call_user_func(
-			$this->pipelines[$pipieline], new Pipeline($this->container), $object
+			$this->pipelines[$pipeline], new Pipeline($this->container), $object
 		);
 	}
 
