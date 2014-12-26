@@ -366,6 +366,16 @@ abstract class AbstractPaginator {
 	}
 
 	/**
+	 * Get the paginator's underlying collection.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function getCollection()
+	{
+		return $this->items;
+	}
+
+	/**
 	 * Determine if the given item exists.
 	 *
 	 * @param  mixed  $key
@@ -408,6 +418,18 @@ abstract class AbstractPaginator {
 	public function offsetUnset($key)
 	{
 		unset($this->items[$key]);
+	}
+
+	/**
+	 * Make dynamic calls into the collection.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		return call_user_func_array([$this->getCollection(), $method], $parameters);
 	}
 
 	/**
