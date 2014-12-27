@@ -74,6 +74,16 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMacro()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'Hello World');
+		$files = new Filesystem;
+		$files->macro('getFoo', function () use ($files) { return $files->get(__DIR__.'/foo.txt'); });
+		$this->assertEquals('Hello World', $files->getFoo());
+		@unlink(__DIR__.'/foo.txt');
+	}
+
+
 	public function testFilesMethod()
 	{
 		mkdir(__DIR__.'/foo');
