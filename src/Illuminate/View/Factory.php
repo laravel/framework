@@ -444,9 +444,9 @@ class Factory implements FactoryContract {
 	/**
 	 * Add a listener to the event dispatcher.
 	 *
-	 * @param  string   $name
-	 * @param  \Closure $callback
-	 * @param  integer  $priority
+	 * @param  string    $name
+	 * @param  \Closure  $callback
+	 * @param  integer   $priority
 	 * @return void
 	 */
 	protected function addEventListener($name, $callback, $priority = null)

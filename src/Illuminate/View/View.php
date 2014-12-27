@@ -70,7 +70,7 @@ class View implements ArrayAccess, ViewContract {
 	/**
 	 * Get the string contents of the view.
 	 *
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return string
 	 */
 	public function render(Closure $callback = null)
