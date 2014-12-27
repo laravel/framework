@@ -1,12 +1,13 @@
 <?php namespace Illuminate\Http;
 
 use Closure;
+use ArrayAccess;
 use SplFileInfo;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class Request extends SymfonyRequest {
+class Request extends SymfonyRequest implements ArrayAccess {
 
 	/**
 	 * The decoded JSON content for the request.
@@ -714,6 +715,51 @@ class Request extends SymfonyRequest {
 		$this->routeResolver = $callback;
 
 		return $this;
+	}
+
+	/**
+	 * Determine if the given offset exists.
+	 *
+	 * @param  string  $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset)
+	{
+		return array_key_exists($offset, $this->all());
+	}
+
+	/**
+	 * Get the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @return mixed
+	 */
+	public function offsetGet($offset)
+	{
+		return $this->input($offset);
+	}
+
+	/**
+	 * Set the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		return $this->getInputSource()->set($offset, $value);
+	}
+
+	/**
+	 * Remove the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @return void
+	 */
+	public function offsetUnset($offset)
+	{
+		return $this->getInputSource()->remove($offset);
 	}
 
 	/**
