@@ -498,7 +498,7 @@ class Guard implements GuardContract {
 	/**
 	 * Queue the recaller cookie into the cookie jar.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
 	protected function queueRecallerCookie(UserContract $user)
