@@ -32,7 +32,7 @@ class Hub implements HubContract {
 	}
 
 	/**
-	 * Define the default named pipieline.
+	 * Define the default named pipeline.
 	 *
 	 * @param  \Closure  $callback
 	 * @return void
@@ -43,7 +43,7 @@ class Hub implements HubContract {
 	}
 
 	/**
-	 * Define a new named pipieline.
+	 * Define a new named pipeline.
 	 *
 	 * @param  string  $name
 	 * @param  \Closure  $callback
