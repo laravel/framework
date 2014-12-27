@@ -36,13 +36,10 @@ class CallQueuedHandler {
 			$job, unserialize($data['command'])
 		);
 
-		$handler = $this->setJobInstanceIfNecessary(
-			$job, $this->dispatcher->resolveHandler($command)
-		);
-
-		$method = $this->dispatcher->getHandlerMethod($command);
-
-		call_user_func([$handler, $method], $command);
+		$this->dispatcher->dispatchNow($command, function($handler) use ($job)
+		{
+			$this->setJobInstanceIfNecessary($job, $handler);
+		});
 
 		if ( ! $job->isDeletedOrReleased())
 		{
