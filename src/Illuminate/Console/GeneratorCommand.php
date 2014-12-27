@@ -119,7 +119,7 @@ abstract class GeneratorCommand extends Command {
 	}
 
 	/**
-	 * Build the controller class with the given name.
+	 * Build the class with the given name.
 	 *
 	 * @param  string  $name
 	 * @return string
