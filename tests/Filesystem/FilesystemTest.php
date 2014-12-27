@@ -4,14 +4,42 @@ use Illuminate\Filesystem\Filesystem;
 
 class FilesystemTest extends PHPUnit_Framework_TestCase {
 
-	protected $testDirectory = __DIR__;
+	static protected $testDirectory = __DIR__;
+
+	protected $filesystem = null;
+
+	/**
+	 * Files/Folders that should not be deleted after running tests.
+	 * The files/folders not listed here are supposed to be leftover by failing tests. 
+	 */
+	static protected $excludedFromDelete = ['FilesystemTest.php'];
+
+	public function tearDown()
+	{
+		if($this->filesystem == null)
+			$this->filesystem = new Filesystem();
+
+		$directories = $this->filesystem->directories(self::$testDirectory);
+		$files = $this->filesystem->files(self::$testDirectory);
+		
+		foreach($directories as $directory)
+		{
+			if( !in_array($directory,self::$excludedFromDelete))
+				$this->filesystem->deleteDirectory($directory);
+		}
+		foreach($directories as $file)
+		{
+			if( !in_array($file,self::$excludedFromDelete))
+				$this->filesystem->delete($file);
+		}
+	}
 
 	public function testGetRetrievesFiles()
 	{
-		file_put_contents($this->testDirectory.'/file.txt', 'Hello World');
+		file_put_contents(self::$testDirectory.'/file.txt', 'Hello World');
 		$files = new Filesystem;
-		$this->assertEquals('Hello World', $files->get($this->testDirectory.'/file.txt'));
-		@unlink($this->testDirectory.'/file.txt');
+		$this->assertEquals('Hello World', $files->get(self::$testDirectory.'/file.txt'));
+		@unlink(self::$testDirectory.'/file.txt');
 	}
 
 
@@ -21,16 +49,16 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	public function testGetThrowsExceptionNonexisitingFile()
 	{
 		$files = new Filesystem;
-		$files->get($this->testDirectory.'/unknown-file.txt');
+		$files->get(self::$testDirectory.'/unknown-file.txt');
 	}
 
 
 	public function testGetRequireReturnsProperly()
 	{
-		file_put_contents($this->testDirectory.'/file.php', '<?php return "Howdy?"; ?>');
+		file_put_contents(self::$testDirectory.'/file.php', '<?php return "Howdy?"; ?>');
 		$files = new Filesystem;
-		$this->assertEquals('Howdy?',$files->getRequire($this->testDirectory.'/file.php'));
-		@unlink($this->testDirectory.'/file.php');
+		$this->assertEquals('Howdy?',$files->getRequire(self::$testDirectory.'/file.php'));
+		@unlink(self::$testDirectory.'/file.php');
 	}
 
 
@@ -40,262 +68,262 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	public function testGetRequireThrowsExceptionNonexisitingFile()
 	{
 		$files = new Filesystem;
-		$files->getRequire($this->testDirectory.'/file.php');
+		$files->getRequire(self::$testDirectory.'/file.php');
 	}
 
 
 	public function testAppendAddsDataToFile()
 	{
-		file_put_contents($this->testDirectory.'/file.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/file.txt', 'foo');
 		$files = new Filesystem;
-		$bytesWritten = $files->append($this->testDirectory.'/file.txt','bar');
+		$bytesWritten = $files->append(self::$testDirectory.'/file.txt','bar');
 		$this->assertEquals(mb_strlen('bar','8bit'),$bytesWritten);
-		$this->assertFileExists($this->testDirectory.'/file.txt');
-		$this->assertStringEqualsFile($this->testDirectory.'/file.txt','foobar');
-		@unlink($this->testDirectory.'/file.txt');
+		$this->assertFileExists(self::$testDirectory.'/file.txt');
+		$this->assertStringEqualsFile(self::$testDirectory.'/file.txt','foobar');
+		@unlink(self::$testDirectory.'/file.txt');
 	}
 
 
 	public function testMoveMovesFiles()
 	{
-		file_put_contents($this->testDirectory.'/foo.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$files->move($this->testDirectory.'/foo.txt',$this->testDirectory.'/bar.txt');
-		$this->assertFileExists($this->testDirectory.'/bar.txt');
-		$this->assertFileNotExists($this->testDirectory.'/foo.txt');
-		@unlink($this->testDirectory.'/bar.txt');
+		$files->move(self::$testDirectory.'/foo.txt',self::$testDirectory.'/bar.txt');
+		$this->assertFileExists(self::$testDirectory.'/bar.txt');
+		$this->assertFileNotExists(self::$testDirectory.'/foo.txt');
+		@unlink(self::$testDirectory.'/bar.txt');
 	}
 
 
 	public function testExtensionReturnsExtension()
 	{
-		file_put_contents($this->testDirectory.'/foo.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals('txt',$files->extension($this->testDirectory.'/foo.txt'));
-		@unlink($this->testDirectory.'/foo.txt');
+		$this->assertEquals('txt',$files->extension(self::$testDirectory.'/foo.txt'));
+		@unlink(self::$testDirectory.'/foo.txt');
 	}
 
 
 	public function testTypeIndentifiesFile()
 	{
-		file_put_contents($this->testDirectory.'/foo.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals('file',$files->type($this->testDirectory.'/foo.txt'));
-		@unlink($this->testDirectory.'/foo.txt');
+		$this->assertEquals('file',$files->type(self::$testDirectory.'/foo.txt'));
+		@unlink(self::$testDirectory.'/foo.txt');
 	}
 
 
 	public function testTypeIndentifiesDirectory()
 	{
-		mkdir($this->testDirectory.'/foo');
+		mkdir(self::$testDirectory.'/foo');
 		$files = new Filesystem;
-		$this->assertEquals('dir',$files->type($this->testDirectory.'/foo'));
-		@rmdir($this->testDirectory.'/foo');
+		$this->assertEquals('dir',$files->type(self::$testDirectory.'/foo'));
+		@rmdir(self::$testDirectory.'/foo');
 	}
 
 
 	public function testSizeOutputsSize()
 	{
-		$size = file_put_contents($this->testDirectory.'/foo.txt', 'foo');
+		$size = file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals($size,$files->size($this->testDirectory.'/foo.txt'));
-		@unlink($this->testDirectory.'/foo.txt');
+		$this->assertEquals($size,$files->size(self::$testDirectory.'/foo.txt'));
+		@unlink(self::$testDirectory.'/foo.txt');
 	}
 
 
 	public function testLastModified()
 	{
 		$time = time();
-		file_put_contents($this->testDirectory.'/foo.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals($time,$files->lastModified($this->testDirectory.'/foo.txt'));
-		@unlink($this->testDirectory.'/foo.txt');
+		$this->assertEquals($time,$files->lastModified(self::$testDirectory.'/foo.txt'));
+		@unlink(self::$testDirectory.'/foo.txt');
 	}
 
 
 	public function testIsWritable()
 	{
-		file_put_contents($this->testDirectory.'/foo.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		@chmod($this->testDirectory.'/foo.txt', 0444);
-		$this->assertFalse($files->isWritable($this->testDirectory.'/foo.txt'));
-		@chmod($this->testDirectory.'/foo.txt', 0777);
-		$this->assertTrue($files->isWritable($this->testDirectory.'/foo.txt'));
-		@unlink($this->testDirectory.'/foo.txt');
+		@chmod(self::$testDirectory.'/foo.txt', 0444);
+		$this->assertFalse($files->isWritable(self::$testDirectory.'/foo.txt'));
+		@chmod(self::$testDirectory.'/foo.txt', 0777);
+		$this->assertTrue($files->isWritable(self::$testDirectory.'/foo.txt'));
+		@unlink(self::$testDirectory.'/foo.txt');
 	}
 
 
 	public function testGlobFindsFiles()
 	{
-		file_put_contents($this->testDirectory.'/foo.txt', 'foo');
-		file_put_contents($this->testDirectory.'/bar.txt', 'bar');
+		file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/bar.txt', 'bar');
 		$files = new Filesystem;
-		$glob = $files->glob($this->testDirectory.'/*.txt');
-		$this->assertContains($this->testDirectory.'/foo.txt',$glob);
-		$this->assertContains($this->testDirectory.'/bar.txt',$glob);
-		@unlink($this->testDirectory.'/foo.txt');
-		@unlink($this->testDirectory.'/bar.txt');
+		$glob = $files->glob(self::$testDirectory.'/*.txt');
+		$this->assertContains(self::$testDirectory.'/foo.txt',$glob);
+		$this->assertContains(self::$testDirectory.'/bar.txt',$glob);
+		@unlink(self::$testDirectory.'/foo.txt');
+		@unlink(self::$testDirectory.'/bar.txt');
 	}
 
 
 	public function testAllFilesFindsFiles()
 	{
-		file_put_contents($this->testDirectory.'/foo.txt', 'foo');
-		file_put_contents($this->testDirectory.'/bar.txt', 'bar');
+		file_put_contents(self::$testDirectory.'/foo.txt', 'foo');
+		file_put_contents(self::$testDirectory.'/bar.txt', 'bar');
 		$files = new Filesystem;
 		$allFiles = [];
-		foreach($files->allFiles($this->testDirectory) as $file)
+		foreach($files->allFiles(self::$testDirectory) as $file)
 			$allFiles[] = $file->getFilename();
 		$this->assertContains('foo.txt',$allFiles);
 		$this->assertContains('bar.txt',$allFiles);
-		@unlink($this->testDirectory.'/foo.txt');
-		@unlink($this->testDirectory.'/bar.txt');
+		@unlink(self::$testDirectory.'/foo.txt');
+		@unlink(self::$testDirectory.'/bar.txt');
 	}
 
 
 	public function testDirectoriesFindsDirectories()
 	{
-		mkdir($this->testDirectory.'/foo');
-		mkdir($this->testDirectory.'/bar');
+		mkdir(self::$testDirectory.'/foo');
+		mkdir(self::$testDirectory.'/bar');
 		$files = new Filesystem;
-		$directories = $files->directories($this->testDirectory);
-		$this->assertContains($this->testDirectory.DIRECTORY_SEPARATOR.'foo',$directories);
-		$this->assertContains($this->testDirectory.DIRECTORY_SEPARATOR.'bar',$directories);
-		@rmdir($this->testDirectory.'/foo');
-		@rmdir($this->testDirectory.'/bar');
+		$directories = $files->directories(self::$testDirectory);
+		$this->assertContains(self::$testDirectory.DIRECTORY_SEPARATOR.'foo',$directories);
+		$this->assertContains(self::$testDirectory.DIRECTORY_SEPARATOR.'bar',$directories);
+		@rmdir(self::$testDirectory.'/foo');
+		@rmdir(self::$testDirectory.'/bar');
 	}
 
 	public function testMakeDirectory()
 	{
 		$files = new Filesystem;
-		$this->assertTrue($files->makeDirectory($this->testDirectory.'/foo'));
-		$this->assertFileExists($this->testDirectory.'/foo');
-		@rmdir($this->testDirectory.'/foo');
+		$this->assertTrue($files->makeDirectory(self::$testDirectory.'/foo'));
+		$this->assertFileExists(self::$testDirectory.'/foo');
+		@rmdir(self::$testDirectory.'/foo');
 	}
 
 
 	public function testPutStoresFiles()
 	{
 		$files = new Filesystem;
-		$files->put($this->testDirectory.'/file.txt', 'Hello World');
-		$this->assertEquals('Hello World', file_get_contents($this->testDirectory.'/file.txt'));
-		@unlink($this->testDirectory.'/file.txt');
+		$files->put(self::$testDirectory.'/file.txt', 'Hello World');
+		$this->assertEquals('Hello World', file_get_contents(self::$testDirectory.'/file.txt'));
+		@unlink(self::$testDirectory.'/file.txt');
 	}
 
 
 	public function testDeleteRemovesFiles()
 	{
-		file_put_contents($this->testDirectory.'/file.txt', 'Hello World');
+		file_put_contents(self::$testDirectory.'/file.txt', 'Hello World');
 		$files = new Filesystem;
-		$files->delete($this->testDirectory.'/file.txt');
-		$this->assertFileNotExists($this->testDirectory.'/file.txt');
-		@unlink($this->testDirectory.'/file.txt');
+		$files->delete(self::$testDirectory.'/file.txt');
+		$this->assertFileNotExists(self::$testDirectory.'/file.txt');
+		@unlink(self::$testDirectory.'/file.txt');
 	}
 
 
 	public function testPrependExistingFiles()
 	{
 		$files = new Filesystem;
-		$files->put($this->testDirectory.'/file.txt', 'World');
-		$files->prepend($this->testDirectory.'/file.txt', 'Hello ');
-		$this->assertEquals('Hello World', file_get_contents($this->testDirectory.'/file.txt'));
-		@unlink($this->testDirectory.'/file.txt');
+		$files->put(self::$testDirectory.'/file.txt', 'World');
+		$files->prepend(self::$testDirectory.'/file.txt', 'Hello ');
+		$this->assertEquals('Hello World', file_get_contents(self::$testDirectory.'/file.txt'));
+		@unlink(self::$testDirectory.'/file.txt');
 	}
 
 
 	public function testPrependNewFiles()
 	{
 		$files = new Filesystem;
-		$files->prepend($this->testDirectory.'/file.txt', 'Hello World');
-		$this->assertEquals('Hello World', file_get_contents($this->testDirectory.'/file.txt'));
-		@unlink($this->testDirectory.'/file.txt');
+		$files->prepend(self::$testDirectory.'/file.txt', 'Hello World');
+		$this->assertEquals('Hello World', file_get_contents(self::$testDirectory.'/file.txt'));
+		@unlink(self::$testDirectory.'/file.txt');
 	}
 
 
 	public function testDeleteDirectory()
 	{
-		mkdir($this->testDirectory.'/foo');
-		file_put_contents($this->testDirectory.'/foo/file.txt', 'Hello World');
+		mkdir(self::$testDirectory.'/foo');
+		file_put_contents(self::$testDirectory.'/foo/file.txt', 'Hello World');
 		$files = new Filesystem;
-		$files->deleteDirectory($this->testDirectory.'/foo');
-		$this->assertFalse(is_dir($this->testDirectory.'/foo'));
-		$this->assertFileNotExists($this->testDirectory.'/foo/file.txt');
+		$files->deleteDirectory(self::$testDirectory.'/foo');
+		$this->assertFalse(is_dir(self::$testDirectory.'/foo'));
+		$this->assertFileNotExists(self::$testDirectory.'/foo/file.txt');
 	}
 
 
 	public function testDeleteDirectoryWorksRecursively()
 	{
-		mkdir($this->testDirectory.'/foo');
-		mkdir($this->testDirectory.'/foo/bar');
+		mkdir(self::$testDirectory.'/foo');
+		mkdir(self::$testDirectory.'/foo/bar');
 		$files = new Filesystem;
-		$files->deleteDirectory($this->testDirectory.'/foo');
-		$this->assertFalse(is_dir($this->testDirectory.'/foo/bar'));
-		$this->assertFalse(is_dir($this->testDirectory.'/foo'));
+		$files->deleteDirectory(self::$testDirectory.'/foo');
+		$this->assertFalse(is_dir(self::$testDirectory.'/foo/bar'));
+		$this->assertFalse(is_dir(self::$testDirectory.'/foo'));
 	}
 
 
 	public function testCleanDirectory()
 	{
-		mkdir($this->testDirectory.'/foo');
-		file_put_contents($this->testDirectory.'/foo/file.txt', 'Hello World');
+		mkdir(self::$testDirectory.'/foo');
+		file_put_contents(self::$testDirectory.'/foo/file.txt', 'Hello World');
 		$files = new Filesystem;
-		$files->cleanDirectory($this->testDirectory.'/foo');
-		$this->assertTrue(is_dir($this->testDirectory.'/foo'));
-		$this->assertFileNotExists($this->testDirectory.'/foo/file.txt');
-		@rmdir($this->testDirectory.'/foo');
+		$files->cleanDirectory(self::$testDirectory.'/foo');
+		$this->assertTrue(is_dir(self::$testDirectory.'/foo'));
+		$this->assertFileNotExists(self::$testDirectory.'/foo/file.txt');
+		@rmdir(self::$testDirectory.'/foo');
 	}
 
 
 	public function testFilesMethod()
 	{
-		mkdir($this->testDirectory.'/foo');
-		file_put_contents($this->testDirectory.'/foo/1.txt', '1');
-		file_put_contents($this->testDirectory.'/foo/2.txt', '2');
-		mkdir($this->testDirectory.'/foo/bar');
+		mkdir(self::$testDirectory.'/foo');
+		file_put_contents(self::$testDirectory.'/foo/1.txt', '1');
+		file_put_contents(self::$testDirectory.'/foo/2.txt', '2');
+		mkdir(self::$testDirectory.'/foo/bar');
 		$files = new Filesystem;
-		$this->assertEquals(array($this->testDirectory.'/foo/1.txt', $this->testDirectory.'/foo/2.txt'), $files->files($this->testDirectory.'/foo'));
+		$this->assertEquals(array(self::$testDirectory.'/foo/1.txt', self::$testDirectory.'/foo/2.txt'), $files->files(self::$testDirectory.'/foo'));
 		unset($files);
-		@unlink($this->testDirectory.'/foo/1.txt');
-		@unlink($this->testDirectory.'/foo/2.txt');
-		@rmdir($this->testDirectory.'/foo/bar');
-		@rmdir($this->testDirectory.'/foo');
+		@unlink(self::$testDirectory.'/foo/1.txt');
+		@unlink(self::$testDirectory.'/foo/2.txt');
+		@rmdir(self::$testDirectory.'/foo/bar');
+		@rmdir(self::$testDirectory.'/foo');
 	}
 
 
 	public function testCopyDirectoryReturnsFalseIfSourceIsntDirectory()
 	{
 		$files = new Filesystem;
-		$this->assertFalse($files->copyDirectory($this->testDirectory.'/foo/bar/baz/breeze/boom', $this->testDirectory));
+		$this->assertFalse($files->copyDirectory(self::$testDirectory.'/foo/bar/baz/breeze/boom', self::$testDirectory));
 	}
 
 
 	public function testCopyDirectoryMovesEntireDirectory()
 	{
-		mkdir($this->testDirectory.'/tmp', 0777, true);
-		file_put_contents($this->testDirectory.'/tmp/foo.txt', '');
-		file_put_contents($this->testDirectory.'/tmp/bar.txt', '');
-		mkdir($this->testDirectory.'/tmp/nested', 0777, true);
-		file_put_contents($this->testDirectory.'/tmp/nested/baz.txt', '');
+		mkdir(self::$testDirectory.'/tmp', 0777, true);
+		file_put_contents(self::$testDirectory.'/tmp/foo.txt', '');
+		file_put_contents(self::$testDirectory.'/tmp/bar.txt', '');
+		mkdir(self::$testDirectory.'/tmp/nested', 0777, true);
+		file_put_contents(self::$testDirectory.'/tmp/nested/baz.txt', '');
 
 		$files = new Filesystem;
-		$files->copyDirectory($this->testDirectory.'/tmp', $this->testDirectory.'/tmp2');
-		$this->assertTrue(is_dir($this->testDirectory.'/tmp2'));
-		$this->assertFileExists($this->testDirectory.'/tmp2/foo.txt');
-		$this->assertFileExists($this->testDirectory.'/tmp2/bar.txt');
-		$this->assertTrue(is_dir($this->testDirectory.'/tmp2/nested'));
-		$this->assertFileExists($this->testDirectory.'/tmp2/nested/baz.txt');
+		$files->copyDirectory(self::$testDirectory.'/tmp', self::$testDirectory.'/tmp2');
+		$this->assertTrue(is_dir(self::$testDirectory.'/tmp2'));
+		$this->assertFileExists(self::$testDirectory.'/tmp2/foo.txt');
+		$this->assertFileExists(self::$testDirectory.'/tmp2/bar.txt');
+		$this->assertTrue(is_dir(self::$testDirectory.'/tmp2/nested'));
+		$this->assertFileExists(self::$testDirectory.'/tmp2/nested/baz.txt');
 
-		unlink($this->testDirectory.'/tmp/nested/baz.txt');
-		rmdir($this->testDirectory.'/tmp/nested');
-		unlink($this->testDirectory.'/tmp/bar.txt');
-		unlink($this->testDirectory.'/tmp/foo.txt');
-		rmdir($this->testDirectory.'/tmp');
+		unlink(self::$testDirectory.'/tmp/nested/baz.txt');
+		rmdir(self::$testDirectory.'/tmp/nested');
+		unlink(self::$testDirectory.'/tmp/bar.txt');
+		unlink(self::$testDirectory.'/tmp/foo.txt');
+		rmdir(self::$testDirectory.'/tmp');
 
-		unlink($this->testDirectory.'/tmp2/nested/baz.txt');
-		rmdir($this->testDirectory.'/tmp2/nested');
-		unlink($this->testDirectory.'/tmp2/foo.txt');
-		unlink($this->testDirectory.'/tmp2/bar.txt');
-		rmdir($this->testDirectory.'/tmp2');
+		unlink(self::$testDirectory.'/tmp2/nested/baz.txt');
+		rmdir(self::$testDirectory.'/tmp2/nested');
+		unlink(self::$testDirectory.'/tmp2/foo.txt');
+		unlink(self::$testDirectory.'/tmp2/bar.txt');
+		rmdir(self::$testDirectory.'/tmp2');
 	}
 
 }
