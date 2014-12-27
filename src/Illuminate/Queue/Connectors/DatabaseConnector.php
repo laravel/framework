@@ -6,6 +6,13 @@ use Illuminate\Database\ConnectionResolverInterface;
 class DatabaseConnector implements ConnectorInterface {
 
 	/**
+	 * Database connections.
+	 *
+	 * @var \Illuminate\Database\ConnectionResolverInterface
+	 */
+	protected $connections;
+
+	/**
 	 * Create a new connector instance.
 	 *
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $connections
