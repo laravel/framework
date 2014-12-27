@@ -57,7 +57,6 @@ class SyncQueue extends Queue implements QueueContract {
 	/**
 	 * Resolve a Sync job instance.
 	 *
-	 * @param  string  $job
 	 * @param  string  $payload
 	 * @return \Illuminate\Queue\Jobs\SyncJob
 	 */

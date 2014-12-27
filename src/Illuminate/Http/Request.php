@@ -765,6 +765,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	/**
 	 * Get an input element from the request.
 	 *
+	 * @param  string  $key
 	 * @return mixed
 	 */
 	public function __get($key)

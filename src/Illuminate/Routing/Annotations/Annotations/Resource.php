@@ -65,7 +65,6 @@ class Resource extends Annotation {
 	 * Get all of the resource method endpoints with pathless filters.
 	 *
 	 * @param  \Illuminate\Routing\Annotations\EndpointCollection  $endpoints
-	 * @param  string  $key
 	 * @return array
 	 */
 	protected function getEndpointsWithResourceMethods(EndpointCollection $endpoints)

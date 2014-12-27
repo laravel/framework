@@ -193,7 +193,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Iterator/MultiplePcreFilterIterator.php',
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Iterator/PathFilterIterator.php',
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Iterator/ExcludeDirectoryFilterIterator.php',
-    $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Iterator/RecurisveDirectoryIterator.php',
+    $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Iterator/RecursiveDirectoryIterator.php',
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Iterator/FilterIterator.php',
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Iterator/FileTypeFilterIterator.php',
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Shell/Shell.php',

@@ -56,6 +56,7 @@ class Kernel implements KernelContract {
 	 * Create a new HTTP kernel instance.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Routing\Registrar  $router
 	 * @return void
 	 */
 	public function __construct(Application $app, Router $router)

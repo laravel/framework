@@ -115,7 +115,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	/**
 	 * Store the current URL for the request if necessary.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @param  \Illuminate\Session\SessionInterface  $session
 	 * @return void
 	 */
@@ -161,7 +161,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 * Add the session cookie to the application response.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Response  $response
-	 * @param  \Symfony\Component\HttpFoundation\Session\SessionInterface  $session
+	 * @param  \Illuminate\\Session\SessionInterface  $session
 	 * @return void
 	 */
 	protected function addCookieToResponse(Response $response, SessionInterface $session)
