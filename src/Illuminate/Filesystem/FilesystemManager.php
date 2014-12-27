@@ -2,7 +2,6 @@
 
 use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
-use Illuminate\Support\Manager;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Adapter\AwsS3 as S3Adapter;

@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Foundation\Http;
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
