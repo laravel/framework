@@ -11,7 +11,7 @@ interface Factory {
 	 * @param  array  $customAttributes
 	 * @return \Illuminate\Contracts\Validation\Validator
 	 */
-	public function make(array $data, array $rules, array $messages = array(), array $customAttributes = array());
+	public function make(array $data, array $rules, array $messages = [], array $customAttributes = []);
 
 	/**
 	 * Register a custom validator extension.

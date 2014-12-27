@@ -195,7 +195,7 @@ class SqlServerGrammar extends Grammar {
 	 */
 	public function compileTruncate(Builder $query)
 	{
-		return array('truncate table '.$this->wrapTable($query->from) => array());
+		return array('truncate table '.$this->wrapTable($query->from) => []);
 	}
 
 	/**

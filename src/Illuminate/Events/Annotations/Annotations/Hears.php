@@ -18,7 +18,7 @@ class Hears {
 	 * @param  array  $values
 	 * @return void
 	 */
-	public function __construct(array $values = array())
+	public function __construct(array $values = [])
 	{
 		$this->events = (array) $values['value'];
 	}

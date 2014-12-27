@@ -24,7 +24,7 @@ class CookieJar implements JarContract {
 	 *
 	 * @var array
 	 */
-	protected $queued = array();
+	protected $queued = [];
 
 	/**
 	 * Create a new cookie instance.

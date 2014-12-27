@@ -27,7 +27,7 @@ interface Dispatcher {
 	 * @param  array   $payload
 	 * @return mixed
 	 */
-	public function until($event, $payload = array());
+	public function until($event, $payload = []);
 
 	/**
 	 * Fire an event and call the listeners.
@@ -37,7 +37,7 @@ interface Dispatcher {
 	 * @param  bool    $halt
 	 * @return array|null
 	 */
-	public function fire($event, $payload = array(), $halt = false);
+	public function fire($event, $payload = [], $halt = false);
 
 	/**
 	 * Get the event that is currently firing.

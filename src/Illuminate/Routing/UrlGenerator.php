@@ -127,7 +127,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  bool|null  $secure
 	 * @return string
 	 */
-	public function to($path, $extra = array(), $secure = null)
+	public function to($path, $extra = [], $secure = null)
 	{
 		// First we will check if the URL is already a valid URL. If it is we will not
 		// try to generate a new one but will simply return the URL as is, which is
@@ -157,7 +157,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	public function secure($path, $parameters = array())
+	public function secure($path, $parameters = [])
 	{
 		return $this->to($path, $parameters, true);
 	}
@@ -242,7 +242,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function route($name, $parameters = array(), $absolute = true)
+	public function route($name, $parameters = [], $absolute = true)
 	{
 		if ( ! is_null($route = $this->routes->getByName($name)))
 		{
@@ -361,7 +361,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  array  $parameters
 	 * @return array
 	 */
-	protected function replaceRoutableParameters($parameters = array())
+	protected function replaceRoutableParameters($parameters = [])
 	{
 		$parameters = is_array($parameters) ? $parameters : array($parameters);
 
@@ -519,7 +519,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  bool    $absolute
 	 * @return string
 	 */
-	public function action($action, $parameters = array(), $absolute = true)
+	public function action($action, $parameters = [], $absolute = true)
 	{
 		if ($this->rootNamespace && ! (strpos($action, '\\') === 0))
 		{

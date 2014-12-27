@@ -35,7 +35,7 @@ class ResourceRegistrar {
 	 * @param  array   $options
 	 * @return void
 	 */
-	public function register($name, $controller, array $options = array())
+	public function register($name, $controller, array $options = [])
 	{
 		// If the resource name contains a slash, we will assume the developer wishes to
 		// register these resource routes with a prefix so we will set that up out of

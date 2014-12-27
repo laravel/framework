@@ -19,28 +19,28 @@ class Dispatcher implements DispatcherContract {
 	 *
 	 * @var array
 	 */
-	protected $listeners = array();
+	protected $listeners = [];
 
 	/**
 	 * The wildcard listeners.
 	 *
 	 * @var array
 	 */
-	protected $wildcards = array();
+	protected $wildcards = [];
 
 	/**
 	 * The sorted event listeners.
 	 *
 	 * @var array
 	 */
-	protected $sorted = array();
+	protected $sorted = [];
 
 	/**
 	 * The event firing stack.
 	 *
 	 * @var array
 	 */
-	protected $firing = array();
+	protected $firing = [];
 
 	/**
 	 * The queue resolver instance.
@@ -115,7 +115,7 @@ class Dispatcher implements DispatcherContract {
 	 * @param  array   $payload
 	 * @return void
 	 */
-	public function push($event, $payload = array())
+	public function push($event, $payload = [])
 	{
 		$this->listen($event.'_pushed', function() use ($event, $payload)
 		{
@@ -159,7 +159,7 @@ class Dispatcher implements DispatcherContract {
 	 * @param  array   $payload
 	 * @return mixed
 	 */
-	public function until($event, $payload = array())
+	public function until($event, $payload = [])
 	{
 		return $this->fire($event, $payload, true);
 	}
@@ -193,7 +193,7 @@ class Dispatcher implements DispatcherContract {
 	 * @param  bool    $halt
 	 * @return array|null
 	 */
-	public function fire($event, $payload = array(), $halt = false)
+	public function fire($event, $payload = [], $halt = false)
 	{
 		// When the given "event" is actually an object we will assume it is an event
 		// object and use the class as the event name and this event itself as the
@@ -203,7 +203,7 @@ class Dispatcher implements DispatcherContract {
 			list($payload, $event) = [[$event], get_class($event)];
 		}
 
-		$responses = array();
+		$responses = [];
 
 		// If an array is not given to us as the payload, we will turn it into one so
 		// we can easily use call_user_func_array on the listeners, passing in the
@@ -265,7 +265,7 @@ class Dispatcher implements DispatcherContract {
 	 */
 	protected function getWildcardListeners($eventName)
 	{
-		$wildcards = array();
+		$wildcards = [];
 
 		foreach ($this->wildcards as $key => $listeners)
 		{
@@ -283,7 +283,7 @@ class Dispatcher implements DispatcherContract {
 	 */
 	protected function sortListeners($eventName)
 	{
-		$this->sorted[$eventName] = array();
+		$this->sorted[$eventName] = [];
 
 		// If listeners exist for the given event, we will sort them by the priority
 		// so that we can call them in the correct order. We will cache off these

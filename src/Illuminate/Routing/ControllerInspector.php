@@ -23,7 +23,7 @@ class ControllerInspector {
 	 */
 	public function getRoutable($controller, $prefix)
 	{
-		$routable = array();
+		$routable = [];
 
 		$reflection = new ReflectionClass($controller);
 

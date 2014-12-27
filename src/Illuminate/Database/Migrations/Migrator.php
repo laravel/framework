@@ -38,7 +38,7 @@ class Migrator {
 	 *
 	 * @var array
 	 */
-	protected $notes = array();
+	protected $notes = [];
 
 	/**
 	 * Create a new migrator instance.
@@ -66,7 +66,7 @@ class Migrator {
 	 */
 	public function run($path, $pretend = false)
 	{
-		$this->notes = array();
+		$this->notes = [];
 
 		$files = $this->getMigrationFiles($path);
 
@@ -150,7 +150,7 @@ class Migrator {
 	 */
 	public function rollback($pretend = false)
 	{
-		$this->notes = array();
+		$this->notes = [];
 
 		// We want to pull in the last batch of migrations that ran on the previous
 		// migration operation. We'll then reverse those migrations and run each
@@ -219,7 +219,7 @@ class Migrator {
 		// Once we have the array of files in the directory we will just remove the
 		// extension and take the basename of the file which is all we need when
 		// finding the migrations that haven't been run against the databases.
-		if ($files === false) return array();
+		if ($files === false) return [];
 
 		$files = array_map(function($file)
 		{
