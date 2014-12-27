@@ -18,7 +18,7 @@ class BusServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('Illuminate\Contracts\Bus\Dispatcher', function($app)
+		$this->app->singleton('Illuminate\Bus\Dispatcher', function($app)
 		{
 			return new Dispatcher($app, function() use ($app)
 			{
@@ -27,7 +27,11 @@ class BusServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->alias(
-			'Illuminate\Contracts\Bus\Dispatcher', 'Illuminate\Contracts\Bus\QueueingDispatcher'
+			'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\Dispatcher'
+		);
+
+		$this->app->alias(
+			'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\QueueingDispatcher'
 		);
 	}
 
@@ -39,6 +43,7 @@ class BusServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
+			'Illuminate\Bus\Dispatcher',
 			'Illuminate\Contracts\Bus\Dispatcher',
 			'Illuminate\Contracts\Bus\QueueingDispatcher',
 		];
