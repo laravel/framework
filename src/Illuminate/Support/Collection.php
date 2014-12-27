@@ -17,7 +17,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @var array
 	 */
-	protected $items = array();
+	protected $items = [];
 
 	/**
 	 * Create a new collection.
@@ -25,7 +25,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  mixed  $items
 	 * @return void
 	 */
-	public function __construct($items = array())
+	public function __construct($items = [])
 	{
 		$items = is_null($items) ? [] : $this->getArrayableItems($items);
 
@@ -60,7 +60,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function collapse()
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($this->items as $values)
 		{
@@ -231,7 +231,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function groupBy($groupBy)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($this->items as $key => $value)
 		{
@@ -593,7 +593,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
 	{
-		$results = array();
+		$results = [];
 
 		if (is_string($callback)) $callback =
                           $this->valueRetriever($callback);
@@ -642,7 +642,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  mixed  $replacement
 	 * @return static
 	 */
-	public function splice($offset, $length = 0, $replacement = array())
+	public function splice($offset, $length = 0, $replacement = [])
 	{
 		return new static(array_splice($this->items, $offset, $length, $replacement));
 	}

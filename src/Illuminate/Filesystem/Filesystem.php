@@ -253,7 +253,7 @@ class Filesystem {
 	{
 		$glob = glob($directory.'/*');
 
-		if ($glob === false) return array();
+		if ($glob === false) return [];
 
 		// To get the appropriate files, we'll simply glob the directory and filter
 		// out any "files" that are not truly files so we do not end up with any
@@ -283,7 +283,7 @@ class Filesystem {
 	 */
 	public function directories($directory)
 	{
-		$directories = array();
+		$directories = [];
 
 		foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir)
 		{

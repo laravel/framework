@@ -134,14 +134,14 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $pluralCache = array();
+	protected static $pluralCache = [];
 
 	/**
 	 * The cached copies of the singular inflections.
 	 *
 	 * @var array
 	 */
-	protected static $singularCache = array();
+	protected static $singularCache = [];
 
 	/**
 	 * Get the singular form of the given word.

@@ -448,7 +448,7 @@ class Request extends SymfonyRequest {
 	 * @param  array   $keys
 	 * @return void
 	 */
-	public function flash($filter = null, $keys = array())
+	public function flash($filter = null, $keys = [])
 	{
 		$flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
@@ -488,7 +488,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function flush()
 	{
-		$this->session()->flashInput(array());
+		$this->session()->flashInput([]);
 	}
 
 	/**

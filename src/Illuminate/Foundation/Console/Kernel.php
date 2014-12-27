@@ -117,7 +117,7 @@ class Kernel implements KernelContract {
 	 * @param  array  $parameters
 	 * @return int
 	 */
-	public function call($command, array $parameters = array())
+	public function call($command, array $parameters = [])
 	{
 		$this->bootstrap();
 
@@ -131,7 +131,7 @@ class Kernel implements KernelContract {
 	 * @param  array  $parameters
 	 * @return void
 	 */
-	public function queue($command, array $parameters = array())
+	public function queue($command, array $parameters = [])
 	{
 		$this->app['Illuminate\Contracts\Queue\Queue']->push(
 			'Illuminate\Foundation\Console\QueuedJob', func_get_args()

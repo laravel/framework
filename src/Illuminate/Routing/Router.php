@@ -60,35 +60,35 @@ class Router implements RegistrarContract {
 	 *
 	 * @var array
 	 */
-	protected $patternFilters = array();
+	protected $patternFilters = [];
 
 	/**
 	 * The registered regular expression based filters.
 	 *
 	 * @var array
 	 */
-	protected $regexFilters = array();
+	protected $regexFilters = [];
 
 	/**
 	 * The registered route value binders.
 	 *
 	 * @var array
 	 */
-	protected $binders = array();
+	protected $binders = [];
 
 	/**
 	 * The globally available parameter patterns.
 	 *
 	 * @var array
 	 */
-	protected $patterns = array();
+	protected $patterns = [];
 
 	/**
 	 * The route group attribute stack.
 	 *
 	 * @var array
 	 */
-	protected $groupStack = array();
+	protected $groupStack = [];
 
 	/**
 	 * All of the verbs supported by the router.
@@ -232,7 +232,7 @@ class Router implements RegistrarContract {
 	 * @param  array   $names
 	 * @return void
 	 */
-	public function controller($uri, $controller, $names = array())
+	public function controller($uri, $controller, $names = [])
 	{
 		$prepended = $controller;
 
@@ -304,7 +304,7 @@ class Router implements RegistrarContract {
 	 * @param  array   $options
 	 * @return void
 	 */
-	public function resource($name, $controller, array $options = array())
+	public function resource($name, $controller, array $options = [])
 	{
 		(new ResourceRegistrar($this))->register($name, $controller, $options);
 	}
@@ -1016,7 +1016,7 @@ class Router implements RegistrarContract {
 	 */
 	public function findPatternFilters($request)
 	{
-		$results = array();
+		$results = [];
 
 		list($path, $method) = array($request->path(), $request->getMethod());
 
@@ -1058,7 +1058,7 @@ class Router implements RegistrarContract {
 	 */
 	protected function patternsByMethod($method, $filters)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($filters as $filter)
 		{

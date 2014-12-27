@@ -43,21 +43,21 @@ class Factory implements FactoryContract {
 	 *
 	 * @var array
 	 */
-	protected $shared = array();
+	protected $shared = [];
 
 	/**
 	 * Array of registered view name aliases.
 	 *
 	 * @var array
 	 */
-	protected $aliases = array();
+	protected $aliases = [];
 
 	/**
 	 * All of the registered view names.
 	 *
 	 * @var array
 	 */
-	protected $names = array();
+	protected $names = [];
 
 	/**
 	 * The extension to engine bindings.
@@ -71,21 +71,21 @@ class Factory implements FactoryContract {
 	 *
 	 * @var array
 	 */
-	protected $composers = array();
+	protected $composers = [];
 
 	/**
 	 * All of the finished, captured sections.
 	 *
 	 * @var array
 	 */
-	protected $sections = array();
+	protected $sections = [];
 
 	/**
 	 * The stack of in-progress sections.
 	 *
 	 * @var array
 	 */
-	protected $sectionStack = array();
+	protected $sectionStack = [];
 
 	/**
 	 * The number of active rendering operations.
@@ -119,7 +119,7 @@ class Factory implements FactoryContract {
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function file($path, $data = array(), $mergeData = array())
+	public function file($path, $data = [], $mergeData = [])
 	{
 		$data = array_merge($mergeData, $this->parseData($data));
 
@@ -136,7 +136,7 @@ class Factory implements FactoryContract {
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function make($view, $data = array(), $mergeData = array())
+	public function make($view, $data = [], $mergeData = [])
 	{
 		if (isset($this->aliases[$view])) $view = $this->aliases[$view];
 
@@ -190,7 +190,7 @@ class Factory implements FactoryContract {
 	 * @param  mixed   $data
 	 * @return \Illuminate\View\View
 	 */
-	public function of($view, $data = array())
+	public function of($view, $data = [])
 	{
 		return $this->make($this->names[$view], $data);
 	}
@@ -345,7 +345,7 @@ class Factory implements FactoryContract {
 	 */
 	public function creator($views, $callback)
 	{
-		$creators = array();
+		$creators = [];
 
 		foreach ((array) $views as $view)
 		{
@@ -363,7 +363,7 @@ class Factory implements FactoryContract {
 	 */
 	public function composers(array $composers)
 	{
-		$registered = array();
+		$registered = [];
 
 		foreach ($composers as $callback => $views)
 		{
@@ -383,7 +383,7 @@ class Factory implements FactoryContract {
 	 */
 	public function composer($views, $callback, $priority = null)
 	{
-		$composers = array();
+		$composers = [];
 
 		foreach ((array) $views as $view)
 		{
@@ -654,9 +654,9 @@ class Factory implements FactoryContract {
 	 */
 	public function flushSections()
 	{
-		$this->sections = array();
+		$this->sections = [];
 
-		$this->sectionStack = array();
+		$this->sectionStack = [];
 	}
 
 	/**

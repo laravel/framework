@@ -14,7 +14,7 @@ class TagSet {
 	 *
 	 * @var array
 	 */
-	protected $names = array();
+	protected $names = [];
 
 	/**
 	 * Create a new TagSet instance.
@@ -23,7 +23,7 @@ class TagSet {
 	 * @param  array  $names
 	 * @return void
 	 */
-	public function __construct(StoreInterface $store, array $names = array())
+	public function __construct(StoreInterface $store, array $names = [])
 	{
 		$this->store = $store;
 		$this->names = $names;

@@ -34,7 +34,7 @@ class Arr {
 	 */
 	public static function build($array, Closure $callback)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $key => $value)
 		{
@@ -66,7 +66,7 @@ class Arr {
 	 */
 	public static function dot($array, $prepend = '')
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $key => $value)
 		{
@@ -106,7 +106,7 @@ class Arr {
 	{
 		foreach (explode('.', $key) as $segment)
 		{
-			$results = array();
+			$results = [];
 
 			foreach ($array as $value)
 			{
@@ -161,7 +161,7 @@ class Arr {
 	 */
 	public static function flatten($array)
 	{
-		$return = array();
+		$return = [];
 
 		array_walk_recursive($array, function($x) use (&$return) { $return[] = $x; });
 
@@ -275,7 +275,7 @@ class Arr {
 	 */
 	public static function pluck($array, $value, $key = null)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $item)
 		{
@@ -341,7 +341,7 @@ class Arr {
 			// values at the correct depth. Then we'll keep digging into the array.
 			if ( ! isset($array[$key]) || ! is_array($array[$key]))
 			{
-				$array[$key] = array();
+				$array[$key] = [];
 			}
 
 			$array =& $array[$key];
@@ -373,7 +373,7 @@ class Arr {
 	 */
 	public static function where($array, Closure $callback)
 	{
-		$filtered = array();
+		$filtered = [];
 
 		foreach ($array as $key => $value)
 		{

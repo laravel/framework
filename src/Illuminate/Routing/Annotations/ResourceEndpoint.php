@@ -79,7 +79,7 @@ class ResourceEndpoint implements EndpointInterface {
 	 * @param  array  $attributes
 	 * @return void
 	 */
-	public function __construct(array $attributes = array())
+	public function __construct(array $attributes = [])
 	{
 		foreach ($attributes as $key => $value)
 		{

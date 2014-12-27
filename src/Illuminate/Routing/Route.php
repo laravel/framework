@@ -42,14 +42,14 @@ class Route {
 	 *
 	 * @var array
 	 */
-	protected $defaults = array();
+	protected $defaults = [];
 
 	/**
 	 * The regular expression requirements.
 	 *
 	 * @var array
 	 */
-	protected $wheres = array();
+	protected $wheres = [];
 
 	/**
 	 * The array of matched parameters.
@@ -231,7 +231,7 @@ class Route {
 
 		$this->compiled = with(
 
-			new SymfonyRoute($uri, $optionals, $this->wheres, array(), $this->domain() ?: '')
+			new SymfonyRoute($uri, $optionals, $this->wheres, [], $this->domain() ?: '')
 
 		)->compile();
 	}
@@ -265,7 +265,7 @@ class Route {
 	 */
 	public function beforeFilters()
 	{
-		if ( ! isset($this->action['before'])) return array();
+		if ( ! isset($this->action['before'])) return [];
 
 		return $this->parseFilters($this->action['before']);
 	}
@@ -277,7 +277,7 @@ class Route {
 	 */
 	public function afterFilters()
 	{
-		if ( ! isset($this->action['after'])) return array();
+		if ( ! isset($this->action['after'])) return [];
 
 		return $this->parseFilters($this->action['after']);
 	}
@@ -317,7 +317,7 @@ class Route {
 	 */
 	protected static function explodeArrayFilters(array $filters)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($filters as $filter)
 		{
@@ -335,7 +335,7 @@ class Route {
 	 */
 	public static function parseFilter($filter)
 	{
-		if ( ! str_contains($filter, ':')) return array($filter, array());
+		if ( ! str_contains($filter, ':')) return array($filter, []);
 
 		return static::parseParameterFilter($filter);
 	}
@@ -550,7 +550,7 @@ class Route {
 	 */
 	protected function matchToKeys(array $matches)
 	{
-		if (count($this->parameterNames()) == 0) return array();
+		if (count($this->parameterNames()) == 0) return [];
 
 		$parameters = array_intersect_key($matches, array_flip($this->parameterNames()));
 
