@@ -504,7 +504,7 @@ if ( ! function_exists('env'))
 	{
 		$value = getenv($key);
 
-		if ( ! $value) return value($default);
+		if (false === $value) return value($default);
 
 		switch (strtolower($value))
 		{
