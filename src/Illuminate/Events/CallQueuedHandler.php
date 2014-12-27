@@ -32,10 +32,10 @@ class CallQueuedHandler {
 	 */
 	public function call(Job $job, array $data)
 	{
-		$event = $this->setJobIfNecessary(unserialize($data['data']));
+		$event = $this->setJobIfNecessary($job, unserialize($data['data']));
 
 		$handler = $this->setJobInstanceIfNecessary(
-			$this->container->make($data['class'])
+			$job, $this->container->make($data['class'])
 		);
 
 		call_user_func_array(
@@ -51,12 +51,13 @@ class CallQueuedHandler {
 	/**
 	 * Set the job instance of the given class if necessary.
 	 *
+	 * @param  \Illuminate\Contracts\Queue\Job  $job
 	 * @param  mixed  $instance
 	 * @return mixed
 	 */
-	protected function setJobInstanceIfNecessary($instance)
+	protected function setJobInstanceIfNecessary(Job $job, $instance)
 	{
-		if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive($instance)))
+		if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive(get_class($instance))))
 		{
 			$instance->setJob($job);
 		}
