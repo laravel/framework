@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
+use LogicException;
 use ReflectionFunction;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
@@ -420,7 +421,7 @@ class Route {
 	 *
 	 * @return array
 	 *
-	 * @throws \LogicException
+	 * @throws LogicException
 	 */
 	public function parameters()
 	{
@@ -937,6 +938,8 @@ class Route {
 	 * Prepare the route instance for serialization.
 	 *
 	 * @return void
+	 *
+	 * @throws LogicException
 	 */
 	public function prepareForSerialization()
 	{

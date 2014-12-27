@@ -114,7 +114,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	}
 
 	/**
-	 * Get the handler instnace for the given command.
+	 * Get the handler instance for the given command.
 	 *
 	 * @param  mixed  $command
 	 * @return mixed

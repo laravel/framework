@@ -105,7 +105,7 @@ class Repository implements ArrayAccess, ConfigContract {
 	/**
 	 * Get all of the configuration items for the application.
 	 *
-	 * @var array
+	 * @return array
 	 */
 	public function all()
 	{

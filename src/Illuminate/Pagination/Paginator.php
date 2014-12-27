@@ -45,7 +45,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	/**
 	 * Get the current page for the request.
 	 *
-	 * @param  int  $lastPage
+	 * @param  int  $currentPage
 	 * @return int
 	 */
 	protected function setCurrentPage($currentPage)

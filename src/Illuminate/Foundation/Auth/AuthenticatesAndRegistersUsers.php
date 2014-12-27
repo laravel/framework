@@ -23,8 +23,8 @@ trait AuthenticatesAndRegistersUsers {
 	/**
 	 * Create a new authentication controller instance.
 	 *
-	 * @param  Guard  $auth
-	 * @param  Registrar  $registrar
+	 * @param  \Illuminate\Contracts\Auth\Guard  $auth
+	 * @param  \Illuminate\Contracts\Auth\Registrar  $registrar
 	 * @return void
 	 */
 	public function __construct(Guard $auth, Registrar $registrar)
@@ -38,7 +38,7 @@ trait AuthenticatesAndRegistersUsers {
 	/**
 	 * Show the application registration form.
 	 *
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function getRegister()
 	{
@@ -48,8 +48,8 @@ trait AuthenticatesAndRegistersUsers {
 	/**
 	 * Handle a registration request for the application.
 	 *
-	 * @param  RegisterRequest  $request
-	 * @return Response
+	 * @param  \Illuminate\Foundation\Http\FormRequest  $request
+	 * @return \Illuminate\Http\Response
 	 */
 	public function postRegister(Request $request)
 	{
@@ -106,7 +106,7 @@ trait AuthenticatesAndRegistersUsers {
 	/**
 	 * Log the user out of the application.
 	 *
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function getLogout()
 	{

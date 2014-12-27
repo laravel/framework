@@ -3,6 +3,7 @@
 use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Config\Repository as RepositoryContract;
 
 class LoadConfiguration {
 
@@ -46,7 +47,7 @@ class LoadConfiguration {
 	 * @param  \Illuminate\Contracts\Config\Repository  $config
 	 * @return void
 	 */
-	protected function loadConfigurationFiles(Application $app, Repository $config)
+	protected function loadConfigurationFiles(Application $app, RepositoryContract $config)
 	{
 		foreach ($this->getConfigurationFiles($app) as $key => $path)
 		{
