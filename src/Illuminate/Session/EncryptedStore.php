@@ -52,7 +52,7 @@ class EncryptedStore extends Store {
 	 * Prepare the serialized session data for storage.
 	 *
 	 * @param  string  $data
-	 * @retunr string
+	 * @return string
 	 */
 	protected function prepareForStorage($data)
 	{

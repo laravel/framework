@@ -116,7 +116,7 @@ class MethodEndpoint implements EndpointInterface {
 	/**
 	 * Determine if the endpoint has any paths.
 	 *
-	 * @var bool
+	 * @return bool
 	 */
 	public function hasPaths()
 	{
