@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Contracts\Bus;
 
+use Closure;
+
 interface Dispatcher {
 
 	/**
@@ -8,7 +10,7 @@ interface Dispatcher {
 	 * @param  mixed  $command
 	 * @return mixed
 	 */
-	public function dispatch($command);
+	public function dispatch($command, Closure $afterResolving = null);
 
 	/**
 	 * Dispatch a command to its appropriate handler in the current process.
@@ -16,6 +18,6 @@ interface Dispatcher {
 	 * @param  mixed  $command
 	 * @return mixed
 	 */
-	public function dispatchNow($command);
+	public function dispatchNow($command, Closure $afterResolving = null);
 
 }

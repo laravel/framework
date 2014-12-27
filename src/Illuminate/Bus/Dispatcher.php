@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Bus\HandlerResolver;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
@@ -55,9 +56,10 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Dispatch a command to its appropriate handler.
 	 *
 	 * @param  mixed  $command
+	 * @param  \Closure  $afterResolving
 	 * @return mixed
 	 */
-	public function dispatch($command)
+	public function dispatch($command, Closure $afterResolving = null)
 	{
 		if ($this->queueResolver && $command instanceof ShouldBeQueued)
 		{
@@ -73,12 +75,21 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Dispatch a command to its appropriate handler in the current process.
 	 *
 	 * @param  mixed  $command
+	 * @param  \Closure  $afterResolving
 	 * @return mixed
 	 */
-	public function dispatchNow($command)
+	public function dispatchNow($command, Closure $afterResolving = null)
 	{
+		if ($command instanceof SelfHandling)
+			return $this->container->call([$command, 'handle']);
+
+		$handler = $this->resolveHandler($command);
+
+		if ($afterResolving)
+			call_user_func($afterResolving, $handler);
+
 		return call_user_func(
-			[$this->resolveHandler($command), $this->getHandlerMethod($command)], $command
+			[$handler, $this->getHandlerMethod($command)], $command
 		);
 	}
 
