@@ -215,4 +215,18 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		$this->mapper = $mapper;
 	}
 
+	/**
+	 * Map the command to a handler within a given root namespace.
+	 *
+	 * @param  mixed  $command
+	 * @param  string  $rootNamespace
+	 * @return string
+	 */
+	public static function simpleMapping($command, $rootNamespace)
+	{
+		$command = str_replace($rootNamespace.'\Commands', '', get_class($command));
+
+		return $rootNamespace.'\Handlers\Commands\\'.trim($command, '\\').'Handler@handle';
+	}
+
 }
