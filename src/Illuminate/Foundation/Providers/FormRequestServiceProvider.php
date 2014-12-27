@@ -45,7 +45,7 @@ class FormRequestServiceProvider extends ServiceProvider {
 	 * Initialize the form request with data from the given request.
 	 *
 	 * @param  \Illuminate\Foundation\Http\FormRequest  $form
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $current
 	 * @return void
 	 */
 	protected function initializeRequest(FormRequest $form, Request $current)

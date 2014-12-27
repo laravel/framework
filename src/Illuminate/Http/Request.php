@@ -719,6 +719,7 @@ class Request extends SymfonyRequest {
 	/**
 	 * Get an input element from the request.
 	 *
+	 * @param  string  $key
 	 * @return mixed
 	 */
 	public function __get($key)
