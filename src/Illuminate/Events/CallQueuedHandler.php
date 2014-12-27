@@ -32,14 +32,12 @@ class CallQueuedHandler {
 	 */
 	public function call(Job $job, array $data)
 	{
-		$event = $this->setJobIfNecessary($job, unserialize($data['data']));
-
 		$handler = $this->setJobInstanceIfNecessary(
 			$job, $this->container->make($data['class'])
 		);
 
 		call_user_func_array(
-			[$handler, $data['method']], $event
+			[$handler, $data['method']], unserialize($data['data'])
 		);
 
 		if ( ! $job->isDeletedOrReleased())
