@@ -2,8 +2,17 @@
 
 use {{rootNamespace}}Events\Event;
 
+use Illuminate\Queue\SerializesModels;
+
 class {{class}} extends Event {
 
+	use SerializesModels;
+
+	/**
+	 * Create a new event instance.
+	 *
+	 * @return void
+	 */
 	public function __construct()
 	{
 		//
