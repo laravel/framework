@@ -1,0 +1,33 @@
+<?php namespace {{namespace}};
+
+use {{fullEvent}};
+
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldBeQueued;
+
+class {{class}} implements ShouldBeQueued {
+
+	use InteractsWithQueue;
+
+	/**
+	 * Create the event handler.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		//
+	}
+
+	/**
+	 * Handle the event.
+	 *
+	 * @param  {{event}}
+	 * @return void
+	 */
+	public function handle({{event}} $command)
+	{
+		//
+	}
+
+}
