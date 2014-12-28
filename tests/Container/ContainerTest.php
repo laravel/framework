@@ -214,6 +214,19 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExtendCanBeCalledBeforeBind()
+	{
+		$container = new Container;
+		$container->extend('foo', function($old, $container)
+		{
+			return $old.'bar';
+		});
+		$container['foo'] = 'foo';
+
+		$this->assertEquals('foobar', $container->make('foo'));
+	}
+
+
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
@@ -250,6 +263,17 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$container->resolvingAny(function($object) { return $object->name = 'taylor'; });
+		$container->bind('foo', function() { return new StdClass; });
+		$instance = $container->make('foo');
+
+		$this->assertEquals('taylor', $instance->name);
+	}
+
+
+	public function testResolvingCallbacksAreCalledForType()
+	{
+		$container = new Container;
+		$container->resolvingType('StdClass', function($object) { return $object->name = 'taylor'; });
 		$container->bind('foo', function() { return new StdClass; });
 		$instance = $container->make('foo');
 
@@ -329,6 +353,152 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 
+
+	public function testCallWithDependencies()
+	{
+		$container = new Container;
+		$result = $container->call(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		});
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals([], $result[1]);
+
+		$result = $container->call(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		}, ['bar' => 'taylor']);
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+
+		/**
+		 * Wrap a function...
+		 */
+		$result = $container->wrap(function(StdClass $foo, $bar = array()) {
+			return func_get_args();
+		}, ['bar' => 'taylor']);
+
+		$this->assertInstanceOf('Closure', $result);
+		$result = $result();
+
+		$this->assertInstanceOf('stdClass', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+	}
+
+
+	/**
+	 * @expectedException ReflectionException
+	 */
+	public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
+	{
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub');
+	}
+
+
+	public function testCallWithAtSignBasedClassReferences()
+	{
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub@work', ['foo', 'bar']);
+		$this->assertEquals(['foo', 'bar'], $result);
+
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub@inject');
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub@inject', ['default' => 'foo']);
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('foo', $result[1]);
+
+		$container = new Container;
+		$result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
+		$this->assertEquals(['foo', 'bar'], $result);
+	}
+
+
+	public function testCallWithCallableArray()
+	{
+		$container = new Container;
+		$stub = new ContainerTestCallStub();
+		$result = $container->call([$stub, 'work'], ['foo', 'bar']);
+		$this->assertEquals(['foo', 'bar'], $result);
+	}
+
+
+	public function testCallWithStaticMethodNameString()
+	{
+		$container = new Container;
+		$result = $container->call('ContainerStaticMethodStub::inject');
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+	}
+
+
+	public function testCallWithGlobalMethodName()
+	{
+		$container = new Container;
+		$result = $container->call('containerTestInject');
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+	}
+
+
+	public function testContainerCanInjectDifferentImplementationsDependingOnContext()
+	{
+		$container = new Container;
+
+		$container->bind('IContainerContractStub', 'ContainerImplementationStub');
+
+		$container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStub');
+		$container->when('ContainerTestContextInjectTwo')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+		$one = $container->make('ContainerTestContextInjectOne');
+		$two = $container->make('ContainerTestContextInjectTwo');
+
+		$this->assertInstanceOf('ContainerImplementationStub', $one->impl);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
+
+		/**
+		 * Test With Closures
+		 */
+		$container = new Container;
+
+		$container->bind('IContainerContractStub', 'ContainerImplementationStub');
+
+		$container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStub');
+		$container->when('ContainerTestContextInjectTwo')->needs('IContainerContractStub')->give(function($container) {
+			return $container->make('ContainerImplementationStubTwo');
+		});
+
+		$one = $container->make('ContainerTestContextInjectOne');
+		$two = $container->make('ContainerTestContextInjectTwo');
+
+		$this->assertInstanceOf('ContainerImplementationStub', $one->impl);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
+	}
+
+
+	public function testContainerTags()
+	{
+		$container = new Container;
+		$container->tag('ContainerImplementationStub', 'foo', 'bar');
+		$container->tag('ContainerImplementationStubTwo', ['foo']);
+
+		$this->assertCount(1, $container->tagged('bar'));
+		$this->assertCount(2, $container->tagged('foo'));
+		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
+		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('bar')[0]);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
+
+		$container = new Container;
+		$container->tag(['ContainerImplementationStub', 'ContainerImplementationStubTwo'], ['foo']);
+		$this->assertEquals(2, count($container->tagged('foo')));
+		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
+		$this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
+	}
+
 }
 
 class ContainerConcreteStub {}
@@ -336,6 +506,7 @@ class ContainerConcreteStub {}
 interface IContainerContractStub {}
 
 class ContainerImplementationStub implements IContainerContractStub {}
+class ContainerImplementationStubTwo implements IContainerContractStub {}
 
 class ContainerDependentStub {
 	public $impl;
@@ -384,4 +555,44 @@ class ContainerConstructorParameterLoggingStub {
 class ContainerLazyExtendStub {
 	public static $initialized = false;
 	public function init() { static::$initialized = true; }
+}
+
+class ContainerTestCallStub {
+	public function work() {
+		return func_get_args();
+	}
+
+	public function inject(ContainerConcreteStub $stub, $default = 'taylor')
+	{
+		return func_get_args();
+	}
+}
+
+class ContainerTestContextInjectOne {
+	public $impl;
+	public function __construct(IContainerContractStub $impl)
+	{
+		$this->impl = $impl;
+	}
+}
+
+class ContainerTestContextInjectTwo {
+	public $impl;
+	public function __construct(IContainerContractStub $impl)
+	{
+		$this->impl = $impl;
+	}
+}
+
+class ContainerStaticMethodStub
+{
+	public static function inject(ContainerConcreteStub $stub, $default = 'taylor')
+	{
+		return func_get_args();
+	}
+}
+
+function containerTestInject(ContainerConcreteStub $stub, $default = 'taylor')
+{
+	return func_get_args();
 }

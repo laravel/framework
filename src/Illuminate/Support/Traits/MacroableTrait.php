@@ -1,5 +1,8 @@
 <?php namespace Illuminate\Support\Traits;
 
+use Closure;
+use BadMethodCallException;
+
 trait MacroableTrait {
 
 	/**
@@ -24,8 +27,8 @@ trait MacroableTrait {
 	/**
 	 * Checks if macro is registered
 	 *
-	 * @param  string    $name
-	 * @return boolean
+	 * @param  string  $name
+	 * @return bool
 	 */
 	public static function hasMacro($name)
 	{
@@ -45,10 +48,17 @@ trait MacroableTrait {
 	{
 		if (static::hasMacro($method))
 		{
-			return call_user_func_array(static::$macros[$method], $parameters);
+			if (static::$macros[$method] instanceof Closure)
+			{
+				return call_user_func_array(Closure::bind(static::$macros[$method], null, get_called_class()), $parameters);
+			}
+			else
+			{
+				return call_user_func_array(static::$macros[$method], $parameters);
+			}
 		}
 
-		throw new \BadMethodCallException("Method {$method} does not exist.");
+		throw new BadMethodCallException("Method {$method} does not exist.");
 	}
 
 	/**
@@ -62,7 +72,19 @@ trait MacroableTrait {
 	 */
 	public function __call($method, $parameters)
 	{
-		return static::__callStatic($method, $parameters);
+		if (static::hasMacro($method))
+		{
+			if (static::$macros[$method] instanceof Closure)
+			{
+				return call_user_func_array(static::$macros[$method]->bindTo($this, get_class($this)), $parameters);
+			}
+			else
+			{
+				return call_user_func_array(static::$macros[$method], $parameters);
+			}
+		}
+
+		throw new BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

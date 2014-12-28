@@ -2,8 +2,9 @@
 
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Job as JobContract;
 
-class RedisJob extends Job {
+class RedisJob extends Job implements JobContract {
 
 	/**
 	 * The Redis queue instance.
@@ -76,6 +77,8 @@ class RedisJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
+		parent::release($delay);
+
 		$this->delete();
 
 		$this->redis->release($this->queue, $this->job, $delay, $this->attempts() + 1);

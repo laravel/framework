@@ -56,13 +56,44 @@ class MandrillTransport implements Swift_Transport {
 	{
 		$client = $this->getHttpClient();
 
-		$client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
+		return $client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
 			'body' => [
 				'key' => $this->key,
+				'to' => $this->getToAddresses($message),
 				'raw_message' => (string) $message,
 				'async' => false,
 			],
 		]);
+	}
+
+	/**
+	 * Get all the addresses this message should be sent to.
+	 *
+	 * Note that Mandrill still respects CC, BCC headers in raw message itself.
+	 *
+	 * @param  Swift_Mime_Message $message
+	 * @return array
+	 */
+	protected function getToAddresses(Swift_Mime_Message $message)
+	{
+		$to = [];
+
+		if ($message->getTo())
+		{
+			$to = array_merge($to, array_keys($message->getTo()));
+		}
+
+		if ($message->getCc())
+		{
+			$to = array_merge($to, array_keys($message->getCc()));
+		}
+
+		if ($message->getBcc())
+		{
+			$to = array_merge($to, array_keys($message->getBcc()));
+		}
+
+		return $to;
 	}
 
 	/**

@@ -2,8 +2,9 @@
 
 use Illuminate\Redis\Database;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class RedisQueue extends Queue implements QueueInterface {
+class RedisQueue extends Queue implements QueueContract {
 
 	/**
 	* The Redis database instance.
@@ -116,7 +117,7 @@ class RedisQueue extends Queue implements QueueInterface {
 	 * Pop the next job off of the queue.
 	 *
 	 * @param  string  $queue
-	 * @return \Illuminate\Queue\Jobs\Job|null
+	 * @return \Illuminate\Contracts\Queue\Job|null
 	 */
 	public function pop($queue = null)
 	{

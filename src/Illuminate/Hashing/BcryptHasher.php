@@ -1,6 +1,9 @@
 <?php namespace Illuminate\Hashing;
 
-class BcryptHasher implements HasherInterface {
+use RuntimeException;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+
+class BcryptHasher implements HasherContract {
 
 	/**
 	 * Default crypt cost factor.
@@ -26,7 +29,7 @@ class BcryptHasher implements HasherInterface {
 
 		if ($hash === false)
 		{
-			throw new \RuntimeException("Bcrypt hashing not supported.");
+			throw new RuntimeException("Bcrypt hashing not supported.");
 		}
 
 		return $hash;
@@ -60,14 +63,16 @@ class BcryptHasher implements HasherInterface {
 	}
 
 	/**
-	 * Set the default crypt cost factor.
+	 * Set the default passwork work factor.
 	 *
 	 * @param  int  $rounds
-	 * @return void
+	 * @return $this
 	 */
 	public function setRounds($rounds)
 	{
 		$this->rounds = (int) $rounds;
+
+		return $this;
 	}
 
 }

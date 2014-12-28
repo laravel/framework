@@ -230,7 +230,7 @@ abstract class HasOneOrMany extends Relation {
 	{
 		if ($this->related->usesTimestamps())
 		{
-			$attributes[$this->relatedUpdatedAt()] = $this->related->freshTimestamp();
+			$attributes[$this->relatedUpdatedAt()] = $this->related->freshTimestampString();
 		}
 
 		return $this->query->update($attributes);

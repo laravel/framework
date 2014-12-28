@@ -109,7 +109,9 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		return $this->fire();
+		$method = method_exists($this, 'handle') ? 'handle' : 'fire';
+
+		return $this->laravel->call([$this, $method]);
 	}
 
 	/**
@@ -197,7 +199,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	{
 		$helper = $this->getHelperSet()->get('question');
 
-		$question = new Question("<question>$question</question>", $default);
+		$question = new Question("<question>$question</question> ", $default);
 
 		return $helper->ask($this->input, $this->output, $question);
 	}
@@ -214,7 +216,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	{
 		$helper = $this->getHelperSet()->get('question');
 
-		$question = new Question("<question>$question</question>", $default);
+		$question = new Question("<question>$question</question> ", $default);
 
 		$question->setAutocompleterValues($choices);
 
@@ -232,7 +234,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	{
 		$helper = $this->getHelperSet()->get('question');
 
-		$question = new Question("<question>$question</question>");
+		$question = new Question("<question>$question</question> ");
 
 		$question->setHidden(true)->setHiddenFallback($fallback);
 
@@ -253,7 +255,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	{
 		$helper = $this->getHelperSet()->get('question');
 
-		$question = new ChoiceQuestion("<question>$question</question>", $choices, $default);
+		$question = new ChoiceQuestion("<question>$question</question> ", $choices, $default);
 
 		$question->setMaxAttempts($attempts)->setMultiselect($multiple);
 

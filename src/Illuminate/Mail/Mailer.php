@@ -3,19 +3,22 @@
 use Closure;
 use Swift_Mailer;
 use Swift_Message;
-use Illuminate\Log\Writer;
-use Illuminate\View\Factory;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Queue\QueueManager;
-use Illuminate\Container\Container;
+use Psr\Log\LoggerInterface;
+use InvalidArgumentException;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\SerializableClosure;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 
-class Mailer {
+class Mailer implements MailerContract, MailQueueContract {
 
 	/**
 	 * The view factory instance.
 	 *
-	 * @var \Illuminate\View\Factory
+	 * @var \Illuminate\Contracts\View\Factory
 	 */
 	protected $views;
 
@@ -29,7 +32,7 @@ class Mailer {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
@@ -43,21 +46,21 @@ class Mailer {
 	/**
 	 * The log writer instance.
 	 *
-	 * @var \Illuminate\Log\Writer
+	 * @var \Psr\Log\LoggerInterface
 	 */
 	protected $logger;
 
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
-	/*
-	 * The QueueManager instance.
+	/**
+	 * The queue implementation.
 	 *
-	 * @var \Illuminate\Queue\QueueManager
+	 * @var \Illuminate\Contracts\Queue\Queue
 	 */
 	protected $queue;
 
@@ -85,9 +88,9 @@ class Mailer {
 	/**
 	 * Create a new Mailer instance.
 	 *
-	 * @param  \Illuminate\View\Factory  $views
+	 * @param  \Illuminate\Contracts\View\Factory  $views
 	 * @param  \Swift_Mailer  $swift
-	 * @param  \Illuminate\Events\Dispatcher  $events
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
@@ -110,6 +113,18 @@ class Mailer {
 	}
 
 	/**
+	 * Send a new message when only a raw text part.
+	 *
+	 * @param  string  $text
+	 * @param  mixed   $callback
+	 * @return int
+	 */
+	public function raw($text, $callback)
+	{
+		return $this->send(array('raw' => $text), [], $callback);
+	}
+
+	/**
 	 * Send a new message when only a plain part.
 	 *
 	 * @param  string  $view
@@ -128,14 +143,14 @@ class Mailer {
 	 * @param  string|array  $view
 	 * @param  array  $data
 	 * @param  \Closure|string  $callback
-	 * @return void
+	 * @return mixed
 	 */
 	public function send($view, array $data, $callback)
 	{
 		// First we need to parse the view, which could either be a string or an array
 		// containing both an HTML and plain text versions of the view which should
 		// be used when sending an e-mail. We will extract both of them out here.
-		list($view, $plain) = $this->parseView($view);
+		list($view, $plain, $raw) = $this->parseView($view);
 
 		$data['message'] = $message = $this->createMessage();
 
@@ -144,11 +159,11 @@ class Mailer {
 		// Once we have retrieved the view content for the e-mail we will set the body
 		// of this message using the HTML type, which will provide a simple wrapper
 		// to creating view based emails that are able to receive arrays of data.
-		$this->addContent($message, $view, $plain, $data);
+		$this->addContent($message, $view, $plain, $raw, $data);
 
 		$message = $message->getSwiftMessage();
 
-		$this->sendSwiftMessage($message);
+		return $this->sendSwiftMessage($message);
 	}
 
 	/**
@@ -229,7 +244,7 @@ class Mailer {
 	/**
 	 * Handle a queued e-mail message job.
 	 *
-	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  \Illuminate\Contracts\Queue\Job  $job
 	 * @param  array  $data
 	 * @return void
 	 */
@@ -262,10 +277,11 @@ class Mailer {
 	 * @param  \Illuminate\Mail\Message  $message
 	 * @param  string  $view
 	 * @param  string  $plain
+	 * @param  string  $raw
 	 * @param  array   $data
 	 * @return void
 	 */
-	protected function addContent($message, $view, $plain, $data)
+	protected function addContent($message, $view, $plain, $raw, $data)
 	{
 		if (isset($view))
 		{
@@ -275,6 +291,11 @@ class Mailer {
 		if (isset($plain))
 		{
 			$message->addPart($this->getView($plain, $data), 'text/plain');
+		}
+
+		if (isset($raw))
+		{
+			$message->addPart($raw, 'text/plain');
 		}
 	}
 
@@ -288,14 +309,14 @@ class Mailer {
 	 */
 	protected function parseView($view)
 	{
-		if (is_string($view)) return array($view, null);
+		if (is_string($view)) return [$view, null, null];
 
 		// If the given view is an array with numeric keys, we will just assume that
 		// both a "pretty" and "plain" view were provided, so we will return this
 		// array as is, since must should contain both views with numeric keys.
 		if (is_array($view) && isset($view[0]))
 		{
-			return $view;
+			return [$view[0], $view[1], null];
 		}
 
 		// If the view is an array, but doesn't contain numeric keys, we will assume
@@ -303,12 +324,14 @@ class Mailer {
 		// named keys instead, allowing the developers to use one or the other.
 		elseif (is_array($view))
 		{
-			return array(
-				array_get($view, 'html'), array_get($view, 'text')
-			);
+			return [
+				array_get($view, 'html'),
+				array_get($view, 'text'),
+				array_get($view, 'raw'),
+			];
 		}
 
-		throw new \InvalidArgumentException("Invalid view.");
+		throw new InvalidArgumentException("Invalid view.");
 	}
 
 	/**
@@ -326,7 +349,7 @@ class Mailer {
 
 		if ( ! $this->pretending)
 		{
-			$this->swift->send($message, $this->failedRecipients);
+			return $this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
 		{
@@ -364,10 +387,10 @@ class Mailer {
 		}
 		elseif (is_string($callback))
 		{
-			return $this->container[$callback]->mail($message);
+			return $this->container->make($callback)->mail($message);
 		}
 
-		throw new \InvalidArgumentException("Callback is not valid.");
+		throw new InvalidArgumentException("Callback is not valid.");
 	}
 
 	/**
@@ -426,7 +449,7 @@ class Mailer {
 	/**
 	 * Get the view factory instance.
 	 *
-	 * @return \Illuminate\View\Factory
+	 * @return \Illuminate\Contracts\View\Factory
 	 */
 	public function getViewFactory()
 	{
@@ -467,10 +490,10 @@ class Mailer {
 	/**
 	 * Set the log writer instance.
 	 *
-	 * @param  \Illuminate\Log\Writer  $logger
+	 * @param  \Psr\Log\LoggerInterface  $logger
 	 * @return $this
 	 */
-	public function setLogger(Writer $logger)
+	public function setLogger(LoggerInterface $logger)
 	{
 		$this->logger = $logger;
 
@@ -480,10 +503,10 @@ class Mailer {
 	/**
 	 * Set the queue manager instance.
 	 *
-	 * @param  \Illuminate\Queue\QueueManager  $queue
+	 * @param  \Illuminate\Contracts\Queue\Queue  $queue
 	 * @return $this
 	 */
-	public function setQueue(QueueManager $queue)
+	public function setQueue(QueueContract $queue)
 	{
 		$this->queue = $queue;
 
@@ -493,7 +516,7 @@ class Mailer {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

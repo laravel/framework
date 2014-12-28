@@ -18,7 +18,7 @@ class RedisServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->bindShared('redis', function($app)
+		$this->app->singleton('redis', function($app)
 		{
 			return new Database($app['config']['database.redis']);
 		});

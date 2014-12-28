@@ -37,15 +37,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testForgetMiddleware()
-	{
-		$app = new ApplicationGetMiddlewaresStub;
-		$app->middleware('Illuminate\Http\FrameGuard');
-		$app->forgetMiddleware('Illuminate\Http\FrameGuard');
-		$this->assertEquals(0, count($app->getMiddlewares()));
-	}
-
-
 	public function testDeferredServicesMarkedAsBound()
 	{
 		$app = new Application;
@@ -95,7 +86,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($app->bound('foo'));
 		$this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
 		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
-		$this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
+		$this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
 		$this->assertEquals('foobar', $app->make('foo'));
 		$this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
 	}
@@ -124,18 +115,22 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testHandleRespectsCatchArgument()
+	public function testEnvironment()
 	{
-		$this->setExpectedException('Exception');
 		$app = new Application;
-		$app['router'] = $router = m::mock('StdClass');
-		$router->shouldReceive('dispatch')->andThrow('Exception');
-		$app['env'] = 'temporarilynottesting';
-		$app->handle(
-			new Symfony\Component\HttpFoundation\Request(),
-			Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST,
-			false
-		);
+		$app['env'] = 'foo';
+
+		$this->assertEquals('foo', $app->environment());
+
+		$this->assertTrue($app->environment('foo'));
+		$this->assertTrue($app->environment('f*'));
+		$this->assertTrue($app->environment('foo', 'bar'));
+		$this->assertTrue($app->environment(['foo', 'bar']));
+
+		$this->assertFalse($app->environment('qux'));
+		$this->assertFalse($app->environment('q*'));
+		$this->assertFalse($app->environment('qux', 'bar'));
+		$this->assertFalse($app->environment(['qux', 'bar']));
 	}
 
 }
@@ -171,7 +166,7 @@ class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\Se
 	protected $defer = true;
 	public function register()
 	{
-		$this->app->bindShared('foo', function() {
+		$this->app->singleton('foo', function() {
 			return new StdClass;
 		});
 	}
@@ -212,7 +207,7 @@ class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
 	protected $defer = true;
 	public function register()
 	{
-		$this->app->bindShared('foo', function() { return 'foo'; });
-		$this->app->bindShared('bar', function($app) { return $app['foo'].'bar'; });
+		$this->app->singleton('foo', function() { return 'foo'; });
+		$this->app->singleton('bar', function($app) { return $app['foo'].'bar'; });
 	}
 }

@@ -83,7 +83,7 @@ class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase {
 		$response->setSession($session = m::mock('Illuminate\Session\Store'));
 		$session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
 		$session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
-		$provider = m::mock('Illuminate\Support\Contracts\MessageProviderInterface');
+		$provider = m::mock('Illuminate\Contracts\Support\MessageProvider');
 		$provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
 		$response->withErrors($provider);
 	}

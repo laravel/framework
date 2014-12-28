@@ -1,140 +1,89 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
-class CommandMakeCommand extends Command {
+class CommandMakeCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'command:make';
+	protected $name = 'make:command';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = "Create a new Artisan command";
+	protected $description = 'Create a new command class';
 
 	/**
-	 * Create a new command creator command.
+	 * The type of class being generated.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
+	 * @var string
 	 */
-	public function __construct(Filesystem $files)
-	{
-		parent::__construct();
-
-		$this->files = $files;
-	}
+	protected $type = 'Command';
 
 	/**
-	 * Execute the console command.
+	 * Execute the command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		$path = $this->getPath();
+		parent::fire();
 
-		$stub = $this->files->get(__DIR__.'/stubs/command.stub');
+		if ($this->doesntHaveHandler()) return;
 
-		// We'll grab the class name to determine the file name. Since applications are
-		// typically using the PSR-0 standards we can safely assume the classes name
-		// will correspond to what the actual file should be stored as on storage.
-		$file = $path.'/'.$this->input->getArgument('name').'.php';
-
-		$this->writeCommand($file, $stub);
+		$this->call('handler:command', [
+			'name' => $this->argument('name').'Handler',
+			'--command' => $this->parseName($this->argument('name'))
+		]);
 	}
 
 	/**
-	 * Write the finished command file to disk.
+	 * Determine if the command doesn't need a handler.
 	 *
-	 * @param  string  $file
-	 * @param  string  $stub
-	 * @return void
+	 * @return bool
 	 */
-	protected function writeCommand($file, $stub)
+	protected function doesntHaveHandler()
 	{
-		if ( ! file_exists($file))
-		{
-			$this->files->put($file, $this->formatStub($stub));
-
-			$this->info('Command created successfully.');
-		}
-		else
-		{
-			$this->error('Command already exists!');
-		}
+		return $this->option('self-handling') || $this->option('no-handler');
 	}
 
 	/**
-	 * Format the command class stub.
-	 *
-	 * @param  string  $stub
-	 * @return string
-	 */
-	protected function formatStub($stub)
-	{
-		$stub = str_replace('{{class}}', $this->input->getArgument('name'), $stub);
-
-		if ( ! is_null($this->option('command')))
-		{
-			$stub = str_replace('command:name', $this->option('command'), $stub);
-		}
-
-		return $this->addNamespace($stub);
-	}
-
-	/**
-	 * Add the proper namespace to the command.
-	 *
-	 * @param  string  $stub
-	 * @return string
-	 */
-	protected function addNamespace($stub)
-	{
-		if ( ! is_null($namespace = $this->input->getOption('namespace')))
-		{
-			return str_replace('{{namespace}}', ' namespace '.$namespace.';', $stub);
-		}
-
-		return str_replace('{{namespace}}', '', $stub);
-	}
-
-	/**
-	 * Get the path where the command should be stored.
+	 * Get the stub file for the generator.
 	 *
 	 * @return string
 	 */
-	protected function getPath()
+	protected function getStub()
 	{
-		$path = $this->input->getOption('path');
-
-		if (is_null($path))
+		if ($this->option('queued') && $this->option('self-handling'))
 		{
-			return $this->laravel['path'].'/commands';
+			return __DIR__.'/stubs/command-self-queued.stub';
 		}
-
-		return $this->laravel['path.base'].'/'.$path;
+		if ($this->option('queued'))
+		{
+			return __DIR__.'/stubs/command-queued.stub';
+		}
+		if ($this->option('self-handling'))
+		{
+			return __DIR__.'/stubs/command-self.stub';
+		}
+		return __DIR__.'/stubs/command.stub';
 	}
 
 	/**
-	 * Get the console command arguments.
+	 * Get the default namespace for the class.
 	 *
-	 * @return array
+	 * @param  string  $rootNamespace
+	 * @return string
 	 */
-	protected function getArguments()
+	protected function getDefaultNamespace($rootNamespace)
 	{
-		return array(
-			array('name', InputArgument::REQUIRED, 'The name of the command.'),
-		);
+		return $rootNamespace.'\Commands';
 	}
 
 	/**
@@ -145,11 +94,11 @@ class CommandMakeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', null),
+			array('no-handler', null, InputOption::VALUE_NONE, 'Indicates that handler class should not be generated.'),
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path where the command should be stored.', null),
+			array('queued', null, InputOption::VALUE_NONE, 'Indicates that command should be queued.'),
 
-			array('namespace', null, InputOption::VALUE_OPTIONAL, 'The command namespace.', null),
+			array('self-handling', null, InputOption::VALUE_NONE, 'Indicates that command handles itself.'),
 		);
 	}
 

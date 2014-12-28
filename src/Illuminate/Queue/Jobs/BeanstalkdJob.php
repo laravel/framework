@@ -1,10 +1,11 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use Pheanstalk_Job;
+use Pheanstalk\Pheanstalk;
 use Illuminate\Container\Container;
-use Pheanstalk_Pheanstalk as Pheanstalk;
+use Pheanstalk\Job as PheanstalkJob;
+use Illuminate\Contracts\Queue\Job as JobContract;
 
-class BeanstalkdJob extends Job {
+class BeanstalkdJob extends Job implements JobContract {
 
 	/**
 	 * The Pheanstalk instance.
@@ -16,7 +17,7 @@ class BeanstalkdJob extends Job {
 	/**
 	 * The Pheanstalk job instance.
 	 *
-	 * @var \Pheanstalk_Job
+	 * @var PheanstalkJob
 	 */
 	protected $job;
 
@@ -24,14 +25,14 @@ class BeanstalkdJob extends Job {
 	 * Create a new job instance.
 	 *
 	 * @param  \Illuminate\Container\Container  $container
-	 * @param  \Pheanstalk_Pheanstalk  $pheanstalk
-	 * @param  \Pheanstalk_Job  $job
+	 * @param  Pheanstalk  $pheanstalk
+	 * @param  PheanstalkJob  $job
 	 * @param  string  $queue
 	 * @return void
 	 */
 	public function __construct(Container $container,
                                 Pheanstalk $pheanstalk,
-                                Pheanstalk_Job $job,
+                                PheanstalkJob $job,
                                 $queue)
 	{
 		$this->job = $job;
@@ -80,6 +81,8 @@ class BeanstalkdJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
+		parent::release($delay);
+
 		$priority = Pheanstalk::DEFAULT_PRIORITY;
 
 		$this->pheanstalk->release($this->job, $priority, $delay);
@@ -140,7 +143,7 @@ class BeanstalkdJob extends Job {
 	/**
 	 * Get the underlying Pheanstalk job.
 	 *
-	 * @return \Pheanstalk_Job
+	 * @return PheanstalkJob
 	 */
 	public function getPheanstalkJob()
 	{

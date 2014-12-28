@@ -1,5 +1,6 @@
 {
     "name": "illuminate/mail",
+    "description": "The Illuminate Mail package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,25 +10,24 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/container": "4.2.*",
-        "illuminate/log": "4.2.*",
-        "illuminate/support": "4.2.*",
-        "illuminate/view": "4.2.*",
+        "illuminate/container": "5.0.*",
+        "illuminate/contracts": "5.0.*",
+        "illuminate/support": "5.0.*",
+        "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~5.1"
     },
-    "require-dev": {
-        "illuminate/queue": "4.2.*"
-    },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Mail": ""
+        "psr-4": {
+            "Illuminate\\Mail\\": ""
         }
     },
-    "target-dir": "Illuminate/Mail",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "Required for Mailgun and Mandrill mail drivers."
     },
     "minimum-stability": "dev"
 }

@@ -1,5 +1,6 @@
 {
     "name": "illuminate/encryption",
+    "description": "The Illuminate Encryption package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,18 +10,19 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
-        "symfony/security-core": "2.5.*"
+        "ext-openssl": "*",
+        "illuminate/contracts": "5.0.*",
+        "illuminate/support": "5.0.*",
+        "symfony/security-core": "2.6.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Encryption": ""
+        "psr-4": {
+            "Illuminate\\Encryption\\": ""
         }
     },
-    "target-dir": "Illuminate/Encryption",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

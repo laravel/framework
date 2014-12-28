@@ -340,7 +340,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeFloat(Fluent $column)
 	{
-		return 'real';
+		return $this->typeDouble($column);
 	}
 
 	/**
@@ -390,6 +390,17 @@ class PostgresGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a json type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeJson(Fluent $column)
+	{
+		return "json";
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -408,7 +419,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeDateTime(Fluent $column)
 	{
-		return 'timestamp';
+		return 'timestamp(0) without time zone';
 	}
 
 	/**
@@ -419,7 +430,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeTime(Fluent $column)
 	{
-		return 'time';
+		return 'time(0) without time zone';
 	}
 
 	/**
@@ -430,7 +441,7 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
-		return 'timestamp';
+		return 'timestamp(0) without time zone';
 	}
 
 	/**

@@ -1,12 +1,14 @@
 <?php namespace Illuminate\View;
 
 use Closure;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
+use InvalidArgumentException;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\Support\Contracts\ArrayableInterface as Arrayable;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\View\Factory as FactoryContract;
 
-class Factory {
+class Factory implements FactoryContract {
 
 	/**
 	 * The engine implementation.
@@ -25,14 +27,14 @@ class Factory {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
 
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
@@ -97,7 +99,7 @@ class Factory {
 	 *
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
 	 * @param  \Illuminate\View\ViewFinderInterface  $finder
-	 * @param  \Illuminate\Events\Dispatcher  $events
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
@@ -112,6 +114,23 @@ class Factory {
 	/**
 	 * Get the evaluated view contents for the given view.
 	 *
+	 * @param  string  $path
+	 * @param  array   $data
+	 * @param  array   $mergeData
+	 * @return \Illuminate\View\View
+	 */
+	public function file($path, $data = array(), $mergeData = array())
+	{
+		$data = array_merge($mergeData, $this->parseData($data));
+
+		$this->callCreator($view = new View($this, $this->getEngineFromPath($path), $path, $path, $data));
+
+		return $view;
+	}
+
+	/**
+	 * Get the evaluated view contents for the given view.
+	 *
 	 * @param  string  $view
 	 * @param  array   $data
 	 * @param  array   $mergeData
@@ -121,6 +140,8 @@ class Factory {
 	{
 		if (isset($this->aliases[$view])) $view = $this->aliases[$view];
 
+		$view = $this->normalizeName($view);
+
 		$path = $this->finder->find($view);
 
 		$data = array_merge($mergeData, $this->parseData($data));
@@ -128,6 +149,27 @@ class Factory {
 		$this->callCreator($view = new View($this, $this->getEngineFromPath($path), $view, $path, $data));
 
 		return $view;
+	}
+
+	/**
+	 * Normalize a view name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return string
+	 */
+	protected function normalizeName($name)
+	{
+		$delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+
+		if (strpos($name, $delimiter) === false)
+		{
+			return str_replace('/', '.', $name);
+		}
+
+		list($namespace, $name) = explode($delimiter, $name);
+
+		return $namespace . $delimiter . str_replace('/', '.', $name);
 	}
 
 	/**
@@ -253,7 +295,7 @@ class Factory {
 	{
 		if ( ! $extension = $this->getExtension($path))
 		{
-			throw new \InvalidArgumentException("Unrecognized extension in file: $path");
+			throw new InvalidArgumentException("Unrecognized extension in file: $path");
 		}
 
 		$engine = $this->extensions[$extension];
@@ -362,6 +404,8 @@ class Factory {
 	 */
 	protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
 	{
+		$view = $this->normalizeName($view);
+
 		if ($callback instanceof Closure)
 		{
 			$this->addEventListener($prefix.$view, $callback, $priority);
@@ -426,16 +470,14 @@ class Factory {
 	 */
 	protected function buildClassEventCallback($class, $prefix)
 	{
-		$container = $this->container;
-
 		list($class, $method) = $this->parseClassEvent($class, $prefix);
 
 		// Once we have the class and method name, we can build the Closure to resolve
 		// the instance out of the IoC container and call the method on it with the
 		// given arguments that are passed to the Closure as the composer's data.
-		return function() use ($class, $method, $container)
+		return function() use ($class, $method)
 		{
-			$callable = array($container->make($class), $method);
+			$callable = array($this->container->make($class), $method);
 
 			return call_user_func_array($callable, func_get_args());
 		};
@@ -758,7 +800,7 @@ class Factory {
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public function getDispatcher()
 	{
@@ -768,7 +810,7 @@ class Factory {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
@@ -779,7 +821,7 @@ class Factory {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container\Container
+	 * @return \Illuminate\Contracts\Container\Container
 	 */
 	public function getContainer()
 	{
@@ -789,7 +831,7 @@ class Factory {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

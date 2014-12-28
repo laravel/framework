@@ -26,7 +26,7 @@ class SeedCommand extends Command {
 	/**
 	 * The connection resolver instance.
 	 *
-	 * @var  \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected $resolver;
 

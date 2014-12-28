@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Foundation\Composer;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\Migrations\MigrationCreator;
@@ -11,7 +12,7 @@ class MigrateMakeCommand extends BaseCommand {
 	 *
 	 * @var string
 	 */
-	protected $name = 'migrate:make';
+	protected $name = 'make:migration';
 
 	/**
 	 * The console command description.
@@ -35,17 +36,24 @@ class MigrateMakeCommand extends BaseCommand {
 	protected $packagePath;
 
 	/**
+	 * @var \Illuminate\Foundation\Composer
+	 */
+	protected $composer;
+
+	/**
 	 * Create a new migration install command instance.
 	 *
 	 * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
+	 * @param  \Illuminate\Foundation\Composer  $composer
 	 * @param  string  $packagePath
 	 * @return void
 	 */
-	public function __construct(MigrationCreator $creator, $packagePath)
+	public function __construct(MigrationCreator $creator, Composer $composer, $packagePath)
 	{
 		parent::__construct();
 
 		$this->creator = $creator;
+		$this->composer = $composer;
 		$this->packagePath = $packagePath;
 	}
 
@@ -72,7 +80,7 @@ class MigrateMakeCommand extends BaseCommand {
 		// make sure that the migrations are registered by the class loaders.
 		$this->writeMigration($name, $table, $create);
 
-		$this->call('dump-autoload');
+		$this->composer->dumpAutoloads();
 	}
 
 	/**
@@ -112,11 +120,7 @@ class MigrateMakeCommand extends BaseCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The workbench the migration belongs to.', null),
-
 			array('create', null, InputOption::VALUE_OPTIONAL, 'The table to be created.'),
-
-			array('package', null, InputOption::VALUE_OPTIONAL, 'The package the migration belongs to.', null),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'Where to store the migration.', null),
 

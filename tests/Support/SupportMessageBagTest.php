@@ -145,6 +145,17 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCountable()
+	{
+		$container = new MessageBag;
+
+		$container->add('foo', 'bar');
+		$container->add('boom', 'baz');
+
+		$this->assertCount(2, $container);
+	}
+
+
 	public function testConstructor()
 	{
 		$messageBag = new MessageBag(array('country' => 'Azerbaijan', 'capital' => 'Baku'));

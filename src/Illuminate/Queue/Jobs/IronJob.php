@@ -2,8 +2,9 @@
 
 use Illuminate\Queue\IronQueue;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Job as JobContract;
 
-class IronJob extends Job {
+class IronJob extends Job implements JobContract {
 
 	/**
 	 * The Iron queue instance.
@@ -88,6 +89,8 @@ class IronJob extends Job {
 	 */
 	public function release($delay = 0)
 	{
+		parent::release($delay);
+
 		if ( ! $this->pushed) $this->delete();
 
 		$this->recreateJob($delay);

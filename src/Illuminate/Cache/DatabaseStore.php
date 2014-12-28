@@ -1,21 +1,22 @@
 <?php namespace Illuminate\Cache;
 
-use Illuminate\Database\Connection;
-use Illuminate\Encryption\Encrypter;
+use LogicException;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class DatabaseStore implements StoreInterface {
 
 	/**
 	 * The database connection instance.
 	 *
-	 * @var \Illuminate\Database\Connection
+	 * @var \Illuminate\Database\ConnectionInterface
 	 */
 	protected $connection;
 
 	/**
 	 * The encrypter instance.
 	 *
-	 * @var \Illuminate\Encryption\Encrypter
+	 * @var \Illuminate\Contracts\Encryption\Encrypter
 	 */
 	protected $encrypter;
 
@@ -36,13 +37,13 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Create a new database store.
 	 *
-	 * @param  \Illuminate\Database\Connection  $connection
-	 * @param  \Illuminate\Encryption\Encrypter  $encrypter
+	 * @param  \Illuminate\Database\ConnectionInterface  $connection
+	 * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
 	 * @param  string  $table
 	 * @param  string  $prefix
 	 * @return void
 	 */
-	public function __construct(Connection $connection, Encrypter $encrypter, $table, $prefix = '')
+	public function __construct(ConnectionInterface $connection, EncrypterContract $encrypter, $table, $prefix = '')
 	{
 		$this->table = $table;
 		$this->prefix = $prefix;
@@ -73,7 +74,7 @@ class DatabaseStore implements StoreInterface {
 			{
 				$this->forget($key);
 
-				return null;
+				return;
 			}
 
 			return $this->encrypter->decrypt($cache->value);
@@ -120,7 +121,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function increment($key, $value = 1)
 	{
-		throw new \LogicException("Increment operations not supported by this driver.");
+		throw new LogicException("Increment operations not supported by this driver.");
 	}
 
 	/**
@@ -134,7 +135,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Decrement operations not supported by this driver.");
+		throw new LogicException("Decrement operations not supported by this driver.");
 	}
 
 	/**
@@ -163,11 +164,13 @@ class DatabaseStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
 		$this->table()->where('key', '=', $this->prefix.$key)->delete();
+
+		return true;
 	}
 
 	/**
@@ -193,7 +196,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Get the underlying database connection.
 	 *
-	 * @return \Illuminate\Database\Connection
+	 * @return \Illuminate\Database\ConnectionInterface
 	 */
 	public function getConnection()
 	{
@@ -203,7 +206,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Get the encrypter instance.
 	 *
-	 * @return \Illuminate\Encryption\Encrypter
+	 * @return \Illuminate\Contracts\Encryption\Encrypter
 	 */
 	public function getEncrypter()
 	{
