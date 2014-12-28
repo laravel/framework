@@ -355,7 +355,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Get instance.
 	 *
-	 * @param $command
+	 * @param  string  $command
 	 * @return \Symfony\Component\Console\Command\Command
 	 */
 	protected function getInstance($command)
