@@ -105,6 +105,14 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
 	}
 
+	public function testBackRedirectToHttpRefererWithoutReferer()
+	{
+		$this->headers->shouldReceive( 'has' )->with( 'referer' )->andReturn( false );
+		$this->headers->shouldReceive( 'get' )->with( 'referer' )->andReturn( null );
+		$response = $this->redirect->back('bar');
+		$this->assertEquals( 'http://foo.com/bar', $response->getTargetUrl() );
+	}
+
 
 	public function testBackRedirectToHttpReferer()
 	{
