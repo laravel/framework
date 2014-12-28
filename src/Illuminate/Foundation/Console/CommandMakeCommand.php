@@ -64,18 +64,15 @@ class CommandMakeCommand extends GeneratorCommand {
 		{
 			return __DIR__.'/stubs/command-self-queued.stub';
 		}
-		elseif ($this->option('queued'))
+		if ($this->option('queued'))
 		{
 			return __DIR__.'/stubs/command-queued.stub';
 		}
-		elseif ($this->option('self-handling'))
+		if ($this->option('self-handling'))
 		{
 			return __DIR__.'/stubs/command-self.stub';
 		}
-		else
-		{
-			return __DIR__.'/stubs/command.stub';
-		}
+		return __DIR__.'/stubs/command.stub';
 	}
 
 	/**
