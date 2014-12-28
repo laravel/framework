@@ -154,7 +154,7 @@ class AppNameCommand extends Command {
 	protected function setComposerNamespace()
 	{
 		$this->replaceIn(
-			$this->getComposerPath(), $this->currentRoot.'\\\\', $this->argument('name').'\\\\'
+			$this->getComposerPath(), $this->currentRoot.'\\\\', str_replace('\\', '\\\\', $this->argument('name')).'\\\\'
 		);
 	}
 
