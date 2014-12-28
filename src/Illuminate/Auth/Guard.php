@@ -737,7 +737,7 @@ class Guard implements GuardContract {
 	 */
 	public function getName()
 	{
-		return 'login_'.md5(get_class($this));
+		return 'login_'.$this->getClassHash();
 	}
 
 	/**
@@ -747,7 +747,17 @@ class Guard implements GuardContract {
 	 */
 	public function getRecallerName()
 	{
-		return 'remember_'.md5(get_class($this));
+		return 'remember_'.$this->getClassHash();
+	}
+
+	/**
+	 * Get class MD5 hash.
+	 *
+	 * @return string
+	 */
+	protected function getClassHash()
+	{
+		return md5(get_class($this));
 	}
 
 	/**
