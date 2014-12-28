@@ -52,7 +52,9 @@ class Redirector {
 	public function back($default = '/', $status = 302, $headers = array())
 	{
 		if(!$this->generator->getRequest()->headers->has('referer'))
-			return $this->to($default, $status, $headers);
+		{
+			return $this->to( $default, $status, $headers );
+		}
 
 		$back = $this->generator->getRequest()->headers->get('referer');
 
