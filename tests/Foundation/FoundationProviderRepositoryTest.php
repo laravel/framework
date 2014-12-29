@@ -28,24 +28,6 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testServicesAreNeverLazyLoadedWhenRunningInConsole()
-	{
-		$app = m::mock('Illuminate\Foundation\Application')->makePartial();
-
-		$repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', array($app, m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__.'/services.json')));
-		$repo->shouldReceive('loadManifest')->once()->andReturn(array('eager' => array('foo'), 'deferred' => array('deferred'), 'providers' => array('providers'), 'when' => array()));
-		$repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
-		$provider = m::mock('Illuminate\Support\ServiceProvider');
-		$repo->shouldReceive('createProvider')->once()->with('providers')->andReturn($provider);
-
-		$app->shouldReceive('register')->once()->with($provider);
-		$app->shouldReceive('runningInConsole')->andReturn(true);
-		$app->shouldReceive('setDeferredServices')->once()->with(array('deferred'));
-
-		$repo->load(array());
-	}
-
-
 	public function testManifestIsProperlyRecompiled()
 	{
 		$app = m::mock('Illuminate\Foundation\Application');
