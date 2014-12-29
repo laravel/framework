@@ -117,7 +117,6 @@ class FileSessionHandler implements \SessionHandlerInterface
 	 */
 	public function write($sessionId, $data)
 	{
-		// if the proper session file isn't open, notify us and don't write
 		if ($sessionId != $this->currentId || !$this->fp) {
 			if (!$this->open($this->path, $sessionId)) {
 				throw new Exception('Could not open session file');
