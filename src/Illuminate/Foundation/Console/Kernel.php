@@ -122,6 +122,9 @@ class Kernel implements KernelContract {
 	{
 		$this->bootstrap();
 
+		// If we are calling a arbitary command from within the application, we will load
+		// all of the available deferred providers which will make all of the commands
+		// available to an application. Otherwise the command will not be available.
 		$this->app->loadDeferredProviders();
 
 		return $this->getArtisan()->call($command, $parameters);
