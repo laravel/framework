@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Bus;
 
 use Closure;
+use ReflectionClass;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Container\Container;
@@ -61,7 +62,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	public function dispatch($command, Closure $afterResolving = null)
 	{
-		if ($this->queueResolver && $command instanceof ShouldBeQueued)
+		if ($this->queueResolver && $this->commandShouldBeQueued($command))
 		{
 			return $this->dispatchToQueue($command);
 		}
@@ -90,6 +91,21 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 
 		return call_user_func(
 			[$handler, $this->getHandlerMethod($command)], $command
+		);
+	}
+
+	/**
+	 * Determine if the given command should be queued.
+	 *
+	 * @param  mixed  $command
+	 * @return bool
+	 */
+	protected function commandShouldBeQueued($command)
+	{
+		if ($command instanceof ShouldBeQueued) return true;
+
+		return (new ReflectionClass($this->getHandlerClass($command)))->implementsInterface(
+			'Illuminate\Contracts\Queue\ShouldBeQueued'
 		);
 	}
 
