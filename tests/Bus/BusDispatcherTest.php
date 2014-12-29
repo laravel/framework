@@ -39,6 +39,20 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHandlersThatShouldBeQueuedAreQueued()
+	{
+		$container = new Container;
+		$dispatcher = new Dispatcher($container, function() {
+			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
+			$mock->shouldReceive('push')->once();
+			return $mock;
+		});
+		$dispatcher->mapUsing(function() { return 'BusDispatcherTestQueuedHandler@handle'; });
+
+		$dispatcher->dispatch(new BusDispatcherTestBasicCommand);
+	}
+
+
 	public function testDispatchNowShouldNeverQueue()
 	{
 		$container = new Container;
@@ -63,4 +77,8 @@ class BusDispatcherTestBasicHandler {
 	{
 
 	}
+}
+
+class BusDispatcherTestQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued {
+
 }
