@@ -70,7 +70,6 @@ class Store implements SessionInterface {
 	 * @param  string $name
 	 * @param  \SessionHandlerInterface $handler
 	 * @param  string|null $id
-	 * @param  \Illuminate\Contracts\Encryption\Encrypter $encrypter
 	 * @return void
 	 */
 	public function __construct($name, SessionHandlerInterface $handler, $id = null)
@@ -262,7 +261,7 @@ class Store implements SessionInterface {
 	 * Prepare the serialized session data for storage.
 	 *
 	 * @param  string  $data
-	 * @retunr string
+	 * @return string
 	 */
 	protected function prepareForStorage($data)
 	{

@@ -90,7 +90,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveByCredentials(array $credentials)
 	{

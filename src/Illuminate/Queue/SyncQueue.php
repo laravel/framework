@@ -52,12 +52,14 @@ class SyncQueue extends Queue implements QueueContract {
 	 * @param  string  $queue
 	 * @return \Illuminate\Contracts\Queue\Job|null
 	 */
-	public function pop($queue = null) {}
+	public function pop($queue = null)
+	{
+		//
+	}
 
 	/**
 	 * Resolve a Sync job instance.
 	 *
-	 * @param  string  $job
 	 * @param  string  $payload
 	 * @return \Illuminate\Queue\Jobs\SyncJob
 	 */

@@ -68,6 +68,7 @@ interface Log {
 	/**
 	 * Log a message to the logs.
 	 *
+	 * @param  string  $level
 	 * @param  string  $message
 	 * @param  array  $context
 	 * @return void

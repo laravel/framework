@@ -67,8 +67,8 @@ class PasswordBroker implements PasswordBrokerContract {
 	/**
 	 * Send a password reset link to a user.
 	 *
-	 * @param  array     $credentials
-	 * @param  \Closure  $callback
+	 * @param  array  $credentials
+	 * @param  \Closure|null  $callback
 	 * @return string
 	 */
 	public function sendResetLink(array $credentials, Closure $callback = null)
@@ -97,8 +97,8 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * Send the password reset link via e-mail.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-	 * @param  string    $token
-	 * @param  \Closure  $callback
+	 * @param  string  $token
+	 * @param  \Closure|null  $callback
 	 * @return int
 	 */
 	public function emailResetLink(CanResetPasswordContract $user, $token, Closure $callback = null)

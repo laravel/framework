@@ -18,14 +18,14 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * The container instance.
 	 *
-	 * @var Container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
 	/**
 	 * The redirector instance.
 	 *
-	 * @var Redirector
+	 * @var \Illuminate\Routing\Redirector
 	 */
 	protected $redirector;
 
@@ -109,7 +109,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	 * Get sanitized input.
 	 *
 	 * @param  string  $key
-	 * @param  mixed  $default
+	 * @param  mixed   $default
 	 * @return mixed
 	 */
 	public function sanitized($key = null, $default = null)
@@ -237,7 +237,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Set the container implementation.
 	 *
-	 * @param  Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return $this
 	 */
 	public function setContainer(Container $container)

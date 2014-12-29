@@ -38,8 +38,8 @@ class Blueprint {
 	/**
 	 * Create a new schema blueprint.
 	 *
-	 * @param  string   $table
-	 * @param  \Closure  $callback
+	 * @param  string  $table
+	 * @param  \Closure|null  $callback
 	 * @return void
 	 */
 	public function __construct($table, Closure $callback = null)

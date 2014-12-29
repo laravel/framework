@@ -867,7 +867,7 @@ class Router implements RegistrarContract {
 	 *
 	 * @param  string  $key
 	 * @param  string  $class
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return void
 	 *
 	 * @throws NotFoundHttpException

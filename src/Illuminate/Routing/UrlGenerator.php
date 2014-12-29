@@ -75,7 +75,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * Create a new URL Generator instance.
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
-	 * @param  \Symfony\Component\HttpFoundation\Request   $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
 	public function __construct(RouteCollection $routes, Request $request)

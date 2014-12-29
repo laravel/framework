@@ -395,7 +395,7 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Resolve all of the bindings for a given tag.
 	 *
-	 * @param  array  $tag
+	 * @param  string  $tag
 	 * @return array
 	 */
 	public function tagged($tag)
