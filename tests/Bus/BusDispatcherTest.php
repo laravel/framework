@@ -66,6 +66,19 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $result);
 	}
 
+
+	public function testDispatchShouldCallAfterResolvingIfCommandNotQueued()
+	{
+		$container = new Container;
+		$handler = m::mock('StdClass')->shouldIgnoreMissing();
+		$handler->shouldReceive('after')->once();
+		$container->instance('Handler', $handler);
+		$dispatcher = new Dispatcher($container);
+		$dispatcher->mapUsing(function() { return 'Handler@handle'; });
+
+		$dispatcher->dispatch(new BusDispatcherTestBasicCommand, function($handler) { $handler->after(); });
+	}
+
 }
 
 class BusDispatcherTestBasicCommand {
