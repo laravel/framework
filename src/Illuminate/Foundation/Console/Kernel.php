@@ -4,6 +4,7 @@ use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
+use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 
@@ -121,6 +122,8 @@ class Kernel implements KernelContract {
 	{
 		$this->bootstrap();
 
+		$this->app->loadDeferredProviders();
+
 		return $this->getArtisan()->call($command, $parameters);
 	}
 
@@ -174,7 +177,35 @@ class Kernel implements KernelContract {
 			$this->app->bootstrapWith($this->bootstrappers());
 		}
 
-		$this->app->loadDeferredProviders();
+		$this->loadConsoleProviders();
+	}
+
+	/**
+	 * Load the appropriate service providers for the console environment.
+	 *
+	 * @return void
+	 */
+	protected function loadConsoleProviders()
+	{
+		// If we are just calling another queue command, we will only load the queue
+		// service provider. This saves a lot of file loading as we don't need to
+		// load the providers with commands for every possible console command.
+
+		$this->isCallingAQueueCommand()
+					? $this->app->loadDeferredProvider('queue')
+					: $this->app->loadDeferredProviders();
+	}
+
+	/**
+	 * Determine if the console is calling a queue command.
+	 *
+	 * @return bool
+	 */
+	protected function isCallingAQueueCommand()
+	{
+		return in_array((new ArgvInput)->getFirstArgument(), [
+			'queue:listen', 'queue:work'
+		]);
 	}
 
 	/**

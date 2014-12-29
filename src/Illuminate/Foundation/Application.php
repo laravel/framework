@@ -446,7 +446,7 @@ class Application extends Container implements ApplicationContract {
 	 * @param  string  $service
 	 * @return void
 	 */
-	protected function loadDeferredProvider($service)
+	public function loadDeferredProvider($service)
 	{
 		$provider = $this->deferredServices[$service];
 
