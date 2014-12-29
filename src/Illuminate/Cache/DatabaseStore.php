@@ -176,6 +176,8 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Remove all items from the cache.
 	 *
+	 * This ignores any configured cache key prefix.
+	 *
 	 * @return void
 	 */
 	public function flush()
