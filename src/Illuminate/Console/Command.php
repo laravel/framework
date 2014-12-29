@@ -123,7 +123,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function call($command, array $arguments = array())
 	{
-		$instance = $this->getApplication()->find($command);
+		$instance = $this->getInstance($command);
 
 		$arguments['command'] = $command;
 
@@ -139,7 +139,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function callSilent($command, array $arguments = array())
 	{
-		$instance = $this->getApplication()->find($command);
+		$instance = $this->getInstance($command);
 
 		$arguments['command'] = $command;
 
@@ -181,7 +181,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function confirm($question, $default = false)
 	{
-		$helper = $this->getHelperSet()->get('question');
+		$helper = $this->getQuestion();
 
 		$question = new ConfirmationQuestion("<question>{$question}</question> ", $default);
 
@@ -197,7 +197,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function ask($question, $default = null)
 	{
-		$helper = $this->getHelperSet()->get('question');
+		$helper = $this->getQuestion();
 
 		$question = new Question("<question>$question</question> ", $default);
 
@@ -214,7 +214,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function askWithCompletion($question, array $choices, $default = null)
 	{
-		$helper = $this->getHelperSet()->get('question');
+		$helper = $this->getQuestion();
 
 		$question = new Question("<question>$question</question> ", $default);
 
@@ -232,7 +232,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function secret($question, $fallback = true)
 	{
-		$helper = $this->getHelperSet()->get('question');
+		$helper = $this->getQuestion();
 
 		$question = new Question("<question>$question</question> ");
 
@@ -253,7 +253,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
 	{
-		$helper = $this->getHelperSet()->get('question');
+		$helper = $this->getQuestion();
 
 		$question = new ChoiceQuestion("<question>$question</question> ", $choices, $default);
 
@@ -340,6 +340,27 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	protected function getArguments()
 	{
 		return array();
+	}
+
+	/**
+	 * Get the question.
+	 *
+	 * @return \Symfony\Component\Console\Helper\HelperInterface
+	 */
+	protected function getQuestion()
+	{
+		return $this->getHelperSet()->get('question');
+	}
+
+	/**
+	 * Get instance.
+	 *
+	 * @param  string  $command
+	 * @return \Symfony\Component\Console\Command\Command
+	 */
+	protected function getInstance($command)
+	{
+		return $this->getApplication()->find($command);
 	}
 
 	/**
