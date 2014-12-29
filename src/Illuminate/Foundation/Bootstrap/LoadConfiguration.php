@@ -65,10 +65,18 @@ class LoadConfiguration {
 	{
 		$files = [];
 
-		foreach (Finder::create()->files()->name('*.php')->in($app->configPath()) as $file)
-		{
-			$files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
-		}
+        	foreach (Finder::create()->files()->name('*.php')->in($app->configPath()) as $file)
+        	{
+            		if (dirname($file->getRealPath()) == $app->configPath()) {
+                		$files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            		}
+        	}
+        	if ($app->environment() != 'production') {
+            	foreach (Finder::create()->files()->name('*.php')->in($app->configPath().'/'.$app->environment()) as $file)
+            	{
+	                $files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
+        	    }
+        	}
 
 		return $files;
 	}
