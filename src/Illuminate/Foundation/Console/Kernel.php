@@ -180,20 +180,9 @@ class Kernel implements KernelContract {
 			$this->app->bootstrapWith($this->bootstrappers());
 		}
 
-		$this->loadConsoleProviders();
-	}
-
-	/**
-	 * Load the appropriate service providers for the console environment.
-	 *
-	 * @return void
-	 */
-	protected function loadConsoleProviders()
-	{
 		// If we are just calling another queue command, we will only load the queue
 		// service provider. This saves a lot of file loading as we don't need to
 		// load the providers with commands for every possible console command.
-
 		$this->isCallingAQueueCommand()
 					? $this->app->loadDeferredProvider('queue')
 					: $this->app->loadDeferredProviders();
