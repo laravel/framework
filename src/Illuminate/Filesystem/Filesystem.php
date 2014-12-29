@@ -62,11 +62,12 @@ class Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $contents
+	 * @param  bool  $lock
 	 * @return int
 	 */
-	public function put($path, $contents)
+	public function put($path, $contents, $lock = false)
 	{
-		return file_put_contents($path, $contents);
+		return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
 	}
 
 	/**
@@ -138,7 +139,7 @@ class Filesystem {
 	{
 		return copy($path, $target);
 	}
-	
+
 	/**
 	 * Extract the file name from a file path.
 	 *
