@@ -336,6 +336,19 @@ abstract class AbstractPaginator {
 	}
 
 	/**
+	 * Set the base path to assign to all URLs.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function setPath($path)
+	{
+		$this->path = $path;
+
+		return $this;
+	}
+
+	/**
 	 * Get an iterator for the items.
 	 *
 	 * @return \ArrayIterator
