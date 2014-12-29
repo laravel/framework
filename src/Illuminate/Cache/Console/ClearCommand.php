@@ -47,6 +47,12 @@ class ClearCommand extends Command {
 
 		$this->cache = $cache;
 		$this->files = $files;
+		$this->setHelp(wordwrap(
+			"The entire cache repository is flushed, ignoring any configured cache key prefix. "
+			. "If this application is using a shared repository "
+			. "(for example a single Redis store shared by multiple websites), "
+			. "the data cleared may not only be that set by this application."
+		));
 	}
 
 	/**
