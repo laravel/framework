@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Traits;
 
+use BadMethodCallException;
+
 trait MacroableTrait {
 
 	/**
@@ -24,8 +26,8 @@ trait MacroableTrait {
 	/**
 	 * Checks if macro is registered
 	 *
-	 * @param  string    $name
-	 * @return boolean
+	 * @param  string  $name
+	 * @return bool
 	 */
 	public static function hasMacro($name)
 	{
@@ -48,7 +50,7 @@ trait MacroableTrait {
 			return call_user_func_array(static::$macros[$method], $parameters);
 		}
 
-		throw new \BadMethodCallException("Method {$method} does not exist.");
+		throw new BadMethodCallException("Method {$method} does not exist.");
 	}
 
 	/**

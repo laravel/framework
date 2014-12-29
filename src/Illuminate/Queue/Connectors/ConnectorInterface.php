@@ -6,7 +6,7 @@ interface ConnectorInterface {
 	 * Establish a queue connection.
 	 *
 	 * @param  array  $config
-	 * @return \Illuminate\Queue\QueueInterface
+	 * @return \Illuminate\Contracts\Queue\Queue
 	 */
 	public function connect(array $config);
 

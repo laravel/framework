@@ -3,7 +3,9 @@
 use PDO;
 use Closure;
 use DateTime;
-use Illuminate\Events\Dispatcher;
+use LogicException;
+use RuntimeException;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 
@@ -54,23 +56,9 @@ class Connection implements ConnectionInterface {
 	/**
 	 * The event dispatcher instance.
 	 *
-	 * @var \Illuminate\Events\Dispatcher
+	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
-
-	/**
-	 * The paginator environment instance.
-	 *
-	 * @var \Illuminate\Pagination\Paginator
-	 */
-	protected $paginator;
-
-	/**
-	 * The cache manager instance.
-	 *
-	 * @var \Illuminate\Cache\CacheManager
-	 */
-	protected $cache;
 
 	/**
 	 * The default fetch mode of the connection.
@@ -98,7 +86,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @var bool
 	 */
-	protected $loggingQueries = true;
+	protected $loggingQueries = false;
 
 	/**
 	 * Indicates if the connection is in a "dry run".
@@ -688,7 +676,7 @@ class Connection implements ConnectionInterface {
 			return call_user_func($this->reconnector, $this);
 		}
 
-		throw new \LogicException("Lost connection and no reconnector available.");
+		throw new LogicException("Lost connection and no reconnector available.");
 	}
 
 	/**
@@ -832,7 +820,7 @@ class Connection implements ConnectionInterface {
 	public function setPdo($pdo)
 	{
 		if ($this->transactions >= 1)
-			throw new \RuntimeException("Can't swap PDO instance while within transaction.");
+			throw new RuntimeException("Can't swap PDO instance while within transaction.");
 
 		$this->pdo = $pdo;
 
@@ -962,7 +950,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the event dispatcher used by the connection.
 	 *
-	 * @return \Illuminate\Events\Dispatcher
+	 * @return \Illuminate\Contracts\Events\Dispatcher
 	 */
 	public function getEventDispatcher()
 	{
@@ -972,64 +960,12 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the event dispatcher instance on the connection.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $events)
 	{
 		$this->events = $events;
-	}
-
-	/**
-	 * Get the paginator environment instance.
-	 *
-	 * @return \Illuminate\Pagination\Factory
-	 */
-	public function getPaginator()
-	{
-		if ($this->paginator instanceof Closure)
-		{
-			$this->paginator = call_user_func($this->paginator);
-		}
-
-		return $this->paginator;
-	}
-
-	/**
-	 * Set the pagination environment instance.
-	 *
-	 * @param  \Illuminate\Pagination\Factory|\Closure  $paginator
-	 * @return void
-	 */
-	public function setPaginator($paginator)
-	{
-		$this->paginator = $paginator;
-	}
-
-	/**
-	 * Get the cache manager instance.
-	 *
-	 * @return \Illuminate\Cache\CacheManager
-	 */
-	public function getCacheManager()
-	{
-		if ($this->cache instanceof Closure)
-		{
-			$this->cache = call_user_func($this->cache);
-		}
-
-		return $this->cache;
-	}
-
-	/**
-	 * Set the cache manager instance on the connection.
-	 *
-	 * @param  \Illuminate\Cache\CacheManager|\Closure  $cache
-	 * @return void
-	 */
-	public function setCacheManager($cache)
-	{
-		$this->cache = $cache;
 	}
 
 	/**

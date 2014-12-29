@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Support\Traits;
 
 use Illuminate\Support\Fluent;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 
 trait CapsuleManagerTrait {
 
@@ -15,19 +15,19 @@ trait CapsuleManagerTrait {
 	/**
 	 * The container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
 	/**
 	 * Setup the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container|null  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
-	protected function setupContainer($container)
+	protected function setupContainer(Container $container)
 	{
-		$this->container = $container ?: new Container;
+		$this->container = $container;
 
 		if ( ! $this->container->bound('config'))
 		{
@@ -48,7 +48,7 @@ trait CapsuleManagerTrait {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container\Container
+	 * @return \Illuminate\Contracts\Container\Container
 	 */
 	public function getContainer()
 	{
@@ -58,7 +58,7 @@ trait CapsuleManagerTrait {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)

@@ -51,12 +51,14 @@ interface StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key);
 
 	/**
 	 * Remove all items from the cache.
+	 *
+	 * This ignores any configured cache key prefix.
 	 *
 	 * @return void
 	 */

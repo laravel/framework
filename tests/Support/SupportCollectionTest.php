@@ -48,9 +48,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
-		$item1 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item1 = m::mock('Illuminate\Contracts\Support\Arrayable');
 		$item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-		$item2 = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
 		$item2->shouldReceive('toArray')->once()->andReturn('bar.array');
 		$c = new Collection(array($item1, $item2));
 		$results = $c->toArray();
@@ -95,7 +95,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testCountable()
 	{
 		$c = new Collection(array('foo', 'bar'));
-		$this->assertEquals(2, count($c));
+		$this->assertCount(2, $c);
 	}
 
 
@@ -121,6 +121,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		{
 			return $item['id'] == 2;
 		})->all());
+	}
+
+
+	public function testWhere()
+	{
+		$c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+
+		$this->assertEquals([['v' => 3], ['v' => '3']], $c->where('v', 3)->values()->all());
 	}
 
 
@@ -245,7 +253,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testChunk ()
+	public function testChunk()
 	{
 		$data = new Collection(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		$data = $data->chunk(3);
@@ -266,12 +274,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testListsWithArrayAccessValues()
+	{
+		$data = new Collection(array(
+			new TestArrayAccessImplementation(array('name' => 'taylor', 'email' => 'foo')),
+			new TestArrayAccessImplementation(array('name' => 'dayle', 'email' => 'bar'))
+		));
+
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name'));
+		$this->assertEquals(array('foo', 'bar'), $data->lists('email'));
+	}
+
+
 	public function testImplode()
 	{
 		$data = new Collection(array(array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
 		$this->assertEquals('foobar', $data->implode('email'));
-		$this->assertEquals('foobar', $data->implode('email', ''));
-		$this->assertEquals('foobar', $data->implode('email', null));
 		$this->assertEquals('foo,bar', $data->implode('email', ','));
 	}
 
@@ -323,6 +341,80 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$collection = Collection::make('foo');
 		$this->assertEquals(array('foo'), $collection->all());
+	}
+
+
+	public function testMakeMethodFromNull()
+	{
+		$collection = Collection::make(null);
+		$this->assertEquals([], $collection->all());
+
+		$collection = Collection::make();
+		$this->assertEquals([], $collection->all());
+	}
+
+
+	public function testMakeMethodFromCollection()
+	{
+		$firstCollection = Collection::make(['foo' => 'bar']);
+		$secondCollection = Collection::make($firstCollection);
+		$this->assertEquals(['foo' => 'bar'], $secondCollection->all());
+	}
+
+
+	public function testMakeMethodFromArray()
+	{
+		$collection = Collection::make(['foo' => 'bar']);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+	public function testConstructMakeFromObject()
+	{
+		$object = new stdClass();
+		$object->foo = 'bar';
+		$collection = Collection::make($object);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
+	public function testConstructMethod()
+	{
+		$collection = new Collection('foo');
+		$this->assertEquals(array('foo'), $collection->all());
+	}
+
+
+	public function testConstructMethodFromNull()
+	{
+		$collection = new Collection(null);
+		$this->assertEquals([], $collection->all());
+
+		$collection = new Collection();
+		$this->assertEquals([], $collection->all());
+	}
+
+
+	public function testConstructMethodFromCollection()
+	{
+		$firstCollection = new Collection(['foo' => 'bar']);
+		$secondCollection = new Collection($firstCollection);
+		$this->assertEquals(['foo' => 'bar'], $secondCollection->all());
+	}
+
+
+	public function testConstructMethodFromArray()
+	{
+		$collection = new Collection(['foo' => 'bar']);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
+	}
+
+
+	public function testConstructMethodFromObject()
+	{
+		$object = new stdClass();
+		$object->foo = 'bar';
+		$collection = new Collection($object);
+		$this->assertEquals(['foo' => 'bar'], $collection->all());
 	}
 
 
@@ -405,6 +497,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($c->contains(2));
 		$this->assertTrue($c->contains(function($value) { return $value < 5; }));
 		$this->assertFalse($c->contains(function($value) { return $value > 5; }));
+
+		$c = new Collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+		$this->assertTrue($c->contains('v', 1));
+		$this->assertFalse($c->contains('v', 2));
 	}
 
 
@@ -485,6 +582,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('name', 'framework'), $c->keys());
 	}
 
+
+	public function testPaginate()
+	{
+		$c = new Collection(['one', 'two', 'three', 'four']);
+		$this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
+		$this->assertEquals(['three', 'four'], $c->forPage(2, 2)->all());
+		$this->assertEquals([], $c->forPage(3, 2)->all());
+	}
+
 }
 
 class TestAccessorEloquentTestStub
@@ -507,9 +613,50 @@ class TestAccessorEloquentTestStub
 		return $this->$attribute;
 	}
 
+	public function __isset($attribute)
+	{
+		$accessor = 'get' .lcfirst($attribute). 'Attribute';
+
+		if (method_exists($this, $accessor)) {
+			return !is_null($this->$accessor());
+		}
+
+		return isset($this->$attribute);
+	}
+
 
 	public function getSomeAttribute()
 	{
 		return $this->attributes['some'];
+	}
+}
+
+class TestArrayAccessImplementation implements ArrayAccess
+{
+	private $arr;
+
+	public function __construct($arr)
+	{
+		$this->arr = $arr;
+	}
+
+	public function offsetExists($offset)
+	{
+		return isset($this->arr[$offset]);
+	}
+
+	public function offsetGet($offset)
+	{
+		return $this->arr[$offset];
+	}
+
+	public function offsetSet($offset, $value)
+	{
+		$this->arr[$offset] = $value;
+	}
+
+	public function offsetUnset($offset)
+	{
+		unset($this->arr[$offset]);
 	}
 }

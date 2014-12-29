@@ -27,7 +27,7 @@ class FailedTableCommand extends Command {
 	protected $files;
 
 	/**
-	 * Create a new session table command instance.
+	 * Create a new failed queue jobs table command instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
@@ -62,7 +62,7 @@ class FailedTableCommand extends Command {
 	{
 		$name = 'create_failed_jobs_table';
 
-		$path = $this->laravel['path'].'/database/migrations';
+		$path = $this->laravel['path.database'].'/migrations';
 
 		return $this->laravel['migration.creator']->create($name, $path);
 	}

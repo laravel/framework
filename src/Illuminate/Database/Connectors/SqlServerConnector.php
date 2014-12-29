@@ -10,10 +10,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 * @var array
 	 */
 	protected $options = array(
-			PDO::ATTR_CASE => PDO::CASE_NATURAL,
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-			PDO::ATTR_STRINGIFY_FETCHES => false,
+		PDO::ATTR_CASE => PDO::CASE_NATURAL,
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+		PDO::ATTR_STRINGIFY_FETCHES => false,
 	);
 
 	/**
@@ -37,23 +37,45 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getDsn(array $config)
 	{
-		extract($config);
-
 		// First we will create the basic DSN setup as well as the port if it is in
 		// in the configuration options. This will give us the basic DSN we will
 		// need to establish the PDO connections and return them back for use.
 		if (in_array('dblib', $this->getAvailableDrivers()))
 		{
-			$port = isset($config['port']) ? ':'.$port : '';
-
-			return "dblib:host={$host}{$port};dbname={$database}";
+			return $this->getDblibDsn($config);
 		}
+		else
+		{
+			return $this->getSqlSrvDsn($config);
+		}
+	}
 
-		$port = isset($config['port']) ? ','.$port : '';
+	/**
+	 * Get the DSN string for a DbLib connection.
+	 *
+	 * @param  array  $config
+	 * @return string
+	 */
+	protected function getDblibDsn(array $config)
+	{
+		$port = isset($config['port']) ? ':'.$config['port'] : '';
 
-		$dbName = $database != '' ? ";Database={$database}" : '';
+		return "dblib:host={$config['host']}{$port};dbname={$config['database']}";
+	}
 
-		return "sqlsrv:Server={$host}{$port}{$dbName}";
+	/**
+	 * Get the DSN string for a SqlSrv connection.
+	 *
+	 * @param  array  $config
+	 * @return string
+	 */
+	protected function getSqlSrvDsn(array $config)
+	{
+		$port = isset($config['port']) ? ','.$config['port'] : '';
+
+		$dbName = $config['database'] != '' ? ";Database={$config['database']}" : '';
+
+		return "sqlsrv:Server={$config['host']}{$port}{$dbName}";
 	}
 
 	/**

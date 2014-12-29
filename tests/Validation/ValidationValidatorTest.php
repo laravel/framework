@@ -25,6 +25,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAfterCallbacksAreCalledWithValidatorInstance()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
+		$v->setContainer(new Illuminate\Container\Container);
+		$v->after(function($validator)
+		{
+			$_SERVER['__validator.after.test'] = true;
+		});
+
+		$this->assertFalse($v->passes());
+		$this->assertTrue($_SERVER['__validator.after.test']);
+
+		unset($_SERVER['__validator.after.test']);
+	}
+
+
 	public function testSometimesWorksOnArrays()
 	{
 		$trans = $this->getRealTranslator();
@@ -951,6 +968,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$v = new Validator($trans, array('x' => 'http://google.com'), array('x' => 'active_url'));
 		$this->assertTrue($v->passes());
+
+		$v = new Validator($trans, array('x' => 'http://www.google.com'), array('x' => 'active_url'));
+		$this->assertTrue($v->passes());
 	}
 
 
@@ -984,6 +1004,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$file5 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('guessExtension'), $uploadedFile);
 		$file5->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
 		$v->setFiles(array('x' => $file5));
+		$this->assertTrue($v->passes());
+
+		$file6 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('guessExtension'), $uploadedFile);
+		$file6->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
+		$v->setFiles(array('x' => $file6));
 		$this->assertTrue($v->passes());
 	}
 
@@ -1379,4 +1404,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		return $trans;
 	}
 
+}
+
+
+class ValidatorTestAfterCallbackStub {
+	public function validate() {
+		$_SERVER['__validator.after.test'] = true;
+	}
 }

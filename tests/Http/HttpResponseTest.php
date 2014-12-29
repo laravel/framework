@@ -1,7 +1,9 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\Support\Jsonable;
 
 class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
@@ -26,7 +28,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
 	public function testRenderablesAreRendered()
 	{
-		$mock = m::mock('Illuminate\Support\Contracts\RenderableInterface');
+		$mock = m::mock('Illuminate\Contracts\Support\Renderable');
 		$mock->shouldReceive('render')->once()->andReturn('foo');
 		$response = new Illuminate\Http\Response($mock);
 		$this->assertEquals('foo', $response->getContent());
@@ -69,16 +71,91 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
 	public function testSetAndRetrieveStatusCode()
 	{
-		$response = new Illuminate\Http\Response('foo', 404);
-		$this->assertSame(404, $response->getStatusCode());
-
 		$response = new Illuminate\Http\Response('foo');
 		$response->setStatusCode(404);
 		$this->assertSame(404, $response->getStatusCode());
 	}
 
+
+	public function testOnlyInputOnRedirect()
+	{
+		$response = new RedirectResponse('foo.bar');
+		$response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+		$response->setSession($session = m::mock('Illuminate\Session\Store'));
+		$session->shouldReceive('flashInput')->once()->with(array('name' => 'Taylor'));
+		$response->onlyInput('name');
+	}
+
+
+	public function testExceptInputOnRedirect()
+	{
+		$response = new RedirectResponse('foo.bar');
+		$response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+		$response->setSession($session = m::mock('Illuminate\Session\Store'));
+		$session->shouldReceive('flashInput')->once()->with(array('name' => 'Taylor'));
+		$response->exceptInput('age');
+	}
+
+
+	public function testFlashingErrorsOnRedirect()
+	{
+		$response = new RedirectResponse('foo.bar');
+		$response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+		$response->setSession($session = m::mock('Illuminate\Session\Store'));
+		$session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
+		$session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
+		$provider = m::mock('Illuminate\Contracts\Support\MessageProvider');
+		$provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
+		$response->withErrors($provider);
+	}
+
+
+	public function testSettersGettersOnRequest()
+	{
+		$response = new RedirectResponse('foo.bar');
+		$this->assertNull($response->getRequest());
+		$this->assertNull($response->getSession());
+
+		$request = Request::create('/', 'GET');
+		$session = m::mock('Illuminate\Session\Store');
+		$response->setRequest($request);
+		$response->setSession($session);
+		$this->assertSame($request, $response->getRequest());
+		$this->assertSame($session, $response->getSession());
+	}
+
+
+	public function testRedirectWithErrorsArrayConvertsToMessageBag()
+	{
+		$response = new RedirectResponse('foo.bar');
+		$response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+		$response->setSession($session = m::mock('Illuminate\Session\Store'));
+		$session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
+		$session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
+		$provider = array('foo' => 'bar');
+		$response->withErrors($provider);
+	}
+
+
+	public function testMagicCall()
+	{
+		$response = new RedirectResponse('foo.bar');
+		$response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+		$response->setSession($session = m::mock('Illuminate\Session\Store'));
+		$session->shouldReceive('flash')->once()->with('foo', 'bar');
+		$response->withFoo('bar');
+	}
+
+
+	public function testMagicCallException()
+	{
+		$this->setExpectedException('BadMethodCallException');
+		$response = new RedirectResponse('foo.bar');
+		$response->doesNotExist('bar');
+	}
+
 }
 
-class JsonableStub implements JsonableInterface {
+class JsonableStub implements Jsonable {
 	public function toJson($options = 0) { return 'foo'; }
 }

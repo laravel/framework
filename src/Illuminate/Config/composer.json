@@ -1,5 +1,6 @@
 {
     "name": "illuminate/config",
+    "description": "The Illuminate Config package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,16 +10,18 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/filesystem": "4.2.*",
-        "illuminate/support": "4.2.*"
+        "illuminate/contracts": "5.0.*",
+        "illuminate/filesystem": "5.0.*",
+        "illuminate/support": "5.0.*"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Config": ""}
+        "psr-4": {
+            "Illuminate\\Config\\": ""
+        }
     },
-    "target-dir": "Illuminate/Config",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

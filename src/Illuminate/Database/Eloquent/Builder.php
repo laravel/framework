@@ -1,7 +1,9 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -226,83 +228,44 @@ class Builder {
 	}
 
 	/**
-	 * Get a paginator for the "select" statement.
+	 * Paginate the given query.
 	 *
-	 * @param  int    $perPage
+	 * @param  int  $perPage
 	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
-	public function paginate($perPage = null, $columns = array('*'))
+	public function paginate($perPage = 15, $columns = ['*'])
 	{
-		$perPage = $perPage ?: $this->model->getPerPage();
+		$total = $this->query->getCountForPagination();
 
-		$paginator = $this->query->getConnection()->getPaginator();
+		$this->query->forPage(
+			$page = Paginator::resolveCurrentPage(),
+			$perPage = $perPage ?: $this->model->getPerPage()
+		);
 
-		if (isset($this->query->groups))
-		{
-			return $this->groupedPaginate($paginator, $perPage, $columns);
-		}
-
-		return $this->ungroupedPaginate($paginator, $perPage, $columns);
+		return new LengthAwarePaginator($this->get($columns)->all(), $total, $perPage, $page, [
+			'path' => Paginator::resolveCurrentPath()
+		]);
 	}
 
 	/**
-	 * Get a paginator for a grouped statement.
+	 * Paginate the given query into a simple paginator.
 	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
-	 * @param  int    $perPage
+	 * @param  int  $perPage
 	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Contracts\Pagination\Paginator
 	 */
-	protected function groupedPaginate($paginator, $perPage, $columns)
+	public function simplePaginate($perPage = null, $columns = ['*'])
 	{
-		$results = $this->get($columns)->all();
-
-		return $this->query->buildRawPaginator($paginator, $results, $perPage);
-	}
-
-	/**
-	 * Get a paginator for an ungrouped statement.
-	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
-	{
-		$total = $this->query->getPaginationCount();
-
-		// Once we have the paginator we need to set the limit and offset values for
-		// the query so we can get the properly paginated items. Once we have an
-		// array of items we can create the paginator instances for the items.
-		$page = $paginator->getCurrentPage($total);
-
-		$this->query->forPage($page, $perPage);
-
-		return $paginator->make($this->get($columns)->all(), $total, $perPage);
-	}
-
-	/**
-	 * Get a paginator only supporting simple next and previous links.
-	 *
-	 * This is more efficient on larger data-sets, etc.
-	 *
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	public function simplePaginate($perPage = null, $columns = array('*'))
-	{
-		$paginator = $this->query->getConnection()->getPaginator();
-
-		$page = $paginator->getCurrentPage();
+		$page = Paginator::resolveCurrentPage();
 
 		$perPage = $perPage ?: $this->model->getPerPage();
 
-		$this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
+		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
-		return $paginator->make($this->get($columns)->all(), $perPage);
+		return new Paginator($this->get($columns)->all(), $perPage, $page, [
+			'path' => Paginator::resolveCurrentPath()
+		]);
 	}
 
 	/**

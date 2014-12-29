@@ -4,6 +4,7 @@ git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Cache:git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Config:git@github.com:illuminate/config.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Console:git@github.com:illuminate/console.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Container:git@github.com:illuminate/container.git
+git subsplit publish --heads="master" --no-tags src/Illuminate/Contracts:git@github.com:illuminate/contracts.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Cookie:git@github.com:illuminate/cookie.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Database:git@github.com:illuminate/database.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Encryption:git@github.com:illuminate/encryption.git
@@ -25,5 +26,4 @@ git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Support:g
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Translation:git@github.com:illuminate/translation.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Validation:git@github.com:illuminate/validation.git
 git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/View:git@github.com:illuminate/view.git
-git subsplit publish --heads="master 4.1 4.2" --no-tags src/Illuminate/Workbench:git@github.com:illuminate/workbench.git
 rm -rf .subsplit/

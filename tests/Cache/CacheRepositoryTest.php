@@ -85,7 +85,12 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRepository()
 	{
-		return new Illuminate\Cache\Repository(m::mock('Illuminate\Cache\StoreInterface'));
+		$dispatcher = new \Illuminate\Events\Dispatcher(m::mock('Illuminate\Container\Container'));
+		$repository = new Illuminate\Cache\Repository(m::mock('Illuminate\Cache\StoreInterface'));
+
+		$repository->setEventDispatcher($dispatcher);
+
+		return $repository;
 	}
 
 }

@@ -4,6 +4,7 @@ git subsplit publish src/Illuminate/Cache:git@github.com:illuminate/cache.git
 git subsplit publish src/Illuminate/Config:git@github.com:illuminate/config.git
 git subsplit publish src/Illuminate/Console:git@github.com:illuminate/console.git
 git subsplit publish src/Illuminate/Container:git@github.com:illuminate/container.git
+git subsplit publish --heads="master" src/Illuminate/Contracts:git@github.com:illuminate/contracts.git
 git subsplit publish src/Illuminate/Cookie:git@github.com:illuminate/cookie.git
 git subsplit publish src/Illuminate/Database:git@github.com:illuminate/database.git
 git subsplit publish src/Illuminate/Encryption:git@github.com:illuminate/encryption.git
@@ -25,5 +26,4 @@ git subsplit publish src/Illuminate/Support:git@github.com:illuminate/support.gi
 git subsplit publish src/Illuminate/Translation:git@github.com:illuminate/translation.git
 git subsplit publish src/Illuminate/Validation:git@github.com:illuminate/validation.git
 git subsplit publish src/Illuminate/View:git@github.com:illuminate/view.git
-git subsplit publish src/Illuminate/Workbench:git@github.com:illuminate/workbench.git
 rm -rf .subsplit/

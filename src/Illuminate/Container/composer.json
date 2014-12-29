@@ -1,5 +1,6 @@
 {
     "name": "illuminate/container",
+    "description": "The Illuminate Container package.",
     "license": "MIT",
     "authors": [
         {
@@ -8,17 +9,17 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "illuminate/contracts": "5.0.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Container": ""
+        "psr-4": {
+            "Illuminate\\Container\\": ""
         }
     },
-    "target-dir": "Illuminate/Container",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

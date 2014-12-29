@@ -1,5 +1,6 @@
 {
     "name": "illuminate/filesystem",
+    "description": "The Illuminate Filesystem package.",
     "license": "MIT",
     "authors": [
         {
@@ -9,18 +10,19 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
-        "symfony/finder": "2.5.*"
+        "illuminate/contracts": "5.0.*",
+        "illuminate/support": "5.0.*",
+        "symfony/finder": "2.6.*",
+        "league/flysystem": "~1.0"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Filesystem": ""
+        "psr-4": {
+            "Illuminate\\Filesystem\\": ""
         }
     },
-    "target-dir": "Illuminate/Filesystem",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "minimum-stability": "dev"

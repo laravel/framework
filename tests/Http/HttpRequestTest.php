@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Illuminate\Http\Request;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase {
@@ -349,6 +350,24 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testInputWithEmptyFilename()
+	{
+		$invalidFiles = [
+			'file' => [
+				'name' => null,
+				'type' => null,
+				'tmp_name' => null,
+				'error' => 4,
+				'size' => 0
+			]
+		];
+
+		$baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), $invalidFiles);
+
+		$request = Request::createFromBase($baseRequest);
+	}
+
+
 	public function testOldMethodCallsSession()
 	{
 		$request = Request::create('/', 'GET');
@@ -390,6 +409,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->setExpectedException('RuntimeException');
 		$request = Request::create('/', 'GET');
 		$request->session();
+	}
+
+
+	public function testUserResolverMakesUserAvailableAsMagicProperty()
+	{
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
+		$request->setUserResolver(function() { return 'user'; });
+		$this->assertEquals('user', $request->user());
 	}
 
 }

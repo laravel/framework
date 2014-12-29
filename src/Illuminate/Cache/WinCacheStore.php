@@ -89,15 +89,17 @@ class WinCacheStore extends TaggableStore implements StoreInterface {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function forget($key)
 	{
-		wincache_ucache_delete($this->prefix.$key);
+		return wincache_ucache_delete($this->prefix.$key);
 	}
 
 	/**
 	 * Remove all items from the cache.
+	 *
+	 * This ignores any configured cache key prefix.
 	 *
 	 * @return void
 	 */

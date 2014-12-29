@@ -7,10 +7,10 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
-class Collection implements ArrayAccess, ArrayableInterface, Countable, IteratorAggregate, JsonableInterface, JsonSerializable {
+class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable {
 
 	/**
 	 * The items contained in the collection.
@@ -22,12 +22,14 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Create a new collection.
 	 *
-	 * @param  array  $items
+	 * @param  mixed  $items
 	 * @return void
 	 */
-	public function __construct(array $items = array())
+	public function __construct($items = array())
 	{
-		$this->items = $items;
+		$items = is_null($items) ? [] : $this->getArrayableItems($items);
+
+		$this->items = (array) $items;
 	}
 
 	/**
@@ -36,13 +38,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  mixed  $items
 	 * @return static
 	 */
-	public static function make($items)
+	public static function make($items = null)
 	{
-		if (is_null($items)) return new static;
-
-		if ($items instanceof Collection) return $items;
-
-		return new static(is_array($items) ? $items : array($items));
+		return new static($items);
 	}
 
 	/**
@@ -77,23 +75,32 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Determine if an item exists in the collection.
 	 *
+	 * @param  mixed  $key
 	 * @param  mixed  $value
 	 * @return bool
 	 */
-	public function contains($value)
+	public function contains($key, $value = null)
 	{
-		if ($value instanceof Closure)
+		if (func_num_args() == 2)
 		{
-			return ! is_null($this->first($value));
+			return $this->contains(function($k, $item) use ($key, $value)
+			{
+				return data_get($item, $key) == $value;
+			});
 		}
 
-		return in_array($value, $this->items);
+		if ($key instanceof Closure)
+		{
+			return ! is_null($this->first($key));
+		}
+
+		return in_array($key, $this->items);
 	}
 
 	/**
 	 * Diff the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function diff($items)
@@ -134,6 +141,21 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function filter(Closure $callback)
 	{
 		return new static(array_filter($this->items, $callback));
+	}
+
+	/**
+	 * Filter items by the given key value pair.
+	 *
+	 * @param  string  $key
+	 * @param  mixed  $value
+	 * @return static
+	 */
+	public function where($key, $value)
+	{
+		return $this->filter(function($item) use ($key, $value)
+		{
+			return data_get($item, $key) == $value;
+		});
 	}
 
 	/**
@@ -283,7 +305,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+ 	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function intersect($items)
@@ -347,12 +369,24 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	/**
 	 * Merge the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return static
 	 */
 	public function merge($items)
 	{
 		return new static(array_merge($this->items, $this->getArrayableItems($items)));
+	}
+
+	/**
+	 * "Paginate" the collection by slicing it into a smaller collection.
+	 *
+	 * @param  int  $page
+	 * @param  int  $perPage
+	 * @return static
+	 */
+	public function forPage($page, $perPage)
+	{
+		return new static(array_slice($this->items, ($page - 1) * $perPage, $perPage));
 	}
 
 	/**
@@ -419,7 +453,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function random($amount = 1)
 	{
-		if ($this->isEmpty()) return null;
+		if ($this->isEmpty()) return;
 
 		$keys = array_rand($this->items, $amount);
 
@@ -704,7 +738,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		return array_map(function($value)
 		{
-			return $value instanceof ArrayableInterface ? $value->toArray() : $value;
+			return $value instanceof Arrayable ? $value->toArray() : $value;
 
 		}, $this->items);
 	}
@@ -824,9 +858,9 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
-	 * Results array of items from Collection or ArrayableInterface.
+	 * Results array of items from Collection or Arrayable.
 	 *
-  	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
+  	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
 	 * @return array
 	 */
 	protected function getArrayableItems($items)
@@ -835,7 +869,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		{
 			$items = $items->all();
 		}
-		elseif ($items instanceof ArrayableInterface)
+		elseif ($items instanceof Arrayable)
 		{
 			$items = $items->toArray();
 		}

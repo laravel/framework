@@ -111,15 +111,11 @@ class MigrateCommand extends BaseCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
-
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
 
 			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
-
-			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 
