@@ -498,7 +498,7 @@ class Guard implements GuardContract {
 	/**
 	 * Queue the recaller cookie into the cookie jar.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
 	protected function queueRecallerCookie(UserContract $user)
@@ -677,7 +677,7 @@ class Guard implements GuardContract {
 	/**
 	 * Return the currently cached user of the application.
 	 *
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function getUser()
 	{

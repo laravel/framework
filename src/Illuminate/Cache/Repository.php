@@ -48,7 +48,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $events)

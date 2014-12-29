@@ -113,6 +113,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 	 * @param  \DateTime|int  $delay
 	 * @param  string|null  $queue
 	 * @param  string  $payload
+	 * @param  int  $attempts
 	 * @return mixed
 	 */
 	protected function pushToDatabase($delay, $queue, $payload, $attempts = 0)

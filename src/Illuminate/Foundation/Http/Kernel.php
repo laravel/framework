@@ -19,14 +19,14 @@ class Kernel implements KernelContract {
 	/**
 	 * The router instance.
 	 *
-	 * @param  \Illuminate\Routing\Router
+	 * @var \Illuminate\Routing\Router
 	 */
 	protected $router;
 
 	/**
 	 * The bootstrap classes for the application.
 	 *
-	 * @return void
+	 * @var array
 	 */
 	protected $bootstrappers = [
 		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
@@ -56,6 +56,7 @@ class Kernel implements KernelContract {
 	 * Create a new HTTP kernel instance.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Routing\Registrar  $router
 	 * @return void
 	 */
 	public function __construct(Application $app, Router $router)

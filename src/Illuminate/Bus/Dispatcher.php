@@ -57,7 +57,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Dispatch a command to its appropriate handler.
 	 *
 	 * @param  mixed  $command
-	 * @param  \Closure  $afterResolving
+	 * @param  \Closure|null  $afterResolving
 	 * @return mixed
 	 */
 	public function dispatch($command, Closure $afterResolving = null)
@@ -76,7 +76,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Dispatch a command to its appropriate handler in the current process.
 	 *
 	 * @param  mixed  $command
-	 * @param  \Closure  $afterResolving
+	 * @param  \Closure|null  $afterResolving
 	 * @return mixed
 	 */
 	public function dispatchNow($command, Closure $afterResolving = null)
@@ -130,7 +130,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	}
 
 	/**
-	 * Get the handler instnace for the given command.
+	 * Get the handler instance for the given command.
 	 *
 	 * @param  mixed  $command
 	 * @return mixed

@@ -34,7 +34,7 @@ class VerifyCsrfToken implements Middleware {
 	 * @param  \Closure  $next
 	 * @return mixed
 	 *
-	 * @throws TokenMismatchException
+	 * @throws \Illuminate\Session\TokenMismatchException
 	 */
 	public function handle($request, Closure $next)
 	{

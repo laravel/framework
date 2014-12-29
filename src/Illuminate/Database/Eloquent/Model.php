@@ -1354,6 +1354,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Set the observable event names.
 	 *
+	 * @param  array  $observables
 	 * @return void
 	 */
 	public function setObservableEvents(array $observables)
@@ -2002,6 +2003,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Set the primary key for the model.
 	 *
+	 * @param  string  $key
 	 * @return void
 	 */
 	public function setKeyName($key)

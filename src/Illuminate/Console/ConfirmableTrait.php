@@ -8,7 +8,7 @@ trait ConfirmableTrait {
 	 * Confirm before proceeding with the action
 	 *
 	 * @param  string    $warning
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return bool
 	 */
 	public function confirmToProceed($warning = 'Application In Production!', Closure $callback = null)
