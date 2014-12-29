@@ -68,7 +68,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		}
 		else
 		{
-			return $this->dispatchNow($command);
+			return $this->dispatchNow($command, $afterResolving);
 		}
 	}
 
