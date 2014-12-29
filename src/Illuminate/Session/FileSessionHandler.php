@@ -66,7 +66,7 @@ class FileSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function write($sessionId, $data)
 	{
-		file_put_contents($this->path.'/'.$sessionId, $data, LOCK_EX);
+		$this->files->put($this->path.'/'.$sessionId, $data, true);
 	}
 
 	/**
