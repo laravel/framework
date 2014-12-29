@@ -59,14 +59,6 @@ class ProviderRepository {
 			$manifest = $this->compileManifest($providers);
 		}
 
-		// If the application is running in the console, we will not lazy load any of
-		// the service providers. This is mainly because it's not as necessary for
-		// performance and also so any provided Artisan commands get registered.
-		if ($this->app->runningInConsole())
-		{
-			$manifest['eager'] = $manifest['providers'];
-		}
-
 		// Next, we will register events to load the providers for each of the events
 		// that it has requested. This allows the service provider to defer itself
 		// while still getting automatically loaded when a certain event occurs.
