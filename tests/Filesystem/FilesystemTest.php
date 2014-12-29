@@ -9,28 +9,30 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	protected $filesystem = null;
 
 	/**
-	 * Files/Folders that should not be deleted after running tests.
-	 * The files/folders not listed here are supposed to be leftover by failing tests. 
-	 */
+     * Files and directories that are excluded from delete.
+     *
+     * This array holds the list of files/directories that should not
+     * be deleted after the run of each test case. The files/directories
+     * not listed here are supposed to be leftover by failing tests.
+     *
+     * @var string[]
+     */
 	static protected $excludedFromDelete = ['FilesystemTest.php'];
 
 	public function tearDown()
 	{
-		if($this->filesystem == null)
+		if($this->filesystem == null){
 			$this->filesystem = new Filesystem();
-
-		$directories = $this->filesystem->directories(self::$testDirectory);
-		$files = $this->filesystem->files(self::$testDirectory);
-		
-		foreach($directories as $directory)
-		{
-			if( !in_array($directory,self::$excludedFromDelete))
-				$this->filesystem->deleteDirectory($directory);
 		}
-		foreach($directories as $file)
-		{
-			if( !in_array($file,self::$excludedFromDelete))
+		foreach($this->filesystem->directories(self::$testDirectory) as $directory){
+			if( !in_array($directory,self::$excludedFromDelete)){
+				$this->filesystem->deleteDirectory($directory);
+			}
+		}
+		foreach($$this->filesystem->files(self::$testDirectory) as $file){
+			if( !in_array($file,self::$excludedFromDelete)){
 				$this->filesystem->delete($file);
+			}
 		}
 	}
 
