@@ -80,11 +80,10 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	{
 		$input = $input ?: $this->request->input();
 
-		$input = array_filter($input, function ($value) {
+		$this->session->flashInput(array_filter($input, function ($value)
+		{
 			return ! $value instanceof UploadedFile;
-		});
-
-		$this->session->flashInput($input);
+		}));
 
 		return $this;
 	}
