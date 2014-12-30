@@ -70,15 +70,17 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	}
 
 	/**
-	* Add multiple cookies to the response.
-	*
-	* @param  array  $cookie
-	* @return $this
+	 * Add multiple cookies to the response.
+	 *
+	 * @param  array  $cookie
+	 * @return $this
 	*/
 	public function withCookies(array $cookies)
 	{
-		foreach($cookies as $cookie)
+		foreach ($cookies as $cookie)
+		{
 			$this->headers->setCookie($cookie);
+		}
 
 		return $this;
 	}
