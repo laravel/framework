@@ -131,10 +131,10 @@ if ( ! function_exists('config'))
 	/**
 	 * Get / set the specified configuration value.
 	 *
-	 * If an array as passed as the key, we will assume you want to set an array of values.
+	 * If an array is passed as the key, we will assume you want to set an array of values.
 	 *
 	 * @param  array|string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	function config($key, $default = null)
@@ -143,10 +143,8 @@ if ( ! function_exists('config'))
 		{
 			return app('config')->set($key);
 		}
-		else
-		{
-			return app('config')->get($key, $default);
-		}
+
+		return app('config')->get($key, $default);
 	}
 }
 
@@ -429,15 +427,21 @@ if ( ! function_exists('secure_url'))
 if ( ! function_exists('session'))
 {
 	/**
-	 * Get a value from the session.
+	 * Get / set the specified session value.
 	 *
-	 * @param  string  $name
-	 * @param  mixed|null  $default
+	 * If an array is passed as the key, we will assume you want to set an array of values.
+	 *
+	 * @param  array|string  $key
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	function session($name, $default = null)
+	function session($key = null, $default = null)
 	{
-		return app('session')->get($name, $default);
+		if (is_null($key)) return app('session');
+
+		if (is_array($key)) return app('session')->put($key);
+
+		return app('session')->get($key, $default);
 	}
 }
 
