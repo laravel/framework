@@ -82,6 +82,19 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMacro()
+	{
+		$router = $this->getRouter();
+		$router->macro('webhook', function() use ($router)
+		{
+			$router->match(['GET', 'POST'], 'webhook', function() { return 'OK'; });
+		});
+		$router->webhook();
+		$this->assertEquals('OK', $router->dispatch(Request::create('webhook', 'GET'))->getContent());
+		$this->assertEquals('OK', $router->dispatch(Request::create('webhook', 'POST'))->getContent());
+	}
+
+
 	public function testClassesCanBeInjectedIntoRoutes()
 	{
 		unset($_SERVER['__test.route_inject']);
