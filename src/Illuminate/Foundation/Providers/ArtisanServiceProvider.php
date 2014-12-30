@@ -1,28 +1,9 @@
 <?php namespace Illuminate\Foundation\Providers;
 
+use ReflectionClass;
+use ReflectionMethod;
+use InvalidArgumentException;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Console\UpCommand;
-use Illuminate\Foundation\Console\DownCommand;
-use Illuminate\Foundation\Console\TinkerCommand;
-use Illuminate\Foundation\Console\AppNameCommand;
-use Illuminate\Foundation\Console\OptimizeCommand;
-use Illuminate\Foundation\Console\RouteListCommand;
-use Illuminate\Foundation\Console\RouteScanCommand;
-use Illuminate\Foundation\Console\EventMakeCommand;
-use Illuminate\Foundation\Console\EventScanCommand;
-use Illuminate\Foundation\Console\RouteCacheCommand;
-use Illuminate\Foundation\Console\RouteClearCommand;
-use Illuminate\Foundation\Console\CommandMakeCommand;
-use Illuminate\Foundation\Console\ConfigCacheCommand;
-use Illuminate\Foundation\Console\ConfigClearCommand;
-use Illuminate\Foundation\Console\ConsoleMakeCommand;
-use Illuminate\Foundation\Console\EnvironmentCommand;
-use Illuminate\Foundation\Console\KeyGenerateCommand;
-use Illuminate\Foundation\Console\RequestMakeCommand;
-use Illuminate\Foundation\Console\ProviderMakeCommand;
-use Illuminate\Foundation\Console\HandlerEventCommand;
-use Illuminate\Foundation\Console\ClearCompiledCommand;
-use Illuminate\Foundation\Console\HandlerCommandCommand;
 
 class ArtisanServiceProvider extends ServiceProvider {
 
@@ -39,28 +20,28 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 * @var array
 	 */
 	protected $commands = [
-		'AppName' => 'command.app.name',
-		'ClearCompiled' => 'command.clear-compiled',
-		'CommandMake' => 'command.command.make',
-		'ConfigCache' => 'command.config.cache',
-		'ConfigClear' => 'command.config.clear',
-		'ConsoleMake' => 'command.console.make',
-		'EventMake' => 'command.event.make',
-		'Down' => 'command.down',
-		'Environment' => 'command.environment',
-		'EventScan' => 'command.event.scan',
-		'HandlerCommand' => 'command.handler.command',
-		'HandlerEvent' => 'command.handler.event',
-		'KeyGenerate' => 'command.key.generate',
-		'Optimize' => 'command.optimize',
-		'ProviderMake' => 'command.provider.make',
-		'RequestMake' => 'command.request.make',
-		'RouteCache' => 'command.route.cache',
-		'RouteClear' => 'command.route.clear',
-		'RouteList' => 'command.route.list',
-		'RouteScan' => 'command.route.scan',
-		'Tinker' => 'command.tinker',
-		'Up' => 'command.up',
+		'command.app.name' => 'Illuminate\Foundation\Console\AppNameCommand',
+		'command.clear-compiled' => 'Illuminate\Foundation\Console\ClearCompiledCommand',
+		'command.command.make' => 'Illuminate\Foundation\Console\CommandMakeCommand',
+		'command.config.cache' => 'Illuminate\Foundation\Console\ConfigCacheCommand',
+		'command.config.clear' => 'Illuminate\Foundation\Console\ConfigClearCommand',
+		'command.console.make' => 'Illuminate\Foundation\Console\ConsoleMakeCommand',
+		'command.event.make' => 'Illuminate\Foundation\Console\EventMakeCommand',
+		'command.down' => 'Illuminate\Foundation\Console\DownCommand',
+		'command.environment' => 'Illuminate\Foundation\Console\EnvironmentCommand',
+		'command.event.scan' => 'Illuminate\Foundation\Console\EventScanCommand',
+		'command.handler.command' => 'Illuminate\Foundation\Console\HandlerCommandCommand',
+		'command.handler.event' => 'Illuminate\Foundation\Console\HandlerEventCommand',
+		'command.key.generate' => 'Illuminate\Foundation\Console\KeyGenerateCommand',
+		'command.optimize' => 'Illuminate\Foundation\Console\OptimizeCommand',
+		'command.provider.make' => 'Illuminate\Foundation\Console\ProviderMakeCommand',
+		'command.request.make' => 'Illuminate\Foundation\Console\RequestMakeCommand',
+		'command.route.cache' => 'Illuminate\Foundation\Console\RouteCacheCommand',
+		'command.route.clear' => 'Illuminate\Foundation\Console\RouteClearCommand',
+		'command.route.list' => 'Illuminate\Foundation\Console\RouteListCommand',
+		'command.route.scan' => 'Illuminate\Foundation\Console\RouteScanCommand',
+		'command.tinker' => 'Illuminate\Foundation\Console\TinkerCommand',
+		'command.up' => 'Illuminate\Foundation\Console\UpCommand',
 	];
 
 	/**
@@ -70,300 +51,55 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		foreach (array_keys($this->commands) as $command)
+		foreach ($this->commands as $commandName => $commandClass)
 		{
-			$method = "register{$command}Command";
-
-			call_user_func_array([$this, $method], []);
+			$this->registerCommand($commandName, $commandClass);
 		}
 
-		$this->commands(array_values($this->commands));
+		$this->commands(array_keys($this->commands));
 	}
 
 	/**
-	 * Register the command.
+	 * Register command in container
 	 *
+	 * @param  string $commandName
+	 * @param  string $commandClass
 	 * @return void
 	 */
-	protected function registerAppNameCommand()
+	protected function registerCommand($commandName, $commandClass)
 	{
-		$this->app->singleton('command.app.name', function($app)
+		$this->app->singleton($commandName, function($app) use ($commandClass)
 		{
-			return new AppNameCommand($app['composer'], $app['files']);
+			$class  = new ReflectionClass($commandClass);
+
+			return $class->newInstanceArgs($this->resolveCommandParameters($class->getConstructor()));
 		});
 	}
 
 	/**
-	 * Register the command.
+	 * Resolve the parameters in the constructor
 	 *
-	 * @return void
+	 * @param  ReflectionMethod $constructor
+	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
-	protected function registerClearCompiledCommand()
+	protected function resolveCommandParameters(ReflectionMethod $constructor)
 	{
-		$this->app->singleton('command.clear-compiled', function()
-		{
-			return new ClearCompiledCommand;
-		});
-	}
+		$params      = [];
+		foreach ($constructor->getParameters() as $parameter) {
+			$paramClass = $parameter->getClass();
+			if (!is_null($paramClass)) {
+				$paramClass   = $paramClass->name;
+				$value        = $this->app->make($paramClass);
+				$pos          = $parameter->getPosition();
+				$params[$pos] = $value;
+			} else {
+				throw new InvalidArgumentException("The parameter: '" . $parameter->name . "' there is not valid class");
+			}
+		}
 
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerCommandMakeCommand()
-	{
-		$this->app->singleton('command.command.make', function($app)
-		{
-			return new CommandMakeCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerConfigCacheCommand()
-	{
-		$this->app->singleton('command.config.cache', function()
-		{
-			return new ConfigCacheCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerConfigClearCommand()
-	{
-		$this->app->singleton('command.config.clear', function()
-		{
-			return new ConfigClearCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerConsoleMakeCommand()
-	{
-		$this->app->singleton('command.console.make', function($app)
-		{
-			return new ConsoleMakeCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerEventMakeCommand()
-	{
-		$this->app->singleton('command.event.make', function($app)
-		{
-			return new EventMakeCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerDownCommand()
-	{
-		$this->app->singleton('command.down', function()
-		{
-			return new DownCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerEnvironmentCommand()
-	{
-		$this->app->singleton('command.environment', function()
-		{
-			return new EnvironmentCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerEventScanCommand()
-	{
-		$this->app->singleton('command.event.scan', function()
-		{
-			return new EventScanCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerHandlerCommandCommand()
-	{
-		$this->app->singleton('command.handler.command', function($app)
-		{
-			return new HandlerCommandCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerHandlerEventCommand()
-	{
-		$this->app->singleton('command.handler.event', function($app)
-		{
-			return new HandlerEventCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerKeyGenerateCommand()
-	{
-		$this->app->singleton('command.key.generate', function($app)
-		{
-			return new KeyGenerateCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerOptimizeCommand()
-	{
-		$this->app->singleton('command.optimize', function($app)
-		{
-			return new OptimizeCommand($app['composer']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerProviderMakeCommand()
-	{
-		$this->app->singleton('command.provider.make', function($app)
-		{
-			return new ProviderMakeCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerRequestMakeCommand()
-	{
-		$this->app->singleton('command.request.make', function($app)
-		{
-			return new RequestMakeCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerRouteCacheCommand()
-	{
-		$this->app->singleton('command.route.cache', function($app)
-		{
-			return new RouteCacheCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerRouteClearCommand()
-	{
-		$this->app->singleton('command.route.clear', function($app)
-		{
-			return new RouteClearCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerRouteListCommand()
-	{
-		$this->app->singleton('command.route.list', function($app)
-		{
-			return new RouteListCommand($app['router']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerRouteScanCommand()
-	{
-		$this->app->singleton('command.route.scan', function()
-		{
-			return new RouteScanCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerTinkerCommand()
-	{
-		$this->app->singleton('command.tinker', function()
-		{
-			return new TinkerCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerUpCommand()
-	{
-		$this->app->singleton('command.up', function()
-		{
-			return new UpCommand;
-		});
+		return $params;
 	}
 
 	/**
@@ -373,7 +109,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array_values($this->commands);
+		return array_keys($this->commands);
 	}
 
 }
