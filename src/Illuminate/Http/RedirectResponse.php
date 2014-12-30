@@ -74,7 +74,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 *
 	 * @param  array  $cookie
 	 * @return $this
-	*/
+	 */
 	public function withCookies(array $cookies)
 	{
 		foreach ($cookies as $cookie)
