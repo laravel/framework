@@ -6,6 +6,7 @@ use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectResponse {
 
@@ -80,7 +81,10 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	{
 		$input = $input ?: $this->request->input();
 
-		$this->session->flashInput($input);
+		$this->session->flashInput(array_filter($input, function ($value)
+		{
+			return ! $value instanceof UploadedFile;
+		}));
 
 		return $this;
 	}
