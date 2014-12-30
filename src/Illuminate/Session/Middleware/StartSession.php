@@ -2,11 +2,11 @@
 
 use Closure;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
@@ -70,7 +70,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	/**
 	 * Perform any final actions for the request lifecycle.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
@@ -85,7 +85,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	/**
 	 * Start the session for the given request.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Session\SessionInterface
 	 */
 	protected function startSession(Request $request)
@@ -100,7 +100,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	/**
 	 * Get the session implementation from the manager.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Session\SessionInterface
 	 */
 	public function getSession(Request $request)
@@ -115,7 +115,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	/**
 	 * Store the current URL for the request if necessary.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Illuminate\Session\SessionInterface  $session
 	 * @return void
 	 */
