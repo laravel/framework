@@ -19,7 +19,7 @@ class {{class}} {
 	/**
 	 * Handle the command.
 	 *
-	 * @param  {{command}}
+	 * @param  {{command}}  $command
 	 * @return void
 	 */
 	public function handle({{command}} $command)
