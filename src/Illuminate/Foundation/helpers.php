@@ -137,8 +137,10 @@ if ( ! function_exists('config'))
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	function config($key, $default = null)
+	function config($key = null, $default = null)
 	{
+		if (is_null($key)) return app('config');
+
 		if (is_array($key))
 		{
 			return app('config')->set($key);
@@ -251,8 +253,10 @@ if ( ! function_exists('logger'))
 	 * @param  array  $context
 	 * @return void
 	 */
-	function logger($message, array $context = array())
+	function logger($message = null, array $context = array())
 	{
+		if (is_null($message)) return app('log');
+
 		return app('log')->debug($message, $context);
 	}
 }
@@ -344,14 +348,9 @@ if ( ! function_exists('redirect'))
 	 */
 	function redirect($to = null, $status = 302, $headers = array(), $secure = null)
 	{
-		if ( ! is_null($to))
-		{
-			return app('redirect')->to($to, $status, $headers, $secure);
-		}
-		else
-		{
-			return app('redirect');
-		}
+		if (is_null($to)) return app('redirect');
+
+		return app('redirect')->to($to, $status, $headers, $secure);
 	}
 }
 
@@ -470,8 +469,10 @@ if ( ! function_exists('trans'))
 	 * @param  string  $locale
 	 * @return string
 	 */
-	function trans($id, $parameters = array(), $domain = 'messages', $locale = null)
+	function trans($id = null, $parameters = array(), $domain = 'messages', $locale = null)
 	{
+		if (is_null($id)) return app('translator');
+
 		return app('translator')->trans($id, $parameters, $domain, $locale);
 	}
 }
