@@ -137,6 +137,8 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	public function resolveHandler($command)
 	{
+		if ($command instanceof SelfHandling) return $command;
+
 		return $this->container->make($this->getHandlerClass($command));
 	}
 
