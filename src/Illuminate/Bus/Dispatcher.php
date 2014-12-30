@@ -148,6 +148,8 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	public function getHandlerClass($command)
 	{
+		if ($command instanceof SelfHandling) return get_class($command);
+
 		return $this->inflectSegment($command, 0);
 	}
 
