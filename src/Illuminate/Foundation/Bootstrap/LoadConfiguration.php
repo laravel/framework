@@ -67,6 +67,9 @@ class LoadConfiguration {
 
 		foreach (Finder::create()->files()->name('*.php')->in($app->configPath()) as $file)
 		{
+			$path = $file->getRelativePath();
+			if($path && $path != $app->environment())
+				continue;
 			$files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
 		}
 
