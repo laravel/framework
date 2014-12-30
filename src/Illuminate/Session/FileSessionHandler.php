@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Session;
 
+use Exception;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 
-class FileSessionHandler implements \SessionHandlerInterface
-{
+class FileSessionHandler implements \SessionHandlerInterface {
 
 	/**
-	 * The current session ID that's open
+	 * The current session ID that's open.
 	 *
 	 * @var string
 	 */
@@ -21,11 +21,11 @@ class FileSessionHandler implements \SessionHandlerInterface
 	protected $files;
 
 	/**
-	 * The session file pointer
+	 * The session file pointer.
 	 *
 	 * @var resource
 	 */
-	private $fp;
+	protected $fp;
 
 	/**
 	 * The path where sessions should be stored.
@@ -37,8 +37,8 @@ class FileSessionHandler implements \SessionHandlerInterface
 	/**
 	 * Create a new file driven handler instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem $files
-	 * @param  string $path
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  string  $path
 	 * @return void
 	 */
 	public function __construct(Filesystem $files, $path)
@@ -63,7 +63,8 @@ class FileSessionHandler implements \SessionHandlerInterface
 		// Obtain a write lock - must explicitly perform this because
 		// the underlying OS may be advisory as opposed to mandatory
 		$locked = flock($this->fp, LOCK_EX);
-		if (!$locked) {
+		if ( ! $locked)
+		{
 			fclose($this->fp);
 			$this->fp = null;
 			$this->currentId = null;
@@ -79,7 +80,8 @@ class FileSessionHandler implements \SessionHandlerInterface
 	public function close()
 	{
 		// only close if there is something to close
-		if ($this->fp) {
+		if ($this->fp)
+		{
 			flock($this->fp, LOCK_UN);
 			fclose($this->fp);
 			$this->fp = null;
@@ -95,17 +97,22 @@ class FileSessionHandler implements \SessionHandlerInterface
 	public function read($sessionId)
 	{
 		// if the proper session file isn't open, open it
-		if ($sessionId != $this->currentId || !$this->fp) {
-			if (!$this->open($this->path, $sessionId)) {
+		if ($sessionId != $this->currentId || !$this->fp)
+		{
+			if ( ! $this->open($this->path, $sessionId))
+			{
 				throw new Exception('Could not open session file');
 			}
-		} else {
+		}
+		else
+		{
 			// otherwise make sure we are at the beginning of the file
 			rewind($this->fp);
 		}
 
 		$data = '';
-		while (!feof($this->fp)) {
+		while ( ! feof($this->fp))
+		{
 			$data .= fread($this->fp, 8192);
 		}
 
@@ -117,8 +124,10 @@ class FileSessionHandler implements \SessionHandlerInterface
 	 */
 	public function write($sessionId, $data)
 	{
-		if ($sessionId != $this->currentId || !$this->fp) {
-			if (!$this->open($this->path, $sessionId)) {
+		if ($sessionId != $this->currentId || !$this->fp)
+		{
+			if (!$this->open($this->path, $sessionId))
+			{
 				throw new Exception('Could not open session file');
 			}
 		}
@@ -143,29 +152,36 @@ class FileSessionHandler implements \SessionHandlerInterface
 	 */
 	public function gc($lifetime)
 	{
-		// a race condition exists such that garbage collection will throw a runtime exception if a file in the iterator
-		// object returned by the Finder call in the parent function is deleted out of band before the iterator call
-		// (foreach) gets to it.  this just catches those exceptions and retries the call (currently set arbitrarily at
+		// a race condition exists such that garbage collection will throw a
+		// runtime exception if a file in the iterator object returned by the
+		// Finder call in the parent function is deleted out of band before the
+		// iterator call (foreach) gets to it.  this just catches those
+		// exceptions and retries the call (currently set arbitrarily at
 		// 5 retries
 		$retries = 5;
 
-		for ($i = 0; $i < $retries; $i++) {
-			try {
+		for ($i = 0; $i < $retries; $i++)
+		{
+			try
+			{
 				$files = Finder::create()
 					->in($this->path)
 					->files()
 					->ignoreDotFiles(true)
 					->date('<= now - ' . $lifetime . ' seconds');
 
-				foreach ($files as $file) {
+				foreach ($files as $file)
+				{
 					$this->files->delete($file->getRealPath());
 				}
 			}
-			catch (RuntimeException $e) {
+			catch (RuntimeException $e)
+			{
 				continue;
 			}
 
 			break;
 		}
 	}
+
 }
