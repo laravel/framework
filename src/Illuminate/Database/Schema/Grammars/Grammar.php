@@ -315,7 +315,7 @@ abstract class Grammar extends BaseGrammar {
 	{
 		$table = clone $table;
 
-		foreach($blueprint->getChangedColumns() as $fluent)
+		foreach ($blueprint->getChangedColumns() as $fluent)
 		{
 			$column = $this->getDoctrineColumnForChange($table, $fluent);
 

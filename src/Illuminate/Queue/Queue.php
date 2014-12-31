@@ -37,7 +37,7 @@ abstract class Queue {
 	 */
 	public function bulk($jobs, $data = '', $queue = null)
 	{
-		foreach ((array) $jobs as $job)
+		foreach ($jobs as $job)
 		{
 			$this->push($job, $data, $queue);
 		}

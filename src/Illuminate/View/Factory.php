@@ -119,7 +119,7 @@ class Factory implements FactoryContract {
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function file($path, $data = array(), $mergeData = array())
+	public function file($path, $data = [], $mergeData = [])
 	{
 		$data = array_merge($mergeData, $this->parseData($data));
 
@@ -136,7 +136,7 @@ class Factory implements FactoryContract {
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	public function make($view, $data = array(), $mergeData = array())
+	public function make($view, $data = [], $mergeData = [])
 	{
 		if (isset($this->aliases[$view])) $view = $this->aliases[$view];
 
@@ -190,7 +190,7 @@ class Factory implements FactoryContract {
 	 * @param  mixed   $data
 	 * @return \Illuminate\View\View
 	 */
-	public function of($view, $data = array())
+	public function of($view, $data = [])
 	{
 		return $this->make($this->names[$view], $data);
 	}
@@ -345,9 +345,10 @@ class Factory implements FactoryContract {
 	 */
 	public function creator($views, $callback)
 	{
-		$creators = array();
+		$creators = [];
+		$views = (array) $views;
 
-		foreach ((array) $views as $view)
+		foreach ($views as $view)
 		{
 			$creators[] = $this->addViewEvent($view, $callback, 'creating: ');
 		}
@@ -363,7 +364,7 @@ class Factory implements FactoryContract {
 	 */
 	public function composers(array $composers)
 	{
-		$registered = array();
+		$registered = [];
 
 		foreach ($composers as $callback => $views)
 		{
@@ -383,9 +384,10 @@ class Factory implements FactoryContract {
 	 */
 	public function composer($views, $callback, $priority = null)
 	{
-		$composers = array();
+		$composers = [];
+		$views = (array) $views;
 
-		foreach ((array) $views as $view)
+		foreach ($views as $view)
 		{
 			$composers[] = $this->addViewEvent($view, $callback, 'composing: ', $priority);
 		}
@@ -654,9 +656,8 @@ class Factory implements FactoryContract {
 	 */
 	public function flushSections()
 	{
-		$this->sections = array();
-
-		$this->sectionStack = array();
+		$this->sections = [];
+		$this->sectionStack = [];
 	}
 
 	/**

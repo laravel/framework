@@ -178,8 +178,9 @@ class Arr {
 	public static function forget(&$array, $keys)
 	{
 		$original =& $array;
+		$keys = (array) $keys;
 
-		foreach ((array) $keys as $key)
+		foreach ($keys as $key)
 		{
 			$parts = explode('.', $key);
 

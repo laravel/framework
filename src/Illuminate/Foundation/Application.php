@@ -788,7 +788,7 @@ class Application extends Container implements ApplicationContract {
 	 */
 	public function registerCoreContainerAliases()
 	{
-		$aliases = array(
+		$containerAliases = [
 			'app'            => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
 			'artisan'        => ['Illuminate\Console\Application', 'Illuminate\Contracts\Console\Application'],
 			'auth'           => 'Illuminate\Auth\AuthManager',
@@ -823,11 +823,12 @@ class Application extends Container implements ApplicationContract {
 			'url'            => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
 			'validator'      => ['Illuminate\Validation\Factory', 'Illuminate\Contracts\Validation\Factory'],
 			'view'           => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
-		);
+		];
 
-		foreach ($aliases as $key => $aliases)
+		foreach ($containerAliases as $key => $aliases)
 		{
-			foreach ((array) $aliases as $alias)
+			$aliases = (array) $aliases;
+			foreach ($aliases as $alias)
 			{
 				$this->alias($key, $alias);
 			}

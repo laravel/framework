@@ -70,7 +70,8 @@ class Dispatcher implements DispatcherContract {
 	 */
 	public function listen($events, $listener, $priority = 0)
 	{
-		foreach ((array) $events as $event)
+		$events = (array) $events;
+		foreach ($events as $event)
 		{
 			if (str_contains($event, '*'))
 			{
