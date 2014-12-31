@@ -3,7 +3,7 @@
 use Closure;
 use BadMethodCallException;
 
-trait MacroableTrait {
+trait Macroable {
 
 	/**
 	 * The registered string macros.

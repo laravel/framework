@@ -4,13 +4,13 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Traits\MacroableTrait;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Repository implements CacheContract, ArrayAccess {
 
-	use MacroableTrait {
+	use Macroable {
 		__call as macroCall;
 	}
 

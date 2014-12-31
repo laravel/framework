@@ -1,11 +1,11 @@
 <?php namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Support\Traits\MacroableTrait;
+use Illuminate\Support\Traits\Macroable;
 
 class Arr {
 
-	use MacroableTrait;
+	use Macroable;
 
 	/**
 	 * Add an element to an array using "dot" notation if it doesn't exist.

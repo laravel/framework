@@ -2,12 +2,12 @@
 
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
-use Illuminate\Support\Traits\MacroableTrait;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class Filesystem {
 
-	use MacroableTrait;
+	use Macroable;
 
 	/**
 	 * Determine if a file exists.

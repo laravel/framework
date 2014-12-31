@@ -2,11 +2,11 @@
 
 use Patchwork\Utf8;
 use RuntimeException;
-use Illuminate\Support\Traits\MacroableTrait;
+use Illuminate\Support\Traits\Macroable;
 
 class Str {
 
-	use MacroableTrait;
+	use Macroable;
 
 	/**
 	 * The cache of snake-cased words.
