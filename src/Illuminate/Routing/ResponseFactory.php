@@ -4,7 +4,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Traits\MacroableTrait;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -12,7 +12,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 
 class ResponseFactory implements FactoryContract {
 
-	use MacroableTrait;
+	use Macroable;
 
 	/**
 	 * The view factory implementation.

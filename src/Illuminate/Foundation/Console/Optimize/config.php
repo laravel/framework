@@ -95,7 +95,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pagination/AbstractPaginator.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pagination/Paginator.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Traits/MacroableTrait.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Traits/Macroable.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Arr.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Str.php',
     $basePath.'/vendor/symfony/debug/Symfony/Component/Debug/ErrorHandler.php',
