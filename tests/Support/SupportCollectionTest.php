@@ -425,6 +425,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCanSumValuesWithoutACallback()
+	{
+		$c = new Collection(array(1, 2, 3, 4, 5));
+		$this->assertEquals(15, $c->sum());
+	}
+
+
 	public function testValueRetrieverAcceptsDotNotation()
 	{
 		$c = new Collection(array(
