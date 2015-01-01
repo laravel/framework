@@ -623,7 +623,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		if (is_null($callback))
 		{
-			$callback = function($item) { return $item; };
+			return array_sum($this->items);
 		}
 
 		if (is_string($callback))
