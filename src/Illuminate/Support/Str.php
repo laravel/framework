@@ -280,8 +280,8 @@ class Str {
 	/**
 	 * Generate a utf8-compatible URL friendly "slug" from a given string.
 	 *
-	 * @param $title
-	 * @param string $separator
+	 * @param  string $title
+	 * @param  string $separator
 	 * @return string
 	 */
 	public static function lightSlug($title, $separator = '-')
