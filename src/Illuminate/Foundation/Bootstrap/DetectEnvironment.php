@@ -20,7 +20,7 @@ class DetectEnvironment {
 
 		$app->detectEnvironment(function()
 		{
-			return getenv('APP_ENV') ?: 'production';
+			return env('APP_ENV', 'production');
 		});
 	}
 
