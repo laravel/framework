@@ -25,7 +25,7 @@ class {{class}} implements ShouldBeQueued {
 	 * @param  {{event}}
 	 * @return void
 	 */
-	public function handle({{event}} $command)
+	public function handle({{event}} $event)
 	{
 		//
 	}
