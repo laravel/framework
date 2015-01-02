@@ -650,11 +650,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Get the sum of the given values.
 	 *
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return mixed
 	 */
-	public function sum($callback)
+	public function sum($callback = null)
 	{
+		if (is_null($callback))
+		{
+			return array_sum($this->items);
+		}
+
 		if (is_string($callback))
 		{
 			$callback = $this->valueRetriever($callback);
