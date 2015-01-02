@@ -10,6 +10,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "ext-mbstring": "*",
         "illuminate/contracts": "5.0.*",
         "doctrine/inflector": "~1.0",
         "danielstjules/stringy": "~1.5"
