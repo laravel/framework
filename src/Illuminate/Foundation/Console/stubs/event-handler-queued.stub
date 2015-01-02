@@ -22,7 +22,7 @@ class {{class}} implements ShouldBeQueued {
 	/**
 	 * Handle the event.
 	 *
-	 * @param  {{event}}
+	 * @param  {{event}}  $event
 	 * @return void
 	 */
 	public function handle({{event}} $event)
