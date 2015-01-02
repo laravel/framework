@@ -8,7 +8,7 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('child', str_singular('children'));
 		$this->assertEquals('test', str_singular('tests'));
 		$this->assertEquals('deer', str_singular('deer'));
-		$this->assertEquals('criterium', str_singular('criteria'));
+		$this->assertEquals('criterion', str_singular('criteria'));
 	}
 
 
@@ -28,8 +28,8 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('TEST', str_singular('TESTS'));
 		$this->assertEquals('Deer', str_singular('Deer'));
 		$this->assertEquals('DEER', str_singular('DEER'));
-		$this->assertEquals('Criterium', str_singular('Criteria'));
-		$this->assertEquals('CRITERIUM', str_singular('CRITERIA'));
+		$this->assertEquals('Criterion', str_singular('Criteria'));
+		$this->assertEquals('CRITERION', str_singular('CRITERIA'));
 	}
 
 
