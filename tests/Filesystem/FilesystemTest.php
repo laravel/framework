@@ -136,4 +136,33 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		rmdir(__DIR__.'/tmp2');
 	}
 
+
+	public function testGetFiles()
+	{
+		mkdir(__DIR__.'/tmp', 0777, true);
+		file_put_contents(__DIR__.'/tmp/foo.txt', '');
+		file_put_contents(__DIR__.'/tmp/bar.txt', '');
+		mkdir(__DIR__.'/tmp/nested', 0777, true);
+		file_put_contents(__DIR__.'/tmp/nested/baz.txt', '');
+
+		$fileSystem = new Filesystem;
+
+		$directories = [
+			__DIR__.'/tmp/nested',
+		];
+		$this->assertSame($directories, $fileSystem->directories(__DIR__.'/tmp'));
+
+		$files = [
+			__DIR__.'/tmp/bar.txt',
+			__DIR__.'/tmp/foo.txt',
+		];
+		$this->assertSame($files, $fileSystem->files(__DIR__.'/tmp'));
+
+		unlink(__DIR__.'/tmp/nested/baz.txt');
+		rmdir(__DIR__.'/tmp/nested');
+		unlink(__DIR__.'/tmp/bar.txt');
+		unlink(__DIR__.'/tmp/foo.txt');
+		rmdir(__DIR__.'/tmp');
+	}
+
 }
