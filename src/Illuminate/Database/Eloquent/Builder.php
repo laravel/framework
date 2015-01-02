@@ -613,7 +613,7 @@ class Builder {
 
 	/**
 	 * Add nested relationship count conditions to the query.
-	 * 
+	 *
 	 * @param  string  $relations
 	 * @param  string  $operator
 	 * @param  integer $count
@@ -625,14 +625,11 @@ class Builder {
 	{
 		$relations = explode('.', $relations);
 
-		// In order to nest "has", we need to add count relation constraints
-		// on the callback closure. We will do this by simply passing to
-		// closure its own reference, so it calls itself recursively.
+		// In order to nest "has", we need to add count relation constraints on the
+		// callback Closure. We'll do this by simply passing the Closure its own
+		// reference to itself so it calls itself recursively on each segment.
 		$closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback)
 		{
-			// If the "relation" is specified using dot notation, we will assume
-			// that developer wants to check simple "has" on the intermediate
-			// relations and add constraints only on the furthermost query.
 			if (count($relations) > 1)
 			{
 				$q->whereHas(array_shift($relations), $closure);
