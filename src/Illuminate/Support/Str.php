@@ -65,12 +65,7 @@ class Str {
 	 */
 	public static function contains($haystack, $needles)
 	{
-		foreach ((array) $needles as $needle)
-		{
-			if ($needle != '' && strpos($haystack, $needle) !== false) return true;
-		}
-
-		return false;
+		return StaticStringy::containsAny($haystack, array_filter((array) $needles));
 	}
 
 	/**
@@ -82,9 +77,9 @@ class Str {
 	 */
 	public static function endsWith($haystack, $needles)
 	{
-		foreach ((array) $needles as $needle)
+		foreach (array_filter((array) $needles) as $needle)
 		{
-			if ((string) $needle === substr($haystack, -strlen($needle))) return true;
+			if (StaticStringy::endsWith($haystack, $needle)) return true;
 		}
 
 		return false;
@@ -133,7 +128,7 @@ class Str {
 	 */
 	public static function length($value)
 	{
-		return mb_strlen($value);
+		return StaticStringy::length($value);
 	}
 
 	/**
@@ -159,7 +154,7 @@ class Str {
 	 */
 	public static function lower($value)
 	{
-		return mb_strtolower($value);
+		return StaticStringy::toLowerCase($value);
 	}
 
 	/**
@@ -251,7 +246,7 @@ class Str {
 	 */
 	public static function upper($value)
 	{
-		return mb_strtoupper($value);
+		return StaticStringy::toUpperCase($value);
 	}
 
 	/**
@@ -262,7 +257,7 @@ class Str {
 	 */
 	public static function title($value)
 	{
-		return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
+		return StaticStringy::toTitleCase($value);
 	}
 
 	/**
@@ -332,9 +327,9 @@ class Str {
 	 */
 	public static function startsWith($haystack, $needles)
 	{
-		foreach ((array) $needles as $needle)
+		foreach (array_filter((array) $needles) as $needle)
 		{
-			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
+			if (StaticStringy::startsWith($haystack, $needle)) return true;
 		}
 
 		return false;
