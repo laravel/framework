@@ -149,15 +149,21 @@ class Validator implements MessageProviderInterface {
 	/**
 	 * Parse the data and hydrate the files array.
 	 *
-	 * @param  array  $data
+	 * @param  array   $data
+	 * @param  string  $arrayKey
 	 * @return array
 	 */
-	protected function parseData(array $data)
+	protected function parseData(array $data, $arrayKey = null)
 	{
-		$this->files = array();
+		if (is_null($arrayKey))
+		{
+			$this->files = array();
+		}
 
 		foreach ($data as $key => $value)
 		{
+			$key = ($arrayKey) ? "$arrayKey.$key" : $key;
+
 			// If this value is an instance of the HttpFoundation File class we will
 			// remove it from the data array and add it to the files array, which
 			// we use to conveniently separate out these files from other data.
@@ -166,6 +172,10 @@ class Validator implements MessageProviderInterface {
 				$this->files[$key] = $value;
 
 				unset($data[$key]);
+			}
+			elseif (is_array($value))
+			{
+				$this->parseData($value, $key);
 			}
 		}
 
