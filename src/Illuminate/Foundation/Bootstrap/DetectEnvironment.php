@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv;
+use InvalidArgumentException;
 use Illuminate\Contracts\Foundation\Application;
 
 class DetectEnvironment {
@@ -13,9 +14,13 @@ class DetectEnvironment {
 	 */
 	public function bootstrap(Application $app)
 	{
-		if (file_exists($app['path.base'].'/.env'))
+		try
 		{
 			Dotenv::load($app['path.base']);
+		}
+		catch (InvalidArgumentException $e)
+		{
+			//
 		}
 
 		$app->detectEnvironment(function()
