@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Session;
 
+use SessionHandlerInterface;
 use Illuminate\Database\ConnectionInterface;
 
-class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAwareInterface {
+class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface {
 
 	/**
 	 * The database connection instance.
