@@ -12,6 +12,13 @@ class EventServiceProvider extends ServiceProvider {
 	 * @var array
 	 */
 	protected $scan = [];
+	
+	/**
+	 * The subscriber classes to register.
+	 * 
+	 * @var array
+	 */
+	protected $subscribe = [];
 
 	/**
 	 * Determines if we will auto-scan in the local environment.
@@ -44,6 +51,11 @@ class EventServiceProvider extends ServiceProvider {
 			{
 				$events->listen($event, $listener);
 			}
+		}
+		
+		foreach ($this->subscribe as $subscriber)
+		{
+			$events->subscribe($subscriber);
 		}
 	}
 
