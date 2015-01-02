@@ -29,7 +29,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 				$this->filesystem->deleteDirectory($directory);
 			}
 		}
-		foreach($$this->filesystem->files(self::$testDirectory) as $file){
+		foreach($this->filesystem->files(self::$testDirectory) as $file){
 			if( !in_array($file,self::$excludedFromDelete)){
 				$this->filesystem->delete($file);
 			}
