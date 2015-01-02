@@ -964,20 +964,7 @@ class Validator implements ValidatorContract {
 			return $value->getSize() / 1024;
 		}
 
-		return $this->getStringSize($value);
-	}
-
-	/**
-	 * Get the size of a string.
-	 *
-	 * @param  string  $value
-	 * @return int
-	 */
-	protected function getStringSize($value)
-	{
-		if (function_exists('mb_strlen')) return mb_strlen($value);
-
-		return strlen($value);
+		return mb_strlen($value);
 	}
 
 	/**
