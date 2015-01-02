@@ -3,8 +3,9 @@
 use ArrayObject;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
-class Response extends \Symfony\Component\HttpFoundation\Response {
+class Response extends BaseResponse {
 
 	use ResponseTrait;
 
