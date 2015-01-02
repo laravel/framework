@@ -7,8 +7,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
-class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectResponse {
+class RedirectResponse extends BaseRedirectResponse {
 
 	/**
 	 * The request instance.
