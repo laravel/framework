@@ -10,9 +10,10 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "ext-mbstring": "*",
         "illuminate/contracts": "5.0.*",
         "doctrine/inflector": "~1.0",
-        "patchwork/utf8": "~1.1"
+        "danielstjules/stringy": "~1.5"
     },
     "require-dev": {
         "jeremeamia/superclosure": "~1.0.1"

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Support;
 
-use Patchwork\Utf8;
 use RuntimeException;
+use Stringy\StaticStringy;
 use Illuminate\Support\Traits\Macroable;
 
 class Str {
@@ -37,7 +37,7 @@ class Str {
 	 */
 	public static function ascii($value)
 	{
-		return Utf8::toAscii($value);
+		return StaticStringy::toAscii($value);
 	}
 
 	/**
