@@ -94,6 +94,83 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	}
 
 	/**
+	 * Find a related model by its primary key or return new instance of the related model.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
+	 */
+	public function findOrNew($id, $columns = array('*'))
+	{
+		if (is_null($instance = $this->find($id, $columns)))
+		{
+			$instance = $this->related->newInstance();
+
+			// When saving a polymorphic relationship, we need to set not only the foreign
+			// key, but also the foreign key type, which is typically the class name of
+			// the parent model. This makes the polymorphic item unique in the table.
+			$this->setForeignAttributesForCreate($instance);
+		}
+
+		return $instance;
+	}
+
+	/**
+	 * Get the first related model record matching the attributes or instantiate it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function firstOrNew(array $attributes)
+	{
+		if (is_null($instance = $this->where($attributes)->first()))
+		{
+			$instance = $this->related->newInstance();
+
+			// When saving a polymorphic relationship, we need to set not only the foreign
+			// key, but also the foreign key type, which is typically the class name of
+			// the parent model. This makes the polymorphic item unique in the table.
+			$this->setForeignAttributesForCreate($instance);
+		}
+
+		return $instance;
+	}
+
+	/**
+	 * Get the first related record matching the attributes or create it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function firstOrCreate(array $attributes)
+	{
+		if (is_null($instance = $this->where($attributes)->first()))
+		{
+			$instance = $this->create($attributes);
+		}
+
+		return $instance;
+	}
+
+	/**
+	 * Create or update a related record matching the attributes, and fill it with values.
+	 *
+	 * @param  array  $attributes
+	 * @param  array  $values
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function updateOrCreate(array $attributes, array $values = array())
+	{
+		$instance = $this->firstOrNew($attributes);
+
+		$instance->fill($values);
+
+		$instance->save();
+
+		return $instance;
+	}
+
+	/**
 	 * Create a new instance of the related model.
 	 *
 	 * @param  array  $attributes

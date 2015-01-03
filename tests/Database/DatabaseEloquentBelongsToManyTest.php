@@ -271,6 +271,85 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($model, $relation->create(array('attributes'), array('joining')));
 	}
 
+	public function testFindOrNewMethodFindsModel()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('find'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue($model = m::mock('StdClass')));
+		$relation->getRelated()->shouldReceive('newInstance')->never();
+
+		$this->assertTrue($relation->findOrNew('foo') instanceof StdClass);
+	}
+
+	public function testFindOrNewMethodReturnsNewModel()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('find'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue(null));
+		$relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'));
+
+		$this->assertTrue($relation->findOrNew('foo') instanceof StdClass);
+	}
+
+	public function testFirstOrNewMethodFindsFirstModel()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('where')->with(array('foo'))->will($this->returnValue($relation->getQuery()));
+		$relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
+		$relation->getRelated()->shouldReceive('newInstance')->never();
+
+		$this->assertTrue($relation->firstOrNew(array('foo')) instanceof StdClass);
+	}
+
+	public function testFirstOrNewMethodReturnsNewModel()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('where')->with(array('foo'))->will($this->returnValue($relation->getQuery()));
+		$relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
+		$relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'));
+
+		$this->assertTrue($relation->firstOrNew(array('foo')) instanceof StdClass);
+	}
+
+	public function testFirstOrCreateMethodFindsFirstModel()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where','create'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('where')->with(array('foo'))->will($this->returnValue($relation->getQuery()));
+		$relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
+		$relation->expects($this->never())->method('create')->with(array('foo'))->will($this->returnValue(null));
+
+		$this->assertTrue($relation->firstOrCreate(array('foo')) instanceof StdClass);
+	}
+
+	public function testFirstOrCreateMethodReturnsNewModel()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where','create'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('where')->with(array('foo'))->will($this->returnValue($relation->getQuery()));
+		$relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
+		$relation->expects($this->once())->method('create')->with(array('foo'))->will($this->returnValue($model = m::mock('StdClass')));
+
+		$this->assertTrue($relation->firstOrCreate(array('foo')) instanceof StdClass);
+	}
+
+	public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where','create'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('where')->with(array('foo'))->will($this->returnValue($relation->getQuery()));
+		$relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
+		$model->shouldReceive('fill')->once();
+		$model->shouldReceive('save')->once();
+		$relation->expects($this->never())->method('create')->with(array('foo'))->will($this->returnValue(null));
+
+		$this->assertTrue($relation->updateOrCreate(array('foo')) instanceof StdClass);
+	}
+
+	public function testUpdateOrCreateMethodReturnsNewModel()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where','create'), $this->getRelationArguments());
+		$relation->expects($this->once())->method('where')->with(array('bar'))->will($this->returnValue($relation->getQuery()));
+		$relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
+		$relation->expects($this->once())->method('create')->with(array('foo'))->will($this->returnValue($model = m::mock('StdClass')));
+
+		$this->assertTrue($relation->updateOrCreate(array('bar'),array('foo')) instanceof StdClass);
+	}
 
 	/**
 	 * @dataProvider syncMethodListProvider
