@@ -189,7 +189,7 @@ abstract class HasOneOrMany extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
 	 */
-	public function findOrNew($id, $columns = array('*'))
+	public function findOrNew($id, $columns = ['*'])
 	{
 		if (is_null($instance = $this->find($id, $columns)))
 		{
@@ -242,7 +242,7 @@ abstract class HasOneOrMany extends Relation {
 	 * @param  array  $values
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function updateOrCreate(array $attributes, array $values = array())
+	public function updateOrCreate(array $attributes, array $values = [])
 	{
 		$instance = $this->firstOrNew($attributes);
 
