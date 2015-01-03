@@ -519,7 +519,7 @@ class BelongsToMany extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
 	 */
-	public function findOrNew($id, $columns = array('*'))
+	public function findOrNew($id, $columns = ['*'])
 	{
 		if (is_null($instance = $this->find($id, $columns)))
 		{
@@ -551,7 +551,7 @@ class BelongsToMany extends Relation {
 	 * @param  array  $attributes
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function firstOrCreate(array $attributes, array $joining = array(), $touch = true)
+	public function firstOrCreate(array $attributes, array $joining = [], $touch = true)
 	{
 		if (is_null($instance = $this->where($attributes)->first()))
 		{
@@ -568,18 +568,16 @@ class BelongsToMany extends Relation {
 	 * @param  array  $values
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function updateOrCreate(array $attributes, array $values = array(), array $joining = array(), $touch = true)
+	public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
 	{
 		if (is_null($instance = $this->where($attributes)->first()))
 		{
-			$instance = $this->create($values, $joining, $touch);
+			return $this->create($values, $joining, $touch);
 		}
-		else
-		{
-			$instance->fill($values);
 
-			$instance->save(array('touch' => false));
-		}
+		$instance->fill($values);
+
+		$instance->save(['touch' => false]);
 
 		return $instance;
 	}
