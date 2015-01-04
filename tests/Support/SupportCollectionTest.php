@@ -46,6 +46,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testToSentence()
+	{
+		$c = new Collection;
+		$this->assertEquals('', $c->toSentence('key'));
+
+		$c = new Collection([['key' => 'foo']]);
+		$this->assertEquals('foo', $c->toSentence('key'));
+
+		$c = new Collection([['key' => 'foo'], ['key' => 'bar']]);
+		$this->assertEquals('foo and bar', $c->toSentence('key'));
+
+		$c = new Collection([['key' => 'foo'], ['key' => 'bar'], ['key' => 'bat']]);
+		$this->assertEquals('foo, bar and bat', $c->toSentence('key'));
+	}
+
+
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
 		$item1 = m::mock('Illuminate\Contracts\Support\Arrayable');
