@@ -13,15 +13,15 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		if ($this->filesystem == null)
 			$this->filesystem = new Filesystem();
 		$tempFiles = ['foo','bar','foo.txt','bar.txt','file.txt','file.php','tmp','tmp2'];
-		foreach ($tempFiles as $item)
+		foreach ($tempFiles as $item) 
 		{
-			if($this->filesystem->isDirectory(self::$testDirectory.DIRECTORY_SEPARATOR.$item))
+			if($this->filesystem->isDirectory(self::$testDirectory.'/'.$item))
 			{
-				$this->filesystem->deleteDirectory(self::$testDirectory.DIRECTORY_SEPARATOR.$item);
+				$this->filesystem->deleteDirectory(self::$testDirectory.'/'.$item);
 			}
-			else if($this->filesystem->isFile(self::$testDirectory.DIRECTORY_SEPARATOR.$item))
+			else if($this->filesystem->isFile(self::$testDirectory.'/'.$item))
 			{
-				$this->filesystem->delete(self::$testDirectory.DIRECTORY_SEPARATOR.$item);
+				$this->filesystem->delete(self::$testDirectory.'/'.$item);
 			}
 		}
 	}
