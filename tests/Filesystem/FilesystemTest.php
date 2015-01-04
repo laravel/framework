@@ -10,15 +10,17 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
-		if($this->filesystem == null){
+		if ($this->filesystem == null)
 			$this->filesystem = new Filesystem();
-		}
 		$tempFiles = ['foo','bar','foo.txt','bar.txt','file.txt','file.php','tmp','tmp2'];
-		foreach ($tempFiles as $item) {
-			if($this->filesystem->isDirectory(self::$testDirectory.DIRECTORY_SEPARATOR.$item)){
+		foreach ($tempFiles as $item)
+		{
+			if($this->filesystem->isDirectory(self::$testDirectory.DIRECTORY_SEPARATOR.$item))
+			{
 				$this->filesystem->deleteDirectory(self::$testDirectory.DIRECTORY_SEPARATOR.$item);
 			}
-			else if($this->filesystem->isFile(self::$testDirectory.DIRECTORY_SEPARATOR.$item)){
+			else if($this->filesystem->isFile(self::$testDirectory.DIRECTORY_SEPARATOR.$item))
+			{
 				$this->filesystem->delete(self::$testDirectory.DIRECTORY_SEPARATOR.$item);
 			}
 		}
