@@ -735,6 +735,34 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Get a collection of items as a sentence.
+	 *
+	 * @param  string  $key
+	 * @param  string  $wordsConnector
+	 * @param  string  $twoWordsConnector
+	 * @param  string  $lastWordConnector
+	 * @return string
+	 */
+	public function toSentence($key, $wordsConnector = ', ', $twoWordsConnector = ' and ', $lastWordConnector = ', and ')
+	{
+		switch ($this->count()) 
+		{
+			case 0:
+				return '';
+
+			case 1:
+				return array_get($this->first(), $key);
+
+			case 2:
+				return $this->implode($key, $twoWordsConnector);
+
+			default:
+				$lastWord = $this->pop();
+				return $this->implode($key, $wordsConnector) . $lastWordConnector . array_get($lastWord, $key);
+		}
+	}
+
+	/**
 	 * Get the collection of items as a plain array.
 	 *
 	 * @return array
