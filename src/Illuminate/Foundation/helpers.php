@@ -559,11 +559,11 @@ if ( ! function_exists('env'))
 			case '(false)':
 				return false;
 
-                        case 'null':
+			case 'null':
 			case '(null)':
 				return null;
 
-                        case 'empty':
+			case 'empty':
 			case '(empty)':
 				return '';
 		}
