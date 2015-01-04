@@ -13,7 +13,8 @@
         "ext-mbstring": "*",
         "illuminate/contracts": "5.0.*",
         "doctrine/inflector": "~1.0",
-        "danielstjules/stringy": "~1.5"
+        "danielstjules/stringy": "~1.5",
+        "symfony/var-dumper": "2.6.*"
     },
     "require-dev": {
         "jeremeamia/superclosure": "~1.0.1"
