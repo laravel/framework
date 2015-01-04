@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Queue\Failed;
 
+use Exception;
+
 interface FailedJobProviderInterface {
 
 	/**
@@ -8,9 +10,10 @@ interface FailedJobProviderInterface {
 	 * @param  string  $connection
 	 * @param  string  $queue
 	 * @param  string  $payload
+	 * @param  \Exception|null  $exception
 	 * @return void
 	 */
-	public function log($connection, $queue, $payload);
+	public function log($connection, $queue, $payload, Exception $exception = null);
 
 	/**
 	 * Get a list of all of the failed jobs.
