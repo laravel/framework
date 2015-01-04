@@ -203,7 +203,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function forget($key)
 	{
-		unset($this->items[$key]);
+		$this->offsetUnset($key);
 	}
 
 	/**
@@ -418,7 +418,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function push($value)
 	{
-		$this->items[] = $value;
+		$this->offsetSet(null, $value);
 	}
 
 	/**
@@ -442,7 +442,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function put($key, $value)
 	{
-		$this->items[$key] = $value;
+		$this->offsetSet($key, $value);
 	}
 
 	/**
