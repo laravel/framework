@@ -26,9 +26,9 @@ trait ApplicationTrait {
 	 */
 	protected function refreshApplication()
 	{
-		$this->app = $this->createApplication();
-
 		putenv('APP_ENV=testing');
+		
+		$this->app = $this->createApplication();
 	}
 
 	/**
